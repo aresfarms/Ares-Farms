@@ -1,0 +1,11 @@
+import { calculatePropertyScore } from "./src/services/scoring/calculatePropertyScore";
+
+const result = calculatePropertyScore({
+  creditScore: 780,
+  liquidity: 150000,
+  experienceLevel: 5,
+  collateralEquity: 300000,
+  acreage: 120,
+});
+
+console.log(JSON.stringify(result, null, 2));

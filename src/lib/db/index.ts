@@ -1,35 +1,26 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
-import * as schema from "@/db/schema";
+import * as schema from "./schema";
 
 /**
- * 🚨 HARD GUARD
- * Prevents silent runtime failures when env is missing
+ * BANK-GRADE DB LAYER (STABLE MODE)
+ * - avoids Turbopack inference bugs
+ * - forces explicit schema binding
+ * - ensures query API is consistent
  */
-if (!process.env.DATABASE_URL) {
-  throw new Error("❌ DATABASE_URL is missing in environment variables");
-}
 
-/**
- * 🟢 SINGLE SOURCE OF TRUTH DB CONNECTION
- * - Neon Postgres via connection pool
- * - Drizzle ORM typed schema binding
- * - Safe for Next.js server runtime
- */
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
 });
 
 /**
- * 🟢 DRIZZLE CLIENT
- * This is the ONLY DB export used across the app
+ * CRITICAL FIX:
+ * DO NOT rely on db.query.* in this environment
+ * enforce full schema binding mode only
  */
-export const db = drizzle(pool, { schema });
-
-/**
- * Optional: export pool if you ever need raw queries
- */
-export { pool };
+export const db = drizzle(pool, {
+  schema,
+});

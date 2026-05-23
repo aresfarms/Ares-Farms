@@ -1,33 +1,62 @@
 import { NextResponse } from "next/server";
-import { orchestrateFarmDecision } from "@/lib/engine/orchestrator";
-import { EMPTY_FARM_RESPONSE } from "@/lib/contracts/farmDecisionContract";
-
-/**
- * 🧠 FARM LOAN DECISION API ROUTE
- * Phase 5–6 orchestrated + contract-safe version
- */
+import { writeAuditEvent } from "@/lib/audit/writeAuditEvent";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    const result = orchestrateFarmDecision(body);
+    const {
+      userId = "unknown",
+      eventType = "PIPELINE_RUN",
+      decision,
+      compositeScore,
+      riskScore,
+      input,
+      output,
+      trace,
+    } = body;
 
-    return NextResponse.json(result);
+    // Basic validation (fail fast, deterministic behavior)
+    if (!decision) {
+      return NextResponse.json(
+        { ok: false, error: "Missing decision" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      typeof compositeScore !== "number" ||
+      typeof riskScore !== "number"
+    ) {
+      return NextResponse.json(
+        { ok: false, error: "Invalid scores" },
+        { status: 400 }
+      );
+    }
+
+    // 🔒 ALL AUDIT WRITES NOW FLOW THROUGH CANONICAL WRITER
+    const auditRecord = await writeAuditEvent({
+      userId,
+      eventType,
+      decision,
+      compositeScore,
+      riskScore,
+      input,
+      output,
+      trace,
+    });
+
+    return NextResponse.json({
+      ok: true,
+      auditId: auditRecord.id,
+    });
   } catch (err: any) {
-    console.error("applyEngine error:", err);
-
     return NextResponse.json(
       {
-        ...EMPTY_FARM_RESPONSE,
-        system: {
-          pipelineVersion: "phase-6-fallback",
-          status: "fallback",
-        },
+        ok: false,
+        error: err?.message ?? "Unknown error",
       },
-      {
-        status: 200, // keep UI stable, never break frontend
-      }
+      { status: 500 }
     );
   }
 }

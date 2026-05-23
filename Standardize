@@ -1,0 +1,80 @@
+export type CanonicalValidationResult = {
+  healthy: boolean;
+  total: number;
+  brokenCount: number;
+  issues: Array<{
+    index: number;
+    id: string;
+    reason: string;
+  }>;
+};
+
+/**
+ * Canonical Chain Validator (STRICT CONTRACT)
+ *
+ * Rules:
+ * - MUST return flat structure (no nested "summary")
+ * - MUST be deterministic
+ * - MUST not throw (only report)
+ * - FULL responsibility: integrity check of prevHash → eventHash linkage
+ */
+export async function validateCanonicalChain(
+  rows: any[]
+): Promise<CanonicalValidationResult> {
+  const issues: CanonicalValidationResult["issues"] = [];
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return {
+      healthy: false,
+      total: 0,
+      brokenCount: 0,
+      issues: [
+        {
+          index: -1,
+          id: "EMPTY",
+          reason: "Canonical chain is empty",
+        },
+      ],
+    };
+  }
+
+  let prevHash: string | null = null;
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+
+    // normalize field access defensively
+    const id = row?.id ?? "UNKNOWN";
+    const currentPrevHash = row?.prevHash ?? null;
+    const eventHash = row?.eventHash ?? null;
+
+    // Rule 1: hash must exist
+    if (!eventHash) {
+      issues.push({
+        index: i,
+        id,
+        reason: "Missing eventHash",
+      });
+    }
+
+    // Rule 2: chain linkage must match
+    if (currentPrevHash !== prevHash) {
+      issues.push({
+        index: i,
+        id,
+        reason: `Broken prevHash link (expected ${prevHash}, got ${currentPrevHash})`,
+      });
+    }
+
+    prevHash = eventHash;
+  }
+
+  const brokenCount = issues.length;
+
+  return {
+    healthy: brokenCount === 0,
+    total: rows.length,
+    brokenCount,
+    issues,
+  };
+}

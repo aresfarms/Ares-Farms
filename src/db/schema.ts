@@ -1,39 +1,30 @@
-import {
-  pgTable,
-  uuid,
-  text,
-  timestamp,
-  jsonb,
-} from "drizzle-orm/pg-core";
+/**
+ * Canonical Schema Bridge
+ *
+ * Master Volume Series Governance:
+ * - Vol I: Establishes one authoritative schema authority.
+ * - Vol II: Maintains controlled governance routing.
+ * - Vol III: Eliminates duplicate schema infrastructure paths.
+ * - Vol IV: Supports deterministic operational recovery.
+ * - Vol V: Enables replayability, observability, explainability,
+ *           and canonical backend migration sequencing.
+ *
+ * Purpose:
+ * Legacy imports using:
+ *
+ *   "@/db/schema"
+ *
+ * are redirected into the governed canonical schema spine:
+ *
+ *   src/db/schema/
+ *
+ * Rule:
+ * All future schema definitions must originate from:
+ *
+ *   src/db/schema/index.ts
+ *
+ * Duplicate schema definitions outside the canonical spine
+ * are prohibited during future migration phases.
+ */
 
-export const users = pgTable("users", {
-  id: uuid("id").primaryKey(),
-  email: text("email").notNull(),
-  name: text("name"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-export const properties = pgTable("properties", {
-  id: uuid("id").primaryKey(),
-
-  userId: uuid("user_id").notNull(),
-
-  name: text("name"),
-  address: text("address"),
-  city: text("city"),
-
-  state: text("state").notNull(),
-
-  // REQUIRED for your onboarding + regional logic
-  county: text("county").notNull(),
-
-  // US regional system (your architecture requirement)
-  federalRegion: text("federal_region").notNull(),   // NE, South, Midwest, West
-  internalRegion: text("internal_region").notNull(), // your custom grouping layer
-
-  country: text("country").notNull().default("US"),
-
-  metadata: jsonb("metadata"),
-
-  createdAt: timestamp("created_at").defaultNow(),
-});
+export * from "./schema/index";

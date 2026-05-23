@@ -23,6 +23,9 @@ export default function DashboardPage() {
       });
 
       const json = await res.json();
+
+      console.log("🔥 RAW API RESPONSE:", json);
+
       setData(json);
     }
 
@@ -30,35 +33,43 @@ export default function DashboardPage() {
   }, []);
 
   if (!data) {
-    return <div style={{ padding: 24 }}>Loading Farm Loan Decision Dashboard...</div>;
+    return (
+      <div style={{ padding: 24 }}>
+        Loading Farm Loan Decision Dashboard...
+      </div>
+    );
   }
 
-  const decision = data.decision || {};
-  const scores = data.scores || {};
+  const decision = data?.decision ?? {};
+  const scores = data?.scores ?? {};
 
   return (
     <main style={{ padding: 24, fontFamily: "Arial" }}>
       <h1>Farm Loan Decision Dashboard</h1>
 
-      <h2>Tenant ID: {data.tenantId}</h2>
+      <h2>Tenant ID: {data?.userId ?? "unknown"}</h2>
 
-      <h2>SBA Score: {(scores.sba * 100).toFixed(1)}%</h2>
+      <h2>
+        SBA Score: {((scores?.sba ?? 0) * 100).toFixed(1)}%
+      </h2>
 
       <h3>Score Breakdown</h3>
       <ul>
-        <li>Credit: {(scores.credit * 100).toFixed(1)}%</li>
-        <li>Liquidity: {(scores.liquidity * 100).toFixed(1)}%</li>
-        <li>Experience: {(scores.experience * 100).toFixed(1)}%</li>
-        <li>Collateral: {(scores.collateral * 100).toFixed(1)}%</li>
-        <li>Acreage: {(scores.acreage * 100).toFixed(1)}%</li>
+        <li>Credit: {((scores?.credit ?? 0) * 100).toFixed(1)}%</li>
+        <li>Liquidity: {((scores?.liquidity ?? 0) * 100).toFixed(1)}%</li>
+        <li>Experience: {((scores?.experience ?? 0) * 100).toFixed(1)}%</li>
+        <li>Collateral: {((scores?.collateral ?? 0) * 100).toFixed(1)}%</li>
+        <li>Acreage: {((scores?.acreage ?? 0) * 100).toFixed(1)}%</li>
       </ul>
 
       <h3>Farm Recommendations</h3>
 
       <h4>Crops</h4>
       <ul>
-        {decision.crops?.length ? (
-          decision.crops.map((c: string, i: number) => <li key={i}>{c}</li>)
+        {decision?.crops?.length ? (
+          decision.crops.map((c: string, i: number) => (
+            <li key={i}>{c}</li>
+          ))
         ) : (
           <li>No crop recommendations yet.</li>
         )}
@@ -66,8 +77,10 @@ export default function DashboardPage() {
 
       <h4>Livestock</h4>
       <ul>
-        {decision.livestock?.length ? (
-          decision.livestock.map((l: string, i: number) => <li key={i}>{l}</li>)
+        {decision?.livestock?.length ? (
+          decision.livestock.map((l: string, i: number) => (
+            <li key={i}>{l}</li>
+          ))
         ) : (
           <li>No livestock recommendations yet.</li>
         )}
@@ -75,8 +88,10 @@ export default function DashboardPage() {
 
       <h4>Equipment</h4>
       <ul>
-        {decision.equipment?.length ? (
-          decision.equipment.map((e: string, i: number) => <li key={i}>{e}</li>)
+        {decision?.equipment?.length ? (
+          decision.equipment.map((e: string, i: number) => (
+            <li key={i}>{e}</li>
+          ))
         ) : (
           <li>No equipment recommendations yet.</li>
         )}
@@ -84,8 +99,10 @@ export default function DashboardPage() {
 
       <h4>Vendors</h4>
       <ul>
-        {decision.vendors?.length ? (
-          decision.vendors.map((v: string, i: number) => <li key={i}>{v}</li>)
+        {decision?.vendors?.length ? (
+          decision.vendors.map((v: string, i: number) => (
+            <li key={i}>{v}</li>
+          ))
         ) : (
           <li>No vendor recommendations yet.</li>
         )}

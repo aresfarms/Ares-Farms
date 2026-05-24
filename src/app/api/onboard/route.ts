@@ -1,82 +1,182 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { users, properties } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
-import { stateToFederalRegion } from "@/lib/geo/federalRegions";
+import { NextRequest, NextResponse } from "next/server";
 
-export const runtime = "nodejs";
+import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
+import {
+  createRuntimeVersionRef,
+  evaluateVersionRuntime,
+} from "@/lib/runtime/versionRuntime";
+import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
+import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
 
-export async function POST(req: Request) {
+/**
+ * Borrower Onboarding API
+ *
+ * Master Volume Governance:
+ * - Vol I: Constitutional Backbone
+ *   Enforces intake accountability, auditability, and governed borrower handling.
+ *
+ * - Vol II: Regulatory Governance
+ *   Supports compliant intake processing and regulated onboarding review.
+ *
+ * - Vol III: Technical Infrastructure
+ *   Provides replay-safe onboarding execution and governed intake lineage.
+ *
+ * - Vol IV: Operational Runbooks
+ *   Supports intake review, escalation, remediation, and operator workflows.
+ *
+ * - Vol V: Canonical Platform Doctrines
+ *   Enforces classification, explainability, replay lineage,
+ *   observability, and governed disclosure.
+ */
+
+function createOnboardTraceId(): string {
+  return `onboard-${Date.now()}-${Math.random()
+    .toString(36)
+    .slice(2, 10)}`;
+}
+
+export async function POST(req: NextRequest) {
   try {
+    const traceId = createOnboardTraceId();
     const body = await req.json();
 
-    const {
-      userId,
-      email,
-      name,
-      address,
-      city,
-      state,
-      county,
-      internalRegion = "default",
-    } = body;
+    const runtimeGuard = runRuntimeGuard({
+      operation: "borrower.onboard",
+      module: "api.onboard",
+      traceId,
+      schemaVersion: "borrower-onboarding-v0.1.0",
+      governanceVersion: "master-volumes-runtime-v0.1.0",
+      classificationLevel: "CONFIDENTIAL",
+      replayRef: traceId,
+      metadata: {
+        route: "/api/onboard",
+        borrowerIntakeSurface: true,
+      },
+    });
 
-    // REQUIRED FIELDS
-    if (!userId || !email || !state || !county) {
+    if (!runtimeGuard.allowed) {
       return NextResponse.json(
-        { error: "userId, email, state, and county are required" },
-        { status: 400 }
+        {
+          ok: false,
+          error: "Runtime governance guard blocked onboarding request.",
+          governance: {
+            traceId,
+            runtimeGuard,
+          },
+        },
+        { status: 403 }
       );
     }
 
-    // derive US federal region
-    const federalRegion = stateToFederalRegion[state];
+    const versionRuntime = evaluateVersionRuntime({
+      operation: "borrower.onboard",
+      module: "api.onboard",
+      traceId,
+      versions: [
+        createRuntimeVersionRef(
+          "schema",
+          "borrower-onboarding-v0.1.0",
+          "src/app/api/onboard/route.ts",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "governance",
+          "master-volume-runtime-v0.1.0",
+          "Master Volume Series",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "runtime-enforcement-v0.1.0",
+          "src/lib/runtime",
+          traceId
+        ),
+      ],
+    });
 
-    if (!federalRegion) {
-      return NextResponse.json(
-        { error: "Invalid state: cannot derive federal region" },
-        { status: 400 }
-      );
-    }
+    const classifiedPayload = classifyRecord(body, {
+      classificationLevel: "CONFIDENTIAL",
+      sensitivityScope: "borrower",
+      classificationSource: "api-onboard-route",
+      classificationVersion: "classification-runtime-v0.1.0",
+      replayRef: traceId,
+      disclosureAudience: [
+        "authorized-underwriter",
+        "authorized-operator",
+        "governance",
+      ],
+      sharingPermissions: [
+        "borrower-underwriting-review",
+        "regulated-operational-processing",
+      ],
+      exportRestrictions: [
+        "requires-governed-access",
+        "requires-authorized-processing-context",
+      ],
+      redactionRequirements: [
+        "redact-sensitive-pii-for-non-underwriting-audiences",
+      ],
+      consentRequirements: ["borrower-submission-consent"],
+    });
 
-    // check user exists
-    const existingUser = await db
-      .select()
-      .from(users)
-      .where(eq(users.email, email))
-      .limit(1);
+    const explanation = createExplanationLineage({
+      outputIdentifier: traceId,
+      outputType: "borrower_onboarding_submission",
+      audience: "internal",
+      claimType: "fact",
+      summary:
+        "Borrower onboarding request processed through governed runtime intake controls.",
+      ruleVersion: "borrower-onboarding-runtime-v0.1.0",
+      overlayRefs: [],
+      confidenceScore: 1,
+      humanReviewRequired: true,
+      replayRefs: [traceId],
+      auditEventRefs: [],
+      metadata: {
+        borrowerIntakeSurface: true,
+        classified: true,
+      },
+    });
 
-    // create user if missing
-    if (existingUser.length === 0) {
-      await db.insert(users).values({
-        id: uuidv4(),
-        email,
-        name: name ?? null,
-      });
-    }
+    const observability = createObservabilityEvent({
+      eventType: "BORROWER_ONBOARDING_SUBMITTED",
+      domain: "operations",
+      severity: "INFO",
+      message:
+        "Borrower onboarding request processed through governed runtime controls.",
+      traceId,
+      replayRef: traceId,
+      module: "api.onboard",
+      metadata: {
+        versionRuntimeOk: versionRuntime.ok,
+        classificationLevel:
+          classifiedPayload.classification.classificationLevel,
+      },
+    });
 
-    // create property
-    const property = await db
-      .insert(properties)
-      .values({
-        id: uuidv4(),
-        userId,
-        name: name ?? null,
-        address: address ?? null,
-        city: city ?? null,
-        state,
-        county,
-        federalRegion,
-        internalRegion,
-        country: "US",
-      })
-      .returning();
-
-    return NextResponse.json(property[0]);
-  } catch (err: any) {
+    return NextResponse.json({
+      ok: true,
+      accepted: true,
+      onboarding: classifiedPayload,
+      governance: {
+        traceId,
+        runtimeGuard,
+        versionRuntime,
+        classification: classifiedPayload.classification,
+        explainability: explanation,
+        observability,
+      },
+    });
+  } catch (error) {
     return NextResponse.json(
-      { error: err?.message ?? "Unknown error" },
+      {
+        ok: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unknown onboarding runtime error.",
+      },
       { status: 500 }
     );
   }

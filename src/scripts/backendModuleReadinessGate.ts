@@ -427,6 +427,7 @@ function main() {
     "smoke:source-promotion-packets",
     "smoke:production-regulatory-response",
     "smoke:build-preservation",
+    "smoke:doctrine-gap-ledger",
     "smoke:integration",
     "smoke:modules",
     "smoke:platform",
@@ -444,6 +445,7 @@ function main() {
     "smoke:scraper-source-apis",
     "smoke:revenue-source-apis",
     "smoke:source-stack-apis",
+    "smoke:doctrine-gap-ledger",
     "smoke:source-legal-review",
     "smoke:source-promotion-packets",
     "smoke:persistence",
@@ -1568,6 +1570,36 @@ function main() {
       "Build preservation runtime, API, internal surface, documentation, build snapshot evidence pack, module integration, integration smoke, and backend smoke coverage are wired while production launch, deployment, public API exposure, portal launch, payments, notices, reports, public verification, official reliance, legal advice, regulatory response, corrective-action commitment, remediation execution, and live external actions remain blocked.",
     failDetail:
       "Build preservation runtime, route, page, documentation, evidence pack, matrix references, or smoke coverage is missing.",
+  });
+
+  check(checks, {
+    id: "backend-module.doctrine-to-code-gap-ledger-gate",
+    area: "governance",
+    passed:
+      allExist([
+        "src/lib/governance/doctrineToCodeGapLedgerGate.ts",
+        "src/app/api/governance/doctrine-gap-ledger/route.ts",
+        "src/app/doctrine-gap-ledger/page.tsx",
+        "src/scripts/doctrineToCodeGapLedgerGateSmokeTest.ts",
+        "docs/MODULE_43_DOCTRINE_TO_CODE_GAP_LEDGER.md",
+        "docs/DOCTRINE_TO_CODE_GAP_LEDGER.md",
+        "docs/current-master-volume-registry.json",
+      ]) &&
+      allIncluded(scripts["smoke:integration"] ?? "", [
+        "smoke:doctrine-gap-ledger",
+      ]) &&
+      allIncluded(scripts["smoke:backend"] ?? "", [
+        "smoke:doctrine-gap-ledger",
+      ]) &&
+      allIncluded(coverageMatrix, [
+        "Doctrine-to-code gap ledger gate",
+      ]),
+    summary:
+      "Doctrine-to-code gap ledger must name every awaiting-controlled-promotion requirement with owner, route, blocked reason, required evidence, promotion condition, human authority, and current Master Volume version evidence.",
+    passDetail:
+      "Doctrine-to-code gap ledger runtime, API, internal surface, documentation, module integration, integration smoke, backend smoke coverage, current Master Volume registry evidence, named gap tickets, human authority boundaries, and production authority blocks are wired while production launch, public API exposure, portal launch, payments, notices, official reports, public verification, official reliance, legal advice, and live external actions remain blocked.",
+    failDetail:
+      "Doctrine-to-code gap ledger runtime, route, page, documentation, current version registry, matrix references, or smoke coverage is missing.",
   });
 
   check(checks, {

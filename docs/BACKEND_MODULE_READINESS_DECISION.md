@@ -147,6 +147,7 @@ The following are module or promotion work, not missing backend foundation:
 | Regulatory examination package approval, regulator submission, or evidence archive certification | Requires Module 40 production regulatory examination gate review, Module 39 production reliance verification review, examination scope review, archive completeness review, retention/legal-hold review, audit/replay export review, privacy/redaction/public-records review, regulatory communication review, source/report/notice/payment/legal/live-action boundary review, qualified legal/compliance review, and qualified human approval. |
 | Regulatory response package approval, corrective-action commitment, or remediation execution | Requires Module 41 production regulatory response gate review, Module 40 production regulatory examination review, examiner finding intake review, corrective-action plan review, remediation evidence review, legal/compliance response review, audit/replay response evidence review, privacy/redaction/public-records review, source/report/notice/payment/legal/live-action boundary review, qualified legal/compliance review, and qualified human approval. |
 | Build checkpoint promotion, evidence archive, or tree-drift acceptance | Requires Module 42 build preservation gate review, checkpoint evidence pack review, ignored-sensitive-file verification, tree drift resolution, `npm run verify:backend`, `npm run build`, updated snapshot evidence, qualified governance/human review, and preservation of all production authority blocks. |
+| Doctrine gap controlled promotion | Requires Module 43 doctrine-to-code gap ledger review, named gap ticket completion, owner review, route/evidence/promotion-condition verification, current Master Volume version evidence, qualified human authority approval, `npm run smoke:doctrine-gap-ledger`, `npm run verify:backend`, and preservation of all production authority blocks. |
 | Official environmental assessment/report generation or live environmental provider engagement | Requires provider contracts, licensed-professional workflow controls, official document generation controls, legal/compliance review, monitoring, audit export, human approval, and controlled promotion. |
 
 ## Commands That Must Pass Before Module Work
@@ -180,6 +181,7 @@ npm run smoke:production-reliance-verification
 npm run smoke:production-regulatory-examination
 npm run smoke:production-regulatory-response
 npm run smoke:build-preservation
+npm run smoke:doctrine-gap-ledger
 npm run smoke:environmental-compliance
 npm run smoke:environmental-compliance-admin-read
 npm run build

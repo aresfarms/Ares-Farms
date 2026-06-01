@@ -6,7 +6,7 @@ Repository: `ares-farms`
 
 Branch: `main`
 
-Current build phase: Backend governance foundation, portable module surface build, and build preservation archive through Module 42.
+Current build phase: Backend governance foundation, portable module surface build, build preservation archive, and doctrine-to-code gap ledger through Module 43.
 
 Canonical checkpoint: `BR-2026-06-01-M41` - Review-Bound Backend Governance Foundation.
 
@@ -63,7 +63,7 @@ The dated build archive records branch, commit hash, verification timestamp, and
 
 ## Executive Build Summary
 
-The platform is currently built as a governed, evidence-first financial coordination and agricultural intelligence web portal. The backend foundation, governance runtime, schema layer, module registry, event contracts, cross-module handoffs, public surface controls, replay checks, security and audit readiness gates, scraper/source intelligence gates, revenue intelligence gates, production-readiness gates, regulatory response gate, and build preservation archive gate are implemented through Module 42.
+The platform is currently built as a governed, evidence-first financial coordination and agricultural intelligence web portal. The backend foundation, governance runtime, schema layer, module registry, event contracts, cross-module handoffs, public surface controls, replay checks, security and audit readiness gates, scraper/source intelligence gates, revenue intelligence gates, production-readiness gates, regulatory response gate, build preservation archive gate, and doctrine-to-code gap ledger gate are implemented through Module 43.
 
 The system is not production-live and should not be treated as live authority. Current posture remains review-bound and blocked from live reliance, deployment, official regulatory submission, official reports, payment capture, public verification, legal advice, production activation, DNS cutover, migrations, and live external actions.
 
@@ -231,7 +231,7 @@ Revenue outputs remain advisory and review-bound. They do not create guaranteed 
 
 ## Production Gate Sequence
 
-Production and preservation gates are built through Module 42. Their purpose is to assemble evidence and preserve hard blocks, not to activate production.
+Production, preservation, and doctrine gap ledger gates are built through Module 43. Their purpose is to assemble evidence, preserve hard blocks, and keep controlled-promotion gaps named, not to activate production.
 
 Implemented production gates include:
 
@@ -251,6 +251,7 @@ Implemented production gates include:
 - Production regulatory examination
 - Production regulatory response and corrective action
 - Build preservation and evidence archive
+- Doctrine-to-code gap ledger
 
 ## Current Production Blocks
 
@@ -336,7 +337,7 @@ The backend verification gate included:
 - `npm run backend:module-readiness`
 - `npm run smoke:integration`
 
-Key verification outputs:
+Key verification outputs from the preserved Module 42 archive:
 
 - Master Volume conformance: passed
 - Requirements checked: 60
@@ -357,7 +358,7 @@ Key verification outputs:
 
 ## Current Build Decision
 
-The backend and governed module foundation are in a complete, internally verified, review-bound state through Module 42, with Module 41 preserved as canonical checkpoint `BR-2026-06-01-M41`.
+The backend and governed module foundation are in a complete, internally verified, review-bound state through Module 43, with Module 41 preserved as canonical checkpoint `BR-2026-06-01-M41`, Module 42 preserving that checkpoint, and Module 43 naming the three controlled-promotion doctrine gaps.
 
 The next proper build phase should be controlled cleanup, commit/preservation, then targeted live-readiness or UX/module refinement. No production launch or public go-live should happen until the later activation authority gates are explicitly satisfied and approved.
 

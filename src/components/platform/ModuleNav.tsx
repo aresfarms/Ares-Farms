@@ -53,6 +53,7 @@ const primaryRoutes = [
   "/production-regulatory-examination",
   "/production-regulatory-response",
   "/build-preservation",
+  "/doctrine-gap-ledger",
   "/exception-remediation",
   "/data-rights",
   "/module-readiness",

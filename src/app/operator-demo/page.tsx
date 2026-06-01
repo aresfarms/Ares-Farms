@@ -399,6 +399,17 @@ const demoSurfaces: DemoSurface[] = [
   },
   {
     step: "30",
+    label: "Doctrine-to-Code Gap Ledger",
+    href: "/doctrine-gap-ledger",
+    moduleRef: "Module 43",
+    boundary:
+      "Doctrine-to-code gap ledger review only; the three awaiting-controlled-promotion requirements are named, owned, routed, evidenced, ticketed, and blocked, and no production launch, public API exposure, portal launch, payment capture, notice send, official report publication, public verification, official reliance, legal advice, or live external action is authorized.",
+    path: () =>
+      `/api/governance/doctrine-gap-ledger?actorId=${actorId}&limit=6`,
+    collectionKeys: ["doctrineGapLedgerReviews"],
+  },
+  {
+    step: "31",
     label: "Partner Coordination",
     href: "/partners",
     moduleRef: "Module 11",
@@ -410,7 +421,7 @@ const demoSurfaces: DemoSurface[] = [
     collectionKeys: ["partnerWorkflows"],
   },
   {
-    step: "31",
+    step: "32",
     label: "Advisory Reports",
     href: "/reports",
     moduleRef: "Module 13",
@@ -422,7 +433,7 @@ const demoSurfaces: DemoSurface[] = [
     collectionKeys: ["reportRecords"],
   },
   {
-    step: "32",
+    step: "33",
     label: "Integrated Readiness",
     href: "/module-readiness",
     moduleRef: "Module 20",
@@ -459,6 +470,7 @@ const productionBlocks = [
   "Unqualified production regulatory examination approval",
   "Unqualified production regulatory response approval",
   "Unqualified build preservation production authority",
+  "Unqualified doctrine gap controlled promotion",
   "Production secret activation",
   "Public DNS cutover",
   "Production database migration",
@@ -556,7 +568,7 @@ export default function OperatorDemoHandoffPage() {
     return evaluateContentClaims({
       text: [
         "Operator Demo Handoff",
-        "Internal governed walkthrough for completed Modules 01 through 42",
+        "Internal governed walkthrough for completed Modules 01 through 43",
         ADVISORY_ONLY_DISCLOSURE,
         BORROWER_PORTABILITY_DISCLOSURE,
         LENDER_READY_DISCLOSURE,
@@ -606,7 +618,7 @@ export default function OperatorDemoHandoffPage() {
               </h1>
               <p style={{ margin: 0, color: "#334155", lineHeight: 1.5 }}>
                 Governed review path for seeded demo records across Modules
-                01-42 without promoting production activity.
+                01-43 without promoting production activity.
               </p>
             </div>
 

@@ -4,6 +4,16 @@ Generated: 2026-06-01T20:07:08.342Z
 
 This ledger names every Master Volume requirement currently marked `awaiting_controlled_promotion`. There are no unnamed doctrine gaps in the current build.
 
+Canonical module surface: Module 43 - Doctrine-to-Code Gap Ledger.
+
+Route: `/doctrine-gap-ledger`
+
+API: `/api/governance/doctrine-gap-ledger`
+
+Smoke test: `npm run smoke:doctrine-gap-ledger`
+
+Current posture: review-bound and controlled-promotion only. This ledger does not authorize production launch, public production API exposure, production portal launch, payment capture, borrower notice sending, official report publication, public verification, official reliance, legal advice, or live external action.
+
 | Requirement | Title | Owner | Route | Blocked Reason | Required Evidence | Promotion Condition |
 | --- | --- | --- | --- | --- | --- | --- |
 | PROMOTION-GATE-001 | Production and public-action blocks | Constitutional Authority + Release Manager | /promotion | Production, public action, live external calls, payments, notices, official reports, and verification authority are intentionally blocked until controlled promotion and qualified human approval are recorded. | backend production readiness approval; security and audit readiness approval; production auth activation approval; feature flag and kill-switch review; release, rollback, monitoring, incident, support, and audit evidence; qualified constitutional authority and release manager signoff | May move from awaiting controlled promotion only after the full production gate chain through final authority, activation ceremony, post-activation verification, and reliance boundary review passes without blocked items. |

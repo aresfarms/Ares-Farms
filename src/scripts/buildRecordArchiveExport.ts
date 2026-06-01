@@ -526,6 +526,17 @@ const humanAuthorityMap = [
       "Checkpoint evidence pack, ignored-sensitive-file verification, tree drift resolution, backend verification, production build evidence, and preservation of all production authority blocks.",
     currentPosture: "Evidence-only; checkpoint archived without production authority.",
   },
+  {
+    module: "Module 43",
+    gate: "Doctrine-to-Code Gap Ledger",
+    route: "/doctrine-gap-ledger",
+    requiredHumanAuthority:
+      "Constitutional Authority + Release Manager + Public Surface Governance Owner + Claims/Compliance Reviewer + Source Intelligence Governance Owner + Public DTO Owner",
+    approvalBoundary:
+      "Named gap ownership, route mapping, blocked reason, required evidence, promotion condition, ticket reference, current Master Volume version evidence, and controlled-promotion review.",
+    currentPosture:
+      "Review-bound; the three remaining gaps are named and blocked pending qualified controlled promotion.",
+  },
 ];
 
 const operationalEvidencePacketTemplates = [
@@ -1113,7 +1124,7 @@ function writeCanonicalBuildRecord(
     "",
     "## Canonical Decision",
     "",
-    "The current backend and governed module foundation are internally verified and review-bound through Module 42. Module 41 is preserved as checkpoint `BR-2026-06-01-M41`; Module 42 preserves that checkpoint and detects tree drift. The three remaining doctrine gaps are named tickets awaiting controlled promotion, not unnamed missing backend work.",
+    "The current backend and governed module foundation are internally verified and review-bound through Module 43. Module 41 is preserved as checkpoint `BR-2026-06-01-M41`; Module 42 preserves that checkpoint and detects tree drift. Module 43 exposes the three remaining doctrine gaps as named, owned, routed, and ticketed items awaiting controlled promotion, not unnamed missing backend work.",
     "",
   ].join("\n");
 

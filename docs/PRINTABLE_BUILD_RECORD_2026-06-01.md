@@ -6,17 +6,21 @@ Repository: `ares-farms`
 
 Branch: `main`
 
-Current build phase: Backend governance foundation and portable module surface build through Module 41.
+Current build phase: Backend governance foundation, portable module surface build, and build preservation archive through Module 42.
+
+Canonical checkpoint: `BR-2026-06-01-M41` - Review-Bound Backend Governance Foundation.
+
+Checkpoint commit: `51bb19f`.
 
 ## Executive Build Summary
 
-The platform is currently built as a governed, evidence-first financial coordination and agricultural intelligence web portal. The backend foundation, governance runtime, schema layer, module registry, event contracts, cross-module handoffs, public surface controls, replay checks, security and audit readiness gates, scraper/source intelligence gates, revenue intelligence gates, and production-readiness gates are implemented through Module 41.
+The platform is currently built as a governed, evidence-first financial coordination and agricultural intelligence web portal. The backend foundation, governance runtime, schema layer, module registry, event contracts, cross-module handoffs, public surface controls, replay checks, security and audit readiness gates, scraper/source intelligence gates, revenue intelligence gates, production-readiness gates, regulatory response gate, and build preservation archive gate are implemented through Module 42.
 
 The system is not production-live and should not be treated as live authority. Current posture remains review-bound and blocked from live reliance, deployment, official regulatory submission, official reports, payment capture, public verification, legal advice, production activation, DNS cutover, migrations, and live external actions.
 
 ## Master Volume Alignment
 
-The build is governed by the Master Volume Series and the later source intelligence, conformance, integration, and missing-doctrine updates that were incorporated into the build sequence.
+The build is governed by the current Master Volume Series, including Volumes 0-VI, the unified TOC/hub, the build conformance matrix, source intelligence, conformance, integration, missing-doctrine, scraper, revenue intelligence, source-stack, and build-reference updates incorporated into the build sequence.
 
 Current implementation posture:
 
@@ -26,16 +30,19 @@ Current implementation posture:
 - Operational runbooks are reflected in readiness gates, production hold gates, incident gates, support gates, release gates, and audit evidence packets.
 - Canonical doctrines are implemented across claims, data classification, redaction, explanation, replay, observability, and controlled promotion.
 - Source Intelligence integration is implemented with scraper/source governance, source authority, source legal review, source promotion packets, source production readiness, and live scraper activation blocks.
+- Volume VI conformance is explicitly reflected in source intelligence, scraper governance, source-stack architecture, revenue intelligence, public DTO boundaries, integration requirements, conformance testing, and build snapshot references.
+
+Module 41 conformance decision: Module 41 conforms to current Master Volumes 0-VI as of checkpoint `BR-2026-06-01-M41`. It remains review-bound and does not authorize production launch, regulatory response issuance, corrective-action commitment, remediation execution, public verification, official reliance, legal advice, payments, notices, reports, or live external actions.
 
 ## Current Platform Counts
 
-- Module manifests: 62
-- Numbered internal build modules: 41
-- Highest numbered module: 41
-- Event contracts: 53
-- Cross-module handoffs: 86
-- Portable vertical surfaces: 42
-- Internal surfaces: 24
+- Module manifests: 63
+- Numbered internal build modules: 42
+- Highest numbered module: 42
+- Event contracts: 54
+- Cross-module handoffs: 89
+- Portable vertical surfaces: 43
+- Internal surfaces: 25
 - Borrower surfaces: 7
 - Lender surfaces: 6
 - Sponsor surfaces: 5
@@ -85,6 +92,7 @@ Current implementation posture:
 | 39 | production-reliance-verification | Production Reliance and Public Verification Boundary Gate | `/production-reliance-verification` |
 | 40 | production-regulatory-examination | Production Regulatory Examination and Evidence Archive Gate | `/production-regulatory-examination` |
 | 41 | production-regulatory-response | Production Regulatory Response and Corrective Action Gate | `/production-regulatory-response` |
+| 42 | build-preservation | Build Preservation and Evidence Archive Gate | `/build-preservation` |
 
 ## Portable Surface Architecture
 
@@ -174,7 +182,7 @@ Revenue outputs remain advisory and review-bound. They do not create guaranteed 
 
 ## Production Gate Sequence
 
-Production gates are built through Module 41. Their purpose is to assemble evidence and preserve hard blocks, not to activate production.
+Production and preservation gates are built through Module 42. Their purpose is to assemble evidence and preserve hard blocks, not to activate production.
 
 Implemented production gates include:
 
@@ -193,6 +201,7 @@ Implemented production gates include:
 - Production reliance verification
 - Production regulatory examination
 - Production regulatory response and corrective action
+- Build preservation and evidence archive
 
 ## Current Production Blocks
 
@@ -225,6 +234,31 @@ The following remain blocked unless later explicitly authorized through qualifie
 - Legal hold release
 - Live scraper activation
 - Live external actions
+- Unreviewed tree drift becoming a canonical checkpoint
+- Sensitive local files entering build history
+
+## Canonical Checkpoint
+
+Checkpoint `BR-2026-06-01-M41` - Review-Bound Backend Governance Foundation - is the formal preserved build state for the verified backend governance foundation through Module 41.
+
+Checkpoint evidence:
+
+- Commit hash: `51bb19f`
+- `npm run verify:backend`: passed
+- `npm run build`: passed
+- Module manifests: 62
+- Numbered modules: 41
+- Highest module number: 41
+- Event contracts: 53
+- Handoffs: 86
+- Public surfaces: 19
+- Portable surfaces: 42
+- App page routes: 70
+- API route files: 148
+- Static pages generated: 219
+- Evidence pack: `docs/BUILD_SNAPSHOT_EVIDENCE_PACK_BR_2026_06_01_M41.md`
+- `.env`: ignored
+- `Recovery Key.pdf`: ignored
 
 ## Verification Record
 
@@ -260,24 +294,26 @@ Key verification outputs:
 - Requirements implemented: 57
 - Awaiting controlled promotion: 3
 - Module conformance: passed
-- Modules checked: 62
-- Highest module number: 41
+- Modules checked: 63
+- Highest module number: 42
 - Public surfaces checked: 19
-- Handoffs checked: 86
-- Event contracts checked: 53
+- Handoffs checked: 89
+- Event contracts checked: 54
 - Cross-module integration: passed
 - Whole-platform smoke test: passed
 - Production build: passed
-- Static pages generated: 219
+- Current app page routes after Module 42: 71
+- Current API route files after Module 42: 149
+- Static pages generated after Module 42: 221
 
 ## Current Build Decision
 
-The backend and governed module foundation are in a complete, internally verified, review-bound state through Module 41.
+The backend and governed module foundation are in a complete, internally verified, review-bound state through Module 42, with Module 41 preserved as canonical checkpoint `BR-2026-06-01-M41`.
 
 The next proper build phase should be controlled cleanup, commit/preservation, then targeted live-readiness or UX/module refinement. No production launch or public go-live should happen until the later activation authority gates are explicitly satisfied and approved.
 
-## Tree Cleanup Note
+## Tree Preservation Note
 
-The local Git tree contains a large amount of real build work. It should be preserved, not discarded.
+The local Git tree contains real build work and must be preserved through an explicit Git commit, not discarded.
 
-Sensitive/private local files should remain outside version control. The root-level `Recovery Key.pdf` is intentionally ignored and should not be committed.
+Sensitive/private local files must remain outside version control. The root-level `Recovery Key.pdf` is intentionally ignored and must not be committed.

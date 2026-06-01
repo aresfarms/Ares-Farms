@@ -490,6 +490,16 @@ const moduleSurfaces: ReadinessSurface[] = [
     readinessRole:
       "Production regulatory response, corrective action, remediation, examiner finding closure, legal hold, official regulator response, audit/replay, redaction, public records, public verification, official reliance, legal advice, report, notice, payment, public exposure, and live-action posture",
   },
+  {
+    moduleNumber: "42",
+    label: "Build Preservation",
+    href: "/build-preservation",
+    path: () =>
+      `/api/governance/build-preservation?actorId=${actorId}&limit=4`,
+    collectionKeys: ["buildPreservationReviews"],
+    readinessRole:
+      "Build preservation, checkpoint BR-2026-06-01-M41, backend verification, production build evidence, route inventory, event contracts, handoffs, public surfaces, tree drift detection, ignored sensitive files, Master Volume 0-VI conformance, archive evidence, and production authority blocks",
+  },
 ];
 
 function readinessScore(surface: ReadinessResult): string {
@@ -567,7 +577,7 @@ export default function IntegratedModuleReadinessControlTowerPage() {
     return evaluateContentClaims({
       text: [
         "Module 20 Integrated Module Readiness Control Tower",
-        "Internal readiness control surface for governed modules 01 through 41",
+        "Internal readiness control surface for governed modules 01 through 42",
         ADVISORY_ONLY_DISCLOSURE,
         BORROWER_PORTABILITY_DISCLOSURE,
         LENDER_READY_DISCLOSURE,
@@ -586,7 +596,7 @@ export default function IntegratedModuleReadinessControlTowerPage() {
   const badges = [
     `Claims Gate ${contentClaims.ok ? "Pass" : "Review"}`,
     `Scope ${data.scope.applicationId ?? data.scope.tenantId ?? "Unscoped"}`,
-    "Modules 01-41 Linked",
+    "Modules 01-42 Linked",
     "No Production Promotion",
   ];
 
@@ -596,7 +606,7 @@ export default function IntegratedModuleReadinessControlTowerPage() {
         <ModuleHeader
           moduleNumber="20"
           title="Integrated Module Readiness Control Tower"
-          subtitle="Whole-system readiness view connecting governed modules 01 through 41 without promoting live external actions."
+          subtitle="Whole-system readiness view connecting governed modules 01 through 42 without promoting live external actions."
           badges={badges}
           refreshing={refreshing}
           onRefresh={() => void loadAll()}
@@ -649,7 +659,7 @@ export default function IntegratedModuleReadinessControlTowerPage() {
                 Post-Completion Handoff
               </h2>
               <p style={{ margin: 0, color: "#475569", lineHeight: 1.5 }}>
-                Review the seeded internal demo case across Modules 01-41 while
+                Review the seeded internal demo case across Modules 01-42 while
                 production promotion, live external calls, official reports,
                 payments, notices, and final decisions remain blocked.
               </p>

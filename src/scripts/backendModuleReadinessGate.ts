@@ -426,6 +426,7 @@ function main() {
     "smoke:source-legal-review",
     "smoke:source-promotion-packets",
     "smoke:production-regulatory-response",
+    "smoke:build-preservation",
     "smoke:integration",
     "smoke:modules",
     "smoke:platform",
@@ -1538,6 +1539,35 @@ function main() {
       "Production regulatory response runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while response package approval, official regulator response, corrective-action plan approval, corrective-action commitment, corrective-action execution, remediation plan approval, remediation execution, examiner finding closure, legal hold release, external examiner disclosure, production reliance, public verification, official reliance, legal advice, production health certification, activation, go-live, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, customer communications, public status, and live external actions remain blocked.",
     failDetail:
       "Production regulatory response runtime, route, page, documentation, matrix references, or smoke coverage is missing.",
+  });
+
+  check(checks, {
+    id: "backend-module.build-preservation-evidence-archive-gate",
+    area: "governance",
+    passed:
+      allExist([
+        "src/lib/governance/buildPreservationEvidenceArchiveGate.ts",
+        "src/app/api/governance/build-preservation/route.ts",
+        "src/app/build-preservation/page.tsx",
+        "src/scripts/buildPreservationEvidenceArchiveGateSmokeTest.ts",
+        "docs/MODULE_42_BUILD_PRESERVATION_EVIDENCE_ARCHIVE_GATE.md",
+        "docs/BUILD_SNAPSHOT_EVIDENCE_PACK_BR_2026_06_01_M41.md",
+      ]) &&
+      allIncluded(scripts["smoke:integration"] ?? "", [
+        "smoke:build-preservation",
+      ]) &&
+      allIncluded(scripts["smoke:backend"] ?? "", [
+        "smoke:build-preservation",
+      ]) &&
+      allIncluded(coverageMatrix, [
+        "Build preservation and evidence archive gate",
+      ]),
+    summary:
+      "Build preservation must freeze checkpoint BR-2026-06-01-M41, attach verification evidence, detect tree drift, verify ignored sensitive files, and keep production authority blocked.",
+    passDetail:
+      "Build preservation runtime, API, internal surface, documentation, build snapshot evidence pack, module integration, integration smoke, and backend smoke coverage are wired while production launch, deployment, public API exposure, portal launch, payments, notices, reports, public verification, official reliance, legal advice, regulatory response, corrective-action commitment, remediation execution, and live external actions remain blocked.",
+    failDetail:
+      "Build preservation runtime, route, page, documentation, evidence pack, matrix references, or smoke coverage is missing.",
   });
 
   check(checks, {

@@ -388,6 +388,17 @@ const demoSurfaces: DemoSurface[] = [
   },
   {
     step: "29",
+    label: "Build Preservation",
+    href: "/build-preservation",
+    moduleRef: "Module 42",
+    boundary:
+      "Build preservation and evidence archive review only; checkpoint BR-2026-06-01-M41 is recorded, tree drift and ignored sensitive files are reviewed, and no production launch, deployment, public API exposure, portal launch, payment capture, notice send, official report publication, public verification, official reliance, legal advice, regulatory response, corrective-action commitment, remediation execution, or live external action is authorized.",
+    path: () =>
+      `/api/governance/build-preservation?actorId=${actorId}&limit=6`,
+    collectionKeys: ["buildPreservationReviews"],
+  },
+  {
+    step: "30",
     label: "Partner Coordination",
     href: "/partners",
     moduleRef: "Module 11",
@@ -399,7 +410,7 @@ const demoSurfaces: DemoSurface[] = [
     collectionKeys: ["partnerWorkflows"],
   },
   {
-    step: "30",
+    step: "31",
     label: "Advisory Reports",
     href: "/reports",
     moduleRef: "Module 13",
@@ -411,7 +422,7 @@ const demoSurfaces: DemoSurface[] = [
     collectionKeys: ["reportRecords"],
   },
   {
-    step: "31",
+    step: "32",
     label: "Integrated Readiness",
     href: "/module-readiness",
     moduleRef: "Module 20",
@@ -447,6 +458,7 @@ const productionBlocks = [
   "Unqualified production reliance verification approval",
   "Unqualified production regulatory examination approval",
   "Unqualified production regulatory response approval",
+  "Unqualified build preservation production authority",
   "Production secret activation",
   "Public DNS cutover",
   "Production database migration",
@@ -544,7 +556,7 @@ export default function OperatorDemoHandoffPage() {
     return evaluateContentClaims({
       text: [
         "Operator Demo Handoff",
-        "Internal governed walkthrough for completed Modules 01 through 41",
+        "Internal governed walkthrough for completed Modules 01 through 42",
         ADVISORY_ONLY_DISCLOSURE,
         BORROWER_PORTABILITY_DISCLOSURE,
         LENDER_READY_DISCLOSURE,
@@ -594,7 +606,7 @@ export default function OperatorDemoHandoffPage() {
               </h1>
               <p style={{ margin: 0, color: "#334155", lineHeight: 1.5 }}>
                 Governed review path for seeded demo records across Modules
-                01-41 without promoting production activity.
+                01-42 without promoting production activity.
               </p>
             </div>
 

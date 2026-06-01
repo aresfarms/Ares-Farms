@@ -52,6 +52,7 @@ const primaryRoutes = [
   "/production-reliance-verification",
   "/production-regulatory-examination",
   "/production-regulatory-response",
+  "/build-preservation",
   "/exception-remediation",
   "/data-rights",
   "/module-readiness",

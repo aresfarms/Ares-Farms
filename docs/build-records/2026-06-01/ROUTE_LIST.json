@@ -61,6 +61,11 @@
       "type": "page"
     },
     {
+      "route": "/doctrine-gap-ledger",
+      "file": "src/app/doctrine-gap-ledger/page.tsx",
+      "type": "page"
+    },
+    {
       "route": "/documents",
       "file": "src/app/documents/page.tsx",
       "type": "page"
@@ -550,6 +555,11 @@
     {
       "route": "/api/governance/deployment-environment-readiness",
       "file": "src/app/api/governance/deployment-environment-readiness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/doctrine-gap-ledger",
+      "file": "src/app/api/governance/doctrine-gap-ledger/route.ts",
       "type": "api"
     },
     {
@@ -1103,7 +1113,7 @@
       "type": "api"
     }
   ],
-  "pageRouteCount": 71,
-  "apiRouteCount": 149,
-  "totalRouteCount": 220
+  "pageRouteCount": 72,
+  "apiRouteCount": 150,
+  "totalRouteCount": 222
 }

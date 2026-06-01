@@ -1,6 +1,6 @@
 {
   "registryId": "current-master-volume-registry",
-  "generatedAt": "2026-06-01T20:07:08.331Z",
+  "generatedAt": "2026-06-01T20:35:02.012Z",
   "repository": "ares-farms",
   "activeBuildDate": "2026-06-01",
   "controllingRule": "This registry is the single machine-readable current-version pointer for build verification. Specific amended volume text controls over older compatibility rows.",

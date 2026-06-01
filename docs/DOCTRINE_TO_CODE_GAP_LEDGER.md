@@ -1,18 +1,8 @@
 # Doctrine-to-Code Gap Ledger
 
-Generated: 2026-06-01T20:07:08.342Z
+Generated: 2026-06-01T20:35:02.024Z
 
 This ledger names every Master Volume requirement currently marked `awaiting_controlled_promotion`. There are no unnamed doctrine gaps in the current build.
-
-Canonical module surface: Module 43 - Doctrine-to-Code Gap Ledger.
-
-Route: `/doctrine-gap-ledger`
-
-API: `/api/governance/doctrine-gap-ledger`
-
-Smoke test: `npm run smoke:doctrine-gap-ledger`
-
-Current posture: review-bound and controlled-promotion only. This ledger does not authorize production launch, public production API exposure, production portal launch, payment capture, borrower notice sending, official report publication, public verification, official reliance, legal advice, or live external action.
 
 | Requirement | Title | Owner | Route | Blocked Reason | Required Evidence | Promotion Condition |
 | --- | --- | --- | --- | --- | --- | --- |

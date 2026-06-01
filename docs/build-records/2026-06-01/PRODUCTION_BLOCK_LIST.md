@@ -1,6 +1,6 @@
 # Production Block List
 
-Generated: 2026-06-01T20:07:08.342Z
+Generated: 2026-06-01T20:35:02.021Z
 
 The current build is not production-live. These blocks remain active unless later cleared through qualified controlled promotion and human authority gates.
 
@@ -69,3 +69,4 @@ The current build is not production-live. These blocks remain active unless late
 | Module 40 | Production Regulatory Examination and Evidence Archive Gate | /production-regulatory-examination | Regulatory Response Owner + Legal/Compliance Reviewer | Blocked; regulator submission and archive certification not approved. |
 | Module 41 | Production Regulatory Response and Corrective Action Gate | /production-regulatory-response | Regulatory Response Owner + Corrective Action Owner + Legal/Compliance Reviewer | Blocked; official response, corrective-action commitment, and remediation execution not approved. |
 | Module 42 | Build Preservation and Evidence Archive Gate | /build-preservation | Governance Archivist + Release Manager | Evidence-only; checkpoint archived without production authority. |
+| Module 43 | Doctrine-to-Code Gap Ledger | /doctrine-gap-ledger | Constitutional Authority + Release Manager + Public Surface Governance Owner + Claims/Compliance Reviewer + Source Intelligence Governance Owner + Public DTO Owner | Review-bound; the three remaining gaps are named and blocked pending qualified controlled promotion. |

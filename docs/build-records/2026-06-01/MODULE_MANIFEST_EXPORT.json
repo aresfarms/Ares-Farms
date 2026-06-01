@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-06-01T20:07:08.344Z",
-  "count": 63,
-  "numberedModules": 42,
-  "highestModuleNumber": 42,
+  "generatedAt": "2026-06-01T20:35:02.026Z",
+  "count": 64,
+  "numberedModules": 43,
+  "highestModuleNumber": 43,
   "manifests": [
     {
       "id": "governance",
@@ -25,7 +25,8 @@
         "production-reliance-verification",
         "production-regulatory-examination",
         "production-regulatory-response",
-        "build-preservation"
+        "build-preservation",
+        "doctrine-gap-ledger"
       ],
       "publicSurfaceAllowed": false,
       "productionBlocked": true,
@@ -40,7 +41,8 @@
         "production-reliance-verification",
         "production-regulatory-examination",
         "production-regulatory-response",
-        "build-preservation"
+        "build-preservation",
+        "doctrine-gap-ledger"
       ],
       "eventsPublished": [
         "governance.posture.reviewed"
@@ -62,7 +64,8 @@
         "production.reliance.verification.reviewed",
         "production.regulatory.examination.reviewed",
         "production.regulatory.response.reviewed",
-        "build.preservation.archived"
+        "build.preservation.archived",
+        "doctrine.gap.ledger.reviewed"
       ],
       "featureFlags": {
         "module_enabled": true,
@@ -726,7 +729,8 @@
         "production-reliance-verification",
         "production-regulatory-examination",
         "production-regulatory-response",
-        "build-preservation"
+        "build-preservation",
+        "doctrine-gap-ledger"
       ],
       "publicSurfaceAllowed": false,
       "productionBlocked": true,
@@ -742,7 +746,8 @@
         "production-reliance-verification",
         "production-regulatory-examination",
         "production-regulatory-response",
-        "build-preservation"
+        "build-preservation",
+        "doctrine-gap-ledger"
       ],
       "eventsPublished": [
         "promotion.gate.blocked"
@@ -765,7 +770,8 @@
         "production.reliance.verification.reviewed",
         "production.regulatory.examination.reviewed",
         "production.regulatory.response.reviewed",
-        "build.preservation.archived"
+        "build.preservation.archived",
+        "doctrine.gap.ledger.reviewed"
       ],
       "featureFlags": {
         "module_enabled": true,
@@ -1089,7 +1095,8 @@
         "production-reliance-verification",
         "production-regulatory-examination",
         "production-regulatory-response",
-        "build-preservation"
+        "build-preservation",
+        "doctrine-gap-ledger"
       ],
       "publicSurfaceAllowed": false,
       "productionBlocked": true,
@@ -1114,7 +1121,8 @@
         "production-reliance-verification",
         "production-regulatory-examination",
         "production-regulatory-response",
-        "build-preservation"
+        "build-preservation",
+        "doctrine-gap-ledger"
       ],
       "eventsPublished": [
         "module.readiness.checked"
@@ -1143,7 +1151,8 @@
         "production.reliance.verification.reviewed",
         "production.regulatory.examination.reviewed",
         "production.regulatory.response.reviewed",
-        "build.preservation.archived"
+        "build.preservation.archived",
+        "doctrine.gap.ledger.reviewed"
       ],
       "featureFlags": {
         "module_enabled": true,
@@ -2861,7 +2870,8 @@
         "module-readiness",
         "governance",
         "promotion",
-        "operator-demo"
+        "operator-demo",
+        "doctrine-gap-ledger"
       ],
       "eventsPublished": [
         "build.preservation.archived"
@@ -2869,6 +2879,71 @@
       "eventsConsumed": [
         "production.regulatory.response.reviewed",
         "production.regulatory.examination.reviewed",
+        "module.readiness.checked",
+        "promotion.gate.blocked"
+      ],
+      "featureFlags": {
+        "module_enabled": true,
+        "public_surface_enabled": false,
+        "production_live_enabled": false,
+        "external_actions_enabled": false,
+        "payment_capture_enabled": false,
+        "notice_send_enabled": false,
+        "raw_document_processing_enabled": false
+      },
+      "requiredGovernance": [
+        "CONST-DATA-001",
+        "CANON-CLASS-001",
+        "TECH-LEDGER-001",
+        "TECH-REPLAY-001",
+        "TECH-RBAC-001",
+        "CANON-CLAIMS-001",
+        "PROMOTION-GATE-001",
+        "LIVE-ACTION-BLOCK-001",
+        "CONNECTOR-GOV-001"
+      ]
+    },
+    {
+      "id": "doctrine-gap-ledger",
+      "moduleNumber": 43,
+      "title": "Doctrine-to-Code Gap Ledger",
+      "route": "/doctrine-gap-ledger",
+      "audience": [
+        "internal"
+      ],
+      "permissions": [
+        "doctrine-gap-ledger:read",
+        "doctrine-gap-ledger:review"
+      ],
+      "dataDependencies": [
+        "master-volume-requirements",
+        "current-master-volume-registry",
+        "doctrine-gap-ledger",
+        "controlled-promotion-tickets",
+        "build-record-archive",
+        "public-surface-disclosure-audit",
+        "human-authority-map",
+        "module-registry",
+        "event-contract-registry",
+        "handoff-map"
+      ],
+      "publicSurfaceAllowed": false,
+      "productionBlocked": true,
+      "claimsProfile": "live-action-blocked",
+      "replayRequired": true,
+      "description": "Internal doctrine-to-code gap ledger for naming every awaiting-controlled-promotion requirement with owner, route, blocked reason, required evidence, promotion condition, human authority, current Master Volume version evidence, and controlled-promotion ticketing while production launch, public exposure, portal launch, payments, notices, official reports, public verification, official reliance, legal advice, and live external actions remain blocked.",
+      "adjacentModules": [
+        "build-preservation",
+        "module-readiness",
+        "governance",
+        "promotion",
+        "operator-demo"
+      ],
+      "eventsPublished": [
+        "doctrine.gap.ledger.reviewed"
+      ],
+      "eventsConsumed": [
+        "build.preservation.archived",
         "module.readiness.checked",
         "promotion.gate.blocked"
       ],
@@ -2918,7 +2993,8 @@
         "production-reliance-verification",
         "production-regulatory-examination",
         "production-regulatory-response",
-        "build-preservation"
+        "build-preservation",
+        "doctrine-gap-ledger"
       ],
       "publicSurfaceAllowed": false,
       "productionBlocked": true,
@@ -2940,6 +3016,7 @@
         "production-regulatory-examination",
         "production-regulatory-response",
         "build-preservation",
+        "doctrine-gap-ledger",
         "case-command"
       ],
       "eventsPublished": [
@@ -2959,7 +3036,8 @@
         "production.reliance.verification.reviewed",
         "production.regulatory.examination.reviewed",
         "production.regulatory.response.reviewed",
-        "build.preservation.archived"
+        "build.preservation.archived",
+        "doctrine.gap.ledger.reviewed"
       ],
       "featureFlags": {
         "module_enabled": true,
@@ -5143,10 +5221,10 @@
       "route": "/module-readiness",
       "audience": "internal",
       "moduleRefs": [
-        "Modules 02-42"
+        "Modules 02-43"
       ],
-      "purpose": "Internal operational control surfaces for applications, queues, documents, reviews, rules, notices, connectors, partners, billing, reports, promotion, evidence, ingestion, environmental compliance, live scraper activation, source legal review, source promotion packets, source production readiness, controlled promotion activation, production portal readiness, production launch evidence, deployment environment readiness, release-candidate freeze, production cutover hold, production release board, production operations monitoring, production incident response readiness, production support communications readiness, production final authority, production activation ceremony, production post-activation verification, production reliance verification, production regulatory examination, production regulatory response, build preservation, exceptions, data rights, and readiness.",
-      "primaryStatus": "Modules 01-42 are available for governed internal operation.",
+      "purpose": "Internal operational control surfaces for applications, queues, documents, reviews, rules, notices, connectors, partners, billing, reports, promotion, evidence, ingestion, environmental compliance, live scraper activation, source legal review, source promotion packets, source production readiness, controlled promotion activation, production portal readiness, production launch evidence, deployment environment readiness, release-candidate freeze, production cutover hold, production release board, production operations monitoring, production incident response readiness, production support communications readiness, production final authority, production activation ceremony, production post-activation verification, production reliance verification, production regulatory examination, production regulatory response, build preservation, doctrine-to-code gap ledger, exceptions, data rights, and readiness.",
+      "primaryStatus": "Modules 01-43 are available for governed internal operation.",
       "safeMessages": [
         "Your document was received.",
         "Human review is pending.",
@@ -5216,7 +5294,8 @@
         "/production-reliance-verification",
         "/production-regulatory-examination",
         "/production-regulatory-response",
-        "/build-preservation"
+        "/build-preservation",
+        "/doctrine-gap-ledger"
       ]
     },
     {
@@ -7050,7 +7129,7 @@
         "No legal or regulatory reliance is authorized.",
         "No public verification is available unless separately authorized.",
         "BR-2026-06-01-M41 has been recorded as a review-bound build checkpoint.",
-        "Module 41 conforms to current Master Volumes 0-VI as of the checkpoint evidence.",
+        "Module 41 conforms to current Master Volumes 0-VII as of the checkpoint evidence.",
         "Build preservation is evidence-only and does not authorize production launch.",
         "Tree drift must be resolved before a new canonical checkpoint is declared.",
         "Sensitive files must remain ignored and outside build history.",
@@ -7082,7 +7161,7 @@
         "observability and audit evidence",
         "replay reference or replay-safe read posture",
         "human review boundary",
-        "Master Volume 0-VI conformance evidence",
+        "Master Volume 0-VII conformance evidence",
         "checkpoint commit evidence",
         "backend verification evidence",
         "production build evidence",
@@ -7129,7 +7208,103 @@
         "/module-readiness",
         "/governance",
         "/operator-demo",
-        "/promotion"
+        "/promotion",
+        "/doctrine-gap-ledger"
+      ]
+    },
+    {
+      "id": "internal-doctrine-gap-ledger",
+      "label": "Doctrine-to-Code Gap Ledger",
+      "route": "/doctrine-gap-ledger",
+      "audience": "internal",
+      "moduleRefs": [
+        "Module 43",
+        "Checkpoint BR-2026-06-01-M43"
+      ],
+      "purpose": "Internal controlled-promotion ledger for naming every awaiting-controlled-promotion Master Volume requirement with owner, route, blocked reason, required evidence, promotion condition, human authority, current Master Volume version evidence, and ticket references.",
+      "primaryStatus": "All current doctrine-to-code gaps are named, owned, routed, and review-bound. Awaiting controlled promotion is not production approval.",
+      "safeMessages": [
+        "Your document was received.",
+        "Human review is pending.",
+        "More information may be needed.",
+        "Advisory only.",
+        "No approval has been granted.",
+        "No guarantee is made.",
+        "No legal or regulatory reliance is authorized.",
+        "No public verification is available unless separately authorized.",
+        "All current doctrine-to-code gaps are named, owned, routed, and review-bound.",
+        "The ledger is verified against the current Master Volume registry for Volumes 0-VII, the Cross-Reference Index, the Unified TOC, and the Build Matrix.",
+        "Awaiting controlled promotion is not production approval.",
+        "No production launch has been authorized.",
+        "No public production API exposure has been approved.",
+        "No production portal launch has been executed.",
+        "No payment capture has been enabled.",
+        "No borrower notice has been sent.",
+        "No official report has been published.",
+        "No public verification authority has been granted.",
+        "No official reliance has been created.",
+        "No legal advice has been provided.",
+        "No live external action has been performed."
+      ],
+      "requiredBackendSurfaces": [
+        "/api/governance/doctrine-gap-ledger",
+        "/api/governance/build-preservation",
+        "/api/public/surfaces",
+        "/api/public/grants",
+        "/api/claims/public",
+        "/api/runtime/state"
+      ],
+      "governanceRequirements": [
+        "Master Volume governance alignment",
+        "role and record-level permission checks",
+        "classification metadata",
+        "content-claims review",
+        "version lineage",
+        "observability and audit evidence",
+        "replay reference or replay-safe read posture",
+        "human review boundary",
+        "current Master Volume version registry",
+        "named doctrine-to-code gaps",
+        "controlled promotion tickets",
+        "human authority mapping",
+        "required evidence boundaries",
+        "promotion conditions",
+        "production authority blocks"
+      ],
+      "productionBlocks": [
+        "advisory only",
+        "no approval",
+        "no guarantee",
+        "no legal or regulatory reliance",
+        "no official report publication",
+        "no final lending decision",
+        "no borrower notice send",
+        "no live external agency call",
+        "no source promotion without qualified approval",
+        "no release-candidate freeze approval",
+        "no production cutover approval",
+        "no production release board approval",
+        "no payment capture",
+        "no raw document-content processing",
+        "no public verification claim",
+        "no public verification unless authorized",
+        "no production launch authorization",
+        "no public production API exposure",
+        "no production portal launch",
+        "no payment capture",
+        "no borrower notice send",
+        "no official report publication",
+        "no public verification approval",
+        "no official reliance",
+        "no legal advice",
+        "no live external action"
+      ],
+      "adjacentRoutes": [
+        "/build-preservation",
+        "/module-readiness",
+        "/governance",
+        "/promotion",
+        "/operator-demo"
       ]
     },
     {

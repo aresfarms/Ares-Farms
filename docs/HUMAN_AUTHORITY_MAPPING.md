@@ -1,6 +1,6 @@
 # Human Authority Mapping
 
-Generated: 2026-06-01T20:07:08.343Z
+Generated: 2026-06-01T20:35:02.025Z
 
 Vol III-B governance runtime treats qualified human authority as constitutional-grade infrastructure. These gates do not self-clear; each one requires the named human authority role and evidence boundary.
 

@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-06-01T20:07:08.345Z",
-  "count": 89,
+  "generatedAt": "2026-06-01T20:35:02.026Z",
+  "count": 94,
   "handoffs": [
     {
       "id": "applications-to-documents",
@@ -724,6 +724,61 @@
       "fromRoute": "/build-preservation",
       "toRoute": "/governance",
       "eventType": "build.preservation.archived",
+      "replayRequired": true,
+      "humanReviewBoundary": true,
+      "productionBlocked": true
+    },
+    {
+      "id": "build-preservation-to-doctrine-gap-ledger",
+      "fromModuleId": "build-preservation",
+      "toModuleId": "doctrine-gap-ledger",
+      "fromRoute": "/build-preservation",
+      "toRoute": "/doctrine-gap-ledger",
+      "eventType": "build.preservation.archived",
+      "replayRequired": true,
+      "humanReviewBoundary": true,
+      "productionBlocked": true
+    },
+    {
+      "id": "doctrine-gap-ledger-to-module-readiness",
+      "fromModuleId": "doctrine-gap-ledger",
+      "toModuleId": "module-readiness",
+      "fromRoute": "/doctrine-gap-ledger",
+      "toRoute": "/module-readiness",
+      "eventType": "doctrine.gap.ledger.reviewed",
+      "replayRequired": true,
+      "humanReviewBoundary": true,
+      "productionBlocked": true
+    },
+    {
+      "id": "doctrine-gap-ledger-to-governance",
+      "fromModuleId": "doctrine-gap-ledger",
+      "toModuleId": "governance",
+      "fromRoute": "/doctrine-gap-ledger",
+      "toRoute": "/governance",
+      "eventType": "doctrine.gap.ledger.reviewed",
+      "replayRequired": true,
+      "humanReviewBoundary": true,
+      "productionBlocked": true
+    },
+    {
+      "id": "doctrine-gap-ledger-to-promotion",
+      "fromModuleId": "doctrine-gap-ledger",
+      "toModuleId": "promotion",
+      "fromRoute": "/doctrine-gap-ledger",
+      "toRoute": "/promotion",
+      "eventType": "doctrine.gap.ledger.reviewed",
+      "replayRequired": true,
+      "humanReviewBoundary": true,
+      "productionBlocked": true
+    },
+    {
+      "id": "doctrine-gap-ledger-to-operator-demo",
+      "fromModuleId": "doctrine-gap-ledger",
+      "toModuleId": "operator-demo",
+      "fromRoute": "/doctrine-gap-ledger",
+      "toRoute": "/operator-demo",
+      "eventType": "doctrine.gap.ledger.reviewed",
       "replayRequired": true,
       "humanReviewBoundary": true,
       "productionBlocked": true

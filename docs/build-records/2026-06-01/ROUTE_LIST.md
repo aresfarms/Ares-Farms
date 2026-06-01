@@ -1,12 +1,12 @@
 # Route List
 
-Generated: 2026-06-01T20:07:08.343Z
+Generated: 2026-06-01T20:35:02.025Z
 
-Page routes: 71
+Page routes: 72
 
-API routes: 149
+API routes: 150
 
-Total routes: 220
+Total routes: 222
 
 ## Page Routes
 
@@ -24,6 +24,7 @@ Total routes: 220
 | /data-rights | src/app/data-rights/page.tsx |
 | /decisions | src/app/decisions/page.tsx |
 | /deployment-environment-readiness | src/app/deployment-environment-readiness/page.tsx |
+| /doctrine-gap-ledger | src/app/doctrine-gap-ledger/page.tsx |
 | /documents | src/app/documents/page.tsx |
 | /environmental-compliance | src/app/environmental-compliance/page.tsx |
 | /evidence-packets | src/app/evidence-packets/page.tsx |
@@ -127,6 +128,7 @@ Total routes: 220
 | /api/governance/build-preservation | src/app/api/governance/build-preservation/route.ts |
 | /api/governance/controlled-promotion-activation | src/app/api/governance/controlled-promotion-activation/route.ts |
 | /api/governance/deployment-environment-readiness | src/app/api/governance/deployment-environment-readiness/route.ts |
+| /api/governance/doctrine-gap-ledger | src/app/api/governance/doctrine-gap-ledger/route.ts |
 | /api/governance/environmental-compliance/admin | src/app/api/governance/environmental-compliance/admin/route.ts |
 | /api/governance/environmental-compliance | src/app/api/governance/environmental-compliance/route.ts |
 | /api/governance/live-action-readiness/admin | src/app/api/governance/live-action-readiness/admin/route.ts |

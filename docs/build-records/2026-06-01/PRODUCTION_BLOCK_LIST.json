@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-01T20:07:08.342Z",
+  "generatedAt": "2026-06-01T20:35:02.021Z",
   "globalProductionBlocks": [
     "advisory only",
     "no approval",
@@ -165,6 +165,13 @@
       "gate": "Build Preservation and Evidence Archive Gate",
       "requiredHumanAuthority": "Governance Archivist + Release Manager",
       "currentPosture": "Evidence-only; checkpoint archived without production authority."
+    },
+    {
+      "module": "Module 43",
+      "route": "/doctrine-gap-ledger",
+      "gate": "Doctrine-to-Code Gap Ledger",
+      "requiredHumanAuthority": "Constitutional Authority + Release Manager + Public Surface Governance Owner + Claims/Compliance Reviewer + Source Intelligence Governance Owner + Public DTO Owner",
+      "currentPosture": "Review-bound; the three remaining gaps are named and blocked pending qualified controlled promotion."
     }
   ],
   "hardBlocks": [

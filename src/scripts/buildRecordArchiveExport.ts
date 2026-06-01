@@ -97,6 +97,8 @@ function gitMetadata() {
   };
 }
 
+type GitMetadata = ReturnType<typeof gitMetadata>;
+
 function walkFiles(root: string, predicate: (fileName: string) => boolean): string[] {
   const files: string[] = [];
 
@@ -1018,9 +1020,9 @@ function writeCanonicalBuildRecord(
   gaps: GapTicket[],
   routes: ReturnType<typeof routeInventory>,
   audit: ReturnType<typeof publicSurfaceDisclosureAudit>,
-  blocks: ReturnType<typeof productionBlockList>
+  blocks: ReturnType<typeof productionBlockList>,
+  git: GitMetadata
 ): void {
-  const git = gitMetadata();
   const statusCounts = Object.values(matrix.requirements).reduce(
     (counts, requirement) => {
       counts[requirement.status] = (counts[requirement.status] ?? 0) + 1;
@@ -1143,6 +1145,7 @@ function main(): void {
   ensureDir(archiveRoot);
   ensureDir(ticketRoot);
 
+  const sourceGit = gitMetadata();
   const matrix = readRequirementMatrix();
   const gaps = doctrineGapLedger(matrix);
   const routes = routeInventory();
@@ -1165,7 +1168,7 @@ function main(): void {
   writeRouteArtifacts(routes);
   writeProductionBlockArtifacts(blocks);
   writeModuleExports();
-  writeCanonicalBuildRecord(matrix, gaps, routes, audit, blocks);
+  writeCanonicalBuildRecord(matrix, gaps, routes, audit, blocks, sourceGit);
 
   const verificationSummaryPath = join(archiveRoot, "VERIFICATION_OUTPUT.md");
   const verifyBackendOutputExists = existsSync(join(archiveRoot, "VERIFY_BACKEND_OUTPUT.txt"));
@@ -1205,7 +1208,10 @@ function main(): void {
         apiRoutes: routes.apiRouteCount,
         controlledPromotionGaps: gaps.length,
         publicDisclosureAuditOk: audit.ok,
-        git: gitMetadata(),
+        git: {
+          source: sourceGit,
+          postExport: gitMetadata(),
+        },
       },
       null,
       2

@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
+import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
+import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   createRuntimeVersionRef,
   evaluateVersionRuntime,
 } from "@/lib/runtime/versionRuntime";
-import { classifyRecord } from "@/lib/runtime/classificationRuntime";
-import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
-import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
 
 /**
  * Recommendation API
@@ -20,14 +21,15 @@ import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
  *   Supports compliant recommendation handling and regulated borrower assistance.
  *
  * - Vol III: Technical Infrastructure
- *   Provides replay-safe recommendation execution and version lineage.
+ *   Provides replay-safe recommendation execution with durable version,
+ *   classification, observability, and replay-verification evidence.
  *
  * - Vol IV: Operational Runbooks
  *   Supports operator review, borrower guidance, escalation, and remediation workflows.
  *
  * - Vol V: Canonical Platform Doctrines
  *   Enforces classification, explainability, observability, replayability,
- *   version lineage, and selective disclosure.
+ *   version lineage, selective disclosure, and evidence preservation.
  */
 
 type RecommendRequestBody = {
@@ -77,8 +79,9 @@ function buildRecommendations(body: RecommendRequestBody) {
 }
 
 export async function POST(req: NextRequest) {
+  const traceId = createRecommendTraceId();
+
   try {
-    const traceId = createRecommendTraceId();
     const body = (await req.json()) as RecommendRequestBody;
 
     const runtimeGuard = runRuntimeGuard({
@@ -98,6 +101,31 @@ export async function POST(req: NextRequest) {
     });
 
     if (!runtimeGuard.allowed) {
+      const observability = createObservabilityEvent({
+        eventType: "RECOMMENDATION_RUNTIME_BLOCKED",
+        domain: "runtime",
+        severity: "WARN",
+        message: "Recommendation runtime guard blocked the request.",
+        traceId,
+        replayRef: traceId,
+        actorId: body.userId ?? body.borrowerId ?? null,
+        module: "api.recommend",
+        metadata: {
+          route: "/api/recommend",
+          findings: runtimeGuard.findings,
+        },
+      });
+
+      const evidence = await persistGovernanceEvidence({
+        traceId,
+        replayRef: traceId,
+        observability,
+        metadata: {
+          route: "/api/recommend",
+          runtimeBlocked: true,
+        },
+      });
+
       return NextResponse.json(
         {
           ok: false,
@@ -105,6 +133,8 @@ export async function POST(req: NextRequest) {
           governance: {
             traceId,
             runtimeGuard,
+            observability,
+            evidence,
           },
         },
         { status: 403 }
@@ -124,7 +154,7 @@ export async function POST(req: NextRequest) {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -132,6 +162,12 @@ export async function POST(req: NextRequest) {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -235,6 +271,64 @@ export async function POST(req: NextRequest) {
         classificationLevel:
           classifiedOutput.classification.classificationLevel,
         advisoryOnly: true,
+        durableGovernanceEvidence: true,
+      },
+    });
+
+    const evidence = await persistGovernanceEvidence({
+      traceId,
+      replayRef: traceId,
+      versionRuntime,
+      classifications: [
+        {
+          resourceType: "recommendation_input",
+          resourceId: traceId,
+          classification: classifiedInput.classification,
+          traceId,
+          replayRef: traceId,
+          metadata: {
+            route: "/api/recommend",
+            stage: "input",
+          },
+        },
+        {
+          resourceType: "recommendation_output",
+          resourceId: traceId,
+          classification: classifiedOutput.classification,
+          traceId,
+          replayRef: traceId,
+          metadata: {
+            route: "/api/recommend",
+            stage: "output",
+            advisoryOnly: true,
+          },
+        },
+      ],
+      observability,
+      replayVerification: {
+        traceId,
+        replayRef: traceId,
+        targetType: "api_route",
+        targetId: "api.recommend",
+        verificationStatus: versionRuntime.ok ? "PASS" : "WARN",
+        deterministic: true,
+        replaySafe: versionRuntime.replaySafe,
+        sourceVersion: "recommendation-request-v0.1.0",
+        replayVersion: "governance-evidence-store-v0.1.0",
+        eventCount: 1,
+        mismatchCount: versionRuntime.ok ? 0 : 1,
+        result: {
+          advisoryOnly: true,
+          versionRuntimeOk: versionRuntime.ok,
+        },
+        metadata: {
+          route: "/api/recommend",
+          operation: "recommendation.generate",
+        },
+      },
+      metadata: {
+        route: "/api/recommend",
+        operation: "recommendation.generate",
       },
     });
 
@@ -251,9 +345,37 @@ export async function POST(req: NextRequest) {
         outputClassification: classifiedOutput.classification,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {
+    const observability = createObservabilityEvent({
+      eventType: "RECOMMENDATION_RUNTIME_ERROR",
+      domain: "runtime",
+      severity: "ERROR",
+      message: "Recommendation API encountered an unhandled runtime error.",
+      traceId,
+      replayRef: traceId,
+      module: "api.recommend",
+      metadata: {
+        route: "/api/recommend",
+        error:
+          error instanceof Error
+            ? error.message
+            : "Unknown recommendation runtime error.",
+      },
+    });
+
+    const evidence = await persistGovernanceEvidence({
+      traceId,
+      replayRef: traceId,
+      observability,
+      metadata: {
+        route: "/api/recommend",
+        runtimeError: true,
+      },
+    });
+
     return NextResponse.json(
       {
         ok: false,
@@ -261,6 +383,11 @@ export async function POST(req: NextRequest) {
           error instanceof Error
             ? error.message
             : "Unknown recommendation runtime error.",
+        governance: {
+          traceId,
+          observability,
+          evidence,
+        },
       },
       { status: 500 }
     );

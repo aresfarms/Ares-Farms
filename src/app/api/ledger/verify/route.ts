@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { verifyLedger } from "@/lib/audit";
+import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   createRuntimeVersionRef,
@@ -80,7 +81,7 @@ export async function GET() {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -88,6 +89,12 @@ export async function GET() {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -145,6 +152,22 @@ export async function GET() {
       },
     });
 
+    const evidence = await persistRouteGovernanceEvidence({
+      traceId,
+      route: "/api/ledger/verify",
+      operation: "ledger.verify",
+      module: "api.ledger.verify",
+      versionRuntime,
+      observability,
+      sourceVersion: "ledger-verification-v0.1.0",
+      verificationStatus: verified ? "PASS" : "REVIEW_REQUIRED",
+      mismatchCount: verified ? 0 : 1,
+      result: {
+        verified,
+        verification,
+      },
+    });
+
     return NextResponse.json({
       ok: verified,
       verified,
@@ -155,6 +178,7 @@ export async function GET() {
         versionRuntime,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {

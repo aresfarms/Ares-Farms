@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auditEvents } from "@/db/schema";
 import { repairLedgerChain } from "@/lib/ledger/repairLedgerChain";
+import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -134,7 +135,7 @@ export async function POST() {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -142,6 +143,12 @@ export async function POST() {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -202,6 +209,29 @@ export async function POST() {
       },
     });
 
+    const evidence = await persistRouteGovernanceEvidence({
+      traceId,
+      route: "/api/ledger/repair",
+      operation: "ledger.repair",
+      module: "api.ledger.repair",
+      versionRuntime,
+      observability,
+      sourceVersion: "ledger-repair-v0.1.0",
+      eventCount: entriesBeforeRepair.length,
+      verificationStatus: repairOk ? "PASS" : "REVIEW_REQUIRED",
+      mismatchCount: repairOk ? 0 : 1,
+      result: {
+        repairedCount,
+        repairOk,
+        issueCount: Array.isArray(repairResult.issues)
+          ? repairResult.issues.length
+          : 0,
+      },
+      metadata: {
+        mutationSensitive: true,
+      },
+    });
+
     return NextResponse.json({
       ok: repairOk,
       repairedCount,
@@ -212,6 +242,7 @@ export async function POST() {
         versionRuntime,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {

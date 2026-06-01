@@ -5,12 +5,14 @@ export function sha256(input: string) {
 }
 
 export function createEventHash(event: any, prevHash: string | null) {
+  const eventWithChainRef = {
+    ...event,
+    prevHash: prevHash ?? null,
+  };
+
   const normalized = JSON.stringify(
-    {
-      ...event,
-      prevHash: prevHash ?? null,
-    },
-    Object.keys(event).sort()
+    eventWithChainRef,
+    Object.keys(eventWithChainRef).sort()
   );
 
   return sha256(normalized);

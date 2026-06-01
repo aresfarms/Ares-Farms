@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 
 import { db } from "@/lib/db";
+import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   createRuntimeVersionRef,
@@ -105,7 +106,7 @@ export async function GET() {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -113,6 +114,12 @@ export async function GET() {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -174,6 +181,22 @@ export async function GET() {
       },
     });
 
+    const evidence = await persistRouteGovernanceEvidence({
+      traceId,
+      route: "/api/ledger/canonical",
+      operation: "ledger.canonical.read",
+      module: "api.ledger.canonical",
+      versionRuntime,
+      observability,
+      sourceVersion: "canonical-ledger-read-v0.1.0",
+      eventCount: activeMeta === null ? 0 : 1,
+      verificationStatus: activeMeta !== null ? "PASS" : "REVIEW_REQUIRED",
+      mismatchCount: activeMeta !== null ? 0 : 1,
+      result: {
+        activeMetaFound: activeMeta !== null,
+      },
+    });
+
     return NextResponse.json({
       ok: true,
       activeMeta,
@@ -183,6 +206,7 @@ export async function GET() {
         versionRuntime,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {

@@ -4,39 +4,32 @@ import { makeDecision } from "@/services/decision/decisionEngine";
 import { routeVendors } from "@/services/vendors/vendorRouter";
 
 /**
- * MASTER OUTPUT ENGINE
- * Combines:
- * - farm intelligence
- * - vendor routing
- * - report gating
- * - compliance rules
+ * Governed Output Builder
+ *
+ * Master Volume Governance:
+ * - Vol I: keeps output inside constitutional platform authority.
+ * - Vol II: prevents borrower-facing output from becoming approval,
+ *   eligibility, financing, permitting, legal, or regulatory determination.
+ * - Vol III: preserves deterministic response structure.
+ * - Vol III-B: keeps AI output advisory and human-review bounded.
+ * - Vol IV: supports operator review and escalation.
+ * - Vol V: preserves explainability, classification, portability, and
+ *   controlled-disclosure boundaries.
  */
 export function buildResponse(state: OnboardingState) {
-  // ----------------------------
-  // CORE INTELLIGENCE
-  // ----------------------------
   const recommendations = makeDecision(state);
-
-  // ----------------------------
-  // VENDOR MATCHING
-  // ----------------------------
   const vendorMatches = routeVendors(state);
 
-  // ----------------------------
-  // REPORT AVAILABILITY
-  // ----------------------------
-  const paidReports =
+  const institutionalReports =
     recommendations.reports?.length > 0
-      ? recommendations.reports.map((r) => ({
-          name: r,
-          status: "PAYWALLED",
-          requiresPurchase: true,
+      ? recommendations.reports.map((reportName) => ({
+          name: reportName,
+          status: "INSTITUTIONAL_REVIEW_REQUIRED",
+          borrowerCharged: false,
+          requiresHumanReview: true,
         }))
       : [];
 
-  // ----------------------------
-  // EXOTIC / HIGH RISK FLAGS
-  // ----------------------------
   const exotic =
     state.farmTypes?.includes("EXOTIC_ANIMALS") ||
     state.farmTypes?.includes("EXOTIC_BIRDS");
@@ -44,20 +37,14 @@ export function buildResponse(state: OnboardingState) {
   const complianceWarnings = exotic
     ? [
         "EXOTIC FARMING CATEGORY DETECTED",
-        "STATE PERMIT REQUIRED BEFORE OPERATION",
-        "DO NOT PROCEED WITHOUT REGULATORY APPROVAL",
+        "STATE OR LOCAL REVIEW MAY BE REQUIRED BEFORE OPERATION",
+        "DO NOT RELY ON THIS PLATFORM OUTPUT AS A PERMITTING, LEGAL, OR REGULATORY DETERMINATION",
       ]
     : [];
 
-  // ----------------------------
-  // DISCLAIMER (GLOBAL SYSTEM RULE)
-  // ----------------------------
   const disclaimer =
-    "AI-GENERATED INFORMATION ONLY — NOT AN OFFICIAL REPORT — NOT VALID FOR PERMITTING, FINANCING, LEGAL, OR REGULATORY USE. INFORMATION IS PROVIDED FOR GENERAL EDUCATIONAL AND DECISION-SUPPORT PURPOSES ONLY AND SHOULD NOT BE RELIED UPON WITHOUT INDEPENDENT VERIFICATION. USERS ARE STRONGLY ENCOURAGED TO CONSULT APPROPRIATE LICENSED PROFESSIONALS BEFORE MAKING ANY BUSINESS OR PROPERTY DECISIONS.";
+    "AI-GENERATED INFORMATION ONLY - NOT AN OFFICIAL REPORT - NOT VALID FOR PERMITTING, FINANCING, LEGAL, OR REGULATORY USE. INFORMATION IS PROVIDED FOR GENERAL EDUCATIONAL AND DECISION-SUPPORT PURPOSES ONLY AND SHOULD NOT BE RELIED UPON WITHOUT INDEPENDENT VERIFICATION. USERS SHOULD CONSULT APPROPRIATE LICENSED PROFESSIONALS BEFORE MAKING BUSINESS OR PROPERTY DECISIONS.";
 
-  // ----------------------------
-  // FINAL RESPONSE OBJECT
-  // ----------------------------
   return {
     profile: {
       stage: state.stage,
@@ -72,23 +59,24 @@ export function buildResponse(state: OnboardingState) {
     vendors: vendorMatches,
 
     reports: {
-      free: recommendations.notes,
-      paid: paidReports,
+      baseline: recommendations.notes,
+      institutional: institutionalReports,
     },
 
     complianceWarnings,
 
-    monetization: {
-      hasPaidReports: paidReports.length > 0,
-      vendorRoutingEnabled: true,
-      newsletterEligible: true,
+    fundingModel: {
+      borrowerCharged: false,
+      institutionFunded: true,
+      noOutcomeCompensation: true,
+      noDataMonetization: true,
     },
 
     nextActions: [
-      "Explore free farm plan",
-      "Purchase detailed report",
-      "Browse vetted vendors",
-      "Check financing options",
+      "Review baseline readiness guidance",
+      "Prepare documents for human review",
+      "Use governed export and portability workflows",
+      "Request operator support for institutional coordination",
     ],
 
     disclaimer,

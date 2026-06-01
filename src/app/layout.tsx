@@ -1,3 +1,5 @@
+import { PlatformShell } from "@/components/platform/PlatformShell";
+
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +7,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <PlatformShell>{children}</PlatformShell>
     </html>
   );
 }

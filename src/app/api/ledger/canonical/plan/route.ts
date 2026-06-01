@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { auditEvents } from "@/db/schema";
 import { validateCanonicalChain } from "@/lib/ledger/validateCanonicalChain";
+import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -94,7 +95,7 @@ export async function GET() {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -102,6 +103,12 @@ export async function GET() {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -174,6 +181,23 @@ export async function GET() {
       },
     });
 
+    const evidence = await persistRouteGovernanceEvidence({
+      traceId,
+      route: "/api/ledger/canonical/plan",
+      operation: "ledger.canonical.plan",
+      module: "api.ledger.canonical.plan",
+      versionRuntime,
+      observability,
+      sourceVersion: "canonical-ledger-plan-v0.1.0",
+      eventCount: entries.length,
+      verificationStatus: fixes.length === 0 ? "PASS" : "REVIEW_REQUIRED",
+      mismatchCount: fixes.length,
+      result: {
+        valid: validation.valid,
+        issueCount: fixes.length,
+      },
+    });
+
     return NextResponse.json({
       ok: true,
       valid: validation.valid,
@@ -185,6 +209,7 @@ export async function GET() {
         versionRuntime,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {

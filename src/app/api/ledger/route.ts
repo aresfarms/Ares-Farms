@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
 import { auditEvents } from "@/db/schema";
+import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -82,7 +83,7 @@ export async function GET() {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -90,6 +91,12 @@ export async function GET() {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -134,6 +141,20 @@ export async function GET() {
       },
     });
 
+    const evidence = await persistRouteGovernanceEvidence({
+      traceId,
+      route: "/api/ledger",
+      operation: "ledger.read",
+      module: "api.ledger",
+      versionRuntime,
+      observability,
+      sourceVersion: "ledger-read-v0.1.0",
+      eventCount: rows.length,
+      result: {
+        rowCount: rows.length,
+      },
+    });
+
     return NextResponse.json({
       ok: true,
       count: rows.length,
@@ -144,6 +165,7 @@ export async function GET() {
         versionRuntime,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {

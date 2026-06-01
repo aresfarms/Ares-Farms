@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
 import { auditEvents } from "@/db/schema";
+import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -84,7 +85,7 @@ export async function GET() {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -92,6 +93,12 @@ export async function GET() {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -167,6 +174,37 @@ export async function GET() {
       },
     });
 
+    const evidence = await persistRouteGovernanceEvidence({
+      traceId,
+      route: "/api/audit/export",
+      operation: "audit.export",
+      module: "api.audit.export",
+      versionRuntime,
+      classifications: [
+        {
+          resourceType: "audit_export",
+          resourceId: traceId,
+          classification: classifiedExport.classification,
+          traceId,
+          replayRef: traceId,
+          metadata: {
+            rowCount: rows.length,
+          },
+        },
+      ],
+      observability,
+      sourceVersion: "audit-export-v0.1.0",
+      eventCount: rows.length,
+      result: {
+        rowCount: rows.length,
+        classificationLevel:
+          classifiedExport.classification.classificationLevel,
+      },
+      metadata: {
+        exportSurface: true,
+      },
+    });
+
     return NextResponse.json({
       ok: true,
       count: rows.length,
@@ -178,6 +216,7 @@ export async function GET() {
         classification: classifiedExport.classification,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {

@@ -1,93 +1,133 @@
-export function buildReport(result: any) {
-  const { scores, decision, tenantId } = result;
+/**
+ * Governed Report Builder
+ *
+ * Master Volume Governance:
+ * - Vol I: generated reports must stay inside constitutional authority.
+ * - Vol II: outputs must remain advisory and cannot imply approval,
+ *   underwriting, eligibility, financing, permitting, legal, or regulatory use.
+ * - Vol III: report structure must be deterministic and replay-safe.
+ * - Vol IV: human-review and escalation limits must remain visible.
+ * - Vol V: report output must preserve classification, explainability,
+ *   portability, disclosure, and export-governance boundaries.
+ */
 
-  /**
-   * 📊 BASE SUMMARY
-   */
+type ReportInput = {
+  scores?: Record<string, number | null | undefined>;
+  decision?: {
+    crops?: unknown[];
+    livestock?: unknown[];
+    equipment?: unknown[];
+    vendors?: unknown[];
+  };
+  tenantId?: string | null;
+};
+
+function numericScore(value: unknown): number {
+  const numericValue = Number(value);
+
+  return Number.isFinite(numericValue) ? numericValue : 0;
+}
+
+function percentScore(value: unknown): number {
+  return Math.round(numericScore(value) * 100);
+}
+
+function riskLevelFromScore(score: number): "LOW" | "MEDIUM" | "HIGH" {
+  if (score > 0.75) {
+    return "LOW";
+  }
+
+  if (score > 0.5) {
+    return "MEDIUM";
+  }
+
+  return "HIGH";
+}
+
+function safeItems(value: unknown[] | undefined): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+export function buildReport(result: ReportInput) {
+  const scores = result.scores ?? {};
+  const decision = result.decision ?? {};
+  const tenantId = result.tenantId ?? "unknown";
+  const sbaScore = numericScore(scores.sba);
+
   const summary = {
     tenantId,
-    riskLevel:
-      scores.sba > 0.75
-        ? "LOW"
-        : scores.sba > 0.5
-        ? "MEDIUM"
-        : "HIGH",
-
-    overallScore: Math.round(scores.sba * 100),
+    riskLevel: riskLevelFromScore(sbaScore),
+    overallScore: percentScore(sbaScore),
+    advisoryOnly: true,
+    borrowerCharged: false,
+    officialUseAllowed: false,
   };
 
-  /**
-   * 🌾 FREE REPORT (SAFE OUTPUT)
-   */
-  const freeReport = {
-    title: "Farm AI Summary Report",
+  const baselineReadinessReport = {
+    title: "Baseline Readiness Report",
+    advisory:
+      "Advisory information only. This is not an approval, pre-approval, credit decision, underwriting decision, financing commitment, permitting decision, legal conclusion, or regulatory determination.",
     sections: {
       overview: [
         `Tenant: ${tenantId}`,
-        `Overall Score: ${summary.overallScore}%`,
-        `Risk Level: ${summary.riskLevel}`,
+        `Overall readiness signal: ${summary.overallScore}%`,
+        `Operational risk signal: ${summary.riskLevel}`,
       ],
-
-      basicRecommendations: {
-        crops: decision.crops,
-        livestock: decision.livestock,
+      readinessGuidance: {
+        crops: safeItems(decision.crops),
+        livestock: safeItems(decision.livestock),
       },
+      borrowerRights: [
+        "Borrowers pay nothing for baseline readiness support.",
+        "Borrowers may review and export governed records through portability workflows.",
+        "Human review is required before any regulated reliance.",
+      ],
     },
   };
 
-  /**
-   * 💰 PAID REPORT (BUSINESS LAYER)
-   */
-  const paidReport = {
-    title: "Commercial Farm Expansion Report",
-
+  const institutionalCoordinationReport = {
+    title: "Institutional Coordination Report",
+    advisory:
+      "Institutional coordination support only. This is not borrower-paid and does not create approval, eligibility, underwriting, financing, legal, permitting, or regulatory reliance.",
     sections: {
-      financialHealth: {
-        credit: scores.credit,
-        liquidity: scores.liquidity,
-        collateral: scores.collateral,
+      operatingSignals: {
+        credit: numericScore(scores.credit),
+        liquidity: numericScore(scores.liquidity),
+        collateral: numericScore(scores.collateral),
       },
-
-      optimization: {
-        crops: decision.crops,
-        equipment: decision.equipment,
+      operationalPlanning: {
+        crops: safeItems(decision.crops),
+        equipment: safeItems(decision.equipment),
       },
-
-      vendorStrategy: decision.vendors,
-
+      vendorContext: safeItems(decision.vendors),
       notes: [
-        "Includes optimization for scaling operations",
-        "Includes financing pathways and equipment planning",
+        "Supports organized human review and institutional coordination.",
+        "Does not create a lender commitment or borrower disclosure.",
       ],
     },
   };
 
-  /**
-   * 🌍 ENVIRONMENTAL REPORT (PE / REGULATED)
-   */
-  const environmentalReport = {
-    title: "Environmental Compliance Report (Phase I–III)",
-
+  const environmentalReadinessChecklist = {
+    title: "Environmental Documentation Readiness Checklist",
+    advisory:
+      "Environmental readiness support only. This is not valid for permitting, financing, legal, or regulatory reliance without independent licensed professional review.",
     sections: {
-      siteAssessment: [
-        "Soil suitability analysis required",
-        "Water table risk assessment required",
+      documentationReadiness: [
+        "Soil suitability documentation may need licensed professional review.",
+        "Water table and site risk documentation may need licensed professional review.",
       ],
-
-      complianceNotes: [
-        "Requires PE certification before regulatory submission",
-        "Not legally valid without human review",
+      relianceLimits: [
+        "Not an official environmental report.",
+        "Not a permit application.",
+        "Not a legal or regulatory determination.",
       ],
     },
   };
 
-  /**
-   * 📦 FINAL OUTPUT STRUCTURE
-   */
   return {
     summary,
-    freeReport,
-    paidReport,
-    environmentalReport,
+    baselineReadinessReport,
+    institutionalCoordinationReport,
+    environmentalReadinessChecklist,
   };
 }

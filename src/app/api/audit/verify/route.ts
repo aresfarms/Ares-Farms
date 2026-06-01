@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { verifyAuditChain } from "@/lib/audit";
+import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   createRuntimeVersionRef,
@@ -80,7 +81,7 @@ export async function GET() {
         ),
         createRuntimeVersionRef(
           "governance",
-          "master-volume-runtime-v0.1.0",
+          "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
           traceId
         ),
@@ -88,6 +89,12 @@ export async function GET() {
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
+          traceId
+        ),
+        createRuntimeVersionRef(
+          "runtime",
+          "governance-evidence-store-v0.1.0",
+          "src/lib/governance/evidenceStore.ts",
           traceId
         ),
         createRuntimeVersionRef(
@@ -145,6 +152,25 @@ export async function GET() {
       },
     });
 
+    const evidence = await persistRouteGovernanceEvidence({
+      traceId,
+      route: "/api/audit/verify",
+      operation: "audit.verifyChain",
+      module: "api.audit.verify",
+      versionRuntime,
+      observability,
+      sourceVersion: "audit-chain-verification-v0.1.0",
+      eventCount: verification.checkedRows,
+      verificationStatus: verified ? "PASS" : "REVIEW_REQUIRED",
+      mismatchCount: verified ? 0 : 1,
+      result: {
+        verified,
+        checkedRows: verification.checkedRows,
+        brokenIndex: verification.brokenIndex,
+        source: verification.source,
+      },
+    });
+
     return NextResponse.json({
       ok: verified,
       verified,
@@ -155,6 +181,7 @@ export async function GET() {
         versionRuntime,
         explainability: explanation,
         observability,
+        evidence,
       },
     });
   } catch (error) {

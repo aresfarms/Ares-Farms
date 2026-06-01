@@ -256,15 +256,15 @@ const currentMasterVolumeRegistry = {
   documents: [
     {
       key: "toc",
-      label: "Ares Master Volume Series Unified TOC",
+      label: "Furlong Master Volume Series Unified TOC",
       governingVersion: "v1.0",
-      file: "Ares_Master_Volume_Series_Unified_TOC.pdf",
+      file: "Furlong_Master_Volume_Series_Unified_TOC.pdf",
     },
     {
       key: "buildMatrix",
-      label: "Ares Build Conformance & Cross-Reference Matrix",
+      label: "Furlong Build Conformance & Cross-Reference Matrix",
       governingVersion: "v1.0",
-      file: "Ares_Build_Conformance_Cross_Reference_Matrix.pdf",
+      file: "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf",
     },
     {
       key: "volume0",
@@ -276,49 +276,56 @@ const currentMasterVolumeRegistry = {
       key: "volumeI",
       label: "Ares/Furlong Volume I Constitutional Backbone Master",
       governingVersion: "v29.0",
-      file: "Ares_Volume_I_Constitutional_Backbone_Master.pdf",
+      file: "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
     },
     {
       key: "volumeII",
       label: "Ares/Furlong Volume II Regulatory Governance Master",
       governingVersion: "v23.0 compatibility state",
-      file: "Ares_Volume_II_Regulatory_Governance_Master.pdf",
+      file: "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
     },
     {
       key: "volumeIII",
       label: "Ares/Furlong Volume III Technical Infrastructure Master",
       governingVersion: "v25.0",
-      file: "Ares_Volume_III_Technical_Infrastructure_Master.pdf",
+      file: "Furlong_Volume_III_Technical_Infrastructure_Master.pdf",
     },
     {
       key: "volumeIII-B",
       label: "Ares/Furlong Volume III-B Governance Runtime Master",
       governingVersion: "v4.0",
-      file: "Ares_Volume_III_B_Governance_Runtime_Master.pdf",
+      file: "Furlong_Volume_III_B_Governance_Runtime_Master.pdf",
     },
     {
       key: "volumeIV",
       label: "Ares/Furlong Volume IV Operational Runbooks Master",
       governingVersion: "v22.0",
-      file: "Ares_Volume_IV_Operational_Runbooks_Master.pdf",
+      file: "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
     },
     {
       key: "volumeV",
       label: "Ares/Furlong Volume V Canonical Doctrines Master",
       governingVersion: "v10.0",
-      file: "Ares_Volume_V_Canonical_Doctrines_Master.pdf",
+      file: "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
     },
     {
       key: "volumeVI",
       label: "Ares/Furlong Volume VI Source Intelligence Integration Master",
       governingVersion: "v1.1",
-      file: "Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf",
+      file: "Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf",
+    },
+    {
+      key: "volumeVII",
+      label: "Furlong Volume VII Unified Governance Conformance Matrix",
+      governingVersion: "v1.0 active conformance matrix",
+      file: "Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf",
+      note: "Active conformance proof layer for unified governance, build verification, and doctrine-to-code traceability.",
     },
     {
       key: "xref",
       label: "Ares/Furlong Master Cross-Reference Index",
       governingVersion: "v22.0 active build-control reference",
-      file: "Ares_Master_Cross_Reference_Index.pdf",
+      file: "Furlong_Master_Cross_Reference_Index.pdf",
       note: "The supplied copy still carries some v21.0 compatibility rows; later amended volume text and the active build matrix control.",
     },
   ],
@@ -973,6 +980,7 @@ function writeVersionRegistryArtifacts(): void {
     join(repoRoot, "docs", "current-master-volume-registry.json"),
     currentMasterVolumeRegistry
   );
+  writeJson(join(repoRoot, "docs", "versions.json"), currentMasterVolumeRegistry);
   writeJson(
     join(archiveRoot, "CURRENT_MASTER_VOLUME_REGISTRY.json"),
     currentMasterVolumeRegistry

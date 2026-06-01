@@ -77,10 +77,10 @@ export const CONTENT_CLAIMS_POLICY_VERSION =
 export const CONTENT_CLAIMS_POLICY_SOURCES = [
   "Furlong_Customer_Version.pdf",
   "Furlong_Governance_Doctrines_Master_Series.pdf",
-  "Ares_Volume_I_Constitutional_Backbone_Master.pdf",
-  "Ares_Volume_II_Regulatory_Governance_Master.pdf",
-  "Ares_Volume_III_B_Governance_Runtime_Master.pdf",
-  "Ares_Volume_V_Canonical_Doctrines_Master.pdf",
+  "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
+  "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+  "Furlong_Volume_III_B_Governance_Runtime_Master.pdf",
+  "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
 ];
 
 export const LENDER_READY_DISCLOSURE =

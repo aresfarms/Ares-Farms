@@ -24,6 +24,7 @@ This module is review-bound. It does not authorize production launch, public pro
 - Vol IV: supports queueable operator review, audit handoff, and promotion readiness tracking.
 - Vol V: preserves claims, controlled disclosure, redaction, source authority, replayability, and evidence lineage.
 - Vol VI: keeps source intelligence, public DTO, scraper, revenue, conformance, and build-reference promotion limits review-bound until qualified approval exists.
+- Vol VII: uses the unified governance conformance matrix as the current proof layer for doctrine-to-code traceability.
 
 ## Current Gap Posture
 

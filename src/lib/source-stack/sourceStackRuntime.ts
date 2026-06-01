@@ -28,7 +28,7 @@ import {
  *   canonical lineage, replayability, and controlled disclosure.
  *
  * Supplemental governing inputs:
- * - Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf
+ * - Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf
  * - SOURCE_STACK_001_Canonical_External_Source_Discovery_Architecture.docx
  * - IMPLEMENTATION_WORKPACKAGES_Revenue_Intelligence_Runtime_Build.docx
  */
@@ -36,7 +36,7 @@ import {
 export const SOURCE_STACK_VERSION = "source-stack-runtime-v0.1.0";
 
 export const SOURCE_STACK_SOURCES = [
-  "Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf",
+  "Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf",
   "SOURCE_STACK_001_Canonical_External_Source_Discovery_Architecture.docx",
   "IMPLEMENTATION_WORKPACKAGES_Revenue_Intelligence_Runtime_Build.docx",
 ] as const;

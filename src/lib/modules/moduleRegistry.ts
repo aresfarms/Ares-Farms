@@ -28,7 +28,7 @@ import {
  * Supplemental integration sources:
  * - Ares_Furlong_Module_Integration_Expansion_Requirements.docx
  * - Ares_Furlong_Platform_Integration_Architecture.docx
- * - Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf
+ * - Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf
  */
 
 export type ModuleAudience =

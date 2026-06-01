@@ -93,11 +93,11 @@ const volumeViConsolidationRequirementIds = [
 ] as const;
 
 const updatedMasterVolumeSources = [
-  "Ares_Master_Volume_Series_Unified_TOC.pdf",
-  "Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf",
-  "Ares_Master_Cross_Reference_Index.pdf",
-  "Ares_Build_Conformance_Cross_Reference_Matrix.pdf",
-  "Volume_VI_Consolidation_and_Changes_Summary.md",
+  "Furlong_Master_Volume_Series_Unified_TOC.pdf",
+  "Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf",
+  "Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf",
+  "Furlong_Master_Cross_Reference_Index.pdf",
+  "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf",
   "Furlong_Master_Series_Hub.html",
 ] as const;
 
@@ -134,7 +134,7 @@ function main() {
     updatedMasterVolumeSources.every((source) =>
       matrix.sourceDocuments.includes(source)
     ),
-    "Requirement matrix must reference the updated unified TOC, Volume VI, and cross-reference index."
+    "Requirement matrix must reference the updated unified TOC, Volumes VI-VII, cross-reference index, and build conformance matrix."
   );
   assert(
     volumeViRequirementIds.every((requirementId) =>

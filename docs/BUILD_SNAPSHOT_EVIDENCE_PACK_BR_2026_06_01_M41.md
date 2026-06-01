@@ -26,8 +26,9 @@ Module 41 is recorded as conforming to the current Master Volume Series as of th
 - Volume IV: Operational runbooks, readiness, incident, support, release, archive, and recovery posture.
 - Volume V: Canonical doctrines for claims, classification, replay, explainability, redaction, controlled disclosure, data rights, source authority, and advisory-only output.
 - Volume VI: Source intelligence, scraper governance, revenue intelligence, runtime integration, conformance, public DTOs, source-stack architecture, and build-reference controls.
+- Volume VII: Unified governance conformance matrix, doctrine-to-code proof, and build-control traceability.
 
-Conclusion: Module 41 is a review-bound backend governance checkpoint under current Volumes 0-VI, not a production approval.
+Conclusion: Module 41 is a review-bound backend governance checkpoint under current Volumes 0-VII, not a production approval.
 
 ## Verification Commands
 

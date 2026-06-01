@@ -9,9 +9,9 @@ It incorporates:
 - `Ares_Furlong_Module_Integration_Expansion_Requirements.docx`
 - `Ares_Furlong_Platform_Integration_Architecture.docx`
 - `Ares_Furlong_Master_Volume_Conformance_Testing_Framework.docx`
-- `Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf`
+- `Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf`
 - `Volume_VI_Consolidation_and_Changes_Summary.md`
-- `Ares_Build_Conformance_Cross_Reference_Matrix.pdf`
+- `Furlong_Build_Conformance_Cross_Reference_Matrix.pdf`
 
 ## Governing Interpretation
 

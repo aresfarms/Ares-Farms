@@ -10,8 +10,8 @@ The source DOCX/PDF/HTML/MD files live at:
 
 | Document | Governing Version |
 | --- | --- |
-| Ares Master Volume Series Unified TOC | v1.0 |
-| Ares Build Conformance & Cross-Reference Matrix | v1.0 |
+| Furlong Master Volume Series Unified TOC | v1.0 |
+| Furlong Build Conformance & Cross-Reference Matrix | v1.0 |
 | Furlong Volume 0 Platform Orientation | v14.0 |
 | Ares/Furlong Volume I Constitutional Backbone Master | v29.0 |
 | Ares/Furlong Volume II Regulatory Governance Master | v23.0 compatibility state |
@@ -20,7 +20,8 @@ The source DOCX/PDF/HTML/MD files live at:
 | Ares/Furlong Volume IV Operational Runbooks Master | v22.0 |
 | Ares/Furlong Volume V Canonical Doctrines Master | v10.0 |
 | Ares/Furlong Volume VI Source Intelligence Integration Master | v1.1 |
-| Ares/Furlong Master Cross-Reference Index | v21.0 supplied copy |
+| Furlong Volume VII Unified Governance Conformance Matrix | v1.0 active conformance matrix |
+| Ares/Furlong Master Cross-Reference Index | v22.0 active build-control reference |
 
 Note: the supplied Master Cross-Reference Index and Build Conformance Matrix still
 show some earlier compatibility rows, while the individual Volume I, III, IV, and
@@ -35,27 +36,18 @@ These hashes help confirm whether the local PDF files changed again.
 
 | File | SHA-256 |
 | --- | --- |
-| `Ares_Master_Volume_Series_Unified_TOC.docx` | `3d735d9020d0813087ed125f99aeed0dc619a88db46736e23633badd85439f30` |
-| `Ares_Master_Volume_Series_Unified_TOC.pdf` | `52c6c33dc9d3a7410cea8328423930fce5a7d127e732934494f2363d4f49c481` |
-| `Ares_Build_Conformance_Cross_Reference_Matrix.docx` | `bf617e2a061e48aba71f5a96e002a6a52add44c48628cdd358627e179994ed82` |
-| `Ares_Build_Conformance_Cross_Reference_Matrix.pdf` | `9c32a4bb20c6465858b3f2e7eed378d768f4adf4b1ff7f242da53e218ee8e35a` |
-| `Ares_Master_Cross_Reference_Index.docx` | `3e6d15d13d7510cf43c36a8d027010328906626ef2bb1428be9b0b8038c44736` |
-| `Ares_Master_Cross_Reference_Index.pdf` | `18b243173f4c355fecb874b3531c3e1413e4d5b999affad632090521b3b12432` |
-| `Ares_Volume_I_Constitutional_Backbone_Master.docx` | `0f1f9d759dd6d617060923ce74d153bb843b637d1d3e53bfe4cde7bed88e6931` |
-| `Ares_Volume_I_Constitutional_Backbone_Master.pdf` | `0cb4f21f3d0f4fcbc7990d7355686ae1e1a3aba1302ec8bb6c1612a1a6ec93f8` |
-| `Ares_Volume_II_Regulatory_Governance_Master.docx` | `454e495602c76a7775892c3d13042a31d9fee511bc78aa453648516711437dd3` |
-| `Ares_Volume_II_Regulatory_Governance_Master.pdf` | `d658cc5e70831ad91150b27e15820f03b7b9bd60ec24e8ba825e2412243c800d` |
-| `Ares_Volume_III_Technical_Infrastructure_Master.docx` | `4573a01b948d155a58cd43745418a345e0ef286674457f6b6b83c592d033e9d1` |
-| `Ares_Volume_III_Technical_Infrastructure_Master.pdf` | `434e07b4347fb28c7654663f6fbdd759818fd7f90ccc0b43f5a78c57332da5ac` |
-| `Ares_Volume_III_B_Governance_Runtime_Master.docx` | `3f9bb553b307524bb217f7dd11d88929de9691dbc4440d9b211efe5b67285731` |
-| `Ares_Volume_III_B_Governance_Runtime_Master.pdf` | `fe9f9e02f4180938ae73bef3ec73cbccf560e7391328aedf390f93cd530cd358` |
-| `Ares_Volume_IV_Operational_Runbooks_Master.docx` | `508c4598f820eba1a71cc335b939be9ac23a555064e7a4a1148fa9d0c527b13b` |
-| `Ares_Volume_IV_Operational_Runbooks_Master.pdf` | `1b9f93a100f22af646fcd6f59e8998ab23f27bcb096b5b2a350d77c53d1ccc3b` |
-| `Ares_Volume_V_Canonical_Doctrines_Master.docx` | `73c0325ebc9b81b114b496f500bcd2f857882d07094bb702ccc06a76a57af504` |
-| `Ares_Volume_V_Canonical_Doctrines_Master.pdf` | `70b583ec985274ce4db254d45d3cba9a1363346dce282676113b060e9d92eb2a` |
-| `Ares_Volume_VI_Source_Intelligence_Integration_Master.docx` | `1a473ab78602a82c574d121f85f4797c6302bb8af1b35916be699de9645266b1` |
-| `Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf` | `c9603acd929dc8ad4217912548b24ede90bfd49cb08f9042815ac31a3198262c` |
-| `Furlong_Volume_0_Platform_Orientation.pdf` | `158a81ea51eac7be4b1e500e9f547776c75a0b5744b3586cdd16dcdd3fa9e48c` |
+| `Furlong_Volume_0_Platform_Orientation.pdf` | `54e51f85d1ac1b5a0f134bccdbb0e6ce213e67534952463434c4fb5147126e6b` |
+| `Furlong_Volume_I_Constitutional_Backbone_Master.pdf` | `6e379c94fec16ea61ce480836baa877b2aa744a4a1f04a04288684a004078bc6` |
+| `Furlong_Volume_II_Regulatory_Governance_Master.pdf` | `97bf5fa0a9d5682e3cbebf7eae5c46b3335df31597e07eda5fb0b530b4101df9` |
+| `Furlong_Volume_III_Technical_Infrastructure_Master.pdf` | `51d238a450d15a6fd3037e973d3daa5562976e05f80adaf40288ac454a382466` |
+| `Furlong_Volume_III_B_Governance_Runtime_Master.pdf` | `b0aa74475ae49d10e7332bc5342820643df4ce6ef1e5c2c9ba740b1db291db9d` |
+| `Furlong_Volume_IV_Operational_Runbooks_Master.pdf` | `5b680a045bbb5876e40da19092853a1ee99fae1814d657e0fac3044ef70cb816` |
+| `Furlong_Volume_V_Canonical_Doctrines_Master.pdf` | `7c91a6e3d07212bd0b7e04f88260a2d59828a5bb5b134fbab124b41bc597db92` |
+| `Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf` | `4d66b37f228726c063a17ce36723b89da935a0a7ba26570a88049f237730b204` |
+| `Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf` | `0bfc1f11ed79fa0a4723d73918b0e37998e42bc8d1ffb65ef755c41acc7c2530` |
+| `Furlong_Master_Cross_Reference_Index.pdf` | `07faff413ceadbd1a6cd83e239a2fe22ff135a1d30b72e2b2b883a463af321f0` |
+| `Furlong_Master_Volume_Series_Unified_TOC.pdf` | `a90777cdcc6cd1176bef4bbccd1fd434f5956be25a5a69ac386c2c425f7866be` |
+| `Furlong_Build_Conformance_Cross_Reference_Matrix.pdf` | `07bd0f9dd3ed05a8b8878e63f26d9eb7fab2235c98636232a753bf7a0ee30b16` |
 | `Furlong_Master_Series_Hub.html` | `f953cfe7f1d04a5f6f08855c1b1cb7c964f78c3a12ac3ff14b827f85b149c191` |
 | `Volume_VI_Consolidation_and_Changes_Summary.md` | `c44802c3f8c782e6ca86b7934b805a4671baf3c6b0d7668f645384f4d1d26f76` |
 
@@ -76,7 +68,7 @@ borrower portability, lender-ready language, and security posture claims.
 
 Caitlin provided these module-integration and platform-architecture inputs on
 2026-05-25. As of the 2026-05-31 update, they are absorbed into
-`Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf` and remain active
+`Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf` and remain active
 through Volume VI rather than as loose pending inputs.
 
 | File | SHA-256 |
@@ -116,11 +108,13 @@ The current backend build must incorporate these updated requirements:
   migration/runtime file, conformance entry, and verification command exist or
   the capability is explicitly recorded as blocked pending controlled
   promotion.
-- The governing build set now covers Volumes 0-VI and the Master Cross-Reference
+- The governing build set now covers Volumes 0-VII and the Master Cross-Reference
   Index v22.0. Volume VI is the canonical authority for source intelligence,
   scraper governance, property discovery, revenue intelligence, runtime
   governance, module integration, public source surfaces, conformance, backend
-  readiness, module readiness, and portable vertical surface alignment.
+  readiness, module readiness, and portable vertical surface alignment. Volume
+  VII is the active unified conformance proof layer for doctrine-to-code
+  traceability and build-control verification.
 - `docs/master-volume-requirements.json` must include all 33 Volume VI doctrine
   IDs from Part 8 of the updated Cross-Reference Index.
 - Public-safe source intelligence routes must exist for grants, property

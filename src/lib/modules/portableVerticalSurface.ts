@@ -1457,7 +1457,7 @@ export const internalPortableSurfaces: PortableVerticalSurface[] = [
       "Build preservation is evidence-only. Production launch, deployment, public exposure, portal launch, payments, notices, official reports, public verification, official reliance, legal advice, regulatory response, corrective-action commitment, remediation execution, and live external actions remain blocked.",
     safeMessages: portableSafeMessagesWith(
       "BR-2026-06-01-M41 has been recorded as a review-bound build checkpoint.",
-      "Module 41 conforms to current Master Volumes 0-VI as of the checkpoint evidence.",
+      "Module 41 conforms to current Master Volumes 0-VII as of the checkpoint evidence.",
       "Build preservation is evidence-only and does not authorize production launch.",
       "Tree drift must be resolved before a new canonical checkpoint is declared.",
       "Sensitive files must remain ignored and outside build history.",
@@ -1482,7 +1482,7 @@ export const internalPortableSurfaces: PortableVerticalSurface[] = [
     ],
     governanceRequirements: [
       ...portableSurfaceGovernanceRequirements,
-      "Master Volume 0-VI conformance evidence",
+      "Master Volume 0-VII conformance evidence",
       "checkpoint commit evidence",
       "backend verification evidence",
       "production build evidence",
@@ -1530,7 +1530,7 @@ export const internalPortableSurfaces: PortableVerticalSurface[] = [
       "All current doctrine-to-code gaps are named, owned, routed, and review-bound. Awaiting controlled promotion is not production approval.",
     safeMessages: portableSafeMessagesWith(
       "All current doctrine-to-code gaps are named, owned, routed, and review-bound.",
-      "The ledger is verified against the current Master Volume registry for Volumes 0-VI, the Cross-Reference Index, the Unified TOC, and the Build Matrix.",
+      "The ledger is verified against the current Master Volume registry for Volumes 0-VII, the Cross-Reference Index, the Unified TOC, and the Build Matrix.",
       "Awaiting controlled promotion is not production approval.",
       "No production launch has been authorized.",
       "No public production API exposure has been approved.",

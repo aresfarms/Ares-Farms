@@ -13,16 +13,17 @@ Use these documents as the source of truth:
 | Volume | File | Build Role |
 | --- | --- | --- |
 | Volume 0 | `Furlong_Volume_0_Platform_Orientation.pdf` | Platform identity, institutional purpose, borrower/lender positioning, executive orientation |
-| Volume I | `Ares_Volume_I_Constitutional_Backbone_Master.pdf` | Constitutional authority, doctrine hierarchy, role authority, amendment control, compliance checklist |
-| Volume II | `Ares_Volume_II_Regulatory_Governance_Master.pdf` | USDA/SBA/regulatory rules, adverse action, retention, policy versioning, regulatory monitoring |
-| Volume III | `Ares_Volume_III_Technical_Infrastructure_Master.pdf` | Technical architecture, ledger, replay, schema singularity, implementation sequence |
-| Volume III-B | `Ares_Volume_III_B_Governance_Runtime_Master.pdf` | Governance runtime, metrics, human-in-the-loop rules, observability, onboarding architecture |
-| Volume IV | `Ares_Volume_IV_Operational_Runbooks_Master.pdf` | Operational runbooks, deployment sequencing, workpackages, escalation and continuity procedures |
-| Volume V | `Ares_Volume_V_Canonical_Doctrines_Master.pdf` | Canonical doctrines: classification, explainability, overlays, versioning, observability, simulation, treasury, consent, source, sovereignty, economics |
-| Volume VI | `Ares_Volume_VI_Source_Intelligence_Integration_Master.pdf` / `.docx` | Canonical de-duplicated authority for source intelligence, scraper governance, revenue/source intelligence, runtime governance, platform integration, module integration, conformance, backend readiness, and portable vertical surface alignment |
-| Cross-Reference | `Ares_Master_Cross_Reference_Index.pdf` / `.docx` | Traceability map across all volumes; use this before building or changing modules |
-| Unified TOC | `Ares_Master_Volume_Series_Unified_TOC.pdf` / `.docx` | Current master-series front matter spanning Volumes 0-VI and the Index |
-| Build Conformance Matrix | `Ares_Build_Conformance_Cross_Reference_Matrix.pdf` / `.docx` | Doctrine-family to actual build artifact proof matrix with routes, schema, migrations, commands, and Built vs Built/BLOCKED status |
+| Volume I | `Furlong_Volume_I_Constitutional_Backbone_Master.pdf` | Constitutional authority, doctrine hierarchy, role authority, amendment control, compliance checklist |
+| Volume II | `Furlong_Volume_II_Regulatory_Governance_Master.pdf` | USDA/SBA/regulatory rules, adverse action, retention, policy versioning, regulatory monitoring |
+| Volume III | `Furlong_Volume_III_Technical_Infrastructure_Master.pdf` | Technical architecture, ledger, replay, schema singularity, implementation sequence |
+| Volume III-B | `Furlong_Volume_III_B_Governance_Runtime_Master.pdf` | Governance runtime, metrics, human-in-the-loop rules, observability, onboarding architecture |
+| Volume IV | `Furlong_Volume_IV_Operational_Runbooks_Master.pdf` | Operational runbooks, deployment sequencing, workpackages, escalation and continuity procedures |
+| Volume V | `Furlong_Volume_V_Canonical_Doctrines_Master.pdf` | Canonical doctrines: classification, explainability, overlays, versioning, observability, simulation, treasury, consent, source, sovereignty, economics |
+| Volume VI | `Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf` | Canonical de-duplicated authority for source intelligence, scraper governance, revenue/source intelligence, runtime governance, platform integration, module integration, conformance, backend readiness, and portable vertical surface alignment |
+| Volume VII | `Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf` | Unified governance conformance proof matrix, doctrine-to-code verification, and build-control traceability |
+| Cross-Reference | `Furlong_Master_Cross_Reference_Index.pdf` | Traceability map across all volumes; use this before building or changing modules |
+| Unified TOC | `Furlong_Master_Volume_Series_Unified_TOC.pdf` | Current master-series front matter spanning Volumes 0-VII and the Index |
+| Build Conformance Matrix | `Furlong_Build_Conformance_Cross_Reference_Matrix.pdf` | Doctrine-family to actual build artifact proof matrix with routes, schema, migrations, commands, and Built vs Built/BLOCKED status |
 | Series Hub | `Furlong_Master_Series_Hub.html` | Current index of the maintained Master Series documents |
 | Volume VI Changes Summary | `Volume_VI_Consolidation_and_Changes_Summary.md` | Governing change-control note for the Volume VI consolidation, de-duplication, index/TOC/hub updates, and conformance matrix expectations |
 
@@ -49,6 +50,7 @@ Current governing snapshot:
 - Volume IV v22.0 active supplied volume; the Volume VI summary records the earlier v21.0 consolidation pass
 - Volume V v10.0 active supplied volume; the Volume VI summary records the earlier v7.0 consolidation pass
 - Volume VI v1.1
+- Volume VII v1.0 active conformance matrix
 - Build Conformance Matrix v1.0
 - Cross-Reference Index v22.0 summary intent, with the supplied local copy still showing v21.0 in some extracted header fields
 

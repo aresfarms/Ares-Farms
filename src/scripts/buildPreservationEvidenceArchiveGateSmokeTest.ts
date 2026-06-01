@@ -148,7 +148,7 @@ function main() {
     ) &&
       review?.preservationItems.some(
         (preservationItem) =>
-          preservationItem.id === "master-volume-0-vi-conformance-attached"
+          preservationItem.id === "master-volume-0-vii-conformance-attached"
       ) &&
       review?.preservationItems.some(
         (preservationItem) =>
@@ -165,14 +165,14 @@ function main() {
         (preservationItem) =>
           preservationItem.id === "production-authority-remains-blocked"
       ),
-    "Build preservation must include checkpoint, Vol 0-VI, verification, drift, sensitive-file, and production block controls."
+    "Build preservation must include checkpoint, Vol 0-VII, verification, drift, sensitive-file, and production block controls."
   );
   assert(
     result.disclosures.includes("Your document was received.") &&
       result.disclosures.includes("Human review is pending.") &&
       result.disclosures.includes("More information may be needed.") &&
       result.disclosures.includes(
-        "Module 41 conforms to current Master Volumes 0-VI as of the checkpoint evidence."
+        "Module 41 conforms to current Master Volumes 0-VII as of the checkpoint evidence."
       ) &&
       result.disclosures.includes(
         "Build preservation is evidence-only and does not authorize production launch."
@@ -191,7 +191,7 @@ function main() {
       result.disclosures.includes("No official reliance has been created.") &&
       result.disclosures.includes("No legal advice has been provided.") &&
       result.disclosures.includes("No live external action has been performed."),
-    "Build preservation disclosures must include required safe status, Vol 0-VI, sensitive-file, and production-block messages."
+    "Build preservation disclosures must include required safe status, Vol 0-VII, sensitive-file, and production-block messages."
   );
   assert(
     eventTypes.has("build.preservation.archived"),

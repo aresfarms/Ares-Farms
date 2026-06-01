@@ -24,6 +24,7 @@ This module is evidence-only. It does not authorize production launch, deploymen
 - Vol IV: supports restoration, archive, recovery, audit, and operator handoff.
 - Vol V: preserves claims, redaction, controlled disclosure, replayability, explainability, data rights, and evidence lineage.
 - Vol VI: freezes source intelligence, scraper, revenue intelligence, runtime governance, integration, conformance, and build-reference evidence.
+- Vol VII: attaches unified governance conformance matrix posture as evidence-only proof without production authority.
 
 ## Canonical Checkpoint
 
@@ -79,7 +80,7 @@ Module 42 includes the shared safe workflow language:
 It also includes build-specific safe language:
 
 - BR-2026-06-01-M41 has been recorded as a review-bound build checkpoint.
-- Module 41 conforms to current Master Volumes 0-VI as of the checkpoint evidence.
+- Module 41 conforms to current Master Volumes 0-VII as of the checkpoint evidence.
 - Build preservation is evidence-only and does not authorize production launch.
 - Tree drift must be resolved before a new canonical checkpoint is declared.
 - Sensitive files must remain ignored and outside build history.

@@ -129,10 +129,13 @@ function main() {
       (entry) => entry.key === "volumeVI" && entry.governingVersion === "v1.1"
     ) &&
       review.currentMasterVolumeVersions.some(
+        (entry) => entry.key === "volumeVII"
+      ) &&
+      review.currentMasterVolumeVersions.some(
         (entry) => entry.key === "volumeIII-B"
       ) &&
       review.currentMasterVolumeVersions.some((entry) => entry.key === "xref"),
-    "Doctrine gap ledger must attach current Vol VI, Vol III-B, and cross-reference version evidence."
+    "Doctrine gap ledger must attach current Vol VI, Vol VII, Vol III-B, and cross-reference version evidence."
   );
   assert(
     result.disclosures.includes("Your document was received.") &&

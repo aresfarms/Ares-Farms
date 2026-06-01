@@ -45,8 +45,8 @@ Machine-readable version registry: `docs/current-master-volume-registry.json`.
 
 | Document | Version |
 |---|---|
-| Ares Master Volume Series Unified TOC | v1.0 |
-| Ares Build Conformance & Cross-Reference Matrix | v1.0 |
+| Furlong Master Volume Series Unified TOC | v1.0 |
+| Furlong Build Conformance & Cross-Reference Matrix | v1.0 |
 | Furlong Volume 0 Platform Orientation | v14.0 |
 | Ares/Furlong Volume I Constitutional Backbone Master | v29.0 |
 | Ares/Furlong Volume II Regulatory Governance Master | v23.0 compatibility state |
@@ -55,6 +55,7 @@ Machine-readable version registry: `docs/current-master-volume-registry.json`.
 | Ares/Furlong Volume IV Operational Runbooks Master | v22.0 |
 | Ares/Furlong Volume V Canonical Doctrines Master | v10.0 |
 | Ares/Furlong Volume VI Source Intelligence Integration Master | v1.1 |
+| Furlong Volume VII Unified Governance Conformance Matrix | v1.0 active conformance matrix |
 | Ares/Furlong Master Cross-Reference Index | v22.0 active build-control reference |
 
 ## Git Metadata
@@ -69,7 +70,7 @@ The system is not production-live and should not be treated as live authority. C
 
 ## Master Volume Alignment
 
-The build is governed by the current Master Volume Series, including Volumes 0-VI, the unified TOC/hub, the build conformance matrix, source intelligence, conformance, integration, missing-doctrine, scraper, revenue intelligence, source-stack, and build-reference updates incorporated into the build sequence.
+The build is governed by the current Master Volume Series, including Volumes 0-VII, the unified TOC/hub, the build conformance matrix, source intelligence, conformance, integration, missing-doctrine, scraper, revenue intelligence, source-stack, and build-reference updates incorporated into the build sequence.
 
 Current implementation posture:
 
@@ -80,21 +81,23 @@ Current implementation posture:
 - Canonical doctrines are implemented across claims, data classification, redaction, explanation, replay, observability, and controlled promotion.
 - Source Intelligence integration is implemented with scraper/source governance, source authority, source legal review, source promotion packets, source production readiness, and live scraper activation blocks.
 - Volume VI conformance is explicitly reflected in source intelligence, scraper governance, source-stack architecture, revenue intelligence, public DTO boundaries, integration requirements, conformance testing, and build snapshot references.
+- Volume VII conformance is explicitly reflected in the current version registry, doctrine-to-code gap ledger, build conformance proof layer, and Module 41 checkpoint conformance statement.
 
-Module 41 conformance decision: Module 41 conforms to current Master Volumes 0-VI as of checkpoint `BR-2026-06-01-M41`. It remains review-bound and does not authorize production launch, regulatory response issuance, corrective-action commitment, remediation execution, public verification, official reliance, legal advice, payments, notices, reports, or live external actions.
+Module 41 conformance decision: Module 41 conforms to current Master Volumes 0-VII as of checkpoint `BR-2026-06-01-M41`. It remains review-bound and does not authorize production launch, regulatory response issuance, corrective-action commitment, remediation execution, public verification, official reliance, legal advice, payments, notices, reports, or live external actions.
 
 ## Current Platform Counts
 
-- Module manifests: 63
-- Numbered internal build modules: 42
-- Highest numbered module: 42
-- Event contracts: 54
-- Cross-module handoffs: 89
-- Portable vertical surfaces: 43
-- Internal surfaces: 25
+- Module manifests: 64
+- Numbered internal build modules: 43
+- Highest numbered module: 43
+- Event contracts: 55
+- Cross-module handoffs: 94
+- Portable vertical surfaces: 44
+- Internal surfaces: 26
 - Borrower surfaces: 7
 - Lender surfaces: 6
 - Sponsor surfaces: 5
+- Public/partner-facing surfaces: 18
 
 ## Numbered Build Modules
 
@@ -142,6 +145,7 @@ Module 41 conformance decision: Module 41 conforms to current Master Volumes 0-V
 | 40 | production-regulatory-examination | Production Regulatory Examination and Evidence Archive Gate | `/production-regulatory-examination` |
 | 41 | production-regulatory-response | Production Regulatory Response and Corrective Action Gate | `/production-regulatory-response` |
 | 42 | build-preservation | Build Preservation and Evidence Archive Gate | `/build-preservation` |
+| 43 | doctrine-gap-ledger | Doctrine-to-Code Gap Ledger | `/doctrine-gap-ledger` |
 
 ## Portable Surface Architecture
 
@@ -337,24 +341,24 @@ The backend verification gate included:
 - `npm run backend:module-readiness`
 - `npm run smoke:integration`
 
-Key verification outputs from the preserved Module 42 archive:
+Key verification outputs from the current Module 43 verification:
 
 - Master Volume conformance: passed
 - Requirements checked: 60
 - Requirements implemented: 57
 - Awaiting controlled promotion: 3
 - Module conformance: passed
-- Modules checked: 63
-- Highest module number: 42
+- Modules checked: 64
+- Highest module number: 43
 - Public surfaces checked: 19
-- Handoffs checked: 89
-- Event contracts checked: 54
+- Handoffs checked: 94
+- Event contracts checked: 55
 - Cross-module integration: passed
 - Whole-platform smoke test: passed
 - Production build: passed
-- Current app page routes after Module 42: 71
-- Current API route files after Module 42: 149
-- Static pages generated after Module 42: 221
+- Current app page routes after Module 43: 72
+- Current API route files after Module 43: 150
+- Static pages generated after Module 43: 223
 
 ## Current Build Decision
 

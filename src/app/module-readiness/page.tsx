@@ -498,7 +498,7 @@ const moduleSurfaces: ReadinessSurface[] = [
       `/api/governance/build-preservation?actorId=${actorId}&limit=4`,
     collectionKeys: ["buildPreservationReviews"],
     readinessRole:
-      "Build preservation, checkpoint BR-2026-06-01-M41, backend verification, production build evidence, route inventory, event contracts, handoffs, public surfaces, tree drift detection, ignored sensitive files, Master Volume 0-VI conformance, archive evidence, and production authority blocks",
+      "Build preservation, checkpoint BR-2026-06-01-M41, backend verification, production build evidence, route inventory, event contracts, handoffs, public surfaces, tree drift detection, ignored sensitive files, Master Volume 0-VII conformance, archive evidence, and production authority blocks",
   },
   {
     moduleNumber: "43",

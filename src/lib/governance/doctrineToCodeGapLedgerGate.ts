@@ -290,7 +290,7 @@ const baseDisclosures = [
   "Human review is pending.",
   "More information may be needed.",
   "All current doctrine-to-code gaps are named, owned, routed, and review-bound.",
-  "The ledger is verified against the current Master Volume registry for Volumes 0-VI, the Cross-Reference Index, the Unified TOC, and the Build Matrix.",
+  "The ledger is verified against the current Master Volume registry for Volumes 0-VII, the Cross-Reference Index, the Unified TOC, and the Build Matrix.",
   "Awaiting controlled promotion is not production approval.",
   "No production launch has been authorized.",
   "No public production API exposure has been approved.",

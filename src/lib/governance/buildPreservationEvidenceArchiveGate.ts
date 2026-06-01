@@ -24,6 +24,8 @@ import { allPortableVerticalSurfaces } from "@/lib/modules/portableVerticalSurfa
  * - Vol VI: freezes source intelligence, scraper, revenue intelligence,
  *   runtime governance, integration, conformance, and build-reference evidence
  *   as review-bound archive material.
+ * - Vol VII: attaches unified governance conformance matrix posture as
+ *   evidence-only proof, not production authority.
  */
 
 export const BUILD_PRESERVATION_EVIDENCE_ARCHIVE_GATE_VERSION =
@@ -292,10 +294,10 @@ function buildPreservationItems(input: {
       null
     ),
     item(
-      "master-volume-0-vi-conformance-attached",
-      "Master Volume 0-VI conformance attached",
+      "master-volume-0-vii-conformance-attached",
+      "Master Volume 0-VII conformance attached",
       "PASS",
-      "Volumes 0, I, II, III, III-B, IV, V, VI plus build conformance and source intelligence additions",
+      "Volumes 0, I, II, III, III-B, IV, V, VI, VII plus build conformance and source intelligence additions",
       "governance",
       null
     ),
@@ -412,7 +414,7 @@ export function evaluateBuildPreservationEvidenceArchiveGate(
     "Human review is pending.",
     "More information may be needed.",
     `${BUILD_PRESERVATION_CHECKPOINT_ID} has been recorded as a review-bound build checkpoint.`,
-    "Module 41 conforms to current Master Volumes 0-VI as of the checkpoint evidence.",
+    "Module 41 conforms to current Master Volumes 0-VII as of the checkpoint evidence.",
     "Build preservation is evidence-only and does not authorize production launch.",
     "Tree drift must be resolved before a new canonical checkpoint is declared.",
     "Sensitive files must remain ignored and outside build history.",

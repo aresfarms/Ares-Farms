@@ -284,7 +284,7 @@ export default function BuildPreservationPage() {
               "Human review is pending.",
               "More information may be needed.",
               "BR-2026-06-01-M41 has been recorded as a review-bound build checkpoint.",
-              "Module 41 conforms to current Master Volumes 0-VI as of the checkpoint evidence.",
+              "Module 41 conforms to current Master Volumes 0-VII as of the checkpoint evidence.",
               "Build preservation is evidence-only and does not authorize production launch.",
               "Tree drift must be resolved before a new canonical checkpoint is declared.",
               "Sensitive files must remain ignored and outside build history.",

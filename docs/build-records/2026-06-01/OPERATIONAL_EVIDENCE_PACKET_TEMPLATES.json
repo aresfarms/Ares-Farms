@@ -1,0 +1,110 @@
+[
+  {
+    "templateId": "production-release-board",
+    "title": "Production Release Board Evidence Packet",
+    "owningRole": "Production Release Board",
+    "route": "/production-release-board",
+    "requiredSections": [
+      "release board agenda and quorum",
+      "release manager attestation",
+      "security/compliance/operations/support owner attestations",
+      "public-copy and content-claims review",
+      "incident, rollback, support, and communications evidence",
+      "launch, deployment, and freeze hold status",
+      "secrets, migration, DNS/CDN/TLS/WAF, monitoring, backup, and DR evidence",
+      "explicit production block preservation statement"
+    ]
+  },
+  {
+    "templateId": "regulator-exam-archive",
+    "title": "Regulator Examination Evidence Archive Packet",
+    "owningRole": "Regulatory Response Owner + Legal/Compliance Reviewer",
+    "route": "/production-regulatory-examination",
+    "requiredSections": [
+      "examination scope and regulator audience",
+      "archive inventory and completeness checklist",
+      "retention and legal hold status",
+      "audit and replay export references",
+      "privacy, redaction, and public-records review",
+      "regulatory communication boundary",
+      "source/report/notice/payment/legal/live-action boundary review"
+    ]
+  },
+  {
+    "templateId": "incident-response",
+    "title": "Production Incident Response Evidence Packet",
+    "owningRole": "Incident Commander",
+    "route": "/production-incident-response-readiness",
+    "requiredSections": [
+      "incident command roles and severity model",
+      "on-call escalation and bridge plan",
+      "rollback decision tree and emergency hold authority",
+      "data integrity, replay, and audit export plan",
+      "customer-safe communications",
+      "legal/regulatory escalation boundary",
+      "post-incident evidence retention"
+    ]
+  },
+  {
+    "templateId": "source-promotion",
+    "title": "Source Promotion Packet",
+    "owningRole": "Source Promotion Authority",
+    "route": "/source-promotion-packets",
+    "requiredSections": [
+      "source authority tier and source identity",
+      "legal/ToS/licensing review",
+      "credential vault reference only",
+      "adapter certification and schema contract",
+      "provenance, replay, and freshness evidence",
+      "failover, stale-source, and conflict escalation plan",
+      "claims and public DTO restrictions",
+      "human source promotion approval"
+    ]
+  },
+  {
+    "templateId": "scraper-activation",
+    "title": "Live Scraper Activation Evidence Packet",
+    "owningRole": "Source Promotion Authority + Legal/Compliance Reviewer",
+    "route": "/live-scraper-activation",
+    "requiredSections": [
+      "source legal approval",
+      "credential ownership and vault reference",
+      "certified live adapter reference",
+      "dry-run and no-live-fetch evidence",
+      "replay and provenance certification",
+      "monitoring, rollback, and incident runbook",
+      "kill switch and emergency stop owner",
+      "human promotion approval"
+    ]
+  },
+  {
+    "templateId": "revenue-advisory-source-review",
+    "title": "Revenue Advisory Source Review Packet",
+    "owningRole": "Revenue Intelligence Owner + Claims/Compliance Reviewer",
+    "route": "/customer-revenue",
+    "requiredSections": [
+      "source lineage and authority tier",
+      "program, market, cost, geospatial, and regulatory source references",
+      "advisory-only revenue and program-fit disclosure",
+      "no guaranteed revenue, program approval, lender commitment, or legal advice statement",
+      "freshness and replay evidence",
+      "conflict and stale-source handling",
+      "human review requirement"
+    ]
+  },
+  {
+    "templateId": "corrective-action",
+    "title": "Corrective Action Evidence Packet",
+    "owningRole": "Corrective Action Owner + Legal/Compliance Reviewer",
+    "route": "/production-regulatory-response",
+    "requiredSections": [
+      "examiner finding or issue intake",
+      "corrective-action plan draft",
+      "remediation evidence inventory",
+      "legal/compliance response language",
+      "audit/replay evidence",
+      "privacy, redaction, and public-records review",
+      "no commitment or remediation execution without authority statement"
+    ]
+  }
+]

@@ -1,0 +1,190 @@
+{
+  "generatedAt": "2026-06-01T20:07:08.342Z",
+  "globalProductionBlocks": [
+    "advisory only",
+    "no approval",
+    "no guarantee",
+    "no legal or regulatory reliance",
+    "no official report publication",
+    "no final lending decision",
+    "no borrower notice send",
+    "no live external agency call",
+    "no source promotion without qualified approval",
+    "no release-candidate freeze approval",
+    "no production cutover approval",
+    "no production release board approval",
+    "no payment capture",
+    "no raw document-content processing",
+    "no public verification claim",
+    "no public verification unless authorized"
+  ],
+  "gateBlocks": [
+    {
+      "module": "Module 22",
+      "route": "/live-scraper-activation",
+      "gate": "Live Scraper Activation Gate",
+      "requiredHumanAuthority": "Source Promotion Authority + Legal/Compliance Reviewer",
+      "currentPosture": "Blocked; live fetch remains disabled."
+    },
+    {
+      "module": "Module 23",
+      "route": "/source-legal-review",
+      "gate": "Source Legal and Licensing Review Gate",
+      "requiredHumanAuthority": "Qualified Legal/Compliance Reviewer",
+      "currentPosture": "Review-bound; no legal advice and no live source approval."
+    },
+    {
+      "module": "Module 24",
+      "route": "/source-promotion-packets",
+      "gate": "Source Promotion Packet Gate",
+      "requiredHumanAuthority": "Source Promotion Authority",
+      "currentPosture": "Blocked pending qualified human source promotion approval."
+    },
+    {
+      "module": "Module 25",
+      "route": "/source-production-readiness",
+      "gate": "Source Production Promotion Readiness Gate",
+      "requiredHumanAuthority": "Source Production Owner + Compliance Reviewer",
+      "currentPosture": "Blocked; production source activation not approved."
+    },
+    {
+      "module": "Module 26",
+      "route": "/controlled-promotion-activation",
+      "gate": "Controlled Promotion Activation Gate",
+      "requiredHumanAuthority": "Controlled Promotion Board",
+      "currentPosture": "Blocked; activation not executed."
+    },
+    {
+      "module": "Module 27",
+      "route": "/production-portal-readiness",
+      "gate": "Production Portal Readiness Preflight Gate",
+      "requiredHumanAuthority": "Portal Launch Owner + Security/Compliance Reviewer",
+      "currentPosture": "Blocked; portal launch not approved."
+    },
+    {
+      "module": "Module 28",
+      "route": "/production-launch-evidence",
+      "gate": "Production Launch Evidence Packet",
+      "requiredHumanAuthority": "Qualified Release Manager + Legal/Compliance Reviewer",
+      "currentPosture": "Blocked; go-live not approved."
+    },
+    {
+      "module": "Module 29",
+      "route": "/deployment-environment-readiness",
+      "gate": "Deployment Environment Readiness Gate",
+      "requiredHumanAuthority": "Deployment Owner + Security Owner",
+      "currentPosture": "Blocked; deployment not executed."
+    },
+    {
+      "module": "Module 30",
+      "route": "/release-candidate-freeze",
+      "gate": "Release Candidate Freeze Plan",
+      "requiredHumanAuthority": "Release Manager",
+      "currentPosture": "Blocked; release candidate not frozen."
+    },
+    {
+      "module": "Module 31",
+      "route": "/production-cutover-hold",
+      "gate": "Production Cutover Hold Gate",
+      "requiredHumanAuthority": "Cutover Authority + Release Manager",
+      "currentPosture": "Blocked; cutover authority not granted."
+    },
+    {
+      "module": "Module 32",
+      "route": "/production-release-board",
+      "gate": "Production Release Board Evidence Packet",
+      "requiredHumanAuthority": "Production Release Board",
+      "currentPosture": "Blocked; release board approval not granted."
+    },
+    {
+      "module": "Module 33",
+      "route": "/production-operations-monitoring",
+      "gate": "Production Operations Monitoring Gate",
+      "requiredHumanAuthority": "Operations Owner + On-Call Lead",
+      "currentPosture": "Blocked; monitoring activation not approved."
+    },
+    {
+      "module": "Module 34",
+      "route": "/production-incident-response-readiness",
+      "gate": "Production Incident Response Readiness Gate",
+      "requiredHumanAuthority": "Incident Commander + Legal/Compliance Escalation Owner",
+      "currentPosture": "Blocked; incident response activation not approved."
+    },
+    {
+      "module": "Module 35",
+      "route": "/production-support-communications-readiness",
+      "gate": "Production Support Communications Readiness Gate",
+      "requiredHumanAuthority": "Support Lead + Communications/Compliance Reviewer",
+      "currentPosture": "Blocked; support operations not activated."
+    },
+    {
+      "module": "Module 36",
+      "route": "/production-final-authority",
+      "gate": "Production Final Authority Gate",
+      "requiredHumanAuthority": "Constitutional Authority + Qualified Release Manager",
+      "currentPosture": "Blocked; final authority not granted."
+    },
+    {
+      "module": "Module 37",
+      "route": "/production-activation-ceremony",
+      "gate": "Production Activation Ceremony Gate",
+      "requiredHumanAuthority": "Dual-Control Activation Authority",
+      "currentPosture": "Blocked; activation ceremony not executed."
+    },
+    {
+      "module": "Module 38",
+      "route": "/production-post-activation-verification",
+      "gate": "Production Post-Activation Verification Gate",
+      "requiredHumanAuthority": "Watch-Window Owner + Operations Lead",
+      "currentPosture": "Blocked; production health not certified."
+    },
+    {
+      "module": "Module 39",
+      "route": "/production-reliance-verification",
+      "gate": "Production Reliance and Public Verification Boundary Gate",
+      "requiredHumanAuthority": "Reliance Authority + Legal/Compliance Reviewer",
+      "currentPosture": "Blocked; public verification and official reliance not authorized."
+    },
+    {
+      "module": "Module 40",
+      "route": "/production-regulatory-examination",
+      "gate": "Production Regulatory Examination and Evidence Archive Gate",
+      "requiredHumanAuthority": "Regulatory Response Owner + Legal/Compliance Reviewer",
+      "currentPosture": "Blocked; regulator submission and archive certification not approved."
+    },
+    {
+      "module": "Module 41",
+      "route": "/production-regulatory-response",
+      "gate": "Production Regulatory Response and Corrective Action Gate",
+      "requiredHumanAuthority": "Regulatory Response Owner + Corrective Action Owner + Legal/Compliance Reviewer",
+      "currentPosture": "Blocked; official response, corrective-action commitment, and remediation execution not approved."
+    },
+    {
+      "module": "Module 42",
+      "route": "/build-preservation",
+      "gate": "Build Preservation and Evidence Archive Gate",
+      "requiredHumanAuthority": "Governance Archivist + Release Manager",
+      "currentPosture": "Evidence-only; checkpoint archived without production authority."
+    }
+  ],
+  "hardBlocks": [
+    "no production activation",
+    "no go-live approval",
+    "no deployment execution",
+    "no secret activation",
+    "no DNS cutover",
+    "no production database migration",
+    "no public production API exposure",
+    "no portal launch",
+    "no payment capture",
+    "no borrower notice send",
+    "no official report publication",
+    "no public verification authority",
+    "no official reliance",
+    "no legal advice",
+    "no live external action",
+    "no regulatory response issuance",
+    "no corrective-action commitment",
+    "no remediation execution"
+  ]
+}

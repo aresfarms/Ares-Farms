@@ -10,6 +10,7 @@ import {
 import {
   PortableSurfaceAudience,
   portableSurfaceById,
+  publicSurfaceDisclosureMessages,
   portableSurfacesByAudience,
 } from "@/lib/modules";
 
@@ -363,6 +364,40 @@ export function PortableSurfaceIndexPage(props: {
             {props.subtitle}
           </p>
         </header>
+
+        <section
+          style={{
+            ...panelStyle,
+            padding: 16,
+            display: "grid",
+            gap: 10,
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: 20 }}>Disclosure Boundary</h2>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 10,
+            }}
+          >
+            {publicSurfaceDisclosureMessages.map((message) => (
+              <div
+                key={message}
+                style={{
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 8,
+                  padding: 12,
+                  lineHeight: 1.45,
+                  background: "#f8fafc",
+                  fontWeight: 800,
+                }}
+              >
+                {message}
+              </div>
+            ))}
+          </div>
+        </section>
 
         <div
           style={{

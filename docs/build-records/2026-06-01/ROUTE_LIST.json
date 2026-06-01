@@ -1,0 +1,1109 @@
+{
+  "pageRoutes": [
+    {
+      "route": "/applications",
+      "file": "src/app/applications/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/audit-replay",
+      "file": "src/app/audit-replay/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/billing",
+      "file": "src/app/billing/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/build-preservation",
+      "file": "src/app/build-preservation/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/case-command",
+      "file": "src/app/case-command/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/connectors",
+      "file": "src/app/connectors/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/controlled-promotion-activation",
+      "file": "src/app/controlled-promotion-activation/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/customer-revenue",
+      "file": "src/app/customer-revenue/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/dashboard",
+      "file": "src/app/dashboard/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/data-rights",
+      "file": "src/app/data-rights/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/decisions",
+      "file": "src/app/decisions/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/deployment-environment-readiness",
+      "file": "src/app/deployment-environment-readiness/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/documents",
+      "file": "src/app/documents/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/environmental-compliance",
+      "file": "src/app/environmental-compliance/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/evidence-packets",
+      "file": "src/app/evidence-packets/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/exception-remediation",
+      "file": "src/app/exception-remediation/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/governance",
+      "file": "src/app/governance/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/lender/applications",
+      "file": "src/app/lender/applications/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/lender/dashboard",
+      "file": "src/app/lender/dashboard/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/lender/evidence",
+      "file": "src/app/lender/evidence/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/lender/overlays",
+      "file": "src/app/lender/overlays/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/lender",
+      "file": "src/app/lender/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/lender/property-opportunities",
+      "file": "src/app/lender/property-opportunities/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/lender/revenue-opportunities",
+      "file": "src/app/lender/revenue-opportunities/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/live-scraper-activation",
+      "file": "src/app/live-scraper-activation/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/module-readiness",
+      "file": "src/app/module-readiness/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/notices",
+      "file": "src/app/notices/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/onboarding",
+      "file": "src/app/onboarding/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/operator-demo",
+      "file": "src/app/operator-demo/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/operator-queue",
+      "file": "src/app/operator-queue/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/",
+      "file": "src/app/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/partners",
+      "file": "src/app/partners/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/borrower/applications",
+      "file": "src/app/portal/borrower/applications/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/borrower/data-rights",
+      "file": "src/app/portal/borrower/data-rights/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/borrower/documents",
+      "file": "src/app/portal/borrower/documents/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/borrower/notices",
+      "file": "src/app/portal/borrower/notices/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/borrower",
+      "file": "src/app/portal/borrower/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/borrower/reports",
+      "file": "src/app/portal/borrower/reports/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal",
+      "file": "src/app/portal/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/property-discovery",
+      "file": "src/app/portal/property-discovery/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portal/revenue-opportunities",
+      "file": "src/app/portal/revenue-opportunities/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/portfolio",
+      "file": "src/app/portfolio/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-activation-ceremony",
+      "file": "src/app/production-activation-ceremony/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-cutover-hold",
+      "file": "src/app/production-cutover-hold/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-final-authority",
+      "file": "src/app/production-final-authority/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-incident-response-readiness",
+      "file": "src/app/production-incident-response-readiness/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-launch-evidence",
+      "file": "src/app/production-launch-evidence/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-operations-monitoring",
+      "file": "src/app/production-operations-monitoring/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-portal-readiness",
+      "file": "src/app/production-portal-readiness/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-post-activation-verification",
+      "file": "src/app/production-post-activation-verification/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-regulatory-examination",
+      "file": "src/app/production-regulatory-examination/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-regulatory-response",
+      "file": "src/app/production-regulatory-response/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-release-board",
+      "file": "src/app/production-release-board/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-reliance-verification",
+      "file": "src/app/production-reliance-verification/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/production-support-communications-readiness",
+      "file": "src/app/production-support-communications-readiness/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/promotion",
+      "file": "src/app/promotion/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/release-candidate-freeze",
+      "file": "src/app/release-candidate-freeze/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/reports",
+      "file": "src/app/reports/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/reviews",
+      "file": "src/app/reviews/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/rules",
+      "file": "src/app/rules/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/source-ingestion",
+      "file": "src/app/source-ingestion/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/source-legal-review",
+      "file": "src/app/source-legal-review/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/source-production-readiness",
+      "file": "src/app/source-production-readiness/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/source-promotion-packets",
+      "file": "src/app/source-promotion-packets/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/sponsor/dashboard",
+      "file": "src/app/sponsor/dashboard/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/sponsor",
+      "file": "src/app/sponsor/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/sponsor/project-discovery",
+      "file": "src/app/sponsor/project-discovery/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/sponsor/readiness",
+      "file": "src/app/sponsor/readiness/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/sponsor/reports",
+      "file": "src/app/sponsor/reports/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/sponsor/revenue-opportunities",
+      "file": "src/app/sponsor/revenue-opportunities/page.tsx",
+      "type": "page"
+    },
+    {
+      "route": "/success",
+      "file": "src/app/success/page.tsx",
+      "type": "page"
+    }
+  ],
+  "apiRoutes": [
+    {
+      "route": "/api/applications/admin",
+      "file": "src/app/api/applications/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/apply",
+      "file": "src/app/api/apply/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/audit/export",
+      "file": "src/app/api/audit/export/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/audit/verify",
+      "file": "src/app/api/audit/verify/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/auth/[...nextauth]",
+      "file": "src/app/api/auth/[...nextauth]/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/auth/init",
+      "file": "src/app/api/auth/init/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/auth/role-provisioning",
+      "file": "src/app/api/auth/role-provisioning/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/billing/admin",
+      "file": "src/app/api/billing/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/billing/connectors/admin",
+      "file": "src/app/api/billing/connectors/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/billing/connectors",
+      "file": "src/app/api/billing/connectors/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/billing/execution",
+      "file": "src/app/api/billing/execution/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/checkout",
+      "file": "src/app/api/checkout/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/claims/escalate",
+      "file": "src/app/api/claims/escalate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/claims/public",
+      "file": "src/app/api/claims/public/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/claims/validate",
+      "file": "src/app/api/claims/validate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/config/change",
+      "file": "src/app/api/config/change/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/config/rollback",
+      "file": "src/app/api/config/rollback/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/config",
+      "file": "src/app/api/config/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/connectors/adapters",
+      "file": "src/app/api/connectors/adapters/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/connectors/admin",
+      "file": "src/app/api/connectors/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/connectors/credentialed-ingestion/admin",
+      "file": "src/app/api/connectors/credentialed-ingestion/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/connectors/credentialed-ingestion",
+      "file": "src/app/api/connectors/credentialed-ingestion/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/connectors/execution",
+      "file": "src/app/api/connectors/execution/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/connectors/source-check",
+      "file": "src/app/api/connectors/source-check/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/customer-revenue/advisory",
+      "file": "src/app/api/customer-revenue/advisory/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/decision",
+      "file": "src/app/api/decision/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/decisions/finalize",
+      "file": "src/app/api/decisions/finalize/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/documents/admin",
+      "file": "src/app/api/documents/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/documents/storage-handoff",
+      "file": "src/app/api/documents/storage-handoff/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/documents/submit",
+      "file": "src/app/api/documents/submit/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/entitlements",
+      "file": "src/app/api/entitlements/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/features/activate",
+      "file": "src/app/api/features/activate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/features/deactivate",
+      "file": "src/app/api/features/deactivate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/features/rollback",
+      "file": "src/app/api/features/rollback/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/features",
+      "file": "src/app/api/features/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/geo/suitability",
+      "file": "src/app/api/geo/suitability/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/build-preservation",
+      "file": "src/app/api/governance/build-preservation/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/controlled-promotion-activation",
+      "file": "src/app/api/governance/controlled-promotion-activation/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/deployment-environment-readiness",
+      "file": "src/app/api/governance/deployment-environment-readiness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/environmental-compliance/admin",
+      "file": "src/app/api/governance/environmental-compliance/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/environmental-compliance",
+      "file": "src/app/api/governance/environmental-compliance/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/live-action-readiness/admin",
+      "file": "src/app/api/governance/live-action-readiness/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/live-action-readiness",
+      "file": "src/app/api/governance/live-action-readiness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/live-scraper-activation",
+      "file": "src/app/api/governance/live-scraper-activation/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-activation-ceremony",
+      "file": "src/app/api/governance/production-activation-ceremony/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-cutover-hold",
+      "file": "src/app/api/governance/production-cutover-hold/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-final-authority",
+      "file": "src/app/api/governance/production-final-authority/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-incident-response-readiness",
+      "file": "src/app/api/governance/production-incident-response-readiness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-launch-evidence",
+      "file": "src/app/api/governance/production-launch-evidence/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-operations-monitoring",
+      "file": "src/app/api/governance/production-operations-monitoring/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-portal-readiness",
+      "file": "src/app/api/governance/production-portal-readiness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-post-activation-verification",
+      "file": "src/app/api/governance/production-post-activation-verification/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-regulatory-examination",
+      "file": "src/app/api/governance/production-regulatory-examination/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-regulatory-response",
+      "file": "src/app/api/governance/production-regulatory-response/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-release-board",
+      "file": "src/app/api/governance/production-release-board/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-reliance-verification",
+      "file": "src/app/api/governance/production-reliance-verification/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/production-support-communications-readiness",
+      "file": "src/app/api/governance/production-support-communications-readiness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/release-candidate-freeze",
+      "file": "src/app/api/governance/release-candidate-freeze/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/source-legal-review",
+      "file": "src/app/api/governance/source-legal-review/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/source-production-readiness",
+      "file": "src/app/api/governance/source-production-readiness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/source-promotion-packets",
+      "file": "src/app/api/governance/source-promotion-packets/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/sovereign-consent-gateway/admin",
+      "file": "src/app/api/governance/sovereign-consent-gateway/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/governance/sovereign-consent-gateway",
+      "file": "src/app/api/governance/sovereign-consent-gateway/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/implementation/certify",
+      "file": "src/app/api/implementation/certify/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/implementation/coverage",
+      "file": "src/app/api/implementation/coverage/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/implementation/manifest",
+      "file": "src/app/api/implementation/manifest/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/implementation/validate",
+      "file": "src/app/api/implementation/validate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/incidents/create",
+      "file": "src/app/api/incidents/create/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/incidents/escalate",
+      "file": "src/app/api/incidents/escalate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/incidents/resolve",
+      "file": "src/app/api/incidents/resolve/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/incidents/status",
+      "file": "src/app/api/incidents/status/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ledger/admin",
+      "file": "src/app/api/ledger/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ledger/canonical/plan",
+      "file": "src/app/api/ledger/canonical/plan/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ledger/canonical",
+      "file": "src/app/api/ledger/canonical/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ledger/repair",
+      "file": "src/app/api/ledger/repair/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ledger/replay-verify",
+      "file": "src/app/api/ledger/replay-verify/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ledger",
+      "file": "src/app/api/ledger/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ledger/verify",
+      "file": "src/app/api/ledger/verify/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/market-signals",
+      "file": "src/app/api/market-signals/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/notices/admin",
+      "file": "src/app/api/notices/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/notices/deliver",
+      "file": "src/app/api/notices/deliver/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/notices/exceptions/resolve",
+      "file": "src/app/api/notices/exceptions/resolve/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/notices/provider-execution",
+      "file": "src/app/api/notices/provider-execution/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/notices/receipts",
+      "file": "src/app/api/notices/receipts/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/onboard",
+      "file": "src/app/api/onboard/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/partners/admin",
+      "file": "src/app/api/partners/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/partners/workflows",
+      "file": "src/app/api/partners/workflows/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/programs/search",
+      "file": "src/app/api/programs/search/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/properties/canonical",
+      "file": "src/app/api/properties/canonical/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/properties/discovery",
+      "file": "src/app/api/properties/discovery/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/properties/replay",
+      "file": "src/app/api/properties/replay/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/public/equipment",
+      "file": "src/app/api/public/equipment/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/public/grants",
+      "file": "src/app/api/public/grants/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/public/market-context",
+      "file": "src/app/api/public/market-context/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/public/property-discovery",
+      "file": "src/app/api/public/property-discovery/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/public/surfaces",
+      "file": "src/app/api/public/surfaces/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/public/weather-risk",
+      "file": "src/app/api/public/weather-risk/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/queues/admin",
+      "file": "src/app/api/queues/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/queues/operator",
+      "file": "src/app/api/queues/operator/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/rank",
+      "file": "src/app/api/rank/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/recommend",
+      "file": "src/app/api/recommend/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/reports/admin",
+      "file": "src/app/api/reports/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/reports/pdf",
+      "file": "src/app/api/reports/pdf/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/catalog",
+      "file": "src/app/api/revenue-intelligence/catalog/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/claims",
+      "file": "src/app/api/revenue-intelligence/claims/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/customer-eligibility",
+      "file": "src/app/api/revenue-intelligence/customer-eligibility/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/fusion",
+      "file": "src/app/api/revenue-intelligence/fusion/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/geospatial",
+      "file": "src/app/api/revenue-intelligence/geospatial/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/market-signals",
+      "file": "src/app/api/revenue-intelligence/market-signals/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/marketplace",
+      "file": "src/app/api/revenue-intelligence/marketplace/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/operating-costs",
+      "file": "src/app/api/revenue-intelligence/operating-costs/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/opportunities",
+      "file": "src/app/api/revenue-intelligence/opportunities/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/programs",
+      "file": "src/app/api/revenue-intelligence/programs/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue-intelligence/state-registry",
+      "file": "src/app/api/revenue-intelligence/state-registry/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/revenue/opportunities",
+      "file": "src/app/api/revenue/opportunities/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/reviews/admin",
+      "file": "src/app/api/reviews/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/reviews/human",
+      "file": "src/app/api/reviews/human/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/reviews/transition",
+      "file": "src/app/api/reviews/transition/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/rules/admin",
+      "file": "src/app/api/rules/admin/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/rules/evaluate",
+      "file": "src/app/api/rules/evaluate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/runtime/emergency-mode",
+      "file": "src/app/api/runtime/emergency-mode/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/runtime/restrictions",
+      "file": "src/app/api/runtime/restrictions/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/runtime/state",
+      "file": "src/app/api/runtime/state/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/runtime/transition",
+      "file": "src/app/api/runtime/transition/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/scrapers/classification",
+      "file": "src/app/api/scrapers/classification/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/scrapers/escalate",
+      "file": "src/app/api/scrapers/escalate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/scrapers/provenance",
+      "file": "src/app/api/scrapers/provenance/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/scrapers/replay",
+      "file": "src/app/api/scrapers/replay/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/scrapers",
+      "file": "src/app/api/scrapers/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/scrapers/run",
+      "file": "src/app/api/scrapers/run/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/scrapers/status",
+      "file": "src/app/api/scrapers/status/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-ingestion/classify",
+      "file": "src/app/api/source-ingestion/classify/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-ingestion/reject",
+      "file": "src/app/api/source-ingestion/reject/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-ingestion/review",
+      "file": "src/app/api/source-ingestion/review/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-ingestion/submit",
+      "file": "src/app/api/source-ingestion/submit/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-stack/canonicalization",
+      "file": "src/app/api/source-stack/canonicalization/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-stack/conflicts",
+      "file": "src/app/api/source-stack/conflicts/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-stack/failover",
+      "file": "src/app/api/source-stack/failover/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-stack/freshness",
+      "file": "src/app/api/source-stack/freshness/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-stack/observability",
+      "file": "src/app/api/source-stack/observability/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/source-stack",
+      "file": "src/app/api/source-stack/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/stripe/checkout",
+      "file": "src/app/api/stripe/checkout/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/stripe/webhook",
+      "file": "src/app/api/stripe/webhook/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/test-score",
+      "file": "src/app/api/test-score/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/user",
+      "file": "src/app/api/user/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ux/escalate",
+      "file": "src/app/api/ux/escalate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ux/governance",
+      "file": "src/app/api/ux/governance/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/ux/validate",
+      "file": "src/app/api/ux/validate/route.ts",
+      "type": "api"
+    },
+    {
+      "route": "/api/verify-ledger",
+      "file": "src/app/api/verify-ledger/route.ts",
+      "type": "api"
+    }
+  ],
+  "pageRouteCount": 71,
+  "apiRouteCount": 149,
+  "totalRouteCount": 220
+}

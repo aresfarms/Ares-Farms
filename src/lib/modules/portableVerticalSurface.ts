@@ -38,10 +38,19 @@ export type PortableVerticalSurface = {
   adjacentRoutes: string[];
 };
 
+export const publicSurfaceDisclosureMessages = [
+  "Advisory only.",
+  "No approval has been granted.",
+  "No guarantee is made.",
+  "No legal or regulatory reliance is authorized.",
+  "No public verification is available unless separately authorized.",
+] as const;
+
 export const portableSurfaceSafeMessages = [
   "Your document was received.",
   "Human review is pending.",
   "More information may be needed.",
+  ...publicSurfaceDisclosureMessages,
 ] as const;
 
 function portableSafeMessagesWith(...messages: string[]): string[] {
@@ -60,6 +69,10 @@ export const portableSurfaceGovernanceRequirements = [
 ] as const;
 
 export const portableSurfaceProductionBlocks = [
+  "advisory only",
+  "no approval",
+  "no guarantee",
+  "no legal or regulatory reliance",
   "no official report publication",
   "no final lending decision",
   "no borrower notice send",
@@ -71,6 +84,7 @@ export const portableSurfaceProductionBlocks = [
   "no payment capture",
   "no raw document-content processing",
   "no public verification claim",
+  "no public verification unless authorized",
 ] as const;
 
 const internalBackendSurfaces = [
@@ -1906,11 +1920,7 @@ export const borrowerPortalSurfaces: PortableVerticalSurface[] = [
     purpose:
       "Borrower-facing data review, portability, export, and correction-preparation surface.",
     primaryStatus: "Borrower data-rights preparation is available for review.",
-    safeMessages: [
-      "Your document was received.",
-      "Human review is pending.",
-      "More information may be needed.",
-    ],
+    safeMessages: [...portableSurfaceSafeMessages],
     requiredBackendSurfaces: [
       "/api/reports/admin",
       "/api/documents/admin",
@@ -2012,11 +2022,7 @@ export const lenderPortalSurfaces: PortableVerticalSurface[] = [
     purpose:
       "Lender-facing application intake translation with borrower, tenant, and partner scope preserved.",
     primaryStatus: "Application materials are available for governed review.",
-    safeMessages: [
-      "Your document was received.",
-      "Human review is pending.",
-      "More information may be needed.",
-    ],
+    safeMessages: [...portableSurfaceSafeMessages],
     requiredBackendSurfaces: ["/api/applications/admin", "/api/documents/admin"],
     governanceRequirements: [...portableSurfaceGovernanceRequirements],
     productionBlocks: [...portableSurfaceProductionBlocks],

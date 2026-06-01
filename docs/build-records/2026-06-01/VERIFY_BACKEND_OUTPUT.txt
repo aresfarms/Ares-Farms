@@ -1,0 +1,2743 @@
+
+> ares-farms@0.1.0 verify:backend
+> npm run verify:schema && npx tsc --noEmit && npm run verify:master-volumes && npm run verify:missing-doctrines && npm run verify:scraper-source-intelligence && npm run verify:revenue-source-intelligence && npm run verify:source-stack-architecture && npm run smoke:security-policy && npm run smoke:content-claims && npm run smoke:auth-activation-policy && npm run auth:activation && npm run security:audit && npm run backend:production-readiness && npm run backend:module-readiness && npm run smoke:integration
+
+
+> ares-farms@0.1.0 verify:schema
+> tsx src/scripts/verifySchemaSingularity.ts
+
+Schema singularity verified: all table definitions are under src/db/schema/.
+
+> ares-farms@0.1.0 verify:master-volumes
+> tsx src/scripts/masterVolumeConformanceTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:27.087Z",
+  "frameworkVersion": "master-volume-conformance-v0.3.1",
+  "requirements": 60,
+  "moduleManifests": 63,
+  "eventContracts": 54,
+  "handoffs": 89,
+  "publicSurfaces": 19,
+  "statuses": {
+    "implemented": 57,
+    "awaiting_controlled_promotion": 3
+  },
+  "message": "Master Volume conformance test passed."
+}
+
+> ares-farms@0.1.0 verify:missing-doctrines
+> npm run verify:runtime-states && npm run smoke:runtime-transitions && npm run verify:feature-governance && npm run smoke:feature-rollbacks && npm run verify:public-claims && npm run smoke:incident-escalation && npm run verify:incident-governance && npm run verify:config-governance && npm run smoke:config-rollbacks && npm run verify:ux-governance && npm run smoke:accessibility && npm run smoke:workflow-visibility && npm run verify:implementation-manifest && npm run smoke:governance-traceability && npm run smoke:deployment-conformance
+
+
+> ares-farms@0.1.0 verify:runtime-states
+> tsx src/scripts/missingDoctrineConformanceSuite.ts runtime-states
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:27.293Z",
+  "mode": "runtime-states",
+  "results": {
+    "runtime-states": {
+      "runtimeStates": 12,
+      "tables": 6
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:runtime-transitions
+> tsx src/scripts/missingDoctrineConformanceSuite.ts runtime-transitions
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:27.430Z",
+  "mode": "runtime-transitions",
+  "results": {
+    "runtime-transitions": {
+      "allowedTransition": "SANDBOX",
+      "blockedReasons": [
+        "authority-ref-required"
+      ],
+      "emergencyState": "EMERGENCY_GOVERNANCE"
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 verify:feature-governance
+> tsx src/scripts/missingDoctrineConformanceSuite.ts feature-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:27.566Z",
+  "mode": "feature-governance",
+  "results": {
+    "feature-governance": {
+      "requiredMetadata": 9,
+      "features": 3
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:feature-rollbacks
+> tsx src/scripts/missingDoctrineConformanceSuite.ts feature-rollbacks
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:27.704Z",
+  "mode": "feature-rollbacks",
+  "results": {
+    "feature-rollbacks": {
+      "activationBlocked": [
+        "production-not-authorized"
+      ],
+      "rollbackState": "rollback"
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 verify:public-claims
+> tsx src/scripts/missingDoctrineConformanceSuite.ts public-claims
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:27.846Z",
+  "mode": "public-claims",
+  "results": {
+    "public-claims": {
+      "claimRegistry": 3,
+      "blockedCodes": [
+        "PROHIBITED_APPROVAL_CLAIM"
+      ]
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:incident-escalation
+> tsx src/scripts/missingDoctrineConformanceSuite.ts incident-escalation
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:27.983Z",
+  "mode": "incident-escalation",
+  "results": {
+    "incident-escalation": {
+      "incidentClass": "constitutional",
+      "severity": "CRITICAL",
+      "resolutionState": "ESCALATED"
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 verify:incident-governance
+> tsx src/scripts/missingDoctrineConformanceSuite.ts incident-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:28.120Z",
+  "mode": "incident-governance",
+  "results": {
+    "incident-governance": {
+      "incidentClasses": 9,
+      "escalationPath": [
+        "operator",
+        "governance",
+        "constitutional-authority"
+      ]
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 verify:config-governance
+> tsx src/scripts/missingDoctrineConformanceSuite.ts config-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:28.259Z",
+  "mode": "config-governance",
+  "results": {
+    "config-governance": {
+      "configTypes": 8,
+      "invalidBlockers": [
+        "unknown-config-type",
+        "rollback-ref-required"
+      ]
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:config-rollbacks
+> tsx src/scripts/missingDoctrineConformanceSuite.ts config-rollbacks
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:28.396Z",
+  "mode": "config-rollbacks",
+  "results": {
+    "config-rollbacks": {
+      "configType": "deployment modes",
+      "controls": 6
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 verify:ux-governance
+> tsx src/scripts/missingDoctrineConformanceSuite.ts ux-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:28.533Z",
+  "mode": "ux-governance",
+  "results": {
+    "ux-governance": {
+      "controls": 7,
+      "prohibitedPatterns": 5,
+      "violations": [
+        "deceptive urgency",
+        "misleading approval indicators"
+      ]
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:accessibility
+> tsx src/scripts/missingDoctrineConformanceSuite.ts accessibility
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:28.673Z",
+  "mode": "accessibility",
+  "results": {
+    "accessibility": {
+      "missingControls": [
+        "accessibility compliance"
+      ],
+      "ok": true
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:workflow-visibility
+> tsx src/scripts/missingDoctrineConformanceSuite.ts workflow-visibility
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:28.811Z",
+  "mode": "workflow-visibility",
+  "results": {
+    "workflow-visibility": {
+      "missingControls": [
+        "workflow clarity",
+        "escalation visibility"
+      ]
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 verify:implementation-manifest
+> tsx src/scripts/missingDoctrineConformanceSuite.ts implementation-manifest
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:28.948Z",
+  "mode": "implementation-manifest",
+  "results": {
+    "implementation-manifest": {
+      "doctrineFamilies": 7,
+      "apiRoutes": 25,
+      "tables": 31,
+      "packageCommands": 15
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:governance-traceability
+> tsx src/scripts/missingDoctrineConformanceSuite.ts governance-traceability
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:29.085Z",
+  "mode": "governance-traceability",
+  "results": {
+    "governance-traceability": {
+      "modules": 63,
+      "eventContracts": 54,
+      "handoffs": 89
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 smoke:deployment-conformance
+> tsx src/scripts/missingDoctrineConformanceSuite.ts deployment-conformance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:29.223Z",
+  "mode": "deployment-conformance",
+  "results": {
+    "deployment-conformance": {
+      "modules": 63,
+      "notProductionCertified": 63
+    }
+  },
+  "message": "Missing doctrine conformance suite passed."
+}
+
+> ares-farms@0.1.0 verify:scraper-source-intelligence
+> npm run verify:scrapers && npm run verify:source-ingestion && npm run verify:connector-governance && npm run verify:property-discovery && npm run verify:source-authority && npm run verify:canonical-properties && npm run verify:provenance && npm run smoke:scraper-registry && npm run smoke:scraper-replay && npm run smoke:source-review && npm run smoke:connector-certification && npm run smoke:property-listings && npm run smoke:listing-canonicalization && npm run smoke:gist-reconciliation && npm run smoke:property-replay && npm run smoke:live-scraper-activation
+
+
+> ares-farms@0.1.0 verify:scrapers
+> tsx src/scripts/scraperSourceConformanceSuite.ts scrapers
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:29.460Z",
+  "mode": "scrapers",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:source-ingestion
+> tsx src/scripts/scraperSourceConformanceSuite.ts source-ingestion
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:29.600Z",
+  "mode": "source-ingestion",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:connector-governance
+> tsx src/scripts/scraperSourceConformanceSuite.ts connector-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:29.736Z",
+  "mode": "connector-governance",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:property-discovery
+> tsx src/scripts/scraperSourceConformanceSuite.ts property-discovery
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:29.870Z",
+  "mode": "property-discovery",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:source-authority
+> tsx src/scripts/scraperSourceConformanceSuite.ts source-authority
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.005Z",
+  "mode": "source-authority",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:canonical-properties
+> tsx src/scripts/scraperSourceConformanceSuite.ts canonical-properties
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.141Z",
+  "mode": "canonical-properties",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:provenance
+> tsx src/scripts/scraperSourceConformanceSuite.ts provenance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.276Z",
+  "mode": "provenance",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:scraper-registry
+> tsx src/scripts/scraperSourceConformanceSuite.ts scraper-registry
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.422Z",
+  "mode": "scraper-registry",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:scraper-replay
+> tsx src/scripts/scraperSourceConformanceSuite.ts scraper-replay
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.568Z",
+  "mode": "scraper-replay",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:source-review
+> tsx src/scripts/scraperSourceConformanceSuite.ts source-review
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.711Z",
+  "mode": "source-review",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:connector-certification
+> tsx src/scripts/scraperSourceConformanceSuite.ts connector-certification
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.856Z",
+  "mode": "connector-certification",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:property-listings
+> tsx src/scripts/scraperSourceConformanceSuite.ts property-listings
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:30.998Z",
+  "mode": "property-listings",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:listing-canonicalization
+> tsx src/scripts/scraperSourceConformanceSuite.ts listing-canonicalization
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:31.143Z",
+  "mode": "listing-canonicalization",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:gist-reconciliation
+> tsx src/scripts/scraperSourceConformanceSuite.ts gist-reconciliation
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:31.282Z",
+  "mode": "gist-reconciliation",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:property-replay
+> tsx src/scripts/scraperSourceConformanceSuite.ts property-replay
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:31.418Z",
+  "mode": "property-replay",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:live-scraper-activation
+> tsx src/scripts/liveScraperActivationGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:31.563Z",
+  "scrapersReviewed": 10,
+  "sourceStackProfiles": 26,
+  "liveFetchEnabled": 0,
+  "message": "Live scraper activation gate smoke test passed."
+}
+
+> ares-farms@0.1.0 verify:revenue-source-intelligence
+> npm run verify:revenue-intelligence && npm run verify:sellable-catalog && npm run verify:program-graph && npm run verify:marketplace-intel && npm run verify:operating-costs && npm run verify:market-signals && npm run verify:geospatial-governance && npm run verify:state-registry && npm run verify:customer-type-eligibility && npm run verify:data-fusion && npm run verify:customer-revenue-module && npm run smoke:customer-revenue && npm run smoke:program-revenue-matching && npm run smoke:revenue-claims && npm run smoke:regional-product-matching && npm run smoke:minor-operator-constraints && npm run smoke:program-product-eligibility && npm run smoke:program-stacking && npm run smoke:program-conflicts && npm run smoke:grant-deadline-refresh && npm run smoke:equipment-price-refresh && npm run smoke:program-equipment-compatibility && npm run smoke:supplier-region-matching && npm run smoke:input-price-refresh && npm run smoke:cost-revenue-model && npm run smoke:forecast-disclosures && npm run smoke:commodity-price-refresh && npm run smoke:market-signal-replay && npm run smoke:forecast-labeling && npm run smoke:soil-map-ingestion && npm run smoke:weather-climate-refresh && npm run smoke:geo-suitability-replay && npm run smoke:state-rule-refresh && npm run smoke:licensing-constraint-matching && npm run smoke:regulatory-claims && npm run smoke:minor-eligibility && npm run smoke:industry-revenue-matching && npm run smoke:customer-program-fit && npm run smoke:fusion-source-lineage && npm run smoke:fusion-conflict-detection && npm run smoke:advisory-output-claims && npm run smoke:customer-revenue-module && npm run smoke:customer-revenue-route && npm run smoke:public-revenue-disclosures && npm run smoke:revenue-opportunity-replay
+
+
+> ares-farms@0.1.0 verify:revenue-intelligence
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:31.764Z",
+  "mode": "revenue-intelligence",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:sellable-catalog
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:31.902Z",
+  "mode": "sellable-catalog",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:program-graph
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:32.039Z",
+  "mode": "program-graph",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:marketplace-intel
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts marketplace-intel
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:32.177Z",
+  "mode": "marketplace-intel",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:operating-costs
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts operating-costs
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:32.314Z",
+  "mode": "operating-costs",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:market-signals
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts market-signals
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:32.448Z",
+  "mode": "market-signals",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:geospatial-governance
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts geospatial-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:32.587Z",
+  "mode": "geospatial-governance",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:state-registry
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts state-registry
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:32.723Z",
+  "mode": "state-registry",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:customer-type-eligibility
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-type-eligibility
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:32.863Z",
+  "mode": "customer-type-eligibility",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:data-fusion
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts data-fusion
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.001Z",
+  "mode": "data-fusion",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:customer-revenue-module
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-revenue-module
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.137Z",
+  "mode": "customer-revenue-module",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:customer-revenue
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-revenue-module
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.275Z",
+  "mode": "customer-revenue-module",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:program-revenue-matching
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.411Z",
+  "mode": "revenue-intelligence",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:revenue-claims
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-claims
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.550Z",
+  "mode": "revenue-claims",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:regional-product-matching
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.698Z",
+  "mode": "sellable-catalog",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:minor-operator-constraints
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-type-eligibility
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.834Z",
+  "mode": "customer-type-eligibility",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:program-product-eligibility
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:33.969Z",
+  "mode": "sellable-catalog",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:program-stacking
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:34.105Z",
+  "mode": "program-graph",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:program-conflicts
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:34.242Z",
+  "mode": "program-graph",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:grant-deadline-refresh
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:34.387Z",
+  "mode": "program-graph",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:equipment-price-refresh
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts marketplace-intel
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:34.530Z",
+  "mode": "marketplace-intel",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:program-equipment-compatibility
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts marketplace-intel
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:34.674Z",
+  "mode": "marketplace-intel",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:supplier-region-matching
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts marketplace-intel
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:34.819Z",
+  "mode": "marketplace-intel",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:input-price-refresh
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts operating-costs
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:34.960Z",
+  "mode": "operating-costs",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:cost-revenue-model
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts operating-costs
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:35.109Z",
+  "mode": "operating-costs",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:forecast-disclosures
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts market-signals
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:35.250Z",
+  "mode": "market-signals",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:commodity-price-refresh
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts market-signals
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:35.387Z",
+  "mode": "market-signals",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:market-signal-replay
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts market-signals
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:35.522Z",
+  "mode": "market-signals",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:forecast-labeling
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts market-signals
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:35.657Z",
+  "mode": "market-signals",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:soil-map-ingestion
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts geospatial-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:35.793Z",
+  "mode": "geospatial-governance",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:weather-climate-refresh
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts geospatial-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:35.929Z",
+  "mode": "geospatial-governance",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:geo-suitability-replay
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts geospatial-governance
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:36.067Z",
+  "mode": "geospatial-governance",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:state-rule-refresh
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts state-registry
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:36.205Z",
+  "mode": "state-registry",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:licensing-constraint-matching
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts state-registry
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:36.343Z",
+  "mode": "state-registry",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:regulatory-claims
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-claims
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:36.482Z",
+  "mode": "revenue-claims",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:minor-eligibility
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-type-eligibility
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:36.618Z",
+  "mode": "customer-type-eligibility",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:industry-revenue-matching
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-type-eligibility
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:36.757Z",
+  "mode": "customer-type-eligibility",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:customer-program-fit
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-type-eligibility
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:36.893Z",
+  "mode": "customer-type-eligibility",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:fusion-source-lineage
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts data-fusion
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:37.029Z",
+  "mode": "data-fusion",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:fusion-conflict-detection
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts data-fusion
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:37.166Z",
+  "mode": "data-fusion",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:advisory-output-claims
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-claims
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:37.306Z",
+  "mode": "revenue-claims",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:customer-revenue-module
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-revenue-module
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:37.445Z",
+  "mode": "customer-revenue-module",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:customer-revenue-route
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts customer-revenue-module
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:37.586Z",
+  "mode": "customer-revenue-module",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:public-revenue-disclosures
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-claims
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:37.724Z",
+  "mode": "revenue-claims",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 smoke:revenue-opportunity-replay
+> tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:37.860Z",
+  "mode": "revenue-intelligence",
+  "opportunities": 3,
+  "sellableCatalogItems": 3,
+  "programNodes": 3,
+  "marketplaceItems": 2,
+  "operatingCostSignals": 2,
+  "marketSignals": 2,
+  "geospatialProfiles": 1,
+  "stateRegulatoryRecords": 2,
+  "customerTypeProfiles": 2,
+  "fusionResults": 1,
+  "schemaTables": 20,
+  "message": "Revenue source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:source-stack-architecture
+> npm run verify:source-stack && npm run verify:source-authority && npm run verify:canonicalization && npm run verify:replay && npm run smoke:source-failover && npm run smoke:marketplace-ingestion && npm run smoke:source-conflict-resolution && npm run smoke:source-legal-review && npm run smoke:source-promotion-packets && npm run smoke:source-production-readiness && npm run smoke:controlled-promotion-activation && tsx src/scripts/sourceStackConformanceSuite.ts commands
+
+
+> ares-farms@0.1.0 verify:source-stack
+> tsx src/scripts/sourceStackConformanceSuite.ts source-stack
+
+Source stack conformance passed (source-stack).
+
+> ares-farms@0.1.0 verify:source-authority
+> tsx src/scripts/scraperSourceConformanceSuite.ts source-authority
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:38.209Z",
+  "mode": "source-authority",
+  "scrapers": 10,
+  "sourceAuthorities": 10,
+  "schemaTables": 21,
+  "apiRoutes": 14,
+  "publicSurfaces": 3,
+  "message": "Scraper/source intelligence conformance passed."
+}
+
+> ares-farms@0.1.0 verify:canonicalization
+> tsx src/scripts/sourceStackConformanceSuite.ts canonicalization
+
+Source stack conformance passed (canonicalization).
+
+> ares-farms@0.1.0 verify:replay
+> tsx src/scripts/replayConformanceTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:38.501Z",
+  "modulesChecked": 63,
+  "eventContractsChecked": 54,
+  "handoffsChecked": 89,
+  "message": "Replay conformance test passed."
+}
+
+> ares-farms@0.1.0 smoke:source-failover
+> tsx src/scripts/sourceStackConformanceSuite.ts source-failover
+
+Source stack conformance passed (source-failover).
+
+> ares-farms@0.1.0 smoke:marketplace-ingestion
+> tsx src/scripts/sourceStackConformanceSuite.ts marketplace-ingestion
+
+Source stack conformance passed (marketplace-ingestion).
+
+> ares-farms@0.1.0 smoke:source-conflict-resolution
+> tsx src/scripts/sourceStackConformanceSuite.ts source-conflict-resolution
+
+Source stack conformance passed (source-conflict-resolution).
+
+> ares-farms@0.1.0 smoke:source-legal-review
+> tsx src/scripts/sourceLegalReviewGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:39.104Z",
+  "sourcesReviewed": 26,
+  "legalApproved": 0,
+  "liveFetchEnabled": 0,
+  "message": "Source legal review gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:source-promotion-packets
+> tsx src/scripts/sourcePromotionPacketGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:39.256Z",
+  "packetsReviewed": 26,
+  "promotionReady": 0,
+  "liveFetchEnabled": 0,
+  "message": "Source promotion packet gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:source-production-readiness
+> tsx src/scripts/sourceProductionReadinessGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:39.405Z",
+  "reviewsChecked": 26,
+  "productionReady": 0,
+  "liveFetchEnabled": 0,
+  "message": "Source production readiness gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:controlled-promotion-activation
+> tsx src/scripts/controlledPromotionActivationGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:39.551Z",
+  "reviewsChecked": 26,
+  "activationReady": 0,
+  "activationExecuted": 0,
+  "liveFetchEnabled": 0,
+  "message": "Controlled promotion activation gate smoke test passed."
+}
+Source stack conformance passed (commands).
+
+> ares-farms@0.1.0 smoke:security-policy
+> tsx src/scripts/apiSecurityPolicySmokeTest.ts
+
+{
+  "ok": true,
+  "message": "API security policy smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:content-claims
+> tsx src/scripts/contentClaimsPolicySmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:39.910Z",
+  "policy": "content-claims-policy-v0.1.0",
+  "cases": [
+    {
+      "name": "lender-ready disclosure is allowed",
+      "ok": true,
+      "details": {
+        "findingCount": 0
+      }
+    },
+    {
+      "name": "approval and guarantee claims are blocked",
+      "ok": true,
+      "details": {
+        "blockedCodes": [
+          "PROHIBITED_APPROVAL_CLAIM",
+          "PROHIBITED_APPROVAL_CLAIM",
+          "PROHIBITED_APPROVAL_CLAIM"
+        ]
+      }
+    },
+    {
+      "name": "verification claims require live infrastructure",
+      "ok": true,
+      "details": {
+        "blocked": 2,
+        "allowed": true
+      }
+    },
+    {
+      "name": "free tier and portability rights are protected",
+      "ok": true,
+      "details": {
+        "allowed": true,
+        "blockedCodes": [
+          "FREE_TIER_DARK_PATTERN",
+          "PORTABILITY_BARRIER",
+          "FREE_TIER_BASELINE_REVIEW",
+          "PORTABILITY_RIGHTS_REVIEW",
+          "PORTABILITY_RIGHTS_REVIEW"
+        ]
+      }
+    },
+    {
+      "name": "AI decision claims are blocked",
+      "ok": true,
+      "details": {
+        "blockedCodes": [
+          "AI_DECISION_CLAIM"
+        ],
+        "allowed": true
+      }
+    },
+    {
+      "name": "security posture overclaims are blocked",
+      "ok": true,
+      "details": {
+        "soc2Blocked": 1,
+        "fedRampBlocked": 1,
+        "allowed": true
+      }
+    }
+  ]
+}
+
+> ares-farms@0.1.0 smoke:auth-activation-policy
+> tsx src/scripts/authActivationPolicySmokeTest.ts
+
+{
+  "ok": true,
+  "message": "Auth activation policy smoke test passed."
+}
+
+> ares-farms@0.1.0 auth:activation
+> tsx src/scripts/productionAuthActivationGate.ts
+
+{
+  "ok": true,
+  "profile": "development",
+  "checkedAt": "2026-06-01T20:06:40.189Z",
+  "summary": {
+    "total": 11,
+    "pass": 7,
+    "warn": 4,
+    "block": 0
+  },
+  "checks": [
+    {
+      "id": "auth-activation.credentials-policy-wired",
+      "area": "credentials",
+      "status": "PASS",
+      "summary": "NextAuth credentials must use the auth activation policy.",
+      "detail": "NextAuth credentials route is wired to auth activation policy."
+    },
+    {
+      "id": "auth-activation.self-service-role-limit",
+      "area": "roles",
+      "status": "PASS",
+      "summary": "Self-service auth init must not create elevated roles.",
+      "detail": "Auth init sanitizes self-service roles and routes elevated roles to provisioning."
+    },
+    {
+      "id": "auth-activation.role-provisioning-route",
+      "area": "roles",
+      "status": "PASS",
+      "summary": "Governed role provisioning route must exist.",
+      "detail": "Role provisioning route requires session authority and governed policy."
+    },
+    {
+      "id": "auth-activation.role-provisioning-store",
+      "area": "roles",
+      "status": "PASS",
+      "summary": "Role provisioning must persist durable user role changes.",
+      "detail": "Role provisioning store exists."
+    },
+    {
+      "id": "auth-activation.smoke-wired",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Auth activation smoke and gate must be wired into verification.",
+      "detail": "Auth activation smoke and gate are wired into backend verification."
+    },
+    {
+      "id": "auth-activation.nextauth-secret",
+      "area": "credentials",
+      "status": "PASS",
+      "summary": "Production auth requires a strong NextAuth secret.",
+      "detail": "Local profile permits governed development secret posture."
+    },
+    {
+      "id": "auth-activation.nextauth-url",
+      "area": "credentials",
+      "status": "PASS",
+      "summary": "Production auth requires an HTTPS NEXTAUTH_URL.",
+      "detail": "Local profile permits localhost URL posture."
+    },
+    {
+      "id": "auth-activation.api-auth-required",
+      "area": "perimeter",
+      "status": "WARN",
+      "summary": "Production auth activation requires API auth enforcement.",
+      "detail": "API_AUTH_ENFORCEMENT is not set to required."
+    },
+    {
+      "id": "auth-activation.rate-limit-enabled",
+      "area": "perimeter",
+      "status": "WARN",
+      "summary": "Production auth activation requires API rate limiting.",
+      "detail": "RATE_LIMITING_ENABLED is not true."
+    },
+    {
+      "id": "auth-activation.credentials-mode",
+      "area": "credentials",
+      "status": "WARN",
+      "summary": "Production credentials must use email allowlist plus a strong shared secret until external IdP is added.",
+      "detail": "AUTH_CREDENTIALS_MODE=email-allowlist, AUTH_CREDENTIAL_EMAIL_ALLOWLIST, and a strong AUTH_CREDENTIAL_SHARED_SECRET are required for production activation."
+    },
+    {
+      "id": "auth-activation.role-provisioning-mode",
+      "area": "roles",
+      "status": "WARN",
+      "summary": "Production role provisioning must run in governed-admin-only mode.",
+      "detail": "ROLE_PROVISIONING_MODE is not governed-admin-only."
+    }
+  ]
+}
+
+> ares-farms@0.1.0 security:audit
+> tsx src/scripts/securityAuditReadinessGate.ts
+
+{
+  "ok": true,
+  "profile": "development",
+  "checkedAt": "2026-06-01T20:06:40.341Z",
+  "summary": {
+    "total": 20,
+    "pass": 18,
+    "warn": 2,
+    "block": 0
+  },
+  "checks": [
+    {
+      "id": "security.master-volume-snapshot",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Master Volume and backend readiness documents are present.",
+      "detail": "Source snapshot, coverage matrix, and readiness checklist are present."
+    },
+    {
+      "id": "security.env-file-ignored",
+      "area": "secrets",
+      "status": "PASS",
+      "summary": ".env must not be committed.",
+      "detail": ".env is ignored by git."
+    },
+    {
+      "id": "security.env-no-raw-agency-credentials",
+      "area": "secrets",
+      "status": "PASS",
+      "summary": "Environment file must not contain raw agency credentials.",
+      "detail": "No suspicious raw agency credential keys were found in the local .env file."
+    },
+    {
+      "id": "security.database-url-present",
+      "area": "database",
+      "status": "PASS",
+      "summary": "DATABASE_URL must be configured.",
+      "detail": "DATABASE_URL is configured."
+    },
+    {
+      "id": "security.database-ssl-policy",
+      "area": "database",
+      "status": "PASS",
+      "summary": "PostgreSQL SSL must be explicit and certificate-verifying.",
+      "detail": "PostgreSQL SSL verifies the server certificate chain."
+    },
+    {
+      "id": "security.database-production-ssl",
+      "area": "database",
+      "status": "PASS",
+      "summary": "Production database SSL should use verify-full or verify-ca.",
+      "detail": "PostgreSQL SSL verifies the server certificate chain."
+    },
+    {
+      "id": "security.database-runtime-ssl-helper",
+      "area": "database",
+      "status": "PASS",
+      "summary": "Application database pool must use the governed SSL helper.",
+      "detail": "The application database pool uses createPostgresSslConfig()."
+    },
+    {
+      "id": "security.nextauth-secret",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "NextAuth secret must be configured with a strong value.",
+      "detail": "A governed local-only development secret is active."
+    },
+    {
+      "id": "security.nextauth-url",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "NEXTAUTH_URL must be HTTPS and non-localhost for production.",
+      "detail": "Local profile allows the governed localhost fallback."
+    },
+    {
+      "id": "security.nextauth-runtime-helper",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "NextAuth route must use governed runtime security helpers.",
+      "detail": "NextAuth route is wired to governed URL and secret helpers."
+    },
+    {
+      "id": "security.auth-activation-policy",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "Auth activation policy must block open production credentials and self-service elevated roles.",
+      "detail": "Auth activation policy is wired into credentials and auth initialization."
+    },
+    {
+      "id": "security.role-provisioning-controls",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "Elevated roles must be provisioned through governed session authority.",
+      "detail": "Governed role provisioning route and durable store are present."
+    },
+    {
+      "id": "security.auth-activation-gate-wired",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Production Auth Activation Gate must be wired into backend verification.",
+      "detail": "Production Auth Activation Gate and smoke test are wired into backend verification."
+    },
+    {
+      "id": "security.api-security-policy-runtime",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "API security policy runtime must define session enforcement, public-route limits, and caller-claim conflict checks.",
+      "detail": "API security policy runtime defines auth enforcement, rate limiting, public-route exceptions, and claim conflict checks."
+    },
+    {
+      "id": "security.api-security-perimeter-proxy",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "Protected API routes must have a perimeter proxy for session authority and abuse control.",
+      "detail": "API perimeter proxy is present and wired to session enforcement, rate limiting, and caller-claim conflict checks."
+    },
+    {
+      "id": "security.api-security-policy-smoke",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "API security policy must have smoke coverage wired into verify:backend.",
+      "detail": "API security policy smoke coverage exists and is included in verify:backend."
+    },
+    {
+      "id": "security.production-api-auth-enforcement",
+      "area": "auth",
+      "status": "WARN",
+      "summary": "Production API routes must enforce real authenticated sessions rather than caller-claimed roles.",
+      "detail": "API_AUTH_ENFORCEMENT is not set to required. This remains a production-live blocker."
+    },
+    {
+      "id": "security.production-rate-limiting",
+      "area": "abuse-control",
+      "status": "WARN",
+      "summary": "Production API routes need rate limiting or abuse controls.",
+      "detail": "RATE_LIMITING_ENABLED is not set to true. This remains a production-live blocker."
+    },
+    {
+      "id": "security.audit-ledger-admin-read",
+      "area": "audit",
+      "status": "PASS",
+      "summary": "Audit/ledger admin-read surface must exist and be smoke-tested.",
+      "detail": "Audit/ledger admin-read route, store, and smoke test exist."
+    },
+    {
+      "id": "security.smoke-backend-wired",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Security-relevant smoke coverage must be wired into package scripts.",
+      "detail": "Backend smoke includes ledger admin-read coverage and verify:backend includes the security audit gate."
+    }
+  ]
+}
+
+> ares-farms@0.1.0 backend:production-readiness
+> tsx src/scripts/backendProductionReadinessGate.ts
+
+{
+  "ok": true,
+  "profile": "development",
+  "checkedAt": "2026-06-01T20:06:40.485Z",
+  "summary": {
+    "total": 14,
+    "pass": 9,
+    "warn": 5,
+    "block": 0
+  },
+  "checks": [
+    {
+      "id": "backend-production.master-volume-docs-present",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Backend production promotion must be documented under the Master Volumes.",
+      "detail": "Master Volume source, backend readiness, security, auth, and production activation docs are present."
+    },
+    {
+      "id": "backend-production.package-scripts-wired",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Production backend readiness scripts must be wired into package.json.",
+      "detail": "Build, local verification, full smoke, production auth, security, and production readiness scripts are wired."
+    },
+    {
+      "id": "backend-production.env-template-present",
+      "area": "configuration",
+      "status": "PASS",
+      "summary": "A non-secret production environment template must exist.",
+      "detail": ".env.production.example exists and is explicitly allowed through .gitignore."
+    },
+    {
+      "id": "backend-production.env-template-complete",
+      "area": "configuration",
+      "status": "PASS",
+      "summary": "The production environment template must include all known backend activation keys.",
+      "detail": "The production environment template includes the database, auth, perimeter, rate-limit, smoke, and payment connector keys."
+    },
+    {
+      "id": "backend-production.database-url",
+      "area": "database",
+      "status": "PASS",
+      "summary": "Production backend activation requires DATABASE_URL.",
+      "detail": "DATABASE_URL is configured."
+    },
+    {
+      "id": "backend-production.database-ssl",
+      "area": "database",
+      "status": "PASS",
+      "summary": "Production database traffic must use certificate-verifying SSL.",
+      "detail": "PostgreSQL SSL verifies the server certificate chain."
+    },
+    {
+      "id": "backend-production.nextauth-secret",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "Production auth requires a strong, non-local NextAuth secret.",
+      "detail": "Local profile permits governed development secret posture."
+    },
+    {
+      "id": "backend-production.nextauth-url",
+      "area": "auth",
+      "status": "PASS",
+      "summary": "Production auth requires an HTTPS non-localhost NEXTAUTH_URL.",
+      "detail": "Local profile permits localhost URL posture."
+    },
+    {
+      "id": "backend-production.api-auth-enforcement",
+      "area": "perimeter",
+      "status": "WARN",
+      "summary": "Production API exposure requires authenticated session enforcement.",
+      "detail": "API_AUTH_ENFORCEMENT is not set to required."
+    },
+    {
+      "id": "backend-production.rate-limit-enabled",
+      "area": "perimeter",
+      "status": "WARN",
+      "summary": "Production API exposure requires rate limiting.",
+      "detail": "RATE_LIMITING_ENABLED is not true."
+    },
+    {
+      "id": "backend-production.rate-limit-tuned",
+      "area": "perimeter",
+      "status": "WARN",
+      "summary": "Production API rate limiting must have explicit positive limits.",
+      "detail": "API_RATE_LIMIT_WINDOW_SECONDS and API_RATE_LIMIT_MAX must be positive integers."
+    },
+    {
+      "id": "backend-production.credential-mode",
+      "area": "auth",
+      "status": "WARN",
+      "summary": "Production credential auth must use a controlled allowlist bridge.",
+      "detail": "AUTH_CREDENTIALS_MODE=email-allowlist, AUTH_CREDENTIAL_EMAIL_ALLOWLIST, and a strong AUTH_CREDENTIAL_SHARED_SECRET are required."
+    },
+    {
+      "id": "backend-production.role-provisioning",
+      "area": "auth",
+      "status": "WARN",
+      "summary": "Production role changes must go through governed provisioning.",
+      "detail": "ROLE_PROVISIONING_MODE is not governed-admin-only."
+    },
+    {
+      "id": "backend-production.live-action-boundary",
+      "area": "live-action",
+      "status": "PASS",
+      "summary": "Live external actions must remain explicitly controlled before public exposure.",
+      "detail": "The backend coverage matrix documents live-action blockers and promotion boundaries."
+    }
+  ]
+}
+
+> ares-farms@0.1.0 backend:module-readiness
+> tsx src/scripts/backendModuleReadinessGate.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:40.632Z",
+  "summary": {
+    "total": 38,
+    "pass": 38,
+    "warn": 0,
+    "block": 0
+  },
+  "decision": "Backend foundation is ready for governed module work. Production-live and live external action promotion remain separate module gates.",
+  "checks": [
+    {
+      "id": "backend-module.master-volume-docs",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Module work requires a documented Master Volume backend readiness decision.",
+      "detail": "Master Volume source, protocol, readiness, coverage, security, auth, production, and module readiness docs are present."
+    },
+    {
+      "id": "backend-module.route-surface",
+      "area": "routes",
+      "status": "PASS",
+      "summary": "The governed backend route surface must exist before module work begins.",
+      "detail": "Identity, applications, documents, connectors, reviews, notices, queues, partners, reports, billing, governance, and audit route surfaces are present."
+    },
+    {
+      "id": "backend-module.runtime-surface",
+      "area": "runtime",
+      "status": "PASS",
+      "summary": "The governed backend runtime/store surface must exist before module work begins.",
+      "detail": "Access control, security, database SSL, applications, documents, connectors, rules, reviews, decisions, notices, queues, partners, reports, billing, governance, and audit runtimes are present."
+    },
+    {
+      "id": "backend-module.package-commands",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Backend readiness commands must be available before module work begins.",
+      "detail": "Schema, backend verification, smoke, security, auth, production readiness, and module readiness commands are wired."
+    },
+    {
+      "id": "backend-module.smoke-coverage",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Full backend smoke coverage must include every governed module-facing surface.",
+      "detail": "Full backend smoke coverage includes all governed module-facing backend surfaces."
+    },
+    {
+      "id": "backend-module.verify-coverage",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Backend verification must include schema, types, security, auth, production readiness, module readiness, and integration readiness.",
+      "detail": "Backend verification includes schema, type, security, auth, production readiness, module readiness, and integration gates."
+    },
+    {
+      "id": "backend-module.integration-architecture-files",
+      "area": "integration",
+      "status": "PASS",
+      "summary": "Module integration requires manifests, DTOs, events, case context, handoffs, feature flags, and platform shell files.",
+      "detail": "Manifest registry, DTO/view-model layer, event contract registry, shared case context, handoff map, feature flags, PlatformShell, and ModuleNav are present."
+    },
+    {
+      "id": "backend-module.integration-smoke-coverage",
+      "area": "verification",
+      "status": "PASS",
+      "summary": "Integration smoke coverage must verify manifests, public surfaces, claims, replay, and cross-module contracts.",
+      "detail": "Integration smoke coverage is wired and included in verify:backend."
+    },
+    {
+      "id": "backend-module.integration-contract",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "The final module integration and public surface contract must document all new supplemental requirements.",
+      "detail": "The module integration contract documents manifests, DTOs, event contracts, case context, public gateway, handoffs, feature flags, shell, and smoke coverage."
+    },
+    {
+      "id": "backend-module.master-volume-conformance-framework",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Master Volume conformance testing must provide requirement traceability and constitutional proof commands.",
+      "detail": "Master Volume requirement matrix and conformance tests for modules, classification, ledger, replay, platform, redaction, and public claims are present."
+    },
+    {
+      "id": "backend-module.environmental-compliance",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Environmental pathway governance must exist before modules rely on environmental assessment state.",
+      "detail": "Environmental compliance records, borrower fee controls, provider license verification, spoke isolation, write/admin-read route surfaces, migration, and smoke coverage are wired."
+    },
+    {
+      "id": "backend-module.missing-doctrine-governance",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Missing doctrine governance must be represented by runtime, schema, APIs, traceability, and tests.",
+      "detail": "Runtime states, feature activation, public claims, incidents, configuration, UX, and implementation traceability are wired into governance and verification."
+    },
+    {
+      "id": "backend-module.scraper-source-intelligence",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Scraper, source-ingestion, property discovery, and source-intelligence governance must be represented before dependent modules rely on them.",
+      "detail": "Source intelligence runtime, schema, APIs, public translation surfaces, conformance suite, API smoke test, matrix entries, and production blocks are wired."
+    },
+    {
+      "id": "backend-module.revenue-source-intelligence",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Revenue source intelligence must be represented before customer revenue, product, pricing, program, or opportunity surfaces rely on it.",
+      "detail": "Revenue intelligence runtime, schema, APIs, translation surfaces, conformance suite, API smoke test, matrix entries, and production blocks are wired."
+    },
+    {
+      "id": "backend-module.source-stack-architecture",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Canonical external source stack, failover, canonicalization, source freshness, conflicts, aliases, and public DTO boundaries must be represented before modules rely on source discovery.",
+      "detail": "Source stack runtime, schema, APIs, aliases, conformance suite, smoke test, matrix entries, and controlled production blocks are wired."
+    },
+    {
+      "id": "backend-module.source-legal-review-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Source legal, ToS, licensing, anti-bulk, retention, republication, and public DTO review must gate source activation.",
+      "detail": "Source legal review runtime, API, internal surface, documentation, module integration, source-stack verification, and backend smoke coverage are wired while live fetch remains blocked."
+    },
+    {
+      "id": "backend-module.source-promotion-packet-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Source promotion packets must package legal, activation, replay, provenance, adapter, monitoring, rollback, incident, claims, and human approval evidence before source activation.",
+      "detail": "Source promotion packet runtime, API, internal surface, documentation, module integration, source-stack verification, and backend smoke coverage are wired while source promotion remains blocked."
+    },
+    {
+      "id": "backend-module.source-production-readiness-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Source production readiness must assemble final controlled-promotion evidence while keeping source activation and live fetch blocked.",
+      "detail": "Source production readiness runtime, API, internal surface, documentation, module integration, source-stack verification, and backend smoke coverage are wired while production source promotion remains blocked."
+    },
+    {
+      "id": "backend-module.controlled-promotion-activation-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Controlled promotion activation must assemble final activation ceremony evidence while keeping source activation and live fetch blocked.",
+      "detail": "Controlled promotion activation runtime, API, internal surface, documentation, module integration, source-stack verification, and backend smoke coverage are wired while activation execution remains blocked."
+    },
+    {
+      "id": "backend-module.production-portal-readiness-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production portal readiness must assemble launch preflight evidence while keeping portal launch, public verification, live actions, payment capture, notice sends, and official reports blocked.",
+      "detail": "Production portal readiness runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while production portal launch remains blocked."
+    },
+    {
+      "id": "backend-module.production-launch-evidence-packet",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production launch evidence must assemble go-live proof while keeping portal launch, public verification, live actions, payment capture, notice sends, and official reports blocked.",
+      "detail": "Production launch evidence runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while go-live release remains blocked."
+    },
+    {
+      "id": "backend-module.deployment-environment-readiness-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Deployment environment readiness must assemble release-candidate and production environment evidence while keeping deployment, secret activation, DNS cutover, migrations, and go-live release blocked.",
+      "detail": "Deployment environment readiness runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while deployment remains blocked."
+    },
+    {
+      "id": "backend-module.release-candidate-freeze-plan",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Release candidate freeze must assemble final freeze evidence while keeping freeze approval, candidate freeze, deployment, secret activation, DNS cutover, migrations, and go-live release blocked.",
+      "detail": "Release candidate freeze runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while freeze approval and deployment remain blocked."
+    },
+    {
+      "id": "backend-module.production-cutover-hold-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production cutover hold must assemble final cutover, launch hold, deployment hold, freeze hold, public exposure, and release-manager evidence while keeping cutover, launch, deployment, and public production exposure blocked.",
+      "detail": "Production cutover hold runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while cutover, launch, deployment, and public exposure remain blocked."
+    },
+    {
+      "id": "backend-module.production-release-board-evidence-packet",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production release board must assemble release board, quorum, qualified release manager, security, compliance, operations, support, launch hold, cutover authority, public API exposure, and portal launch evidence while keeping board approval, cutover authority, deployment, and public production exposure blocked.",
+      "detail": "Production release board runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while board approval, cutover authority, launch hold release, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, and public verification remain blocked."
+    },
+    {
+      "id": "backend-module.production-operations-monitoring-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production operations monitoring must assemble monitoring, alerting, on-call, incident, rollback, support, audit export, backup, restore, communications, emergency hold, and kill-switch evidence while keeping monitoring activation, cutover authority, deployment, and public production exposure blocked.",
+      "detail": "Production operations monitoring runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while operations approval, monitoring activation, on-call activation, incident bridge activation, rollback authorization, emergency hold release, cutover authority, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, and public verification remain blocked."
+    },
+    {
+      "id": "backend-module.production-incident-response-readiness-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production incident response readiness must assemble incident command, severity, escalation, rollback, support, communications, data integrity, replay, emergency hold, and kill-switch evidence while keeping incident activation, rollback, public communications, cutover authority, deployment, and public production exposure blocked.",
+      "detail": "Production incident response readiness runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while incident approval, incident activation, incident bridge activation, rollback authorization, emergency rollback, emergency hold release, kill-switch activation, customer communications, public status page, support escalation, cutover authority, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, and public verification remain blocked."
+    },
+    {
+      "id": "backend-module.production-support-communications-readiness-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production support communications readiness must assemble support routing, customer-safe language, public status, escalation, accessibility, translation, redaction, data rights, audit, replay, and communications freeze evidence while keeping support activation, communications release, notices, public status, cutover authority, deployment, and public production exposure blocked.",
+      "detail": "Production support communications readiness runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while support approval, support activation, support escalation, customer communications, regulatory communications, public status page, notices, official reports, public verification, legal advice, official reliance, incident activation, rollback authorization, cutover authority, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.production-final-authority-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production final authority must assemble constitutional authority, release-manager, launch, deployment, cutover, operations, incident, support, communications, security, privacy, redaction, claims, audit, replay, and data-rights evidence while keeping final authority, go-live, hold release, deployment, and public production exposure blocked.",
+      "detail": "Production final authority runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while final authority approval, go-live approval, production launch authorization, constitutional attestation, release-manager approval, hold releases, support activation, communications release, public status page, cutover authority, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, public verification, legal advice, official reliance, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.production-activation-ceremony-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production activation ceremony must assemble final ceremony evidence while keeping ceremony approval, ceremony execution, production activation, post-activation verification, deployment, and public production exposure blocked.",
+      "detail": "Production activation ceremony runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while activation ceremony approval, ceremony execution, production activation, post-activation verification, final authority, go-live, hold releases, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, public verification, legal advice, official reliance, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.production-post-activation-verification-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production post-activation verification must assemble verification evidence while keeping verification start, verification completion, production health certification, activation, deployment, and public production exposure blocked.",
+      "detail": "Production post-activation verification runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while verification approval, verification start, verification completion, production health certification, activation ceremony approval, ceremony execution, production activation, final authority, go-live, hold releases, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, public verification, legal advice, official reliance, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.production-reliance-verification-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production reliance verification must assemble public verification and official reliance boundary evidence while keeping reliance authority, public verification, official reliance, legal advice, production health certification, activation, deployment, and public production exposure blocked.",
+      "detail": "Production reliance verification runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while production reliance approval, public verification approval, public verification gateway operation, public verification artifact publication, external reliance disclosure, regulatory reliance, official reliance, legal advice, post-activation verification approval, production health certification, activation, final authority, go-live, hold releases, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, customer communications, public status, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.production-regulatory-examination-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production regulatory examination must assemble examination and archive evidence while keeping regulator submission, official responses, archive certification, reliance authority, public verification, legal advice, deployment, and public production exposure blocked.",
+      "detail": "Production regulatory examination runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while package approval, regulator submission, portal upload, official regulator response, archive certification, retention certification, legal hold release, external examiner disclosure, production reliance, public verification, official reliance, legal advice, production health certification, activation, go-live, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, customer communications, public status, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.production-regulatory-response-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Production regulatory response must assemble response and corrective-action evidence while keeping official regulator response, corrective-action commitment, remediation execution, finding closure, reliance authority, public verification, legal advice, deployment, and public production exposure blocked.",
+      "detail": "Production regulatory response runtime, API, internal surface, documentation, module integration, integration smoke, and backend smoke coverage are wired while response package approval, official regulator response, corrective-action plan approval, corrective-action commitment, corrective-action execution, remediation plan approval, remediation execution, examiner finding closure, legal hold release, external examiner disclosure, production reliance, public verification, official reliance, legal advice, production health certification, activation, go-live, deployment, secrets, DNS, migrations, public APIs, portal launch, payments, notices, official reports, customer communications, public status, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.build-preservation-evidence-archive-gate",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Build preservation must freeze checkpoint BR-2026-06-01-M41, attach verification evidence, detect tree drift, verify ignored sensitive files, and keep production authority blocked.",
+      "detail": "Build preservation runtime, API, internal surface, documentation, build snapshot evidence pack, module integration, integration smoke, and backend smoke coverage are wired while production launch, deployment, public API exposure, portal launch, payments, notices, reports, public verification, official reliance, legal advice, regulatory response, corrective-action commitment, remediation execution, and live external actions remain blocked."
+    },
+    {
+      "id": "backend-module.live-action-boundaries",
+      "area": "live-action",
+      "status": "PASS",
+      "summary": "Live external actions must be separated from backend foundation completion.",
+      "detail": "Live external calls, authenticated agency sessions, notice sends, payment capture, raw document processing, and public production API exposure are explicitly separated from backend foundation readiness."
+    },
+    {
+      "id": "backend-module.content-claims-policy",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "Customer-facing module work must pass governed content-claims policy before promotion.",
+      "detail": "Content claims policy, prohibited language smoke coverage, lender-ready limits, verification claim limits, free-tier protections, and borrower portability controls are documented and wired."
+    },
+    {
+      "id": "backend-module.final-decision-language",
+      "area": "governance",
+      "status": "PASS",
+      "summary": "The backend readiness checklist must contain the final module-start decision.",
+      "detail": "The readiness checklist records the final backend foundation completion decision."
+    }
+  ]
+}
+
+> ares-farms@0.1.0 smoke:integration
+> npm run verify:module-manifests && npm run smoke:module-registry && npm run smoke:public-surfaces && npm run smoke:claims-public && npm run smoke:redaction && npm run smoke:replay-cross-module && npm run smoke:live-scraper-activation && npm run smoke:source-legal-review && npm run smoke:source-promotion-packets && npm run smoke:source-production-readiness && npm run smoke:controlled-promotion-activation && npm run smoke:production-portal-readiness && npm run smoke:production-launch-evidence && npm run smoke:deployment-environment-readiness && npm run smoke:release-candidate-freeze && npm run smoke:production-cutover-hold && npm run smoke:production-release-board && npm run smoke:production-operations-monitoring && npm run smoke:production-incident-response-readiness && npm run smoke:production-support-communications-readiness && npm run smoke:production-final-authority && npm run smoke:production-activation-ceremony && npm run smoke:production-post-activation-verification && npm run smoke:production-reliance-verification && npm run smoke:production-regulatory-examination && npm run smoke:production-regulatory-response && npm run smoke:build-preservation && npm run smoke:platform && tsx src/scripts/integrationSmokeTest.ts
+
+
+> ares-farms@0.1.0 verify:module-manifests
+> tsx src/scripts/moduleConformanceTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:40.835Z",
+  "modulesChecked": 63,
+  "highestModuleNumber": 42,
+  "publicSurfacesChecked": 19,
+  "handoffsChecked": 89,
+  "eventContractsChecked": 54,
+  "message": "Per-module conformance test passed."
+}
+
+> ares-farms@0.1.0 smoke:module-registry
+> tsx src/scripts/moduleRegistrySmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:40.979Z",
+  "manifestCount": 63,
+  "message": "Module manifest registry smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:public-surfaces
+> tsx src/scripts/publicSurfaceSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:41.123Z",
+  "surfaceCount": 19,
+  "publicSourceIntelligenceSurfaces": 5,
+  "message": "Public surface gateway smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:claims-public
+> tsx src/scripts/publicClaimsSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:41.265Z",
+  "policyVersion": "content-claims-policy-v0.1.0",
+  "surfaceCount": 19,
+  "findingCount": 0,
+  "message": "Public claims smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:redaction
+> tsx src/scripts/redactionSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:41.404Z",
+  "surfaceCount": 19,
+  "prohibitedKeysChecked": 11,
+  "message": "Public redaction smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:replay-cross-module
+> tsx src/scripts/crossModuleReplaySmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:41.546Z",
+  "modulesChecked": 63,
+  "eventContractsChecked": 54,
+  "handoffsChecked": 89,
+  "message": "Cross-module replay smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:live-scraper-activation
+> tsx src/scripts/liveScraperActivationGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:41.690Z",
+  "scrapersReviewed": 10,
+  "sourceStackProfiles": 26,
+  "liveFetchEnabled": 0,
+  "message": "Live scraper activation gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:source-legal-review
+> tsx src/scripts/sourceLegalReviewGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:41.830Z",
+  "sourcesReviewed": 26,
+  "legalApproved": 0,
+  "liveFetchEnabled": 0,
+  "message": "Source legal review gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:source-promotion-packets
+> tsx src/scripts/sourcePromotionPacketGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:41.975Z",
+  "packetsReviewed": 26,
+  "promotionReady": 0,
+  "liveFetchEnabled": 0,
+  "message": "Source promotion packet gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:source-production-readiness
+> tsx src/scripts/sourceProductionReadinessGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:42.120Z",
+  "reviewsChecked": 26,
+  "productionReady": 0,
+  "liveFetchEnabled": 0,
+  "message": "Source production readiness gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:controlled-promotion-activation
+> tsx src/scripts/controlledPromotionActivationGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:42.266Z",
+  "reviewsChecked": 26,
+  "activationReady": 0,
+  "activationExecuted": 0,
+  "liveFetchEnabled": 0,
+  "message": "Controlled promotion activation gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-portal-readiness
+> tsx src/scripts/productionPortalReadinessGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:42.427Z",
+  "reviewsChecked": 43,
+  "productionBlocked": 43,
+  "launchReady": 0,
+  "launchExecuted": 0,
+  "publicLaunchAllowed": 0,
+  "message": "Production portal readiness gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-launch-evidence
+> tsx src/scripts/productionLaunchEvidencePacketSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:42.589Z",
+  "evidenceItemsChecked": 15,
+  "blocked": 7,
+  "reviewRequired": 2,
+  "goLiveApproved": 0,
+  "portalLaunchExecuted": 0,
+  "message": "Production launch evidence packet smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:deployment-environment-readiness
+> tsx src/scripts/deploymentEnvironmentReadinessGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:42.761Z",
+  "environmentItemsChecked": 18,
+  "blocked": 9,
+  "reviewRequired": 5,
+  "releaseCandidateApproved": 0,
+  "deploymentExecuted": 0,
+  "message": "Deployment environment readiness gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:release-candidate-freeze
+> tsx src/scripts/releaseCandidateFreezePlanSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:42.981Z",
+  "freezeItemsChecked": 19,
+  "blocked": 8,
+  "reviewRequired": 7,
+  "releaseCandidateFreezeApproved": 0,
+  "releaseCandidateFrozen": 0,
+  "deploymentExecuted": 0,
+  "message": "Release candidate freeze plan smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-cutover-hold
+> tsx src/scripts/productionCutoverHoldGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:43.194Z",
+  "cutoverItemsChecked": 19,
+  "blocked": 11,
+  "reviewRequired": 4,
+  "productionCutoverApproved": 0,
+  "productionCutoverExecuted": 0,
+  "finalGoLiveHoldReleased": 0,
+  "message": "Production cutover hold gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-release-board
+> tsx src/scripts/productionReleaseBoardSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:43.402Z",
+  "releaseBoardItemsChecked": 22,
+  "blocked": 12,
+  "reviewRequired": 6,
+  "releaseBoardApprovalGranted": 0,
+  "cutoverAuthorityGranted": 0,
+  "productionCutoverExecuted": 0,
+  "message": "Production release board smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-operations-monitoring
+> tsx src/scripts/productionOperationsMonitoringGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:43.612Z",
+  "operationsItemsChecked": 17,
+  "blocked": 6,
+  "reviewRequired": 8,
+  "operationsMonitoringApprovalGranted": 0,
+  "productionMonitoringActivated": 0,
+  "productionCutoverExecuted": 0,
+  "message": "Production operations monitoring gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-incident-response-readiness
+> tsx src/scripts/productionIncidentResponseReadinessGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:43.825Z",
+  "incidentItemsChecked": 17,
+  "blocked": 5,
+  "reviewRequired": 9,
+  "incidentResponseApprovalGranted": 0,
+  "incidentResponseActivated": 0,
+  "productionCutoverExecuted": 0,
+  "message": "Production incident response readiness gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-support-communications-readiness
+> tsx src/scripts/productionSupportCommunicationsReadinessGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:44.034Z",
+  "supportItemsChecked": 16,
+  "blocked": 5,
+  "reviewRequired": 8,
+  "supportCommunicationsApprovalGranted": 0,
+  "supportOperationsActivated": 0,
+  "productionCutoverExecuted": 0,
+  "message": "Production support communications readiness gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-final-authority
+> tsx src/scripts/productionFinalAuthorityGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:44.247Z",
+  "authorityItemsChecked": 17,
+  "blocked": 5,
+  "reviewRequired": 9,
+  "finalAuthorityApprovalGranted": 0,
+  "goLiveApproved": 0,
+  "productionLaunchAuthorized": 0,
+  "productionCutoverExecuted": 0,
+  "message": "Production final authority gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-activation-ceremony
+> tsx src/scripts/productionActivationCeremonyGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:44.456Z",
+  "ceremonyItemsChecked": 15,
+  "blocked": 4,
+  "reviewRequired": 8,
+  "activationCeremonyApprovalGranted": 0,
+  "activationCeremonyExecuted": 0,
+  "productionActivationExecuted": 0,
+  "message": "Production activation ceremony gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-post-activation-verification
+> tsx src/scripts/productionPostActivationVerificationGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:44.668Z",
+  "verificationItemsChecked": 15,
+  "blocked": 5,
+  "reviewRequired": 7,
+  "postActivationVerificationApprovalGranted": 0,
+  "postActivationVerificationStarted": 0,
+  "postActivationVerificationCompleted": 0,
+  "productionHealthCertified": 0,
+  "message": "Production post-activation verification gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-reliance-verification
+> tsx src/scripts/productionRelianceVerificationGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:44.880Z",
+  "relianceItemsChecked": 15,
+  "blocked": 5,
+  "reviewRequired": 7,
+  "productionRelianceApprovalGranted": 0,
+  "publicVerificationApprovalGranted": 0,
+  "publicVerificationGatewayOperational": 0,
+  "officialRelianceAllowed": 0,
+  "legalAdviceProvided": 0,
+  "message": "Production reliance and public verification boundary gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-regulatory-examination
+> tsx src/scripts/productionRegulatoryExaminationGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:45.094Z",
+  "examinationItemsChecked": 15,
+  "blocked": 5,
+  "reviewRequired": 7,
+  "regulatoryExaminationPackageApproved": 0,
+  "regulatoryExaminationPackageSubmitted": 0,
+  "examinationArchiveCertified": 0,
+  "officialRelianceAllowed": 0,
+  "legalAdviceProvided": 0,
+  "message": "Production regulatory examination and evidence archive gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:production-regulatory-response
+> tsx src/scripts/productionRegulatoryResponseGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:45.310Z",
+  "responseItemsChecked": 15,
+  "blocked": 5,
+  "reviewRequired": 7,
+  "regulatoryResponsePackageApproved": 0,
+  "officialRegulatorResponseIssued": 0,
+  "correctiveActionCommitted": 0,
+  "remediationExecuted": 0,
+  "officialRelianceAllowed": 0,
+  "legalAdviceProvided": 0,
+  "message": "Production regulatory response and corrective action gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:build-preservation
+> tsx src/scripts/buildPreservationEvidenceArchiveGateSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:45.458Z",
+  "checkpointId": "BR-2026-06-01-M41",
+  "checkpointCommitHash": "51bb19f",
+  "preservationItemsChecked": 9,
+  "blocked": 1,
+  "reviewRequired": 0,
+  "treeDriftDetected": 0,
+  "ignoredSensitiveFilesVerified": 1,
+  "productionLaunchAuthorized": 0,
+  "deploymentExecuted": 0,
+  "publicProductionApiExposureAllowed": 0,
+  "legalAdviceProvided": 0,
+  "liveExternalActionsPerformed": 0,
+  "message": "Build preservation and evidence archive gate smoke test passed."
+}
+
+> ares-farms@0.1.0 smoke:platform
+> tsx src/scripts/platformSmokeTest.ts
+
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:45.600Z",
+  "chainTransitions": 9,
+  "modulesChecked": 63,
+  "message": "Whole-platform smoke test passed."
+}
+{
+  "ok": true,
+  "checkedAt": "2026-06-01T20:06:45.684Z",
+  "eventContracts": 54,
+  "handoffs": 89,
+  "caseContext": {
+    "case_id": "integration-smoke-case",
+    "current_stage": "GOVERNED_REVIEW",
+    "related_modules": [
+      "applications",
+      "documents",
+      "reviews"
+    ]
+  },
+  "message": "Cross-module integration smoke test passed."
+}

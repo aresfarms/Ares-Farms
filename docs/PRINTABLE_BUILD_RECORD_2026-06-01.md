@@ -12,6 +12,55 @@ Canonical checkpoint: `BR-2026-06-01-M41` - Review-Bound Backend Governance Foun
 
 Checkpoint commit: `51bb19f`.
 
+Canonical Markdown build record: `docs/build-records/2026-06-01/BUILD_RECORD.md`.
+
+This printable record is a human-readable summary. The non-duplicated canonical archive for this build date lives under `docs/build-records/2026-06-01/` and includes the route list, module manifest export, event contracts, handoffs, production block list, public surface disclosure audit, doctrine gap ledger, human authority map, operational evidence templates, and verification outputs.
+
+## Known Blocks
+
+This build is not production-live. No reader should treat this archive as approval for go-live, deployment, public production API exposure, public verification, legal or regulatory reliance, official report publication, payment capture, notice sending, regulatory response issuance, corrective-action commitment, remediation execution, live scraping, or live external actions.
+
+- No production activation
+- No go-live approval
+- No deployment execution
+- No secret activation
+- No DNS cutover
+- No production database migration
+- No public production API exposure
+- No portal launch
+- No payment capture
+- No borrower notice send
+- No official report publication
+- No public verification authority
+- No official reliance
+- No legal advice
+- No live external action
+- No regulatory response issuance
+- No corrective-action commitment
+- No remediation execution
+
+## Verified Against
+
+Machine-readable version registry: `docs/current-master-volume-registry.json`.
+
+| Document | Version |
+|---|---|
+| Ares Master Volume Series Unified TOC | v1.0 |
+| Ares Build Conformance & Cross-Reference Matrix | v1.0 |
+| Furlong Volume 0 Platform Orientation | v14.0 |
+| Ares/Furlong Volume I Constitutional Backbone Master | v29.0 |
+| Ares/Furlong Volume II Regulatory Governance Master | v23.0 compatibility state |
+| Ares/Furlong Volume III Technical Infrastructure Master | v25.0 |
+| Ares/Furlong Volume III-B Governance Runtime Master | v4.0 |
+| Ares/Furlong Volume IV Operational Runbooks Master | v22.0 |
+| Ares/Furlong Volume V Canonical Doctrines Master | v10.0 |
+| Ares/Furlong Volume VI Source Intelligence Integration Master | v1.1 |
+| Ares/Furlong Master Cross-Reference Index | v22.0 active build-control reference |
+
+## Git Metadata
+
+The dated build archive records branch, commit hash, verification timestamp, and dirty/clean status in `docs/build-records/2026-06-01/BUILD_RECORD.md`. Regenerate it with `npm run build-record:archive` after verification or commit changes.
+
 ## Executive Build Summary
 
 The platform is currently built as a governed, evidence-first financial coordination and agricultural intelligence web portal. The backend foundation, governance runtime, schema layer, module registry, event contracts, cross-module handoffs, public surface controls, replay checks, security and audit readiness gates, scraper/source intelligence gates, revenue intelligence gates, production-readiness gates, regulatory response gate, and build preservation archive gate are implemented through Module 42.

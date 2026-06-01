@@ -5,6 +5,7 @@ import {
   SELLABLE_CATALOG,
   PROGRAM_GRAPH,
 } from "@/lib/revenue-intelligence/revenueSourceIntelligenceRuntime";
+import { publicSurfaceDisclosureMessages } from "@/lib/modules";
 
 type RevenueSurfaceAudience = "internal" | "borrower" | "lender" | "sponsor";
 
@@ -83,6 +84,7 @@ export function RevenueIntelligenceSurface({
             "Human review is pending.",
             "More information may be needed.",
             "No final decision has been made.",
+            ...publicSurfaceDisclosureMessages,
           ].map((message) => (
             <div
               key={message}

@@ -1,0 +1,170 @@
+[
+  {
+    "module": "Module 22",
+    "gate": "Live Scraper Activation Gate",
+    "route": "/live-scraper-activation",
+    "requiredHumanAuthority": "Source Promotion Authority + Legal/Compliance Reviewer",
+    "approvalBoundary": "Source-specific legal/ToS/licensing, credential, adapter, provenance, replay, rollback, incident, and monitoring approval.",
+    "currentPosture": "Blocked; live fetch remains disabled."
+  },
+  {
+    "module": "Module 23",
+    "gate": "Source Legal and Licensing Review Gate",
+    "route": "/source-legal-review",
+    "requiredHumanAuthority": "Qualified Legal/Compliance Reviewer",
+    "approvalBoundary": "Legal/ToS/licensing, anti-bulk, retention, republication, and public-display scope review.",
+    "currentPosture": "Review-bound; no legal advice and no live source approval."
+  },
+  {
+    "module": "Module 24",
+    "gate": "Source Promotion Packet Gate",
+    "route": "/source-promotion-packets",
+    "requiredHumanAuthority": "Source Promotion Authority",
+    "approvalBoundary": "Promotion packet completeness, source legal review, credential vault, adapter, replay, provenance, failover, rollback, incident, and claims evidence.",
+    "currentPosture": "Blocked pending qualified human source promotion approval."
+  },
+  {
+    "module": "Module 25",
+    "gate": "Source Production Promotion Readiness Gate",
+    "route": "/source-production-readiness",
+    "requiredHumanAuthority": "Source Production Owner + Compliance Reviewer",
+    "approvalBoundary": "Final source production readiness, kill switch, activation ceremony, live adapter, audit export, claims review, and source-specific approval.",
+    "currentPosture": "Blocked; production source activation not approved."
+  },
+  {
+    "module": "Module 26",
+    "gate": "Controlled Promotion Activation Gate",
+    "route": "/controlled-promotion-activation",
+    "requiredHumanAuthority": "Controlled Promotion Board",
+    "approvalBoundary": "Promotion change record, risk signoff, source readiness, legal approval, activation ceremony, post-activation verification, and rollback controls.",
+    "currentPosture": "Blocked; activation not executed."
+  },
+  {
+    "module": "Module 27",
+    "gate": "Production Portal Readiness Preflight Gate",
+    "route": "/production-portal-readiness",
+    "requiredHumanAuthority": "Portal Launch Owner + Security/Compliance Reviewer",
+    "approvalBoundary": "Portable surface, auth, security, audit, claims, redaction, support, rollback, incident, and launch-hold evidence.",
+    "currentPosture": "Blocked; portal launch not approved."
+  },
+  {
+    "module": "Module 28",
+    "gate": "Production Launch Evidence Packet",
+    "route": "/production-launch-evidence",
+    "requiredHumanAuthority": "Qualified Release Manager + Legal/Compliance Reviewer",
+    "approvalBoundary": "Go-live packet, backend/security/auth approvals, claims freeze, monitoring, rollback, incident, support, audit, and qualified release ceremony.",
+    "currentPosture": "Blocked; go-live not approved."
+  },
+  {
+    "module": "Module 29",
+    "gate": "Deployment Environment Readiness Gate",
+    "route": "/deployment-environment-readiness",
+    "requiredHumanAuthority": "Deployment Owner + Security Owner",
+    "approvalBoundary": "Production secrets, HTTPS, DNS/CDN/TLS/WAF, migrations, backup/restore, monitoring, rollback, and deployment hold release.",
+    "currentPosture": "Blocked; deployment not executed."
+  },
+  {
+    "module": "Module 30",
+    "gate": "Release Candidate Freeze Plan",
+    "route": "/release-candidate-freeze",
+    "requiredHumanAuthority": "Release Manager",
+    "approvalBoundary": "Release candidate freeze, change freeze, verification, content freeze, migration plan, rollback, incident, and go-live hold review.",
+    "currentPosture": "Blocked; release candidate not frozen."
+  },
+  {
+    "module": "Module 31",
+    "gate": "Production Cutover Hold Gate",
+    "route": "/production-cutover-hold",
+    "requiredHumanAuthority": "Cutover Authority + Release Manager",
+    "approvalBoundary": "Cutover sequence, final launch hold, deployment hold, freeze hold, secrets, migrations, DNS/CDN/TLS/WAF, monitoring, rollback, support, and incident approval.",
+    "currentPosture": "Blocked; cutover authority not granted."
+  },
+  {
+    "module": "Module 32",
+    "gate": "Production Release Board Evidence Packet",
+    "route": "/production-release-board",
+    "requiredHumanAuthority": "Production Release Board",
+    "approvalBoundary": "Board quorum, release manager, security, compliance, operations, support, public-copy, incident, rollback, communication, and cutover authority review.",
+    "currentPosture": "Blocked; release board approval not granted."
+  },
+  {
+    "module": "Module 33",
+    "gate": "Production Operations Monitoring Gate",
+    "route": "/production-operations-monitoring",
+    "requiredHumanAuthority": "Operations Owner + On-Call Lead",
+    "approvalBoundary": "Monitoring, alerting, SLOs, on-call roster, incident bridge, rollback drill, backup/restore, audit export, emergency hold, and kill-switch review.",
+    "currentPosture": "Blocked; monitoring activation not approved."
+  },
+  {
+    "module": "Module 34",
+    "gate": "Production Incident Response Readiness Gate",
+    "route": "/production-incident-response-readiness",
+    "requiredHumanAuthority": "Incident Commander + Legal/Compliance Escalation Owner",
+    "approvalBoundary": "Incident roles, severity model, on-call escalation, rollback decision tree, audit/replay/data integrity, communications, regulatory/legal escalation, emergency hold, and kill-switch review.",
+    "currentPosture": "Blocked; incident response activation not approved."
+  },
+  {
+    "module": "Module 35",
+    "gate": "Production Support Communications Readiness Gate",
+    "route": "/production-support-communications-readiness",
+    "requiredHumanAuthority": "Support Lead + Communications/Compliance Reviewer",
+    "approvalBoundary": "Support routing, customer-safe language, status page, notice/adverse-action boundary, accessibility/translation, data-rights handoff, escalation runbook, and audit/replay evidence.",
+    "currentPosture": "Blocked; support operations not activated."
+  },
+  {
+    "module": "Module 36",
+    "gate": "Production Final Authority Gate",
+    "route": "/production-final-authority",
+    "requiredHumanAuthority": "Constitutional Authority + Qualified Release Manager",
+    "approvalBoundary": "Final supremacy/no-conflict review, release manager approval, production exposure, privacy/redaction/data rights, claims, communications freeze, monitoring/incident/rollback, audit/replay/evidence, and explicit launch authority.",
+    "currentPosture": "Blocked; final authority not granted."
+  },
+  {
+    "module": "Module 37",
+    "gate": "Production Activation Ceremony Gate",
+    "route": "/production-activation-ceremony",
+    "requiredHumanAuthority": "Dual-Control Activation Authority",
+    "approvalBoundary": "Dual-control quorum, credential vault release, deployment and migration sequence, monitoring/post-activation verification, rollback, emergency hold, communications freeze, and audit/replay evidence.",
+    "currentPosture": "Blocked; activation ceremony not executed."
+  },
+  {
+    "module": "Module 38",
+    "gate": "Production Post-Activation Verification Gate",
+    "route": "/production-post-activation-verification",
+    "requiredHumanAuthority": "Watch-Window Owner + Operations Lead",
+    "approvalBoundary": "Verification runbook, watch-window ownership, synthetic health checks, public surface check, audit/replay export, monitoring/SLOs, rollback/emergency hold, support/communications, privacy/redaction/data-rights, and source boundary review.",
+    "currentPosture": "Blocked; production health not certified."
+  },
+  {
+    "module": "Module 39",
+    "gate": "Production Reliance and Public Verification Boundary Gate",
+    "route": "/production-reliance-verification",
+    "requiredHumanAuthority": "Reliance Authority + Legal/Compliance Reviewer",
+    "approvalBoundary": "Public verification infrastructure, claims, DTOs, external recipients, audit/replay, privacy/redaction/data rights, source authority, report/notice/payment/legal/live-action boundaries, and reliance authority review.",
+    "currentPosture": "Blocked; public verification and official reliance not authorized."
+  },
+  {
+    "module": "Module 40",
+    "gate": "Production Regulatory Examination and Evidence Archive Gate",
+    "route": "/production-regulatory-examination",
+    "requiredHumanAuthority": "Regulatory Response Owner + Legal/Compliance Reviewer",
+    "approvalBoundary": "Examination scope, archive completeness, retention/legal hold, audit/replay export, privacy/redaction/public records, regulatory communication, and source/report/notice/payment/legal/live-action boundaries.",
+    "currentPosture": "Blocked; regulator submission and archive certification not approved."
+  },
+  {
+    "module": "Module 41",
+    "gate": "Production Regulatory Response and Corrective Action Gate",
+    "route": "/production-regulatory-response",
+    "requiredHumanAuthority": "Regulatory Response Owner + Corrective Action Owner + Legal/Compliance Reviewer",
+    "approvalBoundary": "Examiner finding intake, response package, corrective-action plan, remediation evidence, legal/compliance language, audit/replay response evidence, privacy/redaction/public records, and source/report/notice/payment/legal/live-action boundaries.",
+    "currentPosture": "Blocked; official response, corrective-action commitment, and remediation execution not approved."
+  },
+  {
+    "module": "Module 42",
+    "gate": "Build Preservation and Evidence Archive Gate",
+    "route": "/build-preservation",
+    "requiredHumanAuthority": "Governance Archivist + Release Manager",
+    "approvalBoundary": "Checkpoint evidence pack, ignored-sensitive-file verification, tree drift resolution, backend verification, production build evidence, and preservation of all production authority blocks.",
+    "currentPosture": "Evidence-only; checkpoint archived without production authority."
+  }
+]

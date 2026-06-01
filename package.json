@@ -19,6 +19,7 @@
     "backend:production-readiness": "tsx src/scripts/backendProductionReadinessGate.ts",
     "backend:production-readiness:production": "BACKEND_PRODUCTION_READINESS_PROFILE=production tsx src/scripts/backendProductionReadinessGate.ts",
     "backend:module-readiness": "tsx src/scripts/backendModuleReadinessGate.ts",
+    "build-record:archive": "tsx src/scripts/buildRecordArchiveExport.ts",
     "demo:seed": "tsx src/scripts/seedOperatorDemoData.ts",
     "verify:master-volumes": "tsx src/scripts/masterVolumeConformanceTest.ts",
     "verify:module-manifests": "tsx src/scripts/moduleConformanceTest.ts",

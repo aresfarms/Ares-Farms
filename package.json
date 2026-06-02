@@ -92,6 +92,7 @@
     "smoke:build-preservation": "tsx src/scripts/buildPreservationEvidenceArchiveGateSmokeTest.ts",
     "smoke:doctrine-gap-ledger": "tsx src/scripts/doctrineToCodeGapLedgerGateSmokeTest.ts",
     "smoke:borrower-onboarding-core": "tsx src/scripts/borrowerOnboardingCoreSmokeTest.ts",
+    "smoke:financing-pathway-engine": "tsx src/scripts/financingPathwayEngineSmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

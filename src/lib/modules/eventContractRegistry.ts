@@ -35,6 +35,7 @@ export const eventContractRegistry: EventContract[] = [
     producerModuleId: "portal-borrower-onboarding",
     consumerModuleIds: [
       "portal-borrower-applications",
+      "portal-borrower-financing-pathways",
       "portal-borrower-documents",
       "portal-borrower-data-rights",
       "reviews",
@@ -52,6 +53,29 @@ export const eventContractRegistry: EventContract[] = [
     ],
     purpose:
       "Record governed borrower onboarding submission and route review-bound handoffs without approval, eligibility, financing, legal, permitting, or regulatory reliance.",
+  },
+  {
+    eventType: "financing.pathway.evaluated",
+    producerModuleId: "portal-borrower-financing-pathways",
+    consumerModuleIds: [
+      "portal-borrower-applications",
+      "portal-borrower-documents",
+      "reviews",
+    ],
+    classificationLevel: "CONFIDENTIAL",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: [
+      "application_id",
+      "borrower_id",
+      "readiness_percent",
+      "pathway_count",
+      "human_review_required",
+      "replay_ref",
+    ],
+    purpose:
+      "Record advisory financing pathway guidance and route review-bound handoffs without approval, eligibility, preapproval, underwriting, lender commitment, guarantee, legal, or regulatory reliance.",
   },
   {
     eventType: "application.review.requested",

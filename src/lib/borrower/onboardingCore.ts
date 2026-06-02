@@ -179,7 +179,7 @@ export function createBorrowerOnboardingWorkflow(
     {
       id: "financing",
       label: "Financing pathway",
-      route: "/portal/revenue-opportunities",
+      route: "/financing-pathways",
       status: state.interests.financing ? "pending-review" : "needs-input",
       reason: state.interests.financing
         ? "Financing interest can route to advisory pathway guidance."

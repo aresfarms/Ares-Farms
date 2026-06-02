@@ -31,6 +31,29 @@ export type EventContract = {
 
 export const eventContractRegistry: EventContract[] = [
   {
+    eventType: "borrower.onboarding.submitted",
+    producerModuleId: "portal-borrower-onboarding",
+    consumerModuleIds: [
+      "portal-borrower-applications",
+      "portal-borrower-documents",
+      "portal-borrower-data-rights",
+      "reviews",
+    ],
+    classificationLevel: "CONFIDENTIAL",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: [
+      "application_id",
+      "borrower_id",
+      "readiness_percent",
+      "human_review_required",
+      "replay_ref",
+    ],
+    purpose:
+      "Record governed borrower onboarding submission and route review-bound handoffs without approval, eligibility, financing, legal, permitting, or regulatory reliance.",
+  },
+  {
     eventType: "application.review.requested",
     producerModuleId: "applications",
     consumerModuleIds: [

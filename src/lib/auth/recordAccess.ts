@@ -351,6 +351,24 @@ export async function evaluateApplicationRecordAccess(input: {
     userId: normalizeText(input.userId),
   };
 
+  if (!applicationId && input.allowMissingApplication) {
+    const hasCreationScope = Boolean(
+      requestedScope.borrowerId || requestedScope.tenantId || requestedScope.userId
+    );
+
+    if (hasCreationScope) {
+      return evaluateLoadedRecordAccess({
+        access: input.access,
+        operation: input.operation,
+        module: input.module,
+        traceId: input.traceId,
+        resourceType: input.resourceType,
+        requestedScope,
+        targetScope: requestedScope,
+      });
+    }
+  }
+
   if (!applicationId) {
     return {
       allowed: false,

@@ -3,6 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import { evaluateApplicationRecordAccess } from "@/lib/auth/recordAccess";
 import { persistApplicationState } from "@/lib/applications/applicationStore";
+import {
+  BorrowerOnboardingState,
+  createBorrowerOnboardingWorkflow,
+} from "@/lib/borrower/onboardingCore";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
@@ -44,6 +48,7 @@ type OnboardRequestBody = {
   requestedPrograms?: unknown;
   role?: string | null;
   metadata?: Record<string, unknown>;
+  state?: BorrowerOnboardingState;
   [key: string]: unknown;
 };
 
@@ -304,6 +309,9 @@ export async function POST(req: NextRequest) {
       ],
       consentRequirements: ["borrower-submission-consent"],
     });
+    const borrowerWorkflow = body.state
+      ? createBorrowerOnboardingWorkflow(body.state)
+      : null;
 
     const persistedState = await persistApplicationState({
       traceId,
@@ -322,6 +330,8 @@ export async function POST(req: NextRequest) {
         ...(body.metadata ?? {}),
         access,
         recordAccess,
+        borrowerWorkflow,
+        borrowerWorkflowVersion: "borrower-onboarding-core-v0.1.0",
       },
     });
 
@@ -333,6 +343,7 @@ export async function POST(req: NextRequest) {
         borrowerId: body.borrowerId ?? null,
         userId: body.userId ?? null,
         replayRef: traceId,
+        borrowerWorkflow,
       },
       {
         classificationLevel: "CONFIDENTIAL",
@@ -379,6 +390,8 @@ export async function POST(req: NextRequest) {
         classified: true,
         applicationId: persistedState.application.id,
         propertyId: persistedState.property?.id ?? null,
+        readinessPercent: borrowerWorkflow?.readinessPercent ?? null,
+        missingItemCount: borrowerWorkflow?.missingItems.length ?? null,
       },
     });
 
@@ -430,6 +443,7 @@ export async function POST(req: NextRequest) {
             stage: "output",
             accepted: true,
             propertyId: persistedState.property?.id ?? null,
+            borrowerWorkflow,
           },
         },
       ],
@@ -450,6 +464,7 @@ export async function POST(req: NextRequest) {
           accepted: true,
           applicationId: persistedState.application.id,
           propertyId: persistedState.property?.id ?? null,
+          borrowerWorkflow,
           versionRuntimeOk: versionRuntime.ok,
         },
         metadata: {
@@ -468,6 +483,7 @@ export async function POST(req: NextRequest) {
       accepted: true,
       application: persistedState.application,
       property: persistedState.property,
+      borrowerWorkflow,
       onboarding: classifiedPayload,
       submission: acceptedSubmission,
       governance: {

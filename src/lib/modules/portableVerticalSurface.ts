@@ -1904,6 +1904,49 @@ export const internalPortableSurfaces: PortableVerticalSurface[] = [
 
 export const borrowerPortalSurfaces: PortableVerticalSurface[] = [
   {
+    id: "borrower-onboarding",
+    label: "Borrower Onboarding",
+    route: "/onboarding",
+    audience: "borrower",
+    moduleRefs: ["Build Now", "Module 03", "Module 19"],
+    purpose:
+      "Borrower-facing governed intake surface for starting a review-bound application path, identifying missing intake items, and routing to application, document, environmental, opportunity, and data-rights workflows.",
+    primaryStatus: "Your intake can be received for human review.",
+    safeMessages: portableSafeMessagesWith(
+      "Your document was received.",
+      "Human review is pending.",
+      "More information may be needed.",
+      "No approval has been granted.",
+      "No guarantee is made."
+    ),
+    requiredBackendSurfaces: [
+      "/api/onboard",
+      "/api/apply",
+      "/api/applications/admin",
+      "/api/public/surfaces",
+    ],
+    governanceRequirements: [
+      ...portableSurfaceGovernanceRequirements,
+      "borrower onboarding core runtime",
+      "human review routing",
+      "data-rights handoff",
+    ],
+    productionBlocks: [
+      ...portableSurfaceProductionBlocks,
+      "no eligibility determination",
+      "no financing approval",
+      "no legal or regulatory reliance",
+      "no official environmental clearance",
+    ],
+    adjacentRoutes: [
+      "/portal/borrower/applications",
+      "/portal/borrower/documents",
+      "/environmental-compliance",
+      "/portal/property-discovery",
+      "/portal/borrower/data-rights",
+    ],
+  },
+  {
     id: "borrower-applications",
     label: "Borrower Applications",
     route: "/portal/borrower/applications",

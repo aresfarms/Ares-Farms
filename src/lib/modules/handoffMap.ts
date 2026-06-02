@@ -26,6 +26,17 @@ export type ModuleHandoff = {
 
 export const crossModuleHandoffMap: ModuleHandoff[] = [
   {
+    id: "borrower-onboarding-to-applications",
+    fromModuleId: "portal-borrower-onboarding",
+    toModuleId: "portal-borrower-applications",
+    fromRoute: "/onboarding",
+    toRoute: "/portal/borrower/applications",
+    eventType: "borrower.onboarding.submitted",
+    replayRequired: true,
+    humanReviewBoundary: true,
+    productionBlocked: true,
+  },
+  {
     id: "applications-to-documents",
     fromModuleId: "applications",
     toModuleId: "documents",

@@ -2043,6 +2043,28 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     featureFlags: internalFlags,
   },
   {
+    id: "portal-borrower-onboarding",
+    title: "Borrower Onboarding",
+    route: "/onboarding",
+    audience: ["borrower", "public"],
+    permissions: ["borrower:onboarding:write", "borrower:own-records:read"],
+    dataDependencies: ["applications", "documents", "data-rights"],
+    publicSurfaceAllowed: true,
+    productionBlocked: true,
+    claimsProfile: "borrower-safe",
+    replayRequired: true,
+    description:
+      "Borrower-safe governed intake surface with readiness, missing-item, human-review, and next-route handoff posture.",
+    adjacentModules: [
+      "portal-borrower-applications",
+      "portal-borrower-documents",
+      "portal-borrower-data-rights",
+    ],
+    eventsPublished: ["borrower.onboarding.submitted", "public.surface.viewed"],
+    eventsConsumed: [],
+    featureFlags: translationFlags,
+  },
+  {
     id: "portal-borrower",
     title: "Borrower Portal",
     route: "/portal/borrower",
@@ -2079,7 +2101,10 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     description: "Borrower-safe application status translation.",
     adjacentModules: ["portal-borrower-documents", "portal-borrower-data-rights"],
     eventsPublished: ["public.surface.viewed"],
-    eventsConsumed: ["application.review.requested"],
+    eventsConsumed: [
+      "borrower.onboarding.submitted",
+      "application.review.requested",
+    ],
     featureFlags: translationFlags,
   },
   {

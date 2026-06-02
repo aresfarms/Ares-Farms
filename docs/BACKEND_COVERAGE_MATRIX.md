@@ -333,24 +333,34 @@ These are intentionally not built as live execution modules yet.
 
 ## What We Can Build Next
 
-Allowed next modules must consume completed backend surfaces only.
+Allowed next modules must consume completed backend surfaces only. The current
+phase roadmap is recorded in `docs/BUILD_PHASE_ROADMAP.md`.
 
-Good next candidates:
+Build-now candidates:
 
-- internal governance dashboard using admin/read APIs,
-- application operations dashboard,
-- document intake dashboard using metadata and storage handoff state,
-- review and adverse-action queue workspace,
-- notice lifecycle operations dashboard,
-- connector certification and live-action readiness dashboard,
-- environmental compliance review dashboard for trigger/exemption, fee,
-  provider-license, spoke-isolation, and pathway advancement records,
-- scraper/source intelligence review dashboard,
-- source legal/licensing review dashboard,
-- source promotion packet dashboard,
-- property discovery and canonical property review dashboard,
-- billing/payment control dashboard without live capture,
-- partner workflow dashboard with advisory/no-commitment posture.
+- core borrower onboarding,
+- financing pathway engine,
+- readiness assessment,
+- environmental intake,
+- opportunity discovery,
+- public trust pages,
+- basic lender workflow.
+
+Build-next candidates:
+
+- governance evidence engine,
+- certification engine,
+- registry framework,
+- connector certification,
+- advanced intelligence modules.
+
+Build-later candidates:
+
+- full institutional ecosystem,
+- Volume VII automation,
+- third-party certification marketplace,
+- federated participant network,
+- external conformance program.
 
 Not allowed yet:
 

@@ -1593,6 +1593,29 @@ export const eventContractRegistry: EventContract[] = [
     purpose:
       "Record borrower opportunity discovery review posture and route review-bound handoffs without guaranteed revenue, program approval, source certainty, property certification, lender commitment, live external action, or legal or regulatory reliance.",
   },
+  {
+    eventType: "public.trust.viewed",
+    producerModuleId: "public-trust",
+    consumerModuleIds: [
+      "portal-borrower-readiness",
+      "portal-borrower-financing-pathways",
+      "portal-borrower-data-rights",
+      "governance",
+    ],
+    classificationLevel: "PUBLIC",
+    replayRequired: true,
+    publicSurfaceAllowed: true,
+    productionBlocked: true,
+    payloadFields: [
+      "audience",
+      "referrer_route",
+      "content_claims_ok",
+      "trace_id",
+      "replay_ref",
+    ],
+    purpose:
+      "Record public trust content viewing posture and route review-bound handoffs without approval, eligibility, credit decision, certification, public verification, lender commitment, environmental clearance, payment authorization, official report publication, or legal or regulatory reliance.",
+  },
 ];
 
 const moduleIds = new Set(moduleManifests.map((manifest) => manifest.id));

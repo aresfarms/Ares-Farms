@@ -116,5 +116,8 @@ jobs:
       - name: Financing Pathway Engine v2
         run: npm run smoke:financing-pathway-engine-v2
 
+      - name: Opportunity Discovery v2
+        run: npm run smoke:opportunity-discovery-v2
+
       - name: Next.js production build
         run: npm run build

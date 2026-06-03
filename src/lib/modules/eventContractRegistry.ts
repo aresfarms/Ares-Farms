@@ -1594,6 +1594,34 @@ export const eventContractRegistry: EventContract[] = [
       "Record borrower opportunity discovery review posture and route review-bound handoffs without guaranteed revenue, program approval, source certainty, property certification, lender commitment, live external action, or legal or regulatory reliance.",
   },
   {
+    eventType: "governance.certification.posture.composed",
+    producerModuleId: "governance-certification-engine",
+    consumerModuleIds: [
+      "governance-evidence-engine",
+      "evidence-packets",
+      "audit-replay",
+      "governance",
+      "reviews",
+      "module-readiness",
+    ],
+    classificationLevel: "RESTRICTED",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: [
+      "application_id",
+      "domain_count",
+      "certified_domain_count",
+      "pending_domain_count",
+      "blocked_domain_count",
+      "overall_readiness_percent",
+      "human_review_required",
+      "replay_ref",
+    ],
+    purpose:
+      "Record internal certification posture composition and route review-bound handoffs without external certification, public verification, regulatory reliance, lender commitment, credit decision, environmental clearance, payment authorization, or legal reliance.",
+  },
+  {
     eventType: "governance.evidence.pack.composed",
     producerModuleId: "governance-evidence-engine",
     consumerModuleIds: [

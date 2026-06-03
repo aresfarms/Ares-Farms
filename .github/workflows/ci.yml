@@ -1,0 +1,108 @@
+name: Master Volume verification
+
+on:
+  push:
+    branches:
+      - main
+      - master-volume-build
+  pull_request:
+    branches:
+      - main
+
+# Master Volume Governance:
+# - Vol III: keeps every push and pull request under deterministic,
+#   replay-safe verification.
+# - Vol III-B: enforces tsc --noEmit, module manifest conformance, public
+#   surface and public claims sweeps, every published smoke test, and the
+#   Next.js production build on every change.
+# - Vol IV: the verification job is the operator continuity gate; failure
+#   blocks merge.
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      # Placeholder values keep tsc, smoke tests, and `next build` from
+      # failing on environment-variable reads. No CI step talks to a real
+      # database, scraper, or external connector.
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci?sslmode=disable"
+      LEDGER_MODE: "OPTION_C"
+      DRY_RUN: "true"
+      REBUILD_MODE: "STRICT"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript noEmit
+        run: npx tsc --noEmit
+
+      - name: Module manifest conformance
+        run: npm run verify:module-manifests
+
+      - name: Public surface gateway
+        run: npm run smoke:public-surfaces
+
+      - name: Public claims policy
+        run: npm run smoke:claims-public
+
+      - name: Public redaction
+        run: npm run smoke:redaction
+
+      - name: Borrower onboarding core
+        run: npm run smoke:borrower-onboarding-core
+
+      - name: Financing pathway engine
+        run: npm run smoke:financing-pathway-engine
+
+      - name: Readiness assessment
+        run: npm run smoke:readiness-assessment
+
+      - name: Environmental intake
+        run: npm run smoke:environmental-intake
+
+      - name: Opportunity discovery
+        run: npm run smoke:opportunity-discovery
+
+      - name: Public trust
+        run: npm run smoke:public-trust
+
+      - name: Lender workflow
+        run: npm run smoke:lender-workflow
+
+      - name: Governance evidence engine
+        run: npm run smoke:governance-evidence-engine
+
+      - name: Internal certification engine
+        run: npm run smoke:certification-engine
+
+      - name: Registry framework
+        run: npm run smoke:registry-framework
+
+      - name: Connector certification
+        run: npm run smoke:connector-certification
+
+      - name: Advanced intelligence
+        run: npm run smoke:advanced-intelligence
+
+      - name: Next.js production build
+        run: npm run build

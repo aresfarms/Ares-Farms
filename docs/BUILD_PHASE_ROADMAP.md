@@ -14,6 +14,7 @@ This roadmap governs the practical build order after the backend foundation. It 
 - Build Next 08 (Governance evidence engine) is complete as a governed internal evidence composition surface. Pack output remains internal evidence unless separately promoted through governed controlled-promotion gates.
 - Build Next 09 (Internal certification engine) is complete as a governed internal certification composition surface. Posture output is internal certification only — external certification claims remain blocked until the public verification and reliance gates are approved.
 - Build Next 10 (Registry framework) is complete as a governed internal registry composition surface over the canonical module manifest, public surface, event contract, handoff, source authority, controlled promotion, and participant role registries. Framework output remains internal evidence unless separately promoted through governed controlled-promotion gates.
+- Build Next 11 (Connector certification) is complete as a governed internal connector posture composition surface across review, certification evidence, rollback, monitoring, and activation checks. Live external connector execution remains blocked until qualified approval through the Source Promotion Authority, the Controlled Promotion Board, and the Live Scraper Activation Gate.
 - Checkpoint `BR-2026-06-01-M41` remains the preserved backend governance checkpoint.
 - Current machine-readable version registry covers Master Volumes 0-VII.
 - The three awaiting-controlled-promotion items remain named, owned, routed, and blocked.

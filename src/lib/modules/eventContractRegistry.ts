@@ -1594,6 +1594,38 @@ export const eventContractRegistry: EventContract[] = [
       "Record borrower opportunity discovery review posture and route review-bound handoffs without guaranteed revenue, program approval, source certainty, property certification, lender commitment, live external action, or legal or regulatory reliance.",
   },
   {
+    eventType: "governance.connector.certification.composed",
+    producerModuleId: "governance-connector-certification",
+    consumerModuleIds: [
+      "connectors",
+      "source-ingestion",
+      "live-scraper-activation",
+      "controlled-promotion-activation",
+      "governance-registry-framework",
+      "governance-evidence-engine",
+      "governance-certification-engine",
+      "evidence-packets",
+      "audit-replay",
+      "governance",
+      "reviews",
+    ],
+    classificationLevel: "RESTRICTED",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: [
+      "connector_count",
+      "certified_connector_count",
+      "blocked_connector_count",
+      "overall_readiness_percent",
+      "live_execution_blocked_count",
+      "human_review_required",
+      "replay_ref",
+    ],
+    purpose:
+      "Record per-connector certification posture and route review-bound handoffs without live external connector execution, live fetch, external promotion, public verification, regulatory reliance, lender commitment, credit decision, environmental clearance, payment authorization, or legal reliance.",
+  },
+  {
     eventType: "governance.registry.framework.composed",
     producerModuleId: "governance-registry-framework",
     consumerModuleIds: [

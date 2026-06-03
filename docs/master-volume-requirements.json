@@ -1,0 +1,1270 @@
+{
+  "frameworkVersion": "master-volume-conformance-v0.3.1",
+  "createdAt": "2026-05-31",
+  "sourceDocuments": [
+    "Furlong_Volume_0_Platform_Orientation.pdf",
+    "Furlong_Master_Volume_Series_Unified_TOC.pdf",
+    "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
+    "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+    "Furlong_Volume_III_Technical_Infrastructure_Master.pdf",
+    "Furlong_Volume_III_B_Governance_Runtime_Master.pdf",
+    "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
+    "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+    "Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf",
+    "Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf",
+    "Furlong_Master_Cross_Reference_Index.pdf",
+    "Furlong_Master_Series_Hub.html",
+    "Volume_VI_Consolidation_and_Changes_Summary.md",
+    "Ares_Furlong_Master_Volume_Conformance_Testing_Framework.docx",
+    "Ares_Furlong_Missing_Doctrines_Implementation_Master.pdf",
+    "Ares_Furlong_Scraper_Connector_Source_Ingestion_Governance_Doctrine.pdf",
+    "Ares_Furlong_Property_Discovery_Scraper_Governance_Integration_Master.pdf",
+    "Ares_Furlong_Institutional_Scraper_Source_Intelligence_Implementation_Master.pdf",
+    "Ares Furlong Revenue Source Intelligence Doctrines.docx",
+    "SOURCE_STACK_001_Canonical_External_Source_Discovery_Architecture.docx",
+    "IMPLEMENTATION_WORKPACKAGES_Revenue_Intelligence_Runtime_Build.docx",
+    "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf"
+  ],
+  "allowedStatuses": [
+    "implemented",
+    "intentionally_blocked",
+    "not_applicable",
+    "awaiting_controlled_promotion"
+  ],
+  "requirements": {
+    "CONST-DATA-001": {
+      "title": "Immutable audit ledger and hash chain",
+      "status": "implemented",
+      "requires": [
+        "immutable_ledger",
+        "hash_chain",
+        "replay_refs"
+      ],
+      "tests": [
+        "verify:ledger",
+        "smoke:ledger-admin-read",
+        "verify:backend"
+      ],
+      "evidence": [
+        "src/lib/ledger/writeEvent.ts",
+        "src/lib/ledger/verifyAuditChain.ts",
+        "src/db/schema/canonicalLedger.ts"
+      ]
+    },
+    "TECH-REPLAY-001": {
+      "title": "Replay-safe runtime continuity",
+      "status": "implemented",
+      "requires": [
+        "replay_engine",
+        "replay_verification",
+        "cross_module_replay"
+      ],
+      "tests": [
+        "verify:replay",
+        "smoke:replay-cross-module",
+        "smoke:cross-module-replay"
+      ],
+      "evidence": [
+        "src/lib/replay/loadReplay.ts",
+        "src/db/schema/replayVerification.ts",
+        "src/scripts/crossModuleReplaySmokeTest.ts"
+      ]
+    },
+    "CANON-CLASS-001": {
+      "title": "Classification metadata propagation",
+      "status": "implemented",
+      "requires": [
+        "classification_runtime",
+        "classification_registry",
+        "dto_filtering"
+      ],
+      "tests": [
+        "verify:classification",
+        "smoke:public-surfaces",
+        "smoke:redaction"
+      ],
+      "evidence": [
+        "src/lib/runtime/classificationRuntime.ts",
+        "src/db/schema/dataClassificationRegistry.ts",
+        "src/lib/dto/public/index.ts"
+      ]
+    },
+    "TECH-RBAC-001": {
+      "title": "RBAC, entitlements, and record-level access",
+      "status": "implemented",
+      "requires": [
+        "role_permissions",
+        "record_scope",
+        "entitlement_enforcement"
+      ],
+      "tests": [
+        "smoke:record-access",
+        "smoke:auth-activation-policy",
+        "verify:backend"
+      ],
+      "evidence": [
+        "src/lib/auth/accessControl.ts",
+        "src/lib/auth/recordAccess.ts",
+        "src/lib/entitlements/store.ts"
+      ]
+    },
+    "CANON-CLAIMS-001": {
+      "title": "Claims governance and public language controls",
+      "status": "implemented",
+      "requires": [
+        "content_claims_policy",
+        "public_claims_smoke",
+        "advisory_only_boundary"
+      ],
+      "tests": [
+        "verify:claims",
+        "smoke:content-claims",
+        "smoke:claims-public"
+      ],
+      "evidence": [
+        "src/lib/governance/contentClaimsPolicy.ts",
+        "src/scripts/contentClaimsPolicySmokeTest.ts",
+        "src/scripts/publicClaimsSmokeTest.ts"
+      ]
+    },
+    "PROMOTION-GATE-001": {
+      "title": "Production and public-action blocks",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "promotion_gates",
+        "live_action_blocks",
+        "feature_flags"
+      ],
+      "tests": [
+        "backend:production-readiness",
+        "smoke:live-action-readiness",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/app/promotion/page.tsx",
+        "src/lib/governance/liveActionReadinessStore.ts",
+        "src/lib/modules/featureFlagGovernance.ts"
+      ]
+    },
+    "CONNECTOR-GOV-001": {
+      "title": "Connector and credentialed source governance",
+      "status": "implemented",
+      "requires": [
+        "connector_certification",
+        "credential_vault_refs",
+        "no_live_external_call"
+      ],
+      "tests": [
+        "smoke:connectors",
+        "smoke:credentialed-ingestion",
+        "smoke:connector-execution"
+      ],
+      "evidence": [
+        "src/lib/connectors/externalDataConnectorStore.ts",
+        "src/lib/connectors/credentialedAgencyIngestionStore.ts",
+        "src/db/schema/credentialVaultRefs.ts"
+      ]
+    },
+    "MODULE-MANIFEST-001": {
+      "title": "Per-module governed manifests",
+      "status": "implemented",
+      "requires": [
+        "module_manifest_registry",
+        "required_governance_tags",
+        "production_block_posture"
+      ],
+      "tests": [
+        "verify:modules",
+        "verify:module-manifests",
+        "smoke:module-registry"
+      ],
+      "evidence": [
+        "src/lib/modules/moduleRegistry.ts",
+        "src/scripts/moduleConformanceTest.ts",
+        "src/scripts/moduleRegistrySmokeTest.ts"
+      ]
+    },
+    "PUBLIC-SURFACE-001": {
+      "title": "Public surfaces as governed translation layers",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "public_gateway",
+        "dto_filtering",
+        "redaction",
+        "claims_gate"
+      ],
+      "tests": [
+        "smoke:public-surfaces",
+        "smoke:claims-public",
+        "smoke:redaction"
+      ],
+      "evidence": [
+        "src/app/api/public/surfaces/route.ts",
+        "src/lib/dto/public/index.ts",
+        "src/scripts/redactionSmokeTest.ts"
+      ]
+    },
+    "CROSS-MODULE-001": {
+      "title": "Cross-module workflow and handoff continuity",
+      "status": "implemented",
+      "requires": [
+        "event_contract_registry",
+        "handoff_map",
+        "shared_case_context"
+      ],
+      "tests": [
+        "smoke:integration",
+        "smoke:platform",
+        "smoke:cross-module-replay"
+      ],
+      "evidence": [
+        "src/lib/modules/eventContractRegistry.ts",
+        "src/lib/modules/handoffMap.ts",
+        "src/lib/modules/caseContext.ts"
+      ]
+    },
+    "RUNTIME-STATE-001": {
+      "title": "Unified runtime state and operational mode governance",
+      "status": "implemented",
+      "requires": [
+        "runtime_state_registry",
+        "runtime_transition_events",
+        "runtime_restriction_profiles",
+        "runtime_replay_refs"
+      ],
+      "tests": [
+        "verify:runtime-states",
+        "smoke:runtime-transitions",
+        "verify:missing-doctrines"
+      ],
+      "evidence": [
+        "src/lib/governance/constitutionalDoctrineRuntime.ts",
+        "src/db/schema/missingDoctrineGovernance.ts",
+        "src/app/api/runtime/state/route.ts"
+      ]
+    },
+    "FEATURE-GOV-001": {
+      "title": "Constitutional feature activation and runtime flag governance",
+      "status": "implemented",
+      "requires": [
+        "feature_registry",
+        "feature_activation_events",
+        "feature_rollout_profiles",
+        "feature_kill_switch_events"
+      ],
+      "tests": [
+        "verify:feature-governance",
+        "smoke:feature-rollbacks",
+        "verify:missing-doctrines"
+      ],
+      "evidence": [
+        "src/lib/governance/constitutionalDoctrineRuntime.ts",
+        "src/lib/modules/featureFlagGovernance.ts",
+        "src/app/api/features/route.ts"
+      ]
+    },
+    "PUBLIC-CLAIMS-001": {
+      "title": "Public representation and institutional claims governance",
+      "status": "implemented",
+      "requires": [
+        "public_claim_registry",
+        "claim_validation_records",
+        "claim_escalation_events",
+        "content_claims_policy"
+      ],
+      "tests": [
+        "smoke:claims-public",
+        "verify:public-claims",
+        "verify:claims"
+      ],
+      "evidence": [
+        "src/lib/governance/contentClaimsPolicy.ts",
+        "src/lib/governance/constitutionalDoctrineRuntime.ts",
+        "src/app/api/claims/validate/route.ts"
+      ]
+    },
+    "INCIDENT-GOV-001": {
+      "title": "Constitutional incident and emergency governance architecture",
+      "status": "implemented",
+      "requires": [
+        "incident_registry",
+        "incident_escalation_events",
+        "incident_replay_refs",
+        "incident_resolution_records"
+      ],
+      "tests": [
+        "smoke:incident-escalation",
+        "verify:incident-governance",
+        "verify:missing-doctrines"
+      ],
+      "evidence": [
+        "src/lib/governance/constitutionalDoctrineRuntime.ts",
+        "src/app/api/incidents/create/route.ts",
+        "src/app/api/runtime/emergency-mode/route.ts"
+      ]
+    },
+    "CONFIG-GOV-001": {
+      "title": "Runtime configuration and environmental governance",
+      "status": "implemented",
+      "requires": [
+        "config_registry",
+        "config_change_events",
+        "config_validation_records",
+        "config_replay_refs"
+      ],
+      "tests": [
+        "verify:config-governance",
+        "smoke:config-rollbacks",
+        "verify:missing-doctrines"
+      ],
+      "evidence": [
+        "src/lib/governance/constitutionalDoctrineRuntime.ts",
+        "src/app/api/config/route.ts",
+        "src/app/api/config/change/route.ts"
+      ]
+    },
+    "UX-GOV-001": {
+      "title": "Constitutional user experience and disclosure governance",
+      "status": "implemented",
+      "requires": [
+        "ux_governance_registry",
+        "ux_disclosure_profiles",
+        "ux_violation_events",
+        "ux_accessibility_records"
+      ],
+      "tests": [
+        "verify:ux-governance",
+        "smoke:accessibility",
+        "smoke:workflow-visibility"
+      ],
+      "evidence": [
+        "src/lib/governance/constitutionalDoctrineRuntime.ts",
+        "src/app/api/ux/governance/route.ts",
+        "src/app/api/ux/validate/route.ts"
+      ]
+    },
+    "IMPLEMENTATION-MANIFEST-001": {
+      "title": "Constitutional implementation traceability and runtime manifest registry",
+      "status": "implemented",
+      "requires": [
+        "implementation_manifest_registry",
+        "runtime_conformance_records",
+        "governance_traceability_refs",
+        "constitutional_coverage_matrix"
+      ],
+      "tests": [
+        "verify:implementation-manifest",
+        "smoke:governance-traceability",
+        "smoke:deployment-conformance"
+      ],
+      "evidence": [
+        "src/lib/governance/constitutionalDoctrineRuntime.ts",
+        "src/app/api/implementation/manifest/route.ts",
+        "src/app/api/implementation/coverage/route.ts"
+      ]
+    },
+    "SCRAPER-SOURCE-GOV-001": {
+      "title": "Governed scraper connector and source ingestion architecture",
+      "status": "implemented",
+      "requires": [
+        "scraper_registry",
+        "scraper_run_events",
+        "scraper_fetch_records",
+        "source_ingestion_records",
+        "connector_certification_records"
+      ],
+      "tests": [
+        "verify:scrapers",
+        "verify:source-ingestion",
+        "verify:connector-governance",
+        "verify:scraper-source-intelligence"
+      ],
+      "evidence": [
+        "src/lib/source-intelligence/sourceIntelligenceRuntime.ts",
+        "src/db/schema/scraperSourceGovernance.ts",
+        "src/lib/db/migrations/0030_scraper_source_governance.sql",
+        "src/app/api/scrapers/route.ts"
+      ]
+    },
+    "PROPERTY-DISCOVERY-GOV-001": {
+      "title": "Governed property discovery and canonical property governance",
+      "status": "implemented",
+      "requires": [
+        "property_discovery_registry",
+        "property_listing_records",
+        "canonical_property_records",
+        "property_provenance_records",
+        "property_replay_refs"
+      ],
+      "tests": [
+        "verify:property-discovery",
+        "verify:canonical-properties",
+        "smoke:listing-canonicalization",
+        "smoke:property-replay"
+      ],
+      "evidence": [
+        "src/lib/property-discovery/index.ts",
+        "src/lib/canonical-properties/index.ts",
+        "src/lib/db/migrations/0030_scraper_source_governance.sql",
+        "src/app/api/properties/discovery/route.ts",
+        "src/app/portal/property-discovery/page.tsx"
+      ]
+    },
+    "SOURCE-INTELLIGENCE-GOV-001": {
+      "title": "Institutional source authority, provenance, replay, and public translation governance",
+      "status": "implemented",
+      "requires": [
+        "source_authority_registry",
+        "scraper_replay_refs",
+        "scraper_integrity_reports",
+        "classification_events",
+        "governed_public_property_surfaces"
+      ],
+      "tests": [
+        "verify:source-authority",
+        "verify:provenance",
+        "smoke:scraper-registry",
+        "smoke:scraper-source-apis"
+      ],
+      "evidence": [
+        "src/lib/scrapers/provenance.ts",
+        "src/lib/scrapers/authority.ts",
+        "src/scripts/scraperSourceConformanceSuite.ts",
+        "src/scripts/scraperSourceApiSmokeTest.ts"
+      ]
+    },
+    "REVENUE-INTEL-001": {
+      "title": "Customer revenue opportunity governance",
+      "status": "implemented",
+      "requires": [
+        "customer_revenue_opportunity_registry",
+        "source_lineage",
+        "program_refs",
+        "claims_controls",
+        "human_review"
+      ],
+      "tests": [
+        "verify:revenue-intelligence",
+        "smoke:customer-revenue",
+        "smoke:program-revenue-matching",
+        "smoke:revenue-claims"
+      ],
+      "evidence": [
+        "src/lib/revenue-intelligence/revenueSourceIntelligenceRuntime.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts",
+        "src/app/api/revenue-intelligence/opportunities/route.ts",
+        "src/app/customer-revenue/page.tsx"
+      ]
+    },
+    "SELLABLE-CATALOG-001": {
+      "title": "Regional sellable goods and biological product catalog governance",
+      "status": "implemented",
+      "requires": [
+        "sellable_catalog_items",
+        "regional_legality",
+        "program_product_refs",
+        "minor_operator_constraints"
+      ],
+      "tests": [
+        "verify:sellable-catalog",
+        "smoke:regional-product-matching",
+        "smoke:minor-operator-constraints",
+        "smoke:program-product-eligibility"
+      ],
+      "evidence": [
+        "src/lib/sellable-catalog/index.ts",
+        "src/lib/ag-products/index.ts",
+        "src/lib/livestock/index.ts",
+        "src/app/api/revenue-intelligence/catalog/route.ts"
+      ]
+    },
+    "PROGRAM-GRAPH-001": {
+      "title": "Federal, state, local, and philanthropic program graph governance",
+      "status": "implemented",
+      "requires": [
+        "program_graph_nodes",
+        "program_graph_edges",
+        "program_stacking_rules",
+        "program_conflict_rules",
+        "deadline_review"
+      ],
+      "tests": [
+        "verify:program-graph",
+        "smoke:program-stacking",
+        "smoke:program-conflicts",
+        "smoke:grant-deadline-refresh"
+      ],
+      "evidence": [
+        "src/lib/program-graph/index.ts",
+        "src/app/api/revenue-intelligence/programs/route.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts"
+      ]
+    },
+    "MARKETPLACE-INTEL-001": {
+      "title": "Equipment, materials, supplier, and pricing intelligence governance",
+      "status": "implemented",
+      "requires": [
+        "marketplace_items",
+        "supplier_registry",
+        "marketplace_price_snapshots",
+        "program_use_refs",
+        "price_basis"
+      ],
+      "tests": [
+        "verify:marketplace-intel",
+        "smoke:equipment-price-refresh",
+        "smoke:program-equipment-compatibility",
+        "smoke:supplier-region-matching"
+      ],
+      "evidence": [
+        "src/lib/marketplace-intel/index.ts",
+        "src/app/api/revenue-intelligence/marketplace/route.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts"
+      ]
+    },
+    "OPERATING-COST-GOV-001": {
+      "title": "Operating cost and input price governance",
+      "status": "implemented",
+      "requires": [
+        "operating_cost_signals",
+        "freshness_status",
+        "uncertainty_classification",
+        "replay_refs"
+      ],
+      "tests": [
+        "verify:operating-costs",
+        "smoke:input-price-refresh",
+        "smoke:cost-revenue-model",
+        "smoke:forecast-disclosures"
+      ],
+      "evidence": [
+        "src/lib/operating-costs/index.ts",
+        "src/app/api/revenue-intelligence/operating-costs/route.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts"
+      ]
+    },
+    "MARKET-SIGNAL-001": {
+      "title": "Commodities, pricing, and market signal governance",
+      "status": "implemented",
+      "requires": [
+        "market_signal_registry",
+        "market_signal_snapshots",
+        "signal_basis",
+        "forecast_labeling",
+        "historical_replay"
+      ],
+      "tests": [
+        "verify:market-signals",
+        "smoke:commodity-price-refresh",
+        "smoke:market-signal-replay",
+        "smoke:forecast-labeling"
+      ],
+      "evidence": [
+        "src/lib/market-signals/index.ts",
+        "src/app/api/revenue-intelligence/market-signals/route.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts"
+      ]
+    },
+    "GEOSPATIAL-GOV-001": {
+      "title": "Soil, weather, climate, infrastructure, and suitability governance",
+      "status": "implemented",
+      "requires": [
+        "geospatial_source_registry",
+        "geo_suitability_profiles",
+        "source_separability",
+        "weighting_assumptions"
+      ],
+      "tests": [
+        "verify:geospatial-governance",
+        "smoke:soil-map-ingestion",
+        "smoke:weather-climate-refresh",
+        "smoke:geo-suitability-replay"
+      ],
+      "evidence": [
+        "src/lib/geospatial-governance/index.ts",
+        "src/app/api/revenue-intelligence/geospatial/route.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts"
+      ]
+    },
+    "STATE-REGISTRY-001": {
+      "title": "State records, regulations, and licensing intelligence governance",
+      "status": "implemented",
+      "requires": [
+        "state_regulatory_records",
+        "jurisdictional_versioning",
+        "legal_advice_block",
+        "human_review"
+      ],
+      "tests": [
+        "verify:state-registry",
+        "smoke:state-rule-refresh",
+        "smoke:licensing-constraint-matching",
+        "smoke:regulatory-claims"
+      ],
+      "evidence": [
+        "src/lib/regional-eligibility/index.ts",
+        "src/app/api/revenue-intelligence/state-registry/route.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts"
+      ]
+    },
+    "CUSTOMER-TYPE-ELIGIBILITY-001": {
+      "title": "Customer type and industry revenue fit governance",
+      "status": "implemented",
+      "requires": [
+        "customer_type_eligibility_profiles",
+        "age_constraints",
+        "geography_constraints",
+        "required_documents",
+        "restricted_categories"
+      ],
+      "tests": [
+        "verify:customer-type-eligibility",
+        "smoke:minor-eligibility",
+        "smoke:industry-revenue-matching",
+        "smoke:customer-program-fit"
+      ],
+      "evidence": [
+        "src/lib/regional-eligibility/index.ts",
+        "src/app/api/revenue-intelligence/customer-eligibility/route.ts",
+        "src/db/schema/revenueSourceIntelligenceGovernance.ts"
+      ]
+    },
+    "DATA-FUSION-001": {
+      "title": "Orchestrated source fusion and advisory output governance",
+      "status": "implemented",
+      "requires": [
+        "advisory_fusion_results",
+        "source_separability",
+        "conflict_refs",
+        "assumptions",
+        "claims_validation"
+      ],
+      "tests": [
+        "verify:data-fusion",
+        "smoke:fusion-source-lineage",
+        "smoke:fusion-conflict-detection",
+        "smoke:advisory-output-claims"
+      ],
+      "evidence": [
+        "src/lib/data-fusion/index.ts",
+        "src/app/api/revenue-intelligence/fusion/route.ts",
+        "src/scripts/revenueSourceIntelligenceConformanceSuite.ts"
+      ]
+    },
+    "SOURCE-STACK-001": {
+      "title": "Canonical external source discovery stack governance",
+      "status": "implemented",
+      "requires": [
+        "source_registry",
+        "connector_registry",
+        "source_authority_tiers",
+        "runtime_components",
+        "public_dto_safety",
+        "live_fetch_block"
+      ],
+      "tests": [
+        "verify:source-stack",
+        "verify:source-authority",
+        "verify:source-stack-architecture"
+      ],
+      "evidence": [
+        "src/lib/source-stack/sourceStackRuntime.ts",
+        "src/lib/source-stack/sourceStackApi.ts",
+        "src/db/schema/externalSourceStackGovernance.ts",
+        "src/lib/db/migrations/0032_external_source_stack_governance.sql"
+      ]
+    },
+    "SOURCE-FAILOVER-001": {
+      "title": "Governed source failover and stale-source handling",
+      "status": "implemented",
+      "requires": [
+        "source_freshness_records",
+        "source_failover_events",
+        "queue_health_events",
+        "live_fetch_performed_false",
+        "human_review"
+      ],
+      "tests": [
+        "smoke:source-failover",
+        "smoke:source-stack-apis"
+      ],
+      "evidence": [
+        "src/lib/source-stack/sourceStackRuntime.ts",
+        "src/app/api/source-stack/failover/route.ts",
+        "src/app/api/source-stack/freshness/route.ts",
+        "src/app/api/source-stack/observability/route.ts"
+      ]
+    },
+    "CANONICALIZATION-PIPELINE-001": {
+      "title": "External source canonicalization and conflict preservation",
+      "status": "implemented",
+      "requires": [
+        "canonical_entities",
+        "source_weighting",
+        "lineage",
+        "historical_snapshots",
+        "source_conflict_events"
+      ],
+      "tests": [
+        "verify:canonicalization",
+        "smoke:source-conflict-resolution"
+      ],
+      "evidence": [
+        "src/lib/canonicalization/index.ts",
+        "src/app/api/source-stack/canonicalization/route.ts",
+        "src/app/api/source-stack/conflicts/route.ts",
+        "src/db/schema/externalSourceStackGovernance.ts"
+      ]
+    },
+    "EXTERNAL-SOURCE-RUNTIME-WORKPACKAGES-001": {
+      "title": "Revenue intelligence workpackage API aliases and runtime build controls",
+      "status": "implemented",
+      "requires": [
+        "program_search_alias",
+        "revenue_opportunity_alias",
+        "market_signal_alias",
+        "geo_suitability_alias",
+        "event_contracts",
+        "source_stack_smoke"
+      ],
+      "tests": [
+        "verify:source-stack-architecture",
+        "smoke:source-stack-apis",
+        "smoke:marketplace-ingestion"
+      ],
+      "evidence": [
+        "src/app/api/programs/search/route.ts",
+        "src/app/api/revenue/opportunities/route.ts",
+        "src/app/api/market-signals/route.ts",
+        "src/app/api/geo/suitability/route.ts",
+        "src/lib/modules/eventContractRegistry.ts"
+      ]
+    },
+    "SOURCEINT-001": {
+      "title": "Volume VI core rule: governed source intelligence is not a decision engine",
+      "status": "implemented",
+      "requires": [
+        "connector_certification",
+        "source_authority_classification",
+        "provenance_capture",
+        "classification_tagging",
+        "claims_governance"
+      ],
+      "tests": [
+        "verify:sources",
+        "verify:scraper-source-intelligence",
+        "smoke:source-stack-apis"
+      ],
+      "evidence": [
+        "src/lib/source-intelligence/sourceIntelligenceRuntime.ts",
+        "src/lib/source-stack/sourceStackRuntime.ts",
+        "src/lib/governance/contentClaimsPolicy.ts",
+        "src/app/api/public/grants/route.ts"
+      ]
+    },
+    "SOURCEINT-002": {
+      "title": "Governed scraper architecture and canonical source pipeline",
+      "status": "implemented",
+      "requires": [
+        "connector_certification_layer",
+        "scraper_runtime_layer",
+        "source_ingestion_gate",
+        "canonicalization_engine",
+        "replay_audit_layer"
+      ],
+      "tests": [
+        "verify:scrapers",
+        "verify:source-stack",
+        "verify:sources"
+      ],
+      "evidence": [
+        "src/lib/scrapers/runner.ts",
+        "src/lib/source-ingestion/index.ts",
+        "src/lib/canonicalization/index.ts",
+        "src/lib/source-stack/sourceStackRuntime.ts"
+      ]
+    },
+    "SOURCE-AUTH-001": {
+      "title": "Source authority tier governance",
+      "status": "implemented",
+      "requires": [
+        "source_authority_tiers",
+        "provenance_score",
+        "replayability_score",
+        "claims_restrictions",
+        "connector_certification_status"
+      ],
+      "tests": [
+        "verify:source-authority",
+        "verify:sources",
+        "verify:source-stack-architecture"
+      ],
+      "evidence": [
+        "src/lib/scrapers/authority.ts",
+        "src/lib/source-stack/sourceStackRuntime.ts",
+        "src/db/schema/externalSourceStackGovernance.ts"
+      ]
+    },
+    "CONNECTOR-CERT-001": {
+      "title": "Connector certification governance",
+      "status": "implemented",
+      "requires": [
+        "connector_metadata",
+        "certification_status",
+        "rate_limit_profile",
+        "fallback_connector",
+        "classification_profile"
+      ],
+      "tests": [
+        "verify:connector-governance",
+        "smoke:connector-certification",
+        "smoke:connectors"
+      ],
+      "evidence": [
+        "src/lib/connectors/certifiedConnectorAdapterStore.ts",
+        "src/lib/connectors/externalConnectorExecutionStore.ts",
+        "src/app/api/connectors/adapters/route.ts"
+      ]
+    },
+    "SOURCE-INGEST-001": {
+      "title": "Source Ingestion Gate governance",
+      "status": "implemented",
+      "requires": [
+        "candidate_source_evidence",
+        "source_review",
+        "source_classification",
+        "source_rejection",
+        "operational_use_block"
+      ],
+      "tests": [
+        "verify:source-ingestion",
+        "smoke:source-ingestion",
+        "smoke:scraper-source-apis"
+      ],
+      "evidence": [
+        "src/lib/source-ingestion/index.ts",
+        "src/app/api/source-ingestion/submit/route.ts",
+        "src/app/api/source-ingestion/review/route.ts",
+        "src/app/api/source-ingestion/classify/route.ts",
+        "src/app/api/source-ingestion/reject/route.ts"
+      ]
+    },
+    "SOURCE-PROV-001": {
+      "title": "Source provenance and classification requirements",
+      "status": "implemented",
+      "requires": [
+        "source_id",
+        "source_url",
+        "content_hash",
+        "classification_level",
+        "confidence_score",
+        "replay_ref"
+      ],
+      "tests": [
+        "verify:provenance",
+        "verify:classification",
+        "verify:sources"
+      ],
+      "evidence": [
+        "src/lib/scrapers/provenance.ts",
+        "src/lib/provenance/index.ts",
+        "src/lib/classification/index.ts",
+        "src/db/schema/scraperSourceGovernance.ts"
+      ]
+    },
+    "SOURCE-REPLAY-001": {
+      "title": "Source audit ledger and replay requirements",
+      "status": "implemented",
+      "requires": [
+        "scraper_run_events",
+        "scraper_replay_refs",
+        "replay_verification",
+        "source_integrity_reports",
+        "audit_events"
+      ],
+      "tests": [
+        "verify:replay",
+        "smoke:scraper-replay",
+        "smoke:replay-cross-module"
+      ],
+      "evidence": [
+        "src/lib/scrapers/replay.ts",
+        "src/lib/replay/loadReplay.ts",
+        "src/db/schema/replayVerification.ts",
+        "src/scripts/crossModuleReplaySmokeTest.ts"
+      ]
+    },
+    "PROPERTY-DISC-001": {
+      "title": "Property discovery and canonical property governance",
+      "status": "implemented",
+      "requires": [
+        "property_discovery_registry",
+        "canonical_property_records",
+        "source_verification",
+        "property_replay_refs",
+        "advisory_public_disclosures"
+      ],
+      "tests": [
+        "verify:property-discovery",
+        "verify:canonical-properties",
+        "smoke:property-replay"
+      ],
+      "evidence": [
+        "src/lib/property-discovery/index.ts",
+        "src/lib/canonical-properties/index.ts",
+        "src/app/api/properties/discovery/route.ts",
+        "src/app/api/public/property-discovery/route.ts"
+      ]
+    },
+    "PLATFORM-FED-001": {
+      "title": "Federated platform integration through governed backend spine",
+      "status": "implemented",
+      "requires": [
+        "module_registry",
+        "shared_backend_spine",
+        "event_contract_registry",
+        "case_context",
+        "handoff_map"
+      ],
+      "tests": [
+        "smoke:platform",
+        "smoke:integration",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/modules/moduleRegistry.ts",
+        "src/lib/modules/eventContractRegistry.ts",
+        "src/lib/modules/caseContext.ts",
+        "src/lib/modules/handoffMap.ts"
+      ]
+    },
+    "SURFACE-GOV-001": {
+      "title": "Public Surface Gateway and public-safe source DTO governance",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "public_gateway",
+        "public_source_aliases",
+        "dto_filtering",
+        "claims_governance",
+        "redaction"
+      ],
+      "tests": [
+        "smoke:public-surfaces",
+        "smoke:claims-public",
+        "smoke:redaction"
+      ],
+      "evidence": [
+        "src/app/api/public/surfaces/route.ts",
+        "src/app/api/public/grants/route.ts",
+        "src/lib/dto/publicSourceIntelligence.ts",
+        "src/scripts/publicSurfaceSmokeTest.ts"
+      ]
+    },
+    "CONFORMANCE-001": {
+      "title": "Master Volume conformance framework",
+      "status": "implemented",
+      "requires": [
+        "requirement_matrix",
+        "module_conformance",
+        "platform_smoke",
+        "public_surface_smoke",
+        "replay_conformance"
+      ],
+      "tests": [
+        "verify:master-volumes",
+        "verify:modules",
+        "smoke:platform"
+      ],
+      "evidence": [
+        "docs/master-volume-requirements.json",
+        "src/scripts/masterVolumeConformanceTest.ts",
+        "src/scripts/moduleConformanceTest.ts",
+        "src/scripts/platformSmokeTest.ts"
+      ]
+    },
+    "MODULE-GATE-001": {
+      "title": "Modules 01-20 Completion and Integration Gate",
+      "status": "implemented",
+      "requires": [
+        "module_01_20_gate",
+        "module_route_set",
+        "browser_route_list",
+        "production_blocks"
+      ],
+      "tests": [
+        "verify:modules",
+        "smoke:integration",
+        "verify:backend"
+      ],
+      "evidence": [
+        "docs/MODULE_01_20_COMPLETION_INTEGRATION_GATE.md",
+        "src/lib/modules/moduleRegistry.ts",
+        "src/scripts/moduleConformanceTest.ts"
+      ]
+    },
+    "MODULE-READINESS-001": {
+      "title": "Backend Module Readiness Decision",
+      "status": "implemented",
+      "requires": [
+        "backend_readiness_decision",
+        "backend_module_gate",
+        "production_boundary",
+        "live_action_boundary"
+      ],
+      "tests": [
+        "backend:module-readiness",
+        "verify:backend",
+        "smoke:integration"
+      ],
+      "evidence": [
+        "docs/BACKEND_MODULE_READINESS_DECISION.md",
+        "src/scripts/backendModuleReadinessGate.ts",
+        "docs/BACKEND_READINESS_CHECKLIST.md"
+      ]
+    },
+    "BACKEND-COVERAGE-001": {
+      "title": "Backend Coverage Matrix and hard-block register",
+      "status": "implemented",
+      "requires": [
+        "route_coverage",
+        "schema_coverage",
+        "runtime_store_coverage",
+        "verified_command_gates",
+        "hard_blocks"
+      ],
+      "tests": [
+        "backend:module-readiness",
+        "verify:backend",
+        "smoke:backend"
+      ],
+      "evidence": [
+        "docs/BACKEND_COVERAGE_MATRIX.md",
+        "src/scripts/backendModuleReadinessGate.ts",
+        "src/scripts/backendSmokeTest.ts"
+      ]
+    },
+    "SURFACE-ALIGN-001": {
+      "title": "Portable vertical surface alignment",
+      "status": "implemented",
+      "requires": [
+        "internal_surfaces",
+        "borrower_surfaces",
+        "lender_surfaces",
+        "sponsor_surfaces",
+        "shared_library_barrels"
+      ],
+      "tests": [
+        "verify:modules",
+        "smoke:public-surfaces",
+        "smoke:platform"
+      ],
+      "evidence": [
+        "docs/PORTABLE_VERTICAL_SURFACE_ALIGNMENT.md",
+        "src/lib/modules/portableVerticalSurface.ts",
+        "src/lib/dto/publicSourceIntelligence.ts"
+      ]
+    },
+    "ROLE-ARCH-001": {
+      "title": "Environmental Engineering Spoke authority and Banker Spoke isolation",
+      "status": "implemented",
+      "requires": [
+        "environmental_spoke_scope",
+        "banker_spoke_isolation",
+        "role_authority_boundary"
+      ],
+      "tests": [
+        "smoke:environmental-compliance",
+        "backend:module-readiness"
+      ],
+      "evidence": [
+        "src/lib/governance/environmentalComplianceStore.ts",
+        "src/app/api/governance/environmental-compliance/route.ts",
+        "src/db/schema/environmentalComplianceRecords.ts"
+      ]
+    },
+    "REG-NEPA-001": {
+      "title": "NEPA and environmental review routing governance",
+      "status": "implemented",
+      "requires": [
+        "environmental_trigger_evaluation",
+        "assessment_type_routing",
+        "human_review_boundary"
+      ],
+      "tests": [
+        "smoke:environmental-compliance",
+        "backend:module-readiness"
+      ],
+      "evidence": [
+        "src/lib/governance/environmentalComplianceStore.ts",
+        "src/app/api/governance/environmental-compliance/route.ts",
+        "src/scripts/environmentalComplianceSmokeTest.ts"
+      ]
+    },
+    "USDA-ENV-001": {
+      "title": "USDA environmental pathway governance and exemption handling",
+      "status": "implemented",
+      "requires": [
+        "usda_environmental_pathway_trigger",
+        "pathway_exemption_event",
+        "no_official_report_claim"
+      ],
+      "tests": [
+        "smoke:environmental-compliance",
+        "smoke:content-claims"
+      ],
+      "evidence": [
+        "src/lib/governance/environmentalComplianceStore.ts",
+        "src/app/api/governance/environmental-compliance/route.ts",
+        "src/scripts/environmentalComplianceSmokeTest.ts"
+      ]
+    },
+    "TECH-CONN-001": {
+      "title": "Environmental compliance records canonical schema and audit anchor",
+      "status": "implemented",
+      "requires": [
+        "environmental_compliance_records",
+        "audit_anchor_ref",
+        "replay_ref"
+      ],
+      "tests": [
+        "smoke:environmental-compliance",
+        "verify:schema"
+      ],
+      "evidence": [
+        "src/db/schema/environmentalComplianceRecords.ts",
+        "src/lib/db/migrations/0033_environmental_compliance_records.sql",
+        "src/lib/governance/environmentalComplianceStore.ts"
+      ]
+    },
+    "OPS-BORROWER-JOURNEY-001": {
+      "title": "Borrower journey environmental trigger, fee, and lineage steps 2.5-2.7",
+      "status": "implemented",
+      "requires": [
+        "trigger_evaluation",
+        "provider_license_verification",
+        "environmental_lineage_confirmation"
+      ],
+      "tests": [
+        "smoke:environmental-compliance",
+        "smoke:backend"
+      ],
+      "evidence": [
+        "src/lib/governance/environmentalComplianceStore.ts",
+        "src/app/api/governance/environmental-compliance/route.ts",
+        "src/scripts/environmentalComplianceSmokeTest.ts"
+      ]
+    },
+    "CANON-ECON-001": {
+      "title": "Environmental assessment fee disclosure and borrower autonomy protections",
+      "status": "implemented",
+      "requires": [
+        "borrower_protection_fee_controls",
+        "pre_assessment_fee_disclosure",
+        "no_surcharge_or_preference"
+      ],
+      "tests": [
+        "smoke:environmental-compliance",
+        "smoke:content-claims"
+      ],
+      "evidence": [
+        "src/db/schema/environmentalComplianceRecords.ts",
+        "src/lib/governance/environmentalComplianceStore.ts",
+        "src/scripts/environmentalComplianceSmokeTest.ts"
+      ]
+    },
+    "CANON-SOVEREIGNTY-001": {
+      "title": "State-level environmental provider license verification",
+      "status": "implemented",
+      "requires": [
+        "provider_license_ref",
+        "provider_license_verified",
+        "jurisdictional_credential_gate"
+      ],
+      "tests": [
+        "smoke:environmental-compliance",
+        "smoke:sovereign-consent"
+      ],
+      "evidence": [
+        "src/lib/governance/environmentalComplianceStore.ts",
+        "src/db/schema/environmentalComplianceRecords.ts",
+        "src/scripts/environmentalComplianceSmokeTest.ts"
+      ]
+    },
+    "VOLVI-CONSOLIDATION-001": {
+      "title": "Volume VI de-duplicated consolidation authority",
+      "status": "implemented",
+      "requires": [
+        "de_duplicated_volume_vi_authority",
+        "absorbed_supplemental_inputs",
+        "no_parallel_architecture_drift"
+      ],
+      "tests": [
+        "verify:master-volumes",
+        "backend:module-readiness",
+        "smoke:integration"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
+        "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
+        "docs/MODULE_INTEGRATION_AND_PUBLIC_SURFACE_CONTRACT.md"
+      ]
+    },
+    "XREF-V22-001": {
+      "title": "Volume VI cross-reference and Part 8 doctrine register",
+      "status": "implemented",
+      "requires": [
+        "volumes_0_to_vi_coverage",
+        "part_8_volume_vi_doctrine_register",
+        "thirty_three_volume_vi_ids"
+      ],
+      "tests": [
+        "verify:master-volumes",
+        "verify:backend"
+      ],
+      "evidence": [
+        "docs/master-volume-requirements.json",
+        "src/scripts/masterVolumeConformanceTest.ts",
+        "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md"
+      ]
+    },
+    "BUILD-CONFORMANCE-MATRIX-001": {
+      "title": "Build Conformance Matrix doctrine-to-artifact proof layer",
+      "status": "implemented",
+      "requires": [
+        "doctrine_to_artifact_mapping",
+        "routes_schema_migrations_commands",
+        "built_vs_blocked_status"
+      ],
+      "tests": [
+        "verify:master-volumes",
+        "backend:module-readiness",
+        "verify:backend"
+      ],
+      "evidence": [
+        "docs/master-volume-requirements.json",
+        "src/scripts/masterVolumeConformanceTest.ts",
+        "src/scripts/backendModuleReadinessGate.ts",
+        "docs/BACKEND_COVERAGE_MATRIX.md"
+      ]
+    },
+    "NO-CAPABILITY-DRIFT-001": {
+      "title": "No unbuilt capability claims in public or institutional surfaces",
+      "status": "implemented",
+      "requires": [
+        "claim_matches_actual_build",
+        "live_capability_blocks_disclosed",
+        "human_review_and_advisory_posture"
+      ],
+      "tests": [
+        "smoke:content-claims",
+        "smoke:claims-public",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/contentClaimsPolicy.ts",
+        "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
+        "docs/BACKEND_COVERAGE_MATRIX.md"
+      ]
+    }
+  }
+}

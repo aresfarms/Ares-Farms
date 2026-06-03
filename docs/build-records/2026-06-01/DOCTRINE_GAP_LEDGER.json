@@ -1,0 +1,114 @@
+[
+  {
+    "id": "PROMOTION-GATE-001",
+    "title": "Production and public-action blocks",
+    "status": "awaiting_controlled_promotion",
+    "requirement": {
+      "title": "Production and public-action blocks",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "promotion_gates",
+        "live_action_blocks",
+        "feature_flags"
+      ],
+      "tests": [
+        "backend:production-readiness",
+        "smoke:live-action-readiness",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/app/promotion/page.tsx",
+        "src/lib/governance/liveActionReadinessStore.ts",
+        "src/lib/modules/featureFlagGovernance.ts"
+      ]
+    },
+    "owner": "Constitutional Authority + Release Manager",
+    "route": "/promotion",
+    "blockedReason": "Production, public action, live external calls, payments, notices, official reports, and verification authority are intentionally blocked until controlled promotion and qualified human approval are recorded.",
+    "requiredEvidence": [
+      "backend production readiness approval",
+      "security and audit readiness approval",
+      "production auth activation approval",
+      "feature flag and kill-switch review",
+      "release, rollback, monitoring, incident, support, and audit evidence",
+      "qualified constitutional authority and release manager signoff"
+    ],
+    "promotionCondition": "May move from awaiting controlled promotion only after the full production gate chain through final authority, activation ceremony, post-activation verification, and reliance boundary review passes without blocked items."
+  },
+  {
+    "id": "PUBLIC-SURFACE-001",
+    "title": "Public surfaces as governed translation layers",
+    "status": "awaiting_controlled_promotion",
+    "requirement": {
+      "title": "Public surfaces as governed translation layers",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "public_gateway",
+        "dto_filtering",
+        "redaction",
+        "claims_gate"
+      ],
+      "tests": [
+        "smoke:public-surfaces",
+        "smoke:claims-public",
+        "smoke:redaction"
+      ],
+      "evidence": [
+        "src/app/api/public/surfaces/route.ts",
+        "src/lib/dto/public/index.ts",
+        "src/scripts/redactionSmokeTest.ts"
+      ]
+    },
+    "owner": "Public Surface Governance Owner + Claims/Compliance Reviewer",
+    "route": "/api/public/surfaces",
+    "blockedReason": "Public surfaces are built as advisory DTO translation layers, but public production exposure and reliance remain blocked until claims, redaction, access, rate-limit, public-copy, and verification boundaries are approved.",
+    "requiredEvidence": [
+      "public claims smoke pass",
+      "redaction smoke pass",
+      "public DTO and classification filtering review",
+      "public-copy freeze and accessibility review",
+      "rate-limit and abuse-control readiness",
+      "qualified claims/compliance approval"
+    ],
+    "promotionCondition": "May promote only when every public, borrower, lender, and sponsor surface carries required disclosures and a qualified reviewer approves public exposure without reliance, approval, guarantee, or legal/regulatory claims."
+  },
+  {
+    "id": "SURFACE-GOV-001",
+    "title": "Public Surface Gateway and public-safe source DTO governance",
+    "status": "awaiting_controlled_promotion",
+    "requirement": {
+      "title": "Public Surface Gateway and public-safe source DTO governance",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "public_gateway",
+        "public_source_aliases",
+        "dto_filtering",
+        "claims_governance",
+        "redaction"
+      ],
+      "tests": [
+        "smoke:public-surfaces",
+        "smoke:claims-public",
+        "smoke:redaction"
+      ],
+      "evidence": [
+        "src/app/api/public/surfaces/route.ts",
+        "src/app/api/public/grants/route.ts",
+        "src/lib/dto/publicSourceIntelligence.ts",
+        "src/scripts/publicSurfaceSmokeTest.ts"
+      ]
+    },
+    "owner": "Source Intelligence Governance Owner + Public DTO Owner",
+    "route": "/api/public/grants",
+    "blockedReason": "Public source aliases and public-safe source DTOs are implemented, but live source freshness, public verification, source certainty, and production source reliance remain blocked pending source legal, licensing, promotion, replay, and provenance approval.",
+    "requiredEvidence": [
+      "source legal and licensing review",
+      "source promotion packet approval",
+      "source production readiness review",
+      "controlled promotion activation review",
+      "live scraper activation review with live fetch still disabled until approval",
+      "public DTO safety, redaction, claims, replay, and provenance evidence"
+    ],
+    "promotionCondition": "May promote only after source-specific legal/ToS/licensing, live adapter certification, provenance, replay, monitoring, rollback, incident response, and qualified human source promotion approval are recorded."
+  }
+]

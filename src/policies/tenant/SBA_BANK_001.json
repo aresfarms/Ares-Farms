@@ -1,0 +1,13 @@
+{
+  "tenantId": "SBA_BANK_001",
+  "version": "v1.0",
+  "weights": {
+    "fsa": 0.25,
+    "bni": 0.35,
+    "sba": 0.4
+  },
+  "thresholds": {
+    "approve": 650,
+    "review": 450
+  }
+}

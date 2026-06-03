@@ -104,5 +104,8 @@ jobs:
       - name: Advanced intelligence
         run: npm run smoke:advanced-intelligence
 
+      - name: Capital Graph
+        run: npm run smoke:capital-graph
+
       - name: Next.js production build
         run: npm run build

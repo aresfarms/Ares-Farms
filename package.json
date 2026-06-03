@@ -106,6 +106,7 @@
     "smoke:capital-graph": "tsx src/scripts/capitalGraphSmokeTest.ts",
     "smoke:customer-type-registry": "tsx src/scripts/customerTypeRegistrySmokeTest.ts",
     "smoke:revenue-intelligence-v2": "tsx src/scripts/revenueIntelligenceV2SmokeTest.ts",
+    "smoke:financing-pathway-engine-v2": "tsx src/scripts/financingPathwayEngineV2SmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

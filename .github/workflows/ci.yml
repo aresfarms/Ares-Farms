@@ -113,5 +113,8 @@ jobs:
       - name: Revenue Intelligence v2
         run: npm run smoke:revenue-intelligence-v2
 
+      - name: Financing Pathway Engine v2
+        run: npm run smoke:financing-pathway-engine-v2
+
       - name: Next.js production build
         run: npm run build

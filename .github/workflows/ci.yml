@@ -107,5 +107,8 @@ jobs:
       - name: Capital Graph
         run: npm run smoke:capital-graph
 
+      - name: Customer Type Registry
+        run: npm run smoke:customer-type-registry
+
       - name: Next.js production build
         run: npm run build

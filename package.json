@@ -102,6 +102,7 @@
     "smoke:certification-engine": "tsx src/scripts/certificationEngineSmokeTest.ts",
     "smoke:registry-framework": "tsx src/scripts/registryFrameworkSmokeTest.ts",
     "smoke:connector-certification": "tsx src/scripts/connectorCertificationSmokeTest.ts",
+    "smoke:advanced-intelligence": "tsx src/scripts/advancedIntelligenceSmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

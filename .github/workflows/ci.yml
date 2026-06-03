@@ -110,5 +110,8 @@ jobs:
       - name: Customer Type Registry
         run: npm run smoke:customer-type-registry
 
+      - name: Revenue Intelligence v2
+        run: npm run smoke:revenue-intelligence-v2
+
       - name: Next.js production build
         run: npm run build

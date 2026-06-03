@@ -284,6 +284,8 @@ export function evaluateFinancingPathways(
     pathways,
     recommendedNextRoutes: unique([
       "/onboarding",
+      "/readiness",
+      "/portal/borrower/opportunities",
       "/portal/borrower/applications",
       "/portal/borrower/documents",
       "/portal/revenue-opportunities",

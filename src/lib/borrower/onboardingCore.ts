@@ -188,7 +188,7 @@ export function createBorrowerOnboardingWorkflow(
     {
       id: "environmental",
       label: "Environmental intake",
-      route: "/environmental-compliance",
+      route: "/portal/borrower/environmental-intake",
       status: state.interests.environmentalReports
         ? "pending-review"
         : "needs-input",
@@ -199,7 +199,7 @@ export function createBorrowerOnboardingWorkflow(
     {
       id: "opportunities",
       label: "Opportunity discovery",
-      route: "/portal/property-discovery",
+      route: "/portal/borrower/opportunities",
       status:
         state.interests.vendorRecommendations ||
         state.interests.commodityIntelligence ||
@@ -216,6 +216,16 @@ export function createBorrowerOnboardingWorkflow(
       status: "pending-review",
       reason:
         "Borrower portability and governed record access remain available through data-rights workflows.",
+    },
+    {
+      id: "readiness",
+      label: "Readiness assessment",
+      route: "/readiness",
+      status: missingItems.length === 0 ? "pending-review" : "needs-input",
+      reason:
+        missingItems.length === 0
+          ? "Readiness can be assessed as operational guidance only and remains review-bound."
+          : "Complete onboarding items to advance the readiness assessment.",
     },
   ];
 

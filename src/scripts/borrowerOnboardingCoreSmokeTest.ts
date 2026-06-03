@@ -63,9 +63,9 @@ function main() {
   );
   assert(
     completeWorkflow.handoffs.some(
-      (handoff) => handoff.route === "/environmental-compliance"
+      (handoff) => handoff.route === "/portal/borrower/environmental-intake"
     ),
-    "Borrower onboarding must hand off to environmental intake."
+    "Borrower onboarding must hand off to the borrower environmental intake."
   );
 
   console.log(

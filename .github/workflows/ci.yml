@@ -119,5 +119,8 @@ jobs:
       - name: Opportunity Discovery v2
         run: npm run smoke:opportunity-discovery-v2
 
+      - name: Lender Workflow v2
+        run: npm run smoke:lender-workflow-v2
+
       - name: Next.js production build
         run: npm run build

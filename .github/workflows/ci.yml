@@ -128,5 +128,8 @@ jobs:
       - name: Evidence Engine v2
         run: npm run smoke:evidence-engine-v2
 
+      - name: Certification Engine v2
+        run: npm run smoke:certification-engine-v2
+
       - name: Next.js production build
         run: npm run build

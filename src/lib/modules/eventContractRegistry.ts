@@ -1594,6 +1594,34 @@ export const eventContractRegistry: EventContract[] = [
       "Record borrower opportunity discovery review posture and route review-bound handoffs without guaranteed revenue, program approval, source certainty, property certification, lender commitment, live external action, or legal or regulatory reliance.",
   },
   {
+    eventType: "governance.evidence.pack.composed",
+    producerModuleId: "governance-evidence-engine",
+    consumerModuleIds: [
+      "evidence-packets",
+      "audit-replay",
+      "governance",
+      "reviews",
+      "module-readiness",
+      "lender-evidence",
+    ],
+    classificationLevel: "RESTRICTED",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: [
+      "pack_intent",
+      "application_id",
+      "module_count",
+      "event_contract_count",
+      "handoff_count",
+      "human_authority_count",
+      "human_review_required",
+      "replay_ref",
+    ],
+    purpose:
+      "Record governance evidence pack composition posture and route review-bound handoffs without approval, official certification, public verification, regulatory reliance, lender commitment, credit decision, environmental clearance, payment authorization, or legal reliance.",
+  },
+  {
     eventType: "lender.workflow.viewed",
     producerModuleId: "lender-workflow",
     consumerModuleIds: [

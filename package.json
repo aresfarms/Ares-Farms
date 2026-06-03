@@ -97,6 +97,7 @@
     "smoke:environmental-intake": "tsx src/scripts/environmentalIntakeSmokeTest.ts",
     "smoke:opportunity-discovery": "tsx src/scripts/opportunityDiscoverySmokeTest.ts",
     "smoke:public-trust": "tsx src/scripts/publicTrustSmokeTest.ts",
+    "smoke:lender-workflow": "tsx src/scripts/lenderWorkflowSmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

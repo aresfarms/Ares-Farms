@@ -10,7 +10,7 @@ This roadmap governs the practical build order after the backend foundation. It 
 
 - Backend governance foundation is complete for governed module work.
 - Current implementation is review-bound through Module 43.
-- Build Now items 01 (Core borrower onboarding), 02 (Financing pathway engine), 03 (Readiness assessment), 04 (Environmental intake), 05 (Opportunity discovery), and 06 (Public trust pages) are complete as governed, review-bound vertical surfaces.
+- All seven Build Now items (01 Core borrower onboarding, 02 Financing pathway engine, 03 Readiness assessment, 04 Environmental intake, 05 Opportunity discovery, 06 Public trust pages, 07 Basic lender workflow) are complete as governed, review-bound vertical surfaces.
 - Checkpoint `BR-2026-06-01-M41` remains the preserved backend governance checkpoint.
 - Current machine-readable version registry covers Master Volumes 0-VII.
 - The three awaiting-controlled-promotion items remain named, owned, routed, and blocked.

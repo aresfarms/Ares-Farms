@@ -100,6 +100,7 @@
     "smoke:lender-workflow": "tsx src/scripts/lenderWorkflowSmokeTest.ts",
     "smoke:governance-evidence-engine": "tsx src/scripts/governanceEvidenceEngineSmokeTest.ts",
     "smoke:certification-engine": "tsx src/scripts/certificationEngineSmokeTest.ts",
+    "smoke:registry-framework": "tsx src/scripts/registryFrameworkSmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

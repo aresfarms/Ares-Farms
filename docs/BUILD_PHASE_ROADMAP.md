@@ -13,6 +13,7 @@ This roadmap governs the practical build order after the backend foundation. It 
 - All seven Build Now items (01 Core borrower onboarding, 02 Financing pathway engine, 03 Readiness assessment, 04 Environmental intake, 05 Opportunity discovery, 06 Public trust pages, 07 Basic lender workflow) are complete as governed, review-bound vertical surfaces.
 - Build Next 08 (Governance evidence engine) is complete as a governed internal evidence composition surface. Pack output remains internal evidence unless separately promoted through governed controlled-promotion gates.
 - Build Next 09 (Internal certification engine) is complete as a governed internal certification composition surface. Posture output is internal certification only — external certification claims remain blocked until the public verification and reliance gates are approved.
+- Build Next 10 (Registry framework) is complete as a governed internal registry composition surface over the canonical module manifest, public surface, event contract, handoff, source authority, controlled promotion, and participant role registries. Framework output remains internal evidence unless separately promoted through governed controlled-promotion gates.
 - Checkpoint `BR-2026-06-01-M41` remains the preserved backend governance checkpoint.
 - Current machine-readable version registry covers Master Volumes 0-VII.
 - The three awaiting-controlled-promotion items remain named, owned, routed, and blocked.

@@ -122,5 +122,8 @@ jobs:
       - name: Lender Workflow v2
         run: npm run smoke:lender-workflow-v2
 
+      - name: Advanced Intelligence v2
+        run: npm run smoke:advanced-intelligence-v2
+
       - name: Next.js production build
         run: npm run build

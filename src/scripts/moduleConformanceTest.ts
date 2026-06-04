@@ -77,22 +77,16 @@ function main() {
     );
   }
 
-  // Module-number reservations. The Master Volume sequence allows
-  // a build to ship a higher-numbered module before a lower-numbered
-  // one when the lower one is intentionally deferred. Module 45 is
-  // shipped before Module 44 per the Module 45 Human Authority
-  // Registry Specification §0 ("Build order: before Module 44; it
-  // clears the dominant failure mode"). Module 44 (Disclosure Audit
-  // Gate) remains reserved and the conformance test skips it.
-  const RESERVED_MODULE_NUMBERS = new Set<number>([44]);
+  // Module-number reservations. Build 36 shipped Module 45 (Human
+  // Authority Registry) before Module 44 (Disclosure Audit Gate) per
+  // the Module 45 spec §0 build order; Build 37 then shipped Module
+  // 44 itself, so the sequence is now contiguous and no reservations
+  // are needed.
   for (
     let moduleNumber = 1;
     moduleNumber <= highestModuleNumber;
     moduleNumber += 1
   ) {
-    if (RESERVED_MODULE_NUMBERS.has(moduleNumber)) {
-      continue;
-    }
     assert(
       moduleNumbers.has(moduleNumber),
       `Module sequence is missing Module ${moduleNumber}.`

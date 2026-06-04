@@ -2,6 +2,9 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import {
+  moduleDisclosureResolutionFor,
+} from "@/lib/disclosure-audit/disclosureAuditGateRuntime";
+import {
   deriveModuleIntent,
   HumanAuthorityRoleFill,
   moduleHumanAuthorityResolutionFor,
@@ -531,35 +534,34 @@ function buildReplayCheck(
 }
 
 // =============================================================================
-// disclosures_present — based on audience + publicSurfaceAllowed
+// disclosures_present — sourced from Module 44 Disclosure Audit Gate
 // =============================================================================
 
 function buildDisclosuresCheck(
   manifest: ModuleManifest
 ): BuildSelfReportCheckCell {
-  if (!manifest.publicSurfaceAllowed) {
+  const resolution = moduleDisclosureResolutionFor(manifest);
+  if (resolution.disclosuresStatus === "N/A") {
     return {
       status: "N/A",
-      reason: "internal surface — no public disclosure required",
+      reason: resolution.disclosuresReason,
     };
   }
-  // For a public surface, the description must signal advisory
-  // posture. Use a lightweight token check; the canonical disclosure
-  // corpus depends on Module 44.
-  const tokens = [
-    /advisory/i,
-    /no\s+approval/i,
-    /human\s+review/i,
-    /not\s+a\s+(commitment|guarantee|approval|decision)/i,
-  ];
-  const desc = manifest.description.toLowerCase();
-  const matched = tokens.filter((re) => re.test(desc)).length;
-  if (matched >= 2) {
-    return "PASS";
+  if (resolution.disclosuresStatus === "PASS") {
+    return {
+      status: "PASS",
+      reason: `disclosure-audit-gate resolves ${manifest.id}: ${resolution.disclosuresReason}`,
+    };
+  }
+  if (resolution.disclosuresStatus === "WARN") {
+    return {
+      status: "WARN",
+      reason: `disclosure-audit-gate resolves ${manifest.id}: ${resolution.disclosuresReason}`,
+    };
   }
   return {
-    status: "WARN",
-    reason: `public surface description contains fewer than two advisory-posture tokens (${matched}/${tokens.length}); strongest result requires Module 44 disclosure-audit gate`,
+    status: "FAIL",
+    reason: `disclosure-audit-gate resolves ${manifest.id}: ${resolution.disclosuresReason}`,
   };
 }
 
@@ -667,31 +669,35 @@ function buildHumanAuthorityCheck(
 }
 
 // =============================================================================
-// claims_controls — based on claimsProfile + Module 44 dependency
+// claims_controls — sourced from Module 44 Disclosure Audit Gate
 // =============================================================================
 
 function buildClaimsControlsCheck(
   manifest: ModuleManifest,
   surfaceClass: BuildSelfReportSurfaceClass
 ): BuildSelfReportCheckCell {
-  if (surfaceClass === "internal" || surfaceClass === "gate") {
+  const resolution = moduleDisclosureResolutionFor(manifest);
+  if (resolution.claimsStatus === "N/A") {
     return {
       status: "N/A",
-      reason: "module emits no customer-facing claims",
+      reason: resolution.claimsReason,
     };
   }
-  if (!manifest.claimsProfile || manifest.claimsProfile.length === 0) {
+  if (resolution.claimsStatus === "PASS") {
     return {
-      status: "FAIL",
-      reason: "customer-facing surface has no claimsProfile assigned",
+      status: "PASS",
+      reason: `disclosure-audit-gate resolves ${manifest.id}: ${resolution.claimsReason}`,
     };
   }
-  // Module 44 (Disclosure Audit Gate) supplies the canonical
-  // prohibited-claims corpus. Until then, we accept a non-empty
-  // claimsProfile as PASS with a note.
+  if (resolution.claimsStatus === "WARN") {
+    return {
+      status: "WARN",
+      reason: `disclosure-audit-gate resolves ${manifest.id}: ${resolution.claimsReason}`,
+    };
+  }
   return {
-    status: "PASS",
-    reason: `claimsProfile = ${manifest.claimsProfile}; canonical prohibited-claims corpus depends on Module 44`,
+    status: "FAIL",
+    reason: `disclosure-audit-gate resolves ${manifest.id}: ${resolution.claimsReason}`,
   };
 }
 

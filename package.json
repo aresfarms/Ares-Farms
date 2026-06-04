@@ -129,6 +129,8 @@
     "smoke:public-alpha-profile": "tsx src/scripts/publicAlphaProfileSmokeTest.ts",
     "smoke:human-authority-registry": "tsx src/scripts/humanAuthorityRegistrySmokeTest.ts",
     "verify:human-authority": "tsx src/scripts/humanAuthorityRegistryCli.ts",
+    "smoke:disclosure-audit-gate": "tsx src/scripts/disclosureAuditGateSmokeTest.ts",
+    "verify:disclosures": "tsx src/scripts/disclosureAuditGateCli.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

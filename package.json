@@ -121,6 +121,7 @@
     "smoke:environmental-compliance-v2": "tsx src/scripts/environmentalComplianceV2SmokeTest.ts",
     "smoke:environmental-risk-assessment-v2": "tsx src/scripts/environmentalRiskAssessmentV2SmokeTest.ts",
     "smoke:environmental-escalation-engine-v2": "tsx src/scripts/environmentalEscalationEngineV2SmokeTest.ts",
+    "smoke:evidence-resolution-workflow": "tsx src/scripts/evidenceResolutionWorkflowSmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

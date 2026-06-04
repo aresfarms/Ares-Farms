@@ -120,6 +120,7 @@
     "smoke:recommendation-precision": "tsx src/scripts/recommendationPrecisionSmokeTest.ts",
     "smoke:environmental-compliance-v2": "tsx src/scripts/environmentalComplianceV2SmokeTest.ts",
     "smoke:environmental-risk-assessment-v2": "tsx src/scripts/environmentalRiskAssessmentV2SmokeTest.ts",
+    "smoke:environmental-escalation-engine-v2": "tsx src/scripts/environmentalEscalationEngineV2SmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

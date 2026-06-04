@@ -140,5 +140,8 @@ jobs:
       - name: Borrower Onboarding Core v2
         run: npm run smoke:borrower-onboarding-core-v2
 
+      - name: Readiness Assessment v2
+        run: npm run smoke:readiness-assessment-v2
+
       - name: Next.js production build
         run: npm run build

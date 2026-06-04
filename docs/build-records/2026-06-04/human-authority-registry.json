@@ -2,7 +2,7 @@
   "runtimeVersion": "human-authority-registry-runtime-v0.1.0",
   "specVersion": "module-45-human-authority-registry-spec-v1.0",
   "docRef": "docs/DOCTRINE_HUMAN_AUTHORITY_REGISTRY_V1.md",
-  "generatedAt": "2026-06-04T17:00:07.892Z",
+  "generatedAt": "2026-06-04T17:44:43.293Z",
   "reviewerRole": "Chief Governance Authority",
   "applicationId": null,
   "bindings": [
@@ -2469,6 +2469,20 @@
       "reason": "internal_support module — no clearable action required."
     },
     {
+      "moduleId": "governance-disclosure-audit-gate",
+      "intent": "internal_support",
+      "bindingIds": [],
+      "bindingCount": 0,
+      "bindingsActive": 0,
+      "bindingsRoleUnfilled": 0,
+      "bindingsDefinedOnly": 0,
+      "anyAiPermitted": false,
+      "anySelfClearAllowed": false,
+      "anyBelowQuorumQuorumBinding": false,
+      "status": "N/A",
+      "reason": "internal_support module — no clearable action required."
+    },
+    {
       "moduleId": "governance-human-authority-registry",
       "intent": "internal_support",
       "bindingIds": [
@@ -4742,14 +4756,14 @@
     "bindingsDefinedOnly": 41,
     "rolesDeclared": 12,
     "rolesFilled": 0,
-    "modulesAudited": 101,
+    "modulesAudited": 102,
     "modulesAlphaRequired": 29,
     "modulesIntentionallyHeld": 29,
-    "modulesInternalSupport": 43,
+    "modulesInternalSupport": 44,
     "modulesAuthorityPass": 0,
     "modulesAuthorityFail": 29,
     "modulesAuthorityWarn": 29,
-    "modulesAuthorityNA": 43,
+    "modulesAuthorityNA": 44,
     "coverageMissingCount": 0,
     "findingCount": 29,
     "crossSourceConflictCount": 1,

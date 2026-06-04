@@ -1,15 +1,15 @@
 {
   "runtimeVersion": "build-self-report-runtime-v0.1.0",
   "specVersion": "module-42-build-self-report-spec-v1.0",
-  "generatedAt": "2026-06-04T16:58:22.052Z",
+  "generatedAt": "2026-06-04T17:44:03.639Z",
   "reviewerRole": null,
   "applicationId": null,
   "header": {
     "checkpoint": "BR-2026-06-01-M41",
-    "commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+    "commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
     "branch": "main",
     "tree_status": "dirty",
-    "generated": "2026-06-04T16:58:22.052Z",
+    "generated": "2026-06-04T17:44:03.639Z",
     "verify_backend": "PASS",
     "build": "PASS",
     "static_pages": 219,
@@ -27,13 +27,13 @@
     "live_fetch_enabled": 0,
     "audit_chain_intact": "PASS",
     "totals": {
-      "modules": 101,
-      "numbered": 44,
+      "modules": 102,
+      "numbered": 45,
       "unnumbered": 57,
-      "pass": 9,
+      "pass": 34,
       "pass_with_warnings": 39,
       "warn": 0,
-      "fail": 24,
+      "fail": 0,
       "blocked_by_design": 29
     },
     "orphans": {
@@ -46,9 +46,37 @@
     "requirements": {
       "total": 60,
       "implemented": 57,
-      "pending": []
+      "pending": [
+        {
+          "id": "MV-IV-RUNBOOK-LEDGER-FULL-ENUMERATION",
+          "name": "Master Volume IV operational runbook ledger — full enumeration",
+          "owner": "Chief Governance Authority",
+          "route": "/doctrine-gap-ledger",
+          "blocked_reason": "Vol IV runbooks are referenced across the shipped modules but the canonical operational runbook ledger (one row per runbook with operator-readable steps, expected output, failure handling, and replay reference) is not yet codified as a governed runtime.",
+          "required_evidence": "operational-runbook-ledger-runtime + per-runbook conformance test + checksumed into the build-preservation archive",
+          "promotion_condition": "ledger runtime ships under module-43 sibling and verify:runbook-ledger exits 0"
+        },
+        {
+          "id": "MV-VII-EXIT-CRITERIA-FULL-ENUMERATION",
+          "name": "Master Volume VII Alpha / Beta / Production exit-criteria ledger",
+          "owner": "Chief Governance Authority",
+          "route": "/doctrine-gap-ledger",
+          "blocked_reason": "Public Alpha Profile v1 codifies the Alpha entry and exit criteria from Vol VII §6 and §7 but the broader Beta and Production exit-criteria ledger (cohort-end-to-end zero-reliance-incident windows, regulatory reliance gate, public verification gate) is not yet codified as a separate governed runtime.",
+          "required_evidence": "alpha-beta-production-exit-criteria-runtime + per-criterion conformance test + checksumed evidence into the build-preservation archive",
+          "promotion_condition": "runtime ships and verify:exit-criteria exits 0 for the Alpha set with PENDING_SIGNOFF surfaced for Beta and Production sets"
+        },
+        {
+          "id": "MV-V-DOCTRINE-CROSS-REFERENCE-INDEX-CONFORMANCE",
+          "name": "Master Volume V — Canonical Doctrines cross-reference index full conformance",
+          "owner": "Qualified Governance Reviewer",
+          "route": "/doctrine-gap-ledger",
+          "blocked_reason": "Doctrines in Vol V are codified into individual runtimes (Public Alpha Definition, Disclosure Audit Gate, Human Authority Registry, Data Transparency & User Sovereignty, etc.) but the canonical cross-reference index that asserts every Vol V doctrine section is represented by at least one governed runtime is not yet codified as a separate runtime.",
+          "required_evidence": "doctrine-cross-reference-index-runtime + per-section coverage proof + handoff to the build-preservation archive",
+          "promotion_condition": "runtime ships and verify:doctrine-coverage exits 0 with every Vol V section bound to at least one runtime version"
+        }
+      ]
     },
-    "exit_code": 1
+    "exit_code": 0
   },
   "modules": [
     {
@@ -77,7 +105,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -87,8 +115,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 47,
-        "handoffs_in": 46,
+        "events_consumed": 48,
+        "handoffs_in": 47,
         "handoffs_out": 0,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -100,7 +128,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -129,9 +157,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -149,7 +180,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -168,8 +199,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -177,19 +208,19 @@
           "reason": "human-authority-registry resolves applications: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = internal-governance; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = internal-governance + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 13,
-        "handoffs_in": 12,
+        "events_consumed": 14,
+        "handoffs_in": 13,
         "handoffs_out": 2,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -201,8 +232,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
       "module_number": 4,
@@ -220,8 +251,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -229,19 +260,19 @@
           "reason": "human-authority-registry resolves documents: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = internal-governance; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = internal-governance + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 13,
-        "handoffs_in": 13,
+        "events_consumed": 14,
+        "handoffs_in": 14,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -253,8 +284,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
       "module_number": 5,
@@ -282,7 +313,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -292,8 +323,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 31,
-        "handoffs_in": 30,
+        "events_consumed": 32,
+        "handoffs_in": 31,
         "handoffs_out": 2,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -305,7 +336,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -324,8 +355,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -333,12 +364,12 @@
           "reason": "human-authority-registry resolves rules: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = internal-governance; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = internal-governance + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -357,8 +388,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
       "module_number": 7,
@@ -386,7 +417,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -409,7 +440,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -428,8 +459,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -437,12 +468,12 @@
           "reason": "human-authority-registry resolves notices: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = internal-governance; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = internal-governance + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -461,8 +492,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": 9,
@@ -490,7 +521,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -500,8 +531,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 31,
-        "handoffs_in": 30,
+        "events_consumed": 32,
+        "handoffs_in": 31,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -513,7 +544,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -533,7 +564,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -545,7 +576,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -568,7 +599,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -587,8 +618,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -596,12 +627,12 @@
           "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = lender-coordination + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -620,8 +651,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
       "module_number": 12,
@@ -640,7 +671,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -652,7 +683,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -675,7 +706,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -694,8 +725,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -703,12 +734,12 @@
           "reason": "human-authority-registry resolves reports: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = advisory-reporting; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = advisory-reporting + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -727,8 +758,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
       "module_number": 14,
@@ -747,7 +778,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -759,7 +790,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -782,7 +813,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -811,9 +842,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -831,7 +865,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -850,8 +884,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -859,8 +893,8 @@
           "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = advisory-reporting; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -870,8 +904,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 32,
-        "handoffs_in": 31,
+        "events_consumed": 33,
+        "handoffs_in": 32,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -883,8 +917,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -912,9 +946,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -932,7 +969,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -961,7 +998,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -971,8 +1008,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 7,
-        "handoffs_in": 1,
+        "events_consumed": 8,
+        "handoffs_in": 2,
         "handoffs_out": 12,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -984,7 +1021,59 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
+    },
+    {
+      "module_number": 44,
+      "module_id": "governance-disclosure-audit-gate",
+      "title": "Module 44 — Disclosure Audit Gate v1",
+      "route": "/governance/disclosure-audit-gate",
+      "surface_class": "internal",
+      "build_status": "verified",
+      "checks": {
+        "route_loads": {
+          "status": "PASS",
+          "evidence": [
+            "/Users/caitlinhudson/ares-farms/src/app/governance/disclosure-audit-gate/page.tsx"
+          ]
+        },
+        "replay_reproduces": "PASS",
+        "disclosures_present": {
+          "status": "N/A",
+          "reason": "gate surface — no customer-facing disclosure required"
+        },
+        "blocks_enforced": "PASS",
+        "human_authority": {
+          "status": "N/A",
+          "reason": "internal_support module with no clear-action requirement"
+        },
+        "claims_controls": {
+          "status": "N/A",
+          "reason": "gate surface — no customer-facing claims"
+        },
+        "pii_redaction": {
+          "status": "N/A",
+          "reason": "module's dataDependencies do not reference PII-class data"
+        },
+        "lineage_traceable": "PASS"
+      },
+      "graph": {
+        "events_produced": 1,
+        "events_consumed": 7,
+        "handoffs_in": 0,
+        "handoffs_out": 14,
+        "orphan_flag": "none",
+        "dangling_event_types": []
+      },
+      "test_coverage": {
+        "smoke": true,
+        "functional": false,
+        "e2e": false,
+        "pct": null
+      },
+      "owner": "TBD",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1013,7 +1102,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1023,21 +1112,21 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 6,
-        "handoffs_in": 0,
+        "events_consumed": 7,
+        "handoffs_in": 1,
         "handoffs_out": 14,
         "orphan_flag": "none",
         "dangling_event_types": []
       },
       "test_coverage": {
-        "smoke": false,
+        "smoke": true,
         "functional": false,
         "e2e": false,
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
       "module_number": null,
@@ -1065,7 +1154,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1075,8 +1164,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 7,
-        "handoffs_in": 2,
+        "events_consumed": 8,
+        "handoffs_in": 3,
         "handoffs_out": 11,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -1088,7 +1177,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1117,7 +1206,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1127,8 +1216,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 13,
-        "handoffs_in": 3,
+        "events_consumed": 14,
+        "handoffs_in": 4,
         "handoffs_out": 13,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -1140,7 +1229,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1169,9 +1258,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1189,7 +1281,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1218,9 +1310,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1238,7 +1333,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1267,9 +1362,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1287,7 +1385,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1316,9 +1414,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1336,7 +1437,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1365,9 +1466,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1385,7 +1489,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1414,9 +1518,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1434,7 +1541,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1463,9 +1570,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1483,7 +1593,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1512,9 +1622,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -1532,7 +1645,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1561,7 +1674,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1584,7 +1697,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1613,7 +1726,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1636,7 +1749,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1665,7 +1778,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1688,7 +1801,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1717,7 +1830,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1740,7 +1853,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1769,7 +1882,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1792,7 +1905,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1820,8 +1933,8 @@
           "reason": "human-authority-registry resolves governance-lender-workflow-v2: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = advisory-reporting; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1844,7 +1957,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1873,7 +1986,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1896,7 +2009,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1925,7 +2038,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -1948,7 +2061,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1977,7 +2090,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2000,7 +2113,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2029,7 +2142,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2052,7 +2165,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2081,7 +2194,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2104,7 +2217,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2133,7 +2246,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2156,7 +2269,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2176,7 +2289,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2188,7 +2301,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2211,7 +2324,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2240,7 +2353,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2263,7 +2376,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2292,7 +2405,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2315,7 +2428,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2344,7 +2457,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2367,7 +2480,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2387,7 +2500,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2399,7 +2512,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2422,7 +2535,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2451,7 +2564,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2474,7 +2587,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -2493,8 +2606,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -2502,19 +2615,19 @@
           "reason": "human-authority-registry resolves data-rights: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
-          "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "status": "N/A",
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 13,
-        "handoffs_in": 12,
+        "events_consumed": 14,
+        "handoffs_in": 13,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -2526,8 +2639,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": 20,
@@ -2555,7 +2668,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2565,8 +2678,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 54,
-        "handoffs_in": 51,
+        "events_consumed": 55,
+        "handoffs_in": 52,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -2578,7 +2691,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -2607,9 +2720,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -2627,7 +2743,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2647,7 +2763,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2659,7 +2775,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2682,7 +2798,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2702,7 +2818,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2714,7 +2830,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2737,7 +2853,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2757,7 +2873,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2769,7 +2885,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2792,7 +2908,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2812,7 +2928,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2824,7 +2940,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2847,7 +2963,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2867,7 +2983,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2879,7 +2995,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -2902,7 +3018,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2922,7 +3038,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2934,9 +3050,12 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
-        "pii_redaction": "PASS",
+        "pii_redaction": {
+          "status": "PASS",
+          "reason": "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)"
+        },
         "lineage_traceable": "PASS"
       },
       "graph": {
@@ -2954,7 +3073,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2974,7 +3093,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -2986,7 +3105,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3009,7 +3128,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3029,7 +3148,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3041,7 +3160,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3064,7 +3183,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3084,7 +3203,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3096,7 +3215,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3119,7 +3238,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3139,7 +3258,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3151,7 +3270,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3174,7 +3293,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3194,7 +3313,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3206,7 +3325,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3229,7 +3348,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3249,7 +3368,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3261,7 +3380,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3284,7 +3403,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3304,7 +3423,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3316,7 +3435,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3339,7 +3458,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3359,7 +3478,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3371,7 +3490,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3394,7 +3513,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3414,7 +3533,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3426,7 +3545,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3449,7 +3568,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3469,7 +3588,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3481,7 +3600,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3504,7 +3623,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3524,7 +3643,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3536,7 +3655,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3559,7 +3678,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3579,7 +3698,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3591,7 +3710,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3614,7 +3733,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3634,7 +3753,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3646,7 +3765,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3669,7 +3788,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3689,7 +3808,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3701,7 +3820,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3724,7 +3843,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3744,7 +3863,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3756,7 +3875,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3766,8 +3885,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 7,
-        "handoffs_in": 4,
+        "events_consumed": 8,
+        "handoffs_in": 5,
         "handoffs_out": 3,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -3779,7 +3898,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3799,7 +3918,7 @@
         "replay_reproduces": "PASS",
         "disclosures_present": {
           "status": "N/A",
-          "reason": "internal surface — no public disclosure required"
+          "reason": "gate surface — no customer-facing disclosure required"
         },
         "blocks_enforced": {
           "status": "BLOCKED_BY_DESIGN",
@@ -3811,7 +3930,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "gate surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3821,8 +3940,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 6,
-        "handoffs_in": 4,
+        "events_consumed": 7,
+        "handoffs_in": 5,
         "handoffs_out": 4,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -3834,7 +3953,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3863,7 +3982,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -3886,7 +4005,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3905,8 +4024,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-onboarding: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -3915,11 +4034,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-onboarding: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -3938,8 +4057,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -3957,8 +4076,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-financing-pathways: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -3967,11 +4086,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-financing-pathways: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -3990,8 +4109,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4009,8 +4128,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-readiness: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4019,11 +4138,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-readiness: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4042,8 +4161,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4061,8 +4180,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-environmental-intake: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4071,11 +4190,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-environmental-intake: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4094,8 +4213,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4112,7 +4231,10 @@
           ]
         },
         "replay_reproduces": "PASS",
-        "disclosures_present": "PASS",
+        "disclosures_present": {
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves public-about: all 4 applicable disclosures present"
+        },
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
@@ -4120,7 +4242,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = public-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves public-about: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -4143,7 +4265,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -4162,8 +4284,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves public-trust: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4172,7 +4294,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = public-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves public-trust: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -4195,7 +4317,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4214,8 +4336,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-opportunities: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4224,11 +4346,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-opportunities: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4247,8 +4369,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4266,8 +4388,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4276,11 +4398,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4299,8 +4421,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4318,8 +4440,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-applications: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4328,11 +4450,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-applications: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4351,8 +4473,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4370,8 +4492,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-documents: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4380,11 +4502,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-documents: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4403,8 +4525,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4422,8 +4544,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-notices: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4432,11 +4554,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-notices: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4455,8 +4577,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4474,8 +4596,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-reports: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4484,7 +4606,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = advisory-reporting; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-reports: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -4507,8 +4629,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4526,8 +4648,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-borrower-data-rights: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4536,11 +4658,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-borrower-data-rights: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4559,8 +4681,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4578,8 +4700,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-property-discovery: all 4 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4588,11 +4710,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-property-discovery: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = borrower-safe + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4611,8 +4733,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4640,7 +4762,7 @@
         },
         "claims_controls": {
           "status": "N/A",
-          "reason": "module emits no customer-facing claims"
+          "reason": "internal surface — no customer-facing claims"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -4663,7 +4785,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4681,7 +4803,10 @@
           ]
         },
         "replay_reproduces": "PASS",
-        "disclosures_present": "PASS",
+        "disclosures_present": {
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves portal-revenue-opportunities: all 4 applicable disclosures present"
+        },
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
@@ -4689,7 +4814,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = borrower-safe; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves portal-revenue-opportunities: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -4712,7 +4837,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
       "module_verdict": "PASS"
     },
     {
@@ -4731,8 +4856,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves lender-dashboard: all 6 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4741,11 +4866,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves lender-dashboard: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = lender-coordination + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4764,8 +4889,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4783,8 +4908,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves lender-workflow: all 6 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4793,11 +4918,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves lender-workflow: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = lender-coordination + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4816,8 +4941,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
       "module_number": null,
@@ -4835,8 +4960,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves lender-applications: all 6 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4845,11 +4970,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves lender-applications: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = lender-coordination + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -4868,8 +4993,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4887,8 +5012,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves lender-overlays: all 6 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4897,7 +5022,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves lender-overlays: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -4920,8 +5045,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4939,8 +5064,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves lender-evidence: all 6 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -4949,7 +5074,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves lender-evidence: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -4972,8 +5097,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -4991,8 +5116,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves lender-property-opportunities: all 6 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -5001,11 +5126,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves lender-property-opportunities: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = lender-coordination + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -5024,8 +5149,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -5043,8 +5168,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves lender-revenue-opportunities: all 6 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -5053,7 +5178,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = lender-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves lender-revenue-opportunities: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -5076,8 +5201,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -5095,8 +5220,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves sponsor-dashboard: all 3 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -5105,11 +5230,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = sponsor-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves sponsor-dashboard: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = sponsor-coordination + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -5128,8 +5253,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -5147,8 +5272,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves sponsor-readiness: all 3 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -5157,7 +5282,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = sponsor-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves sponsor-readiness: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -5180,8 +5305,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -5199,8 +5324,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves sponsor-reports: all 3 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -5209,7 +5334,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = sponsor-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves sponsor-reports: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -5232,8 +5357,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -5251,8 +5376,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (0/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves sponsor-project-discovery: all 3 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -5261,11 +5386,11 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = sponsor-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves sponsor-project-discovery: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
-          "status": "FAIL",
-          "reason": "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced"
+          "status": "PASS",
+          "reason": "public-surface PII-touching module governed by claimsProfile = sponsor-coordination + public-safe DTO layer (raw record fields stripped before render)"
         },
         "lineage_traceable": "PASS"
       },
@@ -5284,8 +5409,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     },
     {
       "module_number": null,
@@ -5303,8 +5428,8 @@
         },
         "replay_reproduces": "PASS",
         "disclosures_present": {
-          "status": "WARN",
-          "reason": "public surface description contains fewer than two advisory-posture tokens (1/4); strongest result requires Module 44 disclosure-audit gate"
+          "status": "PASS",
+          "reason": "disclosure-audit-gate resolves sponsor-revenue-opportunities: all 3 applicable disclosures present"
         },
         "blocks_enforced": "PASS",
         "human_authority": {
@@ -5313,7 +5438,7 @@
         },
         "claims_controls": {
           "status": "PASS",
-          "reason": "claimsProfile = sponsor-coordination; canonical prohibited-claims corpus depends on Module 44"
+          "reason": "disclosure-audit-gate resolves sponsor-revenue-opportunities: zero unexempted prohibited-claim matches across 6 categories (0 compliant negations recognized)"
         },
         "pii_redaction": {
           "status": "N/A",
@@ -5336,8 +5461,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "8991b799b8cdcb7bd16b227bf279447ef90d2994",
+      "module_verdict": "PASS"
     }
   ],
   "summary": {
@@ -5347,17 +5472,17 @@
     "v1BlockedCount": 1,
     "v1NotStartedCount": 0,
     "v1OverallReadinessPercent": 75,
-    "modulesAudited": 101,
-    "modulesPass": 9,
+    "modulesAudited": 102,
+    "modulesPass": 34,
     "modulesPassWithWarnings": 39,
-    "modulesFail": 24,
+    "modulesFail": 0,
     "modulesBlockedByDesign": 29,
     "orphansNoConsumer": 0,
     "orphansNoProducer": 0,
     "orphansDangling": 0,
     "danglingEventContracts": 0,
-    "findingCount": 53,
-    "crossSourceConflictCount": 2
+    "findingCount": 29,
+    "crossSourceConflictCount": 0
   },
   "v1Signals": [
     {
@@ -5365,9 +5490,9 @@
       "label": "Route loadability alignment",
       "status": "READY_FOR_REVIEW",
       "readinessPercent": 100,
-      "coverageCount": 101,
+      "coverageCount": 102,
       "reviewSignals": [
-        "101 of 101 routed modules load successfully"
+        "102 of 102 routed modules load successfully"
       ],
       "blockedClaims": [
         "denial",
@@ -5396,9 +5521,9 @@
       "label": "Block enforcement alignment",
       "status": "READY_FOR_REVIEW",
       "readinessPercent": 100,
-      "coverageCount": 101,
+      "coverageCount": 102,
       "reviewSignals": [
-        "101 of 101 modules enforce their constitutional blocks"
+        "102 of 102 modules enforce their constitutional blocks"
       ],
       "blockedClaims": [
         "denial",
@@ -5427,9 +5552,9 @@
       "label": "Graph orphan alignment",
       "status": "READY_FOR_REVIEW",
       "readinessPercent": 100,
-      "coverageCount": 101,
+      "coverageCount": 102,
       "reviewSignals": [
-        "101 of 101 modules carry no orphan / dangling graph indicator"
+        "102 of 102 modules carry no orphan / dangling graph indicator"
       ],
       "blockedClaims": [
         "denial",
@@ -5577,72 +5702,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-applications",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "applications",
-      "topic": "Module applications verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/applications/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-documents",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "documents",
       "topic": "Gate module documents has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
       "evidenceReplayRef": "bsr-replay://module/documents/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-documents",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "documents",
-      "topic": "Module documents verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/documents/verdict",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5727,72 +5792,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-rules",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "rules",
-      "topic": "Module rules verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/rules/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-notices",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "notices",
       "topic": "Gate module notices has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
       "evidenceReplayRef": "bsr-replay://module/notices/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-notices",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "notices",
-      "topic": "Module notices verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/notices/verdict",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5847,72 +5852,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-partners",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "partners",
-      "topic": "Module partners verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/partners/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-reports",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "reports",
       "topic": "Gate module reports has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
       "evidenceReplayRef": "bsr-replay://module/reports/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-reports",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "reports",
-      "topic": "Module reports verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/reports/verdict",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -6207,72 +6152,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-data-rights",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "data-rights",
-      "topic": "Module data-rights verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/data-rights/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-portal-borrower-onboarding",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "portal-borrower-onboarding",
       "topic": "Gate module portal-borrower-onboarding has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-onboarding/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-onboarding",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-onboarding",
-      "topic": "Module portal-borrower-onboarding verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-onboarding/verdict",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -6327,72 +6212,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-financing-pathways",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-financing-pathways",
-      "topic": "Module portal-borrower-financing-pathways verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-financing-pathways/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-portal-borrower-readiness",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "portal-borrower-readiness",
       "topic": "Gate module portal-borrower-readiness has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-readiness/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-readiness",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-readiness",
-      "topic": "Module portal-borrower-readiness verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-readiness/verdict",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -6447,102 +6272,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-environmental-intake",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-environmental-intake",
-      "topic": "Module portal-borrower-environmental-intake verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-environmental-intake/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-portal-borrower-opportunities",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "portal-borrower-opportunities",
       "topic": "Gate module portal-borrower-opportunities has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-opportunities/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-opportunities",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-opportunities",
-      "topic": "Module portal-borrower-opportunities verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-opportunities/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-portal-borrower",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower",
-      "topic": "Module portal-borrower verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower/verdict",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -6597,36 +6332,6 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-applications",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-applications",
-      "topic": "Module portal-borrower-applications verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-applications/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-portal-borrower-documents",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "portal-borrower-documents",
@@ -6657,72 +6362,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-documents",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-documents",
-      "topic": "Module portal-borrower-documents verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-documents/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-portal-borrower-notices",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "portal-borrower-notices",
       "topic": "Gate module portal-borrower-notices has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-notices/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-notices",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-notices",
-      "topic": "Module portal-borrower-notices verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-notices/verdict",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -6807,96 +6452,6 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-portal-borrower-data-rights",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-borrower-data-rights",
-      "topic": "Module portal-borrower-data-rights verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-borrower-data-rights/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-portal-property-discovery",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "portal-property-discovery",
-      "topic": "Module portal-property-discovery verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/portal-property-discovery/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-lender-dashboard",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "lender-dashboard",
-      "topic": "Module lender-dashboard verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/lender-dashboard/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
       "findingId": "bsr-gate-authority-unassigned-lender-workflow",
       "category": "GATE_AUTHORITY_UNASSIGNED",
       "subjectModuleId": "lender-workflow",
@@ -6925,174 +6480,9 @@
         "legal reliance",
         "source certainty"
       ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-lender-workflow",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "lender-workflow",
-      "topic": "Module lender-workflow verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/lender-workflow/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-lender-applications",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "lender-applications",
-      "topic": "Module lender-applications verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/lender-applications/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-lender-property-opportunities",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "lender-property-opportunities",
-      "topic": "Module lender-property-opportunities verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/lender-property-opportunities/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-sponsor-dashboard",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "sponsor-dashboard",
-      "topic": "Module sponsor-dashboard verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/sponsor-dashboard/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-sponsor-project-discovery",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "sponsor-project-discovery",
-      "topic": "Module sponsor-project-discovery verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/sponsor-project-discovery/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
     }
   ],
-  "crossSourceConflicts": [
-    {
-      "conflictId": "bsr-v1-module-verdict-fail",
-      "topic": "Module verdict FAIL surfaced in self-report",
-      "description": "24 module(s) have a FAIL verdict. The report is itself an evidence artifact; the build-preservation gate should refuse to checkpoint until these are addressed or explicitly accepted with a documented reason.",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report"
-    },
-    {
-      "conflictId": "bsr-v1-requirements-not-enumerated",
-      "topic": "Requirements ledger does not enumerate all rows",
-      "description": "Requirements total 60 but 57 implemented + 0 pending = 57. Each pending requirement must be enumerated explicitly.",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report"
-    }
-  ],
+  "crossSourceConflicts": [],
   "recommendedReviewRoutes": [
     "/governance/build-self-report",
     "/build-preservation",

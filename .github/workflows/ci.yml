@@ -131,5 +131,8 @@ jobs:
       - name: Certification Engine v2
         run: npm run smoke:certification-engine-v2
 
+      - name: Registry Framework v2
+        run: npm run smoke:registry-framework-v2
+
       - name: Next.js production build
         run: npm run build

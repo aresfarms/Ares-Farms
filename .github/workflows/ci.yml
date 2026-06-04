@@ -164,5 +164,8 @@ jobs:
       - name: Document Evidence Reconciliation v1
         run: npm run smoke:document-evidence-reconciliation
 
+      - name: Data Transparency Posture v1
+        run: npm run smoke:data-transparency-posture
+
       - name: Next.js production build
         run: npm run build

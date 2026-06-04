@@ -1,15 +1,15 @@
 {
   "runtimeVersion": "build-self-report-runtime-v0.1.0",
   "specVersion": "module-42-build-self-report-spec-v1.0",
-  "generatedAt": "2026-06-04T15:51:11.812Z",
+  "generatedAt": "2026-06-04T16:58:22.052Z",
   "reviewerRole": null,
   "applicationId": null,
   "header": {
     "checkpoint": "BR-2026-06-01-M41",
-    "commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+    "commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
     "branch": "main",
     "tree_status": "dirty",
-    "generated": "2026-06-04T15:51:11.812Z",
+    "generated": "2026-06-04T16:58:22.052Z",
     "verify_backend": "PASS",
     "build": "PASS",
     "static_pages": 219,
@@ -27,14 +27,14 @@
     "live_fetch_enabled": 0,
     "audit_chain_intact": "PASS",
     "totals": {
-      "modules": 99,
-      "numbered": 43,
-      "unnumbered": 56,
+      "modules": 101,
+      "numbered": 44,
+      "unnumbered": 57,
       "pass": 9,
       "pass_with_warnings": 39,
       "warn": 0,
-      "fail": 51,
-      "blocked_by_design": 0
+      "fail": 24,
+      "blocked_by_design": 29
     },
     "orphans": {
       "no_consumer": [],
@@ -72,8 +72,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -87,8 +87,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 45,
-        "handoffs_in": 44,
+        "events_consumed": 47,
+        "handoffs_in": 46,
         "handoffs_out": 0,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -100,7 +100,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -124,8 +124,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves operator-queue: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -149,7 +149,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -173,8 +173,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves applications: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -188,8 +188,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 11,
-        "handoffs_in": 10,
+        "events_consumed": 13,
+        "handoffs_in": 12,
         "handoffs_out": 2,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -201,7 +201,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -225,8 +225,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves documents: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -240,8 +240,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 11,
-        "handoffs_in": 11,
+        "events_consumed": 13,
+        "handoffs_in": 13,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -253,7 +253,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -277,8 +277,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves reviews: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -292,8 +292,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 29,
-        "handoffs_in": 28,
+        "events_consumed": 31,
+        "handoffs_in": 30,
         "handoffs_out": 2,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -305,7 +305,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -329,8 +329,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves rules: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -357,7 +357,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -381,8 +381,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves decisions: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -409,8 +409,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "PASS_WITH_WARNINGS"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 8,
@@ -433,8 +433,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves notices: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -461,7 +461,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -485,8 +485,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves audit-replay: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -500,8 +500,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 29,
-        "handoffs_in": 28,
+        "events_consumed": 31,
+        "handoffs_in": 30,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -513,7 +513,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -540,8 +540,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves connectors: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -568,8 +568,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 11,
@@ -593,7 +593,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -620,7 +620,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -647,8 +647,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves billing: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -675,8 +675,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 13,
@@ -699,8 +699,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves reports: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -727,7 +727,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -754,8 +754,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves promotion: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -769,8 +769,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 20,
-        "handoffs_in": 8,
+        "events_consumed": 21,
+        "handoffs_in": 9,
         "handoffs_out": 0,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -782,8 +782,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 15,
@@ -807,7 +807,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -831,7 +831,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -856,7 +856,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -870,8 +870,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 30,
-        "handoffs_in": 29,
+        "events_consumed": 32,
+        "handoffs_in": 31,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -883,7 +883,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -908,7 +908,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -919,7 +919,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 10,
+        "events_consumed": 11,
         "handoffs_in": 1,
         "handoffs_out": 13,
         "orphan_flag": "none",
@@ -932,7 +932,111 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "PASS"
+    },
+    {
+      "module_number": null,
+      "module_id": "governance-public-alpha-profile",
+      "title": "Public Alpha Profile v1",
+      "route": "/governance/public-alpha-profile",
+      "surface_class": "internal",
+      "build_status": "verified",
+      "checks": {
+        "route_loads": {
+          "status": "PASS",
+          "evidence": [
+            "/Users/caitlinhudson/ares-farms/src/app/governance/public-alpha-profile/page.tsx"
+          ]
+        },
+        "replay_reproduces": "PASS",
+        "disclosures_present": {
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
+        },
+        "blocks_enforced": "PASS",
+        "human_authority": {
+          "status": "N/A",
+          "reason": "internal_support module with no clear-action requirement"
+        },
+        "claims_controls": {
+          "status": "N/A",
+          "reason": "module emits no customer-facing claims"
+        },
+        "pii_redaction": {
+          "status": "N/A",
+          "reason": "module's dataDependencies do not reference PII-class data"
+        },
+        "lineage_traceable": "PASS"
+      },
+      "graph": {
+        "events_produced": 1,
+        "events_consumed": 7,
+        "handoffs_in": 1,
+        "handoffs_out": 12,
+        "orphan_flag": "none",
+        "dangling_event_types": []
+      },
+      "test_coverage": {
+        "smoke": true,
+        "functional": false,
+        "e2e": false,
+        "pct": null
+      },
+      "owner": "TBD",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "PASS_WITH_WARNINGS"
+    },
+    {
+      "module_number": 45,
+      "module_id": "governance-human-authority-registry",
+      "title": "Module 45 — Human Authority Registry v1",
+      "route": "/governance/human-authority-registry",
+      "surface_class": "internal",
+      "build_status": "verified",
+      "checks": {
+        "route_loads": {
+          "status": "PASS",
+          "evidence": [
+            "/Users/caitlinhudson/ares-farms/src/app/governance/human-authority-registry/page.tsx"
+          ]
+        },
+        "replay_reproduces": "PASS",
+        "disclosures_present": {
+          "status": "N/A",
+          "reason": "internal surface — no public disclosure required"
+        },
+        "blocks_enforced": "PASS",
+        "human_authority": {
+          "status": "N/A",
+          "reason": "internal_support module with no clear-action requirement"
+        },
+        "claims_controls": {
+          "status": "N/A",
+          "reason": "module emits no customer-facing claims"
+        },
+        "pii_redaction": {
+          "status": "N/A",
+          "reason": "module's dataDependencies do not reference PII-class data"
+        },
+        "lineage_traceable": "PASS"
+      },
+      "graph": {
+        "events_produced": 1,
+        "events_consumed": 6,
+        "handoffs_in": 0,
+        "handoffs_out": 14,
+        "orphan_flag": "none",
+        "dangling_event_types": []
+      },
+      "test_coverage": {
+        "smoke": false,
+        "functional": false,
+        "e2e": false,
+        "pct": null
+      },
+      "owner": "TBD",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -957,7 +1061,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -971,8 +1075,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 5,
-        "handoffs_in": 0,
+        "events_consumed": 7,
+        "handoffs_in": 2,
         "handoffs_out": 11,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -984,7 +1088,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1009,7 +1113,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1023,8 +1127,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 11,
-        "handoffs_in": 1,
+        "events_consumed": 13,
+        "handoffs_in": 3,
         "handoffs_out": 13,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -1036,7 +1140,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1061,7 +1165,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1072,7 +1176,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 15,
+        "events_consumed": 16,
         "handoffs_in": 1,
         "handoffs_out": 15,
         "orphan_flag": "none",
@@ -1085,7 +1189,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1110,7 +1214,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1121,7 +1225,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 15,
+        "events_consumed": 16,
         "handoffs_in": 2,
         "handoffs_out": 14,
         "orphan_flag": "none",
@@ -1134,7 +1238,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1159,7 +1263,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1170,7 +1274,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 15,
+        "events_consumed": 16,
         "handoffs_in": 2,
         "handoffs_out": 20,
         "orphan_flag": "none",
@@ -1183,7 +1287,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1208,7 +1312,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1219,7 +1323,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 14,
+        "events_consumed": 15,
         "handoffs_in": 3,
         "handoffs_out": 19,
         "orphan_flag": "none",
@@ -1232,7 +1336,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1257,7 +1361,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1268,7 +1372,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 14,
+        "events_consumed": 15,
         "handoffs_in": 4,
         "handoffs_out": 18,
         "orphan_flag": "none",
@@ -1281,7 +1385,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1306,7 +1410,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1317,7 +1421,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 16,
+        "events_consumed": 17,
         "handoffs_in": 6,
         "handoffs_out": 17,
         "orphan_flag": "none",
@@ -1330,7 +1434,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1354,8 +1458,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-readiness-assessment-v2: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -1366,7 +1470,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 17,
+        "events_consumed": 18,
         "handoffs_in": 8,
         "handoffs_out": 18,
         "orphan_flag": "none",
@@ -1379,7 +1483,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1403,8 +1507,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-borrower-onboarding-core-v2: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -1415,7 +1519,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 17,
+        "events_consumed": 18,
         "handoffs_in": 9,
         "handoffs_out": 18,
         "orphan_flag": "none",
@@ -1428,7 +1532,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1453,7 +1557,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1480,7 +1584,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1505,7 +1609,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1532,7 +1636,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1557,7 +1661,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1584,7 +1688,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1609,7 +1713,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1636,7 +1740,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1661,7 +1765,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -1688,7 +1792,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1712,8 +1816,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-lender-workflow-v2: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -1740,7 +1844,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1764,8 +1868,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-opportunity-discovery-v2: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -1779,7 +1883,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 25,
+        "events_consumed": 26,
         "handoffs_in": 13,
         "handoffs_out": 18,
         "orphan_flag": "none",
@@ -1792,7 +1896,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1816,8 +1920,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-financing-pathway-engine-v2: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -1831,7 +1935,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 25,
+        "events_consumed": 26,
         "handoffs_in": 14,
         "handoffs_out": 17,
         "orphan_flag": "none",
@@ -1844,7 +1948,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1868,8 +1972,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-revenue-intelligence-v2: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -1883,7 +1987,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 25,
+        "events_consumed": 26,
         "handoffs_in": 15,
         "handoffs_out": 16,
         "orphan_flag": "none",
@@ -1896,7 +2000,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1920,8 +2024,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-customer-type-registry: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -1935,7 +2039,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 25,
+        "events_consumed": 26,
         "handoffs_in": 16,
         "handoffs_out": 15,
         "orphan_flag": "none",
@@ -1948,7 +2052,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1972,8 +2076,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves governance-capital-graph: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "N/A",
@@ -1987,7 +2091,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 28,
+        "events_consumed": 29,
         "handoffs_in": 17,
         "handoffs_out": 15,
         "orphan_flag": "none",
@@ -2000,7 +2104,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2025,7 +2129,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -2052,7 +2156,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2079,8 +2183,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves governance-connector-certification: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2107,8 +2211,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": null,
@@ -2132,7 +2236,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -2159,7 +2263,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2184,7 +2288,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -2211,7 +2315,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2236,7 +2340,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -2263,7 +2367,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2290,8 +2394,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves source-ingestion: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2318,8 +2422,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 18,
@@ -2343,7 +2447,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -2370,7 +2474,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -2394,8 +2498,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves data-rights: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -2409,8 +2513,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 11,
-        "handoffs_in": 10,
+        "events_consumed": 13,
+        "handoffs_in": 12,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -2422,7 +2526,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -2447,7 +2551,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -2461,8 +2565,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 52,
-        "handoffs_in": 49,
+        "events_consumed": 54,
+        "handoffs_in": 51,
         "handoffs_out": 1,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -2474,7 +2578,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -2499,7 +2603,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -2510,7 +2614,7 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 11,
+        "events_consumed": 12,
         "handoffs_in": 7,
         "handoffs_out": 1,
         "orphan_flag": "none",
@@ -2523,7 +2627,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2550,8 +2654,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves live-scraper-activation: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2578,8 +2682,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 23,
@@ -2605,8 +2709,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves source-legal-review: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2633,8 +2737,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 24,
@@ -2660,8 +2764,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves source-promotion-packets: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2688,8 +2792,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 25,
@@ -2715,8 +2819,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves source-production-readiness: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2743,8 +2847,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 26,
@@ -2770,8 +2874,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves controlled-promotion-activation: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2798,8 +2902,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 27,
@@ -2825,8 +2929,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-portal-readiness: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2850,8 +2954,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 28,
@@ -2877,8 +2981,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-launch-evidence: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2905,8 +3009,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 29,
@@ -2932,8 +3036,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves deployment-environment-readiness: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -2960,8 +3064,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 30,
@@ -2987,8 +3091,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves release-candidate-freeze: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3015,8 +3119,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 31,
@@ -3042,8 +3146,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-cutover-hold: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3070,8 +3174,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 32,
@@ -3097,8 +3201,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-release-board: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3125,8 +3229,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 33,
@@ -3152,8 +3256,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-operations-monitoring: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3180,8 +3284,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 34,
@@ -3207,8 +3311,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-incident-response-readiness: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3235,8 +3339,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 35,
@@ -3262,8 +3366,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-support-communications-readiness: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3290,8 +3394,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 36,
@@ -3317,8 +3421,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-final-authority: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3345,8 +3449,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 37,
@@ -3372,8 +3476,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-activation-ceremony: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3400,8 +3504,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 38,
@@ -3427,8 +3531,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-post-activation-verification: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3455,8 +3559,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 39,
@@ -3482,8 +3586,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-reliance-verification: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3510,8 +3614,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 40,
@@ -3537,8 +3641,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-regulatory-examination: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3565,8 +3669,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 41,
@@ -3592,8 +3696,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves production-regulatory-response: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3620,8 +3724,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 42,
@@ -3647,8 +3751,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves build-preservation: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3662,8 +3766,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 5,
-        "handoffs_in": 2,
+        "events_consumed": 7,
+        "handoffs_in": 4,
         "handoffs_out": 3,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -3675,8 +3779,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": 43,
@@ -3702,8 +3806,8 @@
           "reason": "module's primary function is an intentionally-held block and the block is asserted on the manifest"
         },
         "human_authority": {
-          "status": "FAIL",
-          "reason": "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves doctrine-gap-ledger: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3717,8 +3821,8 @@
       },
       "graph": {
         "events_produced": 1,
-        "events_consumed": 4,
-        "handoffs_in": 2,
+        "events_consumed": 6,
+        "handoffs_in": 4,
         "handoffs_out": 4,
         "orphan_flag": "none",
         "dangling_event_types": []
@@ -3730,8 +3834,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "FAIL"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": null,
@@ -3754,8 +3858,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "WARN",
+          "reason": "human-authority-registry resolves operator-demo: intentionally_held module has 1 binding(s) with unfilled roles — acceptable for held modules pending production sign-off."
         },
         "claims_controls": {
           "status": "N/A",
@@ -3782,8 +3886,8 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
-      "module_verdict": "PASS"
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
+      "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
       "module_number": null,
@@ -3806,8 +3910,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-onboarding: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -3834,7 +3938,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -3858,8 +3962,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-financing-pathways: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -3886,7 +3990,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -3910,8 +4014,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-readiness: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -3938,7 +4042,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -3962,8 +4066,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-environmental-intake: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -3977,7 +4081,7 @@
       },
       "graph": {
         "events_produced": 2,
-        "events_consumed": 11,
+        "events_consumed": 12,
         "handoffs_in": 7,
         "handoffs_out": 5,
         "orphan_flag": "none",
@@ -3990,7 +4094,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4012,7 +4116,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4039,7 +4143,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -4064,7 +4168,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4091,7 +4195,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4115,8 +4219,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-opportunities: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -4143,7 +4247,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4168,7 +4272,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4195,7 +4299,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4219,8 +4323,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-applications: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -4247,7 +4351,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4271,8 +4375,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-documents: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -4299,7 +4403,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4323,8 +4427,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-notices: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -4351,7 +4455,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4375,8 +4479,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-reports: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -4403,7 +4507,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4427,8 +4531,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves portal-borrower-data-rights: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -4455,7 +4559,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4480,7 +4584,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4507,7 +4611,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4532,7 +4636,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "N/A",
@@ -4559,7 +4663,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4581,7 +4685,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4608,7 +4712,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS"
     },
     {
@@ -4633,7 +4737,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4660,7 +4764,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4684,8 +4788,8 @@
         },
         "blocks_enforced": "PASS",
         "human_authority": {
-          "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "status": "FAIL",
+          "reason": "human-authority-registry resolves lender-workflow: alpha_required module has 1 binding(s) with unfilled roles — Alpha entry blocked until filled."
         },
         "claims_controls": {
           "status": "PASS",
@@ -4712,7 +4816,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4737,7 +4841,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4764,7 +4868,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4789,7 +4893,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4816,7 +4920,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4841,7 +4945,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4868,7 +4972,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4893,7 +4997,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4920,7 +5024,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -4945,7 +5049,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -4972,7 +5076,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4997,7 +5101,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -5024,7 +5128,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -5049,7 +5153,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -5076,7 +5180,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -5101,7 +5205,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -5128,7 +5232,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -5153,7 +5257,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -5180,7 +5284,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "FAIL"
     },
     {
@@ -5205,7 +5309,7 @@
         "blocks_enforced": "PASS",
         "human_authority": {
           "status": "N/A",
-          "reason": "non-gate module with no clear-action requirement"
+          "reason": "internal_support module with no clear-action requirement"
         },
         "claims_controls": {
           "status": "PASS",
@@ -5232,7 +5336,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d7450e04f115b3e573978ffa17b30a8589116d2b",
+      "last_verified_commit": "7f025aad8a8dcc9861f2cda5568cc07f46fd4dc6",
       "module_verdict": "PASS_WITH_WARNINGS"
     }
   ],
@@ -5243,16 +5347,16 @@
     "v1BlockedCount": 1,
     "v1NotStartedCount": 0,
     "v1OverallReadinessPercent": 75,
-    "modulesAudited": 99,
+    "modulesAudited": 101,
     "modulesPass": 9,
     "modulesPassWithWarnings": 39,
-    "modulesFail": 51,
-    "modulesBlockedByDesign": 0,
+    "modulesFail": 24,
+    "modulesBlockedByDesign": 29,
     "orphansNoConsumer": 0,
     "orphansNoProducer": 0,
     "orphansDangling": 0,
     "danglingEventContracts": 0,
-    "findingCount": 78,
+    "findingCount": 53,
     "crossSourceConflictCount": 2
   },
   "v1Signals": [
@@ -5261,9 +5365,9 @@
       "label": "Route loadability alignment",
       "status": "READY_FOR_REVIEW",
       "readinessPercent": 100,
-      "coverageCount": 99,
+      "coverageCount": 101,
       "reviewSignals": [
-        "99 of 99 routed modules load successfully"
+        "101 of 101 routed modules load successfully"
       ],
       "blockedClaims": [
         "denial",
@@ -5292,9 +5396,9 @@
       "label": "Block enforcement alignment",
       "status": "READY_FOR_REVIEW",
       "readinessPercent": 100,
-      "coverageCount": 99,
+      "coverageCount": 101,
       "reviewSignals": [
-        "99 of 99 modules enforce their constitutional blocks"
+        "101 of 101 modules enforce their constitutional blocks"
       ],
       "blockedClaims": [
         "denial",
@@ -5323,9 +5427,9 @@
       "label": "Graph orphan alignment",
       "status": "READY_FOR_REVIEW",
       "readinessPercent": 100,
-      "coverageCount": 99,
+      "coverageCount": 101,
       "reviewSignals": [
-        "99 of 99 modules carry no orphan / dangling graph indicator"
+        "101 of 101 modules carry no orphan / dangling graph indicator"
       ],
       "blockedClaims": [
         "denial",
@@ -5356,7 +5460,7 @@
       "readinessPercent": 0,
       "coverageCount": 0,
       "reviewSignals": [
-        "0 of 27 gate modules carry an assigned human authority (Module 45 dependency)"
+        "0 of 58 gate modules carry an assigned human authority (Module 45 dependency)"
       ],
       "blockedClaims": [
         "denial",
@@ -5383,12 +5487,132 @@
   ],
   "findings": [
     {
+      "findingId": "bsr-gate-authority-unassigned-governance",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "governance",
+      "topic": "Gate module governance has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/governance/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-operator-queue",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "operator-queue",
+      "topic": "Gate module operator-queue has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/operator-queue/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-applications",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "applications",
+      "topic": "Gate module applications has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/applications/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
       "findingId": "bsr-module-verdict-fail-applications",
       "category": "MODULE_VERDICT_FAIL",
       "subjectModuleId": "applications",
       "topic": "Module applications verdict = FAIL",
       "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
       "evidenceReplayRef": "bsr-replay://module/applications/verdict",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-documents",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "documents",
+      "topic": "Gate module documents has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/documents/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5443,12 +5667,102 @@
       ]
     },
     {
+      "findingId": "bsr-gate-authority-unassigned-reviews",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "reviews",
+      "topic": "Gate module reviews has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/reviews/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-rules",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "rules",
+      "topic": "Gate module rules has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/rules/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
       "findingId": "bsr-module-verdict-fail-rules",
       "category": "MODULE_VERDICT_FAIL",
       "subjectModuleId": "rules",
       "topic": "Module rules verdict = FAIL",
       "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
       "evidenceReplayRef": "bsr-replay://module/rules/verdict",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-notices",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "notices",
+      "topic": "Gate module notices has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/notices/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5503,42 +5817,12 @@
       ]
     },
     {
-      "findingId": "bsr-gate-authority-unassigned-connectors",
+      "findingId": "bsr-gate-authority-unassigned-audit-replay",
       "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "connectors",
-      "topic": "Gate module connectors has no assigned human authority",
+      "subjectModuleId": "audit-replay",
+      "topic": "Gate module audit-replay has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/connectors/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-connectors",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "connectors",
-      "topic": "Module connectors verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/connectors/verdict",
+      "evidenceReplayRef": "bsr-replay://module/audit-replay/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5593,42 +5877,12 @@
       ]
     },
     {
-      "findingId": "bsr-gate-authority-unassigned-billing",
+      "findingId": "bsr-gate-authority-unassigned-reports",
       "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "billing",
-      "topic": "Gate module billing has no assigned human authority",
+      "subjectModuleId": "reports",
+      "topic": "Gate module reports has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/billing/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-billing",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "billing",
-      "topic": "Module billing verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/billing/verdict",
+      "evidenceReplayRef": "bsr-replay://module/reports/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5683,12 +5937,12 @@
       ]
     },
     {
-      "findingId": "bsr-gate-authority-unassigned-promotion",
+      "findingId": "bsr-gate-authority-unassigned-governance-readiness-assessment-v2",
       "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "promotion",
-      "topic": "Gate module promotion has no assigned human authority",
+      "subjectModuleId": "governance-readiness-assessment-v2",
+      "topic": "Gate module governance-readiness-assessment-v2 has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/promotion/human-authority",
+      "evidenceReplayRef": "bsr-replay://module/governance-readiness-assessment-v2/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5713,42 +5967,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-promotion",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "promotion",
-      "topic": "Module promotion verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/promotion/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-governance-connector-certification",
+      "findingId": "bsr-gate-authority-unassigned-governance-borrower-onboarding-core-v2",
       "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "governance-connector-certification",
-      "topic": "Gate module governance-connector-certification has no assigned human authority",
+      "subjectModuleId": "governance-borrower-onboarding-core-v2",
+      "topic": "Gate module governance-borrower-onboarding-core-v2 has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/governance-connector-certification/human-authority",
+      "evidenceReplayRef": "bsr-replay://module/governance-borrower-onboarding-core-v2/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5773,42 +5997,12 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-governance-connector-certification",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "governance-connector-certification",
-      "topic": "Module governance-connector-certification verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/governance-connector-certification/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-source-ingestion",
+      "findingId": "bsr-gate-authority-unassigned-governance-lender-workflow-v2",
       "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "source-ingestion",
-      "topic": "Gate module source-ingestion has no assigned human authority",
+      "subjectModuleId": "governance-lender-workflow-v2",
+      "topic": "Gate module governance-lender-workflow-v2 has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/source-ingestion/human-authority",
+      "evidenceReplayRef": "bsr-replay://module/governance-lender-workflow-v2/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5833,12 +6027,162 @@
       ]
     },
     {
-      "findingId": "bsr-module-verdict-fail-source-ingestion",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "source-ingestion",
-      "topic": "Module source-ingestion verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/source-ingestion/verdict",
+      "findingId": "bsr-gate-authority-unassigned-governance-opportunity-discovery-v2",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "governance-opportunity-discovery-v2",
+      "topic": "Gate module governance-opportunity-discovery-v2 has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/governance-opportunity-discovery-v2/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-governance-financing-pathway-engine-v2",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "governance-financing-pathway-engine-v2",
+      "topic": "Gate module governance-financing-pathway-engine-v2 has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/governance-financing-pathway-engine-v2/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-governance-revenue-intelligence-v2",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "governance-revenue-intelligence-v2",
+      "topic": "Gate module governance-revenue-intelligence-v2 has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/governance-revenue-intelligence-v2/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-governance-customer-type-registry",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "governance-customer-type-registry",
+      "topic": "Gate module governance-customer-type-registry has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/governance-customer-type-registry/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-governance-capital-graph",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "governance-capital-graph",
+      "topic": "Gate module governance-capital-graph has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/governance-capital-graph/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-data-rights",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "data-rights",
+      "topic": "Gate module data-rights has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/data-rights/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -5893,1302 +6237,12 @@
       ]
     },
     {
-      "findingId": "bsr-gate-authority-unassigned-live-scraper-activation",
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-onboarding",
       "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "live-scraper-activation",
-      "topic": "Gate module live-scraper-activation has no assigned human authority",
+      "subjectModuleId": "portal-borrower-onboarding",
+      "topic": "Gate module portal-borrower-onboarding has no assigned human authority",
       "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/live-scraper-activation/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-live-scraper-activation",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "live-scraper-activation",
-      "topic": "Module live-scraper-activation verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/live-scraper-activation/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-source-legal-review",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "source-legal-review",
-      "topic": "Gate module source-legal-review has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/source-legal-review/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-source-legal-review",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "source-legal-review",
-      "topic": "Module source-legal-review verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/source-legal-review/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-source-promotion-packets",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "source-promotion-packets",
-      "topic": "Gate module source-promotion-packets has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/source-promotion-packets/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-source-promotion-packets",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "source-promotion-packets",
-      "topic": "Module source-promotion-packets verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/source-promotion-packets/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-source-production-readiness",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "source-production-readiness",
-      "topic": "Gate module source-production-readiness has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/source-production-readiness/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-source-production-readiness",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "source-production-readiness",
-      "topic": "Module source-production-readiness verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/source-production-readiness/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-controlled-promotion-activation",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "controlled-promotion-activation",
-      "topic": "Gate module controlled-promotion-activation has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/controlled-promotion-activation/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-controlled-promotion-activation",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "controlled-promotion-activation",
-      "topic": "Module controlled-promotion-activation verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/controlled-promotion-activation/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-portal-readiness",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-portal-readiness",
-      "topic": "Gate module production-portal-readiness has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-portal-readiness/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-portal-readiness",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-portal-readiness",
-      "topic": "Module production-portal-readiness verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-portal-readiness/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-launch-evidence",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-launch-evidence",
-      "topic": "Gate module production-launch-evidence has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-launch-evidence/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-launch-evidence",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-launch-evidence",
-      "topic": "Module production-launch-evidence verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-launch-evidence/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-deployment-environment-readiness",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "deployment-environment-readiness",
-      "topic": "Gate module deployment-environment-readiness has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/deployment-environment-readiness/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-deployment-environment-readiness",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "deployment-environment-readiness",
-      "topic": "Module deployment-environment-readiness verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/deployment-environment-readiness/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-release-candidate-freeze",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "release-candidate-freeze",
-      "topic": "Gate module release-candidate-freeze has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/release-candidate-freeze/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-release-candidate-freeze",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "release-candidate-freeze",
-      "topic": "Module release-candidate-freeze verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/release-candidate-freeze/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-cutover-hold",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-cutover-hold",
-      "topic": "Gate module production-cutover-hold has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-cutover-hold/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-cutover-hold",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-cutover-hold",
-      "topic": "Module production-cutover-hold verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-cutover-hold/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-release-board",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-release-board",
-      "topic": "Gate module production-release-board has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-release-board/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-release-board",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-release-board",
-      "topic": "Module production-release-board verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-release-board/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-operations-monitoring",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-operations-monitoring",
-      "topic": "Gate module production-operations-monitoring has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-operations-monitoring/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-operations-monitoring",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-operations-monitoring",
-      "topic": "Module production-operations-monitoring verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-operations-monitoring/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-incident-response-readiness",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-incident-response-readiness",
-      "topic": "Gate module production-incident-response-readiness has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-incident-response-readiness/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-incident-response-readiness",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-incident-response-readiness",
-      "topic": "Module production-incident-response-readiness verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-incident-response-readiness/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-support-communications-readiness",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-support-communications-readiness",
-      "topic": "Gate module production-support-communications-readiness has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-support-communications-readiness/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-support-communications-readiness",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-support-communications-readiness",
-      "topic": "Module production-support-communications-readiness verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-support-communications-readiness/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-final-authority",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-final-authority",
-      "topic": "Gate module production-final-authority has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-final-authority/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-final-authority",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-final-authority",
-      "topic": "Module production-final-authority verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-final-authority/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-activation-ceremony",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-activation-ceremony",
-      "topic": "Gate module production-activation-ceremony has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-activation-ceremony/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-activation-ceremony",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-activation-ceremony",
-      "topic": "Module production-activation-ceremony verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-activation-ceremony/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-post-activation-verification",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-post-activation-verification",
-      "topic": "Gate module production-post-activation-verification has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-post-activation-verification/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-post-activation-verification",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-post-activation-verification",
-      "topic": "Module production-post-activation-verification verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-post-activation-verification/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-reliance-verification",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-reliance-verification",
-      "topic": "Gate module production-reliance-verification has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-reliance-verification/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-reliance-verification",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-reliance-verification",
-      "topic": "Module production-reliance-verification verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-reliance-verification/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-regulatory-examination",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-regulatory-examination",
-      "topic": "Gate module production-regulatory-examination has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-regulatory-examination/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-regulatory-examination",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-regulatory-examination",
-      "topic": "Module production-regulatory-examination verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-regulatory-examination/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-production-regulatory-response",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "production-regulatory-response",
-      "topic": "Gate module production-regulatory-response has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/production-regulatory-response/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-production-regulatory-response",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "production-regulatory-response",
-      "topic": "Module production-regulatory-response verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/production-regulatory-response/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-build-preservation",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "build-preservation",
-      "topic": "Gate module build-preservation has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/build-preservation/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-build-preservation",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "build-preservation",
-      "topic": "Module build-preservation verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/build-preservation/verdict",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-gate-authority-unassigned-doctrine-gap-ledger",
-      "category": "GATE_AUTHORITY_UNASSIGNED",
-      "subjectModuleId": "doctrine-gap-ledger",
-      "topic": "Gate module doctrine-gap-ledger has no assigned human authority",
-      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
-      "evidenceReplayRef": "bsr-replay://module/doctrine-gap-ledger/human-authority",
-      "resolution": "REQUIRES_HUMAN_REVIEW",
-      "reviewRoute": "/governance/build-self-report",
-      "doctrineRefs": [
-        "ROLE-ARCH-001",
-        "CANON-ECON-001",
-        "CANON-SOVEREIGNTY-001",
-        "TECH-CONN-001",
-        "module-42-build-self-report-spec-v1.0"
-      ],
-      "blockedClaims": [
-        "denial",
-        "rejection",
-        "approval",
-        "preapproval",
-        "lender commitment",
-        "agency decision",
-        "official certification",
-        "public verification",
-        "regulatory reliance",
-        "legal reliance",
-        "source certainty"
-      ]
-    },
-    {
-      "findingId": "bsr-module-verdict-fail-doctrine-gap-ledger",
-      "category": "MODULE_VERDICT_FAIL",
-      "subjectModuleId": "doctrine-gap-ledger",
-      "topic": "Module doctrine-gap-ledger verdict = FAIL",
-      "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
-      "evidenceReplayRef": "bsr-replay://module/doctrine-gap-ledger/verdict",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-onboarding/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -7243,12 +6297,72 @@
       ]
     },
     {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-financing-pathways",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-financing-pathways",
+      "topic": "Gate module portal-borrower-financing-pathways has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-financing-pathways/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
       "findingId": "bsr-module-verdict-fail-portal-borrower-financing-pathways",
       "category": "MODULE_VERDICT_FAIL",
       "subjectModuleId": "portal-borrower-financing-pathways",
       "topic": "Module portal-borrower-financing-pathways verdict = FAIL",
       "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-financing-pathways/verdict",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-readiness",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-readiness",
+      "topic": "Gate module portal-borrower-readiness has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-readiness/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -7303,12 +6417,72 @@
       ]
     },
     {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-environmental-intake",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-environmental-intake",
+      "topic": "Gate module portal-borrower-environmental-intake has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-environmental-intake/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
       "findingId": "bsr-module-verdict-fail-portal-borrower-environmental-intake",
       "category": "MODULE_VERDICT_FAIL",
       "subjectModuleId": "portal-borrower-environmental-intake",
       "topic": "Module portal-borrower-environmental-intake verdict = FAIL",
       "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-environmental-intake/verdict",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-opportunities",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-opportunities",
+      "topic": "Gate module portal-borrower-opportunities has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-opportunities/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -7393,12 +6567,72 @@
       ]
     },
     {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-applications",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-applications",
+      "topic": "Gate module portal-borrower-applications has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-applications/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
       "findingId": "bsr-module-verdict-fail-portal-borrower-applications",
       "category": "MODULE_VERDICT_FAIL",
       "subjectModuleId": "portal-borrower-applications",
       "topic": "Module portal-borrower-applications verdict = FAIL",
       "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-applications/verdict",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-documents",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-documents",
+      "topic": "Gate module portal-borrower-documents has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-documents/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -7453,12 +6687,102 @@
       ]
     },
     {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-notices",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-notices",
+      "topic": "Gate module portal-borrower-notices has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-notices/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
       "findingId": "bsr-module-verdict-fail-portal-borrower-notices",
       "category": "MODULE_VERDICT_FAIL",
       "subjectModuleId": "portal-borrower-notices",
       "topic": "Module portal-borrower-notices verdict = FAIL",
       "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
       "evidenceReplayRef": "bsr-replay://module/portal-borrower-notices/verdict",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-reports",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-reports",
+      "topic": "Gate module portal-borrower-reports has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-reports/human-authority",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-portal-borrower-data-rights",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "portal-borrower-data-rights",
+      "topic": "Gate module portal-borrower-data-rights has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/portal-borrower-data-rights/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -7549,6 +6873,36 @@
       "topic": "Module lender-dashboard verdict = FAIL",
       "reviewerExplanation": "Per the spec roll-up, this module's verdict is FAIL because at least one of route_loads, blocks_enforced, claims_controls, pii_redaction, gate-human_authority, or orphan_flag failed.",
       "evidenceReplayRef": "bsr-replay://module/lender-dashboard/verdict",
+      "resolution": "REQUIRES_HUMAN_REVIEW",
+      "reviewRoute": "/governance/build-self-report",
+      "doctrineRefs": [
+        "ROLE-ARCH-001",
+        "CANON-ECON-001",
+        "CANON-SOVEREIGNTY-001",
+        "TECH-CONN-001",
+        "module-42-build-self-report-spec-v1.0"
+      ],
+      "blockedClaims": [
+        "denial",
+        "rejection",
+        "approval",
+        "preapproval",
+        "lender commitment",
+        "agency decision",
+        "official certification",
+        "public verification",
+        "regulatory reliance",
+        "legal reliance",
+        "source certainty"
+      ]
+    },
+    {
+      "findingId": "bsr-gate-authority-unassigned-lender-workflow",
+      "category": "GATE_AUTHORITY_UNASSIGNED",
+      "subjectModuleId": "lender-workflow",
+      "topic": "Gate module lender-workflow has no assigned human authority",
+      "reviewerExplanation": "Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.",
+      "evidenceReplayRef": "bsr-replay://module/lender-workflow/human-authority",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report",
       "doctrineRefs": [
@@ -7727,7 +7081,7 @@
     {
       "conflictId": "bsr-v1-module-verdict-fail",
       "topic": "Module verdict FAIL surfaced in self-report",
-      "description": "51 module(s) have a FAIL verdict. The report is itself an evidence artifact; the build-preservation gate should refuse to checkpoint until these are addressed or explicitly accepted with a documented reason.",
+      "description": "24 module(s) have a FAIL verdict. The report is itself an evidence artifact; the build-preservation gate should refuse to checkpoint until these are addressed or explicitly accepted with a documented reason.",
       "resolution": "REQUIRES_HUMAN_REVIEW",
       "reviewRoute": "/governance/build-self-report"
     },

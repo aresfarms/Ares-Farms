@@ -173,5 +173,8 @@ jobs:
       - name: Public Alpha Profile v1
         run: npm run smoke:public-alpha-profile
 
+      - name: Human Authority Registry v1
+        run: npm run smoke:human-authority-registry
+
       - name: Next.js production build
         run: npm run build

@@ -170,5 +170,8 @@ jobs:
       - name: Build Self-Report v1
         run: npm run smoke:build-self-report
 
+      - name: Public Alpha Profile v1
+        run: npm run smoke:public-alpha-profile
+
       - name: Next.js production build
         run: npm run build

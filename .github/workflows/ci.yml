@@ -161,5 +161,8 @@ jobs:
       - name: Evidence Resolution Workflow v1
         run: npm run smoke:evidence-resolution-workflow
 
+      - name: Document Evidence Reconciliation v1
+        run: npm run smoke:document-evidence-reconciliation
+
       - name: Next.js production build
         run: npm run build

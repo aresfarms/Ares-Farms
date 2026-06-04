@@ -146,5 +146,8 @@ jobs:
       - name: Environmental Intake v2
         run: npm run smoke:environmental-intake-v2
 
+      - name: Recommendation Precision Harness
+        run: npm run smoke:recommendation-precision
+
       - name: Next.js production build
         run: npm run build

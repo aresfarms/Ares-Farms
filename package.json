@@ -115,6 +115,7 @@
     "smoke:registry-framework-v2": "tsx src/scripts/registryFrameworkV2SmokeTest.ts",
     "smoke:connector-certification-v2": "tsx src/scripts/connectorCertificationV2SmokeTest.ts",
     "smoke:borrower-onboarding-core-v2": "tsx src/scripts/borrowerOnboardingCoreV2SmokeTest.ts",
+    "smoke:readiness-assessment-v2": "tsx src/scripts/readinessAssessmentV2SmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

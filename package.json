@@ -117,6 +117,7 @@
     "smoke:borrower-onboarding-core-v2": "tsx src/scripts/borrowerOnboardingCoreV2SmokeTest.ts",
     "smoke:readiness-assessment-v2": "tsx src/scripts/readinessAssessmentV2SmokeTest.ts",
     "smoke:environmental-intake-v2": "tsx src/scripts/environmentalIntakeV2SmokeTest.ts",
+    "smoke:recommendation-precision": "tsx src/scripts/recommendationPrecisionSmokeTest.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

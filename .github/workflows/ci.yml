@@ -167,5 +167,8 @@ jobs:
       - name: Data Transparency Posture v1
         run: npm run smoke:data-transparency-posture
 
+      - name: Build Self-Report v1
+        run: npm run smoke:build-self-report
+
       - name: Next.js production build
         run: npm run build

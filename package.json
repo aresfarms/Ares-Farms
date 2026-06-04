@@ -124,6 +124,8 @@
     "smoke:evidence-resolution-workflow": "tsx src/scripts/evidenceResolutionWorkflowSmokeTest.ts",
     "smoke:document-evidence-reconciliation": "tsx src/scripts/documentEvidenceReconciliationSmokeTest.ts",
     "smoke:data-transparency-posture": "tsx src/scripts/dataTransparencyPostureSmokeTest.ts",
+    "smoke:build-self-report": "tsx src/scripts/buildSelfReportSmokeTest.ts",
+    "build:self-report": "tsx src/scripts/buildSelfReportCli.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

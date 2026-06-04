@@ -179,5 +179,8 @@ jobs:
       - name: Disclosure Audit Gate v1
         run: npm run smoke:disclosure-audit-gate
 
+      - name: Public Alpha Profile v1 — Customer Journey
+        run: npm run smoke:public-alpha-customer-journey
+
       - name: Next.js production build
         run: npm run build

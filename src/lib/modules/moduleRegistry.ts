@@ -278,7 +278,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -329,7 +330,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -362,7 +364,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -436,7 +439,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -565,7 +569,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -807,7 +812,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -921,7 +927,67 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "doctrine.gap.ledger.reviewed",
       "module.readiness.checked",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
+    ],
+    featureFlags: internalFlags,
+  },
+  {
+    id: "governance-public-alpha-customer-journey",
+    title: "Public Alpha Profile v1 — Customer Journey",
+    route: "/governance/public-alpha-customer-journey",
+    audience: ["internal"],
+    permissions: [
+      "public-alpha-customer-journey:read",
+      "public-alpha-customer-journey:audit",
+      "governance:read",
+    ],
+    dataDependencies: [
+      "module-registry",
+      "event-contract-registry",
+      "cross-module-handoff-map",
+      "public-alpha-profile-v1-spec",
+      "disclosure-audit-gate-runtime",
+      "human-authority-registry-runtime",
+      "customer-trust-profile-v1",
+      "audit-ledger",
+      "replay-verification",
+    ],
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    claimsProfile: "internal-governance",
+    replayRequired: true,
+    description:
+      "Twenty-third downstream composition module on the canonical eligibility matrix. Codifies the Public Alpha Profile v1 doctrine (docs/DOCTRINE_PUBLIC_ALPHA_CUSTOMER_JOURNEY_V1.md). Audits the first customer-facing experience against the spec: 7 entry-surface sections (founder introduction, customer project intake, pathway discovery, readiness review, financing reality classification, human escalation, data transparency), 6 customer success criteria (What are my options / risks / documents / data / next / who can help me), the Customer Promise (Compass to Capital tagline + 5 negations: approve loans / deny loans / issue underwriting decisions / issue agency determinations / guarantee funding + 6 affirmations: available pathways / readiness gaps / documentation needs / financing realities / environmental considerations / next recommended actions), the 6 Financing Reality Classifications (likely financeable / financeable with conditions / specialist review required / limited financing market / cash-favored transaction / not enough information), Module 44 disclosure coverage on every entry-surface page, and Module 45 human-authority binding for every escalation-capable section. Six governed signals and eight finding categories. Aggregate alpha_journey_ready gate: PASS only when every section, customer promise, financing reality classification, disclosure coverage, and escalation authority binding holds; PENDING_SIGNOFF when structurally complete but customer questions only partially answerable; FAIL otherwise. The runtime does NOT authorize Public Alpha entry; the named governance authority records that decision externally. Together with Module 44, Module 45, Build 35 Public Alpha Profile, and Build 34 Build Self-Report (post-Build-38 foundation), this runtime completes the Public Alpha Definition of Done audit chain. Doctrine status PROPOSED — Public Alpha approval requires named human authority and successful governance verification. Internal advisory audit posture only — no customer-facing publication, no Alpha entry authorization, no autonomous determination of any kind, no information sale, no silent submission, no secret distribution, no marketing lead generation, no denial, no rejection, no approval, no preapproval, no lender commitment, no agency decision, no official certification, no public verification, no regulatory reliance, no legal reliance, no source certainty claim, no live external action, no payment authorization, no notice send. Every finding resolves to REQUIRES_HUMAN_REVIEW.",
+    adjacentModules: [
+      "governance-public-alpha-profile",
+      "governance-disclosure-audit-gate",
+      "governance-human-authority-registry",
+      "governance-build-self-report",
+      "governance-data-transparency-posture",
+      "build-preservation",
+      "doctrine-gap-ledger",
+      "module-readiness",
+      "applications",
+      "documents",
+      "data-rights",
+      "evidence-packets",
+      "audit-replay",
+      "governance",
+      "reviews",
+    ],
+    eventsPublished: [
+      "governance.public.alpha.customer.journey.audited",
+    ],
+    eventsConsumed: [
+      "governance.public.alpha.profile.evaluated",
+      "governance.disclosure.audit.gate.verified",
+      "governance.human.authority.registry.verified",
+      "governance.build.self.report.generated",
+      "governance.data.transparency.posture.audited",
+      "build.preservation.archived",
+      "doctrine.gap.ledger.reviewed",
+      "module.readiness.checked",
     ],
     featureFlags: internalFlags,
   },
@@ -978,6 +1044,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "build.preservation.archived",
       "doctrine.gap.ledger.reviewed",
       "module.readiness.checked",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -1032,7 +1099,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "build.preservation.archived",
       "doctrine.gap.ledger.reviewed",
       "module.readiness.checked",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -1085,7 +1153,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -1145,7 +1214,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.public.alpha.profile.evaluated",
       "governance.recommendation.precision.tested",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -3001,7 +3071,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -3131,7 +3202,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -4397,7 +4469,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },
@@ -4444,7 +4517,8 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.human.authority.registry.verified",
-      "governance.disclosure.audit.gate.verified"
+      "governance.disclosure.audit.gate.verified",
+      "governance.public.alpha.customer.journey.audited"
     ],
     featureFlags: internalFlags,
   },

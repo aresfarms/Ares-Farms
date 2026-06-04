@@ -155,5 +155,8 @@ jobs:
       - name: Environmental Risk Assessment v2
         run: npm run smoke:environmental-risk-assessment-v2
 
+      - name: Environmental Escalation Engine v2
+        run: npm run smoke:environmental-escalation-engine-v2
+
       - name: Next.js production build
         run: npm run build

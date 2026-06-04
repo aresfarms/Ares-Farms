@@ -137,5 +137,8 @@ jobs:
       - name: Connector Certification v2
         run: npm run smoke:connector-certification-v2
 
+      - name: Borrower Onboarding Core v2
+        run: npm run smoke:borrower-onboarding-core-v2
+
       - name: Next.js production build
         run: npm run build

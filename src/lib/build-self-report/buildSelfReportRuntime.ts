@@ -2,6 +2,12 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import {
+  deriveModuleIntent,
+  HumanAuthorityRoleFill,
+  moduleHumanAuthorityResolutionFor,
+  ModuleIntent,
+} from "@/lib/human-authority/humanAuthorityRegistryRuntime";
+import {
   EventContract,
   eventContractRegistry,
 } from "@/lib/modules/eventContractRegistry";
@@ -80,6 +86,13 @@ export type BuildSelfReportInput = {
     promotion_condition?: string;
   }>;
   fileSystemRoot?: string;
+  // Optional roster of role fills supplied by the access-control
+  // layer. Consumed by the Module 45 Human Authority Registry to
+  // resolve per-module authority status. When omitted, the registry
+  // reports FAIL for every alpha_required module with a binding (the
+  // honest baseline). See §2 of
+  // docs/DOCTRINE_HUMAN_AUTHORITY_REGISTRY_V1.md.
+  humanAuthorityFilledRoles?: HumanAuthorityRoleFill[];
   metadata?: Record<string, unknown> | null;
 };
 
@@ -574,31 +587,82 @@ function buildBlocksCheck(
 }
 
 // =============================================================================
-// human_authority — depends on Module 45 (Human Authority Registry)
+// human_authority — sourced from Module 45 (Human Authority Registry)
 // =============================================================================
 
 function buildHumanAuthorityCheck(
   manifest: ModuleManifest,
-  surfaceClass: BuildSelfReportSurfaceClass
+  surfaceClass: BuildSelfReportSurfaceClass,
+  filledRoles: HumanAuthorityRoleFill[]
 ): BuildSelfReportCheckCell {
-  // Until Module 45 lands, we report:
-  // - For gate modules: FAIL with reason (this honestly surfaces the
-  //   missing piece).
-  // - For non-gate modules: N/A with reason.
-  const isGate =
-    surfaceClass === "gate" ||
-    manifest.claimsProfile === "live-action-blocked" ||
-    /gate$/i.test(manifest.id);
-  if (isGate) {
+  // Consult Module 45 for per-module authority resolution.
+  const resolution = moduleHumanAuthorityResolutionFor(manifest, filledRoles);
+
+  // Module 45 §2 verdict-resolution semantics:
+  // - internal_support → N/A (no clear-action requirement).
+  // - alpha_required + binding(s) + roles filled → PASS.
+  // - alpha_required + binding(s) + roles unfilled → FAIL.
+  // - intentionally_held + binding(s) + roles filled → PASS at the
+  //   per-cell level (the per-cell answer is "the human who would
+  //   clear this is named"). The verdict roll-up promotes this to
+  //   BLOCKED_BY_DESIGN at the module-verdict level (computeVerdict
+  //   below). PASS at the cell is correct because the cell only
+  //   reports "is a credentialed human assigned"; the held block
+  //   posture is encoded in module_verdict.
+  // - intentionally_held + binding(s) + roles unfilled → WARN. The
+  //   binding is defined, the block stays on by design, and the role
+  //   is unfilled — that is exactly the intended state until the
+  //   block lifts. Surfacing WARN keeps the gap visible without
+  //   reporting FAIL.
+  // - coverage missing → FAIL.
+
+  if (resolution.intent === "internal_support") {
     return {
-      status: "FAIL",
-      reason:
-        "human-authority-registry-not-yet-built (Module 45 dependency); gate modules need a named credentialed role to clear",
+      status: "N/A",
+      reason: "internal_support module with no clear-action requirement",
     };
   }
+
+  if (resolution.bindingCount === 0) {
+    // Coverage gap on a clearable module.
+    return {
+      status: "FAIL",
+      reason: `human-authority-registry has no binding for ${manifest.id} (intent=${resolution.intent}); coverage missing`,
+    };
+  }
+
+  if (resolution.anyAiPermitted || resolution.anySelfClearAllowed) {
+    return {
+      status: "FAIL",
+      reason: `human-authority-registry binding violates ai_permitted=false or no_self_clear=true on ${manifest.id}`,
+    };
+  }
+
+  if (resolution.status === "PASS") {
+    return {
+      status: "PASS",
+      reason: `human-authority-registry resolves ${manifest.id}: ${resolution.reason}`,
+    };
+  }
+
+  if (resolution.status === "WARN") {
+    return {
+      status: "WARN",
+      reason: `human-authority-registry resolves ${manifest.id}: ${resolution.reason}`,
+    };
+  }
+
+  if (resolution.status === "FAIL") {
+    return {
+      status: "FAIL",
+      reason: `human-authority-registry resolves ${manifest.id}: ${resolution.reason}`,
+    };
+  }
+
+  // Fallback (should not happen).
   return {
     status: "N/A",
-    reason: "non-gate module with no clear-action requirement",
+    reason: resolution.reason,
   };
 }
 
@@ -834,7 +898,8 @@ function isGateModule(
 
 function computeVerdict(
   row: BuildSelfReportModuleRow,
-  isGate: boolean
+  isGate: boolean,
+  intent: ModuleIntent
 ): BuildSelfReportModuleVerdict {
   const r = row.checks;
   const fail = (cell: BuildSelfReportCheckCell) => getStatus(cell) === "FAIL";
@@ -859,9 +924,25 @@ function computeVerdict(
     warn(r.pii_redaction) ||
     warn(r.lineage_traceable) ||
     (row.test_coverage.smoke && !row.test_coverage.functional);
+
+  // Module 45 §2 verdict-resolution rule (THE important fix).
+  // intentionally_held + human_authority assigned (PASS) means:
+  // "the human who would clear this is named, and the block is still
+  // deliberately on" → BLOCKED_BY_DESIGN, NEVER PASS. PASS for a held
+  // module would falsely signal production-readiness.
+  if (
+    intent === "intentionally_held" &&
+    getStatus(r.human_authority) !== "FAIL" &&
+    !failingHard
+  ) {
+    return "BLOCKED_BY_DESIGN";
+  }
+
+  // Legacy BLOCKED_BY_DESIGN promotion (driven by blocks_enforced
+  // status). Preserved for modules whose blocks_enforced cell already
+  // returns BLOCKED_BY_DESIGN independent of Module 45 intent.
   const blockedByDesign =
-    getStatus(r.blocks_enforced) === "BLOCKED_BY_DESIGN" &&
-    !failingHard;
+    getStatus(r.blocks_enforced) === "BLOCKED_BY_DESIGN" && !failingHard;
   if (blockedByDesign && !anyWarn) {
     return "BLOCKED_BY_DESIGN";
   }
@@ -1173,17 +1254,23 @@ export function composeBuildSelfReport(
   );
 
   // 1. Build per-module rows.
+  const filledRoles = input.humanAuthorityFilledRoles ?? [];
   const modules: BuildSelfReportModuleRow[] = moduleManifests.map((manifest) => {
     const surfaceClass = classifySurface(manifest);
     const routeLoads = buildRouteLoadsCheck(manifest, fsRoot, surfaceClass);
     const blocksEnforced = buildBlocksCheck(manifest);
     const isGate = isGateModule(manifest, surfaceClass);
+    const intent = deriveModuleIntent(manifest);
     const checks: BuildSelfReportModuleRow["checks"] = {
       route_loads: routeLoads,
       replay_reproduces: buildReplayCheck(manifest),
       disclosures_present: buildDisclosuresCheck(manifest),
       blocks_enforced: blocksEnforced,
-      human_authority: buildHumanAuthorityCheck(manifest, surfaceClass),
+      human_authority: buildHumanAuthorityCheck(
+        manifest,
+        surfaceClass,
+        filledRoles
+      ),
       claims_controls: buildClaimsControlsCheck(manifest, surfaceClass),
       pii_redaction: buildPiiRedactionCheck(manifest),
       lineage_traceable: buildLineageCheck(manifest, eventContractByType),
@@ -1208,7 +1295,7 @@ export function composeBuildSelfReport(
       last_verified_commit: input.commit ?? "unknown",
       module_verdict: "PASS",
     };
-    row.module_verdict = computeVerdict(row, isGate);
+    row.module_verdict = computeVerdict(row, isGate, intent);
     return row;
   });
 

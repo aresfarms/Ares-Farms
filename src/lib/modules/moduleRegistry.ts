@@ -277,6 +277,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -326,6 +327,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -357,6 +359,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -429,6 +432,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -556,6 +560,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -705,6 +710,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "build.preservation.archived",
       "doctrine.gap.ledger.reviewed",
       "governance.registry.framework.composed",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -795,6 +801,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -907,6 +914,61 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "build.preservation.archived",
       "doctrine.gap.ledger.reviewed",
       "module.readiness.checked",
+      "governance.human.authority.registry.verified"
+    ],
+    featureFlags: internalFlags,
+  },
+  {
+    id: "governance-human-authority-registry",
+    moduleNumber: 45,
+    title: "Module 45 — Human Authority Registry v1",
+    route: "/governance/human-authority-registry",
+    audience: ["internal"],
+    permissions: [
+      "human-authority-registry:read",
+      "human-authority-registry:verify",
+      "governance:read",
+    ],
+    dataDependencies: [
+      "module-registry",
+      "event-contract-registry",
+      "cross-module-handoff-map",
+      "module-45-human-authority-registry-spec-v1",
+      "audit-ledger",
+      "replay-verification",
+    ],
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    claimsProfile: "internal-governance",
+    replayRequired: true,
+    description:
+      "Twenty-first downstream composition module on the canonical eligibility matrix. Codifies the Module 45 Human Authority Registry Specification (docs/DOCTRINE_HUMAN_AUTHORITY_REGISTRY_V1.md). Declares the canonical machine-readable binding of every clearable action to a named human role (Governance Operator, Qualified Governance Reviewer, Credit/Eligibility Authority, Source Legal Authority, Data Rights Officer, Chief Governance Authority, Regulatory Liaison Authority, Document Verification Reviewer, Borrower Intake Reviewer, Environmental Engineering Spoke Reviewer, Sovereign Federation Authority, Third Party Records Authority). The registry binds ROLES, not named individuals — individuals are recorded in the access-control layer and the audit ledger at clear-time. Constitutional invariants enforced at validation: ai_permitted = false on every binding, no_self_clear = true on every binding, separation_of_duties = true on every binding, quorum bindings require min_approvers >= 2. The runtime also classifies every module's intent (alpha_required / intentionally_held / internal_support) so the Build Self-Report verdict roll-up can apply the §2 table: alpha_required + authority assigned -> PASS; intentionally_held + authority assigned -> BLOCKED_BY_DESIGN (never PASS — PASS would falsely signal production-readiness); internal_support -> unchanged. Four governed authority signals (coverage_alignment, no_ai_alignment, role_filled_alignment, separation_of_duties_alignment). Six finding categories (BINDING_AI_PERMITTED, BINDING_SELF_CLEAR_ALLOWED, BINDING_QUORUM_INVALID, BINDING_UNKNOWN_ROLE, MODULE_BINDING_COVERAGE_MISSING, ALPHA_REQUIRED_ROLE_UNFILLED). Exit code 0 only if 100% coverage of clearable actions, zero ai_permitted = true, zero self-clear paths, and every alpha_required module's role is filled. Internal advisory audit posture only — no autonomous determination of any kind, no authority assignment, no ai clearing, no self-clear, no information sale, no silent submission, no secret distribution, no marketing lead generation, no denial, no rejection, no approval, no preapproval, no lender commitment, no agency decision, no official certification, no public verification, no regulatory reliance, no legal reliance, no source certainty claim, no live external action, no payment authorization, no notice send. Every finding resolves to REQUIRES_HUMAN_REVIEW.",
+    adjacentModules: [
+      "governance-build-self-report",
+      "governance-public-alpha-profile",
+      "governance-data-transparency-posture",
+      "build-preservation",
+      "doctrine-gap-ledger",
+      "module-readiness",
+      "applications",
+      "documents",
+      "data-rights",
+      "evidence-packets",
+      "audit-replay",
+      "governance",
+      "reviews",
+      "promotion",
+    ],
+    eventsPublished: [
+      "governance.human.authority.registry.verified",
+    ],
+    eventsConsumed: [
+      "governance.build.self.report.generated",
+      "governance.public.alpha.profile.evaluated",
+      "governance.data.transparency.posture.audited",
+      "build.preservation.archived",
+      "doctrine.gap.ledger.reviewed",
+      "module.readiness.checked",
     ],
     featureFlags: internalFlags,
   },
@@ -958,6 +1020,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -1016,6 +1079,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
       "governance.recommendation.precision.tested",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -2870,6 +2934,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -2998,6 +3063,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "governance.data.transparency.posture.audited",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -4262,6 +4328,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "promotion.gate.blocked",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },
@@ -4307,6 +4374,7 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
       "promotion.gate.blocked",
       "governance.build.self.report.generated",
       "governance.public.alpha.profile.evaluated",
+      "governance.human.authority.registry.verified"
     ],
     featureFlags: internalFlags,
   },

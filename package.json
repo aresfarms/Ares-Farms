@@ -127,6 +127,8 @@
     "smoke:build-self-report": "tsx src/scripts/buildSelfReportSmokeTest.ts",
     "build:self-report": "tsx src/scripts/buildSelfReportCli.ts",
     "smoke:public-alpha-profile": "tsx src/scripts/publicAlphaProfileSmokeTest.ts",
+    "smoke:human-authority-registry": "tsx src/scripts/humanAuthorityRegistrySmokeTest.ts",
+    "verify:human-authority": "tsx src/scripts/humanAuthorityRegistryCli.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",
     "verify:sellable-catalog": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts sellable-catalog",
     "verify:program-graph": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts program-graph",

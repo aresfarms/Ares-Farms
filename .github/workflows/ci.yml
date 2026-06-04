@@ -134,5 +134,8 @@ jobs:
       - name: Registry Framework v2
         run: npm run smoke:registry-framework-v2
 
+      - name: Connector Certification v2
+        run: npm run smoke:connector-certification-v2
+
       - name: Next.js production build
         run: npm run build

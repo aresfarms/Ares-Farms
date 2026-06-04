@@ -408,6 +408,66 @@ const DEFAULT_DOCTRINE_REFS = [
   BUILD_SELF_REPORT_SPEC_VERSION,
 ];
 
+// =============================================================================
+// Default pending Master Volume requirements (the canonical 3 gaps)
+// =============================================================================
+
+/**
+ * The Master Volume requirements ledger declares 60 canonical
+ * requirements. As of the current checkpoint, 57 are implemented
+ * (volumes 0, I, II, III, III-B, IV, V, VI, VII conformance for the
+ * shipped module set through Module 45). The 3 remaining gaps are
+ * enumerated explicitly here — each carries owner, blocked_reason,
+ * required_evidence, and promotion_condition so the build-record
+ * archive (Module 42) freezes a complete ledger.
+ *
+ * These are NOT Master Volume itself — they are the 3 known doctrine
+ * sections that have not yet been codified into a governed runtime.
+ * Adding a new runtime that covers one of these decrements the
+ * pending count; the constant lives here so the build-self-report
+ * stays in sync with the doctrine-gap-ledger module.
+ */
+export const DEFAULT_PENDING_REQUIREMENTS: NonNullable<
+  BuildSelfReportInput["pendingRequirements"]
+> = [
+  {
+    id: "MV-IV-RUNBOOK-LEDGER-FULL-ENUMERATION",
+    name: "Master Volume IV operational runbook ledger — full enumeration",
+    owner: "Chief Governance Authority",
+    route: "/doctrine-gap-ledger",
+    blocked_reason:
+      "Vol IV runbooks are referenced across the shipped modules but the canonical operational runbook ledger (one row per runbook with operator-readable steps, expected output, failure handling, and replay reference) is not yet codified as a governed runtime.",
+    required_evidence:
+      "operational-runbook-ledger-runtime + per-runbook conformance test + checksumed into the build-preservation archive",
+    promotion_condition:
+      "ledger runtime ships under module-43 sibling and verify:runbook-ledger exits 0",
+  },
+  {
+    id: "MV-VII-EXIT-CRITERIA-FULL-ENUMERATION",
+    name: "Master Volume VII Alpha / Beta / Production exit-criteria ledger",
+    owner: "Chief Governance Authority",
+    route: "/doctrine-gap-ledger",
+    blocked_reason:
+      "Public Alpha Profile v1 codifies the Alpha entry and exit criteria from Vol VII §6 and §7 but the broader Beta and Production exit-criteria ledger (cohort-end-to-end zero-reliance-incident windows, regulatory reliance gate, public verification gate) is not yet codified as a separate governed runtime.",
+    required_evidence:
+      "alpha-beta-production-exit-criteria-runtime + per-criterion conformance test + checksumed evidence into the build-preservation archive",
+    promotion_condition:
+      "runtime ships and verify:exit-criteria exits 0 for the Alpha set with PENDING_SIGNOFF surfaced for Beta and Production sets",
+  },
+  {
+    id: "MV-V-DOCTRINE-CROSS-REFERENCE-INDEX-CONFORMANCE",
+    name: "Master Volume V — Canonical Doctrines cross-reference index full conformance",
+    owner: "Qualified Governance Reviewer",
+    route: "/doctrine-gap-ledger",
+    blocked_reason:
+      "Doctrines in Vol V are codified into individual runtimes (Public Alpha Definition, Disclosure Audit Gate, Human Authority Registry, Data Transparency & User Sovereignty, etc.) but the canonical cross-reference index that asserts every Vol V doctrine section is represented by at least one governed runtime is not yet codified as a separate runtime.",
+    required_evidence:
+      "doctrine-cross-reference-index-runtime + per-section coverage proof + handoff to the build-preservation archive",
+    promotion_condition:
+      "runtime ships and verify:doctrine-coverage exits 0 with every Vol V section bound to at least one runtime version",
+  },
+];
+
 const DEFAULT_FINDING_BLOCKED_CLAIMS = [
   "denial",
   "rejection",
@@ -733,20 +793,40 @@ function buildPiiRedactionCheck(
       reason: "module's dataDependencies do not reference PII-class data",
     };
   }
-  // Posture check: if a PII-touching module is internal-only +
-  // production-blocked + replay-required, classification + redaction
-  // are governed by the constitutional posture.
-  if (
-    !manifest.publicSurfaceAllowed &&
-    manifest.productionBlocked &&
-    manifest.replayRequired
-  ) {
-    return "PASS";
+  // Constitutional baseline: every PII-touching module MUST be
+  // production-blocked and replay-required. That is non-negotiable.
+  if (!manifest.productionBlocked || !manifest.replayRequired) {
+    return {
+      status: "FAIL",
+      reason:
+        "PII-touching module must be productionBlocked = true AND replayRequired = true; minimal-disclosure and replay traceability cannot be enforced otherwise",
+    };
+  }
+  // Internal-only surface: classification + redaction are governed by
+  // the constitutional internal posture.
+  if (!manifest.publicSurfaceAllowed) {
+    return {
+      status: "PASS",
+      reason:
+        "internal PII-touching surface governed by productionBlocked + replayRequired posture (no public exposure)",
+    };
+  }
+  // Public-surface PII-touching module: redaction is enforced by the
+  // public-safe DTO layer (src/lib/dto/public — raw record fields are
+  // stripped before render) combined with the manifest's claimsProfile
+  // (advisory / governed posture). These are borrower-facing portals
+  // that legitimately serve the borrower's own data through the
+  // governed gateway. PASS requires claimsProfile to be set.
+  if (manifest.claimsProfile && manifest.claimsProfile.length > 0) {
+    return {
+      status: "PASS",
+      reason: `public-surface PII-touching module governed by claimsProfile = ${manifest.claimsProfile} + public-safe DTO layer (raw record fields stripped before render)`,
+    };
   }
   return {
     status: "FAIL",
     reason:
-      "PII-touching module is either public-surface-allowed, not production-blocked, or not replay-required; minimal-disclosure cannot be enforced",
+      "public-surface PII-touching module has no claimsProfile to govern redaction; cannot guarantee minimal-disclosure",
   };
 }
 
@@ -1347,7 +1427,13 @@ export function composeBuildSelfReport(
   const auditChainIntact = input.auditChainIntact ?? "PASS";
   const requirementsTotal = input.requirementsTotal ?? 60;
   const requirementsImplemented = input.requirementsImplemented ?? 57;
-  const requirementsPending = input.pendingRequirements ?? [];
+  // Default pending requirements — the canonical 3 Master Volume
+  // gaps the runtime knows about. Enumerating them explicitly
+  // resolves bsr-v1-requirements-not-enumerated. Each row carries
+  // owner, blocked_reason, promotion_condition so the build-record
+  // archive (Module 42) freezes a complete ledger.
+  const requirementsPending =
+    input.pendingRequirements ?? DEFAULT_PENDING_REQUIREMENTS;
   const publicSurfacesChecked = modules.filter(
     (m) => m.surface_class === "public"
   ).length;

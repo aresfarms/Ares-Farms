@@ -143,5 +143,8 @@ jobs:
       - name: Readiness Assessment v2
         run: npm run smoke:readiness-assessment-v2
 
+      - name: Environmental Intake v2
+        run: npm run smoke:environmental-intake-v2
+
       - name: Next.js production build
         run: npm run build

@@ -158,5 +158,8 @@ jobs:
       - name: Environmental Escalation Engine v2
         run: npm run smoke:environmental-escalation-engine-v2
 
+      - name: Evidence Resolution Workflow v1
+        run: npm run smoke:evidence-resolution-workflow
+
       - name: Next.js production build
         run: npm run build

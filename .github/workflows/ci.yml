@@ -176,5 +176,8 @@ jobs:
       - name: Human Authority Registry v1
         run: npm run smoke:human-authority-registry
 
+      - name: Disclosure Audit Gate v1
+        run: npm run smoke:disclosure-audit-gate
+
       - name: Next.js production build
         run: npm run build

@@ -122,6 +122,17 @@ export default function HomePage() {
             max-width: 900px;
             font-weight: 800;
           }
+          /* ── Hero brand line — "FURLONG" above the headline ──── */
+          .fl-hero-brand {
+            margin: 0;
+            font-size: clamp(13px, 1.8vw, 17px);
+            font-weight: 800;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #8a6914;   /* dark gold — 4.84:1 on #f6f8fb, WCAG AA ✓ */
+            line-height: 1;
+          }
+
           .fl-hero-sub {
             margin: 0;
             font-size: clamp(16px, 2vw, 20px);
@@ -313,6 +324,7 @@ export default function HomePage() {
             ══════════════════════════════════════════════════════════════ */}
         <section className="fl-hero" aria-label="Furlong discovery">
           <header className="fl-hero-copy">
+            <p className="fl-hero-brand">Furlong</p>
             <h1>
               Every Journey Starts Somewhere.
             </h1>

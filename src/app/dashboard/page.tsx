@@ -1,6 +1,40 @@
 "use client";
 
+/**
+ * /dashboard — INTERNAL_ONLY (legacy developer / diagnostic surface).
+ *
+ * Renders a hardcoded demo decision (demo-user-001 / "Demo Farm") against
+ * /api/decision and displays raw internal governance diagnostics (runtime
+ * guard, classification level, observability, pipeline version). This is NOT
+ * a Public Alpha customer surface and must not be presented as the customer
+ * portal. The Public Alpha customer portal is /portal/borrower. The route
+ * remains reachable for internal diagnostics only and carries the visible
+ * internal-use-only banner below per the surface-classification doctrine. It
+ * is intentionally excluded from public navigation and the customer-surface
+ * gates (verify:customer-journey / verify:disclosures classify customer
+ * surfaces; this route is not one).
+ */
+
 import { useEffect, useMemo, useState } from "react";
+
+const internalUseOnlyBanner = (
+  <aside
+    role="note"
+    style={{
+      border: "2px solid #b45309",
+      background: "#fffbeb",
+      color: "#7c2d12",
+      borderRadius: 8,
+      padding: "12px 16px",
+      fontWeight: 600,
+      lineHeight: 1.5,
+    }}
+  >
+    INTERNAL USE ONLY — developer / diagnostic surface. This is NOT a Public
+    Alpha customer page and is NOT the customer portal. The Public Alpha
+    customer portal is <code>/portal/borrower</code>. No customer reliance.
+  </aside>
+);
 
 type DecisionResponse = {
   success: boolean;
@@ -144,6 +178,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main style={{ padding: 24, fontFamily: "Arial, sans-serif" }}>
+        {internalUseOnlyBanner}
         <h1>Farm Loan Decision Dashboard</h1>
         <p>Loading governed decision runtime...</p>
       </main>
@@ -153,6 +188,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <main style={{ padding: 24, fontFamily: "Arial, sans-serif" }}>
+        {internalUseOnlyBanner}
         <h1>Farm Loan Decision Dashboard</h1>
         <h2>Runtime Status: Error</h2>
         <p>{error}</p>
@@ -170,6 +206,7 @@ export default function DashboardPage() {
         maxWidth: 960,
       }}
     >
+      {internalUseOnlyBanner}
       <header>
         <h1>Farm Loan Decision Dashboard</h1>
         <p>Tenant ID: {demoDecisionRequest.userId}</p>

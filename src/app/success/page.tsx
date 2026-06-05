@@ -13,12 +13,9 @@ import Link from "next/link";
  */
 
 const nextActions = [
-  {
-    href: "/dashboard",
-    label: "Review Decision Runtime",
-    description:
-      "Open the governed decision surface to view runtime guard, version lineage, classification, observability, and human-review status.",
-  },
+  // /dashboard (legacy internal decision-runtime diagnostic) is not a
+  // Public Alpha customer surface and is removed from this next-step
+  // navigation. The Public Alpha customer portal is /portal/borrower.
   {
     href: "/portfolio",
     label: "Review Portfolio Ranking",

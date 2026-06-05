@@ -25,6 +25,19 @@
 *.pem
 Recovery Key.pdf
 
+# personal financial / identity documents (never commit) —
+# defense-in-depth; verify:no-personal-docs is the canonical gate.
+Credit_Summary_*.pdf
+*_Caitlin_Hudson.pdf
+*_Stuart_Fraass.pdf
+*_Frances_Fraass.pdf
+*_ssn*
+*social_security*
+*passport*
+*drivers_license*
+*tax_return*
+*bank_statement*
+
 # debug
 npm-debug.log*
 yarn-debug.log*

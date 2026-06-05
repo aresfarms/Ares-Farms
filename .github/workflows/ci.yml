@@ -53,6 +53,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # ────────────────────────────────────────────────────────────────
+      # Personal Document Git Guard — runs first per doctrine
+      # §CI Placement. Two-layer scanner (filename pattern + content
+      # signature) over the full checked-out tree at HEAD (tree mode
+      # per Build 40 hardening §1). No base-range dependency, no
+      # shallow-clone ambiguity, no `|| true` swallowing setup errors,
+      # no empty-range pass, no vacuous pass. Suspicious-filename PDFs
+      # fail closed.
+      #
+      # The gate self-asserts its anti-vacuous-pass invariant: the
+      # only way the scanner can exit 0 is by inspecting at least one
+      # real file and finding nothing. Scope-resolution failures,
+      # enumeration failures, and zero-file scans all fail closed at
+      # the scanner level — CI just runs it and checks the exit code.
+      # ────────────────────────────────────────────────────────────────
+      - name: Personal document git guard (tree mode, fail-closed, self-asserting)
+        run: npm run verify:no-personal-docs
+
+      - name: Personal document git guard smoke
+        run: npm run smoke:no-personal-docs
+
       - name: TypeScript noEmit
         run: npx tsc --noEmit
 

@@ -3,14 +3,15 @@
 import { usePathname } from "next/navigation";
 
 import { ModuleNav } from "@/components/platform/ModuleNav";
+import { PublicSiteHeader } from "@/components/public/PublicSiteHeader";
 
 /**
- * Platform Chrome (Build 45)
+ * Platform Chrome (Build 45 / 44-B)
  *
- * Renders the internal operator header + governed-module navigation — but ONLY
- * on internal routes. On public, customer-facing routes (the homepage and the
- * Public Alpha customer surfaces) it renders nothing, so those pages read as a
- * public discovery experience rather than an internal dashboard.
+ * On internal routes: renders the internal operator header + governed-module
+ * navigation. On public, customer-facing routes: renders the PublicSiteHeader
+ * (Furlong logo trust anchor + public navigation) instead — so those pages read
+ * as a public discovery experience, branded but never as an internal dashboard.
  */
 
 // Customer-facing routes that must NOT show internal operator chrome.
@@ -47,7 +48,7 @@ export function PlatformChrome({
 }) {
   const pathname = usePathname();
   if (pathname && isPublicRoute(pathname)) {
-    return null;
+    return <PublicSiteHeader />;
   }
 
   return (

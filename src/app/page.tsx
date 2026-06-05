@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { FurlongLogo } from "@/components/brand/FurlongLogo";
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
 import { StewardshipSection } from "@/components/stewardship/StewardshipSection";
 import {
@@ -24,6 +25,20 @@ const TRUST_LANGUAGE = [
   "We do not sell your data.",
   "We show pathways, not promises.",
   "Furlong is not a lender and does not approve, deny, guarantee, or make official determinations.",
+];
+
+const HOW_FURLONG_WORKS = [
+  "Start with the full map of possibilities before sharing personal information.",
+  "Choose one of eight exploration categories or stay broad while you compare paths.",
+  "See readiness, financing, program, land, and stewardship context before deciding whether to focus your journey.",
+  "Request human review only when you want a deeper next-step conversation.",
+];
+
+const WHAT_FURLONG_DOES_NOT_DO = [
+  "Approve loans or deny loans.",
+  "Guarantee funding, rates, or eligibility.",
+  "Track your location or build the map around where you are.",
+  "Sell your information or silently submit it to lenders, agencies, or brokers.",
 ];
 
 const FOOTER_LINKS = [
@@ -59,8 +74,9 @@ export default function HomePage() {
   return (
     <main style={shell}>
       <div style={container}>
-        {/* Hero */}
-        <header style={{ display: "grid", gap: 14, textAlign: "center" }}>
+        {/* Hero — the logo supports the headline (it does not replace it). */}
+        <header style={{ display: "grid", gap: 14, justifyItems: "center", textAlign: "center" }}>
+          <FurlongLogo size="hero" />
           <h1 style={{ margin: 0, fontSize: 40, lineHeight: 1.12 }}>
             Furlong helps you discover things you didn’t know were possible.
           </h1>
@@ -75,9 +91,26 @@ export default function HomePage() {
             Discover your possibilities. Explore your options. Understand your
             next steps. Make informed decisions.
           </p>
+          <Link
+            href="/onboarding"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: 48,
+              padding: "0 22px",
+              borderRadius: 999,
+              background: "#0f766e",
+              color: "#ffffff",
+              fontWeight: 800,
+              textDecoration: "none",
+            }}
+          >
+            Explore the full map
+          </Link>
         </header>
 
-        {/* Primary CTA + category choice */}
+        {/* Category choice */}
         <section style={{ display: "grid", gap: 16 }}>
           <h2 style={{ margin: 0, fontSize: 24, textAlign: "center" }}>
             What would you like to explore today?
@@ -119,7 +152,7 @@ export default function HomePage() {
         {/* Living Opportunity Map */}
         <LivingOpportunityMap />
 
-        {/* Trust language */}
+        {/* Trust strip */}
         <section
           aria-label="How Furlong works with you"
           style={{
@@ -139,6 +172,54 @@ export default function HomePage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section
+          style={{
+            display: "grid",
+            gap: 16,
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          }}
+        >
+          <article
+            style={{
+              padding: 22,
+              border: "1px solid #d7deea",
+              borderRadius: 12,
+              background: "#ffffff",
+              display: "grid",
+              gap: 12,
+            }}
+          >
+            <h2 style={{ margin: 0, fontSize: 22 }}>How Furlong Works</h2>
+            <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+              {HOW_FURLONG_WORKS.map((line) => (
+                <li key={line} style={{ lineHeight: 1.6 }}>
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article
+            style={{
+              padding: 22,
+              border: "1px solid #d7deea",
+              borderRadius: 12,
+              background: "#ffffff",
+              display: "grid",
+              gap: 12,
+            }}
+          >
+            <h2 style={{ margin: 0, fontSize: 22 }}>What Furlong Does Not Do</h2>
+            <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+              {WHAT_FURLONG_DOES_NOT_DO.map((line) => (
+                <li key={line} style={{ lineHeight: 1.6 }}>
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </article>
         </section>
 
         {/* Meet the Stewards — platform-first, introduced after exploration,

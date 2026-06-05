@@ -10,19 +10,48 @@ import {
 } from "@/lib/customer-landing/featuredExplorationStories";
 
 /**
- * Living Opportunity Map (Build 45) — homepage discovery visual.
+ * Living Opportunity Map (Build 45 → map visual fix).
  *
- * A "use client" React component (state/refs/effects — no raw DOM mutation).
- * The animated SVG is purely DECORATIVE (aria-hidden); all real content lives
- * in accessible HTML so the experience works without the graphic. The map
- * reveals illustrative OPPORTUNITIES, never the visitor: no geolocation, no
- * addresses, and an explicit "not based on your location" label.
+ * A "use client" React component. It reads clearly as a NATIONAL MAP OF
+ * POSSIBILITIES on first load: a recognizable United States silhouette is
+ * always visible (light, high-contrast), with curated exploration pathways
+ * illuminated on top and one featured state/county glowing at a time.
  *
- * Respects prefers-reduced-motion (no auto-rotation, no pulse). Selection is
- * keyboard-accessible and never depends on hover, so it works on mobile.
+ * Layered design:
+ *   Layer 1 — visible US map base (always on, no hover/interaction needed)
+ *   Layer 2 — soft regional glow + animated pathway lines over the map
+ *   Layer 3 — featured state/county exploration node (glowing, pulsing)
+ *   Layer 4 — story / opportunity card (accessible text)
+ *
+ * The map reveals opportunities, not the visitor: no geolocation, no
+ * addresses, illustrative examples only. Respects prefers-reduced-motion;
+ * selection is keyboard-accessible and never depends on hover (mobile-safe).
  */
 
 const ROTATE_MS = 6500;
+
+// Stylized-but-recognizable continental United States silhouette
+// (viewBox 0 0 100 62): wide body, pointed Northeast, Florida hanging at the
+// lower-right, Texas dipping at the lower-middle, Pacific coast on the left.
+const US_SILHOUETTE_PATH =
+  "M6 9 L18 8 L34 7 L46 7 L52 7 L56 11 L60 9 L72 8 L86 8 L94 11 " +
+  "L92 16 L89 21 L87 26 L86 31 L88 35 L86 40 L85 44 L84 48 L82 54 " +
+  "L80 50 L79 46 L72 47 L64 48 L58 48 L55 52 L50 57 L46 52 L44 48 " +
+  "L38 48 L28 47 L18 45 L13 43 L11 37 L9 29 L8 21 L7 14 Z";
+
+// Approximate on-map location of each featured state (viewBox coordinates), so
+// the featured exploration visibly belongs to a point on the US map.
+const STATE_MAP_POINTS: Record<string, { x: number; y: number }> = {
+  Iowa: { x: 52, y: 25 },
+  Missouri: { x: 56, y: 31 },
+  Tennessee: { x: 64, y: 36 },
+  Pennsylvania: { x: 80, y: 23 },
+  "North Carolina": { x: 81, y: 34 },
+};
+
+function mapPointFor(story: FeaturedStory): { x: number; y: number } {
+  return STATE_MAP_POINTS[story.state] ?? { x: 52, y: 30 };
+}
 
 export function LivingOpportunityMap({
   stories = CURATED_EXPLORATION_STORIES,
@@ -33,7 +62,6 @@ export function LivingOpportunityMap({
   const [reduceMotion, setReduceMotion] = useState(false);
   const pausedRef = useRef(false);
 
-  // Detect reduced-motion preference.
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -43,7 +71,6 @@ export function LivingOpportunityMap({
     return () => mq.removeEventListener?.("change", apply);
   }, []);
 
-  // Auto-rotate the featured example so the map "feels alive".
   useEffect(() => {
     if (reduceMotion || stories.length < 2) return;
     const id = window.setInterval(() => {
@@ -55,10 +82,17 @@ export function LivingOpportunityMap({
   }, [reduceMotion, stories.length]);
 
   const story = stories[active] ?? stories[0];
+  const focus = mapPointFor(story);
+  // A short pathway fanning inward from the featured state, illuminated over
+  // the map (not floating in empty space).
+  const pathwayPoints = [
+    focus,
+    { x: focus.x - 6, y: focus.y - 3 },
+    { x: focus.x - 12, y: focus.y - 6 },
+  ];
 
   function select(index: number) {
     setActive(index);
-    // Briefly pause auto-rotation after a manual choice.
     pausedRef.current = true;
     window.setTimeout(() => {
       pausedRef.current = false;
@@ -69,10 +103,10 @@ export function LivingOpportunityMap({
     <section
       aria-label="Featured exploration"
       style={{
-        border: "1px solid #1f2a44",
+        border: "1px solid #cdd9ec",
         borderRadius: 16,
-        background: "linear-gradient(160deg, #0b1220 0%, #0f1b30 100%)",
-        color: "#e8eefb",
+        background: "linear-gradient(160deg, #f3f7fd 0%, #e7eefa 100%)",
+        color: "#162033",
         padding: 20,
         display: "grid",
         gap: 16,
@@ -80,13 +114,16 @@ export function LivingOpportunityMap({
     >
       <style>{`
         @keyframes furlong-pulse {
-          0% { r: 2.2; opacity: 1; }
-          70% { r: 6.5; opacity: 0; }
-          100% { r: 6.5; opacity: 0; }
+          0% { transform: scale(1); opacity: 0.55; }
+          70% { transform: scale(2.6); opacity: 0; }
+          100% { transform: scale(2.6); opacity: 0; }
         }
-        .furlong-pulse-ring { animation: furlong-pulse 2.4s ease-out infinite; }
+        @keyframes furlong-flow { to { stroke-dashoffset: -16; } }
+        .furlong-pulse-ring { transform-box: fill-box; transform-origin: center; animation: furlong-pulse 2.4s ease-out infinite; }
+        .furlong-flow { stroke-dasharray: 3 3; animation: furlong-flow 1.6s linear infinite; }
         @media (prefers-reduced-motion: reduce) {
           .furlong-pulse-ring { animation: none; opacity: 0; }
+          .furlong-flow { animation: none; }
         }
       `}</style>
 
@@ -102,7 +139,7 @@ export function LivingOpportunityMap({
         <strong style={{ fontSize: 14, letterSpacing: 0.4, textTransform: "uppercase" }}>
           {FEATURED_EXPLORATION_LABEL}
         </strong>
-        <span style={{ fontSize: 12, color: "#9fb0d0" }}>
+        <span style={{ fontSize: 12, color: "#5d687a" }}>
           {FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE}
         </span>
       </div>
@@ -111,108 +148,115 @@ export function LivingOpportunityMap({
         style={{
           display: "grid",
           gap: 16,
-          gridTemplateColumns: "minmax(0, 1.3fr) minmax(0, 1fr)",
+          gridTemplateColumns: "minmax(0, 1.35fr) minmax(0, 1fr)",
           alignItems: "stretch",
         }}
       >
-        {/* Decorative animated map — hidden from assistive tech. */}
+        {/* Layers 1–3: the US map. Informative (it reads as a US map); the
+            featured details are also given as text in the card at right. */}
         <div
-          aria-hidden="true"
           style={{
-            position: "relative",
-            minHeight: 220,
-            border: "1px solid #21314f",
+            border: "1px solid #cdd9ec",
             borderRadius: 12,
-            background:
-              "radial-gradient(circle at 50% 40%, rgba(79,195,247,0.10), transparent 60%)",
-            overflow: "hidden",
+            background: "#ffffff",
+            padding: 8,
           }}
         >
           <svg
-            viewBox="0 0 100 70"
+            viewBox="0 0 100 62"
             preserveAspectRatio="xMidYMid meet"
-            style={{ width: "100%", height: "100%", display: "block" }}
+            role="img"
+            aria-label={`Map of the United States highlighting a featured exploration region in ${story.state}.`}
+            style={{ width: "100%", height: "auto", display: "block" }}
           >
-            {/* faint graticule */}
-            {[14, 28, 42, 56].map((gy) => (
-              <line
-                key={`h${gy}`}
-                x1="6"
-                y1={gy}
-                x2="94"
-                y2={gy}
-                stroke="#1b2742"
-                strokeWidth="0.3"
-              />
-            ))}
-            {[20, 40, 60, 80].map((gx) => (
-              <line
-                key={`v${gx}`}
-                x1={gx}
-                y1="8"
-                x2={gx}
-                y2="64"
-                stroke="#1b2742"
-                strokeWidth="0.3"
-              />
-            ))}
+            <defs>
+              <filter id="furlong-soft" x="-60%" y="-60%" width="220%" height="220%">
+                <feGaussianBlur stdDeviation="2.3" />
+              </filter>
+            </defs>
 
-            {/* all stories as faint markers */}
-            {stories.map((s, i) => (
-              <circle
-                key={`dot-${s.state}`}
-                cx={s.focusPoint.x}
-                cy={s.focusPoint.y}
-                r={i === active ? 0 : 1.3}
-                fill="#5a6c92"
-                opacity={0.6}
-              />
-            ))}
+            {/* Layer 1 — visible US base map (always on). */}
+            <path
+              d={US_SILHOUETTE_PATH}
+              fill="#dbe7f7"
+              stroke="#8aa3cc"
+              strokeWidth="0.7"
+              strokeLinejoin="round"
+            />
 
-            {/* active story: connecting path + nodes */}
+            {/* All featured regions as faint markers on the map. */}
+            {stories.map((s, i) => {
+              const p = mapPointFor(s);
+              return (
+                <circle
+                  key={`dot-${s.state}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r={i === active ? 0 : 1}
+                  fill="#6f86b3"
+                  opacity={0.7}
+                />
+              );
+            })}
+
+            {/* Layer 2 — soft regional glow + animated pathway over the map. */}
+            <circle
+              cx={focus.x}
+              cy={focus.y}
+              r="7"
+              fill={story.color}
+              opacity="0.28"
+              filter="url(#furlong-soft)"
+            />
             <polyline
-              points={story.connectedNodes
-                .map((n) => `${n.x},${n.y}`)
-                .join(" ")}
+              className="furlong-flow"
+              points={pathwayPoints.map((p) => `${p.x},${p.y}`).join(" ")}
               fill="none"
               stroke={story.color}
-              strokeWidth="0.6"
-              strokeOpacity="0.8"
+              strokeWidth="0.8"
+              strokeLinecap="round"
             />
-            {story.connectedNodes.map((n) => (
+            {pathwayPoints.slice(1).map((p, i) => (
               <circle
-                key={`node-${story.state}-${n.type}`}
-                cx={n.x}
-                cy={n.y}
-                r="1.6"
+                key={`path-node-${i}`}
+                cx={p.x}
+                cy={p.y}
+                r="1.2"
                 fill={story.color}
               />
             ))}
-            {/* focus point + pulse */}
-            <circle
-              cx={story.focusPoint.x}
-              cy={story.focusPoint.y}
-              r="2.6"
-              fill={story.color}
-            />
+
+            {/* Layer 3 — featured state/county exploration node (glow + pulse). */}
             <circle
               className="furlong-pulse-ring"
-              cx={story.focusPoint.x}
-              cy={story.focusPoint.y}
-              r="2.2"
-              fill="none"
-              stroke={story.color}
-              strokeWidth="0.6"
+              cx={focus.x}
+              cy={focus.y}
+              r="2.4"
+              fill={story.color}
             />
+            <circle cx={focus.x} cy={focus.y} r="2.4" fill={story.color} />
+            <circle cx={focus.x} cy={focus.y} r="1" fill="#ffffff" opacity="0.9" />
           </svg>
         </div>
 
-        {/* Accessible content — the real, non-canvas exploration card. */}
+        {/* Layer 4 — accessible story / opportunity card. */}
         <div style={{ display: "grid", gap: 10, alignContent: "start" }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignSelf: "start",
+              padding: "4px 10px",
+              borderRadius: 999,
+              background: "#eef3fb",
+              color: "#35507a",
+              fontSize: 12,
+              fontWeight: 800,
+            }}
+          >
+            Featured / Illustrative Exploration
+          </div>
           <div aria-live="polite" style={{ display: "grid", gap: 4 }}>
-            <span style={{ fontSize: 12, color: "#9fb0d0" }}>
-              Example region
-            </span>
+            <span style={{ fontSize: 12, color: "#5d687a" }}>Illustrative region</span>
             <strong style={{ fontSize: 18 }}>
               {story.state} · {story.county}
             </strong>
@@ -223,7 +267,7 @@ export function LivingOpportunityMap({
               alignSelf: "start",
               padding: "3px 10px",
               borderRadius: 999,
-              background: "rgba(255,255,255,0.08)",
+              background: "#eef3fb",
               color: story.color,
               fontSize: 12,
               fontWeight: 700,
@@ -233,19 +277,13 @@ export function LivingOpportunityMap({
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
             {story.connectedNodes.map((n, i) => (
-              <span
-                key={`chip-${story.state}-${n.type}`}
-                style={{
-                  fontSize: 12,
-                  color: "#cdd9f2",
-                }}
-              >
+              <span key={`chip-${story.state}-${n.type}`} style={{ fontSize: 12, color: "#475569" }}>
                 {n.type}
                 {i < story.connectedNodes.length - 1 ? " →" : ""}
               </span>
             ))}
           </div>
-          <p style={{ margin: 0, lineHeight: 1.6, color: "#dbe5fb", fontSize: 14 }}>
+          <p style={{ margin: 0, lineHeight: 1.6, color: "#1f2a3d", fontSize: 14 }}>
             {story.story}
           </p>
         </div>
@@ -269,11 +307,9 @@ export function LivingOpportunityMap({
                 minHeight: 40,
                 padding: "0 12px",
                 borderRadius: 999,
-                border: isActive
-                  ? `1px solid ${s.color}`
-                  : "1px solid #2c3b5c",
-                background: isActive ? "rgba(255,255,255,0.10)" : "transparent",
-                color: isActive ? "#ffffff" : "#aebbd8",
+                border: isActive ? `1px solid ${s.color}` : "1px solid #cdd9ec",
+                background: isActive ? "#ffffff" : "transparent",
+                color: isActive ? "#162033" : "#5d687a",
                 fontWeight: 700,
                 fontSize: 13,
                 cursor: "pointer",
@@ -285,9 +321,10 @@ export function LivingOpportunityMap({
         })}
       </div>
 
-      <p style={{ margin: 0, fontSize: 12, color: "#8094b8", lineHeight: 1.5 }}>
-        These are illustrative examples of what people explore — not offers, and
-        not based on your location. We show pathways, not promises.
+      <p style={{ margin: 0, fontSize: 12, color: "#5d687a", lineHeight: 1.5 }}>
+        A national map of possibilities. These are illustrative examples of what
+        people explore — not offers, and not based on your location. The map
+        reveals opportunities, not the visitor. We show pathways, not promises.
       </p>
     </section>
   );

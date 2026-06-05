@@ -9,7 +9,7 @@ import {
 } from "@/lib/customer-landing/featuredExplorationStories";
 
 /**
- * Furlong homepage — public-facing discovery experience (Build 50).
+ * Furlong homepage — public-facing discovery experience (Build 52).
  *
  * Section order:
  *   1. Hero — compass + headline + CTA
@@ -314,14 +314,13 @@ export default function HomePage() {
         <section className="fl-hero" aria-label="Furlong discovery">
           <header className="fl-hero-copy">
             <h1>
-              Start your journey with Furlong.
+              Every Journey Starts Somewhere.
             </h1>
             <p className="fl-hero-sub">
-              Discover possibilities. Explore your options.
-              Understand your next steps. Make informed decisions.
+              Explore Your Possibilities.
             </p>
             <a href="#explore" className="fl-cta-primary">
-              Explore your possibilities
+              Explore Your Possibilities →
             </a>
           </header>
         </section>

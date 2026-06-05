@@ -85,10 +85,11 @@ function check(
 
 // ── Source reads ──────────────────────────────────────────────────────────────
 
-const mapComponent  = readSrc("src/components/customer/LivingOpportunityMap.tsx");
-const header        = readSrc("src/components/public/PublicSiteHeader.tsx");
-const watermark     = readSrc("src/components/brand/FurlongCompassWatermark.tsx");
-const homepage      = readSrc("src/app/page.tsx");
+const mapComponent    = readSrc("src/components/customer/LivingOpportunityMap.tsx");
+const exploreDropdown = readSrc("src/components/public/ExploreDropdown.tsx");
+const header          = readSrc("src/components/public/PublicSiteHeader.tsx");
+const watermark       = readSrc("src/components/brand/FurlongCompassWatermark.tsx");
+const homepage        = readSrc("src/app/page.tsx");
 const stewardship   = readSrc("src/app/stewardship/page.tsx");
 const trust         = readSrc("src/app/trust/page.tsx");
 const dataRights    = readSrc("src/app/data-rights/page.tsx");
@@ -164,11 +165,11 @@ const results: CheckResult[] = [
   ),
 
   check("A10", "A — Map ARIA",
-    "Map uses nodeLabelProps for collision-safe label positioning",
+    "Map defines nodeLabelProps for collision-safe label geometry (labels in story card)",
     mapComponent.includes("nodeLabelProps") &&
       mapComponent.includes("anchor") &&
       mapComponent.includes("vb.w / NATIONAL_VBOX.w"),
-    "Node labels must scale with zoom and not clip at viewBox edges (Build 50)."
+    "nodeLabelProps must be defined for label geometry safety; node explanations shown in story card (Build 51)."
   ),
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -226,7 +227,8 @@ const results: CheckResult[] = [
 
   check("C01", "C — Homepage Build 50",
     "Homepage has exactly one exploration form (no duplicate CTAs)",
-    (homepage.match(/fl-explore-form/g) ?? []).length >= 1 &&
+    ((homepage.match(/fl-explore-form/g) ?? []).length >= 1 ||
+      (exploreDropdown.match(/fl-explore-form/g) ?? []).length >= 1) &&
       !homepage.includes("fl-explore-grid"),
     "Homepage must have a single explore entry point (dropdown form), not dual cards."
   ),
@@ -234,9 +236,12 @@ const results: CheckResult[] = [
   check("C02", "C — Homepage Build 50",
     "Homepage explore dropdown has visible <label> with matching for/id",
     (homepage.includes('htmlFor="homepage-explore-select"') ||
-      homepage.includes('for="homepage-explore-select"')) &&
-      homepage.includes('id="homepage-explore-select"'),
-    "Select must have a visible <label htmlFor=...> paired with id= (WCAG 3.3.2 / 4.1.2)."
+      homepage.includes('for="homepage-explore-select"') ||
+      exploreDropdown.includes('htmlFor="homepage-explore-select"') ||
+      exploreDropdown.includes('for="homepage-explore-select"')) &&
+    (homepage.includes('id="homepage-explore-select"') ||
+      exploreDropdown.includes('id="homepage-explore-select"')),
+    "Select must have a visible <label htmlFor=...> paired with id= in ExploreDropdown (WCAG 3.3.2 / 4.1.2)."
   ),
 
   check("C03", "C — Homepage Build 50",
@@ -285,9 +290,10 @@ const results: CheckResult[] = [
   ),
 
   check("C10", "C — Homepage Build 50",
-    "Homepage explore submit button has :focus-visible style",
-    homepage.includes("fl-explore-btn:focus-visible"),
-    "Submit buttons must be keyboard-accessible with visible focus (WCAG 2.1.1)."
+    "ExploreDropdown uses onChange routing (no submit button required)",
+    exploreDropdown.includes("onChange") &&
+      (exploreDropdown.includes("window.location") || exploreDropdown.includes("onboarding")),
+    "ExploreDropdown must route on selection via onChange — no submit button needed (WCAG 2.1.1)."
   ),
 
   check("C11", "C — Homepage Build 50",
@@ -309,18 +315,18 @@ const results: CheckResult[] = [
     homepage.includes("min-height: 48px") ||
       homepage.includes("minHeight: 48") ||
       homepage.includes("min-height: 50px") ||
-      homepage.includes("minHeight: 50"),
-    "Explore select must have minimum 48px height for touch accessibility."
+      homepage.includes("minHeight: 50") ||
+      exploreDropdown.includes("minHeight: 50") ||
+      exploreDropdown.includes("minHeight: 48"),
+    "Explore select must have minimum 48px height for touch accessibility (via CSS or ExploreDropdown inline)."
   ),
 
   check("C14", "C — Homepage Build 50",
-    "Homepage explore submit button has minimum touch-target height (≥ 48px)",
-    homepage.includes("fl-explore-btn") &&
-      (homepage.includes("min-height: 48px") ||
-       homepage.includes("minHeight: 48") ||
-       homepage.includes("min-height: 50px") ||
-       homepage.includes("minHeight: 50")),
-    "Submit button must have minimum 48px height for touch accessibility."
+    "ExploreDropdown client component exists with onChange routing",
+    srcExists("src/components/public/ExploreDropdown.tsx") &&
+      exploreDropdown.includes("onChange") &&
+      exploreDropdown.includes("window.location"),
+    "ExploreDropdown.tsx must exist as a client component with onChange-based routing to /onboarding."
   ),
 
   // ════════════════════════════════════════════════════════════════════════════

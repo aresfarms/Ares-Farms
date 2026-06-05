@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { FurlongCompassWatermark } from "@/components/brand/FurlongCompassWatermark";
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
+import { ExploreDropdown } from "@/components/public/ExploreDropdown";
 import {
   AMERICA_250_STORIES,
 } from "@/lib/customer-landing/featuredExplorationStories";
@@ -43,19 +44,6 @@ const WHAT_FURLONG_IS_NOT = [
   "Furlong does not guarantee outcomes.",
   "Furlong does not make official determinations.",
   "Furlong does not sell your information.",
-] as const;
-
-// Options for the homepage exploration dropdown.
-// These are the canonical starting-point categories for onboarding.
-const EXPLORE_OPTIONS = [
-  { slug: "property-land",             label: "Property & Land" },
-  { slug: "farms-agriculture",         label: "Farms & Agriculture" },
-  { slug: "small-business-growth",     label: "Small Business Growth" },
-  { slug: "environmental-compliance",  label: "Environmental & Compliance" },
-  { slug: "financing-capital",         label: "Financing & Capital" },
-  { slug: "housing-development",       label: "Housing & Development" },
-  { slug: "programs-incentives",       label: "Programs & Incentives" },
-  { slug: "not-sure",                  label: "I'm Not Sure Yet" },
 ] as const;
 
 const FOOTER_LINKS = [
@@ -207,6 +195,8 @@ export default function HomePage() {
           }
 
           /* ── Explore dropdown form ─────────────────────────────────── */
+          /* fl-explore-form, fl-explore-label, fl-explore-select rendered  */
+          /* by ExploreDropdown client component (onChange routes to onboarding). */
           .fl-explore-form {
             display: grid;
             gap: 10px;
@@ -220,13 +210,8 @@ export default function HomePage() {
             color: #3b475a;
             text-align: center;
           }
-          .fl-explore-row {
-            display: flex;
-            gap: 12px;
-            align-items: stretch;
-          }
           .fl-explore-select {
-            flex: 1;
+            width: 100%;
             min-height: 50px;
             padding: 0 14px;
             border-radius: 10px;
@@ -241,25 +226,6 @@ export default function HomePage() {
             outline: 2px solid #0f766e;
             outline-offset: 2px;
             border-color: #0f766e;
-          }
-          .fl-explore-btn {
-            min-height: 50px;
-            padding: 0 24px;
-            border-radius: 10px;
-            border: none;
-            background: #0f766e;
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: inherit;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: background 0.15s;
-          }
-          .fl-explore-btn:hover { background: #0d6460; }
-          .fl-explore-btn:focus-visible {
-            outline: 2px solid #0f766e;
-            outline-offset: 3px;
           }
 
           /* ── Trust strip ───────────────────────────────────────────── */
@@ -357,9 +323,7 @@ export default function HomePage() {
             .fl-trust-strip-items { gap: 8px 16px; }
             .fl-not-grid { grid-template-columns: 1fr; }
             .fl-a250-label { justify-content: flex-start; }
-            .fl-explore-row { flex-direction: column; }
             .fl-explore-select { min-height: 48px; }
-            .fl-explore-btn { min-height: 48px; }
           }
 
         `}</style>
@@ -410,29 +374,10 @@ export default function HomePage() {
         >
           <h2 className="fl-section-title">What would you like to explore today?</h2>
 
-          <form method="GET" action="/onboarding" className="fl-explore-form">
-            <label htmlFor="homepage-explore-select" className="fl-explore-label">
-              Choose a starting point
-            </label>
-            <div className="fl-explore-row">
-              <select
-                id="homepage-explore-select"
-                name="explore"
-                className="fl-explore-select"
-                defaultValue=""
-              >
-                <option value="" disabled>Select a topic…</option>
-                {EXPLORE_OPTIONS.map((o) => (
-                  <option key={o.slug} value={o.slug}>
-                    {o.label}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="fl-explore-btn">
-                Begin exploring →
-              </button>
-            </div>
-          </form>
+          {/* ExploreDropdown: "use client" component — routes on selection,
+              no submit button. Contains <label htmlFor="homepage-explore-select">
+              and <select id="homepage-explore-select"> for WCAG 3.3.2/4.1.2. */}
+          <ExploreDropdown />
 
           <p style={{ ...muted, margin: 0, fontSize: 14, textAlign: "center" }}>
             No account or personal information is needed to look around.

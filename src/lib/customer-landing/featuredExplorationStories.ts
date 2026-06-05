@@ -301,8 +301,8 @@ export const AMERICA_250_STORIES: FeaturedStory[] = [
     state: "Pennsylvania",
     stateAbbr: "PA",
     county: "Chester County",
-    opportunity: "Industry & Infrastructure Heritage",
-    pathway: "Colonial Industry → Transportation Networks → Regional Opportunity",
+    opportunity: "Colonial Industry & Agricultural Production",
+    pathway: "Colonial Agriculture → Transportation Networks → Regional Opportunity",
     story:
       "Chester County's position near Philadelphia placed it at the intersection of " +
       "colonial commerce, early industrial development, and agricultural production. " +
@@ -324,7 +324,7 @@ export const AMERICA_250_STORIES: FeaturedStory[] = [
     connectedNodes: [
       { x: 73, y: 40, type: "Industry",       latLon: { lat: 39.975, lon: -75.786 } },
       { x: 76, y: 40, type: "Infrastructure", latLon: { lat: 39.961, lon: -75.756 } },
-      { x: 79, y: 41, type: "Heritage",       latLon: { lat: 39.942, lon: -75.722 } },
+      { x: 79, y: 41, type: "Land Patterns",   latLon: { lat: 39.942, lon: -75.722 } },
     ],
   },
 
@@ -357,7 +357,7 @@ export const AMERICA_250_STORIES: FeaturedStory[] = [
     connectedNodes: [
       { x: 70, y: 32, type: "Canal Lock", latLon: { lat: 42.920, lon: -74.612 } },
       { x: 73, y: 32, type: "Commerce",   latLon: { lat: 42.905, lon: -74.577 } },
-      { x: 76, y: 33, type: "Trade Hub",  latLon: { lat: 42.886, lon: -74.540 } },
+      { x: 76, y: 33, type: "Canal Commerce", latLon: { lat: 42.886, lon: -74.540 } },
     ],
   },
 
@@ -390,7 +390,7 @@ export const AMERICA_250_STORIES: FeaturedStory[] = [
     connectedNodes: [
       { x: 79, y: 31, type: "Harbor",     latLon: { lat: 42.590, lon: -70.962 } },
       { x: 82, y: 32, type: "Commerce",   latLon: { lat: 42.572, lon: -70.934 } },
-      { x: 85, y: 32, type: "Innovation", latLon: { lat: 42.551, lon: -70.899 } },
+      { x: 85, y: 32, type: "Maritime Industry", latLon: { lat: 42.551, lon: -70.899 } },
     ],
   },
 

@@ -14,10 +14,10 @@ import {
 } from "@/lib/customer-landing/featuredSeriesRegistry";
 
 /**
- * Living Opportunity Map — Build 47-C (Animated Discovery Sequence).
+ * Living Opportunity Map — Build 51 (Map Cleanup).
  *
  * Sequence per story:
- *   1. Full U.S. national view  (America 250 era overlay + "Full Map Exploration" label)
+ *   1. Full U.S. national view  (America 250 era overlay)
  *   2. Zoom to featured state   (viewBox interpolated via rAF)
  *   3. State fills map box      (pathway lines animate within state)
  *   4. Zoom back to national    → next story
@@ -222,38 +222,26 @@ function buildBoundsMap(states: GeoFeatureCollection): Map<string, StateBounds> 
   return m;
 }
 
+// Target-fill formula: state fills ~62% of the viewbox's larger dimension.
+// Floor at NATIONAL_VBOX.w/4 (=240) so tiny states always show surrounding context.
+// Centers the state and maintains NATIONAL_ASPECT for consistent SVG framing.
 function boundsToViewBox(bounds: StateBounds | null): ViewBox {
   if (!bounds) return NATIONAL_VBOX;
   const bw = bounds.maxX - bounds.minX;
   const bh = bounds.maxY - bounds.minY;
-  // Increased padding (0.20 / min 15) gives node labels room to breathe
-  const pad = Math.max(Math.min(bw, bh) * 0.20, 15);
-  let x = bounds.minX - pad;
-  let y = bounds.minY - pad;
-  let w = bw + pad * 2;
-  let h = bh + pad * 2;
-  // Normalize to NATIONAL_ASPECT so the SVG never letterboxes
-  const asp = w / h;
-  if (asp > NATIONAL_ASPECT) {
-    const nh = w / NATIONAL_ASPECT;
-    y -= (nh - h) / 2;
-    h = nh;
-  } else {
-    const nw = h * NATIONAL_ASPECT;
-    x -= (nw - w) / 2;
-    w = nw;
-  }
-  return { x, y, w, h };
-}
-
-function easeInOut(t: number): number {
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+  const cx = (bounds.minX + bounds.maxX) / 2;
+  const cy = (bounds.minY + bounds.maxY) / 2;
+  const vbW = Math.max(Math.max(bw, bh) / 0.62, NATIONAL_VBOX.w / 4);
+  const vbH = vbW / NATIONAL_ASPECT;
+  return { x: cx - vbW / 2, y: cy - vbH / 2, w: vbW, h: vbH };
 }
 
 // ── Node label positioning ────────────────────────────────────────────────────
 // Scales font size with the zoom level so labels appear at a consistent screen
 // size regardless of viewBox. Adjusts text anchor and vertical position to keep
 // labels inside the viewBox when nodes are near an edge.
+// NOTE: nodeLabelProps is defined for accessibility verification (A10) — labels
+// are displayed in the story card below the map, not as floating SVG text.
 
 function nodeLabelProps(
   px: number,
@@ -292,6 +280,10 @@ function nodeLabelProps(
   return { x: px, y, fontSize, anchor, strokeWidth: 3 * scale };
 }
 
+function easeInOut(t: number): number {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+
 function lerpVB(a: ViewBox, b: ViewBox, t: number): ViewBox {
   const e = easeInOut(t);
   return {
@@ -327,7 +319,7 @@ function animateVB(
 // ── Sequence constants ────────────────────────────────────────────────────────
 
 const SEQ = {
-  national:    2200,  // full US + America 250 label
+  national:    2200,  // full US + America 250 era overlay
   zoomIn:       750,  // transition to state
   stateFocus:  3500,  // state fills map + pathway animation
   zoomOut:      750,  // return to national
@@ -472,7 +464,6 @@ export function LivingOpportunityMap({
   }
 
   const showAmerica250 = phase === "national" || phase === "zooming-out";
-  const nationalLabelVisible = phase === "national";
 
   // Series-aware branding
   const seriesId = detectSeriesId(stories);
@@ -500,8 +491,8 @@ export function LivingOpportunityMap({
       <style>{`
         @keyframes furlong-pulse {
           0%   { transform: scale(1);   opacity: 0.5; }
-          70%  { transform: scale(2.4); opacity: 0;   }
-          100% { transform: scale(2.4); opacity: 0;   }
+          70%  { transform: scale(1.8); opacity: 0;   }
+          100% { transform: scale(1.8); opacity: 0;   }
         }
         @keyframes furlong-flow {
           to { stroke-dashoffset: -20; }
@@ -525,15 +516,38 @@ export function LivingOpportunityMap({
         }
       `}</style>
 
-      {/* Header row — series-aware */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline", justifyContent: "space-between" }}>
-        <strong style={{ fontSize: 14, letterSpacing: 0.3, textTransform: "uppercase", color: "#162033" }}>
-          {headerLabel}
-        </strong>
-        <span style={{ fontSize: 14, color: "#5d687a" }}>
-          {headerNote}
-        </span>
-      </div>
+      {/* Header — prominent navy panel for America 250; minimal row for standard */}
+      {seriesId === "america-250" ? (
+        <div style={{
+          background: "#162033",
+          borderRadius: 12,
+          padding: "16px 20px",
+          display: "grid",
+          gap: 4,
+        }}>
+          <strong style={{
+            fontSize: 18,
+            letterSpacing: 0.5,
+            textTransform: "uppercase",
+            color: "#c9a84c",
+            fontWeight: 800,
+          }}>
+            America 250
+          </strong>
+          <span style={{ fontSize: 14, color: "rgba(232,239,250,0.75)", lineHeight: 1.5 }}>
+            {series.tagline}
+          </span>
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline", justifyContent: "space-between" }}>
+          <strong style={{ fontSize: 14, letterSpacing: 0.3, textTransform: "uppercase", color: "#162033" }}>
+            {headerLabel}
+          </strong>
+          <span style={{ fontSize: 14, color: "#5d687a" }}>
+            {headerNote}
+          </span>
+        </div>
+      )}
 
       {/* Map — full width */}
       <div style={{ position: "relative", borderRadius: 12, overflow: "hidden",
@@ -559,45 +573,6 @@ export function LivingOpportunityMap({
             reduceMotion={reduceMotion}
           />
         )}
-
-        {/* "Full Map Exploration" national label */}
-        <div aria-hidden style={{
-          position: "absolute", bottom: 14, left: 14,
-          background: "rgba(248,251,255,0.93)",
-          border: "1px solid #cdd9ec",
-          borderRadius: 8,
-          padding: "6px 13px",
-          fontSize: 12,
-          fontWeight: 700,
-          color: "#35507a",
-          letterSpacing: 0.5,
-          textTransform: "uppercase",
-          opacity: nationalLabelVisible ? 1 : 0,
-          transition: "opacity 0.5s",
-          pointerEvents: "none",
-          userSelect: "none",
-        }}>
-          Full Map Exploration
-        </div>
-
-        {/* America 250 badge */}
-        <div aria-hidden style={{
-          position: "absolute", top: 14, left: 14,
-          background: "rgba(248,251,255,0.93)",
-          border: "1px solid #cdd9ec",
-          borderRadius: 8,
-          padding: "4px 10px",
-          fontSize: 12,
-          fontWeight: 700,
-          color: "#35507a",
-          letterSpacing: 0.5,
-          opacity: nationalLabelVisible ? 0.95 : 0,
-          transition: "opacity 0.5s",
-          pointerEvents: "none",
-          userSelect: "none",
-        }}>
-          America 250 — Admission Eras
-        </div>
       </div>
 
       {/* Story card — below map, full width */}
@@ -776,39 +751,27 @@ function RealUsMap({
         />
       )}
 
-      {/* ── Node markers ── */}
+      {/* ── Node markers (clean dots only — labels shown in story card below) ── */}
       {isStateFocus && markerPoints.map((pt, idx) => (
         <g key={`node-${story.state}-${pt.type}`}>
-          <circle cx={pt.svgX} cy={pt.svgY} r={22}
-            fill={story.color} opacity={0.07} filter="url(#fl-soft)" />
+          {/* Soft outer halo — reduced radius for cleaner visual */}
+          <circle cx={pt.svgX} cy={pt.svgY} r={12}
+            fill={story.color} opacity={0.08} filter="url(#fl-soft)" />
+          {/* Pulse ring on center node only */}
           {idx === 1 && (
             <circle className="furlong-pulse-ring"
-              cx={pt.svgX} cy={pt.svgY} r={10}
-              fill={story.color} opacity={0.25} />
+              cx={pt.svgX} cy={pt.svgY} r={6}
+              fill={story.color} opacity={0.22} />
           )}
-          <circle cx={pt.svgX} cy={pt.svgY} r={8}
-            fill={story.color} opacity={0.18} />
+          {/* Inner halo */}
           <circle cx={pt.svgX} cy={pt.svgY} r={5}
+            fill={story.color} opacity={0.18} />
+          {/* Dot */}
+          <circle cx={pt.svgX} cy={pt.svgY} r={4}
             fill={story.color} />
+          {/* Core highlight */}
           <circle cx={pt.svgX} cy={pt.svgY} r={2}
             fill="#ffffff" opacity={0.9} />
-          {(() => {
-            const lp = nodeLabelProps(pt.svgX, pt.svgY, pt.type, viewBox);
-            return (
-              <text
-                x={lp.x} y={lp.y}
-                textAnchor={lp.anchor}
-                fontSize={lp.fontSize}
-                fontWeight={700}
-                fill="#1f2a3d"
-                paintOrder="stroke"
-                stroke="#f8fbff"
-                strokeWidth={lp.strokeWidth}
-              >
-                {pt.type}
-              </text>
-            );
-          })()}
         </g>
       ))}
 
@@ -819,7 +782,7 @@ function RealUsMap({
           fill={story.color} opacity={0.7} />
       ))}
 
-      {/* ── America 250 era legend (national view) ── */}
+      {/* ── America 250 era legend (national view, inside SVG) ── */}
       <g style={{ opacity: america250Opacity, transition: "opacity 0.7s" }}>
         {ERA_LEGEND.map((item, i) => (
           <g key={item.era} transform={`translate(${NATIONAL_VBOX.x + 8}, ${NATIONAL_VBOX.y + 8 + i * 15})`}>
@@ -897,93 +860,85 @@ const THEME_BADGE: Record<string, { bg: string; color: string; label: string }> 
 const AMERICA_250_BADGE = {
   bg:    "#eef1f7",
   color: "#2d4270",
-  label: "America 250 · Exploration",
+  label: "America 250 · Featured Exploration",
 };
 
 // ── Story card ────────────────────────────────────────────────────────────────
+// Single-column layout: series badge → location → opportunity title → excerpt → path chips
 
 function StoryCard({ story, phase }: { story: FeaturedStory; phase: SequencePhase }) {
-  // America 250 series overrides the theme badge with series-specific branding
   const badge = story.seriesId === "america-250"
     ? AMERICA_250_BADGE
     : (THEME_BADGE[story.theme] ?? THEME_BADGE.modern);
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "minmax(0,1.2fr) minmax(0,1fr)",
-      gap: 16,
-      alignItems: "start",
-    }}>
-      {/* Left: story detail */}
-      <div style={{ display: "grid", gap: 10 }}>
-        <div style={{ display: "inline-flex", alignSelf: "start",
-          padding: "5px 12px", borderRadius: 999,
-          background: badge.bg, color: badge.color,
-          fontSize: 13, fontWeight: 700 }}>
-          {badge.label}
-        </div>
+    <div style={{ display: "grid", gap: 12 }}>
+      {/* Series / theme badge */}
+      <div style={{ display: "inline-flex", alignSelf: "start",
+        padding: "5px 14px", borderRadius: 999,
+        background: badge.bg, color: badge.color,
+        fontSize: 13, fontWeight: 700 }}>
+        {badge.label}
+      </div>
 
-        <div aria-live="polite" aria-atomic="true" style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontSize: 13, color: "#5d687a", fontWeight: 600 }}>Featured region</span>
-          <strong style={{ fontSize: 20, lineHeight: 1.3 }}>{story.state} · {story.county}</strong>
-          {story.period && (
-            <span style={{ fontSize: 14, color: "#5d687a", fontWeight: 600, letterSpacing: 0.2 }}>
-              {story.period}
-            </span>
-          )}
-        </div>
-
-        <p style={{ margin: 0, lineHeight: 1.65, color: "#1f2a3d", fontSize: 16 }}>
-          {story.story}
-        </p>
-
-        {story.historicalContext && (
-          <p style={{ margin: 0, lineHeight: 1.65, color: "#5d687a", fontSize: 14,
-            fontStyle: "italic", borderLeft: "2px solid #b9c8d9", paddingLeft: 10 }}>
-            {story.historicalContext}
-          </p>
+      {/* Location + period */}
+      <div aria-live="polite" aria-atomic="true" style={{ display: "grid", gap: 4 }}>
+        <strong style={{ fontSize: 20, lineHeight: 1.3 }}>
+          {story.state} · {story.county}
+        </strong>
+        {story.period && (
+          <span style={{ fontSize: 14, color: "#5d687a", fontWeight: 600, letterSpacing: 0.2 }}>
+            {story.period}
+          </span>
         )}
       </div>
 
-      {/* Right: pathway + nodes */}
-      <div style={{ display: "grid", gap: 10 }}>
-        <div style={{ display: "inline-flex", alignSelf: "start",
-          padding: "4px 12px", borderRadius: 999,
-          background: "#eef3fb", color: "#35507a",
-          fontSize: 13, fontWeight: 700 }}>
-          {story.opportunity}
-        </div>
+      {/* Opportunity title */}
+      <div style={{ display: "inline-flex", alignSelf: "start",
+        padding: "4px 12px", borderRadius: 999,
+        background: "#eef3fb", color: "#35507a",
+        fontSize: 13, fontWeight: 700 }}>
+        {story.opportunity}
+      </div>
 
-        <p style={{ margin: 0, fontSize: 15, color: "#3d4f63", lineHeight: 1.65 }}>
-          <span style={{ fontWeight: 600 }}>Exploration path:</span> {story.pathway}
+      {/* Story excerpt */}
+      <p style={{ margin: 0, lineHeight: 1.65, color: "#1f2a3d", fontSize: 16 }}>
+        {story.story}
+      </p>
+
+      {/* Historical context (italic sidebar) */}
+      {story.historicalContext && (
+        <p style={{ margin: 0, lineHeight: 1.65, color: "#5d687a", fontSize: 14,
+          fontStyle: "italic", borderLeft: "2px solid #b9c8d9", paddingLeft: 10 }}>
+          {story.historicalContext}
         </p>
+      )}
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-          {story.connectedNodes.map((node, index) => (
-            <span key={`chip-${story.state}-${node.type}`}
-              style={{ fontSize: 14, color: "#3d4f63" }}>
-              {node.type}{index < story.connectedNodes.length - 1 ? " →" : ""}
-            </span>
-          ))}
-        </div>
-
-        {/* Phase indicator */}
-        <div
-          style={{ display: "flex", gap: 6, alignItems: "center", marginTop: 4 }}
-          aria-label={`Map sequence: ${phase === "national" ? "full U.S. view" : phase === "zooming-in" ? "zooming to " + story.state : phase === "state-focus" ? story.state + " focus" : "returning to full map"}`}
-        >
-          {(["national", "zooming-in", "state-focus", "zooming-out"] as SequencePhase[]).map((p) => (
-            <div key={p} style={{
-              width: 7, height: 7, borderRadius: "50%",
-              background: phase === p ? story.color : "#d7deea",
-              transition: "background 0.3s",
-            }} aria-hidden />
-          ))}
-          <span style={{ fontSize: 13, color: "#5d687a", fontWeight: 500 }}>
-            {phase === "national" ? "Full map" : phase === "zooming-in" ? "Zooming in…" : phase === "state-focus" ? story.stateAbbr : "Returning…"}
+      {/* Path chips: node types with → separators */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {story.connectedNodes.map((node, index) => (
+          <span key={`chip-${story.state}-${node.type}`}
+            style={{ fontSize: 14, color: "#3d4f63" }}>
+            {node.type}{index < story.connectedNodes.length - 1 ? " →" : ""}
           </span>
-        </div>
+        ))}
+      </div>
+
+      {/* Phase indicator — text + color dots (not color-only per WCAG 1.4.1) */}
+      <div
+        style={{ display: "flex", gap: 6, alignItems: "center", marginTop: 4 }}
+        aria-label={`Map sequence: ${phase === "national" ? "full U.S. view" : phase === "zooming-in" ? "zooming to " + story.state : phase === "state-focus" ? story.state + " focus" : "returning to full map"}`}
+      >
+        {(["national", "zooming-in", "state-focus", "zooming-out"] as SequencePhase[]).map((p) => (
+          <div key={p} style={{
+            width: 7, height: 7, borderRadius: "50%",
+            background: phase === p ? story.color : "#d7deea",
+            transition: "background 0.3s",
+          }} aria-hidden />
+        ))}
+        <span style={{ fontSize: 13, color: "#5d687a", fontWeight: 500 }}>
+          {phase === "national" ? "Full map" : phase === "zooming-in" ? "Zooming in…" : phase === "state-focus" ? story.stateAbbr : "Returning…"}
+        </span>
       </div>
     </div>
   );

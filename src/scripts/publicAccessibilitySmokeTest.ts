@@ -124,11 +124,19 @@ function runAcceptanceCriteria(): CriterionResult[] {
     },
     {
       id:    "AC-2",
-      label: "Dropdown has visible <label> element (htmlFor + id paired)",
-      pass:  (homepage.includes('htmlFor="homepage-explore-select"') ||
-              homepage.includes('for="homepage-explore-select"')) &&
-             homepage.includes('id="homepage-explore-select"'),
-      detail: "Select must have a visible <label> with matching htmlFor/id (WCAG 3.3.2 / 4.1.2).",
+      label: "Dropdown has visible <label> element (htmlFor + id paired in ExploreDropdown)",
+      pass:  (() => {
+        const exploreDD = readSrc("src/components/public/ExploreDropdown.tsx");
+        return (
+          (homepage.includes('htmlFor="homepage-explore-select"') ||
+           homepage.includes('for="homepage-explore-select"') ||
+           exploreDD.includes('htmlFor="homepage-explore-select"') ||
+           exploreDD.includes('for="homepage-explore-select"')) &&
+          (homepage.includes('id="homepage-explore-select"') ||
+           exploreDD.includes('id="homepage-explore-select"'))
+        );
+      })(),
+      detail: "Select must have a visible <label> with matching htmlFor/id in ExploreDropdown (WCAG 3.3.2 / 4.1.2).",
     },
     {
       id:    "AC-3",

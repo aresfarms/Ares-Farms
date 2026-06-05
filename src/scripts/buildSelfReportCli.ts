@@ -65,6 +65,19 @@ function main() {
         auditChainIntact: result.header.audit_chain_intact,
         findingCount: result.summary.findingCount,
         crossSourceConflictCount: result.summary.crossSourceConflictCount,
+        classificationRegistryParsed:
+          result.summary.classificationRegistryParsed,
+        classificationChangesActive: result.summary.classificationChangesActive,
+        classificationChangesHistorical:
+          result.summary.classificationChangesHistorical,
+        activeClassificationChanges:
+          result.classificationChangeRegistry.activeEntries.map((e) => ({
+            id: e.id,
+            title: e.title,
+            previousState: e.previousState,
+            newState: e.newState,
+            status: e.status,
+          })),
         exitCode: result.header.exit_code,
         jsonPath,
         mdPath,

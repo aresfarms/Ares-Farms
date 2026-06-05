@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { America250Banner } from "@/components/brand/America250Banner";
 import { FurlongCompassWatermark } from "@/components/brand/FurlongCompassWatermark";
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
 import { ExploreDropdown } from "@/components/public/ExploreDropdown";
@@ -93,6 +94,9 @@ export default function HomePage() {
       <FurlongCompassWatermark variant="hero" />
       <FurlongCompassWatermark variant="subtle" />
 
+      {/* America 250 full-width commemorative banner */}
+      <America250Banner />
+
       <div style={container}>
 
         {/* ─── Inline styles ─────────────────────────────────────────── */}
@@ -151,35 +155,6 @@ export default function HomePage() {
           /* ── Map section ───────────────────────────────────────────── */
           .fl-map-section {
             margin-top: 16px;
-          }
-
-          /* ── America 250 label — navy/gold treatment ───────────────── */
-          .fl-a250-label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 10px;
-          }
-          .fl-a250-badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 999px;
-            background: #162033;
-            color: #c9a84c;
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            white-space: nowrap;
-          }
-          .fl-a250-copy {
-            font-size: 14px;
-            font-weight: 600;
-            color: #162033;
-            line-height: 1.55;
           }
 
           /* ── Section spacing ───────────────────────────────────────── */
@@ -327,7 +302,6 @@ export default function HomePage() {
             .fl-hero { padding: 52px 0 28px; }
             .fl-trust-strip-items { gap: 8px 16px; }
             .fl-not-grid { grid-template-columns: 1fr; }
-            .fl-a250-label { justify-content: flex-start; }
             .fl-explore-select { min-height: 48px; }
           }
 
@@ -357,13 +331,6 @@ export default function HomePage() {
             America 250 Featured Exploration — immediately below hero
             ══════════════════════════════════════════════════════════════ */}
         <div className="fl-map-section">
-          <div className="fl-a250-label" aria-hidden="true">
-            <span className="fl-a250-badge">America 250</span>
-            <span className="fl-a250-copy">
-              Celebrating 250 years of American growth, innovation,
-              stewardship, and opportunity.
-            </span>
-          </div>
           <LivingOpportunityMap stories={AMERICA_250_STORIES} />
         </div>
 

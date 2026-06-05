@@ -134,6 +134,8 @@
     "smoke:public-alpha-customer-journey": "tsx src/scripts/publicAlphaCustomerJourneySmokeTest.ts",
     "verify:no-personal-docs": "tsx src/scripts/verifyNoPersonalDocs.ts",
     "smoke:no-personal-docs": "tsx src/scripts/verifyNoPersonalDocsSmokeTest.ts",
+    "verify:scraper-coverage": "tsx src/scripts/verifyScraperCoverage.ts",
+    "smoke:scraper-coverage": "tsx src/scripts/scraperCoverageSmokeTest.ts",
     "verify:customer-journey-audit": "tsx src/scripts/publicAlphaCustomerJourneyCli.ts",
     "verify:customer-journey": "tsx src/scripts/verifyCustomerJourney.ts",
     "verify:revenue-intelligence": "tsx src/scripts/revenueSourceIntelligenceConformanceSuite.ts revenue-intelligence",

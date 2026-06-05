@@ -1,15 +1,15 @@
 {
   "runtimeVersion": "build-self-report-runtime-v0.1.0",
   "specVersion": "module-42-build-self-report-spec-v1.0",
-  "generatedAt": "2026-06-05T02:22:22.424Z",
+  "generatedAt": "2026-06-05T15:55:15.697Z",
   "reviewerRole": null,
   "applicationId": null,
   "header": {
     "checkpoint": "BR-2026-06-01-M41",
-    "commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
-    "branch": "build-41-public-alpha-surface-content",
+    "commit": "742420f8768199d733d0d8f678b2e2446fd14013",
+    "branch": "build-44-b-logo-brand",
     "tree_status": "dirty",
-    "generated": "2026-06-05T02:22:22.424Z",
+    "generated": "2026-06-05T15:55:15.697Z",
     "verify_backend": "PASS",
     "build": "PASS",
     "static_pages": 219,
@@ -128,7 +128,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -180,7 +180,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -232,7 +232,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -284,7 +284,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -336,7 +336,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -388,7 +388,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -440,7 +440,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -492,7 +492,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -544,7 +544,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -599,7 +599,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -651,7 +651,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -706,7 +706,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -758,7 +758,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -813,7 +813,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -865,7 +865,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -917,7 +917,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -969,7 +969,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -1021,7 +1021,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1073,7 +1073,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1125,7 +1125,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1177,7 +1177,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1229,7 +1229,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1281,7 +1281,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1333,7 +1333,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1385,7 +1385,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1437,7 +1437,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1489,7 +1489,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1541,7 +1541,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1593,7 +1593,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1645,7 +1645,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1697,7 +1697,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1749,7 +1749,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1801,7 +1801,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1853,7 +1853,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1905,7 +1905,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -1957,7 +1957,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2009,7 +2009,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2061,7 +2061,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2113,7 +2113,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2165,7 +2165,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2217,7 +2217,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2269,7 +2269,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2321,7 +2321,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2376,7 +2376,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2428,7 +2428,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2480,7 +2480,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2532,7 +2532,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2587,7 +2587,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2639,7 +2639,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -2691,7 +2691,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -2743,7 +2743,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -2795,7 +2795,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -2850,7 +2850,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2905,7 +2905,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -2960,7 +2960,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3015,7 +3015,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3070,7 +3070,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3125,7 +3125,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3180,7 +3180,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3235,7 +3235,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3290,7 +3290,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3345,7 +3345,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3400,7 +3400,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3455,7 +3455,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3510,7 +3510,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3565,7 +3565,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3620,7 +3620,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3675,7 +3675,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3730,7 +3730,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3785,7 +3785,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3840,7 +3840,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3895,7 +3895,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -3950,7 +3950,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -4005,7 +4005,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -4057,7 +4057,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "BLOCKED_BY_DESIGN"
     },
     {
@@ -4109,7 +4109,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4161,7 +4161,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4213,7 +4213,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4265,7 +4265,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4317,7 +4317,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4369,7 +4369,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4421,7 +4421,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4473,7 +4473,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4525,7 +4525,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4577,7 +4577,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4629,7 +4629,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4681,7 +4681,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4733,7 +4733,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4785,7 +4785,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4837,7 +4837,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -4889,7 +4889,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4941,7 +4941,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -4993,7 +4993,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS_WITH_WARNINGS"
     },
     {
@@ -5045,7 +5045,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5097,7 +5097,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5149,7 +5149,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5201,7 +5201,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5253,7 +5253,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5305,7 +5305,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5357,7 +5357,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5409,7 +5409,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5461,7 +5461,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     },
     {
@@ -5513,7 +5513,7 @@
         "pct": null
       },
       "owner": "TBD",
-      "last_verified_commit": "d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25",
+      "last_verified_commit": "742420f8768199d733d0d8f678b2e2446fd14013",
       "module_verdict": "PASS"
     }
   ],
@@ -5534,7 +5534,10 @@
     "orphansDangling": 0,
     "danglingEventContracts": 0,
     "findingCount": 29,
-    "crossSourceConflictCount": 0
+    "crossSourceConflictCount": 0,
+    "classificationChangesActive": 3,
+    "classificationChangesHistorical": 1,
+    "classificationRegistryParsed": true
   },
   "v1Signals": [
     {
@@ -6535,6 +6538,62 @@
     }
   ],
   "crossSourceConflicts": [],
+  "classificationChangeRegistry": {
+    "parsed": true,
+    "error": null,
+    "runtimeVersion": "classification-change-registry-runtime-v0.1.0",
+    "docRef": "docs/CLASSIFICATION_CHANGE_REGISTRY.md",
+    "activeEntries": [
+      {
+        "id": "CCR-2026-002",
+        "title": "Environmental Engineering Reviewer Reclassification (Step-3 assumption correction)",
+        "status": "ACTIVE",
+        "previousState": "Role ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER classified ACTIVE_FILL (ASSUMED during Step-3 Annex projection; assumed holder Stuart Fraass).",
+        "newState": "Role ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER classified HELD_FOR_ALPHA.",
+        "reason": "Environmental review is deferred from Alpha (Module 21 deferred per the open §9 B4 decision, default deferred); Stuart cannot legally perform environmental engineering review, so the assumed fill was invalid; the role is correctly held, not filled. A held role requires no Alpha fill, so no gate green was bought.",
+        "approver": "Founder Governance Review (2-of-3); independent review per VIA-AUDIT-EXCEPTION-001 (Stuart + Frances).",
+        "effectiveDate": "Build 39 (2026-06-04) operational; formal ratification at Public Alpha ceremony.",
+        "resolutionCriteria": "Activates only when both (a) an environmental workflow is featured in scope and (b) a qualified environmental reviewer is assigned. Regulated-competency single point of failure — only Caitlin currently qualifies."
+      },
+      {
+        "id": "CCR-2026-003",
+        "title": "Regulatory Liaison Authority reclassification",
+        "status": "ACTIVE",
+        "previousState": "Role REGULATORY_LIAISON_AUTHORITY classified ACTIVE_FILL (ASSUMED; holder Caitlin Hudson).",
+        "newState": "Role REGULATORY_LIAISON_AUTHORITY classified HELD_FOR_ALPHA.",
+        "reason": "Regulatory examination/response gates (Modules 40-41) are BLOCKED_BY_DESIGN in Alpha; zero alpha_required bindings require this role (audit: 0 alpha_required / 2 intentionally_held). The assumed active fill was invalid and over-concentrated Caitlin.",
+        "approver": "Founder Governance Review (2-of-3); finalized at Build 39 commit.",
+        "effectiveDate": "Build 39 commit (2026-06-04)",
+        "resolutionCriteria": "Activates when regulatory examination/response capabilities activate (production/regulatory path)."
+      },
+      {
+        "id": "CCR-2026-004",
+        "title": "Source Legal Authority reclassification",
+        "status": "ACTIVE",
+        "previousState": "Role SOURCE_LEGAL_AUTHORITY classified ACTIVE_FILL (ASSUMED; holder Frances Fraass).",
+        "newState": "Role SOURCE_LEGAL_AUTHORITY classified HELD_FOR_ALPHA.",
+        "reason": "Source legal/licensing review (Module 23) and source promotion are held in Alpha; source-intelligence/scraper activation is blocked (live-fetch = 0); zero alpha_required bindings require this role (audit: 0 alpha_required / 7 intentionally_held). The assumed Frances assignment was also a domain mismatch.",
+        "approver": "Founder Governance Review (2-of-3); finalized at Build 39 commit.",
+        "effectiveDate": "Build 39 commit (2026-06-04)",
+        "resolutionCriteria": "Activates when source legal/licensing review activates (source-promotion path)."
+      }
+    ],
+    "historicalEntries": [
+      {
+        "id": "CCR-2026-001",
+        "title": "Build 38 Human Authority Severity Reclassification",
+        "status": "RESOLVED",
+        "previousState": "Finding GATE_AUTHORITY_UNASSIGNED classified FAIL — contributed to self-report gate failure.",
+        "newState": "Finding GATE_AUTHORITY_UNASSIGNED classified WARN / Operational Finding — reported but does not fail the build self-report gate.",
+        "reason": "The finding represents operational governance state, not a software, configuration, implementation, security, or conformance defect; the platform implementation remains conformant.",
+        "approver": "Founder Governance Review — approved by majority governance review.",
+        "effectiveDate": "Build 38 (2026-06-04)",
+        "resolutionCriteria": "Resolves when required authority assignments are recorded and verify:human-authority reports zero unfilled alpha-required authorities. Met at Build 39 — Vol VII Operational Annex populated; verify:human-authority exits 0."
+      }
+    ],
+    "activeCount": 3,
+    "historicalCount": 1
+  },
   "recommendedReviewRoutes": [
     "/governance/build-self-report",
     "/build-preservation",
@@ -6557,6 +6616,7 @@
     "Human-authority assignment depends on Module 45 (Human Authority Registry). Until that lands, gate modules without an assigned authority correctly report FAIL — that surfaces a real gap, not a bug.",
     "Disclosure-audit and claims-corpus columns depend on Module 44 (Disclosure Audit Gate). Until that lands, these columns operate on the manifest's declared classification and blocked-claims posture.",
     "The report is itself an evidence artifact; the build-preservation gate checksums it into the archive.",
+    "Per VIA-GOVERNANCE-CLASSIFICATION-001, the report emits the active Classification Change Registry entries on every run. A registry parse failure, or an active CCR missing a required field, fails the report closed.",
     "Every finding resolves to REQUIRES_HUMAN_REVIEW.",
     "Your document was received.",
     "Human review is pending.",

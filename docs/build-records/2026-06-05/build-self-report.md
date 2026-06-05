@@ -2,8 +2,8 @@
 
 Spec: `module-42-build-self-report-spec-v1.0`
 Runtime: `build-self-report-runtime-v0.1.0`
-Generated: `2026-06-05T02:22:22.424Z`
-Commit: `d2694ce80eaf0041a4dcf12c7dd41b9a9fcc4e25` · Branch: `build-41-public-alpha-surface-content` · Tree: `dirty`
+Generated: `2026-06-05T15:55:15.697Z`
+Commit: `742420f8768199d733d0d8f678b2e2446fd14013` · Branch: `build-44-b-logo-brand` · Tree: `dirty`
 verify_backend: PASS · build: PASS · static_pages: 219
 volumes_conformed: [0, I, II, III, III-B, IV, V, VI, VII]
 live_fetch_enabled: 0 · audit_chain_intact: PASS
@@ -183,6 +183,45 @@ exit_code: 0
 - **GATE_AUTHORITY_UNASSIGNED** · `bsr-gate-authority-unassigned-lender-workflow` · lender-workflow
   - Gate module requires a named credentialed role to clear. Module 45 (Human Authority Registry) is the canonical source for this assignment; until it lands, this column correctly reports FAIL.
 
+## Active Classification Changes (3)
+
+### CCR-2026-002 — Environmental Engineering Reviewer Reclassification (Step-3 assumption correction)
+
+- **Status:** ACTIVE
+- **Previous state:** Role ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER classified ACTIVE_FILL (ASSUMED during Step-3 Annex projection; assumed holder Stuart Fraass).
+- **New state:** Role ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER classified HELD_FOR_ALPHA.
+- **Reason:** Environmental review is deferred from Alpha (Module 21 deferred per the open §9 B4 decision, default deferred); Stuart cannot legally perform environmental engineering review, so the assumed fill was invalid; the role is correctly held, not filled. A held role requires no Alpha fill, so no gate green was bought.
+- **Approver:** Founder Governance Review (2-of-3); independent review per VIA-AUDIT-EXCEPTION-001 (Stuart + Frances).
+- **Effective date:** Build 39 (2026-06-04) operational; formal ratification at Public Alpha ceremony.
+- **Resolution criteria:** Activates only when both (a) an environmental workflow is featured in scope and (b) a qualified environmental reviewer is assigned. Regulated-competency single point of failure — only Caitlin currently qualifies.
+
+### CCR-2026-003 — Regulatory Liaison Authority reclassification
+
+- **Status:** ACTIVE
+- **Previous state:** Role REGULATORY_LIAISON_AUTHORITY classified ACTIVE_FILL (ASSUMED; holder Caitlin Hudson).
+- **New state:** Role REGULATORY_LIAISON_AUTHORITY classified HELD_FOR_ALPHA.
+- **Reason:** Regulatory examination/response gates (Modules 40-41) are BLOCKED_BY_DESIGN in Alpha; zero alpha_required bindings require this role (audit: 0 alpha_required / 2 intentionally_held). The assumed active fill was invalid and over-concentrated Caitlin.
+- **Approver:** Founder Governance Review (2-of-3); finalized at Build 39 commit.
+- **Effective date:** Build 39 commit (2026-06-04)
+- **Resolution criteria:** Activates when regulatory examination/response capabilities activate (production/regulatory path).
+
+### CCR-2026-004 — Source Legal Authority reclassification
+
+- **Status:** ACTIVE
+- **Previous state:** Role SOURCE_LEGAL_AUTHORITY classified ACTIVE_FILL (ASSUMED; holder Frances Fraass).
+- **New state:** Role SOURCE_LEGAL_AUTHORITY classified HELD_FOR_ALPHA.
+- **Reason:** Source legal/licensing review (Module 23) and source promotion are held in Alpha; source-intelligence/scraper activation is blocked (live-fetch = 0); zero alpha_required bindings require this role (audit: 0 alpha_required / 7 intentionally_held). The assumed Frances assignment was also a domain mismatch.
+- **Approver:** Founder Governance Review (2-of-3); finalized at Build 39 commit.
+- **Effective date:** Build 39 commit (2026-06-04)
+- **Resolution criteria:** Activates when source legal/licensing review activates (source-promotion path).
+
+## Historical Classification Changes (1)
+
+_Resolved / voided entries — recorded for lineage, not counted as active._
+
+- **CCR-2026-001** — Build 38 Human Authority Severity Reclassification · status **RESOLVED**
+  - Resolution: Resolves when required authority assignments are recorded and verify:human-authority reports zero unfilled alpha-required authorities. Met at Build 39 — Vol VII Operational Annex populated; verify:human-authority exits 0.
+
 ## Disclosures
 
 - Build Self-Report v1 output is internal advisory audit evidence only, replay-safe, audit-safe, and conflict-preserving.
@@ -193,6 +232,7 @@ exit_code: 0
 - Human-authority assignment depends on Module 45 (Human Authority Registry). Until that lands, gate modules without an assigned authority correctly report FAIL — that surfaces a real gap, not a bug.
 - Disclosure-audit and claims-corpus columns depend on Module 44 (Disclosure Audit Gate). Until that lands, these columns operate on the manifest's declared classification and blocked-claims posture.
 - The report is itself an evidence artifact; the build-preservation gate checksums it into the archive.
+- Per VIA-GOVERNANCE-CLASSIFICATION-001, the report emits the active Classification Change Registry entries on every run. A registry parse failure, or an active CCR missing a required field, fails the report closed.
 - Every finding resolves to REQUIRES_HUMAN_REVIEW.
 - Your document was received.
 - Human review is pending.

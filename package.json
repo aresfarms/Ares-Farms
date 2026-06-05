@@ -125,6 +125,8 @@
     "smoke:document-evidence-reconciliation": "tsx src/scripts/documentEvidenceReconciliationSmokeTest.ts",
     "smoke:data-transparency-posture": "tsx src/scripts/dataTransparencyPostureSmokeTest.ts",
     "smoke:build-self-report": "tsx src/scripts/buildSelfReportSmokeTest.ts",
+    "verify:stewardship": "tsx src/scripts/verifyStewardship.ts",
+    "smoke:stewardship": "tsx src/scripts/stewardshipSmokeTest.ts",
     "build:self-report": "tsx src/scripts/buildSelfReportCli.ts",
     "build:self-report:ci": "tsx src/scripts/buildSelfReportCli.ts --check",
     "smoke:public-alpha-profile": "tsx src/scripts/publicAlphaProfileSmokeTest.ts",

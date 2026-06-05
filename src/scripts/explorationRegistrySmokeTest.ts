@@ -22,8 +22,9 @@ function main() {
     "Featured exploration label drifted."
   );
   assert(
-    FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE.includes("not based on your location"),
-    "Illustrative note must disclose that the map is not location-based."
+    FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE.includes("no geolocation") &&
+      FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE.includes("exact address"),
+    "Illustrative note must disclose no geolocation and no exact address."
   );
 
   console.log(

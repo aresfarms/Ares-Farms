@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 
+import { FurlongCompassWatermark } from "@/components/brand/FurlongCompassWatermark";
 import { FurlongLogo } from "@/components/brand/FurlongLogo";
 
 /**
@@ -34,13 +35,19 @@ export function ExplorationJourneyShell({
         color: "#162033",
         fontFamily:
           'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      <FurlongCompassWatermark variant="journey" />
+
       <header
         style={{
           borderBottom: "1px solid #d7deea",
           background: "#ffffff",
           padding: "10px 20px",
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <div
@@ -65,7 +72,15 @@ export function ExplorationJourneyShell({
         </div>
       </header>
 
-      <main style={{ maxWidth: 880, margin: "0 auto", padding: "24px 20px 40px" }}>
+      <main
+        style={{
+          maxWidth: 880,
+          margin: "0 auto",
+          padding: "24px 20px 40px",
+          position: "relative",
+          zIndex: 1,
+        }}
+      >
         {children}
       </main>
 
@@ -76,6 +91,8 @@ export function ExplorationJourneyShell({
           padding: "0 20px 40px",
           ...muted,
           fontSize: 12,
+          position: "relative",
+          zIndex: 1,
         }}
       >
         <p style={{ margin: 0 }}>

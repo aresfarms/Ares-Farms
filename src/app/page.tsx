@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { FurlongCompassWatermark } from "@/components/brand/FurlongCompassWatermark";
 import { FurlongLogo } from "@/components/brand/FurlongLogo";
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
 import { StewardshipSection } from "@/components/stewardship/StewardshipSection";
@@ -74,83 +75,121 @@ export default function HomePage() {
   return (
     <main style={shell}>
       <div style={container}>
-        {/* Hero — the logo supports the headline (it does not replace it). */}
-        <header style={{ display: "grid", gap: 14, justifyItems: "center", textAlign: "center" }}>
-          <FurlongLogo size="hero" />
-          <h1 style={{ margin: 0, fontSize: 40, lineHeight: 1.12 }}>
-            Furlong helps you discover things you didn’t know were possible.
-          </h1>
-          <p
-            style={{
-              ...muted,
-              margin: "0 auto",
-              maxWidth: 720,
-              fontSize: 18,
-            }}
-          >
-            Discover your possibilities. Explore your options. Understand your
-            next steps. Make informed decisions.
-          </p>
-          <Link
-            href="/onboarding"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              minHeight: 48,
-              padding: "0 22px",
-              borderRadius: 999,
-              background: "#0f766e",
-              color: "#ffffff",
-              fontWeight: 800,
-              textDecoration: "none",
-            }}
-          >
-            Explore the full map
-          </Link>
-        </header>
+        <style>{`
+          .furlong-hero-stage {
+            position: relative;
+            display: grid;
+            gap: 28px;
+            overflow: hidden;
+            padding: 10px 0 8px;
+          }
 
-        {/* Category choice */}
-        <section style={{ display: "grid", gap: 16 }}>
-          <h2 style={{ margin: 0, fontSize: 24, textAlign: "center" }}>
-            What would you like to explore today?
-          </h2>
-          <div
-            style={{
-              display: "grid",
-              gap: 12,
-              gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-            }}
-          >
-            {EXPLORATION_CATEGORIES.map((category) => (
-              <Link
-                key={category.slug}
-                href={explorationHref(category.slug)}
-                style={{
-                  display: "grid",
-                  gap: 6,
-                  padding: 18,
-                  border: "1px solid #d7deea",
-                  borderRadius: 12,
-                  background: "#ffffff",
-                  color: "inherit",
-                  textDecoration: "none",
-                }}
-              >
-                <strong style={{ fontSize: 17 }}>{category.label}</strong>
-                <span style={{ ...muted, fontSize: 13 }}>{category.blurb}</span>
-              </Link>
-            ))}
+          .furlong-stage-content {
+            position: relative;
+            z-index: 1;
+          }
+
+          .furlong-hero-copy {
+            display: grid;
+            gap: 14px;
+            justify-items: center;
+            text-align: center;
+            padding-top: 68px;
+          }
+
+          .furlong-hero-copy h1 {
+            margin: 0;
+            font-size: clamp(42px, 6vw, 72px);
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            max-width: 980px;
+          }
+
+          .furlong-category-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+          }
+
+          .furlong-category-card {
+            display: grid;
+            gap: 6px;
+            padding: 18px;
+            border: 1px solid #d7deea;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: inherit;
+            text-decoration: none;
+            backdrop-filter: blur(6px);
+          }
+        `}</style>
+
+        <section className="furlong-hero-stage">
+          <FurlongCompassWatermark variant="hero" />
+          <FurlongCompassWatermark variant="subtle" />
+
+          {/* Hero — the logo supports the headline (it does not replace it). */}
+          <header className="furlong-stage-content furlong-hero-copy">
+            <h1>Furlong helps you discover things you didn’t know were possible.</h1>
+            <p
+              style={{
+                ...muted,
+                margin: "0 auto",
+                maxWidth: 720,
+                fontSize: 18,
+              }}
+            >
+              Discover your possibilities. Explore your options. Understand your
+              next steps. Make informed decisions.
+            </p>
+            <Link
+              href="/onboarding"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 48,
+                padding: "0 22px",
+                borderRadius: 999,
+                background: "#0f766e",
+                color: "#ffffff",
+                fontWeight: 800,
+                textDecoration: "none",
+              }}
+            >
+              Explore the full map
+            </Link>
+          </header>
+
+          {/* Category choice */}
+          <section className="furlong-stage-content" style={{ display: "grid", gap: 16 }}>
+            <h2 style={{ margin: 0, fontSize: 24, textAlign: "center" }}>
+              What would you like to explore today?
+            </h2>
+            <div className="furlong-category-grid">
+              {EXPLORATION_CATEGORIES.map((category) => (
+                <Link
+                  key={category.slug}
+                  href={explorationHref(category.slug)}
+                  className="furlong-category-card"
+                >
+                  <strong style={{ fontSize: 17 }}>{category.label}</strong>
+                  <span style={{ ...muted, fontSize: 13 }}>{category.blurb}</span>
+                </Link>
+              ))}
+            </div>
+            <p style={{ ...muted, margin: 0, fontSize: 13, textAlign: "center" }}>
+              Choose a starting point — or just begin exploring. You can change
+              direction any time, and no account or personal information is needed
+              to look around.
+            </p>
+          </section>
+
+          {/* Living Opportunity Map */}
+          <div className="furlong-stage-content">
+            <LivingOpportunityMap />
           </div>
-          <p style={{ ...muted, margin: 0, fontSize: 13, textAlign: "center" }}>
-            Choose a starting point — or just begin exploring. You can change
-            direction any time, and no account or personal information is needed
-            to look around.
-          </p>
         </section>
-
-        {/* Living Opportunity Map */}
-        <LivingOpportunityMap />
 
         {/* Trust strip */}
         <section

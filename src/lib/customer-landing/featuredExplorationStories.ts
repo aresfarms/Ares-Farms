@@ -3,7 +3,7 @@
  *
  * Curated, ILLUSTRATIVE exploration stories for the Living Opportunity Map on
  * the public homepage. These are examples only:
- * - They are NOT based on the visitor's location.
+ * - They are NOT personalized from the visitor's location.
  * - No live geolocation is used anywhere on the homepage.
  * - No exact addresses are shown.
  * - The map reveals opportunities, never the visitor.
@@ -32,7 +32,7 @@ export type FeaturedStory = {
 export const FEATURED_EXPLORATION_LABEL = "Featured Exploration";
 
 export const FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE =
-  "Illustrative example — not based on your location.";
+  "Illustrative example — no geolocation or exact address.";
 
 export const CURATED_EXPLORATION_STORIES: FeaturedStory[] = [
   {

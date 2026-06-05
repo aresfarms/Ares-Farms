@@ -80,7 +80,7 @@ export function ModuleNav() {
       }}
     >
       <Link
-        href="/"
+        href="/internal"
         style={{
           color: "#0f172a",
           fontSize: 13,
@@ -89,7 +89,7 @@ export function ModuleNav() {
           padding: "6px 8px",
         }}
       >
-        Home
+        Console
       </Link>
       {items.map((item) => (
         <Link

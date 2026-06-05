@@ -1,0 +1,772 @@
+{
+  "ok": false,
+  "runtimeVersion": "verify-customer-journey-runtime-v0.1.0",
+  "docRef": "docs/PUBLIC_ALPHA_SURFACE_CONTENT.md",
+  "commit": "123ca8e0b01ad966b75adbb99ae369140536a542",
+  "branch": "build-41-public-alpha-surface-content",
+  "sectionCount": 7,
+  "sectionsPass": 0,
+  "sectionsFail": 7,
+  "sectionsScanned": 7,
+  "totalRequiredContentBlocks": 77,
+  "totalContentTokensPresent": 4,
+  "totalContentTokensMissing": 73,
+  "totalRequiredDisclosures": 30,
+  "totalDisclosuresPresent": 14,
+  "totalDisclosuresMissing": 16,
+  "totalBannedTokenViolations": 0,
+  "findings": [
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Compass to Capital tagline (Customer Journey §Customer Promise) — token not detected: /tagline::Compass\\s+to\\s+Capital/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Founder mission paragraph (Customer Trust Profile §Foundational Principle) — token not detected: /founder-mission::(compass|not\\s+a\\s+lender|help\\s+(people|users))/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 5 negations (Customer Journey §Customer Promise) — token not detected: /promise-negations::approve\\s+loans/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 5 negations (Customer Journey §Customer Promise) — token not detected: /promise-negations::deny\\s+loans/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 5 negations (Customer Journey §Customer Promise) — token not detected: /promise-negations::issue\\s+underwriting\\s+decisions/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 5 negations (Customer Journey §Customer Promise) — token not detected: /promise-negations::issue\\s+agency\\s+determinations/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 5 negations (Customer Journey §Customer Promise) — token not detected: /promise-negations::guarantee\\s+funding/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 6 affirmations (Customer Journey §Customer Promise) — token not detected: /promise-affirmations::available\\s+pathways/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 6 affirmations (Customer Journey §Customer Promise) — token not detected: /promise-affirmations::readiness\\s+gaps/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 6 affirmations (Customer Journey §Customer Promise) — token not detected: /promise-affirmations::documentation\\s+needs/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 6 affirmations (Customer Journey §Customer Promise) — token not detected: /promise-affirmations::financing\\s+realities/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 6 affirmations (Customer Journey §Customer Promise) — token not detected: /promise-affirmations::environmental\\s+considerations/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Customer Promise — 6 affirmations (Customer Journey §Customer Promise) — token not detected: /promise-affirmations::next\\s+recommended\\s+actions/"
+    },
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"furlong-not-lender\" not present for module public-about"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Foundational principle (Your information belongs to you) (Data Transparency §Foundational Principle) — token not detected: /foundational-principle::your\\s+information\\s+belongs\\s+to\\s+you/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+why\\s+information\\s+is\\s+requested\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+how\\s+information\\s+is\\s+used\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+which\\s+recommendations\\s+relied\\s+upon\\s+specific…/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+when\\s+additional\\s+information\\s+is\\s+needed\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+when\\s+information\\s+is\\s+shared\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+when\\s+information\\s+is\\s+retained\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+when\\s+information\\s+can\\s+be\\s+deleted\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Explain\\s+when\\s+information\\s+can\\s+be\\s+exported\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Preserve\\s+evidence\\s+lineage\\s+and\\s+recommendation\\s+trace…/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Ten Furlong will obligations (Data Transparency §What Furlong Will Do) — token not detected: /ten-will-do::Allow\\s+users\\s+to\\s+understand\\s+how\\s+conclusions\\s+were\\s…/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Sell\\s+user\\s+information\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Secretly\\s+submit\\s+user\\s+information\\s+to\\s+lenders\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Secretly\\s+submit\\s+user\\s+information\\s+to\\s+agencies\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Secretly\\s+submit\\s+user\\s+information\\s+to\\s+brokers\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Secretly\\s+distribute\\s+user\\s+information\\s+to\\s+third\\s+pa…/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Generate\\s+undisclosed\\s+marketing\\s+leads\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Hide\\s+recommendation\\s+logic\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Hide\\s+pathway\\s+exclusions\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Hide\\s+readiness\\s+limitations\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Hide\\s+known\\s+conflicts\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Hide\\s+known\\s+risks\\./"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Twelve Furlong will not prohibitions (Data Transparency §What Furlong Will Not Do) — token not detected: /twelve-will-not-do::Represent\\s+user\\s+information\\s+as\\s+verified\\s+when\\s+it\\s…/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Trust principle (informed decision-making) (Data Transparency §Trust Principle) — token not detected: /trust-principle::informed\\s+decision[-\\s]?making/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Trust principle (informed decision-making) (Data Transparency §Trust Principle) — token not detected: /trust-principle::(hidden\\s+process|prioritize)/"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"furlong-not-lender\" not present for module public-trust"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"ai-tier1-only\" not present for module public-trust"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"data-rights\" not present for module public-trust"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"free-for-borrowers\" not present for module public-trust"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Foundational statement (Your information belongs to you) (Data Transparency §Foundational Principle) — token not detected: /foundational-principle::your\\s+information\\s+belongs\\s+to\\s+you/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Five customer rights (Data Transparency Posture Runtime v1) — token not detected: /five-customer-rights::REQUEST_EXPLANATION/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Five customer rights (Data Transparency Posture Runtime v1) — token not detected: /five-customer-rights::REQUEST_DELETION/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Five customer rights (Data Transparency Posture Runtime v1) — token not detected: /five-customer-rights::REQUEST_EXPORT/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Five customer rights (Data Transparency Posture Runtime v1) — token not detected: /five-customer-rights::REQUEST_HUMAN_REVIEW/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Five customer rights (Data Transparency Posture Runtime v1) — token not detected: /five-customer-rights::REQUEST_HOLD_ON_ESCALATION/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Verbatim deletion language (Data Transparency §WillDo #7) (Data Transparency §What Furlong Will Do (item 7)) — token not detected: /verbatim-deletion-language::delete\\s+your\\s+information\\s+from\\s+the\\s+live\\s+system/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Verbatim deletion language (Data Transparency §WillDo #7) (Data Transparency §What Furlong Will Do (item 7)) — token not detected: /verbatim-deletion-language::audit\\s+log\\s+required\\s+for\\s+regulatory\\s+traceability/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Verbatim deletion language (Data Transparency §WillDo #7) (Data Transparency §What Furlong Will Do (item 7)) — token not detected: /verbatim-deletion-language::(when|what)\\s+information\\s+can\\s+be\\s+deleted/"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"advisory-only\" not present for module data-rights"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"data-rights\" not present for module data-rights"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"user-data-sovereignty\" not present for module data-rights"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"free-for-borrowers\" not present for module data-rights"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Likely / Excluded pathways + rationale (Customer Journey §3) — token not detected: /pathway-discovery-categories::likely\\s+pathways/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Likely / Excluded pathways + rationale (Customer Journey §3) — token not detected: /pathway-discovery-categories::excluded\\s+pathways/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Likely / Excluded pathways + rationale (Customer Journey §3) — token not detected: /pathway-discovery-categories::rationale/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Six financing reality classifications (Customer Journey §5) — token not detected: /six-financing-reality-classifications::likely\\s+financeable/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Six financing reality classifications (Customer Journey §5) — token not detected: /six-financing-reality-classifications::financeable\\s+with\\s+conditions/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Six financing reality classifications (Customer Journey §5) — token not detected: /six-financing-reality-classifications::specialist\\s+review\\s+required/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Six financing reality classifications (Customer Journey §5) — token not detected: /six-financing-reality-classifications::limited\\s+financing\\s+market/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Six financing reality classifications (Customer Journey §5) — token not detected: /six-financing-reality-classifications::cash-favored\\s+transaction/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Six financing reality classifications (Customer Journey §5) — token not detected: /six-financing-reality-classifications::not\\s+enough\\s+information/"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"furlong-not-lender\" not present for module portal-borrower-financing-pathways"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"ai-tier1-only\" not present for module portal-borrower-financing-pathways"
+    },
+    {
+      "route": "/readiness",
+      "ordinal": 5,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Three sections: indicators, missing items, doc recommendations (Customer Journey §4) — token not detected: /readiness-three-sections::readiness\\s+indicators/"
+    },
+    {
+      "route": "/readiness",
+      "ordinal": 5,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Three sections: indicators, missing items, doc recommendations (Customer Journey §4) — token not detected: /readiness-three-sections::documentation\\s+recommendations/"
+    },
+    {
+      "route": "/readiness",
+      "ordinal": 5,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"data-rights\" not present for module portal-borrower-readiness"
+    },
+    {
+      "route": "/onboarding",
+      "ordinal": 6,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four intake questions (Customer Journey §2) — token not detected: /four-intake-questions::What\\s+type\\s+of\\s+business\\s+do\\s+you\\s+own\\?/"
+    },
+    {
+      "route": "/onboarding",
+      "ordinal": 6,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four intake questions (Customer Journey §2) — token not detected: /four-intake-questions::What\\s+are\\s+you\\s+trying\\s+to\\s+accomplish\\?/"
+    },
+    {
+      "route": "/onboarding",
+      "ordinal": 6,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four intake questions (Customer Journey §2) — token not detected: /four-intake-questions::Where\\s+is\\s+the\\s+property\\s+located\\?/"
+    },
+    {
+      "route": "/onboarding",
+      "ordinal": 6,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four intake questions (Customer Journey §2) — token not detected: /four-intake-questions::What\\s+type\\s+of\\s+asset\\s+is\\s+involved\\?/"
+    },
+    {
+      "route": "/onboarding",
+      "ordinal": 6,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"data-rights\" not present for module portal-borrower-onboarding"
+    },
+    {
+      "route": "/onboarding",
+      "ordinal": 6,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"free-for-borrowers\" not present for module portal-borrower-onboarding"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four-stage escalation (Exploration → Application Submission) (Data Transparency §Escalation Control) — token not detected: /four-stage-escalation::Exploration/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four-stage escalation (Exploration → Application Submission) (Data Transparency §Escalation Control) — token not detected: /four-stage-escalation::Human\\s+Review/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four-stage escalation (Exploration → Application Submission) (Data Transparency §Escalation Control) — token not detected: /four-stage-escalation::Lender\\s+Engagement/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Four-stage escalation (Exploration → Application Submission) (Data Transparency §Escalation Control) — token not detected: /four-stage-escalation::Application\\s+Submission/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Available human review paths (5 reviewer roles) (Customer Journey §6 + Vol VII Operational Annex) — token not detected: /human-review-paths::borrower\\s+intake\\s+reviewer/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Available human review paths (5 reviewer roles) (Customer Journey §6 + Vol VII Operational Annex) — token not detected: /human-review-paths::document\\s+verification\\s+reviewer/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Available human review paths (5 reviewer roles) (Customer Journey §6 + Vol VII Operational Annex) — token not detected: /human-review-paths::qualified\\s+governance\\s+reviewer/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Available human review paths (5 reviewer roles) (Customer Journey §6 + Vol VII Operational Annex) — token not detected: /human-review-paths::data\\s+rights\\s+officer/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Available human review paths (5 reviewer roles) (Customer Journey §6 + Vol VII Operational Annex) — token not detected: /human-review-paths::chief\\s+governance\\s+authority/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Next-step guidance (Customer Journey §6) — token not detected: /next-step-guidance::(your\\s+decision|whatever\\s+you\\s+do\\s+next\\s+is\\s+your)/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "REQUIRED_CONTENT_MISSING",
+      "detail": "Next-step guidance (Customer Journey §6) — token not detected: /next-step-guidance::(recommend|trade[-\\s]?offs?|next\\s+stage)/"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"furlong-not-lender\" not present for module portal-borrower"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "category": "DISCLOSURE_MISSING",
+      "detail": "Module 44 disclosure \"ai-tier1-only\" not present for module portal-borrower"
+    }
+  ],
+  "sectionResults": [
+    {
+      "route": "/about",
+      "ordinal": 1,
+      "doctrineLabel": "Founder Introduction",
+      "pageFilePath": "src/app/about/page.tsx",
+      "routeLoads": "PASS",
+      "requiredContentPresent": 1,
+      "requiredContentTotal": 14,
+      "requiredContentMissing": [
+        "tagline::Compass\\s+to\\s+Capital",
+        "founder-mission::(compass|not\\s+a\\s+lender|help\\s+(people|users))",
+        "promise-negations::approve\\s+loans",
+        "promise-negations::deny\\s+loans",
+        "promise-negations::issue\\s+underwriting\\s+decisions",
+        "promise-negations::issue\\s+agency\\s+determinations",
+        "promise-negations::guarantee\\s+funding",
+        "promise-affirmations::available\\s+pathways",
+        "promise-affirmations::readiness\\s+gaps",
+        "promise-affirmations::documentation\\s+needs",
+        "promise-affirmations::financing\\s+realities",
+        "promise-affirmations::environmental\\s+considerations",
+        "promise-affirmations::next\\s+recommended\\s+actions"
+      ],
+      "requiredDisclosuresPresent": 3,
+      "requiredDisclosuresTotal": 4,
+      "requiredDisclosuresMissing": [
+        "furlong-not-lender"
+      ],
+      "bannedTokenViolations": [],
+      "overall": "FAIL",
+      "reason": "13 required content token(s) missing; 1 required disclosure(s) missing;"
+    },
+    {
+      "route": "/trust",
+      "ordinal": 2,
+      "doctrineLabel": "Trust Posture",
+      "pageFilePath": "src/app/trust/page.tsx",
+      "routeLoads": "PASS",
+      "requiredContentPresent": 0,
+      "requiredContentTotal": 25,
+      "requiredContentMissing": [
+        "foundational-principle::your\\s+information\\s+belongs\\s+to\\s+you",
+        "ten-will-do::Explain\\s+why\\s+information\\s+is\\s+requested\\.",
+        "ten-will-do::Explain\\s+how\\s+information\\s+is\\s+used\\.",
+        "ten-will-do::Explain\\s+which\\s+recommendations\\s+relied\\s+upon\\s+specific…",
+        "ten-will-do::Explain\\s+when\\s+additional\\s+information\\s+is\\s+needed\\.",
+        "ten-will-do::Explain\\s+when\\s+information\\s+is\\s+shared\\.",
+        "ten-will-do::Explain\\s+when\\s+information\\s+is\\s+retained\\.",
+        "ten-will-do::Explain\\s+when\\s+information\\s+can\\s+be\\s+deleted\\.",
+        "ten-will-do::Explain\\s+when\\s+information\\s+can\\s+be\\s+exported\\.",
+        "ten-will-do::Preserve\\s+evidence\\s+lineage\\s+and\\s+recommendation\\s+trace…",
+        "ten-will-do::Allow\\s+users\\s+to\\s+understand\\s+how\\s+conclusions\\s+were\\s…",
+        "twelve-will-not-do::Sell\\s+user\\s+information\\.",
+        "twelve-will-not-do::Secretly\\s+submit\\s+user\\s+information\\s+to\\s+lenders\\.",
+        "twelve-will-not-do::Secretly\\s+submit\\s+user\\s+information\\s+to\\s+agencies\\.",
+        "twelve-will-not-do::Secretly\\s+submit\\s+user\\s+information\\s+to\\s+brokers\\.",
+        "twelve-will-not-do::Secretly\\s+distribute\\s+user\\s+information\\s+to\\s+third\\s+pa…",
+        "twelve-will-not-do::Generate\\s+undisclosed\\s+marketing\\s+leads\\.",
+        "twelve-will-not-do::Hide\\s+recommendation\\s+logic\\.",
+        "twelve-will-not-do::Hide\\s+pathway\\s+exclusions\\.",
+        "twelve-will-not-do::Hide\\s+readiness\\s+limitations\\.",
+        "twelve-will-not-do::Hide\\s+known\\s+conflicts\\.",
+        "twelve-will-not-do::Hide\\s+known\\s+risks\\.",
+        "twelve-will-not-do::Represent\\s+user\\s+information\\s+as\\s+verified\\s+when\\s+it\\s…",
+        "trust-principle::informed\\s+decision[-\\s]?making",
+        "trust-principle::(hidden\\s+process|prioritize)"
+      ],
+      "requiredDisclosuresPresent": 4,
+      "requiredDisclosuresTotal": 8,
+      "requiredDisclosuresMissing": [
+        "furlong-not-lender",
+        "ai-tier1-only",
+        "data-rights",
+        "free-for-borrowers"
+      ],
+      "bannedTokenViolations": [],
+      "overall": "FAIL",
+      "reason": "25 required content token(s) missing; 4 required disclosure(s) missing;"
+    },
+    {
+      "route": "/data-rights",
+      "ordinal": 3,
+      "doctrineLabel": "Data Transparency",
+      "pageFilePath": "src/app/data-rights/page.tsx",
+      "routeLoads": "PASS",
+      "requiredContentPresent": 0,
+      "requiredContentTotal": 9,
+      "requiredContentMissing": [
+        "foundational-principle::your\\s+information\\s+belongs\\s+to\\s+you",
+        "five-customer-rights::REQUEST_EXPLANATION",
+        "five-customer-rights::REQUEST_DELETION",
+        "five-customer-rights::REQUEST_EXPORT",
+        "five-customer-rights::REQUEST_HUMAN_REVIEW",
+        "five-customer-rights::REQUEST_HOLD_ON_ESCALATION",
+        "verbatim-deletion-language::delete\\s+your\\s+information\\s+from\\s+the\\s+live\\s+system",
+        "verbatim-deletion-language::audit\\s+log\\s+required\\s+for\\s+regulatory\\s+traceability",
+        "verbatim-deletion-language::(when|what)\\s+information\\s+can\\s+be\\s+deleted"
+      ],
+      "requiredDisclosuresPresent": 0,
+      "requiredDisclosuresTotal": 4,
+      "requiredDisclosuresMissing": [
+        "advisory-only",
+        "data-rights",
+        "user-data-sovereignty",
+        "free-for-borrowers"
+      ],
+      "bannedTokenViolations": [],
+      "overall": "FAIL",
+      "reason": "9 required content token(s) missing; 4 required disclosure(s) missing;"
+    },
+    {
+      "route": "/financing-pathways",
+      "ordinal": 4,
+      "doctrineLabel": "Pathway Discovery + Financing Reality Classification",
+      "pageFilePath": "src/app/financing-pathways/page.tsx",
+      "routeLoads": "PASS",
+      "requiredContentPresent": 0,
+      "requiredContentTotal": 9,
+      "requiredContentMissing": [
+        "pathway-discovery-categories::likely\\s+pathways",
+        "pathway-discovery-categories::excluded\\s+pathways",
+        "pathway-discovery-categories::rationale",
+        "six-financing-reality-classifications::likely\\s+financeable",
+        "six-financing-reality-classifications::financeable\\s+with\\s+conditions",
+        "six-financing-reality-classifications::specialist\\s+review\\s+required",
+        "six-financing-reality-classifications::limited\\s+financing\\s+market",
+        "six-financing-reality-classifications::cash-favored\\s+transaction",
+        "six-financing-reality-classifications::not\\s+enough\\s+information"
+      ],
+      "requiredDisclosuresPresent": 2,
+      "requiredDisclosuresTotal": 4,
+      "requiredDisclosuresMissing": [
+        "furlong-not-lender",
+        "ai-tier1-only"
+      ],
+      "bannedTokenViolations": [],
+      "overall": "FAIL",
+      "reason": "9 required content token(s) missing; 2 required disclosure(s) missing;"
+    },
+    {
+      "route": "/readiness",
+      "ordinal": 5,
+      "doctrineLabel": "Readiness Review",
+      "pageFilePath": "src/app/readiness/page.tsx",
+      "routeLoads": "PASS",
+      "requiredContentPresent": 3,
+      "requiredContentTotal": 5,
+      "requiredContentMissing": [
+        "readiness-three-sections::readiness\\s+indicators",
+        "readiness-three-sections::documentation\\s+recommendations"
+      ],
+      "requiredDisclosuresPresent": 2,
+      "requiredDisclosuresTotal": 3,
+      "requiredDisclosuresMissing": [
+        "data-rights"
+      ],
+      "bannedTokenViolations": [],
+      "overall": "FAIL",
+      "reason": "2 required content token(s) missing; 1 required disclosure(s) missing;"
+    },
+    {
+      "route": "/onboarding",
+      "ordinal": 6,
+      "doctrineLabel": "Customer Project Intake",
+      "pageFilePath": "src/app/onboarding/page.tsx",
+      "routeLoads": "PASS",
+      "requiredContentPresent": 0,
+      "requiredContentTotal": 4,
+      "requiredContentMissing": [
+        "four-intake-questions::What\\s+type\\s+of\\s+business\\s+do\\s+you\\s+own\\?",
+        "four-intake-questions::What\\s+are\\s+you\\s+trying\\s+to\\s+accomplish\\?",
+        "four-intake-questions::Where\\s+is\\s+the\\s+property\\s+located\\?",
+        "four-intake-questions::What\\s+type\\s+of\\s+asset\\s+is\\s+involved\\?"
+      ],
+      "requiredDisclosuresPresent": 2,
+      "requiredDisclosuresTotal": 4,
+      "requiredDisclosuresMissing": [
+        "data-rights",
+        "free-for-borrowers"
+      ],
+      "bannedTokenViolations": [],
+      "overall": "FAIL",
+      "reason": "4 required content token(s) missing; 2 required disclosure(s) missing;"
+    },
+    {
+      "route": "/portal/borrower",
+      "ordinal": 7,
+      "doctrineLabel": "Human Escalation",
+      "pageFilePath": "src/app/portal/borrower/page.tsx",
+      "routeLoads": "PASS",
+      "requiredContentPresent": 0,
+      "requiredContentTotal": 11,
+      "requiredContentMissing": [
+        "four-stage-escalation::Exploration",
+        "four-stage-escalation::Human\\s+Review",
+        "four-stage-escalation::Lender\\s+Engagement",
+        "four-stage-escalation::Application\\s+Submission",
+        "human-review-paths::borrower\\s+intake\\s+reviewer",
+        "human-review-paths::document\\s+verification\\s+reviewer",
+        "human-review-paths::qualified\\s+governance\\s+reviewer",
+        "human-review-paths::data\\s+rights\\s+officer",
+        "human-review-paths::chief\\s+governance\\s+authority",
+        "next-step-guidance::(your\\s+decision|whatever\\s+you\\s+do\\s+next\\s+is\\s+your)",
+        "next-step-guidance::(recommend|trade[-\\s]?offs?|next\\s+stage)"
+      ],
+      "requiredDisclosuresPresent": 1,
+      "requiredDisclosuresTotal": 3,
+      "requiredDisclosuresMissing": [
+        "furlong-not-lender",
+        "ai-tier1-only"
+      ],
+      "bannedTokenViolations": [],
+      "overall": "FAIL",
+      "reason": "11 required content token(s) missing; 2 required disclosure(s) missing;"
+    }
+  ],
+  "exitCode": 1
+}

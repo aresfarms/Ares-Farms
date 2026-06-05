@@ -1,0 +1,265 @@
+{
+  "$schema": "vol-vii-operational-annex-v0.1.0",
+  "annexVersion": "vol-vii-operational-annex-v0.1.0",
+  "specVersion": "vol-vi-a-doctrine-2026-06-04",
+  "generatedAt": "2026-06-04",
+  "context": {
+    "phase": "public_alpha",
+    "doctrineSources": [
+      "docs/DOCTRINE_VIA_AUDIT_001_005_INDEPENDENT_VERIFICATION.md",
+      "docs/GOVERNANCE_EXCEPTION_REGISTRY.md",
+      "docs/DOCTRINE_VIA_GOVERNANCE_CLASSIFICATION_001.md",
+      "docs/CLASSIFICATION_CHANGE_REGISTRY.md",
+      "docs/DOCTRINE_VIA_STEWARDSHIP_004_005.md"
+    ],
+    "founderRegistry": [
+      { "id": "caitlin-hudson",  "name": "Caitlin Hudson", "founderRole": "Technical Infrastructure Steward + Governance Authority" },
+      { "id": "stuart-fraass",   "name": "Stuart Fraass",  "founderRole": "Capital & Financing + Borrower Escalation Authority" },
+      { "id": "frances-fraass",  "name": "Frances Fraass", "founderRole": "Communications + Public Trust / Disclosure Authority" }
+    ],
+    "votingDoctrine": {
+      "majorityQuorum": "2 of 3 founders",
+      "appliesTo": [
+        "VIA-VOTE-002 — Public Alpha approval (Ceremony Part D)",
+        "VIA-AUDIT-EXCEPTION-001 — Governance exception approval",
+        "Founder Governance Ceremony — Stewardship amendments"
+      ]
+    }
+  },
+
+  "activeFillAuthorities": [
+    {
+      "id": "A1",
+      "label": "Governance Authority",
+      "holder": "Caitlin Hudson",
+      "holderId": "caitlin-hudson",
+      "status": "ACTIVE",
+      "effectiveDate": null,
+      "quorum": "2-of-3 founders to clear",
+      "mappingConfidence": "CANONICAL",
+      "clearsModule45Roles": ["CHIEF_GOVERNANCE_AUTHORITY", "GOVERNANCE_OPERATOR"]
+    },
+    {
+      "id": "A2",
+      "label": "Compliance Authority",
+      "holder": "Caitlin Hudson",
+      "holderId": "caitlin-hudson",
+      "status": "ACTIVE",
+      "effectiveDate": null,
+      "quorum": "1",
+      "mappingConfidence": "FUNCTIONAL_OVERSIGHT",
+      "clearsModule45Roles": [],
+      "notes": "QUALIFIED_GOVERNANCE_REVIEWER was previously listed here (ASSUMED) but reassigned to Stuart Fraass per AAR-2026-001 (independence). REGULATORY_LIAISON_AUTHORITY was previously listed here (ASSUMED) but reclassified HELD_FOR_ALPHA per CCR-2026-003 (no alpha_required binding consumes it). Caitlin retains functional oversight of the Compliance domain but does not clear any Module 45 binding under it in Alpha."
+    },
+    {
+      "id": "A3",
+      "label": "Data Rights Authority",
+      "holder": "Caitlin Hudson",
+      "holderId": "caitlin-hudson",
+      "status": "ACTIVE",
+      "effectiveDate": null,
+      "quorum": "1",
+      "mappingConfidence": "CANONICAL",
+      "clearsModule45Roles": ["DATA_RIGHTS_OFFICER"]
+    },
+    {
+      "id": "A4",
+      "label": "Capital & Financing Authority",
+      "holder": "Stuart Fraass",
+      "holderId": "stuart-fraass",
+      "status": "ACTIVE",
+      "effectiveDate": null,
+      "quorum": "1",
+      "mappingConfidence": "FUNCTIONAL_OVERSIGHT",
+      "clearsModule45Roles": [],
+      "notes": "ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER was previously mapped here (ASSUMED) but reclassified HELD_FOR_ALPHA per CCR-2026-002 (environmental review deferred from Alpha; Stuart not qualified to perform environmental engineering review)."
+    },
+    {
+      "id": "A5",
+      "label": "Borrower Escalation Authority",
+      "holder": "Stuart Fraass",
+      "holderId": "stuart-fraass",
+      "status": "ACTIVE",
+      "effectiveDate": null,
+      "quorum": "1",
+      "mappingConfidence": "CONFIRMED",
+      "clearsModule45Roles": [
+        "BORROWER_INTAKE_REVIEWER",
+        "DOCUMENT_VERIFICATION_REVIEWER",
+        "QUALIFIED_GOVERNANCE_REVIEWER"
+      ],
+      "notes": "BORROWER_INTAKE_REVIEWER: canonical per runbook. DOCUMENT_VERIFICATION_REVIEWER: ASSUMED tag dropped per AAR-2026-002 (scope confirmed = borrower-document completeness/escalation only; no control verification or audit certification). QUALIFIED_GOVERNANCE_REVIEWER: assigned per AAR-2026-001 (independence — builder cannot hold independent governance-review role). Scope confirmed in AAR-2026-001 Scope Confirmation Appendix; auth-audit-replay-verify boundary case handled by alternate-role routing under VIA-AUDIT-EXCEPTION-001."
+    },
+    {
+      "id": "A6",
+      "label": "Communications Authority",
+      "holder": "Frances Fraass",
+      "holderId": "frances-fraass",
+      "status": "ACTIVE",
+      "effectiveDate": null,
+      "quorum": "1",
+      "mappingConfidence": "FUNCTIONAL_OVERSIGHT",
+      "clearsModule45Roles": [],
+      "notes": "Functional oversight over notice content; underlying notice bindings clear under GOVERNANCE_OPERATOR. Recorded for completeness."
+    },
+    {
+      "id": "A7",
+      "label": "Public Trust / Disclosure Authority",
+      "holder": "Frances Fraass",
+      "holderId": "frances-fraass",
+      "status": "ACTIVE",
+      "effectiveDate": null,
+      "quorum": "1",
+      "mappingConfidence": "FUNCTIONAL_OVERSIGHT",
+      "clearsModule45Roles": [],
+      "notes": "SOURCE_LEGAL_AUTHORITY was previously listed here (ASSUMED) but reclassified HELD_FOR_ALPHA per CCR-2026-004 (no alpha_required binding consumes it; source-legal is also a domain mismatch with public-trust). Frances retains functional oversight of public disclosure (Module 44 product-side) but does not clear any Module 45 binding under it in Alpha; disclosure compliance is enforced by the Module 44 runtime + reviewed at Ceremony Part D."
+    }
+  ],
+
+  "recordOnlyAuthorities": [
+    {
+      "id": "R1",
+      "domain": "Technical Infrastructure",
+      "doctrineRef": "VIA-STEWARD-004",
+      "holder": "Caitlin Hudson",
+      "holderId": "caitlin-hudson",
+      "status": "RECORD_ONLY",
+      "notes": "Builder; cannot independently certify own controls for production reliance per VIA-AUDIT-001."
+    },
+    {
+      "id": "R2",
+      "domain": "Platform Architecture",
+      "holder": "Caitlin Hudson",
+      "holderId": "caitlin-hudson",
+      "status": "RECORD_ONLY",
+      "notes": "Subsumed under Technical Infrastructure stewardship."
+    }
+  ],
+
+  "heldAuthorities": [
+    {
+      "id": "H1",
+      "domain": "Deployment",
+      "status": "HELD",
+      "activationTrigger": "Production gate chain (Modules 27–41). Not required for Alpha."
+    },
+    {
+      "id": "H2",
+      "domain": "Treasury & Institutional Capital",
+      "doctrineRef": "VIA-STEWARD-005",
+      "status": "HELD",
+      "activationTrigger": "Institutional reserve creation, external investment acceptance, or governance-set revenue threshold."
+    }
+  ],
+
+  "unfilledByDesignAuthorities": [
+    {
+      "id": "U1",
+      "label": "Independent Verification Authority",
+      "status": "UNFILLED_BY_DESIGN",
+      "compensatingControl": "VIA-AUDIT-EXCEPTION-001 — Technical Infrastructure Steward performs internal verification; results labeled 'Internally Verified — Independent Verification Pending.'"
+    },
+    {
+      "id": "U2",
+      "label": "Audit Certification Authority",
+      "status": "UNFILLED_BY_DESIGN",
+      "compensatingControl": "VIA-AUDIT-EXCEPTION-001."
+    },
+    {
+      "id": "U3",
+      "label": "Build Verification Authority",
+      "status": "UNFILLED_BY_DESIGN",
+      "compensatingControl": "VIA-AUDIT-EXCEPTION-001."
+    }
+  ],
+
+  "externalAuthorities": [
+    {
+      "id": "E1",
+      "label": "Credit / Eligibility Authority",
+      "status": "EXTERNAL",
+      "holder": "Lender / agency",
+      "mappingConfidence": "CANONICAL",
+      "clearsModule45Roles": ["CREDIT_ELIGIBILITY_AUTHORITY"]
+    },
+    {
+      "id": "E2",
+      "label": "Third Party Records Authority",
+      "status": "EXTERNAL",
+      "holder": "County recorder / title office / etc.",
+      "mappingConfidence": "ASSUMED",
+      "clearsModule45Roles": ["THIRD_PARTY_RECORDS_AUTHORITY"]
+    }
+  ],
+
+  "module45RolesNotInAlpha": [
+    {
+      "roleId": "SOVEREIGN_FEDERATION_AUTHORITY",
+      "reason": "No sovereign customer in Alpha cohort (CANON-SOVEREIGNTY-001 named federation participation requirement).",
+      "category": "UNFILLED_BY_DESIGN_FOR_ALPHA"
+    },
+    {
+      "roleId": "ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER",
+      "reason": "Environmental review deferred from Alpha per CCR-2026-002 and Public Alpha §9 B4 default. Activates only when (a) an environmental workflow is featured AND (b) a qualified environmental reviewer is assigned. Caitlin currently holds the qualification but is the builder; this is a regulated-competency single point of failure flagged in CCR-2026-002.",
+      "category": "HELD_FOR_ALPHA",
+      "ccrRef": "CCR-2026-002"
+    },
+    {
+      "roleId": "REGULATORY_LIAISON_AUTHORITY",
+      "reason": "Regulatory Liaison governs Modules 40-41 (BLOCKED_BY_DESIGN in Alpha). PR-review audit confirmed 0 alpha_required bindings consume this role (2 intentionally_held bindings only). Held until regulatory examination/response capabilities activate (production/regulatory path).",
+      "category": "HELD_FOR_ALPHA",
+      "ccrRef": "CCR-2026-003"
+    },
+    {
+      "roleId": "SOURCE_LEGAL_AUTHORITY",
+      "reason": "Source legal/licensing review (Module 23) and source promotion are held in Alpha; source-intelligence/scraper activation is blocked (live-fetch = 0). PR-review audit confirmed 0 alpha_required bindings consume this role (7 intentionally_held bindings). Held until source promotion activates.",
+      "category": "HELD_FOR_ALPHA",
+      "ccrRef": "CCR-2026-004"
+    }
+  ],
+
+  "moduleVia2module45TraceabilityCheck": {
+    "rule": "Every Module 45 alpha_required role must trace to an Active-Fill authority or be explicitly UNFILLED_BY_DESIGN_FOR_ALPHA. Every Module 45 intentionally_held role may trace to Held, Record-Only, or remain unfilled. Untraceable alpha_required roles = FAIL.",
+    "exceptionReviewers": ["Stuart Fraass", "Frances Fraass"],
+    "exceptionApproval": "VIA-VOTE-002 founder majority (2-of-3)"
+  },
+
+  "activeClassificationChangeRegistryEntries": [
+    {
+      "ccrId": "CCR-2026-001",
+      "doctrineRef": "docs/CLASSIFICATION_CHANGE_REGISTRY.md",
+      "topic": "GATE_AUTHORITY_UNASSIGNED FAIL → WARN",
+      "reason": "Operational governance state — required human role assignments not yet recorded in the operational roster.",
+      "status": "ACTIVE",
+      "effectiveAt": "Build 38",
+      "resolutionCriteria": "verify:human-authority reports zero unfilled alpha-required authorities."
+    },
+    {
+      "ccrId": "CCR-2026-002",
+      "doctrineRef": "docs/CLASSIFICATION_CHANGE_REGISTRY.md",
+      "topic": "ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER ACTIVE_FILL → HELD_FOR_ALPHA",
+      "reason": "Environmental review deferred from Alpha; Stuart not qualified; Caitlin holds qualification but is the builder (regulated-competency SPOF flagged for successor plan).",
+      "status": "ACTIVE",
+      "effectiveAt": "Build 39",
+      "resolutionCriteria": "Both (a) environmental workflow featured in scope AND (b) qualified environmental reviewer assigned."
+    },
+    {
+      "ccrId": "CCR-2026-003",
+      "doctrineRef": "docs/CLASSIFICATION_CHANGE_REGISTRY.md",
+      "topic": "REGULATORY_LIAISON_AUTHORITY ACTIVE_FILL → HELD_FOR_ALPHA",
+      "reason": "Modules 40-41 BLOCKED_BY_DESIGN in Alpha; 0 alpha_required bindings consume the role (PR-audit confirmed).",
+      "status": "ACTIVE",
+      "effectiveAt": "Build 39",
+      "resolutionCriteria": "Regulatory examination/response capabilities activate (production/regulatory path)."
+    },
+    {
+      "ccrId": "CCR-2026-004",
+      "doctrineRef": "docs/CLASSIFICATION_CHANGE_REGISTRY.md",
+      "topic": "SOURCE_LEGAL_AUTHORITY ACTIVE_FILL → HELD_FOR_ALPHA",
+      "reason": "Source legal/licensing review and source promotion held in Alpha; 0 alpha_required bindings consume the role (PR-audit confirmed); assumed Frances→source-legal was a domain mismatch.",
+      "status": "ACTIVE",
+      "effectiveAt": "Build 39",
+      "resolutionCriteria": "Source legal/licensing review activates (source-promotion path)."
+    }
+  ]
+}

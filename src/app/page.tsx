@@ -295,9 +295,12 @@ export default function HomePage() {
           }
           .fl-not-note {
             margin: 0;
-            font-size: 14px;
-            color: rgba(232,239,250,0.65);
+            font-size: 16px;
+            font-weight: 600;
+            color: #c9a84c;
             line-height: 1.65;
+            border-top: 1px solid rgba(201,168,76,0.28);
+            padding-top: 16px;
           }
 
           /* ── Footer ────────────────────────────────────────────────── */

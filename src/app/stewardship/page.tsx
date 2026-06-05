@@ -115,6 +115,9 @@ export default function StewardshipIndexPage() {
           <Link href="/trust" style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}>
             How we handle your information
           </Link>
+          <Link href="/about/furlong-story" style={{ color: "#8a6914", fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+            The Furlong Story →
+          </Link>
         </footer>
       </div>
     </div>

@@ -482,6 +482,18 @@ export default function HomePage() {
             Meet the Furlong Stewards →
           </Link>
 
+          <Link
+            href="/about/furlong-story"
+            style={{
+              color: "#8a6914",
+              fontSize: 14,
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            The Furlong Story →
+          </Link>
+
           <span className="fl-footer-sep" aria-hidden="true">|</span>
 
           {FOOTER_LINKS.map((link) => (

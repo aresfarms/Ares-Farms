@@ -318,6 +318,33 @@ export default function AboutFurlongPage() {
             ))}
           </ul>
         </section>
+
+        {/* Build 48 — The Furlong Story link */}
+        <section
+          style={{
+            ...panelStyle,
+            padding:        22,
+            background:     "#fdf8ec",
+            borderColor:    "rgba(201,168,76,0.35)",
+            display:        "grid",
+            gap:            10,
+          }}
+        >
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#162033" }}>
+            The Furlong Story
+          </h2>
+          <p style={{ ...mutedText, margin: 0, fontSize: 14 }}>
+            Two historical threads that converged in a shared belief about
+            how to serve people navigating agricultural land and finance.
+            An America 250 living-history experience.
+          </p>
+          <Link
+            href="/about/furlong-story"
+            style={{ color: "#8a6914", fontWeight: 800, textDecoration: "none", fontSize: 14 }}
+          >
+            Read the Furlong Story →
+          </Link>
+        </section>
       </div>
     </main>
   );

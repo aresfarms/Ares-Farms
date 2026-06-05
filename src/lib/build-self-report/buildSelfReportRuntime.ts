@@ -2,6 +2,11 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import {
+  ClassificationChangeEntry,
+  loadClassificationChangeRegistry,
+  parseClassificationChangeRegistry,
+} from "@/lib/build-self-report/classificationChangeRegistry";
+import {
   moduleDisclosureResolutionFor,
 } from "@/lib/disclosure-audit/disclosureAuditGateRuntime";
 import {
@@ -96,6 +101,16 @@ export type BuildSelfReportInput = {
   // honest baseline). See §2 of
   // docs/DOCTRINE_HUMAN_AUTHORITY_REGISTRY_V1.md.
   humanAuthorityFilledRoles?: HumanAuthorityRoleFill[];
+  // Classification Change Registry source. When
+  // `classificationChangeRegistryMarkdown` is provided (including an
+  // empty string), the runtime parses it directly instead of reading
+  // the canonical file — used by the smoke test to inject malformed
+  // and empty fixtures. When omitted, the runtime reads + parses
+  // `docs/CLASSIFICATION_CHANGE_REGISTRY.md` from the file-system root.
+  // Per VIA-GOVERNANCE-CLASSIFICATION-001 the report emits the active
+  // entries on every run and fails closed on parse failure.
+  classificationChangeRegistryMarkdown?: string | null;
+  classificationChangeRegistryPath?: string;
   metadata?: Record<string, unknown> | null;
 };
 
@@ -234,6 +249,9 @@ export type BuildSelfReportSummary = {
   danglingEventContracts: number;
   findingCount: number;
   crossSourceConflictCount: number;
+  classificationChangesActive: number;
+  classificationChangesHistorical: number;
+  classificationRegistryParsed: boolean;
 };
 
 export type BuildSelfReportSignalId =
@@ -268,6 +286,17 @@ export type BuildSelfReportCrossSourceConflict = {
   reviewRoute: string;
 };
 
+export type BuildSelfReportClassificationChangeRegistry = {
+  parsed: boolean;
+  error: string | null;
+  runtimeVersion: string;
+  docRef: string;
+  activeEntries: ClassificationChangeEntry[];
+  historicalEntries: ClassificationChangeEntry[];
+  activeCount: number;
+  historicalCount: number;
+};
+
 export type BuildSelfReportFinding = {
   findingId: string;
   category:
@@ -276,7 +305,8 @@ export type BuildSelfReportFinding = {
     | "ORPHAN_OR_DANGLING"
     | "GATE_AUTHORITY_UNASSIGNED"
     | "DANGLING_EVENT_CONTRACT"
-    | "MODULE_VERDICT_FAIL";
+    | "MODULE_VERDICT_FAIL"
+    | "CLASSIFICATION_REGISTRY_PARSE_FAIL";
   subjectModuleId?: string;
   topic: string;
   reviewerExplanation: string;
@@ -299,6 +329,7 @@ export type BuildSelfReportResult = {
   v1Signals: BuildSelfReportSignal[];
   findings: BuildSelfReportFinding[];
   crossSourceConflicts: BuildSelfReportCrossSourceConflict[];
+  classificationChangeRegistry: BuildSelfReportClassificationChangeRegistry;
   recommendedReviewRoutes: string[];
   disclosures: string[];
   productionRestrictions: string[];
@@ -372,6 +403,7 @@ export const BUILD_SELF_REPORT_DISCLOSURES = [
   "Human-authority assignment depends on Module 45 (Human Authority Registry). Until that lands, gate modules without an assigned authority correctly report FAIL — that surfaces a real gap, not a bug.",
   "Disclosure-audit and claims-corpus columns depend on Module 44 (Disclosure Audit Gate). Until that lands, these columns operate on the manifest's declared classification and blocked-claims posture.",
   "The report is itself an evidence artifact; the build-preservation gate checksums it into the archive.",
+  "Per VIA-GOVERNANCE-CLASSIFICATION-001, the report emits the active Classification Change Registry entries on every run. A registry parse failure, or an active CCR missing a required field, fails the report closed.",
   "Every finding resolves to REQUIRES_HUMAN_REVIEW.",
   "Your document was received.",
   "Human review is pending.",
@@ -1066,9 +1098,23 @@ function unique<T>(values: T[]): T[] {
 
 function buildFindings(
   modules: BuildSelfReportModuleRow[],
-  danglingContracts: string[]
+  danglingContracts: string[],
+  classificationChangeRegistry: BuildSelfReportClassificationChangeRegistry
 ): BuildSelfReportFinding[] {
   const findings: BuildSelfReportFinding[] = [];
+  if (!classificationChangeRegistry.parsed) {
+    findings.push({
+      findingId: "bsr-classification-registry-parse-fail",
+      category: "CLASSIFICATION_REGISTRY_PARSE_FAIL",
+      topic: "Classification Change Registry could not be parsed",
+      reviewerExplanation: `The Classification Change Registry (${classificationChangeRegistry.docRef}) could not be parsed, or an active CCR is missing a required field. Per VIA-GOVERNANCE-CLASSIFICATION-001 the build self-report emits active classification changes on every run and fails closed when the registry cannot be read. Parser error: ${classificationChangeRegistry.error ?? "unknown"}.`,
+      evidenceReplayRef: "bsr-replay://classification-change-registry/parse",
+      resolution: "REQUIRES_HUMAN_REVIEW",
+      reviewRoute: REVIEW_ROUTE,
+      doctrineRefs: [...DEFAULT_DOCTRINE_REFS],
+      blockedClaims: [...DEFAULT_FINDING_BLOCKED_CLAIMS],
+    });
+  }
   for (const row of modules) {
     if (getStatus(row.checks.route_loads) === "FAIL") {
       findings.push({
@@ -1161,9 +1207,19 @@ function buildFindings(
 }
 
 function buildCrossSourceConflicts(
-  header: BuildSelfReportHeader
+  header: BuildSelfReportHeader,
+  classificationChangeRegistry: BuildSelfReportClassificationChangeRegistry
 ): BuildSelfReportCrossSourceConflict[] {
   const conflicts: BuildSelfReportCrossSourceConflict[] = [];
+  if (!classificationChangeRegistry.parsed) {
+    conflicts.push({
+      conflictId: "bsr-v1-classification-registry-parse-fail",
+      topic: "Classification Change Registry parse failure",
+      description: `The Classification Change Registry could not be parsed (${classificationChangeRegistry.error ?? "unknown error"}). The report fails closed: classification/severity changes cannot be emitted into the audit output until the registry is well-formed and every active CCR carries its required fields.`,
+      resolution: "REQUIRES_HUMAN_REVIEW",
+      reviewRoute: REVIEW_ROUTE,
+    });
+  }
   if (header.totals.fail > 0) {
     conflicts.push({
       conflictId: "bsr-v1-module-verdict-fail",
@@ -1339,6 +1395,32 @@ export function composeBuildSelfReport(
     eventContractRegistry.map((entry) => [entry.eventType, entry])
   );
 
+  // Classification Change Registry (VIA-GOVERNANCE-CLASSIFICATION-001).
+  // Emitted on every run so classification/severity changes are
+  // visible in the canonical audit output. Parse failure or an active
+  // CCR missing a required field fails the report closed.
+  const ccrParse =
+    input.classificationChangeRegistryMarkdown !== undefined &&
+    input.classificationChangeRegistryMarkdown !== null
+      ? parseClassificationChangeRegistry(
+          input.classificationChangeRegistryMarkdown
+        )
+      : loadClassificationChangeRegistry(
+          input.classificationChangeRegistryPath ??
+            path.join(fsRoot, "docs", "CLASSIFICATION_CHANGE_REGISTRY.md")
+        );
+  const classificationChangeRegistry: BuildSelfReportClassificationChangeRegistry =
+    {
+      parsed: ccrParse.ok,
+      error: ccrParse.error,
+      runtimeVersion: ccrParse.runtimeVersion,
+      docRef: ccrParse.docRef,
+      activeEntries: ccrParse.activeEntries,
+      historicalEntries: ccrParse.historicalEntries,
+      activeCount: ccrParse.activeCount,
+      historicalCount: ccrParse.historicalCount,
+    };
+
   // 1. Build per-module rows.
   const filledRoles = input.humanAuthorityFilledRoles ?? [];
   const modules: BuildSelfReportModuleRow[] = moduleManifests.map((manifest) => {
@@ -1445,6 +1527,7 @@ export function composeBuildSelfReport(
     orphansNoProducer.length > 0 ||
     orphansDangling.length > 0 ||
     danglingEventContracts.length > 0 ||
+    !classificationChangeRegistry.parsed ||
     requirementsImplemented + requirementsPending.length !== requirementsTotal
       ? 1
       : 0;
@@ -1478,8 +1561,15 @@ export function composeBuildSelfReport(
   };
 
   // 5. Findings + conflicts + signals.
-  const findings = buildFindings(modules, danglingEventContracts);
-  const crossSourceConflicts = buildCrossSourceConflicts(header);
+  const findings = buildFindings(
+    modules,
+    danglingEventContracts,
+    classificationChangeRegistry
+  );
+  const crossSourceConflicts = buildCrossSourceConflicts(
+    header,
+    classificationChangeRegistry
+  );
   const v1Signals: BuildSelfReportSignal[] = V1_SIGNAL_IDS.map((id) =>
     buildSignal(id, modules)
   );
@@ -1521,6 +1611,10 @@ export function composeBuildSelfReport(
     danglingEventContracts: danglingEventContracts.length,
     findingCount: findings.length,
     crossSourceConflictCount: crossSourceConflicts.length,
+    classificationChangesActive: classificationChangeRegistry.activeCount,
+    classificationChangesHistorical:
+      classificationChangeRegistry.historicalCount,
+    classificationRegistryParsed: classificationChangeRegistry.parsed,
   };
 
   const recommendedReviewRoutes = unique([
@@ -1549,6 +1643,7 @@ export function composeBuildSelfReport(
     v1Signals,
     findings,
     crossSourceConflicts,
+    classificationChangeRegistry,
     recommendedReviewRoutes,
     disclosures: [...BUILD_SELF_REPORT_DISCLOSURES],
     productionRestrictions: [...BUILD_SELF_REPORT_PRODUCTION_RESTRICTIONS],
@@ -1604,6 +1699,7 @@ export function renderBuildSelfReportMarkdown(
   result: BuildSelfReportResult
 ): string {
   const { header, modules, findings, crossSourceConflicts } = result;
+  const ccr = result.classificationChangeRegistry;
   const lines: string[] = [];
   lines.push(`# Build Self-Report — ${header.checkpoint}`);
   lines.push("");
@@ -1670,6 +1766,54 @@ export function renderBuildSelfReportMarkdown(
     }
     lines.push("");
   }
+  // Active Classification Changes (VIA-GOVERNANCE-CLASSIFICATION-001).
+  lines.push(`## Active Classification Changes (${ccr.activeCount})`);
+  lines.push("");
+  if (!ccr.parsed) {
+    lines.push(
+      `> **Registry parse FAILED — build fails closed.** ${ccr.error ?? "unknown error"}`
+    );
+    lines.push("");
+  } else if (ccr.activeCount === 0) {
+    lines.push(
+      "_No active classification changes are recorded at this checkpoint._"
+    );
+    lines.push("");
+  } else {
+    for (const entry of ccr.activeEntries) {
+      lines.push(`### ${entry.id} — ${entry.title}`);
+      lines.push("");
+      lines.push(`- **Status:** ${entry.status}`);
+      lines.push(`- **Previous state:** ${entry.previousState}`);
+      lines.push(`- **New state:** ${entry.newState}`);
+      lines.push(`- **Reason:** ${entry.reason}`);
+      lines.push(`- **Approver:** ${entry.approver}`);
+      lines.push(`- **Effective date:** ${entry.effectiveDate}`);
+      lines.push(`- **Resolution criteria:** ${entry.resolutionCriteria}`);
+      lines.push("");
+    }
+  }
+
+  if (ccr.parsed && ccr.historicalCount > 0) {
+    lines.push(
+      `## Historical Classification Changes (${ccr.historicalCount})`
+    );
+    lines.push("");
+    lines.push(
+      "_Resolved / voided entries — recorded for lineage, not counted as active._"
+    );
+    lines.push("");
+    for (const entry of ccr.historicalEntries) {
+      lines.push(
+        `- **${entry.id}** — ${entry.title} · status **${entry.status}**`
+      );
+      if (entry.resolutionCriteria.length > 0) {
+        lines.push(`  - Resolution: ${entry.resolutionCriteria}`);
+      }
+    }
+    lines.push("");
+  }
+
   lines.push("## Disclosures");
   lines.push("");
   for (const d of result.disclosures) {

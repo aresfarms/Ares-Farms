@@ -191,6 +191,67 @@ function main() {
   }
 
   // ────────────────────────────────────────────────────────────────────
+  // Classification Change Registry — canonical file (default path).
+  // Scenario A reads docs/CLASSIFICATION_CHANGE_REGISTRY.md from the
+  // repo root. Per VIA-GOVERNANCE-CLASSIFICATION-001 it must parse and
+  // surface the active entries. CCR-2026-001 resolved (its resolution
+  // criteria are met since verify:human-authority exits 0); -002/-003/
+  // -004 remain ACTIVE (held for Alpha until their capabilities lift).
+  // ────────────────────────────────────────────────────────────────────
+  const ccr = result.classificationChangeRegistry;
+  assert(
+    ccr.parsed,
+    `Canonical Classification Change Registry must parse. Error: ${ccr.error ?? "(none)"}`
+  );
+  const allCcr = [...ccr.activeEntries, ...ccr.historicalEntries];
+  const ccrById = (id: string) => allCcr.find((e) => e.id === id);
+  assert(
+    ccrById("CCR-2026-001")?.status === "RESOLVED",
+    "CCR-2026-001 must be RESOLVED (resolution criteria met at Build 39)."
+  );
+  for (const activeId of ["CCR-2026-002", "CCR-2026-003", "CCR-2026-004"]) {
+    const entry = ccrById(activeId);
+    assert(
+      entry?.status === "ACTIVE",
+      `${activeId} must be ACTIVE in the canonical registry.`
+    );
+    assert(
+      ccr.activeEntries.some((e) => e.id === activeId),
+      `${activeId} must appear in activeEntries[].`
+    );
+  }
+  assert(
+    !ccr.activeEntries.some((e) => e.id === "CCR-2026-001"),
+    "CCR-2026-001 (RESOLVED) must NOT count as active."
+  );
+  // Every active entry must carry the full required field set.
+  for (const entry of ccr.activeEntries) {
+    assert(
+      entry.id.length > 0 &&
+        entry.title.length > 0 &&
+        entry.previousState.length > 0 &&
+        entry.newState.length > 0 &&
+        entry.reason.length > 0 &&
+        entry.approver.length > 0 &&
+        entry.effectiveDate.length > 0 &&
+        entry.resolutionCriteria.length > 0,
+      `Active CCR ${entry.id} must carry every required field.`
+    );
+  }
+  // Markdown must surface the active-changes section + each active id.
+  const ccrMd = renderBuildSelfReportMarkdown(result);
+  assert(
+    ccrMd.includes("## Active Classification Changes"),
+    "Markdown must include the Active Classification Changes section."
+  );
+  for (const activeId of ["CCR-2026-002", "CCR-2026-003", "CCR-2026-004"]) {
+    assert(
+      ccrMd.includes(activeId),
+      `Markdown active-changes section must render ${activeId}.`
+    );
+  }
+
+  // ────────────────────────────────────────────────────────────────────
   // Scenario B: gate behavior — live_fetch_enabled != 0 must
   // surface a cross-source conflict and force exit_code 1.
   // ────────────────────────────────────────────────────────────────────
@@ -259,6 +320,176 @@ function main() {
       (c) => c.conflictId === "bsr-v1-requirements-not-enumerated"
     ),
     "requirements-not-enumerated must surface the requirements conflict."
+  );
+
+  // ────────────────────────────────────────────────────────────────────
+  // Scenario E: malformed CCR — an ACTIVE entry missing a required
+  // field must fail the report closed (exit 1) and surface a finding +
+  // cross-source conflict. Proves "if an active CCR lacks required
+  // fields, build:self-report fails closed."
+  // ────────────────────────────────────────────────────────────────────
+  const malformedCcrMarkdown = [
+    "# Classification Change Registry",
+    "",
+    "<!-- ccr:meta",
+    "id: CCR-TEST-MALFORMED",
+    "title: Malformed active entry (missing reason)",
+    "status: ACTIVE",
+    "previousState: ACTIVE_FILL",
+    "newState: HELD_FOR_ALPHA",
+    "approver: Founder Governance Review",
+    "effectiveDate: 2026-06-04",
+    "resolutionCriteria: never",
+    "-->",
+    "",
+  ].join("\n");
+  const malformedPack = composeBuildSelfReport({
+    commit: "smoke",
+    requirementsTotal: 60,
+    requirementsImplemented: 57,
+    pendingRequirements: [
+      { id: "REQ-58", name: "p1" },
+      { id: "REQ-59", name: "p2" },
+      { id: "REQ-60", name: "p3" },
+    ],
+    classificationChangeRegistryMarkdown: malformedCcrMarkdown,
+  });
+  assert(
+    malformedPack.classificationChangeRegistry.parsed === false,
+    "Malformed CCR (active entry missing required field) must not parse."
+  );
+  assert(
+    malformedPack.header.exit_code === 1,
+    "Malformed CCR must fail the report closed (exit_code 1)."
+  );
+  assert(
+    malformedPack.classificationChangeRegistry.activeCount === 0,
+    "A failed parse must emit zero active entries."
+  );
+  assert(
+    malformedPack.findings.some(
+      (f) => f.category === "CLASSIFICATION_REGISTRY_PARSE_FAIL"
+    ),
+    "Malformed CCR must surface a CLASSIFICATION_REGISTRY_PARSE_FAIL finding."
+  );
+  assert(
+    malformedPack.crossSourceConflicts.some(
+      (c) => c.conflictId === "bsr-v1-classification-registry-parse-fail"
+    ),
+    "Malformed CCR must surface the classification-registry-parse-fail conflict."
+  );
+
+  // A junk line inside a meta block must also fail closed.
+  const junkLineCcrMarkdown = [
+    "<!-- ccr:meta",
+    "id: CCR-TEST-JUNK",
+    "title: Junk line entry",
+    "status: ACTIVE",
+    "this line has no key colon value structure",
+    "-->",
+  ].join("\n");
+  const junkPack = composeBuildSelfReport({
+    commit: "smoke",
+    requirementsTotal: 60,
+    requirementsImplemented: 57,
+    pendingRequirements: [
+      { id: "REQ-58", name: "p1" },
+      { id: "REQ-59", name: "p2" },
+      { id: "REQ-60", name: "p3" },
+    ],
+    classificationChangeRegistryMarkdown: junkLineCcrMarkdown,
+  });
+  assert(
+    junkPack.classificationChangeRegistry.parsed === false &&
+      junkPack.header.exit_code === 1,
+    "A malformed meta line must fail the report closed."
+  );
+
+  // Invalid status must fail closed.
+  const badStatusCcrMarkdown = [
+    "<!-- ccr:meta",
+    "id: CCR-TEST-BADSTATUS",
+    "title: Bad status entry",
+    "status: PENDING",
+    "-->",
+  ].join("\n");
+  const badStatusPack = composeBuildSelfReport({
+    commit: "smoke",
+    requirementsTotal: 60,
+    requirementsImplemented: 57,
+    pendingRequirements: [
+      { id: "REQ-58", name: "p1" },
+      { id: "REQ-59", name: "p2" },
+      { id: "REQ-60", name: "p3" },
+    ],
+    classificationChangeRegistryMarkdown: badStatusCcrMarkdown,
+  });
+  assert(
+    badStatusPack.classificationChangeRegistry.parsed === false &&
+      badStatusPack.header.exit_code === 1,
+    "An invalid status value must fail the report closed."
+  );
+
+  // ────────────────────────────────────────────────────────────────────
+  // Scenario F: empty registry — a registry with no active CCRs must
+  // NOT fail the report. Proves "empty registry does not fail if no
+  // active CCRs exist." Covers both a literally empty file and a file
+  // whose only entry is RESOLVED (historical, not active).
+  // ────────────────────────────────────────────────────────────────────
+  const emptyCcrPack = composeBuildSelfReport({
+    commit: "smoke",
+    requirementsTotal: 60,
+    requirementsImplemented: 57,
+    pendingRequirements: [
+      { id: "REQ-58", name: "p1" },
+      { id: "REQ-59", name: "p2" },
+      { id: "REQ-60", name: "p3" },
+    ],
+    classificationChangeRegistryMarkdown: "",
+  });
+  assert(
+    emptyCcrPack.classificationChangeRegistry.parsed === true,
+    "An empty registry must parse (no entries is not a failure)."
+  );
+  assert(
+    emptyCcrPack.classificationChangeRegistry.activeCount === 0,
+    "An empty registry must emit zero active entries."
+  );
+  assert(
+    emptyCcrPack.header.exit_code === 0,
+    "An empty registry with no active CCRs must NOT fail the report."
+  );
+  assert(
+    !emptyCcrPack.findings.some(
+      (f) => f.category === "CLASSIFICATION_REGISTRY_PARSE_FAIL"
+    ),
+    "An empty registry must not surface a parse-fail finding."
+  );
+
+  const historyOnlyCcrMarkdown = [
+    "<!-- ccr:meta",
+    "id: CCR-TEST-RESOLVED",
+    "title: Resolved-only entry",
+    "status: RESOLVED",
+    "-->",
+  ].join("\n");
+  const historyOnlyPack = composeBuildSelfReport({
+    commit: "smoke",
+    requirementsTotal: 60,
+    requirementsImplemented: 57,
+    pendingRequirements: [
+      { id: "REQ-58", name: "p1" },
+      { id: "REQ-59", name: "p2" },
+      { id: "REQ-60", name: "p3" },
+    ],
+    classificationChangeRegistryMarkdown: historyOnlyCcrMarkdown,
+  });
+  assert(
+    historyOnlyPack.classificationChangeRegistry.parsed === true &&
+      historyOnlyPack.classificationChangeRegistry.activeCount === 0 &&
+      historyOnlyPack.classificationChangeRegistry.historicalCount === 1 &&
+      historyOnlyPack.header.exit_code === 0,
+    "A registry whose only entry is RESOLVED must parse, count 0 active, and not fail."
   );
 
   // Disclosures + production restrictions.
@@ -374,6 +605,14 @@ function main() {
         liveFetchPackExitCode: liveFetchPack.header.exit_code,
         auditBrokenPackExitCode: auditBrokenPack.header.exit_code,
         reqGapPackExitCode: reqGapPack.header.exit_code,
+        classificationRegistryParsed:
+          result.classificationChangeRegistry.parsed,
+        classificationChangesActive:
+          result.summary.classificationChangesActive,
+        classificationChangesHistorical:
+          result.summary.classificationChangesHistorical,
+        malformedCcrExitCode: malformedPack.header.exit_code,
+        emptyCcrExitCode: emptyCcrPack.header.exit_code,
         handoffs: handoffs.length,
         message: "Build Self-Report v1 smoke test passed.",
       },

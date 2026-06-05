@@ -262,6 +262,10 @@ type RunResult = {
 };
 
 function main(): void {
+  // `--check` (CI mode): run the identical live page.tsx audit but skip
+  // the timestamped build-record write, so the gate can run on every PR
+  // without committing dated artifacts. Still exits result.exitCode.
+  const checkMode = process.argv.includes("--check");
   const commit = safeExec("git rev-parse HEAD", "unknown");
   const branch = safeExec("git rev-parse --abbrev-ref HEAD", "main");
   const fsRoot = process.cwd();
@@ -354,12 +358,14 @@ function main(): void {
     exitCode,
   };
 
-  // Write the build-record JSON for the archive.
+  // Write the build-record JSON for the archive (skipped in --check mode).
   const today = new Date().toISOString().slice(0, 10);
   const outDir = path.join("docs", "build-records", today);
-  mkdirSync(outDir, { recursive: true });
   const jsonPath = path.join(outDir, "customer-journey.json");
-  writeFileSync(jsonPath, JSON.stringify(result, null, 2) + "\n", "utf8");
+  if (!checkMode) {
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(jsonPath, JSON.stringify(result, null, 2) + "\n", "utf8");
+  }
 
   const lineage = publicAlphaSurfaceContentLineage();
 
@@ -394,7 +400,8 @@ function main(): void {
           reason: s.reason,
         })),
         exitCode: result.exitCode,
-        jsonPath,
+        checkMode,
+        jsonPath: checkMode ? "(--check: build-record not written)" : jsonPath,
         message:
           result.exitCode === 0
             ? `verify:customer-journey PASS — all ${result.sectionCount} customer-facing routes carry the canonical surface content.`

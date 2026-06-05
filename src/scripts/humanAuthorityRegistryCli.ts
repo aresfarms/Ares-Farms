@@ -138,6 +138,10 @@ function safeExec(command: string, fallback: string): string {
 }
 
 function main() {
+  // `--check` (CI mode): run the identical live-state audit but skip the
+  // timestamped build-record write, so the gate can be enforced on every
+  // PR without committing dated artifacts. Still exits result.exitCode.
+  const checkMode = process.argv.includes("--check");
   const commit = safeExec("git rev-parse HEAD", "unknown");
   const branch = safeExec("git rev-parse --abbrev-ref HEAD", "main");
 
@@ -161,9 +165,11 @@ function main() {
 
   const today = new Date().toISOString().slice(0, 10);
   const outDir = path.join("docs", "build-records", today);
-  mkdirSync(outDir, { recursive: true });
   const jsonPath = path.join(outDir, "human-authority-registry.json");
-  writeFileSync(jsonPath, JSON.stringify(result, null, 2) + "\n", "utf8");
+  if (!checkMode) {
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(jsonPath, JSON.stringify(result, null, 2) + "\n", "utf8");
+  }
 
   console.log(
     JSON.stringify(
@@ -196,7 +202,8 @@ function main() {
         crossSourceConflictCount: result.summary.crossSourceConflictCount,
         v1OverallReadinessPercent: result.summary.v1OverallReadinessPercent,
         exitCode: result.exitCode,
-        jsonPath,
+        checkMode,
+        jsonPath: checkMode ? "(--check: build-record not written)" : jsonPath,
         message:
           result.exitCode === 0
             ? "Human Authority Registry PASS — every clearable action has a binding, zero ai_permitted, zero self-clear, every alpha_required role filled."

@@ -191,17 +191,37 @@ jobs:
       - name: Build Self-Report v1
         run: npm run smoke:build-self-report
 
+      # Live-state enforcement (Build 43): the smoke variants above read
+      # fixtures/runtime structure and tolerate gaps; the :ci variants run
+      # the literal verify:/build: CLIs in --check mode (live repo state,
+      # no timestamped build-record write) so the real governance gates
+      # are enforced on every PR, not just locally.
+      - name: Build Self-Report v1 — live-state check
+        run: npm run build:self-report:ci
+
       - name: Public Alpha Profile v1
         run: npm run smoke:public-alpha-profile
 
       - name: Human Authority Registry v1
         run: npm run smoke:human-authority-registry
 
+      - name: Human Authority Registry v1 — live-state check
+        run: npm run verify:human-authority:ci
+
       - name: Disclosure Audit Gate v1
         run: npm run smoke:disclosure-audit-gate
 
       - name: Public Alpha Profile v1 — Customer Journey
         run: npm run smoke:public-alpha-customer-journey
+
+      - name: Public Alpha Profile v1 — Customer Journey live-state check
+        run: npm run verify:customer-journey:ci
+
+      # Proves the live-state :ci gates fail closed on real-state defects:
+      # an unfilled alpha-required role, a customer surface missing required
+      # content, and a malformed/incomplete active CCR each force a failure.
+      - name: CI live-state gate fail-closed proof
+        run: npm run smoke:ci-live-state-proof
 
       - name: Next.js production build
         run: npm run build

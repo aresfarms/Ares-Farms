@@ -2,7 +2,7 @@
   "runtimeVersion": "human-authority-registry-runtime-v0.1.0",
   "specVersion": "module-45-human-authority-registry-spec-v1.0",
   "docRef": "docs/DOCTRINE_HUMAN_AUTHORITY_REGISTRY_V1.md",
-  "generatedAt": "2026-06-04T23:35:00.629Z",
+  "generatedAt": "2026-06-05T00:47:38.035Z",
   "reviewerRole": "Chief Governance Authority",
   "applicationId": null,
   "bindings": [
@@ -3785,27 +3785,9 @@
       "recordedAt": "2026-06-04"
     },
     {
-      "roleId": "QUALIFIED_GOVERNANCE_REVIEWER",
-      "filledByCount": 1,
-      "recordedBy": "Caitlin Hudson (ACTIVE_FILL)",
-      "recordedAt": "2026-06-04"
-    },
-    {
-      "roleId": "REGULATORY_LIAISON_AUTHORITY",
-      "filledByCount": 1,
-      "recordedBy": "Caitlin Hudson (ACTIVE_FILL)",
-      "recordedAt": "2026-06-04"
-    },
-    {
       "roleId": "DATA_RIGHTS_OFFICER",
       "filledByCount": 1,
       "recordedBy": "Caitlin Hudson (ACTIVE_FILL)",
-      "recordedAt": "2026-06-04"
-    },
-    {
-      "roleId": "ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER",
-      "filledByCount": 1,
-      "recordedBy": "Stuart Fraass (ACTIVE_FILL)",
       "recordedAt": "2026-06-04"
     },
     {
@@ -3821,9 +3803,9 @@
       "recordedAt": "2026-06-04"
     },
     {
-      "roleId": "SOURCE_LEGAL_AUTHORITY",
+      "roleId": "QUALIFIED_GOVERNANCE_REVIEWER",
       "filledByCount": 1,
-      "recordedBy": "Frances Fraass (ACTIVE_FILL)",
+      "recordedBy": "Stuart Fraass (ACTIVE_FILL)",
       "recordedAt": "2026-06-04"
     },
     {
@@ -3842,6 +3824,24 @@
       "roleId": "SOVEREIGN_FEDERATION_AUTHORITY",
       "filledByCount": 1,
       "recordedBy": "UNFILLED_BY_DESIGN_FOR_ALPHA: No sovereign customer in Alpha cohort (CANON-SOVEREIGNTY-001 named federation participation requirement). (UNFILLED_BY_DESIGN_FOR_ALPHA)",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "roleId": "ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER",
+      "filledByCount": 1,
+      "recordedBy": "HELD_FOR_ALPHA: Environmental review deferred from Alpha per CCR-2026-002 and Public Alpha §9 B4 default. Activates only when (a) an environmental workflow is featured AND (b) a qualified environmental reviewer is assigned. Caitlin currently holds the qualification but is the builder; this is a regulated-competency single point of failure flagged in CCR-2026-002. (HELD_FOR_ALPHA)",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "roleId": "REGULATORY_LIAISON_AUTHORITY",
+      "filledByCount": 1,
+      "recordedBy": "HELD_FOR_ALPHA: Regulatory Liaison governs Modules 40-41 (BLOCKED_BY_DESIGN in Alpha). PR-review audit confirmed 0 alpha_required bindings consume this role (2 intentionally_held bindings only). Held until regulatory examination/response capabilities activate (production/regulatory path). (HELD_FOR_ALPHA)",
+      "recordedAt": "2026-06-04"
+    },
+    {
+      "roleId": "SOURCE_LEGAL_AUTHORITY",
+      "filledByCount": 1,
+      "recordedBy": "HELD_FOR_ALPHA: Source legal/licensing review (Module 23) and source promotion are held in Alpha; source-intelligence/scraper activation is blocked (live-fetch = 0). PR-review audit confirmed 0 alpha_required bindings consume this role (7 intentionally_held bindings). Held until source promotion activates. (HELD_FOR_ALPHA)",
       "recordedAt": "2026-06-04"
     }
   ],

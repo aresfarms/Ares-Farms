@@ -2,32 +2,33 @@ import Link from "next/link";
 
 import { FurlongCompassWatermark } from "@/components/brand/FurlongCompassWatermark";
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
-import { StewardshipSection } from "@/components/stewardship/StewardshipSection";
 import {
   AMERICA_250_STORIES,
   EXPLORATION_CATEGORIES,
-  explorationHref,
 } from "@/lib/customer-landing/featuredExplorationStories";
 
 /**
- * Furlong homepage — public-facing discovery experience (Build 47-B).
+ * Furlong homepage — public-facing discovery experience (Build 50).
  *
  * Section order:
- *   1. Hero Identity Layer (compass + map + headline + CTA)
- *   2. Featured Exploration Layer (Living Opportunity Map)
- *   3. Full Map vs Personalize Choice
- *   4. Exploration Categories
- *   5. Trust Strip
- *   6. Stewardship Section
- *   7. What Furlong Is Not
- *   8. Footer
+ *   1. Hero — compass + headline + CTA
+ *   2. Living Opportunity Map — America 250 Featured Exploration
+ *   3. What would you like to explore today? — dropdown → onboarding
+ *   4. Trust Strip
+ *   5. What Furlong Is Not — institutional blue/gold
+ *   6. Footer (with stewardship link)
  *
- * Design posture: curious, trustworthy, alive. Educational, not salesy.
- * Exploration-first, not lead-capture-first. No internal module names.
- * No governance jargon. No dashboard diagnostics. No geolocation.
+ * Design posture: compass → map → discovery. Lighthouse, not sitemap.
+ * Educational, not salesy. Exploration-first. No geolocation. No jargon.
+ *
+ * Privacy posture (unchanged):
+ *   "The map reveals opportunities, not the visitor."
+ *   No geolocation. No visitor identification. No personal data.
+ *
+ * Public Alpha remains PENDING.
  */
 
-// ── Content ──────────────────────────────────────────────────────────────────
+// ── Content ───────────────────────────────────────────────────────────────────
 
 const TRUST_STRIP = [
   "We personalize with you, not to you.",
@@ -46,14 +47,13 @@ const WHAT_FURLONG_IS_NOT = [
 ] as const;
 
 const FOOTER_LINKS = [
-  { href: "/about",             label: "About" },
-  { href: "/trust",             label: "Trust" },
-  { href: "/data-rights",       label: "Data Rights" },
-  { href: "/financing-pathways",label: "Financing Pathways" },
-  { href: "/readiness",         label: "Readiness" },
-  { href: "/onboarding",        label: "Onboarding" },
-  { href: "/portal/borrower",   label: "Borrower Portal" },
-  { href: "/stewardship",       label: "Stewardship" },
+  { href: "/about",              label: "About" },
+  { href: "/trust",              label: "Trust" },
+  { href: "/data-rights",        label: "Data Rights" },
+  { href: "/financing-pathways", label: "Financing Pathways" },
+  { href: "/readiness",          label: "Readiness" },
+  { href: "/onboarding",         label: "Onboarding" },
+  { href: "/portal/borrower",    label: "Borrower Portal" },
 ] as const;
 
 // ── Shared tokens ─────────────────────────────────────────────────────────────
@@ -63,6 +63,8 @@ const shell = {
   color: "#162033",
   fontFamily:
     'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  position: "relative" as const,
+  overflow: "hidden" as const,
 } as const;
 
 const container = {
@@ -71,15 +73,8 @@ const container = {
   padding: "0 24px 80px",
   display: "grid",
   gap: 0,
-} as const;
-
-const card = {
-  padding: 24,
-  border: "1px solid #d7deea",
-  borderRadius: 14,
-  background: "#ffffff",
-  display: "grid",
-  gap: 12,
+  position: "relative" as const,
+  zIndex: 1,
 } as const;
 
 const muted = { color: "#5d687a", lineHeight: 1.65 } as const;
@@ -89,25 +84,29 @@ const muted = { color: "#5d687a", lineHeight: 1.65 } as const;
 export default function HomePage() {
   return (
     <div style={shell}>
+      {/*
+        ╔═══════════════════════════════════════════════════════════════╗
+        ║  Compass watermarks — page scope, z-index: 0, behind all     ║
+        ║  content. Both are aria-hidden and pointer-events: none.      ║
+        ╚═══════════════════════════════════════════════════════════════╝
+      */}
+      <FurlongCompassWatermark variant="hero" />
+      <FurlongCompassWatermark variant="subtle" />
+
       <div style={container}>
 
-        {/* ─── Inline responsive styles ─────────────────────────────────── */}
+        {/* ─── Inline styles ─────────────────────────────────────────── */}
         <style>{`
-          /* Hero stage */
+
+          /* ── Hero ──────────────────────────────────────────────────── */
           .fl-hero {
-            position: relative;
-            overflow: hidden;
-            padding: 72px 0 40px;
+            padding: 80px 0 36px;
             display: grid;
-            gap: 36px;
-          }
-          .fl-hero-content {
-            position: relative;
-            z-index: 1;
+            gap: 0;
           }
           .fl-hero-copy {
             display: grid;
-            gap: 18px;
+            gap: 20px;
             text-align: center;
             justify-items: center;
           }
@@ -126,15 +125,8 @@ export default function HomePage() {
             color: #5d687a;
             line-height: 1.65;
           }
-          .fl-hero-trust-note {
-            margin: 0;
-            font-size: 14px;
-            color: #5d687a;
-            max-width: 560px;
-            line-height: 1.6;
-          }
 
-          /* Primary CTA button */
+          /* ── Primary CTA ───────────────────────────────────────────── */
           .fl-cta-primary {
             display: inline-flex;
             align-items: center;
@@ -156,184 +148,12 @@ export default function HomePage() {
             outline-offset: 3px;
           }
 
-          /* Section spacing */
-          .fl-section {
-            margin-top: 52px;
-            display: grid;
-            gap: 20px;
-          }
-          .fl-section-title {
-            margin: 0;
-            font-size: clamp(22px, 3vw, 30px);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-            text-align: center;
-          }
-          .fl-section-title--left {
-            text-align: left;
+          /* ── Map section ───────────────────────────────────────────── */
+          .fl-map-section {
+            margin-top: 24px;
           }
 
-          /* Full Map vs Personalize — two option cards */
-          .fl-explore-grid {
-            display: grid;
-            gap: 16px;
-            grid-template-columns: 1fr 1fr;
-          }
-          .fl-explore-card {
-            display: grid;
-            gap: 12px;
-            padding: 26px 22px;
-            border: 1.5px solid #d7deea;
-            border-radius: 14px;
-            background: #ffffff;
-            text-decoration: none;
-            color: inherit;
-            align-content: start;
-            transition: border-color 0.14s, box-shadow 0.14s;
-          }
-          .fl-explore-card:hover {
-            border-color: #0f766e;
-            box-shadow: 0 2px 16px rgba(15,118,110,0.08);
-          }
-          .fl-explore-card--primary {
-            border-color: #0f766e;
-            background: linear-gradient(160deg, #f0fbf9 0%, #ffffff 100%);
-          }
-          .fl-explore-card--primary:hover {
-            box-shadow: 0 4px 20px rgba(15,118,110,0.14);
-          }
-          .fl-explore-icon {
-            font-size: 28px;
-            line-height: 1;
-          }
-          .fl-explore-card-title {
-            font-size: 19px;
-            font-weight: 800;
-            color: #162033;
-            margin: 0;
-          }
-          .fl-explore-card-desc {
-            font-size: 15px;
-            color: #5d687a;
-            line-height: 1.6;
-            margin: 0;
-          }
-          .fl-explore-card-cta {
-            font-size: 14px;
-            font-weight: 700;
-            color: #0f766e;
-          }
-          .fl-explore-card:focus-visible {
-            outline: 2px solid #0f766e;
-            outline-offset: 2px;
-          }
-
-          /* Category grid */
-          .fl-category-grid {
-            display: grid;
-            gap: 12px;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          }
-          .fl-category-card {
-            display: grid;
-            gap: 6px;
-            padding: 18px;
-            border: 1px solid #d7deea;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.92);
-            color: inherit;
-            text-decoration: none;
-            backdrop-filter: blur(4px);
-            transition: border-color 0.14s, box-shadow 0.12s;
-          }
-          .fl-category-card:hover {
-            border-color: #0f766e;
-            box-shadow: 0 2px 10px rgba(15,118,110,0.07);
-          }
-          .fl-category-card:focus-visible {
-            outline: 2px solid #0f766e;
-            outline-offset: 2px;
-          }
-
-          /* Trust strip */
-          .fl-trust-strip {
-            display: grid;
-            gap: 0;
-            padding: 26px 28px;
-            border: 1px solid #d7deea;
-            border-radius: 14px;
-            background: #ffffff;
-          }
-          .fl-trust-strip-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px 28px;
-          }
-          .fl-trust-item {
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            font-size: 15px;
-            line-height: 1.6;
-            color: #162033;
-          }
-          .fl-trust-check {
-            font-size: 13px;
-            color: #0f766e;
-            flex-shrink: 0;
-            font-weight: 900;
-          }
-
-          /* Stewardship */
-          .fl-stewardship-wrap {
-            display: grid;
-            gap: 6px;
-            margin-bottom: 4px;
-          }
-          .fl-stewardship-wrap p {
-            margin: 0;
-            color: #5d687a;
-            line-height: 1.65;
-            font-size: 15px;
-          }
-
-          /* What Furlong Is Not */
-          .fl-not-grid {
-            display: grid;
-            gap: 10px;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-          }
-          .fl-not-item {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            padding: 14px 16px;
-            border: 1px solid #f1c40f22;
-            border-radius: 10px;
-            background: #fffdf0;
-            font-size: 15px;
-            line-height: 1.6;
-            color: #162033;
-          }
-          .fl-not-mark {
-            font-size: 13px;
-            color: #b45309;
-            font-weight: 900;
-            flex-shrink: 0;
-          }
-
-          /* Footer */
-          .fl-footer {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            justify-content: center;
-            padding-top: 20px;
-            border-top: 1px solid #d7deea;
-            margin-top: 52px;
-          }
-
-          /* America 250 featured exploration label */
+          /* ── America 250 label ─────────────────────────────────────── */
           .fl-a250-label {
             display: flex;
             align-items: baseline;
@@ -360,25 +180,177 @@ export default function HomePage() {
             line-height: 1.55;
           }
 
-          /* Responsive */
+          /* ── Section spacing ───────────────────────────────────────── */
+          .fl-section {
+            margin-top: 52px;
+            display: grid;
+            gap: 20px;
+          }
+          .fl-section-title {
+            margin: 0;
+            font-size: clamp(22px, 3vw, 30px);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            text-align: center;
+          }
+
+          /* ── Explore dropdown form ─────────────────────────────────── */
+          .fl-explore-form {
+            display: grid;
+            gap: 12px;
+            max-width: 580px;
+            margin: 0 auto;
+          }
+          .fl-explore-row {
+            display: flex;
+            gap: 12px;
+            align-items: stretch;
+          }
+          .fl-explore-select {
+            flex: 1;
+            min-height: 50px;
+            padding: 0 14px;
+            border-radius: 10px;
+            border: 1.5px solid #cdd9ec;
+            background: #ffffff;
+            color: #162033;
+            font-size: 15px;
+            font-family: inherit;
+            cursor: pointer;
+          }
+          .fl-explore-select:focus-visible {
+            outline: 2px solid #0f766e;
+            outline-offset: 2px;
+            border-color: #0f766e;
+          }
+          .fl-explore-btn {
+            min-height: 50px;
+            padding: 0 24px;
+            border-radius: 10px;
+            border: none;
+            background: #0f766e;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.15s;
+          }
+          .fl-explore-btn:hover { background: #0d6460; }
+          .fl-explore-btn:focus-visible {
+            outline: 2px solid #0f766e;
+            outline-offset: 3px;
+          }
+
+          /* ── Trust strip ───────────────────────────────────────────── */
+          .fl-trust-strip {
+            padding: 26px 28px;
+            border: 1px solid #d7deea;
+            border-radius: 14px;
+            background: #ffffff;
+          }
+          .fl-trust-strip-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 28px;
+            margin-top: 16px;
+          }
+          .fl-trust-item {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #162033;
+          }
+          .fl-trust-check {
+            font-size: 13px;
+            color: #0f766e;
+            flex-shrink: 0;
+            font-weight: 900;
+          }
+
+          /* ── What Furlong Is Not — institutional blue / gold ───────── */
+          .fl-not-panel {
+            background: #162033;
+            border-radius: 16px;
+            padding: 36px 32px;
+            display: grid;
+            gap: 20px;
+          }
+          .fl-not-heading {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+            color: #c9a84c;
+            letter-spacing: -0.01em;
+          }
+          .fl-not-grid {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          }
+          .fl-not-item {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.06);
+            font-size: 15px;
+            line-height: 1.6;
+            color: #e8effa;
+          }
+          .fl-not-mark {
+            font-size: 13px;
+            color: #c9a84c;
+            font-weight: 900;
+            flex-shrink: 0;
+          }
+          .fl-not-note {
+            margin: 0;
+            font-size: 14px;
+            color: rgba(232,239,250,0.65);
+            line-height: 1.65;
+          }
+
+          /* ── Footer ────────────────────────────────────────────────── */
+          .fl-footer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 1px solid #d7deea;
+            margin-top: 52px;
+          }
+          .fl-footer-sep {
+            color: #d7deea;
+            font-size: 14px;
+            user-select: none;
+          }
+
+          /* ── Responsive ────────────────────────────────────────────── */
           @media (max-width: 640px) {
-            .fl-hero { padding: 48px 0 28px; gap: 24px; }
-            .fl-explore-grid { grid-template-columns: 1fr; }
+            .fl-hero { padding: 52px 0 28px; }
             .fl-trust-strip-items { gap: 8px 16px; }
             .fl-not-grid { grid-template-columns: 1fr; }
             .fl-a250-label { justify-content: flex-start; }
+            .fl-explore-row { flex-direction: column; }
+            .fl-explore-select { min-height: 48px; }
+            .fl-explore-btn { min-height: 48px; }
           }
+
         `}</style>
 
         {/* ═══════════════════════════════════════════════════════════════
-            1. HERO IDENTITY LAYER
+            1. HERO
+            Headline · Sub · CTA
             ══════════════════════════════════════════════════════════════ */}
         <section className="fl-hero" aria-label="Furlong discovery">
-          {/* Compass watermark — brand identity behind the hero */}
-          <FurlongCompassWatermark variant="hero" />
-          <FurlongCompassWatermark variant="subtle" />
-
-          <header className="fl-hero-content fl-hero-copy">
+          <header className="fl-hero-copy">
             <h1>
               Furlong helps you discover things you didn&rsquo;t know were possible.
             </h1>
@@ -389,106 +361,73 @@ export default function HomePage() {
             <a href="#explore" className="fl-cta-primary">
               What would you like to explore today?
             </a>
-            <p className="fl-hero-trust-note">
-              You choose what you want to explore. From there, you can personalize
-              your journey or continue exploring the full map.
-            </p>
           </header>
-
-          {/* ─── 2. AMERICA 250 FEATURED EXPLORATION (Living Opportunity Map) ─ */}
-          <div className="fl-hero-content">
-            <div className="fl-a250-label">
-              <span className="fl-a250-badge">America 250</span>
-              <span className="fl-a250-copy">
-                Celebrating 250 years of American growth, innovation,
-                stewardship, and opportunity.
-              </span>
-            </div>
-            <LivingOpportunityMap stories={AMERICA_250_STORIES} />
-          </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            3. FULL MAP vs PERSONALIZE CHOICE
+            2. LIVING OPPORTUNITY MAP
+            America 250 Featured Exploration — immediately below hero
+            ══════════════════════════════════════════════════════════════ */}
+        <div className="fl-map-section">
+          <div className="fl-a250-label" aria-hidden="true">
+            <span className="fl-a250-badge">America 250</span>
+            <span className="fl-a250-copy">
+              Celebrating 250 years of American growth, innovation,
+              stewardship, and opportunity.
+            </span>
+          </div>
+          <LivingOpportunityMap stories={AMERICA_250_STORIES} />
+        </div>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            3. EXPLORE DROPDOWN
+            Single focused entry point → onboarding
             ══════════════════════════════════════════════════════════════ */}
         <section
           id="explore"
           className="fl-section"
-          aria-label="How would you like to explore"
-          style={{ scrollMarginTop: 80 }}
-        >
-          <h2 className="fl-section-title">How would you like to explore?</h2>
-
-          <div className="fl-explore-grid">
-            <Link href="/onboarding" className="fl-explore-card fl-explore-card--primary">
-              <span className="fl-explore-icon" aria-hidden="true">🗺</span>
-              <p className="fl-explore-card-title">Explore the Full Map</p>
-              <p className="fl-explore-card-desc">
-                Browse opportunities, pathways, and ideas without narrowing your
-                journey. See the full range of what Furlong can help you discover.
-              </p>
-              <span className="fl-explore-card-cta">Begin exploring →</span>
-            </Link>
-
-            <a href="#topics" className="fl-explore-card">
-              <span className="fl-explore-icon" aria-hidden="true">🧭</span>
-              <p className="fl-explore-card-title">Focus My Exploration</p>
-              <p className="fl-explore-card-desc">
-                Choose a topic, location, or goal to help Furlong surface more
-                relevant pathways for your specific situation.
-              </p>
-              <span className="fl-explore-card-cta">Choose where to start →</span>
-            </a>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            4. EXPLORATION CATEGORIES
-            ══════════════════════════════════════════════════════════════ */}
-        <section
-          id="topics"
-          className="fl-section"
-          aria-label="Exploration topics"
+          aria-label="Choose your exploration"
           style={{ scrollMarginTop: 80 }}
         >
           <h2 className="fl-section-title">What would you like to explore today?</h2>
 
-          <div className="fl-category-grid">
-            {EXPLORATION_CATEGORIES.map((category) => (
-              <Link
-                key={category.slug}
-                href={explorationHref(category.slug)}
-                className="fl-category-card"
+          <form method="GET" action="/onboarding" className="fl-explore-form">
+            <div className="fl-explore-row">
+              <select
+                id="fl-explore-select"
+                name="explore"
+                className="fl-explore-select"
+                aria-label="Choose an exploration topic"
+                defaultValue=""
               >
-                <strong style={{ fontSize: 16 }}>{category.label}</strong>
-                <span style={{ ...muted, fontSize: 14 }}>{category.blurb}</span>
-              </Link>
-            ))}
-          </div>
+                <option value="" disabled>Choose a starting point…</option>
+                {EXPLORATION_CATEGORIES.map((c) => (
+                  <option key={c.slug} value={c.slug}>
+                    {c.label}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="fl-explore-btn">
+                Begin exploring →
+              </button>
+            </div>
+          </form>
 
           <p style={{ ...muted, margin: 0, fontSize: 14, textAlign: "center" }}>
-            Choose a starting point — or just begin exploring. You can change
-            direction any time. No account or personal information is needed
-            to look around.
+            No account or personal information is needed to look around.
+            You can change direction any time.
           </p>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            5. TRUST STRIP
+            4. TRUST STRIP
             ══════════════════════════════════════════════════════════════ */}
         <section
           className="fl-section"
           aria-label="How Furlong works with you"
         >
           <div className="fl-trust-strip">
-            <h2
-              style={{
-                margin: "0 0 16px",
-                fontSize: 18,
-                fontWeight: 800,
-                color: "#162033",
-              }}
-            >
+            <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#162033" }}>
               How we work with you
             </h2>
             <div className="fl-trust-strip-items">
@@ -503,34 +442,14 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            6. STEWARDSHIP PREVIEW (gateway to /stewardship)
-            ══════════════════════════════════════════════════════════════ */}
-        <section
-          className="fl-section"
-          aria-label="Furlong Stewardship"
-        >
-          <h2 className="fl-section-title">Meet the Stewards Behind Furlong</h2>
-          <StewardshipSection />
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            7. WHAT FURLONG IS NOT
+            5. WHAT FURLONG IS NOT — institutional blue / gold
             ══════════════════════════════════════════════════════════════ */}
         <section
           className="fl-section"
           aria-label="What Furlong is not"
         >
-          <div style={card}>
-            <h2
-              className="fl-section-title--left"
-              style={{
-                margin: 0,
-                fontSize: 22,
-                fontWeight: 800,
-              }}
-            >
-              What Furlong Is Not
-            </h2>
+          <div className="fl-not-panel">
+            <h2 className="fl-not-heading">What Furlong Is Not</h2>
             <div className="fl-not-grid">
               {WHAT_FURLONG_IS_NOT.map((line) => (
                 <span key={line} className="fl-not-item">
@@ -539,7 +458,7 @@ export default function HomePage() {
                 </span>
               ))}
             </div>
-            <p style={{ ...muted, margin: 0, fontSize: 14 }}>
+            <p className="fl-not-note">
               Furlong is a discovery and exploration platform. We help you understand
               your options — the decisions and determinations always belong to you
               and to qualified professionals.
@@ -548,9 +467,23 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            8. FOOTER
+            6. FOOTER
             ══════════════════════════════════════════════════════════════ */}
         <footer className="fl-footer" aria-label="Site navigation">
+          <Link
+            href="/stewardship"
+            style={{
+              color: "#0f766e",
+              fontSize: 14,
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            Meet the Furlong Stewards →
+          </Link>
+
+          <span className="fl-footer-sep" aria-hidden="true">|</span>
+
           {FOOTER_LINKS.map((link) => (
             <Link
               key={link.href}

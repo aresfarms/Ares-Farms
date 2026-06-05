@@ -226,7 +226,8 @@ function boundsToViewBox(bounds: StateBounds | null): ViewBox {
   if (!bounds) return NATIONAL_VBOX;
   const bw = bounds.maxX - bounds.minX;
   const bh = bounds.maxY - bounds.minY;
-  const pad = Math.max(Math.min(bw, bh) * 0.14, 8);
+  // Increased padding (0.20 / min 15) gives node labels room to breathe
+  const pad = Math.max(Math.min(bw, bh) * 0.20, 15);
   let x = bounds.minX - pad;
   let y = bounds.minY - pad;
   let w = bw + pad * 2;
@@ -247,6 +248,48 @@ function boundsToViewBox(bounds: StateBounds | null): ViewBox {
 
 function easeInOut(t: number): number {
   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+
+// ── Node label positioning ────────────────────────────────────────────────────
+// Scales font size with the zoom level so labels appear at a consistent screen
+// size regardless of viewBox. Adjusts text anchor and vertical position to keep
+// labels inside the viewBox when nodes are near an edge.
+
+function nodeLabelProps(
+  px: number,
+  py: number,
+  labelText: string,
+  vb: ViewBox,
+): {
+  x: number;
+  y: number;
+  fontSize: number;
+  anchor: "start" | "middle" | "end";
+  strokeWidth: number;
+} {
+  // zoom factor relative to national view (< 1 = more zoomed in)
+  const scale = vb.w / NATIONAL_VBOX.w;
+
+  // Font size in SVG units — stays visually constant on screen
+  const fontSize = Math.max(1.5, 10 * scale);
+
+  // Estimated half-width of the label in SVG units
+  const charW   = 5.5 * scale;
+  const halfW   = (labelText.length * charW) / 2;
+  const above   = 13 * scale; // distance above the dot
+  const margin  = 4  * scale;
+
+  // Horizontal: start / middle / end anchor to avoid left/right clipping
+  let anchor: "start" | "middle" | "end" = "middle";
+  if (px - vb.x < halfW + margin)              anchor = "start";
+  else if ((vb.x + vb.w) - px < halfW + margin) anchor = "end";
+
+  // Vertical: flip below dot when near the top edge
+  const y = (py - vb.y < above + margin)
+    ? py + above + fontSize
+    : py - above;
+
+  return { x: px, y, fontSize, anchor, strokeWidth: 3 * scale };
 }
 
 function lerpVB(a: ViewBox, b: ViewBox, t: number): ViewBox {
@@ -749,16 +792,23 @@ function RealUsMap({
             fill={story.color} />
           <circle cx={pt.svgX} cy={pt.svgY} r={2}
             fill="#ffffff" opacity={0.9} />
-          <text
-            x={pt.svgX} y={pt.svgY - 13}
-            textAnchor="middle"
-            fontSize={10} fontWeight={700}
-            fill="#1f2a3d"
-            paintOrder="stroke"
-            stroke="#f8fbff" strokeWidth={3}
-          >
-            {pt.type}
-          </text>
+          {(() => {
+            const lp = nodeLabelProps(pt.svgX, pt.svgY, pt.type, viewBox);
+            return (
+              <text
+                x={lp.x} y={lp.y}
+                textAnchor={lp.anchor}
+                fontSize={lp.fontSize}
+                fontWeight={700}
+                fill="#1f2a3d"
+                paintOrder="stroke"
+                stroke="#f8fbff"
+                strokeWidth={lp.strokeWidth}
+              >
+                {pt.type}
+              </text>
+            );
+          })()}
         </g>
       ))}
 

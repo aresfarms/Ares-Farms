@@ -161,18 +161,18 @@ const results = [
     "Primary CTA must be keyboard-accessible with visible focus."
   ),
 
-  // ── 15. Homepage explore cards have focus-visible ─────────────────────────
+  // ── 15. Homepage explore select has focus-visible ─────────────────────────
   check(
-    "Homepage explore cards have :focus-visible style",
-    homepage.includes("fl-explore-card:focus-visible"),
-    "Card links must be keyboard-accessible (WCAG 2.1.1)."
+    "Homepage explore select has :focus-visible style",
+    homepage.includes("fl-explore-select:focus-visible"),
+    "Form select elements must show a keyboard focus indicator (WCAG 2.4.7)."
   ),
 
-  // ── 16. Homepage category cards have focus-visible ────────────────────────
+  // ── 16. Homepage explore submit button has focus-visible ──────────────────
   check(
-    "Homepage category cards have :focus-visible style",
-    homepage.includes("fl-category-card:focus-visible"),
-    "Category card links must show keyboard focus (WCAG 2.4.7)."
+    "Homepage explore submit button has :focus-visible style",
+    homepage.includes("fl-explore-btn:focus-visible"),
+    "Submit buttons must be keyboard-accessible with visible focus (WCAG 2.1.1)."
   ),
 
   // ── 17. No #7a8fa8 low-contrast color on homepage ────────────────────────

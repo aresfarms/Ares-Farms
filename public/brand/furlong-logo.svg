@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 44" role="img" aria-label="Furlong">
+  <title>Furlong</title>
+  <!-- Legacy SVG placeholder retained while the official PNG at
+       /brand/furlong-logo.png serves as the canonical in-product asset.
+       A future vector version can replace this file without changing the
+       public path or the consuming components. -->
+  <g fill="#0f766e">
+    <circle cx="22" cy="22" r="19" fill="none" stroke="#0f766e" stroke-width="2.5" />
+    <path d="M22 6 L25 19 L38 22 L25 25 L22 38 L19 25 L6 22 L19 19 Z" />
+  </g>
+  <text x="52" y="30" font-family="Inter, system-ui, -apple-system, Segoe UI, sans-serif"
+        font-size="26" font-weight="800" letter-spacing="2" fill="#0f766e">FURLONG</text>
+</svg>

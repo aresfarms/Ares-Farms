@@ -191,6 +191,16 @@ jobs:
       - name: Build Self-Report v1
         run: npm run smoke:build-self-report
 
+      # Universal Exploration Engine (Build 45): every Alpha exploration
+      # module must support Full Map + Focus, show value before any personal
+      # info, gate human review behind value, hold environmental technical
+      # review for a qualified reviewer, and carry no prohibited claims.
+      - name: Universal Exploration Engine registry
+        run: npm run verify:exploration-registry
+
+      - name: Universal Exploration Engine smoke
+        run: npm run smoke:exploration-registry
+
       # Live-state enforcement (Build 43): the smoke variants above read
       # fixtures/runtime structure and tolerate gaps; the :ci variants run
       # the literal verify:/build: CLIs in --check mode (live repo state,

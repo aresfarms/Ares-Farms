@@ -5,7 +5,8 @@ import { FurlongLogo } from "@/components/brand/FurlongLogo";
 /**
  * PublicSiteHeader (Build 48) — persistent public header / trust anchor.
  *
- * Nav order: Explore | Stewardship (hover dropdown) | Trust | Data Rights
+ * Nav order: Explore (/#explore) | Stewardship (/stewardship, hover dropdown) |
+ *             Trust | Data Rights | About
  * Stewardship links to /stewardship overview; hover exposes the three domains.
  * On touch/mobile, tapping Stewardship navigates to /stewardship overview
  * where all domain cards are accessible.
@@ -123,7 +124,8 @@ export function PublicSiteHeader() {
             alignItems: "center",
           }}
         >
-          <Link href="/onboarding" className="ps-nav-link">
+          {/* Explore → homepage dropdown anchor */}
+          <Link href="/#explore" className="ps-nav-link">
             Explore
           </Link>
 
@@ -149,6 +151,9 @@ export function PublicSiteHeader() {
           </Link>
           <Link href="/data-rights" className="ps-nav-link">
             Data Rights
+          </Link>
+          <Link href="/about" className="ps-nav-link">
+            About
           </Link>
         </div>
       </nav>

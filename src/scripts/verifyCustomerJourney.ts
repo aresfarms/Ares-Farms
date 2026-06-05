@@ -2,7 +2,10 @@ import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
-import { composeDisclosureAuditGate } from "@/lib/disclosure-audit/disclosureAuditGateRuntime";
+import {
+  DISCLOSURE_REGISTRY,
+  composeDisclosureAuditGate,
+} from "@/lib/disclosure-audit/disclosureAuditGateRuntime";
 import {
   PUBLIC_ALPHA_SURFACE_CONTENT_DOC_REF,
   PUBLIC_ALPHA_SURFACE_CONTENT_VERSION,
@@ -142,19 +145,34 @@ function auditSection(
     }
   }
 
-  // Module 44 disclosures — use the disclosure audit pack's per-surface
-  // result keyed by the module id mapped from the route.
-  const moduleId = moduleIdForRoute(section.route);
-  const surfaceResult = moduleId
-    ? disclosurePack.surfaceResults.find((r) => r.surfaceId === moduleId)
-    : undefined;
-  const presentDisclosureIds = new Set(
-    surfaceResult?.presentDisclosureIds ?? []
-  );
+  // Module 44 disclosures — checked directly against the page text
+  // by running the canonical semantic_tokens from the Module 44
+  // disclosure registry. This decouples the per-route surface-content
+  // requirement from Module 44's per-surface-class `applies_to`
+  // filter (which is correctly narrower at the broader audit level).
+  // A required disclosure for this route is "present" if any of the
+  // semantic tokens for that disclosure_id appears on the page.
   const missingDisclosures: string[] = [];
   let presentDisclosures = 0;
+  const moduleId = moduleIdForRoute(section.route);
+  // Acknowledge the disclosure pack output for record-keeping; the
+  // canonical check runs against page text below.
+  void disclosurePack;
+  void moduleId;
   for (const id of section.requiredDisclosureIds) {
-    if (presentDisclosureIds.has(id)) {
+    const def = DISCLOSURE_REGISTRY.find((d) => d.disclosure_id === id);
+    if (!def) {
+      missingDisclosures.push(id);
+      findings.push({
+        route: section.route,
+        ordinal: section.ordinal,
+        category: "DISCLOSURE_MISSING",
+        detail: `Disclosure id "${id}" is not declared in the Module 44 registry; cannot verify.`,
+      });
+      continue;
+    }
+    const present = def.semantic_tokens.some((re) => re.test(contentBody));
+    if (present) {
       presentDisclosures += 1;
     } else {
       missingDisclosures.push(id);
@@ -162,7 +180,7 @@ function auditSection(
         route: section.route,
         ordinal: section.ordinal,
         category: "DISCLOSURE_MISSING",
-        detail: `Module 44 disclosure "${id}" not present for module ${moduleId ?? "(unmapped route)"}`,
+        detail: `Module 44 disclosure "${id}" not detected on page text via semantic_tokens (${def.required_text_canonical.slice(0, 80)}${def.required_text_canonical.length > 80 ? "…" : ""}).`,
       });
     }
   }

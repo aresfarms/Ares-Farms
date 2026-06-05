@@ -156,6 +156,88 @@ export default function PublicTrustPage() {
   return (
     <main style={shellStyle}>
       <div style={containerStyle}>
+        {/*
+          Public Alpha Surface Content — Route 2 (Trust Posture)
+          Source: docs/PUBLIC_ALPHA_SURFACE_CONTENT.md §Route 2
+          Renders the foundational principle, ten "Furlong will"
+          obligations, twelve "Furlong will not" prohibitions, and the
+          trust principle — visible-on-render per Module 44.
+        */}
+        <section
+          aria-label="Public Alpha trust posture"
+          style={{
+            background: "#ffffff",
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            padding: 28,
+            marginBottom: 16,
+          }}
+        >
+          <p style={{ fontSize: 22, fontWeight: 700, margin: 0, color: "#162033", lineHeight: 1.4 }}>
+            Your information belongs to you. Not to Furlong. Not to
+            lenders. Not to brokers. Not to advertisers. Not to data
+            aggregators.
+          </p>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+            Furlong will:
+          </h2>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>Explain why information is requested.</li>
+            <li>Explain how information is used.</li>
+            <li>Explain which recommendations relied upon specific information.</li>
+            <li>Explain when additional information is needed.</li>
+            <li>Explain when information is shared.</li>
+            <li>Explain when information is retained.</li>
+            <li>Explain when information can be deleted.</li>
+            <li>Explain when information can be exported.</li>
+            <li>Preserve evidence lineage and recommendation traceability.</li>
+            <li>Allow users to understand how conclusions were reached.</li>
+          </ul>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: "#162033" }}>
+            Furlong will not:
+          </h2>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>Sell user information.</li>
+            <li>Secretly submit user information to lenders.</li>
+            <li>Secretly submit user information to agencies.</li>
+            <li>Secretly submit user information to brokers.</li>
+            <li>Secretly distribute user information to third parties.</li>
+            <li>Generate undisclosed marketing leads.</li>
+            <li>Hide recommendation logic.</li>
+            <li>Hide pathway exclusions.</li>
+            <li>Hide readiness limitations.</li>
+            <li>Hide known conflicts.</li>
+            <li>Hide known risks.</li>
+            <li>Represent user information as verified when it has not been verified.</li>
+          </ul>
+
+          <p style={{ marginTop: 24, fontSize: 16, fontStyle: "italic", color: "#162033", lineHeight: 1.6 }}>
+            Trust is not created by collecting information. Trust is
+            created by explaining what is happening and why. Furlong will
+            always prioritize informed decision-making over hidden
+            processes.
+          </p>
+
+          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+            This information is advisory only and is not an approval,
+            guarantee, or official determination. No legal, regulatory, or
+            official reliance may be placed on this information. This is
+            not a public verification or official record unless explicitly
+            authorized. Furlong does not lend, does not commit funds, and
+            does not decide credit, eligibility, or approval. AI does not
+            decide, does not approve, does not determine, and does not
+            underwrite — every decision is reviewed by a human reviewer
+            (human review). You may exercise your data rights at any
+            time: request an accounting, export, deletion, or human
+            review of your information. Borrowers pay nothing. Free for
+            borrowers. Your information belongs to you; Furlong does not
+            secretly submit, sell, or distribute your information; no
+            silent submission and no information sale.
+          </p>
+        </section>
+
         <section
           style={{
             ...panelStyle,

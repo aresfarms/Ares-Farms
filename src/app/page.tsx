@@ -455,28 +455,13 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            6. STEWARDSHIP SECTION
+            6. STEWARDSHIP PREVIEW (gateway to /stewardship)
             ══════════════════════════════════════════════════════════════ */}
         <section
           className="fl-section"
           aria-label="Furlong Stewardship"
         >
-          <h2 className="fl-section-title">Furlong Stewardship</h2>
-
-          {/* Intro copy (also rendered inside StewardshipSection — shown
-              here as the section lead so the heading lands before the cards) */}
-          <div className="fl-stewardship-wrap">
-            <p>Every journey benefits from trusted guides.</p>
-            <p>
-              Furlong&rsquo;s stewards help illuminate opportunities, pathways,
-              considerations, and next steps.
-            </p>
-            <p>
-              The journey remains yours. The decisions remain yours.
-              We help you understand the map.
-            </p>
-          </div>
-
+          <h2 className="fl-section-title">Meet the Stewards Behind Furlong</h2>
           <StewardshipSection />
         </section>
 

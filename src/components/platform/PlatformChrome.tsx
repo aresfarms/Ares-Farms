@@ -28,7 +28,7 @@ const PUBLIC_ROUTES = new Set<string>([
 ]);
 
 // Public route prefixes (e.g. the stewardship index + each steward profile).
-const PUBLIC_ROUTE_PREFIXES = ["/stewardship"];
+const PUBLIC_ROUTE_PREFIXES = ["/stewardship", "/explore"];
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_ROUTES.has(pathname)) {

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { StewardshipTabBar } from "@/components/stewardship/StewardshipTabBar";
 import {
   STEWARDSHIP_DOCTRINE_RULES,
   STEWARDSHIP_DOMAINS,
@@ -7,15 +8,17 @@ import {
 } from "@/lib/stewardship/stewardshipRegistry";
 
 /**
- * /stewardship — public stewardship index (Build 44-A).
+ * /stewardship — public stewardship overview (Build 48).
  *
- * The "Stewardship" footer link target. Lists the current stewardship domains
- * (each persists independently of its current steward) and the stewardship
- * doctrine. Platform-first, advisory, customer-in-control.
+ * Entry point for all stewardship domains. Accessible from the top navigation.
+ * Shows the stewardship purpose statement, the three domain tabs, and domain
+ * cards linking to each domain page.
+ *
+ * Domains persist independently of the individuals who currently steward them.
+ * Platform-first, advisory, customer-in-control.
  */
 
 const shell = {
-  minHeight: "100vh",
   background: "#f6f8fb",
   color: "#162033",
   fontFamily:
@@ -27,7 +30,7 @@ const container = {
   margin: "0 auto",
   padding: "40px 24px 56px",
   display: "grid",
-  gap: 22,
+  gap: 28,
 } as const;
 
 const card = {
@@ -41,7 +44,7 @@ const muted = { color: "#5d687a", lineHeight: 1.6 } as const;
 
 export default function StewardshipIndexPage() {
   return (
-    <main style={shell}>
+    <div style={shell}>
       <div style={container}>
         <header style={{ display: "grid", gap: 10 }}>
           <h1 style={{ margin: 0, fontSize: 32 }}>Furlong Stewardship</h1>
@@ -52,12 +55,14 @@ export default function StewardshipIndexPage() {
           ))}
         </header>
 
-        <section style={{ display: "grid", gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 22 }}>Stewardship domains</h2>
+        {/* Domain tab bar — no active tab on the overview */}
+        <div>
+          <StewardshipTabBar />
+
           <div
             style={{
               display: "grid",
-              gap: 12,
+              gap: 14,
               gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
             }}
           >
@@ -68,9 +73,10 @@ export default function StewardshipIndexPage() {
                 style={{
                   ...card,
                   display: "grid",
-                  gap: 6,
+                  gap: 8,
                   textDecoration: "none",
                   color: "inherit",
+                  transition: "border-color 0.14s, box-shadow 0.14s",
                 }}
               >
                 <strong style={{ fontSize: 17 }}>{domain.domainName}</strong>
@@ -80,13 +86,13 @@ export default function StewardshipIndexPage() {
                 <span style={{ ...muted, fontSize: 13 }}>
                   {domain.description}
                 </span>
-                <span style={{ color: "#0f766e", fontSize: 13 }}>
-                  View domain →
+                <span style={{ color: "#0f766e", fontSize: 13, fontWeight: 600 }}>
+                  Explore this domain →
                 </span>
               </Link>
             ))}
           </div>
-        </section>
+        </div>
 
         <section style={{ ...card, background: "#f8fafc" }}>
           <h2 style={{ marginTop: 0, fontSize: 18 }}>How stewardship works</h2>
@@ -111,6 +117,6 @@ export default function StewardshipIndexPage() {
           </Link>
         </footer>
       </div>
-    </main>
+    </div>
   );
 }

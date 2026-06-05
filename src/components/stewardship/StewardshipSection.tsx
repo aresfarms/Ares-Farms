@@ -2,47 +2,38 @@ import Link from "next/link";
 
 import {
   STEWARDSHIP_DOMAINS,
-  STEWARDSHIP_INTRO,
+  STEWARDSHIP_TAGLINE,
 } from "@/lib/stewardship/stewardshipRegistry";
 
 /**
- * "Meet the Stewards Behind Furlong" — homepage section (Build 44-A).
+ * Homepage stewardship preview (Build 48).
  *
- * Platform-first: this is introduced AFTER exploration, trust, and discovery
- * content. No steward is the homepage hero. Stewards are shown as the CURRENT
- * stewards of persistent domains; each domain links to its own profile page.
+ * Compact gateway: shows tagline, domain cards, and a link to the full
+ * stewardship overview. Not the primary stewardship experience — that lives
+ * at /stewardship and /stewardship/<domainId>.
  */
 
 const muted = { color: "#5d687a", lineHeight: 1.6 } as const;
 
 export function StewardshipSection() {
   return (
-    <section
-      aria-label="Meet the stewards behind Furlong"
+    <div
       style={{
         display: "grid",
-        gap: 14,
-        padding: 24,
+        gap: 16,
+        padding: "22px 24px",
         border: "1px solid #d7deea",
         borderRadius: 12,
         background: "#ffffff",
       }}
     >
-      <h2 style={{ margin: 0, fontSize: 24 }}>Meet the Stewards Behind Furlong</h2>
-      <div style={{ display: "grid", gap: 6 }}>
-        {STEWARDSHIP_INTRO.map((line) => (
-          <p key={line} style={{ ...muted, margin: 0 }}>
-            {line}
-          </p>
-        ))}
-      </div>
+      <p style={{ ...muted, margin: 0, fontSize: 15 }}>{STEWARDSHIP_TAGLINE}</p>
 
       <div
         style={{
           display: "grid",
           gap: 12,
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          marginTop: 4,
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
         }}
       >
         {STEWARDSHIP_DOMAINS.map((domain) => (
@@ -51,8 +42,8 @@ export function StewardshipSection() {
             href={domain.profileRoute}
             style={{
               display: "grid",
-              gap: 6,
-              padding: 16,
+              gap: 5,
+              padding: "14px 16px",
               border: "1px solid #d7deea",
               borderRadius: 10,
               background: "#f8fafc",
@@ -60,7 +51,7 @@ export function StewardshipSection() {
               textDecoration: "none",
             }}
           >
-            <strong style={{ fontSize: 16 }}>{domain.domainName}</strong>
+            <strong style={{ fontSize: 15 }}>{domain.domainName}</strong>
             <span style={{ ...muted, fontSize: 13 }}>
               Current Steward: {domain.currentSteward}
             </span>
@@ -70,6 +61,18 @@ export function StewardshipSection() {
           </Link>
         ))}
       </div>
-    </section>
+
+      <Link
+        href="/stewardship"
+        style={{
+          color: "#0f766e",
+          fontSize: 13,
+          fontWeight: 600,
+          textDecoration: "none",
+        }}
+      >
+        Explore all stewardship domains →
+      </Link>
+    </div>
   );
 }

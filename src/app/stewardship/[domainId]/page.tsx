@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { StewardshipTabBar } from "@/components/stewardship/StewardshipTabBar";
 import {
   STEWARDSHIP_DOCTRINE_RULES,
   STEWARDSHIP_DOMAINS,
@@ -8,13 +9,11 @@ import {
 } from "@/lib/stewardship/stewardshipRegistry";
 
 /**
- * Steward profile page (Build 44-A) — /stewardship/<domainId>.
+ * Steward domain page (Build 48) — /stewardship/<domainId>.
  *
- * Uses stewardship language ("Steward of …"). Focuses on what pathways the
- * steward helps illuminate, what questions they help explore, and when human
- * review may be appropriate. No expert/guru/master/captain/salesperson framing,
- * no advisor-first positioning, no sales or approval/guarantee language.
- * The domain persists; the current steward may change.
+ * Domain-first language: the domain persists; the current steward may change.
+ * Active tab bar at top shows all three domains; current domain is highlighted.
+ * No approval, guarantee, official-determination, or lender-status language.
  */
 
 export function generateStaticParams() {
@@ -22,7 +21,6 @@ export function generateStaticParams() {
 }
 
 const shell = {
-  minHeight: "100vh",
   background: "#f6f8fb",
   color: "#162033",
   fontFamily:
@@ -30,11 +28,11 @@ const shell = {
 } as const;
 
 const container = {
-  maxWidth: 820,
+  maxWidth: 880,
   margin: "0 auto",
   padding: "40px 24px 56px",
   display: "grid",
-  gap: 22,
+  gap: 24,
 } as const;
 
 const card = {
@@ -58,7 +56,7 @@ function List({ items }: { items: string[] }) {
   );
 }
 
-export default async function StewardProfilePage({
+export default async function StewardDomainPage({
   params,
 }: {
   params: Promise<{ domainId: string }>;
@@ -70,16 +68,25 @@ export default async function StewardProfilePage({
   }
 
   return (
-    <main style={shell}>
+    <div style={shell}>
       <div style={container}>
-        <header style={{ display: "grid", gap: 8 }}>
-          <Link href="/stewardship" style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}>
-            ← All stewardship domains
-          </Link>
+        {/* Back link */}
+        <Link
+          href="/stewardship"
+          style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}
+        >
+          ← All stewardship domains
+        </Link>
+
+        {/* Active tab bar — highlights current domain */}
+        <StewardshipTabBar currentDomainId={domainId} />
+
+        {/* Domain header */}
+        <header style={{ display: "grid", gap: 8, marginTop: -12 }}>
           <h1 style={{ margin: 0, fontSize: 32, lineHeight: 1.15 }}>
-            {domain.stewardTitle}
+            {domain.domainName}
           </h1>
-          <p style={{ ...muted, margin: 0 }}>
+          <p style={{ ...muted, margin: 0, fontSize: 15 }}>
             Current Steward: <strong>{domain.currentSteward}</strong>
           </p>
           <p style={{ ...muted, margin: 0 }}>{domain.description}</p>
@@ -105,18 +112,13 @@ export default async function StewardProfilePage({
           </h2>
           <List items={domain.whenHumanReviewAppropriate} />
           {domain.heldForAlphaNote && (
-            <p style={{ ...muted, margin: "10px 0 0", fontSize: 13 }}>
+            <p style={{ ...muted, margin: "12px 0 0", fontSize: 13 }}>
               {domain.heldForAlphaNote}
             </p>
           )}
         </section>
 
-        <section
-          style={{
-            ...card,
-            background: "#f8fafc",
-          }}
-        >
+        <section style={{ ...card, background: "#f8fafc" }}>
           <h2 style={{ marginTop: 0, fontSize: 18 }}>How stewardship works</h2>
           <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
             {STEWARDSHIP_DOCTRINE_RULES.map((rule) => (
@@ -125,24 +127,33 @@ export default async function StewardProfilePage({
               </li>
             ))}
           </ul>
-          <p style={{ ...muted, margin: "10px 0 0" }}>
+          <p style={{ ...muted, margin: "12px 0 0" }}>
             The journey remains yours. The decisions remain yours. We help you
             understand the map.
           </p>
         </section>
 
         <footer style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
-          <Link href="/onboarding" style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}>
+          <Link
+            href="/stewardship"
+            style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}
+          >
+            All stewardship domains
+          </Link>
+          <Link
+            href="/onboarding"
+            style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}
+          >
             Tell us about your project
           </Link>
-          <Link href="/trust" style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}>
+          <Link
+            href="/trust"
+            style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}
+          >
             How we handle your information
-          </Link>
-          <Link href="/stewardship" style={{ color: "#0f766e", fontSize: 14, textDecoration: "none" }}>
-            All stewardship domains
           </Link>
         </footer>
       </div>
-    </main>
+    </div>
   );
 }

@@ -8,6 +8,10 @@ import {
   FEATURED_EXPLORATION_LABEL,
   type FeaturedStory,
 } from "@/lib/customer-landing/featuredExplorationStories";
+import {
+  detectSeriesId,
+  getFeaturedSeries,
+} from "@/lib/customer-landing/featuredSeriesRegistry";
 
 /**
  * Living Opportunity Map — Build 47-C (Animated Discovery Sequence).
@@ -427,9 +431,19 @@ export function LivingOpportunityMap({
   const showAmerica250 = phase === "national" || phase === "zooming-out";
   const nationalLabelVisible = phase === "national";
 
+  // Series-aware branding
+  const seriesId = detectSeriesId(stories);
+  const series   = getFeaturedSeries(seriesId);
+  const headerLabel = seriesId === "standard"
+    ? FEATURED_EXPLORATION_LABEL
+    : series.badge;
+  const headerNote = seriesId === "standard"
+    ? FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE
+    : series.tagline;
+
   return (
     <section
-      aria-label="Featured exploration"
+      aria-label={series.label}
       style={{
         border: "1px solid #cdd9ec",
         borderRadius: 16,
@@ -468,13 +482,13 @@ export function LivingOpportunityMap({
         }
       `}</style>
 
-      {/* Header row */}
+      {/* Header row — series-aware */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline", justifyContent: "space-between" }}>
-        <strong style={{ fontSize: 14, letterSpacing: 0.4, textTransform: "uppercase" }}>
-          {FEATURED_EXPLORATION_LABEL}
+        <strong style={{ fontSize: 14, letterSpacing: 0.3, textTransform: "uppercase", color: "#162033" }}>
+          {headerLabel}
         </strong>
         <span style={{ fontSize: 14, color: "#5d687a" }}>
-          {FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE}
+          {headerNote}
         </span>
       </div>
 
@@ -829,10 +843,20 @@ const THEME_BADGE: Record<string, { bg: string; color: string; label: string }> 
   evolution: { bg: "#f0f7f0", color: "#2e6b3a", label: "Then & Now / Illustrative evolution" },
 };
 
+// America 250 series badge overrides the theme badge when seriesId === "america-250"
+const AMERICA_250_BADGE = {
+  bg:    "#eef1f7",
+  color: "#2d4270",
+  label: "America 250 · Exploration",
+};
+
 // ── Story card ────────────────────────────────────────────────────────────────
 
 function StoryCard({ story, phase }: { story: FeaturedStory; phase: SequencePhase }) {
-  const badge = THEME_BADGE[story.theme] ?? THEME_BADGE.modern;
+  // America 250 series overrides the theme badge with series-specific branding
+  const badge = story.seriesId === "america-250"
+    ? AMERICA_250_BADGE
+    : (THEME_BADGE[story.theme] ?? THEME_BADGE.modern);
 
   return (
     <div style={{

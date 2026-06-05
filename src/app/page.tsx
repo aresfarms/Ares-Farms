@@ -4,6 +4,7 @@ import { FurlongCompassWatermark } from "@/components/brand/FurlongCompassWaterm
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
 import { StewardshipSection } from "@/components/stewardship/StewardshipSection";
 import {
+  AMERICA_250_STORIES,
   EXPLORATION_CATEGORIES,
   explorationHref,
 } from "@/lib/customer-landing/featuredExplorationStories";
@@ -332,12 +333,40 @@ export default function HomePage() {
             margin-top: 52px;
           }
 
+          /* America 250 featured exploration label */
+          .fl-a250-label {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 14px;
+          }
+          .fl-a250-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: #eef1f7;
+            color: #2d4270;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            white-space: nowrap;
+          }
+          .fl-a250-copy {
+            font-size: 14px;
+            color: #5d687a;
+            line-height: 1.55;
+          }
+
           /* Responsive */
           @media (max-width: 640px) {
             .fl-hero { padding: 48px 0 28px; gap: 24px; }
             .fl-explore-grid { grid-template-columns: 1fr; }
             .fl-trust-strip-items { gap: 8px 16px; }
             .fl-not-grid { grid-template-columns: 1fr; }
+            .fl-a250-label { justify-content: flex-start; }
           }
         `}</style>
 
@@ -366,9 +395,16 @@ export default function HomePage() {
             </p>
           </header>
 
-          {/* ─── 2. FEATURED EXPLORATION LAYER (Living Opportunity Map) ──── */}
+          {/* ─── 2. AMERICA 250 FEATURED EXPLORATION (Living Opportunity Map) ─ */}
           <div className="fl-hero-content">
-            <LivingOpportunityMap />
+            <div className="fl-a250-label">
+              <span className="fl-a250-badge">America 250</span>
+              <span className="fl-a250-copy">
+                Celebrating 250 years of American growth, innovation,
+                stewardship, and opportunity.
+              </span>
+            </div>
+            <LivingOpportunityMap stories={AMERICA_250_STORIES} />
           </div>
         </section>
 

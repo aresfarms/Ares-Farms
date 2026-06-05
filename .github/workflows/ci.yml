@@ -59,31 +59,17 @@ jobs:
       # signature) over the full checked-out tree at HEAD (tree mode
       # per Build 40 hardening §1). No base-range dependency, no
       # shallow-clone ambiguity, no `|| true` swallowing setup errors,
-      # no empty-range pass. Suspicious-filename PDFs fail closed.
-      # The assertion step requires mode = tree and a non-zero
-      # scanned file count before declaring PASS.
+      # no empty-range pass, no vacuous pass. Suspicious-filename PDFs
+      # fail closed.
+      #
+      # The gate self-asserts its anti-vacuous-pass invariant: the
+      # only way the scanner can exit 0 is by inspecting at least one
+      # real file and finding nothing. Scope-resolution failures,
+      # enumeration failures, and zero-file scans all fail closed at
+      # the scanner level — CI just runs it and checks the exit code.
       # ────────────────────────────────────────────────────────────────
-      - name: Personal document git guard (tree mode, fail-closed)
-        run: |
-          set -euo pipefail
-          OUT="$(npm run --silent verify:no-personal-docs)"
-          echo "$OUT"
-          MODE=$(printf '%s' "$OUT" | jq -r '.mode // "missing"')
-          COUNT=$(printf '%s' "$OUT" | jq -r '.scannedFileCount // 0')
-          EXIT=$(printf '%s' "$OUT" | jq -r '.exitCode // 1')
-          echo "::notice ::verify:no-personal-docs mode=${MODE} scannedFileCount=${COUNT} exitCode=${EXIT}"
-          if [ "$MODE" != "tree" ]; then
-            echo "::error ::Build 40 hardening §5: scanner must run in mode=tree (got '${MODE}')."
-            exit 1
-          fi
-          if [ "$COUNT" -lt 1 ]; then
-            echo "::error ::Build 40 hardening §5: scannedFileCount must be > 0 (got ${COUNT})."
-            exit 1
-          fi
-          if [ "$EXIT" != "0" ]; then
-            echo "::error ::verify:no-personal-docs reported exitCode=${EXIT}."
-            exit "$EXIT"
-          fi
+      - name: Personal document git guard (tree mode, fail-closed, self-asserting)
+        run: npm run verify:no-personal-docs
 
       - name: Personal document git guard smoke
         run: npm run smoke:no-personal-docs

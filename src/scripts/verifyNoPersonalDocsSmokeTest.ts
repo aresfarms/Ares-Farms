@@ -5,6 +5,7 @@ import {
   VERIFY_NO_PERSONAL_DOCS_RUNTIME_VERSION,
   scanFileContent,
   scanFilename,
+  scanPaths,
   validateAllowlistEntry,
 } from "@/scripts/verifyNoPersonalDocs";
 
@@ -180,6 +181,46 @@ function main() {
     redactionConfirmation: true,
   });
   assert(validEntry.ok, "Valid allowlist entry must pass validation.");
+
+  // ────────────────────────────────────────────────────────────────────
+  // Anti-vacuous-pass invariant (Build 40 hardening §5)
+  // Empty paths must fail closed. Scanned-count > 0 is asserted
+  // inside the gate, not in the CI log.
+  // ────────────────────────────────────────────────────────────────────
+  const vacuous = scanPaths([], [], "tree", "smoke: empty-paths");
+  assert(
+    vacuous.exitCode === 1,
+    `scanPaths with 0 paths must exit 1 (anti-vacuous-pass invariant) — got ${vacuous.exitCode}.`
+  );
+  assert(
+    vacuous.findings.some((f) => f.category === "SCAN_VACUOUS_NO_FILES"),
+    "scanPaths with 0 paths must emit a SCAN_VACUOUS_NO_FILES finding."
+  );
+  assert(
+    vacuous.scannedFileCount === 0,
+    "Vacuous scan must report scannedFileCount = 0."
+  );
+
+  // A non-empty scan that finds nothing must still exit 0.
+  const cleanScan = scanPaths(
+    ["README.md", "package.json"],
+    [],
+    "tree",
+    "smoke: clean-scan"
+  );
+  // (We don't read these files via scanPaths since it would try to
+  // open them; instead we verify that scanPaths' OWN invariant
+  // permits exit 0 only when paths > 0. The exitCode depends on
+  // whether the content scan finds anything; the smoke fixture
+  // checks the invariant gate, not the content of the repo.)
+  assert(
+    cleanScan.scannedFileCount === 2,
+    `scanPaths must report 2 scanned files for ['README.md', 'package.json'] — got ${cleanScan.scannedFileCount}.`
+  );
+  assert(
+    !cleanScan.findings.some((f) => f.category === "SCAN_VACUOUS_NO_FILES"),
+    "Non-empty scan must NOT emit SCAN_VACUOUS_NO_FILES finding."
+  );
 
   // ────────────────────────────────────────────────────────────────────
   // Registry coverage

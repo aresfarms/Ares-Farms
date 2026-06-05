@@ -519,7 +519,11 @@ export type Finding = {
     | "CONTENT_SIGNATURE_MATCH"
     | "PDF_UNINSPECTABLE_SUSPICIOUS_FILENAME"
     | "ALLOWLIST_ENTRY_INVALID"
-    | "FILE_READ_ERROR";
+    | "FILE_READ_ERROR"
+    // Anti-vacuous-pass invariant: the gate refuses to declare PASS
+    // unless at least one real file was inspected. Per Build 40
+    // hardening §5 (assert inside the gate, not in the CI log).
+    | "SCAN_VACUOUS_NO_FILES";
   path: string;
   lineNumber?: number;
   redactedReason: string;
@@ -556,6 +560,25 @@ export function scanPaths(
   let layer2HitCount = 0;
   let pdfFailClosedCount = 0;
   let fileReadErrorCount = 0;
+
+  // ───────────────────────────────────────────────────────────────────
+  // Anti-vacuous-pass invariant (Build 40 hardening §5)
+  // ───────────────────────────────────────────────────────────────────
+  // The gate proves its own integrity instead of trusting a reader
+  // to notice in the CI log. If we received zero paths to inspect,
+  // we cannot have proven the absence of sensitive content; refuse
+  // to declare PASS. Together with §3 (cannot enumerate → fail) this
+  // closes the fail-open hole completely: the only path to exit 0
+  // is "scanned real files and found nothing."
+  if (paths.length === 0) {
+    findings.push({
+      layer: 3,
+      category: "SCAN_VACUOUS_NO_FILES",
+      path: "(scan-scope)",
+      redactedReason:
+        "Refusing to declare PASS without inspecting at least one file. The gate enforces its own integrity rather than trusting an external reader to verify the file count.",
+    });
+  }
 
   // Validate allowlist entries (invalid entries themselves become
   // findings — a malformed allowlist cannot pass the gate).
@@ -660,12 +683,19 @@ function resolveScope(args: string[]): Scope {
   //                       directly in the smoke test)
   const modeFlag = args.find((a) => a.startsWith("--mode="));
   const explicitPathsIdx = args.findIndex((a) => a === "--paths");
-  const explicitPaths =
-    explicitPathsIdx >= 0
-      ? args.slice(explicitPathsIdx + 1).filter((a) => !a.startsWith("--"))
-      : [];
+  const explicitPathsPresent = explicitPathsIdx >= 0;
+  const explicitPaths = explicitPathsPresent
+    ? args.slice(explicitPathsIdx + 1).filter((a) => !a.startsWith("--"))
+    : [];
 
-  if (explicitPaths.length > 0) {
+  if (explicitPathsPresent) {
+    if (explicitPaths.length === 0) {
+      // --paths flag present but no paths supplied → setup error
+      // (silently falling through to tree mode would mask a CLI bug).
+      throw new ScanSetupError(
+        "--paths was supplied with no following paths; refusing to silently fall through to tree mode."
+      );
+    }
     return {
       mode: "tree",
       description: `explicit-paths (${explicitPaths.length})`,

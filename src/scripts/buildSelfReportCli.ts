@@ -25,6 +25,10 @@ function safeExec(command: string, fallback: string): string {
 }
 
 function main() {
+  // `--check` (CI mode): compose against the identical live state but skip
+  // the timestamped build-record writes, so the gate's exit condition can
+  // be enforced on every PR. Still exits result.header.exit_code.
+  const checkMode = process.argv.includes("--check");
   const commit = safeExec("git rev-parse HEAD", "unknown");
   const branch = safeExec("git rev-parse --abbrev-ref HEAD", "main");
   const status = safeExec("git status --porcelain", "");
@@ -38,11 +42,13 @@ function main() {
 
   const today = new Date().toISOString().slice(0, 10);
   const outDir = path.join("docs", "build-records", today);
-  mkdirSync(outDir, { recursive: true });
   const jsonPath = path.join(outDir, "build-self-report.json");
   const mdPath = path.join(outDir, "build-self-report.md");
-  writeFileSync(jsonPath, JSON.stringify(result, null, 2) + "\n", "utf8");
-  writeFileSync(mdPath, renderBuildSelfReportMarkdown(result), "utf8");
+  if (!checkMode) {
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(jsonPath, JSON.stringify(result, null, 2) + "\n", "utf8");
+    writeFileSync(mdPath, renderBuildSelfReportMarkdown(result), "utf8");
+  }
 
   console.log(
     JSON.stringify(
@@ -79,8 +85,9 @@ function main() {
             status: e.status,
           })),
         exitCode: result.header.exit_code,
-        jsonPath,
-        mdPath,
+        checkMode,
+        jsonPath: checkMode ? "(--check: build-record not written)" : jsonPath,
+        mdPath: checkMode ? "(--check: build-record not written)" : mdPath,
         message:
           result.header.exit_code === 0
             ? "Build Self-Report PASS."

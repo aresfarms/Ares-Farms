@@ -5,34 +5,28 @@ import path from "node:path";
 /**
  * verify:no-personal-docs — Personal Document Git Guard
  *
- * Codifies docs/DOCTRINE_VERIFY_NO_PERSONAL_DOCS_V1.md.
+ * Codifies docs/DOCTRINE_VERIFY_NO_PERSONAL_DOCS_V1.md plus the
+ * Build 40 hardening:
  *
- * Two-layer scanner over the PR diff range (origin/main...HEAD):
- *
- *   Layer 1 — filename pattern scan: fail if any added/modified/
- *             renamed/copied file path matches sensitive patterns
- *             (credit summary, founder-name PDFs, recovery key,
- *             SSN, social security, passport, driver's license,
- *             tax return, bank statement, etc.)
- *
- *   Layer 2 — content signature scan: fail if newly added or
- *             modified text-extractable files contain high-risk
- *             signatures (SSN-like ###-##-####, credit card number
- *             groups, private key headers, recovery seed phrase
- *             labels, bank routing/account labels, credit report
- *             labels).
- *
- * PDFs: text extraction is not done by default (no native PDF
- * library bundled); a PDF whose filename matches a sensitive
- * pattern fails closed. Allowlist entries require an owner, a
- * reason, and an expiration per the doctrine.
- *
- * Allowlisting is discouraged. No permanent allowlist for founder
- * financial or identity documents.
+ *   1. Default scan = full checked-out tree at HEAD (`tree` mode).
+ *      No base-range dependency. No shallow-clone ambiguity. If the
+ *      file exists anywhere in the tree at HEAD, fail.
+ *   2. Optional diff mode is secondary / informational only
+ *      (--mode=diff). It is NOT the source of truth.
+ *   3. Fail closed on scan setup errors:
+ *        - cannot compute scope → fail
+ *        - cannot inspect suspicious PDF → fail
+ *        - cannot enumerate files → fail
+ *        - empty scope in default mode → fail
+ *   4. Never print matched secrets. Findings carry only:
+ *        - layer, category, path, lineNumber (if safe),
+ *          redactedReason (the pattern label, not the matched text).
+ *   5. CI proof prints `mode`, `scannedFileCount`, and exit code 0
+ *      only after a non-zero file count is enumerated and scanned.
  */
 
 export const VERIFY_NO_PERSONAL_DOCS_RUNTIME_VERSION =
-  "verify-no-personal-docs-runtime-v0.1.0";
+  "verify-no-personal-docs-runtime-v0.2.0";
 
 export const VERIFY_NO_PERSONAL_DOCS_DOC_REF =
   "docs/DOCTRINE_VERIFY_NO_PERSONAL_DOCS_V1.md";
@@ -105,14 +99,6 @@ export const SENSITIVE_FILENAME_PATTERNS: ReadonlyArray<FilenamePatternDef> = [
   },
 ];
 
-// Path prefixes that may legitimately contain sensitive-looking
-// strings as part of governance/regulatory doctrine text. The
-// scanner whitelists these for Layer 1 only when explicitly opted
-// in via the allowlist; by default they are subject to the same
-// scan as everything else. (Currently empty — the doctrine forbids
-// permanent allowlists for founder financial or identity documents.)
-export const PATH_PREFIX_ALLOWLIST: ReadonlyArray<string> = [];
-
 // =============================================================================
 // Layer 2 — content signature patterns
 // =============================================================================
@@ -134,19 +120,28 @@ export const SENSITIVE_CONTENT_SIGNATURES: ReadonlyArray<ContentSignatureDef> =
     },
     {
       id: "credit-card-16",
-      pattern: /\b(?:\d[ -]?){15,19}\d\b/,
-      label: "Credit card number-like group (15-20 digits with separators)",
+      // Card-network-prefix-anchored to avoid UUID / hash false
+      // positives. Recognized prefixes: Visa (4xxx), MasterCard
+      // (51-55 + xx, or 2221-2720 BIN range), American Express
+      // (34, 37), Discover (6011, 65xx, 644-649). The trailing
+      // groups follow the standard 4-4-4 / 4-4-4-1+ layout.
+      pattern:
+        /\b(?:4\d{3}|5[1-5]\d{2}|34\d{2}|37\d{2}|6011|65\d{2}|64[4-9]\d|2[2-7]\d{2})[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{1,7}\b/,
+      label:
+        "Credit card number-like group (Visa/MC/Amex/Discover-prefixed 13-19 digit run)",
       severity: "FAIL",
     },
     {
       id: "private-key-header",
-      pattern: /-----BEGIN\s+(RSA |DSA |EC |OPENSSH |PGP |ENCRYPTED )?PRIVATE KEY-----/,
+      pattern:
+        /-----BEGIN\s+(RSA |DSA |EC |OPENSSH |PGP |ENCRYPTED )?PRIVATE KEY-----/,
       label: "Private key header (-----BEGIN ... PRIVATE KEY-----)",
       severity: "FAIL",
     },
     {
       id: "recovery-phrase-label",
-      pattern: /\b(?:seed\s+phrase|recovery\s+phrase|mnemonic\s+phrase|recovery\s+seed)\b/i,
+      pattern:
+        /\b(?:seed\s+phrase|recovery\s+phrase|mnemonic\s+phrase|recovery\s+seed)\b/i,
       label: "Recovery / seed phrase label",
       severity: "FAIL",
     },
@@ -164,17 +159,13 @@ export const SENSITIVE_CONTENT_SIGNATURES: ReadonlyArray<ContentSignatureDef> =
     },
     {
       id: "credit-report-label",
-      pattern: /\b(?:credit\s+report|fico\s+score|equifax|experian|transunion)\b/i,
+      pattern:
+        /\b(?:credit\s+report|fico\s+score|equifax|experian|transunion)\b/i,
       label: "Credit report / bureau label",
       severity: "FAIL",
     },
   ];
 
-// Extensions the content scanner can read as text. PDFs are not in
-// this list — a PDF with a sensitive filename fails closed at
-// Layer 1; a PDF without a sensitive filename is not content-scanned
-// (the doctrine accepts this as a known limitation; gitleaks /
-// trufflehog can extend coverage as optional tooling).
 const TEXT_EXTRACTABLE_EXTENSIONS = new Set<string>([
   ".ts",
   ".tsx",
@@ -205,16 +196,16 @@ const TEXT_EXTRACTABLE_EXTENSIONS = new Set<string>([
   ".log",
 ]);
 
+// Path whitelist for Layer 2 only — the scanner's own files
+// legitimately reference the patterns. Layer 1 (filename) is NEVER
+// whitelisted — these files' own names don't match any sensitive
+// pattern so there is nothing to whitelist.
 const FALSE_POSITIVE_PATH_TOKENS: ReadonlyArray<RegExp> = [
-  // Scanner's own doctrine / runtime / smoke files reference sensitive
-  // tokens as part of their text; they are intentionally excluded from
-  // the Layer 2 content scan but NOT from the Layer 1 filename scan
-  // (which already covers the file by id, not by content).
   /^docs\/DOCTRINE_VERIFY_NO_PERSONAL_DOCS_V1\.md$/,
-  /^src\/scripts\/verifyNoPersonalDocs\.ts$/,
-  /^src\/scripts\/verifyNoPersonalDocsSmokeTest\.ts$/,
   /^docs\/BUILD_40_VERIFY_NO_PERSONAL_DOCS\.md$/,
   /^docs\/build-records\/PR_BODY_BUILD_40\.md$/,
+  /^src\/scripts\/verifyNoPersonalDocs\.ts$/,
+  /^src\/scripts\/verifyNoPersonalDocsSmokeTest\.ts$/,
 ];
 
 // =============================================================================
@@ -236,9 +227,7 @@ const ALLOWLIST_PATH = path.join(
 );
 
 function loadAllowlist(): AllowlistEntry[] {
-  if (!existsSync(ALLOWLIST_PATH)) {
-    return [];
-  }
+  if (!existsSync(ALLOWLIST_PATH)) return [];
   try {
     const raw = readFileSync(ALLOWLIST_PATH, "utf8");
     const parsed = JSON.parse(raw) as AllowlistEntry[];
@@ -249,7 +238,7 @@ function loadAllowlist(): AllowlistEntry[] {
   }
 }
 
-function validateAllowlistEntry(
+export function validateAllowlistEntry(
   e: Partial<AllowlistEntry>
 ): { ok: boolean; reason?: string } {
   if (!e.path) return { ok: false, reason: "missing path" };
@@ -262,7 +251,6 @@ function validateAllowlistEntry(
     return { ok: false, reason: "missing classificationLevel" };
   if (e.redactionConfirmation !== true)
     return { ok: false, reason: "redactionConfirmation must be true" };
-  // Reject expired entries.
   const exp = new Date(e.expirationDate);
   if (Number.isNaN(exp.getTime())) {
     return { ok: false, reason: "expirationDate is not a valid date" };
@@ -270,38 +258,20 @@ function validateAllowlistEntry(
   if (exp.getTime() < Date.now()) {
     return { ok: false, reason: `allowlist entry expired ${e.expirationDate}` };
   }
-  // Permanent allowlist for founder financial/identity documents is
-  // forbidden by doctrine. Reject entries that look like founder
-  // financial/identity material outright.
+  // Per doctrine: no permanent allowlist for founder financial/identity
+  // documents. Reject these outright.
+  const forbiddenIds = new Set([
+    "credit-summary-pdf",
+    "credit-summary-glob",
+    "founder-named-pdf",
+    "recovery-key-pdf",
+    "recovery-key-glob",
+  ]);
   for (const def of SENSITIVE_FILENAME_PATTERNS) {
-    if (def.id === "founder-named-pdf" && def.pattern.test(e.path)) {
+    if (forbiddenIds.has(def.id) && def.pattern.test(e.path)) {
       return {
         ok: false,
-        reason: `founder financial/identity documents may not be allowlisted (${def.id})`,
-      };
-    }
-    if (def.id === "credit-summary-pdf" && def.pattern.test(e.path)) {
-      return {
-        ok: false,
-        reason: `credit-summary documents may not be allowlisted (${def.id})`,
-      };
-    }
-    if (def.id === "credit-summary-glob" && def.pattern.test(e.path)) {
-      return {
-        ok: false,
-        reason: `credit-summary documents may not be allowlisted (${def.id})`,
-      };
-    }
-    if (def.id === "recovery-key-pdf" && def.pattern.test(e.path)) {
-      return {
-        ok: false,
-        reason: `recovery-key documents may not be allowlisted (${def.id})`,
-      };
-    }
-    if (def.id === "recovery-key-glob" && def.pattern.test(e.path)) {
-      return {
-        ok: false,
-        reason: `recovery-key documents may not be allowlisted (${def.id})`,
+        reason: `founder financial/identity/recovery documents may not be allowlisted (${def.id})`,
       };
     }
   }
@@ -309,62 +279,123 @@ function validateAllowlistEntry(
 }
 
 // =============================================================================
-// Diff range resolution
+// Setup-error sentinel
 // =============================================================================
 
-function safeExec(command: string, fallback: string): string {
-  try {
-    return execSync(command, {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    })
-      .toString()
-      .trim();
-  } catch {
-    return fallback;
+class ScanSetupError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ScanSetupError";
   }
 }
 
-type ChangedFile = {
-  path: string;
-  status: "A" | "C" | "M" | "R" | "T"; // Added/Copied/Modified/Renamed/Type-change
+// =============================================================================
+// Scope resolution
+// =============================================================================
+
+function execStrict(command: string): string {
+  // execSync throws if the command exits non-zero; we want that.
+  return execSync(command, {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"],
+  })
+    .toString();
+}
+
+type ScopeMode = "tree" | "diff" | "full-history";
+
+type Scope = {
+  mode: ScopeMode;
+  description: string;
+  paths: string[];
 };
 
-function resolveBaseRef(): string {
-  // Prefer origin/main; fall back to main; fall back to HEAD~1 on
-  // detached single-commit branches.
-  const candidates = ["origin/main", "main"];
-  for (const c of candidates) {
-    const head = safeExec(`git rev-parse --verify ${c}`, "");
-    if (head.length > 0) return c;
+function enumerateTreeAtHead(): string[] {
+  // `git ls-files` lists every tracked file at the current index/HEAD.
+  // This is the canonical "what's in the repo" view; .gitignore is
+  // honored by definition (ignored files aren't tracked).
+  let raw: string;
+  try {
+    raw = execStrict("git ls-files");
+  } catch (err) {
+    throw new ScanSetupError(
+      `git ls-files failed; cannot enumerate tree at HEAD: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
   }
-  // Last resort
-  const headPrev = safeExec("git rev-parse --verify HEAD~1", "");
-  if (headPrev.length > 0) return "HEAD~1";
-  return "HEAD";
+  const paths = raw
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  if (paths.length === 0) {
+    throw new ScanSetupError(
+      "git ls-files returned 0 paths; this is unexpected and treated as a scan setup error (fail closed)."
+    );
+  }
+  return paths;
 }
 
-function getChangedFiles(baseRef: string, headRef: string): ChangedFile[] {
-  // --diff-filter=ACMRT covers Added, Copied, Modified, Renamed,
-  // Type-change. Deletions are intentionally excluded (a deletion
-  // does not introduce sensitive content; it removes it).
-  const raw = safeExec(
-    `git diff --name-status --diff-filter=ACMRT ${baseRef}...${headRef}`,
-    ""
-  );
-  if (raw.length === 0) return [];
-  const out: ChangedFile[] = [];
+function enumerateDiffRange(baseRef: string, headRef: string): string[] {
+  let raw: string;
+  try {
+    raw = execStrict(
+      `git diff --name-status --diff-filter=ACMRT ${baseRef}...${headRef}`
+    );
+  } catch (err) {
+    throw new ScanSetupError(
+      `git diff against ${baseRef}...${headRef} failed: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+  }
+  const out: string[] = [];
   for (const line of raw.split(/\r?\n/)) {
     if (line.length === 0) continue;
     const parts = line.split(/\t+/);
     const code = parts[0]?.charAt(0);
     if (!code || !["A", "C", "M", "R", "T"].includes(code)) continue;
-    // For renames/copies, the new path is the last column.
     const p = parts[parts.length - 1];
-    if (!p) continue;
-    out.push({ path: p, status: code as ChangedFile["status"] });
+    if (p) out.push(p);
   }
   return out;
+}
+
+function enumerateFullHistory(): string[] {
+  let raw: string;
+  try {
+    raw = execStrict(
+      "git log --all --name-only --pretty=format: --diff-filter=ACMRT"
+    );
+  } catch (err) {
+    throw new ScanSetupError(
+      `git log --all enumeration failed: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+  }
+  const set = new Set<string>();
+  for (const line of raw.split(/\r?\n/)) {
+    const t = line.trim();
+    if (t.length > 0) set.add(t);
+  }
+  return [...set];
+}
+
+function resolveDiffBaseRef(): string {
+  for (const c of ["origin/main", "main"]) {
+    try {
+      execStrict(`git rev-parse --verify ${c}`);
+      return c;
+    } catch {
+      // try next
+    }
+  }
+  // No HEAD~1 fallback: in diff mode we require a clearly-named base
+  // ref to avoid silent "empty diff = pass" failure modes.
+  throw new ScanSetupError(
+    "diff mode requires origin/main or main to exist locally; neither is reachable. Either fetch the base ref, or use the default tree mode."
+  );
 }
 
 // =============================================================================
@@ -393,18 +424,21 @@ export function scanFilename(filePath: string): FilenameHit[] {
 }
 
 // =============================================================================
-// Layer 2 — content scan
+// Layer 2 — content scan (redacted output only)
 // =============================================================================
 
 export type ContentHit = {
   path: string;
   signatureId: string;
-  label: string;
-  excerpt: string;
+  signatureLabel: string;
   lineNumber: number;
+  // No excerpt, no captured-text field. The doctrine + Build 40
+  // hardening §4 forbids printing matched secrets. The label is the
+  // pattern's human-readable name (e.g. "SSN-like pattern
+  // (###-##-####)"); the line number is safe to print.
 };
 
-const MAX_CONTENT_BYTES = 2 * 1024 * 1024; // 2 MiB — skip huge files
+const MAX_CONTENT_BYTES = 2 * 1024 * 1024; // 2 MiB
 
 function isFalsePositivePath(filePath: string): boolean {
   return FALSE_POSITIVE_PATH_TOKENS.some((re) => re.test(filePath));
@@ -418,26 +452,22 @@ export function scanFileContent(
   const hits: ContentHit[] = [];
   const lines = content.split(/\r?\n/);
   for (const def of SENSITIVE_CONTENT_SIGNATURES) {
-    // Reset the lastIndex for stateful regex (we use non-global, but
-    // be safe).
     const re = new RegExp(def.pattern.source, def.pattern.flags);
     for (let i = 0; i < lines.length; i += 1) {
       const line = lines[i];
       if (line.length === 0) continue;
-      // Skip lines that contain the literal pattern definition itself
-      // (the doctrine / scanner source). isFalsePositivePath above
-      // covers the obvious files; this catches any other reference
-      // that explicitly labels itself as "example" or "fixture".
-      if (/\b(example|fixture|sample|placeholder|synthetic|fake)\b/i.test(line)) {
+      // False-positive guard: skip lines tagged with explicit marker
+      // words so doctrine / smoke / fixture text does not self-trigger.
+      if (
+        /\b(example|fixture|sample|placeholder|synthetic|fake)\b/i.test(line)
+      ) {
         continue;
       }
-      const m = re.exec(line);
-      if (m) {
+      if (re.exec(line) !== null) {
         hits.push({
           path: filePath,
           signatureId: def.id,
-          label: def.label,
-          excerpt: line.slice(0, 200),
+          signatureLabel: def.label,
           lineNumber: i + 1,
         });
       }
@@ -446,14 +476,26 @@ export function scanFileContent(
   return hits;
 }
 
-function readFileSafely(filePath: string): string | null {
+type ReadResult =
+  | { kind: "ok"; content: string }
+  | { kind: "err"; reason: string };
+
+function readFileSafely(filePath: string): ReadResult {
   try {
     const stat = statSync(filePath);
-    if (!stat.isFile()) return null;
-    if (stat.size > MAX_CONTENT_BYTES) return null;
-    return readFileSync(filePath, "utf8");
-  } catch {
-    return null;
+    if (!stat.isFile()) return { kind: "err", reason: "not a regular file" };
+    if (stat.size > MAX_CONTENT_BYTES) {
+      return {
+        kind: "err",
+        reason: `file exceeds ${MAX_CONTENT_BYTES} bytes`,
+      };
+    }
+    return { kind: "ok", content: readFileSync(filePath, "utf8") };
+  } catch (err) {
+    return {
+      kind: "err",
+      reason: err instanceof Error ? err.message : String(err),
+    };
   }
 }
 
@@ -476,20 +518,23 @@ export type Finding = {
     | "FILENAME_PATTERN_MATCH"
     | "CONTENT_SIGNATURE_MATCH"
     | "PDF_UNINSPECTABLE_SUSPICIOUS_FILENAME"
-    | "ALLOWLIST_ENTRY_INVALID";
+    | "ALLOWLIST_ENTRY_INVALID"
+    | "FILE_READ_ERROR";
   path: string;
-  detail: string;
+  lineNumber?: number;
+  redactedReason: string;
 };
 
 export type ScanResult = {
   runtimeVersion: string;
   docRef: string;
-  baseRef: string;
-  headRef: string;
-  changedFileCount: number;
+  mode: ScopeMode;
+  scopeDescription: string;
+  scannedFileCount: number;
   layer1HitCount: number;
   layer2HitCount: number;
   pdfFailClosedCount: number;
+  fileReadErrorCount: number;
   allowlistInvalidCount: number;
   findings: Finding[];
   allowlistEntries: AllowlistEntry[];
@@ -497,22 +542,23 @@ export type ScanResult = {
 };
 
 // =============================================================================
-// Main entry
+// Scan engine
 // =============================================================================
 
-function scanPaths(
+export function scanPaths(
   paths: string[],
-  baseRef: string,
-  headRef: string,
-  allowlist: AllowlistEntry[]
+  allowlist: AllowlistEntry[],
+  mode: ScopeMode,
+  scopeDescription: string
 ): ScanResult {
   const findings: Finding[] = [];
   let layer1HitCount = 0;
   let layer2HitCount = 0;
   let pdfFailClosedCount = 0;
+  let fileReadErrorCount = 0;
 
-  // Validate allowlist entries (rejected entries still count as
-  // findings — invalid allowlists cannot pass).
+  // Validate allowlist entries (invalid entries themselves become
+  // findings — a malformed allowlist cannot pass the gate).
   const allowlistInvalid = allowlist
     .map((e) => ({ entry: e, validation: validateAllowlistEntry(e) }))
     .filter((x) => !x.validation.ok);
@@ -521,7 +567,7 @@ function scanPaths(
       layer: 3,
       category: "ALLOWLIST_ENTRY_INVALID",
       path: i.entry.path,
-      detail: `Allowlist entry invalid: ${i.validation.reason}`,
+      redactedReason: `Allowlist entry invalid: ${i.validation.reason}`,
     });
   }
   const allowedPaths = new Set(
@@ -540,19 +586,16 @@ function scanPaths(
           layer: 1,
           category: "FILENAME_PATTERN_MATCH",
           path: p,
-          detail: `pattern=${h.patternId} — ${h.rationale}`,
+          redactedReason: `pattern=${h.patternId} — ${h.rationale}`,
         });
       }
-      // PDF fail-closed: a PDF whose filename matches a sensitive
-      // pattern fails closed because we cannot reliably inspect
-      // content without an extractor.
       if (isPdf(p)) {
         pdfFailClosedCount += 1;
         findings.push({
           layer: 1,
           category: "PDF_UNINSPECTABLE_SUSPICIOUS_FILENAME",
           path: p,
-          detail:
+          redactedReason:
             "Suspicious-filename PDF cannot be inspected without an extractor; failing closed.",
         });
       }
@@ -560,18 +603,30 @@ function scanPaths(
 
     // Layer 2 — content
     if (isTextExtractable(p) && !allowedPaths.has(p)) {
-      const text = readFileSafely(p);
-      if (text !== null) {
-        const contentHits = scanFileContent(p, text);
+      const r = readFileSafely(p);
+      if (r.kind === "ok") {
+        const contentHits = scanFileContent(p, r.content);
         layer2HitCount += contentHits.length;
         for (const h of contentHits) {
           findings.push({
             layer: 2,
             category: "CONTENT_SIGNATURE_MATCH",
             path: p,
-            detail: `signature=${h.signatureId} (${h.label}) at line ${h.lineNumber}: "${h.excerpt}"`,
+            lineNumber: h.lineNumber,
+            // REDACTED — the signature label is logged, not the
+            // matched text. Per Build 40 hardening §4.
+            redactedReason: `signature=${h.signatureId} (${h.signatureLabel}) — match redacted; inspect locally to remediate.`,
           });
         }
+      } else {
+        // Cannot read a candidate file → fail closed (audit-safe).
+        fileReadErrorCount += 1;
+        findings.push({
+          layer: 2,
+          category: "FILE_READ_ERROR",
+          path: p,
+          redactedReason: `File could not be read for content scan: ${r.reason}`,
+        });
       }
     }
   }
@@ -580,12 +635,13 @@ function scanPaths(
   return {
     runtimeVersion: VERIFY_NO_PERSONAL_DOCS_RUNTIME_VERSION,
     docRef: VERIFY_NO_PERSONAL_DOCS_DOC_REF,
-    baseRef,
-    headRef,
-    changedFileCount: paths.length,
+    mode,
+    scopeDescription,
+    scannedFileCount: paths.length,
     layer1HitCount,
     layer2HitCount,
     pdfFailClosedCount,
+    fileReadErrorCount,
     allowlistInvalidCount: allowlistInvalid.length,
     findings,
     allowlistEntries: allowlist,
@@ -593,47 +649,118 @@ function scanPaths(
   };
 }
 
-function main() {
-  // CLI flags:
-  //   --full-history       scan every file ever committed
-  //   --paths a b c        scan specific paths (used by smoke test)
-  //   (default)            scan the PR diff origin/main...HEAD
-  const args = process.argv.slice(2);
-  const fullHistory = args.includes("--full-history");
-  const pathsFlag = args.findIndex((a) => a === "--paths");
-  const explicitPaths =
-    pathsFlag >= 0 ? args.slice(pathsFlag + 1).filter((a) => !a.startsWith("--")) : [];
+// =============================================================================
+// Main entry
+// =============================================================================
 
-  const allowlist = loadAllowlist();
-  let baseRef: string;
-  let headRef: string;
-  let paths: string[];
+function resolveScope(args: string[]): Scope {
+  // --mode=tree (default), --mode=diff, --mode=full-history
+  // --paths a b c        (smoke-test injection; bypasses git
+  //                       enumeration; failure cases are tested
+  //                       directly in the smoke test)
+  const modeFlag = args.find((a) => a.startsWith("--mode="));
+  const explicitPathsIdx = args.findIndex((a) => a === "--paths");
+  const explicitPaths =
+    explicitPathsIdx >= 0
+      ? args.slice(explicitPathsIdx + 1).filter((a) => !a.startsWith("--"))
+      : [];
 
   if (explicitPaths.length > 0) {
-    baseRef = "(explicit paths)";
-    headRef = "(explicit paths)";
-    paths = explicitPaths;
-  } else if (fullHistory) {
-    baseRef = "(full history)";
-    headRef = "(full history)";
-    // List every path ever committed.
-    const raw = safeExec(
-      "git log --all --name-only --pretty=format: --diff-filter=ACMRT",
-      ""
-    );
-    const set = new Set<string>();
-    for (const line of raw.split(/\r?\n/)) {
-      const t = line.trim();
-      if (t.length > 0) set.add(t);
-    }
-    paths = [...set];
-  } else {
-    baseRef = resolveBaseRef();
-    headRef = "HEAD";
-    paths = getChangedFiles(baseRef, headRef).map((c) => c.path);
+    return {
+      mode: "tree",
+      description: `explicit-paths (${explicitPaths.length})`,
+      paths: explicitPaths,
+    };
   }
 
-  const result = scanPaths(paths, baseRef, headRef, allowlist);
+  const requestedMode = modeFlag ? modeFlag.split("=")[1] : "tree";
+
+  switch (requestedMode) {
+    case "tree": {
+      const paths = enumerateTreeAtHead(); // throws on setup error
+      return {
+        mode: "tree",
+        description: "git ls-files (full tree at HEAD)",
+        paths,
+      };
+    }
+    case "diff": {
+      const baseRef = resolveDiffBaseRef(); // throws if unresolvable
+      const paths = enumerateDiffRange(baseRef, "HEAD");
+      if (paths.length === 0) {
+        // Per hardening §3: no empty-range pass. In diff mode, an
+        // empty diff is a SETUP error (the diff was not meaningfully
+        // computed against the intended base). Fail closed.
+        throw new ScanSetupError(
+          `diff mode against ${baseRef}...HEAD returned 0 paths; refusing to silently pass an empty range. If this is genuinely a no-op branch, use tree mode instead.`
+        );
+      }
+      return {
+        mode: "diff",
+        description: `git diff ${baseRef}...HEAD`,
+        paths,
+      };
+    }
+    case "full-history": {
+      const paths = enumerateFullHistory();
+      if (paths.length === 0) {
+        throw new ScanSetupError(
+          "full-history enumeration returned 0 paths; treating as setup error."
+        );
+      }
+      return {
+        mode: "full-history",
+        description: "git log --all enumeration",
+        paths,
+      };
+    }
+    default:
+      throw new ScanSetupError(
+        `unknown --mode=${requestedMode}; expected tree | diff | full-history`
+      );
+  }
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const allowlist = loadAllowlist();
+
+  let scope: Scope;
+  try {
+    scope = resolveScope(args);
+  } catch (err) {
+    // Setup error → exit 1 (fail closed). Output a clean record.
+    const message =
+      err instanceof Error ? err.message : "unknown scan setup error";
+    console.log(
+      JSON.stringify(
+        {
+          ok: false,
+          runtimeVersion: VERIFY_NO_PERSONAL_DOCS_RUNTIME_VERSION,
+          docRef: VERIFY_NO_PERSONAL_DOCS_DOC_REF,
+          mode: "(setup-error)",
+          scopeDescription: "(setup-error)",
+          scannedFileCount: 0,
+          findings: [
+            {
+              layer: 3,
+              category: "ALLOWLIST_ENTRY_INVALID", // closest existing category
+              path: "(scan-setup)",
+              redactedReason: `Scan setup error: ${message}`,
+            },
+          ],
+          exitCode: 1,
+          message:
+            "verify:no-personal-docs FAIL — scan setup error (failing closed per Build 40 hardening §3).",
+        },
+        null,
+        2
+      )
+    );
+    process.exit(1);
+  }
+
+  const result = scanPaths(scope.paths, allowlist, scope.mode, scope.description);
 
   console.log(
     JSON.stringify(
@@ -641,20 +768,21 @@ function main() {
         ok: result.exitCode === 0,
         runtimeVersion: result.runtimeVersion,
         docRef: result.docRef,
-        baseRef: result.baseRef,
-        headRef: result.headRef,
-        changedFileCount: result.changedFileCount,
+        mode: result.mode,
+        scopeDescription: result.scopeDescription,
+        scannedFileCount: result.scannedFileCount,
         layer1HitCount: result.layer1HitCount,
         layer2HitCount: result.layer2HitCount,
         pdfFailClosedCount: result.pdfFailClosedCount,
+        fileReadErrorCount: result.fileReadErrorCount,
         allowlistInvalidCount: result.allowlistInvalidCount,
         findingCount: result.findings.length,
         findings: result.findings,
         exitCode: result.exitCode,
         message:
           result.exitCode === 0
-            ? "verify:no-personal-docs PASS — no sensitive filenames or content signatures in the PR diff."
-            : "verify:no-personal-docs FAIL — sensitive personal documents or content signatures detected. Review the findings; remove the offending paths/content; rerun.",
+            ? `verify:no-personal-docs PASS — mode=${result.mode}, scanned ${result.scannedFileCount} files, no sensitive filenames or content signatures detected.`
+            : `verify:no-personal-docs FAIL — mode=${result.mode}, scanned ${result.scannedFileCount} files. Review the redacted findings; remove the offending paths/content; rerun.`,
       },
       null,
       2
@@ -664,8 +792,6 @@ function main() {
   process.exit(result.exitCode);
 }
 
-// Only run main when invoked directly (not when imported by the
-// smoke test).
 if (
   process.argv[1] &&
   /verifyNoPersonalDocs(\.ts|\.js)?$/.test(process.argv[1])
@@ -673,8 +799,4 @@ if (
   main();
 }
 
-// =============================================================================
-// Public exports for the smoke test + downstream consumers
-// =============================================================================
-
-export { scanPaths, validateAllowlistEntry, loadAllowlist };
+export { loadAllowlist };

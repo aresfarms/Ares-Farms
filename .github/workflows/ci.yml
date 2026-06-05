@@ -56,15 +56,34 @@ jobs:
       # ────────────────────────────────────────────────────────────────
       # Personal Document Git Guard — runs first per doctrine
       # §CI Placement. Two-layer scanner (filename pattern + content
-      # signature) over the PR diff origin/main...HEAD. Suspicious-
-      # filename PDFs fail closed.
+      # signature) over the full checked-out tree at HEAD (tree mode
+      # per Build 40 hardening §1). No base-range dependency, no
+      # shallow-clone ambiguity, no `|| true` swallowing setup errors,
+      # no empty-range pass. Suspicious-filename PDFs fail closed.
+      # The assertion step requires mode = tree and a non-zero
+      # scanned file count before declaring PASS.
       # ────────────────────────────────────────────────────────────────
-      - name: Personal document git guard
+      - name: Personal document git guard (tree mode, fail-closed)
         run: |
-          # CI may shallow-clone; ensure origin/main exists locally so
-          # the diff range resolves.
-          git fetch --no-tags --depth=1 origin main:refs/remotes/origin/main || true
-          npm run verify:no-personal-docs
+          set -euo pipefail
+          OUT="$(npm run --silent verify:no-personal-docs)"
+          echo "$OUT"
+          MODE=$(printf '%s' "$OUT" | jq -r '.mode // "missing"')
+          COUNT=$(printf '%s' "$OUT" | jq -r '.scannedFileCount // 0')
+          EXIT=$(printf '%s' "$OUT" | jq -r '.exitCode // 1')
+          echo "::notice ::verify:no-personal-docs mode=${MODE} scannedFileCount=${COUNT} exitCode=${EXIT}"
+          if [ "$MODE" != "tree" ]; then
+            echo "::error ::Build 40 hardening §5: scanner must run in mode=tree (got '${MODE}')."
+            exit 1
+          fi
+          if [ "$COUNT" -lt 1 ]; then
+            echo "::error ::Build 40 hardening §5: scannedFileCount must be > 0 (got ${COUNT})."
+            exit 1
+          fi
+          if [ "$EXIT" != "0" ]; then
+            echo "::error ::verify:no-personal-docs reported exitCode=${EXIT}."
+            exit "$EXIT"
+          fi
 
       - name: Personal document git guard smoke
         run: npm run smoke:no-personal-docs

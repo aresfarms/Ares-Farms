@@ -15,8 +15,8 @@ function assert(condition: boolean, message: string): asserts condition {
 function main() {
   assert(
     VERIFY_NO_PERSONAL_DOCS_RUNTIME_VERSION ===
-      "verify-no-personal-docs-runtime-v0.1.0",
-    "Runtime version must match canonical seal."
+      "verify-no-personal-docs-runtime-v0.2.0",
+    "Runtime version must match canonical seal (post Build 40 hardening)."
   );
   assert(
     VERIFY_NO_PERSONAL_DOCS_DOC_REF ===
@@ -95,6 +95,22 @@ function main() {
       hits.some((h) => h.signatureId === c.id),
       `Layer 2 must catch ${c.id} on "${c.text}" — got: ${JSON.stringify(hits.map((h) => h.signatureId))}`
     );
+    // Build 40 hardening §4: no excerpt / no matched-text fields on
+    // the hit. The hit must carry only safe fields.
+    for (const h of hits) {
+      assert(
+        !("excerpt" in (h as Record<string, unknown>)),
+        "ContentHit must NOT carry an 'excerpt' field per Build 40 hardening §4 (never print matched secrets)."
+      );
+      assert(
+        typeof h.signatureLabel === "string" && h.signatureLabel.length > 0,
+        "ContentHit must carry a signatureLabel."
+      );
+      assert(
+        typeof h.lineNumber === "number" && h.lineNumber > 0,
+        "ContentHit must carry a positive lineNumber."
+      );
+    }
   }
 
   // False-positive guard: lines explicitly tagged with the word

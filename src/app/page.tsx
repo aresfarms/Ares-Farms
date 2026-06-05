@@ -165,12 +165,10 @@ const portalSurfaces = [
     status: "Governed intake active",
     runtime: "runtime guard, classification, replay, observability",
   },
-  {
-    href: "/dashboard",
-    label: "Decision Dashboard",
-    status: "Migration-stabilization mode",
-    runtime: "decision runtime, version lineage, human review",
-  },
+  // /dashboard is a legacy internal developer/diagnostic surface (demo
+  // decision against /api/decision); it is NOT a Public Alpha customer
+  // surface and is intentionally removed from navigation. The Public
+  // Alpha customer portal is /portal/borrower.
   {
     href: "/portfolio",
     label: "Portfolio Ranking",

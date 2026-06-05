@@ -26,6 +26,18 @@ const PUBLIC_ROUTES = new Set<string>([
   "/success",
 ]);
 
+// Public route prefixes (e.g. the stewardship index + each steward profile).
+const PUBLIC_ROUTE_PREFIXES = ["/stewardship"];
+
+function isPublicRoute(pathname: string): boolean {
+  if (PUBLIC_ROUTES.has(pathname)) {
+    return true;
+  }
+  return PUBLIC_ROUTE_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+  );
+}
+
 export function PlatformChrome({
   internalCount,
   translationCount,
@@ -34,7 +46,7 @@ export function PlatformChrome({
   translationCount: number;
 }) {
   const pathname = usePathname();
-  if (pathname && PUBLIC_ROUTES.has(pathname)) {
+  if (pathname && isPublicRoute(pathname)) {
     return null;
   }
 

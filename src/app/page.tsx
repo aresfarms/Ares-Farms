@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
+import { StewardshipSection } from "@/components/stewardship/StewardshipSection";
 import {
   EXPLORATION_CATEGORIES,
   explorationHref,
@@ -33,6 +34,7 @@ const FOOTER_LINKS = [
   { href: "/readiness", label: "Readiness" },
   { href: "/onboarding", label: "Tell us about your project" },
   { href: "/portal/borrower", label: "Borrower portal" },
+  { href: "/stewardship", label: "Stewardship" },
 ];
 
 const shell = {
@@ -138,6 +140,10 @@ export default function HomePage() {
             ))}
           </ul>
         </section>
+
+        {/* Meet the Stewards — platform-first, introduced after exploration,
+            trust, and discovery content. No steward is the hero. */}
+        <StewardshipSection />
 
         {/* Footer links to customer surfaces */}
         <footer

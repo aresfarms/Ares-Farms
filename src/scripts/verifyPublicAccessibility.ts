@@ -232,11 +232,11 @@ const results: CheckResult[] = [
   ),
 
   check("C02", "C — Homepage Build 50",
-    "Homepage explore dropdown (select) has accessible label",
-    homepage.includes('aria-label="Choose an exploration topic"') ||
-      homepage.includes("aria-label={") ||
-      homepage.includes('<label') && homepage.includes('fl-explore-select'),
-    "Select element must have an accessible label (WCAG 3.3.2 / 4.1.2)."
+    "Homepage explore dropdown has visible <label> with matching for/id",
+    (homepage.includes('htmlFor="homepage-explore-select"') ||
+      homepage.includes('for="homepage-explore-select"')) &&
+      homepage.includes('id="homepage-explore-select"'),
+    "Select must have a visible <label htmlFor=...> paired with id= (WCAG 3.3.2 / 4.1.2)."
   ),
 
   check("C03", "C — Homepage Build 50",

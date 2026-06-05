@@ -124,10 +124,11 @@ function runAcceptanceCriteria(): CriterionResult[] {
     },
     {
       id:    "AC-2",
-      label: "Dropdown has accessible label (aria-label on select)",
-      pass:  homepage.includes('aria-label="Choose an exploration topic"') ||
-             (homepage.includes("fl-explore-select") && homepage.includes("aria-label")),
-      detail: "Select element must have aria-label (WCAG 3.3.2 / 4.1.2).",
+      label: "Dropdown has visible <label> element (htmlFor + id paired)",
+      pass:  (homepage.includes('htmlFor="homepage-explore-select"') ||
+              homepage.includes('for="homepage-explore-select"')) &&
+             homepage.includes('id="homepage-explore-select"'),
+      detail: "Select must have a visible <label> with matching htmlFor/id (WCAG 3.3.2 / 4.1.2).",
     },
     {
       id:    "AC-3",

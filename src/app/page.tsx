@@ -4,7 +4,6 @@ import { FurlongCompassWatermark } from "@/components/brand/FurlongCompassWaterm
 import { LivingOpportunityMap } from "@/components/customer/LivingOpportunityMap";
 import {
   AMERICA_250_STORIES,
-  EXPLORATION_CATEGORIES,
 } from "@/lib/customer-landing/featuredExplorationStories";
 
 /**
@@ -13,7 +12,7 @@ import {
  * Section order:
  *   1. Hero — compass + headline + CTA
  *   2. Living Opportunity Map — America 250 Featured Exploration
- *   3. What would you like to explore today? — dropdown → onboarding
+ *   3. Explore section (id="explore") — labeled dropdown form → onboarding
  *   4. Trust Strip
  *   5. What Furlong Is Not — institutional blue/gold
  *   6. Footer (with stewardship link)
@@ -44,6 +43,19 @@ const WHAT_FURLONG_IS_NOT = [
   "Furlong does not guarantee outcomes.",
   "Furlong does not make official determinations.",
   "Furlong does not sell your information.",
+] as const;
+
+// Options for the homepage exploration dropdown.
+// These are the canonical starting-point categories for onboarding.
+const EXPLORE_OPTIONS = [
+  { slug: "property-land",             label: "Property & Land" },
+  { slug: "farms-agriculture",         label: "Farms & Agriculture" },
+  { slug: "small-business-growth",     label: "Small Business Growth" },
+  { slug: "environmental-compliance",  label: "Environmental & Compliance" },
+  { slug: "financing-capital",         label: "Financing & Capital" },
+  { slug: "housing-development",       label: "Housing & Development" },
+  { slug: "programs-incentives",       label: "Programs & Incentives" },
+  { slug: "not-sure",                  label: "I'm Not Sure Yet" },
 ] as const;
 
 const FOOTER_LINKS = [
@@ -197,9 +209,16 @@ export default function HomePage() {
           /* ── Explore dropdown form ─────────────────────────────────── */
           .fl-explore-form {
             display: grid;
-            gap: 12px;
+            gap: 10px;
             max-width: 580px;
             margin: 0 auto;
+          }
+          .fl-explore-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #3b475a;
+            text-align: center;
           }
           .fl-explore-row {
             display: flex;
@@ -359,7 +378,7 @@ export default function HomePage() {
               Understand your next steps. Make informed decisions.
             </p>
             <a href="#explore" className="fl-cta-primary">
-              What would you like to explore today?
+              Explore your possibilities →
             </a>
           </header>
         </section>
@@ -392,18 +411,20 @@ export default function HomePage() {
           <h2 className="fl-section-title">What would you like to explore today?</h2>
 
           <form method="GET" action="/onboarding" className="fl-explore-form">
+            <label htmlFor="homepage-explore-select" className="fl-explore-label">
+              Choose a starting point
+            </label>
             <div className="fl-explore-row">
               <select
-                id="fl-explore-select"
+                id="homepage-explore-select"
                 name="explore"
                 className="fl-explore-select"
-                aria-label="Choose an exploration topic"
                 defaultValue=""
               >
-                <option value="" disabled>Choose a starting point…</option>
-                {EXPLORATION_CATEGORIES.map((c) => (
-                  <option key={c.slug} value={c.slug}>
-                    {c.label}
+                <option value="" disabled>Select a topic…</option>
+                {EXPLORE_OPTIONS.map((o) => (
+                  <option key={o.slug} value={o.slug}>
+                    {o.label}
                   </option>
                 ))}
               </select>

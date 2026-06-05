@@ -10,14 +10,19 @@ import {
 } from "@/lib/customer-landing/featuredExplorationStories";
 
 /**
- * Living Opportunity Map — Build 47 (Authoritative Map Asset System).
+ * Living Opportunity Map — Build 47 / 47-A (Authoritative Map Asset System).
  *
  * Renders a real U.S. map from locally cached GeoJSON assets ingested from
  * U.S. Census Bureau TIGER Web Services (federal, public domain).
  * See: public/maps/us-states.geojson, us-counties.geojson, us-map-metadata.json
- * and docs/DOCTRINE_AUTHORITATIVE_MAP_ASSET_INGESTION_V1.md
+ * Doctrines: AUTHORITATIVE_MAP_ASSET_INGESTION_V1 · MAP_LAYER_GOVERNANCE_V1
  *
- * Hard rules (Build 47):
+ * Build 47-A extension: stories may now carry a theme (modern / historical / evolution)
+ * and a historical context note. The component surfaces this as an educational layer
+ * within the story card — not as a separate map layer (those require data ingestion
+ * from USGS/BLM/USDA before becoming available; see mapLayerRegistry.ts).
+ *
+ * Hard rules:
  * - No fake or hand-drawn U.S. map outline
  * - No live fetch from third-party services during page load
  * - No geolocation
@@ -403,7 +408,11 @@ function RealUsMap({
       viewBox="0 0 960 600"
       preserveAspectRatio="xMidYMid meet"
       role="img"
-      aria-label={`U.S. map highlighting a featured exploration in ${story.state} — illustrative, not based on your location.`}
+      aria-label={
+        story.theme === "modern"
+          ? `U.S. map highlighting a featured exploration in ${story.state} — illustrative, not based on your location.`
+          : `U.S. map showing a featured ${story.theme} exploration in ${story.state}${story.period ? ` — ${story.period}` : ""} — illustrative, not based on your location.`
+      }
       style={{ width: "100%", height: "auto", display: "block" }}
     >
       <defs>
@@ -600,9 +609,34 @@ function AbstractOpportunityNetwork({
   );
 }
 
+// ── Theme badge colors ───────────────────────────────────────────────────────
+
+const THEME_BADGE: Record<
+  string,
+  { bg: string; color: string; label: string }
+> = {
+  modern: {
+    bg: "#eef3fb",
+    color: "#35507a",
+    label: "Featured Exploration / Illustrative example",
+  },
+  historical: {
+    bg: "#fef3e2",
+    color: "#8b5e00",
+    label: "Historical Exploration / Educational context",
+  },
+  evolution: {
+    bg: "#f0f7f0",
+    color: "#2e6b3a",
+    label: "Then & Now / Illustrative evolution",
+  },
+};
+
 // ── Story card ───────────────────────────────────────────────────────────────
 
 function StoryCard({ story }: { story: FeaturedStory }) {
+  const badge = THEME_BADGE[story.theme] ?? THEME_BADGE.modern;
+
   return (
     <div style={{ display: "grid", gap: 10, alignContent: "start" }}>
       <div
@@ -611,20 +645,34 @@ function StoryCard({ story }: { story: FeaturedStory }) {
           alignSelf: "start",
           padding: "4px 10px",
           borderRadius: 999,
-          background: "#eef3fb",
-          color: "#35507a",
+          background: badge.bg,
+          color: badge.color,
           fontSize: 12,
           fontWeight: 800,
         }}
       >
-        Featured Exploration / Illustrative example
+        {badge.label}
       </div>
+
       <div aria-live="polite" style={{ display: "grid", gap: 4 }}>
         <span style={{ fontSize: 12, color: "#5d687a" }}>Featured region</span>
         <strong style={{ fontSize: 18 }}>
           {story.state} · {story.county}
         </strong>
+        {story.period && (
+          <span
+            style={{
+              fontSize: 12,
+              color: badge.color,
+              fontWeight: 700,
+              letterSpacing: 0.3,
+            }}
+          >
+            {story.period}
+          </span>
+        )}
       </div>
+
       <div
         style={{
           display: "inline-flex",
@@ -639,9 +687,11 @@ function StoryCard({ story }: { story: FeaturedStory }) {
       >
         {story.opportunity}
       </div>
+
       <p style={{ margin: 0, fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
         Exploration path: {story.pathway}
       </p>
+
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {story.connectedNodes.map((node, index) => (
           <span key={`chip-${story.state}-${node.type}`} style={{ fontSize: 12, color: "#475569" }}>
@@ -650,9 +700,26 @@ function StoryCard({ story }: { story: FeaturedStory }) {
           </span>
         ))}
       </div>
+
       <p style={{ margin: 0, lineHeight: 1.6, color: "#1f2a3d", fontSize: 14 }}>
         {story.story}
       </p>
+
+      {story.historicalContext && (
+        <p
+          style={{
+            margin: 0,
+            lineHeight: 1.6,
+            color: "#5d687a",
+            fontSize: 12,
+            fontStyle: "italic",
+            borderLeft: `2px solid ${badge.bg === "#eef3fb" ? "#cdd9ec" : badge.color}`,
+            paddingLeft: 10,
+          }}
+        >
+          {story.historicalContext}
+        </p>
+      )}
     </div>
   );
 }

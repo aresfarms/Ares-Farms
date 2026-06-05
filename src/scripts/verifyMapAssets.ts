@@ -136,7 +136,12 @@ function verifyStates(): GeoJSONFeatureCollection {
   const nameSet = new Set(
     states.features.map((f) => String(f.properties?.NAME ?? f.properties?.name ?? ""))
   );
-  const expectedStates = ["Tennessee", "Iowa", "Pennsylvania", "Missouri", "North Carolina"];
+  const expectedStates = [
+    // Modern opportunity stories (Build 47)
+    "Tennessee", "Iowa", "Pennsylvania", "Missouri", "North Carolina",
+    // Historical discovery stories (Build 47-A)
+    "Illinois", "Kansas", "Oregon",
+  ];
   for (const s of expectedStates) {
     if (!nameSet.has(s)) {
       fail(

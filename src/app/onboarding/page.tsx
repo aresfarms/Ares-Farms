@@ -341,6 +341,46 @@ export default function OnboardingPage() {
   return (
     <main style={shellStyle}>
       <div style={containerStyle}>
+        {/*
+          Public Alpha Surface Content — Route 6 (Customer Project Intake)
+          Source: docs/PUBLIC_ALPHA_SURFACE_CONTENT.md §Route 6
+        */}
+        <section
+          aria-label="Public Alpha customer project intake"
+          style={{
+            background: "#ffffff",
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            padding: 28,
+            marginBottom: 16,
+          }}
+        >
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "#162033" }}>
+            Tell us about your project
+          </h1>
+          <p style={{ marginTop: 12, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            We ask only what we need to give you advisory guidance. You
+            may stop at any time, request deletion, or request human
+            review (human review).
+          </p>
+          <ol style={{ marginTop: 12, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>What type of business do you own?</li>
+            <li>What are you trying to accomplish?</li>
+            <li>Where is the property located?</li>
+            <li>What type of asset is involved?</li>
+          </ol>
+          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+            This information is advisory only and is not an approval,
+            guarantee, or official determination. You may exercise your
+            data rights at any time: request an accounting, export,
+            deletion, or human review of your information (data-rights).
+            Borrowers pay nothing. Free for borrowers. Your information
+            belongs to you; Furlong does not secretly submit, sell, or
+            distribute your information; no silent submission and no
+            information sale.
+          </p>
+        </section>
+
         <header
           style={{
             display: "grid",

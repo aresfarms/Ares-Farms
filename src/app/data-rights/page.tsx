@@ -376,6 +376,86 @@ export default function BorrowerDataRightsPortabilityWorkspacePage() {
   return (
     <main style={moduleShellStyle}>
       <div style={moduleContainerStyle}>
+        {/*
+          Public Alpha Surface Content — Route 3 (Data Transparency &
+          Customer Rights)
+          Source: docs/PUBLIC_ALPHA_SURFACE_CONTENT.md §Route 3
+          Renders the foundational statement, the five customer rights,
+          and the verbatim deletion language — visible-on-render.
+        */}
+        <section
+          aria-label="Public Alpha data transparency and customer rights"
+          style={{
+            background: "#ffffff",
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            padding: 28,
+            marginBottom: 16,
+          }}
+        >
+          <p style={{ fontSize: 22, fontWeight: 700, margin: 0, color: "#162033" }}>
+            Your information belongs to you.
+          </p>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+            What information is collected, why, how it is used, what has been shared, and what has not been shared
+          </h2>
+          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.7 }}>
+            On request, Furlong provides a plain-English summary of:
+            (a) what information is collected, (b) why it is collected,
+            (c) how it is used, (d) what has been shared, and (e) what
+            has not been shared. No legal-document review is required to
+            understand this.
+          </p>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+            Your data rights
+          </h2>
+          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            You may exercise any of these data rights at any time without giving a reason:
+          </p>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>
+              <strong>REQUEST_EXPLANATION</strong> — &ldquo;Tell me why I&apos;m seeing this and what it relied on.&rdquo;
+            </li>
+            <li>
+              <strong>REQUEST_DELETION</strong> — &ldquo;Delete what you have about me.&rdquo;
+            </li>
+            <li>
+              <strong>REQUEST_EXPORT</strong> — &ldquo;Give me a copy of what you have about me, in a usable form.&rdquo; (You may request an export.)
+            </li>
+            <li>
+              <strong>REQUEST_HUMAN_REVIEW</strong> — &ldquo;Have a human look at this before it goes anywhere.&rdquo;
+            </li>
+            <li>
+              <strong>REQUEST_HOLD_ON_ESCALATION</strong> — &ldquo;Don&apos;t move my information to the next stage yet.&rdquo;
+            </li>
+          </ul>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+            Deletion
+          </h2>
+          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.7 }}>
+            When you request deletion, Furlong will delete your
+            information from the live system, preserve only the audit
+            log required for regulatory traceability, and confirm what
+            happened. We will explain when information can be deleted
+            and what information can be deleted, and what we keep for
+            traceability.
+          </p>
+
+          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+            This information is advisory only and is not an approval,
+            guarantee, or official determination. You may request an
+            accounting, export, deletion, or human review of your
+            information at any time (data-rights). Borrowers pay
+            nothing. Free for borrowers. Your information belongs to
+            you; Furlong does not secretly submit, sell, or distribute
+            your information; no silent submission and no information
+            sale.
+          </p>
+        </section>
+
         <ModuleHeader
           moduleNumber="19"
           title="Borrower Data Rights and Portability"

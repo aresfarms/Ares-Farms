@@ -251,6 +251,69 @@ export default function FinancingPathwaysPage() {
   return (
     <main style={shellStyle}>
       <div style={containerStyle}>
+        {/*
+          Public Alpha Surface Content — Route 4 (Pathway Discovery +
+          Financing Reality Classification)
+          Source: docs/PUBLIC_ALPHA_SURFACE_CONTENT.md §Route 4
+          No approval language permitted (§3).
+        */}
+        <section
+          aria-label="Public Alpha pathway discovery and financing reality"
+          style={{
+            background: "#ffffff",
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            padding: 28,
+            marginBottom: 16,
+          }}
+        >
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "#162033" }}>
+            Pathway discovery
+          </h1>
+          <p style={{ marginTop: 12, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            Each project is reviewed against the following categories.
+            This is advisory and is not an approval, guarantee, or
+            official determination.
+          </p>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>
+              <strong>Likely pathways</strong> — pathways your project may fit, advisory only.
+            </li>
+            <li>
+              <strong>Excluded pathways</strong> — pathways your project does not fit, with the rationale.
+            </li>
+            <li>
+              <strong>Rationale</strong> — plain-English explanation of why a pathway is included or excluded.
+            </li>
+          </ul>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+            Financing reality classification
+          </h2>
+          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            Each candidate pathway is labeled with one of:
+          </p>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>likely financeable</li>
+            <li>financeable with conditions</li>
+            <li>specialist review required</li>
+            <li>limited financing market</li>
+            <li>cash-favored transaction</li>
+            <li>not enough information</li>
+          </ul>
+
+          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+            This information is advisory only and is not an approval,
+            guarantee, or official determination. No legal, regulatory,
+            or official reliance may be placed on this information.
+            Furlong does not lend, does not commit funds, and does not
+            decide credit, eligibility, or approval. AI does not decide,
+            does not approve, does not determine, and does not
+            underwrite — every recommendation is reviewed by a human
+            reviewer (human review).
+          </p>
+        </section>
+
         <section
           style={{
             ...panelStyle,

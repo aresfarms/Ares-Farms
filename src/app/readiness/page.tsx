@@ -299,6 +299,55 @@ export default function ReadinessAssessmentPage() {
   return (
     <main style={shellStyle}>
       <div style={containerStyle}>
+        {/*
+          Public Alpha Surface Content — Route 5 (Readiness Review)
+          Source: docs/PUBLIC_ALPHA_SURFACE_CONTENT.md §Route 5
+        */}
+        <section
+          aria-label="Public Alpha readiness review"
+          style={{
+            background: "#ffffff",
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            padding: 28,
+            marginBottom: 16,
+          }}
+        >
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "#162033" }}>
+            Readiness review
+          </h1>
+          <p style={{ marginTop: 12, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            Every readiness assessment is advisory. A named credentialed
+            reviewer can review your readiness with you on request
+            (human review).
+          </p>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+            Readiness indicators
+          </h2>
+          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            The signals we computed about your project, with a plain-English &ldquo;why this matters&rdquo; for each.
+          </p>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: "#162033" }}>
+            Missing items
+          </h2>
+          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            What you still need to provide for a readiness assessment to be complete, each with a plain-English &ldquo;why this matters.&rdquo;
+          </p>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: "#162033" }}>
+            Documentation recommendations
+          </h2>
+          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+            Documents we recommend you prepare. Each carries a &ldquo;why this matters&rdquo; sentence.
+          </p>
+          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+            This information is advisory only and is not an approval,
+            guarantee, or official determination. No legal, regulatory,
+            or official reliance may be placed on this information. You
+            may request an accounting, export, deletion, or human
+            review of your information at any time (data-rights).
+          </p>
+        </section>
+
         <section
           style={{
             ...panelStyle,

@@ -86,6 +86,71 @@ export default function AboutFurlongPage() {
   return (
     <main style={shellStyle}>
       <div style={containerStyle}>
+        {/*
+          Public Alpha Surface Content — Route 1 (Founder Introduction)
+          Source: docs/PUBLIC_ALPHA_SURFACE_CONTENT.md §Route 1
+          Registry: src/lib/customer-journey/publicAlphaSurfaceContent.ts
+          Rendered visible-on-render (no click, no accordion, no modal).
+          See Build 41 closure doc for traceability.
+        */}
+        <section
+          aria-label="Public Alpha founder introduction"
+          style={{
+            background: "#ffffff",
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            padding: 28,
+            marginBottom: 16,
+          }}
+        >
+          <h1 style={{ fontSize: 32, fontWeight: 800, margin: 0, color: "#162033" }}>
+            Compass to Capital
+          </h1>
+          <p style={{ marginTop: 16, fontSize: 16, lineHeight: 1.6, color: "#162033" }}>
+            Furlong exists to help people understand their options before
+            they commit significant time, money, effort, or personal
+            information to a path. We are a compass, not a lender. Every
+            decision that affects you is cleared by a named, credentialed
+            human; no AI clears anything; no one clears their own request.
+          </p>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+            Furlong does not:
+          </h2>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>approve loans</li>
+            <li>deny loans</li>
+            <li>issue underwriting decisions</li>
+            <li>issue agency determinations</li>
+            <li>guarantee funding</li>
+          </ul>
+
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: "#162033" }}>
+            Furlong helps users understand:
+          </h2>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+            <li>available pathways</li>
+            <li>readiness gaps</li>
+            <li>documentation needs</li>
+            <li>financing realities</li>
+            <li>environmental considerations</li>
+            <li>next recommended actions</li>
+          </ul>
+          <p style={{ marginTop: 12, fontSize: 14, color: "#3b475a", fontStyle: "italic" }}>
+            — before significant time, money, or effort are committed.
+          </p>
+
+          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+            This information is advisory only and is not an approval,
+            guarantee, or official determination. No legal, regulatory, or
+            official reliance may be placed on this information. Furlong
+            does not lend, does not commit funds, and does not decide
+            credit, eligibility, or approval. Your information belongs to
+            you. Furlong does not secretly submit, sell, or distribute
+            your information.
+          </p>
+        </section>
+
         <section
           style={{
             ...panelStyle,

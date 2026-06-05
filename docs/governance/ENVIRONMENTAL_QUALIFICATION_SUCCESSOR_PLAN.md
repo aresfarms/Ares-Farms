@@ -1,12 +1,28 @@
 # Environmental Qualification Successor Plan
 
-**Status: NOTE COMPLETE + SUCCESSOR PLAN RECORDED.**
+**Status: NOTE COMPLETE + SUCCESSOR PLAN RECORDED.
+Alpha-entry status = ACCEPTED_WITH_CONDITION** (environmental review is deferred
+from Alpha, so the SPOF is dormant; it must be resolved **before** environmental
+capability leaves HELD_FOR_ALPHA — it does not block Alpha entry).
+
+**Mark:** Internally Verified — Independent Verification Pending.
 
 This document closes the open action flagged by **CCR-2026-002**: the
 environmental engineering review role is a regulated-competency single point of
 failure (SPOF). The SPOF *note* was already recorded in the Classification
 Change Registry and the Vol VII Operational Annex; this document is the
 *successor plan* that note demanded.
+
+> **Stewardship succession ≠ professional qualification.** Governance
+> *stewardship* of the Environmental & Compliance domain can be assigned for
+> continuity, but that assignment does **not** transfer the regulated
+> professional environmental qualification. A governance-continuity successor is
+> not, by virtue of that role, qualified to perform environmental engineering
+> review. **Frances Fraass** may serve as an interim **governance-continuity**
+> successor for the domain, but is **not** a technical qualification successor
+> unless she is independently qualified. Environmental activation requires
+> **Caitlin Hudson or another independently qualified environmental reviewer** —
+> never a stewardship successor who lacks the credential.
 
 **Doctrine references**
 - `docs/CLASSIFICATION_CHANGE_REGISTRY.md` — **CCR-2026-002** (ENVIRONMENTAL_ENGINEERING_SPOKE_REVIEWER → HELD_FOR_ALPHA).

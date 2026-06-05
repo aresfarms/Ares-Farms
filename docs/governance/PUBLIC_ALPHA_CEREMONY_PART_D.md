@@ -59,9 +59,12 @@ remaining three are **NOT** CI-equivalent:
 `verify:`/`build:` gates **locally against live repo state**, and they passed.
 So the Step 8 result is truthful. The gap is **forward CI enforcement** only:
 regressions to the Annex, the customer pages, or the build-self-report exit
-condition would not be caught by CI today. Hardening is queued (CI-safe
-`--check` modes for the three literal gates); it does **not** block Alpha because
-it does not affect the truthfulness of Step 8 at `55aa7a2`.
+condition would not be caught by CI today. **Hardening is being added** (Build 43
+Track B / PR #34): CI-safe `--check` modes — `verify:human-authority:ci`,
+`verify:customer-journey:ci`, `build:self-report:ci` — that read live state, skip
+the timestamped artifact write, and exit the real gate code, run in CI alongside
+the existing smokes. This does **not** block Alpha because it does not affect the
+truthfulness of Step 8 at `55aa7a2`.
 
 ---
 
@@ -73,21 +76,24 @@ it does not affect the truthfulness of Step 8 at `55aa7a2`.
 | 2 | Governance Registry documentation | **COMPLETE** | `AUTHORITY_ASSIGNMENT_REGISTRY.md`, `CLASSIFICATION_CHANGE_REGISTRY.md`, `GOVERNANCE_EXCEPTION_REGISTRY.md`, `HUMAN_AUTHORITY_MAPPING.md`, `DOCTRINE_HUMAN_AUTHORITY_REGISTRY_V1.md`, `governance/VOL_VII_OPERATIONAL_ANNEX.{json,md}`, VIA doctrines; `verify:human-authority` green | — |
 | 3 | Technical architecture documentation | **COMPLETE (distributed)** | `ENTERPRISE_BOUNDARY_MAP.md`, `MODULE_INTEGRATION_AND_PUBLIC_SURFACE_CONTRACT.md`, `BACKEND_COVERAGE_MATRIX.md`, `ledger-system-spec.md`, Master Volume III | No single consolidated architecture-overview file; substance is spread across 4–5 docs + Vol III |
 | 4 | Build documentation | **COMPLETE** | `BUILD_NOW_01..07`, `BUILD_NEXT_08..12`, `BUILD_13..42_*.md`, `BUILD_PHASE_ROADMAP.md`, `docs/build-records/`; `build:self-report` green | — |
-| 5 | Deployment documentation | **COMPLETE** | `docs/governance/ALPHA_DEPLOYMENT_RUNBOOK.md` (Build 43) — environment inventory, deploy/rollback/DNS/emergency-shutdown/founder-notification procedures, Alpha boundaries; plus `MODULE_29_DEPLOYMENT_ENVIRONMENT_READINESS_GATE.md` | Closed in Build 43. Production launch remains BLOCKED_BY_DESIGN (separate ceremony) |
-| 6 | Recovery documentation | **COMPLETE** | `docs/governance/ALPHA_DISASTER_RECOVERY_RUNBOOK.md` (Build 43) — backup inventory, recovery sequence, replay verification, build-archive recovery, key custody (2-of-3), escalation matrix; plus Modules 18 / 34 / 42 | Closed in Build 43 |
-| 7 | Replay documentation | **COMPLETE (distributed)** | `MODULE_09_AUDIT_REPLAY_CONSOLE.md`, `ledger-system-spec.md`, per-module replay references, `verify:replay` conformance test; recovery replay procedure now in the Disaster Recovery Runbook §3 | No single standalone replay-doctrine doc; replay is enforced per-module + by conformance test |
-| 8 | Environmental qualification successor plan | **COMPLETE (note + successor plan recorded)** | `CLASSIFICATION_CHANGE_REGISTRY.md` (CCR-2026-002) + `governance/VOL_VII_OPERATIONAL_ANNEX.md`; successor plan: `docs/governance/ENVIRONMENTAL_QUALIFICATION_SUCCESSOR_PLAN.md` (Build 43) — qualification/replacement criteria, knowledge transfer, SPOF mitigation, trigger conditions | Note + plan recorded. Environmental review stays HELD_FOR_ALPHA; SPOF is dormant (not live) and not an Alpha blocker |
+| 5 | Deployment documentation | **COMPLETE** (Alpha entry) | `docs/governance/ALPHA_DEPLOYMENT_AND_ROLLBACK_RUNBOOK.md` (Build 43) — Alpha environment boundary, deploy owner, pre-deploy checks, deploy/rollback/emergency-shutdown/DNS procedures, post-deploy verification, founder notification, incident triggers; plus `MODULE_29_DEPLOYMENT_ENVIRONMENT_READINESS_GATE.md` | Closed for Alpha entry. Production launch remains BLOCKED_BY_DESIGN (separate ceremony) |
+| 6 | Recovery / key-custody documentation | **COMPLETE** (key-custody/recovery entry slice) | `docs/governance/ALPHA_KEY_CUSTODY_AND_DISASTER_RECOVERY_RUNBOOK.md` (Build 43) — Recovery Key custody (2-of-3), access rules, prohibited storage, emergency access, dual/compensating control, incident logging, replay verification, build-archive restoration, borrower-PII rule; plus Modules 18 / 34 / 42 | Entry slice closed. **Full DR consolidation = ACCEPTED_WITH_CONDITION for Alpha exit** (RTO/RPO + failover playbook + independent verification) |
+| 7 | Replay documentation | **COMPLETE (distributed)** | `MODULE_09_AUDIT_REPLAY_CONSOLE.md`, `ledger-system-spec.md`, per-module replay references, `verify:replay`; recovery replay procedure in the Key Custody & DR Runbook §8 | No single standalone replay-doctrine doc; replay is enforced per-module + by conformance test |
+| 8 | Environmental qualification successor plan | **ACCEPTED_WITH_CONDITION** (Alpha entry) | `CLASSIFICATION_CHANGE_REGISTRY.md` (CCR-2026-002) + `governance/VOL_VII_OPERATIONAL_ANNEX.md`; successor plan: `docs/governance/ENVIRONMENTAL_QUALIFICATION_SUCCESSOR_PLAN.md` (Build 43) | Environmental review stays HELD_FOR_ALPHA; Caitlin holds the qualification; stewardship succession ≠ regulated qualification; Frances = governance-continuity successor, not technical-qualification successor unless independently qualified. **Must be resolved before environmental capability leaves HELD_FOR_ALPHA** |
 
-**Summary (after Build 43):** all eight continuity items are **COMPLETE**
-(items 3 and 7 are complete-but-distributed across several docs; item 8 records
-both the SPOF note and the successor plan, with environmental review remaining
-HELD_FOR_ALPHA). No item is PARTIAL or MISSING.
+**Summary (after Build 43):** Items 1–7 are **COMPLETE** for Alpha entry
+(items 3 and 7 complete-but-distributed; item 6 is the key-custody/recovery
+*entry slice* — full DR consolidation is ACCEPTED_WITH_CONDITION for exit). Item
+8 (environmental successor plan) is **ACCEPTED_WITH_CONDITION** — deferred and
+dormant for Alpha, to be resolved before environmental capability activates. No
+item is PARTIAL-without-a-plan or MISSING.
 
-### Known open Master-Volume gaps (from the build-self-report ledger)
+### Known open Master-Volume gaps (ACCEPTED_WITH_CONDITION)
 
-The self-report enumerates three doctrine-to-code gaps that remain pending (each
-with owner + promotion condition). They do not block the Alpha gate but the
-founders vote with knowledge of them:
+The self-report enumerates three doctrine-to-code gaps. They do **not** block the
+Alpha gate; the founders vote with knowledge of them and they are carried as
+**ACCEPTED_WITH_CONDITION** to close on their own timelines (before the relevant
+Beta/Production milestone):
 
 - `MV-IV-RUNBOOK-LEDGER-FULL-ENUMERATION` — Vol IV operational runbook ledger.
 - `MV-VII-EXIT-CRITERIA-FULL-ENUMERATION` — Beta/Production exit-criteria ledger.

@@ -52,6 +52,10 @@ export type FeaturedStory = {
   historicalContext?: string; // educational note about the historical dimension
   // Series classification (Build 47-D)
   seriesId?: FeaturedSeriesId; // which featured series this story belongs to
+  // Registry fields (Build 52 — America 250 Story Registry)
+  headline?: string;        // Founder-authored title displayed prominently in StoryCard
+  selectorLabel?: string;   // Short label for selector button (defaults to stateAbbr)
+  stayNational?: boolean;   // Skip state zoom — hold national view for intro / overview stories
 };
 
 export const FEATURED_EXPLORATION_LABEL = "Featured Exploration";
@@ -254,185 +258,22 @@ export const CURATED_EXPLORATION_STORIES: FeaturedStory[] = [
   },
 ];
 
-// ── America 250 Discovery Series (Build 47-D) ─────────────────────────────────
-// Educational exploration stories marking America's 250th Anniversary (2026).
-// Themes: discovery and possibility, not nostalgia or politics.
-// Connects historical growth patterns to the opportunities present today.
-// All stories are illustrative — no geolocation, no visitor identification.
-// Source: U.S. Census Bureau TIGER/Line (public domain) for coordinates.
-//         USGS, BLM, USDA, and National Archives public-domain data.
+// ── America 250 Discovery Series ─────────────────────────────────────────────
+// Canonical founder-authored stories are now maintained in the story registry.
+// All deprecated placeholder copy (natural trading hub, Trade Hub, Innovation Hub,
+// Canal Commerce as node type, Port → Commerce → Trade Route) has been removed.
+// Source: src/lib/maps/america250StoryRegistry.ts (Build 52)
+//
+// Sequence: Intro → Capital Road-Trip → Delaware → Pennsylvania →
+//           New York → Massachusetts → Virginia (placeholder) → Maine (placeholder)
+//
+// Do not re-add generic generated blurbs here. Narrative copy lives in the registry.
 
-export const AMERICA_250_STORIES: FeaturedStory[] = [
+export { AMERICA_250_STORIES } from "@/lib/maps/america250StoryRegistry";
 
-  // ── 1. Delaware — "The First State" ─────────────────────────────────────────
-  {
-    state: "Delaware",
-    stateAbbr: "DE",
-    county: "New Castle County",
-    opportunity: "Commerce & Port Heritage",
-    pathway: "Historical Ports → Trade Corridors → Modern Commerce",
-    story:
-      "Delaware's position at the Delaware Bay made it a natural trading hub from " +
-      "its earliest days as the first state. Those geographic and commercial " +
-      "foundations — ports, trade routes, and market connections — created " +
-      "opportunity patterns that businesses, landowners, and communities " +
-      "in the region continue exploring today.",
-    focusPoint: { x: 78, y: 40 },
-    latLon: { lat: 39.745, lon: -75.547 },
-    color: "#4d7bb5",
-    theme: "evolution",
-    seriesId: "america-250",
-    period: "1787 → Today",
-    historicalContext:
-      "Delaware was the first state to ratify the U.S. Constitution in December 1787. " +
-      "Its location at the confluence of the Delaware River and Bay made it both " +
-      "strategically and commercially significant. Wilmington evolved from a colonial " +
-      "port and milling center into a hub of manufacturing and finance — a pattern " +
-      "of commerce and infrastructure investment that shaped regional opportunity for generations.",
-    connectedNodes: [
-      { x: 75, y: 41, type: "Port",        latLon: { lat: 39.731, lon: -75.553 } },
-      { x: 78, y: 40, type: "Commerce",    latLon: { lat: 39.745, lon: -75.547 } },
-      { x: 81, y: 39, type: "Trade Route", latLon: { lat: 39.762, lon: -75.530 } },
-    ],
-  },
-
-  // ── 2. Pennsylvania — Industry, Infrastructure & Agriculture ─────────────────
-  {
-    state: "Pennsylvania",
-    stateAbbr: "PA",
-    county: "Chester County",
-    opportunity: "Colonial Industry & Agricultural Production",
-    pathway: "Colonial Agriculture → Transportation Networks → Regional Opportunity",
-    story:
-      "Chester County's position near Philadelphia placed it at the intersection of " +
-      "colonial commerce, early industrial development, and agricultural production. " +
-      "Pennsylvania's role as a manufacturing and transportation leader created land use " +
-      "patterns, infrastructure, and regional dynamics still shaping opportunity today.",
-    focusPoint: { x: 76, y: 40 },
-    latLon: { lat: 39.961, lon: -75.756 },
-    color: "#b07e2e",
-    theme: "evolution",
-    seriesId: "america-250",
-    period: "1776 → Today",
-    historicalContext:
-      "Chester County's rich agricultural land and proximity to Philadelphia made it " +
-      "a center of early American commerce and industry. Pennsylvania's industrial and " +
-      "agricultural heritage stretches from the Revolutionary era through the Industrial " +
-      "Revolution. The transportation networks, land patterns, and infrastructure investments " +
-      "of those generations continue to define what financing, conservation, and " +
-      "development opportunities look like across the region today.",
-    connectedNodes: [
-      { x: 73, y: 40, type: "Industry",       latLon: { lat: 39.975, lon: -75.786 } },
-      { x: 76, y: 40, type: "Infrastructure", latLon: { lat: 39.961, lon: -75.756 } },
-      { x: 79, y: 41, type: "Land Patterns",   latLon: { lat: 39.942, lon: -75.722 } },
-    ],
-  },
-
-  // ── 3. New York — Erie Canal & Trade Corridors ───────────────────────────────
-  {
-    state: "New York",
-    stateAbbr: "NY",
-    county: "Montgomery County",
-    opportunity: "Infrastructure & Trade Corridors",
-    pathway: "Erie Canal → Commerce Networks → Regional Development",
-    story:
-      "The Erie Canal, completed in 1825, transformed New York's interior from " +
-      "isolated farmland into one of America's busiest commercial corridors. " +
-      "The infrastructure investments that unlocked the west created land value " +
-      "patterns, market connections, and regional development dynamics that " +
-      "communities in the Hudson-Mohawk Valley continue building upon today.",
-    focusPoint: { x: 73, y: 32 },
-    latLon: { lat: 42.905, lon: -74.577 },
-    color: "#3d8a6d",
-    theme: "evolution",
-    seriesId: "america-250",
-    period: "1825 → Today",
-    historicalContext:
-      "Completed in 1825 by Governor DeWitt Clinton, the Erie Canal connected the " +
-      "Great Lakes to the Hudson River and New York City, reducing shipping costs by " +
-      "over 90% and triggering waves of westward migration and commercial growth. " +
-      "Montgomery County's position along the canal made it a key waypoint for grain, " +
-      "goods, and the communities that built interior New York. Those infrastructure " +
-      "decisions still shape land values and regional opportunity today.",
-    connectedNodes: [
-      { x: 70, y: 32, type: "Canal Lock", latLon: { lat: 42.920, lon: -74.612 } },
-      { x: 73, y: 32, type: "Commerce",   latLon: { lat: 42.905, lon: -74.577 } },
-      { x: 76, y: 33, type: "Canal Commerce", latLon: { lat: 42.886, lon: -74.540 } },
-    ],
-  },
-
-  // ── 4. Massachusetts — Maritime Commerce & Innovation ────────────────────────
-  {
-    state: "Massachusetts",
-    stateAbbr: "MA",
-    county: "Essex County",
-    opportunity: "Maritime Commerce & Innovation",
-    pathway: "Historical Harbors → Trade Networks → Coastal Opportunity",
-    story:
-      "Essex County's maritime heritage traces from early colonial fishing and trade " +
-      "through the American industrial revolution. Salem and Gloucester became centers " +
-      "of global commerce, innovation, and community development — creating " +
-      "infrastructure, land use patterns, and economic foundations that coastal " +
-      "communities continue building upon today.",
-    focusPoint: { x: 82, y: 32 },
-    latLon: { lat: 42.572, lon: -70.934 },
-    color: "#6b59a0",
-    theme: "evolution",
-    seriesId: "america-250",
-    period: "1620s → Today",
-    historicalContext:
-      "The Essex County coastline was among the first places in America where " +
-      "European settlers established permanent communities. Salem's global trade " +
-      "networks and Gloucester's fishing industry made Massachusetts a center of " +
-      "early American commerce, shipbuilding, and innovation. The infrastructure, " +
-      "land ownership patterns, and economic networks shaped by those centuries of " +
-      "maritime trade continue to define coastal New England opportunity today.",
-    connectedNodes: [
-      { x: 79, y: 31, type: "Harbor",     latLon: { lat: 42.590, lon: -70.962 } },
-      { x: 82, y: 32, type: "Commerce",   latLon: { lat: 42.572, lon: -70.934 } },
-      { x: 85, y: 32, type: "Maritime Industry", latLon: { lat: 42.551, lon: -70.899 } },
-    ],
-  },
-
-  // ── 5. Virginia — Land Stewardship & Agricultural Heritage ───────────────────
-  {
-    state: "Virginia",
-    stateAbbr: "VA",
-    county: "Augusta County",
-    opportunity: "Land Stewardship & Agricultural Heritage",
-    pathway: "Colonial Agriculture → Land Patterns → Conservation Today",
-    story:
-      "The Shenandoah Valley's agricultural heritage extends from the earliest " +
-      "European settlements through generations of farmers who shaped the land. " +
-      "Augusta County's soil, water, and landholding patterns from those early " +
-      "decades continue to influence what conservation programs, financing options, " +
-      "and stewardship opportunities landowners can explore today.",
-    focusPoint: { x: 74, y: 49 },
-    latLon: { lat: 38.149, lon: -79.071 },
-    color: "#c0604a",
-    theme: "evolution",
-    seriesId: "america-250",
-    period: "1607 → Today",
-    historicalContext:
-      "Augusta County was settled in the 1730s and 1740s, primarily by German and " +
-      "Scots-Irish immigrants who brought distinctive farming traditions to the " +
-      "Shenandoah Valley. Their approach to land stewardship — careful management " +
-      "of soil, water, and forest resources — created agricultural patterns that " +
-      "persist today. Those historic land decisions shape conservation program " +
-      "eligibility, financing options, and stewardship obligations landowners " +
-      "encounter when exploring what their land can support.",
-    connectedNodes: [
-      { x: 72, y: 48, type: "Farm",        latLon: { lat: 38.171, lon: -79.088 } },
-      { x: 74, y: 49, type: "Land",        latLon: { lat: 38.149, lon: -79.071 } },
-      { x: 77, y: 50, type: "Stewardship", latLon: { lat: 38.124, lon: -79.042 } },
-    ],
-  },
-
-];
-
-// Future expansion: Maine, New Hampshire, Rhode Island, Connecticut, New Jersey,
-// Maryland, North Carolina, South Carolina, Georgia — ready to add as additional
-// anchor states in the America 250 series.
+// Future expansion: New Hampshire, Rhode Island, Connecticut, New Jersey,
+// Maryland, North Carolina, South Carolina, Georgia — ready to add as
+// additional anchor states in the America 250 series.
 
 export type ExplorationCategory = {
   slug: string;

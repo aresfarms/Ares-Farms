@@ -405,38 +405,51 @@ export function LivingOpportunityMap({
         if (cancelled.current) break;
 
         const story = stories[idx];
-        const bounds = boundsMap.get(story.state) ?? null;
-        const stateVB = boundsToViewBox(bounds);
 
-        // ─── Phase 1: National view ───────────────────────────────────────
-        setPhase("national");
-        if (currentVB !== NATIONAL_VBOX) {
+        if (story.stayNational) {
+          // ─── National-only story (intro / overview) ──────────────────────
+          // Hold the full national view for the combined national + stateFocus
+          // duration. No zoom in or out. Used for intro and overview entries.
+          setPhase("national");
           setViewBox(NATIONAL_VBOX);
           currentVB = NATIONAL_VBOX;
+          await wait(SEQ.national + SEQ.stateFocus);
+          if (cancelled.current) break;
+        } else {
+          // ─── Normal zoom sequence ─────────────────────────────────────────
+          const bounds = boundsMap.get(story.state) ?? null;
+          const stateVB = boundsToViewBox(bounds);
+
+          // Phase 1: National view
+          setPhase("national");
+          if (currentVB !== NATIONAL_VBOX) {
+            setViewBox(NATIONAL_VBOX);
+            currentVB = NATIONAL_VBOX;
+          }
+          await wait(SEQ.national);
+          if (cancelled.current) break;
+
+          // Phase 2: Zoom in
+          setPhase("zooming-in");
+          await animateVB(NATIONAL_VBOX, stateVB, SEQ.zoomIn, vb => {
+            setViewBox(vb);
+            currentVB = vb;
+          }, cancelled);
+          if (cancelled.current) break;
+
+          // Phase 3: State focus + pathways
+          setPhase("state-focus");
+          await wait(SEQ.stateFocus);
+          if (cancelled.current) break;
+
+          // Phase 4: Zoom out
+          setPhase("zooming-out");
+          await animateVB(stateVB, NATIONAL_VBOX, SEQ.zoomOut, vb => {
+            setViewBox(vb);
+            currentVB = vb;
+          }, cancelled);
+          if (cancelled.current) break;
         }
-        await wait(SEQ.national);
-        if (cancelled.current) break;
-
-        // ─── Phase 2: Zoom in ─────────────────────────────────────────────
-        setPhase("zooming-in");
-        await animateVB(NATIONAL_VBOX, stateVB, SEQ.zoomIn, vb => {
-          setViewBox(vb);
-          currentVB = vb;
-        }, cancelled);
-        if (cancelled.current) break;
-
-        // ─── Phase 3: State focus + pathways ─────────────────────────────
-        setPhase("state-focus");
-        await wait(SEQ.stateFocus);
-        if (cancelled.current) break;
-
-        // ─── Phase 4: Zoom out ────────────────────────────────────────────
-        setPhase("zooming-out");
-        await animateVB(stateVB, NATIONAL_VBOX, SEQ.zoomOut, vb => {
-          setViewBox(vb);
-          currentVB = vb;
-        }, cancelled);
-        if (cancelled.current) break;
 
         // Advance to next story
         idx = (idx + 1) % stories.length;
@@ -583,11 +596,15 @@ export function LivingOpportunityMap({
         style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {stories.map((s, i) => {
           const isActive = i === active;
+          // Use selectorLabel if provided (e.g. "Intro", "Capitals"),
+          // otherwise fall back to stateAbbr for standard state stories.
+          const btnLabel = s.selectorLabel ?? s.stateAbbr;
           return (
             <button key={`sel-${s.stateAbbr}`} type="button"
               className="fl-story-btn"
               onClick={() => select(i)}
               aria-pressed={isActive}
+              aria-label={s.headline ?? s.state}
               style={{
                 minHeight: 40, padding: "0 14px", borderRadius: 999,
                 border: isActive ? `1px solid ${s.color}` : "1px solid #cdd9ec",
@@ -596,7 +613,7 @@ export function LivingOpportunityMap({
                 fontWeight: 700, fontSize: 14, cursor: "pointer",
               }}
             >
-              {s.state}
+              {btnLabel}
             </button>
           );
         })}
@@ -881,9 +898,18 @@ function StoryCard({ story, phase }: { story: FeaturedStory; phase: SequencePhas
         {badge.label}
       </div>
 
+      {/* Founder-authored headline — shown when registry provides a title */}
+      {story.headline && (
+        <h3 style={{ margin: "0 0 -4px", fontSize: 21, fontWeight: 800,
+          color: "#162033", lineHeight: 1.2, letterSpacing: -0.01 }}>
+          {story.headline}
+        </h3>
+      )}
+
       {/* Location + period */}
       <div aria-live="polite" aria-atomic="true" style={{ display: "grid", gap: 4 }}>
-        <strong style={{ fontSize: 20, lineHeight: 1.3 }}>
+        <strong style={{ fontSize: story.headline ? 15 : 20, lineHeight: 1.3,
+          color: story.headline ? "#5d687a" : "#162033", fontWeight: story.headline ? 600 : 700 }}>
           {story.state} · {story.county}
         </strong>
         {story.period && (

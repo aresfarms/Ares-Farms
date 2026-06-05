@@ -151,7 +151,7 @@ export default function BorrowerPortalPage() {
           <p
             style={{
               marginTop: 20,
-              fontSize: 13,
+              fontSize: 14,
               color: "#5d687a",
               lineHeight: 1.6,
             }}

@@ -220,7 +220,7 @@ export default function PublicTrustPage() {
             processes.
           </p>
 
-          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
             This information is advisory only and is not an approval,
             guarantee, or official determination. No legal, regulatory, or
             official reliance may be placed on this information. This is
@@ -249,7 +249,7 @@ export default function PublicTrustPage() {
           <span
             style={{
               color: "#456077",
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 800,
               textTransform: "uppercase",
             }}
@@ -319,8 +319,8 @@ export default function PublicTrustPage() {
                     gap: 6,
                     flexWrap: "wrap",
                     color: "#64748b",
-                    fontSize: 11,
-                    fontWeight: 800,
+                    fontSize: 13,
+                    fontWeight: 700,
                   }}
                 >
                   {protection.governanceRefs.map((governanceRef) => (
@@ -341,9 +341,9 @@ export default function PublicTrustPage() {
                   href={protection.reviewRoute}
                   style={{
                     color: "#1d4ed8",
-                    fontWeight: 800,
+                    fontWeight: 700,
                     textDecoration: "none",
-                    fontSize: 13,
+                    fontSize: 14,
                   }}
                 >
                   {protection.reviewRoute}
@@ -385,8 +385,8 @@ export default function PublicTrustPage() {
               gap: 8,
               flexWrap: "wrap",
               color: "#64748b",
-              fontSize: 12,
-              fontWeight: 800,
+              fontSize: 13,
+              fontWeight: 700,
             }}
           >
             {result.productionRestrictions.map((restriction) => (

@@ -444,7 +444,7 @@ export default function BorrowerDataRightsPortabilityWorkspacePage() {
             traceability.
           </p>
 
-          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
             This information is advisory only and is not an approval,
             guarantee, or official determination. You may request an
             accounting, export, deletion, or human review of your
@@ -554,7 +554,7 @@ export default function BorrowerDataRightsPortabilityWorkspacePage() {
                     }}
                   >
                     <strong>{shortId(id)}</strong>
-                    <span style={{ color: "#64748b", fontSize: 13 }}>
+                    <span style={{ color: "#64748b", fontSize: 14 }}>
                       Borrower {shortId(application.borrowerId)}
                     </span>
                   </button>
@@ -582,7 +582,7 @@ export default function BorrowerDataRightsPortabilityWorkspacePage() {
                     <strong>
                       Module {source.moduleNumber} / {source.label}
                     </strong>
-                    <span style={{ color: "#64748b", fontSize: 13 }}>
+                    <span style={{ color: "#64748b", fontSize: 14 }}>
                       {source.portabilityRole}
                     </span>
                   </div>
@@ -603,7 +603,7 @@ export default function BorrowerDataRightsPortabilityWorkspacePage() {
                   </div>
                 </div>
                 {source.rows.length === 0 ? (
-                  <span style={{ color: "#64748b", fontSize: 13 }}>
+                  <span style={{ color: "#64748b", fontSize: 14 }}>
                     No scoped records returned for this source.
                   </span>
                 ) : (
@@ -611,7 +611,7 @@ export default function BorrowerDataRightsPortabilityWorkspacePage() {
                     {source.rows.slice(0, 3).map((row) => (
                       <span
                         key={`${source.label}-${dataRightsTitle(row)}-${dataRightsStatus(row)}`}
-                        style={{ color: "#475569", fontSize: 13 }}
+                        style={{ color: "#475569", fontSize: 14 }}
                       >
                         {dataRightsTitle(row)} / {dataRightsStatus(row)}
                       </span>
@@ -623,7 +623,7 @@ export default function BorrowerDataRightsPortabilityWorkspacePage() {
           </section>
         </section>
 
-        <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
+        <p style={{ margin: 0, color: "#64748b", fontSize: 14 }}>
           Last refresh: {lastLoadedAt ?? "Not loaded"}
         </p>
       </div>

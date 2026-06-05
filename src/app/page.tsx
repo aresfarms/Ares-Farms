@@ -127,8 +127,8 @@ export default function HomePage() {
           }
           .fl-hero-trust-note {
             margin: 0;
-            font-size: 13px;
-            color: #7a8fa8;
+            font-size: 14px;
+            color: #5d687a;
             max-width: 560px;
             line-height: 1.6;
           }
@@ -150,6 +150,10 @@ export default function HomePage() {
             transition: background 0.15s;
           }
           .fl-cta-primary:hover { background: #0d6460; }
+          .fl-cta-primary:focus-visible {
+            outline: 3px solid #0f766e;
+            outline-offset: 3px;
+          }
 
           /* Section spacing */
           .fl-section {
@@ -208,15 +212,19 @@ export default function HomePage() {
             margin: 0;
           }
           .fl-explore-card-desc {
-            font-size: 14px;
+            font-size: 15px;
             color: #5d687a;
             line-height: 1.6;
             margin: 0;
           }
           .fl-explore-card-cta {
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 700;
             color: #0f766e;
+          }
+          .fl-explore-card:focus-visible {
+            outline: 2px solid #0f766e;
+            outline-offset: 2px;
           }
 
           /* Category grid */
@@ -241,6 +249,10 @@ export default function HomePage() {
             border-color: #0f766e;
             box-shadow: 0 2px 10px rgba(15,118,110,0.07);
           }
+          .fl-category-card:focus-visible {
+            outline: 2px solid #0f766e;
+            outline-offset: 2px;
+          }
 
           /* Trust strip */
           .fl-trust-strip {
@@ -260,8 +272,8 @@ export default function HomePage() {
             display: flex;
             align-items: baseline;
             gap: 8px;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 15px;
+            line-height: 1.6;
             color: #162033;
           }
           .fl-trust-check {
@@ -298,8 +310,8 @@ export default function HomePage() {
             border: 1px solid #f1c40f22;
             border-radius: 10px;
             background: #fffdf0;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 15px;
+            line-height: 1.6;
             color: #162033;
           }
           .fl-not-mark {
@@ -413,12 +425,12 @@ export default function HomePage() {
                 className="fl-category-card"
               >
                 <strong style={{ fontSize: 16 }}>{category.label}</strong>
-                <span style={{ ...muted, fontSize: 13 }}>{category.blurb}</span>
+                <span style={{ ...muted, fontSize: 14 }}>{category.blurb}</span>
               </Link>
             ))}
           </div>
 
-          <p style={{ ...muted, margin: 0, fontSize: 13, textAlign: "center" }}>
+          <p style={{ ...muted, margin: 0, fontSize: 14, textAlign: "center" }}>
             Choose a starting point — or just begin exploring. You can change
             direction any time. No account or personal information is needed
             to look around.
@@ -491,7 +503,7 @@ export default function HomePage() {
                 </span>
               ))}
             </div>
-            <p style={{ ...muted, margin: 0, fontSize: 13 }}>
+            <p style={{ ...muted, margin: 0, fontSize: 14 }}>
               Furlong is a discovery and exploration platform. We help you understand
               your options — the decisions and determinations always belong to you
               and to qualified professionals.

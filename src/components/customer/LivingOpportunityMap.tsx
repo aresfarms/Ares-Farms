@@ -462,6 +462,10 @@ export function LivingOpportunityMap({
           .furlong-pulse-ring { animation: none; opacity: 0; }
           .furlong-flow       { animation: none; }
         }
+        .fl-story-btn:focus-visible {
+          outline: 2px solid #0f766e;
+          outline-offset: 2px;
+        }
       `}</style>
 
       {/* Header row */}
@@ -469,7 +473,7 @@ export function LivingOpportunityMap({
         <strong style={{ fontSize: 14, letterSpacing: 0.4, textTransform: "uppercase" }}>
           {FEATURED_EXPLORATION_LABEL}
         </strong>
-        <span style={{ fontSize: 12, color: "#5d687a" }}>
+        <span style={{ fontSize: 14, color: "#5d687a" }}>
           {FEATURED_EXPLORATION_ILLUSTRATIVE_NOTE}
         </span>
       </div>
@@ -505,11 +509,11 @@ export function LivingOpportunityMap({
           background: "rgba(248,251,255,0.93)",
           border: "1px solid #cdd9ec",
           borderRadius: 8,
-          padding: "5px 13px",
-          fontSize: 11,
+          padding: "6px 13px",
+          fontSize: 12,
           fontWeight: 700,
           color: "#35507a",
-          letterSpacing: 0.6,
+          letterSpacing: 0.5,
           textTransform: "uppercase",
           opacity: nationalLabelVisible ? 1 : 0,
           transition: "opacity 0.5s",
@@ -526,7 +530,7 @@ export function LivingOpportunityMap({
           border: "1px solid #cdd9ec",
           borderRadius: 8,
           padding: "4px 10px",
-          fontSize: 10,
+          fontSize: 12,
           fontWeight: 700,
           color: "#35507a",
           letterSpacing: 0.5,
@@ -549,14 +553,15 @@ export function LivingOpportunityMap({
           const isActive = i === active;
           return (
             <button key={`sel-${s.stateAbbr}`} type="button"
+              className="fl-story-btn"
               onClick={() => select(i)}
               aria-pressed={isActive}
               style={{
-                minHeight: 36, padding: "0 12px", borderRadius: 999,
+                minHeight: 40, padding: "0 14px", borderRadius: 999,
                 border: isActive ? `1px solid ${s.color}` : "1px solid #cdd9ec",
                 background: isActive ? "#ffffff" : "transparent",
                 color: isActive ? "#162033" : "#5d687a",
-                fontWeight: 700, fontSize: 13, cursor: "pointer",
+                fontWeight: 700, fontSize: 14, cursor: "pointer",
               }}
             >
               {s.state}
@@ -565,7 +570,7 @@ export function LivingOpportunityMap({
         })}
       </div>
 
-      <p style={{ margin: 0, fontSize: 12, color: "#5d687a", lineHeight: 1.5 }}>
+      <p style={{ margin: 0, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
         Featured explorations are illustrative examples only. No geolocation,
         no exact addresses, and no personalized location tracking are used.
         The map reveals opportunities, not the visitor. We show pathways, not promises.
@@ -807,7 +812,7 @@ function AbstractOpportunityNetwork({ story, reduceMotion }: { story: FeaturedSt
       <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center", pointerEvents: "none" }}>
         <span style={{ display: "inline-block", background: "rgba(248,251,255,0.92)",
           border: "1px solid #cdd9ec", borderRadius: 8, padding: "4px 12px",
-          fontSize: 11, color: "#5d687a" }}>
+          fontSize: 13, color: "#5d687a" }}>
           Opportunity Network — Map asset temporarily unavailable.
         </span>
       </div>
@@ -839,29 +844,29 @@ function StoryCard({ story, phase }: { story: FeaturedStory; phase: SequencePhas
       {/* Left: story detail */}
       <div style={{ display: "grid", gap: 10 }}>
         <div style={{ display: "inline-flex", alignSelf: "start",
-          padding: "4px 10px", borderRadius: 999,
+          padding: "5px 12px", borderRadius: 999,
           background: badge.bg, color: badge.color,
-          fontSize: 12, fontWeight: 800 }}>
+          fontSize: 13, fontWeight: 700 }}>
           {badge.label}
         </div>
 
-        <div aria-live="polite" style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 12, color: "#5d687a" }}>Featured region</span>
-          <strong style={{ fontSize: 18 }}>{story.state} · {story.county}</strong>
+        <div aria-live="polite" aria-atomic="true" style={{ display: "grid", gap: 6 }}>
+          <span style={{ fontSize: 13, color: "#5d687a", fontWeight: 600 }}>Featured region</span>
+          <strong style={{ fontSize: 20, lineHeight: 1.3 }}>{story.state} · {story.county}</strong>
           {story.period && (
-            <span style={{ fontSize: 12, color: badge.color, fontWeight: 700, letterSpacing: 0.3 }}>
+            <span style={{ fontSize: 14, color: "#5d687a", fontWeight: 600, letterSpacing: 0.2 }}>
               {story.period}
             </span>
           )}
         </div>
 
-        <p style={{ margin: 0, lineHeight: 1.6, color: "#1f2a3d", fontSize: 14 }}>
+        <p style={{ margin: 0, lineHeight: 1.65, color: "#1f2a3d", fontSize: 16 }}>
           {story.story}
         </p>
 
         {story.historicalContext && (
-          <p style={{ margin: 0, lineHeight: 1.6, color: "#5d687a", fontSize: 12,
-            fontStyle: "italic", borderLeft: `2px solid ${badge.color}33`, paddingLeft: 10 }}>
+          <p style={{ margin: 0, lineHeight: 1.65, color: "#5d687a", fontSize: 14,
+            fontStyle: "italic", borderLeft: "2px solid #b9c8d9", paddingLeft: 10 }}>
             {story.historicalContext}
           </p>
         )}
@@ -870,35 +875,38 @@ function StoryCard({ story, phase }: { story: FeaturedStory; phase: SequencePhas
       {/* Right: pathway + nodes */}
       <div style={{ display: "grid", gap: 10 }}>
         <div style={{ display: "inline-flex", alignSelf: "start",
-          padding: "3px 10px", borderRadius: 999,
-          background: "#eef3fb", color: story.color,
-          fontSize: 12, fontWeight: 700 }}>
+          padding: "4px 12px", borderRadius: 999,
+          background: "#eef3fb", color: "#35507a",
+          fontSize: 13, fontWeight: 700 }}>
           {story.opportunity}
         </div>
 
-        <p style={{ margin: 0, fontSize: 13, color: "#475569", lineHeight: 1.6 }}>
-          Exploration path: {story.pathway}
+        <p style={{ margin: 0, fontSize: 15, color: "#3d4f63", lineHeight: 1.65 }}>
+          <span style={{ fontWeight: 600 }}>Exploration path:</span> {story.pathway}
         </p>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {story.connectedNodes.map((node, index) => (
             <span key={`chip-${story.state}-${node.type}`}
-              style={{ fontSize: 12, color: "#475569" }}>
+              style={{ fontSize: 14, color: "#3d4f63" }}>
               {node.type}{index < story.connectedNodes.length - 1 ? " →" : ""}
             </span>
           ))}
         </div>
 
         {/* Phase indicator */}
-        <div style={{ display: "flex", gap: 6, alignItems: "center", marginTop: 4 }}>
-          {(["national", "zooming-in", "state-focus", "zooming-out"] as SequencePhase[]).map((p, i) => (
+        <div
+          style={{ display: "flex", gap: 6, alignItems: "center", marginTop: 4 }}
+          aria-label={`Map sequence: ${phase === "national" ? "full U.S. view" : phase === "zooming-in" ? "zooming to " + story.state : phase === "state-focus" ? story.state + " focus" : "returning to full map"}`}
+        >
+          {(["national", "zooming-in", "state-focus", "zooming-out"] as SequencePhase[]).map((p) => (
             <div key={p} style={{
-              width: 6, height: 6, borderRadius: "50%",
+              width: 7, height: 7, borderRadius: "50%",
               background: phase === p ? story.color : "#d7deea",
               transition: "background 0.3s",
             }} aria-hidden />
           ))}
-          <span style={{ fontSize: 11, color: "#9db4d8" }}>
+          <span style={{ fontSize: 13, color: "#5d687a", fontWeight: 500 }}>
             {phase === "national" ? "Full map" : phase === "zooming-in" ? "Zooming in…" : phase === "state-focus" ? story.stateAbbr : "Returning…"}
           </span>
         </div>

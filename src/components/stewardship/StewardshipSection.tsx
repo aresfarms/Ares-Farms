@@ -51,11 +51,11 @@ export function StewardshipSection() {
               textDecoration: "none",
             }}
           >
-            <strong style={{ fontSize: 15 }}>{domain.domainName}</strong>
-            <span style={{ ...muted, fontSize: 13 }}>
+            <strong style={{ fontSize: 16 }}>{domain.domainName}</strong>
+            <span style={{ ...muted, fontSize: 14 }}>
               Current Steward: {domain.currentSteward}
             </span>
-            <span style={{ color: "#0f766e", fontSize: 13 }}>
+            <span style={{ color: "#0f766e", fontSize: 14 }}>
               See what this steward helps illuminate →
             </span>
           </Link>
@@ -66,7 +66,7 @@ export function StewardshipSection() {
         href="/stewardship"
         style={{
           color: "#0f766e",
-          fontSize: 13,
+          fontSize: 14,
           fontWeight: 600,
           textDecoration: "none",
         }}

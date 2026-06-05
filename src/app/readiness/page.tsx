@@ -339,7 +339,7 @@ export default function ReadinessAssessmentPage() {
           <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
             Documents we recommend you prepare. Each carries a &ldquo;why this matters&rdquo; sentence.
           </p>
-          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
             This information is advisory only and is not an approval,
             guarantee, or official determination. No legal, regulatory,
             or official reliance may be placed on this information. You
@@ -402,7 +402,7 @@ export default function ReadinessAssessmentPage() {
             }}
           >
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#334155" }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
                 Borrower ID
               </span>
               <input
@@ -419,7 +419,7 @@ export default function ReadinessAssessmentPage() {
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#334155" }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
                 Application ID
               </span>
               <input
@@ -437,7 +437,7 @@ export default function ReadinessAssessmentPage() {
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#334155" }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
                 Documents requested
               </span>
               <input
@@ -456,7 +456,7 @@ export default function ReadinessAssessmentPage() {
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#334155" }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
                 Documents received
               </span>
               <input
@@ -475,7 +475,7 @@ export default function ReadinessAssessmentPage() {
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#334155" }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
                 Documents pending review
               </span>
               <input
@@ -494,7 +494,7 @@ export default function ReadinessAssessmentPage() {
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#334155" }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
                 Discovery advisory views
               </span>
               <input

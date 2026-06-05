@@ -106,7 +106,7 @@ export default async function OnboardingPage({
                 <li key={question}>{question}</li>
               ))}
             </ol>
-            <p style={{ ...mutedText, margin: 0, fontSize: 13 }}>
+            <p style={{ ...mutedText, margin: 0, fontSize: 14 }}>
               This information is advisory only and is not an approval,
               guarantee, or official determination. You may exercise your data
               rights at any time: request an accounting, export, deletion, or

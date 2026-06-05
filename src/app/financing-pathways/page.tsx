@@ -90,8 +90,8 @@ function FieldLabel(props: { children: string }) {
         display: "block",
         marginBottom: 6,
         color: "#334155",
-        fontSize: 13,
-        fontWeight: 800,
+        fontSize: 14,
+        fontWeight: 700,
       }}
     >
       {props.children}
@@ -302,7 +302,7 @@ export default function FinancingPathwaysPage() {
             <li>not enough information</li>
           </ul>
 
-          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
             This information is advisory only and is not an approval,
             guarantee, or official determination. No legal, regulatory,
             or official reliance may be placed on this information.
@@ -335,8 +335,8 @@ export default function FinancingPathwaysPage() {
               <span
                 style={{
                   color: "#456077",
-                  fontSize: 13,
-                  fontWeight: 800,
+                  fontSize: 14,
+                  fontWeight: 700,
                   textTransform: "uppercase",
                 }}
               >

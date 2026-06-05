@@ -34,11 +34,16 @@ export function PublicSiteHeader() {
       <style>{`
         .ps-nav-link {
           color: #162033;
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 600;
           text-decoration: none;
         }
         .ps-nav-link:hover { color: #0f766e; }
+        .ps-nav-link:focus-visible {
+          outline: 2px solid #0f766e;
+          outline-offset: 3px;
+          border-radius: 3px;
+        }
 
         /* Stewardship hover dropdown */
         .ps-stw { position: relative; }
@@ -47,11 +52,16 @@ export function PublicSiteHeader() {
           align-items: center;
           gap: 4px;
           color: #162033;
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 600;
           text-decoration: none;
         }
         .ps-stw-toggle:hover { color: #0f766e; }
+        .ps-stw-toggle:focus-visible {
+          outline: 2px solid #0f766e;
+          outline-offset: 3px;
+          border-radius: 3px;
+        }
         .ps-stw-caret { font-size: 10px; opacity: 0.55; }
         .ps-stw-menu {
           display: none;
@@ -73,10 +83,10 @@ export function PublicSiteHeader() {
         }
         .ps-stw-menu a {
           display: block;
-          padding: 9px 14px;
+          padding: 10px 14px;
           border-radius: 7px;
           color: #162033;
-          font-size: 13px;
+          font-size: 14px;
           font-weight: 500;
           text-decoration: none;
           white-space: nowrap;
@@ -84,6 +94,11 @@ export function PublicSiteHeader() {
         .ps-stw-menu a:hover {
           background: #f0fbf9;
           color: #0f766e;
+        }
+        .ps-stw-menu a:focus-visible {
+          outline: 2px solid #0f766e;
+          outline-offset: -2px;
+          border-radius: 5px;
         }
       `}</style>
       <nav

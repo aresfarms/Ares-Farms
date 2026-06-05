@@ -23,17 +23,25 @@ export function StewardshipTabBar({
         marginBottom: 32,
       }}
     >
+      <style>{`
+        .stw-tab:focus-visible {
+          outline: 2px solid #0f766e;
+          outline-offset: -2px;
+          border-radius: 4px 4px 0 0;
+        }
+      `}</style>
       {STEWARDSHIP_DOMAINS.map((d) => {
         const active = d.domainId === currentDomainId;
         return (
           <Link
             key={d.domainId}
             href={d.profileRoute}
+            className="stw-tab"
             aria-current={active ? "page" : undefined}
             style={{
               display: "inline-block",
               padding: "10px 18px",
-              fontSize: 14,
+              fontSize: 15,
               fontWeight: active ? 700 : 500,
               color: active ? "#0f766e" : "#5d687a",
               textDecoration: "none",

@@ -80,13 +80,13 @@ export default function StewardshipIndexPage() {
                 }}
               >
                 <strong style={{ fontSize: 17 }}>{domain.domainName}</strong>
-                <span style={{ ...muted, fontSize: 13 }}>
+                <span style={{ ...muted, fontSize: 14 }}>
                   Current Steward: {domain.currentSteward}
                 </span>
-                <span style={{ ...muted, fontSize: 13 }}>
+                <span style={{ ...muted, fontSize: 14 }}>
                   {domain.description}
                 </span>
-                <span style={{ color: "#0f766e", fontSize: 13, fontWeight: 600 }}>
+                <span style={{ color: "#0f766e", fontSize: 14, fontWeight: 600 }}>
                   Explore this domain →
                 </span>
               </Link>

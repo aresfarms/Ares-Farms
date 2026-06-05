@@ -140,7 +140,7 @@ export default function AboutFurlongPage() {
             — before significant time, money, or effort are committed.
           </p>
 
-          <p style={{ marginTop: 20, fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
             This information is advisory only and is not an approval,
             guarantee, or official determination. No legal, regulatory, or
             official reliance may be placed on this information. Furlong
@@ -162,8 +162,8 @@ export default function AboutFurlongPage() {
           <span
             style={{
               color: "#456077",
-              fontSize: 13,
-              fontWeight: 800,
+              fontSize: 14,
+              fontWeight: 700,
               textTransform: "uppercase",
             }}
           >
@@ -292,7 +292,7 @@ export default function AboutFurlongPage() {
                 }}
               >
                 <strong style={{ fontSize: 15 }}>{item.label}</strong>
-                <p style={{ ...mutedText, margin: 0, fontSize: 13 }}>
+                <p style={{ ...mutedText, margin: 0, fontSize: 14 }}>
                   {item.description}
                 </p>
               </article>

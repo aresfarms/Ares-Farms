@@ -319,10 +319,10 @@ function animateVB(
 // ── Sequence constants ────────────────────────────────────────────────────────
 
 const SEQ = {
-  national:    2200,  // full US + America 250 era overlay
-  zoomIn:       750,  // transition to state
-  stateFocus:  3500,  // state fills map + pathway animation
-  zoomOut:      750,  // return to national
+  national:    2400,  // full US + America 250 era overlay
+  zoomIn:       800,  // transition to state
+  stateFocus:  6000,  // state fills map + pathway animation — hold longer for reading
+  zoomOut:      800,  // return to national
 } as const;
 
 type SequencePhase = "national" | "zooming-in" | "state-focus" | "zooming-out";
@@ -480,12 +480,12 @@ export function LivingOpportunityMap({
       aria-label={series.label}
       style={{
         border: "1px solid #cdd9ec",
-        borderRadius: 16,
+        borderRadius: 14,
         background: "linear-gradient(160deg, #f3f7fd 0%, #e7eef9 100%)",
         color: "#162033",
-        padding: 20,
+        padding: 14,
         display: "grid",
-        gap: 16,
+        gap: 12,
       }}
     >
       <style>{`

@@ -100,7 +100,7 @@ export default function HomePage() {
 
           /* ── Hero ──────────────────────────────────────────────────── */
           .fl-hero {
-            padding: 80px 0 36px;
+            padding: 60px 0 20px;
             display: grid;
             gap: 0;
           }
@@ -150,33 +150,35 @@ export default function HomePage() {
 
           /* ── Map section ───────────────────────────────────────────── */
           .fl-map-section {
-            margin-top: 24px;
+            margin-top: 16px;
           }
 
-          /* ── America 250 label ─────────────────────────────────────── */
+          /* ── America 250 label — navy/gold treatment ───────────────── */
           .fl-a250-label {
             display: flex;
-            align-items: baseline;
-            gap: 10px;
+            align-items: center;
+            gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
           }
           .fl-a250-badge {
             display: inline-flex;
             align-items: center;
-            padding: 3px 10px;
+            padding: 4px 12px;
             border-radius: 999px;
-            background: #eef1f7;
-            color: #2d4270;
+            background: #162033;
+            color: #c9a84c;
             font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 0.03em;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
             white-space: nowrap;
           }
           .fl-a250-copy {
             font-size: 14px;
-            color: #5d687a;
+            font-weight: 600;
+            color: #162033;
             line-height: 1.55;
           }
 
@@ -338,14 +340,14 @@ export default function HomePage() {
         <section className="fl-hero" aria-label="Furlong discovery">
           <header className="fl-hero-copy">
             <h1>
-              Furlong helps you discover things you didn&rsquo;t know were possible.
+              Start your journey with Furlong.
             </h1>
             <p className="fl-hero-sub">
-              Discover your possibilities. Explore your options.
+              Discover possibilities. Explore your options.
               Understand your next steps. Make informed decisions.
             </p>
             <a href="#explore" className="fl-cta-primary">
-              Explore your possibilities →
+              Explore your possibilities
             </a>
           </header>
         </section>

@@ -129,6 +129,11 @@ export function PublicSiteHeader() {
             Explore
           </Link>
 
+          {/* Furlong Story → /about/furlong-story */}
+          <Link href="/about/furlong-story" className="ps-nav-link">
+            Furlong Story
+          </Link>
+
           {/* Stewardship with hover dropdown */}
           <div className="ps-stw">
             <Link href="/stewardship" className="ps-stw-toggle">

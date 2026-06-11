@@ -1,5 +1,8 @@
+import Link from "next/link";
+
 import { America250Banner } from "@/components/brand/America250Banner";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
+import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
 import { isoWeekSeed } from "@/lib/public-content/weekSeed";
 import { Disclosures } from "@/components/public/Disclosures";
@@ -357,6 +360,17 @@ export default async function HomePage({
               {HOMEPAGE_HERO.subhead}
             </p>
             <p className="fl-hero-trust">{HOMEPAGE_HERO.trustTag}</p>
+            {discoveryPrimary() && (
+              <div style={{ display: "grid", gap: 8, justifyItems: "center", marginTop: 6 }}>
+                <Link href={DISCOVERY_HREF} data-testid="home-discovery-cta"
+                  style={{ fontSize: 15, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "13px 30px", textDecoration: "none" }}>
+                  What are your possibilities? →
+                </Link>
+                <span style={{ fontSize: 12, color: "#9aa6b6" }}>
+                  Anonymous · no account · we help you understand your options, we don't sell you anything.
+                </span>
+              </div>
+            )}
           </header>
         </section>
 

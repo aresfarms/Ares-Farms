@@ -1,175 +1,164 @@
-import { PortableSurfaceIndexPage } from "@/app/portal/verticalSurfacePage";
+import type { Metadata } from "next";
+import Link from "next/link";
 
-/*
-  Public Alpha Surface Content — Route 7 (Human Escalation)
-  Source: docs/PUBLIC_ALPHA_SURFACE_CONTENT.md §Route 7
-  Renders the four-stage escalation, the five reviewer roles
-  (sourced from Vol VII Operational Annex + Module 45), and
-  next-step guidance — visible-on-render.
-*/
+import { Disclosures } from "@/components/public/Disclosures";
 
-const panelStyle = {
-  background: "#ffffff",
-  border: "1px solid #d7deea",
-  borderRadius: 12,
-  padding: 28,
-  marginBottom: 16,
+/**
+ * /portal/borrower — Borrower Portal (Build 53)
+ *
+ * Public placeholder. Borrower Portal is pending Alpha activation.
+ * Internal module list removed. Clean public surface only.
+ * Per Build 53 public surface remediation.
+ *
+ * Required content tokens (Customer Journey §6):
+ *   - four-stage escalation: Exploration, Human Review, Lender Engagement, Application Submission
+ *   - five reviewer roles (Borrower Intake Reviewer, Document Verification Reviewer,
+ *     Qualified Governance Reviewer, Data Rights Officer, Chief Governance Authority)
+ *   - next-step guidance
+ *
+ * Governance:
+ *   - No approval, eligibility, or official-determination language.
+ *   - Public Alpha remains PENDING.
+ *   - "The map reveals opportunities, not the visitor."
+ */
+
+export const metadata: Metadata = {
+  title:       "Borrower Portal | Furlong",
+  description: "The Furlong Borrower Portal is pending Alpha activation. Explore the map while you wait.",
+};
+
+const container = {
+  maxWidth: 720,
+  margin:   "0 auto",
+  padding:  "48px 24px 80px",
+  display:  "grid",
+  gap:      24,
+} as const;
+
+const whitePanel = {
+  background:   "#ffffff",
+  border:       "1px solid #d7deea",
+  borderRadius: 14,
+  padding:      "24px 28px",
+  display:      "grid",
+  gap:          12,
+} as const;
+
+const muted = {
+  color:      "#5d687a",
+  lineHeight: 1.65,
 } as const;
 
 export default function BorrowerPortalPage() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        background: "#f6f8fb",
-        color: "#162033",
-        fontFamily:
-          'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1180,
-          margin: "0 auto",
-          padding: 24,
-          display: "grid",
-          gap: 18,
-        }}
-      >
-        <section aria-label="Public Alpha human escalation" style={panelStyle}>
-          <h1
-            style={{
-              fontSize: 24,
-              fontWeight: 800,
-              margin: 0,
-              color: "#162033",
-            }}
-          >
-            Human escalation
+    <main>
+      <div style={container}>
+
+        {/* ── Header ──────────────────────────────────────────────────────── */}
+        <header style={{ display: "grid", gap: 10 }}>
+          <h1 style={{ margin: 0, fontSize: 34, fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.12, color: "#162033" }}>
+            Borrower Portal
           </h1>
-
-          <h2
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              marginTop: 20,
-              color: "#162033",
-            }}
-          >
-            You decide when your information moves stages
-          </h2>
-          <p
-            style={{
-              marginTop: 8,
-              fontSize: 14,
-              color: "#162033",
-              lineHeight: 1.7,
-            }}
-          >
-            Users decide when information moves from:
-            <br />
-            <strong>Exploration</strong> &nbsp;→&nbsp;{" "}
-            <strong>Human Review</strong> &nbsp;→&nbsp;{" "}
-            <strong>Lender Engagement</strong> &nbsp;→&nbsp;{" "}
-            <strong>Application Submission</strong>.
-            <br />
-            Furlong may recommend escalation but will not silently
-            perform escalation.
+          <p style={{ margin: 0, fontSize: 18, ...muted }}>
+            Borrower Portal is pending Alpha activation.
           </p>
+        </header>
 
-          <h2
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              marginTop: 20,
-              color: "#162033",
-            }}
-          >
-            Available human review paths
-          </h2>
-          <p
-            style={{
-              marginTop: 8,
-              fontSize: 14,
-              color: "#162033",
-              lineHeight: 1.6,
-            }}
-          >
-            Each escalation lands on a named, credentialed human reviewer
-            (human review). Names are recorded in the Vol VII Operational
-            Annex and surfaced on request via REQUEST_HUMAN_REVIEW.
+        {/* ── Pending message ──────────────────────────────────────────────── */}
+        <section style={whitePanel} aria-label="Portal pending activation">
+          <p style={{ margin: 0, fontSize: 16, ...muted }}>
+            When available, the Borrower Portal is where your exploration
+            continues — reviewing pathways, understanding readiness, and
+            choosing whether to take the next step. Until then, you can explore
+            the full map of possibilities without an account.
           </p>
-          <ul
+          <Link
+            href="/onboarding"
             style={{
-              marginTop: 8,
-              marginBottom: 0,
-              paddingLeft: 22,
-              color: "#162033",
-              lineHeight: 1.7,
+              display:        "inline-flex",
+              justifyContent: "center",
+              alignItems:     "center",
+              minHeight:      48,
+              padding:        "0 22px",
+              borderRadius:   999,
+              background:     "#0f766e",
+              color:          "#ffffff",
+              fontWeight:     800,
+              textDecoration: "none",
+              fontSize:       16,
             }}
           >
-            <li>
-              <strong>Borrower intake</strong> — Borrower Intake Reviewer.
-            </li>
-            <li>
-              <strong>Document review</strong> — Document Verification Reviewer.
-            </li>
-            <li>
-              <strong>Independent governance review</strong> — Qualified Governance Reviewer.
-            </li>
-            <li>
-              <strong>Data-rights fulfillment</strong> — Data Rights Officer.
-            </li>
-            <li>
-              <strong>Final authority decisions</strong> — Chief Governance Authority.
-            </li>
-          </ul>
+            Explore Your Possibilities →
+          </Link>
+        </section>
 
-          <h2
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              marginTop: 20,
-              color: "#162033",
-            }}
-          >
-            Next step
+        {/* ── How the process works ────────────────────────────────────────── */}
+        {/* Required: four-stage escalation (Exploration, Human Review,
+            Lender Engagement, Application Submission) per CJ §6 */}
+        <section style={whitePanel} aria-label="How the process works">
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#162033" }}>
+            How the process works — when you're ready
           </h2>
-          <p
-            style={{
-              marginTop: 8,
-              fontSize: 14,
-              color: "#162033",
-              lineHeight: 1.7,
-            }}
-          >
-            Whatever you do next is your decision. We will tell you what
-            we recommend, what the trade-offs are, and what the next
-            stage requires.
+          <p style={{ margin: 0, fontSize: 15, ...muted }}>
+            You decide when your information moves between stages. Furlong will never
+            silently advance your information.
           </p>
-
-          <p
-            style={{
-              marginTop: 20,
-              fontSize: 13,
-              color: "#5d687a",
-              lineHeight: 1.6,
-            }}
-          >
-            This information is advisory only and is not an approval,
-            guarantee, or official determination. Furlong does not lend,
-            does not commit funds, and does not decide credit,
-            eligibility, or approval. AI does not decide, does not
-            approve, does not determine, and does not underwrite — every
-            decision is reviewed by a human reviewer (human review).
+          <ol style={{ margin: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.8, display: "grid", gap: 4 }}>
+            <li><strong>Exploration</strong> — Browse the map. No account. No personal information required.</li>
+            <li><strong>Human Review</strong> — When you choose, a named human reviewer looks at your readiness before anything moves forward.</li>
+            <li><strong>Lender Engagement</strong> — Only with your permission does any information reach a lender.</li>
+            <li><strong>Application Submission</strong> — You decide if and when to proceed with a formal application.</li>
+          </ol>
+          <p style={{ margin: 0, fontSize: 14, ...muted }}>
+            Whatever you do next is your decision. We will tell you what we recommend,
+            what the trade-offs are, and what the next stage requires.
           </p>
         </section>
 
-        <PortableSurfaceIndexPage
-          audience="borrower"
-          title="Borrower Portal"
-          subtitle="Borrower application, document, notice, report, and data-rights surfaces using the same Master Volume governed language."
-        />
+        {/* ── Available review paths ───────────────────────────────────────── */}
+        {/* Required: five reviewer roles per CJ §6 + Vol VII Operational Annex */}
+        <section style={whitePanel} aria-label="Available review paths">
+          <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#162033" }}>
+            Available review paths
+          </h2>
+          <p style={{ margin: 0, fontSize: 15, ...muted }}>
+            Every review that affects you lands on a named, credentialed human.
+          </p>
+          <ul style={{ margin: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.8, display: "grid", gap: 4 }}>
+            <li><strong>Borrower intake review</strong> — Borrower Intake Reviewer</li>
+            <li><strong>Document review</strong> — Document Verification Reviewer</li>
+            <li><strong>Independent governance review</strong> — Qualified Governance Reviewer</li>
+            <li><strong>Data-rights fulfillment</strong> — Data Rights Officer</li>
+            <li><strong>Final authority decisions</strong> — Chief Governance Authority</li>
+          </ul>
+        </section>
+
+        {/* ── Advisory disclosure ──────────────────────────────────────────── */}
+        <section
+          style={{
+            background:   "#f8fafc",
+            border:       "1px solid #d7deea",
+            borderRadius: 14,
+            padding:      "20px 24px",
+            display:      "grid",
+            gap:          8,
+          }}
+          aria-label="Advisory disclosure"
+        >
+          {/* Canonical disclosures — single source of truth (see Disclosures.tsx). */}
+          <Disclosures variant="full" />
+        </section>
+
+        {/* Page-level footer: contextual CTA only. Site nav is in the layout header/footer. */}
+        <div style={{ paddingTop: 8 }}>
+          <Link
+            href="/onboarding"
+            style={{ color: "#0f766e", fontSize: 14, fontWeight: 700, textDecoration: "none" }}
+          >
+            Explore Your Possibilities →
+          </Link>
+        </div>
+
       </div>
     </main>
   );

@@ -92,7 +92,23 @@ function safeExec(command: string, fallback: string): string {
 
 function readSurfaceText(absolutePath: string): string | null {
   try {
-    return readFileSync(absolutePath, "utf-8");
+    let text = readFileSync(absolutePath, "utf-8");
+    // Single-source-of-truth support: a page that renders <Disclosures> or
+    // references SHARED_ADVISORY_DISCLOSURE carries those canonical tokens via
+    // the shared module. Resolve that module's source so its tokens count as
+    // present on the page (the page no longer hand-writes the sentences).
+    const root = process.cwd();
+    if (text.includes("<Disclosures")) {
+      try {
+        text += "\n" + readFileSync(path.join(root, "src/components/public/Disclosures.tsx"), "utf-8");
+      } catch { /* component optional */ }
+    }
+    if (text.includes("SHARED_ADVISORY_DISCLOSURE")) {
+      try {
+        text += "\n" + readFileSync(path.join(root, "src/lib/public-content/publicCopyRegistry.ts"), "utf-8");
+      } catch { /* registry optional */ }
+    }
+    return text;
   } catch {
     return null;
   }

@@ -1,0 +1,210 @@
+/**
+ * usdaPublicSafeGenerated — GENERATED FILE. Do not edit by hand.
+ *
+ * CLIENT-SAFE: public-safe projection only (state/county/town, type, bands,
+ * "why it may fit," citation, vintage). Contains NO exact address and NO
+ * lat/long, so it is safe to bundle into the client (homepage map "Possible"
+ * card). Written by src/scripts/ingestUsdaResale.ts.
+ *
+ * Ingested at: 2026-06-10T23:40:26.673Z
+ */
+
+import type { PublicSafeProperty } from "./propertyTypes";
+
+export const USDA_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
+  "AZ": {
+    "id": "usda-9080197194",
+    "sourceId": "usda",
+    "state": "AZ",
+    "county": "Mohave",
+    "town": "Fredonia",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "$100k–$250k",
+    "whyMayFit": "USDA Rural Development resale property in Mohave County, AZ — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-08-24",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  },
+  "CA": {
+    "id": "usda-9003045663",
+    "sourceId": "usda",
+    "state": "CA",
+    "county": "Riverside",
+    "town": "Blythe",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Riverside County, CA — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2015-06-18",
+    "isCurrent": false,
+    "vintageStamp": "2015 record · historical snapshot"
+  },
+  "FL": {
+    "id": "usda-9001997289",
+    "sourceId": "usda",
+    "state": "FL",
+    "county": "Escambia",
+    "town": "Walnut Hill",
+    "propertyType": "home",
+    "acreageBand": "Under 1 acre",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Escambia County, FL — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2017-09-26",
+    "isCurrent": false,
+    "vintageStamp": "2017 record · historical snapshot"
+  },
+  "HI": {
+    "id": "usda-1870080760000",
+    "sourceId": "usda",
+    "state": "HI",
+    "county": "Honolulu",
+    "town": "Waianae",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "$500k+",
+    "whyMayFit": "USDA Rural Development resale property in Honolulu County, HI — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2017-06-16",
+    "isCurrent": false,
+    "vintageStamp": "2017 record · historical snapshot"
+  },
+  "ID": {
+    "id": "usda-9037752171",
+    "sourceId": "usda",
+    "state": "ID",
+    "county": "Elmore",
+    "town": "Glenns Ferry",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Elmore County, ID — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-03-20",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  },
+  "IN": {
+    "id": "usda-9030108256",
+    "sourceId": "usda",
+    "state": "IN",
+    "county": "Scott",
+    "town": "Austin",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Scott County, IN — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2014-10-16",
+    "isCurrent": false,
+    "vintageStamp": "2014 record · historical snapshot"
+  },
+  "KS": {
+    "id": "usda-9037620452",
+    "sourceId": "usda",
+    "state": "KS",
+    "county": "Sherman",
+    "town": "Goodland",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Sherman County, KS — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-07-05",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  },
+  "MO": {
+    "id": "usda-9040508192",
+    "sourceId": "usda",
+    "state": "MO",
+    "county": "St. Francois",
+    "town": "Desloge",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in St. Francois County, MO — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-02-12",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  },
+  "MT": {
+    "id": "usda-9080233867",
+    "sourceId": "usda",
+    "state": "MT",
+    "county": "Hill",
+    "town": "Havre",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Price on request",
+    "whyMayFit": "USDA Rural Development resale property in Hill County, MT — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-04-09",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  },
+  "NV": {
+    "id": "usda-009002001",
+    "sourceId": "usda",
+    "state": "NV",
+    "county": "Elko",
+    "town": "Jackpot",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Elko County, NV — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2017-05-19",
+    "isCurrent": false,
+    "vintageStamp": "2017 record · historical snapshot"
+  },
+  "OR": {
+    "id": "usda-9037370634",
+    "sourceId": "usda",
+    "state": "OR",
+    "county": "Jackson",
+    "town": "Eagle Point",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "$100k–$250k",
+    "whyMayFit": "USDA Rural Development resale property in Jackson County, OR — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-05-30",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  },
+  "PR": {
+    "id": "usda-9007204086",
+    "sourceId": "usda",
+    "state": "PR",
+    "county": "Caguas",
+    "town": "Humacao",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Caguas County, PR — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-07-24",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  },
+  "UT": {
+    "id": "usda-9032954369",
+    "sourceId": "usda",
+    "state": "UT",
+    "county": "Sevier",
+    "town": "Sigurd",
+    "propertyType": "home",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "USDA Rural Development resale property in Sevier County, UT — a historical example; providers can help you explore financing.",
+    "sourceCitation": "Source: USDA Rural Development / FSA",
+    "asOf": "2018-08-21",
+    "isCurrent": false,
+    "vintageStamp": "2018 record · historical snapshot"
+  }
+};

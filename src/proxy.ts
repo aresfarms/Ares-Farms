@@ -2,6 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
+import { isProtectedPage } from "@/lib/auth/protectedRoutes";
 import {
   ClaimedActorContext,
   apiAuthEnforcementRequired,
@@ -17,13 +18,34 @@ import {
 } from "@/lib/security/apiSecurityPolicy";
 
 /**
- * API Security Perimeter Proxy
+ * Security Perimeter Proxy — the Next 16 server-side middleware.
+ *
+ * In Next.js 16 the "middleware" file convention was renamed to "proxy": this
+ * file (src/proxy.ts, exporting `proxy` + `config`) IS the request middleware,
+ * loaded automatically and run on the server before any page renders or any
+ * route handler executes. (Do not also add src/middleware.ts — Next refuses to
+ * start with both.)
+ *
+ * Two responsibilities (Build 57 — security launch blocker):
+ *   1. API perimeter (pre-existing): every /api/* route is deny-by-default with
+ *      a narrow public allowlist (NextAuth, Stripe webhook, /api/public, and the
+ *      few public-surface discovery endpoints). Anonymous ⇒ 401. Caller-claimed
+ *      role/actor/tenant must not conflict with the session. This protects the
+ *      DATA layer, not just the UI.
+ *   2. Page perimeter (added): internal/operator/portal PAGES require an
+ *      authenticated session. Anonymous ⇒ redirect to the operator sign-in; the
+ *      console and its data are never rendered. The nav-leak fix hid the door;
+ *      this locks it.
+ *
+ * What counts as "internal" is the single source of truth in
+ * src/lib/auth/protectedRoutes.ts (shared with PlatformChrome and the
+ * verify:internal-auth gate). Public pages fall straight through.
  *
  * Master Volume Governance:
- * - Vol I: Requires accountable identity authority before protected backend use.
+ * - Vol I: Requires accountable identity authority before protected surface use.
  * - Vol II: Prevents regulated workflow access from relying on caller-claimed
  *   roles, tenants, or actor identities.
- * - Vol III: Provides deterministic API boundary enforcement and abuse control.
+ * - Vol III: Provides one deterministic server-side boundary and abuse control.
  * - Vol IV: Supports security operations, incident response, and deployment
  *   readiness gates.
  * - Vol V: Preserves source authority, controlled disclosure, observability
@@ -205,9 +227,64 @@ function requestWithSessionHeaders(
   });
 }
 
+/**
+ * Preview wall — locks the WHOLE preview behind one HTTP Basic-auth password.
+ * INERT unless PREVIEW_BASIC_AUTH_USER + PREVIEW_BASIC_AUTH_PASSWORD are set
+ * (i.e. only on the locked preview deploy; dev/local/prod are untouched). This
+ * is in ADDITION to — never instead of — the operator auth gate below: internal
+ * routes still require login after the preview password. Crawlers get 401 +
+ * noindex, so the preview is never indexed.
+ */
+function previewGate(req: NextRequest): NextResponse | null {
+  const user = process.env.PREVIEW_BASIC_AUTH_USER;
+  const pass = process.env.PREVIEW_BASIC_AUTH_PASSWORD;
+  if (!user || !pass) return null; // not a locked preview → no-op
+  const expected = `Basic ${btoa(`${user}:${pass}`)}`;
+  if ((req.headers.get("authorization") ?? "") !== expected) {
+    return new NextResponse("Authentication required", {
+      status: 401,
+      headers: {
+        "WWW-Authenticate": 'Basic realm="Furlong private preview"',
+        "X-Robots-Tag": "noindex, nofollow",
+      },
+    });
+  }
+  return null; // password ok → fall through to the normal operator gate
+}
+
 export async function proxy(req: NextRequest) {
-  const traceId = createSecurityTraceId();
+  // Locked-preview password wall (deploy-only; inert otherwise). Must run first.
+  const previewBlock = previewGate(req);
+  if (previewBlock) return previewBlock;
+
   const route = req.nextUrl.pathname;
+
+  // ── Page perimeter ──────────────────────────────────────────────────────────
+  // Non-API routes: protect internal/operator/portal PAGES. Anonymous visitors
+  // are redirected to the operator sign-in; the console is never rendered. Public
+  // pages fall straight through. (The API perimeter below owns /api/*.)
+  if (!route.startsWith("/api/")) {
+    if (isProtectedPage(route)) {
+      const pageSecret = resolveNextAuthSecret();
+      const pageToken = pageSecret
+        ? await getToken({ req, secret: pageSecret })
+        : null;
+
+      if (!pageToken) {
+        const signInUrl = req.nextUrl.clone();
+        signInUrl.pathname = "/api/auth/signin";
+        signInUrl.search = `callbackUrl=${encodeURIComponent(
+          `${route}${req.nextUrl.search}`,
+        )}`;
+        return NextResponse.redirect(signInUrl);
+      }
+    }
+
+    return NextResponse.next();
+  }
+
+  // ── API perimeter ───────────────────────────────────────────────────────────
+  const traceId = createSecurityTraceId();
   const publicReason = apiSecurityPublicReason(route);
   const rateLimitEnabled = apiRateLimitingEnabled();
 
@@ -303,5 +380,11 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: "/api/:path*",
+  // Run on application routes (API + pages); exclude Next internals and public
+  // static asset directories/files (anything with a file extension). The proxy
+  // body decides per-path: /api/* → API perimeter, internal pages → page
+  // perimeter, everything else → next().
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|maps/|brand/|journey/|.*\\..*).*)",
+  ],
 };

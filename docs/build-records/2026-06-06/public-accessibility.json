@@ -1,0 +1,432 @@
+{
+  "ok": true,
+  "runtimeVersion": "verify-public-accessibility-v1.0.0",
+  "specVersion": "public-accessibility-wcag-aa-v1.0",
+  "docRef": "docs/DOCTRINE_PUBLIC_ACCESSIBILITY_WCAG_AA_V1.md",
+  "buildPhase": "Build 53 — Accessibility Support + Verification",
+  "publicAlpha": "PENDING",
+  "privacyPosture": "The map reveals opportunities, not the visitor.",
+  "totalChecks": 59,
+  "pass": 59,
+  "fail": 0,
+  "groups": {
+    "A — Map ARIA": [
+      {
+        "id": "A01",
+        "status": "PASS",
+        "label": "Map SVG has role='img' and aria-label"
+      },
+      {
+        "id": "A02",
+        "status": "PASS",
+        "label": "Map animation respects prefers-reduced-motion (CSS)"
+      },
+      {
+        "id": "A03",
+        "status": "PASS",
+        "label": "Map reduced-motion checked in JS useEffect"
+      },
+      {
+        "id": "A04",
+        "status": "PASS",
+        "label": "Story card has aria-live='polite' for dynamic region updates"
+      },
+      {
+        "id": "A05",
+        "status": "PASS",
+        "label": "Story card live region has aria-atomic='true'"
+      },
+      {
+        "id": "A06",
+        "status": "PASS",
+        "label": "Phase indicator container has aria-label"
+      },
+      {
+        "id": "A07",
+        "status": "PASS",
+        "label": "Abstract fallback SVG has role='img' and aria-label"
+      },
+      {
+        "id": "A08",
+        "status": "PASS",
+        "label": "Story selector buttons have :focus-visible CSS"
+      },
+      {
+        "id": "A09",
+        "status": "PASS",
+        "label": "Story selector buttons have minHeight ≥ 40px"
+      },
+      {
+        "id": "A10",
+        "status": "PASS",
+        "label": "Map defines nodeLabelProps for collision-safe label geometry (labels in story card)"
+      }
+    ],
+    "B — Color/Contrast": [
+      {
+        "id": "B01",
+        "status": "PASS",
+        "label": "Story body paragraph text is at 16px"
+      },
+      {
+        "id": "B02",
+        "status": "PASS",
+        "label": "Opportunity badge uses fixed high-contrast color, not story.color"
+      },
+      {
+        "id": "B03",
+        "status": "PASS",
+        "label": "Period label uses fixed accessible color, not badge.color"
+      },
+      {
+        "id": "B04",
+        "status": "PASS",
+        "label": "Homepage does not use low-contrast #7a8fa8 text color"
+      },
+      {
+        "id": "B05",
+        "status": "PASS",
+        "label": "Homepage 'What Furlong Is Not' has no yellow/caution styling"
+      },
+      {
+        "id": "B06",
+        "status": "PASS",
+        "label": "No fontSize 11 or below in visible, non-decorative UI text"
+      }
+    ],
+    "C — Homepage Build 50": [
+      {
+        "id": "C01",
+        "status": "PASS",
+        "label": "Homepage has exactly one exploration form (no duplicate CTAs)"
+      },
+      {
+        "id": "C02",
+        "status": "PASS",
+        "label": "Single journey CTA on the map capstone → /explore (no second non-map CTA)"
+      },
+      {
+        "id": "C03",
+        "status": "PASS",
+        "label": "Homepage has no fl-category-card class (category wall removed)"
+      },
+      {
+        "id": "C04",
+        "status": "PASS",
+        "label": "Homepage has no fl-explore-card class (dual-choice removed)"
+      },
+      {
+        "id": "C05",
+        "status": "PASS",
+        "label": "Homepage does not render StewardshipSection component"
+      },
+      {
+        "id": "C06",
+        "status": "PASS",
+        "label": "Homepage has fl-map-section (map immediately below hero)"
+      },
+      {
+        "id": "C07",
+        "status": "PASS",
+        "label": "Compass watermark renders in PublicSiteLayout (shared public layout)"
+      },
+      {
+        "id": "C08",
+        "status": "PASS",
+        "label": "Homepage CTA button has :focus-visible style"
+      },
+      {
+        "id": "C09",
+        "status": "PASS",
+        "label": "Homepage CTA has :focus-visible style (ExploreDropdown removed)"
+      },
+      {
+        "id": "C10",
+        "status": "PASS",
+        "label": "ExploreDropdown still exists as a component (for onboarding page use)"
+      },
+      {
+        "id": "C11",
+        "status": "PASS",
+        "label": "Homepage 'What Furlong Is Not' panel uses dark background (institutional blue)"
+      },
+      {
+        "id": "C12",
+        "status": "PASS",
+        "label": "Homepage 'What Furlong Is Not' heading uses gold color"
+      },
+      {
+        "id": "C13",
+        "status": "PASS",
+        "label": "Homepage CTA button has minimum touch-target height (≥ 48px)"
+      },
+      {
+        "id": "C14",
+        "status": "PASS",
+        "label": "Homepage retains accessible CTA styling; journey CTA is on the map capstone"
+      }
+    ],
+    "D — Navigation/Focus": [
+      {
+        "id": "D01",
+        "status": "PASS",
+        "label": "Navigation links have :focus-visible styles"
+      },
+      {
+        "id": "D02",
+        "status": "PASS",
+        "label": "Stewardship dropdown menu items have :focus-visible styles"
+      },
+      {
+        "id": "D03",
+        "status": "PASS",
+        "label": "Stewardship tab bar has :focus-visible styles"
+      },
+      {
+        "id": "D04",
+        "status": "PASS",
+        "label": "Stewardship dropdown toggle has aria-expanded attribute"
+      },
+      {
+        "id": "D05",
+        "status": "PASS",
+        "label": "Stewardship dropdown toggle has aria-haspopup attribute"
+      }
+    ],
+    "E — Brand/Decorative": [
+      {
+        "id": "E01",
+        "status": "PASS",
+        "label": "Compass watermark component is aria-hidden"
+      },
+      {
+        "id": "E02",
+        "status": "PASS",
+        "label": "Compass watermark image has empty alt (decorative)"
+      },
+      {
+        "id": "E03",
+        "status": "PASS",
+        "label": "Compass watermark is pointer-events: none (non-interactive)"
+      }
+    ],
+    "F — Form Accessibility": [
+      {
+        "id": "F01",
+        "status": "PASS",
+        "label": "Readiness form inputs are wrapped in <label> elements"
+      },
+      {
+        "id": "F02",
+        "status": "PASS",
+        "label": "About page status badges include text labels (not color-only)"
+      }
+    ],
+    "G — Privacy Posture": [
+      {
+        "id": "G01",
+        "status": "PASS",
+        "label": "Homepage does not call navigator.geolocation"
+      },
+      {
+        "id": "G02",
+        "status": "PASS",
+        "label": "Map component preserves 'not the visitor' governance comment"
+      },
+      {
+        "id": "G03",
+        "status": "PASS",
+        "label": "Onboarding page does not capture geolocation on load"
+      },
+      {
+        "id": "G04",
+        "status": "PASS",
+        "label": "Portal/borrower page does not expose geolocation on render"
+      }
+    ],
+    "H — Page Existence": [
+      {
+        "id": "H01",
+        "status": "PASS",
+        "label": "All 13 public pages exist as source files"
+      },
+      {
+        "id": "H02",
+        "status": "PASS",
+        "label": "Doctrine document exists"
+      },
+      {
+        "id": "H03",
+        "status": "PASS",
+        "label": "Map GeoJSON asset exists"
+      },
+      {
+        "id": "H04",
+        "status": "PASS",
+        "label": "Compass watermark image exists"
+      },
+      {
+        "id": "H05",
+        "status": "PASS",
+        "label": "Featured series registry exists"
+      },
+      {
+        "id": "H06",
+        "status": "PASS",
+        "label": "Accessibility page exists at src/app/(public)/accessibility/page.tsx"
+      }
+    ],
+    "I — Build 53 Accessibility": [
+      {
+        "id": "I01",
+        "status": "PASS",
+        "label": "PlatformShell has skip-to-main link before PlatformChrome"
+      },
+      {
+        "id": "I02",
+        "status": "PASS",
+        "label": "PlatformShell skip link is visually hidden until focused"
+      },
+      {
+        "id": "I03",
+        "status": "PASS",
+        "label": "PlatformShell <main> has id='main-content' anchor target"
+      },
+      {
+        "id": "I04",
+        "status": "PASS",
+        "label": "Homepage footer has Accessibility link to /accessibility"
+      },
+      {
+        "id": "I05",
+        "status": "PASS",
+        "label": "Hero brand text uses readable font-size (≥ 32px minimum)"
+      },
+      {
+        "id": "I06",
+        "status": "PASS",
+        "label": "verify:accessibility script entry exists in package.json"
+      },
+      {
+        "id": "I07",
+        "status": "PASS",
+        "label": "Accessibility page has visible h1"
+      },
+      {
+        "id": "I08",
+        "status": "PASS",
+        "label": "Accessibility page covers keyboard navigation, screen readers, reduced motion"
+      },
+      {
+        "id": "I09",
+        "status": "PASS",
+        "label": "Accessibility page has contact/help section"
+      }
+    ]
+  },
+  "findings": [],
+  "wcagChecklist": [
+    {
+      "id": "1.1.1",
+      "req": "Non-text content has text alternative",
+      "status": "COVERED"
+    },
+    {
+      "id": "1.3.1",
+      "req": "Info and relationships conveyed structurally",
+      "status": "COVERED"
+    },
+    {
+      "id": "1.4.1",
+      "req": "Color not the only visual means of conveying info",
+      "status": "COVERED"
+    },
+    {
+      "id": "1.4.3",
+      "req": "Text contrast ≥ 4.5:1 (normal), 3:1 (large)",
+      "status": "PARTIAL — axe required for full coverage"
+    },
+    {
+      "id": "1.4.4",
+      "req": "Text resizes to 200% without loss of content",
+      "status": "MANUAL"
+    },
+    {
+      "id": "1.4.11",
+      "req": "Non-text UI contrast ≥ 3:1",
+      "status": "MANUAL — axe required"
+    },
+    {
+      "id": "2.1.1",
+      "req": "All functionality available via keyboard",
+      "status": "COVERED"
+    },
+    {
+      "id": "2.1.2",
+      "req": "No keyboard trap",
+      "status": "MANUAL"
+    },
+    {
+      "id": "2.4.7",
+      "req": "Focus visible on all interactive elements",
+      "status": "COVERED"
+    },
+    {
+      "id": "2.5.3",
+      "req": "Label in name — accessible name contains visible label",
+      "status": "PARTIAL — axe required"
+    },
+    {
+      "id": "2.5.5",
+      "req": "Touch target ≥ 44×44px (AAA) / practical 48px (AA)",
+      "status": "COVERED"
+    },
+    {
+      "id": "3.3.2",
+      "req": "Labels or instructions on form inputs",
+      "status": "COVERED"
+    },
+    {
+      "id": "4.1.2",
+      "req": "Name, role, value on UI components",
+      "status": "COVERED"
+    },
+    {
+      "id": "map-1",
+      "req": "Animated map has text equivalent in story card",
+      "status": "COVERED"
+    },
+    {
+      "id": "map-2",
+      "req": "Map animation halts on prefers-reduced-motion",
+      "status": "COVERED"
+    },
+    {
+      "id": "map-3",
+      "req": "Map fallback communicates story without visual",
+      "status": "COVERED"
+    },
+    {
+      "id": "map-4",
+      "req": "Map SVG has role='img' and aria-label",
+      "status": "COVERED"
+    },
+    {
+      "id": "map-5",
+      "req": "Decorative compass is aria-hidden and alt=''",
+      "status": "COVERED"
+    },
+    {
+      "id": "map-6",
+      "req": "Node labels scale with zoom, no clipping",
+      "status": "COVERED"
+    },
+    {
+      "id": "map-7",
+      "req": "Phase indicator uses text + color (not color only)",
+      "status": "COVERED"
+    }
+  ],
+  "exitCode": 0,
+  "message": "verify:accessibility PASS — 59/59 checks pass. See wcagChecklist for manual/axe requirements."
+}

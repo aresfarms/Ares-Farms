@@ -281,6 +281,52 @@ export const SOURCE_AUTHORITY_REGISTRY: SourceAuthorityProfile[] = [
     jurisdictionScope: ["federal", "state", "county"],
     sourceVersion: "epa-environmental-source-authority-v0.1.0",
   },
+  {
+    sourceId: "hud-opportunity-zones",
+    sourceName: "HUD / Treasury Opportunity Zones",
+    sourceCategory: "government-public",
+    sourceAuthorityTier: "TIER_1",
+    provenanceScore: 98,
+    replayabilityScore: 95,
+    institutionalReliability: "HIGH",
+    claimsAllowed: ["official-place-fact", "source-visible", "review-required"],
+    classificationLevel: "PUBLIC",
+    connectorCertificationStatus: "PENDING_CERTIFICATION",
+    jurisdictionScope: ["federal", "state", "county"],
+    sourceVersion: "hud-opportunity-zones-source-authority-v0.1.0",
+  },
+  {
+    // State real-estate license lookup — registered like every live source;
+    // NO adapter wired yet (50 heterogeneous state systems). Until a state's
+    // machine lookup is wired AND Module 22/23-approved, license verification
+    // is operator-performed with recorded evidence (licenseVerification.ts).
+    sourceId: "state-re-license",
+    sourceName: "State real-estate license lookup",
+    sourceCategory: "government-public",
+    sourceAuthorityTier: "TIER_1",
+    provenanceScore: 95,
+    replayabilityScore: 85,
+    institutionalReliability: "HIGH",
+    claimsAllowed: ["official-reference-required", "review-required"],
+    classificationLevel: "INTERNAL",
+    connectorCertificationStatus: "PENDING_CERTIFICATION",
+    jurisdictionScope: ["state"],
+    sourceVersion: "state-re-license-source-authority-v0.1.0",
+  },
+  {
+    sourceId: "sba-hubzone",
+    sourceName: "SBA HUBZone (Historically Underutilized Business Zone)",
+    sourceCategory: "government-public",
+    sourceAuthorityTier: "TIER_1",
+    provenanceScore: 96,
+    replayabilityScore: 92,
+    institutionalReliability: "HIGH",
+    claimsAllowed: ["official-place-fact", "source-visible", "review-required"],
+    classificationLevel: "PUBLIC",
+    connectorCertificationStatus: "PENDING_CERTIFICATION",
+    jurisdictionScope: ["federal", "state", "county"],
+    sourceVersion: "sba-hubzone-source-authority-v0.1.0",
+  },
 ];
 
 export const SCRAPER_REGISTRY: ScraperDefinition[] =
@@ -336,6 +382,8 @@ export const INSTITUTIONAL_VALIDATION_SOURCES = [
   "USDA eligibility",
   "FEMA/flood",
   "Census/rural overlays",
+  "Opportunity Zones (HUD/Treasury)",
+  "HUBZone (SBA)",
   "Zoning",
   "Environmental overlays",
   "Infrastructure overlays",

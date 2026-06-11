@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { ModuleNav } from "@/components/platform/ModuleNav";
+import { PlatformChrome } from "@/components/platform/PlatformChrome";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
 
 /**
@@ -38,47 +38,41 @@ export function PlatformShell({ children }: { children: ReactNode }) {
           '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       }}
     >
-      <header
-        style={{
-          borderBottom: "1px solid #d9e2ec",
-          background: "#0f172a",
-          color: "#ffffff",
-          padding: "14px 20px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 12,
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 15, fontWeight: 700 }}>
-              Ares/Furlong Governed Platform
-            </div>
-            <div style={{ color: "#cbd5e1", fontSize: 13, marginTop: 3 }}>
-              {internalCount} internal surfaces, {translationCount} translated
-              surfaces, production-live controls still gated
-            </div>
-          </div>
-          <div
-            style={{
-              border: "1px solid #64748b",
-              borderRadius: 6,
-              color: "#e2e8f0",
-              fontSize: 12,
-              padding: "6px 8px",
-            }}
-          >
-            Master Volume runtime active
-          </div>
-        </div>
-      </header>
-      <ModuleNav />
-      <main>{children}</main>
+      {/*
+        Skip-to-main link — visually hidden until focused (WCAG 2.4.1).
+        Must appear BEFORE PlatformChrome so it is the first focusable element
+        on the page. Keyboard users pressing Tab see it immediately.
+      */}
+      <style>{`
+        .skip-to-main {
+          position: absolute;
+          top: -48px;
+          left: 12px;
+          z-index: 9999;
+          padding: 10px 18px;
+          background: #0f766e;
+          color: #ffffff;
+          font-size: 15px;
+          font-weight: 700;
+          text-decoration: none;
+          border-radius: 0 0 8px 8px;
+          transition: top 0.15s;
+        }
+        .skip-to-main:focus {
+          top: 0;
+          outline: 3px solid #c9a84c;
+          outline-offset: 2px;
+        }
+      `}</style>
+      <a href="#main-content" className="skip-to-main">
+        Skip to main content
+      </a>
+
+      <PlatformChrome
+        internalCount={internalCount}
+        translationCount={translationCount}
+      />
+      <main id="main-content">{children}</main>
     </body>
   );
 }

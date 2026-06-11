@@ -191,6 +191,16 @@ jobs:
       - name: Build Self-Report v1
         run: npm run smoke:build-self-report
 
+      # Furlong Stewardship (Build 44-A): stewardship domains persist
+      # independently of individuals, use stewardship language, route to
+      # review, hold environmental technical review for a qualified reviewer,
+      # and carry no forbidden-title / sales / approval language.
+      - name: Furlong Stewardship registry
+        run: npm run verify:stewardship
+
+      - name: Furlong Stewardship smoke
+        run: npm run smoke:stewardship
+
       # Live-state enforcement (Build 43): the smoke variants above read
       # fixtures/runtime structure and tolerate gaps; the :ci variants run
       # the literal verify:/build: CLIs in --check mode (live repo state,

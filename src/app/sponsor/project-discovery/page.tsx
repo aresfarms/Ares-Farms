@@ -1,7 +1,10 @@
+// DIVEST-001: reach property data via the core-backbone property-discovery
+// CONTRACT, never the source-intelligence unit's internals directly (keeps
+// lender-sponsor-surfaces separable from source-intelligence).
 import {
   PROPERTY_DISCOVERY_DISCLOSURES,
   propertyDiscovery,
-} from "@/lib/source-intelligence/sourceIntelligenceRuntime";
+} from "@/lib/property-discovery";
 
 const shellStyle = {
   minHeight: "100vh",

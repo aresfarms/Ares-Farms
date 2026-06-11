@@ -1,0 +1,192 @@
+/**
+ * verify:internal-auth — Build 57 (security launch blocker)
+ *
+ * Proves, against the RUNNING app, that every internal/operator/portal surface
+ * rejects ANONYMOUS (logged-out) requests server-side. Complements
+ * verify:public-no-internal-leak: the leak gate proves public pages don't expose
+ * internal routes; this gate proves those internal routes aren't anonymously
+ * reachable. Hiding the door is not locking it — this is the lock.
+ *
+ * For each internal PAGE: an unauthenticated request must redirect to sign-in
+ * (3xx → /api/auth/signin) or 404 — NEVER 200 with the console, and never any
+ * body carrying the internal console markers.
+ *
+ * For each internal API: an unauthenticated request must be rejected (401/403)
+ * — never 200 with data. (Middleware runs before the handler, so a GET suffices
+ * even for POST-only routes.)
+ *
+ * Sanity (so the lock didn't also brick the public site): public pages still
+ * load (200, not redirected to sign-in) and the genuinely-public APIs are not
+ * blocked.
+ *
+ * Requires the dev server. Override target with BASE_URL (default :3000).
+ * Exit 0 only if every assertion holds.
+ */
+
+const BASE = (process.env.BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+
+// Markers that only appear on the rendered internal operator console.
+const CONSOLE_MARKERS = [
+  "Furlong Governed Platform",
+  "Master Volume runtime active",
+];
+
+// Representative internal PAGE per protected namespace (covers the full
+// requirement list: operator consoles, source-*/production-* families, portals).
+const INTERNAL_PAGES = [
+  "/internal",
+  "/internal/data-rights",
+  "/internal/source-review",
+  "/internal/place-facts",
+  "/internal/listing-review",
+  "/governance",
+  "/operator-queue",
+  "/operator-demo",
+  "/applications",
+  "/documents",
+  "/reviews",
+  "/rules",
+  "/decisions",
+  "/notices",
+  "/audit-replay",
+  "/connectors",
+  "/partners",
+  "/billing",
+  "/reports",
+  "/promotion",
+  "/case-command",
+  "/evidence-packets",
+  "/exception-remediation",
+  "/module-readiness",
+  "/environmental-compliance",
+  "/source-ingestion",
+  "/production-final-authority",
+  "/dashboard",
+  "/lender/dashboard",
+  "/sponsor/dashboard",
+  "/portal/borrower",
+];
+
+// Representative internal API per namespace. Middleware blocks before the
+// handler, so GET works regardless of the handler's supported methods.
+const INTERNAL_APIS = [
+  "/api/governance/live-action-readiness",
+  "/api/billing/admin",
+  "/api/decisions",
+  "/api/reviews",
+  "/api/rules",
+  "/api/reports",
+  "/api/partners",
+  "/api/connectors",
+  "/api/notices",
+  "/api/queues",
+  "/api/documents",
+  "/api/applications",
+  "/api/ledger",
+  "/api/audit",
+  "/api/entitlements",
+];
+
+// Public pages must still render (must NOT be redirected to sign-in).
+const PUBLIC_PAGES = ["/", "/about", "/trust", "/compass", "/explore", "/accessibility"];
+
+// Genuinely-public APIs must NOT be auth-blocked (allowlisted in apiSecurityPolicy).
+const PUBLIC_APIS = [
+  "/api/auth/providers",
+  "/api/readiness",
+  "/api/financing/pathways",
+  "/api/accessibility-feedback",
+];
+
+type Failure = { route: string; detail: string };
+
+async function get(path: string): Promise<{ status: number; location: string | null; body: string }> {
+  const res = await fetch(`${BASE}${path}`, {
+    redirect: "manual",
+    headers: { Accept: "text/html,application/json" },
+  });
+  let body = "";
+  try { body = await res.text(); } catch { body = ""; }
+  return { status: res.status, location: res.headers.get("location"), body };
+}
+
+function isSignInRedirect(status: number, location: string | null): boolean {
+  return status >= 300 && status < 400 && !!location && /\/api\/auth\/signin/.test(location);
+}
+
+async function main(): Promise<void> {
+  const failures: Failure[] = [];
+
+  // ── Server reachable? ──────────────────────────────────────────────────────
+  try {
+    await fetch(BASE, { redirect: "manual" });
+  } catch {
+    console.error(`verify:internal-auth FAIL — dev server not reachable at ${BASE}.`);
+    console.error("  Start it (`npm run dev`) and re-run, or set BASE_URL.");
+    process.exit(1);
+  }
+
+  // ── Internal PAGES must redirect-to-signin or 404, never serve the console ──
+  for (const route of INTERNAL_PAGES) {
+    const { status, location, body } = await get(route);
+    const redirected = isSignInRedirect(status, location);
+    const notFound = status === 404;
+    const leakedMarker = CONSOLE_MARKERS.find((m) => body.includes(m));
+    if (!redirected && !notFound) {
+      failures.push({
+        route,
+        detail: `expected sign-in redirect or 404, got ${status}` +
+          (location ? ` → ${location}` : "") +
+          (leakedMarker ? ` AND body leaked console marker "${leakedMarker}"` : ""),
+      });
+    } else if (leakedMarker) {
+      failures.push({ route, detail: `served console marker "${leakedMarker}" anonymously (status ${status})` });
+    }
+  }
+
+  // ── Internal APIs must reject (401/403), never serve data ───────────────────
+  for (const route of INTERNAL_APIS) {
+    const { status, location } = await get(route);
+    const rejected = status === 401 || status === 403 || isSignInRedirect(status, location);
+    if (!rejected) {
+      failures.push({ route, detail: `expected 401/403 for anonymous request, got ${status}` });
+    }
+  }
+
+  // ── Public pages must still load (not redirected to sign-in) ────────────────
+  for (const route of PUBLIC_PAGES) {
+    const { status, location } = await get(route);
+    if (isSignInRedirect(status, location)) {
+      failures.push({ route, detail: `PUBLIC page was redirected to sign-in (status ${status}) — auth gate is over-broad` });
+    } else if (status >= 500) {
+      failures.push({ route, detail: `PUBLIC page errored (status ${status})` });
+    }
+  }
+
+  // ── Public APIs must NOT be auth-blocked ────────────────────────────────────
+  for (const route of PUBLIC_APIS) {
+    const { status, location } = await get(route);
+    if (status === 401 || status === 403 || isSignInRedirect(status, location)) {
+      failures.push({ route, detail: `PUBLIC API was blocked (status ${status}) — must stay in the public allowlist` });
+    }
+  }
+
+  // ── Report ──────────────────────────────────────────────────────────────────
+  const checked = INTERNAL_PAGES.length + INTERNAL_APIS.length + PUBLIC_PAGES.length + PUBLIC_APIS.length;
+  console.log(`verify:internal-auth — ${checked} routes checked against ${BASE}`);
+  console.log(`  internal pages: ${INTERNAL_PAGES.length} · internal APIs: ${INTERNAL_APIS.length} · public pages: ${PUBLIC_PAGES.length} · public APIs: ${PUBLIC_APIS.length}`);
+
+  if (failures.length > 0) {
+    console.error(`\n✗  verify:internal-auth FAIL — ${failures.length} route(s) not correctly gated:`);
+    for (const f of failures) console.error(`    ✗ ${f.route} — ${f.detail}`);
+    process.exit(1);
+  }
+
+  console.log("\n✓  verify:internal-auth PASS — every internal page/API rejects anonymous access; public surfaces unaffected.");
+  process.exit(0);
+}
+
+main().catch((e) => {
+  console.error("verify:internal-auth FAIL — unexpected error:", e);
+  process.exit(1);
+});

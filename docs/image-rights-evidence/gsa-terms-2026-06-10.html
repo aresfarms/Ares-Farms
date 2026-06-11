@@ -1,0 +1,740 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- /templates/layout/theme-4/Layout.html-->
+  <title>Real Estate Sales Home Page</title>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-8P43E672F7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-8P43E672F7');
+  </script>
+
+  <!-- Meta Tags -->
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="format-decetion" content="telephone=no" />
+  
+  <!-- links -->
+  <script type="text/javascript" src="https://d2w9j5i7epyyai.cloudfront.net/static/assets/uswds/js/uswds-init.min.js?v=1.1" ></script>
+  <link rel="icon" href="https://d2m3yrz4x1yefr.cloudfront.net/property_image/1706846164.7074475_resauclogo.png" type="image/png" sizes="16x16">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link href="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/css/style.css?v=6.0" type="text/css" rel="stylesheet" />
+  <link href="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/css/all.css?v=4.0" type="text/css" rel="stylesheet" />
+  <link href="https://d2w9j5i7epyyai.cloudfront.net/static/theme-common/css/custom_style.css?v=3.0" type="text/css" rel="stylesheet" />
+  <link href="https://d2w9j5i7epyyai.cloudfront.net/static/theme-common/css/jquery.growl.css?v=3.0" type="text/css" rel="stylesheet" />
+  <link href="https://d2w9j5i7epyyai.cloudfront.net/static/theme-common/css/dropzone.css?v=2.1" type="text/css" rel="stylesheet" />
+  <link href="https://d2w9j5i7epyyai.cloudfront.net/static/assets/css/styles.css?v=2.1" type="text/css" rel="stylesheet" />
+
+  <!-- PGC 6.6.0 did not work, back to 6.1.1 
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" type="text/css" rel="stylesheet" />
+  -->
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+
+  
+  
+
+  <!-- PGC Quick Hack to make it look better -->
+  <style>
+    .banner-wrap .container-fluid h1 {
+      color: #FFFFFF;
+      background: transparent; /* Ensure no background color */
+    }
+    .banner-wrap .container-fluid h4 {
+      color: #FFFFFF;
+      background: transparent; /* Ensure no background color */
+    }
+  </style>
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--about-us.html-->
+
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+  <!--[if lte IE 7]> <html class="ie7"> <![endif]-->
+  <!--[if IE 8]>     <html class="ie8"> <![endif]-->
+  <!--[if IE 9]>     <html class="ie9"> <![endif]-->
+  <!--[if !IE]><!-->
+
+<script>
+    var aws_url = 'https://d2m3yrz4x1yefr.cloudfront.net/';
+    var base_url = 'https://realestatesales.gov';
+  </script>
+</head>
+
+<body class="homepage">
+
+    
+    
+<header id="header" class="header homepage-header">
+<section
+  class="usa-banner"
+  aria-label="Official website of the United States government"
+>
+  <div class="usa-accordion">
+    <header class="usa-banner__header">
+      <div class="usa-banner__inner">
+        <div class="grid-col-auto">
+          <img
+            aria-hidden="true"
+            class="usa-banner__header-flag"
+            src="https://d2w9j5i7epyyai.cloudfront.net/static/assets/uswds/img/us_flag_small.png"
+            alt=""
+          />
+        </div>
+        <div class="grid-col-fill tablet:grid-col-auto" aria-hidden="true">
+          <p class="usa-banner__header-text">
+            An official website of the United States government
+          </p>
+          <p class="usa-banner__header-action">Here’s how you know</p>
+        </div>
+        <button
+          type="button"
+          class="usa-accordion__button usa-banner__button"
+          aria-expanded="false"
+          aria-controls="gov-banner-default"
+        >
+          <span class="usa-banner__button-text">Here’s how you know</span>
+        </button>
+      </div>
+    </header>
+    <div
+      class="usa-banner__content usa-accordion__content"
+      id="gov-banner-default"
+    >
+      <div class="grid-row grid-gap-lg">
+        <div class="usa-banner__guidance tablet:grid-col-6">
+          <img
+            class="usa-banner__icon usa-media-block__img"
+            src="https://d2w9j5i7epyyai.cloudfront.net/static/assets/uswds/img/icon-dot-gov.svg"
+            role="img"
+            alt=""
+            aria-hidden="true"
+          />
+          <div class="usa-media-block__body">
+            <p>
+              <strong>Official websites use .gov</strong><br />GSA
+              <strong>.gov</strong> website belongs to an official government
+              organization in the United States.
+            </p>
+          </div>
+        </div>
+        <div class="usa-banner__guidance tablet:grid-col-6">
+          <img
+            class="usa-banner__icon usa-media-block__img"
+            src="https://d2w9j5i7epyyai.cloudfront.net/static/assets/uswds/img/icon-https.svg"
+            role="img"
+            alt=""
+            aria-hidden="true"
+          />
+          <div class="usa-media-block__body">
+            <p>
+              <strong>Secure .gov websites use HTTPS</strong><br />
+              <strong>lock</strong> (
+              <span class="icon-lock"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="52"
+                  height="64"
+                  viewBox="0 0 52 64"
+                  class="usa-banner__lock-image"
+                  role="img"
+                  aria-labelledby="banner-lock-description-default"
+                  focusable="false"
+                >
+                  <title id="banner-lock-title-default">Lock</title>
+                  <desc id="banner-lock-description-default">Locked padlock icon</desc>
+                  <path
+                    fill="#000000"
+                    fill-rule="evenodd"
+                    d="M26 0c10.493 0 19 8.507 19 19v9h3a4 4 0 0 1 4 4v28a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V32a4 4 0 0 1 4-4h3v-9C7 8.507 15.507 0 26 0zm0 8c-5.979 0-10.843 4.77-10.996 10.712L15 19v9h22v-9c0-6.075-4.925-11-11-11z"
+                  />
+                </svg> </span
+              >) or <strong>https://</strong> means you’ve safely connected to
+              the .gov website. Share sensitive information only on official,
+              secure websites.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>  
+  
+  <a role="button" href="#main-link" class="skip" tabindex="0">Skip to main content</a>  
+  <div class="header-ani">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="table">
+              <div class="table-cell">
+                <a href="/" role="button" tabindex="0">
+                  <img class="logo" src="https://d2m3yrz4x1yefr.cloudfront.net/property_image/1706846114.515992_resauclogo.png" alt="real estate sales">
+                  <img class="logo-icon" src="https://d2m3yrz4x1yefr.cloudfront.net/property_image/1706846114.515992_resauclogo.png" alt="real estate sales">
+                </a>
+              </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <a href="javascript:void(0)" role="button" class="nav-button">Menu</a>
+                <a href="javascript:void(0)" role="button" class="nav-close">Close Menu</a>
+                <nav class="nav">
+                  <ul>
+                    <li class="nav-submenu" id="our_listings">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="0">Search</a>
+                      <ul>
+                        <li><a href="/our-listing" role="button" >Our Listings</a></li>
+                        <!--  <li><a href="">Sold Listings</a></li>-->
+                        <!-- <li><a href="">Nationwide Listings</a></li>-->
+                      </ul>
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="0">Subscribe and Bid</a>
+                      <ul>
+                        <li>
+                          <a href="/subscribers/" role="button">Subscriber's Guide</a>
+                        </li><li>
+                          <a href="/buyers/" role="button">Bidder's Guide</a>
+                        </li>
+                        <!-- PGC
+                        <li>
+                          <a href="/sellers/" role="button">Sellers Guide</a>
+                        </li>
+                        -->
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="/about-us/" role="button" >About Us</a>
+                      <!--
+                      <a href="/about-us" role="button" aria-expanded="true" aria-haspopup="true" tabindex="0">About Us</a>
+                      <ul>
+                        <li><a href="/about-us" role="button">About Us</a></li>
+                        
+                      </ul>
+                    -->
+                    </li>
+                    <li class="nav-submenu">
+                      <a href="javascript:void(0)" role="button" aria-expanded="true" aria-haspopup="true" tabindex="0">Learn</a>
+                      <ul>
+                        <!--
+                        <li><a href="/bid-online/" role="button" >How To Bid</a></li>
+                        <li><a href="/auction-type/" role="button" >Our Auction Types</a></li>
+                        <li><a href="/video-tutorials/" role="button" >Auction Video Tutorials</a></li>
+                        -->
+                        <li><a href="/faq/" role="button">FAQs</a></li>
+                      </ul>
+                    </li>
+                    <li>
+                      <a href="/terms/" role="button" tabindex="0">Terms and Conditions</a>
+                    </li>
+                    <li>
+                      <a href="/contact-us" role="button" tabindex="0">Contact Us</a>
+                    </li>
+                  </ul>
+                </nav>
+                </div><!-- End .table-cell -->
+              <div class="table-cell">
+                <ul class="user-links">
+                  <!-- <li class="search-btn">
+                    <div class="search-container">
+                      <form action="/search" method="get">
+                        <input class="search expandright" id="searchright" type="search" name="q" placeholder="Search">
+                        <label class="button searchbutton" for="searchright"><span class="mglass"><i class="fas fa-search"></i></span></label>
+                      </form>
+                    </div>
+                  </li> -->
+                  
+                  <li>
+                    <a role="button" href="/login/?next=/terms/" class="btn btn-secondary btn-sm" tabindex="0"><i class="fa-solid fa-arrow-right-to-bracket" role="presentation" aria-hidden="true"></i> Login</a>
+                  </li>
+                  
+                  
+                </ul>
+              </div><!-- End .table-cell -->
+
+            </div><!-- End .table -->
+          </div><!-- End .col-md-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </div><!-- End .header-ani -->
+  </header><!-- End .header -->
+    
+
+    
+
+
+<style>
+
+  .tutorial-wrap ul, ol { 
+    margin: 0;
+    padding-left: 20px;
+  }
+  .tutorial-wrap ul { 
+      list-style-type: disc; /* Ensure bullet points are visible */
+  }
+  .tutorial-wrap ol { 
+      list-style-type: decimal; /* Ensure numbering is visible */
+  }
+  .tutorial-wrap ul li {
+      list-style: inside; /* Ensure list items are displayed inside the list */
+  }
+  .tutorial-wrap ol li {
+    list-style: inside; /* Ensure list items are displayed inside the list */
+    list-style-type: decimal;
+}
+</style>
+  
+<div class="body-content blog-body">
+
+    <div class="blog-header">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 ">
+            <div class="blog-header-inner">
+              <div class="heading">
+                
+                <h1>
+                  Terms and Conditions
+                </h1>
+                
+              </div>
+            </div>
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container-fluid -->
+    </div><!-- End .blog-header -->
+
+    <section class="tutorial-wrapper">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+
+            <div class="tutorial-detail-wrap">
+              <div class="tutorial-wrap">
+                <!-- <h2>Terms<span class="hr-line"></span></h2> -->
+                
+                
+                <p><strong>PLEASE NOTE: The following is a summary of the general terms and conditions for bidding on a real property.&nbsp;</strong></p>
+<ul>
+<li><strong>The complete sales contract terms and conditions are located in the Invitation for Bids (IFB) that are specific to each property for sales.</strong></li>
+<li><strong>Before bidding on a property, a prospective bidder must acknowledge that they have read and agree to all the terms and conditions in the IFB as part of the registration process.<br /></strong></li>
+</ul>
+<p>&nbsp;</p>
+<p><span style="font-weight: 400;"><strong>DEFINITIONS</strong></span></p>
+<p><span style="font-weight: 400;">a. AUTOMATIC BID or PROXY BID<br /></span><span style="font-weight: 400;">Also known as &ldquo;bid by proxy&rdquo; wherein the bidder establishes a person to bid on their behalf at auction up to a certain limit. In the case of online auctions, computers have automated the proxy role and bidders establish their bid limits online and the software answers bid challenges by automatically making the next bid increment up to the proxy limit.</span></p>
+<p><span style="font-weight: 400;">b. BACKUP BIDDER<br /></span><span style="font-weight: 400;">The term &ldquo;Backup Bidder&rdquo; refers to the bidder, whose bid conforms to the terms and conditions of the IFB, is the second-highest dollar bid at the close of the auction and is determined by the Government to be the second most acceptable bid.</span></p>
+<p><span style="font-weight: 400;">c. BIDDER(S)<br /></span><span style="font-weight: 400;">The term &ldquo;Bidder&rdquo; or &ldquo;Bidders&rdquo; as used herein refers to the offeror or offerors for the purchase of the subject Property, and is used interchangeably with &ldquo;you.&rdquo;</span></p>
+<p><span style="font-weight: 400;">d. BID INCREMENT/INTERVAL<br /></span>The &ldquo;Bid Increment&rdquo; is the minimum amount of money required to increase a starting or current bid. &ldquo;Bid Interval&rdquo; is the maximum amount of time in which to make a bid before the auction ends. The Bid Interval is also referred to as the Inactivity Period at RealEstateSales.gov.</p>
+<p><span style="font-weight: 400;">e. BROKER/BROKERAGE<br /></span><span style="font-weight: 400;">The term "broker" as used herein refers to a person with an active real estate license in the State where he/she practices real estate who, in exchange for a commission, acts for another person or entity solely as agent in conformance with the IFB. The &ldquo;brokerage&rdquo; is the business entity of the broker representing the Bidder(s). A broker must be acting as an agent and cannot be a party to the contract to receive a commission.&nbsp;</span></p>
+<p><span style="font-weight: 400;">f. CLOSE TIME<br /></span><span style="font-weight: 400;">Close Time is stated on the RealEstateSales.gov website for each specific property auction and represented by the &ldquo;Bidding Ends In&rdquo; countdown clock as the time remaining for making bids. Online auction sales cannot end on Weekends or Federal Holidays.</span></p>
+<p><span style="font-weight: 400;">g. EARNEST MONEY<br /></span><span style="font-weight: 400;">The term &ldquo;Earnest Money&rdquo; refers to the Bidder&rsquo;s deposit of money demonstrating the Purchaser&rsquo;s good faith offer to the Government to fully execute and comply with all terms, conditions, covenants and agreements contained in any contract resulting from the Government&rsquo;s acceptance of the Bidder&rsquo;s offered bid price. Once a bid is accepted by the Government for contract, all prior deposits made by the Purchaser to register for the sale, subject to the Invitation for Bids, become Earnest Money to the benefit, custody, accountability and control of the Government.</span></p>
+<p><span style="font-weight: 400;">h. FIXED BID OR FLAT BID<br /></span><span style="font-weight: 400;">A fixed bid, also known as flat bid is for an amount at least the current bid plus the posted minimum Bid Increment. If the bid is greater than another bidder&rsquo;s automatic bid, the system will consider this flat bid as the current (winning) bid. If the bid is less than or equal to another bidder&rsquo;s automatic bid, the system will record the bid but it will not be considered the current (winning) bid.</span></p>
+<p><span style="font-weight: 400;">i. GENERAL SERVICES ADMINISTRATION<br /></span><span style="font-weight: 400;">The term &ldquo;General Services Administration&rdquo; (&ldquo;GSA&rdquo;) as used herein refers to the United States General Services Administration, a Federal agency conducting this sale in agreement with the other United States Federal Agencies that have full custody of and all accountability for all matters, known and unknown, concerning the physical, title, and environmental condition of the Property.</span></p>
+<p><span style="font-weight: 400;">&nbsp;j. </span><span style="font-weight: 400;">GOVERNMENT<br /></span><span style="font-weight: 400;">The term &ldquo;Government&rdquo; as used herein refers to the United States of America, and is used interchangeably with &ldquo;Seller&rdquo; and &ldquo;Grantor.&rdquo;&nbsp;</span></p>
+<p><span style="font-weight: 400;">k. HIGH BIDDER<br /></span><span style="font-weight: 400;">The term &ldquo;High Bidder&rdquo; refers to the bidder, whose bid conforms to the terms and conditions of the IFB, is the highest dollar bid at the close of the auction and is determined by the Government to be the most acceptable bid.</span></p>
+<p><span style="font-weight: 400;">l. INVITATION FOR BIDS<br /></span><span style="font-weight: 400;">The term "Invitation for Bids" ("IFB") refers to the document available for each property on RealEstateSales.gov and the following items that are attached thereto and incorporated therein: the Property Description; Terms of Sale; Instructions to Bidders; Notice and Covenants and/or Special Terms of Sale (if applicable); Bidder Registration and Bid Form for Purchase of Government Property; associated leasebacks (if applicable), Exhibits and Additional Documents. Should the aforementioned documents be modified or supplemented by any addenda or amendments, or replaced by a new issue, issued by the Government prior to the conclusion of the online auction, those modifications, addenda or amendments, shall be part of the reissued IFB.</span></p>
+<p><span style="font-weight: 400;">m. PROPERTY<br /></span><span style="font-weight: 400;">The term &ldquo;Property&rdquo; refers to the property or properties described in the Property Description of this IFB.</span></p>
+<p><span style="font-weight: 400;">n. PURCHASER<br /></span><span style="font-weight: 400;">The term &ldquo;Purchaser&rdquo; refers to the bidder whose bid the Government accepts and is used interchangeably with &ldquo;Buyer&rdquo; and &ldquo;Grantee.&rdquo;&nbsp;</span></p>
+<p><span style="font-weight: 400;">o. WEBSITE<br /></span><span style="font-weight: 400;">The RealEstateSales.gov website has been developed to allow the general public the opportunity to bid electronically on a wide array of Federal assets, including real property. Auctions for real property are offered and can be viewed at RealEstateSales.gov. Additional information can also be found at propertydisposal.gsa.gov.&nbsp;</span></p>
+<p>&nbsp;</p>
+<p><strong>GENERAL TERMS AND CONDITIONS</strong></p>
+<p><span style="font-weight: 400;">1. PROPERTY DESCRIPTION PROVIDED IN IFB<br /></span><span style="font-weight: 400;">The description of the Property, and all other information provided with respect to the Property set forth in the IFB, are based on the best information available to GSA, Real Property Disposition and are believed to be correct. Any error or omission, including but not limited to, the omission of any information available to the agency having custody over the Property and/or any other Federal agency, shall NOT constitute grounds or reason for nonperformance of the contract of sale, or claim by purchaser for allowance, refund or deduction from the purchase price. The IFB is made available at RealEstateSales.gov and may be modified and amended by the Government at any time prior to the conclusion of the auction. Bidder agrees and accepts that notices of any changes to the descriptions provided in the IFB are satisfactory when made available on either or both of GSA&rsquo;s real property disposal websites at RealEstateSales.gov and/or disposal.gsa.gov.</span></p>
+<p><span style="font-weight: 400;">2. PROPERTY INSPECTION<br /></span><span style="font-weight: 400;">Bidders are invited, urged, and cautioned to inspect the Property prior to submitting a bid. Photos provided by the Government may not represent the condition or existence of any improvements of the Property and are NOT to be relied upon in place of the Bidder's own inspection. Any maps, illustrations or other graphical images of the Property are provided for visual context and are NOT to be relied upon in place of the Bidder&rsquo;s own inspection. The failure of any bidder to inspect, or to be fully informed as to the condition of all or any portion of the Property, will not constitute grounds for any claim or demand for adjustment or withdrawal of a bid after the auction.</span></p>
+<p><span style="font-weight: 400;">3. CONTRACT<br /></span><span style="font-weight: 400;">The IFB and the bid, when accepted by the Government shall constitute an agreement for sale (&ldquo;Agreement&rdquo;) between the high bidder (&ldquo;Purchaser&rdquo;) and the Government. Such Agreement shall constitute the whole contract to be succeeded only by the formal instrument(s) of transfer, unless modified in writing and signed by both parties. No oral statements or representations made by, or for, or on behalf of either party shall be a part of such contract. In addition, the Purchaser shall not transfer or assign the Agreement without the express written consent of the Government. Any assignment transaction without such consent shall be void.</span></p>
+<p><span style="font-weight: 400;">4. CONDITION OF PROPERTY<br /></span><span style="font-weight: 400;">The Property is offered for sale &ldquo;AS IS&rdquo; AND &ldquo;WHERE IS&rdquo; without representation or warranty, expressed or implied. The Purchaser, and Purchaser&rsquo;s successors and assigns, or any party-in-possession of the Property, or any part thereof, further acknowledges that the Government makes no representations or warranty concerning the title, zoning, character, condition, size, quantity, quality and state of repair of the Property. The Government makes no other agreement or promise to alter, improve, adapt or repair the Property not otherwise contained herein. Purchaser shall rely solely on its own due diligence and examination of the Property. Purchaser acknowledges that there will be no claims or any allowances or deductions upon grounds that the Property is not in condition or fit to be used for any purpose intended by the Purchaser after the conclusion of the auction. An &ldquo;As Is, Where Is&rdquo; provision will be included in the Quitclaim Deed [sample deed attached][and is provided in the Notices and Covenants section].</span></p>
+<p><span style="font-weight: 400;">5. BIDS AND TERMS OF SALE<br /></span><span style="font-weight: 400;">Bids to purchase must be ALL-CASH. Buyers are expected to arrange their own financing and to pay the balance in full by the closing date. No Government credit terms are available. GSA has no information on the availability of private financing or on the suitability of this Property for financing.</span></p>
+<p><span style="font-weight: 400;">6. ACCEPTABLE BID<br /></span><span style="font-weight: 400;">An acceptable bid is one received from a responsible bidder, whose bid, conforming to the IFB, will be most advantageous to the Government.&nbsp;</span></p>
+<p><span style="font-weight: 400;">7. BID EXECUTED ON BEHALF OF BIDDER<br /></span><span style="font-weight: 400;">A bid executed by an attorney or agent on behalf of the bidder shall be accompanied by an authenticated copy of their Power of Attorney or other evidence of their authority to act on behalf of the bidder.&nbsp;</span></p>
+<p><span style="font-weight: 400;">If the bidder is a corporation, the Certificate of Corporate/Organization Bidder, included in the IFB, must be executed. The certificate must be executed under the corporate seal by some duly authorized officer of the corporation other than the officer signing the bid. In lieu of the Certificate of Corporate Bidder, there may be attached to the bid, copies of so much of the records of the corporation as will show the official character and authority of the officer signing, duly certified by the secretary or assistant secretary, under the corporate seal, to be true copies.</span></p>
+<p><span style="font-weight: 400;">If the bidder is a partnership, and all partners sign the bid, with a notation that they are all general partners, the Government will not ordinarily require any further proof of the existence of the partnership. If all the partners do not sign the bid, then the names of all those except limited partners must be furnished on the bid form and the Government, in its discretion, may require evidence of the authority of the signer(s) to execute bids on behalf of the partnership. The name(s) and signature(s) of the designated bidder(s) must be included on the Bidder Registration and Bid Form.</span></p>
+<p><span style="font-weight: 400;">If the bidder is a limited liability company, a certificate of the LLC must be completed and executed by the manager and submitted with the Bidder Registration Form. The Certificate of Corporate/Organization Bidder form may be used for this purpose.</span></p>
+<p><span style="font-weight: 400;">8. NOTICE OF ACCEPTANCE OR REJECTION<br /></span><span style="font-weight: 400;">Notice by the Government of acceptance or rejection of the bid shall be deemed to have been sufficiently given when faxed, mailed or e-mailed to the bidder or their duly authorized representative at the fax number physical address or e-mail address indicated on the Bid Form. The processing of a registration deposit by the Government shall not, in itself, constitute acceptance of the bidder's offer. The Government reserves the right to reject any or all bids or portions thereof for any reason.</span></p>
+<p><span style="font-weight: 400;">9. AUCTION SUSPENSION OR CANCELLATION<br /></span><span style="font-weight: 400;">The Government reserves the right to temporarily suspend or cancel the auction for any reason without accepting a bid and resume the auction or start a new auction at any time. In the event of a temporary suspension due to technical problems, or other bidding issues, the Government will determine the high bidder and the high bid amount; re-open bidding and allow the auction to proceed according to the bidding terms described herein. The Government reserves the right to cancel the sale at any time and Registration Deposits will be returned to bidders without interest or further obligation by the Government.</span></p>
+<p><span style="font-weight: 400;">10. REVOCATION OF BID AND DEFAULT<br /></span><span style="font-weight: 400;">Purchaser agrees that bids made to purchase the Property are binding offers and once accepted for contract by the Government, all deposits made by the Purchaser to register for the sale, subject to this Invitation for Bids, become Earnest Money to the benefit, custody and accountability of the Government.</span></p>
+<p><span style="font-weight: 400;">In the event of (1) revocation of a bid after the conclusion of an auction, but prior to acceptance of the high bid by the Government, or (2) in the event of revocation of a bid after notice of acceptance, or (3) in the event of any default by the Purchaser in the performance of the contract of sale created by such acceptance, or (4) in the event of failure by the Purchaser to consummate the transaction, the Purchaser agrees that any Earnest Money and all deposits paid to the Government in any acceptable form, including credit card, together with any payments subsequently made on account, are subject to forfeit by the Purchaser to the Government at the option of the Government as damages for breach of contract, in which event the Purchaser shall be relieved from further liability. Purchaser agrees that all deposits made with credit cards are subject to forfeit upon Government determination of Purchaser&rsquo;s default and breach of contract. Purchaser shall not request retrieval, chargeback or any other cardholder refund.</span></p>
+<p><span style="font-weight: 400;">Purchaser agrees and understands that a debt to the United States of America subject to claim or collection by applicable Federal law may be created if their Earnest Money is in any way made unavailable to the Government and that any party that knowingly participates in such retrieval or refund may be held fully accountable for interfering with a Government contract.&nbsp;</span></p>
+<p><span style="font-weight: 400;">11. GOVERNMENT LIABILITY<br /></span><span style="font-weight: 400;">If the Government accepts a bid for the purchase of the Property and (1) the Government fails for any reason to perform its obligations as set forth herein; or (2) title does not transfer or vest in the Purchaser for any reason, although Purchaser is ready, willing, and able to close; or (3) any other contractual claim or cause of action hereafter accrues in favor of Purchaser under the terms of the IFB, Government&rsquo;s liability to Purchaser shall be strictly limited to all amounts of money Purchaser has paid to Government without interest whereupon Government shall have no further liability to Purchaser.‬&nbsp;</span></p>
+<p><span style="font-weight: 400;">12. WAIVER OF INFORMALITIES OR IRREGULARITIES<br /></span><span style="font-weight: 400;">The Government may, at its election, waive any minor informality or irregularity in bids received.</span></p>
+<p><span style="font-weight: 400;">13. RISK OF LOSS<br /></span><span style="font-weight: 400;">As of the date of assumption of possession of the Property or the date of conveyance, whichever occurs first, the Purchaser shall assume all responsibility for care and handling and all risks of loss or damage to the Property, including but not limited to all buildings and other improvements located thereon, and assume all obligations and liabilities of ownership and no claim for any allowance or deduction upon such grounds will be considered after the conclusion of an auction.</span></p>
+<p><span style="font-weight: 400;">14. TAXES, ASSESSMENTS AND OTHER COSTS<br /></span><span style="font-weight: 400;">As of the date of assumption of possession of the Property, or the date of conveyance, whichever occurs first, the Purchaser shall assume responsibility for all general and special real and personal property taxes or other assessments which have been or may be assessed on the Property, and for all sums due to be paid by the Government in lieu of taxes, which amount shall be prorated.&nbsp;</span></p>
+<p><span style="font-weight: 400;">15. TITLE EVIDENCE<br /></span><span style="font-weight: 400;">Any bidder, at its sole cost and expense, may procure any title evidence that the said bidder desires. The Government will, however, cooperate with the Purchaser or their authorized agent in this transaction, and will permit examination and inspection of such deeds, abstracts, affidavits of title, judgments in condemnation proceedings, or other documents relating to the title of the premises and Property involved, as it may have available. It is understood and agreed that the Government is not obligated to pay for any expense incurred in connection with title matters or survey of the Property.</span></p>
+<p><span style="font-weight: 400;">16. TITLE<br /></span><span style="font-weight: 400;">If a bid for the purchase of the Property is accepted, a quitclaim deed or a deed without warranty in conformity with local law and practice will convey the Government's interest.&nbsp; A bill of sale will be utilized to convey personal property, if necessary. The Government does not pay for or provide title insurance.</span></p>
+<p><span style="font-weight: 400;">&nbsp;17. </span><span style="font-weight: 400;">EASEMENTS, ENCROACHMENTS AND RESERVATIONS<br /></span><span style="font-weight: 400;">The Property will be sold subject to any and all covenants, reservations, easements, restrictions, encroachments, and rights, recorded or unrecorded, in favor of third parties, for highways, streets, power lines, telephone lines and equipment, pipelines, drainage, sewer and water mains and lines, public utilities, public roads, railroads and other rights-of-way, and any easements, reservations, rights and covenants reserved by the Grantor herein.</span></p>
+<p><span style="font-weight: 400;">18. COVENANT AGAINST CONTINGENT FEES&nbsp;<br /></span><span style="font-weight: 400;">The Purchaser warrants that he or she has not employed or retained any person or agency to solicit or secure this contract upon any agreement or understanding for commission, percentage, brokerage, or contingent fee. Breach of this warranty shall give the Government the right to annul the contract without liability or in its discretion to recover from the Purchaser the amount of such commission, percentage, brokerage, or contingent fee in addition to the consideration herewith set forth. This warranty shall not apply to commissions payable by the Purchaser upon the contract secured or made through bona fide established commercial agencies maintained by the Purchaser for the purpose of doing business. &ldquo;Bona fide established commercial agencies&rdquo; has been construed to include licensed real estate brokers engaged in the business generally.</span></p>
+<p><span style="font-weight: 400;">19. OFFICIALS NOT TO BENEFIT<br /></span><span style="font-weight: 400;">No member or delegate to the Congress, resident commissioner or Government official shall be admitted to any share or part of the contract of sale or to any benefit that may arise therefrom, but this provision shall not be construed to extend to the contract of sale if made with a corporation for its general benefit. GSA and (insert landholding agency, if applicable) employees are prohibited from bidding on the Property offered in the IFB.</span></p>
+<p><span style="font-weight: 400;">20. CAPACITY TO CONTRACT<br /></span><span style="font-weight: 400;">Bidders must have the legal capacity to enter into a contract in order to bid and acquire the Property.</span></p>
+<p><span style="font-weight: 400;">21. COMPLIANCE WITH SECTION 889 PART B<br /></span><span style="font-weight: 400;">By signature of the Bidder Registration and Bid Form, bidders hereby certify that their entity is in compliance with&nbsp; Section 889, Prohibition of Certain Telecommunications and Video Surveillance Services or Equipment of the Fiscal Year 2019 National Defense Authorization Act (Pub. L. 115- 232). The bidder represents that it does not use covered telecommunications equipment or services, or use any equipment, system or service that uses covered telecommunications equipment or services. The statute prohibits contracting with an entity that uses certain telecommunications equipment or services produced by the below entities, companies, affiliates, or subsidiaries:</span></p>
+<ol>
+<li><span style="font-weight: 400;"> </span><span style="font-weight: 400;">Huawei Technologies Company</span></li>
+<li><span style="font-weight: 400;"> </span><span style="font-weight: 400;">ZTE Corporation</span></li>
+<li><span style="font-weight: 400;"> </span><span style="font-weight: 400;">Hytera Communications Corporation</span></li>
+<li><span style="font-weight: 400;"> </span><span style="font-weight: 400;">Hangzhou Hikvision Digital Technology Company</span></li>
+<li><span style="font-weight: 400;"> </span><span style="font-weight: 400;">Dahua Technology Company</span></li>
+</ol>
+<p><span style="font-weight: 400;">The prohibition of use of these telecommunications equipment or services applies regardless of whether or not that usage is related to the terms and conditions of the IFB and the certification extends until closing of the transaction as specified herein.</span></p>
+<p><span style="font-weight: 400;">22. EXCLUDED PARTIES<br /></span><span style="font-weight: 400;">Bidders are hereby notified that GSA determines bidders&rsquo; eligibility for participation in the sale described in the IFB both upon registration and at prospective award. GSA validates prospective bidders&rsquo; eligibility via the System for Award Management (SAM) Exclusions Extract (available at https://sam.gov/entity-information) and are required to provide their Social Security Number or Tax Identification Number on the Bid Form.</span></p>
+<p><span style="font-weight: 400;">23. ANTITRUST LAWS (if applicable)<br /></span><span style="font-weight: 400;">The contract made by the acceptance of bid by the Government may be transmitted to the Attorney General of the United States for advice as to whether the sale would tend to create or maintain a situation inconsistent with anti-trust laws. The Government may rescind the acceptance of any bid, in case unfavorable advice is received from the Attorney General, without liability on the part of the Government other than to return any and all deposits held by the Government without interest.</span></p>
+<p><span style="font-weight: 400;">24. ADDITIONAL INFORMATION<br /></span><span style="font-weight: 400;">GSA will provide additional copies of an IFB and make every effort to answer requests for additional information concerning the Property to facilitate preparation of bids. Each bid shall be deemed to have been made with full knowledge of all terms, conditions, and requirements contained in an IFB and any amendments made thereto prior to bid acceptance. Bidders may also review the information pertaining to the Property at https://propertydisposal.gsa.gov or RealEstateSales.gov.</span></p>
+                
+                
+
+
+              </div><!-- End .blog-wrap -->
+
+            </div><!-- End .blog-detail-wrap -->
+
+          </div><!-- End .col-lg-12 -->
+        </div><!-- End .row -->
+      </div><!-- End .container -->
+    </section> <!-- End .blog-wrapper -->
+
+  </div><!-- end .body-content -->
+
+  <div class="overlay" style="display:none;">
+    <div class="loader">Loading...</div>
+  </div>
+
+
+
+
+    
+    
+
+<style>
+  .footer-top-container {
+    background-color: #e0e6eb;
+    padding-top: 20px;
+  }
+
+  .footer-middle-container {
+    background-color: #ccd6e0;
+  }
+
+  .footer-bottom-container {}
+
+  .footer {
+    padding: 0px 0px 40px 0px;
+    background: #323a45;
+  }
+
+  .footer .footer-middle {
+    padding-top: 20px;
+    justify-content: start;
+    align-items: start;
+
+  }
+
+  .footer .footer-middle .block h6 {
+    color: black;
+    font-weight: bold;
+    border-bottom: none;
+  }
+
+  .footer .footer-middle .block ul.links li a {
+    color: #005ea2;
+    font-weight: 300;
+    text-decoration-line: underline;
+  }
+
+  .footer-bottom-container .footer-middle .block ul.links li a {
+    color: #a9aeb1;
+    font-weight: 300;
+    text-decoration-line: underline;
+  }
+
+  .footer .footer-middle-container h6 {
+    color: black;
+    font-weight: bold;
+  }
+
+  .middle-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-top: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+  }
+
+  .middle-row p {
+    margin: 0 0 0;
+    color: black;
+  }
+
+  .banner-icon-img {
+    width: 60px;
+  }
+
+  .outer-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .inner-row {
+    display: flex;
+    /* Horizontal layout for the inner row */
+    gap: 10px;
+    /* Space between cells */
+    padding: 10px
+  }
+</style>
+
+<footer class="footer" aria-label="Footer">
+  <!--
+    <div class="container-fluid">
+    
+    <div class="row">
+      <div class="col-md-12">
+      -->
+
+    <div class="footer-top-container">
+      <div class="container-fluid">
+        <div class="footer-middle">
+          <div class="block">
+            <h6 aria-level="6">
+              Search
+            </h6>
+            <ul class="links">
+              <li>
+                <a role="button" href="/our-listing/" tabindex="21">Our Listings</a>
+              </li>
+              <!-- PGC
+                  <li>
+                    <a role="button" href="javascript:void(0)" tabindex="23">Nationwide Listing</a>
+                  </li>
+                  -->
+              <li>
+                <a role="button" href="/our-listing/?listing_type=closed_listing" tabindex="22">Sold Properties</a>
+              </li>
+            </ul>
+          </div><!-- End .block -->
+          <div class="block">
+            <h6 aria-level="6">
+              Our Office
+            </h6>
+            <ul class="links">
+              <!--
+                  <li>
+                    <a role="button" href="/our-agents" tabindex="25">Our Agents</a>
+                  </li>
+                -->
+              <li>
+                <a role="button" href="/about-us" tabindex="24">About Us</a>
+              </li>
+              <li>
+                <a role="button" href="/contact-us" tabindex="25">Contact Us</a>
+              </li>
+            </ul>
+          </div><!-- End .block -->
+          <div class="block">
+            <h6 aria-level="6">
+              Discover
+            </h6>
+            <ul class="links">
+              <li>
+                <a role="button" href="/buyers/" tabindex="26">Bidders</a>
+              </li>
+              <li>
+                <a role="button" href="/subscribers/" tabindex="27">Subscribers</a>
+              </li>
+              <!--
+                  <li>
+                    <a role="button" href="javascript:void(0)" tabindex="30">Agents</a>
+                  </li>
+                  -->
+            </ul>
+          </div><!-- End .block -->
+          <div class="block">
+            <h6 aria-level="6">
+              Help
+            </h6>
+            <ul class="links">
+              <li>
+                <a role="button" href="/faq/" tabindex="28">FAQs</a>
+              </li>
+              <!-- PGC
+                  <li>
+                    <a role="button" href="/auction-type/" tabindex="29">Auction Types</a>
+                  </li>
+                  <li>
+                    <a role="button" href="/video-tutorials/" tabindex="33">Video Tutorials</a>
+                  </li>
+                  -->
+            </ul>
+          </div><!-- End .block -->
+        </div><!-- End .footer-top -->
+      </div>
+      <br />
+    </div>
+
+    <div class="footer-middle-container">
+      <div class="container-fluid" >
+        <div class="middle-row">
+          <div>
+            <h6>GSA REAL ESTATE SALES</h6>
+            <span style="color: black; margin-left: 5px;">
+              National Applications Help Desk&nbsp;
+              1-866-367-7878 <span> <a style="color: #005ea2; font-weight: 300;text-decoration-line: underline;"
+                  href="mailto:COPBSApp@gsa.gov" target=”_blank” rel=noopener noreferrer””>COPBSApp@gsa.gov</a>
+          </div>
+          <div>
+            <h6>Find us on social media</h6>
+            <ul class="social-links">
+              
+              <li class="facebook">
+                <a role="button" href="https://www.facebook.com/GSARealProperty" target="_blank"
+                  aria-label="Social links" tabindex="31">
+                  <img src="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/images/facebook-icon.png" alt="Social" title="Social">
+                </a>
+              </li>
+              <li class="twitter">
+                <a role="button" href="https://www.twitter.com/GSA_RPdisposal" target="_blank" aria-label="Social links"
+                  tabindex="21">
+                  <img src="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/images/x-icon.png" alt="Social" title="Social">
+                </a>
+              </li>
+              <li class="youtube">
+                <a role="button" href="https://www.youtube.com/playlist?list=PLvdwyPgXnxxXl5BWiyhQRNTpIDmfsOK48"
+                  target="_blank" aria-label="Social links" tabindex="21">
+                  <img src="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/images/youtube-icon.png" alt="Social" title="Social">
+                </a>
+              </li>
+            </ul>
+            <!--
+                  <ul class="social-links">
+                    
+                  </ul>
+                -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom-container">
+      <div class="container-fluid">
+        <div style="padding-top: 20px;">
+
+          <div class="row outer-row">
+
+            <div class="column">
+              <p>
+                <img class="banner-icon-img" role="img" area-label="logo"
+                  src="https://d2m3yrz4x1yefr.cloudfront.net/property_image/1706846114.515992_resauclogo.png"
+                  alt="real estate sales">
+              </p>
+            </div>
+
+            <div class="column">
+              <p style="margin: 0;">realestatesales.gov</p>
+              <p>An official website of the <a href="https://www.gsa.gov/" target="_blank" role="button"
+                  style="color:white; text-decoration: underline;" tabindex="32">General Services Administration&nbsp;<i
+                    class="fas fa-external-link-alt"></i></a></p>
+            </div>
+
+          </div>
+
+          <div class="footer-middle">
+            <div class="block">
+              <ul class="links">
+                <li>
+                  <a role="button" target="_blank" href="https://www.gsa.gov/about-us?topnav=about-us"
+                    tabindex="0">About GSA&nbsp;<i class="fas fa-external-link-alt"></i></a>
+                </li>
+                <li>
+                  <a role="button" target="_blank" href="https://www.gsa.gov/website-information/accessibility-statement" tabindex="0">Accessibility support&nbsp;<i
+                      class="fas fa-external-link-alt"></i></a>
+                </li>
+              </ul>
+            </div><!-- End .block -->
+
+            <div class="block">
+              <ul class="links">
+                <li>
+                  <a role="button" target="_blank" href="https://www.gsa.gov/reference/freedom-of-information-act-foia"
+                    tabindex="0">FOIA requests&nbsp;<i class="fas fa-external-link-alt"></i></a>
+                </li>
+                <li>
+                  <a role="button" target="_blank"
+                    href="https://www.gsa.gov/reference/civil-rights-programs/the-no-fear-act" tabindex="0">No FEAR Act
+                    data&nbsp;<i class="fas fa-external-link-alt"></i></a>
+                </li>
+              </ul>
+            </div><!-- End .block -->
+
+            <div class="block">
+              <ul class="links">
+                <li>
+                  <a role="button" target="_blank" href="https://www.gsaig.gov/" tabindex="0">Office of the Inspector
+                    General&nbsp;<i class="fas fa-external-link-alt"></i></a>
+                </li>
+                <!--
+                    <li>
+                      <a role="button" target="_blank" href="https://www.gsa.gov/reference/reports/budget-and-performance?_gl=1%2Acz8qoc%2A_ga%2ANzk5OTM3NTU5LjE3MjY1MTU2MTQ.%2A_ga_HBYXWFP794%2AMTczMjYzMjk3MS4xMC4wLjE3MzI2MzI5NzEuMC4wLjA." tabindex="0">Performance Reports &nbsp;<i class="fas fa-external-link-alt"></i></a>
+                    </li>
+                    -->
+              </ul>
+            </div><!-- End .block -->
+
+            <div class="block">
+              <ul class="links">
+                <li>
+                  <a role="button" target="_blank"
+                    href="https://www.gsa.gov/website-information/website-policies#privacy" tabindex="38">Privacy
+                    policy&nbsp;<i class="fas fa-external-link-alt"></i></a>
+                </li>
+              </ul>
+            </div><!-- End .block -->
+          </div>
+
+
+          <p style="padding-top: 20px;">Looking for U.S government information and services? <a
+              href="https://www.usa.gov/" target="_blank" role="button"
+              style="color:white; font-weight: bold; text-decoration: underline;" tabindex="39">Visit USA.gov&nbsp;<i
+                class="fas fa-external-link-alt"></i></a></p>
+
+        </div>
+      </div>
+    </div>
+
+  <!-- </div>  -->
+  <script async type="text/javascript" src="https://dap.digitalgov.gov/Universal-Federated-Analytics-Min.js?agency=GSA"
+    id="_fed_an_ua_tag"></script>
+
+</footer><!-- End .footer -->
+    
+
+    
+
+  <script type="text/javascript" src="https://d2w9j5i7epyyai.cloudfront.net/static/assets/uswds/js/uswds.min.js?v=1.1"></script>
+  <script type="text/javascript" src="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/js/all.js?v=1.1"></script>
+
+  <script type="text/javascript" src="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/js/homepage.js?v=1.1"></script>
+  <script type="text/javascript" src="https://d2w9j5i7epyyai.cloudfront.net/static/theme-4/js/toggle-nav.js?v=1.1"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.21.0/jquery.validate.min.js"></script>
+  <script>
+    $('.nav').nav();
+    $(document).ready(function() {
+      $('[data-toggle="tooltip"]').tooltip()
+    });
+    //var google_map_key = "";
+
+  </script>
+  <!-- <script type="text/javascript" src="https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/markerclusterer.js"></script> -->
+
+<script type="text/javascript" src="https://d2w9j5i7epyyai.cloudfront.net/static/theme-common/js/common.js?v=1.1"></script>
+
+
+</body>
+</html>

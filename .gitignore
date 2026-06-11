@@ -48,9 +48,20 @@ yarn-error.log*
 .env*
 !.env.production.example
 
+# Journey photo drop folder — raw phone photos carry GPS/EXIF; never commit them.
+# Only the stripped, published copies under /public/journey/ are committed.
+journey-photos/*
+!journey-photos/README.md
+
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Internal source-review exports (generated, not served)
+review-exports/
+
+# Runtime operator state + audit ledger (not committed)
+data/

@@ -55,7 +55,7 @@ const primaryRoutes = [
   "/build-preservation",
   "/doctrine-gap-ledger",
   "/exception-remediation",
-  "/data-rights",
+  "/internal/data-rights",
   "/module-readiness",
   "/portal/borrower",
   "/lender/dashboard",

@@ -3,41 +3,31 @@
 import { usePathname } from "next/navigation";
 
 import { ModuleNav } from "@/components/platform/ModuleNav";
-import { PublicSiteHeader } from "@/components/public/PublicSiteHeader";
+import { isInternalChromeRoute } from "@/lib/auth/protectedRoutes";
 
 /**
- * Platform Chrome (Build 45 / 44-B)
+ * Platform Chrome (Build 56 — SECURITY: safe-by-default isolation)
  *
- * On internal routes: renders the internal operator header + governed-module
- * navigation. On public, customer-facing routes: renders the PublicSiteHeader
- * (Furlong logo trust anchor + public navigation) instead — so those pages read
- * as a public discovery experience, branded but never as an internal dashboard.
+ * The internal operator/governance chrome (the "Furlong Governed Platform"
+ * index header + ModuleNav of internal routes) must render ONLY on genuine
+ * internal routes — NEVER on a public page.
+ *
+ * Polarity matters: this is an INTERNAL allowlist, default = NOT internal.
+ * An unknown or new public route therefore renders NO internal chrome (the
+ * safe failure mode). The previous design allowlisted *public* routes and
+ * leaked internal chrome onto anything it forgot to list (e.g. /compass) —
+ * exposing the internal route map to the open web. Never again.
+ *
+ * Public pages get their header from PublicSiteLayout; this returns null for
+ * them. verify:public asserts (against rendered HTML) that no internal index or
+ * internal href ever appears on a public page.
  */
 
-// Customer-facing routes that must NOT show internal operator chrome.
-const PUBLIC_ROUTES = new Set<string>([
-  "/",
-  "/about",
-  "/trust",
-  "/data-rights",
-  "/financing-pathways",
-  "/readiness",
-  "/onboarding",
-  "/portal/borrower",
-  "/success",
-]);
-
-// Public route prefixes (e.g. the stewardship index + each steward profile).
-const PUBLIC_ROUTE_PREFIXES = ["/stewardship", "/explore", "/about"];
-
-function isPublicRoute(pathname: string): boolean {
-  if (PUBLIC_ROUTES.has(pathname)) {
-    return true;
-  }
-  return PUBLIC_ROUTE_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-  );
-}
+// The internal-route allowlist is the single source of truth in
+// src/lib/auth/protectedRoutes.ts (shared with the auth middleware and the
+// verify:internal-auth gate), so chrome visibility and server-side auth gating
+// can never drift apart. Anything NOT matched there is public → no chrome.
+const isInternalRoute = isInternalChromeRoute;
 
 export function PlatformChrome({
   internalCount,
@@ -47,8 +37,11 @@ export function PlatformChrome({
   translationCount: number;
 }) {
   const pathname = usePathname();
-  if (pathname && isPublicRoute(pathname)) {
-    return <PublicSiteHeader />;
+  // Safe-by-default: render internal chrome ONLY on genuine internal routes.
+  // Public / unknown routes get null here (PublicSiteLayout owns their header),
+  // so the internal index + internal nav can never leak onto a public page.
+  if (!pathname || !isInternalRoute(pathname)) {
+    return null;
   }
 
   return (
@@ -72,7 +65,7 @@ export function PlatformChrome({
         >
           <div>
             <div style={{ fontSize: 15, fontWeight: 700 }}>
-              Ares/Furlong Governed Platform
+              Furlong Governed Platform
             </div>
             <div style={{ color: "#cbd5e1", fontSize: 13, marginTop: 3 }}>
               {internalCount} internal surfaces, {translationCount} translated

@@ -55,7 +55,7 @@ export const FEATURED_SERIES: Record<FeaturedSeriesId, FeaturedSeries> = {
     label: "America 250 Featured Exploration",
     badge: "America 250 · Featured Exploration",
     tagline:
-      "Celebrating 250 years of American growth, innovation, stewardship, and opportunity.",
+      "Illustrative examples from 250 years of American land, agriculture, and community.",
     description:
       "Discover how places, communities, agriculture, infrastructure, and opportunity " +
       "evolved across America over 250 years. " +

@@ -3046,7 +3046,9 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     id: "data-rights",
     moduleNumber: 19,
     title: "Borrower Data Rights and Portability Workspace",
-    route: "/data-rights",
+    // Build 56: moved off the public "/data-rights" path (the public site
+    // redirects /data-rights → /trust#your-data) to a distinct INTERNAL route.
+    route: "/internal/data-rights",
     audience: ["internal"],
     permissions: ["data-rights:read", "data-rights:prepare"],
     dataDependencies: ["applications", "documents", "reports", "audit-ledger"],

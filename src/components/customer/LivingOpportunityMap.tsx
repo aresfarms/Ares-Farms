@@ -12,6 +12,8 @@ import {
   detectSeriesId,
   getFeaturedSeries,
 } from "@/lib/customer-landing/featuredSeriesRegistry";
+// Narration disabled — professional audio assets pending.
+// Re-enable NarrationBar when ElevenLabs MP3s are deployed.
 
 /**
  * Living Opportunity Map — Build 51 (Map Cleanup).
@@ -344,17 +346,17 @@ export function LivingOpportunityMap({
 }: {
   stories?: FeaturedStory[];
 }) {
-  const [active, setActive]         = useState(0);
-  const [phase, setPhase]           = useState<SequencePhase>("national");
-  const [viewBox, setViewBox]       = useState<ViewBox>(NATIONAL_VBOX);
-  const [reduceMotion, setRM]       = useState(false);
-  const [mapAssets, setMapAssets]   = useState<MapAssetState>({ status: "loading" });
-  const [seqKey, setSeqKey]         = useState(0); // increment to restart sequence
-  const activeRef = useRef(0);
-  const pausedRef = useRef(false);
-  const resumeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Build 50 — Static map. Animated pathway journey (zoom-in/zoom-out to state)
+  // is deferred until the journey animation is production-ready.
+  // Phase is always "national"; viewBox is always NATIONAL_VBOX.
+  // User can still click story buttons to switch the highlighted story.
+  // The animated sequence will be re-enabled in a later build.
+  const [active, setActive]       = useState(0);
+  const [reduceMotion, setRM]     = useState(false);
+  const [mapAssets, setMapAssets] = useState<MapAssetState>({ status: "loading" });
+  const activeRef                 = useRef(0);
 
-  // Reduced-motion detection
+  // Reduced-motion detection — still respected for pulse animation on markers.
   useEffect(() => {
     if (typeof window === "undefined" || !window.matchMedia) return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -382,101 +384,19 @@ export function LivingOpportunityMap({
       .catch(() => setMapAssets({ status: "unavailable" }));
   }, []);
 
-  // Animated discovery sequence
-  useEffect(() => {
-    if (reduceMotion || stories.length < 2 || mapAssets.status !== "ready") return;
-
-    const { boundsMap } = mapAssets;
-    const cancelled = { current: false };
-    let idx = activeRef.current;
-
-    const wait = (ms: number) =>
-      new Promise<void>(r => { const id = setTimeout(r, ms); void id; });
-
-    async function run() {
-      let currentVB = NATIONAL_VBOX;
-      // Reset to national before starting
-      setViewBox(NATIONAL_VBOX);
-      currentVB = NATIONAL_VBOX;
-
-      while (!cancelled.current) {
-        // Wait out any user-initiated pause
-        while (pausedRef.current && !cancelled.current) await wait(200);
-        if (cancelled.current) break;
-
-        const story = stories[idx];
-
-        if (story.stayNational) {
-          // ─── National-only story (intro / overview) ──────────────────────
-          // Hold the full national view for the combined national + stateFocus
-          // duration. No zoom in or out. Used for intro and overview entries.
-          setPhase("national");
-          setViewBox(NATIONAL_VBOX);
-          currentVB = NATIONAL_VBOX;
-          await wait(SEQ.national + SEQ.stateFocus);
-          if (cancelled.current) break;
-        } else {
-          // ─── Normal zoom sequence ─────────────────────────────────────────
-          const bounds = boundsMap.get(story.state) ?? null;
-          const stateVB = boundsToViewBox(bounds);
-
-          // Phase 1: National view
-          setPhase("national");
-          if (currentVB !== NATIONAL_VBOX) {
-            setViewBox(NATIONAL_VBOX);
-            currentVB = NATIONAL_VBOX;
-          }
-          await wait(SEQ.national);
-          if (cancelled.current) break;
-
-          // Phase 2: Zoom in
-          setPhase("zooming-in");
-          await animateVB(NATIONAL_VBOX, stateVB, SEQ.zoomIn, vb => {
-            setViewBox(vb);
-            currentVB = vb;
-          }, cancelled);
-          if (cancelled.current) break;
-
-          // Phase 3: State focus + pathways
-          setPhase("state-focus");
-          await wait(SEQ.stateFocus);
-          if (cancelled.current) break;
-
-          // Phase 4: Zoom out
-          setPhase("zooming-out");
-          await animateVB(stateVB, NATIONAL_VBOX, SEQ.zoomOut, vb => {
-            setViewBox(vb);
-            currentVB = vb;
-          }, cancelled);
-          if (cancelled.current) break;
-        }
-
-        // Advance to next story
-        idx = (idx + 1) % stories.length;
-        activeRef.current = idx;
-        setActive(idx);
-      }
-    }
-
-    run();
-    return () => { cancelled.current = true; };
-  }, [reduceMotion, stories.length, mapAssets.status, seqKey]); // eslint-disable-line
+  // Build 50: No auto-advancing sequence. User clicks story buttons to switch.
+  // Phase is always "national"; no zoom, no flyTo. Animated sequence deferred.
+  const phase: SequencePhase = "national";
+  const viewBox: ViewBox     = NATIONAL_VBOX;
 
   const story = stories[active] ?? stories[0];
 
   function select(index: number) {
     activeRef.current = index;
     setActive(index);
-    pausedRef.current = true;
-    if (resumeTimer.current) clearTimeout(resumeTimer.current);
-    resumeTimer.current = setTimeout(() => {
-      pausedRef.current = false;
-    }, (SEQ.national + SEQ.zoomIn + SEQ.stateFocus + SEQ.zoomOut) * 1.5);
-    // Restart sequence at selected story
-    setSeqKey(k => k + 1);
   }
 
-  const showAmerica250 = phase === "national" || phase === "zooming-out";
+  const showAmerica250 = true; // always national view in Build 50
 
   // Series-aware branding
   const seriesId = detectSeriesId(stories);
@@ -529,43 +449,28 @@ export function LivingOpportunityMap({
         }
       `}</style>
 
-      {/* Header — prominent navy panel for America 250; minimal row for standard */}
-      {seriesId === "america-250" ? (
-        <div style={{
-          background: "#162033",
-          borderRadius: 12,
-          padding: "16px 20px",
-          display: "grid",
-          gap: 4,
-        }}>
-          <strong style={{
-            fontSize: 18,
-            letterSpacing: 0.5,
-            textTransform: "uppercase",
-            color: "#c9a84c",
-            fontWeight: 800,
-          }}>
-            America 250
-          </strong>
-          <span style={{ fontSize: 14, color: "rgba(232,239,250,0.75)", lineHeight: 1.5 }}>
-            {series.tagline}
-          </span>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline", justifyContent: "space-between" }}>
-          <strong style={{ fontSize: 14, letterSpacing: 0.3, textTransform: "uppercase", color: "#162033" }}>
-            {headerLabel}
-          </strong>
-          <span style={{ fontSize: 14, color: "#5d687a" }}>
-            {headerNote}
-          </span>
-        </div>
-      )}
+      {/* Series label — minimal one-line row, no duplicate banners */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "baseline", justifyContent: "space-between" }}>
+        <strong style={{ fontSize: 14, letterSpacing: 0.3, textTransform: "uppercase", color: "#162033" }}>
+          {headerLabel}
+        </strong>
+        <span style={{ fontSize: 14, color: "#5d687a" }}>
+          {headerNote}
+        </span>
+      </div>
 
-      {/* Map — full width */}
-      <div style={{ position: "relative", borderRadius: 12, overflow: "hidden",
-        border: "1px solid #cdd9ec",
+      {/* Map — contained card: max-height 460px, full column width, story overlay inside.
+          Build 50: static national view; no zoom or fly-to animation. */}
+      <div style={{
+        position:   "relative",
+        borderRadius: 12,
+        overflow:   "hidden",
+        border:     "1px solid #cdd9ec",
         background: "radial-gradient(circle at 20% 20%, rgba(79,112,180,0.06), transparent 28%), linear-gradient(180deg,#ffffff 0%,#f8fbff 100%)",
+        height:     460,
+        display:    "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}>
         {mapAssets.status === "loading" && (
           <div aria-hidden style={{ display: "flex", alignItems: "center", justifyContent: "center",
@@ -586,9 +491,12 @@ export function LivingOpportunityMap({
             reduceMotion={reduceMotion}
           />
         )}
+
+        {/* Story overlay — inside the map, gradient bottom panel */}
+        <MapStoryOverlay story={story} phase={phase} />
       </div>
 
-      {/* Story card — below map, full width */}
+      {/* Screen-reader story card — visually hidden, aria-live region */}
       <StoryCard story={story} phase={phase} />
 
       {/* State selector */}
@@ -664,12 +572,8 @@ function RealUsMap({
       viewBox={vbStr(viewBox)}
       preserveAspectRatio="xMidYMid meet"
       role="img"
-      aria-label={
-        phase === "national"
-          ? "Full U.S. map — illustrative exploration overview, not based on your location."
-          : `U.S. map zoomed to ${story.state} — illustrative ${story.theme} exploration${story.period ? `, ${story.period}` : ""}. Not based on your location.`
-      }
-      style={{ width: "100%", height: "auto", display: "block" }}
+      aria-label="Full U.S. map — illustrative exploration overview, not based on your location."
+      style={{ width: "auto", height: "100%", maxHeight: 460, display: "block" }}
     >
       <defs>
         <filter id="fl-glow" x="-60%" y="-60%" width="220%" height="220%">
@@ -719,11 +623,13 @@ function RealUsMap({
             d={d}
             fill={
               isFeatured
-                ? `${story.color}22`
+                // Soft tint — shows featured state without a "hard filled polygon".
+                // 0x14 = opacity 0.078; very light hint of the story color.
+                ? `${story.color}14`
                 : showAmerica250 ? "transparent" : "#e8eef8"
             }
             stroke={isFeatured ? story.color : "#c5d3e8"}
-            strokeWidth={isFeatured ? 1.5 : 0.5}
+            strokeWidth={isFeatured ? 1.8 : 0.5}
             strokeLinejoin="round"
           />
         );
@@ -768,35 +674,42 @@ function RealUsMap({
         />
       )}
 
-      {/* ── Node markers (clean dots only — labels shown in story card below) ── */}
+      {/* ── Node markers — small waypoint dots with pulse on center node ── */}
       {isStateFocus && markerPoints.map((pt, idx) => (
         <g key={`node-${story.state}-${pt.type}`}>
-          {/* Soft outer halo — reduced radius for cleaner visual */}
-          <circle cx={pt.svgX} cy={pt.svgY} r={12}
-            fill={story.color} opacity={0.08} filter="url(#fl-soft)" />
           {/* Pulse ring on center node only */}
           {idx === 1 && (
             <circle className="furlong-pulse-ring"
-              cx={pt.svgX} cy={pt.svgY} r={6}
-              fill={story.color} opacity={0.22} />
+              cx={pt.svgX} cy={pt.svgY} r={5}
+              fill={story.color} opacity={0.28} />
           )}
-          {/* Inner halo */}
-          <circle cx={pt.svgX} cy={pt.svgY} r={5}
-            fill={story.color} opacity={0.18} />
-          {/* Dot */}
+          {/* Waypoint dot */}
           <circle cx={pt.svgX} cy={pt.svgY} r={4}
             fill={story.color} />
           {/* Core highlight */}
-          <circle cx={pt.svgX} cy={pt.svgY} r={2}
+          <circle cx={pt.svgX} cy={pt.svgY} r={1.8}
             fill="#ffffff" opacity={0.9} />
         </g>
       ))}
 
-      {/* ── National view: small markers only ── */}
-      {!isStateFocus && markerPoints.map(pt => (
-        <circle key={`sm-${story.state}-${pt.type}`}
-          cx={pt.svgX} cy={pt.svgY} r={4}
-          fill={story.color} opacity={0.7} />
+      {/* ── National view: soft glowing marker dots ──
+          Build 50: glow filter applied; pulse ring on center node (reduced-motion respected).
+          Markers are subtle indicators of the featured region, not exact locations. */}
+      {!isStateFocus && markerPoints.map((pt, idx) => (
+        <g key={`sm-${story.state}-${pt.type}`} filter="url(#fl-glow)">
+          {/* Outer soft glow ring — pulse on center node only */}
+          {idx === 1 && !reduceMotion && (
+            <circle className="furlong-pulse-ring"
+              cx={pt.svgX} cy={pt.svgY} r={7}
+              fill={story.color} opacity={0.22} />
+          )}
+          {/* Core dot */}
+          <circle cx={pt.svgX} cy={pt.svgY} r={4.5}
+            fill={story.color} opacity={0.82} />
+          {/* Inner highlight */}
+          <circle cx={pt.svgX} cy={pt.svgY} r={1.8}
+            fill="#ffffff" opacity={0.85} />
+        </g>
       ))}
 
       {/* ── America 250 era legend (national view, inside SVG) ── */}
@@ -880,16 +793,113 @@ const AMERICA_250_BADGE = {
   label: "America 250 · Featured Exploration",
 };
 
-// ── Story card ────────────────────────────────────────────────────────────────
-// Single-column layout: series badge → location → opportunity title → excerpt → path chips
+// ── Map story overlay ─────────────────────────────────────────────────────────
+// Rendered INSIDE the map container as a position: absolute gradient panel.
+// Displays location, pathway chips, and story excerpt as a dark bottom overlay.
+// This replaces the old "text below map" pattern.
+
+function MapStoryOverlay({ story, phase: _phase }: { story: FeaturedStory; phase: SequencePhase }) {
+  // Build 50: always national view — no phase label cycling.
+  void _phase;
+
+  return (
+    <div
+      aria-live="polite"
+      aria-atomic="true"
+      style={{
+        position:     "absolute",
+        bottom:       0,
+        left:         0,
+        right:        0,
+        background:   "linear-gradient(0deg, rgba(18,26,44,0.93) 0%, rgba(18,26,44,0.65) 55%, transparent 100%)",
+        padding:      "52px 16px 14px",
+        borderRadius: "0 0 11px 11px",
+        color:        "#ffffff",
+        pointerEvents: "none",
+        userSelect:   "none",
+      }}
+    >
+      {/* Top row — location + phase indicator */}
+      <div style={{
+        display:    "flex",
+        alignItems: "baseline",
+        flexWrap:   "wrap",
+        gap:        "6px 12px",
+        marginBottom: 6,
+      }}>
+        <span style={{ fontWeight: 700, fontSize: 15, lineHeight: 1.2 }}>
+          {story.state} · {story.county}
+        </span>
+        {story.period && (
+          <span style={{ fontSize: 12, color: "rgba(232,239,250,0.60)", fontWeight: 600 }}>
+            {story.period}
+          </span>
+        )}
+        <span style={{
+          marginLeft:    "auto",
+          fontSize:      12,
+          fontWeight:    700,
+          color:         "#c9a84c",
+          letterSpacing: "0.04em",
+        }}>
+          {story.stateAbbr}
+        </span>
+      </div>
+
+      {/* Opportunity + story headline */}
+      {story.headline && (
+        <div style={{
+          fontSize:     14,
+          fontWeight:   700,
+          color:        "rgba(232,239,250,0.90)",
+          lineHeight:   1.3,
+          marginBottom: 6,
+        }}>
+          {story.headline}
+        </div>
+      )}
+
+      {/* Pathway chips */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "3px 6px" }}>
+        {story.connectedNodes.map((node, idx) => (
+          <span
+            key={`overlay-${story.state}-${node.type}`}
+            style={{
+              fontSize: 12,
+              color:    idx === 0 || idx === story.connectedNodes.length - 1
+                        ? "rgba(232,239,250,0.85)"
+                        : "rgba(232,239,250,0.55)",
+            }}
+          >
+            {node.type}{idx < story.connectedNodes.length - 1 ? " →" : ""}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Story card (screen-reader accessible text region) ─────────────────────────
+// Kept for screen readers and text-first accessibility — not the primary visual.
+// The MapStoryOverlay handles the visual display inside the map.
 
 function StoryCard({ story, phase }: { story: FeaturedStory; phase: SequencePhase }) {
   const badge = story.seriesId === "america-250"
     ? AMERICA_250_BADGE
     : (THEME_BADGE[story.theme] ?? THEME_BADGE.modern);
 
+  // Visually hidden — screen-reader text complement to the in-map overlay.
+  // Uses clip pattern (WCAG 2.4.1 / aria-live for dynamic updates).
   return (
-    <div style={{ display: "grid", gap: 12 }}>
+    <div style={{
+      position: "absolute",
+      width: 1, height: 1,
+      padding: 0, margin: -1,
+      overflow: "hidden",
+      clip: "rect(0,0,0,0)",
+      whiteSpace: "nowrap",
+      border: 0,
+    }}>
       {/* Series / theme badge */}
       <div style={{ display: "inline-flex", alignSelf: "start",
         padding: "5px 14px", borderRadius: 999,

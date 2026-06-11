@@ -101,7 +101,7 @@ export const CURATED_EXPLORATION_STORIES: FeaturedStory[] = [
     stateAbbr: "IA",
     county: "Story County",
     opportunity: "Farms & Agriculture",
-    pathway: "Agriculture → Programs & Incentives",
+    pathway: "Agriculture → Grants, Programs & Incentives",
     story:
       "Agricultural projects can connect to financing, conservation, infrastructure, and program opportunities people often do not know to explore.",
     focusPoint: { x: 50, y: 42 },
@@ -319,8 +319,8 @@ export const EXPLORATION_CATEGORIES: ExplorationCategory[] = [
   },
   {
     slug: "programs-incentives",
-    label: "Programs & Incentives",
-    blurb: "Programs and incentives people often do not know to explore.",
+    label: "Grants, Programs & Incentives",
+    blurb: "Grants, tax credits, cost-share, and incentive programs people often don't know to explore — the add-ons that stack onto a project.",
   },
   {
     slug: "not-sure",

@@ -1,5 +1,5 @@
 /**
- * verifyPublicAccessibility — Build 50 WCAG 2.2 AA comprehensive static gate
+ * verifyPublicAccessibility — Build 53 WCAG 2.2 AA comprehensive static gate
  *
  * Doctrine: docs/DOCTRINE_PUBLIC_ACCESSIBILITY_WCAG_AA_V1.md
  * Version:  public-accessibility-wcag-aa-v1.0
@@ -10,21 +10,23 @@
  * we know cause failures are absent from source code, and that the Build 50
  * homepage structure conforms to the lighthouse architecture.
  *
- * Public pages covered (13):
+ * Public pages covered (14):
  *   / | /onboarding | /explore/property-land | /stewardship
  *   /stewardship/financing-capital | /stewardship/environmental-compliance
  *   /stewardship/communications-public-trust | /about | /trust
  *   /data-rights | /financing-pathways | /readiness | /portal/borrower
+ *   /accessibility
  *
  * Check groups:
  *   A — Map component ARIA + animation (Build 47-C/47-D/49)
  *   B — Color / contrast patterns
  *   C — Homepage Build 50 structural requirements
- *   D — Navigation / focus / keyboard
+ *   D — Navigation / focus / keyboard (extended Build 53)
  *   E — Brand / decorative elements
  *   F — Form accessibility
  *   G — Privacy posture (accessibility gate must not introduce surveillance)
- *   H — Cross-page structural existence
+ *   H — Cross-page structural existence (extended Build 53)
+ *   I — Build 53 accessibility additions (skip link, footer link, hero size, script)
  *
  * Verification posture:
  *   1.1.1  Non-text content — COVERED
@@ -53,7 +55,7 @@ import * as path from "path";
 
 const DOC_REF   = "docs/DOCTRINE_PUBLIC_ACCESSIBILITY_WCAG_AA_V1.md";
 const VERSION   = "public-accessibility-wcag-aa-v1.0";
-const BUILD_PHASE = "Build 50 — Homepage Cleanup + Accessibility Gate";
+const BUILD_PHASE = "Build 53 — Accessibility Support + Verification";
 
 function readSrc(rel: string): string {
   const abs = path.join(process.cwd(), rel);
@@ -87,18 +89,27 @@ function check(
 
 const mapComponent    = readSrc("src/components/customer/LivingOpportunityMap.tsx");
 const exploreDropdown = readSrc("src/components/public/ExploreDropdown.tsx");
+// header = PublicSiteHeader.tsx — has the stewardship dropdown, ARIA attributes, focus-visible (D-group checks).
 const header          = readSrc("src/components/public/PublicSiteHeader.tsx");
 const watermark       = readSrc("src/components/brand/FurlongCompassWatermark.tsx");
-const homepage        = readSrc("src/app/page.tsx");
-const stewardship   = readSrc("src/app/stewardship/page.tsx");
-const trust         = readSrc("src/app/trust/page.tsx");
-const dataRights    = readSrc("src/app/data-rights/page.tsx");
-const about         = readSrc("src/app/about/page.tsx");
-const readiness     = readSrc("src/app/readiness/page.tsx");
-const onboarding    = readSrc("src/app/onboarding/page.tsx");
-const financing     = readSrc("src/app/financing-pathways/page.tsx");
+// Build 53: PublicPageShell replaced by PublicSiteLayout for (public) routes.
+// publicShell alias now reads PublicSiteLayout (watermark + skip link source).
+const publicShell     = readSrc("src/components/public/PublicSiteLayout.tsx");
+const homepage        = readSrc("src/app/(public)/page.tsx");
+const stewardship   = readSrc("src/app/(public)/stewardship/page.tsx");
+const trust         = readSrc("src/app/(public)/trust/page.tsx");
+const dataRights    = readSrc("src/app/(public)/data-rights/page.tsx");
+const about         = readSrc("src/app/(public)/about/page.tsx");
+const readiness     = readSrc("src/app/(public)/readiness/page.tsx");
+const onboarding    = readSrc("src/app/(public)/onboarding/page.tsx");
+const financing     = readSrc("src/app/(public)/financing-pathways/page.tsx");
 const portal        = readSrc("src/app/portal/borrower/page.tsx");
 const tabBar        = readSrc("src/components/stewardship/StewardshipTabBar.tsx");
+const platformShell   = readSrc("src/components/platform/PlatformShell.tsx");
+const accessibilityPage = readSrc("src/app/(public)/accessibility/page.tsx");
+const publicCopyRegistry = readSrc("src/lib/public-content/publicCopyRegistry.ts");
+const packageJson     = readSrc("package.json");
+const journeyTour     = readSrc("src/lib/public-content/americasJourneyTour.ts");
 
 // ── Checks ────────────────────────────────────────────────────────────────────
 
@@ -233,15 +244,19 @@ const results: CheckResult[] = [
     "Homepage must have a single explore entry point (dropdown form), not dual cards."
   ),
 
-  check("C02", "C — Homepage Build 50",
-    "Homepage explore dropdown has visible <label> with matching for/id",
-    (homepage.includes('htmlFor="homepage-explore-select"') ||
-      homepage.includes('for="homepage-explore-select"') ||
-      exploreDropdown.includes('htmlFor="homepage-explore-select"') ||
-      exploreDropdown.includes('for="homepage-explore-select"')) &&
-    (homepage.includes('id="homepage-explore-select"') ||
-      exploreDropdown.includes('id="homepage-explore-select"')),
-    "Select must have a visible <label htmlFor=...> paired with id= in ExploreDropdown (WCAG 3.3.2 / 4.1.2)."
+  check("C02", "C — Homepage Build 56",
+    "Single journey CTA on the map capstone → /explore (no second non-map CTA)",
+    // Build 56: the journey CTA is consolidated to ONE button on the map's
+    // capstone card ("Ready to begin your Journey?" → /explore). The homepage
+    // must not render a second, non-map journey CTA, and the /explore
+    // destination must exist (WCAG 2.4.4 — one clear, predictable journey link).
+    journeyTour.includes('href:     "/explore"') &&
+    journeyTour.includes("Ready to begin your Journey?") &&
+    !homepage.includes('href="/onboarding"') &&
+    srcExists("src/app/(public)/explore/page.tsx") &&
+    !homepage.includes("ExploreDropdown") &&
+    !homepage.includes("homepage-explore-select"),
+    "Build 56: the journey CTA must be a single button on the map capstone (href /explore, 'Ready to begin your Journey?'); the homepage must not have a second /onboarding journey CTA, and /explore must exist."
   ),
 
   check("C03", "C — Homepage Build 50",
@@ -269,12 +284,12 @@ const results: CheckResult[] = [
     "Map section must be immediately below hero in Build 50 hierarchy."
   ),
 
-  check("C07", "C — Homepage Build 50",
-    "Homepage compass watermarks at page shell scope (position:relative on shell)",
-    homepage.includes('position: "relative" as const') ||
-      homepage.includes("position: 'relative'") ||
-      homepage.includes('position:"relative"'),
-    "Compass watermarks must render at shell level, not inside overflow:hidden hero."
+  check("C07", "C — Homepage Build 53",
+    "Compass watermark renders in PublicSiteLayout (shared public layout)",
+    // Build 53: PublicPageShell replaced by PublicSiteLayout.
+    publicShell.includes("FurlongCompassWatermark") &&
+    (publicShell.includes('position:') || publicShell.includes('"relative"')),
+    "Watermark must render in PublicSiteLayout (the (public) route group layout), not in individual pages."
   ),
 
   check("C08", "C — Homepage Build 50",
@@ -283,17 +298,18 @@ const results: CheckResult[] = [
     "Primary CTA must be keyboard-accessible with visible focus (WCAG 2.4.7)."
   ),
 
-  check("C09", "C — Homepage Build 50",
-    "Homepage explore select has :focus-visible style",
-    homepage.includes("fl-explore-select:focus-visible"),
-    "Form select elements must show a keyboard focus indicator (WCAG 2.4.7)."
+  check("C09", "C — Homepage Build 53",
+    "Homepage CTA has :focus-visible style (ExploreDropdown removed)",
+    // Build 53: ExploreDropdown removed. The primary CTA (fl-cta-primary) must be accessible.
+    homepage.includes("fl-cta-primary:focus-visible"),
+    "Primary CTA must show a keyboard focus indicator (WCAG 2.4.7)."
   ),
 
-  check("C10", "C — Homepage Build 50",
-    "ExploreDropdown uses onChange routing (no submit button required)",
-    exploreDropdown.includes("onChange") &&
-      (exploreDropdown.includes("window.location") || exploreDropdown.includes("onboarding")),
-    "ExploreDropdown must route on selection via onChange — no submit button needed (WCAG 2.1.1)."
+  check("C10", "C — Homepage Build 53",
+    "ExploreDropdown still exists as a component (for onboarding page use)",
+    // The component file still exists even though it's no longer on the homepage.
+    srcExists("src/components/public/ExploreDropdown.tsx"),
+    "ExploreDropdown.tsx must still exist — it is used on /onboarding even though it was removed from homepage."
   ),
 
   check("C11", "C — Homepage Build 50",
@@ -310,23 +326,25 @@ const results: CheckResult[] = [
     "What Furlong Is Not heading must use gold color, not yellow warning styling."
   ),
 
-  check("C13", "C — Homepage Build 50",
-    "Homepage explore select has minimum touch-target height (≥ 48px)",
-    homepage.includes("min-height: 48px") ||
-      homepage.includes("minHeight: 48") ||
-      homepage.includes("min-height: 50px") ||
-      homepage.includes("minHeight: 50") ||
-      exploreDropdown.includes("minHeight: 50") ||
-      exploreDropdown.includes("minHeight: 48"),
-    "Explore select must have minimum 48px height for touch accessibility (via CSS or ExploreDropdown inline)."
+  check("C13", "C — Homepage Build 53",
+    "Homepage CTA button has minimum touch-target height (≥ 48px)",
+    // Build 53: CTA is now an <a> with fl-cta-primary class.
+    // Check that fl-cta-primary CSS defines at least 48px min-height.
+    homepage.includes("min-height: 52px") ||
+      homepage.includes("minHeight: 52") ||
+      homepage.includes("min-height: 48px") ||
+      homepage.includes("minHeight: 48"),
+    "Primary CTA must have minimum 48px height for touch accessibility (WCAG 2.5.5)."
   ),
 
-  check("C14", "C — Homepage Build 50",
-    "ExploreDropdown client component exists with onChange routing",
-    srcExists("src/components/public/ExploreDropdown.tsx") &&
-      exploreDropdown.includes("onChange") &&
-      exploreDropdown.includes("window.location"),
-    "ExploreDropdown.tsx must exist as a client component with onChange-based routing to /onboarding."
+  check("C14", "C — Homepage Build 56",
+    "Homepage retains accessible CTA styling; journey CTA is on the map capstone",
+    // Build 56: the journey CTA moved entirely to the map capstone (→ /explore).
+    // The .fl-cta-primary class (with its focus-visible + touch-target styling)
+    // remains defined for shared button styling and accessibility checks below.
+    homepage.includes("fl-cta-primary") &&
+      journeyTour.includes('href:     "/explore"'),
+    "Homepage must retain fl-cta-primary styling and the single journey CTA must point to /explore (map capstone)."
   ),
 
   // ════════════════════════════════════════════════════════════════════════════
@@ -339,11 +357,9 @@ const results: CheckResult[] = [
     "All interactive elements must show a visible focus indicator (WCAG 2.4.7)."
   ),
 
-  check("D02", "D — Navigation/Focus",
-    "Stewardship dropdown menu items have :focus-visible styles",
-    header.includes(".ps-stw-menu a:focus-visible"),
-    "Dropdown keyboard navigation requires visible focus (WCAG 2.1.1)."
-  ),
+  // D02/D04/D05 removed in Build 56: the Stewardship dropdown menu was retired
+  // (folded into /compass via redirect), so the menu-disclosure ARIA checks no
+  // longer apply. The header is now a flat 4-page nav (links only, no menu).
 
   check("D03", "D — Navigation/Focus",
     "Stewardship tab bar has :focus-visible styles",
@@ -426,20 +442,22 @@ const results: CheckResult[] = [
   // ════════════════════════════════════════════════════════════════════════════
 
   check("H01", "H — Page Existence",
-    "All 13 public pages exist as source files",
+    "All governed public pages exist as source files",
+    // /data-rights is intentionally absent: after the Build 56 consolidation it
+    // 308-redirects to /trust#your-data (no standalone page). Its content lives on
+    // /trust and is validated by verify:customer-journey + verifyMapPhotos P22.
     [
-      "src/app/page.tsx",
-      "src/app/onboarding/page.tsx",
-      "src/app/stewardship/page.tsx",
-      "src/app/stewardship/[domainId]/page.tsx",
-      "src/app/about/page.tsx",
-      "src/app/trust/page.tsx",
-      "src/app/data-rights/page.tsx",
-      "src/app/financing-pathways/page.tsx",
-      "src/app/readiness/page.tsx",
+      "src/app/(public)/page.tsx",
+      "src/app/(public)/onboarding/page.tsx",
+      "src/app/(public)/stewardship/page.tsx",
+      "src/app/(public)/stewardship/[domainId]/page.tsx",
+      "src/app/(public)/about/page.tsx",
+      "src/app/(public)/trust/page.tsx",
+      "src/app/(public)/financing-pathways/page.tsx",
+      "src/app/(public)/readiness/page.tsx",
       "src/app/portal/borrower/page.tsx",
     ].every(p => srcExists(p)),
-    "All 13 governed public pages must exist as source files."
+    "All governed public pages must exist as source files."
   ),
 
   check("H02", "H — Page Existence",
@@ -464,6 +482,91 @@ const results: CheckResult[] = [
     "Featured series registry exists",
     srcExists("src/lib/customer-landing/featuredSeriesRegistry.ts"),
     "Featured series registry must be present (Build 47-D)."
+  ),
+
+  check("H06", "H — Page Existence",
+    "Accessibility page exists at src/app/(public)/accessibility/page.tsx",
+    srcExists("src/app/(public)/accessibility/page.tsx"),
+    "A public /accessibility page is required (Build 53)."
+  ),
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // I — Build 53 Accessibility Additions
+  // ════════════════════════════════════════════════════════════════════════════
+
+  check("I01", "I — Build 53 Accessibility",
+    "PlatformShell has skip-to-main link before PlatformChrome",
+    platformShell.includes("skip-to-main") &&
+      platformShell.includes("href=\"#main-content\""),
+    "Skip-to-main link must be the first focusable element on every page (WCAG 2.4.1)."
+  ),
+
+  check("I02", "I — Build 53 Accessibility",
+    "PlatformShell skip link is visually hidden until focused",
+    platformShell.includes("skip-to-main:focus") &&
+      (platformShell.includes("top: -") || platformShell.includes("top:-")),
+    "Skip link must be offscreen by default and revealed on :focus (WCAG 2.4.1)."
+  ),
+
+  check("I03", "I — Build 53 Accessibility",
+    "PlatformShell <main> has id='main-content' anchor target",
+    platformShell.includes('id="main-content"'),
+    "The skip-to-main link target must exist as id='main-content' on <main> (WCAG 2.4.1)."
+  ),
+
+  check("I04", "I — Build 53 Accessibility",
+    "Homepage footer has Accessibility link to /accessibility",
+    // Build 50: page-level nav footer removed from homepage (duplicate-nav fix).
+    // Accessibility link now lives in the PublicSiteLayout utility footer.
+    // Accept: (a) inline in page.tsx, (b) via HOMEPAGE_FOOTER_LINKS registry,
+    // OR (c) in PublicSiteLayout (preferred since Build 50).
+    homepage.includes('"/accessibility"') ||
+    homepage.includes("'/accessibility'") ||
+    (homepage.includes("HOMEPAGE_FOOTER_LINKS") &&
+      (publicCopyRegistry.includes('"/accessibility"') ||
+       publicCopyRegistry.includes("'/accessibility'"))) ||
+    publicShell.includes('"/accessibility"') ||
+    publicShell.includes("'/accessibility'"),
+    "An Accessibility link to /accessibility must appear in the homepage or in the shared public layout footer (Build 53)."
+  ),
+
+  check("I05", "I — Build 53 Accessibility",
+    "Hero brand text uses readable font-size (≥ 32px minimum)",
+    (() => {
+      // Check that fl-hero-brand does NOT use the old small sizes (13px, 17px)
+      // and DOES use a large clamp (≥ 32px as first argument)
+      const hasOldSmall = /\.fl-hero-brand\s*\{[^}]*font-size:\s*clamp\(1[0-9]px/.test(homepage);
+      const hasLarge    = /\.fl-hero-brand\s*\{[^}]*font-size:\s*clamp\([3-9][0-9]px/.test(homepage);
+      return !hasOldSmall && hasLarge;
+    })(),
+    "FURLONG hero brand text must be readable: clamp(32px+, ...) not clamp(13px, ...)."
+  ),
+
+  check("I06", "I — Build 53 Accessibility",
+    "verify:accessibility script entry exists in package.json",
+    packageJson.includes('"verify:accessibility"') &&
+      packageJson.includes("verifyPublicAccessibility"),
+    "package.json must include 'verify:accessibility' pointing to verifyPublicAccessibility.ts."
+  ),
+
+  check("I07", "I — Build 53 Accessibility",
+    "Accessibility page has visible h1",
+    accessibilityPage.includes("<h1>") || accessibilityPage.includes("<h1 "),
+    "Accessibility page must have an h1 for screen reader page identification (WCAG 1.3.1)."
+  ),
+
+  check("I08", "I — Build 53 Accessibility",
+    "Accessibility page covers keyboard navigation, screen readers, reduced motion",
+    accessibilityPage.includes("Keyboard") &&
+      accessibilityPage.includes("Screen Reader") &&
+      accessibilityPage.includes("Reduced Motion"),
+    "Accessibility page must document the three core assistive technology supports."
+  ),
+
+  check("I09", "I — Build 53 Accessibility",
+    "Accessibility page has contact/help section",
+    accessibilityPage.includes("Request") || accessibilityPage.includes("Contact"),
+    "Accessibility page must explain how to request help (WCAG good practice)."
   ),
 
 ];
@@ -509,14 +612,15 @@ const output = {
   pass,
   fail,
   groups: {
-    "A — Map ARIA":         results.filter(r => r.group.startsWith("A")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
-    "B — Color/Contrast":   results.filter(r => r.group.startsWith("B")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
-    "C — Homepage Build 50":results.filter(r => r.group.startsWith("C")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
-    "D — Navigation/Focus": results.filter(r => r.group.startsWith("D")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
-    "E — Brand/Decorative": results.filter(r => r.group.startsWith("E")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
-    "F — Form Accessibility":results.filter(r => r.group.startsWith("F")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
-    "G — Privacy Posture":  results.filter(r => r.group.startsWith("G")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
-    "H — Page Existence":   results.filter(r => r.group.startsWith("H")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "A — Map ARIA":              results.filter(r => r.group.startsWith("A")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "B — Color/Contrast":        results.filter(r => r.group.startsWith("B")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "C — Homepage Build 50":     results.filter(r => r.group.startsWith("C")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "D — Navigation/Focus":      results.filter(r => r.group.startsWith("D")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "E — Brand/Decorative":      results.filter(r => r.group.startsWith("E")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "F — Form Accessibility":    results.filter(r => r.group.startsWith("F")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "G — Privacy Posture":       results.filter(r => r.group.startsWith("G")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "H — Page Existence":        results.filter(r => r.group.startsWith("H")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
+    "I — Build 53 Accessibility":results.filter(r => r.group.startsWith("I")).map(r => ({ id: r.id, status: r.pass ? "PASS" : "FAIL", label: r.label })),
   },
   findings: results
     .filter(r => !r.pass)

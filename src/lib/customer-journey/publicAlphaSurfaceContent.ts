@@ -210,11 +210,13 @@ export const PUBLIC_ALPHA_SURFACE_SECTIONS: ReadonlyArray<SurfaceSection> = [
   // Route 1 — /about (Founder Introduction)
   // ──────────────────────────────────────────────────────────────────
   {
-    route: "/about",
+    // Build 56 consolidation: the value-prop / founder-introduction surface is
+    // now /compass (What We Do). /about became "Our Story" (founding narrative).
+    route: "/compass",
     ordinal: 1,
     doctrineSection: "Customer Journey §1",
     doctrineLabel: "Founder Introduction",
-    pageFilePath: "src/app/about/page.tsx",
+    pageFilePath: "src/app/(public)/compass/page.tsx",
     requiredContent: [
       {
         id: "tagline",
@@ -261,7 +263,7 @@ export const PUBLIC_ALPHA_SURFACE_SECTIONS: ReadonlyArray<SurfaceSection> = [
     ordinal: 2,
     doctrineSection: "Customer Trust Profile",
     doctrineLabel: "Trust Posture",
-    pageFilePath: "src/app/trust/page.tsx",
+    pageFilePath: "src/app/(public)/trust/page.tsx",
     requiredContent: [
       {
         id: "foundational-principle",
@@ -305,14 +307,19 @@ export const PUBLIC_ALPHA_SURFACE_SECTIONS: ReadonlyArray<SurfaceSection> = [
   },
 
   // ──────────────────────────────────────────────────────────────────
-  // Route 3 — /data-rights (Data Transparency & Customer Rights)
+  // Route 3 — Data Transparency & Customer Rights.
+  // Build 56 consolidation: the standalone /data-rights page was retired;
+  // /data-rights 308-redirects to /trust#your-data and the data-rights content
+  // (the five rights + honest-deletion language + disclosures) is merged into the
+  // Trust & Your Data page. This section therefore validates that content against
+  // its canonical home, src/app/(public)/trust/page.tsx.
   // ──────────────────────────────────────────────────────────────────
   {
-    route: "/data-rights",
+    route: "/trust#your-data",
     ordinal: 3,
     doctrineSection: "Customer Journey §7",
     doctrineLabel: "Data Transparency",
-    pageFilePath: "src/app/data-rights/page.tsx",
+    pageFilePath: "src/app/(public)/trust/page.tsx",
     requiredContent: [
       {
         id: "foundational-principle",
@@ -350,7 +357,7 @@ export const PUBLIC_ALPHA_SURFACE_SECTIONS: ReadonlyArray<SurfaceSection> = [
     ordinal: 4,
     doctrineSection: "Customer Journey §3 + §5",
     doctrineLabel: "Pathway Discovery + Financing Reality Classification",
-    pageFilePath: "src/app/financing-pathways/page.tsx",
+    pageFilePath: "src/app/(public)/financing-pathways/page.tsx",
     requiredContent: [
       {
         id: "pathway-discovery-categories",
@@ -386,7 +393,7 @@ export const PUBLIC_ALPHA_SURFACE_SECTIONS: ReadonlyArray<SurfaceSection> = [
     ordinal: 5,
     doctrineSection: "Customer Journey §4",
     doctrineLabel: "Readiness Review",
-    pageFilePath: "src/app/readiness/page.tsx",
+    pageFilePath: "src/app/(public)/readiness/page.tsx",
     requiredContent: [
       {
         id: "readiness-three-sections",
@@ -420,7 +427,7 @@ export const PUBLIC_ALPHA_SURFACE_SECTIONS: ReadonlyArray<SurfaceSection> = [
     ordinal: 6,
     doctrineSection: "Customer Journey §2",
     doctrineLabel: "Customer Project Intake",
-    pageFilePath: "src/app/onboarding/page.tsx",
+    pageFilePath: "src/app/(public)/onboarding/page.tsx",
     requiredContent: [
       {
         id: "four-intake-questions",

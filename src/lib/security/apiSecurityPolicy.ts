@@ -44,6 +44,20 @@ const NEXTAUTH_PUBLIC_PATHS = new Set([
 const PUBLIC_SIGNATURE_GATED_PATHS = new Set(["/api/stripe/webhook"]);
 const PUBLIC_SURFACE_GATEWAY_PREFIX = "/api/public";
 
+/**
+ * Public-surface APIs the anonymous public site calls directly (no session):
+ *   - the accessibility feedback form POST
+ *   - the public financing-pathway discovery lookup
+ *   - the public readiness self-check
+ * These are intentionally anonymous (advisory discovery only). Everything else
+ * under /api stays deny-by-default. Matched exactly or by sub-path.
+ */
+const PUBLIC_SURFACE_PATHS = new Set([
+  "/api/accessibility-feedback",
+  "/api/financing/pathways",
+  "/api/readiness",
+]);
+
 function cleanPathname(pathname: string): string {
   if (!pathname || pathname === "/") {
     return "/";
@@ -89,6 +103,15 @@ export function apiSecurityPublicReason(
   if (
     normalized === PUBLIC_SURFACE_GATEWAY_PREFIX ||
     normalized.startsWith(`${PUBLIC_SURFACE_GATEWAY_PREFIX}/`)
+  ) {
+    return "public-surface-gateway";
+  }
+
+  if (
+    PUBLIC_SURFACE_PATHS.has(normalized) ||
+    Array.from(PUBLIC_SURFACE_PATHS).some((path) =>
+      normalized.startsWith(`${path}/`),
+    )
   ) {
     return "public-surface-gateway";
   }

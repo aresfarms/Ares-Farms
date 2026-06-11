@@ -36,7 +36,7 @@ export function ExplorationJourneyShell({
         fontFamily:
           'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
         position: "relative",
-        overflow: "hidden",
+        // overflow: "hidden" removed — was clipping compass watermark
       }}
     >
       <FurlongCompassWatermark variant="journey" />

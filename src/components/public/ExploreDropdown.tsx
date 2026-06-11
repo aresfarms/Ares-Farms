@@ -21,7 +21,7 @@ const EXPLORE_OPTIONS = [
   { slug: "environmental-compliance",  label: "Environmental & Compliance" },
   { slug: "financing-capital",         label: "Financing & Capital" },
   { slug: "housing-development",       label: "Housing & Development" },
-  { slug: "programs-incentives",       label: "Programs & Incentives" },
+  { slug: "programs-incentives",       label: "Grants, Programs & Incentives" },
   { slug: "not-sure",                  label: "I'm Not Sure Yet" },
 ] as const;
 

@@ -115,9 +115,9 @@ export type PublicTrustInput = {
 export const PUBLIC_TRUST_WHAT_FURLONG_IS: WhatFurlongIsItem[] = [
   {
     id: "what-coordination",
-    label: "Governed coordination platform",
+    label: "Discovery and exploration platform",
     description:
-      "Furlong helps farmer-borrowers, lenders, sponsors, and operators coordinate intake, review, and supporting evidence through a governed backend and module spine.",
+      "Furlong helps you understand your options — available pathways, readiness gaps, financing realities, and next steps — before significant time or money are committed.",
     reviewRoute: "/onboarding",
   },
   {

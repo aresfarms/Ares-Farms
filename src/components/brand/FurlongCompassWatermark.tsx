@@ -1,19 +1,71 @@
-const VARIANT_CLASS: Record<FurlongCompassVariant, string> = {
-  hero: "furlong-compass-watermark--hero",
-  journey: "furlong-compass-watermark--journey",
-  report: "furlong-compass-watermark--report",
-  subtle: "furlong-compass-watermark--subtle",
-};
+"use client";
+
+/**
+ * FurlongCompassWatermark — Build 54
+ *
+ * Decorative compass watermark. Rendered ONCE by PublicSiteLayout via the
+ * (public) route group layout — covers every public page including the
+ * homepage. Do NOT render this in individual pages.
+ *
+ * Positioning fix (Build 54):
+ *   Previously used `position: absolute` inside a `position: relative` shell,
+ *   which caused the watermark to drift or disappear on tall pages because
+ *   top: 50% is relative to the container height, not the viewport.
+ *   Fixed: `position: fixed; inset: 0; display: grid; place-items: center`
+ *   ensures the watermark is always centered in the viewport regardless of
+ *   how tall the page content is.
+ *
+ * Opacity:
+ *   journey variant default: 0.10 (homepage — more vivid)
+ *   Pass opacity={0.06} from PublicSiteLayout on subpages.
+ *   The `opacity` prop overrides the variant default.
+ *
+ * Stacking:
+ *   z-index: 0 — behind header (z-10) and content (z-10).
+ *
+ * Variants:
+ *   journey  — centered, used by PublicSiteLayout for all public pages
+ *   subtle   — softer, centered (for ExplorationJourneyShell contexts)
+ *   hero     — reserved for future hero-specific sizing
+ *   report   — larger, for portal/report pages
+ *
+ * Accessibility: aria-hidden="true", alt="", pointer-events: none.
+ * Image: /brand/furlong-compass-watermark.png
+ *
+ * Governance:
+ *   "The map reveals opportunities, not the visitor."
+ *   Public Alpha remains PENDING.
+ */
 
 export type FurlongCompassVariant = "hero" | "journey" | "report" | "subtle";
 
+const VARIANT_CLASS: Record<FurlongCompassVariant, string> = {
+  hero:    "furlong-compass-watermark--hero",
+  journey: "furlong-compass-watermark--journey",
+  report:  "furlong-compass-watermark--report",
+  subtle:  "furlong-compass-watermark--subtle",
+};
+
+/** Default opacity per variant. Pass `opacity` prop to override. */
+const VARIANT_OPACITY: Record<FurlongCompassVariant, number> = {
+  journey: 0.10,
+  subtle:  0.06,
+  hero:    0.07,
+  report:  0.08,
+};
+
 export function FurlongCompassWatermark({
   variant,
+  opacity,
   className,
 }: {
-  variant: FurlongCompassVariant;
+  variant:    FurlongCompassVariant;
+  /** Override the variant's default opacity. */
+  opacity?:   number;
   className?: string;
 }) {
+  const effectiveOpacity = opacity ?? VARIANT_OPACITY[variant];
+
   const classes = [
     "furlong-compass-watermark",
     VARIANT_CLASS[variant],
@@ -25,92 +77,64 @@ export function FurlongCompassWatermark({
   return (
     <>
       <style>{`
+        /* ── Base — fixed, full-viewport, centered ──────────────────────────
+           position: fixed + inset: 0 ensures the watermark is always centered
+           in the viewport, even when page content is taller than the screen.
+           (position: absolute in a relative shell drifts on tall pages.)       */
         .furlong-compass-watermark {
-          position: absolute;
-          display: block;
+          position: fixed;
+          inset: 0;
+          display: grid;
+          place-items: center;
           pointer-events: none;
           user-select: none;
           z-index: 0;
-          overflow: visible;
         }
 
         .furlong-compass-watermark img {
           display: block;
-          width: 100%;
           height: auto;
-          opacity: inherit;
-          filter: inherit;
           transform-origin: center;
         }
 
-        .furlong-compass-watermark--hero {
-          inset: -36px -36px auto auto;
-          width: min(78vw, 1080px);
-          opacity: 0.068;
-          filter: blur(1.3px) saturate(0.82);
-          transform: rotate(-11deg);
-        }
-
-        .furlong-compass-watermark--hero img {
-          transform: scale(1.18);
-        }
-
-        .furlong-compass-watermark--subtle {
-          inset: 320px auto auto -120px;
-          width: min(50vw, 720px);
-          opacity: 0.036;
-          filter: blur(2px) saturate(0.78);
-          transform: rotate(10deg);
-        }
-
-        .furlong-compass-watermark--subtle img {
-          transform: scale(1.12);
-        }
-
-        .furlong-compass-watermark--journey {
-          inset: 22px -64px auto auto;
-          width: min(42vw, 440px);
-          opacity: 0.04;
-          filter: blur(1px) saturate(0.84);
-          transform: rotate(-10deg);
-        }
-
+        /* ── journey — homepage + all public pages ───────────────────────────
+           Centered by base (no top/left needed).
+           Rotation and sizing applied to the img.                              */
         .furlong-compass-watermark--journey img {
-          transform: scale(1.14);
+          width: min(60vw, 620px);
+          transform: rotate(-8deg) scale(1.08);
+          filter: blur(0.8px) saturate(0.82);
         }
 
-        .furlong-compass-watermark--report {
-          inset: -10% -8% auto auto;
-          width: min(55vw, 680px);
-          opacity: 0.12;
-          filter: blur(0.8px) saturate(0.86);
-          transform: rotate(-8deg);
+        /* ── subtle — soft secondary layer ──────────────────────────────────
+           Used in ExplorationJourneyShell; centered by base.                  */
+        .furlong-compass-watermark--subtle img {
+          width: min(46vw, 480px);
+          transform: rotate(10deg) scale(1.12);
+          filter: blur(2px) saturate(0.78);
         }
 
+        /* ── hero — reserved ────────────────────────────────────────────────── */
+        .furlong-compass-watermark--hero img {
+          width: min(78vw, 1080px);
+          transform: rotate(-11deg) scale(1.18);
+          filter: blur(1.3px) saturate(0.82);
+        }
+
+        /* ── report — portal/report pages ───────────────────────────────────── */
         .furlong-compass-watermark--report img {
-          transform: scale(1.1);
+          width: min(55vw, 680px);
+          transform: rotate(-8deg) scale(1.10);
+          filter: blur(0.8px) saturate(0.86);
         }
 
+        /* ── Mobile adjustments ──────────────────────────────────────────────── */
         @media (max-width: 780px) {
-          .furlong-compass-watermark--hero {
-            inset: 52px -56px auto auto;
-            width: min(94vw, 520px);
-            opacity: 0.042;
-            filter: blur(1px) saturate(0.78);
-            transform: rotate(-8deg);
+          .furlong-compass-watermark--journey img {
+            width: min(80vw, 380px);
           }
-
-          .furlong-compass-watermark--subtle {
-            inset: 420px auto auto -110px;
-            width: min(74vw, 360px);
-            opacity: 0.02;
-          }
-
-          .furlong-compass-watermark--journey {
-            inset: 40px -72px auto auto;
-            width: min(72vw, 320px);
-            opacity: 0.026;
-            filter: blur(0.8px) saturate(0.78);
+          .furlong-compass-watermark--subtle img {
+            width: min(70vw, 300px);
           }
         }
       `}</style>
@@ -118,7 +142,9 @@ export function FurlongCompassWatermark({
       <span
         aria-hidden="true"
         className={classes}
+        style={{ opacity: effectiveOpacity }}
       >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/brand/furlong-compass-watermark.png"
           alt=""

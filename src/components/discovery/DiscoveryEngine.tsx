@@ -1,231 +1,196 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import type { GuidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import {
   generatePossibilityMap,
-  type DiscoveryAnswers, type PersonaId, type GoalId, type TimeHorizon,
-  type ResourceId, type ConstraintId, type ValueId, type PropertyInterest,
+  type DiscoveryAnswers, type PossibilityMap, type PossibilityItem,
 } from "@/lib/discovery/possibilityEngine";
 
 /**
- * Possibility Discovery Engine — the guided, possibility-first front door
- * (anonymous, in-session). Caitlin's vision (2026-06-11):
- *   Person → Goals → Constraints → Possibilities → Pathways → Actions.
- * The property search is ONE possible destination, never assumed to be THE one.
+ * Possibility Discovery Engine — a CONVERSATIONAL, AI-guided interview.
  *
- * DOCTRINE (mirrors GuidedIntake): everything lives in component state; NOTHING
- * about the person is sent to a server. The Possibility Map is computed in the
- * browser by the deterministic routing layer (possibilityEngine) from these
- * answers + the verified feed the page already rendered. No PII, no qualification
- * — the map is education + routing, never a determination. "Confirm with a
- * licensed professional" is built into every output, and Human Review is always
- * shown.
+ * Caitlin's vision (2026-06-11): it should feel like talking to a knowledgeable
+ * guide, not filling out a form. One question at a time; each next question
+ * adapts to the last answer. The server (/api/public/discovery/converse) drives the
+ * conversation — an AI guide phrases each question (Tier-1, logged), with a
+ * DETERMINISTIC floor that takes over whenever the model is unavailable or
+ * uncertain. The guide is grounded only in verified facts and never says a
+ * person qualifies; the Possibility Map (the 10 outputs) is produced here by the
+ * VERIFIED deterministic engine from the accumulated answers + the verified feed
+ * — so no number, program, or eligibility result is ever fabricated.
+ *
+ * Anonymous: only the person's INTERESTS (option codes) are sent. Free text is
+ * PII-guarded server-side and never stored. Browse stays one click away.
  */
 
-// ── small UI helpers (match GuidedIntake's inline-style vocabulary) ──────────
-function Chip({ on, color, children, onClick }: { on: boolean; color: string; children: React.ReactNode; onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick} aria-pressed={on}
-      style={{ fontSize: 13, fontWeight: 700, borderRadius: 999, padding: "5px 13px", cursor: "pointer",
-        border: `1.5px solid ${on ? color : "#cbd5e1"}`, background: on ? color : "#fff", color: on ? "#fff" : "#334155" }}>
-      {children}
-    </button>
-  );
-}
-function Group({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <div style={{ display: "grid", gap: 8 }}>
-      <span style={{ fontSize: 14, fontWeight: 800, color: "#1f2a3d" }}>{label}{hint ? <span style={{ fontWeight: 400, color: "#7a8aa0" }}> · {hint}</span> : null}</span>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>{children}</div>
-    </div>
-  );
-}
-
-const PERSONAS: [PersonaId, string][] = [
-  ["individual", "Individual"], ["family", "Family"], ["farmer", "Farmer"], ["rancher", "Rancher"],
-  ["landowner", "Landowner"], ["business-owner", "Business Owner"], ["investor", "Investor"],
-  ["nonprofit", "Nonprofit"], ["municipality", "Municipality"], ["tribal", "Tribal Organization"],
-  ["developer", "Developer"], ["veteran", "Veteran"], ["retiree", "Retiree"], ["student", "Student"], ["other", "Other"],
-];
-const GOALS: [GoalId, string][] = [
-  ["buy-land", "Buy land"], ["start-expand-farm", "Start / expand a farm"], ["retire", "Retire"],
-  ["generate-income", "Generate income"], ["preserve-family-land", "Preserve family land"],
-  ["buy-sell-business", "Buy / sell a business"], ["improve-environment", "Improve environmental outcomes"],
-  ["develop", "Develop"], ["create-housing", "Create housing"], ["reduce-debt", "Reduce debt"],
-  ["improve-cash-flow", "Improve cash flow"], ["access-programs", "Access programs"],
-  ["access-financing", "Access financing"], ["build-wealth", "Build generational wealth"],
-  ["passive-income", "Passive income"], ["evaluate-opportunities", "Evaluate opportunities"],
-  ["not-sure", "I'm not sure yet"],
-];
-const HORIZONS: [TimeHorizon, string][] = [
-  ["immediate", "Immediate (0–6mo)"], ["near", "Near (6–24mo)"], ["mid", "Mid (2–5y)"], ["long", "Long (5–10y)"], ["legacy", "Legacy (10+y)"],
-];
-const RESOURCES: [ResourceId, string][] = [
-  ["land", "Land"], ["business", "Business"], ["farm", "Farm"], ["equipment", "Equipment"], ["livestock", "Livestock"],
-  ["housing", "Housing"], ["savings", "Savings"], ["retirement-assets", "Retirement assets"], ["credit-access", "Credit access"],
-  ["family-support", "Family support"], ["industry-experience", "Industry experience"], ["professional-licenses", "Professional licenses"], ["none", "None of these"],
-];
-const CONSTRAINTS: [ConstraintId, string][] = [
-  ["limited-capital", "Limited capital"], ["credit", "Credit"], ["experience", "Experience"], ["time", "Time"],
-  ["physical", "Physical"], ["regulatory", "Regulatory"], ["environmental", "Environmental"], ["market-uncertainty", "Market uncertainty"],
-  ["labor", "Labor"], ["geographic", "Geographic"], ["unsure-where-to-start", "Unsure where to start"],
-];
-const VALUES: [ValueId, string][] = [
-  ["income", "Income"], ["stability", "Stability"], ["family-legacy", "Family legacy"], ["environmental-stewardship", "Environmental stewardship"],
-  ["community-impact", "Community impact"], ["growth", "Growth"], ["risk-reduction", "Risk reduction"], ["retirement-security", "Retirement security"],
-  ["lifestyle", "Lifestyle"], ["independence", "Independence"],
-];
-
-const CAT_LABELS: Record<string, string> = {
-  homes: "Homes", "farms-ranches": "Farms & Ranches", land: "Land", commercial: "Commercial",
-  hospitality: "Hospitality", businesses: "Businesses", misc: "Misc",
+type Option = { value: string; label: string };
+type QuestionResponse = {
+  kind: "question";
+  slot: string;
+  prompt: string;
+  options: Option[];
+  multi: boolean;
+  allowFreeText: boolean;
+  source: "ai" | "guide";
+  answers: DiscoveryAnswers;
 };
+type MapReadyResponse = { kind: "map-ready"; answers: DiscoveryAnswers };
+type ConverseResponse = QuestionResponse | MapReadyResponse;
+
+const EMPTY: DiscoveryAnswers = { goals: [], resources: [], constraints: [], values: [] };
 
 export function DiscoveryEngine({ feed }: { feed: GuidedIntakeFeed }) {
-  const [persona, setPersona] = useState<PersonaId | undefined>();
-  const [goals, setGoals] = useState<GoalId[]>([]);
-  const [horizon, setHorizon] = useState<TimeHorizon | undefined>();
-  const [resources, setResources] = useState<ResourceId[]>([]);
-  const [constraints, setConstraints] = useState<ConstraintId[]>([]);
-  const [values, setValues] = useState<ValueId[]>([]); // click order = priority order
-  const [propertyInterest, setPropertyInterest] = useState<PropertyInterest | undefined>();
-  const [pStates, setPStates] = useState<string[]>([]);
-  const [pCats, setPCats] = useState<string[]>([]);
-  const [financingRequired, setFinancingRequired] = useState(false);
-  const [alreadyOwn, setAlreadyOwn] = useState(false);
-  const [shown, setShown] = useState(false);
+  const [turns, setTurns] = useState<{ role: "assistant" | "user"; text: string }[]>([]);
+  const [answers, setAnswers] = useState<DiscoveryAnswers>(EMPTY);
+  const [q, setQ] = useState<QuestionResponse | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [freeText, setFreeText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [map, setMap] = useState<PossibilityMap | null>(null);
+  const askedSlots = useRef<string[]>([]); // slots presented (a Skip is still "done")
+  const started = useRef(false);
 
-  const toggle = <T,>(list: T[], v: T, set: (x: T[]) => void) =>
-    set(list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
-
-  const availableCats = useMemo(() => {
-    const src = pStates.length ? feed.states.filter((s) => pStates.includes(s.abbr)) : feed.states;
-    const agg = new Map<string, number>();
-    for (const s of src) for (const [k, v] of Object.entries(s.byCategory)) agg.set(k, (agg.get(k) ?? 0) + (v ?? 0));
-    return [...agg.entries()].filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]);
-  }, [pStates, feed.states]);
-
-  const answers: DiscoveryAnswers = {
-    persona, goals, timeHorizon: horizon, resources, constraints, values, propertyInterest,
-    property: propertyInterest && propertyInterest !== "no"
-      ? { states: pStates, categories: pCats, financingRequired, alreadyOwn }
-      : undefined,
-  };
-
-  const map = useMemo(() => (shown ? generatePossibilityMap(answers, feed) : null), [shown]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  if (shown && map) {
-    return <PossibilityMapView map={map} onBack={() => setShown(false)} />;
+  async function post(payload: unknown): Promise<ConverseResponse> {
+    const res = await fetch("/api/public/discovery/converse", {
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(`converse ${res.status}`);
+    return (await res.json()) as ConverseResponse;
   }
 
-  const showProperty = propertyInterest === "yes" || propertyInterest === "maybe";
+  function handle(r: ConverseResponse) {
+    if (r.kind === "map-ready") {
+      setAnswers(r.answers);
+      setMap(generatePossibilityMap(r.answers, feed));
+      setQ(null);
+      return;
+    }
+    setAnswers(r.answers);
+    if (!askedSlots.current.includes(r.slot)) askedSlots.current.push(r.slot);
+    setTurns((t) => [...t, { role: "assistant", text: r.prompt }]);
+    setQ(r);
+    setSelected([]);
+    setFreeText("");
+  }
+
+  async function start() {
+    setLoading(true); setError(null); setMap(null); setTurns([]); setAnswers(EMPTY); setQ(null);
+    askedSlots.current = [];
+    try { handle(await post({ answers: EMPTY, turns: [], askedSlots: [] })); }
+    catch (e) { setError((e as Error).message); }
+    finally { setLoading(false); }
+  }
+
+  useEffect(() => {
+    if (started.current) return;
+    started.current = true;
+    void start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function answer(values: string[]) {
+    if (!q || loading) return;
+    const labels = values.map((v) => q.options.find((o) => o.value === v)?.label ?? v);
+    const userText = labels.length ? labels.join(", ") : freeText.trim() || "(skip)";
+    const nextTurns = [...turns, { role: "user" as const, text: userText }];
+    setTurns(nextTurns);
+    setLoading(true); setError(null);
+    try {
+      handle(await post({
+        answers, turns: nextTurns, askedSlots: askedSlots.current,
+        lastAnswer: { slot: q.slot, values, freeText: freeText.trim() || undefined },
+      }));
+    } catch (e) { setError((e as Error).message); }
+    finally { setLoading(false); }
+  }
+
+  const toggle = (v: string) => setSelected((s) => (s.includes(v) ? s.filter((x) => x !== v) : [...s, v]));
+
+  // ── Map view ─────────────────────────────────────────────────────────────────
+  if (map) return <PossibilityMapView map={map} onBack={start} />;
 
   return (
-    <section data-testid="discovery-engine" aria-label="Possibility discovery"
-      style={{ display: "grid", gap: 22, maxWidth: 760, border: "1px solid #d7deea", borderRadius: 16, background: "#fff", padding: "26px 28px" }}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <strong style={{ fontSize: 22, color: "#101a2b", lineHeight: 1.2 }}>What are you trying to accomplish?</strong>
-        <span style={{ fontSize: 13.5, color: "#5d687a", lineHeight: 1.5 }}>
-          No right or wrong answers. We're not here to sell you something — we help you understand your possibilities.
-          This is anonymous: your answers stay in your browser, nothing is sent or stored, and none of it is ever sold.
+    <section data-testid="discovery-engine" aria-label="Possibility discovery interview"
+      style={{ display: "grid", gap: 18, maxWidth: 720, border: "1px solid #d7deea", borderRadius: 16, background: "#fff", padding: "24px 26px" }}>
+      <div style={{ display: "grid", gap: 4 }}>
+        <strong style={{ fontSize: 18, color: "#101a2b" }}>Let's find your possibilities</strong>
+        <span style={{ fontSize: 12.5, color: "#7a8aa0" }}>
+          A few quick questions — like talking to a guide, not a form. Anonymous: only your interests are used, never your name.
         </span>
       </div>
 
-      <Group label="1 · Who are you?">
-        {PERSONAS.map(([id, label]) => (
-          <Chip key={id} on={persona === id} color="#185FA5" onClick={() => setPersona(persona === id ? undefined : id)}>{label}</Chip>
-        ))}
-      </Group>
-
-      <Group label="2 · What are you trying to accomplish?" hint="choose any">
-        {GOALS.map(([id, label]) => (
-          <Chip key={id} on={goals.includes(id)} color="#0f766e" onClick={() => toggle(goals, id, setGoals)}>{label}</Chip>
-        ))}
-      </Group>
-
-      <Group label="3 · Time horizon">
-        {HORIZONS.map(([id, label]) => (
-          <Chip key={id} on={horizon === id} color="#534AB7" onClick={() => setHorizon(horizon === id ? undefined : id)}>{label}</Chip>
-        ))}
-      </Group>
-
-      <Group label="4 · Resources you have" hint="choose any">
-        {RESOURCES.map(([id, label]) => (
-          <Chip key={id} on={resources.includes(id)} color="#3B6D11" onClick={() => toggle(resources, id, setResources)}>{label}</Chip>
-        ))}
-      </Group>
-
-      <Group label="5 · Constraints" hint="choose any — no judgment">
-        {CONSTRAINTS.map(([id, label]) => (
-          <Chip key={id} on={constraints.includes(id)} color="#993556" onClick={() => toggle(constraints, id, setConstraints)}>{label}</Chip>
-        ))}
-      </Group>
-
-      <Group label="6 · What matters most" hint="tap in order of importance">
-        {VALUES.map(([id, label]) => {
-          const rank = values.indexOf(id);
-          return (
-            <Chip key={id} on={rank >= 0} color="#854F0B" onClick={() => toggle(values, id, setValues)}>
-              {rank >= 0 ? `${rank + 1} · ` : ""}{label}
-            </Chip>
-          );
-        })}
-      </Group>
-
-      <Group label="7 · Interested in property?" hint="property is one option — never assumed">
-        {(["yes", "maybe", "no"] as PropertyInterest[]).map((v) => (
-          <Chip key={v} on={propertyInterest === v} color="#185FA5" onClick={() => setPropertyInterest(propertyInterest === v ? undefined : v)}>
-            {v === "yes" ? "Yes" : v === "maybe" ? "Maybe" : "No"}
-          </Chip>
-        ))}
-      </Group>
-
-      {showProperty && (
-        <div style={{ display: "grid", gap: 14, borderLeft: "3px solid #FAEEDA", paddingLeft: 16 }}>
-          <Group label="Property — which states?" hint="only states with current inventory">
-            {feed.states.map((s) => (
-              <Chip key={s.abbr} on={pStates.includes(s.abbr)} color="#0f766e" onClick={() => toggle(pStates, s.abbr, setPStates)}>{s.abbr} · {s.total}</Chip>
-            ))}
-          </Group>
-          {availableCats.length > 0 && (
-            <Group label="Property — what kind?">
-              {availableCats.map(([cat, n]) => (
-                <Chip key={cat} on={pCats.includes(cat)} color="#6d28d9" onClick={() => toggle(pCats, cat, setPCats)}>{CAT_LABELS[cat] ?? cat} · {n}</Chip>
-              ))}
-            </Group>
-          )}
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, fontSize: 13, color: "#3b475a" }}>
-            <label style={{ display: "inline-flex", gap: 6, alignItems: "center", cursor: "pointer" }}>
-              <input type="checkbox" checked={financingRequired} onChange={(e) => setFinancingRequired(e.target.checked)} /> Financing likely needed
-            </label>
-            <label style={{ display: "inline-flex", gap: 6, alignItems: "center", cursor: "pointer" }}>
-              <input type="checkbox" checked={alreadyOwn} onChange={(e) => setAlreadyOwn(e.target.checked)} /> I already own property
-            </label>
+      {/* conversation transcript */}
+      <div data-testid="conversation" style={{ display: "grid", gap: 10 }}>
+        {turns.map((t, i) => (
+          <div key={i} style={{ justifySelf: t.role === "assistant" ? "start" : "end", maxWidth: "85%",
+            background: t.role === "assistant" ? "#f1f5f9" : "#0f766e", color: t.role === "assistant" ? "#1f2a3d" : "#fff",
+            borderRadius: 14, padding: "10px 14px", fontSize: 14, lineHeight: 1.5 }}>
+            {t.text}
           </div>
+        ))}
+        {loading && <div style={{ justifySelf: "start", fontSize: 13, color: "#9aa6b6" }}>…</div>}
+      </div>
+
+      {error && (
+        <div style={{ fontSize: 13, color: "#b91c1c" }}>
+          Something hiccuped. <button type="button" onClick={start} style={{ color: "#185FA5", textDecoration: "underline", background: "none", border: "none", cursor: "pointer" }}>Start over</button>
         </div>
       )}
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", borderTop: "1px solid #e2e8f0", paddingTop: 18 }}>
-        <button type="button" data-testid="discovery-generate" onClick={() => setShown(true)}
-          style={{ fontSize: 15, fontWeight: 800, color: "#fff", background: "#0f766e", border: "none", borderRadius: 999, padding: "12px 26px", cursor: "pointer" }}>
-          Show my possibilities →
-        </button>
+      {/* current question controls */}
+      {q && !loading && (
+        <div style={{ display: "grid", gap: 12, borderTop: "1px solid #e2e8f0", paddingTop: 14 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }} data-testid="answer-options">
+            {q.options.map((o) => {
+              const on = selected.includes(o.value);
+              const onClick = q.multi ? () => toggle(o.value) : () => void answer([o.value]);
+              return (
+                <button key={o.value} type="button" onClick={onClick} aria-pressed={q.multi ? on : undefined}
+                  data-testid={`opt-${o.value}`}
+                  style={{ fontSize: 13, fontWeight: 700, borderRadius: 999, padding: "6px 14px", cursor: "pointer",
+                    border: `1.5px solid ${on ? "#0f766e" : "#cbd5e1"}`, background: on ? "#0f766e" : "#fff", color: on ? "#fff" : "#334155" }}>
+                  {q.multi && on ? "✓ " : ""}{o.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {q.allowFreeText && (
+            <input value={freeText} onChange={(e) => setFreeText(e.target.value)} placeholder="…or tell me in your own words (optional)"
+              style={{ fontSize: 13, padding: "8px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1", maxWidth: 420 }} />
+          )}
+
+          {(q.multi || q.allowFreeText) && (
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <button type="button" data-testid="continue" onClick={() => void answer(selected)}
+                style={{ fontSize: 14, fontWeight: 800, color: "#fff", background: "#0f766e", border: "none", borderRadius: 999, padding: "9px 22px", cursor: "pointer" }}>
+                Continue →
+              </button>
+              <button type="button" data-testid="skip" onClick={() => void answer([])}
+                style={{ fontSize: 12.5, fontWeight: 700, color: "#7a8aa0", background: "none", border: "none", cursor: "pointer" }}>
+                Skip
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", borderTop: "1px solid #e2e8f0", paddingTop: 14 }}>
         <Link href="/explore?lane=property-land" data-testid="discovery-browse-link"
-          style={{ fontSize: 13.5, fontWeight: 700, color: "#185FA5", textDecoration: "underline" }}>
+          style={{ fontSize: 13, fontWeight: 700, color: "#185FA5", textDecoration: "underline" }}>
           Or just browse properties →
         </Link>
-        <span style={{ fontSize: 12, color: "#9aa6b6" }}>You can get a map without giving your name.</span>
+        <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>You can get a map without giving your name.</span>
       </div>
     </section>
   );
 }
 
-// ── The Possibility Map render (the 10 outputs) ──────────────────────────────
-import type { PossibilityMap, PossibilityItem } from "@/lib/discovery/possibilityEngine";
-
+// ── The Possibility Map render (the 10 outputs) — verified deterministic engine ─
 function Section({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <section style={{ display: "grid", gap: 10 }}>
@@ -256,7 +221,7 @@ function PossibilityMapView({ map, onBack }: { map: PossibilityMap; onBack: () =
       style={{ display: "grid", gap: 26, maxWidth: 820, border: "1px solid #d7deea", borderRadius: 16, background: "#fff", padding: "28px 30px" }}>
       <div style={{ display: "grid", gap: 8 }}>
         <button type="button" onClick={onBack} style={{ justifySelf: "start", fontSize: 12.5, fontWeight: 700, color: "#185FA5", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: 0 }}>
-          ← Change my answers
+          ← Start over
         </button>
         <h2 style={{ margin: 0, fontSize: 24, color: "#101a2b" }}>{map.headline}</h2>
         <p style={{ margin: 0, fontSize: 13.5, color: "#5d687a", lineHeight: 1.55 }}>{map.summary}</p>

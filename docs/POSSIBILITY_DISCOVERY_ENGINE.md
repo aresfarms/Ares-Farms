@@ -66,3 +66,31 @@ so it isn't lost.
 (module-separability, consent-model, listing-engine, place-fact-claims, internal-auth,
 postgres-migration) · `tsc --noEmit` clean · `npm run build` exit 0 (`/discover` in the route
 manifest) · `/discover` and the home CTA render (HTTP 200).
+
+---
+
+## Update (2026-06-11) — Conversational, AI-guided interview
+
+The static form was rebuilt into a **conversational interview**: one adaptive question
+at a time, each next question chosen from the last answer. It feels like a guide, not a form.
+
+| File | Role |
+|---|---|
+| `src/lib/discovery/conversationEngine.ts` | DETERMINISTIC floor (isomorphic): canonical slots, structured option sets, adaptive ordering (`allowedNextSlots`, `remainingSlots`), and answer→typed-`DiscoveryAnswers` mapping. Runs with or without the AI. |
+| `src/lib/discovery/interviewPolicy.ts` | The guardrails baked into the guide: hardened/ jailbreak-resistant system prompt, verified-fact grounding (real `PROGRAM_REGISTRY` names + verified feed), and the pure guards — banned-determination, PII, injection, `validateAssistantTurn`, the structured-output schema. |
+| `src/lib/discovery/aiInterview.ts` | SERVER-only Tier-1 driver: calls `claude-opus-4-8` (adaptive thinking, structured output, no prefills), validates every turn, falls back to the floor on missing key / error / uncertainty, and logs each turn PII-free. |
+| `src/app/api/public/discovery/converse/route.ts` | Public, anonymous interview API: folds option codes into typed answers, PII/injection-guards free text, picks the next question (AI → floor), or signals map-ready. `askedSlots` ensures a Skipped optional is never re-asked. |
+| `src/components/discovery/DiscoveryEngine.tsx` | Rebuilt as a chat: renders one question + structured options at a time, posts interests only to our own converse API, then renders the verified map. |
+
+**Grounding guarantee:** the AI only conducts the interview. The Possibility Map (the 10
+outputs) is still produced by the **verified deterministic engine** from the accumulated
+answers + the verified feed — the model can never invent a program, number, or eligibility
+result. Determination language, PII, and injection are refused in code; the deterministic floor
+is the active path whenever `ANTHROPIC_API_KEY` is unset.
+
+**Verify + proof:** `verify:discovery-engine` PASS (210 map combinations + conversational
+floor adaptivity + the AI guardrails as pure functions + no-key fallback + the Skip-loop
+regression). Full suite green; tsc clean; build exit 0. Live eyes-on: a real browser
+click-through walked the interview to the rendered map — all 10 sections, Human Review
+prominent, verified counts, **zero "you qualify" language**. A skipped optional no longer loops
+(bug caught by the rendered click-through and locked out by a regression test).

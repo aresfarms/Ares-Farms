@@ -291,7 +291,12 @@
     "ingest:property-flood-historic": "tsx src/scripts/ingestPropertyFloodHistoric.ts",
     "run:source-refresh": "tsx -e \"import('./src/lib/property/sourceRefresh').then(m=>m.refreshAllSources().then(r=>{console.log(JSON.stringify(r,null,1));}))\"",
     "run:listing-freshness": "tsx -e \"import('./src/lib/source-intelligence/listing-intake/directListingFreshness').then(m=>console.log(JSON.stringify(m.runDirectListingFreshness(),null,1)))\"",
-    "ingest:property-nmtc": "tsx src/scripts/ingestPropertyNmtc.ts"
+    "ingest:property-nmtc": "tsx src/scripts/ingestPropertyNmtc.ts",
+    "verify:secret-scan": "tsx src/scripts/verifySecretScan.ts",
+    "verify:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts",
+    "verify:security-conformance": "tsx src/scripts/verifySecurityConformance.ts",
+    "verify:security-governance": "tsx src/scripts/verifySecurityGovernance.ts",
+    "run:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

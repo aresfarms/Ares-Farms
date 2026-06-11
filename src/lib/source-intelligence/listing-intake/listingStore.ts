@@ -20,6 +20,7 @@ import * as path from "node:path";
 
 import { appendAuditEvent } from "@/lib/property/auditLedger";
 import { buildLicenseVerification, licensePublicLine } from "./licenseVerification";
+import { sanitizeIngestText } from "@/lib/security/ingestSanitizer";
 import { fairHousingScan } from "./fairHousingGuard";
 import { getListingState } from "./listingSourceActivationStore";
 import { listingRenderEligibility } from "./listingRenderGate";
@@ -294,7 +295,7 @@ export function renderableListings(filter?: { state?: string | null }): Renderab
       state: l.state,
       town: l.town,
       price: l.priceLabelInput,
-      description: l.description,
+      description: sanitizeIngestText(l.description), // control H: sanitized before render
       photoRefs: elig.renderablePhotoRefs,
       venueDisclaimer: venueDisclaimer(l.listerDisplayName, l.listerType),
       asOf: confirmedAsOf,

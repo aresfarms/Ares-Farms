@@ -296,6 +296,7 @@
     "verify:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts",
     "verify:security-conformance": "tsx src/scripts/verifySecurityConformance.ts",
     "verify:security-governance": "tsx src/scripts/verifySecurityGovernance.ts",
+    "verify:domain-governance": "tsx src/scripts/verifyDomainGovernance.ts",
     "run:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts"
   },
   "dependencies": {

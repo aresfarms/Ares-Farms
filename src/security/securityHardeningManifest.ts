@@ -14,7 +14,7 @@
  */
 
 export type ControlStatus = "implemented" | "partial" | "doctrine-only" | "missing" | "required-external";
-export type ControlGroup = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N";
+export type ControlGroup = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O";
 
 export interface SecurityControl {
   id: string;
@@ -111,6 +111,18 @@ export const SECURITY_CONTROLS: SecurityControl[] = [
   { id: "N-pentest", group: "N", name: "Third-party penetration test", status: "required-external", blockingForAlpha: false, blockingForProduction: true, evidence: "NOT scheduled — production blocked until critical/high remediated + retested" },
   { id: "N-glba-audit", group: "N", name: "GLBA / security audit", status: "required-external", blockingForAlpha: false, blockingForProduction: true, evidence: "REQUIRED before any real borrower PII" },
   { id: "N-red-team", group: "N", name: "Red-team (incl. prompt injection + social engineering)", status: "required-external", blockingForAlpha: false, blockingForProduction: true, evidence: "REQUIRED before go-live" },
+  // O — institutional domain asset governance (DOMAIN-ASSET-001)
+  { id: "O-domain-registry", group: "O", name: "Institutional domain asset registry (4 domains, canonical roles)", status: "implemented", blockingForAlpha: true, blockingForProduction: true, evidence: "src/security/domainAssetManifest.ts (DOMAIN_ASSETS) · verify:domain-governance" },
+  { id: "O-domain-multiparty", group: "O", name: "Domain transfer / registrar / DNS-authority / ownership change requires multi-party founders", status: "implemented", blockingForAlpha: true, blockingForProduction: true, evidence: "requireMultiParty domain-* (ALL founders) in src/security/securityGovernanceVerification.ts · verify:domain-governance" },
+  { id: "O-domain-dashboard", group: "O", name: "Domain status panel in the security dashboard", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "domainDashboardPanel in src/security/securityDashboardStatus.ts · verify:domain-governance" },
+  { id: "O-prod-dns-human", group: "O", name: "Production DNS cutover requires human review (gate returns false)", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "productionDnsCutoverAllowed()=false · PRODUCTION_DNS_CUTOVER_REQUIRES_HUMAN_REVIEW · verify:domain-governance" },
+  { id: "O-railway-not-authoritative", group: "O", name: "Railway can never be an authoritative production host", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "railwayCanBeAuthoritativeProductionHost()=false in src/security/domainSecurityVerification.ts · verify:domain-governance" },
+  { id: "O-domain-transfer-lock", group: "O", name: "Transfer/registrar lock enabled on every domain", status: "partial", blockingForAlpha: false, blockingForProduction: true, evidence: "manual founder attestation pending (registrar settings not assumed) · DOMAIN_TRANSFER_LOCK_REQUIRED" },
+  { id: "O-domain-autorenew", group: "O", name: "Auto-renew enabled on every domain", status: "partial", blockingForAlpha: false, blockingForProduction: true, evidence: "manual founder attestation pending · DOMAIN_AUTORENEW_REQUIRED" },
+  { id: "O-domain-dns-review", group: "O", name: "Founder DNS security review recorded", status: "missing", blockingForAlpha: false, blockingForProduction: true, evidence: "no founder DNS review recorded yet · DOMAIN_DNS_REVIEW_REQUIRED" },
+  { id: "O-domain-registrar-mfa", group: "O", name: "Registrar accounts use MFA/passkeys", status: "partial", blockingForAlpha: false, blockingForProduction: true, evidence: "manual founder attestation pending (treat registrar account as critical infrastructure)" },
+  { id: "O-domain-continuity", group: "O", name: "Domains in founder continuity + disaster recovery records", status: "doctrine-only", blockingForAlpha: false, blockingForProduction: true, evidence: "docs/security/domain-security-governance.md continuity section; founder emergency package item" },
+  { id: "O-domain-security-review-launch", group: "O", name: "Domain security review required before public launch", status: "doctrine-only", blockingForAlpha: false, blockingForProduction: true, evidence: "DOMAIN_SECURITY_REVIEW_REQUIRED_BEFORE_PUBLIC_LAUNCH — categorical human gate" },
 ];
 
 export const SECURITY_CONSTITUTIONAL_CONSTRAINTS = {

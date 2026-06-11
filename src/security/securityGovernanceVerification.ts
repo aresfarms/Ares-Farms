@@ -27,7 +27,13 @@ export type CriticalAction =
   | "pii-financial-export"
   | "treasury-movement"
   | "financial-export"
-  | "financial-high-risk";
+  | "financial-high-risk"
+  // DOMAIN-ASSET-001 — institutional domain assets cannot be lost by one founder.
+  | "domain-transfer"
+  | "domain-ownership-change"
+  | "domain-registrar-change"
+  | "domain-dns-authority-change"
+  | "domain-primary-public-change";
 
 /** Quorum policy per action. "all" = every founder; n = at least n distinct. */
 const QUORUM: Record<CriticalAction, "all" | number> = {
@@ -41,6 +47,14 @@ const QUORUM: Record<CriticalAction, "all" | number> = {
   "treasury-movement": 2,
   "financial-export": 2,
   "financial-high-risk": 2,
+  // Permanent transfer/loss of a domain asset requires ALL founders — "no one
+  // founder should be able to permanently transfer or lose domain assets alone".
+  "domain-transfer": "all",
+  "domain-ownership-change": "all",
+  "domain-registrar-change": "all",
+  "domain-dns-authority-change": "all",
+  // A primary public-domain change needs multi-party + human review (not "all").
+  "domain-primary-public-change": 2,
 };
 
 /** Actions where Stuart (financial steward) MUST be one of the approvers. */

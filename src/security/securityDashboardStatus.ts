@@ -11,19 +11,30 @@ import { securityHardeningStatus, SECURITY_HARDENING_GOVERNANCE } from "./securi
 import { verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 import { readIncidentState } from "./securityIncidentRunbook";
 import { AUDIT_LEDGER_PATH } from "@/lib/property/auditLedger";
+import { domainDashboardPanel, type ControlLight } from "./domainSecurityVerification";
 
 export type Light = "green" | "amber" | "red";
 export interface DashboardLine { key: string; light: Light; detail: string }
+
+/** Domain panel uses PASS/PENDING/PARTIAL/FAIL/N-A — map to the dashboard light. */
+function lightFor(status: ControlLight): Light {
+  if (status === "PASS") return "green";
+  if (status === "FAIL") return "red";
+  if (status === "N/A") return "green";
+  return "amber"; // PENDING / PARTIAL — not earned yet
+}
 
 export function securityDashboard(): {
   gate: string;
   lines: DashboardLine[];
   counts: ReturnType<typeof securityHardeningStatus>["counts"];
   incident: ReturnType<typeof readIncidentState>;
+  domains: ReturnType<typeof domainDashboardPanel>;
 } {
   const status = securityHardeningStatus();
   const chain = verifyLedgerChain(AUDIT_LEDGER_PATH);
   const incident = readIncidentState();
+  const domains = domainDashboardPanel();
 
   const lines: DashboardLine[] = [
     { key: "Operator MFA", light: process.env.OPERATOR_MFA_ENFORCED === "true" ? "green" : "amber", detail: process.env.OPERATOR_MFA_ENFORCED === "true" ? "enforced" : "IdP/IAP wiring pending (Phase 4)" },
@@ -37,7 +48,10 @@ export function securityDashboard(): {
     { key: "Treasury freeze", light: incident.treasuryFrozen ? "red" : "green", detail: incident.treasuryFrozen ? "FROZEN (incident active)" : "available, not engaged" },
     { key: "Forensic lockdown", light: incident.forensicLockdown ? "red" : "green", detail: incident.forensicLockdown ? "ENGAGED" : "available, not engaged" },
     { key: "Pen-test readiness", light: "red", detail: "checklist ready; third-party pentest NOT scheduled — production blocked" },
+    // Domain Asset Governance panel (DOMAIN-ASSET-001).
+    ...domains.lines.map((l) => ({ key: `Domain · ${l.key}`, light: lightFor(l.status), detail: l.detail })),
+    { key: "Domain · Last review date", light: domains.lastReviewDate ? "green" as Light : "amber" as Light, detail: domains.lastReviewDate ?? "no founder domain review recorded yet" },
   ];
 
-  return { gate: SECURITY_HARDENING_GOVERNANCE, lines, counts: status.counts, incident };
+  return { gate: SECURITY_HARDENING_GOVERNANCE, lines, counts: status.counts, incident, domains };
 }

@@ -115,11 +115,35 @@ export interface RiskItem {
   mitigationToExplore: string;
 }
 
+/**
+ * Verified property counts — HONEST + SCOPED (same integrity standard as the
+ * place-fact badges). `total` is the TRUE count for the stated scope across ALL
+ * states (never silently capped). `states` shows the top few for readability;
+ * when more exist, `truncated` is true and the render labels it ("showing the
+ * top N of M states") so the number can never read as a total it isn't.
+ */
+export interface VerifiedPropertyCounts {
+  /** TRUE total current listings for the scope, summed across every state. */
+  total: number;
+  /** Number of states that have ≥1 current listing in the scope. */
+  totalStates: number;
+  /** What the count is OF, e.g. "farm & land" or "all property types". */
+  scopeLabel: string;
+  /** True when no category filter applies (count covers every property type). */
+  scopeAllCategories: boolean;
+  asOf: string;
+  /** The states shown (top by scoped count) — a readable subset, not the whole. */
+  states: { abbr: string; total: number; oz?: number; hubzone?: number }[];
+  /** = states.length (how many states are displayed). */
+  statesShown: number;
+  /** True when more states exist than are shown (render must label this). */
+  truncated: boolean;
+}
+
 export interface PropertyOpportunities {
   relevant: boolean;
   note: string;
-  /** Verified current counts pulled straight from the verified feed (no "may fit"). */
-  verified?: { totalCurrent: number; states: { abbr: string; total: number; oz: number; hubzone: number }[]; asOf: string };
+  verified?: VerifiedPropertyCounts;
   exploreHref: string;
 }
 
@@ -374,6 +398,41 @@ function environmentalItems(a: DiscoveryAnswers): PossibilityItem[] {
   return items;
 }
 
+/** How many states to DISPLAY (the true total always covers every state). */
+const PROPERTY_STATES_SHOWN = 8;
+
+/**
+ * Derive the property CATEGORY scope from the person's stated interests, so a
+ * farmer interested in land sees farm & land counts — not every property type.
+ * Explicit category picks win; otherwise persona + goals imply the scope.
+ */
+function categoryScope(a: DiscoveryAnswers): { cats: string[] | null; label: string } {
+  const explicit = (a.property?.categories ?? []).filter(Boolean);
+  if (explicit.length) return { cats: explicit, label: labelFor(explicit) };
+
+  const cats = new Set<string>();
+  const g = a.goals;
+  if (a.persona === "farmer" || a.persona === "rancher" || g.includes("start-expand-farm")) { cats.add("farms-ranches"); cats.add("land"); }
+  if (a.persona === "landowner" || g.includes("buy-land") || g.includes("preserve-family-land")) cats.add("land");
+  if (g.includes("create-housing")) cats.add("homes");
+  if (g.includes("develop")) { cats.add("land"); cats.add("commercial"); }
+  if (a.persona === "business-owner" || a.persona === "investor" || g.includes("buy-sell-business")) { cats.add("commercial"); cats.add("businesses"); }
+  // No strong property signal → cover every type (and say so).
+  if (cats.size === 0) return { cats: null, label: "all property types" };
+  return { cats: [...cats], label: labelFor([...cats]) };
+}
+
+const CAT_LABEL: Record<string, string> = {
+  homes: "homes", "farms-ranches": "farm & ranch", land: "land", commercial: "commercial",
+  hospitality: "hospitality", businesses: "business", misc: "other",
+};
+function labelFor(cats: string[]): string {
+  const parts = cats.map((c) => CAT_LABEL[c] ?? c);
+  if (parts.length === 1) return parts[0];
+  if (parts.length === 2) return `${parts[0]} & ${parts[1]}`;
+  return parts.slice(0, -1).join(", ") + " & " + parts[parts.length - 1];
+}
+
 function propertyOpportunities(a: DiscoveryAnswers, feed: GuidedIntakeFeed): PropertyOpportunities {
   const relevant = a.propertyInterest !== "no";
   if (!relevant) {
@@ -383,20 +442,49 @@ function propertyOpportunities(a: DiscoveryAnswers, feed: GuidedIntakeFeed): Pro
       exploreHref: "/explore?lane=property-land",
     };
   }
+
   const wantStates = (a.property?.states ?? []).map((s) => s.toUpperCase());
-  const chosen = wantStates.length ? feed.states.filter((s) => wantStates.includes(s.abbr)) : feed.states;
-  const states = chosen
-    .map((s) => ({ abbr: s.abbr, total: s.total, oz: s.ozDesignated, hubzone: s.hubzoneDesignated }))
+  const inGeo = wantStates.length ? feed.states.filter((s) => wantStates.includes(s.abbr)) : feed.states;
+  const { cats, label } = categoryScope(a);
+  const scopeAll = cats === null;
+
+  // Per-state SCOPED count (sum only the in-scope categories; all → state total).
+  const scopedTotal = (s: GuidedIntakeFeed["states"][number]) =>
+    scopeAll ? s.total : (cats as string[]).reduce((n, c) => n + (s.byCategory[c as keyof typeof s.byCategory] ?? 0), 0);
+
+  const withCounts = inGeo
+    .map((s) => ({
+      abbr: s.abbr,
+      total: scopedTotal(s),
+      // OZ/HUBZone designations are whole-state (not per-category); only show
+      // them when the scope is the whole inventory, so they never overclaim a
+      // scoped subset.
+      oz: scopeAll ? s.ozDesignated : undefined,
+      hubzone: scopeAll ? s.hubzoneDesignated : undefined,
+    }))
     .filter((s) => s.total > 0)
-    .sort((x, y) => y.total - x.total)
-    .slice(0, 8);
-  const totalCurrent = states.reduce((n, s) => n + s.total, 0);
+    .sort((x, y) => y.total - x.total);
+
+  // TRUE total + true state count — NEVER capped. Only the DISPLAY is trimmed.
+  const total = withCounts.reduce((n, s) => n + s.total, 0);
+  const totalStates = withCounts.length;
+  const shown = withCounts.slice(0, PROPERTY_STATES_SHOWN);
+
   return {
     relevant: true,
     note: a.propertyInterest === "maybe"
-      ? "You're open to property — here is what currently exists, shown only because it may support a pathway above. These are verified current counts, not a claim about you."
-      : "Here is what currently exists in the verified inventory. These are current counts of real listings, with verified place-facts on each — facts about the place, never about you.",
-    verified: { totalCurrent, states, asOf: feed.asOf },
+      ? "You're open to property — here is what currently exists in the verified inventory, shown only because it may support a pathway above. Real counts, not a claim about you."
+      : "Here is what currently exists in the verified inventory, scoped to your interests. Real current counts, with verified place-facts on each listing — facts about the place, never about you.",
+    verified: {
+      total,
+      totalStates,
+      scopeLabel: label,
+      scopeAllCategories: scopeAll,
+      asOf: feed.asOf,
+      states: shown,
+      statesShown: shown.length,
+      truncated: totalStates > shown.length,
+    },
     exploreHref: "/explore?lane=property-land",
   };
 }

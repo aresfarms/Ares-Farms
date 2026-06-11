@@ -3,36 +3,50 @@ import Link from "next/link";
 
 import { Disclosures } from "@/components/public/Disclosures";
 import { DiscoveryEngine } from "@/components/discovery/DiscoveryEngine";
+import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { guidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import { discoveryPrimary, BROWSE_HREF } from "@/lib/discovery/discoveryConfig";
+import { resolveDiscoveryFlow, isPlaceFirstFlow } from "@/lib/discovery/discoveryFlow";
 
 /**
- * /discover — the Possibility Discovery Engine (Caitlin's vision, 2026-06-11).
+ * /discover — the discovery front door. The journey is chosen UP FRONT by the
+ * flow-state resolver (resolveDiscoveryFlow) BEFORE anything renders:
+ *   - place-facts / opportunity-zone / property-discovery → PLACE-FIRST card
+ *     (location first; persona only later);
+ *   - possibilities-persona (default) → the conversational persona interview.
  *
- * The guided, possibility-first front door: Person → Goals → Constraints →
- * Possibilities → Pathways → Actions. The property search is ONE possible
- * destination, never assumed to be THE one. Anonymous + in-session — nothing
- * about the person is sent or stored; the map is computed in the browser by the
- * deterministic routing layer. Education + routing, never determination; Human
- * Review is always offered.
+ * The generic persona intake is NEVER the default when the route/query/entrypoint
+ * signals place/property facts. Browse is preserved. Public Alpha PENDING.
  *
- * Browse is PRESERVED: the existing property map / Explore stays one click away
- * (BROWSE_HREF), per "keep what we have until I see this working."
- *
- * Public Alpha PENDING.
+ * Governance basis: Master Volume VI separates Property Discovery & Canonical
+ * Property Governance from general customer/revenue intelligence.
  */
 
 export const metadata: Metadata = {
   title: "What are your possibilities? | Furlong",
   description:
-    "Before recommending a property, program, financing option, or plan, we help you understand what " +
-    "you're trying to accomplish — then map the possibilities. Anonymous, no account, nothing sold.",
+    "Start with a place or with what you're trying to accomplish. Verified place-facts up front; " +
+    "possibilities mapped from your interests. Anonymous, no account, nothing sold.",
 };
 
-export default async function DiscoverPage() {
+type SP = Record<string, string | string[] | undefined>;
+
+/** Render the journey chosen by the resolver. Exported for the path entrypoints. */
+export function DiscoverSurface({ route, query }: { route: string; query: SP }) {
+  const flow = resolveDiscoveryFlow({ route, query });
+
+  if (isPlaceFirstFlow(flow)) {
+    return (
+      <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
+        <PlaceFirstDiscovery flow={flow} />
+        <Disclosures />
+      </main>
+    );
+  }
+
+  // Default — the conversational persona interview.
   const feed = guidedIntakeFeed();
   const primary = discoveryPrimary();
-
   return (
     <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
       <header style={{ display: "grid", gap: 10 }}>
@@ -47,11 +61,10 @@ export default async function DiscoverPage() {
           we start with what <em>you</em> are trying to accomplish, then show what's out there. No right or wrong
           answers, and we're not here to sell you anything.
         </p>
-        {!primary && (
-          <p style={{ margin: 0, fontSize: 12.5, color: "#9aa6b6" }}>
-            Prefer to look around first? <Link href={BROWSE_HREF} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>Browse properties directly →</Link>
-          </p>
-        )}
+        <p style={{ margin: 0, fontSize: 12.5, color: "#9aa6b6" }}>
+          Looking up a specific place instead? <Link href="/discover?mode=place-facts" style={{ color: "#854F0B", textDecoration: "underline", fontWeight: 700 }}>Check a location's place-facts →</Link>
+          {!primary && <> · <Link href={BROWSE_HREF} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>Browse properties →</Link></>}
+        </p>
       </header>
 
       <DiscoveryEngine feed={feed} />
@@ -59,4 +72,9 @@ export default async function DiscoverPage() {
       <Disclosures />
     </main>
   );
+}
+
+export default async function DiscoverPage({ searchParams }: { searchParams?: Promise<SP> }) {
+  const query = searchParams ? await searchParams : {};
+  return <DiscoverSurface route="/discover" query={query} />;
 }

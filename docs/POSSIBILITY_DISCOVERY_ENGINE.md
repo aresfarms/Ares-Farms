@@ -94,3 +94,40 @@ regression). Full suite green; tsc clean; build exit 0. Live eyes-on: a real bro
 click-through walked the interview to the rendered map — all 10 sections, Human Review
 prominent, verified counts, **zero "you qualify" language**. A skipped optional no longer loops
 (bug caught by the rendered click-through and locked out by a regression test).
+
+---
+
+## Update (2026-06-11) — count honesty + scoping, and discovery flow-state resolution
+
+**Count honesty + scoping (verified-facts integrity).** The map's property count was the
+top-8-states subtotal shown as if it were a total (the old "343"). Fixed in
+`possibilityEngine.propertyOpportunities`:
+- `VerifiedPropertyCounts` now carries `total` (the TRUE count for the scope across **all**
+  states — never silently capped), `totalStates`, `scopeLabel`, `scopeAllCategories`,
+  `states` (top-N shown), `statesShown`, `truncated`.
+- The count is **scoped to interests** (farmer/land → farm & ranch & land categories from the
+  verified feed, not all types). Whole-state OZ/HUBZone are shown only in the all-types view
+  (omitted when scoped, so they can't overclaim a subset).
+- The render labels the scope and state count, and adds "Showing the top N of M states — the
+  total above counts every state" whenever truncated. Rendered proof: *"9 verified current
+  farm & ranch & land listings across 6 states · as of 2026-06-11."*
+
+**Discovery flow-state resolution (Master Volume VI separation).** `/discover` no longer
+defaults to the persona intake for place/property entrypoints:
+- `src/lib/discovery/discoveryFlow.ts` — `resolveDiscoveryFlow({route,query,entrypoint,priorState})`
+  returns `place-facts | opportunity-zone | property-discovery | possibilities-persona` (query
+  `?mode`/`?topic` > path segment > entrypoint hint > prior state > default persona).
+- `src/components/discovery/PlaceFirstDiscovery.tsx` — place-first card: location inputs
+  (address/parcel/county/state) FIRST, then verified place-fact coverage (OZ, USDA rural,
+  FEMA, NPS, NMTC) with source + confidence + disclaimers; persona only as a secondary link.
+  Honest: live per-address lookup is gated (Module 22/23), so it never fabricates — it routes
+  to the verified inventory where the facts are attached.
+- `/discover` page resolves the flow before rendering; `/discover/opportunity-zone` path
+  entrypoint added. Anonymous still means "no account," not "skip place facts."
+
+**Verify:** new `verify:discovery-flow` (resolver units + structural + live SSR: place URLs
+render the place-first card and NOT the persona card). `verify:discovery-engine` extended with
+a count-honesty section (10-state feed proves no silent cap + truncation labeling + scoping).
+Full suite green; tsc clean; build exit 0 (`/discover/opportunity-zone` in the manifest). Live
+eyes-on confirmed both: place-first OZ card renders location-first, and the persona map shows
+the honest scoped count.

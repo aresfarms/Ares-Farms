@@ -269,7 +269,8 @@ function PossibilityMapView({ map, onBack }: { map: PossibilityMap; onBack: () =
           {map.property.relevant && map.property.verified && (
             <div style={{ display: "grid", gap: 6, border: "1px solid #e6ebf2", borderRadius: 10, padding: "12px 14px" }}>
               <strong style={{ fontSize: 13.5, color: "#1f2a3d" }}>
-                {map.property.verified.totalCurrent} verified current listing{map.property.verified.totalCurrent === 1 ? "" : "s"} · as of {map.property.verified.asOf}
+                {map.property.verified.total} verified current {map.property.verified.scopeAllCategories ? "" : `${map.property.verified.scopeLabel} `}listing{map.property.verified.total === 1 ? "" : "s"}
+                {" "}across {map.property.verified.totalStates} state{map.property.verified.totalStates === 1 ? "" : "s"} · as of {map.property.verified.asOf}
               </strong>
               <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
                 {map.property.verified.states.map((s) => (
@@ -278,6 +279,11 @@ function PossibilityMapView({ map, onBack }: { map: PossibilityMap; onBack: () =
                   </span>
                 ))}
               </div>
+              {map.property.verified.truncated && (
+                <span style={{ fontSize: 11.5, color: "#7a8aa0" }}>
+                  Showing the top {map.property.verified.statesShown} of {map.property.verified.totalStates} states — the {map.property.verified.total} total above counts every state.
+                </span>
+              )}
             </div>
           )}
           <Link href={map.property.exploreHref} style={{ fontSize: 13.5, fontWeight: 700, color: "#185FA5", textDecoration: "underline" }}>

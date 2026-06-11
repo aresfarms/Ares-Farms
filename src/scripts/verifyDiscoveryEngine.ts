@@ -71,6 +71,37 @@ for (const [name, src] of [["possibilityEngine", engineSrc], ["conversationEngin
 }
 ok(/runs in the browser|nothing is sent|in-session|deterministic engine/i.test(engineSrc), "engine must document the anonymity/verified guarantee");
 
+// ── 1b. COUNT HONESTY — true total (never silently capped), scoped, labeled ───
+// A 10-state feed (more than the 8 displayed) so the cap-vs-total bug surfaces.
+const BIG_FEED: GuidedIntakeFeed = {
+  asOf: "2026-06-11",
+  states: Array.from({ length: 10 }, (_, i) => ({
+    abbr: ["TX", "FL", "LA", "AL", "PA", "MS", "IL", "OH", "MI", "GA"][i],
+    byCategory: { land: 10 - i, "farms-ranches": 5, homes: 3, commercial: 2 } as Record<string, number>,
+    total: (10 - i) + 5 + 3 + 2,
+    ozDesignated: i, hubzoneDesignated: i % 3,
+  })),
+};
+{
+  // farmer + start a farm, NO explicit states/categories → scope = farm & land.
+  const farmAnswers: DiscoveryAnswers = { persona: "farmer", goals: ["start-expand-farm"], resources: [], constraints: [], values: [], propertyInterest: "yes" };
+  const v = generatePossibilityMap(farmAnswers, BIG_FEED).property.verified!;
+  const trueTotal = BIG_FEED.states.reduce((n, s) => n + (s.byCategory.land ?? 0) + (s.byCategory["farms-ranches"] ?? 0), 0);
+  ok(v.total === trueTotal, `count is the TRUE total for the scope across ALL states (got ${v.total}, expected ${trueTotal}) — never silently capped`);
+  ok(v.totalStates === 10, "totalStates counts every in-scope state (10), not just the shown ones");
+  ok(v.statesShown === 8 && v.truncated === true, "only 8 states displayed → truncated=true so the render can label it");
+  ok(v.states.reduce((n, s) => n + s.total, 0) < v.total, "the shown-states subtotal is LESS than the true total (the total is not the visible sum)");
+  ok(/farm/.test(v.scopeLabel) && /land/.test(v.scopeLabel) && v.scopeAllCategories === false, "count is scoped to interests (farm & land), honestly labeled");
+  ok(v.states.every((s) => s.oz === undefined), "scoped view omits whole-state OZ (no overclaim by mismatched scope)");
+
+  // No property signal → scope = ALL property types, count = sum of every state total.
+  const allAnswers: DiscoveryAnswers = { persona: "retiree", goals: ["generate-income"], resources: [], constraints: [], values: [], propertyInterest: "yes" };
+  const va = generatePossibilityMap(allAnswers, BIG_FEED).property.verified!;
+  ok(va.scopeAllCategories === true && va.scopeLabel === "all property types", "no property signal → 'all property types', labeled");
+  ok(va.total === BIG_FEED.states.reduce((n, s) => n + s.total, 0), "all-types total = sum of every state total (true, uncapped)");
+  ok(va.states.every((s) => typeof s.oz === "number"), "whole-inventory view may show OZ/HUBZone (scope matches)");
+}
+
 // ── battery of intake combinations ───────────────────────────────────────────
 const PERSONAS: PersonaId[] = ["farmer", "investor", "retiree", "veteran", "nonprofit", "individual", "developer"];
 const GOAL_SETS: GoalId[][] = [
@@ -155,9 +186,14 @@ for (const propertyInterest of INTERESTS) {
     ok(map.property.relevant === false && !map.property.verified, "property:'no' yields no property counts");
   } else {
     ok(map.property.relevant === true, `property:'${propertyInterest}' must be relevant`);
-    // counts must equal the verified feed (WV selected → WV total 20)
-    const wv = map.property.verified?.states.find((s) => s.abbr === "WV");
-    ok(wv?.total === 20 && wv.oz === 4 && wv.hubzone === 2, "property counts must equal the verified feed (no fabrication)");
+    // SCOPED to interests: categories=["land"], states=["WV"] → WV land count = 12
+    // (NOT the all-category 20). Scoped views omit whole-state OZ/HUBZone (no overclaim).
+    const v = map.property.verified!;
+    const wv = v.states.find((s) => s.abbr === "WV");
+    ok(wv?.total === 12, "property count is SCOPED to interests (WV land = 12, not all-category 20)");
+    ok(wv?.oz === undefined && wv?.hubzone === undefined, "scoped view omits whole-state OZ/HUBZone (no overclaim)");
+    ok(v.total === 12 && v.totalStates === 1, "scoped TRUE total across all (chosen) states = 12 / 1 state");
+    ok(v.scopeLabel === "land" && v.scopeAllCategories === false, "scope is labeled 'land' (honest about what the number counts)");
   }
   ok(!/may fit|may qualify/i.test(map.property.note), "property note must never say 'may fit/may qualify'");
 
@@ -203,7 +239,7 @@ import("@/lib/discovery/conversationEngine").then((CE) => {
   walk = CE.applyAnswer(walk, "propertyStates", ["WV"]);
   const walkMap = generatePossibilityMap(walk.answers, FEED);
   ok(walkMap.humanReview.recommended === true, "interview-built map keeps Human Review");
-  ok(walkMap.property.verified?.states.find((s) => s.abbr === "WV")?.total === 20, "interview-built map uses verified-only feed counts");
+  ok((walkMap.property.verified?.total ?? 0) > 0 && walkMap.property.verified?.scopeAllCategories === false, "interview-built map uses verified-only feed counts, scoped to interests");
   for (const text of [...claimStrings(walkMap), ...disclaimerStrings(walkMap)])
     for (const re of BANNED) if (re.test(text)) fail.push(`BANNED in interview-built map: ${re}`);
   ok(walk.answers.persona === "farmer" && walk.answers.goals.includes("start-expand-farm"), "applyAnswer maps option codes into typed answers");

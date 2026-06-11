@@ -46,14 +46,10 @@ export type Attestation = "attested-true" | "attested-false" | "unverified";
 
 export type CanonicalRole =
   | "PRIMARY_PUBLIC_PLATFORM"
-  | "INSTITUTIONAL_HUB"
-  | "CORPORATE_ENTITY"
-  | "LEGACY_ENTERPRISE_ASSET";
+  | "INSTITUTIONAL_HUB";
 
 export type ProductionUseStatus =
   | "RESERVED_NOT_LIVE"
-  | "ACTIVE_CORPORATE"
-  | "RESERVED_OR_LEGACY"
   | "PUBLIC_LIVE";
 
 export type RiskStatus = "SECURED" | "SECURED_PENDING_DNS_DEPLOYMENT" | "AT_RISK" | "UNVERIFIED";
@@ -144,58 +140,6 @@ export const DOMAIN_ASSETS: DomainAssetRecord[] = [
     notes:
       "Institutional/partner hub. Any admin or privileged surface requires strict authentication behind " +
       "the operator wall — never exposed by DNS alone.",
-  },
-  {
-    domain: "aresfarmsinc.com",
-    purpose:
-      "Corporate / legal / institutional entity domain — founder & company administration, legal, billing, " +
-      "and official entity communications.",
-    canonical_role: "CORPORATE_ENTITY",
-    registrar: null,
-    owner_entity: "Ares Farms Inc.",
-    renewal_status: "unverified",
-    renewal_date: null,
-    auto_renew_enabled: "unverified",
-    transfer_lock_enabled: "unverified",
-    privacy_enabled: "unverified",
-    mfa_required: "unverified",
-    dns_provider: null,
-    nameservers: [],
-    email_auth: "unverified", // corporate mail domain — SPF/DKIM/DMARC tracked once confirmed
-    production_use_status: "ACTIVE_CORPORATE",
-    connected_services: [],
-    last_reviewed_at: null,
-    reviewed_by: null,
-    risk_status: "SECURED",
-    notes:
-      "Corporate entity domain. If used to send official mail, SPF/DKIM/DMARC must be tracked; DMARC begins " +
-      "in monitoring mode and moves toward quarantine/reject once validated.",
-  },
-  {
-    domain: "redacre.enterprises",
-    purpose:
-      "Legacy / subsidiary / enterprise-initiatives domain — preserved institutional asset for future " +
-      "controlled use.",
-    canonical_role: "LEGACY_ENTERPRISE_ASSET",
-    registrar: null,
-    owner_entity: "Ares Farms Inc. / Redacre institutional lineage",
-    renewal_status: "unverified",
-    renewal_date: null,
-    auto_renew_enabled: "unverified",
-    transfer_lock_enabled: "unverified",
-    privacy_enabled: "unverified",
-    mfa_required: "unverified",
-    dns_provider: null,
-    nameservers: [],
-    email_auth: "n/a",
-    production_use_status: "RESERVED_OR_LEGACY",
-    connected_services: [],
-    last_reviewed_at: null,
-    reviewed_by: null,
-    risk_status: "SECURED",
-    notes:
-      "Preserved institutional asset. Keep auto-renew + transfer lock on; no services should dangle from it. " +
-      "Watch for stale/dangling DNS if ever pointed anywhere.",
   },
 ];
 

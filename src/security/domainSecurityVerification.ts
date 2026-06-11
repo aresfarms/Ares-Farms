@@ -111,7 +111,7 @@ export function domainProductionBlockers(): { id: DomainProductionBlocker; open:
   const statuses = allDomainControlStatus();
   const allAttested = (pick: (s: DomainControlStatus) => ControlLight) => statuses.every((s) => pick(s) === "PASS" || pick(s) === "N/A");
 
-  const registryComplete = DOMAIN_ASSETS.length >= 4 && DOMAIN_ASSETS.every((d) => !!d.canonical_role && !!d.owner_entity);
+  const registryComplete = DOMAIN_ASSETS.length === 2 && DOMAIN_ASSETS.every((d) => !!d.canonical_role && !!d.owner_entity);
   const transferLockAll = allAttested((s) => s.transferLock);
   const autoRenewAll = allAttested((s) => s.autoRenew);
   const dnsReviewAll = allAttested((s) => s.dnsReview);

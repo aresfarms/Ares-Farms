@@ -3,17 +3,19 @@
 **Doctrine:** DOMAIN-ASSET-001 — Institutional Domain Asset Governance.
 **Status:** DOMAIN_ASSET_GOVERNANCE = ALPHA_PENDING. Do not merge. Stop for human review.
 
-These domains are **security-critical institutional infrastructure assets**, not ordinary
-marketing assets. The machine-readable source of truth is
-[`src/security/domainAssetManifest.ts`](../../src/security/domainAssetManifest.ts); this
-document is the human-readable registry.
+DOMAIN-ASSET-001 governs **only Furlong's two domains**. These are **security-critical
+institutional infrastructure assets**, not ordinary marketing assets. The machine-readable source
+of truth is [`src/security/domainAssetManifest.ts`](../../src/security/domainAssetManifest.ts);
+this document is the human-readable registry.
 
 | Domain | Canonical role | Owner entity | Production use | Risk status |
 |---|---|---|---|---|
 | furlongpathways.com | PRIMARY_PUBLIC_PLATFORM | Ares Farms Inc. | RESERVED_NOT_LIVE | SECURED_PENDING_DNS_DEPLOYMENT |
 | furlonghub.com | INSTITUTIONAL_HUB | Ares Farms Inc. | RESERVED_NOT_LIVE | SECURED_PENDING_DNS_DEPLOYMENT |
-| aresfarmsinc.com | CORPORATE_ENTITY | Ares Farms Inc. | ACTIVE_CORPORATE | SECURED |
-| redacre.enterprises | LEGACY_ENTERPRISE_ASSET | Ares Farms Inc. / Redacre institutional lineage | RESERVED_OR_LEGACY | SECURED |
+
+**Out of scope (NOT in this registry):** `aresfarmsinc.com` and `redacre.enterprises` are
+**separate companies**, not part of Furlong. Google system aliases (`*.guest.google`,
+`*.test-google-a.com`) are not owned domains. None of these belong in DOMAIN-ASSET-001.
 
 ## Roles
 
@@ -22,10 +24,6 @@ document is the human-readable registry.
 2. **furlonghub.com** — Institutional hub. Partner, governance, module, developer, certification,
    and ecosystem coordination. May host future partner/admin surfaces, but must not expose
    privileged runtime controls without strict authentication.
-3. **aresfarmsinc.com** — Corporate/legal/institutional entity domain. Founder & company
-   administration, legal, billing, official entity communications.
-4. **redacre.enterprises** — Legacy/subsidiary/enterprise-initiatives domain. Preserved
-   institutional asset for future controlled use.
 
 ## Per-record fields (tracked in the manifest)
 

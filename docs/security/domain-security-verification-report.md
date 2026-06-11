@@ -9,8 +9,10 @@
 |---|---|---|---|
 | furlongpathways.com | Primary public platform / pathway discovery portal ("What are your possibilities?") | PRIMARY_PUBLIC_PLATFORM | Ares Farms Inc. |
 | furlonghub.com | Institutional hub — partner/governance/module/developer/certification coordination | INSTITUTIONAL_HUB | Ares Farms Inc. |
-| aresfarmsinc.com | Corporate/legal entity — admin, legal, billing, official communications | CORPORATE_ENTITY | Ares Farms Inc. |
-| redacre.enterprises | Legacy/subsidiary/enterprise initiatives — preserved asset | LEGACY_ENTERPRISE_ASSET | Ares Farms Inc. / Redacre lineage |
+
+DOMAIN-ASSET-001 governs **only these two Furlong domains**. `aresfarmsinc.com` and
+`redacre.enterprises` are **separate companies** (not Furlong) and Google system aliases
+(`*.guest.google`, `*.test-google-a.com`) are not owned domains — none are in this registry.
 
 ## Registrar / security status
 Ownership is recorded. Registrar-level controls (MFA/passkeys, auto-renew, transfer lock, privacy)
@@ -23,10 +25,8 @@ entry + human approval; DNS authority changes require ALL-founder multi-party ap
 (wildcards, dangling CNAMEs, stale TXT, unused subdomains) to be walked via the DNS checklist.
 
 ## Email authentication status
-- aresfarmsinc.com (corporate mail): **PENDING** — if used to send, publish SPF/DKIM/DMARC; DMARC
-  starts in monitoring (`p=none`), then quarantine/reject once validated.
-- furlongpathways.com / furlonghub.com: PENDING (not yet sending).
-- redacre.enterprises: N/A (non-sending; consider anti-spoofing DMARC reject).
+- furlongpathways.com / furlonghub.com: **PENDING** (not yet sending). If used to send, publish
+  SPF/DKIM/DMARC; DMARC starts in monitoring (`p=none`), then quarantine/reject once validated.
 
 ## Production readiness status
 **BLOCKED.** `productionDnsCutoverAllowed()` = false. `railwayCanBeAuthoritativeProductionHost()`

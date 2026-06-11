@@ -2,7 +2,7 @@
  * verify:domain-governance — DOMAIN-ASSET-001 conformance tests.
  *
  * Proves the institutional domain assets are governed as security-critical
- * property: all four domains registered with canonical roles; production DNS
+ * property: exactly the two Furlong domains registered with canonical roles; production DNS
  * cutover blocked without human review; transfer / DNS-authority / ownership
  * changes require multi-party founder approval (no single founder); missing
  * auto-renew / transfer-lock attestations block production; the dashboard reports
@@ -29,21 +29,25 @@ const fail: string[] = [];
 const ok = (c: boolean, m: string) => { if (!c) fail.push(m); };
 const ap = (f: "caitlin" | "stuart", r = "domain review"): ApprovalRecord => ({ founderId: f, channel: "in-person", ts: new Date().toISOString(), rationale: r });
 
+// DOMAIN-ASSET-001 governs ONLY Furlong's two domains. aresfarmsinc.com and
+// redacre.enterprises are SEPARATE companies (not Furlong); Google system
+// aliases (*.guest.google, *.test-google-a.com) are not owned domains. Neither
+// belongs in this registry.
 const EXPECTED: Record<string, CanonicalRole> = {
   "furlongpathways.com": "PRIMARY_PUBLIC_PLATFORM",
   "furlonghub.com": "INSTITUTIONAL_HUB",
-  "aresfarmsinc.com": "CORPORATE_ENTITY",
-  "redacre.enterprises": "LEGACY_ENTERPRISE_ASSET",
 };
+const NOT_FURLONG = ["aresfarmsinc.com", "redacre.enterprises", "guest.google", "test-google-a.com"];
 
-// ── 1. All four domains exist + each has a canonical role ─────────────────────
+// ── 1. Exactly the two Furlong domains exist, each with a canonical role ──────
 for (const [domain, role] of Object.entries(EXPECTED)) {
   const rec = DOMAIN_ASSETS.find((d) => d.domain === domain);
   ok(!!rec, `domain must be registered: ${domain}`);
   ok(rec?.canonical_role === role, `${domain} canonical_role must be ${role} (got ${rec?.canonical_role})`);
   ok(!!rec?.owner_entity?.includes("Ares Farms Inc."), `${domain} must be owned by Ares Farms Inc.`);
 }
-ok(DOMAIN_ASSETS.length === 4, "exactly four institutional domains registered");
+ok(DOMAIN_ASSETS.length === 2, "exactly two Furlong domains registered (no other companies, no google aliases)");
+for (const d of NOT_FURLONG) ok(!DOMAIN_ASSETS.some((x) => x.domain.includes(d)), `${d} must NOT be in the registry (separate company / not an owned domain)`);
 ok(DOMAIN_ASSETS.every((d) => !!d.canonical_role), "every domain has a canonical role");
 ok(DOMAIN_ASSET_DOCTRINE_ID === "DOMAIN-ASSET-001" && DOMAIN_ASSET_RULES.length >= 12, "DOMAIN-ASSET-001 doctrine + rules present");
 
@@ -107,7 +111,7 @@ if (fail.length) {
   process.exit(1);
 }
 console.log(
-  "\n✓  verify:domain-governance PASS — all four domains registered with canonical roles + Ares Farms Inc. ownership; " +
+  "\n✓  verify:domain-governance PASS — both Furlong domains (furlongpathways.com, furlonghub.com) registered with canonical roles + ownership; " +
     "production DNS cutover blocked without human review; transfer / ownership / DNS-authority changes require multi-party " +
     "founders (no single founder); missing auto-renew/transfer-lock/DNS-review block production; dashboard surfaces incomplete " +
     "controls as blocking; Railway never authoritative; GCP canonical but gated on DNS security review. Gate ALPHA_PENDING.",

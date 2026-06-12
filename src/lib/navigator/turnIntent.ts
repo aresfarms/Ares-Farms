@@ -61,6 +61,7 @@ export type TurnIntent =
   | "ROUTE_ANIMAL_RESCUE_OR_BOARDING" | "ROUTE_CONSERVATION_OR_HABITAT"
   // parcel encumbrance + third-party acquisition boundary
   | "ROUTE_EASEMENT_CONSTRAINT_REVIEW" | "CLARIFY_THIRD_PARTY_ACQUISITION"
+  | "LIMITED_PRIVATE_ADDRESS_OVERVIEW"
   // flow
   | "WAIT_FOR_MORE_INFO" | "PRESENT_PATHWAYS";
 
@@ -156,6 +157,10 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   CLARIFY_THIRD_PARTY_ACQUISITION: {
     intent: "WAIT_FOR_MORE_INFO",
     text: "Whenever there’s a public listing, auction, or other lawful sale source — or you just want to define the kind of property you’re after — I can help with the property itself, never the person.",
+  },
+  LIMITED_PRIVATE_ADDRESS_OVERVIEW: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Whenever you have a public listing, FSBO page, auction notice, broker listing, or a written invitation to evaluate the property, paste or provide that and I can analyze the property itself — never the owner or residents.",
   },
   // The threat alternate STILL REFUSES and STILL holds — different intent and
   // wording only; the boundary never weakens and discovery never resumes.

@@ -284,6 +284,51 @@ export const THIRD_PARTY_CELEBRITY_REPLY =
   "Furlong can’t help target a person’s residence. If there is a public listing or official sale source, paste that " +
   "link and we can analyze only the property, not the person.";
 
+// ── Private-address acquisition: limited public overview vs hard shutdown ─────
+// A bare private/residential address + purchase intent is NOT a hard shutdown.
+// Without verified availability it gets a LIMITED generic overview (categories
+// only), never owner/resident data, pro forma, or targeting. If the same
+// address was tied to stalking/harassment earlier in the session, even the
+// limited overview is withheld.
+const STREET_ADDRESS_RE = /\b\d{1,6}\s+(?:[NSEW]\.?\s+)?[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*\s+(?:st|street|ave|avenue|rd|road|dr|drive|ln|lane|blvd|boulevard|way|ct|court|pl|place|hwy|highway|cir|circle|terrace|ter|trail|trl|pkwy|parkway)\b/i;
+const ACQUIRE_ADDR_RE = /\b(?:buy|purchase|acquire|own)\b/i;
+// A claimed (unverified) availability signal also warrants the limited overview.
+const FSBO_CLAIM_RE = /\bfsbo\b|\bfor\s+sale\s+by\s+owner\b|\bis\s+for\s+sale\b|\bon\s+the\s+market\b/i;
+const SELF_PROPERTY_RE = /\b(?:my|our)\s+(?:farm|land|property|lot|parcel|house|home|place)\b/i;
+const SELLER_OFFERED_RE = /\b(?:offered|wants|agreed|willing)\s+to\s+sell\s+(?:me|us)\b|\bseller\s+(?:offered|invited)\b/i;
+
+export function detectStreetAddress(message: string): string | null {
+  const m = message.match(STREET_ADDRESS_RE);
+  return m ? m[0].toLowerCase().replace(/\s+/g, " ").trim() : null;
+}
+
+export const PRIVATE_ADDRESS_OVERVIEW_REPLY =
+  "I can help at a general property level, but I can’t treat a private residence as a full acquisition target unless " +
+  "there is public sale, FSBO, auction, broker, or other lawful availability evidence. Without that, I can only give " +
+  "a limited overview: what categories we would check — zoning, permitted uses, constraints, condition, financing " +
+  "fit, and due diligence — and I can’t identify, profile, contact, or pressure the owner or residents. If you have " +
+  "a listing, FSBO page, auction notice, or written invitation to evaluate the property, paste or provide that and I " +
+  "can analyze the property itself.";
+
+export const PRIVATE_ADDRESS_STALKING_REFUSAL =
+  "Because this session included targeting or stalking language tied to that address, I can’t continue analyzing it " +
+  "here. If there is a public listing or lawful sale process, start a new property-focused session and provide that " +
+  "listing source.";
+
+export type PrivateAddressKind = "overview" | "seller-offered" | null;
+
+/** Detect a private-address (or seller-offered) acquisition lacking verified availability. */
+export function detectPrivateAddressAcquisition(message: string): { kind: PrivateAddressKind; address: string | null } {
+  // A real listing URL means an ordinary property path — handled elsewhere.
+  if (/https?:\/\//i.test(message)) return { kind: null, address: null };
+  if (SELLER_OFFERED_RE.test(message)) return { kind: "seller-offered", address: detectStreetAddress(message) };
+  const address = detectStreetAddress(message);
+  if (address && (ACQUIRE_ADDR_RE.test(message) || FSBO_CLAIM_RE.test(message)) && !SELF_PROPERTY_RE.test(message)) {
+    return { kind: "overview", address };
+  }
+  return { kind: null, address: null };
+}
+
 export type ThirdPartyKind = "pressure" | "celebrity" | "clarify";
 
 export function detectThirdPartyAcquisition(message: string): ThirdPartyKind | null {

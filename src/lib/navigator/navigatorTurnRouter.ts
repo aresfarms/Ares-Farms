@@ -46,6 +46,8 @@ import {
   detectSpecialtyAsset, specialtyAssetReply,
   detectEasementConstraint, EASEMENT_CONSTRAINT_REPLY,
   detectThirdPartyAcquisition, THIRD_PARTY_CLARIFY_REPLY, THIRD_PARTY_PRESSURE_REPLY, THIRD_PARTY_CELEBRITY_REPLY,
+  detectStreetAddress, detectPrivateAddressAcquisition,
+  PRIVATE_ADDRESS_OVERVIEW_REPLY, PRIVATE_ADDRESS_STALKING_REFUSAL,
 } from "./navigatorGoalRoutes";
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
@@ -438,12 +440,17 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
   const harassment = detectTargetedHarassment(message);
   if (harassment) {
     const repeated = repeatOf("ESCALATE_TARGETED_HARASSMENT");
+    // Flag any address tied to the harassment — no overview for it later.
+    const flagged = detectStreetAddress(message);
+    const patch = flagged
+      ? { flaggedAddresses: [...new Set([...(journey.flaggedAddresses ?? []), flagged])] }
+      : {};
     return {
       turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : "ESCALATE_TARGETED_HARASSMENT",
       text: repeated
         ? "I still can’t help locate, track, or target a person. If there’s a lawful property, boundary, nuisance, safety, or code concern, tell me that and I can help think through documentation, municipal contacts, mediation, or professional help."
         : HARASSMENT_REPLY,
-      slot: `escalate:targeted-harassment:${harassment}`, echoConcept: null, refusal: true, patch: {},
+      slot: `escalate:targeted-harassment:${harassment}`, echoConcept: null, refusal: true, patch,
     };
   }
 
@@ -475,6 +482,17 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
       turnIntent: repeated && thirdParty === "clarify" ? "WAIT_FOR_MORE_INFO" : intent,
       text, slot: `third-party:${thirdParty}`, echoConcept: null,
       refusal: thirdParty !== "clarify", patch: {},
+    };
+  }
+
+  // 0.57 — SELLER-OFFERED third-party property ("my neighbor offered to sell
+  // me their farm"): limited overview + ask for listing/written invitation,
+  // BEFORE the asset routes claim the "farm"/"house" word. No owner identity.
+  const sellerOffered = detectPrivateAddressAcquisition(message);
+  if (sellerOffered.kind === "seller-offered") {
+    return {
+      turnIntent: "LIMITED_PRIVATE_ADDRESS_OVERVIEW", text: PRIVATE_ADDRESS_OVERVIEW_REPLY,
+      slot: "limited-overview:seller-offered", echoConcept: null, refusal: false, patch: {},
     };
   }
 
@@ -765,6 +783,29 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
       text: repeated ? `Still on the ${assetGoal.label} — which market or region, and any budget or financing picture?` : assetGoal.reply,
       slot: `route:asset-goal:${assetGoal.intent}`, echoConcept: assetGoal.label, refusal: false,
       patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 7.8 — PRIVATE-ADDRESS ACQUISITION: a bare private/residential address with
+  // purchase intent (no verified listing) is NOT a hard shutdown — it gets a
+  // LIMITED generic overview (categories only, no owner/resident/pro forma).
+  // If the address was tied to stalking/harassment earlier this session, even
+  // the limited overview is withheld. (Runs after all asset routes, so a
+  // commercial/ag/specialty goal at an address is handled by those first.)
+  const priv = detectPrivateAddressAcquisition(message);
+  if (priv.kind) {
+    const flaggedHit = priv.address && (journey.flaggedAddresses ?? []).includes(priv.address);
+    if (flaggedHit) {
+      return {
+        turnIntent: "REFUSE_OWNER_LOOKUP", text: PRIVATE_ADDRESS_STALKING_REFUSAL,
+        slot: "refuse:stalking-tied-address", echoConcept: null, refusal: true, patch: {},
+      };
+    }
+    const repeated = repeatOf("LIMITED_PRIVATE_ADDRESS_OVERVIEW");
+    return {
+      turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : "LIMITED_PRIVATE_ADDRESS_OVERVIEW",
+      text: PRIVATE_ADDRESS_OVERVIEW_REPLY,
+      slot: `limited-overview:${priv.kind}`, echoConcept: null, refusal: false, patch: {},
     };
   }
 

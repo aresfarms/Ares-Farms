@@ -145,6 +145,13 @@ const LISTING_URL_RE = /https?:\/\/|\b(?:zillow|redfin|loopnet|crexi|realtor|lan
 const OFFICIAL_DISPO_RE = /\b(?:public\s+auction|auction\s+(?:listing|notice)|surplus\s+(?:listing|disposition|notice)|GSA\s+surplus|redevelopment\s+(?:rfp|rfq|listing|notice)|(?:listed|listing)\s+for\s+redevelopment|disposition\s+record|\brfp\b|\brfq\b|official\s+\w+\s+listing)\b/i;
 const WEAK_CLAIM_RE = /\b(?:for\s+sale|on\s+the\s+market|listed|available)\b/i;
 const SELF_OWNED_RE = /\b(?:my\s+(?:farm|land|property|lot|parcel|house|home)|i\s+own|i'?m\s+buying|i\s+am\s+buying|on\s+my\s+\w+)\b/i;
+const STREET_ADDRESS_RE = /\b\d{1,6}\s+(?:[NSEW]\.?\s+)?[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+)*\s+(?:st|street|ave|avenue|rd|road|dr|drive|ln|lane|blvd|boulevard|way|ct|court|pl|place|hwy|highway|cir|circle|terrace|ter|trail|trl|pkwy|parkway)\b/i;
+const FSBO_RE = /\bfsbo\b|\bfor\s+sale\s+by\s+owner\b|\bis\s+for\s+sale\b|\bon\s+the\s+market\b/i;
+/** A bare private/residential address acquisition with no asset-class match. */
+function isPrivateAddressTarget(message: string, asset: AssetRow | null): boolean {
+  return asset === null && STREET_ADDRESS_RE.test(message) &&
+    !SELF_OWNED_RE.test(message) && (/\b(?:buy|purchase|acquire|own)\b/i.test(message) || FSBO_RE.test(message));
+}
 const CRITICAL_INFRA_RE = /\bnuclear\s+(?:plant|facility|reactor)|substation|power\s+plant|pipeline|water\s+treatment|coal\s+(?:plant|mine)|chemical\s+plant|military\s+base|\bprison\b|refinery|fuel\s+terminal/i;
 const REGULATED_FACILITY_RE = /\b(?:small\s+)?airport\b|\bairstrip\b|\bhospital\b|\bmedical\s+center\b/i;
 const GOV_LANDMARK_RE = /\bwhite\s+house\b|\bcapitol\b|\bsupreme\s+court\b|\bpentagon\b|\bbrooklyn\s+bridge\b|\bstatue\s+of\s+liberty\b|\bmount\s+rushmore\b|\bkennedy\s+space\s+center\b/i;
@@ -169,7 +176,7 @@ function classifyConstraint(message: string): ConstraintClass {
 
 function classifyRelationship(message: string, asset: AssetRow | null, encumbered: boolean): RelationshipClass {
   if (NEIGHBOR_RE.test(message)) return "neighbor_or_adjacent_property";
-  if (THIRD_PARTY_PERSON_RE.test(message) || CELEBRITY_RE.test(message)) return "third_party_private_property";
+  if (THIRD_PARTY_PERSON_RE.test(message) || CELEBRITY_RE.test(message) || isPrivateAddressTarget(message, asset)) return "third_party_private_property";
   if (asset?.realityClass === "not_privately_ownable" || GOV_LANDMARK_RE.test(message)) return "government_asset";
   // An easement/encumbrance means the infra term is an ENCUMBRANCE on the
   // user's parcel — not the facility being acquired.
@@ -184,8 +191,8 @@ function classifyAvailability(message: string, asset: AssetRow | null, encumbere
   if (LISTING_URL_RE.test(message) || OFFICIAL_DISPO_RE.test(message)) return "verified_available";
   const sensitive = !encumbered && (CRITICAL_INFRA_RE.test(message) || GOV_BUILDING_RE.test(message) || asset?.realityClass === "sensitive_facility");
   if (sensitive) return "public_disposition_required";
-  if (WEAK_CLAIM_RE.test(message)) return "claimed_available_unverified";
-  if (NEIGHBOR_RE.test(message) || THIRD_PARTY_PERSON_RE.test(message) || CELEBRITY_RE.test(message)) return "not_publicly_available";
+  if (WEAK_CLAIM_RE.test(message) || (isPrivateAddressTarget(message, asset) && FSBO_RE.test(message))) return "claimed_available_unverified";
+  if (NEIGHBOR_RE.test(message) || THIRD_PARTY_PERSON_RE.test(message) || CELEBRITY_RE.test(message) || isPrivateAddressTarget(message, asset)) return "not_publicly_available";
   return "unknown";
 }
 
@@ -194,7 +201,7 @@ function classifySensitivity(message: string, asset: AssetRow | null, encumbered
   if (GOV_LANDMARK_RE.test(message) || GOV_BUILDING_RE.test(message) || asset?.assetClass === "government") return "government_or_civic";
   if (CELEBRITY_RE.test(message)) return "celebrity_or_public_figure_risk";
   if (!encumbered && (REGULATED_FACILITY_RE.test(message) || asset?.realityClass === "regulated")) return "regulated_facility";
-  if (NEIGHBOR_RE.test(message) || THIRD_PARTY_PERSON_RE.test(message)) return "private_residence";
+  if (NEIGHBOR_RE.test(message) || THIRD_PARTY_PERSON_RE.test(message) || isPrivateAddressTarget(message, asset)) return "private_residence";
   if (encumbered || asset) return "ordinary";
   return "unknown";
 }

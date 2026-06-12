@@ -68,13 +68,15 @@ export interface JourneyState {
   noveltyGate: NoveltyGate | null;
   /** ESCALATE_VIOLENT_THREAT fired — discovery stays held until human review. */
   threatHold: boolean;
+  /** Addresses tied to stalking/harassment THIS session — no overview for them. */
+  flaggedAddresses: string[];
 }
 
 export const FRESH_JOURNEY: JourneyState = {
   node: "person", story: [], context: EMPTY_CONTEXT, property: null, entryMode: null,
   intent: null, guidedDiscovery: false, exploredPathways: [], askedPrompts: [],
   guardCounters: { refusals: 0, rejections: 0 },
-  lastTurnIntent: null, recentTurnIntents: [], noveltyGate: null, threatHold: false,
+  lastTurnIntent: null, recentTurnIntents: [], noveltyGate: null, threatHold: false, flaggedAddresses: [],
 };
 
 // ── Guided Property Discovery copy (spec fix 2026-06-11) ─────────────────────

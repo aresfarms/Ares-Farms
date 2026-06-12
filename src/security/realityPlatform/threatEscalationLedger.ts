@@ -33,7 +33,8 @@ export type ThreatReviewStatus = "NEW" | "UNDER_REVIEW" | "FALSE_POSITIVE" | "AC
 export const THREAT_REVIEW_STATES: ThreatReviewStatus[] = ["NEW", "UNDER_REVIEW", "FALSE_POSITIVE", "ACTION_REQUIRED", "CLOSED"];
 
 export type ThreatPhraseCategory =
-  | "bombing" | "arson" | "shooting" | "assault" | "sabotage" | "terrorism" | "threat-other";
+  | "bombing" | "arson" | "shooting" | "assault" | "sabotage" | "terrorism" | "threat-other"
+  | "stalking" | "harassment" | "doxxing" | "infrastructure-probe";
 
 export interface ThreatEscalationRecord {
   /** Anonymous per-event session identifier — NOT a visitor identity. */

@@ -37,6 +37,16 @@ import {
   detectRegulatedUse, CODE_EVASION_REPLY,
 } from "./noveltyBuildDoctrine";
 import { recentIntents, type TurnIntent } from "./turnIntent";
+import {
+  detectTargetedHarassment, HARASSMENT_REPLY,
+  assessCriticalInfrastructure, SENSITIVE_FACILITY_SHUTDOWN_REPLY,
+  SENSITIVE_FACILITY_STATUS_REPLY, SENSITIVE_FACILITY_REUSE_REPLY,
+  detectAssetGoal, detectVehicleInspired, vehicleInspiredReply,
+  detectMarineDwelling, marineReply, nontraditionalReply,
+  detectSpecialtyAsset, specialtyAssetReply,
+} from "./navigatorGoalRoutes";
+
+export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
 
 export interface RouteDecision {
   turnIntent: TurnIntent;
@@ -329,6 +339,53 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
     };
   }
 
+  // 0.4 — INFRASTRUCTURE SECURITY PROBE (weak points / access / guard schedule
+  // on a named sensitive facility) → security escalation, same as a threat.
+  const infra = assessCriticalInfrastructure(message);
+  if (infra?.kind === "escalate") {
+    const repeated = journey.lastTurnIntent === "ESCALATE_VIOLENT_THREAT";
+    return {
+      turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : "ESCALATE_VIOLENT_THREAT",
+      text: repeated
+        ? "I can’t continue with that. This conversation can’t go further until that’s resolved."
+        : VIOLENT_THREAT_REPLY,
+      slot: "escalate:infrastructure-probe", echoConcept: null, refusal: true, patch: { threatHold: true },
+    };
+  }
+
+  // 0.5 — TARGETED HARASSMENT / STALKING / DOXXING: outranks owner lookup,
+  // property analysis, open discovery, and all intake. Refuse + lawful
+  // dispute/safety/code alternatives only; no hold (a restated lawful concern
+  // may proceed).
+  const harassment = detectTargetedHarassment(message);
+  if (harassment) {
+    const repeated = repeatOf("ESCALATE_TARGETED_HARASSMENT");
+    return {
+      turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : "ESCALATE_TARGETED_HARASSMENT",
+      text: repeated
+        ? "I still can’t help locate, track, or target a person. If there’s a lawful property, boundary, nuisance, safety, or code concern, tell me that and I can help think through documentation, municipal contacts, mediation, or professional help."
+        : HARASSMENT_REPLY,
+      slot: `escalate:targeted-harassment:${harassment}`, echoConcept: null, refusal: true, patch: {},
+    };
+  }
+
+  // 0.6 — CRITICAL / SENSITIVE INFRASTRUCTURE hard shutdown: not ordinary
+  // property discovery. No public for-sale/redevelopment evidence = no
+  // analysis. Active-status probes are never answered.
+  if (infra) {
+    const intent: TurnIntent = "HARD_SHUTDOWN_SENSITIVE_FACILITY";
+    const repeated = repeatOf(intent);
+    const text = infra.kind === "status" ? SENSITIVE_FACILITY_STATUS_REPLY
+      : infra.kind === "reuse" ? SENSITIVE_FACILITY_REUSE_REPLY
+      : SENSITIVE_FACILITY_SHUTDOWN_REPLY;
+    return {
+      turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : intent,
+      text: repeated ? "Still not something Furlong can analyze here without a public for-sale, auction, surplus, or redevelopment listing." : text,
+      slot: `shutdown:sensitive-facility:${infra.kind}`, echoConcept: null,
+      refusal: infra.kind !== "reuse", patch: {},
+    };
+  }
+
   // 1 — safety/illegality.
   if (isUnlawfulEvasionAsk(message)) {
     const repeated = repeatOf("REFUSE_UNLAWFUL_EVASION");
@@ -500,6 +557,57 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
         ? `Sticking with the ${weird} — is there a region you're drawn to, and a rough budget range? Both shape where one could legally happen.`
         : weirdLawfulReply(weird),
       slot: "route:weird-but-lawful", echoConcept: weird, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 7.3 — VEHICLE / VESSEL-INSPIRED architecture → clarify use, echo concept.
+  const vehicle = detectVehicleInspired(message);
+  if (vehicle) {
+    const repeated = repeatOf("ROUTE_VEHICLE_INSPIRED_ARCHITECTURE");
+    return {
+      turnIntent: repeated ? "ASK_REGION" : "ROUTE_VEHICLE_INSPIRED_ARCHITECTURE",
+      text: repeated ? `Sticking with the ${vehicle} — which region, and a rough budget? Both shape where it could legally work.` : vehicleInspiredReply(vehicle),
+      slot: "route:vehicle-inspired", echoConcept: vehicle, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 7.4 — MARINE LIVEABOARD / NONTRADITIONAL DWELLING → goal-first dwelling.
+  const dwelling = detectMarineDwelling(message);
+  if (dwelling) {
+    const base: TurnIntent = dwelling.kind === "marine" ? "ROUTE_MARINE_LIVEABOARD" : "ROUTE_NONTRADITIONAL_DWELLING";
+    const repeated = repeatOf(base);
+    return {
+      turnIntent: repeated ? "ASK_REGION" : base,
+      text: repeated ? `Staying with the ${dwelling.concept} — which area, and full-time or seasonal?` : dwelling.kind === "marine" ? marineReply(dwelling.concept) : nontraditionalReply(dwelling.concept),
+      slot: `route:dwelling:${dwelling.kind}`, echoConcept: dwelling.concept, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 7.5 — SPECIALTY / SURPLUS / ADAPTIVE-REUSE asset → unusual but not
+  // impossible; never imply availability.
+  const specialty = detectSpecialtyAsset(message);
+  if (specialty) {
+    const repeated = repeatOf("ROUTE_SPECIALTY_ASSET_ACQUISITION");
+    return {
+      turnIntent: repeated ? "ASK_REGION" : "ROUTE_SPECIALTY_ASSET_ACQUISITION",
+      text: repeated ? `Staying with the ${specialty} — which region, and what use (residential, storage, business, tourism)?` : specialtyAssetReply(specialty),
+      slot: "route:specialty-asset", echoConcept: specialty, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 7.6 — ASSET-CLASS ACQUISITION (commercial / healthcare / regulated) →
+  // respond to the clear goal, never fall through to ASK_PERSON/ASK_STORY.
+  const assetGoal = detectAssetGoal(message);
+  if (assetGoal) {
+    const repeated = repeatOf(assetGoal.intent);
+    return {
+      turnIntent: repeated ? "ASK_REGION" : assetGoal.intent,
+      text: repeated ? `Still on the ${assetGoal.label} — which market or region, and any budget or financing picture?` : assetGoal.reply,
+      slot: `route:asset-goal:${assetGoal.intent}`, echoConcept: assetGoal.label, refusal: false,
       patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
   }

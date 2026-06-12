@@ -38,7 +38,7 @@ import {
   GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState,
 } from "@/lib/navigator/narrativeInterpreter";
 import { noveltyGateClear, translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY } from "@/lib/navigator/noveltyBuildDoctrine";
-import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder, detectViolentThreat } from "@/lib/navigator/navigatorTurnRouter";
+import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder, detectViolentThreat, detectTargetedHarassment, assessCriticalInfrastructure } from "@/lib/navigator/navigatorTurnRouter";
 import { appendThreatEscalation } from "@/security/realityPlatform/threatEscalationLedger";
 import { guardTurnIntent, intentForNode, type TurnIntent } from "@/lib/navigator/turnIntent";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
@@ -109,27 +109,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ kind: "refusal", refusal: "injection", text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
-  // 0.5 — THREAT / VIOLENCE ESCALATION (CRITICAL, 2026-06-12): overrides EVERY
-  // pathway, before all questionnaire prompts. A trigger creates a human-review
-  // security event (hashes + network identifier where legally available — never
-  // raw text, never a dossier, never shown in public UI) and HOLDS the journey:
-  // no discovery flow continues until human review clears it.
+  // 0.5 — SAFETY ESCALATION (CRITICAL, 2026-06-12): violent threat, targeted
+  // harassment/stalking/doxxing, and infrastructure security-probes override
+  // EVERY pathway, before all questionnaire prompts. Each creates a
+  // human-review security event (hashes + network identifier where legally
+  // available — never raw text, never a dossier, never shown in public UI).
+  // A violent-threat / infra-probe HOLDS the journey; harassment refuses but
+  // lets a restated lawful concern proceed.
   const threatCat = detectViolentThreat(message);
-  if (threatCat || journey.threatHold) {
-    const decision = routeTurn(message, journey)!; // the threat branch always decides
+  const infraAssess = assessCriticalInfrastructure(message);
+  const harassCat = detectTargetedHarassment(message);
+  const escCategory = threatCat
+    ?? (infraAssess?.kind === "escalate" ? "infrastructure-probe" as const : null)
+    ?? harassCat;
+  if (escCategory || journey.threatHold) {
+    const decision = routeTurn(message, journey)!; // an escalation branch decides
     journey = { ...journey, ...decision.patch, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
     journey = { ...journey, lastTurnIntent: decision.turnIntent, recentTurnIntents: [...(journey.recentTurnIntents ?? []), decision.turnIntent].slice(-3) };
     journey = rememberPrompt(journey, decision.text);
-    const replayRef = hashEvidence([decision.slot, threatCat ?? "hold"]);
+    const replayRef = hashEvidence([decision.slot, escCategory ?? "hold"]);
     appendReplay({
       ts: new Date().toISOString(), inputDecision: "ESCALATE_SECURITY", scrubbedFieldCount: 0, contextZones: [],
       urlSandboxVerdict: null, privacyFirewallOk: true, outputGateOk: true,
-      refusalReason: `violent-threat:${threatCat ?? "hold"}`, evidenceBundleHash: replayRef, renderedOutputHash: hashOutput(decision.text),
+      refusalReason: `safety-escalation:${escCategory ?? "hold"}`, evidenceBundleHash: replayRef, renderedOutputHash: hashOutput(decision.text),
     });
-    if (threatCat) {
+    if (escCategory) {
       appendThreatEscalation({
         message,
-        phraseCategory: threatCat,
+        phraseCategory: escCategory,
         networkIdentifier: req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip"),
         userAgent: req.headers.get("user-agent"),
         pageRoute: "/api/public/navigator/converse",
@@ -138,7 +145,7 @@ export async function POST(req: Request) {
       });
     }
     logInterviewTurn({ source: "fallback", slot: `navigator:${decision.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-    return NextResponse.json({ kind: "refusal", refusal: "violent-threat", text: decision.text, turnIntent: decision.turnIntent, journey });
+    return NextResponse.json({ kind: "refusal", refusal: "safety-escalation", text: decision.text, turnIntent: decision.turnIntent, journey });
   }
 
   // 1 — PRIORITY 1: unlawful evasion is checked BEFORE G-1/G-2 (router owns it).
@@ -163,6 +170,9 @@ export async function POST(req: Request) {
       "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE", "ROUTE_EARTH_SHELTERED_HOUSING",
       "ROUTE_PROPERTY_ANALYSIS", "CLARIFY_SPECIFIC_CONCEPT_USE", "CLARIFY_NOVELTY_BUILD_CONCEPT",
       "CLARIFY_ANIMAL_HOUSING", "ROUTE_PET_STRUCTURE", "ROUTE_LIVESTOCK_OR_AG_STRUCTURE",
+      "ROUTE_VEHICLE_INSPIRED_ARCHITECTURE", "ROUTE_MARINE_LIVEABOARD", "ROUTE_NONTRADITIONAL_DWELLING",
+      "ROUTE_SPECIALTY_ASSET_ACQUISITION", "ROUTE_COMMERCIAL_ACQUISITION",
+      "ROUTE_HEALTHCARE_REAL_ESTATE", "ROUTE_REGULATED_BUSINESS_ACQUISITION",
     ];
     if (allowedGoal && PRESERVABLE.includes(allowedGoal.turnIntent)) {
       journey = { ...journey, ...allowedGoal.patch };

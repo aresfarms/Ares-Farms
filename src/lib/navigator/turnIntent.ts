@@ -41,6 +41,13 @@ export type TurnIntent =
   | "OUT_OF_SCOPE_WITH_REAL_WORLD_ADJACENT"
   // reality + safety escalation
   | "REALITY_CHECK_ICONIC_ASSET" | "ESCALATE_VIOLENT_THREAT"
+  | "ESCALATE_TARGETED_HARASSMENT" | "HARD_SHUTDOWN_SENSITIVE_FACILITY"
+  // goal-first asset-class / dwelling / specialty routes
+  | "ROUTE_COMMERCIAL_ACQUISITION" | "ROUTE_HEALTHCARE_REAL_ESTATE"
+  | "ROUTE_REGULATED_BUSINESS_ACQUISITION" | "ROUTE_VEHICLE_INSPIRED_ARCHITECTURE"
+  | "ROUTE_MARINE_LIVEABOARD" | "ROUTE_NONTRADITIONAL_DWELLING"
+  | "ROUTE_SPECIALTY_ASSET_ACQUISITION" | "ROUTE_SURPLUS_GOVERNMENT_PROPERTY"
+  | "ROUTE_ADAPTIVE_REUSE_PROPERTY"
   // flow
   | "WAIT_FOR_MORE_INFO" | "PRESENT_PATHWAYS";
 
@@ -90,6 +97,24 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
     intent: "OFFER_SEARCH_AND_BRING_BACK",
     text: SEARCH_BRING_BACK_TEXT,
   },
+  // Harassment alternate STILL REFUSES and HOLDS — wording/intent only changes.
+  ESCALATE_TARGETED_HARASSMENT: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "I still can’t help locate, track, or target a person. If there’s a lawful property, boundary, nuisance, safety, or code concern, tell me that and I can help think through documentation, municipal contacts, mediation, or professional help.",
+  },
+  HARD_SHUTDOWN_SENSITIVE_FACILITY: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Still not something Furlong can analyze here. If you have a public for-sale, auction, surplus, or redevelopment listing, paste it and we can review only the lawful, high-level reuse questions.",
+  },
+  ROUTE_COMMERCIAL_ACQUISITION: { intent: "ASK_REGION", text: "Which market or region are you focused on, and is there a rough budget or financing picture? Both shape what's realistic." },
+  ROUTE_HEALTHCARE_REAL_ESTATE: { intent: "ASK_REGION", text: "Which state or market, and roughly what scale? Healthcare real estate rules are very state-specific." },
+  ROUTE_REGULATED_BUSINESS_ACQUISITION: { intent: "ASK_REGION", text: "Which state or town, and any budget range? Licensing and zoning for regulated businesses are local." },
+  ROUTE_VEHICLE_INSPIRED_ARCHITECTURE: { intent: "ASK_REGION", text: "Which region are you thinking, and a rough budget? Both shape where a concept like that could legally work." },
+  ROUTE_MARINE_LIVEABOARD: { intent: "ASK_REGION", text: "Which coast or waterway, and full-time or seasonal? Marina and harbor rules vary a lot by location." },
+  ROUTE_NONTRADITIONAL_DWELLING: { intent: "ASK_REGION", text: "Which area, and is this full-time living or part-time? Local rules decide what's allowed." },
+  ROUTE_SPECIALTY_ASSET_ACQUISITION: { intent: "ASK_REGION", text: "Which region, and what use — residential, storage, business, or tourism? That shapes the diligence." },
+  ROUTE_SURPLUS_GOVERNMENT_PROPERTY: { intent: "ASK_REGION", text: "Which area, and intended reuse? Surplus channels and conditions vary by agency and location." },
+  ROUTE_ADAPTIVE_REUSE_PROPERTY: { intent: "ASK_REGION", text: "Which region, and what reuse do you have in mind? Code and zoning drive what's feasible." },
   // The threat alternate STILL REFUSES and STILL holds — different intent and
   // wording only; the boundary never weakens and discovery never resumes.
   ESCALATE_VIOLENT_THREAT: {

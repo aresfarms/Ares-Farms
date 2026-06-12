@@ -48,6 +48,7 @@ import {
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
 import { classifyGoalAsset } from "./navigatorGoalParser";
+import { resolveAmbiguity } from "./semanticAmbiguityResolver";
 
 export interface RouteDecision {
   turnIntent: TurnIntent;
@@ -477,6 +478,20 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
       text: repeated ? "Which jurisdiction is this in? The permitting authority is local." : op.reply,
       slot: `route:property-operation:${op.intent}`, echoConcept: null,
       refusal: false, patch: op.intent === "CLARIFY_LAWFUL_PROPERTY_OPERATION" ? {} : { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 0.8 — SEMANTIC AMBIGUITY: a double-meaning/slang term must be clarified
+  // (or routed if animal/property context is clear, or refused if the message
+  // clearly seeks adult services) BEFORE any intake or routing.
+  const ambiguity = resolveAmbiguity(message);
+  if (ambiguity) {
+    const repeated = repeatOf(ambiguity.turnIntent);
+    return {
+      turnIntent: repeated && !ambiguity.refusal ? "ASK_REGION" : ambiguity.turnIntent,
+      text: ambiguity.text, slot: ambiguity.slot, echoConcept: ambiguity.echoConcept,
+      refusal: ambiguity.refusal,
+      patch: ambiguity.refusal || ambiguity.turnIntent === "CLARIFY_AMBIGUOUS_TERM" ? {} : { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
   }
 

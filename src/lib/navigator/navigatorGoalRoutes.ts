@@ -122,7 +122,7 @@ type AssetGoalIntent = "ROUTE_HEALTHCARE_REAL_ESTATE" | "ROUTE_REGULATED_BUSINES
 const ACQUIRE_VERB = "\\b(?:buy|purchase|acquire|own|invest\\s+in|develop|build|open|start)\\b";
 
 const HEALTHCARE_RE = /\b(?:hospital|medical\s+(?:center|building|office)|clinic|nursing\s+home|assisted\s+living|surgery\s+center|dialysis\s+center|healthcare\s+facility|urgent\s+care)\b/i;
-const REGULATED_BIZ_RE = /\b(?:laundromat|gas\s+station|car\s+wash|liquor\s+store|dispensary|funeral\s+home|daycare|child\s+care|self[- ]storage|storage\s+facility|processing\s+(?:facility|plant)|distillery|brewery|winery|cannabis\s+(?:grow|cultivation)|slaughterhouse|recycling\s+(?:center|facility))\b/i;
+const REGULATED_BIZ_RE = /\b(?:laundromat|gas\s+station|car\s+wash|liquor\s+store|dispensary|funeral\s+home|daycare|child\s+care|self[- ]storage|storage\s+facility|processing\s+(?:facility|plant)|distillery|brewery|winery|cannabis\s+(?:grow|cultivation)|slaughterhouse|recycling\s+(?:center|facility)|cat\s+cafe|pet\s+(?:cafe|daycare|hotel|resort)|cafe|coffee\s+shop)\b/i;
 const COMMERCIAL_RE = /\b(?:hotel|motel|resort|apartment\s+(?:complex|building)|mobile\s+home\s+park|trailer\s+park|rv\s+park|shopping\s+(?:center|mall)|strip\s+mall|office\s+(?:building|park)|warehouse|industrial\s+(?:building|park)|retail\s+(?:center|space)|restaurant|bar\s+business|farmland|ranch\s+land|vineyard|orchard|timberland|commercial\s+(?:building|property|real\s+estate))\b/i;
 
 export function detectAssetGoal(message: string): AssetGoal | null {

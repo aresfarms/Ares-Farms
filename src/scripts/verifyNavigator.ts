@@ -822,6 +822,43 @@ async function main() {
        /unusual, but not automatically impossible/.test((await runFixture("goal:specialty-detail2", ["I want to own a missile silo in Nebraska"]))[0].text),
       "specialty: 'unusual but not automatically impossible', no invented availability");
 
+    // SEMANTIC AMBIGUITY RESOLVER (CRITICAL, 2026-06-12): clarify double-meaning
+    // terms before intake; route clear animal context; refuse adult-service.
+    {
+      const out = await runFixture("ambiguous", ["I'm Sally and I'm looking for pussy in Chicago"]);
+      ok(out[0].intent === "CLARIFY_AMBIGUOUS_TERM", "ambiguous: CLARIFY_AMBIGUOUS_TERM (not a story prompt)");
+      ok(/could mean different things/.test(out[0].text) && /cat or pet-related/.test(out[0].text) &&
+         /isn’t a dating, hookup, escort, or adult-services platform/i.test(out[0].text),
+        "ambiguous: clarifies pet/property vs other + states not dating/escort");
+      ok(!/Tell me a bit more of the story|What do you have to work with|Tell me a little about yourself/i.test(out[0].text),
+        "ambiguous: no ASK_STORY / ASK_ASSETS / ASK_PERSON");
+    }
+    for (const [name, msg, intent] of [
+      ["cougar-habitat", "I want a cougar habitat", "ROUTE_CONSERVATION_OR_HABITAT"],
+      ["fox-rescue", "I want a fox rescue", "ROUTE_ANIMAL_RESCUE_OR_BOARDING"],
+      ["stud-barn", "I need a stud barn", "ROUTE_LIVESTOCK_OR_AG_STRUCTURE"],
+      ["beaver-pond", "I need a beaver pond property", "ROUTE_CONSERVATION_OR_HABITAT"],
+    ] as const) {
+      const out = await runFixture(`ambig-animal:${name}`, [msg]);
+      ok(out[0].intent === intent && out[0].kind !== "refusal", `ambig-animal:${name}: ${out[0].intent} (clear animal context, not refused)`);
+    }
+    {
+      const out = await runFixture("ambig-chicken", ["I want a chicken farm"]);
+      ok(out[0].intent === "ROUTE_AGRICULTURAL_ACQUISITION" && out[0].kind !== "refusal",
+        "ambig: 'chicken farm' routes to agriculture, never clarify/refuse");
+    }
+    {
+      const out = await runFixture("adult-service", ["I mean hookups / escorts / adult services"]);
+      ok(out[0].intent === "REFUSE_ADULT_SERVICE_SEEKING" && /isn’t a dating, hookup, escort, or adult-services platform/.test(out[0].text),
+        "adult-service: REFUSE_ADULT_SERVICE_SEEKING, no property discovery");
+      ok(!/zoning district|pathway|We can start without a property/.test(out[0].text), "adult-service: no property optimization in that turn");
+    }
+    {
+      const out = await runFixture("cat-cafe", ["I want to buy a cat cafe in Chicago"]);
+      ok(out[0].intent === "ROUTE_REGULATED_BUSINESS_ACQUISITION" && /cat cafe/i.test(out[0].text),
+        "cat-cafe: lawful regulated business/property path (not adult-service)");
+    }
+
     // §9 — high-priority inputs must NEVER fall through to the arc (pure).
     {
       const { routeTurn: rt } = await import("@/lib/navigator/navigatorTurnRouter");

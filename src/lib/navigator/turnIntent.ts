@@ -56,6 +56,9 @@ export type TurnIntent =
   | "ROUTE_AGRICULTURAL_ACQUISITION" | "ROUTE_REGULATED_AIRPORT_ASSET"
   | "ROUTE_MARINE_VESSEL_OR_LIVEABOARD" | "REALITY_CHECK_IMPOSSIBLE_SCALE_ASSET"
   | "REALITY_CHECK_NOT_PRIVATELY_OWNABLE"
+  // semantic ambiguity resolution
+  | "CLARIFY_AMBIGUOUS_TERM" | "REFUSE_ADULT_SERVICE_SEEKING"
+  | "ROUTE_ANIMAL_RESCUE_OR_BOARDING" | "ROUTE_CONSERVATION_OR_HABITAT"
   // flow
   | "WAIT_FOR_MORE_INFO" | "PRESENT_PATHWAYS";
 
@@ -136,6 +139,17 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   ROUTE_MARINE_VESSEL_OR_LIVEABOARD: { intent: "ASK_REGION", text: "Which coast or waterway, and live-aboard, operate, rent, or waterfront land?" },
   REALITY_CHECK_IMPOSSIBLE_SCALE_ASSET: { intent: "OFFER_SEARCH_AND_BRING_BACK", text: SEARCH_BRING_BACK_TEXT },
   REALITY_CHECK_NOT_PRIVATELY_OWNABLE: { intent: "OFFER_SEARCH_AND_BRING_BACK", text: SEARCH_BRING_BACK_TEXT },
+  CLARIFY_AMBIGUOUS_TERM: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Whenever you can tell me the real-world property, land, or business goal in plain terms, I’ll help with zoning, licensing, constraints, and alternatives.",
+  },
+  // The adult-service alternate STILL REFUSES — wording/intent only changes.
+  REFUSE_ADULT_SERVICE_SEEKING: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Furlong still isn’t a dating, hookup, escort, or adult-services platform. If there’s a lawful property or business goal, describe that and I can help with zoning, licensing, and alternatives.",
+  },
+  ROUTE_ANIMAL_RESCUE_OR_BOARDING: { intent: "ASK_REGION", text: "Which area, and is this nonprofit rescue, boarding, or breeding? Animal-use rules are local." },
+  ROUTE_CONSERVATION_OR_HABITAT: { intent: "ASK_REGION", text: "Which region, and conservation, habitat, or private land? That shapes the rules and any programs." },
   // The threat alternate STILL REFUSES and STILL holds — different intent and
   // wording only; the boundary never weakens and discovery never resumes.
   ESCALATE_VIOLENT_THREAT: {

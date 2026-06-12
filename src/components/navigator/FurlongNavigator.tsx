@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import type { JourneyState } from "@/lib/navigator/narrativeInterpreter";
 import type { PathwayAssessment } from "@/lib/navigator/possibilityCheck";
+import type { DecisionSummary } from "@/lib/navigator/decisionFramework";
 
 /**
  * Furlong Navigator — the governed conversational front door (spec 2026-06-11 +
@@ -24,7 +25,7 @@ type Turn = { role: "guide" | "you"; text: string };
 type Reply =
   | { kind: "question"; node: string; text: string; journey: JourneyState }
   | { kind: "refusal"; refusal: string; text: string; journey: JourneyState }
-  | { kind: "pathways"; node: string; text: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; journey: JourneyState };
+  | { kind: "pathways"; node: string; text: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; journey: JourneyState };
 
 const MEM_KEY = "furlong-navigator-journey-v1"; // sessionStorage — anonymous, ephemeral
 
@@ -47,6 +48,7 @@ export function FurlongNavigator() {
   const [pathways, setPathways] = useState<PathwayAssessment[] | null>(null);
   const [graphChain, setGraphChain] = useState<string[]>([]);
   const [programsSeam, setProgramsSeam] = useState<string | null>(null);
+  const [decision, setDecision] = useState<DecisionSummary | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [resumed, setResumed] = useState(false);
@@ -72,6 +74,7 @@ export function FurlongNavigator() {
       setPathways(r.pathways);
       setGraphChain(r.graphChain);
       setProgramsSeam(r.programsSeam);
+      setDecision(r.decision);
     }
     remember(r.journey, next);
   }
@@ -168,6 +171,38 @@ export function FurlongNavigator() {
               </div>
             );
           })}
+
+          {/* Navigator Decision Framework — the four canonical questions
+              (addendum 2026-06-11): Achievable · Obstacles · Alternatives ·
+              Probability. Advisory only — pathways, not promises. */}
+          {decision && (
+            <div data-testid="decision-framework" style={{ display: "grid", gap: 10, border: "1.5px solid #d7deea", borderRadius: 12, padding: "16px 18px", background: "#fbfcfe" }}>
+              <strong style={{ fontSize: 15, color: "#101a2b" }}>Where this leaves you</strong>
+              <div data-testid="decision-achievable" style={{ display: "grid", gap: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#0F6E56" }}>Achievable</span>
+                {decision.achievable.length ? decision.achievable.map((a, i) => (
+                  <span key={i} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}><strong>{a.pathway}:</strong> {a.how}</span>
+                )) : <span style={{ fontSize: 12.5, color: "#7a8aa0" }}>Nothing is confirmable as achievable yet — the confirmations below come first.</span>}
+              </div>
+              <div data-testid="decision-obstacles" style={{ display: "grid", gap: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#993C1D" }}>Obstacles</span>
+                {decision.obstacles.slice(0, 5).map((o, i) => (
+                  <span key={i} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}><strong>{o.pathway}:</strong> {o.obstacle}</span>
+                ))}
+              </div>
+              <div data-testid="decision-alternatives" style={{ display: "grid", gap: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#854F0B" }}>Alternatives</span>
+                {decision.alternatives.slice(0, 4).map((a, i) => (
+                  <span key={i} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}><strong>{a.from}:</strong> {a.alternative}</span>
+                ))}
+              </div>
+              <div data-testid="decision-probability" style={{ display: "grid", gap: 4 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#534AB7" }}>Probability</span>
+                <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{decision.probability.assessment}</span>
+                <span style={{ fontSize: 11.5, color: "#7a8aa0", lineHeight: 1.5 }}>{decision.probability.advisory}</span>
+              </div>
+            </div>
+          )}
 
           {/* discovery graph — pathways cross, diverge, reconnect */}
           {graphChain.length > 1 && (

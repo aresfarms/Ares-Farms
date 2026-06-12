@@ -14,6 +14,7 @@ import { resolveListingInput } from "@/lib/navigator/listingIntake";
 import { assessPathways, discoveryGraphChain, EMPTY_CONTEXT } from "@/lib/navigator/possibilityCheck";
 import { interpretMessage, detectPropertyIntent, FRESH_JOURNEY, GUIDED_DISCOVERY_OPENER } from "@/lib/navigator/narrativeInterpreter";
 import { FURLONG_NAVIGATOR_MANIFEST } from "@/lib/navigator/furlongNavigatorManifest";
+import { deriveDecisionSummary, PATHWAYS_NOT_PROMISES } from "@/lib/navigator/decisionFramework";
 
 const fail: string[] = [];
 const ok = (c: boolean, m: string) => { if (!c) fail.push(m); };
@@ -175,9 +176,39 @@ const pubFiles = [
 for (const f of pubFiles) ok(!/AI questionnaire/i.test(fs.readFileSync(f, "utf8")), `${f}: public copy never says "AI questionnaire"`);
 
 const home = fs.readFileSync("src/app/(public)/page.tsx", "utf8");
-ok(/cta-start-journey/.test(home) && /Start your journey here/.test(home), "hero primary CTA = Start your journey here");
-ok(/cta-possibilities-map/.test(home) && home.includes('href="/explore"'), "hero secondary CTA = possibilities → map/wheel");
-ok(!/home-discovery-cta/.test(home), "old single CTA removed");
+// Hero CTA restructure Option A (2026-06-11): labels explain themselves.
+ok(/cta-navigator/.test(home) && /Talk to Furlong Navigator/.test(home) && home.includes('href="/navigator"'),
+  "hero primary CTA = Talk to Furlong Navigator → /navigator");
+ok(/Tell us what you're looking for and we'll help uncover pathways/.test(home), "primary CTA carries its supporting line");
+ok(/cta-explore-map/.test(home) && /Explore America's Possibilities/.test(home) && home.includes('href="#americas-possibilities"'),
+  "hero secondary CTA = Explore America's Possibilities → map section anchor");
+ok(/Browse the map, hidden-gem stories, and pathway examples/.test(home), "secondary CTA carries its supporting line");
+ok(home.includes('id="americas-possibilities"'), "the map section carries the scroll-target anchor");
+ok(!/cta-start-journey|cta-possibilities-map|home-discovery-cta/.test(home), "old CTA labels/testids removed");
+// Hero copy revision + new-visitor understanding (property NOT required).
+const heroCopy = fs.readFileSync("src/lib/public-content/publicCopyRegistry.ts", "utf8");
+ok(/Discover possibilities you didn't know existed\./.test(heroCopy), "headline revised");
+ok(/start with nothing at all/.test(heroCopy), "supporting copy says a property is NOT required");
+ok(/Anonymous\. No account required\. We don't sell your information\./.test(heroCopy), "trust line revised");
+ok(fs.existsSync("src/app/(public)/navigator/page.tsx"), "/navigator route exists");
+
+// ── Navigator Decision Framework (addendum 2026-06-11) ────────────────────────
+ok(FURLONG_NAVIGATOR_MANIFEST.decisionFramework.length === 4
+  && /realistically achievable/.test(FURLONG_NAVIGATOR_MANIFEST.decisionFramework[0]),
+  "manifest carries the four canonical decision questions");
+{
+  const farmD = deriveDecisionSummary(assessPathways({ ...EMPTY_CONTEXT, propertyKind: "farm", acreage: 120, inHoa: false }));
+  ok(farmD.achievable.length >= 1 && /cropland/i.test(farmD.achievable[0].pathway), "Achievable derived from YES pathways");
+  ok(farmD.obstacles.length >= 1 && farmD.obstacles.every((o) => !!o.obstacle), "Obstacles derived from NO/CANT_DETERMINE");
+  ok(farmD.alternatives.length >= 1, "Alternatives derived from reroutes + graph neighbors");
+  ok(/highest relative likelihood|strongest relative footing|enough verified evidence/.test(farmD.probability.assessment),
+    "Probability is a plain-language RELATIVE assessment");
+  ok(farmD.probability.advisory.includes(PATHWAYS_NOT_PROMISES) && /advisory only/i.test(farmD.probability.advisory),
+    "Probability is explicitly advisory — pathways, not promises");
+  ok(!/guaranteed|you will succeed|we promise/i.test(JSON.stringify(farmD)), "decision summary contains no guarantee language");
+  const noYes = deriveDecisionSummary(assessPathways({ ...EMPTY_CONTEXT, propertyKind: "residential" }));
+  ok(noYes.achievable.length === 0 && noYes.probability.assessment.length > 0, "no YES pathways → honest 'nothing confirmable yet' probability read");
+}
 const mapSrc = fs.readFileSync("src/components/public/PublicMapExperience.tsx", "utf8");
 ok(!/under-map-explore-cta/.test(mapSrc), "duplicate under-map CTA removed (nothing after the tour controls)");
 
@@ -196,9 +227,12 @@ async function main() {
     const homeHtml = await fetch(`${BASE}/`).then((r) => r.text());
     // Count the rendered DOM attribute form only — the RSC flight payload
     // repeats the string JSON-escaped, which is not a rendered element.
-    ok((homeHtml.match(/data-testid="cta-start-journey"/g) ?? []).length === 1 &&
-       (homeHtml.match(/data-testid="cta-possibilities-map"/g) ?? []).length === 1,
+    ok((homeHtml.match(/data-testid="cta-navigator"/g) ?? []).length === 1 &&
+       (homeHtml.match(/data-testid="cta-explore-map"/g) ?? []).length === 1,
       "SSR: hero renders exactly the two CTAs");
+    ok(/Discover possibilities you didn't know existed\./.test(homeHtml), "SSR: revised headline renders");
+    const navHtml = await fetch(`${BASE}/navigator`).then((r) => r.text());
+    ok(navHtml.includes('data-testid="furlong-navigator"'), "SSR: /navigator renders Furlong Navigator");
     ok(!/under-map-explore-cta/.test(homeHtml), "SSR: no CTA after the tour controls");
     const disc = await fetch(`${BASE}/discover`).then((r) => r.text());
     ok(disc.includes('data-testid="furlong-navigator"'), "SSR: /discover renders Furlong Navigator");

@@ -27,6 +27,7 @@ import {
   GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState,
 } from "@/lib/navigator/narrativeInterpreter";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
+import { deriveDecisionSummary } from "@/lib/navigator/decisionFramework";
 import { logInterviewTurn, hashTranscript } from "@/lib/discovery/aiInterview";
 
 export const runtime = "nodejs";
@@ -101,6 +102,7 @@ export async function POST(req: Request) {
     journey = { ...journey, exploredPathways: [...new Set([...explored, ...pathways.map((p) => p.id)])] };
     const chainStart = pathways.find((p) => p.graphNeighbors.length > 0)?.id ?? pathways[0]?.id;
     logInterviewTurn({ source: "fallback", slot: `navigator:pathways:${journey.context.propertyKind}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
+    const decision = deriveDecisionSummary(pathways);
     return NextResponse.json({
       kind: "pathways",
       node: journey.node,
@@ -112,6 +114,7 @@ export async function POST(req: Request) {
       pathways,
       graphChain: chainStart ? discoveryGraphChain(chainStart) : [],
       programsSeam: "A property qualifying for a program is a fact about the property. Whether YOU qualify is a licensed professional's call — property qualifies ≠ you qualify.",
+      decision,
       journey,
     });
   }

@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { Disclosures } from "@/components/public/Disclosures";
-import { DiscoveryEngine } from "@/components/discovery/DiscoveryEngine";
+import { FurlongNavigator } from "@/components/navigator/FurlongNavigator";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
-import { guidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import { discoveryPrimary, BROWSE_HREF } from "@/lib/discovery/discoveryConfig";
 import { resolveDiscoveryFlow, isPlaceFirstFlow } from "@/lib/discovery/discoveryFlow";
 
@@ -44,22 +43,22 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
     );
   }
 
-  // Default — the conversational persona interview.
-  const feed = guidedIntakeFeed();
+  // Default — Furlong Navigator: the governed conversational front door.
+  // One open question, one free-text box, the spine walked in the visitor's
+  // own words. No chip grid, no persona picker (spec 2026-06-11 §3).
   const primary = discoveryPrimary();
   return (
     <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
       <header style={{ display: "grid", gap: 10 }}>
         <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#0f766e" }}>
-          Possibility discovery
+          Furlong Navigator
         </span>
         <h1 style={{ margin: 0, fontSize: 30, lineHeight: 1.15, color: "#101a2b", maxWidth: 720 }}>
-          Understand your possibilities — before anyone recommends anything.
+          Start your journey here.
         </h1>
         <p style={{ margin: 0, fontSize: 15, color: "#5d687a", lineHeight: 1.55, maxWidth: 720 }}>
-          A property, a program, financing, a grant, a conservation pathway, a business opportunity, or a plan —
-          we start with what <em>you</em> are trying to accomplish, then show what's out there. No right or wrong
-          answers, and we're not here to sell you anything.
+          Bring a property, a goal, or nothing at all — the Navigator helps you discover what an asset can
+          realistically become, with evidence, honest No's, and pathways you didn't know existed.
         </p>
         <p style={{ margin: 0, fontSize: 12.5, color: "#9aa6b6" }}>
           Looking up a specific place instead? <Link href="/discover?mode=place-facts" style={{ color: "#854F0B", textDecoration: "underline", fontWeight: 700 }}>Check a location's place-facts →</Link>
@@ -67,7 +66,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
         </p>
       </header>
 
-      <DiscoveryEngine feed={feed} />
+      <FurlongNavigator />
 
       <Disclosures />
     </main>

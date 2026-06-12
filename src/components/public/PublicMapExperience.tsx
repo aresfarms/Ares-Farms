@@ -1457,23 +1457,10 @@ export function PublicMapExperience({
         </span>
       </div>
 
-      {/* ── Always-visible Explore CTA (under-map entry point) ──────────────────
-          One of TWO intentional journey entry points to /explore (the other is
-          the capstone at the tour's end). Visible on load — no playthrough
-          needed. Goes to /explore, never /onboarding. */}
-      <div style={{ marginTop: 14, display: "flex", justifyContent: "center" }}>
-        <a
-          href="/explore"
-          data-testid="under-map-explore-cta"
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 8, minHeight: 48,
-            padding: "0 26px", borderRadius: 999, background: "#0f766e", color: "#ffffff",
-            fontWeight: 800, fontSize: 16, textDecoration: "none", letterSpacing: "0.01em",
-          }}
-        >
-          What are your possibilities? →
-        </a>
-      </div>
+      {/* Duplicate under-map "What are your possibilities?" CTA REMOVED
+          (spec 2026-06-11 §2: exactly two CTAs, both in the hero; nothing after
+          the tour controls). The tour's in-capstone /explore link is part of
+          the tour itself and stays. */}
 
       {/* ── Privacy and advisory footnote ──────────────────────────────────────── */}
       <p style={{ margin: "12px 0 0", fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>

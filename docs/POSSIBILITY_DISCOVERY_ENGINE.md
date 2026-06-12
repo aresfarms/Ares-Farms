@@ -131,3 +131,55 @@ a count-honesty section (10-state feed proves no silent cap + truncation labelin
 Full suite green; tsc clean; build exit 0 (`/discover/opportunity-zone` in the manifest). Live
 eyes-on confirmed both: place-first OZ card renders location-first, and the persona map shows
 the honest scoped count.
+
+---
+
+## Update (2026-06-11) — Furlong Navigator (authoritative spec + addendum)
+
+The core experience is now **Furlong Navigator** — the governed conversational front door
+("the pro forma for whatever you own or are looking at"; mission: pathways they didn't know
+existed, with evidence and transparency). Public copy never says "AI questionnaire."
+
+**Shipped this slice (build sequence §9 steps 1, 2, 4, 5, 7 + addendum artifacts):**
+- **CTA cleanup (§2):** hero renders EXACTLY two CTAs — primary "Start your journey here" →
+  `/discover` (Navigator), secondary "What are your possibilities?" → `/explore` (map/wheel).
+  Duplicate under-map CTA removed; tour + capstone untouched.
+- **`src/lib/navigator/propertyPrivacyDoctrine.ts`** — CONST-PROPERTY-PRIVACY-001: ownership
+  refusal (15 paraphrases tested; pursue/buy asks NOT overreached), Fair-Housing steering
+  refusal incl. proxies ("good/safe/diverse"), HOPA 55+ designation passes (designation in,
+  profiling out), ONE locked gentle redirect line that never hints the data exists.
+- **`intakeScrubber.ts`** — architectural lock: owner + protected-class fields stripped at
+  ingestion (deep, recursive); `assertNoBannedFields` proves absence at the DATA layer.
+- **`listingIntake.ts`** — Crexi/Zillow/Redfin/LoopNet URL or address → property reference by
+  parsing the pasted TEXT only; zero network calls (never scrapes/republishes the listing);
+  parcel-grade resolution stays gated (address-text until activation).
+- **`possibilityCheck.ts`** — the three-answer engine (YES—how / NO—why + honest reroute /
+  CAN'T-DETERMINE—why + who to confirm with) with Possibility Confidence, evidence-linked
+  "We showed this because…", effort/risk/time-to-start/evidence matrix, and the discovery
+  graph (pool→event→parking→storage→dog-park→RV→micro-campground). HONESTY: no fabricated
+  dollar bands — the range-with-basis+last-verified contract is first-class, and numbers
+  degrade to "market band pending — confirm locally" until Layer B synthesis is verified.
+- **`narrativeInterpreter.ts`** — the spine (Person→Story→Assets→Constraints→Pathways→…→
+  Journey) walked from the visitor's OWN WORDS; both entry modes (open discovery / bring-your-
+  own-dream); proactive widening line.
+- **`/api/public/navigator/converse`** — refusal gates FIRST, then interpretation; the locked
+  "property qualifies ≠ you qualify" seam renders with pathways; every turn logged PII-free.
+- **`FurlongNavigator.tsx`** — ONE conversation, ONE free-text box, NO chip grid/persona
+  picker; pathway cards with all addendum fields; graph chain render; anonymous Journey
+  Memory in sessionStorage only (continue-your-journey; no identity, nothing server-stored).
+
+**Verification (`verify:navigator`, run pure + LIVE):** 15 ownership + 12 steering probes
+refused with the locked line against the running API; HOPA passes; scrubber proven at the data
+layer; listing links parsed never fetched; three-answer outputs carry confidence/why-shown/
+matrix; graph chains ≥5; hero = exactly 2 CTAs (DOM-counted), none after tour; G-5 isolation
+(verify:internal-auth) green. **Eyes-on:** home hero + the full farmer conversation to rendered
+pathways screenshotted; ownership probe rendered the exact refusal; "owner" appears only as
+the word "landowners" in copy. A repeated-question wart caught by eyes-on was fixed
+(non-advancing turns now acknowledge instead of repeating verbatim).
+
+**Honest scope notes for review:** Layer A (ordinance engine), Layer B/D (comps synthesis +
+prediction), and the tier gate (§8) are NOT in this slice — pathway legality returns
+CAN'T-DETERMINE with the right confirm-with route until Layer A wires, and no revenue number
+renders until Layer B verifies. The prior chip-based interview + place-first card remain in
+the tree (place-facts flows still resolve to the place-first card; the chip interview is no
+longer mounted as the entry flow).

@@ -360,12 +360,22 @@ export default async function HomePage({
               {HOMEPAGE_HERO.subhead}
             </p>
             <p className="fl-hero-trust">{HOMEPAGE_HERO.trustTag}</p>
+            {/* EXACTLY TWO CTAs (spec 2026-06-11 §2): primary opens Furlong
+                Navigator (the conversation); secondary drops to the map /
+                navigation wheel for visitors not ready to engage. No third
+                button here, no duplicate beneath the map tour. */}
             {discoveryPrimary() && (
-              <div style={{ display: "grid", gap: 8, justifyItems: "center", marginTop: 6 }}>
-                <Link href={DISCOVERY_HREF} data-testid="home-discovery-cta"
-                  style={{ fontSize: 15, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "13px 30px", textDecoration: "none" }}>
-                  What are your possibilities? →
-                </Link>
+              <div style={{ display: "grid", gap: 10, justifyItems: "center", marginTop: 6 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "center" }}>
+                  <Link href={DISCOVERY_HREF} data-testid="cta-start-journey"
+                    style={{ fontSize: 15, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "13px 30px", textDecoration: "none" }}>
+                    Start your journey here →
+                  </Link>
+                  <Link href="/explore" data-testid="cta-possibilities-map"
+                    style={{ fontSize: 15, fontWeight: 800, color: "#0f766e", background: "#fff", border: "1.5px solid #0f766e", borderRadius: 999, padding: "13px 30px", textDecoration: "none" }}>
+                    What are your possibilities? →
+                  </Link>
+                </div>
                 <span style={{ fontSize: 12, color: "#9aa6b6" }}>
                   Anonymous · no account · we help you understand your options, we don't sell you anything.
                 </span>

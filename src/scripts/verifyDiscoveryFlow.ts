@@ -63,8 +63,11 @@ async function main() {
       ok(/Where is the location\?/.test(h), `${u} must put the location input first`);
     }
     const bare = await html("/discover");
-    ok(bare.includes('data-testid="discovery-engine"'), "/discover (no signal) renders the persona interview");
-    ok(/place-facts/.test(bare), "/discover persona view still links to the place-facts journey");
+    // The default flow is now Furlong Navigator (spec 2026-06-11) — one open
+    // conversation, never the chip interview and never the place-first card.
+    ok(bare.includes('data-testid="furlong-navigator"'), "/discover (no signal) renders Furlong Navigator");
+    ok(!bare.includes('data-testid="place-first-discovery"'), "/discover (no signal) does not render the place-first card");
+    ok(/place-facts/.test(bare), "/discover navigator view still links to the place-facts journey");
   } else {
     console.log("  (dev server not reachable — live SSR checks skipped; pure + structural ran)");
   }

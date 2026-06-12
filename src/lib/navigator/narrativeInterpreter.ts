@@ -17,6 +17,7 @@
 
 import { resolveListingInput, type PropertyReference } from "./listingIntake";
 import { EMPTY_CONTEXT, type PropertyContext } from "./possibilityCheck";
+import type { NoveltyGate } from "./noveltyBuildDoctrine";
 
 export type ArcNode =
   | "person" | "story" | "assets" | "constraints"
@@ -59,12 +60,17 @@ export interface JourneyState {
   askedPrompts: string[];
   /** Anonymous abuse counters (REALITY-SEC-001 input guard) — never an identity. */
   guardCounters: { refusals: number; rejections: number };
+  /** Machine-readable intent of the PREVIOUS guide turn (intent loop guard). */
+  lastTurnIntent: string | null;
+  /** Novelty/fantasy build code-compliance gate — null = no novelty concept. */
+  noveltyGate: NoveltyGate | null;
 }
 
 export const FRESH_JOURNEY: JourneyState = {
   node: "person", story: [], context: EMPTY_CONTEXT, property: null, entryMode: null,
   intent: null, guidedDiscovery: false, exploredPathways: [], askedPrompts: [],
   guardCounters: { refusals: 0, rejections: 0 },
+  lastTurnIntent: null, noveltyGate: null,
 };
 
 // ── Guided Property Discovery copy (spec fix 2026-06-11) ─────────────────────

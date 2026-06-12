@@ -15,6 +15,10 @@ import { assessPathways, discoveryGraphChain, EMPTY_CONTEXT } from "@/lib/naviga
 import { interpretMessage, detectPropertyIntent, FRESH_JOURNEY, GUIDED_DISCOVERY_OPENER } from "@/lib/navigator/narrativeInterpreter";
 import { FURLONG_NAVIGATOR_MANIFEST } from "@/lib/navigator/furlongNavigatorManifest";
 import { deriveDecisionSummary, PATHWAYS_NOT_PROMISES } from "@/lib/navigator/decisionFramework";
+import {
+  classifyNoveltyConcept, gateForCategory, isDisallowedOutright, noveltyGateClear,
+  translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY,
+} from "@/lib/navigator/noveltyBuildDoctrine";
 
 const fail: string[] = [];
 const ok = (c: boolean, m: string) => { if (!c) fail.push(m); };
@@ -255,6 +259,30 @@ ok(navFetches.every((u) => u.startsWith("/api/public/navigator/converse")), "Nav
 ok(!/sessionStorage\.setItem|localStorage\.setItem/.test(nav), "component never writes browser storage directly (ephemeral default; privacy module is the only writer)");
 ok(!/email|firstName|lastName|phone/i.test(nav.replace(/\/\*[\s\S]*?\*\//g, "")), "Navigator captures no identity fields");
 
+// ── Novelty / fantasy build code reality boundary (pure) ─────────────────────
+ok(classifyNoveltyConcept("I want a hotel shaped like a penis") === "SEXUAL_EXPLICIT" &&
+   isDisallowedOutright("SEXUAL_EXPLICIT"), "novelty: sexually explicit structure is disallowed outright");
+ok(classifyNoveltyConcept("build a cabin without permits and hide it from the county") === "CODE_EVASION" &&
+   isDisallowedOutright("CODE_EVASION"), "novelty: code-evasion concept is disallowed outright");
+ok(classifyNoveltyConcept("I want to build a hotel in outer space") === "FANTASY_OUT_OF_SCOPE",
+  "novelty: outer-space build classifies as fantasy/out-of-scope");
+ok(!noveltyGateClear(gateForCategory("FANTASY_OUT_OF_SCOPE")),
+  "novelty: six-flag code-compliance gate BLOCKS pathway analysis for untranslated fantasy");
+ok(translatesToRealWorld("ok — a space-themed cabin retreat on some land") && noveltyGateClear(clearedGate()),
+  "novelty: a real-world translation clears the gate");
+ok(noveltyGateClear(null), "novelty: ordinary (non-novelty) conversations pass — no gate on the table");
+ok(/translated into something lawful, safe, non-sexual/.test(NOVELTY_BOUNDARY_REPLY) &&
+   /themed cabin, earth-sheltered home, observatory, farm structure, or hospitality/.test(NOVELTY_BOUNDARY_REPLY),
+  "novelty: locked boundary reply follows the required acknowledge→boundary→codes→translate pattern");
+// turn_intent exposure: route returns it; rendered component exposes data-turn-intent.
+{
+  const routeSrc = fs.readFileSync("src/app/api/public/navigator/converse/route.ts", "utf8");
+  ok((routeSrc.match(/turnIntent:/g) ?? []).length >= 6, "route: every response carries a machine-readable turn_intent");
+  ok(/guardTurnIntent/.test(routeSrc), "route: loop guard compares turn_intent, not just text");
+  const navCmp = fs.readFileSync("src/components/navigator/FurlongNavigator.tsx", "utf8");
+  ok(/data-turn-intent/.test(navCmp), "component: guide turns expose data-turn-intent for the test harness");
+}
+
 // ── Live SSR + conversation probes (when the server is up) ───────────────────
 async function main() {
   const BASE = process.env.BASE_URL ?? "http://localhost:3000";
@@ -326,6 +354,39 @@ async function main() {
       }
       const maxRepeat = Math.max(...texts.map((t) => texts.filter((x) => x === t).length));
       ok(maxRepeat <= 2, `live: no prompt repeats more than once in a session (max occurrences ${maxRepeat})`);
+    }
+
+    // OUTER-SPACE FIXTURE (turn-intent loop guard, patch 2026-06-11) — proves:
+    // 1) no verbatim repeat; 2) no consecutive repeated turn_intent; 3) no
+    // forced asset prompt after out-of-scope input; 4) open discovery proceeds
+    // WITHOUT a property.
+    {
+      const kk = await converse({});
+      let oj = kk.journey;
+      const replies: { text: string; intent: string; kind: string }[] = [];
+      const sendAll = [
+        "I'm a dreamer with big ideas",
+        "I want to build a hotel in outer space",
+        "no really — I want the hotel in outer space",
+        "ok fine — a space-themed cabin retreat on some land instead",
+        "thinking a small farm stay business, budget around 200k, somewhere rural",
+      ];
+      let sawPathwaysNoProperty = false;
+      for (const m of sendAll) {
+        const r = await converse({ message: m, journey: oj }); oj = r.journey;
+        replies.push({ text: r.text, intent: r.turnIntent ?? "(missing)", kind: r.kind });
+        if (r.kind === "pathways" && !r.journey.property) sawPathwaysNoProperty = true;
+      }
+      ok(replies.every((r) => r.intent !== "(missing)"), "outer-space: every bot turn carries turn_intent");
+      const verbatim = replies.some((r, i) => i > 0 && r.text === replies[i - 1].text);
+      ok(!verbatim, "outer-space: 1) no verbatim repeat");
+      const intentRepeat = replies.some((r, i) => i > 0 && r.kind !== "pathways" && r.intent === replies[i - 1].intent);
+      ok(!intentRepeat, `outer-space: 2) no consecutive repeated turn_intent (${replies.map((r) => r.intent).join(" → ")})`);
+      ok(!/What do you have to work with/.test(replies[1].text) && !/What do you have to work with/.test(replies[2].text),
+        "outer-space: 3) no forced asset prompt after out-of-scope input");
+      ok(/unusual idea/.test(replies[1].text) && /lawful/.test(replies[1].text),
+        "outer-space: fantasy build gets the locked reality-boundary reply");
+      ok(sawPathwaysNoProperty, "outer-space: 4) open discovery proceeds to pathways WITHOUT a property");
     }
 
     // walk to pathways: farmer → story → address → constraint

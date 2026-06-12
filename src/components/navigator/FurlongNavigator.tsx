@@ -29,9 +29,9 @@ import {
  */
 
 type Reply =
-  | { kind: "question"; node: string; text: string; journey: JourneyState }
-  | { kind: "refusal"; refusal: string; text: string; journey: JourneyState }
-  | { kind: "pathways"; node: string; text: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; journey: JourneyState };
+  | { kind: "question"; node: string; text: string; turnIntent?: string; journey: JourneyState }
+  | { kind: "refusal"; refusal: string; text: string; turnIntent?: string; journey: JourneyState }
+  | { kind: "pathways"; node: string; text: string; turnIntent?: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; journey: JourneyState };
 
 const CONF_STYLE: Record<string, { label: string; bg: string; fg: string }> = {
   high: { label: "High confidence", bg: "#e1f5ee", fg: "#0F6E56" },
@@ -76,7 +76,9 @@ export function FurlongNavigator() {
   }
 
   function handle(r: Reply, t: Turn[]) {
-    const next = [...t, { role: "guide" as const, text: r.text }];
+    // Machine-readable turn_intent rides with each guide turn so the test
+    // harness can assert the intent loop guard against the REAL rendered UI.
+    const next = [...t, { role: "guide" as const, text: r.text, intent: r.turnIntent }];
     setTurns(next);
     setJourney(r.journey);
     if (r.kind === "pathways") {
@@ -182,7 +184,8 @@ export function FurlongNavigator() {
       {/* the conversation */}
       <div data-testid="navigator-conversation" style={{ display: "grid", gap: 10 }}>
         {turns.map((t, i) => (
-          <div key={i} style={{ justifySelf: t.role === "guide" ? "start" : "end", maxWidth: "88%",
+          <div key={i} data-turn-intent={t.role === "guide" ? (t.intent ?? "UNSPECIFIED") : undefined}
+            style={{ justifySelf: t.role === "guide" ? "start" : "end", maxWidth: "88%",
             background: t.role === "guide" ? "#f1f5f9" : "#0f766e", color: t.role === "guide" ? "#1f2a3d" : "#fff",
             borderRadius: 14, padding: "10px 14px", fontSize: 14, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>
             {t.text}

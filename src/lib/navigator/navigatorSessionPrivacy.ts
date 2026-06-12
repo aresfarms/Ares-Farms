@@ -34,7 +34,7 @@ export const SAVE_JOURNEY_CONSENT_COPY =
   "Saving is optional. If you save this journey, Furlong will store your conversation, search criteria, " +
   "saved properties, and results so you can return later. Public Navigator remains anonymous when you do not save.";
 
-export type Turn = { role: "guide" | "you"; text: string };
+export type Turn = { role: "guide" | "you"; text: string; intent?: string };
 
 // ── Protected-class disclosure detection (belt-and-suspenders, G-2) ──────────
 // Even under opt-in, these are NEVER durably stored — redacted in saved copies.

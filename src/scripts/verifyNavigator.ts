@@ -1100,6 +1100,51 @@ async function main() {
       ok(classifyIntent("I want a camel in Texas").identified, "animal-goal: 'camel' classifies even without a taxonomy row");
     }
 
+    // APICULTURE SCALE / SHORT NOUN PHRASE (2026-06-12).
+    {
+      // Two-turn domain context: "I want bees" → "one bee box please".
+      const k = await converse({});
+      const r1 = await converse({ message: "I want bees", journey: k.journey });
+      ok(/apiculture path/.test(r1.text), "apiary: 'I want bees' routes to the apiculture path");
+      const r2 = await converse({ message: "one bee box please", journey: r1.journey });
+      ok(r2.turnIntent === "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" && /one hive \/ one bee box is a small-scale apiary path/.test(r2.text),
+        "apiary: 'one bee box please' → small-scale apiary, references hive/bee box");
+      ok(!/Anything that boxes you in|What do you have to work with|We can start without a property/.test(r2.text),
+        "apiary: NO generic constraints prompt, NO discovery copy");
+    }
+    for (const [name, msg] of [
+      ["backyard-hive", "I want one hive in my backyard"],
+      ["keep-bees", "Can I keep bees on my property?"],
+      ["pollination", "I want pollination income"],
+    ] as const) {
+      const out = await runFixture(`apiary:${name}`, [msg]);
+      ok(out[0].intent === "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" && /apiary|hive/.test(out[0].text),
+        `apiary:${name}: small-scale apiary path (got ${out[0].intent})`);
+    }
+    {
+      const c = classifyIntent("one bee box please");
+      ok(c.subAssetClass === "apiculture" && c.scaleClass === "hobby_or_small_scale" &&
+         c.recommendedTurnIntent === "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY",
+        "apiary: classifier sets sub_asset=apiculture, scale=hobby_or_small_scale");
+    }
+    {
+      const out = await runFixture("short-np:cat-box", ["Cat box"]);
+      ok(out[0].intent === "CLARIFY_SHORT_NOUN_PHRASE" && /cat box/.test(out[0].text) &&
+         /litter-box product/.test(out[0].text) && /testing the Navigator/.test(out[0].text),
+        "short-np: 'Cat box' → clarify litter/shelter/business/rescue/test");
+      ok(!/Tell me a bit more of the story|Who are you/.test(out[0].text), "short-np: no ASK_STORY/ASK_PERSON");
+    }
+    {
+      const out = await runFixture("short-np:fish-tank", ["fish tank"]);
+      ok(out[0].intent === "CLARIFY_SHORT_NOUN_PHRASE" && /fish tank/.test(out[0].text), "short-np: 'fish tank' clarifies");
+    }
+    {
+      const coop = await runFixture("short-np:chicken-coop", ["chicken coop"]);
+      ok(coop[0].intent === "ROUTE_LIVESTOCK_OR_AG_STRUCTURE", "short-np: 'chicken coop' → poultry/ag structure route (not ASK_STORY)");
+      const barn = await runFixture("short-np:horse-barn", ["horse barn"]);
+      ok(barn[0].intent === "ROUTE_LIVESTOCK_OR_AG_STRUCTURE", "short-np: 'horse barn' → livestock/ag structure route (not ASK_STORY)");
+    }
+
     // §9 — high-priority inputs must NEVER fall through to the arc (pure).
     {
       const { routeTurn: rt } = await import("@/lib/navigator/navigatorTurnRouter");

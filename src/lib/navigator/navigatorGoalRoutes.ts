@@ -247,13 +247,13 @@ function cap(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1);
 // ── GENERIC ANIMAL GOAL classifier (defect fix 2026-06-12) ───────────────────
 // "I want ostriches in ME" / "I want a camel in Texas" must NOT fall through to
 // ASK_STORY. Any animal-goal is classified generically (no per-animal route).
-export type AnimalCategory = "livestock" | "exotic_livestock" | "companion_animal" | "wildlife_or_conservation" | "aquaculture";
+export type AnimalCategory = "livestock" | "exotic_livestock" | "companion_animal" | "wildlife_or_conservation" | "aquaculture" | "apiculture";
 
 const ANIMAL_LEXICON: [RegExp, AnimalCategory][] = [
   [/\b(?:ostrich|emu|rhea|camel|yak|water\s+buffalo|llama|alpaca|reindeer|bison|buffalo|elk|musk\s+ox(?:en)?|peacock|peafowl|guinea\s+fowl|antelope|zebra|kangaroo|wallaby)(?:e?s)?\b/i, "exotic_livestock"],
   [/\b(?:cattle|cow|steer|bull|calf|pig|hog|swine|sheep|lamb|goat|chicken|hen|rooster|poultry|horse|pony|ponies|donkey|mule|turkey|duck|goose|geese|rabbit|quail)(?:e?s)?\b/i, "livestock"],
   [/\b(?:trout|catfish|tilapia|salmon|shrimp|prawn|oyster|clam|mussel|crawfish|aquaculture|fish\s+farm)\b/i, "aquaculture"],
-  [/\b(?:bee|bees|apiary|honeybee)\b/i, "aquaculture"], // apiary handled as specialized ag
+  [/\b(?:bee|bees|apiary|apiaries|honeybee|beekeep(?:ing|er)?|hive)s?\b/i, "apiculture"],
   [/\b(?:deer|bison\s+herd|elk\s+herd|game\s+animal|wildlife|pheasant)\b/i, "wildlife_or_conservation"],
   [/\b(?:dog|cat|puppy|kitten)\b/i, "companion_animal"],
 ];
@@ -291,8 +291,14 @@ export function animalGoalReply(animal: string, category: AnimalCategory): strin
   }
   if (category === "aquaculture") {
     return `${cap(animal)} is an aquaculture/specialized-ag goal. We’d look at water rights and quality, state ` +
-      "aquaculture/apiary permits, zoning, environmental rules, and whether you have land/water or are looking. " +
+      "aquaculture permits, zoning, environmental rules, and whether you have land/water or are looking. " +
       "Which region, and operating business, land to build, or smaller setup?";
+  }
+  if (category === "apiculture") {
+    return "Bees are a real apiculture path — from a single backyard hive to a honey or pollination business. We’d " +
+      "look at local bee rules and setbacks, state apiary registration, lot/HOA limits, water source, and scale. " +
+      "Are you thinking one or two hives at home, a small apiary, or an income operation — and do you have a " +
+      "property already, or are you looking for one that allows bees?";
   }
   if (category === "wildlife_or_conservation") {
     return `A ${animal} goal usually means a wildlife, game, or conservation land use. We’d look at acreage, state ` +
@@ -306,6 +312,51 @@ export function animalGoalReply(animal: string, category: AnimalCategory): strin
   return `A ${animal} operation is a real agricultural goal. We’d look at ag zoning, animal limits, setbacks, ` +
     "manure/nutrient management, water, fencing/shelter, and whether you want an operating farm, land to start one, " +
     "or a smaller setup. Which region, and roughly what scale?";
+}
+
+// ── APICULTURE SCALE / BEE-BOX clarification (patch 2026-06-12) ──────────────
+// "one bee box" after "I want bees" is a SCALE clarification inside the
+// apiculture domain — never a generic constraints answer or open discovery.
+const APIARY_SCALE_RE =
+  /\b(?:one|a|an|1|two|2|a\s+few|couple\s+of?)\s+(?:bee\s*box(?:es)?|hives?|colon(?:y|ies))\b|\bbackyard\s+bees\b|\bsmall\s+apiary\b|\bhobby\s+beekeep|\bhoney\s*bees?\s+for\s+my\s+(?:yard|garden)\b|\bpollination\s+(?:for\s+my\s+(?:garden|yard|crops?)|income|services?)\b|\bkeep\s+bees\b/i;
+
+export const APIARY_SCALE_REPLY =
+  "Got it — one hive / one bee box is a small-scale apiary path. That can be realistic, but it depends on local " +
+  "rules, lot size, setbacks, nuisance rules, water source, nearby neighbors, HOA/private restrictions, state " +
+  "apiary registration, wintering, equipment, and whether this is hobby use or honey/pollination income. Do you " +
+  "already have a property where the hive would go, or are you looking for a property that allows bees?";
+
+export function detectApiaryScale(message: string): boolean {
+  return APIARY_SCALE_RE.test(message);
+}
+
+// ── SHORT NOUN PHRASE resolver (patch 2026-06-12) ────────────────────────────
+// "Cat box" is not nothing. A short noun phrase with no goal verb — especially
+// [animal/object] + box/tank/pond/cage/etc. — clarifies before intake. Phrases
+// the specific routes already own (chicken coop, horse barn) never reach this.
+const GOAL_VERB_PRESENT_RE = /\b(?:want|need|buy|build|live|own|acquire|find|looking|raise|keep|start|sell|lease|convert|help|analyz)/i;
+const SHORT_NP_RE =
+  /^\s*(?:a|an|one|the|my)?\s*([a-z]+(?:\s+[a-z]+)?)\s+(box|tank|pond|cage|crate|room|shelter|hutch|coop|pen|barn|house|kennel|habitat|run)\s*(?:please)?\s*[.!?]*\s*$/i;
+const STANDALONE_NP_RE = /^\s*(?:a|an|one|the)?\s*(animal\s+shelter|kennel|pet\s+room|aviary|apiary)\s*(?:please)?\s*[.!?]*\s*$/i;
+
+export function detectShortNounPhrase(message: string): string | null {
+  if (GOAL_VERB_PRESENT_RE.test(message)) return null;
+  if (message.trim().split(/\s+/).length > 5) return null;
+  const m = message.match(SHORT_NP_RE);
+  if (m) return `${m[1]} ${m[2]}`.toLowerCase();
+  const s = message.match(STANDALONE_NP_RE);
+  return s ? s[1].toLowerCase() : null;
+}
+
+export function shortNounPhraseReply(phrase: string): string {
+  if (/^cat\s+box$/.test(phrase)) {
+    return "When you say “cat box,” do you mean a litter-box product, a shelter/boarding setup for cats, a cat café " +
+      "or pet business, a small structure for an animal rescue, or are you testing the Navigator? Furlong can help " +
+      "with lawful property, business, animal-care, or facility questions once I know which meaning you intend.";
+  }
+  return `When you say “${phrase},” do you mean a product, a structure for animals, a shelter/boarding or rescue ` +
+    "setup, a pet or animal business, or are you testing the Navigator? Furlong can help with lawful property, " +
+    "business, animal-care, or facility questions once I know which meaning you intend.";
 }
 
 // ── PARCEL ENCUMBRANCE / EASEMENT (not infrastructure analysis) ──────────────

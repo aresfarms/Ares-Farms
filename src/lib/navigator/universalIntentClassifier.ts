@@ -21,7 +21,7 @@
  */
 
 import type { TurnIntent } from "./turnIntent";
-import { detectAnimalGoal } from "./navigatorGoalRoutes";
+import { detectAnimalGoal, detectAnimalCategory, detectApiaryScale } from "./navigatorGoalRoutes";
 
 export type IntentClass =
   | "acquire" | "build" | "sell" | "lease" | "finance" | "operate" | "redevelop"
@@ -65,6 +65,10 @@ export interface UniversalClassification {
   availabilityClass: AvailabilityClass;
   sensitivityClass: SensitivityClass;
   constraintClass: ConstraintClass;
+  /** Domain refinement, e.g. "apiculture" (null when not applicable). */
+  subAssetClass: string | null;
+  /** e.g. "hobby_or_small_scale" (null when scale not stated). */
+  scaleClass: string | null;
   recommendedTurnIntent: TurnIntent | null;
   /** True when BOTH an intent and an asset were identified. */
   identified: boolean;
@@ -229,6 +233,10 @@ export function classifyIntent(message: string): UniversalClassification {
   // An easement/encumbrance means an infra term is a CONSTRAINT on the user's
   // parcel, not the facility itself — don't classify it as sensitive/facility.
   const encumbered = constraintClass !== "none_detected" && constraintClass !== "unknown";
+  // Apiculture refinement: bee/hive goals carry sub-asset + scale context.
+  const apiary = detectAnimalCategory(message)?.category === "apiculture" || detectApiaryScale(message);
+  const subAssetClass = apiary ? "apiculture" : null;
+  const scaleClass = apiary && detectApiaryScale(message) ? "hobby_or_small_scale" : null;
   return {
     intentClass,
     assetClass: asset?.assetClass ?? "unknown",
@@ -239,7 +247,9 @@ export function classifyIntent(message: string): UniversalClassification {
     availabilityClass: classifyAvailability(message, asset, encumbered),
     sensitivityClass: classifySensitivity(message, asset, encumbered),
     constraintClass,
-    recommendedTurnIntent: asset?.turnIntent ?? null,
+    subAssetClass,
+    scaleClass,
+    recommendedTurnIntent: scaleClass === "hobby_or_small_scale" ? "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" : asset?.turnIntent ?? null,
     identified: intentClass !== "unknown" && asset !== null,
   };
 }

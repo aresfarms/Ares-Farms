@@ -60,6 +60,7 @@ export type TurnIntent =
   | "CLARIFY_AMBIGUOUS_TERM" | "REFUSE_ADULT_SERVICE_SEEKING"
   | "ROUTE_ANIMAL_RESCUE_OR_BOARDING" | "ROUTE_CONSERVATION_OR_HABITAT"
   | "CLARIFY_AMBIGUOUS_OR_MYTHIC_GOAL" | "CLARIFY_CONTEXTUAL_ANSWER"
+  | "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" | "CLARIFY_SHORT_NOUN_PHRASE"
   // parcel encumbrance + third-party acquisition boundary
   | "ROUTE_EASEMENT_CONSTRAINT_REVIEW" | "CLARIFY_THIRD_PARTY_ACQUISITION"
   | "LIMITED_PRIVATE_ADDRESS_OVERVIEW"
@@ -161,6 +162,14 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   CLARIFY_CONTEXTUAL_ANSWER: {
     intent: "ASK_GOAL",
     text: "Just so I answer the right thing — what would a win look like for you? A property, land, business, or income goal in your own words.",
+  },
+  ROUTE_HOBBY_OR_SMALL_SCALE_APIARY: {
+    intent: "ASK_REGION",
+    text: "Which town or area would the hive go in? Bee rules — setbacks, registration, HOA limits — are local.",
+  },
+  CLARIFY_SHORT_NOUN_PHRASE: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Whenever you can say a bit more about the real-world property, animal-care, business, or facility goal, I’ll point this the right way.",
   },
   ROUTE_EASEMENT_CONSTRAINT_REVIEW: { intent: "ASK_REGION", text: "Which parcel and jurisdiction? Buildable-area and use limits from an easement turn on the recorded document and local zoning." },
   CLARIFY_THIRD_PARTY_ACQUISITION: {

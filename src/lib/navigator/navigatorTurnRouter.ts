@@ -49,6 +49,8 @@ import {
   detectStreetAddress, detectPrivateAddressAcquisition,
   PRIVATE_ADDRESS_OVERVIEW_REPLY, PRIVATE_ADDRESS_STALKING_REFUSAL,
   detectAnimalGoal, animalGoalReply,
+  detectApiaryScale, APIARY_SCALE_REPLY,
+  detectShortNounPhrase, shortNounPhraseReply,
 } from "./navigatorGoalRoutes";
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
@@ -679,6 +681,19 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
     };
   }
 
+  // 5.55 — APICULTURE SCALE: "one bee box / a hive / backyard bees / keep bees /
+  // pollination income" is a small-scale apiary clarification — inside the
+  // apiculture domain, never a generic constraints answer or open discovery.
+  if (detectApiaryScale(message)) {
+    const repeated = repeatOf("ROUTE_HOBBY_OR_SMALL_SCALE_APIARY");
+    return {
+      turnIntent: repeated ? "ASK_REGION" : "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY",
+      text: repeated ? "Which town or area would the hive go in? Bee rules — setbacks, registration, HOA limits — are local." : APIARY_SCALE_REPLY,
+      slot: "route:apiary-small-scale", echoConcept: "bee box / hive", refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
   // 5.6 — ANIMAL / PET / LIVESTOCK housing: classify the use BEFORE any
   // generic route; the reply must reference the animal.
   const animal = detectAnimalHousing(message);
@@ -798,6 +813,20 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
       text: repeated ? `Staying with the ${animalGoal.animal} — which region, and roughly what scale?` : animalGoalReply(animalGoal.animal, animalGoal.category),
       slot: `route:animal-goal:${animalGoal.category}`, echoConcept: animalGoal.animal, refusal: false,
       patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 7.75 — SHORT NOUN PHRASE: "cat box" / "fish tank" with no goal verb is not
+  // nothing — clarify product vs structure vs business vs test before intake.
+  const shortNoun = detectShortNounPhrase(message);
+  if (shortNoun) {
+    const repeated = repeatOf("CLARIFY_SHORT_NOUN_PHRASE");
+    return {
+      turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : "CLARIFY_SHORT_NOUN_PHRASE",
+      text: repeated
+        ? "Whenever you can say a bit more about the real-world property, animal-care, business, or facility goal, I’ll point this the right way."
+        : shortNounPhraseReply(shortNoun),
+      slot: "clarify:short-noun-phrase", echoConcept: shortNoun, refusal: false, patch: {},
     };
   }
 

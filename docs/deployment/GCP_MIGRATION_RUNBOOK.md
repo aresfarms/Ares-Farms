@@ -51,10 +51,30 @@ Secrets exist ONLY in Secret Manager — never in repo, env files in git, or bui
 - Document every var in deploy config; no secret values in repo.
 
 ## 8. Domain / DNS cutover plan (feeds SEC-DNS-001 — stays OPEN until done + reviewed)
-- Canonical domain: `furlongpathways.com` (furlonghub.com redirects). Only the TWO governed domains (DOMAIN-ASSET-001).
-- Pre-cutover: registrar access verified by Caitlin; current records exported (rollback copy); Cloud Run domain mapping or HTTPS LB created; cert issued and VALID; staging hostname smoke-tested incl. `verify:csp-hydration` against the real edge.
+
+**Domain inventory (DOMAIN-GOVERNANCE-002, `src/security/domainPurposeRegistry.ts` — all OWNED, all DNS
+`unverified`, NONE production-approved, NONE live):**
+
+| Domain | Role | Posture |
+|---|---|---|
+| `furlonghub.com` | primary Furlong platform CANDIDATE (public decision-intelligence hub) | canonical candidate — **pending Caitlin approval** |
+| `furlongpathways.com` | Furlong marketing/education ("find your pathway") | likely redirect → furlonghub.com or landing surface; not canonical unless separately approved |
+| `compasstocapital.com` | Compass to Capital — capital/financing pathway; Five Borough/Stuart professional-module surface | NOT Furlong Core; explicit professional handoff only |
+| `comapss2capital.com` | defensive typo registration | redirect-only → compasstocapital.com; must never host a separate product |
+| `comapss2capital.org` | defensive typo / alt-extension | redirect-only unless Caitlin approves separate use |
+
+DOMAIN-ASSET-001 (the two-Furlong-domain canonical contract) is unchanged and composes with this registry.
+**Boundary lock:** Furlong informs; Compass/Five Borough performs professional financing work when separately
+activated — Furlong Core never silently becomes Five Borough.
+
+- **Canonical selection is Caitlin's decision at DNS sign-off** (current candidate: furlonghub.com).
+- Pre-cutover: registrar access verified by Caitlin; current records exported (rollback copy); Cloud Run domain
+  mapping or HTTPS LB created; cert issued and VALID; staging hostname smoke-tested incl. `verify:csp-hydration`
+  against the real edge; redirect strategy (typo→compass, pathways→hub) approved and documented in the
+  SEC-DNS-001 sign-off; redirects preserve HTTPS.
 - Cutover: lower TTL 24h ahead → switch A/AAAA/CNAME → verify HTTPS + headers + nonce-CSP hydration on the live host.
 - **Rollback:** restore exported records (TTL still low), confirm old target healthy. Documented BEFORE cutover.
+- Gate: `npm run verify:domain-purpose` (registry posture) + `verify:domain-governance` (DOMAIN-ASSET-001).
 
 ## 9. Monitoring / logging / alerting
 - Cloud Logging: app logs + security logs (operator wall denials, rate-limit events, failed logins).

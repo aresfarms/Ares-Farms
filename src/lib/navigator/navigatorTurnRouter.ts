@@ -855,7 +855,7 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
 
   // 8 — open discovery (no property / help me find one / no idea).
   const intent = detectPropertyIntent(message, null);
-  if ((intent === "NO_PROPERTY_YET" || intent === "WANTS_PROPERTY_DISCOVERY") && !journey.guidedDiscovery) {
+  if ((intent === "NO_PROPERTY_YET" || intent === "WANTS_PROPERTY_DISCOVERY" || intent === "UNKNOWN_OPEN_DISCOVERY") && !journey.guidedDiscovery) {
     return {
       turnIntent: "ROUTE_OPEN_DISCOVERY",
       text: "", // route.ts supplies the locked guided-discovery copy

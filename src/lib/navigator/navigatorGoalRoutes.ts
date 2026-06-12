@@ -117,7 +117,7 @@ export function assessCriticalInfrastructure(message: string): InfraDecision {
 
 // ── Asset-class acquisition / development goals (respond to the goal first) ───
 export interface AssetGoal { intent: AssetGoalIntent; label: string; reply: string }
-type AssetGoalIntent = "ROUTE_HEALTHCARE_REAL_ESTATE" | "ROUTE_REGULATED_BUSINESS_ACQUISITION" | "ROUTE_COMMERCIAL_ACQUISITION";
+type AssetGoalIntent = "ROUTE_HEALTHCARE_REAL_ESTATE" | "ROUTE_REGULATED_BUSINESS_ACQUISITION" | "ROUTE_COMMERCIAL_ACQUISITION" | "ROUTE_AGRICULTURAL_ACQUISITION";
 
 const ACQUIRE_VERB = "\\b(?:buy|purchase|acquire|own|invest\\s+in|develop|build|open|start)\\b";
 
@@ -125,9 +125,25 @@ const HEALTHCARE_RE = /\b(?:hospital|medical\s+(?:center|building|office)|clinic
 const REGULATED_BIZ_RE = /\b(?:laundromat|gas\s+station|car\s+wash|liquor\s+store|dispensary|funeral\s+home|daycare|child\s+care|self[- ]storage|storage\s+facility|processing\s+(?:facility|plant)|distillery|brewery|winery|cannabis\s+(?:grow|cultivation)|slaughterhouse|recycling\s+(?:center|facility)|cat\s+cafe|pet\s+(?:cafe|daycare|hotel|resort)|cafe|coffee\s+shop)\b/i;
 const COMMERCIAL_RE = /\b(?:hotel|motel|resort|apartment\s+(?:complex|building)|mobile\s+home\s+park|trailer\s+park|rv\s+park|shopping\s+(?:center|mall)|strip\s+mall|office\s+(?:building|park)|warehouse|industrial\s+(?:building|park)|retail\s+(?:center|space)|restaurant|bar\s+business|farmland|ranch\s+land|vineyard|orchard|timberland|commercial\s+(?:building|property|real\s+estate))\b/i;
 
+const BARE_AG_RE = /\b(?:farm|ranch|orchard|vineyard|homestead|cropland|pasture\s+land|acreage)\b/i;
+// "the farm is at…" / "my farm" describe an OWNED property — not an acquisition.
+const OWN_FARM_RE = /\b(?:the|my|our|this)\s+(?:farm|ranch|orchard|vineyard|land)\b/i;
+
 export function detectAssetGoal(message: string): AssetGoal | null {
   const acquiring = new RegExp(ACQUIRE_VERB, "i").test(message);
   if (!acquiring) return null;
+  // Bare farm/ranch/orchard acquisition (D11) → agricultural; never when the
+  // user is describing land they already own ("the farm is at…").
+  if (BARE_AG_RE.test(message) && !OWN_FARM_RE.test(message)) {
+    const m = message.match(BARE_AG_RE)![0].toLowerCase();
+    return {
+      intent: "ROUTE_AGRICULTURAL_ACQUISITION",
+      label: m,
+      reply: `A ${m} is a real agricultural acquisition. We’d look at zoning, soil/water, USDA programs, animal limits ` +
+        "if any, setbacks, environmental rules, financing, and whether you want an operating farm, land to build one, " +
+        "or a smaller setup. Which region, and roughly what scale?",
+    };
+  }
   if (HEALTHCARE_RE.test(message)) {
     const m = message.match(HEALTHCARE_RE)![0].toLowerCase();
     return {

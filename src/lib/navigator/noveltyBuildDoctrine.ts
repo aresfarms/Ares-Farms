@@ -87,6 +87,7 @@ const REGULATED_USE_RE: [RegExp, string][] = [
   [/\b(?:bar|tavern|pub|brewery|liquor[- ]licensed|liquor\s+store)\b/i, "bar or liquor-licensed establishment"],
   [/\badult[\s-]+(?:retail|book\s?store|store|shop|entertainment(?:[\s-]+venue)?|venue|business|use)\b/i, "adult-use business"],
   [/\b(?:strip\s+club|gentlemen'?s\s+club)\b/i, "adult-entertainment venue"],
+  [/\bshort[- ]term\s+rental\b|\bairbnb\b|\bvrbo\b|\bvacation\s+rental\b/i, "short-term rental"],
   [/\btattoo\s+(?:parlor|shop|studio)\b/i, "tattoo studio"],
   [/\b(?:smoke|vape)\s+shop\b/i, "smoke/vape shop"],
   [/\b(?:firearms?\s+dealer|gun\s+(?:shop|store|range))\b/i, "firearms business"],

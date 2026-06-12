@@ -1145,6 +1145,20 @@ async function main() {
       ok(barn[0].intent === "ROUTE_LIVESTOCK_OR_AG_STRUCTURE", "short-np: 'horse barn' → livestock/ag structure route (not ASK_STORY)");
     }
 
+    // RED-TEAM MATRIX over-routing fixes (2026-06-12): lawful goals must route,
+    // never fall to generic intake.
+    {
+      const a3 = await runFixture("matrix:str", ["I want to put up a short-term rental"]);
+      ok(a3[0].intent === "ROUTE_PROPERTY_ANALYSIS", "matrix A3: short-term rental → regulated-use zoning answer");
+      const a15 = await runFixture("matrix:idk", ["I don't know what I want"]);
+      ok(a15[0].intent === "ROUTE_OPEN_DISCOVERY", "matrix A15: 'I don't know what I want' → open discovery (the only generic-intake case)");
+      const d11 = await runFixture("matrix:farm", ["I want to buy a farm"]);
+      ok(d11[0].intent === "ROUTE_AGRICULTURAL_ACQUISITION", "matrix D11: bare 'buy a farm' → agricultural acquisition");
+      // Regression guard: "the farm is at <addr>" is OWNED land, not acquisition.
+      const ownFarm = await runFixture("matrix:own-farm", ["the farm is at 123 Main St, Beckley WV"]);
+      ok(ownFarm[0].intent !== "ROUTE_AGRICULTURAL_ACQUISITION", "matrix: 'the farm is at…' is owned land, not an acquisition route");
+    }
+
     // §9 — high-priority inputs must NEVER fall through to the arc (pure).
     {
       const { routeTurn: rt } = await import("@/lib/navigator/navigatorTurnRouter");

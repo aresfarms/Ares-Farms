@@ -263,7 +263,7 @@ const WEIRD_LAWFUL_RE: [RegExp, string][] = [
   [/\bcastle\s+(?:house|home)\b|\blive\s+in\s+a\s+castle\b/i, "castle house"],
   [/\btree\s?house\s+(?:hotel|lodging|rental|home)?\b/i, "treehouse"],
   [/\bsilo\s+(?:home|house)\b|\bgrain\s+silo\b.{0,20}\b(?:home|live)\b/i, "silo home"],
-  [/\bdome\s+(?:home|house)\b|\bearthship\b|\byurt\b|\bcontainer\s+home\b/i, "alternative dwelling"],
+  [/\bdome\s+(?:home|house)\b|\bearthship\b|\byurt\b/i, "alternative dwelling"],
 ];
 // SPECIFIC lawful/ambiguous concepts whose real-world USE must be clarified
 // BEFORE any generic budget/constraints prompt (fix 2026-06-12): the reply

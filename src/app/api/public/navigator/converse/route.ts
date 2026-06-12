@@ -39,6 +39,7 @@ import {
 } from "@/lib/navigator/narrativeInterpreter";
 import { noveltyGateClear, translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY } from "@/lib/navigator/noveltyBuildDoctrine";
 import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder, detectViolentThreat, detectTargetedHarassment, assessCriticalInfrastructure } from "@/lib/navigator/navigatorTurnRouter";
+import { classifyIntent } from "@/lib/navigator/universalIntentClassifier";
 import { appendThreatEscalation } from "@/security/realityPlatform/threatEscalationLedger";
 import { guardTurnIntent, intentForNode, type TurnIntent } from "@/lib/navigator/turnIntent";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
@@ -65,6 +66,13 @@ export async function POST(req: Request) {
   let journey: JourneyState = body.journey && Array.isArray(body.journey.story)
     ? { ...FRESH_JOURNEY, ...body.journey }
     : FRESH_JOURNEY;
+
+  // STAGE 1–4: the Universal Intent Classification Layer runs BEFORE goal route
+  // selection. Stage 5 (route selection) is performed by routeTurn / the arc,
+  // which must agree with this classification for identified assets. Exposed on
+  // every substantive response so the classification — not a keyword — is the
+  // visible basis for the decision.
+  const classification = message.trim() ? classifyIntent(message) : null;
 
   // Kickoff (no message): the one open question. No chips, no form.
   if (!message.trim()) {
@@ -238,6 +246,7 @@ export async function POST(req: Request) {
       node: journey.node,
       text: guarded.text,
       turnIntent: guarded.intent,
+      classification,
       ...(decision.echoConcept ? { echoConcept: decision.echoConcept } : {}),
       ...(journey.noveltyGate ? { noveltyGate: journey.noveltyGate } : {}),
       journey,
@@ -330,6 +339,15 @@ export async function POST(req: Request) {
   // skippable: a third-peat escalates to guided discovery.
   let text = nextPrompt(journey, prevNode);
   let intent: TurnIntent = intentForNode(journey.node);
+  // HARD RULE: never ASK_PERSON/ASK_STORY when the Universal Intent Classifier
+  // identified an asset — the goal IS the story. (Belt-and-suspenders: routeTurn
+  // already intercepts identified assets; this guarantees the arc can't regress
+  // into intake when a classification exists.)
+  if (classification?.identified && (intent === "ASK_PERSON" || intent === "ASK_STORY" || intent === "ASK_GOAL")) {
+    journey = { ...journey, guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" };
+    text = `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`;
+    intent = "ROUTE_OPEN_DISCOVERY";
+  }
   if (timesAsked(journey, text) >= 2) {
     journey = { ...journey, guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" };
     text = `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`;
@@ -338,7 +356,7 @@ export async function POST(req: Request) {
   const guarded = guardTurnIntent(journey, intent, text, { userMessage: message });
   journey = rememberPrompt(guarded.journey, guarded.text);
   logInterviewTurn({ source: "fallback", slot: `navigator:${journey.node}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
-  return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
+  return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, classification, journey });
 }
 
 // ── prompt bookkeeping (anti-repeat, verbatim-text layer) ────────────────────

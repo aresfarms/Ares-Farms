@@ -16,6 +16,7 @@ import { interpretMessage, detectPropertyIntent, FRESH_JOURNEY, GUIDED_DISCOVERY
 import { FURLONG_NAVIGATOR_MANIFEST } from "@/lib/navigator/furlongNavigatorManifest";
 import { deriveDecisionSummary, PATHWAYS_NOT_PROMISES } from "@/lib/navigator/decisionFramework";
 import { GOAL_COVERAGE_REGISTRY } from "@/lib/navigator/goalCoverageRegistry";
+import { classifyIntent } from "@/lib/navigator/universalIntentClassifier";
 import {
   classifyNoveltyConcept, gateForCategory, isDisallowedOutright, noveltyGateClear,
   translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY,
@@ -295,6 +296,37 @@ ok(noveltyGateClear(null), "novelty: ordinary (non-novelty) conversations pass �
     "explicit CONTENT generation still refused");
   ok(detectRegulatedUse("a building shaped like a breast") === null,
     "explicit-shape ask never misreads as a regulated use");
+  // UNIVERSAL INTENT CLASSIFICATION LAYER (2026-06-12): the 13 success-criteria
+  // goals must classify (intent + asset + reality + review categories) and the
+  // classifier's recommended intent must drive routing — NOT phrase-by-phrase.
+  {
+    const CASES: [string, string, string][] = [
+      ["buy a pig farm", "agricultural", "ordinary"],
+      ["buy a hospital", "institutional", "regulated"],
+      ["buy a small airport", "infrastructure", "regulated"],
+      ["buy a lighthouse", "specialty", "unusual_but_realistic"],
+      ["buy a missile silo", "specialty", "unusual_but_realistic"],
+      ["buy a train car house", "residential", "unusual_but_realistic"],
+      ["buy a shipping container home", "specialty", "unusual_but_realistic"],
+      ["live on a sailboat", "residential", "unusual_but_realistic"],
+      ["I want an airplane house", "residential", "unusual_but_realistic"],
+      ["I want an earth-sheltered house", "residential", "unusual_but_realistic"],
+      ["buy the White House", "government", "not_privately_ownable"],
+      ["buy Manhattan", "government", "impossible_scale"],
+      ["buy the Empire State Building", "iconic", "iconic"],
+    ];
+    for (const [msg, assetClass, realityClass] of CASES) {
+      const c = classifyIntent(msg);
+      ok(c.intentClass !== "unknown", `classifier: "${msg}" has an intent_class (${c.intentClass})`);
+      ok(c.assetClass === assetClass, `classifier: "${msg}" asset_class=${c.assetClass} (expected ${assetClass})`);
+      ok(c.realityClass === realityClass, `classifier: "${msg}" reality_class=${c.realityClass} (expected ${realityClass})`);
+      ok(c.reviewCategories.length > 0 && !!c.recommendedTurnIntent, `classifier: "${msg}" has review categories + recommended intent`);
+      ok(c.identified === true, `classifier: "${msg}" is identified (intent AND asset present)`);
+    }
+    ok(classifyIntent("I don't know what I want").identified === false,
+      "classifier: a vague message is NOT identified (arc may then run)");
+  }
+
   // Goal coverage registry + counsel-review doc + threat-metadata isolation.
   {
     ok(GOAL_COVERAGE_REGISTRY.length >= 18 && GOAL_COVERAGE_REGISTRY.every((e) => e.turnIntent && e.reality && e.feasibilityChecks.length > 0),
@@ -723,6 +755,23 @@ async function main() {
     }
     ok(!(await runFixture("parser:airport-not-shutdown", ["I want to own a small airport in Tennessee"]))[0].text.match(/can’t analyze that facility here/),
       "parser: small airport is NOT hard-shutdown");
+
+    // CLASSIFIER GOVERNS ROUTING — the live routed intent must equal the
+    // classifier's recommendedTurnIntent (sensitive assets defer to the infra
+    // shutdown, which the classifier also flags), and never ASK_PERSON/STORY.
+    for (const msg of [
+      "I want to buy a pig farm", "I want to buy a lighthouse", "I want to buy a missile silo",
+      "I want a train car house", "I want a shipping container home", "I want an airplane house",
+      "I want an earth-sheltered house", "I want to live on a sailboat",
+      "I want to buy the White House", "I want to buy Manhattan NY", "I want to buy the Empire State Building",
+    ]) {
+      const c = classifyIntent(msg);
+      const out = await runFixture(`classify-route:${msg.slice(8, 22)}`, [msg]);
+      ok(out[0].intent === c.recommendedTurnIntent,
+        `classifier-governs: "${msg}" routed ${out[0].intent} === recommended ${c.recommendedTurnIntent}`);
+      ok(!["ASK_PERSON", "ASK_STORY", "ASK_ASSETS"].includes(out[0].intent),
+        `classifier-governs: "${msg}" never ASK_PERSON/STORY/ASSETS`);
+    }
 
     // GOAL FIRST acceptance — these 8 inputs must NEVER produce ASK_PERSON /
     // ASK_STORY / ASK_ASSETS on the first response; the goal IS the story.

@@ -14,7 +14,7 @@
  */
 
 export type ControlStatus = "implemented" | "partial" | "doctrine-only" | "missing" | "required-external";
-export type ControlGroup = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O";
+export type ControlGroup = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P";
 
 export interface SecurityControl {
   id: string;
@@ -123,6 +123,19 @@ export const SECURITY_CONTROLS: SecurityControl[] = [
   { id: "O-domain-registrar-mfa", group: "O", name: "Registrar accounts use MFA/passkeys", status: "partial", blockingForAlpha: false, blockingForProduction: true, evidence: "manual founder attestation pending (treat registrar account as critical infrastructure)" },
   { id: "O-domain-continuity", group: "O", name: "Domains in founder continuity + disaster recovery records", status: "doctrine-only", blockingForAlpha: false, blockingForProduction: true, evidence: "docs/security/domain-security-governance.md continuity section; founder emergency package item" },
   { id: "O-domain-security-review-launch", group: "O", name: "Domain security review required before public launch", status: "doctrine-only", blockingForAlpha: false, blockingForProduction: true, evidence: "DOMAIN_SECURITY_REVIEW_REQUIRED_BEFORE_PUBLIC_LAUNCH — categorical human gate" },
+  // P — cyber resilience foundation (Security & Cyber Resilience build). The
+  // five SEC-* blockers + the supporting frameworks. Frameworks are implemented
+  // governance; the verified-state controls stay open until a human attests.
+  { id: "P-recovery-framework", group: "P", name: "SECURITY-DR-001 cyber recovery state machine", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "src/security/securityRecoveryFramework.ts (8 states/5 scenarios) · verify:cyber-resilience" },
+  { id: "P-lockdown-runtime", group: "P", name: "SECURITY-LOCKDOWN-001 runtime deny policy", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "src/security/securityLockdownRuntime.ts (deny deploy/promote/connector/sync/admin) · verify:cyber-resilience" },
+  { id: "P-cloud-recovery", group: "P", name: "CLOUD-RECOVERY-001 rebuild manifest", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "src/security/cloudRecoveryManifest.ts (ordered, dependency-checked) · verify:cyber-resilience" },
+  { id: "P-drill-framework", group: "P", name: "SECURITY-DRILLS-001 drill framework", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "src/security/securityDrillFramework.ts (6 scenarios, posture sims) · verify:cyber-resilience" },
+  { id: "P-resilience-dashboard", group: "P", name: "CYBER-RESILIENCE-DASHBOARD + production gate", status: "implemented", blockingForAlpha: false, blockingForProduction: true, evidence: "src/security/securityResilienceDashboard.ts (productionReady gate) · verify:cyber-resilience" },
+  { id: "P-sec-backup", group: "P", name: "SEC-BACKUP-001 — immutable backup verified + restore-tested", status: "missing", blockingForAlpha: false, blockingForProduction: true, evidence: "IMMUTABLE-BACKUP-001 Tier C vault not yet provisioned/verified — immutableBackupVerified()=false" },
+  { id: "P-sec-dr", group: "P", name: "SEC-DR-001 — recovery certification valid (RPO/RTO sim-backed)", status: "missing", blockingForAlpha: false, blockingForProduction: true, evidence: "RECOVERY-CERT-001 certification missing — recoveryCertificationValid()=false" },
+  { id: "P-sec-dns", group: "P", name: "SEC-DNS-001 — registrar + DNS controls verified", status: "partial", blockingForAlpha: false, blockingForProduction: true, evidence: "DNS-GOV-001 extends domain governance; controls unverified — dnsGovernanceVerified()=false" },
+  { id: "P-sec-secret", group: "P", name: "SEC-SECRET-001 — secrets vault-backed + rotation current", status: "partial", blockingForAlpha: false, blockingForProduction: true, evidence: "SECRET-GOV-001 inventory + Secret Risk Dashboard; rotation unverified — secretsGovernanceVerified()=false" },
+  { id: "P-sec-forensics", group: "P", name: "SEC-FORENSICS-001 — forensic preservation wired", status: "partial", blockingForAlpha: false, blockingForProduction: true, evidence: "FORENSICS-001 evidence classes partially wired — forensicReadinessVerified()=false" },
 ];
 
 export const SECURITY_CONSTITUTIONAL_CONSTRAINTS = {

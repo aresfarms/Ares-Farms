@@ -12,6 +12,7 @@ import { verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 import { readIncidentState } from "./securityIncidentRunbook";
 import { AUDIT_LEDGER_PATH } from "@/lib/property/auditLedger";
 import { domainDashboardPanel, type ControlLight } from "./domainSecurityVerification";
+import { securityResilienceDashboard } from "./securityResilienceDashboard";
 
 export type Light = "green" | "amber" | "red";
 export interface DashboardLine { key: string; light: Light; detail: string }
@@ -30,11 +31,13 @@ export function securityDashboard(): {
   counts: ReturnType<typeof securityHardeningStatus>["counts"];
   incident: ReturnType<typeof readIncidentState>;
   domains: ReturnType<typeof domainDashboardPanel>;
+  resilience: ReturnType<typeof securityResilienceDashboard>;
 } {
   const status = securityHardeningStatus();
   const chain = verifyLedgerChain(AUDIT_LEDGER_PATH);
   const incident = readIncidentState();
   const domains = domainDashboardPanel();
+  const resilience = securityResilienceDashboard();
 
   const lines: DashboardLine[] = [
     { key: "Operator MFA", light: process.env.OPERATOR_MFA_ENFORCED === "true" ? "green" : "amber", detail: process.env.OPERATOR_MFA_ENFORCED === "true" ? "enforced" : "IdP/IAP wiring pending (Phase 4)" },
@@ -51,7 +54,10 @@ export function securityDashboard(): {
     // Domain Asset Governance panel (DOMAIN-ASSET-001).
     ...domains.lines.map((l) => ({ key: `Domain · ${l.key}`, light: lightFor(l.status), detail: l.detail })),
     { key: "Domain · Last review date", light: domains.lastReviewDate ? "green" as Light : "amber" as Light, detail: domains.lastReviewDate ?? "no founder domain review recorded yet" },
+    // Cyber Resilience panel (CYBER-RESILIENCE-DASHBOARD).
+    ...resilience.panels.map((p) => ({ key: `Resilience · ${p.key}`, light: (p.status === "ready" ? "green" : p.status === "partial" ? "amber" : "red") as Light, detail: p.detail })),
+    { key: "Resilience · Score", light: (resilience.cyber_resilience_score >= 80 ? "green" : resilience.cyber_resilience_score >= 40 ? "amber" : "red") as Light, detail: `Cyber Resilience Score ${resilience.cyber_resilience_score}/100 · production_ready=${resilience.production_ready} · open blockers: ${resilience.openBlockers.join(", ") || "none"}` },
   ];
 
-  return { gate: SECURITY_HARDENING_GOVERNANCE, lines, counts: status.counts, incident, domains };
+  return { gate: SECURITY_HARDENING_GOVERNANCE, lines, counts: status.counts, incident, domains, resilience };
 }

@@ -126,6 +126,16 @@ ok(LIVE_FETCH_ACTIVATION_CONDITIONS.length === 6 && LIVE_FETCH_ACTIVATION_CONDIT
   "the six live-fetch activation conditions are enumerated");
 ok(fs.existsSync("docs/security/REALITY_BLOCKERS_MERGE_NOTE.md"), "merge note exists (blockers fold into the resilience dashboard at integration)");
 ok(/must NOT disappear/.test(fs.readFileSync("docs/security/REALITY_BLOCKERS_MERGE_NOTE.md", "utf8")), "merge note protects the self-contained blocker contract");
+// Reconciliation math (reviewer decision reaffirmed 2026-06-12): 5 cyber +
+// 5 reality = TEN total blockers; RECOVERY-CERT-001 stays folded into
+// SEC-DR-001 — no sixth cyber blocker, no 11-blocker dashboard this cycle.
+{
+  const note = fs.readFileSync("docs/security/REALITY_BLOCKERS_MERGE_NOTE.md", "utf8");
+  ok(/exactly TEN blockers/.test(note) && /NOT eleven/.test(note) && /FOLDED into SEC-DR-001/.test(note),
+    "merge note pins the 10-blocker model (5+5; RECOVERY-CERT folded, not a sixth)");
+  ok(!/expects? (?:11|eleven) blockers|RECOVERY-CERT split required/i.test(note),
+    "merge note carries no stale 11-blocker / split expectation");
+}
 
 // ── Candidate honesty (implementation rule) ──────────────────────────────────
 ok(CANDIDATE_SOURCES_LIVE === false, "candidate sources NOT claimed live");

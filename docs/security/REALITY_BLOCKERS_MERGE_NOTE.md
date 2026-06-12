@@ -17,7 +17,13 @@ other branch. **At branch integration:**
    `realitySecurityDoctrine.ts` as the source of truth for the REALITY-* states
    and have the dashboard read from it, so neither branch's gate weakens.
 4. `verify:reality-security` and `verify:cyber-resilience` must both still PASS
-   after the fold-in, and the combined dashboard must show all ten blockers.
+   after the fold-in, and the combined dashboard must show **exactly TEN blockers:
+   5 cyber-resilience (SEC-DR-001, SEC-BACKUP-001, SEC-DNS-001, SEC-SECRET-001,
+   SEC-FORENSICS-001) + 5 reality-security (REALITY-*)**. NOT eleven:
+   RECOVERY-CERT-001 stays FOLDED into SEC-DR-001 as a mandatory sub-gate
+   (reviewer decision 2026-06-11, reaffirmed 2026-06-12 — no sixth cyber blocker
+   this review cycle; any doc or test expecting a RECOVERY-CERT split or an
+   11-blocker dashboard is superseded).
 
 **Standing constraints (reviewer decision 2026-06-11):**
 - `CANDIDATE_SOURCES_LIVE` stays **false** and **REALITY-URL-001 stays OPEN** until

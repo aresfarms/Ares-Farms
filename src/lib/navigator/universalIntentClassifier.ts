@@ -34,12 +34,36 @@ export type RealityClass =
   | "ordinary" | "unusual_but_realistic" | "highly_constrained" | "regulated"
   | "iconic" | "impossible_scale" | "not_privately_ownable" | "sensitive_facility" | "unknown";
 
+// Relationship / availability / sensitivity / encumbrance context (2026-06-12).
+export type RelationshipClass =
+  | "self_owned_or_controlled" | "public_listing" | "third_party_private_property"
+  | "neighbor_or_adjacent_property" | "public_asset" | "government_asset"
+  | "facility_asset" | "unknown";
+
+export type AvailabilityClass =
+  | "verified_available" | "claimed_available_unverified" | "not_publicly_available"
+  | "public_disposition_required" | "not_privately_ownable" | "unknown";
+
+export type SensitivityClass =
+  | "ordinary" | "private_residence" | "celebrity_or_public_figure_risk"
+  | "government_or_civic" | "critical_infrastructure" | "regulated_facility"
+  | "protected_facility" | "unknown";
+
+export type ConstraintClass =
+  | "none_detected" | "utility_easement" | "pipeline_easement" | "transmission_easement"
+  | "drainage_easement" | "access_easement" | "conservation_easement" | "mineral_rights"
+  | "water_rights" | "railroad_easement" | "unknown";
+
 export interface UniversalClassification {
   intentClass: IntentClass;
   assetClass: AssetClass;
   assetLabel: string | null;
   realityClass: RealityClass;
   reviewCategories: string[];
+  relationshipClass: RelationshipClass;
+  availabilityClass: AvailabilityClass;
+  sensitivityClass: SensitivityClass;
+  constraintClass: ConstraintClass;
   recommendedTurnIntent: TurnIntent | null;
   /** True when BOTH an intent and an asset were identified. */
   identified: boolean;
@@ -113,16 +137,86 @@ export function classifyAsset(message: string): AssetRow | null {
   return null;
 }
 
-/** The full Universal Intent Classification (stages 1–4). */
+// ── Relationship / availability / sensitivity / constraint scans ─────────────
+const NEIGHBOR_RE = /\b(?:my\s+)?neighbor'?s?\s+(?:house|home|property|farm|land|place)\b|\bhouse\s+next\s+door\b|\bnext[- ]door\s+(?:house|property)\b/i;
+const THIRD_PARTY_PERSON_RE = /\b(?:that|this)\s+person'?s\s+(?:house|home|property)\b|\bthe\s+owner'?s\s+(?:house|home|residence)\b|\bget\s+(?:them|him|her|the\s+owner)\s+to\s+sell\b/i;
+const CELEBRITY_RE = /\b(?:celebrity|celeb|famous\s+person|movie\s+star|athlete|senator|congress(?:man|woman|person)|governor|mayor|president|public\s+official)\b.{0,20}\b(?:house|home|residence|property|mansion|estate)\b/i;
+const LISTING_URL_RE = /https?:\/\/|\b(?:zillow|redfin|loopnet|crexi|realtor|landwatch)\b/i;
+const OFFICIAL_DISPO_RE = /\b(?:public\s+auction|auction\s+(?:listing|notice)|surplus\s+(?:listing|disposition|notice)|GSA\s+surplus|redevelopment\s+(?:rfp|rfq|listing|notice)|(?:listed|listing)\s+for\s+redevelopment|disposition\s+record|\brfp\b|\brfq\b|official\s+\w+\s+listing)\b/i;
+const WEAK_CLAIM_RE = /\b(?:for\s+sale|on\s+the\s+market|listed|available)\b/i;
+const SELF_OWNED_RE = /\b(?:my\s+(?:farm|land|property|lot|parcel|house|home)|i\s+own|i'?m\s+buying|i\s+am\s+buying|on\s+my\s+\w+)\b/i;
+const CRITICAL_INFRA_RE = /\bnuclear\s+(?:plant|facility|reactor)|substation|power\s+plant|pipeline|water\s+treatment|coal\s+(?:plant|mine)|chemical\s+plant|military\s+base|\bprison\b|refinery|fuel\s+terminal/i;
+const REGULATED_FACILITY_RE = /\b(?:small\s+)?airport\b|\bairstrip\b|\bhospital\b|\bmedical\s+center\b/i;
+const GOV_LANDMARK_RE = /\bwhite\s+house\b|\bcapitol\b|\bsupreme\s+court\b|\bpentagon\b|\bbrooklyn\s+bridge\b|\bstatue\s+of\s+liberty\b|\bmount\s+rushmore\b|\bkennedy\s+space\s+center\b/i;
+const GOV_BUILDING_RE = /\b(?:state|federal|government|county|municipal)\s+building\b|\bcity\s+hall\b|\bcourthouse\b/i;
+
+const CONSTRAINT_PATTERNS: [RegExp, ConstraintClass][] = [
+  [/\b(?:gas\s+(?:line|pipeline)|pipeline)\s+easement\b|\bpipeline\s+right[- ]of[- ]way\b/i, "pipeline_easement"],
+  [/\btransmission\s+(?:line\s+)?easement\b|\bpower\s+line\s+easement\b/i, "transmission_easement"],
+  [/\bdrainage\s+easement\b/i, "drainage_easement"],
+  [/\baccess\s+easement\b/i, "access_easement"],
+  [/\bconservation\s+easement\b/i, "conservation_easement"],
+  [/\brailroad\s+easement\b|\brail\s+easement\b/i, "railroad_easement"],
+  [/\bmineral\s+rights\b/i, "mineral_rights"],
+  [/\bwater\s+rights\b/i, "water_rights"],
+  [/\butility\s+easement\b|\beasement\b|\bright[- ]of[- ]way\b/i, "utility_easement"],
+];
+
+function classifyConstraint(message: string): ConstraintClass {
+  for (const [re, c] of CONSTRAINT_PATTERNS) if (re.test(message)) return c;
+  return "none_detected";
+}
+
+function classifyRelationship(message: string, asset: AssetRow | null, encumbered: boolean): RelationshipClass {
+  if (NEIGHBOR_RE.test(message)) return "neighbor_or_adjacent_property";
+  if (THIRD_PARTY_PERSON_RE.test(message) || CELEBRITY_RE.test(message)) return "third_party_private_property";
+  if (asset?.realityClass === "not_privately_ownable" || GOV_LANDMARK_RE.test(message)) return "government_asset";
+  // An easement/encumbrance means the infra term is an ENCUMBRANCE on the
+  // user's parcel — not the facility being acquired.
+  if (!encumbered && (asset?.assetClass === "infrastructure" || CRITICAL_INFRA_RE.test(message) || REGULATED_FACILITY_RE.test(message))) return "facility_asset";
+  if (LISTING_URL_RE.test(message) || OFFICIAL_DISPO_RE.test(message)) return "public_listing";
+  if (SELF_OWNED_RE.test(message)) return "self_owned_or_controlled";
+  return "unknown";
+}
+
+function classifyAvailability(message: string, asset: AssetRow | null, encumbered: boolean): AvailabilityClass {
+  if (asset?.realityClass === "not_privately_ownable" || asset?.realityClass === "impossible_scale") return "not_privately_ownable";
+  if (LISTING_URL_RE.test(message) || OFFICIAL_DISPO_RE.test(message)) return "verified_available";
+  const sensitive = !encumbered && (CRITICAL_INFRA_RE.test(message) || GOV_BUILDING_RE.test(message) || asset?.realityClass === "sensitive_facility");
+  if (sensitive) return "public_disposition_required";
+  if (WEAK_CLAIM_RE.test(message)) return "claimed_available_unverified";
+  if (NEIGHBOR_RE.test(message) || THIRD_PARTY_PERSON_RE.test(message) || CELEBRITY_RE.test(message)) return "not_publicly_available";
+  return "unknown";
+}
+
+function classifySensitivity(message: string, asset: AssetRow | null, encumbered: boolean): SensitivityClass {
+  if (!encumbered && (CRITICAL_INFRA_RE.test(message) || asset?.realityClass === "sensitive_facility")) return "critical_infrastructure";
+  if (GOV_LANDMARK_RE.test(message) || GOV_BUILDING_RE.test(message) || asset?.assetClass === "government") return "government_or_civic";
+  if (CELEBRITY_RE.test(message)) return "celebrity_or_public_figure_risk";
+  if (!encumbered && (REGULATED_FACILITY_RE.test(message) || asset?.realityClass === "regulated")) return "regulated_facility";
+  if (NEIGHBOR_RE.test(message) || THIRD_PARTY_PERSON_RE.test(message)) return "private_residence";
+  if (encumbered || asset) return "ordinary";
+  return "unknown";
+}
+
+/** The full Universal Intent Classification (stages 1–4 + context). */
 export function classifyIntent(message: string): UniversalClassification {
   const intentClass = classifyIntentClass(message);
   const asset = classifyAsset(message);
+  const constraintClass = classifyConstraint(message);
+  // An easement/encumbrance means an infra term is a CONSTRAINT on the user's
+  // parcel, not the facility itself — don't classify it as sensitive/facility.
+  const encumbered = constraintClass !== "none_detected" && constraintClass !== "unknown";
   return {
     intentClass,
     assetClass: asset?.assetClass ?? "unknown",
     assetLabel: asset?.label ?? null,
     realityClass: asset?.realityClass ?? "unknown",
     reviewCategories: asset?.reviewCategories ?? [],
+    relationshipClass: classifyRelationship(message, asset, encumbered),
+    availabilityClass: classifyAvailability(message, asset, encumbered),
+    sensitivityClass: classifySensitivity(message, asset, encumbered),
+    constraintClass,
     recommendedTurnIntent: asset?.turnIntent ?? null,
     identified: intentClass !== "unknown" && asset !== null,
   };

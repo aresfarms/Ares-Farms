@@ -325,6 +325,27 @@ ok(noveltyGateClear(null), "novelty: ordinary (non-novelty) conversations pass â
     }
     ok(classifyIntent("I don't know what I want").identified === false,
       "classifier: a vague message is NOT identified (arc may then run)");
+
+    // Relationship / availability / sensitivity / constraint context (2026-06-12).
+    type C = ReturnType<typeof classifyIntent>;
+    const ctx: [string, Partial<C>][] = [
+      ["I want to buy my neighbor's house", { relationshipClass: "neighbor_or_adjacent_property", sensitivityClass: "private_residence", availabilityClass: "not_publicly_available" }],
+      ["I want to buy a celebrity's house", { relationshipClass: "third_party_private_property", sensitivityClass: "celebrity_or_public_figure_risk" }],
+      ["I'm buying a farm with a gas pipeline easement", { constraintClass: "pipeline_easement", relationshipClass: "self_owned_or_controlled", sensitivityClass: "ordinary" }],
+      ["Can I build a barn near a transmission easement", { constraintClass: "transmission_easement" }],
+      ["I have a conservation easement on my land", { constraintClass: "conservation_easement" }],
+      ["I want to buy a small airport in Tennessee", { sensitivityClass: "regulated_facility", relationshipClass: "facility_asset" }],
+      ["what can I do with the nuclear plant at 5 River Rd", { sensitivityClass: "critical_infrastructure", availabilityClass: "public_disposition_required" }],
+      ["I want to buy the White House", { relationshipClass: "government_asset", sensitivityClass: "government_or_civic", availabilityClass: "not_privately_ownable" }],
+      ["this state building is for sale", { availabilityClass: "public_disposition_required", sensitivityClass: "government_or_civic" }],
+      ["here is an official public auction listing for a state building", { availabilityClass: "verified_available", relationshipClass: "public_listing" }],
+    ];
+    for (const [msg, expected] of ctx) {
+      const c = classifyIntent(msg);
+      for (const [field, val] of Object.entries(expected) as [keyof C, string][]) {
+        ok(c[field] === val, `context: "${msg.slice(0, 28)}â€¦" ${String(field)}=${c[field]} (expected ${val})`);
+      }
+    }
   }
 
   // Goal coverage registry + counsel-review doc + threat-metadata isolation.

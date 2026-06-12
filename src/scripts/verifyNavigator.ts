@@ -198,6 +198,8 @@ import("@/lib/navigator/navigatorSessionPrivacy").then((SP) => {
   ok(/LEGACY_KEY/.test(spSrc) && /furlong-navigator-journey-v1/.test(spSrc), "legacy v1 key actively purged");
   const sjSrc = fs.readFileSync("src/lib/navigator/savedJourneyContract.ts", "utf8");
   ok(/SAVED_JOURNEYS_LIVE = false/.test(sjSrc) && /ONLY after consent/.test(sjSrc), "saved-journey accounts contract gated OFF; consent-first attach rule stated");
+  ok(/PERSISTENT_JOURNEY_STORAGE_REQUIRES_AUTH = true/.test(sjSrc), "durable-storage gate: PERSISTENT_JOURNEY_STORAGE_REQUIRES_AUTH=true");
+  ok(!/localStorage\.setItem\(\s*(JOURNEY_KEY|OPT_IN_KEY)/.test(spSrc) && /window\.sessionStorage/.test(spSrc), "opt-in continuity stays in sessionStorage (no durable journey writes)");
 }
 
 // ── Naming + CTA + no-chip structural gates ───────────────────────────────────

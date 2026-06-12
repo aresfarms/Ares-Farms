@@ -21,6 +21,18 @@
 
 export const SAVED_JOURNEYS_LIVE = false;
 
+/**
+ * PERSISTENT_JOURNEY_STORAGE_REQUIRES_AUTH — future activation gate (Caitlin,
+ * 2026-06-11). NO browser-restart persistence (localStorage, IndexedDB, or any
+ * durable medium) for Navigator journeys until authenticated Saved Journey
+ * Accounts are live — login, explicit consent, delete/export controls, and the
+ * My Journeys return path — and the change is human-reviewed. Until then the
+ * opt-in continuity copy stays in sessionStorage ONLY (dies with the tab).
+ * Any future storage change must import this constant and refuse durable
+ * persistence while it is true without a recorded review.
+ */
+export const PERSISTENT_JOURNEY_STORAGE_REQUIRES_AUTH = true;
+
 export const SAVE_FLOW_STEPS = [
   "Pause Navigator",
   "Show account prompt",

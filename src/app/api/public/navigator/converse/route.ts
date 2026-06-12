@@ -1,34 +1,33 @@
 /**
  * POST /api/public/navigator/converse — Furlong Navigator (anonymous, Tier-1).
  *
- * One conversation, one open question at a time, walking the spine:
- * Person → Story → Assets → Constraints → Pathways → … → Journey.
+ * ROUTING AUTHORITY (build fix 2026-06-12): every message passes through the
+ * authoritative pre-response router (navigatorTurnRouter.ts) BEFORE any
+ * questionnaire prompt is selected. The questionnaire state machine renders
+ * ONLY when the router authorizes it. Priority order:
+ *   1. safety/illegality (unlawful evasion)   → REFUSE_UNLAWFUL_EVASION
+ *   2. Fair Housing / ownership / privacy     → REFUSE_FAIR_HOUSING_STEERING /
+ *      (G-1/G-2 locked line, recovery routing)   REFUSE_OWNER_LOOKUP
+ *   3. adult/sexual structure boundary        → REFUSE_ADULT_SEXUAL_STRUCTURE
+ *   4. non-human/fantasy identity             → CLARIFY_HUMAN_CONTEXT
+ *   5. impossible destination                 → OUT_OF_SCOPE_WITH_REAL_WORLD_ADJACENT
+ *   6. specific novelty concept (piñata rule) → CLARIFY_NOVELTY_BUILD_CONCEPT
+ *   7. goal-specific (earth-sheltered / weird-but-lawful architecture)
+ *   8. open discovery
+ *   9. generic arc prompt — LAST RESORT ONLY
  *
- * ORDER OF OPERATIONS (defense-in-depth, spec §7):
- *  1. REFUSAL GATES FIRST — ownership (G-1) and steering/demographic (G-2)
- *     intent is classified BEFORE any interpretation; both reply with the ONE
- *     locked gentle line + redirect to possibility. The refusal never hints the
- *     data exists (it can't — the intake scrubber keeps it out of reach).
- *  1b. NOVELTY/FANTASY BUILD BOUNDARY (patch 2026-06-11) — sexually explicit,
- *     illegal, unsafe, or code-evading structures are refused; fantasy and
- *     untranslated novelty builds get the locked boundary reply and a six-flag
- *     code-compliance gate that BLOCKS pathway generation until the idea is
- *     translated into a lawful, non-sexual, real-world, code-checkable project.
- *  2. Interpret the visitor's own words (deterministic floor; the AI guide can
- *     rephrase questions at this same seam — Tier-1, logged, fallback-floored).
- *  3. Advance the arc; at Pathways, run the three-answer engine and return
- *     pathway assessments with confidence / why-shown / effort / risk / ranges
- *     contract — plus the proactive-widening line (guide, not calculator).
+ * EVERY response carries a machine-readable turn_intent; the SEMANTIC loop
+ * guard compares intents (consecutive repeat blocked; recent-three tracked) —
+ * refusal alternates still refuse. The verbatim-text anti-repeat remains as an
+ * independent second layer. ASK_ASSETS is skippable and may never follow a
+ * high-priority safety/scope/intent input.
  *
- * EVERY response carries a machine-readable turn_intent; the loop guard
- * compares INTENT (not just text) — if next_turn_intent would equal
- * previous_turn_intent, the repeat is blocked and a different allowed action
- * is chosen (turnIntent.ts alternate ladder). The verbatim-text anti-repeat
- * remains as an independent second layer.
+ * The six-flag novelty code-compliance gate still hard-blocks pathway
+ * generation until a lawful real-world translation arrives.
  *
  * Anonymous: no identity captured; journey state lives with the CLIENT
  * (sessionStorage, opt-in only) and is round-tripped here, never stored
- * server-side.
+ * server-side. "Understanding before output. Reality before commitment."
  */
 
 import { NextResponse } from "next/server";
@@ -38,10 +37,8 @@ import {
   interpretMessage, questionForNode, wideningLine, detectPropertyIntent,
   GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState,
 } from "@/lib/navigator/narrativeInterpreter";
-import {
-  classifyNoveltyConcept, gateForCategory, isDisallowedOutright, noveltyGateClear,
-  translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY, NOVELTY_REFUSAL_REPLY,
-} from "@/lib/navigator/noveltyBuildDoctrine";
+import { noveltyGateClear, translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY } from "@/lib/navigator/noveltyBuildDoctrine";
+import { routeTurn, isUnlawfulEvasionAsk } from "@/lib/navigator/navigatorTurnRouter";
 import { guardTurnIntent, intentForNode, type TurnIntent } from "@/lib/navigator/turnIntent";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
 import { deriveDecisionSummary } from "@/lib/navigator/decisionFramework";
@@ -73,13 +70,7 @@ export async function POST(req: Request) {
     const guarded = guardTurnIntent(journey, intentForNode(journey.node), questionForNode(journey));
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: "navigator:open", ok: true, transcriptHash: hashTranscript([]) });
-    return NextResponse.json({
-      kind: "question",
-      node: journey.node,
-      text: guarded.text,
-      turnIntent: guarded.intent,
-      journey,
-    });
+    return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
   // 0 — REALITY-SEC-001 INPUT GUARD: payload/script/injection/abuse checks
@@ -91,7 +82,7 @@ export async function POST(req: Request) {
     const text = guard.decision === "RATE_LIMIT" || guard.decision === "ESCALATE_SECURITY"
       ? RATE_LIMIT_MESSAGE
       : "That input isn't something we can process safely. Let's keep going in plain words — " + questionForNode(journey).charAt(0).toLowerCase() + questionForNode(journey).slice(1);
-    const guarded = guardTurnIntent(journey, "REFUSE_AND_REDIRECT", text);
+    const guarded = guardTurnIntent(journey, "REFUSE_AND_REDIRECT", text, { userMessage: message });
     journey = guarded.journey;
     appendReplay({
       ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0,
@@ -102,11 +93,11 @@ export async function POST(req: Request) {
     logInterviewTurn({ source: "fallback", slot: `navigator:guard:${guard.decision}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
     return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
   }
-  if (guard.decision === "REFUSE_AND_REDIRECT" && !classifyRefusal(message)) {
+  if (guard.decision === "REFUSE_AND_REDIRECT" && !classifyRefusal(message) && !isUnlawfulEvasionAsk(message)) {
     // injection / prompt-extraction (non-G1/G2): refuse generically + continue.
     journey = { ...journey, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
     const follow = nextPrompt(journey, journey.node);
-    const guarded = guardTurnIntent(journey, "REFUSE_AND_REDIRECT", `Let's stay on your possibilities. ${follow}`);
+    const guarded = guardTurnIntent(journey, "REFUSE_AND_REDIRECT", `Let's stay on your possibilities. ${follow}`, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     appendReplay({
       ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0, contextZones: [],
@@ -117,12 +108,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ kind: "refusal", refusal: "injection", text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
-  // 1 — refusal gates BEFORE anything else (G-1 / G-2). Refuse ONCE with the
-  // locked line, then INSPECT THE REMAINING INTENT (loop fix 2026-06-11): a
-  // steering ask that also wants property discovery ("find me something in a
-  // white neighborhood") gets the refusal AND the non-demographic guided-
-  // discovery redirect — never a dead end back to the asset prompt.
-  const refusal = classifyRefusal(message);
+  // 1 — PRIORITY 1: unlawful evasion is checked BEFORE G-1/G-2 (router owns it).
+  // 2 — PRIORITY 2: refusal gates (G-1 ownership / G-2 steering). Refuse ONCE
+  // with the locked line, then INSPECT THE REMAINING INTENT (loop fix
+  // 2026-06-11): a steering ask that also wants property discovery gets the
+  // refusal AND the non-demographic guided-discovery redirect — never a dead
+  // end back to the asset prompt.
+  const refusal = isUnlawfulEvasionAsk(message) ? null : classifyRefusal(message);
   if (refusal) {
     journey = { ...journey, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
     const residual = detectPropertyIntent(message, null);
@@ -139,58 +131,59 @@ export async function POST(req: Request) {
     const followOn = wantsDiscovery
       ? `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`
       : nextPrompt(journey, journey.node);
-    const guarded = guardTurnIntent(journey, "REFUSE_AND_REDIRECT", `${REFUSAL_LINE} ${followOn}`);
+    const refusalIntent: TurnIntent = refusal === "ownership" ? "REFUSE_OWNER_LOOKUP" : "REFUSE_FAIR_HOUSING_STEERING";
+    const guarded = guardTurnIntent(journey, refusalIntent, `${REFUSAL_LINE} ${followOn}`, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}${wantsDiscovery ? ":guided-discovery" : ""}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
+    return NextResponse.json({ kind: "refusal", refusal, text: guarded.text, turnIntent: guarded.intent, journey });
+  }
+
+  // 3–8 — THE AUTHORITATIVE ROUTER: safety, sexual-structure boundary, human
+  // context, impossible destinations, specific novelty concepts (piñata rule:
+  // the reply must NAME the concept), goal-specific architecture routes, and
+  // open discovery. The questionnaire arc renders ONLY if this returns null.
+  const decision = routeTurn(message, journey);
+  if (decision) {
+    journey = { ...journey, ...decision.patch };
+    if (decision.refusal) {
+      journey = { ...journey, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
+    }
+    const text = decision.turnIntent === "ROUTE_OPEN_DISCOVERY" && !decision.text
+      ? `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`
+      : decision.text;
+    const guarded = guardTurnIntent(journey, decision.turnIntent, text, { userMessage: message });
+    journey = rememberPrompt(guarded.journey, guarded.text);
+    logInterviewTurn({ source: "fallback", slot: `navigator:${decision.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
     return NextResponse.json({
-      kind: "refusal",
-      refusal,
+      kind: decision.refusal ? "refusal" : "question",
+      ...(decision.refusal ? { refusal: decision.slot } : {}),
+      node: journey.node,
       text: guarded.text,
       turnIntent: guarded.intent,
+      ...(decision.echoConcept ? { echoConcept: decision.echoConcept } : {}),
+      ...(journey.noveltyGate ? { noveltyGate: journey.noveltyGate } : {}),
       journey,
     });
   }
 
-  // 1b — NOVELTY / FANTASY BUILD CODE REALITY BOUNDARY (patch 2026-06-11).
-  // Disallowed concepts (sexual / illegal-unsafe / code-evading) are refused
-  // outright; fantasy or untranslated novelty gets the locked boundary reply
-  // asking for the real-world translation. Neither advances the arc, and the
-  // six-flag gate blocks pathway generation until translated. A message that
-  // supplies the translation clears the gate and flows on normally.
-  const noveltyCat = classifyNoveltyConcept(message);
-  if (noveltyCat) {
-    journey = { ...journey, noveltyGate: gateForCategory(noveltyCat) };
-    const disallowed = isDisallowedOutright(noveltyCat);
-    const baseIntent: TurnIntent = disallowed ? "REFUSE_AND_REDIRECT" : "CLARIFY_OUT_OF_SCOPE";
-    const guarded = guardTurnIntent(journey, baseIntent, disallowed ? NOVELTY_REFUSAL_REPLY : NOVELTY_BOUNDARY_REPLY);
-    journey = rememberPrompt(guarded.journey, guarded.text);
-    logInterviewTurn({ source: "fallback", slot: `navigator:novelty:${noveltyCat}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-    return NextResponse.json({
-      kind: disallowed ? "refusal" : "question",
-      ...(disallowed ? { refusal: "novelty-disallowed" } : {}),
-      node: journey.node,
-      text: guarded.text,
-      turnIntent: guarded.intent,
-      noveltyGate: journey.noveltyGate,
-      journey,
-    });
-  }
+  // A pending novelty gate clears when the user supplies the lawful
+  // real-world translation the boundary reply invited.
   if (journey.noveltyGate && !noveltyGateClear(journey.noveltyGate) && translatesToRealWorld(message)) {
     journey = { ...journey, noveltyGate: clearedGate() };
   }
 
-  // 2 — interpret + advance the arc.
+  // 9 — ARC AUTHORIZED (last resort): interpret + advance.
   const prevNode = journey.node;
   const wasGuided = journey.guidedDiscovery;
   journey = interpretMessage(journey, message);
 
-  // 3 — at Pathways (or beyond), assess + keep the conversation going.
+  // At Pathways (or beyond), assess + keep the conversation going.
   if (journey.node === "pathways" || journey.node === "evidence" || journey.node === "programs") {
     // HARD RULE: no pathway cards, pro formas, program matches, or property
     // suggestions for a novelty/fantasy build until the concept is translated
     // into a lawful, non-sexual, real-world, code-checkable project.
     if (!noveltyGateClear(journey.noveltyGate)) {
-      const guarded = guardTurnIntent(journey, "CLARIFY_OUT_OF_SCOPE", NOVELTY_BOUNDARY_REPLY);
+      const guarded = guardTurnIntent(journey, "CLARIFY_NOVELTY_BUILD_CONCEPT", NOVELTY_BOUNDARY_REPLY, { userMessage: message });
       journey = rememberPrompt(guarded.journey, guarded.text);
       logInterviewTurn({ source: "fallback", slot: "navigator:novelty:gate-blocked-pathways", ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
       return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, noveltyGate: journey.noveltyGate, journey });
@@ -200,13 +193,13 @@ export async function POST(req: Request) {
     journey = { ...journey, exploredPathways: [...new Set([...explored, ...pathways.map((p) => p.id)])] };
     const chainStart = pathways.find((p) => p.graphNeighbors.length > 0)?.id ?? pathways[0]?.id;
     logInterviewTurn({ source: "fallback", slot: `navigator:pathways:${journey.context.propertyKind}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
-    const decision = deriveDecisionSummary(pathways);
+    const decisionSummary = deriveDecisionSummary(pathways);
     // Search-and-bring-back guidance: ONLY when no property is in hand, and
     // never invented matches — CANDIDATE_SOURCES_LIVE gates any future feed.
     const searchGuidance = !journey.property && !CANDIDATE_SOURCES_LIVE ? buildSearchGuidance(journey.context) : null;
     // REALITY-SEC-001 OUTPUT GATE: nothing renders that fails the final checks.
     const payloadGate = gatePathwayPayload(pathways);
-    const textGate = gateOutputText(JSON.stringify(decision));
+    const textGate = gateOutputText(JSON.stringify(decisionSummary));
     if (!payloadGate.ok || !textGate.ok) {
       appendReplay({
         ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0,
@@ -215,7 +208,7 @@ export async function POST(req: Request) {
         evidenceBundleHash: hashEvidence(pathways.map((x) => x.id)), renderedOutputHash: hashOutput("(blocked)"),
       });
       const guarded = guardTurnIntent(journey, "ASK_GOAL",
-        "We caught something in our own draft answer that doesn't meet our standards, so we held it back. Tell me a bit more and we'll take another honest run at it.");
+        "We caught something in our own draft answer that doesn't meet our standards, so we held it back. Tell me a bit more and we'll take another honest run at it.", { userMessage: message });
       journey = guarded.journey;
       return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
     }
@@ -223,9 +216,9 @@ export async function POST(req: Request) {
       ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0,
       contextZones: ["SYSTEM_RULES", "USER_STORY", "PROPERTY_FACTS"], urlSandboxVerdict: null,
       privacyFirewallOk: true, outputGateOk: true, refusalReason: null,
-      evidenceBundleHash: hashEvidence(pathways.map((x) => x.id)), renderedOutputHash: hashOutput(JSON.stringify(decision)),
+      evidenceBundleHash: hashEvidence(pathways.map((x) => x.id)), renderedOutputHash: hashOutput(JSON.stringify(decisionSummary)),
     });
-    journey = { ...journey, lastTurnIntent: "PRESENT_PATHWAYS" };
+    journey = { ...journey, lastTurnIntent: "PRESENT_PATHWAYS", recentTurnIntents: [...(journey.recentTurnIntents ?? []), "PRESENT_PATHWAYS"].slice(-3) };
     return NextResponse.json({
       kind: "pathways",
       node: journey.node,
@@ -238,25 +231,25 @@ export async function POST(req: Request) {
       pathways,
       graphChain: chainStart ? discoveryGraphChain(chainStart) : [],
       programsSeam: "A property qualifying for a program is a fact about the property. Whether YOU qualify is a licensed professional's call — property qualifies ≠ you qualify.",
-      decision,
+      decision: decisionSummary,
       searchGuidance,
       journey,
     });
   }
 
-  // Guided Property Discovery just engaged (no property / help me find one):
-  // respond with the discovery opener + ONE open follow-up — never the asset
-  // prompt again (loop fix 2026-06-11).
+  // Guided Property Discovery just engaged via interpretation: respond with
+  // the discovery opener + ONE open follow-up — never the asset prompt again.
   if (journey.guidedDiscovery && !wasGuided) {
-    const guarded = guardTurnIntent(journey, "ROUTE_OPEN_DISCOVERY", `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`);
+    const guarded = guardTurnIntent(journey, "ROUTE_OPEN_DISCOVERY", `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:guided-discovery:${journey.intent}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
     return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
-  // Otherwise: the next single open question — with BOTH anti-repeat layers:
-  // verbatim text (a prompt may not repeat more than once) and turn intent
-  // (a consecutive identical intent is blocked by guardTurnIntent).
+  // The next single open question — with BOTH anti-repeat layers: verbatim
+  // text (a prompt may not repeat more than once) and the SEMANTIC intent
+  // guard (consecutive repeat blocked; recent-three tracked). ASK_ASSETS is
+  // skippable: a third-peat escalates to guided discovery.
   let text = nextPrompt(journey, prevNode);
   let intent: TurnIntent = intentForNode(journey.node);
   if (timesAsked(journey, text) >= 2) {
@@ -264,16 +257,10 @@ export async function POST(req: Request) {
     text = `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`;
     intent = "ROUTE_OPEN_DISCOVERY";
   }
-  const guarded = guardTurnIntent(journey, intent, text);
+  const guarded = guardTurnIntent(journey, intent, text, { userMessage: message });
   journey = rememberPrompt(guarded.journey, guarded.text);
   logInterviewTurn({ source: "fallback", slot: `navigator:${journey.node}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
-  return NextResponse.json({
-    kind: "question",
-    node: journey.node,
-    text: guarded.text,
-    turnIntent: guarded.intent,
-    journey,
-  });
+  return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
 }
 
 // ── prompt bookkeeping (anti-repeat, verbatim-text layer) ────────────────────

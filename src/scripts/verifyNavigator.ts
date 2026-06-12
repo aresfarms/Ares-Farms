@@ -384,9 +384,102 @@ async function main() {
       ok(!intentRepeat, `outer-space: 2) no consecutive repeated turn_intent (${replies.map((r) => r.intent).join(" → ")})`);
       ok(!/What do you have to work with/.test(replies[1].text) && !/What do you have to work with/.test(replies[2].text),
         "outer-space: 3) no forced asset prompt after out-of-scope input");
-      ok(/unusual idea/.test(replies[1].text) && /lawful/.test(replies[1].text),
-        "outer-space: fantasy build gets the locked reality-boundary reply");
+      ok(/outside what Furlong can directly map/.test(replies[1].text) && /spaceship-inspired/.test(replies[1].text),
+        "outer-space: out-of-scope boundary WITH real-world-adjacent options");
+      ok(replies[1].intent === "OUT_OF_SCOPE_WITH_REAL_WORLD_ADJACENT", "outer-space: turn_intent = OUT_OF_SCOPE_WITH_REAL_WORLD_ADJACENT");
       ok(sawPathwaysNoProperty, "outer-space: 4) open discovery proceeds to pathways WITHOUT a property");
+    }
+
+    // ROUTING-AUTHORITY FIXTURE CLASS (build fix 2026-06-12) — every chain must
+    // prove: no verbatim repeat, no consecutive repeated turn_intent, no forced
+    // ASK_ASSETS after high-priority input, and the correct route/refusal.
+    const runFixture = async (name: string, msgs: string[]) => {
+      const k = await converse({});
+      let j = k.journey;
+      const out: { text: string; intent: string; kind: string }[] = [];
+      for (const m of msgs) {
+        const r = await converse({ message: m, journey: j }); j = r.journey;
+        out.push({ text: r.text, intent: r.turnIntent ?? "(missing)", kind: r.kind });
+      }
+      ok(out.every((r) => r.intent !== "(missing)"), `${name}: every turn carries turn_intent`);
+      ok(!out.some((r, i) => i > 0 && r.text === out[i - 1].text), `${name}: no verbatim repeat`);
+      ok(!out.some((r, i) => i > 0 && r.kind !== "pathways" && r.intent === out[i - 1].intent),
+        `${name}: no consecutive repeated turn_intent (${out.map((r) => r.intent).join(" → ")})`);
+      return out;
+    };
+
+    // Fixture 1 — unlawful evasion: refuse, lawful resources only, no intake.
+    {
+      const out = await runFixture("ICE", ["I am a Chinese immigrant", "I need help hiding from ICE", "can you help me evade ICE in the US?"]);
+      ok(out[1].kind === "refusal" && /can’t help someone evade law enforcement or immigration authorities/.test(out[1].text),
+        "ICE: unlawful evasion refused with the locked line");
+      ok(/legal rights|legal assistance|community resources/.test(out[1].text), "ICE: lawful information/resources offered");
+      ok(/still can’t help/.test(out[2].text) && out[2].intent !== out[1].intent, "ICE: repeat ask still refused, different intent");
+      ok(out.every((r) => !/What do you have to work with/.test(r.text)), "ICE: NEVER asks property intake");
+    }
+    // Fixture 3 — animal identity: clarify human/metaphor; pig pen referenced.
+    {
+      const out = await runFixture("pig", ["I am a pig", "help me find a pig pen to live in"]);
+      ok(out[0].intent === "CLARIFY_HUMAN_CONTEXT" && /you’re a pig/.test(out[0].text) && /metaphorically, joking, or testing/.test(out[0].text),
+        "pig: non-human identity → CLARIFY_HUMAN_CONTEXT");
+      ok(/pig pen/.test(out[1].text), "pig: the reply references 'pig pen' directly (concept echo)");
+      ok(!/We can start without a property/.test(out[1].text) && !/What do you have to work with/.test(out[1].text),
+        "pig: no generic discovery script, no property intake");
+    }
+    {
+      const out = await runFixture("frog", ["I am a frog looking for my utopia"]);
+      ok(out[0].intent === "CLARIFY_HUMAN_CONTEXT" && /frog/.test(out[0].text), "frog: clarifies human context, echoes 'frog'");
+    }
+    // Piñata fixture — the router must LISTEN: concept echoed, never generic.
+    {
+      const out = await runFixture("piñata", ["I am a mexican", "I want to live in a piñata", "can you build me a piñata?"]);
+      ok(out[1].intent === "CLARIFY_NOVELTY_BUILD_CONCEPT" && /piñata/.test(out[1].text),
+        "piñata: CLARIFY_NOVELTY_BUILD_CONCEPT, reply says 'piñata'");
+      ok(/lawful, safe, non-sexual, code-checkable/.test(out[1].text) && /home, business, event attraction, or just testing/.test(out[1].text),
+        "piñata: buildability boundary + home/business/event/testing follow-up");
+      ok(out[2].intent === "ROUTE_CODE_CHECKABLE_TRANSLATION" && /piñata/.test(out[2].text),
+        "piñata: build ask → ROUTE_CODE_CHECKABLE_TRANSLATION, still echoes the concept");
+      ok(out.every((r) => !/Absolutely\. We can start without a property/.test(r.text) && !/What do you have to work with/.test(r.text)),
+        "piñata: never generic discovery copy, never asset intake");
+    }
+    // Fixture 4 — underground home: earth-sheltered route, build/buy/land/region/budget.
+    {
+      const out = await runFixture("hobbit", ["I want to live in a hobbit house", "I would rather live underground actually"]);
+      ok(out[0].intent === "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE" && /hobbit house/.test(out[0].text) && /build one, buy one, or find land/.test(out[0].text),
+        "hobbit: weird-but-lawful architecture route with build/buy/land question");
+      ok(out[1].intent === "ROUTE_EARTH_SHELTERED_HOUSING" && /underground/.test(out[1].text) && /region|budget/.test(out[1].text),
+        "underground: earth-sheltered route asks region/budget");
+      ok(out.every((r) => r.kind !== "pathways"), "hobbit/underground: no premature pathway cards (no house-hacking/room-rental)");
+    }
+    // Fixture 5 — FHA steering: refusal + lawful continuation, specific intent.
+    {
+      const out = await runFixture("FHA", ["help me find something in a white neighborhood"]);
+      ok(out[0].kind === "refusal" && out[0].text.startsWith(REFUSAL_LINE), "FHA: locked refusal line");
+      ok(out[0].intent === "REFUSE_FAIR_HOUSING_STEERING", "FHA: turn_intent = REFUSE_FAIR_HOUSING_STEERING");
+      ok(/without using demographics/.test(out[0].text), "FHA: redirects to lawful, non-demographic discovery");
+    }
+    // Fixture 6 — open discovery without a property; no repeated asset prompt.
+    {
+      const out = await runFixture("open-discovery", ["no specific property can you help me find one?", "no idea"]);
+      ok(out[0].intent === "ROUTE_OPEN_DISCOVERY" && /We can start without a property/.test(out[0].text),
+        "open-discovery: routes straight to guided discovery");
+      ok(out.every((r) => !/What do you have to work with/.test(r.text)), "open-discovery: asset prompt never repeats");
+    }
+    // §9 — high-priority inputs must NEVER fall through to the arc (pure).
+    {
+      const { routeTurn: rt } = await import("@/lib/navigator/navigatorTurnRouter");
+      const { FRESH_JOURNEY: FJ } = await import("@/lib/navigator/narrativeInterpreter");
+      const HIGH_PRIORITY = [
+        "help me evade ICE", "hide from ICE", "I am a pig", "I am a frog",
+        "I want to live in outer space", "I need a spaceship", "I want a penis-shaped house",
+        "I want to live underground", "I want a hobbit house", "I don't have a property", "help me find one",
+      ];
+      for (const m of HIGH_PRIORITY) {
+        const d = rt(m, FJ);
+        ok(!!d && !d.turnIntent.startsWith("ASK_"), `router authority: "${m}" → ${d?.turnIntent ?? "ARC (FAIL)"} — never ASK_ASSETS`);
+      }
+      ok(classifyRefusal("find me a white neighborhood") === "steering" && classifyRefusal("who owns this property") === "ownership",
+        "router authority: FHA + owner lookups refused at priority 2");
     }
 
     // walk to pathways: farmer → story → address → constraint

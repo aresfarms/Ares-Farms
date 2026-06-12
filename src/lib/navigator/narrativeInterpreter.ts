@@ -62,6 +62,8 @@ export interface JourneyState {
   guardCounters: { refusals: number; rejections: number };
   /** Machine-readable intent of the PREVIOUS guide turn (intent loop guard). */
   lastTurnIntent: string | null;
+  /** Last THREE guide intents (semantic loop guard, routing fix 2026-06-12). */
+  recentTurnIntents: string[];
   /** Novelty/fantasy build code-compliance gate — null = no novelty concept. */
   noveltyGate: NoveltyGate | null;
 }
@@ -70,7 +72,7 @@ export const FRESH_JOURNEY: JourneyState = {
   node: "person", story: [], context: EMPTY_CONTEXT, property: null, entryMode: null,
   intent: null, guidedDiscovery: false, exploredPathways: [], askedPrompts: [],
   guardCounters: { refusals: 0, rejections: 0 },
-  lastTurnIntent: null, noveltyGate: null,
+  lastTurnIntent: null, recentTurnIntents: [], noveltyGate: null,
 };
 
 // ── Guided Property Discovery copy (spec fix 2026-06-11) ─────────────────────

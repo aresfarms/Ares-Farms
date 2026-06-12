@@ -243,3 +243,54 @@ export function specialtyAssetReply(asset: string): string {
 }
 
 function cap(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+// ── PARCEL ENCUMBRANCE / EASEMENT (not infrastructure analysis) ──────────────
+// A pipeline easement ON a farm is a PROPERTY CONSTRAINT — not a request to
+// analyze the pipeline. Detected before the infra hard-shutdown. NEVER yields
+// operational infrastructure detail (owner/operator, route, pressure, status,
+// access, vulnerabilities).
+const EASEMENT_RE = /\beasement\b|\bright[- ]of[- ]way\b|\b(?:utility|gas|pipeline|transmission|power\s+line|drainage|access|conservation)\s+(?:easement|right[- ]of[- ]way|corridor)\b/i;
+
+export const EASEMENT_CONSTRAINT_REPLY =
+  "That is a property-constraint question, not a request to analyze the pipeline or facility itself. Furlong can " +
+  "help at a high level with how an easement may affect buildable area, setbacks, access, farming use, financing, " +
+  "insurance, and due diligence. We won’t provide operational pipeline/utility details. You’d need the recorded " +
+  "easement, survey, title commitment, local zoning, and utility/operator review before relying on it — and " +
+  "without the easement document the exact limits can’t be determined.";
+
+export function detectEasementConstraint(message: string): boolean {
+  return EASEMENT_RE.test(message);
+}
+
+// ── NEIGHBOR / THIRD-PARTY HOUSE ACQUISITION boundary ────────────────────────
+// Property-focused acquisition is allowed; people-targeting is not. Distinguish
+// a lawful "is it for sale / here's the listing" path from pressure, owner
+// lookup, or celebrity/official targeting.
+const THIRD_PARTY_RE = /\b(?:my\s+)?neighbor'?s?\s+(?:house|home|property|farm|land|place)\b|\bhouse\s+next\s+door\b|\b(?:that|this)\s+person'?s\s+(?:house|home|property)\b|\bnext[- ]door\s+(?:house|property)\b/i;
+const PRESSURE_RE = /\b(?:how\s+do\s+i\s+get|how\s+to\s+get|make|convince|pressure|force|persuade|push)\b.{0,30}\b(?:them|him|her|my\s+neighbor|the\s+owner|the\s+homeowner)\b.{0,15}\b(?:to\s+)?sell\b|\bget\s+(?:them|him|her|the\s+owner)\s+to\s+sell\b|\bcontact\s+the\s+(?:owner|homeowner|resident)\b/i;
+const CELEBRITY_RE = /\b(?:celebrity|celeb|famous\s+person|movie\s+star|pop\s+star|athlete|senator|congress(?:man|woman|person)|governor|mayor|president|public\s+official|the\s+ceo\s+of)\b.{0,20}\b(?:house|home|residence|property|mansion|estate)\b|\b(?:house|home|residence|mansion)\b.{0,20}\bof\s+(?:a\s+)?(?:celebrity|famous|senator|governor|the\s+president)\b/i;
+
+export const THIRD_PARTY_CLARIFY_REPLY =
+  "That can be a legitimate property goal, but Furlong has to keep this property-focused, not person-focused. I can " +
+  "help analyze a property that is publicly listed, openly marketed, or that you provide as an address for lawful " +
+  "property-use review — but I can’t identify, target, pressure, or profile the owner or resident. Is the property " +
+  "publicly for sale, or are you asking how to evaluate it if it becomes available?";
+
+export const THIRD_PARTY_PRESSURE_REPLY =
+  "I can’t help pressure, target, or profile a homeowner. A lawful path would be to work through a licensed real " +
+  "estate professional, a public listing, or a neutral market channel.";
+
+export const THIRD_PARTY_CELEBRITY_REPLY =
+  "Furlong can’t help target a person’s residence. If there is a public listing or official sale source, paste that " +
+  "link and we can analyze only the property, not the person.";
+
+export type ThirdPartyKind = "pressure" | "celebrity" | "clarify";
+
+export function detectThirdPartyAcquisition(message: string): ThirdPartyKind | null {
+  // A real listing URL means an ordinary property path — let listing intake run.
+  if (/https?:\/\//i.test(message)) return null;
+  if (PRESSURE_RE.test(message)) return "pressure";
+  if (CELEBRITY_RE.test(message)) return "celebrity";
+  if (THIRD_PARTY_RE.test(message)) return "clarify";
+  return null;
+}

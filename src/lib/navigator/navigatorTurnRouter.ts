@@ -44,6 +44,8 @@ import {
   detectAssetGoal, detectVehicleInspired, vehicleInspiredReply,
   detectMarineDwelling, marineReply, nontraditionalReply,
   detectSpecialtyAsset, specialtyAssetReply,
+  detectEasementConstraint, EASEMENT_CONSTRAINT_REPLY,
+  detectThirdPartyAcquisition, THIRD_PARTY_CLARIFY_REPLY, THIRD_PARTY_PRESSURE_REPLY, THIRD_PARTY_CELEBRITY_REPLY,
 } from "./navigatorGoalRoutes";
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
@@ -442,6 +444,37 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
         ? "I still can’t help locate, track, or target a person. If there’s a lawful property, boundary, nuisance, safety, or code concern, tell me that and I can help think through documentation, municipal contacts, mediation, or professional help."
         : HARASSMENT_REPLY,
       slot: `escalate:targeted-harassment:${harassment}`, echoConcept: null, refusal: true, patch: {},
+    };
+  }
+
+  // 0.55 — PARCEL EASEMENT / ENCUMBRANCE: a pipeline/utility easement ON a
+  // parcel is a property CONSTRAINT, not infrastructure analysis — runs BEFORE
+  // the infra hard-shutdown. (An infra security-probe still escalates above.)
+  if (detectEasementConstraint(message)) {
+    const repeated = repeatOf("ROUTE_EASEMENT_CONSTRAINT_REVIEW");
+    return {
+      turnIntent: repeated ? "ASK_REGION" : "ROUTE_EASEMENT_CONSTRAINT_REVIEW",
+      text: repeated ? "Which parcel and jurisdiction? The recorded easement and local zoning decide the buildable limits." : EASEMENT_CONSTRAINT_REPLY,
+      slot: "route:easement-constraint", echoConcept: null, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 0.56 — NEIGHBOR / THIRD-PARTY HOUSE ACQUISITION: property-focused only,
+  // never people-targeting. Pressure → refuse; celebrity/official → hard stop;
+  // otherwise clarify whether it's publicly for sale before populating data.
+  const thirdParty = detectThirdPartyAcquisition(message);
+  if (thirdParty) {
+    const intent: TurnIntent = thirdParty === "clarify" ? "CLARIFY_THIRD_PARTY_ACQUISITION"
+      : thirdParty === "pressure" ? "REFUSE_AND_REDIRECT" : "CLARIFY_THIRD_PARTY_ACQUISITION";
+    const text = thirdParty === "pressure" ? THIRD_PARTY_PRESSURE_REPLY
+      : thirdParty === "celebrity" ? THIRD_PARTY_CELEBRITY_REPLY
+      : THIRD_PARTY_CLARIFY_REPLY;
+    const repeated = repeatOf(intent);
+    return {
+      turnIntent: repeated && thirdParty === "clarify" ? "WAIT_FOR_MORE_INFO" : intent,
+      text, slot: `third-party:${thirdParty}`, echoConcept: null,
+      refusal: thirdParty !== "clarify", patch: {},
     };
   }
 

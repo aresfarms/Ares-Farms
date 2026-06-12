@@ -59,6 +59,8 @@ export type TurnIntent =
   // semantic ambiguity resolution
   | "CLARIFY_AMBIGUOUS_TERM" | "REFUSE_ADULT_SERVICE_SEEKING"
   | "ROUTE_ANIMAL_RESCUE_OR_BOARDING" | "ROUTE_CONSERVATION_OR_HABITAT"
+  // parcel encumbrance + third-party acquisition boundary
+  | "ROUTE_EASEMENT_CONSTRAINT_REVIEW" | "CLARIFY_THIRD_PARTY_ACQUISITION"
   // flow
   | "WAIT_FOR_MORE_INFO" | "PRESENT_PATHWAYS";
 
@@ -150,6 +152,11 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   },
   ROUTE_ANIMAL_RESCUE_OR_BOARDING: { intent: "ASK_REGION", text: "Which area, and is this nonprofit rescue, boarding, or breeding? Animal-use rules are local." },
   ROUTE_CONSERVATION_OR_HABITAT: { intent: "ASK_REGION", text: "Which region, and conservation, habitat, or private land? That shapes the rules and any programs." },
+  ROUTE_EASEMENT_CONSTRAINT_REVIEW: { intent: "ASK_REGION", text: "Which parcel and jurisdiction? Buildable-area and use limits from an easement turn on the recorded document and local zoning." },
+  CLARIFY_THIRD_PARTY_ACQUISITION: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Whenever there’s a public listing, auction, or other lawful sale source — or you just want to define the kind of property you’re after — I can help with the property itself, never the person.",
+  },
   // The threat alternate STILL REFUSES and STILL holds — different intent and
   // wording only; the boundary never weakens and discovery never resumes.
   ESCALATE_VIOLENT_THREAT: {

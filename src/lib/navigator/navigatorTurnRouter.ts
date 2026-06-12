@@ -34,6 +34,7 @@ import type { JourneyState } from "./narrativeInterpreter";
 import { detectPropertyIntent } from "./narrativeInterpreter";
 import {
   classifyNoveltyConcept, gateForCategory, isDisallowedOutright,
+  detectRegulatedUse, CODE_EVASION_REPLY,
 } from "./noveltyBuildDoctrine";
 import { recentIntents, type TurnIntent } from "./turnIntent";
 
@@ -194,16 +195,52 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
     };
   }
 
-  // 3 — adult/sexual structure (other disallowed novelty handled by doctrine).
+  // 2.5 — LAWFUL-BUT-REGULATED business use → ordinary zoning question, NEVER
+  // a refusal (over-refusal fix 2026-06-12). Adult subject matter alone is not
+  // a refusal trigger; explicit content/shape generation is (checked inside
+  // detectRegulatedUse + classifyNoveltyConcept below). Neutral, evidence-
+  // based three-answer framing: without verified local ordinance data the
+  // honest answer is can't-determine — confirm with the municipality.
+  const regulatedUse = detectRegulatedUse(message);
+  if (regulatedUse) {
+    const repeated = repeatOf("ROUTE_PROPERTY_ANALYSIS");
+    return {
+      turnIntent: repeated ? "ASK_REGION" : "ROUTE_PROPERTY_ANALYSIS",
+      text: repeated
+        ? `Still on the ${regulatedUse} — which municipality or address is this for? The local ordinance is what decides it.`
+        : `${/^[aeiou]/i.test(regulatedUse) ? "An" : "A"} ${regulatedUse} is a lawful, regulated use. In many places it's permitted only in specific zones, often ` +
+          "with buffer or distance requirements (for adult uses, typically from schools, places of worship, and " +
+          "residential areas) plus licensing. We don't have the local ordinance verified for an address yet, so the " +
+          "honest answer is can't-determine until it's checked — the municipality's zoning office can confirm. Share " +
+          "the address or town and I'll map exactly what to verify: zoning district, any special-use or overlay " +
+          "requirements, buffer distances, and license steps.",
+      slot: "route:regulated-use", echoConcept: regulatedUse, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 3 — adult/sexual structure (explicit content/shape) + other disallowed
+  // novelty. CODE_EVASION refuses the EVASION but offers the lawful path.
   const noveltyCat = classifyNoveltyConcept(message);
   if (noveltyCat && isDisallowedOutright(noveltyCat)) {
+    if (noveltyCat === "CODE_EVASION") {
+      const repeated = repeatOf("REFUSE_AND_REDIRECT");
+      return {
+        turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : "REFUSE_AND_REDIRECT",
+        text: repeated
+          ? "Still can’t help hide anything from the county — the lawful permitting path is the only one I can map. Describe the project whenever you’re ready."
+          : CODE_EVASION_REPLY,
+        slot: "refusal:novelty:CODE_EVASION", echoConcept: null, refusal: true,
+        patch: { noveltyGate: gateForCategory(noveltyCat) },
+      };
+    }
     const intent: TurnIntent = noveltyCat === "SEXUAL_EXPLICIT" ? "REFUSE_ADULT_SEXUAL_STRUCTURE" : "REFUSE_AND_REDIRECT";
     const repeated = repeatOf(intent);
     return {
       turnIntent: repeated ? "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE" : intent,
       text: repeated
-        ? "That boundary stays — but unusual, lawful, non-sexual architecture is absolutely on the table: themed cabins, earth-sheltered homes, observatories, art-driven venues. Are you hoping to build one, buy one, or find land where one could legally be built?"
-        : "That isn’t something Furlong can help build — we only work on lawful, safe, non-sexual projects that have a real path through zoning, building codes, and permitting. If there’s a lawful, code-compliant version of what you’re imagining — unusual architecture included — describe that and we can test what may be realistic.",
+        ? "That boundary stays — but unusual, lawful architecture is absolutely on the table: themed cabins, earth-sheltered homes, observatories, art-driven venues. Are you hoping to build one, buy one, or find land where one could legally be built?"
+        : "That isn’t something Furlong can help design — explicit content and explicit building shapes are out of scope. Lawful projects, including unusual architecture and regulated business uses, are fair game: describe that version and we can test what zoning, building codes, and permitting would realistically allow.",
       slot: `refusal:novelty:${noveltyCat}`, echoConcept: null, refusal: true,
       patch: { noveltyGate: gateForCategory(noveltyCat) },
     };

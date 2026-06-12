@@ -57,11 +57,14 @@ export interface JourneyState {
   exploredPathways: string[];
   /** Guide prompts already sent (anti-repeat: a prompt may not repeat more than once). */
   askedPrompts: string[];
+  /** Anonymous abuse counters (REALITY-SEC-001 input guard) — never an identity. */
+  guardCounters: { refusals: number; rejections: number };
 }
 
 export const FRESH_JOURNEY: JourneyState = {
   node: "person", story: [], context: EMPTY_CONTEXT, property: null, entryMode: null,
   intent: null, guidedDiscovery: false, exploredPathways: [], askedPrompts: [],
+  guardCounters: { refusals: 0, rejections: 0 },
 };
 
 // ── Guided Property Discovery copy (spec fix 2026-06-11) ─────────────────────

@@ -291,6 +291,7 @@
     "verify:discovery-engine": "tsx src/scripts/verifyDiscoveryEngine.ts",
     "verify:discovery-flow": "tsx src/scripts/verifyDiscoveryFlow.ts",
     "verify:navigator": "tsx src/scripts/verifyNavigator.ts",
+    "verify:reality-security": "tsx src/scripts/verifyRealitySecurity.ts",
     "ingest:property-flood-historic": "tsx src/scripts/ingestPropertyFloodHistoric.ts",
     "run:source-refresh": "tsx -e \"import('./src/lib/property/sourceRefresh').then(m=>m.refreshAllSources().then(r=>{console.log(JSON.stringify(r,null,1));}))\"",
     "run:listing-freshness": "tsx -e \"import('./src/lib/source-intelligence/listing-intake/directListingFreshness').then(m=>console.log(JSON.stringify(m.runDirectListingFreshness(),null,1)))\"",

@@ -24,6 +24,22 @@
 export const POSSIBILITY_CHECK_VERSION = "possibility-check-v0.1.0";
 
 export type ThreeAnswer = "YES" | "NO" | "CANT_DETERMINE";
+
+/**
+ * REALITY ENGINE DOCTRINE (addendum 2026-06-11): the Navigator answers "what is
+ * realistically possible?", not "what exists?". Each assessment carries a
+ * REALITY CATEGORY refining the three-answer core:
+ *   YES (feasible — here's how) · NO (infeasible — here's why) ·
+ *   NOT_YET (possible later; requirements first) · NOT_HERE (possible
+ *   elsewhere; this location/asset prevents it) · NOT_AT_THIS_SCALE (possible,
+ *   not at this size/intensity) · NOT_WITH_THIS_BUDGET (financial assumptions
+ *   insufficient) · BETTER_ALTERNATIVE (a more realistic pathway exists).
+ * Constraints are VALUABLE OUTPUTS, not failures — an all-constraints result is
+ * a successful Navigator result if it saves a costly mistake.
+ */
+export type RealityCategory =
+  | "YES" | "NO" | "NOT_YET" | "NOT_HERE"
+  | "NOT_AT_THIS_SCALE" | "NOT_WITH_THIS_BUDGET" | "BETTER_ALTERNATIVE";
 export type Confidence = "high" | "medium" | "low" | "cant-determine";
 export type Level = "low" | "medium" | "high";
 
@@ -41,6 +57,8 @@ export interface PathwayAssessment {
   id: string;
   title: string;
   answer: ThreeAnswer;
+  /** Reality Engine category (refines the three-answer core). */
+  realityCategory: RealityCategory;
   /** YES → here's how; NO → here's why; CANT_DETERMINE → here's why. */
   detail: string;
   /** NO only — the honest reroute ("…but here's a real 'here'"). */
@@ -295,10 +313,17 @@ export function assessPathways(c: PropertyContext): PathwayAssessment[] {
       const base = gate
         ? { ...gate, reroute: undefined, whyShown: d.assess(c).whyShown, evidenceStrength: "low" as Level }
         : d.assess(c);
+      const realityCategory: RealityCategory =
+        base.answer === "YES" ? "YES"
+        : base.answer === "CANT_DETERMINE" ? "NOT_YET" // requirements (ordinance/HOA/market) must be satisfied first
+        : /too small|acres/i.test(base.detail) ? "NOT_AT_THIS_SCALE"
+        : /doesn't have|lacks|not available here/i.test(base.detail) ? "NOT_HERE"
+        : "NO";
       return {
         id: d.id,
         title: d.title,
         answer: base.answer,
+        realityCategory,
         detail: base.detail,
         reroute: "reroute" in base ? base.reroute : undefined,
         confirmWith: base.confirmWith,

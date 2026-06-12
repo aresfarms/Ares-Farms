@@ -29,6 +29,11 @@ import {
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
 import { deriveDecisionSummary } from "@/lib/navigator/decisionFramework";
 import { logInterviewTurn, hashTranscript } from "@/lib/discovery/aiInterview";
+import { guardPublicInput } from "@/security/realityPlatform/publicInputGuard";
+import { gateOutputText, gatePathwayPayload } from "@/security/realityPlatform/navigatorOutputGate";
+import { appendReplay, hashEvidence, hashOutput } from "@/security/realityPlatform/realitySecurityReplay";
+import { RATE_LIMIT_MESSAGE } from "@/security/realityPlatform/navigatorRateLimit";
+import { buildSearchGuidance, CANDIDATE_SOURCES_LIVE } from "@/lib/navigator/searchGuidance";
 
 export const runtime = "nodejs";
 
@@ -59,6 +64,42 @@ export async function POST(req: Request) {
     });
   }
 
+  // 0 — REALITY-SEC-001 INPUT GUARD: payload/script/injection/abuse checks
+  // run before everything (the doctrine refusal gates below stay as the
+  // specific G-1/G-2 path so their recovery routing is preserved).
+  const guard = guardPublicInput(message, journey.guardCounters);
+  if (guard.decision === "QUARANTINE" || guard.decision === "RATE_LIMIT" || guard.decision === "ESCALATE_SECURITY") {
+    journey = { ...journey, guardCounters: { ...journey.guardCounters, rejections: journey.guardCounters.rejections + 1 } };
+    appendReplay({
+      ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0,
+      contextZones: [], urlSandboxVerdict: guard.signals.includes("unsafe-url") ? "BLOCKED" : null,
+      privacyFirewallOk: true, outputGateOk: true, refusalReason: guard.reasons.join("; ") || guard.decision,
+      evidenceBundleHash: hashEvidence(guard.signals), renderedOutputHash: hashOutput(RATE_LIMIT_MESSAGE),
+    });
+    logInterviewTurn({ source: "fallback", slot: `navigator:guard:${guard.decision}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
+    return NextResponse.json({
+      kind: "question",
+      node: journey.node,
+      text: guard.decision === "RATE_LIMIT" || guard.decision === "ESCALATE_SECURITY"
+        ? RATE_LIMIT_MESSAGE
+        : "That input isn't something we can process safely. Let's keep going in plain words — " + questionForNode(journey).charAt(0).toLowerCase() + questionForNode(journey).slice(1),
+      journey,
+    });
+  }
+  if (guard.decision === "REFUSE_AND_REDIRECT" && !classifyRefusal(message)) {
+    // injection / prompt-extraction (non-G1/G2): refuse generically + continue.
+    journey = { ...journey, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
+    const follow = nextPrompt(journey, journey.node);
+    journey = rememberPrompt(journey, follow);
+    appendReplay({
+      ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0, contextZones: [],
+      urlSandboxVerdict: null, privacyFirewallOk: true, outputGateOk: true,
+      refusalReason: guard.reasons.join("; "), evidenceBundleHash: hashEvidence(guard.signals), renderedOutputHash: hashOutput(follow),
+    });
+    logInterviewTurn({ source: "fallback", slot: "navigator:guard:injection", ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
+    return NextResponse.json({ kind: "refusal", refusal: "injection", text: `Let's stay on your possibilities. ${follow}`, journey });
+  }
+
   // 1 — refusal gates BEFORE anything else (G-1 / G-2). Refuse ONCE with the
   // locked line, then INSPECT THE REMAINING INTENT (loop fix 2026-06-11): a
   // steering ask that also wants property discovery ("find me something in a
@@ -66,6 +107,7 @@ export async function POST(req: Request) {
   // discovery redirect — never a dead end back to the asset prompt.
   const refusal = classifyRefusal(message);
   if (refusal) {
+    journey = { ...journey, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
     const residual = detectPropertyIntent(message, null);
     const wantsDiscovery = residual === "WANTS_PROPERTY_DISCOVERY" || residual === "NO_PROPERTY_YET";
     if (wantsDiscovery) {
@@ -103,6 +145,28 @@ export async function POST(req: Request) {
     const chainStart = pathways.find((p) => p.graphNeighbors.length > 0)?.id ?? pathways[0]?.id;
     logInterviewTurn({ source: "fallback", slot: `navigator:pathways:${journey.context.propertyKind}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
     const decision = deriveDecisionSummary(pathways);
+    // Search-and-bring-back guidance: ONLY when no property is in hand, and
+    // never invented matches — CANDIDATE_SOURCES_LIVE gates any future feed.
+    const searchGuidance = !journey.property && !CANDIDATE_SOURCES_LIVE ? buildSearchGuidance(journey.context) : null;
+    // REALITY-SEC-001 OUTPUT GATE: nothing renders that fails the final checks.
+    const payloadGate = gatePathwayPayload(pathways);
+    const textGate = gateOutputText(JSON.stringify(decision));
+    if (!payloadGate.ok || !textGate.ok) {
+      appendReplay({
+        ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0,
+        contextZones: ["USER_STORY", "PROPERTY_FACTS"], urlSandboxVerdict: null, privacyFirewallOk: textGate.ok,
+        outputGateOk: false, refusalReason: [...payloadGate.blocks, ...textGate.blocks].slice(0, 3).join("; "),
+        evidenceBundleHash: hashEvidence(pathways.map((x) => x.id)), renderedOutputHash: hashOutput("(blocked)"),
+      });
+      return NextResponse.json({ kind: "question", node: journey.node,
+        text: "We caught something in our own draft answer that doesn't meet our standards, so we held it back. Tell me a bit more and we'll take another honest run at it.", journey });
+    }
+    appendReplay({
+      ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0,
+      contextZones: ["SYSTEM_RULES", "USER_STORY", "PROPERTY_FACTS"], urlSandboxVerdict: null,
+      privacyFirewallOk: true, outputGateOk: true, refusalReason: null,
+      evidenceBundleHash: hashEvidence(pathways.map((x) => x.id)), renderedOutputHash: hashOutput(JSON.stringify(decision)),
+    });
     return NextResponse.json({
       kind: "pathways",
       node: journey.node,
@@ -115,6 +179,7 @@ export async function POST(req: Request) {
       graphChain: chainStart ? discoveryGraphChain(chainStart) : [],
       programsSeam: "A property qualifying for a program is a fact about the property. Whether YOU qualify is a licensed professional's call — property qualifies ≠ you qualify.",
       decision,
+      searchGuidance,
       journey,
     });
   }

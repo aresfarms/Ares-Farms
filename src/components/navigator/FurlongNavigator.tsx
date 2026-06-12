@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { JourneyState } from "@/lib/navigator/narrativeInterpreter";
 import type { PathwayAssessment } from "@/lib/navigator/possibilityCheck";
 import type { DecisionSummary } from "@/lib/navigator/decisionFramework";
+import type { SearchGuidance } from "@/lib/navigator/searchGuidance";
 
 /**
  * Furlong Navigator — the governed conversational front door (spec 2026-06-11 +
@@ -25,7 +26,7 @@ type Turn = { role: "guide" | "you"; text: string };
 type Reply =
   | { kind: "question"; node: string; text: string; journey: JourneyState }
   | { kind: "refusal"; refusal: string; text: string; journey: JourneyState }
-  | { kind: "pathways"; node: string; text: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; journey: JourneyState };
+  | { kind: "pathways"; node: string; text: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; journey: JourneyState };
 
 const MEM_KEY = "furlong-navigator-journey-v1"; // sessionStorage — anonymous, ephemeral
 
@@ -49,6 +50,7 @@ export function FurlongNavigator() {
   const [graphChain, setGraphChain] = useState<string[]>([]);
   const [programsSeam, setProgramsSeam] = useState<string | null>(null);
   const [decision, setDecision] = useState<DecisionSummary | null>(null);
+  const [searchGuidance, setSearchGuidance] = useState<SearchGuidance | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [resumed, setResumed] = useState(false);
@@ -75,6 +77,7 @@ export function FurlongNavigator() {
       setGraphChain(r.graphChain);
       setProgramsSeam(r.programsSeam);
       setDecision(r.decision);
+      setSearchGuidance(r.searchGuidance);
     }
     remember(r.journey, next);
   }
@@ -172,7 +175,26 @@ export function FurlongNavigator() {
             );
           })}
 
-          {/* Navigator Decision Framework — the four canonical questions
+          {/* Search-and-bring-back guidance — HONESTY RULE: we never invent
+              candidate properties; until the live feed is verified we sharpen
+              the search and analyze whatever the visitor brings back. */}
+          {searchGuidance && (
+            <div data-testid="search-guidance" style={{ display: "grid", gap: 8, border: "1.5px dashed #854F0B", borderRadius: 12, padding: "14px 16px", background: "#fffdf8" }}>
+              <strong style={{ fontSize: 14, color: "#854F0B" }}>How to hunt — and what to bring back</strong>
+              <span style={{ fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>{searchGuidance.honestyNote}</span>
+              <div style={{ display: "grid", gap: 3 }}>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: "#5d687a" }}>SEARCH CRITERIA THAT MATTER</span>
+                {searchGuidance.criteria.map((c, i) => <span key={i} style={{ fontSize: 12.5, color: "#3b475a" }}>• {c}</span>)}
+              </div>
+              <div style={{ display: "grid", gap: 3 }}>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: "#5d687a" }}>FILTERS TO USE OUT THERE</span>
+                {searchGuidance.filters.map((f, i) => <span key={i} style={{ fontSize: 12.5, color: "#3b475a" }}>• {f}</span>)}
+              </div>
+              <span style={{ fontSize: 12.5, color: "#0f766e", fontWeight: 700 }}>{searchGuidance.bringBack}</span>
+            </div>
+          )}
+
+                    {/* Navigator Decision Framework — the four canonical questions
               (addendum 2026-06-11): Achievable · Obstacles · Alternatives ·
               Probability. Advisory only — pathways, not promises. */}
           {decision && (

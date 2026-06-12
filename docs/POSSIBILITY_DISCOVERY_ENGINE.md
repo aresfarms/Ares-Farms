@@ -183,3 +183,42 @@ CAN'T-DETERMINE with the right confirm-with route until Layer A wires, and no re
 renders until Layer B verifies. The prior chip-based interview + place-first card remain in
 the tree (place-facts flows still resolve to the place-first card; the chip interview is no
 longer mounted as the entry flow).
+
+---
+
+## Update (2026-06-11) — Reality Engine Doctrine + REALITY-SEC-001 Public-AI Security Layer
+
+**Reality Engine Doctrine:** every pathway now carries a REALITY CATEGORY refining the
+three-answer core — YES / NO / NOT_YET (requirements first) / NOT_HERE (location/asset
+prevents it) / NOT_AT_THIS_SCALE / NOT_WITH_THIS_BUDGET / BETTER_ALTERNATIVE. Constraints
+are valuable outputs: an all-constraints result is a successful Navigator result.
+"Pathways, not promises. Reality before commitment."
+
+**REALITY-SEC-001 (src/security/realityPlatform/):** the public-AI security layer —
+publicInputGuard (6 decision states: ALLOW / ALLOW_WITH_SCRUB / REFUSE_AND_REDIRECT /
+QUARANTINE / RATE_LIMIT / ESCALATE_SECURITY), aiContextFirewall (10 zones; external text =
+evidence-only envelope, never instructions; owner/demographic fields verified absent before
+model context), urlIngestionSandbox (allowlist incl. Realtor/LandWatch/Land.com; SSRF +
+credential blocking; ZERO network calls — listing content can't be captured),
+propertyPrivacyFirewall (output-side identity/steering blocks), navigatorOutputGate (final
+render checks: no promises, no single-number figures, no determinations, ranges-with-basis,
+required shape), abuseTelemetryDashboard (10 anonymous panels, no dossiers),
+navigatorRateLimit (8 action budgets, graceful message), realitySecurityReplay (hash-chained
+replay of every guard decision; chain verifies).
+
+**Five blockers** (REALITY-INPUT/CONTEXT/URL/PRIVACY/OUTPUT-001) default unverified →
+`realityProductionReady()=false`. BRANCH NOTE: registered here as a self-contained gate
+because securityResilienceDashboard lives on the unmerged build-security-cyber-resilience
+branch; the {id, open} contract matches — fold into that dashboard at merge.
+
+**Candidate honesty (implementation rule):** `CANDIDATE_SOURCES_LIVE=false` — open discovery
+never claims real candidate properties; it renders the "How to hunt — and what to bring back"
+card (criteria, permitted-use direction, property types, Zillow/Redfin/Crexi/LoopNet filters,
+paste-back instruction) with the honesty note in-line.
+
+**Verify:** `verify:reality-security` PASS pure + LIVE (23 privacy/FHA phrasings, injection/
+extraction/script/oversize/abuse, SSRF/credential URL blocks, output-gate promise/determination
+blocks, context-firewall envelope + banned-field rejection, rate limits, replay chain, 5
+blockers open, candidate honesty). Rendered review: no-property farm conversation screenshotted
+end-to-end — guided discovery → pathways with reality categories → search-guidance card →
+decision framework; no invented matches anywhere. Full suite green; tsc clean; build exit 0.

@@ -166,6 +166,40 @@ for (const [msg, want] of [
   ok(/without using demographics or neighborhood profiling/.test(GUIDED_DISCOVERY_OPENER), "guided-discovery opener states the non-demographic rule");
 }
 
+// ── SESSION PRIVACY — ephemeral by default (critical fix 2026-06-11) ─────────
+import("@/lib/navigator/navigatorSessionPrivacy").then((SP) => {
+  // protected-class disclosures detected + redacted from any stored copy
+  for (const t of ["I am a gay man looking for my utopia", "my religion matters to me here", "I'm disabled and need ground floor"])
+    ok(SP.containsProtectedClassDisclosure(t), `protected-class disclosure detected: "${t}"`);
+  ok(!SP.containsProtectedClassDisclosure("I'm a farmer with 120 acres"), "ordinary input not flagged");
+  const red = SP.redactForStorage([
+    { role: "you", text: "I am a gay man looking for my utopia" },
+    { role: "you", text: "I want farm income" },
+    { role: "guide", text: "Tell me more" },
+  ]);
+  ok(red[0].text === SP.REDACTED_PLACEHOLDER && red[1].text === "I want farm income",
+    "stored copies redact protected-class disclosures, keep ordinary text");
+  ok(/private detail not saved/.test(SP.REDACTED_PLACEHOLDER), "redaction placeholder is honest");
+  ok(/Continue this anonymous journey on this device\?/.test(SP.OPT_IN_PROMPT), "the explicit opt-in prompt is spec-locked");
+}).catch((e) => { fail.push("privacy module import failed: " + e); });
+
+// Structural: the privacy module is the ONLY browser-storage writer; no auto-
+// resume; old key purged; Start Over + opt-in gate + save-journey controls exist.
+{
+  const navSrc = fs.readFileSync("src/components/navigator/FurlongNavigator.tsx", "utf8");
+  ok(!/sessionStorage\.setItem|localStorage\.setItem/.test(navSrc), "component writes NO browser storage directly (privacy module only)");
+  ok(!/Welcome back/.test(navSrc), "auto-resume 'Welcome back' REMOVED");
+  ok(/loadJourneyIfOptedIn/.test(navSrc) && /saveJourneyIfOptedIn/.test(navSrc), "persistence goes through the opt-in-gated privacy module");
+  ok(/data-testid="start-over"/.test(navSrc), "Start Over / Clear journey control present");
+  ok(/data-testid="continuity-opt-in"/.test(navSrc) && /data-testid="resume-gate"/.test(navSrc), "explicit continuity opt-in + resume gate present");
+  ok(/data-testid="save-journey"/.test(navSrc) && /Continue without saving|stays anonymous/.test(navSrc), "Save this journey control + anonymous-default copy present");
+  const spSrc = fs.readFileSync("src/lib/navigator/navigatorSessionPrivacy.ts", "utf8");
+  ok(/if \(!isContinuityOptedIn\(\)\) return/.test(spSrc), "privacy module: default path writes NOTHING");
+  ok(/LEGACY_KEY/.test(spSrc) && /furlong-navigator-journey-v1/.test(spSrc), "legacy v1 key actively purged");
+  const sjSrc = fs.readFileSync("src/lib/navigator/savedJourneyContract.ts", "utf8");
+  ok(/SAVED_JOURNEYS_LIVE = false/.test(sjSrc) && /ONLY after consent/.test(sjSrc), "saved-journey accounts contract gated OFF; consent-first attach rule stated");
+}
+
 // ── Naming + CTA + no-chip structural gates ───────────────────────────────────
 ok(FURLONG_NAVIGATOR_MANIFEST.name === "Furlong Navigator", "manifest names the Navigator");
 const pubFiles = [
@@ -216,7 +250,7 @@ const nav = fs.readFileSync("src/components/navigator/FurlongNavigator.tsx", "ut
 ok(!/aria-pressed/.test(nav), "Navigator has NO chip grid (no aria-pressed option buttons)");
 const navFetches = [...nav.matchAll(/fetch\(\s*["'`]([^"'`]+)["'`]/g)].map((m) => m[1]);
 ok(navFetches.every((u) => u.startsWith("/api/public/navigator/converse")), "Navigator talks only to its own converse API");
-ok(/sessionStorage/.test(nav) && !/localStorage/.test(nav), "journey memory is session-scoped (anonymous, ephemeral)");
+ok(!/sessionStorage\.setItem|localStorage\.setItem/.test(nav), "component never writes browser storage directly (ephemeral default; privacy module is the only writer)");
 ok(!/email|firstName|lastName|phone/i.test(nav.replace(/\/\*[\s\S]*?\*\//g, "")), "Navigator captures no identity fields");
 
 // ── Live SSR + conversation probes (when the server is up) ───────────────────
@@ -252,6 +286,18 @@ async function main() {
       const r = await converse({ message: p, journey: kick.journey });
       ok(r.kind === "refusal" && r.text.startsWith(REFUSAL_LINE), `live: steering probe refused: "${p}"`);
     }
+    // SESSION PRIVACY live: the converse API is stateless — journey state is
+    // round-tripped, never stored server-side; replay/interview ledgers hold
+    // hashes only (checked here so a regression would fail loudly).
+    {
+      const led = fs.existsSync("data/discovery-interview-ledger.ndjson")
+        ? fs.readFileSync("data/discovery-interview-ledger.ndjson", "utf8") : "";
+      ok(!/gay man|utopia|123 Main/.test(led), "interview ledger holds NO raw conversation text");
+      const rep = fs.existsSync("data/reality-security-replay.ndjson")
+        ? fs.readFileSync("data/reality-security-replay.ndjson", "utf8") : "";
+      ok(!/gay man|utopia|looking for/.test(rep), "replay ledger holds NO raw conversation text (hashes only)");
+    }
+
     // GUIDED PROPERTY DISCOVERY — rendered-conversation reproduction of the
     // screenshot failure (loop fix 2026-06-11):
     {

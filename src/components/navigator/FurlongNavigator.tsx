@@ -7,6 +7,11 @@ import type { JourneyState } from "@/lib/navigator/narrativeInterpreter";
 import type { PathwayAssessment } from "@/lib/navigator/possibilityCheck";
 import type { DecisionSummary } from "@/lib/navigator/decisionFramework";
 import type { SearchGuidance } from "@/lib/navigator/searchGuidance";
+import {
+  clearNavigatorSession, saveJourneyIfOptedIn, loadJourneyIfOptedIn,
+  isContinuityOptedIn, optInToContinuity, revokeContinuity,
+  OPT_IN_PROMPT, SAVE_JOURNEY_CONSENT_COPY, type Turn,
+} from "@/lib/navigator/navigatorSessionPrivacy";
 
 /**
  * Furlong Navigator — the governed conversational front door (spec 2026-06-11 +
@@ -15,20 +20,18 @@ import type { SearchGuidance } from "@/lib/navigator/searchGuidance";
  * their own words; the engine walks the spine and returns pathways with
  * confidence, why-shown, effort/risk, and honest three-answer states.
  *
- * Anonymous journey memory: the journey state lives in sessionStorage only —
- * explored pathways, property reference, conversation — no identity, nothing
- * server-stored, nothing sold. "Continue your journey" works on return within
- * the session; clearing the tab clears the journey.
+ * EPHEMERAL BY DEFAULT (critical privacy fix 2026-06-11): the conversation
+ * lives in memory for the active page only. Nothing is written to browser
+ * storage and nothing restores on reload/revisit unless the visitor explicitly
+ * opts in ("Continue this anonymous journey on this device?"). The old
+ * auto-resume greeting is REMOVED. Start Over wipes everything
+ * instantly. Anonymous means anonymous in the user experience.
  */
-
-type Turn = { role: "guide" | "you"; text: string };
 
 type Reply =
   | { kind: "question"; node: string; text: string; journey: JourneyState }
   | { kind: "refusal"; refusal: string; text: string; journey: JourneyState }
   | { kind: "pathways"; node: string; text: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; journey: JourneyState };
-
-const MEM_KEY = "furlong-navigator-journey-v1"; // sessionStorage — anonymous, ephemeral
 
 const CONF_STYLE: Record<string, { label: string; bg: string; fg: string }> = {
   high: { label: "High confidence", bg: "#e1f5ee", fg: "#0F6E56" },
@@ -53,7 +56,9 @@ export function FurlongNavigator() {
   const [searchGuidance, setSearchGuidance] = useState<SearchGuidance | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
-  const [resumed, setResumed] = useState(false);
+  const [continuity, setContinuity] = useState(false); // explicit opt-in only
+  const [pendingResume, setPendingResume] = useState<{ journey: JourneyState; turns: Turn[] } | null>(null);
+  const [showSaveInfo, setShowSaveInfo] = useState(false);
   const started = useRef(false);
 
   async function post(payload: unknown): Promise<Reply> {
@@ -64,8 +69,10 @@ export function FurlongNavigator() {
     return (await res.json()) as Reply;
   }
 
+  // EPHEMERAL DEFAULT: persists ONLY after explicit opt-in (and even then the
+  // saved copy is protected-class-redacted by the privacy module).
   function remember(j: JourneyState, t: Turn[]) {
-    try { sessionStorage.setItem(MEM_KEY, JSON.stringify({ journey: j, turns: t.slice(-30) })); } catch { /* memory is best-effort */ }
+    saveJourneyIfOptedIn(j, t);
   }
 
   function handle(r: Reply, t: Turn[]) {
@@ -85,22 +92,41 @@ export function FurlongNavigator() {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    // Continue your journey — anonymous session memory only.
-    try {
-      const saved = sessionStorage.getItem(MEM_KEY);
-      if (saved) {
-        const { journey: j, turns: t } = JSON.parse(saved) as { journey: JourneyState; turns: Turn[] };
-        if (j && Array.isArray(t) && t.length) {
-          setJourney(j); setTurns(t); setResumed(true); setLoading(false);
-          return;
-        }
-      }
-    } catch { /* fresh start */ }
+    // NO auto-restore. A saved journey exists only after explicit opt-in, and
+    // even then it never auto-resurfaces — we ASK first, while the fresh
+    // conversation starts normally underneath.
+    const saved = loadJourneyIfOptedIn();
+    if (saved && saved.turns.length) {
+      setPendingResume(saved);
+      setContinuity(true);
+    }
     void (async () => {
       try { handle(await post({}), []); } finally { setLoading(false); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Start Over — wipes the visible thread, all results, and ALL browser storage.
+  async function startOver() {
+    clearNavigatorSession();
+    setContinuity(false); setPendingResume(null);
+    setTurns([]); setJourney(null); setPathways(null); setGraphChain([]);
+    setProgramsSeam(null); setDecision(null); setSearchGuidance(null); setInput("");
+    setLoading(true);
+    try { handle(await post({}), []); } finally { setLoading(false); }
+  }
+
+  function resumeSaved() {
+    if (!pendingResume) return;
+    setJourney(pendingResume.journey); setTurns(pendingResume.turns); setPendingResume(null);
+  }
+  function declineSaved() {
+    revokeContinuity(); setContinuity(false); setPendingResume(null);
+  }
+  function toggleContinuity() {
+    if (continuity) { revokeContinuity(); setContinuity(false); }
+    else { optInToContinuity(); setContinuity(true); if (journey) saveJourneyIfOptedIn(journey, turns); }
+  }
 
   async function send() {
     const msg = input.trim();
@@ -119,8 +145,38 @@ export function FurlongNavigator() {
         <strong style={{ fontSize: 19, color: "#101a2b" }}>Furlong Navigator</strong>
         <span style={{ fontSize: 12.5, color: "#7a8aa0" }}>
           A guide through uncertain waters — anonymous, no account, and we don't sell you anything.
-          {resumed && " Welcome back — continuing your journey."}
+          Your conversation clears when you leave or start over.
         </span>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", marginTop: 4 }}>
+          <button type="button" data-testid="start-over" onClick={() => void startOver()}
+            style={{ fontSize: 12, fontWeight: 800, color: "#993C1D", background: "#fff", border: "1.5px solid #e3c4b8", borderRadius: 999, padding: "5px 14px", cursor: "pointer" }}>
+            ↺ Start over / Clear journey
+          </button>
+          <label data-testid="continuity-opt-in" style={{ display: "inline-flex", gap: 6, alignItems: "center", fontSize: 12, color: "#5d687a", cursor: "pointer" }}>
+            <input type="checkbox" checked={continuity} onChange={toggleContinuity} />
+            {OPT_IN_PROMPT}
+          </label>
+          <button type="button" data-testid="save-journey" onClick={() => setShowSaveInfo((v) => !v)}
+            style={{ fontSize: 12, fontWeight: 700, color: "#185FA5", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
+            Save this journey
+          </button>
+        </div>
+        {showSaveInfo && (
+          <p data-testid="save-journey-info" style={{ margin: 0, fontSize: 12, color: "#5d687a", lineHeight: 1.5, border: "1px solid #e6ebf2", borderRadius: 10, padding: "10px 12px" }}>
+            {SAVE_JOURNEY_CONSENT_COPY} Saved-journey accounts aren't open yet — until they are, nothing is
+            stored and your session stays anonymous. <em>Continue without saving:</em> your session stays
+            anonymous and clears when you leave or start over.
+          </p>
+        )}
+        {pendingResume && (
+          <div data-testid="resume-gate" style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", border: "1px solid #d7deea", borderRadius: 10, padding: "10px 12px" }}>
+            <span style={{ fontSize: 12.5, color: "#3b475a" }}>{OPT_IN_PROMPT}</span>
+            <button type="button" data-testid="resume-yes" onClick={resumeSaved}
+              style={{ fontSize: 12, fontWeight: 800, color: "#fff", background: "#0f766e", border: "none", borderRadius: 999, padding: "5px 14px", cursor: "pointer" }}>Continue</button>
+            <button type="button" data-testid="resume-no" onClick={declineSaved}
+              style={{ fontSize: 12, fontWeight: 700, color: "#5d687a", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>Start fresh</button>
+          </div>
+        )}
       </div>
 
       {/* the conversation */}

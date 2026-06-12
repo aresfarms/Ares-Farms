@@ -222,3 +222,37 @@ blocks, context-firewall envelope + banned-field rejection, rate limits, replay 
 blockers open, candidate honesty). Rendered review: no-property farm conversation screenshotted
 end-to-end — guided discovery → pathways with reality categories → search-guidance card →
 decision framework; no invented matches anywhere. Full suite green; tsc clean; build exit 0.
+
+---
+
+## Update (2026-06-11) — CRITICAL FIX: Navigator session privacy (ephemeral by default)
+
+**Bug (eyes-on):** the Navigator persisted the conversation in sessionStorage and auto-restored
+it on revisit ("Welcome back…"), including a protected-class disclosure. That broke the
+anonymity promise, retained G-2 data, and exposed prior visitors on shared devices.
+
+**Fix — anonymous means anonymous in the USER EXPERIENCE:**
+- `navigatorSessionPrivacy.ts` is now the ONLY browser-storage writer (asserted structurally).
+  Default path writes NOTHING; the buggy v1 key is actively purged on every load.
+- Auto-resume REMOVED. Every load/refresh/revisit starts fresh at "Who are you?".
+- Explicit opt-in gate ("Continue this anonymous journey on this device?") — only after the
+  visitor enables it does device-local continuity exist, and on return the gate ASKS before
+  restoring (never auto-resurfaces).
+- **Protected-class disclosures are NEVER durably stored** — even under opt-in, saved copies
+  redact them ("[private detail not saved — it stays in this conversation only]"); the live
+  in-memory conversation is untouched, and G-2 keeps them out of results either way.
+- "Start over / Clear journey" wipes the visible thread + all storage instantly. Input clears
+  after send. Server side already stateless (journey round-trips request-scoped); interview +
+  replay ledgers verified to hold hashes/enums only, no raw text.
+- "Save this journey" control added with the spec consent copy + honest coming-soon (accounts
+  not open; nothing stored). `savedJourneyContract.ts` carries the full Saved Journey Accounts
+  data model (§5), save flow, and account controls, gated `SAVED_JOURNEYS_LIVE=false` until the
+  authenticated build (secure auth, governed tables, My Journeys dashboard) ships and is
+  human-reviewed.
+
+**Rendered acceptance (all verified in the browser):** mid-conversation reload → empty
+transcript + fresh opener + empty storage; sensitive disclosure typed → input clears, storage
+stays empty by default; opt-in → stored copy is REDACTED while the live session shows their
+words; reload under opt-in → the gate asks first, nothing auto-shows; Continue restores the
+redacted transcript; Start Over wipes everything including the opt-in flag. verify:navigator
+extended with the privacy gates; full suite green; tsc clean; build exit 0.

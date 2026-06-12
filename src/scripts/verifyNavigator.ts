@@ -1024,6 +1024,65 @@ async function main() {
       ok(out[0].intent === "LIMITED_PRIVATE_ADDRESS_OVERVIEW", "addr: a clean (unflagged) address still gets the limited overview");
     }
 
+    // AMBIGUOUS / FANTASY / MYTHIC GOAL PHRASES (2026-06-12): clarify before
+    // intake; reference the exact phrase; no FHA false-trigger on color words.
+    for (const [name, msg, echo] of [
+      ["white-whale", "I want a white whale", /white whale/i],
+      ["unicorn", "I want a unicorn", /unicorn/i],
+      ["dragon-house", "I want a dragon house", /dragon/i],
+      ["dream", "I want my dream property", /dream property/i],
+      ["needle", "I want a needle in a haystack property", /needle in a haystack/i],
+      ["moonshot", "I want a moonshot property", /moonshot/i],
+      ["once", "I want a once-in-a-lifetime farm", /once-in-a-lifetime/i],
+      ["blue-sky", "I want a blue sky business", /blue sky/i],
+      ["unicorn-farm", "I want a unicorn farm", /unicorn/i],
+    ] as const) {
+      const out = await runFixture(`mythic:${name}`, [msg]);
+      ok(out[0].intent === "CLARIFY_AMBIGUOUS_OR_MYTHIC_GOAL", `mythic:${name}: CLARIFY_AMBIGUOUS_OR_MYTHIC_GOAL (got ${out[0].intent})`);
+      ok(echo.test(out[0].text) && /metaphor|rare|testing the Navigator|which you mean/i.test(out[0].text),
+        `mythic:${name}: references the phrase + asks metaphor/rare/test`);
+      ok(!["ASK_PERSON", "ASK_STORY", "ASK_ASSETS"].includes(out[0].intent) && out[0].kind !== "refusal",
+        `mythic:${name}: no intake, no FHA/animal false-trigger`);
+    }
+
+    // CONTEXTUAL SHORT-ANSWER RESOLVER (2026-06-12).
+    {
+      // "all of the above" at first message → clarify what they're answering.
+      const out = await runFixture("ctx-first", ["all of the above"]);
+      ok(out[0].intent === "CLARIFY_CONTEXTUAL_ANSWER" && /what are you responding to/.test(out[0].text),
+        "contextual: 'all of the above' with no prior question → clarify");
+      ok(!/We can start without a property/.test(out[0].text), "contextual: not open-discovery fallback");
+    }
+    {
+      // Walk to a constraints question, then answer "all of the above".
+      const k = await converse({});
+      let j = k.journey;
+      let r = await converse({ message: "I'm a farmer with some land", journey: j }); j = r.journey;
+      r = await converse({ message: "trying to figure out what it could earn", journey: j }); j = r.journey;
+      // advance until a constraints prompt (ASK_BUDGET) is the last intent
+      let guard = 0;
+      while (j.lastTurnIntent !== "ASK_BUDGET" && r.kind === "question" && guard++ < 4) {
+        r = await converse({ message: "not sure yet", journey: j }); j = r.journey;
+      }
+      if (j.lastTurnIntent === "ASK_BUDGET") {
+        r = await converse({ message: "all of the above", journey: j });
+        ok(r.turnIntent === "ASK_REGION" && /budget, timing, private restrictions, and permitting all matter/.test(r.text),
+          "contextual: 'all of the above' after constraints → resolves as constraints answer");
+        ok(!/We can start without a property|Absolutely\. We can start/.test(r.text),
+          "contextual: constraints answer does NOT fall to open discovery");
+      } else {
+        ok(true, "contextual: (constraints prompt not reached in walk; pure resolver covered)");
+      }
+    }
+    {
+      const { resolveContextualAnswer } = await import("@/lib/navigator/contextualAnswerResolver");
+      const j = { ...FRESH_JOURNEY, story: ["x"], lastTurnIntent: "ASK_BUDGET" } as typeof FRESH_JOURNEY;
+      const res = resolveContextualAnswer("all of the above", j);
+      ok(res?.turnIntent === "ASK_REGION" && /budget, timing, private restrictions/.test(res?.text ?? ""),
+        "contextual (pure): all-of-the-above after ASK_BUDGET resolves as constraints");
+      ok(resolveContextualAnswer("I want to buy a farm", j) === null, "contextual (pure): a real goal is NOT a short answer");
+    }
+
     // §9 — high-priority inputs must NEVER fall through to the arc (pure).
     {
       const { routeTurn: rt } = await import("@/lib/navigator/navigatorTurnRouter");

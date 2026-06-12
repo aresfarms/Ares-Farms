@@ -59,6 +59,7 @@ export type TurnIntent =
   // semantic ambiguity resolution
   | "CLARIFY_AMBIGUOUS_TERM" | "REFUSE_ADULT_SERVICE_SEEKING"
   | "ROUTE_ANIMAL_RESCUE_OR_BOARDING" | "ROUTE_CONSERVATION_OR_HABITAT"
+  | "CLARIFY_AMBIGUOUS_OR_MYTHIC_GOAL" | "CLARIFY_CONTEXTUAL_ANSWER"
   // parcel encumbrance + third-party acquisition boundary
   | "ROUTE_EASEMENT_CONSTRAINT_REVIEW" | "CLARIFY_THIRD_PARTY_ACQUISITION"
   | "LIMITED_PRIVATE_ADDRESS_OVERVIEW"
@@ -153,6 +154,14 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   },
   ROUTE_ANIMAL_RESCUE_OR_BOARDING: { intent: "ASK_REGION", text: "Which area, and is this nonprofit rescue, boarding, or breeding? Animal-use rules are local." },
   ROUTE_CONSERVATION_OR_HABITAT: { intent: "ASK_REGION", text: "Which region, and conservation, habitat, or private land? That shapes the rules and any programs." },
+  CLARIFY_AMBIGUOUS_OR_MYTHIC_GOAL: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Whenever you can tell me the real-world version — a rare property, land, business, or conservation goal — I’ll help reality-check what’s realistic.",
+  },
+  CLARIFY_CONTEXTUAL_ANSWER: {
+    intent: "ASK_GOAL",
+    text: "Just so I answer the right thing — what would a win look like for you? A property, land, business, or income goal in your own words.",
+  },
   ROUTE_EASEMENT_CONSTRAINT_REVIEW: { intent: "ASK_REGION", text: "Which parcel and jurisdiction? Buildable-area and use limits from an easement turn on the recorded document and local zoning." },
   CLARIFY_THIRD_PARTY_ACQUISITION: {
     intent: "WAIT_FOR_MORE_INFO",

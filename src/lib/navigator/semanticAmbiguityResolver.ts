@@ -52,9 +52,36 @@ function ambiguousClarifyReply(term: string): string {
     "services, harassment, or illegal activity.";
 }
 
+// ── Ambiguous / fantasy / mythic / idiom goal phrases ────────────────────────
+// "I want a white whale / unicorn / dream property / moonshot" — meaningful but
+// ambiguous. Clarify the intended meaning BEFORE intake. Color words here
+// (white whale, blue sky) must NOT trip the Fair-Housing steering detector.
+const MYTHIC_RE = /\b(unicorn|white\s+whale|dragon|phoenix|griffin|mermaid|pegasus|kraken|leviathan)\b/i;
+const METAPHOR_RE = /\b(dream\s+(?:property|home|house|farm|place)|needle\s+in\s+a\s+haystack|moonshot|once[- ]in[- ]a[- ]lifetime|holy\s+grail|blue\s+sky|pot\s+of\s+gold|diamond\s+in\s+the\s+rough|hidden\s+gem)\b/i;
+
+export function detectMythicOrMetaphor(message: string): string | null {
+  const m = message.match(MYTHIC_RE) ?? message.match(METAPHOR_RE);
+  return m ? m[0].toLowerCase() : null;
+}
+
+function mythicGoalReply(phrase: string): string {
+  if (/white\s+whale/.test(phrase)) {
+    return "When you say “white whale,” do you mean a rare, hard-to-find property or asset, a boat/vessel name, a " +
+      "conservation/animal concept, or are you using it metaphorically for your dream opportunity? Furlong can " +
+      "reality-check lawful property, land, business, conservation, or asset goals once I know which you mean.";
+  }
+  return `When you say “${phrase},” do you mean that metaphorically — a rare, perfect property or opportunity — a ` +
+    "literal animal/conservation concept, or are you testing the Navigator? If you mean a rare property, I can help " +
+    `define what would make it a “${phrase}” and what tradeoffs are realistic.`;
+}
+
 export function resolveAmbiguity(message: string): AmbiguityDecision | null {
   if (ADULT_SERVICE_CLEAR.test(message)) {
     return { turnIntent: "REFUSE_ADULT_SERVICE_SEEKING", text: ADULT_SERVICE_REPLY, echoConcept: null, slot: "refuse:adult-service", refusal: true };
+  }
+  const mythic = detectMythicOrMetaphor(message);
+  if (mythic) {
+    return { turnIntent: "CLARIFY_AMBIGUOUS_OR_MYTHIC_GOAL", text: mythicGoalReply(mythic), echoConcept: mythic, slot: "clarify:mythic-goal", refusal: false };
   }
   const m = message.match(AMBIGUOUS_TERMS);
   if (!m) return null;

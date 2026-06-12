@@ -40,6 +40,7 @@ import {
 import { noveltyGateClear, translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY } from "@/lib/navigator/noveltyBuildDoctrine";
 import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder, detectViolentThreat, detectTargetedHarassment, assessCriticalInfrastructure } from "@/lib/navigator/navigatorTurnRouter";
 import { classifyIntent } from "@/lib/navigator/universalIntentClassifier";
+import { resolveContextualAnswer } from "@/lib/navigator/contextualAnswerResolver";
 import { appendThreatEscalation } from "@/security/realityPlatform/threatEscalationLedger";
 import { guardTurnIntent, intentForNode, type TurnIntent } from "@/lib/navigator/turnIntent";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
@@ -222,6 +223,16 @@ export async function POST(req: Request) {
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}${wantsDiscovery ? ":guided-discovery" : ""}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
     return NextResponse.json({ kind: "refusal", refusal, text: guarded.text, turnIntent: guarded.intent, journey });
+  }
+
+  // 2.5 — CONTEXTUAL SHORT-ANSWER: "all of the above" / "yes" / "the first one"
+  // resolve against the PREVIOUS bot question — never a new discovery goal.
+  const contextual = resolveContextualAnswer(message, journey);
+  if (contextual) {
+    const guarded = guardTurnIntent(journey, contextual.turnIntent, contextual.text, { userMessage: message });
+    journey = rememberPrompt(guarded.journey, guarded.text);
+    logInterviewTurn({ source: "fallback", slot: `navigator:${contextual.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
+    return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, classification, journey });
   }
 
   // 3–8 — THE AUTHORITATIVE ROUTER: safety, sexual-structure boundary, human

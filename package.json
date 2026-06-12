@@ -11,6 +11,7 @@
     "test:apply": "bash scripts/test-apply.sh",
     "test:health": "bash scripts/test-health.sh",
     "verify:schema": "tsx src/scripts/verifySchemaSingularity.ts",
+    "verify:life-event-resilience": "tsx src/scripts/verifyLifeEventResilience.ts",
     "security:audit": "tsx src/scripts/securityAuditReadinessGate.ts",
     "security:audit:production": "SECURITY_GATE_PROFILE=production tsx src/scripts/securityAuditReadinessGate.ts",
     "auth:activation": "tsx src/scripts/productionAuthActivationGate.ts",

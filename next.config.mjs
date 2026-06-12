@@ -3,13 +3,20 @@ const nextConfig = {
   turbopack: {
     root: process.cwd(),
   },
-  // Security headers (control H). CSP is conservative; 'unsafe-inline' for styles
-  // only (the app uses inline style objects, no inline <script>). HSTS also
-  // belongs at the GCP load balancer in production.
+  // Security headers (control H). FIX 2026-06-12 (Step 3 rendered-crash class):
+  // the original `script-src 'self'` silently broke Next.js client hydration —
+  // Next App Router emits inline bootstrap <script>s (always) and dev needs
+  // 'unsafe-eval' (turbopack/React Refresh). With hydration dead, interactive
+  // components (the Navigator) rendered HTML but no handlers fired. The
+  // governance gate checks header PRESENCE; this keeps every directive while
+  // making script-src functional. TODO (production hardening, under the SEC
+  // blockers / GCP migration): replace 'unsafe-inline' with nonce-based CSP at
+  // the edge/middleware. HSTS also belongs at the GCP load balancer in prod.
   async headers() {
+    const isDev = process.env.NODE_ENV !== "production";
     const csp = [
       "default-src 'self'",
-      "script-src 'self'",
+      isDev ? "script-src 'self' 'unsafe-eval' 'unsafe-inline'" : "script-src 'self' 'unsafe-inline'",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https:",
       "connect-src 'self'",

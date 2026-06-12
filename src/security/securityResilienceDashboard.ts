@@ -21,6 +21,7 @@ import { forensicReadinessStatus, forensicReadinessVerified } from "./forensicPr
 import { cloudRecoveryStatus, rebuildOrderValid } from "./cloudRecoveryManifest";
 import { drillReadiness } from "./securityDrillFramework";
 import { lockdownStatus } from "./securityLockdownRuntime";
+import { realitySecurityBlockers, realityProductionReady } from "./realityPlatform/realitySecurityDoctrine";
 
 export const CYBER_RESILIENCE_DOCTRINE_ID = "CYBER-RESILIENCE-DASHBOARD";
 export const CYBER_RESILIENCE_VERSION = "security-resilience-dashboard-v0.1.0";
@@ -72,6 +73,22 @@ export function openResilienceBlockers(): ResilienceBlocker[] {
  */
 export function productionReady(): boolean {
   return openResilienceBlockers().length === 0 && CYBER_RESILIENCE_HUMAN_REVIEW_COMPLETE;
+}
+
+// ── REALITY blocker FOLD-IN (branch integration 2026-06-12, per the merge note
+// docs/security/REALITY_BLOCKERS_MERGE_NOTE.md) ──────────────────────────────
+// The five REALITY-* blockers stay SOURCE-OF-TRUTH'd in
+// realitySecurityDoctrine.ts (the self-contained contract must NOT disappear);
+// this dashboard READS them and combines: exactly TEN blockers (5 SEC + 5
+// REALITY), and combined readiness requires BOTH sets closed plus the
+// human-review attestation. RECOVERY-CERT-001 remains folded inside SEC-DR-001
+// — never a sixth cyber blocker.
+export function combinedProductionBlockers(): { id: string; open: boolean }[] {
+  return [...resilienceProductionBlockers(), ...realitySecurityBlockers()];
+}
+
+export function combinedProductionReady(): boolean {
+  return productionReady() && realityProductionReady();
 }
 
 export type PanelStatus = "ready" | "partial" | "blocked";

@@ -52,12 +52,17 @@
  *     the /about mission line. Do not reintroduce "commercial pathways".
  */
 export const HOMEPAGE_HERO = {
+  // Hero CTA restructure Option A (Caitlin, 2026-06-11): the platform is a
+  // Possibility Discovery Engine, NOT a map product. The Navigator is the
+  // discovery engine; the map supports it. Copy must make the two actions
+  // self-explanatory to a first-time visitor.
   brandName: "Furlong",
-  headline:  "Every journey starts somewhere.",
-  tagline:   "Mapping America's land, funding, and business opportunities.",
+  headline:  "Discover possibilities you didn't know existed.",
+  tagline:   "Pathways, not promises.",
   subhead:
-    "Use 250 years of land and financial history to map your next venture — property, farming, or small business — on your terms.",
-  trustTag:  "Zero tracking. Total transparency.",
+    "Paste a property, describe an idea, or start with nothing at all. Furlong Navigator helps uncover " +
+    "pathways, opportunities, programs, and possibilities using evidence, transparency, and guided discovery.",
+  trustTag:  "Anonymous. No account required. We don't sell your information.",
 } as const;
 
 export const HOMEPAGE_SECTION_HEADINGS = {

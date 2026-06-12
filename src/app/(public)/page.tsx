@@ -1,5 +1,8 @@
+import Link from "next/link";
+
 import { America250Banner } from "@/components/brand/America250Banner";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
+import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
 import { isoWeekSeed } from "@/lib/public-content/weekSeed";
 import { Disclosures } from "@/components/public/Disclosures";
@@ -357,6 +360,37 @@ export default async function HomePage({
               {HOMEPAGE_HERO.subhead}
             </p>
             <p className="fl-hero-trust">{HOMEPAGE_HERO.trustTag}</p>
+            {/* HERO CTA RESTRUCTURE — Option A (Caitlin, 2026-06-11). Exactly
+                TWO CTAs whose LABELS explain the difference: the Navigator IS
+                the discovery engine (primary); the map is supporting
+                exploration (secondary, scrolls to the map section). Each CTA
+                carries its own supporting line so a first-time visitor can
+                answer "what happens if I click this?" without explanation.
+                A property is NOT required — the copy says so. */}
+            {discoveryPrimary() && (
+              <div style={{ display: "grid", gap: 14, justifyItems: "center", marginTop: 8 }}>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 18, justifyContent: "center", alignItems: "stretch" }}>
+                  <div style={{ display: "grid", gap: 6, maxWidth: 320, justifyItems: "center" }}>
+                    <Link href="/navigator" data-testid="cta-navigator"
+                      style={{ fontSize: 15.5, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "14px 32px", textDecoration: "none" }}>
+                      Talk to Furlong Navigator →
+                    </Link>
+                    <span data-testid="cta-navigator-support" style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.45, textAlign: "center" }}>
+                      Tell us what you're looking for and we'll help uncover pathways you may not know exist.
+                    </span>
+                  </div>
+                  <div style={{ display: "grid", gap: 6, maxWidth: 320, justifyItems: "center" }}>
+                    <a href="#americas-possibilities" data-testid="cta-explore-map"
+                      style={{ fontSize: 15.5, fontWeight: 800, color: "#0f766e", background: "#fff", border: "1.5px solid #0f766e", borderRadius: 999, padding: "14px 32px", textDecoration: "none" }}>
+                      Explore America's Possibilities →
+                    </a>
+                    <span data-testid="cta-explore-support" style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.45, textAlign: "center" }}>
+                      Browse the map, hidden-gem stories, and pathway examples before you begin.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </header>
         </section>
 
@@ -365,7 +399,9 @@ export default async function HomePage({
             Canonical stop pool from americasJourneyStops.ts.
             PublicMapExperience manages its own data — no props needed here.
             ══════════════════════════════════════════════════════════════ */}
-        <div className="fl-map-section">
+        {/* id = the secondary CTA's scroll target ("Explore America's
+            Possibilities" → the map experience, the supporting exploration). */}
+        <div className="fl-map-section" id="americas-possibilities">
           <PublicMapExperience liveSources={getRuntimeLiveSources()} weekSeed={weekSeed} />
         </div>
 

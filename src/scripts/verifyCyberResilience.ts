@@ -17,6 +17,7 @@ import { rebuildOrderValid, ASSUMED_LOSS } from "@/security/cloudRecoveryManifes
 import { drillReadiness, DRILL_SCENARIOS, simulateDrill } from "@/security/securityDrillFramework";
 import {
   securityResilienceDashboard, productionReady, openResilienceBlockers, resilienceProductionBlockers, RESILIENCE_BLOCKERS,
+  combinedProductionBlockers, combinedProductionReady,
 } from "@/security/securityResilienceDashboard";
 import { productionDnsCutoverAllowed as domainCutover } from "@/security/domainSecurityVerification";
 import { SECURITY_CONTROLS, securityHardeningStatus } from "@/security/securityHardeningManifest";
@@ -87,6 +88,18 @@ const open = openResilienceBlockers();
 for (const id of ["SEC-DR-001", "SEC-BACKUP-001", "SEC-DNS-001", "SEC-SECRET-001", "SEC-FORENSICS-001"] as const)
   ok(open.includes(id), `${id} is OPEN until its control is verified (blocks production)`);
 ok(resilienceProductionBlockers().every((b) => b.open), "ALL resilience blockers open by default");
+// REALITY FOLD-IN (branch integration 2026-06-12): the combined dashboard shows
+// EXACTLY TEN blockers — 5 SEC + 5 REALITY — no duplicates, no silently-closed
+// gate; combined readiness requires BOTH sets plus human review. The REALITY
+// source of truth stays in realitySecurityDoctrine (self-contained contract).
+{
+  const cb = combinedProductionBlockers();
+  ok(cb.length === 10 && new Set(cb.map((b) => b.id)).size === 10, `combined dashboard shows EXACTLY 10 unique blockers (got ${cb.length})`);
+  ok(cb.filter((b) => b.open).length === 10, "all 10 combined blockers OPEN");
+  for (const id of ["REALITY-INPUT-001", "REALITY-CONTEXT-001", "REALITY-URL-001", "REALITY-PRIVACY-001", "REALITY-OUTPUT-001"])
+    ok(cb.some((b) => b.id === id && b.open), `${id} folded in and OPEN`);
+  ok(combinedProductionReady() === false, "combined production readiness false while any of the 10 is open");
+}
 ok(dash.cyber_resilience_score < 80, `cyber resilience score honest/low until verified (got ${dash.cyber_resilience_score})`);
 
 // ── does NOT weaken existing FortKnox / domain governance ────────────────────

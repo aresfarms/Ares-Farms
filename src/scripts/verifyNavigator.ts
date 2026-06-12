@@ -12,7 +12,7 @@ import {
 import { scrubPropertyRecord, assertNoBannedFields } from "@/lib/navigator/intakeScrubber";
 import { resolveListingInput } from "@/lib/navigator/listingIntake";
 import { assessPathways, discoveryGraphChain, EMPTY_CONTEXT } from "@/lib/navigator/possibilityCheck";
-import { interpretMessage, FRESH_JOURNEY } from "@/lib/navigator/narrativeInterpreter";
+import { interpretMessage, detectPropertyIntent, FRESH_JOURNEY, GUIDED_DISCOVERY_OPENER } from "@/lib/navigator/narrativeInterpreter";
 import { FURLONG_NAVIGATOR_MANIFEST } from "@/lib/navigator/furlongNavigatorManifest";
 
 const fail: string[] = [];
@@ -139,6 +139,32 @@ ok(j.entryMode === "open-discovery" || j.entryMode === "own-asset", "entry mode 
 const j2 = interpretMessage(FRESH_JOURNEY, "I live at 123 Main St, Beckley WV — what can I do with it?");
 ok(j2.property !== null && j2.entryMode === "own-asset", "address in free text → Assets node entry (mode 2)");
 
+// ── Guided Property Discovery routing (loop fix 2026-06-11) ──────────────────
+// "no property / help me find one" must engage guided discovery — NEVER bounce
+// back to the asset prompt. Discovery requires no address to begin.
+for (const [msg, want] of [
+  ["no specific property can you help me find one?", "WANTS_PROPERTY_DISCOVERY"],
+  ["I don't own anything yet", "NO_PROPERTY_YET"],
+  ["I want a property that can make money", "WANTS_PROPERTY_DISCOVERY"],
+  ["help me find a property", "WANTS_PROPERTY_DISCOVERY"],
+  ["I don't have a property yet", "NO_PROPERTY_YET"],
+  ["show me what might fit", "WANTS_PROPERTY_DISCOVERY"],
+  ["no idea", "NO_PROPERTY_YET"],
+] as const) {
+  ok(detectPropertyIntent(msg, null) === want, `intent("${msg}") = ${want} (got ${detectPropertyIntent(msg, null)})`);
+}
+{
+  let gj = interpretMessage(FRESH_JOURNEY, "I'm hoping to build some income");
+  gj = interpretMessage(gj, "no specific property can you help me find one?");
+  ok(gj.guidedDiscovery === true && gj.intent === "WANTS_PROPERTY_DISCOVERY", "no-property ask engages guided discovery");
+  ok(["assets", "constraints", "pathways"].includes(gj.node), "guided discovery satisfies the assets node without an address");
+  // interest answer narrows kind + reaches pathways
+  gj = interpretMessage(gj, "farming income mostly");
+  ok(gj.context.propertyKind === "farm", "guided-discovery interest answer narrows the property kind");
+  ok(gj.node === "pathways" || gj.node === "constraints", `arc keeps advancing in guided discovery (at ${gj.node})`);
+  ok(/without using demographics or neighborhood profiling/.test(GUIDED_DISCOVERY_OPENER), "guided-discovery opener states the non-demographic rule");
+}
+
 // ── Naming + CTA + no-chip structural gates ───────────────────────────────────
 ok(FURLONG_NAVIGATOR_MANIFEST.name === "Furlong Navigator", "manifest names the Navigator");
 const pubFiles = [
@@ -192,6 +218,34 @@ async function main() {
       const r = await converse({ message: p, journey: kick.journey });
       ok(r.kind === "refusal" && r.text.startsWith(REFUSAL_LINE), `live: steering probe refused: "${p}"`);
     }
+    // GUIDED PROPERTY DISCOVERY — rendered-conversation reproduction of the
+    // screenshot failure (loop fix 2026-06-11):
+    {
+      const k = await converse({});
+      let gjj = k.journey;
+      let r = await converse({ message: "I'm hoping to invest in something", journey: gjj }); gjj = r.journey;
+      r = await converse({ message: "no specific property can you help me find one?", journey: gjj }); gjj = r.journey;
+      ok(/We can start without a property/.test(r.text), "live: no-property ask routes to Guided Property Discovery");
+      ok(!/What do you have to work with/.test(r.text), "live: the asset prompt does NOT repeat (the loop is fixed)");
+      // after that, "no idea" must not loop back to the asset prompt either
+      r = await converse({ message: "no idea", journey: gjj }); gjj = r.journey;
+      ok(!/What do you have to work with/.test(r.text), 'live: "no idea" after discovery does not loop');
+      // steering + discovery in one message → refusal THEN non-demographic discovery redirect
+      const sr = await converse({ message: "find me something in a white neighborhood", journey: k.journey });
+      ok(sr.kind === "refusal" && sr.text.startsWith(REFUSAL_LINE), "live: steering+discovery ask is refused first");
+      ok(/We can start without a property/.test(sr.text) && /without using demographics/.test(sr.text),
+        "live: after the refusal, the remaining intent routes to NON-DEMOGRAPHIC guided discovery");
+      // anti-repeat: no guide prompt may appear more than twice in a session
+      let aj = (await converse({})).journey;
+      const texts: string[] = [];
+      for (const m of ["hello", "hmm", "ok", "sure", "fine"]) {
+        const rr = await converse({ message: m, journey: aj }); aj = rr.journey;
+        if (rr.kind === "question" || rr.kind === "refusal") texts.push(rr.text);
+      }
+      const maxRepeat = Math.max(...texts.map((t) => texts.filter((x) => x === t).length));
+      ok(maxRepeat <= 2, `live: no prompt repeats more than once in a session (max occurrences ${maxRepeat})`);
+    }
+
     // walk to pathways: farmer → story → address → constraint
     let jj = kick.journey;
     for (const m of ["I'm a farmer with 120 acres", "trying to figure out what the land could earn", "the farm is at 123 Main St, Beckley WV", "no HOA, money is tight"]) {

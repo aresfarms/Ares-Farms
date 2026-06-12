@@ -22,7 +22,10 @@
 import { NextResponse } from "next/server";
 
 import { classifyRefusal, REFUSAL_LINE } from "@/lib/navigator/propertyPrivacyDoctrine";
-import { interpretMessage, questionForNode, wideningLine, FRESH_JOURNEY, type JourneyState } from "@/lib/navigator/narrativeInterpreter";
+import {
+  interpretMessage, questionForNode, wideningLine, detectPropertyIntent,
+  GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState,
+} from "@/lib/navigator/narrativeInterpreter";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
 import { logInterviewTurn, hashTranscript } from "@/lib/discovery/aiInterview";
 
@@ -44,29 +47,51 @@ export async function POST(req: Request) {
 
   // Kickoff (no message): the one open question. No chips, no form.
   if (!message.trim()) {
+    const text = questionForNode(journey);
+    journey = rememberPrompt(journey, text);
     logInterviewTurn({ source: "fallback", slot: "navigator:open", ok: true, transcriptHash: hashTranscript([]) });
     return NextResponse.json({
       kind: "question",
       node: journey.node,
-      text: questionForNode(journey),
+      text,
       journey,
     });
   }
 
-  // 1 — refusal gates BEFORE anything else (G-1 / G-2).
+  // 1 — refusal gates BEFORE anything else (G-1 / G-2). Refuse ONCE with the
+  // locked line, then INSPECT THE REMAINING INTENT (loop fix 2026-06-11): a
+  // steering ask that also wants property discovery ("find me something in a
+  // white neighborhood") gets the refusal AND the non-demographic guided-
+  // discovery redirect — never a dead end back to the asset prompt.
   const refusal = classifyRefusal(message);
   if (refusal) {
-    logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
+    const residual = detectPropertyIntent(message, null);
+    const wantsDiscovery = residual === "WANTS_PROPERTY_DISCOVERY" || residual === "NO_PROPERTY_YET";
+    if (wantsDiscovery) {
+      journey = {
+        ...journey,
+        intent: "PROTECTED_STEERING_REFUSED",
+        guidedDiscovery: true,
+        entryMode: journey.entryMode ?? "open-discovery",
+      };
+      journey = { ...journey, node: journey.node === "person" ? "story" : journey.node };
+    }
+    const followOn = wantsDiscovery
+      ? `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`
+      : nextPrompt(journey, journey.node);
+    journey = rememberPrompt(journey, followOn);
+    logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}${wantsDiscovery ? ":guided-discovery" : ""}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
     return NextResponse.json({
       kind: "refusal",
       refusal,
-      text: `${REFUSAL_LINE} ${questionForNode(journey)}`,
+      text: `${REFUSAL_LINE} ${followOn}`,
       journey,
     });
   }
 
   // 2 — interpret + advance the arc.
   const prevNode = journey.node;
+  const wasGuided = journey.guidedDiscovery;
   journey = interpretMessage(journey, message);
 
   // 3 — at Pathways (or beyond), assess + keep the conversation going.
@@ -91,13 +116,25 @@ export async function POST(req: Request) {
     });
   }
 
-  // Otherwise: the next single open question. When the arc did not advance,
-  // acknowledge what they said instead of repeating the same line verbatim
-  // (eyes-on wart: identical question twice reads like a form, not a guide).
-  const q = questionForNode(journey);
-  const text = journey.node === prevNode
-    ? `Heard — that helps more than you'd think. One more thing: ${q.charAt(0).toLowerCase()}${q.slice(1)}`
-    : q;
+  // Guided Property Discovery just engaged (no property / help me find one):
+  // respond with the discovery opener + ONE open follow-up — never the asset
+  // prompt again (loop fix 2026-06-11).
+  if (journey.guidedDiscovery && !wasGuided) {
+    const text = `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`;
+    journey = rememberPrompt(journey, text);
+    logInterviewTurn({ source: "fallback", slot: `navigator:guided-discovery:${journey.intent}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
+    return NextResponse.json({ kind: "question", node: journey.node, text, journey });
+  }
+
+  // Otherwise: the next single open question — with the ANTI-REPEAT rule: the
+  // same prompt may not repeat more than once in a session (unless the visitor
+  // restarts). When a prompt would third-peat, escalate to guided discovery.
+  let text = nextPrompt(journey, prevNode);
+  if (timesAsked(journey, text) >= 2) {
+    journey = { ...journey, guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" };
+    text = `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`;
+  }
+  journey = rememberPrompt(journey, text);
   logInterviewTurn({ source: "fallback", slot: `navigator:${journey.node}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
   return NextResponse.json({
     kind: "question",
@@ -105,4 +142,19 @@ export async function POST(req: Request) {
     text,
     journey,
   });
+}
+
+// ── prompt bookkeeping (anti-repeat) ─────────────────────────────────────────
+function timesAsked(j: JourneyState, prompt: string): number {
+  return j.askedPrompts.filter((p) => p === prompt).length;
+}
+function rememberPrompt(j: JourneyState, prompt: string): JourneyState {
+  return { ...j, askedPrompts: [...j.askedPrompts, prompt].slice(-20) };
+}
+/** The base question, softened with an acknowledgment when the arc stalled. */
+function nextPrompt(j: JourneyState, prevNode: string): string {
+  const q = questionForNode(j);
+  return j.node === prevNode && timesAsked(j, q) >= 1
+    ? `Heard — that helps more than you'd think. One more thing: ${q.charAt(0).toLowerCase()}${q.slice(1)}`
+    : q;
 }

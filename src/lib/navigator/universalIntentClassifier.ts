@@ -21,6 +21,7 @@
  */
 
 import type { TurnIntent } from "./turnIntent";
+import { detectAnimalGoal } from "./navigatorGoalRoutes";
 
 export type IntentClass =
   | "acquire" | "build" | "sell" | "lease" | "finance" | "operate" | "redevelop"
@@ -134,6 +135,20 @@ export function classifyIntentClass(message: string): IntentClass {
 
 export function classifyAsset(message: string): AssetRow | null {
   for (const row of ASSET_TAXONOMY) if (row.re.test(message)) return row;
+  // GENERIC ANIMAL fallback (defect fix): any animal goal classifies — no
+  // per-animal taxonomy row required, so unknown animals never fall through.
+  const animal = detectAnimalGoal(message);
+  if (animal) {
+    const exotic = animal.category === "exotic_livestock";
+    const wildlife = animal.category === "wildlife_or_conservation";
+    return {
+      re: /.^/, label: `${animal.animal} (${animal.category})`,
+      assetClass: "agricultural",
+      realityClass: exotic ? "unusual_but_realistic" : wildlife ? "regulated" : "ordinary",
+      reviewCategories: exotic ? ["zoning", "exotic-species permits", "animal limits", "USDA", "veterinary"] : ["zoning", "USDA", "animal limits", "water"],
+      turnIntent: wildlife ? "ROUTE_CONSERVATION_OR_HABITAT" : "ROUTE_LIVESTOCK_OR_AG_STRUCTURE",
+    };
+  }
   return null;
 }
 

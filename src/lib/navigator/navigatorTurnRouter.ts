@@ -48,6 +48,7 @@ import {
   detectThirdPartyAcquisition, THIRD_PARTY_CLARIFY_REPLY, THIRD_PARTY_PRESSURE_REPLY, THIRD_PARTY_CELEBRITY_REPLY,
   detectStreetAddress, detectPrivateAddressAcquisition,
   PRIVATE_ADDRESS_OVERVIEW_REPLY, PRIVATE_ADDRESS_STALKING_REFUSAL,
+  detectAnimalGoal, animalGoalReply,
 } from "./navigatorGoalRoutes";
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
@@ -782,6 +783,20 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
       turnIntent: repeated ? "ASK_REGION" : assetGoal.intent,
       text: repeated ? `Still on the ${assetGoal.label} — which market or region, and any budget or financing picture?` : assetGoal.reply,
       slot: `route:asset-goal:${assetGoal.intent}`, echoConcept: assetGoal.label, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 7.7 — GENERIC ANIMAL GOAL: any animal entity + goal verb (ostriches, camel,
+  // yak, …) classifies to an agricultural/animal pathway — never ASK_STORY.
+  const animalGoal = detectAnimalGoal(message);
+  if (animalGoal) {
+    const base: TurnIntent = animalGoal.category === "wildlife_or_conservation" ? "ROUTE_CONSERVATION_OR_HABITAT" : "ROUTE_LIVESTOCK_OR_AG_STRUCTURE";
+    const repeated = repeatOf(base);
+    return {
+      turnIntent: repeated ? "ASK_REGION" : base,
+      text: repeated ? `Staying with the ${animalGoal.animal} — which region, and roughly what scale?` : animalGoalReply(animalGoal.animal, animalGoal.category),
+      slot: `route:animal-goal:${animalGoal.category}`, echoConcept: animalGoal.animal, refusal: false,
       patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
   }

@@ -1083,6 +1083,23 @@ async function main() {
       ok(resolveContextualAnswer("I want to buy a farm", j) === null, "contextual (pure): a real goal is NOT a short answer");
     }
 
+    // GENERIC ANIMAL GOAL (defect fix 2026-06-12): unknown animals never fall
+    // through to ASK_STORY/ASK_PERSON — they classify generically.
+    for (const animal of ["ostriches", "emu", "camel", "yak", "water buffalo", "llama", "alpaca", "reindeer", "bison", "elk", "musk ox"]) {
+      const out = await runFixture(`animal-goal:${animal}`, [`I want ${animal} in Texas`]);
+      ok(["ROUTE_LIVESTOCK_OR_AG_STRUCTURE", "ROUTE_CONSERVATION_OR_HABITAT"].includes(out[0].intent),
+        `animal-goal:${animal}: agricultural/animal pathway (got ${out[0].intent})`);
+      ok(!["ASK_STORY", "ASK_PERSON", "ASK_ASSETS", "ASK_GOAL"].includes(out[0].intent),
+        `animal-goal:${animal}: NO generic story/person/asset intake`);
+      ok(!/ss\b/.test(out[0].text), `animal-goal:${animal}: no double-pluralization in the reply`);
+    }
+    {
+      const c = classifyIntent("I want ostriches in ME");
+      ok(c.assetClass === "agricultural" && c.realityClass === "unusual_but_realistic" && c.identified,
+        "animal-goal: classifier identifies exotic livestock generically (no per-animal row)");
+      ok(classifyIntent("I want a camel in Texas").identified, "animal-goal: 'camel' classifies even without a taxonomy row");
+    }
+
     // §9 — high-priority inputs must NEVER fall through to the arc (pure).
     {
       const { routeTurn: rt } = await import("@/lib/navigator/navigatorTurnRouter");

@@ -244,6 +244,70 @@ export function specialtyAssetReply(asset: string): string {
 
 function cap(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1); }
 
+// ── GENERIC ANIMAL GOAL classifier (defect fix 2026-06-12) ───────────────────
+// "I want ostriches in ME" / "I want a camel in Texas" must NOT fall through to
+// ASK_STORY. Any animal-goal is classified generically (no per-animal route).
+export type AnimalCategory = "livestock" | "exotic_livestock" | "companion_animal" | "wildlife_or_conservation" | "aquaculture";
+
+const ANIMAL_LEXICON: [RegExp, AnimalCategory][] = [
+  [/\b(?:ostrich|emu|rhea|camel|yak|water\s+buffalo|llama|alpaca|reindeer|bison|buffalo|elk|musk\s+ox(?:en)?|peacock|peafowl|guinea\s+fowl|antelope|zebra|kangaroo|wallaby)(?:e?s)?\b/i, "exotic_livestock"],
+  [/\b(?:cattle|cow|steer|bull|calf|pig|hog|swine|sheep|lamb|goat|chicken|hen|rooster|poultry|horse|pony|ponies|donkey|mule|turkey|duck|goose|geese|rabbit|quail)(?:e?s)?\b/i, "livestock"],
+  [/\b(?:trout|catfish|tilapia|salmon|shrimp|prawn|oyster|clam|mussel|crawfish|aquaculture|fish\s+farm)\b/i, "aquaculture"],
+  [/\b(?:bee|bees|apiary|honeybee)\b/i, "aquaculture"], // apiary handled as specialized ag
+  [/\b(?:deer|bison\s+herd|elk\s+herd|game\s+animal|wildlife|pheasant)\b/i, "wildlife_or_conservation"],
+  [/\b(?:dog|cat|puppy|kitten)\b/i, "companion_animal"],
+];
+
+const ANIMAL_GOAL_VERB_RE = /\b(?:want|wants|need|needs|raise|raising|breed|breeding|buy|keep|keeping|start|get|own|have|farm|farming)\b/i;
+
+function singularizeAnimal(w: string): string {
+  const s = w.toLowerCase();
+  if (/(?:ches|shes|sses|xes)$/.test(s)) return s.slice(0, -2); // ostriches→ostrich
+  if (/[^s]s$/.test(s)) return s.slice(0, -1);                  // emus→emu, camels→camel
+  return s;                                                     // reindeer, sheep, musk ox
+}
+
+export function detectAnimalCategory(message: string): { animal: string; category: AnimalCategory } | null {
+  for (const [re, category] of ANIMAL_LEXICON) {
+    const m = message.match(re);
+    if (m) return { animal: singularizeAnimal(m[0]), category };
+  }
+  return null;
+}
+
+/** A generic animal GOAL: an animal entity + a goal verb (or location phrasing). */
+export function detectAnimalGoal(message: string): { animal: string; category: AnimalCategory } | null {
+  const found = detectAnimalCategory(message);
+  if (!found) return null;
+  const hasGoal = ANIMAL_GOAL_VERB_RE.test(message) || /\b(?:in|on|near)\s+[A-Z]/.test(message);
+  return hasGoal ? found : null;
+}
+
+export function animalGoalReply(animal: string, category: AnimalCategory): string {
+  if (category === "exotic_livestock") {
+    return `Raising ${animal} is a real but specialized agricultural path. We’d look at ag zoning, exotic/livestock ` +
+      "permits and animal limits, fencing/shelter, veterinary and feed sourcing, setbacks, and whether you want an " +
+      "operating operation, land to start one, or a smaller setup. Which region, and roughly what scale?";
+  }
+  if (category === "aquaculture") {
+    return `${cap(animal)} is an aquaculture/specialized-ag goal. We’d look at water rights and quality, state ` +
+      "aquaculture/apiary permits, zoning, environmental rules, and whether you have land/water or are looking. " +
+      "Which region, and operating business, land to build, or smaller setup?";
+  }
+  if (category === "wildlife_or_conservation") {
+    return `A ${animal} goal usually means a wildlife, game, or conservation land use. We’d look at acreage, state ` +
+      "wildlife/game rules, conservation easements or programs, zoning, and whether this is private land, a preserve, " +
+      "or a managed operation. Which region?";
+  }
+  if (category === "companion_animal") {
+    return `Happy to help with the ${animal} as a property goal — are you after land or a property where ${animal}s ` +
+      "are allowed, a boarding/kennel/breeding use, or a pet-related business? Rules are local — which area?";
+  }
+  return `A ${animal} operation is a real agricultural goal. We’d look at ag zoning, animal limits, setbacks, ` +
+    "manure/nutrient management, water, fencing/shelter, and whether you want an operating farm, land to start one, " +
+    "or a smaller setup. Which region, and roughly what scale?";
+}
+
 // ── PARCEL ENCUMBRANCE / EASEMENT (not infrastructure analysis) ──────────────
 // A pipeline easement ON a farm is a PROPERTY CONSTRAINT — not a request to
 // analyze the pipeline. Detected before the infra hard-shutdown. NEVER yields

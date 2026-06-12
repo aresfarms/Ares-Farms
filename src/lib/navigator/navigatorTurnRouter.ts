@@ -87,7 +87,7 @@ const IMPOSSIBLE_PLACE_RE: [RegExp, string][] = [
   [/\bouter\s+space\b|\bin\s+space\b|\bzero[- ]g(?:ravity)?\b|\bin\s+orbit\b|\borbital\b/i, "outer space"],
   [/\bon\s+the\s+moon\b|\bmoon\s+base\b/i, "the Moon"],
   [/\bon\s+mars\b|\bmars\s+colony\b/i, "Mars"],
-  [/\b(?:a|my)\s+spaceship\b|\bneed\s+a\s+spaceship\b|\bbuy\s+a\s+spaceship\b/i, "a spaceship"],
+  [/\b(?:a|my)\s+spaceship\b(?!\s*[- ]?(?:house|home|inspired))/i, "a spaceship"],
   [/\bunderwater\s+(?:city|castle|mansion)\b|\bbottom\s+of\s+the\s+ocean\b/i, "an underwater city"],
   [/\b(?:floating|flying)\s+(?:castle|city|island|fortress)\b/i, "a floating fortress"],
   [/\b(?:hogwarts|death\s+star|cloud\s+(?:city|palace)|narnia|middle[- ]earth)\b/i, "a fictional place"],
@@ -120,11 +120,39 @@ const WEIRD_LAWFUL_RE: [RegExp, string][] = [
   [/\bsilo\s+(?:home|house)\b|\bgrain\s+silo\b.{0,20}\b(?:home|live)\b/i, "silo home"],
   [/\bdome\s+(?:home|house)\b|\bearthship\b|\byurt\b|\bcontainer\s+home\b/i, "alternative dwelling"],
 ];
+// SPECIFIC lawful/ambiguous concepts whose real-world USE must be clarified
+// BEFORE any generic budget/constraints prompt (fix 2026-06-12): the reply
+// must echo the user's concept phrase and ask a USE-SPECIFIC follow-up.
+const SPECIFIC_CONCEPTS: [RegExp, string, string[]][] = [
+  [/\bfrog\s+house\b/i, "frog house",
+    ["a frog-themed house", "a real amphibian habitat", "a wetland education structure", "a tiny home with frog character"]],
+  [/\b(chinese\s+)?apothecary\s+(?:house|home|shop|store|building)\b/i, "apothecary house",
+    ["a residence with apothecary character", "an herbal or apothecary retail shop", "a cultural design concept", "a hospitality concept", "a museum or education space"]],
+  [/\bpig\s?pen\b/i, "pig pen",
+    ["real livestock infrastructure", "a farm property", "a simple rural-home metaphor"]],
+  [/\b(?:bird|owl|bat|butterfly)\s+house\b.{0,30}\b(?:live|home|build|big|giant|human)\b/i, "animal-house concept",
+    ["a themed structure", "a real wildlife habitat", "an education feature"]],
+  [/\b(?:fairy|gnome|mushroom|witch)\s+(?:house|cottage|home)\b/i, "storybook structure",
+    ["a themed cabin or cottage", "a garden feature", "a hospitality concept"]],
+];
+
+export function detectSpecificConcept(message: string): { phrase: string; options: string[] } | null {
+  for (const [re, label, options] of SPECIFIC_CONCEPTS) {
+    const m = message.match(re);
+    if (m) return { phrase: m[1] ? m[0].trim() : label, options };
+  }
+  return null;
+}
+
+export function specificConceptReply(phrase: string, options: string[]): string {
+  return `A ${phrase} could mean a few different real things — ${options.join(", ")} — or are you just testing the ` +
+    "Navigator? Which is closest? Once I know the real-world use, we can check what zoning and building codes would allow.";
+}
+
 // Specific novelty objects / animal structures someone wants to live in or
 // build — the piñata rule: the reply MUST name the concept.
 const NOVELTY_CONCEPT_RE: [RegExp, string][] = [
   [/\bpi[ñn]ata\b/i, "piñata"],
-  [/\bpig\s?pen\b/i, "pig pen"],
   [/\bchicken\s+coop\b/i, "chicken coop"],
   [/\bdog\s?house\b.{0,20}\b(?:live|home)\b/i, "dog house"],
   [/\blive\s+in\s+a\s+(?:giant\s+)?(shoe|boot|teapot|pumpkin|barrel|bottle|sandcastle|igloo)\b/i, "$1"],
@@ -270,6 +298,19 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
         : outOfScopeAdjacentReply(impossible),
       slot: "out-of-scope:impossible-place", echoConcept: impossible, refusal: false,
       patch: { noveltyGate: gateForCategory("FANTASY_OUT_OF_SCOPE") },
+    };
+  }
+
+  // 5.5 — SPECIFIC lawful/ambiguous concept → clarify the real-world USE
+  // before ANY generic constraints/budget prompt; the reply echoes the phrase.
+  const specific = detectSpecificConcept(message);
+  if (specific) {
+    const repeated = repeatOf("CLARIFY_SPECIFIC_CONCEPT_USE");
+    return {
+      turnIntent: repeated ? "ROUTE_CODE_CHECKABLE_TRANSLATION" : "CLARIFY_SPECIFIC_CONCEPT_USE",
+      text: repeated ? codeCheckableTranslationReply(specific.phrase) : specificConceptReply(specific.phrase, specific.options),
+      slot: "clarify:specific-concept-use", echoConcept: specific.phrase, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
   }
 

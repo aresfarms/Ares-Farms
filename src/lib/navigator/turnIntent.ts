@@ -28,6 +28,7 @@ export type TurnIntent =
   // clarification
   | "CLARIFY_HUMAN_CONTEXT" | "CLARIFY_METAPHOR_OR_JOKE" | "CLARIFY_METAPHOR"
   | "CLARIFY_UNUSUAL_BUILD" | "CLARIFY_OUT_OF_SCOPE" | "CLARIFY_NOVELTY_BUILD_CONCEPT"
+  | "CLARIFY_SPECIFIC_CONCEPT_USE"
   // refusals (always refuse in substance; alternates only vary wording)
   | "REFUSE_UNLAWFUL_EVASION" | "REFUSE_FAIR_HOUSING_STEERING"
   | "REFUSE_OWNER_LOOKUP" | "REFUSE_ADULT_SEXUAL_STRUCTURE" | "REFUSE_AND_REDIRECT"
@@ -82,6 +83,10 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   CLARIFY_OUT_OF_SCOPE: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
   CLARIFY_METAPHOR: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
   CLARIFY_METAPHOR_OR_JOKE: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
+  CLARIFY_SPECIFIC_CONCEPT_USE: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Whenever you can tell me the real-world use — home, business, habitat, education, or just testing — we can check what zoning and building codes would allow.",
+  },
   CLARIFY_HUMAN_CONTEXT: {
     intent: "WAIT_FOR_MORE_INFO",
     text: "No rush — whenever you want to tell me about a real property goal, land, business, or place, I'm here for that.",

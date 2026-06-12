@@ -117,6 +117,41 @@ export async function POST(req: Request) {
   const refusal = isUnlawfulEvasionAsk(message) ? null : classifyRefusal(message);
   if (refusal) {
     journey = { ...journey, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
+    const refusalIntent: TurnIntent = refusal === "ownership" ? "REFUSE_OWNER_LOOKUP" : "REFUSE_FAIR_HOUSING_STEERING";
+
+    // MIXED-INTENT PRESERVATION (build fix 2026-06-12): a guardrail refusal
+    // must not erase a legitimate user goal. Split the message: the forbidden
+    // criteria are refused; a lawful concept in the same message (hobbit
+    // house, spaceship house, regulated use, …) is PRESERVED and routed.
+    // (Unlawful-evasion and explicit-content refusals deliberately do NOT
+    // preserve goals in the same turn — those boundaries restrict follow-up.)
+    const allowedGoal = routeTurn(message, { ...journey, lastTurnIntent: null, recentTurnIntents: [] });
+    const PRESERVABLE: TurnIntent[] = [
+      "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE", "ROUTE_EARTH_SHELTERED_HOUSING",
+      "ROUTE_PROPERTY_ANALYSIS", "CLARIFY_SPECIFIC_CONCEPT_USE", "CLARIFY_NOVELTY_BUILD_CONCEPT",
+    ];
+    if (allowedGoal && !allowedGoal.refusal && PRESERVABLE.includes(allowedGoal.turnIntent)) {
+      journey = { ...journey, ...allowedGoal.patch };
+      const preamble = refusal === "steering"
+        ? "I can’t help search by race, demographics, or who lives in an area."
+        : REFUSAL_LINE;
+      const goalText =
+        allowedGoal.turnIntent === "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE" || allowedGoal.turnIntent === "ROUTE_EARTH_SHELTERED_HOUSING"
+          ? `But I can help with the lawful part of your goal: finding land where a ${(allowedGoal.echoConcept ?? "unusual").replace(/\s*house$/i, "")}-style or earth-sheltered home could realistically be built. For that, we’d look at zoning, building codes, setbacks, utilities, septic/water, HOA restrictions, and local permitting. Are you hoping to build one, buy one, or find land where one could legally be built?`
+          : `But I can help with the lawful part of your goal. ${allowedGoal.text}`;
+      const text = `${preamble} ${goalText}`;
+      journey = { ...journey, lastTurnIntent: refusalIntent, recentTurnIntents: [...(journey.recentTurnIntents ?? []), refusalIntent, allowedGoal.turnIntent].slice(-3) };
+      journey = rememberPrompt(journey, text);
+      logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}:goal-preserved:${allowedGoal.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
+      return NextResponse.json({
+        kind: "refusal", refusal, text,
+        turnIntent: refusalIntent,
+        chainedTurnIntents: [refusalIntent, allowedGoal.turnIntent],
+        ...(allowedGoal.echoConcept ? { echoConcept: allowedGoal.echoConcept } : {}),
+        journey,
+      });
+    }
+
     const residual = detectPropertyIntent(message, null);
     const wantsDiscovery = residual === "WANTS_PROPERTY_DISCOVERY" || residual === "NO_PROPERTY_YET";
     if (wantsDiscovery) {
@@ -131,7 +166,6 @@ export async function POST(req: Request) {
     const followOn = wantsDiscovery
       ? `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`
       : nextPrompt(journey, journey.node);
-    const refusalIntent: TurnIntent = refusal === "ownership" ? "REFUSE_OWNER_LOOKUP" : "REFUSE_FAIR_HOUSING_STEERING";
     const guarded = guardTurnIntent(journey, refusalIntent, `${REFUSAL_LINE} ${followOn}`, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}${wantsDiscovery ? ":guided-discovery" : ""}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });

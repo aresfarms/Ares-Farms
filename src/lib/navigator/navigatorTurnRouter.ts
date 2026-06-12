@@ -49,6 +49,7 @@ import {
   detectStreetAddress, detectPrivateAddressAcquisition,
   PRIVATE_ADDRESS_OVERVIEW_REPLY, PRIVATE_ADDRESS_STALKING_REFUSAL,
   detectAnimalGoal, animalGoalReply,
+  detectDecisionRequest, decisionRequestReply,
   detectApiaryScale, APIARY_SCALE_REPLY,
   detectShortNounPhrase, shortNounPhraseReply,
 } from "./navigatorGoalRoutes";
@@ -622,6 +623,22 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
         ? "No rush — whenever you want to tell me about a real property goal, land, business, or place, I'm here for that."
         : humanContextReply(entity),
       slot: "clarify:human-context", echoConcept: entity, refusal: false, patch: {},
+    };
+  }
+
+  // 4.35 — PATH-AND-OPTIONS (constitutional): a request to DECIDE ("should I
+  // buy this RV park?", "tell me what to do", "is this the best?", "rent or
+  // buy?", "100% financing?") gets paths/tradeoffs/alternatives — never a
+  // buy/sell directive. Runs BEFORE asset routing so "should I buy X" isn't
+  // treated as a plain acquisition goal.
+  const decision = detectDecisionRequest(message);
+  if (decision) {
+    const repeated = repeatOf("PRESENT_PATHS_AND_OPTIONS");
+    return {
+      turnIntent: repeated ? "ASK_REGION" : "PRESENT_PATHS_AND_OPTIONS",
+      text: decisionRequestReply(decision),
+      slot: `paths-and-options:${decision}`, echoConcept: null, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
   }
 

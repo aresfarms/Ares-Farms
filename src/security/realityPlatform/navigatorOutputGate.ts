@@ -40,6 +40,23 @@ const LISTING_COPY_MARKERS = [
   /mls ?#?\s*\d/i, /listing photos?\b/i,
 ];
 
+// ── NO_DECISION_FOR_USER_GATE (Path-and-Options Doctrine, constitutional) ────
+// Furlong shows the map; the user chooses the path. Prescriptive buy/sell/rent
+// commands, "best/right/wrong decision" framing, and guaranteed-outcome
+// language are blocked. ("should you / do you / can this property" QUESTIONS
+// are fine — only DIRECTIVES at the user are blocked.)
+const NO_DECISION_FOR_USER = [
+  /\byou\s+should\s+(?:buy|sell|rent|lease|purchase|acquire|invest|not\s+buy|not\s+sell|avoid|walk\s+away)\b/i,
+  /\byou\s+shouldn'?t\s+(?:buy|sell|rent|lease|purchase|invest)\b/i,
+  /\b(?:i|we)\s+recommend\s+(?:you\s+)?(?:buy|sell|purchase|do\s+not|don'?t|against)\b/i,
+  /\bthis\s+is\s+the\s+(?:best|right|wrong)\s+(?:choice|decision|property|option|move)\b/i,
+  /\bthe\s+(?:best|right)\s+(?:choice|decision|move)\s+is\b/i,
+  /\b(?:just|definitely)\s+(?:buy|sell|do)\s+(?:it|this)\b/i,
+  /\b(?:don'?t|do\s+not)\s+(?:buy|do)\s+(?:it|this)\b/i,
+  /\bthis\s+(?:will|is\s+guaranteed\s+to)\s+(?:close|make\s+money|succeed|profit|qualify)\b/i,
+  /\byou\s+will\s+(?:definitely\s+)?(?:close|profit|qualify|succeed)\b/i,
+];
+
 /** Gate any free-text bound for the visitor. */
 export function gateOutputText(text: string): OutputGateVerdict {
   const blocks: string[] = [];
@@ -49,7 +66,13 @@ export function gateOutputText(text: string): OutputGateVerdict {
   for (const re of DETERMINATION_LANGUAGE) if (re.test(text)) blocks.push(`official determination / you-qualify language (${re})`);
   if (hasSingleNumberPromise(text)) blocks.push("single-number financial promise (ranges only)");
   for (const re of LISTING_COPY_MARKERS) if (re.test(text)) blocks.push("source-listing proprietary content marker");
+  for (const re of NO_DECISION_FOR_USER) if (re.test(text)) blocks.push(`prescriptive decision-for-user language (${re})`);
   return { ok: blocks.length === 0, blocks };
+}
+
+/** True when text makes a decision FOR the user (path-and-options violation). */
+export function decidesForUser(text: string): boolean {
+  return NO_DECISION_FOR_USER.some((re) => re.test(text));
 }
 
 /** Gate the structured pathway payload (required shape). */

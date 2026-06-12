@@ -61,6 +61,7 @@ export type TurnIntent =
   | "ROUTE_ANIMAL_RESCUE_OR_BOARDING" | "ROUTE_CONSERVATION_OR_HABITAT"
   | "CLARIFY_AMBIGUOUS_OR_MYTHIC_GOAL" | "CLARIFY_CONTEXTUAL_ANSWER"
   | "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" | "CLARIFY_SHORT_NOUN_PHRASE"
+  | "PRESENT_PATHS_AND_OPTIONS"
   // parcel encumbrance + third-party acquisition boundary
   | "ROUTE_EASEMENT_CONSTRAINT_REVIEW" | "CLARIFY_THIRD_PARTY_ACQUISITION"
   | "LIMITED_PRIVATE_ADDRESS_OVERVIEW"
@@ -170,6 +171,10 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   CLARIFY_SHORT_NOUN_PHRASE: {
     intent: "WAIT_FOR_MORE_INFO",
     text: "Whenever you can say a bit more about the real-world property, animal-care, business, or facility goal, I’ll point this the right way.",
+  },
+  PRESENT_PATHS_AND_OPTIONS: {
+    intent: "ASK_REGION",
+    text: "Which property or option do you want me to lay the paths and tradeoffs out for? I’ll show the map; the decision stays yours.",
   },
   ROUTE_EASEMENT_CONSTRAINT_REVIEW: { intent: "ASK_REGION", text: "Which parcel and jurisdiction? Buildable-area and use limits from an easement turn on the recorded document and local zoning." },
   CLARIFY_THIRD_PARTY_ACQUISITION: {

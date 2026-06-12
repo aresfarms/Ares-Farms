@@ -260,6 +260,54 @@ export function specialtyAssetReply(asset: string): string {
 
 function cap(s: string): string { return s.charAt(0).toUpperCase() + s.slice(1); }
 
+// ── PATH-AND-OPTIONS DOCTRINE (constitutional, 2026-06-12) ───────────────────
+// "Furlong shows the map; the user chooses the path." A request to DECIDE is
+// answered with paths/tradeoffs/alternatives + "the decision is yours" — never
+// a buy/sell/rent directive, never "best", never a financing sales funnel.
+export type DecisionRequestKind = "decide-for-me" | "should-buy" | "best" | "rent-vs-buy" | "financing";
+
+const DECIDE_FOR_ME_RE = /\b(?:tell\s+me\s+what\s+to\s+do|what\s+should\s+i\s+do|decide\s+for\s+me|make\s+the\s+(?:decision|call)\s+for\s+me|what\s+would\s+you\s+do|just\s+tell\s+me\s+(?:yes\s+or\s+no|whether))\b/i;
+const RENT_VS_BUY_RE = /\b(?:rent\s+or\s+buy|buy\s+or\s+rent|rent\s+vs\.?\s+buy|renting\s+vs\.?\s+buying)\b/i;
+const FINANCING_RE = /\b(?:100%?\s+financing|no\s+money\s+down|zero\s+down|no\s+down\s*payment|avoid\s+(?:cash|putting\s+(?:any\s+)?money))\b/i;
+const SHOULD_BUY_RE = /\bshould\s+i\s+(?:buy|purchase|acquire|invest\s+in|get)\b/i;
+const BEST_RE = /\bis\s+(?:this|it)\s+the\s+best\b|\bwhich\s+is\s+(?:the\s+)?best\b|\bbest\s+(?:property|choice|option|deal|investment)\b/i;
+
+export function detectDecisionRequest(message: string): DecisionRequestKind | null {
+  if (FINANCING_RE.test(message)) return "financing";
+  if (RENT_VS_BUY_RE.test(message)) return "rent-vs-buy";
+  if (DECIDE_FOR_ME_RE.test(message)) return "decide-for-me";
+  if (BEST_RE.test(message)) return "best";
+  if (SHOULD_BUY_RE.test(message)) return "should-buy";
+  return null;
+}
+
+const PATHS_SHAPE = "what we know, what we don’t, what it could do, what could go wrong, the due diligence " +
+  "needed, similar alternatives, what ownership may look like over time, and the financing/liquidity realities";
+
+export function decisionRequestReply(kind: DecisionRequestKind): string {
+  switch (kind) {
+    case "decide-for-me":
+      return "I can’t make that decision for you — that part is yours. What I can do is lay out the paths and " +
+        `tradeoffs: ${PATHS_SHAPE}. Tell me the property or option and I’ll map it out so you can decide.`;
+    case "should-buy":
+      return "I won’t tell you to buy or not buy — that decision stays yours. What I can show is the map: " +
+        `${PATHS_SHAPE}. Based on available evidence I can flag what appears supported and what may make it risky, ` +
+        "and surface similar alternatives — then the decision is yours.";
+    case "best":
+      return "I can’t call something “the best” without evidence and your own priorities. What I can do is compare " +
+        "it against similar alternatives on costs, constraints, risks, and tradeoffs — and show what appears " +
+        "supported and what’s uncertain — so you can decide which fits. The decision is yours.";
+    case "rent-vs-buy":
+      return "Rent, buy, and wait are all real paths with different tradeoffs — I can lay out each (upfront cash, " +
+        "flexibility, ownership costs over time, liquidity, and risk) without pushing ownership. There’s no " +
+        "universal right answer here; the decision is yours.";
+    case "financing":
+      return "100% financing may reduce down-payment requirements, but it does not eliminate liquidity needs, " +
+        "transaction costs, due-diligence costs, earnest money, reserves, or closing uncertainty. It’s one part of " +
+        "the decision landscape, not a shortcut to getting a deal done — and the decision is yours.";
+  }
+}
+
 // ── GENERIC ANIMAL GOAL classifier (defect fix 2026-06-12) ───────────────────
 // "I want ostriches in ME" / "I want a camel in Texas" must NOT fall through to
 // ASK_STORY. Any animal-goal is classified generically (no per-animal route).

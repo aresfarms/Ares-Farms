@@ -17,6 +17,7 @@ import { FURLONG_NAVIGATOR_MANIFEST } from "@/lib/navigator/furlongNavigatorMani
 import { deriveDecisionSummary, PATHWAYS_NOT_PROMISES } from "@/lib/navigator/decisionFramework";
 import { GOAL_COVERAGE_REGISTRY } from "@/lib/navigator/goalCoverageRegistry";
 import { classifyIntent } from "@/lib/navigator/universalIntentClassifier";
+import { gateOutputText, decidesForUser } from "@/security/realityPlatform/navigatorOutputGate";
 import {
   classifyNoveltyConcept, gateForCategory, isDisallowedOutright, noveltyGateClear,
   translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY,
@@ -361,6 +362,16 @@ ok(noveltyGateClear(null), "novelty: ordinary (non-novelty) conversations pass �
     const telSrc2 = fs.readFileSync("src/security/realityPlatform/abuseTelemetryDashboard.ts", "utf8");
     ok(!/networkIdentifier|userAgent|triggeringMessageHash/.test(telSrc2),
       "threat metadata isolated: abuse dashboard never reads network/UA/message-hash fields");
+  }
+  // NO_DECISION_FOR_USER_GATE (constitutional): block prescriptive directives,
+  // allow path-and-options framing.
+  {
+    for (const bad of ["You should buy this property.", "You should not buy this RV park.", "This is the best choice.", "This is the right decision.", "Just buy it.", "Don't buy it.", "This will close.", "This will make money."]) {
+      ok(!gateOutputText(bad).ok && decidesForUser(bad), `gate blocks decision-for-user: "${bad}"`);
+    }
+    for (const good of ["Here are the paths and tradeoffs.", "Based on available evidence, this may be difficult to justify at the current price.", "Similar alternatives may offer better risk-adjusted pathways. The decision is yours.", "This appears to support several possible pathways, each with different costs and risks."]) {
+      ok(gateOutputText(good).ok && !decidesForUser(good), `gate allows path-and-options framing: "${good.slice(0, 40)}…"`);
+    }
   }
   ok(classifyNoveltyConcept("how do I hide this addition from the assessor") === "CODE_EVASION" &&
      /lawful path|permit application/.test(CODE_EVASION_REPLY) && /can’t help with avoiding inspections/.test(CODE_EVASION_REPLY),
@@ -1157,6 +1168,21 @@ async function main() {
       // Regression guard: "the farm is at <addr>" is OWNED land, not acquisition.
       const ownFarm = await runFixture("matrix:own-farm", ["the farm is at 123 Main St, Beckley WV"]);
       ok(ownFarm[0].intent !== "ROUTE_AGRICULTURAL_ACQUISITION", "matrix: 'the farm is at…' is owned land, not an acquisition route");
+    }
+
+    // PATH-AND-OPTIONS DOCTRINE (constitutional, 2026-06-12).
+    for (const [name, msg, must] of [
+      ["should-buy", "Should I buy this RV park?", /decision stays yours|decision is yours/],
+      ["decide-for-me", "Tell me what to do", /can’t make that decision for you/],
+      ["best", "Is this the best property?", /can’t call something “the best”|compare it against similar alternatives/],
+      ["financing", "Can I use 100% financing and avoid cash?", /does not eliminate liquidity needs.*earnest money/],
+      ["rent-buy", "Should I rent or buy?", /Rent, buy, and wait are all real paths/],
+    ] as const) {
+      const out = await runFixture(`paths:${name}`, [msg]);
+      ok(out[0].intent === "PRESENT_PATHS_AND_OPTIONS", `paths:${name}: PRESENT_PATHS_AND_OPTIONS (got ${out[0].intent})`);
+      ok(must.test(out[0].text), `paths:${name}: path-and-options framing`);
+      ok(!/you should (?:buy|not buy|sell)|this is the (?:best|right) (?:choice|decision)|just buy it|don’t buy it/i.test(out[0].text),
+        `paths:${name}: NO prescriptive decision-for-user language`);
     }
 
     // §9 — high-priority inputs must NEVER fall through to the arc (pure).

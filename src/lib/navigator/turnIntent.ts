@@ -28,7 +28,8 @@ export type TurnIntent =
   // clarification
   | "CLARIFY_HUMAN_CONTEXT" | "CLARIFY_METAPHOR_OR_JOKE" | "CLARIFY_METAPHOR"
   | "CLARIFY_UNUSUAL_BUILD" | "CLARIFY_OUT_OF_SCOPE" | "CLARIFY_NOVELTY_BUILD_CONCEPT"
-  | "CLARIFY_SPECIFIC_CONCEPT_USE"
+  | "CLARIFY_SPECIFIC_CONCEPT_USE" | "CLARIFY_ANIMAL_HOUSING"
+  | "ROUTE_PET_STRUCTURE" | "ROUTE_LIVESTOCK_OR_AG_STRUCTURE"
   // refusals (always refuse in substance; alternates only vary wording)
   | "REFUSE_UNLAWFUL_EVASION" | "REFUSE_FAIR_HOUSING_STEERING"
   | "REFUSE_OWNER_LOOKUP" | "REFUSE_ADULT_SEXUAL_STRUCTURE" | "REFUSE_AND_REDIRECT"
@@ -83,6 +84,18 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   CLARIFY_OUT_OF_SCOPE: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
   CLARIFY_METAPHOR: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
   CLARIFY_METAPHOR_OR_JOKE: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
+  CLARIFY_ANIMAL_HOUSING: {
+    intent: "ASK_REGION",
+    text: "Whichever it is — which part of the country (or town) are we talking about? Climate, zoning, and animal rules all hang on the place.",
+  },
+  ROUTE_PET_STRUCTURE: {
+    intent: "ASK_REGION",
+    text: "Which town or area is this for? Kennel and animal rules are local — the place decides what's allowed.",
+  },
+  ROUTE_LIVESTOCK_OR_AG_STRUCTURE: {
+    intent: "ASK_REGION",
+    text: "Which region is the land in (or where are you looking)? Ag zoning and animal limits are set locally.",
+  },
   CLARIFY_SPECIFIC_CONCEPT_USE: {
     intent: "WAIT_FOR_MORE_INFO",
     text: "Whenever you can tell me the real-world use — home, business, habitat, education, or just testing — we can check what zoning and building codes would allow.",

@@ -38,7 +38,7 @@ import {
   GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState,
 } from "@/lib/navigator/narrativeInterpreter";
 import { noveltyGateClear, translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY } from "@/lib/navigator/noveltyBuildDoctrine";
-import { routeTurn, isUnlawfulEvasionAsk } from "@/lib/navigator/navigatorTurnRouter";
+import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder } from "@/lib/navigator/navigatorTurnRouter";
 import { guardTurnIntent, intentForNode, type TurnIntent } from "@/lib/navigator/turnIntent";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
 import { deriveDecisionSummary } from "@/lib/navigator/decisionFramework";
@@ -125,19 +125,20 @@ export async function POST(req: Request) {
     // house, spaceship house, regulated use, …) is PRESERVED and routed.
     // (Unlawful-evasion and explicit-content refusals deliberately do NOT
     // preserve goals in the same turn — those boundaries restrict follow-up.)
-    const allowedGoal = routeTurn(message, { ...journey, lastTurnIntent: null, recentTurnIntents: [] });
+    const allowedGoal = extractAllowedRemainder(message, journey);
     const PRESERVABLE: TurnIntent[] = [
       "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE", "ROUTE_EARTH_SHELTERED_HOUSING",
       "ROUTE_PROPERTY_ANALYSIS", "CLARIFY_SPECIFIC_CONCEPT_USE", "CLARIFY_NOVELTY_BUILD_CONCEPT",
+      "CLARIFY_ANIMAL_HOUSING", "ROUTE_PET_STRUCTURE", "ROUTE_LIVESTOCK_OR_AG_STRUCTURE",
     ];
-    if (allowedGoal && !allowedGoal.refusal && PRESERVABLE.includes(allowedGoal.turnIntent)) {
+    if (allowedGoal && PRESERVABLE.includes(allowedGoal.turnIntent)) {
       journey = { ...journey, ...allowedGoal.patch };
       const preamble = refusal === "steering"
         ? "I can’t help search by race, demographics, or who lives in an area."
         : REFUSAL_LINE;
       const goalText =
         allowedGoal.turnIntent === "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE" || allowedGoal.turnIntent === "ROUTE_EARTH_SHELTERED_HOUSING"
-          ? `But I can help with the lawful part of your goal: finding land where a ${(allowedGoal.echoConcept ?? "unusual").replace(/\s*house$/i, "")}-style or earth-sheltered home could realistically be built. For that, we’d look at zoning, building codes, setbacks, utilities, septic/water, HOA restrictions, and local permitting. Are you hoping to build one, buy one, or find land where one could legally be built?`
+          ? `But I can help with the lawful part of your goal: finding land where a ${(allowedGoal.echoConcept ?? "unusual").replace(/\s*house$/i, "")}-inspired or earth-sheltered home could realistically be built. For that, we’d look at zoning, building codes, setbacks, utilities, septic/water, HOA restrictions, and local permitting. Are you hoping to build one, buy one, or find land where one could legally be built?`
           : `But I can help with the lawful part of your goal. ${allowedGoal.text}`;
       const text = `${preamble} ${goalText}`;
       journey = { ...journey, lastTurnIntent: refusalIntent, recentTurnIntents: [...(journey.recentTurnIntents ?? []), refusalIntent, allowedGoal.turnIntent].slice(-3) };

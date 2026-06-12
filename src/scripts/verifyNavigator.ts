@@ -551,18 +551,45 @@ async function main() {
       ok(Array.isArray(r.chainedTurnIntents) && r.chainedTurnIntents.includes("ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE"),
         "mixed FHA+hobbit: chained metadata shows the preserved lawful goal route");
       ok(/can’t help search by race, demographics/.test(r.text), "mixed FHA+hobbit: explicit demographic refusal wording");
-      ok(/hobbit-style or earth-sheltered home/.test(r.text) && /build one, buy one, or find land/.test(r.text),
+      ok(/hobbit-inspired or earth-sheltered home/.test(r.text) && /build one, buy one, or find land/.test(r.text),
         "mixed FHA+hobbit: lawful goal preserved with build/buy/find-land question");
-      ok(!/Absolutely\. We can start without a property/.test(r.text) && !/What do you have to work with/.test(r.text),
-        "mixed FHA+hobbit: no generic discovery copy, no asset intake");
+      ok(!/Absolutely\. We can start without a property/.test(r.text) && !/What do you have to work with/.test(r.text) &&
+         !/What would make a property interesting/.test(r.text),
+        "mixed FHA+hobbit: no generic discovery copy, no asset intake, no generic follow-up");
     }
     {
       const k = await converse({});
       const r = await converse({ message: "who owns this property and can I build a spaceship house there?", journey: k.journey });
       ok(r.kind === "refusal" && r.turnIntent === "REFUSE_OWNER_LOOKUP" &&
          Array.isArray(r.chainedTurnIntents) && r.chainedTurnIntents.includes("ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE") &&
-         /spaceship/.test(r.text),
-        "mixed owner+spaceship: ownership refused, spaceship-house goal preserved");
+         /spaceship-inspired/.test(r.text),
+        "mixed owner+spaceship: ownership refused, 'spaceship-inspired' goal preserved");
+      ok(!/What would make a property interesting|Absolutely\. We can start without a property|What do you have to work with/.test(r.text),
+        "mixed owner+spaceship: no generic fallback after the refusal");
+    }
+
+    // ANIMAL / PET / LIVESTOCK housing fixtures (fix 2026-06-12): the reply
+    // must reference the animal and classify the use — never generic discovery.
+    for (const [name, msg, wantIntent, echo] of [
+      ["dog-house", "my dog needs a house", "CLARIFY_ANIMAL_HOUSING", /dog/],
+      ["coonhound", "one coonhound house please in Alaska", "CLARIFY_ANIMAL_HOUSING", /coonhound/],
+      ["pigs-pen", "my pigs need a pen", "ROUTE_LIVESTOCK_OR_AG_STRUCTURE", /pig/],
+      ["dog-kennel-land", "I need land for a dog kennel", "ROUTE_PET_STRUCTURE", /kennel/],
+      ["horse-barn", "my horse needs a barn", "ROUTE_LIVESTOCK_OR_AG_STRUCTURE", /horse/],
+    ] as const) {
+      const out = await runFixture(`animal:${name}`, [msg]);
+      ok(out[0].intent === wantIntent, `animal:${name}: intent ${out[0].intent} (expected ${wantIntent})`);
+      ok(echo.test(out[0].text), `animal:${name}: the animal/concept is referenced in the reply`);
+      ok(!/Absolutely\. We can start without a property/.test(out[0].text) && !/What do you have to work with/.test(out[0].text),
+        `animal:${name}: no generic discovery, no ASK_ASSETS`);
+    }
+    {
+      const out = await runFixture("animal:clarify-options", ["my dog needs a house"]);
+      ok(/structure for the dog/.test(out[0].text) && /property where dogs are allowed/.test(out[0].text) &&
+         /kennel\/breeding\/boarding/.test(out[0].text) && /testing/.test(out[0].text),
+        "animal: pet/property/business/test classification options offered");
+      ok(/climate, zoning, animal limits, kennel rules, setbacks/.test(out[0].text),
+        "animal: location-dependent checks named (climate/zoning/limits/kennel rules/setbacks)");
     }
     {
       const k = await converse({});

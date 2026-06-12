@@ -149,6 +149,48 @@ export function specificConceptReply(phrase: string, options: string[]): string 
     "Navigator? Which is closest? Once I know the real-world use, we can check what zoning and building codes would allow.";
 }
 
+// ── Animal / pet / livestock housing (fix 2026-06-12) ────────────────────────
+// "My dog needs a house" is NOT open discovery — it's animal housing. If the
+// user names an animal plus house/shelter/pen/kennel/barn/coop/stable, the
+// next response must reference the animal and classify the use: pet structure,
+// livestock/ag infrastructure, boarding/kennel business, property for a person
+// with animals, or joke/test — BEFORE any generic route.
+const PET_ANIMALS = "dog|coonhound|hound|puppy|cat|kitten|rabbit|bunny";
+const LIVESTOCK_ANIMALS = "pig|hog|horse|pony|donkey|mule|goat|sheep|lamb|cow|cattle|bull|chicken|hen|rooster|duck|goose|turkey|llama|alpaca|bee";
+const ANIMAL_STRUCTURES = "house|home|shelter|pen|kennel|barn|coop|stable|run|hutch|paddock|enclosure";
+const ANIMAL_HOUSING_RE = new RegExp(
+  `\\b(${PET_ANIMALS}|${LIVESTOCK_ANIMALS})s?\\b.{0,40}\\b(?:${ANIMAL_STRUCTURES})s?\\b|\\b(?:${ANIMAL_STRUCTURES})s?\\b.{0,30}\\bfor\\b.{0,20}\\b(${PET_ANIMALS}|${LIVESTOCK_ANIMALS})s?\\b`, "i");
+const KENNEL_BUSINESS_RE = /\b(?:land|property|lot|acreage|business)\b.{0,40}\b(?:kennel|boarding|breeding)\b|\b(?:kennel|boarding|breeding)\b.{0,30}\b(?:business|operation|facility)\b/i;
+
+export interface AnimalHousing { animal: string; kind: "pet" | "livestock" | "kennel-business" }
+
+export function detectAnimalHousing(message: string): AnimalHousing | null {
+  const kennel = KENNEL_BUSINESS_RE.test(message);
+  const m = message.match(ANIMAL_HOUSING_RE);
+  const animal = (m?.[1] ?? m?.[2])?.toLowerCase() ?? null;
+  if (kennel) return { animal: animal ?? "dog", kind: "kennel-business" };
+  if (!animal) return null;
+  return { animal, kind: new RegExp(`^(?:${LIVESTOCK_ANIMALS})$`, "i").test(animal) ? "livestock" : "pet" };
+}
+
+export function animalHousingReply(a: AnimalHousing): string {
+  if (a.kind === "kennel-business") {
+    return `A ${a.animal} kennel can be a backyard structure (personal use) or a boarding/breeding business — they're ` +
+      "treated very differently. Kennel businesses usually need specific zoning, animal-limit and noise rules, " +
+      "setbacks, and licensing. Which is it — and do you have land already, or are you looking for some?";
+  }
+  if (a.kind === "livestock") {
+    return `A ${a.animal} needs real agricultural infrastructure — barns, pens, and coops are usually allowed on ` +
+      "ag-zoned land, with setbacks and sometimes animal limits. Is this for animals on land you already have, " +
+      "land you're looking for, or a livestock business? Depending on the place, we'd check zoning, animal limits, " +
+      "setbacks, and personal-use vs business rules.";
+  }
+  return `Happy to help with the ${a.animal} — to point this right: are you looking for a ${a.animal === "dog" ? "doghouse" : `${a.animal} house`} or kennel ` +
+    `structure for the ${a.animal}, a property where ${a.animal}s are allowed, land for a kennel/breeding/boarding ` +
+    "business, livestock-style infrastructure, or are you just testing? Depending on the place, we'd check climate, " +
+    "zoning, animal limits, kennel rules, setbacks, and whether it's personal use or a business.";
+}
+
 // Specific novelty objects / animal structures someone wants to live in or
 // build — the piñata rule: the reply MUST name the concept.
 const NOVELTY_CONCEPT_RE: [RegExp, string][] = [
@@ -314,6 +356,25 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
     };
   }
 
+  // 5.6 — ANIMAL / PET / LIVESTOCK housing: classify the use BEFORE any
+  // generic route; the reply must reference the animal.
+  const animal = detectAnimalHousing(message);
+  if (animal) {
+    const baseIntent: TurnIntent =
+      animal.kind === "kennel-business" ? "ROUTE_PET_STRUCTURE"
+      : animal.kind === "livestock" ? "ROUTE_LIVESTOCK_OR_AG_STRUCTURE"
+      : "CLARIFY_ANIMAL_HOUSING";
+    const repeated = repeatOf(baseIntent);
+    return {
+      turnIntent: repeated ? "ASK_REGION" : baseIntent,
+      text: repeated
+        ? `Staying with the ${animal.animal} — which town or region is this for? Climate, zoning, and animal rules all hang on the place.`
+        : animalHousingReply(animal),
+      slot: `route:animal-housing:${animal.kind}`, echoConcept: animal.animal, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
   // 6 — SPECIFIC novelty concept (piñata rule — the reply must name it).
   const noveltyConcept = detectNoveltyConceptPhrase(message);
   if (noveltyConcept) {
@@ -365,4 +426,17 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
 
   // 9 — no high-priority route: the questionnaire arc is AUTHORIZED (last resort).
   return null;
+}
+
+/**
+ * extractAllowedRemainder — mixed-intent split (build fix 2026-06-12). After a
+ * guardrail refusal (G-1/G-2), the LAWFUL remainder of the same message is
+ * routed with a clean intent history so the refusal can chain to it
+ * (REFUSAL + PRESERVED_ALLOWED_GOAL) instead of erasing the user's goal.
+ * Returns null when no lawful goal exists. The route layer decides which
+ * refusal types may preserve goals (evasion/explicit deliberately may not).
+ */
+export function extractAllowedRemainder(message: string, journey: JourneyState): RouteDecision | null {
+  const d = routeTurn(message, { ...journey, lastTurnIntent: null, recentTurnIntents: [] });
+  return d && !d.refusal ? d : null;
 }

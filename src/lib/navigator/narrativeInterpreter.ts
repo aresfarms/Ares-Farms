@@ -66,13 +66,15 @@ export interface JourneyState {
   recentTurnIntents: string[];
   /** Novelty/fantasy build code-compliance gate — null = no novelty concept. */
   noveltyGate: NoveltyGate | null;
+  /** ESCALATE_VIOLENT_THREAT fired — discovery stays held until human review. */
+  threatHold: boolean;
 }
 
 export const FRESH_JOURNEY: JourneyState = {
   node: "person", story: [], context: EMPTY_CONTEXT, property: null, entryMode: null,
   intent: null, guidedDiscovery: false, exploredPathways: [], askedPrompts: [],
   guardCounters: { refusals: 0, rejections: 0 },
-  lastTurnIntent: null, recentTurnIntents: [], noveltyGate: null,
+  lastTurnIntent: null, recentTurnIntents: [], noveltyGate: null, threatHold: false,
 };
 
 // ── Guided Property Discovery copy (spec fix 2026-06-11) ─────────────────────

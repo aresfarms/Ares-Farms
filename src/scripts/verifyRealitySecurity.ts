@@ -112,7 +112,9 @@ const baseRec = { ts: "t", inputDecision: "ALLOW", scrubbedFieldCount: 1, contex
 appendReplay(baseRec); appendReplay({ ...baseRec, inputDecision: "QUARANTINE" });
 const chain = verifyReplayChain();
 ok(chain.ok && chain.records >= 2, `reality replay chain verifies (${chain.records} records)`);
-ok(abuseTelemetryDashboard().panels.length === 10, "abuse telemetry shows the 10 panels (anonymous only)");
+ok(abuseTelemetryDashboard().panels.length === 11, "abuse telemetry shows the 10 panels + Threat/Violence Escalations (anonymous only)");
+ok(abuseTelemetryDashboard().panels.some((p) => /Threat \/ Violence Escalations/.test(p.key) && /NEW\/UNDER_REVIEW\/FALSE_POSITIVE\/ACTION_REQUIRED\/CLOSED/.test(p.key)),
+  "threat-escalation panel present with the five review states");
 const telSrc = fs.readFileSync("src/security/realityPlatform/abuseTelemetryDashboard.ts", "utf8");
 ok(!/email|ip[_ ]?address|userId|visitorId/i.test(telSrc.replace(/\/\*[\s\S]*?\*\//g, "")), "telemetry stores no visitor identity");
 

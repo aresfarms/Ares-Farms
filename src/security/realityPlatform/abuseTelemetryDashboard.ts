@@ -12,6 +12,7 @@ import * as path from "node:path";
 
 import { REPLAY_LEDGER, type RealityReplayRecord } from "./realitySecurityReplay";
 import { openRealityBlockers, realityProductionReady } from "./realitySecurityDoctrine";
+import { readThreatEscalations, THREAT_REVIEW_STATES } from "./threatEscalationLedger";
 
 const INTERVIEW_LEDGER = path.join(process.cwd(), "data", "discovery-interview-ledger.ndjson");
 
@@ -44,6 +45,11 @@ export function abuseTelemetryDashboard(): {
     { key: "Output-gate blocks", count: replay.filter((r) => r.outputGateOk === false).length },
     { key: "Quarantine events", count: replay.filter((r) => r.inputDecision === "QUARANTINE").length },
     { key: "Security escalations", count: replay.filter((r) => r.inputDecision === "ESCALATE_SECURITY").length },
+    // Threat/Violence Escalations panel (2026-06-12) — HUMAN-REVIEW queue with
+    // states NEW / UNDER_REVIEW / FALSE_POSITIVE / ACTION_REQUIRED / CLOSED.
+    // Server-side only: network identifiers in the underlying ledger are NEVER
+    // exposed in any public UI; this panel surfaces counts only.
+    { key: `Threat / Violence Escalations (states: ${THREAT_REVIEW_STATES.join("/")})`, count: readThreatEscalations().length },
   ];
 
   return { doctrine: "REALITY-SEC-001", panels, openBlockers: openRealityBlockers(), production_ready: realityProductionReady() };

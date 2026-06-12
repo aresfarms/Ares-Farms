@@ -39,6 +39,8 @@ export type TurnIntent =
   | "ROUTE_ALTERNATIVE_HOUSING" | "ROUTE_EARTH_SHELTERED_HOUSING"
   | "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE" | "ROUTE_CODE_CHECKABLE_TRANSLATION"
   | "OUT_OF_SCOPE_WITH_REAL_WORLD_ADJACENT"
+  // reality + safety escalation
+  | "REALITY_CHECK_ICONIC_ASSET" | "ESCALATE_VIOLENT_THREAT"
   // flow
   | "WAIT_FOR_MORE_INFO" | "PRESENT_PATHWAYS";
 
@@ -84,6 +86,16 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   CLARIFY_OUT_OF_SCOPE: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
   CLARIFY_METAPHOR: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
   CLARIFY_METAPHOR_OR_JOKE: { intent: "ROUTE_OPEN_DISCOVERY", text: DISCOVERY_TEXT },
+  REALITY_CHECK_ICONIC_ASSET: {
+    intent: "OFFER_SEARCH_AND_BRING_BACK",
+    text: SEARCH_BRING_BACK_TEXT,
+  },
+  // The threat alternate STILL REFUSES and STILL holds — different intent and
+  // wording only; the boundary never weakens and discovery never resumes.
+  ESCALATE_VIOLENT_THREAT: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "I can’t continue with that. If this is an emergency or someone may be in danger, contact emergency services now. This conversation can’t go further until that’s resolved.",
+  },
   CLARIFY_ANIMAL_HOUSING: {
     intent: "ASK_REGION",
     text: "Whichever it is — which part of the country (or town) are we talking about? Climate, zoning, and animal rules all hang on the place.",

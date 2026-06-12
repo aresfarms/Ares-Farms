@@ -51,6 +51,65 @@ export interface RouteDecision {
   patch: Partial<JourneyState>;
 }
 
+// ── 0. THREAT / VIOLENCE ESCALATION (CRITICAL, 2026-06-12) ───────────────────
+// Violent-threat intent overrides EVERY Navigator pathway — checked before all
+// questionnaire prompts and all other routes. No property, location,
+// materials, planning, evasion, or tactical help. Ever.
+import type { ThreatPhraseCategory } from "@/security/realityPlatform/threatEscalationLedger";
+
+const THREAT_TARGET = "(?:building|house|home|property|school|farm|barn|silo|warehouse|business|facility|courthouse|church|mosque|synagogue|office|store|bridge|dam|plant|grid|infrastructure|agency|government|station|place|people|crowd|neighborhood|town|city)";
+const THREAT_PATTERNS: [RegExp, ThreatPhraseCategory][] = [
+  [new RegExp(`\\b(?:bomb|blow\\s+up|explosive|detonate)\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\bwant\\s+to\\s+bomb\\b|\\b(?:make|build|plant)\\s+a\\s+bomb\\b`, "i"), "bombing"],
+  [new RegExp(`\\b(?:burn\\s+(?:down|up)|set\\s+fire\\s+to|torch|arson)\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\barson\\b`, "i"), "arson"],
+  [new RegExp(`\\b(?:shoot\\s+up|shooting|open\\s+fire)\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\bshoot\\s+up\\b`, "i"), "shooting"],
+  [new RegExp(`\\b(?:attack|assault|hurt|harm|kill)\\b.{0,40}\\b${THREAT_TARGET}s?\\b`, "i"), "assault"],
+  [new RegExp(`\\bsabotage\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\bhow\\s+do\\s+I\\s+sabotage\\b`, "i"), "sabotage"],
+  [/\bterroris[mt]\b|\bterror\s+attack\b/i, "terrorism"],
+];
+
+export const VIOLENT_THREAT_REPLY =
+  "I can’t help with threats, violence, bombing, sabotage, or harming people or property. If this is an emergency " +
+  "or someone may be in danger, contact emergency services now.";
+
+export function detectViolentThreat(message: string): ThreatPhraseCategory | null {
+  for (const [re, cat] of THREAT_PATTERNS) if (re.test(message)) return cat;
+  return null;
+}
+
+// ── ICONIC / LIKELY-UNAVAILABLE ASSET reality check (2026-06-12) ─────────────
+// A famous landmark, public/institutional asset, or major infrastructure is
+// NOT an ordinary property goal: reality-check availability FIRST — name the
+// asset, say it's almost certainly not a realistic ordinary path, offer
+// realistic adjacent alternatives, never invent availability or imply it's
+// for sale.
+const ICONIC_ASSETS_RE: [RegExp, string][] = [
+  [/\bempire\s+state\s+building\b/i, "the Empire State Building"],
+  [/\bwhite\s+house\b/i, "the White House"],
+  [/\bkennedy\s+space\s+center\b|\bcape\s+canaveral\b/i, "Kennedy Space Center"],
+  [/\bdisney\s*(?:world|land)\b/i, "Disney World"],
+  [/\bbrooklyn\s+bridge\b|\bgolden\s+gate\s+bridge\b/i, "that bridge"],
+  [/\bstatue\s+of\s+liberty\b|\bmount\s+rushmore\b|\beiffel\s+tower\b|\bpentagon\b|\bhoover\s+dam\b/i, "that landmark"],
+  [/\b(?:a\s+)?famous\s+(?:skyscraper|landmark|building|tower|stadium)\b/i, "a famous landmark of that kind"],
+  [/\b(?:buy|own|purchase)\b.{0,30}\b(?:an?\s+)?(?:airport|military\s+base|courthouse|capitol|national\s+park)\b/i, "an institutional asset like that"],
+];
+
+export function detectIconicAsset(message: string): string | null {
+  if (!/\b(?:own|buy|purchase|acquire|get|want)\b/i.test(message)) return null;
+  for (const [re, label] of ICONIC_ASSETS_RE) {
+    const m = message.match(re);
+    if (m) return label.startsWith("the ") || label.startsWith("that") || label.startsWith("a ") || label.startsWith("an ") ? label : m[0];
+  }
+  return null;
+}
+
+export function iconicAssetReply(asset: string): string {
+  return `Owning ${asset} itself is almost certainly not a realistic ordinary property path — iconic assets like ` +
+    "that are rarely available and would involve extraordinary capital, institutional ownership, legal diligence, " +
+    "and private-market negotiation. But if your real goal is landmark-style ownership, trophy commercial real " +
+    "estate, an Art Deco building, a mixed-use tower, or a hospitality/office property with similar character, I " +
+    "can help map what would be realistic. Are you looking for that kind of asset, or are you testing the Navigator?";
+}
+
 // ── 1. Safety / illegality — unlawful evasion of law enforcement ─────────────
 const EVASION_RE: RegExp[] = [
   /\b(?:hide|hiding|evade|evading|escape|run|running|avoid\s+detection|stay\s+hidden|conceal)\b.{0,40}\b(?:ice|immigration|cbp|border\s+patrol|police|cops|law\s+enforcement|the\s+feds|fbi|dea|marshals|deportation|authorities)\b/i,
@@ -253,6 +312,23 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
   const recent = recentIntents(journey);
   const repeatOf = (intent: TurnIntent) => journey.lastTurnIntent === intent || recent.includes(intent);
 
+  // 0 — VIOLENT THREAT: overrides everything. The hold persists (threatHold)
+  // until human review clears the escalation; the alternate still refuses.
+  const threat = detectViolentThreat(message);
+  if (threat || journey.threatHold) {
+    // Alternate ONLY on the immediately-previous turn so a persistent hold
+    // cycles two refusing wordings (never resumes discovery, never weakens).
+    const repeated = journey.lastTurnIntent === "ESCALATE_VIOLENT_THREAT";
+    return {
+      turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : "ESCALATE_VIOLENT_THREAT",
+      text: repeated
+        ? "I can’t continue with that. If this is an emergency or someone may be in danger, contact emergency services now. This conversation can’t go further until that’s resolved."
+        : VIOLENT_THREAT_REPLY,
+      slot: `escalate:violent-threat:${threat ?? "hold"}`, echoConcept: null, refusal: true,
+      patch: { threatHold: true },
+    };
+  }
+
   // 1 — safety/illegality.
   if (isUnlawfulEvasionAsk(message)) {
     const repeated = repeatOf("REFUSE_UNLAWFUL_EVASION");
@@ -326,6 +402,21 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
         ? "No rush — whenever you want to tell me about a real property goal, land, business, or place, I'm here for that."
         : humanContextReply(entity),
       slot: "clarify:human-context", echoConcept: entity, refusal: false, patch: {},
+    };
+  }
+
+  // 4.5 — ICONIC / LIKELY-UNAVAILABLE ASSET: reality-check availability before
+  // any ordinary goal handling; never invent availability or imply for-sale.
+  const iconic = detectIconicAsset(message);
+  if (iconic) {
+    const repeated = repeatOf("REALITY_CHECK_ICONIC_ASSET");
+    return {
+      turnIntent: repeated ? "OFFER_SEARCH_AND_BRING_BACK" : "REALITY_CHECK_ICONIC_ASSET",
+      text: repeated
+        ? "Same honest answer on the iconic asset — but the realistic adjacents are searchable: look for trophy commercial, Art Deco, or landmark-character properties on Crexi or LoopNet and paste a listing back here. I'll tell you honestly what it could become."
+        : iconicAssetReply(iconic),
+      slot: "reality-check:iconic-asset", echoConcept: iconic, refusal: false,
+      patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
   }
 

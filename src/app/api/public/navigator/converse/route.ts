@@ -38,7 +38,8 @@ import {
   GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState,
 } from "@/lib/navigator/narrativeInterpreter";
 import { noveltyGateClear, translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY } from "@/lib/navigator/noveltyBuildDoctrine";
-import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder } from "@/lib/navigator/navigatorTurnRouter";
+import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder, detectViolentThreat } from "@/lib/navigator/navigatorTurnRouter";
+import { appendThreatEscalation } from "@/security/realityPlatform/threatEscalationLedger";
 import { guardTurnIntent, intentForNode, type TurnIntent } from "@/lib/navigator/turnIntent";
 import { assessPathways, discoveryGraphChain } from "@/lib/navigator/possibilityCheck";
 import { deriveDecisionSummary } from "@/lib/navigator/decisionFramework";
@@ -106,6 +107,38 @@ export async function POST(req: Request) {
     });
     logInterviewTurn({ source: "fallback", slot: "navigator:guard:injection", ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
     return NextResponse.json({ kind: "refusal", refusal: "injection", text: guarded.text, turnIntent: guarded.intent, journey });
+  }
+
+  // 0.5 — THREAT / VIOLENCE ESCALATION (CRITICAL, 2026-06-12): overrides EVERY
+  // pathway, before all questionnaire prompts. A trigger creates a human-review
+  // security event (hashes + network identifier where legally available — never
+  // raw text, never a dossier, never shown in public UI) and HOLDS the journey:
+  // no discovery flow continues until human review clears it.
+  const threatCat = detectViolentThreat(message);
+  if (threatCat || journey.threatHold) {
+    const decision = routeTurn(message, journey)!; // the threat branch always decides
+    journey = { ...journey, ...decision.patch, guardCounters: { ...journey.guardCounters, refusals: journey.guardCounters.refusals + 1 } };
+    journey = { ...journey, lastTurnIntent: decision.turnIntent, recentTurnIntents: [...(journey.recentTurnIntents ?? []), decision.turnIntent].slice(-3) };
+    journey = rememberPrompt(journey, decision.text);
+    const replayRef = hashEvidence([decision.slot, threatCat ?? "hold"]);
+    appendReplay({
+      ts: new Date().toISOString(), inputDecision: "ESCALATE_SECURITY", scrubbedFieldCount: 0, contextZones: [],
+      urlSandboxVerdict: null, privacyFirewallOk: true, outputGateOk: true,
+      refusalReason: `violent-threat:${threatCat ?? "hold"}`, evidenceBundleHash: replayRef, renderedOutputHash: hashOutput(decision.text),
+    });
+    if (threatCat) {
+      appendThreatEscalation({
+        message,
+        phraseCategory: threatCat,
+        networkIdentifier: req.headers.get("x-forwarded-for") ?? req.headers.get("x-real-ip"),
+        userAgent: req.headers.get("user-agent"),
+        pageRoute: "/api/public/navigator/converse",
+        replayRef,
+        renderedResponse: decision.text,
+      });
+    }
+    logInterviewTurn({ source: "fallback", slot: `navigator:${decision.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
+    return NextResponse.json({ kind: "refusal", refusal: "violent-threat", text: decision.text, turnIntent: decision.turnIntent, journey });
   }
 
   // 1 — PRIORITY 1: unlawful evasion is checked BEFORE G-1/G-2 (router owns it).

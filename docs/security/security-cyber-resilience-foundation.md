@@ -39,3 +39,22 @@ ALL FIVE blockers OPEN**; existing FortKnox + domain controls still present; gat
 
 `verify:security-conformance`, `verify:security-governance`, and `verify:domain-governance` all still PASS
 (existing governance not weakened). `tsc --noEmit` clean; `npm run build` exit 0.
+
+## Clarification (2026-06-11, reviewer decision) — RECOVERY-CERT-001 stays folded into SEC-DR-001
+
+**SEC-DR-001 is an AGGREGATE gate and includes RECOVERY-CERT-001 as a MANDATORY SUB-GATE.**
+DR readiness is NOT verified unless the recovery certification is:
+1. **present/valid** (certification recorded with a certifier),
+2. **unexpired** (within its certification window),
+3. **simulation-backed** (at least one passing recovery simulation meeting the stated RPO/RTO), and
+4. **human-reviewed** (`CYBER_RESILIENCE_HUMAN_REVIEW_COMPLETE` — required for `production_ready`
+   regardless of blocker state).
+
+RECOVERY-CERT-001 is **deliberately not split into a sixth production blocker** for this review
+cycle — the five-blocker model stays, and DR readiness remains the aggregate gate. (A future
+split would be an audit-traceability refactor only; the combined blocking behavior must remain
+identical-or-stricter.) Cert expiry already blocks production today via SEC-DR-001.
+
+Documentation-only change: no production enablement; branch unmerged; production blocked
+pending human review. The reviewer sign-off checklist is at
+`docs/security/cyber-resilience-reviewer-signoff.md`.

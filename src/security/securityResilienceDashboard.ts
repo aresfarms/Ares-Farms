@@ -42,7 +42,15 @@ export const RESILIENCE_BLOCKERS: ResilienceBlocker[] = [
 /** Each blocker is SATISFIED only when its control(s) are verified. */
 function blockerSatisfied(id: ResilienceBlocker): boolean {
   switch (id) {
-    // DR readiness = framework intact + a VALID (present, unexpired, sim-backed) recovery certification.
+    // SEC-DR-001 is an AGGREGATE gate (reviewer decision 2026-06-11): it
+    // INCLUDES RECOVERY-CERT-001 as a MANDATORY SUB-GATE and CANNOT verify
+    // unless the recovery certification is (a) present/valid, (b) unexpired
+    // within its certification window, (c) simulation-backed (a passing sim
+    // meeting the stated RPO/RTO), and — like every blocker — (d) covered by
+    // the recorded human review (CYBER_RESILIENCE_HUMAN_REVIEW_COMPLETE gates
+    // production_ready regardless of this function). RECOVERY-CERT-001 is
+    // deliberately NOT a sixth standalone blocker this review cycle; the
+    // five-blocker model stays, and DR readiness remains the aggregate.
     case "SEC-DR-001": return recoveryFrameworkInvariants().ok && recoveryCertificationValid();
     case "SEC-BACKUP-001": return immutableBackupVerified();
     case "SEC-DNS-001": return dnsGovernanceVerified();

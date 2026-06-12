@@ -37,8 +37,17 @@ export function detectTargetedHarassment(message: string): ThreatPhraseCategory 
 }
 
 // ── Critical / sensitive infrastructure ──────────────────────────────────────
+// SENSITIVE = hard shutdown unless a VERIFIED public disposition source exists.
+// The critical-infrastructure patch is AUTHORITATIVE over specialty/adaptive-
+// reuse routing for these overlap categories (military base, coal plant/mine,
+// prison, substation, power plant, etc.) — they never route as ordinary
+// specialty assets without verified public sale/auction/surplus/redevelopment.
 const CRITICAL_FACILITY_RE =
-  /\b(?:nuclear\s+(?:plant|facility|reactor|station)|electrical?\s+substation|substation|power\s+plant|power\s+station|water\s+treatment|sewage\s+treatment|\bdam\b|data\s+center|datacenter|telecom\s+(?:hub|facility)|pipeline|fuel\s+(?:terminal|depot)|oil\s+(?:refinery|terminal)|refinery|airport|air\s+traffic|rail\s*yard|railyard|\bprison\b|penitentiary|correctional\s+facility|military\s+(?:base|site|installation)|army\s+base|naval\s+base|air\s+force\s+base|emergency\s+services\s+(?:site|station)|fire\s+station|police\s+station|active\s+mine|coal\s+(?:mine|plant)|chemical\s+plant|grid\s+(?:station|facility))\b/i;
+  /\b(?:nuclear\s+(?:plant|facility|reactor|station)|electrical?\s+substation|substation|power\s+plant|power\s+station|water\s+treatment|sewage\s+treatment|\bdam\b|data\s+center|datacenter|telecom\s+(?:hub|facility)|pipeline|fuel\s+(?:terminal|depot)|oil\s+(?:refinery|terminal)|refinery|air\s+traffic|control\s+tower|rail\s*yard|railyard|\bprison\b|penitentiary|correctional\s+facility|military\s+(?:base|site|installation)|army\s+base|naval\s+base|air\s+force\s+base|active\s+mine|coal\s+(?:mine|plant)|chemical\s+plant|grid\s+(?:station|facility)|(?<!empire\s)(?:state|federal|government|county|municipal)\s+building|city\s+hall|courthouse|post\s+office)\b/i;
+// REGULATED PASSTHROUGH = lawful acquisition concepts; a probe/status question
+// still escalates/refuses, but plain acquisition is handled by goal routing
+// (airport → ROUTE_REGULATED_AIRPORT_ASSET; hospital → healthcare goal).
+const REGULATED_PASSTHROUGH_RE = /\b(?:small\s+)?airport\b|\bairstrip\b|\bairfield\b|\bhospital\b/i;
 
 // Probing a facility's access / weak points / security / operations → escalate.
 const INFRA_PROBE_RE =
@@ -47,10 +56,14 @@ const INFRA_PROBE_RE =
 // Active-status probes — must never be answered.
 const INFRA_STATUS_RE = /\b(?:is|are)\b.{0,30}\b(?:active|inactive|operational|abandoned|decommissioned|unused|still\s+(?:running|operating)|guarded|manned|staffed)\b|\bactive\??\s*$/i;
 
-// Explicit public-availability signal in the user's own words (the only way a
-// sensitive facility may proceed to LIMITED, high-level reuse questions).
-const PUBLIC_LISTING_RE =
-  /\b(?:for\s+sale|listed|on\s+the\s+market|auction(?:ed)?|surplus|(?:for\s+)?redevelopment|decommissioned\s+(?:and|for|public)|publicly\s+(?:closed|listed)|GSA\s+surplus)\b/i;
+// VERIFIED public disposition — an OFFICIAL mechanism, not a bare "for sale"
+// claim. User assertion alone is NOT verification (restricted-property refine
+// 2026-06-12): only an official surplus/auction/RFP/disposition reference (or
+// verified Furlong inventory) unlocks high-level reuse. Everything weaker is a
+// verification-required shutdown.
+const OFFICIAL_DISPOSITION_RE =
+  /\b(?:public\s+auction|auction\s+(?:listing|notice)|surplus\s+(?:listing|disposition|notice|record)|GSA\s+surplus|redevelopment\s+(?:rfp|rfq|listing|notice|plan|opportunity)|(?:listed|listing)\s+for\s+redevelopment|disposition\s+(?:record|notice)|decommissioning\s+(?:notice|listing)|\brfp\b|\brfq\b|official\s+\w+\s+listing)\b/i;
+const WEAK_CLAIM_RE = /\b(?:for\s+sale|on\s+the\s+market|listed|available|surplus\s+(?:base|property|building|facility))\b/i;
 
 export const SENSITIVE_FACILITY_SHUTDOWN_REPLY =
   "Furlong can’t analyze that facility here. Sensitive infrastructure and regulated facilities are not treated " +
@@ -64,28 +77,41 @@ export const SENSITIVE_FACILITY_STATUS_REPLY =
   "decommissioning/redevelopment source, paste it and we can review only the lawful, high-level reuse questions.";
 
 export const SENSITIVE_FACILITY_REUSE_REPLY =
-  "With a public sale/redevelopment listing in hand, Furlong can speak only to high-level, lawful reuse " +
-  "categories — environmental diligence, zoning/land-use review, brownfield remediation, general utility/easement " +
-  "limitations, professional engineering review, regulatory approvals, financing/insurance feasibility, public " +
-  "redevelopment constraints, and the requirement for licensed-professional review. No ownership, operational, " +
-  "access, or active-status detail, and no pro forma here. What lawful reuse are you weighing?";
+  "Working only from a genuine public auction, surplus, or redevelopment listing — and strictly high-level — " +
+  "Furlong can speak to lawful reuse categories: environmental diligence, zoning/land-use review, brownfield " +
+  "remediation, general utility/easement limitations, professional engineering review, regulatory approvals, " +
+  "financing/insurance feasibility, public redevelopment constraints, and the requirement for licensed-professional " +
+  "review. No ownership, operational, access, or active-status detail, and no pro forma here. What lawful reuse are " +
+  "you weighing?";
+
+export const SENSITIVE_FACILITY_VERIFY_REPLY =
+  "A claim that it’s for sale isn’t verification on its own — for a sensitive or restricted facility Furlong needs " +
+  "an official public-disposition source: a government surplus listing, a public auction notice, a redevelopment " +
+  "RFP/RFQ, an authorized public-disposition record, or a verified Furlong inventory record. Share that official " +
+  "source and we can review only high-level, lawful reuse questions — never ownership, operator, active-status, " +
+  "access, or operational detail.";
 
 export type InfraDecision =
   | { kind: "escalate"; category: ThreatPhraseCategory }
   | { kind: "shutdown" }
   | { kind: "status" }
+  | { kind: "verify" }
   | { kind: "reuse" }
   | null;
 
 export function assessCriticalInfrastructure(message: string): InfraDecision {
-  if (!CRITICAL_FACILITY_RE.test(message)) {
-    // A bare infra-probe with no named facility still escalates if it reads as
-    // casing a place (handled by the threat layer for explicit violence).
-    return null;
-  }
+  const sensitive = CRITICAL_FACILITY_RE.test(message);
+  const passthrough = REGULATED_PASSTHROUGH_RE.test(message);
+  if (!sensitive && !passthrough) return null;
+  // Probes and active-status questions escalate/refuse for BOTH classes.
   if (INFRA_PROBE_RE.test(message)) return { kind: "escalate", category: "infrastructure-probe" };
   if (INFRA_STATUS_RE.test(message)) return { kind: "status" };
-  if (PUBLIC_LISTING_RE.test(message)) return { kind: "reuse" };
+  // Regulated-passthrough (airport/hospital) acquisition → goal routing owns it.
+  if (passthrough && !sensitive) return null;
+  // Sensitive facility: official disposition → high-level reuse; weak claim →
+  // verification required; nothing → hard shutdown.
+  if (OFFICIAL_DISPOSITION_RE.test(message)) return { kind: "reuse" };
+  if (WEAK_CLAIM_RE.test(message)) return { kind: "verify" };
   return { kind: "shutdown" };
 }
 

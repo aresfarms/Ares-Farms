@@ -40,13 +40,14 @@ import { recentIntents, type TurnIntent } from "./turnIntent";
 import {
   detectTargetedHarassment, HARASSMENT_REPLY,
   assessCriticalInfrastructure, SENSITIVE_FACILITY_SHUTDOWN_REPLY,
-  SENSITIVE_FACILITY_STATUS_REPLY, SENSITIVE_FACILITY_REUSE_REPLY,
+  SENSITIVE_FACILITY_STATUS_REPLY, SENSITIVE_FACILITY_REUSE_REPLY, SENSITIVE_FACILITY_VERIFY_REPLY,
   detectAssetGoal, detectVehicleInspired, vehicleInspiredReply,
   detectMarineDwelling, marineReply, nontraditionalReply,
   detectSpecialtyAsset, specialtyAssetReply,
 } from "./navigatorGoalRoutes";
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
+import { classifyGoalAsset } from "./navigatorGoalParser";
 
 export interface RouteDecision {
   turnIntent: TurnIntent;
@@ -67,22 +68,96 @@ export interface RouteDecision {
 // materials, planning, evasion, or tactical help. Ever.
 import type { ThreatPhraseCategory } from "@/security/realityPlatform/threatEscalationLedger";
 
-const THREAT_TARGET = "(?:building|house|home|property|school|farm|barn|silo|warehouse|business|facility|courthouse|church|mosque|synagogue|office|store|bridge|dam|plant|grid|infrastructure|agency|government|station|place|people|crowd|neighborhood|town|city)";
-const THREAT_PATTERNS: [RegExp, ThreatPhraseCategory][] = [
-  [new RegExp(`\\b(?:bomb|blow\\s+up|explosive|detonate)\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\bwant\\s+to\\s+bomb\\b|\\b(?:make|build|plant)\\s+a\\s+bomb\\b`, "i"), "bombing"],
-  [new RegExp(`\\b(?:burn\\s+(?:down|up)|set\\s+fire\\s+to|torch|arson)\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\barson\\b`, "i"), "arson"],
-  [new RegExp(`\\b(?:shoot\\s+up|shooting|open\\s+fire)\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\bshoot\\s+up\\b`, "i"), "shooting"],
-  [new RegExp(`\\b(?:attack|assault|hurt|harm|kill)\\b.{0,40}\\b${THREAT_TARGET}s?\\b`, "i"), "assault"],
-  [new RegExp(`\\bsabotage\\b.{0,40}\\b${THREAT_TARGET}s?\\b|\\bhow\\s+do\\s+I\\s+sabotage\\b`, "i"), "sabotage"],
+// THREAT CLASSIFIER PRECISION (CRITICAL, 2026-06-12): Furlong's domain overlaps
+// threat vocabulary (controlled burn, demolish a barn, foundation blasting,
+// clear land). threatHold is STICKY, so a false positive locks the session —
+// safety must be strict but not stupid. Threat escalation requires MALICIOUS or
+// harm-oriented context, NOT the mere presence of burn/blast/demolish/destroy/
+// tear down/clear/fire/explosives.
+
+// Unconditionally violent — no lawful land-management reading.
+const THREAT_HARD: [RegExp, ThreatPhraseCategory][] = [
+  [/\b(?:bomb|blow\s+up|detonate|explosives?|pipe\s+bomb|car\s+bomb|ied)\b/i, "bombing"],
+  [/\bshoot\s+up\b|\bopen\s+fire\b|\bmass\s+shooting\b/i, "shooting"],
   [/\bterroris[mt]\b|\bterror\s+attack\b/i, "terrorism"],
 ];
+// Sabotage is malicious by definition in this domain.
+const SABOTAGE_RE = /\bsabotage\b/i;
+// Harm to PEOPLE.
+const HARM_PEOPLE_RE = /\b(?:kill|murder|hurt|harm|injure|shoot|stab|poison|assault)\b.{0,30}\b(?:people|person|him|her|them|someone|somebody|a\s+\w+|my\s+\w+|the\s+\w+|everyone|anybody)\b/i;
+// "attack <target>" is violent.
+const ATTACK_RE = /\battack\b.{0,30}\b(?:building|house|home|school|hospital|courthouse|church|mosque|synagogue|person|people|someone|neighbor|business|office|store|facility|station|the\s+\w+)\b/i;
+// burn / destroy / wreck / vandalize directed at SOMEONE ELSE'S property or with
+// covert/insurance-fraud intent → malicious. Own derelict barn ≠ threat.
+const MALICIOUS_TARGET_RE = /\b(?:neighbor'?s?|neighbour'?s?|someone(?:'s| else'?s)?|somebody'?s?|their|his|her|else'?s|the\s+\w+'s|public|school|hospital|courthouse|church|government|the\s+city|a\s+rival|competitor'?s?)\b/i;
+const MALICIOUS_INTENT_RE = /\b(?:for\s+(?:the\s+)?insurance|insurance\s+money|to\s+collect\s+insurance|get\s+revenge|for\s+revenge|so\s+no\s+one|to\s+get\s+back\s+at|covertly|in\s+secret|without\s+(?:them|anyone)\s+knowing)\b/i;
+const DESTRUCTIVE_VERB_RE = /\b(?:burn\s+(?:down|up)?|set\s+fire\s+to|torch|arson|destroy|wreck|vandaliz|raze\s+(?:someone|their))\b/i;
 
 export const VIOLENT_THREAT_REPLY =
   "I can’t help with threats, violence, bombing, sabotage, or harming people or property. If this is an emergency " +
   "or someone may be in danger, contact emergency services now.";
 
 export function detectViolentThreat(message: string): ThreatPhraseCategory | null {
-  for (const [re, cat] of THREAT_PATTERNS) if (re.test(message)) return cat;
+  for (const [re, cat] of THREAT_HARD) if (re.test(message)) return cat;
+  if (SABOTAGE_RE.test(message)) return "sabotage";
+  if (HARM_PEOPLE_RE.test(message)) return "assault";
+  if (ATTACK_RE.test(message)) return "assault";
+  // Destructive verb ONLY escalates with a malicious target or covert intent.
+  if (DESTRUCTIVE_VERB_RE.test(message) && (MALICIOUS_TARGET_RE.test(message) || MALICIOUS_INTENT_RE.test(message))) {
+    return "arson";
+  }
+  return null;
+}
+
+// ── LAWFUL REGULATED PROPERTY OPERATIONS (burn/demolish/blast/clear) ──────────
+// Distinguished from threats: these route to permitting / professional review.
+// NEVER provide tactical/operational detail (formulas, placement, ignition,
+// bypassing permits) — stay at permitting/compliance level.
+export type PropertyOperation =
+  | { intent: "ROUTE_LAWFUL_LAND_MANAGEMENT"; reply: string }
+  | { intent: "ROUTE_DEMOLITION_PERMITTING"; reply: string }
+  | { intent: "ROUTE_REGULATED_BLASTING_REVIEW"; reply: string }
+  | { intent: "ROUTE_PROPERTY_OPERATION_PERMITTING"; reply: string }
+  | { intent: "CLARIFY_LAWFUL_PROPERTY_OPERATION"; reply: string };
+
+const LAND_MGMT_RE = /\b(?:prescribed|controlled)\s+burn\b|\bburn\s+(?:crop\s+residue|the\s+field|a\s+field|my\s+field|pasture|brush|stubble)\b|\bfirebreak\b|\bcrop\s+residue\s+burn|\bhabitat\s+restoration\s+burn/i;
+const DEMOLITION_RE = /\b(?:demolish|demolition|tear\s+down|knock\s+down|raze)\b.{0,30}\b(?:barn|shed|structure|building|house|garage|silo|outbuilding|derelict\s+\w+|old\s+\w+)\b/i;
+const BLASTING_RE = /\b(?:rock\s+blasting|controlled\s+blasting|foundation\s+blasting|blast(?:ing)?)\b.{0,30}\b(?:quarry|foundation|excavation|rock|site)\b|\bblast(?:ing)?\b.{0,40}\bprofessionals?\b/i;
+const CLEAR_LAND_RE = /\b(?:clear(?:ing)?\s+(?:land|the\s+lot|brush|trees|the\s+land)|land\s+clearing|remove\s+(?:an?\s+)?(?:old\s+)?(?:shed|structure|outbuilding))\b/i;
+// Ambiguous: a bare destructive verb on a generic structure with NO malicious
+// marker and NO clear lawful framing → clarify before any sticky hold.
+const AMBIGUOUS_OP_RE = /\b(?:burn|blast|destroy|demolish|tear\s+down|raze)\b.{0,20}\b(?:this|the|that|an?\s+old)\b.{0,20}\b(?:barn|building|shed|structure|property|house|lot)\b/i;
+
+const LAND_MGMT_REPLY =
+  "A prescribed or controlled burn can be a lawful land-management practice, but it usually requires local fire " +
+  "authority approval, weather/smoke checks, burn permits, safety planning, and sometimes state environmental " +
+  "review. Are you asking about crop residue, pasture management, firebreak creation, or habitat restoration?";
+const DEMOLITION_REPLY =
+  "Demolishing a derelict barn or structure can be lawful, but it may require demolition permits, utility " +
+  "disconnects, asbestos/lead checks, waste-disposal rules, and local inspection. Are you removing it for safety, " +
+  "redevelopment, or land reuse?";
+const BLASTING_REPLY =
+  "Blasting for quarry, excavation, or foundation work is highly regulated and must be handled by licensed " +
+  "professionals under local, state, and federal rules. I can help outline lawful permitting and " +
+  "professional-review categories — not operational blasting instructions. Is this for site prep, a quarry, or " +
+  "foundation work, and do you have a licensed contractor engaged?";
+const CLEAR_REPLY =
+  "Clearing land or removing a structure is usually lawful but permit-dependent — grading/land-disturbance " +
+  "permits, erosion control, tree or wetland rules, utility disconnects, and waste disposal can all apply. What's " +
+  "the parcel and the end use you have in mind?";
+const CLARIFY_OP_REPLY =
+  "I can help with lawful land management, demolition, permitting, or regulated site work, but I can’t help harm " +
+  "people or property. Are you asking about a permitted property operation such as prescribed burning, demolition, " +
+  "clearing, or regulated blasting?";
+
+export function detectPropertyOperation(message: string): PropertyOperation | null {
+  // Malicious context is handled by detectViolentThreat first; this is the
+  // lawful/ambiguous remainder.
+  if (LAND_MGMT_RE.test(message)) return { intent: "ROUTE_LAWFUL_LAND_MANAGEMENT", reply: LAND_MGMT_REPLY };
+  if (BLASTING_RE.test(message)) return { intent: "ROUTE_REGULATED_BLASTING_REVIEW", reply: BLASTING_REPLY };
+  if (DEMOLITION_RE.test(message)) return { intent: "ROUTE_DEMOLITION_PERMITTING", reply: DEMOLITION_REPLY };
+  if (CLEAR_LAND_RE.test(message)) return { intent: "ROUTE_PROPERTY_OPERATION_PERMITTING", reply: CLEAR_REPLY };
+  if (AMBIGUOUS_OP_RE.test(message)) return { intent: "CLARIFY_LAWFUL_PROPERTY_OPERATION", reply: CLARIFY_OP_REPLY };
   return null;
 }
 
@@ -92,15 +167,15 @@ export function detectViolentThreat(message: string): ThreatPhraseCategory | nul
 // asset, say it's almost certainly not a realistic ordinary path, offer
 // realistic adjacent alternatives, never invent availability or imply it's
 // for sale.
+// ICONIC_PRIVATE_ASSET ONLY — theoretically privately ownable but extraordinary
+// capital. Not-privately-ownable assets (White House, bridges, Capitol, KSC,
+// monuments) are handled by navigatorGoalParser.classifyGoalAsset BEFORE this.
 const ICONIC_ASSETS_RE: [RegExp, string][] = [
   [/\bempire\s+state\s+building\b/i, "the Empire State Building"],
-  [/\bwhite\s+house\b/i, "the White House"],
-  [/\bkennedy\s+space\s+center\b|\bcape\s+canaveral\b/i, "Kennedy Space Center"],
+  [/\bchrysler\s+building\b/i, "the Chrysler Building"],
   [/\bdisney\s*(?:world|land)\b/i, "Disney World"],
-  [/\bbrooklyn\s+bridge\b|\bgolden\s+gate\s+bridge\b/i, "that bridge"],
-  [/\bstatue\s+of\s+liberty\b|\bmount\s+rushmore\b|\beiffel\s+tower\b|\bpentagon\b|\bhoover\s+dam\b/i, "that landmark"],
+  [/\beiffel\s+tower\b/i, "the Eiffel Tower"],
   [/\b(?:a\s+)?famous\s+(?:skyscraper|landmark|building|tower|stadium)\b/i, "a famous landmark of that kind"],
-  [/\b(?:buy|own|purchase)\b.{0,30}\b(?:an?\s+)?(?:airport|military\s+base|courthouse|capitol|national\s+park)\b/i, "an institutional asset like that"],
 ];
 
 export function detectIconicAsset(message: string): string | null {
@@ -373,16 +448,35 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
   // property discovery. No public for-sale/redevelopment evidence = no
   // analysis. Active-status probes are never answered.
   if (infra) {
-    const intent: TurnIntent = "HARD_SHUTDOWN_SENSITIVE_FACILITY";
-    const repeated = repeatOf(intent);
+    // Verified-disposition reuse is an ALLOWED (non-refusal) high-level path —
+    // distinct intent so the loop guard never collapses it into the shutdown.
+    if (infra.kind === "reuse") {
+      return {
+        turnIntent: "ROUTE_ADAPTIVE_REUSE_PROPERTY", text: SENSITIVE_FACILITY_REUSE_REPLY,
+        slot: "reuse:sensitive-facility:verified", echoConcept: null, refusal: false, patch: {},
+      };
+    }
     const text = infra.kind === "status" ? SENSITIVE_FACILITY_STATUS_REPLY
-      : infra.kind === "reuse" ? SENSITIVE_FACILITY_REUSE_REPLY
+      : infra.kind === "verify" ? SENSITIVE_FACILITY_VERIFY_REPLY
       : SENSITIVE_FACILITY_SHUTDOWN_REPLY;
     return {
-      turnIntent: repeated ? "WAIT_FOR_MORE_INFO" : intent,
-      text: repeated ? "Still not something Furlong can analyze here without a public for-sale, auction, surplus, or redevelopment listing." : text,
-      slot: `shutdown:sensitive-facility:${infra.kind}`, echoConcept: null,
-      refusal: infra.kind !== "reuse", patch: {},
+      turnIntent: "HARD_SHUTDOWN_SENSITIVE_FACILITY", text,
+      slot: `shutdown:sensitive-facility:${infra.kind}`, echoConcept: null, refusal: true, patch: {},
+    };
+  }
+
+  // 0.7 — LAWFUL REGULATED PROPERTY OPERATIONS (burn/demolish/blast/clear) —
+  // distinguished from threats (which are handled above only on malicious
+  // context). These route to permitting/professional review; ambiguous cases
+  // clarify WITHOUT a sticky threatHold.
+  const op = detectPropertyOperation(message);
+  if (op) {
+    const repeated = repeatOf(op.intent);
+    return {
+      turnIntent: repeated ? "ASK_REGION" : op.intent,
+      text: repeated ? "Which jurisdiction is this in? The permitting authority is local." : op.reply,
+      slot: `route:property-operation:${op.intent}`, echoConcept: null,
+      refusal: false, patch: op.intent === "CLARIFY_LAWFUL_PROPERTY_OPERATION" ? {} : { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
   }
 
@@ -462,8 +556,22 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
     };
   }
 
-  // 4.5 — ICONIC / LIKELY-UNAVAILABLE ASSET: reality-check availability before
-  // any ordinary goal handling; never invent availability or imply for-sale.
+  // 4.4 — UNIVERSAL GOAL PARSER classes: not-privately-ownable, impossible
+  // scale, regulated airport, agriculture, marine vessel. Reality-check the
+  // asset and respond to the goal — never fall through to ASK_PERSON/STORY.
+  const goalAsset = classifyGoalAsset(message);
+  if (goalAsset) {
+    const repeated = repeatOf(goalAsset.turnIntent);
+    return {
+      turnIntent: repeated ? "ASK_REGION" : goalAsset.turnIntent,
+      text: repeated ? `Still on that — which market or region, and what use? That shapes what's realistic.` : goalAsset.text,
+      slot: goalAsset.slot, echoConcept: goalAsset.echoConcept, refusal: false,
+      patch: goalAsset.reality === "NOT_PRIVATELY_OWNABLE" || goalAsset.reality === "IMPOSSIBLE_SCALE_ASSET"
+        ? {} : { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+    };
+  }
+
+  // 4.5 — ICONIC PRIVATE ASSET: extraordinary-capital reality check.
   const iconic = detectIconicAsset(message);
   if (iconic) {
     const repeated = repeatOf("REALITY_CHECK_ICONIC_ASSET");

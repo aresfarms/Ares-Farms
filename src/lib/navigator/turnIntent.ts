@@ -48,6 +48,14 @@ export type TurnIntent =
   | "ROUTE_MARINE_LIVEABOARD" | "ROUTE_NONTRADITIONAL_DWELLING"
   | "ROUTE_SPECIALTY_ASSET_ACQUISITION" | "ROUTE_SURPLUS_GOVERNMENT_PROPERTY"
   | "ROUTE_ADAPTIVE_REUSE_PROPERTY"
+  // lawful regulated property operations (threat-classifier precision)
+  | "ROUTE_LAWFUL_LAND_MANAGEMENT" | "ROUTE_DEMOLITION_PERMITTING"
+  | "ROUTE_REGULATED_BLASTING_REVIEW" | "ROUTE_PROPERTY_OPERATION_PERMITTING"
+  | "CLARIFY_LAWFUL_PROPERTY_OPERATION"
+  // universal goal parser asset classes + iconic taxonomy
+  | "ROUTE_AGRICULTURAL_ACQUISITION" | "ROUTE_REGULATED_AIRPORT_ASSET"
+  | "ROUTE_MARINE_VESSEL_OR_LIVEABOARD" | "REALITY_CHECK_IMPOSSIBLE_SCALE_ASSET"
+  | "REALITY_CHECK_NOT_PRIVATELY_OWNABLE"
   // flow
   | "WAIT_FOR_MORE_INFO" | "PRESENT_PATHWAYS";
 
@@ -115,6 +123,19 @@ const ALTERNATES: Partial<Record<TurnIntent, { intent: TurnIntent; text: string 
   ROUTE_SPECIALTY_ASSET_ACQUISITION: { intent: "ASK_REGION", text: "Which region, and what use — residential, storage, business, or tourism? That shapes the diligence." },
   ROUTE_SURPLUS_GOVERNMENT_PROPERTY: { intent: "ASK_REGION", text: "Which area, and intended reuse? Surplus channels and conditions vary by agency and location." },
   ROUTE_ADAPTIVE_REUSE_PROPERTY: { intent: "ASK_REGION", text: "Which region, and what reuse do you have in mind? Code and zoning drive what's feasible." },
+  ROUTE_LAWFUL_LAND_MANAGEMENT: { intent: "ASK_REGION", text: "Which state and county? Burn rules and fire-authority approvals are local." },
+  ROUTE_DEMOLITION_PERMITTING: { intent: "ASK_REGION", text: "Which municipality? Demolition permits and disposal rules are set locally." },
+  ROUTE_REGULATED_BLASTING_REVIEW: { intent: "ASK_REGION", text: "Which state and site? Blasting rules and licensing are local, state, and federal." },
+  ROUTE_PROPERTY_OPERATION_PERMITTING: { intent: "ASK_REGION", text: "Which parcel and jurisdiction? Land-disturbance permits are local." },
+  CLARIFY_LAWFUL_PROPERTY_OPERATION: {
+    intent: "WAIT_FOR_MORE_INFO",
+    text: "Whenever you can confirm it's a lawful, permitted operation on your own property — prescribed burn, demolition, clearing, or regulated blasting — I can help map the permitting path.",
+  },
+  ROUTE_AGRICULTURAL_ACQUISITION: { intent: "ASK_REGION", text: "Which region or state, and roughly what scale? Ag zoning and animal rules are local." },
+  ROUTE_REGULATED_AIRPORT_ASSET: { intent: "ASK_REGION", text: "Which state, and is this a private airstrip, a public-use field, or land near one? That shapes the rules." },
+  ROUTE_MARINE_VESSEL_OR_LIVEABOARD: { intent: "ASK_REGION", text: "Which coast or waterway, and live-aboard, operate, rent, or waterfront land?" },
+  REALITY_CHECK_IMPOSSIBLE_SCALE_ASSET: { intent: "OFFER_SEARCH_AND_BRING_BACK", text: SEARCH_BRING_BACK_TEXT },
+  REALITY_CHECK_NOT_PRIVATELY_OWNABLE: { intent: "OFFER_SEARCH_AND_BRING_BACK", text: SEARCH_BRING_BACK_TEXT },
   // The threat alternate STILL REFUSES and STILL holds — different intent and
   // wording only; the boundary never weakens and discovery never resumes.
   ESCALATE_VIOLENT_THREAT: {

@@ -15,7 +15,7 @@ import { buildModelContext, outputCitesBasis, CONTEXT_ZONES } from "@/security/r
 import { decideRate, RATE_LIMIT_MESSAGE } from "@/security/realityPlatform/navigatorRateLimit";
 import { appendReplay, verifyReplayChain, hashEvidence, hashOutput } from "@/security/realityPlatform/realitySecurityReplay";
 import { abuseTelemetryDashboard } from "@/security/realityPlatform/abuseTelemetryDashboard";
-import { REALITY_BLOCKERS, openRealityBlockers, realityProductionReady, FORBIDDEN_QUESTIONS } from "@/security/realityPlatform/realitySecurityDoctrine";
+import { REALITY_BLOCKERS, openRealityBlockers, realityProductionReady, FORBIDDEN_QUESTIONS, LIVE_FETCH_ACTIVATION_REVIEW_REQUIRED, LIVE_FETCH_ACTIVATION_CONDITIONS } from "@/security/realityPlatform/realitySecurityDoctrine";
 import { assessPathways, EMPTY_CONTEXT } from "@/lib/navigator/possibilityCheck";
 import { buildSearchGuidance, CANDIDATE_SOURCES_LIVE } from "@/lib/navigator/searchGuidance";
 import { REFUSAL_LINE } from "@/lib/navigator/propertyPrivacyDoctrine";
@@ -120,6 +120,12 @@ ok(!/email|ip[_ ]?address|userId|visitorId/i.test(telSrc.replace(/\/\*[\s\S]*?\*
 ok(REALITY_BLOCKERS.length === 5, "five Reality Security blockers defined");
 ok(openRealityBlockers().length === 5, "ALL FIVE blockers open by default (unverified)");
 ok(realityProductionReady() === false, "production_ready=false while any blocker unverified");
+ok(openRealityBlockers().includes("REALITY-URL-001"), "REALITY-URL-001 stays OPEN until a live fetch path is reviewed");
+ok(LIVE_FETCH_ACTIVATION_REVIEW_REQUIRED === true, "LIVE_FETCH_ACTIVATION_REVIEW_REQUIRED gate is true");
+ok(LIVE_FETCH_ACTIVATION_CONDITIONS.length === 6 && LIVE_FETCH_ACTIVATION_CONDITIONS.some((c) => /robots/.test(c)) && LIVE_FETCH_ACTIVATION_CONDITIONS.some((c) => /rendered output review/.test(c)),
+  "the six live-fetch activation conditions are enumerated");
+ok(fs.existsSync("docs/security/REALITY_BLOCKERS_MERGE_NOTE.md"), "merge note exists (blockers fold into the resilience dashboard at integration)");
+ok(/must NOT disappear/.test(fs.readFileSync("docs/security/REALITY_BLOCKERS_MERGE_NOTE.md", "utf8")), "merge note protects the self-contained blocker contract");
 
 // ── Candidate honesty (implementation rule) ──────────────────────────────────
 ok(CANDIDATE_SOURCES_LIVE === false, "candidate sources NOT claimed live");

@@ -64,6 +64,25 @@ export function realityProductionReady(): boolean {
   return openRealityBlockers().length === 0;
 }
 
+/**
+ * LIVE_FETCH_ACTIVATION_REVIEW_REQUIRED — future activation gate (Caitlin,
+ * 2026-06-11). NO live URL fetcher may be enabled until ALL of the conditions
+ * below are verified by a human against the real fetch path AND its rendered
+ * output. Until then CANDIDATE_SOURCES_LIVE stays false and REALITY-URL-001
+ * stays OPEN. This constant is the doctrine; the future fetcher must import it
+ * and refuse to run while it is true without a recorded review.
+ */
+export const LIVE_FETCH_ACTIVATION_REVIEW_REQUIRED = true;
+
+export const LIVE_FETCH_ACTIVATION_CONDITIONS = [
+  "robots/rate-limit compliance verified",
+  "source-content quarantine verified",
+  "no credential forwarding verified",
+  "no proprietary listing storage verified",
+  "SSRF protection verified",
+  "rendered output review completed",
+] as const;
+
 /** The asks the platform is allowed/forbidden to answer (asserted by verify). */
 export const ALLOWED_QUESTION = "What is realistically possible here?";
 export const FORBIDDEN_QUESTIONS = [

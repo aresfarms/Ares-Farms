@@ -3,33 +3,20 @@ const nextConfig = {
   turbopack: {
     root: process.cwd(),
   },
-  // Security headers (control H). FIX 2026-06-12 (Step 3 rendered-crash class):
-  // the original `script-src 'self'` silently broke Next.js client hydration —
-  // Next App Router emits inline bootstrap <script>s (always) and dev needs
-  // 'unsafe-eval' (turbopack/React Refresh). With hydration dead, interactive
-  // components (the Navigator) rendered HTML but no handlers fired. The
-  // governance gate checks header PRESENCE; this keeps every directive while
-  // making script-src functional. TODO (production hardening, under the SEC
-  // blockers / GCP migration): replace 'unsafe-inline' with nonce-based CSP at
-  // the edge/middleware. HSTS also belongs at the GCP load balancer in prod.
+  // Security headers (control H). NONCE-CSP HARDENING 2026-06-12: the CSP no
+  // longer lives here — a static config header cannot carry a per-request
+  // nonce. src/proxy.ts now generates a cryptographically random nonce per
+  // page request and sets the CSP on the request (so Next tags its inline
+  // hydration scripts) and the response. PRODUCTION script-src has NO
+  // 'unsafe-inline' (nonce + 'strict-dynamic'); dev stays relaxed, gated to
+  // NODE_ENV=development. verify:csp-hydration proves the EFFECT (hydration
+  // under the strict policy), not just header presence. The non-CSP headers
+  // below remain static. HSTS also belongs at the GCP load balancer in prod.
   async headers() {
-    const isDev = process.env.NODE_ENV !== "production";
-    const csp = [
-      "default-src 'self'",
-      isDev ? "script-src 'self' 'unsafe-eval' 'unsafe-inline'" : "script-src 'self' 'unsafe-inline'",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https:",
-      "connect-src 'self'",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-      "object-src 'none'",
-    ].join("; ");
     return [
       {
         source: "/:path*",
         headers: [
-          { key: "Content-Security-Policy", value: csp },
           { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },

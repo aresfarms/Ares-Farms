@@ -252,6 +252,57 @@ function previewGate(req: NextRequest): NextResponse | null {
   return null; // password ok → fall through to the normal operator gate
 }
 
+/**
+ * Nonce-based CSP (GCP/production readiness, 2026-06-12). Pages get a fresh
+ * cryptographically random nonce per request; Next reads the CSP from the
+ * REQUEST headers (the fork's documented proxy pattern) and tags its inline
+ * bootstrap/hydration <script>s with it, so PRODUCTION script-src needs NO
+ * 'unsafe-inline'. Development stays relaxed ('unsafe-eval' for React's debug
+ * eval, 'unsafe-inline' for turbopack dev chunks) — clearly gated to dev only.
+ *
+ * style-src keeps 'unsafe-inline' WITHOUT a nonce on purpose: the app styles
+ * via React inline style ATTRIBUTES, which a style-src nonce would void
+ * (CSP3 ignores 'unsafe-inline' when a nonce is present). Script injection is
+ * the XSS vector this hardens; style attributes carry no script capability.
+ */
+function pageResponseWithCsp(req: NextRequest): NextResponse {
+  const isDev = process.env.NODE_ENV === "development";
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = (isDev
+    ? [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https:",
+        "connect-src 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "object-src 'none'",
+      ]
+    : [
+        "default-src 'self'",
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http:`,
+        "style-src 'self' 'unsafe-inline'",
+        "img-src 'self' data: https:",
+        "connect-src 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "object-src 'none'",
+        "upgrade-insecure-requests",
+      ]
+  ).join("; ");
+
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
+}
+
 export async function proxy(req: NextRequest) {
   // Locked-preview password wall (deploy-only; inert otherwise). Must run first.
   const previewBlock = previewGate(req);
@@ -280,7 +331,9 @@ export async function proxy(req: NextRequest) {
       }
     }
 
-    return NextResponse.next();
+    // Pages render under the per-request nonce CSP (production: no
+    // 'unsafe-inline' in script-src).
+    return pageResponseWithCsp(req);
   }
 
   // ── API perimeter ───────────────────────────────────────────────────────────

@@ -14,6 +14,7 @@
     "verify:csp-hydration": "tsx src/scripts/verifyCspHydration.ts",
     "verify:repo-secrets": "tsx src/scripts/verifyRepoSecrets.ts",
     "verify:domain-purpose": "tsx src/scripts/verifyDomainPurpose.ts",
+    "verify:module-ecosystem": "tsx src/scripts/verifyModuleEcosystem.ts",
     "security:audit": "tsx src/scripts/securityAuditReadinessGate.ts",
     "security:audit:production": "SECURITY_GATE_PROFILE=production tsx src/scripts/securityAuditReadinessGate.ts",
     "auth:activation": "tsx src/scripts/productionAuthActivationGate.ts",

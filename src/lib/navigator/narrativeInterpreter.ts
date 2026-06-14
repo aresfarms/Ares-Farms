@@ -70,6 +70,13 @@ export interface JourneyState {
   threatHold: boolean;
   /** Addresses tied to stalking/harassment THIS session — no overview for them. */
   flaggedAddresses: string[];
+  /**
+   * PROPOSED-SOLUTION-AS-HYPOTHESIS-001: a stated expansion/portfolio path has
+   * already been met with the objective-discovery question this session, so the
+   * hypothesis layer does NOT re-ask — the user's next turn (an objective or a
+   * confirmation) proceeds to the existing asset routing.
+   */
+  proposedSolutionAsked: boolean;
 }
 
 export const FRESH_JOURNEY: JourneyState = {
@@ -77,6 +84,7 @@ export const FRESH_JOURNEY: JourneyState = {
   intent: null, guidedDiscovery: false, exploredPathways: [], askedPrompts: [],
   guardCounters: { refusals: 0, rejections: 0 },
   lastTurnIntent: null, recentTurnIntents: [], noveltyGate: null, threatHold: false, flaggedAddresses: [],
+  proposedSolutionAsked: false,
 };
 
 // ── Guided Property Discovery copy (spec fix 2026-06-11) ─────────────────────

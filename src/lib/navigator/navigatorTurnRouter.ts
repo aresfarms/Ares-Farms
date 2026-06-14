@@ -56,6 +56,7 @@ import {
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
 import { classifyGoalAsset } from "./navigatorGoalParser";
+import { detectProposedSolution, isProposedSolutionConfirmation, proposedSolutionReply, confirmedAssetProbe } from "./proposedSolutionHypothesis";
 import { resolveAmbiguity } from "./semanticAmbiguityResolver";
 
 export interface RouteDecision {
@@ -640,6 +641,44 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
       slot: `paths-and-options:${decision}`, echoConcept: null, refusal: false,
       patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
     };
+  }
+
+  // 4.38 — PROPOSED-SOLUTION-AS-HYPOTHESIS (PROPOSED-SOLUTION-AS-HYPOTHESIS-001):
+  // a stated SCALE / PORTFOLIO / EXPANSION plan ("buy 10 more laundromats",
+  // "five more farms", "a $10M property") is a strategy hypothesis, not a plain
+  // acquisition. Acknowledge it, ask the destination, offer to compare routes —
+  // the stated path stays open. Runs BEFORE the asset routes so the first reply
+  // is human, not a regulated-acquisition label. Does NOT fire when the user is
+  // confirming ("I just want ten more laundromats") or has already been asked
+  // this session — those proceed to the existing asset routing below.
+  {
+    const proposed = detectProposedSolution(message);
+    const confirming = isProposedSolutionConfirmation(message);
+    if (proposed && !confirming && !journey.proposedSolutionAsked) {
+      // First encounter with the expansion plan: ask the destination.
+      return {
+        turnIntent: "EXPLORE_PROPOSED_SOLUTION",
+        text: proposedSolutionReply(proposed.asset),
+        slot: "explore:proposed-solution", echoConcept: proposed.asset, refusal: false,
+        patch: { proposedSolutionAsked: true, guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+      };
+    }
+    // §8 — confirmation, or a follow-up after we already asked: the stated path
+    // proceeds to its EXISTING asset workup. Re-route the (often plural)
+    // expansion phrasing through detectAssetGoal via a singularized probe so the
+    // regulated/commercial/ag route is preserved exactly.
+    if (proposed && (confirming || journey.proposedSolutionAsked)) {
+      const confirmed = detectAssetGoal(confirmedAssetProbe(proposed.asset));
+      if (confirmed) {
+        const repeated = repeatOf(confirmed.intent);
+        return {
+          turnIntent: repeated ? "ASK_REGION" : confirmed.intent,
+          text: repeated ? `Still on the ${confirmed.label} — which market or region, and any budget or financing picture?` : confirmed.reply,
+          slot: `route:confirmed-asset:${confirmed.intent}`, echoConcept: confirmed.label, refusal: false,
+          patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+        };
+      }
+    }
   }
 
   // 4.4 — UNIVERSAL GOAL PARSER classes: not-privately-ownable, impossible

@@ -153,7 +153,7 @@ export type ObjectiveCategory =
   | "scale_enterprise" | "time_freedom" | "stability" | "wealth";
 
 const OBJECTIVE_PATTERNS: [ObjectiveCategory, RegExp][] = [
-  ["passive_income", /\b(?:passive\s+income|cash\s*flow|mailbox\s+money|income\s+stream|money\s+while\s+i\s+sleep)\b/i],
+  ["passive_income", /\b(?:passive\s+income|cash\s*flow|mailbox\s+money|income\s+stream|money\s+while\s+i\s+sleep|(?:more|monthly|extra|additional)\s+income|more\s+revenue)\b/i],
   ["job_replacement", /\b(?:quit|leave|replace|get\s+out\s+of)\s+(?:my\s+)?(?:job|9\s*[-to]*\s*5|day\s+job|career)\b|\breplace\s+my\s+(?:income|salary)\b|\bstop\s+working\b/i],
   ["retirement", /\b(?:retire|retirement|retire\s+early)\b/i],
   ["exit_sale", /\b(?:build\s+(?:something|a\s+(?:business|company))\s+(?:to\s+sell|i\s+can\s+sell)|sell\s+(?:it\s+)?someday|exit|flip\s+(?:it|them)|sell\s+the\s+(?:business|company))\b/i],

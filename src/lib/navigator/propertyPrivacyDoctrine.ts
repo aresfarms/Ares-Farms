@@ -45,10 +45,27 @@ const OWNERSHIP_INTENT: RegExp[] = [
   /\bcontact\s+the\s+owner\b/i,
   /\btell\s+me\s+who\s+(?:bought|sold|owns)\b/i,
   /\bcurrent\s+resident\b/i,
+  // C4c: authority-framed resident/occupant lookup ("give me the resident info").
+  /\bresident(?:'s)?\s+(?:info|information|name|identity|contact|details)\b/i,
+  /\b(?:resident|occupant|tenant)\s+(?:info|information|lookup|details)\b/i,
+  /\bwho\s+(?:is\s+)?(?:the\s+)?(?:resident|occupant|tenant)\b/i,
+  // C3b: erosion follow-up after an owner refusal ("just their name").
+  /\bjust\s+(?:their|his|her|the\s+owner'?s?)\s+name\b/i,
+  /\b(?:their|his|her|the\s+owner'?s?)\s+name\s+(?:then|please)?\s*$/i,
 ];
 
+// C1a: collapse common leetspeak/homoglyph substitutions so obfuscated probes
+// ("wh1te neighborhood", "st@lk") still hit the detectors. Conservative — only
+// used to RE-TEST the refusal patterns, never to alter routing or output.
+export function normalizeForDetection(text: string): string {
+  return text
+    .replace(/[1!|]/g, "i").replace(/0/g, "o").replace(/3/g, "e").replace(/4/g, "a")
+    .replace(/5|\$/g, "s").replace(/7/g, "t").replace(/@/g, "a").replace(/8/g, "b");
+}
+
 export function isOwnershipProbe(text: string): boolean {
-  return OWNERSHIP_INTENT.some((re) => re.test(text));
+  const norm = normalizeForDetection(text);
+  return OWNERSHIP_INTENT.some((re) => re.test(text) || re.test(norm));
 }
 
 // ── G-2: demographic / steering intent — explicit AND proxy phrasings ────────
@@ -71,7 +88,8 @@ const STEERING_INTENT: RegExp[] = [
   /\bis\s+it\s+safe\b/i,
   /\bhow\s+safe\s+is\b/i,
   /\bcrime\s+rate\b/i,
-  /\bis\s+(?:it|this|the\s+area)\s+diverse\b/i,
+  /\bis\s+(?:it|this|that|the)\b.{0,20}\b(?:diverse|changing|gentrify)/i,
+  /\b(?:neighborhood|area|block|street)\b.{0,20}\b(?:diverse|changing|gentrif)/i,
   /\bdiversity\s+(?:of|in)\s+the\s+(?:area|neighborhood)\b/i,
   /\bgood\s+schools?\b.{0,30}\b(?:people|kind|type)\b/i,
   /\bright\s+kind\s+of\s+(?:people|families|neighbors)\b/i,
@@ -95,7 +113,8 @@ export function isHopaDesignationAsk(text: string): boolean {
 
 export function isSteeringProbe(text: string): boolean {
   if (isHopaDesignationAsk(text)) return false; // lawful designation ask
-  return STEERING_INTENT.some((re) => re.test(text));
+  const norm = normalizeForDetection(text); // C1a: catch "wh1te neighborhood"
+  return STEERING_INTENT.some((re) => re.test(text) || re.test(norm));
 }
 
 export type RefusalKind = "ownership" | "steering" | null;

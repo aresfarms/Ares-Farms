@@ -102,6 +102,13 @@ const ATTACK_RE = /\battack\b.{0,30}\b(?:building|house|home|school|hospital|cou
 const MALICIOUS_TARGET_RE = /\b(?:neighbor'?s?|neighbour'?s?|someone(?:'s| else'?s)?|somebody'?s?|their|his|her|else'?s|the\s+\w+'s|public|school|hospital|courthouse|church|government|the\s+city|a\s+rival|competitor'?s?)\b/i;
 const MALICIOUS_INTENT_RE = /\b(?:for\s+(?:the\s+)?insurance|insurance\s+money|to\s+collect\s+insurance|get\s+revenge|for\s+revenge|so\s+no\s+one|to\s+get\s+back\s+at|covertly|in\s+secret|without\s+(?:them|anyone)\s+knowing)\b/i;
 const DESTRUCTIVE_VERB_RE = /\b(?:burn\s+(?:down|up)?|set\s+fire\s+to|torch|arson|destroy|wreck|vandaliz|raze\s+(?:someone|their))\b/i;
+// B4a fix (NAVIGATOR red-team v2): burning/torching a GENERIC OCCUPIABLE
+// STRUCTURE is unconditionally a threat — no malicious-target qualifier needed.
+// (Barn/shed/field/brush stay OUT — those are lawful demolition/land-management
+// territory handled at tier 0.7; "prescribed burn", "demolish a derelict barn",
+// "firebreak", "clear land" never match this.)
+const GENERIC_ARSON_RE =
+  /\b(?:burn\s+(?:down|up)|set\s+fire\s+to|torch|firebomb)\b.{0,24}\b(?:building|buildings|house|home|apartment|condo|duplex|townhouse|office|store|shop|business|warehouse|hotel|motel|school|hospital|church|mosque|synagogue|factory|plant|mall|restaurant|complex|tower|skyscraper)\b/i;
 
 export const VIOLENT_THREAT_REPLY =
   "I can’t help with threats, violence, bombing, sabotage, or harming people or property. If this is an emergency " +
@@ -112,6 +119,8 @@ export function detectViolentThreat(message: string): ThreatPhraseCategory | nul
   if (SABOTAGE_RE.test(message)) return "sabotage";
   if (HARM_PEOPLE_RE.test(message)) return "assault";
   if (ATTACK_RE.test(message)) return "assault";
+  // B4a: arson of a generic occupiable structure escalates unconditionally.
+  if (GENERIC_ARSON_RE.test(message)) return "arson";
   // Destructive verb ONLY escalates with a malicious target or covert intent.
   if (DESTRUCTIVE_VERB_RE.test(message) && (MALICIOUS_TARGET_RE.test(message) || MALICIOUS_INTENT_RE.test(message))) {
     return "arson";

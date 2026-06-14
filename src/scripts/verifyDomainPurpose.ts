@@ -1,48 +1,86 @@
 /**
- * verify:domain-purpose — DOMAIN-GOVERNANCE-002 acceptance (§9). Composes with
- * verify:domain-governance (DOMAIN-ASSET-001 stays exactly the two Furlong
- * domains); this gate locks the five-domain PURPOSE registry, the
- * Furlong/Compass boundary, typo-domain redirect-only posture, and that
- * NOTHING is live or production-approved while SEC-DNS-001 is open.
+ * verify:domain-purpose — DOMAIN-GOVERNANCE-002 acceptance after the FOUNDER
+ * DECISION PATCH (2026-06-14). Composes with verify:domain-governance
+ * (DOMAIN-ASSET-001 stays exactly the two Furlong domains); this gate locks the
+ * founder-approved SIX-domain PURPOSE registry, the role constitutional lock,
+ * the Furlong/Compass boundary, defensive/typo redirect-only posture, the
+ * exclusion of non-owned compass2capital.com, and that NOTHING is live or
+ * production-approved while SEC-DNS-001 is open.
  */
 import * as fs from "node:fs";
 import {
-  DOMAIN_PURPOSE_REGISTRY, domainPurpose, FURLONG_COMPASS_BOUNDARY_LOCK, TYPO_DOMAIN_RULES,
+  DOMAIN_PURPOSE_REGISTRY, domainPurpose, FURLONG_COMPASS_BOUNDARY_LOCK,
+  DOMAIN_ROLE_CONSTITUTIONAL_LOCK, NON_OWNED_EXCLUDED_DOMAINS, TYPO_DOMAIN_RULES,
 } from "@/security/domainPurposeRegistry";
 
 const fail: string[] = [];
 const ok = (c: boolean, m: string) => { if (!c) fail.push(m); };
 
-// All five domains registered, all owned.
-const expected = ["furlonghub.com", "furlongpathways.com", "compasstocapital.com", "comapss2capital.com", "comapss2capital.org"];
-ok(DOMAIN_PURPOSE_REGISTRY.length === 5 && expected.every((d) => !!domainPurpose(d)),
-  "all five owned domains registered in the purpose inventory");
+// §7 — all six founder-confirmed owned domains registered, all owned.
+const expected = [
+  "furlongpathways.com", "furlonghub.com", "compasstocapital.com",
+  "compasstocapital.org", "comapss2capital.com", "comapss2capital.org",
+];
+ok(DOMAIN_PURPOSE_REGISTRY.length === 6 && expected.every((d) => !!domainPurpose(d)),
+  "all six owned domains registered in the purpose inventory");
 ok(DOMAIN_PURPOSE_REGISTRY.every((d) => d.owned), "every record marked owned");
 
-// furlonghub: canonical CANDIDATE but NOT production-approved.
+// §3/§7 — compass2capital.com (NOT owned) must NOT appear anywhere.
+ok(NON_OWNED_EXCLUDED_DOMAINS.includes("compass2capital.com"), "compass2capital.com is listed as excluded/non-owned");
+ok(!DOMAIN_PURPOSE_REGISTRY.some((d) => d.domain === "compass2capital.com"),
+  "compass2capital.com is NOT a registry record");
+
+// §7 — furlongpathways.com is the PRIMARY public-domain candidate.
+const pathways = domainPurpose("furlongpathways.com")!;
+ok(pathways.canonicalCandidate === true && pathways.hubCandidate === false &&
+   /PRIMARY public-facing/i.test(pathways.intendedRole) &&
+   pathways.moduleAlignment.some((m) => /Discovery Engine/.test(m)) &&
+   pathways.productionApproved === false,
+  "furlongpathways.com is the primary public-domain candidate (front door), not production-approved");
+
+// §7 — furlonghub.com is the HUB-domain candidate.
 const hub = domainPurpose("furlonghub.com")!;
-ok(hub.canonicalCandidate === true && hub.productionApproved === false,
-  "furlonghub.com is a canonical candidate but NOT production-approved");
+ok(hub.hubCandidate === true && hub.canonicalCandidate === false &&
+   /ecosystem HUB/i.test(hub.intendedRole) &&
+   hub.moduleAlignment.some((m) => /provider access/.test(m)) &&
+   hub.productionApproved === false,
+  "furlonghub.com is the hub-domain candidate (provider/broker/lender/partner), not production-approved");
 
-// compasstocapital: capital/professional module — NOT Furlong Core.
+// §7 — compasstocapital.com is the capital-brand candidate, Furlong-owned, NOT auto Five Borough.
 const compass = domainPurpose("compasstocapital.com")!;
-ok(compass.moduleAlignment.some((m) => /Five Borough|Compass to Capital/.test(m)) &&
-   !compass.moduleAlignment.some((m) => /^Furlong Core$/.test(m)),
-  "compasstocapital.com maps to the capital/professional module, not Furlong Core");
-ok(/NOT Furlong Core/i.test(compass.intendedRole), "compass role states NOT Furlong Core");
+ok(compass.capitalBrandCandidate === true && compass.canonicalCandidate === false &&
+   compass.hubCandidate === false && /capital-navigation brand/i.test(compass.intendedRole),
+  "compasstocapital.com is the capital-navigation brand candidate");
+ok(compass.notes.some((n) => /NOT automatically Five Borough/i.test(n)) &&
+   compass.notes.some((n) => /financing-neutrality/i.test(n)),
+  "compasstocapital.com: Furlong-owned, not auto Five Borough, preserves financing neutrality");
+ok(!compass.moduleAlignment.some((m) => /^Furlong Core$/.test(m)),
+  "compasstocapital.com is not Furlong Core");
 
-// Typo domains: redirect-only candidates to the canonical Compass surface.
-for (const d of ["comapss2capital.com", "comapss2capital.org"]) {
+// §7 — defensive / typo domains are redirect-only defensive registrations.
+for (const d of ["compasstocapital.org", "comapss2capital.com", "comapss2capital.org"]) {
   const r = domainPurpose(d)!;
-  ok(r.redirectOnly === true && r.redirectTarget === "compasstocapital.com",
-    `${d} is redirect-only → compasstocapital.com`);
+  ok(r.defensiveRegistration === true && r.redirectOnly === true && r.redirectTarget === "compasstocapital.com",
+    `${d} is a defensive registration, redirect-only → compasstocapital.com`);
 }
 
-// Nothing live; nothing production-approved; SEC-DNS-001 stays open.
-ok(DOMAIN_PURPOSE_REGISTRY.every((d) => d.dnsStatus !== "live"), "no domain marked live");
+// §5 — role constitutional lock verbatim (four roles, not collapsed).
+ok(/Furlong Pathways is the public front door/.test(DOMAIN_ROLE_CONSTITUTIONAL_LOCK) &&
+   /Furlong Hub is the ecosystem hub/.test(DOMAIN_ROLE_CONSTITUTIONAL_LOCK) &&
+   /Compass to Capital is the capital-navigation brand/.test(DOMAIN_ROLE_CONSTITUTIONAL_LOCK) &&
+   /Five Borough Capital remains/.test(DOMAIN_ROLE_CONSTITUTIONAL_LOCK) &&
+   /must not\s+collapse these roles into a single identity/.test(DOMAIN_ROLE_CONSTITUTIONAL_LOCK),
+  "§5 role constitutional lock verbatim (four distinct roles, never collapsed)");
+
+// Boundary + typo rules locked.
+ok(FURLONG_COMPASS_BOUNDARY_LOCK === "Furlong informs. Compass/Five Borough performs professional financing work when separately activated.",
+  "Furlong/Compass boundary lock verbatim");
+ok(TYPO_DOMAIN_RULES.length === 6, "six typo/defensive-domain rules locked");
+
+// §7/§8 — nothing live; nothing production-approved; no redirect activated; SEC-DNS-001 open.
+ok(DOMAIN_PURPOSE_REGISTRY.every((d) => d.dnsStatus === "unverified"), "no domain DNS-verified/configured/live");
 ok(DOMAIN_PURPOSE_REGISTRY.every((d) => !d.productionApproved), "no domain production-approved");
 {
-  // SEC-DNS-001 open + production blocked (combined model unchanged).
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const dash = require("@/security/securityResilienceDashboard");
   const blockers = dash.combinedProductionBlockers() as { id: string; open: boolean }[];
@@ -51,21 +89,19 @@ ok(DOMAIN_PURPOSE_REGISTRY.every((d) => !d.productionApproved), "no domain produ
     "10 blockers all open; production readiness remains false");
 }
 
-// Boundary + typo rules locked.
-ok(FURLONG_COMPASS_BOUNDARY_LOCK === "Furlong informs. Compass/Five Borough performs professional financing work when separately activated.",
-  "Furlong/Compass boundary lock verbatim");
-ok(TYPO_DOMAIN_RULES.length === 6, "six typo-domain rules locked");
-
-// Runbook records the inventory + the pending canonical decision.
+// Runbook records the founder-approved inventory.
 const runbook = fs.readFileSync("docs/deployment/GCP_MIGRATION_RUNBOOK.md", "utf8");
-ok(/furlonghub\.com/.test(runbook) && /compasstocapital\.com/.test(runbook) && /comapss2capital\.com/.test(runbook),
-  "runbook carries the domain inventory");
-ok(/pending Caitlin approval|Caitlin'?s approval/i.test(runbook), "runbook: canonical selection pending Caitlin approval");
+ok(/furlongpathways\.com/.test(runbook) && /furlonghub\.com/.test(runbook) &&
+   /compasstocapital\.com/.test(runbook) && /compasstocapital\.org/.test(runbook) &&
+   /comapss2capital\.com/.test(runbook) && /comapss2capital\.org/.test(runbook),
+  "runbook carries the full six-domain inventory");
+ok(/Removed[^\n]*compass2capital\.com/i.test(runbook),
+  "runbook explicitly records compass2capital.com as removed / not owned");
 
 if (fail.length) {
   console.error(`\n✗  verify:domain-purpose FAIL — ${fail.length}:`);
   for (const f of fail) console.error("    ✗ " + f);
   process.exit(1);
 }
-console.log("✓  verify:domain-purpose PASS — five owned domains in the purpose registry; furlonghub canonical CANDIDATE only; compass = professional-module surface (not Furlong Core); typo domains redirect-only; nothing live, nothing production-approved, SEC-DNS-001 open, 10 blockers open.");
+console.log("✓  verify:domain-purpose PASS — six founder-approved owned domains; furlongpathways=primary public front door; furlonghub=ecosystem hub; compasstocapital.com=capital-navigation brand (Furlong-owned, not auto Five Borough, financing-neutral); .org + both typo domains defensive redirect-only; non-owned compass2capital.com excluded; role constitutional lock verbatim; nothing live/approved; SEC-DNS-001 open; 10 blockers open.");
 process.exit(0);

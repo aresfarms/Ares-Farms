@@ -52,26 +52,36 @@ Secrets exist ONLY in Secret Manager — never in repo, env files in git, or bui
 
 ## 8. Domain / DNS cutover plan (feeds SEC-DNS-001 — stays OPEN until done + reviewed)
 
-**Domain inventory (DOMAIN-GOVERNANCE-002, `src/security/domainPurposeRegistry.ts` — all OWNED, all DNS
-`unverified`, NONE production-approved, NONE live):**
+**Domain inventory — FOUNDER DECISION PATCH 2026-06-14 (DOMAIN-GOVERNANCE-002,
+`src/security/domainPurposeRegistry.ts` — six OWNED domains, all DNS `unverified`,
+NONE production-approved, NONE live, NO redirect activated):**
 
-| Domain | Role | Posture |
+| Domain | Founder-approved role | Posture |
 |---|---|---|
-| `furlonghub.com` | primary Furlong platform CANDIDATE (public decision-intelligence hub) | canonical candidate — **pending Caitlin approval** |
-| `furlongpathways.com` | Furlong marketing/education ("find your pathway") | likely redirect → furlonghub.com or landing surface; not canonical unless separately approved |
-| `compasstocapital.com` | Compass to Capital — capital/financing pathway; Five Borough/Stuart professional-module surface | NOT Furlong Core; explicit professional handoff only |
-| `comapss2capital.com` | defensive typo registration | redirect-only → compasstocapital.com; must never host a separate product |
-| `comapss2capital.org` | defensive typo / alt-extension | redirect-only unless Caitlin approves separate use |
+| `furlongpathways.com` | **PRIMARY public-facing Furlong brand** — Discovery Engine front door, newsletter, membership, Curated Opportunity Pipeline, consumer-facing | canonical public-domain candidate; production not approved; DNS not activated |
+| `furlonghub.com` | **Ecosystem hub** — provider access, future broker/lender/partner modules, admin & platform surfaces | hub-domain candidate; production not approved; DNS not activated |
+| `compasstocapital.com` | **Capital-navigation brand** — Financing Intelligence surface, capital-pathway education, future financing module destination | Furlong-OWNED, NOT automatically Five Borough; may route to Five Borough + future providers; must preserve financing neutrality; production not approved |
+| `compasstocapital.org` | alternate extension | defensive registration, redirect candidate → compasstocapital.com |
+| `comapss2capital.com` | defensive typo registration | redirect candidate → compasstocapital.com; must never host a separate product |
+| `comapss2capital.org` | defensive typo registration (alt extension) | redirect candidate → compasstocapital.com |
 
-DOMAIN-ASSET-001 (the two-Furlong-domain canonical contract) is unchanged and composes with this registry.
-**Boundary lock:** Furlong informs; Compass/Five Borough performs professional financing work when separately
-activated — Furlong Core never silently becomes Five Borough.
+> **Removed (NOT owned, NOT governed, NOT in DNS/redirect planning):** `compass2capital.com`.
 
-- **Canonical selection is Caitlin's decision at DNS sign-off** (current candidate: furlonghub.com).
+**Role constitutional lock (§5):** Furlong Pathways is the public front door; Furlong Hub is the ecosystem hub;
+Compass to Capital is the capital-navigation brand; Five Borough Capital remains a professional financing module
+inside the ecosystem. The domains must not collapse these roles into a single identity.
+
+DOMAIN-ASSET-001 (the two-Furlong-domain canonical contract: furlongpathways.com + furlonghub.com) is unchanged
+and composes with this registry. **Boundary lock:** Furlong informs; Compass/Five Borough performs professional
+financing work when separately activated — Furlong Core never silently becomes Five Borough.
+
+- **Canonical selection is Caitlin's decision at DNS sign-off** (founder-approved public candidate: furlongpathways.com).
 - Pre-cutover: registrar access verified by Caitlin; current records exported (rollback copy); Cloud Run domain
   mapping or HTTPS LB created; cert issued and VALID; staging hostname smoke-tested incl. `verify:csp-hydration`
   against the real edge; redirect strategy (typo→compass, pathways→hub) approved and documented in the
-  SEC-DNS-001 sign-off; redirects preserve HTTPS.
+  SEC-DNS-001 sign-off; redirects preserve HTTPS. Redirect strategy now: typo/.org defensive domains
+  (compasstocapital.org, comapss2capital.com, comapss2capital.org) → compasstocapital.com; no redirect activated
+  until founder approval during launch planning.
 - Cutover: lower TTL 24h ahead → switch A/AAAA/CNAME → verify HTTPS + headers + nonce-CSP hydration on the live host.
 - **Rollback:** restore exported records (TTL still low), confirm old target healthy. Documented BEFORE cutover.
 - Gate: `npm run verify:domain-purpose` (registry posture) + `verify:domain-governance` (DOMAIN-ASSET-001).

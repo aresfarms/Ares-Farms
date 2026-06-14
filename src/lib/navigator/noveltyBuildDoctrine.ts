@@ -59,8 +59,8 @@ export const NOVELTY_REFUSAL_REPLY =
 // question (see detectRegulatedUse) — adult subject matter alone is NOT a
 // refusal trigger. Furlong reports what's lawful; it does not moralize.
 const SEXUAL_RE: RegExp[] = [
-  /\b(?:phallic|penis|genital|vagina|breast)[- ]?(?:shaped|themed)?\b.{0,30}\b(?:building|tower|structure|house|hotel|monument)\b/i,
-  /\b(?:building|tower|structure|house|hotel|monument)\b.{0,40}\bshaped\s+like\s+(?:a\s+)?(?:penis|phallus|genitals?|breasts?|butt)\b/i,
+  /\b(?:phallic|penis|genital|genitalia|vagina|breast)[- ]?(?:shaped|themed)?\b.{0,30}\b(?:building|tower|structure|house|hotel|monument)\b/i,
+  /\b(?:building|tower|structure|house|hotel|monument)\b.{0,40}\bshaped\s+like\s+(?:a\s+)?(?:penis|phallus|genital(?:s|ia)?|breasts?|butt)\b/i,
   /\b(?:pornographic|obscene)\s+(?:content|display|building|structure|imagery)\b/i,
   /\bsexually\s+explicit\b.{0,30}\b(?:building|structure|venue|display|content)\b/i,
   /\b(?:generate|make|write|create)\b.{0,30}\b(?:porn|pornography|sexual\s+content|explicit\s+content)\b/i,

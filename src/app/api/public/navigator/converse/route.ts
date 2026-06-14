@@ -227,7 +227,10 @@ export async function POST(req: Request) {
 
   // 2.5 — CONTEXTUAL SHORT-ANSWER: "all of the above" / "yes" / "the first one"
   // resolve against the PREVIOUS bot question — never a new discovery goal.
-  const contextual = resolveContextualAnswer(message, journey);
+  // E5 fix: when objective discovery is pending, a short "not sure" is an
+  // OBJECTIVE answer — let the router's objective tier handle it (it keeps the
+  // user in objective-discovery), not the generic contextual resolver.
+  const contextual = journey.objectiveDiscoveryPending ? null : resolveContextualAnswer(message, journey);
   if (contextual) {
     const guarded = guardTurnIntent(journey, contextual.turnIntent, contextual.text, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);

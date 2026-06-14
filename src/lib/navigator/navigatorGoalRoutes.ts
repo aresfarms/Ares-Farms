@@ -106,6 +106,13 @@ export function assessCriticalInfrastructure(message: string): InfraDecision {
   // Probes and active-status questions escalate/refuse for BOTH classes.
   if (INFRA_PROBE_RE.test(message)) return { kind: "escalate", category: "infrastructure-probe" };
   if (INFRA_STATUS_RE.test(message)) return { kind: "status" };
+  // B7f over-block fix: a sensitive facility named only as an ADJACENCY to the
+  // user's own parcel ("lot backs up to a substation", "near a pipeline") is
+  // ordinary parcel diligence, NOT analysis of the facility — hand it back to
+  // normal routing. (A probe/status about that facility already escalated above.)
+  if (sensitive && /\b(?:backs?\s+up\s+to|back(?:s|ing)?\s+(?:up\s+)?to|next\s+to|adjacent\s+to|adjoin(?:s|ing)?|abuts?|borders?|near(?:by)?|close\s+to|across\s+(?:the\s+)?(?:street|road)\s+from|down\s+the\s+(?:street|road)|sits?\s+(?:near|by)|by\s+a)\b/i.test(message)) {
+    return null;
+  }
   // Regulated-passthrough (airport/hospital) acquisition → goal routing owns it.
   if (passthrough && !sensitive) return null;
   // Sensitive facility: official disposition → high-level reuse; weak claim →

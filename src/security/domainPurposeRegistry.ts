@@ -1,28 +1,35 @@
 /**
- * DOMAIN-GOVERNANCE-002 — Domain Purpose Registry (2026-06-12).
+ * DOMAIN-GOVERNANCE-002 — Domain Purpose Registry.
+ * FOUNDER DECISION PATCH (2026-06-14): inferred assignments replaced with
+ * founder-approved roles. The registry now reflects ACTUAL ownership and
+ * INTENDED architecture, not inference.
  *
- * Records the OWNED domain portfolio with intended purpose, module alignment,
- * and redirect posture — WITHOUT activating any DNS. Prevents domain drift:
- * Furlong is the public decision-intelligence hub; Compass to Capital is the
- * capital/financing pathway and Five Borough/Stuart professional-module
- * surface; typo domains are defensive redirects, never separate brands.
+ * Records the OWNED domain portfolio (six domains) with intended purpose,
+ * module alignment, and redirect posture — WITHOUT activating any DNS.
  *
- * Composes with (does NOT replace) DOMAIN-ASSET-001
- * (domainAssetManifest.ts) — that contract stays exactly the two Furlong
- * domains. This registry is the broader PURPOSE inventory including the
- * Compass portfolio.
+ * Composes with (does NOT replace) DOMAIN-ASSET-001 (domainAssetManifest.ts) —
+ * that contract stays exactly the two Furlong domains. This registry is the
+ * broader PURPOSE inventory including the Compass to Capital portfolio.
  *
- * BOUNDARY LOCK (§4): Five Borough Capital is Stuart Fraass's professional
- * financing module; Compass to Capital is the clearer user-facing capital
- * pathway brand/surface. Furlong may route to Compass/Five Borough ONLY
- * through explicit professional-module handoff. Furlong Core must not
- * silently become Five Borough Capital; Five Borough may be absorbed
- * operationally as a CONNECTED professional module, never collapsed into
- * Furlong Core. "Furlong informs. Compass/Five Borough performs professional
- * financing work when separately activated."
+ * CONSTITUTIONAL LOCK (§5 of the patch — DOMAIN_ROLE_CONSTITUTIONAL_LOCK):
+ *   Furlong Pathways is the public front door.
+ *   Furlong Hub is the ecosystem hub.
+ *   Compass to Capital is the capital-navigation brand.
+ *   Five Borough Capital remains a professional financing module inside the
+ *   ecosystem. The domains must not collapse these roles into one identity.
  *
- * HARD RULES: no DNS cutover; no domain marked live; SEC-DNS-001 stays OPEN;
- * canonical selection requires Caitlin's approval.
+ * BOUNDARY LOCK (FURLONG_COMPASS_BOUNDARY_LOCK): Compass to Capital is the
+ * user-facing capital-navigation brand and a Furlong-OWNED asset — NOT
+ * automatically Five Borough Capital. It MAY route to Five Borough and future
+ * capital providers, and MUST preserve the financing-neutrality doctrine.
+ * Five Borough Capital is Stuart Fraass's professional financing module,
+ * absorbed only as a CONNECTED module, never collapsed into Furlong Core.
+ * "Furlong informs. Compass/Five Borough performs professional financing work
+ * when separately activated."
+ *
+ * HARD RULES: governance decision only; no DNS cutover; no domain marked live;
+ * no redirect activated; SEC-DNS-001 stays OPEN; production not approved;
+ * canonical/redirect activation requires founder approval at launch planning.
  */
 
 export type DnsStatus = "unverified" | "verified" | "configured" | "live";
@@ -32,7 +39,14 @@ export interface DomainPurposeRecord {
   owned: boolean;
   intendedRole: string;
   moduleAlignment: string[];
+  /** Canonical PUBLIC production-domain candidate (Furlong Pathways). */
   canonicalCandidate: boolean;
+  /** Ecosystem HUB-domain candidate (Furlong Hub). */
+  hubCandidate: boolean;
+  /** Capital-navigation BRAND candidate (Compass to Capital .com). */
+  capitalBrandCandidate: boolean;
+  /** Defensive / typo / alternate-extension registration. */
+  defensiveRegistration: boolean;
   redirectTarget?: string;
   redirectOnly: boolean;
   dnsStatus: DnsStatus;
@@ -43,10 +57,22 @@ export interface DomainPurposeRecord {
 
 export const DOMAIN_PURPOSE_DOCTRINE_ID = "DOMAIN-GOVERNANCE-002";
 
+/** §5 — role constitutional lock (verbatim, founder-approved). */
+export const DOMAIN_ROLE_CONSTITUTIONAL_LOCK =
+  "Furlong Pathways is the public front door. Furlong Hub is the ecosystem hub. " +
+  "Compass to Capital is the capital-navigation brand. Five Borough Capital remains " +
+  "a professional financing module inside the ecosystem. The domains must not " +
+  "collapse these roles into a single identity.";
+
 export const FURLONG_COMPASS_BOUNDARY_LOCK =
   "Furlong informs. Compass/Five Borough performs professional financing work when separately activated.";
 
-/** §5 — typo-domain rules (locked). */
+/** Domains that are NOT owned and must never appear in planning. */
+export const NON_OWNED_EXCLUDED_DOMAINS = [
+  "compass2capital.com", // not owned, not governed, not in DNS/redirect planning
+] as const;
+
+/** Typo / defensive-domain rules (locked). */
 export const TYPO_DOMAIN_RULES = [
   "typo domains must not become independent brands",
   "typo domains must not host separate application logic",
@@ -58,73 +84,123 @@ export const TYPO_DOMAIN_RULES = [
 
 export const DOMAIN_PURPOSE_REGISTRY: DomainPurposeRecord[] = [
   {
-    domain: "furlonghub.com",
-    owned: true,
-    intendedRole: "primary Furlong platform candidate — public decision-intelligence hub; likely canonical production domain, pending Caitlin approval",
-    moduleAlignment: [
-      "Furlong Core", "property intelligence", "ownership intelligence", "pathway discovery",
-      "transaction reality", "life-event resilience", "professional module routing",
-    ],
-    canonicalCandidate: true,
-    redirectOnly: false,
-    dnsStatus: "unverified",
-    productionApproved: false,
-    securityCritical: true,
-    notes: ["production use not approved", "SEC-DNS-001 remains open", "canonical selection is Caitlin's call at DNS sign-off"],
-  },
-  {
     domain: "furlongpathways.com",
     owned: true,
-    intendedRole: "Furlong marketing / education / campaign domain ('find your pathway'); possible redirect to furlonghub.com or landing-page surface",
-    moduleAlignment: ["Furlong Core / pathways education"],
-    canonicalCandidate: false,
-    redirectTarget: "furlonghub.com",
+    intendedRole:
+      "PRIMARY public-facing Furlong brand — Discovery Engine front door, newsletter destination, membership destination, Curated Opportunity Pipeline destination, consumer-facing experience",
+    moduleAlignment: [
+      "Furlong Core", "Discovery Engine", "newsletter", "membership",
+      "Curated Opportunity Pipeline", "consumer-facing experience",
+    ],
+    canonicalCandidate: true,
+    hubCandidate: false,
+    capitalBrandCandidate: false,
+    defensiveRegistration: false,
     redirectOnly: false,
     dnsStatus: "unverified",
     productionApproved: false,
     securityCritical: true,
-    notes: ["not canonical unless separately approved", "likely redirect or marketing alias", "current public alpha references this host — role shift needs Caitlin sign-off"],
+    notes: [
+      "founder-approved primary public-domain candidate",
+      "production not approved", "DNS not activated", "SEC-DNS-001 remains open",
+    ],
+  },
+  {
+    domain: "furlonghub.com",
+    owned: true,
+    intendedRole:
+      "ecosystem HUB — provider access, future broker module, future lender module, future partner module, administrative and platform surfaces",
+    moduleAlignment: [
+      "ecosystem hub", "provider access", "future broker module",
+      "future lender module", "future partner module", "administrative / platform surfaces",
+    ],
+    canonicalCandidate: false,
+    hubCandidate: true,
+    capitalBrandCandidate: false,
+    defensiveRegistration: false,
+    redirectOnly: false,
+    dnsStatus: "unverified",
+    productionApproved: false,
+    securityCritical: true,
+    notes: [
+      "founder-approved hub-domain candidate",
+      "production not approved", "DNS not activated",
+    ],
   },
   {
     domain: "compasstocapital.com",
     owned: true,
-    intendedRole: "capital / financing pathway domain — public surface for Compass to Capital, connected to Five Borough Capital / Stuart Fraass professional financing module; NOT Furlong Core; separate but connected",
+    intendedRole:
+      "capital-navigation brand — Financing Intelligence surface, capital-pathway education, future financing module destination",
     moduleAlignment: [
-      "Financing Intelligence handoff", "Five Borough Capital licensed/professional module",
-      "Compass to Capital user-facing capital pathway surface",
+      "Compass to Capital capital-navigation brand", "Financing Intelligence surface",
+      "capital-pathway education", "future financing module destination",
     ],
     canonicalCandidate: false,
+    hubCandidate: false,
+    capitalBrandCandidate: true,
+    defensiveRegistration: false,
     redirectOnly: false,
     dnsStatus: "unverified",
     productionApproved: false,
     securityCritical: true,
-    notes: ["professional-module surface candidate", "not canonical Furlong domain", "explicit-handoff-only from Furlong Core"],
+    notes: [
+      "Furlong-owned asset — NOT automatically Five Borough Capital",
+      "may route to Five Borough and future capital providers",
+      "must preserve financing-neutrality doctrine",
+      "production not approved",
+    ],
+  },
+  {
+    domain: "compasstocapital.org",
+    owned: true,
+    intendedRole:
+      "alternate extension for Compass to Capital — redirect candidate / defensive registration",
+    moduleAlignment: ["Compass to Capital alternate-extension / defensive routing"],
+    canonicalCandidate: false,
+    hubCandidate: false,
+    capitalBrandCandidate: false,
+    defensiveRegistration: true,
+    redirectTarget: "compasstocapital.com",
+    redirectOnly: true,
+    dnsStatus: "unverified",
+    productionApproved: false,
+    securityCritical: false,
+    notes: ["redirect-only", "defensive registration", "no redirect activated until founder approval"],
   },
   {
     domain: "comapss2capital.com",
     owned: true,
-    intendedRole: "defensive typo registration for Compass to Capital — captures common misspelling/misentry; redirect candidate to compasstocapital.com",
-    moduleAlignment: ["Compass to Capital / Five Borough defensive routing"],
+    intendedRole:
+      "defensive typo registration for Compass to Capital — captures common misspelling; redirect candidate to compasstocapital.com",
+    moduleAlignment: ["Compass to Capital defensive routing"],
     canonicalCandidate: false,
+    hubCandidate: false,
+    capitalBrandCandidate: false,
+    defensiveRegistration: true,
     redirectTarget: "compasstocapital.com",
     redirectOnly: true,
     dnsStatus: "unverified",
     productionApproved: false,
     securityCritical: false,
-    notes: ["redirect-only", "must not host separate product"],
+    notes: ["redirect-only", "defensive typo registration", "must not host separate product"],
   },
   {
     domain: "comapss2capital.org",
     owned: true,
-    intendedRole: "defensive typo / alternate-extension registration; possible educational or nonprofit-facing future use ONLY if approved; initial posture redirect-only",
-    moduleAlignment: ["Compass to Capital / Five Borough defensive routing"],
+    intendedRole:
+      "defensive typo registration (alternate extension) for Compass to Capital — redirect candidate to compasstocapital.com",
+    moduleAlignment: ["Compass to Capital defensive routing"],
     canonicalCandidate: false,
+    hubCandidate: false,
+    capitalBrandCandidate: false,
+    defensiveRegistration: true,
     redirectTarget: "compasstocapital.com",
     redirectOnly: true,
     dnsStatus: "unverified",
     productionApproved: false,
     securityCritical: false,
-    notes: ["redirect-only unless Caitlin approves separate use"],
+    notes: ["redirect-only", "defensive typo registration", "must not host separate product"],
   },
 ];
 

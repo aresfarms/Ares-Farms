@@ -56,7 +56,7 @@ import {
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
 import { classifyGoalAsset } from "./navigatorGoalParser";
-import { detectProposedSolution, isProposedSolutionConfirmation, proposedSolutionReply, confirmedAssetProbe, detectObjectivePending, objectiveDiscoveryReply } from "./proposedSolutionHypothesis";
+import { detectProposedSolution, isProposedSolutionConfirmation, proposedSolutionReply, confirmedAssetProbe, detectObjectivePending, objectiveDiscoveryReply, detectLocationPhrase } from "./proposedSolutionHypothesis";
 import { resolveAmbiguity } from "./semanticAmbiguityResolver";
 
 export interface RouteDecision {
@@ -675,7 +675,7 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
     if (proposed && !confirming && !journey.proposedSolutionAsked) {
       return {
         turnIntent: "EXPLORE_PROPOSED_SOLUTION",
-        text: proposedSolutionReply(proposed.asset),
+        text: proposedSolutionReply(proposed.asset, detectLocationPhrase(message)),
         slot: "explore:proposed-solution", echoConcept: proposed.asset, refusal: false,
         patch: {
           proposedSolutionAsked: true, objectiveDiscoveryPending: true, proposedAssetLabel: proposed.asset,

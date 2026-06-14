@@ -10,6 +10,7 @@
 import * as fs from "node:fs";
 import {
   detectProposedSolution, isProposedSolutionConfirmation, proposedSolutionReply,
+  detectStateLocation, detectLocationPhrase,
 } from "@/lib/navigator/proposedSolutionHypothesis";
 
 const fail: string[] = [];
@@ -25,6 +26,12 @@ for (const m of [
   "I want to buy 20 rental houses",
   "I want to buy a $10M property",
   "I want to expand into Albuquerque",
+  // HYPOTHESIS-002 non-numeric expansion
+  "I won a hotel in a poker game. I like it I want to buy more hotels in Mass.",
+  "I own one hotel and want more hotels",
+  "I own a laundromat and want more laundromats in Ohio",
+  "I want to add more RV parks",
+  "I want to get more rental houses",
 ]) ok(!!detectProposedSolution(m), `detects proposed-solution: "${m}"`);
 
 for (const m of [
@@ -33,7 +40,31 @@ for (const m of [
   "I want 100 acres for a homestead",
   "I'm looking at a property in Ohio",
   "I inherited land",
+  "I want a hotel",
+  "I want one hotel",
+  "I want to buy one hotel",
+  "I want more time",
 ]) ok(detectProposedSolution(m) === null, `does NOT over-fire on ordinary goal: "${m}"`);
+
+// HYPOTHESIS-002 location normalization (LAST mention wins; city preserved).
+const locCases: [string, string][] = [
+  ["I want to buy more hotels in Mass.", "Massachusetts"],
+  ["more hotels in MA", "Massachusetts"],
+  ["more hotels in N.Y.", "New York"],
+  ["more hotels in Massachusetts", "Massachusetts"],
+  ["more laundromats in Ohio", "Ohio"],
+  ["more pet stores in NY", "New York"],
+  ["more hotels in New Mexico", "New Mexico"],
+  // expansion target wins over an earlier current-location mention
+  ["I own 3 pet stores in Cape May, NJ and want to buy 15 more in NY", "New York"],
+];
+for (const [m, state] of locCases) ok(detectStateLocation(m) === state, `location "${m}" → ${state} (got ${detectStateLocation(m)})`);
+ok(detectLocationPhrase("more hotels in Albuquerque, NM") === "Albuquerque, New Mexico",
+  `city preserved: "Albuquerque, New Mexico" (got ${detectLocationPhrase("more hotels in Albuquerque, NM")})`);
+ok(detectLocationPhrase("I own 3 pet stores in Cape May, NJ and want to buy 15 more in NY") === "New York",
+  "pet-store NY target chosen over earlier Cape May, NJ");
+ok(/More hotels in Massachusetts could be the right path/.test(proposedSolutionReply("hotels", "Massachusetts")),
+  "reply preserves the user-provided location");
 
 for (const m of [
   "I just want ten more laundromats",

@@ -41,6 +41,13 @@ const SCALE_SIGNALS: RegExp[] = [
   new RegExp(`\\b(?:${NUMBER_WORD}|\\d{1,4})\\s+(?:[a-z][a-z-]*\\s+){0,2}(?:${ASSET_PLURAL})\\b`, "i"),
   // "buy/get/acquire/own/add/open N <asset-plural>" even without a unit word between
   new RegExp(`\\b(?:buy|get|acquire|own|add|open|build|want)\\s+(?:${NUMBER_WORD}|\\d{1,4})\\s+(?:[a-z][a-z-]*\\s+){0,2}(?:${ASSET_PLURAL})\\b`, "i"),
+  // HYPOTHESIS-002: NON-numeric expansion — "(buy/get/add/want/own) more
+  // <asset-plural>", bare "more <asset-plural>", "add/expand into <asset>".
+  // Gated on an asset plural so "want more time/money" never mis-fires.
+  new RegExp(`\\b(?:buy|get|acquire|own|add|open|build|want|purchase)\\s+more\\s+(?:[a-z][a-z-]*\\s+){0,2}(?:${ASSET_PLURAL})\\b`, "i"),
+  new RegExp(`\\bmore\\s+(?:[a-z][a-z-]*\\s+){0,2}(?:${ASSET_PLURAL})\\b`, "i"),
+  new RegExp(`\\badd\\s+(?:more\\s+)?(?:[a-z][a-z-]*\\s+){0,2}(?:${ASSET_PLURAL})\\b`, "i"),
+  new RegExp(`\\bexpand(?:ing)?\\s+into\\s+(?:[a-z][a-z-]*\\s+){0,2}(?:${ASSET_PLURAL})\\b`, "i"),
   /\bmore\s+of\s+(?:the\s+same|these|those|them)\b/i,
   /\banother\b/i,
   /\b(?:second|third|fourth|fifth)\s+[a-z]/i,
@@ -235,14 +242,88 @@ export function objectiveDiscoveryReply(category: ObjectiveCategory, assetLabel:
   }
 }
 
+// ── LOCATION NORMALIZATION (HYPOTHESIS-002) ──────────────────────────────────
+// Preserve a user-provided state/market so the hypothesis reply never asks
+// "which market?" when they already said one. When several locations appear
+// ("Cape May, NJ … 15 more in NY"), the EXPANSION TARGET — the LAST one — wins.
+const US_STATES: [string, string][] = [
+  ["Alabama", "AL"], ["Alaska", "AK"], ["Arizona", "AZ"], ["Arkansas", "AR"],
+  ["California", "CA"], ["Colorado", "CO"], ["Connecticut", "CT"], ["Delaware", "DE"],
+  ["Florida", "FL"], ["Georgia", "GA"], ["Hawaii", "HI"], ["Idaho", "ID"],
+  ["Illinois", "IL"], ["Indiana", "IN"], ["Iowa", "IA"], ["Kansas", "KS"],
+  ["Kentucky", "KY"], ["Louisiana", "LA"], ["Maine", "ME"], ["Maryland", "MD"],
+  ["Massachusetts", "MA"], ["Michigan", "MI"], ["Minnesota", "MN"], ["Mississippi", "MS"],
+  ["Missouri", "MO"], ["Montana", "MT"], ["Nebraska", "NE"], ["Nevada", "NV"],
+  ["New Hampshire", "NH"], ["New Jersey", "NJ"], ["New Mexico", "NM"], ["New York", "NY"],
+  ["North Carolina", "NC"], ["North Dakota", "ND"], ["Ohio", "OH"], ["Oklahoma", "OK"],
+  ["Oregon", "OR"], ["Pennsylvania", "PA"], ["Rhode Island", "RI"], ["South Carolina", "SC"],
+  ["South Dakota", "SD"], ["Tennessee", "TN"], ["Texas", "TX"], ["Utah", "UT"],
+  ["Vermont", "VT"], ["Virginia", "VA"], ["Washington", "WA"], ["West Virginia", "WV"],
+  ["Wisconsin", "WI"], ["Wyoming", "WY"], ["District of Columbia", "DC"],
+];
+const CODE_TO_STATE = new Map(US_STATES.map(([name, code]) => [code, name]));
+const INFORMAL_ALIASES: [RegExp, string][] = [
+  [/\bmass\b\.?/i, "Massachusetts"], [/\bcalif\b\.?/i, "California"], [/\bcali\b/i, "California"],
+  [/\bpenn(?:a)?\b\.?/i, "Pennsylvania"], [/\btenn\b\.?/i, "Tennessee"], [/\bfla\b\.?/i, "Florida"],
+  [/\btex\b\.?/i, "Texas"], [/\bconn\b\.?/i, "Connecticut"], [/\bwash\b\.?/i, "Washington"],
+  [/\bmich\b\.?/i, "Michigan"], [/\bariz\b\.?/i, "Arizona"], [/\bcolo\b\.?/i, "Colorado"],
+];
+
+type LocHit = { index: number; state: string };
+
+/**
+ * Normalize a user-provided US state → canonical name (the LAST one mentioned —
+ * the expansion target). Returns null if none. Also preserves a leading city:
+ * detectStateLocation() returns the bare state; detectLocationPhrase() keeps
+ * "Albuquerque, New Mexico".
+ */
+export function detectStateLocation(message: string): string | null {
+  const hits: LocHit[] = [];
+  // Full names (handles "N.Y."/"N.M." too via the code path below).
+  for (const [name] of US_STATES) {
+    const m = message.match(new RegExp(`\\b${name}\\b`, "i"));
+    if (m && m.index !== undefined) hits.push({ index: m.index, state: name });
+  }
+  for (const [re, name] of INFORMAL_ALIASES) {
+    const m = message.match(re);
+    if (m && m.index !== undefined) hits.push({ index: m.index, state: name });
+  }
+  // Postal codes — uppercase, optionally dotted (NY / N.Y.); case-SENSITIVE so
+  // lowercase words ("in", "or", "hi") never match.
+  const codeRe = /\b([A-Z])\.?([A-Z])\.?(?=\s|,|\.|$)/g;
+  for (let m = codeRe.exec(message); m; m = codeRe.exec(message)) {
+    const code = m[1] + m[2];
+    if (CODE_TO_STATE.has(code)) hits.push({ index: m.index, state: CODE_TO_STATE.get(code)! });
+  }
+  if (!hits.length) return null;
+  // LAST mention wins (the expansion target, not an earlier current location).
+  return hits.sort((a, b) => a.index - b.index).at(-1)!.state;
+}
+
+/** State, with a leading "City," preserved when present ("Albuquerque, New Mexico"). */
+export function detectLocationPhrase(message: string): string | null {
+  const state = detectStateLocation(message);
+  if (!state) return null;
+  // "City, <state-or-code>" immediately preceding the chosen state mention.
+  const cityRe = new RegExp(
+    `\\b([A-Z][a-z]+(?:\\s+[A-Z][a-z]+){0,2}),\\s*(?:${state}\\b|${US_STATES.find(([n]) => n === state)?.[1]}\\b\\.?)`,
+  );
+  const cm = message.match(cityRe);
+  if (cm) return `${cm[1]}, ${state}`;
+  return state;
+}
+
 /**
  * Objective-discovery reply: acknowledge → validate → ask the destination →
  * offer alternative comparison → neutral concentration framing → keep the path
  * open. Human, calm, never a classifier label, never a decision.
  */
-export function proposedSolutionReply(asset: string): string {
+export function proposedSolutionReply(asset: string, location?: string | null): string {
   const a = asset === "that" ? "that path" : asset;
-  const lead = asset === "that" ? "That could be the right path." : `More ${a} could be the right path.`;
+  const where = location ? ` in ${location}` : "";
+  const lead = asset === "that"
+    ? "That could be the right path."
+    : `More ${a}${where} could be the right path.`;
   return (
     `${lead} Before we assume it is — what are you actually trying to accomplish? ` +
     `More monthly income, building a company to sell someday, geographic expansion, passive ` +

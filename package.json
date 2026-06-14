@@ -297,6 +297,7 @@
     "verify:discovery-flow": "tsx src/scripts/verifyDiscoveryFlow.ts",
     "verify:navigator": "tsx src/scripts/verifyNavigator.ts",
     "verify:proposed-solution-hypothesis": "tsx src/scripts/verifyProposedSolutionHypothesis.ts",
+    "verify:objective-discovery": "tsx src/scripts/verifyObjectiveDiscovery.ts",
     "verify:financing-node": "tsx src/scripts/verifyFinancingNode.ts",
     "verify:reality-security": "tsx src/scripts/verifyRealitySecurity.ts",
     "ingest:property-flood-historic": "tsx src/scripts/ingestPropertyFloodHistoric.ts",

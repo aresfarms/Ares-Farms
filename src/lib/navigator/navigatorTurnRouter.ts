@@ -56,7 +56,7 @@ import {
 
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
 import { classifyGoalAsset } from "./navigatorGoalParser";
-import { detectProposedSolution, isProposedSolutionConfirmation, proposedSolutionReply, confirmedAssetProbe } from "./proposedSolutionHypothesis";
+import { detectProposedSolution, isProposedSolutionConfirmation, proposedSolutionReply, confirmedAssetProbe, detectObjectivePending, objectiveDiscoveryReply } from "./proposedSolutionHypothesis";
 import { resolveAmbiguity } from "./semanticAmbiguityResolver";
 
 export interface RouteDecision {
@@ -654,19 +654,40 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
   {
     const proposed = detectProposedSolution(message);
     const confirming = isProposedSolutionConfirmation(message);
+
+    // 4.38a — OBJECTIVE-DISCOVERY-001: we just asked the destination, so this
+    // answer ("I just want to be rich", "passive income", "quit my job") is an
+    // OBJECTIVE — continue objective discovery, never a constraints prompt.
+    // Runs FIRST so an objective answer is never re-read as an asset/confirm.
+    if (journey.objectiveDiscoveryPending) {
+      const objective = detectObjectivePending(message);
+      if (objective) {
+        return {
+          turnIntent: "CLARIFY_OBJECTIVE",
+          text: objectiveDiscoveryReply(objective, journey.proposedAssetLabel),
+          slot: `objective-discovery:${objective}`, echoConcept: journey.proposedAssetLabel, refusal: false,
+          patch: { objectiveDiscoveryPending: false },
+        };
+      }
+    }
+
+    // 4.38b — first encounter with the expansion plan: ask the destination.
     if (proposed && !confirming && !journey.proposedSolutionAsked) {
-      // First encounter with the expansion plan: ask the destination.
       return {
         turnIntent: "EXPLORE_PROPOSED_SOLUTION",
         text: proposedSolutionReply(proposed.asset),
         slot: "explore:proposed-solution", echoConcept: proposed.asset, refusal: false,
-        patch: { proposedSolutionAsked: true, guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+        patch: {
+          proposedSolutionAsked: true, objectiveDiscoveryPending: true, proposedAssetLabel: proposed.asset,
+          guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery",
+        },
       };
     }
-    // §8 — confirmation, or a follow-up after we already asked: the stated path
-    // proceeds to its EXISTING asset workup. Re-route the (often plural)
-    // expansion phrasing through detectAssetGoal via a singularized probe so the
-    // regulated/commercial/ag route is preserved exactly.
+
+    // 4.38c — §8 confirmation, or a follow-up naming the asset after we asked:
+    // the stated path proceeds to its EXISTING asset workup (regulated/
+    // commercial/ag preserved via a singularized probe). Clears objective
+    // discovery — the user chose the path.
     if (proposed && (confirming || journey.proposedSolutionAsked)) {
       const confirmed = detectAssetGoal(confirmedAssetProbe(proposed.asset));
       if (confirmed) {
@@ -675,7 +696,7 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
           turnIntent: repeated ? "ASK_REGION" : confirmed.intent,
           text: repeated ? `Still on the ${confirmed.label} — which market or region, and any budget or financing picture?` : confirmed.reply,
           slot: `route:confirmed-asset:${confirmed.intent}`, echoConcept: confirmed.label, refusal: false,
-          patch: { guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
+          patch: { objectiveDiscoveryPending: false, guidedDiscovery: true, entryMode: journey.entryMode ?? "open-discovery" },
         };
       }
     }

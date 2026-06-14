@@ -101,28 +101,138 @@ export function detectProposedSolution(message: string): { asset: string } | nul
   return { asset: extractAssetLabel(message) };
 }
 
+const STOPWORD_NOUN = /^(?:in|into|to|across|near|around|by|the|a|an|of|and|more|other|additional|them|these|those|here|there|buy|get|own|want|add|open|build|acquire|\d+|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|fifty|several|multiple|many|few)$/i;
+
 /** Best-effort plural asset noun for the acknowledgement; falls back to "that". */
 function extractAssetLabel(message: string): string {
   const m = message.toLowerCase();
-  // common multi-asset expansion nouns (kept generic — no routing meaning)
-  const KNOWN = [
-    "laundromats", "laundromat", "farms", "farm", "rv parks", "rv park",
-    "hotels", "hotel", "self-storage", "storage facilities", "storage units", "storage",
-    "rental houses", "rental homes", "rentals", "rental properties", "apartments",
-    "restaurants", "car washes", "car wash", "gas stations", "warehouses",
-    "vineyards", "ranches", "ranch", "motels", "motel", "properties", "businesses",
-  ];
-  for (const k of KNOWN) {
-    if (new RegExp(`\\b${k.replace(/[-\s]/g, "[-\\s]")}\\b`, "i").test(m)) {
-      return k.endsWith("s") ? k : `${k}s`;
-    }
+  // 1) an asset-plural noun, with up to one leading qualifier ("pet stores",
+  //    "rental houses", "self-storage facilities").
+  const assetMatch = m.match(new RegExp(`\\b([a-z][a-z-]*\\s+)?(${ASSET_PLURAL})\\b`, "i"));
+  if (assetMatch) {
+    const lead = (assetMatch[1] ?? "").trim();
+    const noun = assetMatch[2].trim();
+    return lead && !STOPWORD_NOUN.test(lead) ? `${lead} ${noun}` : noun;
   }
-  // generic: "<number> more <noun(s)>" capture
-  const more = m.match(/\b(?:more|additional|other)\s+([a-z][a-z-]*(?:\s+[a-z][a-z-]*){0,2})\b/);
-  if (more?.[1]) return more[1].trim();
-  const numPlural = m.match(/\b(?:\d{1,4}|two|three|four|five|six|seven|eight|nine|ten|twenty)\s+([a-z][a-z-]*s)\b/);
-  if (numPlural?.[1]) return numPlural[1].trim();
+  // 2) a SINGULAR asset root ("a laundromat … ten more") → pluralize it.
+  const SINGULAR = "laundromat|farm|ranch|vineyard|hotel|motel|warehouse|restaurant|" +
+    "car\\s+wash|gas\\s+station|store|shop|rv\\s+park|park|house|home|apartment|" +
+    "storage\\s+(?:unit|facility)|self[-\\s]?storage|business|facility|complex|building";
+  const sm = m.match(new RegExp(`\\b([a-z][a-z-]*\\s+)?(${SINGULAR})\\b`, "i"));
+  if (sm) {
+    const lead = (sm[1] ?? "").trim();
+    const noun = pluralize(sm[2].trim());
+    return lead && !STOPWORD_NOUN.test(lead) ? `${lead} ${noun}` : noun;
+  }
+  // 3) "<n> more <noun>" — but never a preposition/stopword (skip "more in NY").
+  const more = m.match(/\b(?:more|additional|other)\s+([a-z][a-z-]*)\b/);
+  if (more?.[1] && !STOPWORD_NOUN.test(more[1])) return pluralize(more[1].trim());
   return "that";
+}
+
+function pluralize(noun: string): string {
+  if (/s$/.test(noun)) return noun;
+  if (/(?:ch|sh|x|ss)$/.test(noun)) return `${noun}es`;
+  if (/[^aeiou]y$/.test(noun)) return noun.replace(/y$/, "ies");
+  return `${noun}s`;
+}
+
+// ── OBJECTIVE-DISCOVERY-001 ──────────────────────────────────────────────────
+// After the hypothesis layer asks "what are you trying to accomplish", the next
+// answer is an OBJECTIVE, not a constraints prompt. Categories, in priority
+// order (most specific first).
+export type ObjectiveCategory =
+  | "passive_income" | "job_replacement" | "retirement" | "exit_sale"
+  | "scale_enterprise" | "time_freedom" | "stability" | "wealth";
+
+const OBJECTIVE_PATTERNS: [ObjectiveCategory, RegExp][] = [
+  ["passive_income", /\b(?:passive\s+income|cash\s*flow|mailbox\s+money|income\s+stream|money\s+while\s+i\s+sleep)\b/i],
+  ["job_replacement", /\b(?:quit|leave|replace|get\s+out\s+of)\s+(?:my\s+)?(?:job|9\s*[-to]*\s*5|day\s+job|career)\b|\breplace\s+my\s+(?:income|salary)\b|\bstop\s+working\b/i],
+  ["retirement", /\b(?:retire|retirement|retire\s+early)\b/i],
+  ["exit_sale", /\b(?:build\s+(?:something|a\s+(?:business|company))\s+(?:to\s+sell|i\s+can\s+sell)|sell\s+(?:it\s+)?someday|exit|flip\s+(?:it|them)|sell\s+the\s+(?:business|company))\b/i],
+  ["scale_enterprise", /\b(?:scale|enterprise\s+value|build\s+(?:an?\s+)?empire|grow\s+(?:a\s+)?(?:company|business|portfolio)|operational\s+scale|bigger\s+business)\b/i],
+  ["time_freedom", /\b(?:less\s+work|more\s+(?:time|freedom)|free\s+up\s+(?:my\s+)?time|lifestyle\s+(?:change|freedom)|work\s+less)\b/i],
+  ["stability", /\b(?:stability|stable|secure|security|safe\s+(?:return|bet)|predictable)\b/i],
+  ["wealth", /\b(?:be\s+rich|get\s+rich|rich|wealthy|wealth|generational\s+wealth|family\s+wealth|net\s+worth|financial\s+(?:freedom|independence)|make\s+(?:more|some)\s+money|more\s+money|build\s+wealth)\b/i],
+];
+
+const VAGUE_UNSURE = /^\s*(?:not\s+sure|i'?m\s+not\s+sure|idk|i\s+don'?t\s+know|dunno|no\s+idea|unsure|maybe)\b/i;
+
+/**
+ * Detect the objective in a reply to "what are you trying to accomplish".
+ * Called ONLY while objective discovery is pending. A vague "not sure / idk"
+ * with no signal still counts as an objective answer (it stays in objective
+ * discovery — never a constraints prompt) and resolves to "wealth"-style
+ * clarification by default.
+ */
+export function detectObjectivePending(message: string): ObjectiveCategory | null {
+  for (const [cat, re] of OBJECTIVE_PATTERNS) if (re.test(message)) return cat;
+  if (VAGUE_UNSURE.test(message)) return "wealth";
+  return null;
+}
+
+/** Objective-clarification reply, tailored per category, referencing the asset. */
+export function objectiveDiscoveryReply(category: ObjectiveCategory, assetLabel: string | null): string {
+  const a = assetLabel && assetLabel !== "that" ? assetLabel : "that path";
+  const beforeAssuming = `before assuming ${a === "that path" ? "that's" : `${a} is`} the best route`;
+  switch (category) {
+    case "passive_income":
+      return (
+        `Passive income is a real goal — and it points at very different routes. Let's pin it down ${beforeAssuming}: ` +
+        `roughly how much monthly cash flow are you after, how hands-off does it need to be, and what's your risk and timeline?\n\n` +
+        `Then we can compare ${a} against other income paths — self-storage, RV parks, rental housing, small hospitality, ` +
+        `farmland leases, or a manager-run business — on yield, management burden, capital, and concentration.`
+      );
+    case "job_replacement":
+      return (
+        `Replacing your job is a clear, common goal. Let's define it ${beforeAssuming}: what monthly income would actually ` +
+        `let you walk away, how much runway do you have, what's your risk tolerance, and how much management are you willing ` +
+        `to take on?\n\n` +
+        `Once we know the number and the management appetite, we can compare ${a} against other routes that hit the same ` +
+        `income with different risk, time, and hands-on load.`
+      );
+    case "retirement":
+      return (
+        `Retirement income is the destination, not the asset. Let's define it ${beforeAssuming}: what annual income do you ` +
+        `want it to throw off, when do you want it, and how much volatility can you live with?\n\n` +
+        `Then we can compare ${a} against other retirement-income routes on durability, management, and how easily it ` +
+        `converts back to cash.`
+      );
+    case "exit_sale":
+      return (
+        `Building something to sell is a real strategy — it changes what "good" looks like. Let's define it ${beforeAssuming}: ` +
+        `what kind of exit and timeline, and what sale value are you aiming for?\n\n` +
+        `Then we can compare ${a} against routes that build more enterprise/resale value per dollar and effort.`
+      );
+    case "scale_enterprise":
+      return (
+        `Scale and enterprise value are real goals. Let's define them ${beforeAssuming}: are you optimizing for the size of ` +
+        `the operation, the value of a company you could sell, or both — and over what timeline?\n\n` +
+        `Then we can compare multi-location same-asset expansion (like ${a}) against a diversified or different-asset build ` +
+        `on risk, management, and exit value.`
+      );
+    case "time_freedom":
+      return (
+        `More time and less work is a real goal — and it rules some routes in and others out. Let's define it ${beforeAssuming}: ` +
+        `how hands-off does this need to be, and how much income does it still need to produce?\n\n` +
+        `Then we can compare ${a} against more passive or manager-friendly options.`
+      );
+    case "stability":
+      return (
+        `Stability is a real goal. Let's define it ${beforeAssuming}: are you after predictable income, durability through ` +
+        `downturns, low management, or capital preservation — and over what timeline?\n\n` +
+        `Then we can compare ${a} against steadier or more diversified routes on volatility and concentration.`
+      );
+    case "wealth":
+    default:
+      return (
+        `Fair enough — wealth-building is a real goal. Let's define what "rich" means for you ${beforeAssuming}. ` +
+        `Are you looking for monthly cash flow, higher net worth, a business you can sell someday, passive ownership, ` +
+        `retirement income, financial independence, or something else?\n\n` +
+        `Once we know the destination, we can compare ${a} against other routes that might get there with different risk, ` +
+        `capital, time, and management demands.`
+      );
+  }
 }
 
 /**

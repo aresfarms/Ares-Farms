@@ -303,6 +303,8 @@
     "verify:forensic-pass02": "tsx src/scripts/verifyForensicPass02.ts",
     "verify:public-disclaimer": "tsx src/scripts/verifyPublicDisclaimerSweep.ts",
     "verify:module-sovereignty": "tsx src/scripts/verifyModuleSovereignty.ts",
+    "verify:navigator-refresh": "tsx src/scripts/verifyNavigatorRefresh.ts",
+    "verify:navigator-experience": "tsx src/scripts/verifyNavigatorExperience.ts",
     "verify:navigator-red-team-v3": "tsx src/scripts/verifyNavigatorRedTeamV3.ts",
     "verify:proposed-solution-hypothesis": "tsx src/scripts/verifyProposedSolutionHypothesis.ts",
     "verify:objective-discovery": "tsx src/scripts/verifyObjectiveDiscovery.ts",

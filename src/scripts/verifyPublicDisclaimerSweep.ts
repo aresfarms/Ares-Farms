@@ -42,12 +42,12 @@ const REQUIRED_CLAUSES: { label: string; re: RegExp }[] = [
   { label: "official-determination-negated", re: /official determination/i },
   { label: "not-a-lender", re: /not a lender/i },
   { label: "not-a-government-agency", re: /not a government agency/i },
+  { label: "not-a-regulator", re: /not a regulator/i },
+  { label: "no-legal-or-tax-advice", re: /does not provide legal or tax advice|not (legal|tax) advice/i },
 ];
 // Recommended-but-not-shipped — reported, NOT failed (report-first; owner decides).
-const RECOMMENDED_CLAUSES: { label: string; re: RegExp }[] = [
-  { label: "not-a-regulator", re: /not a regulator/i },
-  { label: "no-legal-or-tax-advice", re: /not (legal|tax) advice|no (legal|tax) advice/i },
-];
+// (empty: all previously-recommended clauses are now shipped + required.)
+const RECOMMENDED_CLAUSES: { label: string; re: RegExp }[] = [];
 
 // ── Prohibited AFFIRMATIVE claims (high-precision; negated forms are allowed). ──
 const PROHIBITED: { label: string; re: RegExp }[] = [

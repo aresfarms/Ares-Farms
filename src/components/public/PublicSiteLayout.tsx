@@ -56,8 +56,8 @@ const FOOTER_UTILITY_LINKS = [
 
 const FOOTER_DISCLOSURE =
   "Advisory information only — not an approval, guarantee, eligibility finding, or " +
-  "official determination. Furlong is not a lender. Not a government agency. " +
-  "Public Alpha remains PENDING.";
+  "official determination. Furlong is not a lender, not a regulator, and not a government agency, " +
+  "and does not provide legal or tax advice. Public Alpha remains PENDING.";
 
 export function PublicSiteLayout({
   children,

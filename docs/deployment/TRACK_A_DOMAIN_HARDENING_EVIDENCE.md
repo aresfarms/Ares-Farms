@@ -121,13 +121,70 @@ This file IS the package index. Owner attaches the named evidence files
 
 | Artifact | Status |
 |---|---|
-| Phase 1 inventory (6 domains) | ☐ owner |
-| Phase 2 MFA screenshots | ☐ owner |
-| Phase 3 lock screenshots | ☐ owner |
-| Phase 4 DNS inventory export | ☐ owner |
-| Phase 5 email-security inventory | ☐ owner |
+| Phase 1 inventory (6 domains) | ✅ owner-attested 2026-06-14 (see Owner-Collected Registrar Evidence) |
+| Phase 2 MFA screenshots | ✅ owner-attested 2026-06-14 (2FA + recovery ON; owner-held) |
+| Phase 3 lock screenshots | ✅ owner-attested 2026-06-14 (auto-renew + WHOIS privacy + lock ON, all 6) |
+| Phase 4 DNS inventory export | ✅ owner-attested 2026-06-14 (Squarespace baseline + SPF/DKIM/DMARC) |
+| Phase 5 email-security inventory | ✅ owner-attested 2026-06-14 (SPF `-all`, DKIM, DMARC `p=reject`) |
 | Phase 6 domain-purpose | ✅ verified (this doc) |
-| Phase 7 cutover/rollback notes | ☐ owner |
+| Phase 7 cutover/rollback notes | ☐ owner (cutover-readiness still outstanding) |
+
+---
+
+## Owner-Collected Registrar Evidence — 2026-06-14
+
+Owner (Caitlin) collected registrar/DNS screenshots for all six owned domains.
+Recorded here as **owner-attested settings state only**. Screenshots are
+**owner-held and NOT committed** (they show account UI). The build agent recorded
+the attestation; it did **not** inspect the images and records **no human review**
+here. **This does not close SEC-DNS-001.**
+
+Common posture observed across the Squarespace-managed account:
+domain ownership under Caitlin Hudson · no additional domain managers visible ·
+Squarespace account 2FA ON · account recovery ON · active-session review
+available · domain activity logging available.
+
+Per-domain (identical evidenced posture across all six):
+
+| Domain | Registrar | Status | Auto-renew | WHOIS privacy | Domain lock | DNS provider | DNS baseline | Google verif. TXT | SPF | DKIM | DMARC | Unexpected custom records |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| furlongpathways.com | Squarespace | active | ✅ ON | ✅ ON | ✅ ON | Squarespace | default A + www CNAME → ext-sq.squarespace.com (+ Domain Connect) | ✅ present | ✅ `v=spf1 -all` | ✅ present | ✅ `p=reject` | none visible |
+| furlonghub.com | Squarespace | active | ✅ ON | ✅ ON | ✅ ON | Squarespace | default A + www CNAME → ext-sq.squarespace.com (+ Domain Connect) | ✅ present | ✅ `v=spf1 -all` | ✅ present | ✅ `p=reject` | none visible |
+| compasstocapital.com | Squarespace | active | ✅ ON | ✅ ON | ✅ ON | Squarespace | default A + www CNAME → ext-sq.squarespace.com (+ Domain Connect) | ✅ present | ✅ `v=spf1 -all` | ✅ present | ✅ `p=reject` | none visible |
+| compasstocapital.org | Squarespace | active | ✅ ON | ✅ ON | ✅ ON | Squarespace | default A + www CNAME → ext-sq.squarespace.com (+ Domain Connect) | ✅ present | ✅ `v=spf1 -all` | ✅ present | ✅ `p=reject` | none visible |
+| comapss2capital.com | Squarespace | active | ✅ ON | ✅ ON | ✅ ON | Squarespace | default A + www CNAME → ext-sq.squarespace.com (+ Domain Connect) | ✅ present | ✅ `v=spf1 -all` | ✅ present | ✅ `p=reject` | none visible |
+| comapss2capital.org | Squarespace | active | ✅ ON | ✅ ON | ✅ ON | Squarespace | default A + www CNAME → ext-sq.squarespace.com (+ Domain Connect) | ✅ present | ✅ `v=spf1 -all` | ✅ present | ✅ `p=reject` | none visible |
+
+**Evidence source:** owner-held screenshots (2026-06-14), not committed to repo.
+No private address, email, account ID, or recovery values recorded here.
+
+### SEC-DNS-001 — evidence status (owner-attested vs still open)
+
+**EVIDENCED (owner-attested 2026-06-14):**
+
+| Control | State |
+|---|---|
+| Registrar ownership controls | **EVIDENCED** (sole owner Caitlin Hudson; no extra managers) |
+| Registrar account MFA / recovery | **EVIDENCED** (2FA ON, account recovery ON) |
+| Domain manager review | **EVIDENCED** (no additional managers visible) |
+| DNS baseline inventory | **EVIDENCED** (Squarespace default A + www CNAME + Domain Connect, all 6) |
+| Email security records | **EVIDENCED** (SPF `-all`, DKIM, DMARC `p=reject`, all 6) |
+| Unauthorized custom-records review | **EVIDENCED** (no unexpected custom records visible) |
+| Domain protection | **EVIDENCED** (auto-renew + WHOIS privacy + domain lock ON, all 6) |
+
+**STILL OPEN — NOT closed by this evidence:**
+
+- GCP live target not configured
+- Production HTTPS edge not verified
+- DNS cutover not performed
+- Rollback rehearsal not performed
+- Founder / counsel / human production sign-off not recorded
+- nonce-CSP not verified at the live production edge
+- No production activation
+
+> The evidenced controls cover the **registrar/DNS-baseline** half of SEC-DNS-001.
+> The **cutover-readiness** half (live edge, cert, rollback rehearsal, human
+> sign-off) is still outstanding, so **SEC-DNS-001 remains OPEN**.
 
 ---
 

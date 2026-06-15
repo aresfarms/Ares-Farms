@@ -422,6 +422,30 @@ async function main() {
       const r = await converse({ message: p, journey: kick.journey });
       ok(r.kind === "refusal" && r.text.startsWith(REFUSAL_LINE), `live: steering probe refused: "${p}"`);
     }
+
+    // NAVIGATOR-DEBUG-001 regression (salvaged): valid business-EXPANSION
+    // scenarios ("I own X and want more of X") must route to a real
+    // conversational response — never fall through to the client "Something
+    // hiccuped" catch (which only fires when this API throws / returns non-2xx).
+    // Each must return a non-error kind with a turnIntent and non-empty text,
+    // both as a first message AND with the kickoff journey attached.
+    for (const m of [
+      "I own a laundromat and I want to buy ten more in Ohio",
+      "I own a farm and want another farm",
+      "I own a hotel and want a second hotel",
+      "I own an RV park and want two more",
+      "I own a trucking company and want to expand",
+    ]) {
+      for (const withJourney of [false, true]) {
+        const r = await converse(withJourney ? { message: m, journey: kick.journey } : { message: m });
+        ok(r && (r.kind === "question" || r.kind === "pathways"),
+          `business-expansion routes (kind=${r?.kind}, journey=${withJourney}): "${m}"`);
+        ok(typeof r?.text === "string" && r.text.length > 0 && !/Something hiccuped/.test(r.text),
+          `business-expansion gives a real conversational reply, no fallback: "${m}"`);
+        ok(typeof r?.turnIntent === "string" && r.turnIntent.length > 0,
+          `business-expansion carries a turnIntent: "${m}"`);
+      }
+    }
     // SESSION PRIVACY live: the converse API is stateless — journey state is
     // round-tripped, never stored server-side; replay/interview ledgers hold
     // hashes only (checked here so a regression would fail loudly).

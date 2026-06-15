@@ -28,6 +28,11 @@ const note = (m: string) => { console.log(`  • ${m}`); };
 const PUBLIC_DIR = "src/app/(public)";
 const LAYOUT_SRC = "src/components/public/PublicSiteLayout.tsx";
 
+// AI / decision-support surfaces that must additionally retain human-review (or
+// qualified/licensed-professional) language — checked in rendered HTML.
+const AI_SURFACES = ["/navigator", "/discover", "/discover/opportunity-zone", "/compass", "/financing-pathways"];
+const HUMAN_REVIEW = /human review|qualified professional|licensed professional|professionals you (?:choose|trust|select)|your own (?:advisor|attorney|accountant|lawyer|cpa)/i;
+
 // ── Required clauses the public footer disclosure MUST carry (shipped baseline). ──
 const REQUIRED_CLAUSES: { label: string; re: RegExp }[] = [
   { label: "advisory-only", re: /advisory information only/i },
@@ -151,6 +156,9 @@ async function renderedLayer() {
     if (status >= 500) { fail.push(`rendered ${r}: server error ${status}`); continue; }
     const hasDisclosure = /advisory information only/i.test(html) && /not a lender/i.test(html);
     ok(hasDisclosure, `rendered ${r}: advisory disclosure present`);
+    if (AI_SURFACES.includes(r)) {
+      ok(HUMAN_REVIEW.test(toText(html)), `rendered ${r}: AI surface retains human-review/professional language`);
+    }
     scanProhibited(html, `rendered(${r})`);
   }
   ok(!fail.some((m) => m.startsWith("rendered(")), "no prohibited affirmative claims in rendered public HTML");

@@ -12,6 +12,7 @@
  */
 
 import type { TurnIntent } from "./turnIntent";
+import { normalizeAdversarial } from "./adversarialNormalize";
 
 export interface AmbiguityDecision {
   turnIntent: TurnIntent;
@@ -76,7 +77,7 @@ function mythicGoalReply(phrase: string): string {
 }
 
 export function resolveAmbiguity(message: string): AmbiguityDecision | null {
-  if (ADULT_SERVICE_CLEAR.test(message)) {
+  if (ADULT_SERVICE_CLEAR.test(message) || ADULT_SERVICE_CLEAR.test(normalizeAdversarial(message))) { // break-me: leet-proof
     return { turnIntent: "REFUSE_ADULT_SERVICE_SEEKING", text: ADULT_SERVICE_REPLY, echoConcept: null, slot: "refuse:adult-service", refusal: true };
   }
   const mythic = detectMythicOrMetaphor(message);

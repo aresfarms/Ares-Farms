@@ -14,6 +14,7 @@
  */
 
 import type { ThreatPhraseCategory } from "@/security/realityPlatform/threatEscalationLedger";
+import { normalizeAdversarial } from "./adversarialNormalize";
 
 // ── ESCALATE_TARGETED_HARASSMENT (stalking / doxxing / locating a person) ────
 const HARASSMENT_RE: [RegExp, ThreatPhraseCategory][] = [
@@ -32,7 +33,8 @@ export const HARASSMENT_REPLY =
   "documentation, municipal contacts, mediation, or legal/professional help.";
 
 export function detectTargetedHarassment(message: string): ThreatPhraseCategory | null {
-  for (const [re, cat] of HARASSMENT_RE) if (re.test(message)) return cat;
+  const m = `${message}\n${normalizeAdversarial(message)}`; // break-me: leet/spacing-proof
+  for (const [re, cat] of HARASSMENT_RE) if (re.test(m)) return cat;
   return null;
 }
 
@@ -100,25 +102,31 @@ export type InfraDecision =
   | null;
 
 export function assessCriticalInfrastructure(message: string): InfraDecision {
-  const sensitive = CRITICAL_FACILITY_RE.test(message);
-  const passthrough = REGULATED_PASSTHROUGH_RE.test(message);
+  // Break-me: match on the adversarially-normalized text ONLY (not raw). It
+  // de-leets/de-spaces so obfuscated probes still match, and it AVOIDS a raw
+  // false-positive where a symbol creates a spurious word boundary — e.g. leet
+  // "dam@ged" would raw-match the hydro-dam token `\bdam\b`; normalized
+  // "damaged" does not. Normalization preserves all real facility words.
+  const m = normalizeAdversarial(message);
+  const sensitive = CRITICAL_FACILITY_RE.test(m);
+  const passthrough = REGULATED_PASSTHROUGH_RE.test(m);
   if (!sensitive && !passthrough) return null;
   // Probes and active-status questions escalate/refuse for BOTH classes.
-  if (INFRA_PROBE_RE.test(message)) return { kind: "escalate", category: "infrastructure-probe" };
-  if (INFRA_STATUS_RE.test(message)) return { kind: "status" };
+  if (INFRA_PROBE_RE.test(m)) return { kind: "escalate", category: "infrastructure-probe" };
+  if (INFRA_STATUS_RE.test(m)) return { kind: "status" };
   // B7f over-block fix: a sensitive facility named only as an ADJACENCY to the
   // user's own parcel ("lot backs up to a substation", "near a pipeline") is
   // ordinary parcel diligence, NOT analysis of the facility — hand it back to
   // normal routing. (A probe/status about that facility already escalated above.)
-  if (sensitive && /\b(?:backs?\s+up\s+to|back(?:s|ing)?\s+(?:up\s+)?to|next\s+to|adjacent\s+to|adjoin(?:s|ing)?|abuts?|borders?|near(?:by)?|close\s+to|across\s+(?:the\s+)?(?:street|road)\s+from|down\s+the\s+(?:street|road)|sits?\s+(?:near|by)|by\s+a)\b/i.test(message)) {
+  if (sensitive && /\b(?:backs?\s+up\s+to|back(?:s|ing)?\s+(?:up\s+)?to|next\s+to|adjacent\s+to|adjoin(?:s|ing)?|abuts?|borders?|near(?:by)?|close\s+to|across\s+(?:the\s+)?(?:street|road)\s+from|down\s+the\s+(?:street|road)|sits?\s+(?:near|by)|by\s+a)\b/i.test(m)) {
     return null;
   }
   // Regulated-passthrough (airport/hospital) acquisition → goal routing owns it.
   if (passthrough && !sensitive) return null;
   // Sensitive facility: official disposition → high-level reuse; weak claim →
   // verification required; nothing → hard shutdown.
-  if (OFFICIAL_DISPOSITION_RE.test(message)) return { kind: "reuse" };
-  if (WEAK_CLAIM_RE.test(message)) return { kind: "verify" };
+  if (OFFICIAL_DISPOSITION_RE.test(m)) return { kind: "reuse" };
+  if (WEAK_CLAIM_RE.test(m)) return { kind: "verify" };
   return { kind: "shutdown" };
 }
 
@@ -445,7 +453,9 @@ export const EASEMENT_CONSTRAINT_REPLY =
   "without the easement document the exact limits can’t be determined.";
 
 export function detectEasementConstraint(message: string): boolean {
-  return EASEMENT_RE.test(message);
+  // break-me: leet/spacing-proof so the easement carve-out can't be obfuscated
+  // away (which would drop a lawful easement question into the infra shutdown).
+  return EASEMENT_RE.test(message) || EASEMENT_RE.test(normalizeAdversarial(message));
 }
 
 // ── NEIGHBOR / THIRD-PARTY HOUSE ACQUISITION boundary ────────────────────────

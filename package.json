@@ -299,6 +299,7 @@
     "verify:navigator": "tsx src/scripts/verifyNavigator.ts",
     "verify:break-me": "tsx src/scripts/verifyBreakMe.ts",
     "verify:forensic-tamper-test": "tsx src/scripts/forensicTamperTest.ts",
+    "verify:forensic-evidence-wiring": "tsx src/scripts/verifyForensicEvidenceWiring.ts",
     "verify:navigator-red-team-v3": "tsx src/scripts/verifyNavigatorRedTeamV3.ts",
     "verify:proposed-solution-hypothesis": "tsx src/scripts/verifyProposedSolutionHypothesis.ts",
     "verify:objective-discovery": "tsx src/scripts/verifyObjectiveDiscovery.ts",

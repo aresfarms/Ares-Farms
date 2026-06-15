@@ -57,6 +57,7 @@ import {
 export { detectTargetedHarassment, assessCriticalInfrastructure } from "./navigatorGoalRoutes";
 import { classifyGoalAsset } from "./navigatorGoalParser";
 import { detectProposedSolution, isProposedSolutionConfirmation, proposedSolutionReply, confirmedAssetProbe, detectObjectivePending, objectiveDiscoveryReply, detectLocationPhrase } from "./proposedSolutionHypothesis";
+import { normalizeAdversarial } from "./adversarialNormalize";
 import { resolveAmbiguity } from "./semanticAmbiguityResolver";
 
 export interface RouteDecision {
@@ -115,14 +116,17 @@ export const VIOLENT_THREAT_REPLY =
   "or someone may be in danger, contact emergency services now.";
 
 export function detectViolentThreat(message: string): ThreatPhraseCategory | null {
-  for (const [re, cat] of THREAT_HARD) if (re.test(message)) return cat;
-  if (SABOTAGE_RE.test(message)) return "sabotage";
-  if (HARM_PEOPLE_RE.test(message)) return "assault";
-  if (ATTACK_RE.test(message)) return "assault";
+  // Break-me hardening: test raw AND adversarially-normalized text so leetspeak/
+  // spacing/punctuation ("b u r n", "sh00t up", "b.o.m.b") can't slip the gate.
+  const message2 = `${message}\n${normalizeAdversarial(message)}`;
+  for (const [re, cat] of THREAT_HARD) if (re.test(message2)) return cat;
+  if (SABOTAGE_RE.test(message2)) return "sabotage";
+  if (HARM_PEOPLE_RE.test(message2)) return "assault";
+  if (ATTACK_RE.test(message2)) return "assault";
   // B4a: arson of a generic occupiable structure escalates unconditionally.
-  if (GENERIC_ARSON_RE.test(message)) return "arson";
+  if (GENERIC_ARSON_RE.test(message2)) return "arson";
   // Destructive verb ONLY escalates with a malicious target or covert intent.
-  if (DESTRUCTIVE_VERB_RE.test(message) && (MALICIOUS_TARGET_RE.test(message) || MALICIOUS_INTENT_RE.test(message))) {
+  if (DESTRUCTIVE_VERB_RE.test(message2) && (MALICIOUS_TARGET_RE.test(message2) || MALICIOUS_INTENT_RE.test(message2))) {
     return "arson";
   }
   return null;
@@ -227,7 +231,8 @@ export const UNLAWFUL_EVASION_REPLY =
   "immigration processes, legal rights, legal assistance, or community resources, I can help with that kind of information.";
 
 export function isUnlawfulEvasionAsk(message: string): boolean {
-  return EVASION_RE.some((re) => re.test(message));
+  const n = normalizeAdversarial(message); // break-me: leet/spacing-proof
+  return EVASION_RE.some((re) => re.test(message) || re.test(n));
 }
 
 // ── 4. Non-human / animal / fantasy / object identity ────────────────────────
@@ -892,7 +897,9 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
   // yak, …) classifies to an agricultural/animal pathway — never ASK_STORY.
   const animalGoal = detectAnimalGoal(message);
   if (animalGoal) {
-    const base: TurnIntent = animalGoal.category === "wildlife_or_conservation" ? "ROUTE_CONSERVATION_OR_HABITAT" : "ROUTE_LIVESTOCK_OR_AG_STRUCTURE";
+    const base: TurnIntent = animalGoal.category === "wildlife_or_conservation" ? "ROUTE_CONSERVATION_OR_HABITAT"
+      : animalGoal.category === "apiculture" ? "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" // F1: bees → dedicated apiary route
+      : "ROUTE_LIVESTOCK_OR_AG_STRUCTURE";
     const repeated = repeatOf(base);
     return {
       turnIntent: repeated ? "ASK_REGION" : base,

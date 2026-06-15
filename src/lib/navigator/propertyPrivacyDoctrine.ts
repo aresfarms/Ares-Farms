@@ -14,6 +14,8 @@
  * layers here are enforced in code and adversarially tested.
  */
 
+import { normalizeAdversarial } from "./adversarialNormalize";
+
 export const PROPERTY_PRIVACY_DOCTRINE_ID = "CONST-PROPERTY-PRIVACY-001";
 export const PROPERTY_PRIVACY_VERSION = "property-privacy-doctrine-v0.1.0";
 
@@ -58,9 +60,9 @@ const OWNERSHIP_INTENT: RegExp[] = [
 // ("wh1te neighborhood", "st@lk") still hit the detectors. Conservative — only
 // used to RE-TEST the refusal patterns, never to alter routing or output.
 export function normalizeForDetection(text: string): string {
-  return text
-    .replace(/[1!|]/g, "i").replace(/0/g, "o").replace(/3/g, "e").replace(/4/g, "a")
-    .replace(/5|\$/g, "s").replace(/7/g, "t").replace(/@/g, "a").replace(/8/g, "b");
+  // Delegates to the shared adversarial normalizer (leetspeak + intra-word
+  // spacing/punctuation: "wh1te", "w.h.o", "p e o p l e").
+  return normalizeAdversarial(text);
 }
 
 export function isOwnershipProbe(text: string): boolean {
@@ -94,6 +96,8 @@ const STEERING_INTENT: RegExp[] = [
   /\bgood\s+schools?\b.{0,30}\b(?:people|kind|type)\b/i,
   /\bright\s+kind\s+of\s+(?:people|families|neighbors)\b/i,
   /\bquality\s+of\s+(?:the\s+)?(?:people|neighbors|residents)\b/i,
+  /\bpeople\s+like\s+(?:me|us)\b/i,                               // proxy steering
+  /\b(?:good|nice|desirable)\s+area\b.{0,25}\bpeople\b/i,
 ];
 
 // HOPA carve-out: 55+/senior designation is a lawful property/community

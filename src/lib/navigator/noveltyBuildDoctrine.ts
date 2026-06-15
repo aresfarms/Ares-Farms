@@ -21,6 +21,8 @@
  * concept. NOVELTY_BOUNDARY_REPLY below is that pattern, locked.
  */
 
+import { normalizeAdversarial } from "./adversarialNormalize";
+
 export type NoveltyCategory =
   | "SEXUAL_EXPLICIT"        // disallowed outright — refuse + redirect
   | "ILLEGAL_OR_UNSAFE"      // disallowed outright — refuse + redirect
@@ -123,9 +125,13 @@ const TRANSLATION_RE =
   /\b(?:themed\s+(?:cabin|retreat|lodge|venue|airbnb|rental)|earth[- ]sheltered|observatory|farm\s+(?:structure|stay)|hospitality|glamping|event\s+venue|tiny\s+home|cabin|barn|agritourism)\b/i;
 
 export function classifyNoveltyConcept(message: string): NoveltyCategory | null {
-  if (SEXUAL_RE.some((re) => re.test(message))) return "SEXUAL_EXPLICIT";
-  if (ILLEGAL_UNSAFE_RE.some((re) => re.test(message))) return "ILLEGAL_OR_UNSAFE";
-  if (CODE_EVASION_RE.some((re) => re.test(message))) return "CODE_EVASION";
+  // break-me: the DISALLOWED categories (sexual/illegal/code-evasion) test raw
+  // AND adversarially-normalized text so leetspeak can't slip them. The benign
+  // categories (fantasy/novelty) stay raw-only — no need to over-trigger them.
+  const m = `${message}\n${normalizeAdversarial(message)}`;
+  if (SEXUAL_RE.some((re) => re.test(m))) return "SEXUAL_EXPLICIT";
+  if (ILLEGAL_UNSAFE_RE.some((re) => re.test(m))) return "ILLEGAL_OR_UNSAFE";
+  if (CODE_EVASION_RE.some((re) => re.test(m))) return "CODE_EVASION";
   if (FANTASY_RE.some((re) => re.test(message))) return "FANTASY_OUT_OF_SCOPE";
   if (NOVELTY_RE.some((re) => re.test(message))) return "NOVELTY_UNTRANSLATED";
   return null;

@@ -38,11 +38,31 @@ export interface ServiceAccount {
   key_rotation_status: RotationStatus;
 }
 
-/** Seeded inventory — the one known secret + planned SAs. Honest defaults. */
+/**
+ * Inventory of the full live application secret set (SECRET-GOV-002 alignment).
+ *
+ * Names + metadata only — never values. Aligned with
+ * docs/deployment/SEC_SECRET_001_INVENTORY.md §1 and the `process.env.*`
+ * consumers in the code. The first three are the original seeds. The remaining
+ * six were added to match the real inventory: they are NOT yet provisioned, so
+ * they are honestly marked vault_backed:false / rotation unknown — the Secret
+ * Risk Dashboard surfaces them as gaps and SEC-SECRET-001 stays OPEN until the
+ * owner provisions + rotates each one in Secret Manager.
+ */
 export const SECRET_REGISTRY: SecretRecord[] = [
   { secret_id: "furlong-db-password", rotation_period_days: 90, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "critical", vault_backed: true, expires_at: null },
   { secret_id: "anthropic-api-key", rotation_period_days: 90, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "high", vault_backed: true, expires_at: null },
   { secret_id: "nextauth-secret", rotation_period_days: 180, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "high", vault_backed: true, expires_at: null },
+  // SECRET-GOV-002: remainder of the real live set (consumers verified in code).
+  { secret_id: "auth-credential-shared-secret", rotation_period_days: 90, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "high", vault_backed: false, expires_at: null },
+  { secret_id: "gsa-api-key", rotation_period_days: 180, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "high", vault_backed: false, expires_at: null },
+  { secret_id: "resend-api-key", rotation_period_days: 180, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "medium", vault_backed: false, expires_at: null },
+  // Stripe pair is GATED (payments not active) but still governed so the
+  // dashboard tracks it before any billing activation.
+  { secret_id: "stripe-secret-key", rotation_period_days: 90, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "critical", vault_backed: false, expires_at: null },
+  { secret_id: "stripe-webhook-secret", rotation_period_days: 90, last_rotation: null, rotation_status: "unknown", environment: "production", owner: "platform-security", risk_level: "high", vault_backed: false, expires_at: null },
+  // Preview-only HTTP Basic wall — UNSET in production by design.
+  { secret_id: "preview-basic-auth-password", rotation_period_days: 90, last_rotation: null, rotation_status: "unknown", environment: "preview", owner: "platform-security", risk_level: "low", vault_backed: false, expires_at: null },
 ];
 
 export const SERVICE_ACCOUNT_INVENTORY: ServiceAccount[] = [

@@ -892,7 +892,9 @@ export function routeTurn(message: string, journey: JourneyState): RouteDecision
   // yak, …) classifies to an agricultural/animal pathway — never ASK_STORY.
   const animalGoal = detectAnimalGoal(message);
   if (animalGoal) {
-    const base: TurnIntent = animalGoal.category === "wildlife_or_conservation" ? "ROUTE_CONSERVATION_OR_HABITAT" : "ROUTE_LIVESTOCK_OR_AG_STRUCTURE";
+    const base: TurnIntent = animalGoal.category === "wildlife_or_conservation" ? "ROUTE_CONSERVATION_OR_HABITAT"
+      : animalGoal.category === "apiculture" ? "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" // F1: bees → dedicated apiary route
+      : "ROUTE_LIVESTOCK_OR_AG_STRUCTURE";
     const repeated = repeatOf(base);
     return {
       turnIntent: repeated ? "ASK_REGION" : base,

@@ -150,9 +150,10 @@ function pluralize(noun: string): string {
 // order (most specific first).
 export type ObjectiveCategory =
   | "passive_income" | "job_replacement" | "retirement" | "exit_sale"
-  | "scale_enterprise" | "time_freedom" | "stability" | "wealth";
+  | "scale_enterprise" | "time_freedom" | "stability" | "asset_affinity" | "wealth";
 
 const OBJECTIVE_PATTERNS: [ObjectiveCategory, RegExp][] = [
+  ["asset_affinity", /\bi\s+(?:just\s+)?(?:like|love|enjoy|am\s+into|have\s+always\s+(?:liked|loved|wanted))\b|\bit'?s\s+(?:fun|interesting)\b|\bi\s+just\s+like\s+(?:them|it|this|these)\b/i],
   ["passive_income", /\b(?:passive\s+income|cash\s*flow|mailbox\s+money|income\s+stream|money\s+while\s+i\s+sleep|(?:more|monthly|extra|additional)\s+income|more\s+revenue)\b/i],
   ["job_replacement", /\b(?:quit|leave|replace|get\s+out\s+of)\s+(?:my\s+)?(?:job|9\s*[-to]*\s*5|day\s+job|career)\b|\breplace\s+my\s+(?:income|salary)\b|\bstop\s+working\b/i],
   ["retirement", /\b(?:retire|retirement|retire\s+early)\b/i],
@@ -229,6 +230,15 @@ export function objectiveDiscoveryReply(category: ObjectiveCategory, assetLabel:
         `Stability is a real goal. Let's define it ${beforeAssuming}: are you after predictable income, durability through ` +
         `downturns, low management, or capital preservation — and over what timeline?\n\n` +
         `Then we can compare ${a} against steadier or more diversified routes on volatility and concentration.`
+      );
+    case "asset_affinity":
+      return (
+        `Liking the asset is a completely valid reason — a lot of the best operators are in it because they enjoy it. ` +
+        `That said, ${beforeAssuming} it's worth being clear-eyed about the ownership reality: the day-to-day work, the ` +
+        `management load, the capital tied up, and the concentration in one thing you like.\n\n` +
+        `So we can pressure-test it together — do you also want it to throw off income, build value to sell, or just be ` +
+        `something you own and enjoy? Either way we can compare ${a} against a smaller version or a mix, so "I like it" ` +
+        `and "it works" point the same direction.`
       );
     case "wealth":
     default:

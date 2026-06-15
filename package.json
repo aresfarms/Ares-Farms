@@ -301,6 +301,7 @@
     "verify:forensic-tamper-test": "tsx src/scripts/forensicTamperTest.ts",
     "verify:forensic-evidence-wiring": "tsx src/scripts/verifyForensicEvidenceWiring.ts",
     "verify:forensic-pass02": "tsx src/scripts/verifyForensicPass02.ts",
+    "verify:public-disclaimer": "tsx src/scripts/verifyPublicDisclaimerSweep.ts",
     "verify:navigator-red-team-v3": "tsx src/scripts/verifyNavigatorRedTeamV3.ts",
     "verify:proposed-solution-hypothesis": "tsx src/scripts/verifyProposedSolutionHypothesis.ts",
     "verify:objective-discovery": "tsx src/scripts/verifyObjectiveDiscovery.ts",

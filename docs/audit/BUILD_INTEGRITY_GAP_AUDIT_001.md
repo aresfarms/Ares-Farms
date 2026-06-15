@@ -168,8 +168,18 @@ cyber-resilience, navigator, navigator-red-team-v3, break-me, csp-hydration).
   false`). Deferred + gated, but it is the least-evidenced REALITY blocker.
 
 ### MEDIUM
-- **M1 — No public-disclaimer conformance gate.** Disclaimer presence is asserted
-  on AI decision surfaces but not on *every* public page. Recommend a sweep gate.
+- **M1 — RESOLVED (2026-06-15).** Added `verify:public-disclaimer`
+  (`src/scripts/verifyPublicDisclaimerSweep.ts`): static layer asserts the global
+  footer carries 7 required advisory clauses + the (public) layout wiring + scans
+  all public page sources for prohibited affirmative claims; rendered layer
+  (BASE_URL) sweeps all live public routes (18 enumerated; `/team` skipped as
+  env-gated 404; dynamic params skipped) asserting the disclosure renders and
+  re-scanning for prohibited claims. **PASS** static + rendered.
+  - **Reported (report-only, owner decides — NOT auto-added):** the public footer
+    has no explicit *"not a regulator"* clause and no explicit *"not legal/tax
+    advice"* clause. Affirmative legal/tax-advice claims ARE blocked by the
+    prohibited scan; these two are *positive disclaimer phrasings* the owner may
+    choose to add to `FOOTER_DISCLOSURE`. No copy changed in this pass.
 - **M2 — Navigator branch cluster (7) likely superseded** by the live navigator on
   main; risk of drift/confusion. Triage + prune-or-fold.
 - **M3 — 22 merged branches unpruned** — branch-list noise; safe `-d` prune.
@@ -195,8 +205,9 @@ cyber-resilience, navigator, navigator-red-team-v3, break-me, csp-hydration).
    BACKUP DR-drill + immutable restore test. (Owner GCP; agent verifies after.)
 2. **Branch hygiene pass:** prune the 22 merged; triage the 16 unmerged (start with
    the navigator cluster — confirm folded-or-obsolete, then prune).
-3. **M1 gate:** build a `verify:public-disclaimer` conformance sweep over all
-   `(public)` page routes.
+3. **M1 gate:** ✅ DONE — `verify:public-disclaimer` shipped. Follow-up: owner
+   decision on adding explicit "not a regulator" / "not legal/tax advice" clauses
+   to `FOOTER_DISCLOSURE` (reported by the gate).
 4. **REALITY-URL-001:** design the sandboxed fetcher spec (deferred/gated build).
 5. **Record human reviews** where evidence is complete (4 REALITY now; SEC-
    FORENSICS after Pass 03) — each explicit, none automatic.

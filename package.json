@@ -298,6 +298,7 @@
     "verify:discovery-flow": "tsx src/scripts/verifyDiscoveryFlow.ts",
     "verify:navigator": "tsx src/scripts/verifyNavigator.ts",
     "verify:break-me": "tsx src/scripts/verifyBreakMe.ts",
+    "verify:navigator-red-team-v3": "tsx src/scripts/verifyNavigatorRedTeamV3.ts",
     "verify:proposed-solution-hypothesis": "tsx src/scripts/verifyProposedSolutionHypothesis.ts",
     "verify:objective-discovery": "tsx src/scripts/verifyObjectiveDiscovery.ts",
     "verify:financing-node": "tsx src/scripts/verifyFinancingNode.ts",

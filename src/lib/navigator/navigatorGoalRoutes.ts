@@ -134,7 +134,7 @@ export function assessCriticalInfrastructure(message: string): InfraDecision {
 export interface AssetGoal { intent: AssetGoalIntent; label: string; reply: string }
 type AssetGoalIntent = "ROUTE_HEALTHCARE_REAL_ESTATE" | "ROUTE_REGULATED_BUSINESS_ACQUISITION" | "ROUTE_COMMERCIAL_ACQUISITION" | "ROUTE_AGRICULTURAL_ACQUISITION";
 
-const ACQUIRE_VERB = "\\b(?:buy|purchase|acquire|own|invest\\s+in|develop|build|open|start)\\b";
+const ACQUIRE_VERB = "\\b(?:buy|purchase|acquire|own|invest\\s+in|develop|build|open|start|want|looking\\s+for|look(?:ing)?\\s+to\\s+(?:buy|get|own)|need|interested\\s+in|get\\s+(?:a|an|into))\\b";
 
 const HEALTHCARE_RE = /\b(?:hospital|medical\s+(?:center|building|office)|clinic|nursing\s+home|assisted\s+living|surgery\s+center|dialysis\s+center|healthcare\s+facility|urgent\s+care)\b/i;
 const REGULATED_BIZ_RE = /\b(?:laundromat|gas\s+station|car\s+wash|liquor\s+store|dispensary|funeral\s+home|daycare|child\s+care|self[- ]storage|storage\s+facility|processing\s+(?:facility|plant)|distillery|brewery|winery|cannabis\s+(?:grow|cultivation)|slaughterhouse|recycling\s+(?:center|facility)|cat\s+cafe|pet\s+(?:cafe|daycare|hotel|resort)|cafe|coffee\s+shop)\b/i;

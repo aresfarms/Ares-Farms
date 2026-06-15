@@ -1114,12 +1114,17 @@ async function main() {
     // APICULTURE SCALE / SHORT NOUN PHRASE (2026-06-12).
     {
       // Two-turn domain context: "I want bees" → "one bee box please".
+      // (v3 F1: "I want bees" now routes to the dedicated apiary intent. The
+      // follow-up scale answer stays on the apiary topic; the loop guard
+      // advances it to a hive/region question rather than repeating the intent.
+      // The standalone scale reply is covered by the single-message fixtures below.)
       const k = await converse({});
       const r1 = await converse({ message: "I want bees", journey: k.journey });
-      ok(/apiculture path/.test(r1.text), "apiary: 'I want bees' routes to the apiculture path");
+      ok(r1.turnIntent === "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" && /apiculture path/.test(r1.text),
+        "apiary: 'I want bees' → dedicated apiary route, apiculture path");
       const r2 = await converse({ message: "one bee box please", journey: r1.journey });
-      ok(r2.turnIntent === "ROUTE_HOBBY_OR_SMALL_SCALE_APIARY" && /one hive \/ one bee box is a small-scale apiary path/.test(r2.text),
-        "apiary: 'one bee box please' → small-scale apiary, references hive/bee box");
+      ok(/hive|bee\s*box|bee rules|apiary/i.test(r2.text),
+        "apiary: 'one bee box please' stays on the apiary topic (hive/bee context)");
       ok(!/Anything that boxes you in|What do you have to work with|We can start without a property/.test(r2.text),
         "apiary: NO generic constraints prompt, NO discovery copy");
     }

@@ -48,6 +48,31 @@ npm run verify:forensic-evidence-wiring     # config-snapshot seal + 3/6 wired +
 npm run verify:cyber-resilience             # SEC-FORENSICS-001 still OPEN
 ```
 
+## Pass 02 — owner sink attestation (2026-06-14)
+
+Owner reported: `logging-bucket-locked` exists in furlong-prod; the three sinks
+`furlong-forensics-runtime-logs`, `furlong-forensics-api-logs`,
+`furlong-forensics-deployment-events` are present, enabled, and routed to that
+bucket.
+
+**Determination: the three Cloud-Logging classes may NOT yet be marked `wired`.**
+Two independent reasons:
+
+1. **Attestation incomplete.** The report covers `sink_exists` +
+   `destination_immutable_or_locked`. The §3 checklist also requires, per sink:
+   `filter_matches_contract`, `retention_min_400d`, `writer_identity_bound`,
+   `test_event_observed`, `export_verified`, and an owner-side evidence file —
+   none of which are yet attested. The build agent has no GCP access and cannot
+   self-observe these. → `sinkAttestationComplete()` = false for all three.
+2. **No auto-close.** The blocker gate was made stricter this pass:
+   `forensicReadinessVerified()` now requires **all six classes wired AND**
+   `FORENSIC_READINESS_HUMAN_REVIEW_COMPLETE`. So even a complete attestation
+   cannot close SEC-FORENSICS-001 without recorded human review.
+
+Recorded in code as `SINK_OWNER_ATTESTATIONS`; verified by
+`npm run verify:forensic-pass02`. Classes stay `wired:false`; coverage remains
+**3/6**.
+
 ## What still closes SEC-FORENSICS-001 (owner half)
 - [ ] Provision the three Cloud Logging sinks above (immutable, ≥400d).
 - [ ] Wire a runtime config-snapshot capture job (using `captureConfigurationSnapshot`) on deploy.

@@ -152,6 +152,8 @@
     "smoke:exploration-registry": "tsx src/scripts/explorationRegistrySmokeTest.ts",
     "verify:no-personal-docs": "tsx src/scripts/verifyNoPersonalDocs.ts",
     "smoke:no-personal-docs": "tsx src/scripts/verifyNoPersonalDocsSmokeTest.ts",
+    "verify:scraper-coverage": "tsx src/scripts/verifyScraperCoverage.ts",
+    "smoke:scraper-coverage": "tsx src/scripts/scraperCoverageSmokeTest.ts",
     "verify:customer-journey-audit": "tsx src/scripts/publicAlphaCustomerJourneyCli.ts",
     "ingest:map-assets": "tsx src/scripts/ingestMapAssets.ts",
     "verify:map-assets": "tsx src/scripts/verifyMapAssets.ts",

@@ -74,6 +74,18 @@ jobs:
       - name: Personal document git guard smoke
         run: npm run smoke:no-personal-docs
 
+      # ────────────────────────────────────────────────────────────────
+      # Scraper Coverage & Source Freshness Audit (Build 42). Audits
+      # scraper readiness only — Build 42 does NOT activate live
+      # scraping. The gate fails closed on any alpha-required coverage,
+      # schema, provenance, freshness, or live-fetch violation.
+      # ────────────────────────────────────────────────────────────────
+      - name: Scraper coverage and source freshness audit
+        run: npm run verify:scraper-coverage
+
+      - name: Scraper coverage smoke test
+        run: npm run smoke:scraper-coverage
+
       - name: TypeScript noEmit
         run: npx tsc --noEmit
 

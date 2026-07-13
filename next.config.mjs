@@ -1,5 +1,13 @@
 const nextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
+  // Vol III (Technical Infrastructure) / Vol IV (Operational Runbooks):
+  // STAGING-DEPLOY P0.3 — deterministic container. `output: "standalone"`
+  // emits `.next/standalone` (minimal server.js + traced node_modules) so the
+  // runtime image installs NOTHING and carries no build toolchain or secrets.
+  // The Dockerfile copies `.next/standalone`, then `.next/static` and `public`
+  // into it (standalone does not bundle those by design). Runtime honors PORT
+  // and HOSTNAME env, so the container binds 0.0.0.0:$PORT for Cloud Run.
+  output: "standalone",
   turbopack: {
     root: process.cwd(),
   },

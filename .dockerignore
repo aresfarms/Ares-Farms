@@ -1,0 +1,56 @@
+# =============================================================================
+# .dockerignore — Ares/Furlong staging container (STAGING-DEPLOY P0.3)
+# Vol III (Technical Infrastructure) / Vol IV (Operational Runbooks)
+#
+# This file is LOAD-BEARING for secret safety, not cosmetic. Two reasons:
+#
+#   1. Next.js output tracing (`output: "standalone"`) copies any root `.env*`
+#      into `.next/standalone/.env` during `next build`. If a real `.env`
+#      entered the build context and the build ran, the Neon DATABASE_URL
+#      (host + password) would be BAKED INTO THE IMAGE. Excluding `.env*` here
+#      guarantees the in-container build cannot trace a secret in.
+#   2. We exclude the host's pre-built `.next` so the image is always built
+#      fresh inside the container from clean source — never shipping a stale or
+#      secret-contaminated local artifact.
+#
+# The runtime image gets ALL config from the environment at run time (Secret
+# Manager -> process env). No secret ever lives in the image. (P0.3: "no
+# secrets baked in"; verify:repo-secrets clean.)
+# =============================================================================
+
+# --- Secrets: NEVER enter the build context ---------------------------------
+.env
+.env.*
+
+# --- Build artifacts: rebuilt fresh inside the image ------------------------
+.next
+node_modules
+out
+dist
+
+# --- Version control / tooling ----------------------------------------------
+.git
+.gitignore
+.gitattributes
+.dockerignore
+Dockerfile
+*.md
+!AGENTS.md
+
+# --- Local / editor / OS noise ----------------------------------------------
+.DS_Store
+*.swp
+*.swo
+.vscode
+.idea
+.claude
+
+# --- Test / coverage / logs -------------------------------------------------
+coverage
+*.log
+npm-debug.log*
+.eslintcache
+
+# --- Infra (not needed in the app image) ------------------------------------
+infra
+artifacts

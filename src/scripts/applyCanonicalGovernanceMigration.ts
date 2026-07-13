@@ -30,9 +30,17 @@ import { RUNTIME_GRANT_SCHEMA } from "@/lib/db/runtimeGrants";
  * (structure) with `applyRuntimeDatabaseGrants.ts` (authority) — this file NEVER
  * touches grants or seeds data.
  *
+ * CREDENTIAL PRECEDENCE (so the whole `migrate:schema` chain runs under ONE
+ * principal): this step prefers MIGRATOR_DATABASE_URL, then falls back to
+ * DATABASE_URL. `migrate:schema` = this step THEN applyRuntimeDatabaseGrants.ts,
+ * and BOTH resolve MIGRATOR_DATABASE_URL first — so the staging migrator Job
+ * only needs to set MIGRATOR_DATABASE_URL and the migrations + grants run as the
+ * same migrator principal. A standalone local `db:migrate:governance` with only
+ * DATABASE_URL set behaves exactly as before.
+ *
  * MODES:
- *   (default)  Apply the governance migrations against DATABASE_URL (unchanged
- *              from prior behavior). Exit non-zero on failure.
+ *   (default)  Apply the governance migrations (MIGRATOR_DATABASE_URL, else
+ *              DATABASE_URL). Exit non-zero on failure.
  *   --plan     Open NO database connection. Print the ordered migration lineage
  *              (0007–0033) and the phase status report:
  *                namespace       = public
@@ -41,9 +49,30 @@ import { RUNTIME_GRANT_SCHEMA } from "@/lib/db/runtimeGrants";
  *                live proof gate = P1.6      (verify:runtime-privileges)
  *
  * Operator rule:
- * Run the default mode only when the active DATABASE_URL is confirmed to be the
- * intended development or controlled migration database.
+ * Run the default mode only when the resolved migration database (see the logged
+ * credential source) is the intended development or controlled migration DB.
  */
+
+/**
+ * Resolve the migration connection. Prefer the migrator principal's URL so the
+ * migrate:schema chain is single-principal; fall back to DATABASE_URL for
+ * standalone local dev.
+ */
+function resolveMigrationConnection(): {
+  connectionString: string | undefined;
+  source: string;
+} {
+  if (process.env.MIGRATOR_DATABASE_URL) {
+    return {
+      connectionString: process.env.MIGRATOR_DATABASE_URL,
+      source: "MIGRATOR_DATABASE_URL",
+    };
+  }
+  if (process.env.DATABASE_URL) {
+    return { connectionString: process.env.DATABASE_URL, source: "DATABASE_URL" };
+  }
+  return { connectionString: undefined, source: "none" };
+}
 
 function runPlan(): void {
   console.log("db:migrate:governance — PLAN (no database connection)");
@@ -54,6 +83,7 @@ function runPlan(): void {
     console.log(`    - ${fileName}`);
   }
   console.log("\n  phase status:");
+  console.log(`    credential src   = ${resolveMigrationConnection().source}  (MIGRATOR_DATABASE_URL preferred, else DATABASE_URL)`);
   console.log(`    namespace        = ${RUNTIME_GRANT_SCHEMA}`);
   console.log(`    target schema    = ${canonicalTargetSchemaVersion()}`);
   console.log(
@@ -69,12 +99,16 @@ function runPlan(): void {
 }
 
 async function runApply(): Promise<void> {
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is required before applying migrations.");
+  const { connectionString, source } = resolveMigrationConnection();
+  if (!connectionString) {
+    throw new Error(
+      "MIGRATOR_DATABASE_URL or DATABASE_URL is required before applying migrations."
+    );
   }
+  console.log(`Applying governance migrations using ${source}.`);
 
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
     max: 1,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 10000,

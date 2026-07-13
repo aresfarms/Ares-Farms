@@ -3,7 +3,7 @@
 #
 # Order matters (spec P1): the servicenetworking connection MUST exist BEFORE
 # the Cloud SQL instance, or the private-IP instance cannot be created. Cloud
-# SQL depends_on the connection in cloudsql.tf.
+# SQL depends_on the connection in sql.tf.
 # =============================================================================
 
 # Custom-mode VPC (no auto subnets) — we declare exactly the one subnet we need.
@@ -37,7 +37,7 @@ resource "google_compute_global_address" "psa_range" {
 }
 
 # Private Services Access connection (servicenetworking peering). Created BEFORE
-# the SQL instance (see cloudsql.tf depends_on).
+# the SQL instance (see sql.tf depends_on).
 resource "google_service_networking_connection" "psa" {
   network                 = google_compute_network.vpc.id
   service                 = "servicenetworking.googleapis.com"

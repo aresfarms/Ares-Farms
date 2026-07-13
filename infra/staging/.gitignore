@@ -1,0 +1,18 @@
+# Terraform local state — may contain sensitive resolved values. NEVER commit.
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Real variable values (may name hosts/roles). Commit only terraform.tfvars.example.
+terraform.tfvars
+*.auto.tfvars
+
+# Provider plugins + local cache. (Do COMMIT .terraform.lock.hcl — see below.)
+.terraform/
+
+# Crash logs + plans
+crash.log
+*.tfplan
+
+# NOTE: .terraform.lock.hcl SHOULD be committed (reproducible provider versions).
+!.terraform.lock.hcl

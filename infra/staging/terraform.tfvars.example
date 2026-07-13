@@ -1,0 +1,23 @@
+# infra/staging — example variable values (STAGING-DEPLOY P1)
+# Copy to terraform.tfvars (git-ignored) and adjust. NO SECRETS go here:
+# Terraform never receives a database password.
+
+project_id = "furlong-staging"
+region     = "us-central1"
+
+# --- Cloud SQL sizing (smallest viable; confirm before apply) ---
+cloudsql_tier    = "db-g1-small"
+database_version = "POSTGRES_16"
+app_db_name      = "furlong"
+
+# --- Backups / PITR ---
+# PITR retains WAL storage that IS billed (not free). Set false to keep only
+# daily backups if the cost estimate is not yet approved.
+enable_point_in_time_recovery  = true
+backup_retention_days          = 7
+transaction_log_retention_days = 7
+
+# --- IAM ---
+# Leave false for Direct private-IP PostgreSQL with a normal connection string.
+# Set true ONLY if you adopt the Cloud SQL Auth Proxy / connectors.
+grant_cloudsql_client = false

@@ -30,17 +30,21 @@ import { RUNTIME_GRANT_SCHEMA } from "@/lib/db/runtimeGrants";
  * (structure) with `applyRuntimeDatabaseGrants.ts` (authority) — this file NEVER
  * touches grants or seeds data.
  *
- * CREDENTIAL PRECEDENCE (so the whole `migrate:schema` chain runs under ONE
- * principal): this step prefers MIGRATOR_DATABASE_URL, then falls back to
- * DATABASE_URL. `migrate:schema` = this step THEN applyRuntimeDatabaseGrants.ts,
- * and BOTH resolve MIGRATOR_DATABASE_URL first — so the staging migrator Job
- * only needs to set MIGRATOR_DATABASE_URL and the migrations + grants run as the
- * same migrator principal. A standalone local `db:migrate:governance` with only
- * DATABASE_URL set behaves exactly as before.
+ * CREDENTIAL PRECEDENCE + SAFETY GATE:
+ * Migrations are DDL and MUST run as the migrator principal — NEVER as the
+ * runtime principal. So this step uses MIGRATOR_DATABASE_URL, and it will only
+ * fall back to DATABASE_URL when explicitly permitted with --allow-database-url.
+ * Without that flag, a set-but-unintended DATABASE_URL is REFUSED rather than
+ * silently used (which could otherwise run DDL as the runtime principal).
+ *   * governed chain  `migrate:schema`  -> strict: requires MIGRATOR_DATABASE_URL
+ *     (both this step and applyRuntimeDatabaseGrants run as the migrator).
+ *   * local operator  `db:migrate:governance` -> passes --allow-database-url,
+ *     so DATABASE_URL works exactly as before for controlled local dev.
  *
  * MODES:
- *   (default)  Apply the governance migrations (MIGRATOR_DATABASE_URL, else
- *              DATABASE_URL). Exit non-zero on failure.
+ *   (default)  Apply the governance migrations. Requires MIGRATOR_DATABASE_URL
+ *              unless --allow-database-url is passed. Exit non-zero on failure.
+ *   --allow-database-url  Permit the DATABASE_URL fallback (local dev only).
  *   --plan     Open NO database connection. Print the ordered migration lineage
  *              (0007–0033) and the phase status report:
  *                namespace       = public
@@ -50,15 +54,29 @@ import { RUNTIME_GRANT_SCHEMA } from "@/lib/db/runtimeGrants";
  *
  * Operator rule:
  * Run the default mode only when the resolved migration database (see the logged
- * credential source) is the intended development or controlled migration DB.
+ * credential source) is the intended controlled migration DB, applied by the
+ * migrator principal.
  */
+
+interface Options {
+  plan: boolean;
+  allowDatabaseUrl: boolean;
+}
+
+function parseArgs(argv: string[]): Options {
+  return {
+    plan: argv.includes("--plan"),
+    allowDatabaseUrl: argv.includes("--allow-database-url"),
+  };
+}
 
 /**
  * Resolve the migration connection. Prefer the migrator principal's URL so the
- * migrate:schema chain is single-principal; fall back to DATABASE_URL for
- * standalone local dev.
+ * migrate:schema chain is single-principal. Fall back to DATABASE_URL ONLY when
+ * --allow-database-url is passed; otherwise a set DATABASE_URL is reported as
+ * refused so the caller fails loudly instead of migrating as the wrong principal.
  */
-function resolveMigrationConnection(): {
+function resolveMigrationConnection(opts: Options): {
   connectionString: string | undefined;
   source: string;
 } {
@@ -69,12 +87,21 @@ function resolveMigrationConnection(): {
     };
   }
   if (process.env.DATABASE_URL) {
-    return { connectionString: process.env.DATABASE_URL, source: "DATABASE_URL" };
+    if (opts.allowDatabaseUrl) {
+      return {
+        connectionString: process.env.DATABASE_URL,
+        source: "DATABASE_URL (--allow-database-url)",
+      };
+    }
+    return {
+      connectionString: undefined,
+      source: "DATABASE_URL present but REFUSED (pass --allow-database-url)",
+    };
   }
   return { connectionString: undefined, source: "none" };
 }
 
-function runPlan(): void {
+function runPlan(opts: Options): void {
   console.log("db:migrate:governance — PLAN (no database connection)");
   console.log(
     `\n  canonical governance migration lineage (${CANONICAL_GOVERNANCE_MIGRATION_FILES.length}), applied in order:`
@@ -83,7 +110,7 @@ function runPlan(): void {
     console.log(`    - ${fileName}`);
   }
   console.log("\n  phase status:");
-  console.log(`    credential src   = ${resolveMigrationConnection().source}  (MIGRATOR_DATABASE_URL preferred, else DATABASE_URL)`);
+  console.log(`    credential src   = ${resolveMigrationConnection(opts).source}  (MIGRATOR_DATABASE_URL; DATABASE_URL only with --allow-database-url)`);
   console.log(`    namespace        = ${RUNTIME_GRANT_SCHEMA}`);
   console.log(`    target schema    = ${canonicalTargetSchemaVersion()}`);
   console.log(
@@ -98,11 +125,20 @@ function runPlan(): void {
   console.log("\nPLAN OK — no database connection opened, no changes applied.");
 }
 
-async function runApply(): Promise<void> {
-  const { connectionString, source } = resolveMigrationConnection();
+async function runApply(opts: Options): Promise<void> {
+  const { connectionString, source } = resolveMigrationConnection(opts);
   if (!connectionString) {
+    if (process.env.DATABASE_URL && !opts.allowDatabaseUrl) {
+      throw new Error(
+        "Refusing to run migrations on DATABASE_URL. Migrations are DDL and must " +
+          "run as the migrator principal: set MIGRATOR_DATABASE_URL, or pass " +
+          "--allow-database-url for controlled local dev. The runtime principal " +
+          "must never run migrations."
+      );
+    }
     throw new Error(
-      "MIGRATOR_DATABASE_URL or DATABASE_URL is required before applying migrations."
+      "MIGRATOR_DATABASE_URL is required before applying migrations " +
+        "(or DATABASE_URL with --allow-database-url for local dev)."
     );
   }
   console.log(`Applying governance migrations using ${source}.`);
@@ -138,11 +174,12 @@ async function runApply(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  if (process.argv.slice(2).includes("--plan")) {
-    runPlan();
+  const opts = parseArgs(process.argv.slice(2));
+  if (opts.plan) {
+    runPlan(opts);
     return;
   }
-  await runApply();
+  await runApply(opts);
 }
 
 main().catch((error: unknown) => {

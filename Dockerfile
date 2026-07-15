@@ -55,7 +55,38 @@ RUN npm run build \
        fi
 
 # -----------------------------------------------------------------------------
-# Stage 3 — runner: minimal production runtime. No npm, no source, no toolchain.
+# Stage 3 — migrator: the furlong-db-migrate Job image (STAGING-DEPLOY P2.2).
+# The runner image deliberately CANNOT run migrations (no tsx, no src/, no
+# migration SQL) — that is the authority split at the image layer. This stage
+# carries the full locked node_modules + source so `migrate:schema` runs under
+# the migrator principal via MIGRATOR_DATABASE_URL (Secret Manager -> env).
+# Build with: docker build --target migrator -t furlong-db-migrate .
+# -----------------------------------------------------------------------------
+FROM node:24.15.0-bookworm-slim AS migrator
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN groupadd --system --gid 1001 nodejs \
+ && useradd  --system --uid 1001 --gid nodejs migrator
+
+# Full locked dependency tree (includes tsx) + the source the scripts need.
+# No .env* can enter (excluded by .dockerignore); credentials arrive at RUN
+# time as MIGRATOR_DATABASE_URL from Secret Manager.
+COPY --from=deps --chown=migrator:nodejs /app/node_modules ./node_modules
+COPY --chown=migrator:nodejs package.json package-lock.json tsconfig.json ./
+COPY --chown=migrator:nodejs src ./src
+
+USER migrator
+
+# STRICT path (no --allow-database-url): refuses to run unless
+# MIGRATOR_DATABASE_URL is set, then applies schema + runtime grants and exits
+# non-zero on any failure (Cloud Run Job exit-code honesty).
+CMD ["npm", "run", "migrate:schema"]
+
+# -----------------------------------------------------------------------------
+# Stage 4 — runner: minimal production runtime. No npm, no source, no toolchain.
 # -----------------------------------------------------------------------------
 FROM node:24.15.0-bookworm-slim AS runner
 WORKDIR /app

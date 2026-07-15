@@ -106,11 +106,67 @@ laptop. Create the two principals via the **Cloud SQL control plane**:
 
 ---
 
+---
+
+## Stage 2 — P2: images, migration Job, IAM-private service
+The P2 resources (`service.tf`, `job.tf`) are **gated on the image variables** —
+a Stage-1 apply with no images creates no Cloud Run resources.
+
+1. **P2.1 — build + push both images via Cloud Build** (no local Docker needed),
+   from the repo root:
+   ```bash
+   gcloud builds submit --config cloudbuild.yaml --project furlong-staging .
+   ```
+   Record the **digests** (Terraform pins by digest, never tag):
+   ```bash
+   gcloud artifacts docker images describe \
+     us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-core:p2 \
+     --format 'value(image_summary.digest)'
+   gcloud artifacts docker images describe \
+     us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-db-migrate:p2 \
+     --format 'value(image_summary.digest)'
+   ```
+2. **Stage-2 apply** — add to `terraform.tfvars` and re-apply:
+   ```hcl
+   core_image         = "us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-core@sha256:<digest>"
+   migrator_image     = "us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-db-migrate@sha256:<digest>"
+   invoker_principals = ["user:chudson@aresfarmsinc.com"]
+   ```
+   ```bash
+   terraform plan -out staging.tfplan && terraform apply staging.tfplan
+   ```
+3. **P2.2 — run the migration Job manually** (never auto-run on boot):
+   ```bash
+   gcloud run jobs execute furlong-db-migrate --region us-central1 --wait
+   ```
+   Success = exit 0 + "Runtime grants applied" in the execution logs. This is
+   also **gate P1.6's first half**; then run `verify:runtime-privileges` (as the
+   runtime principal, from inside the VPC or a Job variant) for the proof.
+4. **NEXTAUTH_URL back-fill**: the run.app URL exists only after the first
+   deploy. Read `terraform output core_service_uri`, set `nextauth_url` in
+   terraform.tfvars, re-apply (mints one new revision).
+5. **P2.4 — verify (authenticated)**: the service is IAM-private, so calls need
+   an identity token from an invoker principal:
+   ```bash
+   TOKEN=$(gcloud auth print-identity-token)
+   URL=$(terraform output -raw core_service_uri)
+   curl -H "Authorization: Bearer $TOKEN" "$URL/health/live"    # 200, no DB
+   curl -H "Authorization: Bearer $TOKEN" "$URL/health/ready"   # 200 = DB reachable
+   ```
+   Confirm **no allUsers/allAuthenticatedUsers**:
+   ```bash
+   gcloud run services get-iam-policy furlong-core --region us-central1
+   ```
+
+**Secret rotation:** after adding a new secret version, increment
+`secret_revision_epoch` in terraform.tfvars and re-apply — that forces a new
+revision so `latest` is re-resolved (spec P2.3 mechanism).
+
 ## What's next (not in this module)
-- **P2** — build + push the image (P2.1), run the `furlong-db-migrate` Job to
-  apply `migrate:schema` (P2.2), deploy `furlong-core` **IAM-private** (P2.3).
-- **Gate P1.6** — run `migrate:schema` (as migrator) + `verify:runtime-privileges`
-  (as runtime) against this instance to prove the DML-only authority split.
+- **Gate P1.6** — `migrate:schema` Job run (as migrator) +
+  `verify:runtime-privileges` (as runtime) against this instance proves the
+  DML-only authority split.
+- **P3** — direct IAP on the service + tester grants. **URL not shared before P3.**
 
 ## Cost note — PITR
 `enable_point_in_time_recovery = true` retains write-ahead logs, and that WAL

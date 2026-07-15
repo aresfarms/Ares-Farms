@@ -74,3 +74,20 @@ output "pitr_enabled" {
   description = "Whether PITR (billed WAL retention) is enabled on the instance."
   value       = var.enable_point_in_time_recovery
 }
+
+# ---- P2 (null until the Stage-2 apply sets the image variables) --------------
+
+output "core_service_uri" {
+  description = "furlong-core run.app URL (IAM-private — needs roles/run.invoker to call). Feed back into var.nextauth_url."
+  value       = try(google_cloud_run_v2_service.core[0].uri, null)
+}
+
+output "db_migrate_job_name" {
+  description = "Migration Job name. Execute manually: gcloud run jobs execute <name> --region <region> --wait"
+  value       = try(google_cloud_run_v2_job.db_migrate[0].name, null)
+}
+
+output "p2_invoker_principals" {
+  description = "Every service-level roles/run.invoker member (deployment-manifest field p2InvokerPrincipals)."
+  value       = var.invoker_principals
+}

@@ -33,6 +33,7 @@ locals {
     "compute.googleapis.com",           # VPC, subnet, addresses
     "vpcaccess.googleapis.com",         # VPC access (connector fallback if needed)
     "servicenetworking.googleapis.com", # Private Services Access peering
+    "cloudbuild.googleapis.com",        # P2.1 image build (owner has no local Docker)
   ]
 }
 

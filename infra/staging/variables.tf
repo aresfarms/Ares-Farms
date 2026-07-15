@@ -144,6 +144,83 @@ variable "grant_cloudsql_client" {
   default     = false
 }
 
+# ---- Cloud Run (P2 — Stage 2) ----------------------------------------------
+# Both images default to "" so a Stage-1 apply (before any image exists) creates
+# NO Cloud Run resources. Set them to DIGEST-pinned refs after the P2.1 push:
+#   us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-core@sha256:...
+
+variable "core_image" {
+  description = "Digest-pinned image ref for the furlong-core service (pin by @sha256 digest, never a tag). Empty = service not created."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.core_image == "" || can(regex("@sha256:[a-f0-9]{64}$", var.core_image))
+    error_message = "core_image must be pinned by digest (…@sha256:<64 hex chars>), not a tag."
+  }
+}
+
+variable "migrator_image" {
+  description = "Digest-pinned image ref for the furlong-db-migrate Job (the Dockerfile `migrator` target). Empty = job not created."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.migrator_image == "" || can(regex("@sha256:[a-f0-9]{64}$", var.migrator_image))
+    error_message = "migrator_image must be pinned by digest (…@sha256:<64 hex chars>), not a tag."
+  }
+}
+
+variable "invoker_principals" {
+  description = "Explicit identities granted roles/run.invoker on furlong-core during P2 (e.g. [\"user:chudson@aresfarmsinc.com\"]). Recorded in the deployment manifest as p2InvokerPrincipals. NEVER allUsers/allAuthenticatedUsers."
+  type        = list(string)
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for p in var.invoker_principals :
+      p != "allUsers" && p != "allAuthenticatedUsers"
+    ])
+    error_message = "allUsers / allAuthenticatedUsers must never receive invoke authority (IAM-private posture)."
+  }
+}
+
+variable "secret_revision_epoch" {
+  description = "Non-secret revision-forcing counter. Increment after rotating a secret version so Cloud Run mints a new revision (TF referencing `latest` sees no diff otherwise) — spec P2.3."
+  type        = number
+  default     = 1
+}
+
+variable "nextauth_url" {
+  description = "Public base URL for NextAuth (the service's run.app URL). Unknown before the first deploy: leave empty, deploy, read the URL output, set this, re-apply."
+  type        = string
+  default     = ""
+}
+
+variable "core_max_instances" {
+  description = "Max Cloud Run instances. CONNECTION BUDGET (spec P2.3): max_instances x per-instance pool (10, src/lib/db/index.ts) must stay BELOW the SQL tier's connection limit (db-g1-small ~50). 2 x 10 = 20 leaves headroom for the migrator + operators."
+  type        = number
+  default     = 2
+}
+
+variable "core_cpu" {
+  description = "CPU limit per instance."
+  type        = string
+  default     = "1"
+}
+
+variable "core_memory" {
+  description = "Memory limit per instance."
+  type        = string
+  default     = "1Gi"
+}
+
+variable "migrate_job_timeout_seconds" {
+  description = "Bounded task timeout for the furlong-db-migrate Job (spec P2.2)."
+  type        = number
+  default     = 900
+}
+
 # ---- Labels -----------------------------------------------------------------
 
 variable "labels" {

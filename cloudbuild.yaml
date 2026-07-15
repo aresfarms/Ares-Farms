@@ -1,0 +1,53 @@
+# =============================================================================
+# Cloud Build — furlong staging images (STAGING-DEPLOY P2.1)
+#
+# Builds BOTH image targets from the one Dockerfile and pushes them to
+# Artifact Registry. Run from the repo root (the owner machine has no local
+# Docker; Cloud Build is the P2.1 build path):
+#
+#   gcloud builds submit --config cloudbuild.yaml --project furlong-staging .
+#
+# The upload tarball honors .gcloudignore (gcloud does NOT read .dockerignore),
+# so `.env*` and the prebuilt `.next` NEVER leave the laptop; inside Cloud
+# Build, docker then applies .dockerignore as usual (P0.3 secret-safety holds
+# at both layers).
+#
+# AFTER the build, record the pushed DIGESTS (P2.1 — Terraform pins by digest,
+# never tag):
+#   gcloud artifacts docker images describe \
+#     us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-core:p2 \
+#     --format 'value(image_summary.digest)'
+#   (same for furlong-db-migrate:p2)
+# Then set core_image / migrator_image in terraform.tfvars using
+# <repo>/<name>@sha256:<digest> and run the Stage-2 apply.
+# =============================================================================
+
+substitutions:
+  _REGION: us-central1
+  _REPO: us-central1-docker.pkg.dev/furlong-staging/furlong
+
+steps:
+  # Runtime image (default final stage: runner)
+  - name: gcr.io/cloud-builders/docker
+    id: build-core
+    args:
+      - build
+      - --target=runner
+      - -t=${_REPO}/furlong-core:p2
+      - .
+
+  # Migrator Job image (the `migrator` stage — carries tsx + src + migrations)
+  - name: gcr.io/cloud-builders/docker
+    id: build-migrator
+    args:
+      - build
+      - --target=migrator
+      - -t=${_REPO}/furlong-db-migrate:p2
+      - .
+
+images:
+  - ${_REPO}/furlong-core:p2
+  - ${_REPO}/furlong-db-migrate:p2
+
+options:
+  logging: CLOUD_LOGGING_ONLY

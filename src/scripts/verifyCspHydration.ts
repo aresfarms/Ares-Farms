@@ -79,8 +79,14 @@ async function main() {
       "object-src 'none' + base-uri 'self' + frame-ancestors 'none' retained");
   }
 
-  // Navigator surface present in HTML (the thing hydration must bring alive).
-  ok(/data-testid="navigator-input"|furlong-navigator/.test(a.html), "Navigator surface present in served HTML");
+  // Front-door surface present in HTML (the thing hydration must bring alive).
+  // DISCOVERY-PRIMARY (founder-approved 2026-07): /navigator serves the
+  // place-first DiscoverSurface; accept its SSR marker or the legacy Navigator
+  // markers so the gate tracks the front door without weakening the assertion.
+  ok(
+    /data-testid="place-first-discovery"|data-testid="navigator-input"|furlong-navigator/.test(a.html),
+    "front-door surface (discovery/navigator) present in served HTML"
+  );
 
   if (fail.length) {
     console.error(`\n✗  verify:csp-hydration FAIL — ${fail.length}:`);

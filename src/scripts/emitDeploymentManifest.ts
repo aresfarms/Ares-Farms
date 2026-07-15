@@ -43,11 +43,13 @@ import { canonicalTargetSchemaVersion } from "@/lib/db/canonicalGovernanceMigrat
  *
  * Usage (after the Stage-2 apply):
  *   npm run deploy:verify-manifest
- * Optional env: GCP_PROJECT (furlong-staging), GCP_REGION (us-central1),
+ * Optional env: GCP_PROJECT (furlong-staging-499102), GCP_REGION (us-central1),
  * SERVICE (furlong-core), JOB (furlong-db-migrate).
  */
 
-const PROJECT = process.env.GCP_PROJECT ?? "furlong-staging";
+// NOTE: the bare "furlong-staging" project ID was taken globally; the real
+// staging project is furlong-staging-499102 (name "furlong-staging").
+const PROJECT = process.env.GCP_PROJECT ?? "furlong-staging-499102";
 const REGION = process.env.GCP_REGION ?? "us-central1";
 const SERVICE = process.env.SERVICE ?? "furlong-core";
 const JOB = process.env.JOB ?? "furlong-db-migrate";

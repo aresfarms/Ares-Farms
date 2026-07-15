@@ -45,7 +45,7 @@ resource "google_sql_database_instance" "pg" {
       ipv4_enabled    = false
       private_network = google_compute_network.vpc.id
       # Enforce TLS on every connection.
-      ssl_mode        = "ENCRYPTED_ONLY"
+      ssl_mode = "ENCRYPTED_ONLY"
     }
 
     backup_configuration {

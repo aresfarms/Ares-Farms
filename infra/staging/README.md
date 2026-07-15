@@ -145,16 +145,25 @@ a Stage-1 apply with no images creates no Cloud Run resources.
 4. **NEXTAUTH_URL back-fill**: the run.app URL exists only after the first
    deploy. Read `terraform output core_service_uri`, set `nextauth_url` in
    terraform.tfvars, re-apply (mints one new revision).
-5. **P2.4 — verify (authenticated)**: the service is IAM-private, so calls need
-   an identity token from an invoker principal:
+5. **P2.4 + P2.5 — verify and emit the manifest (ONE command)**, from the repo
+   root, authenticated as an invoker principal:
+   ```bash
+   npm run deploy:verify-manifest
+   ```
+   This derives every fact from gcloud/git/HTTP (revision, image digest,
+   invoker principals, migration-Job outcome), runs the full P2.4 check set
+   (anonymous-invoke blocked, no allUsers/allAuthenticatedUsers, homepage,
+   /health/live + /health/ready, /internal wall, anonymous /api/audit rejected,
+   `verify:csp-hydration` against the deployed URL), and — only if ALL GREEN —
+   writes the deployment manifest + sha256-linked gate report to
+   `artifacts/deployments/staging/`. A red deploy gets a gate report and a
+   non-zero exit, never a manifest.
+
+   Manual spot-checks (optional; the command above covers these):
    ```bash
    TOKEN=$(gcloud auth print-identity-token)
    URL=$(terraform output -raw core_service_uri)
-   curl -H "Authorization: Bearer $TOKEN" "$URL/health/live"    # 200, no DB
    curl -H "Authorization: Bearer $TOKEN" "$URL/health/ready"   # 200 = DB reachable
-   ```
-   Confirm **no allUsers/allAuthenticatedUsers**:
-   ```bash
    gcloud run services get-iam-policy furlong-core --region us-central1
    ```
 

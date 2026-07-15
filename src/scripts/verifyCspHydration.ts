@@ -22,6 +22,10 @@
  */
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const ALLOW_DEV = process.env.CSP_HYDRATION_ALLOW_DEV === "1";
+// STAGING-DEPLOY P2.4: the staging service is IAM-private — every request needs
+// a Cloud Run identity token. Optional; local verification is unchanged.
+// Usage: VERIFY_BEARER_TOKEN=$(gcloud auth print-identity-token) BASE_URL=... npm run verify:csp-hydration
+const BEARER = process.env.VERIFY_BEARER_TOKEN;
 
 const fail: string[] = [];
 const ok = (c: boolean, m: string) => { if (!c) fail.push(m); };
@@ -32,7 +36,10 @@ function extractDirective(csp: string, name: string): string | null {
 }
 
 async function fetchPage(path: string): Promise<{ csp: string; html: string }> {
-  const r = await fetch(`${BASE}${path}`, { signal: AbortSignal.timeout(15000) });
+  const r = await fetch(`${BASE}${path}`, {
+    signal: AbortSignal.timeout(15000),
+    headers: BEARER ? { Authorization: `Bearer ${BEARER}` } : undefined,
+  });
   return { csp: r.headers.get("content-security-policy") ?? "", html: await r.text() };
 }
 

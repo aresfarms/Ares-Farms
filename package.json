@@ -288,6 +288,7 @@
     "migrate:schema": "tsx src/scripts/applyCanonicalGovernanceMigration.ts && tsx src/scripts/applyRuntimeDatabaseGrants.ts",
     "migrate:schema:plan": "tsx src/scripts/applyCanonicalGovernanceMigration.ts --plan",
     "verify:runtime-privileges": "tsx src/scripts/verifyRuntimePrivileges.ts",
+    "deploy:verify-manifest": "tsx src/scripts/emitDeploymentManifest.ts",
     "test": "npm run test:health && npm run test:apply",
     "verify:place-fact-claims": "tsx src/scripts/verifyPlaceFactClaims.ts",
     "ingest:property-oz": "tsx src/scripts/ingestPropertyOpportunityZones.ts",

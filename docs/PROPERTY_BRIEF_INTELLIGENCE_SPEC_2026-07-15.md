@@ -114,6 +114,25 @@ Core "wouldn't know to ask" block (every property):
     (ii) SELECTED** — see the decision above.
   - Standing rule: no offender-count or registry-derived feature is built, in any tier, without a
     prior written counsel determination. The worksheet pattern is the permanent default.
+
+**FOUNDER DECISION (Caitlin, 2026-07-15) — CRIME AGGREGATES IN PAID REPORTS: APPROVED.** The two
+data classes are not the same animal; crime aggregates from public-domain official sources carry
+none of the registry restrictions, and nothing is lost by including them. Paid reports include
+official reported-crime aggregates ("X burglaries reported county-wide last year, per FBI CDE")
+under a **legality-first source hierarchy**:
+  1. **State / county / city official public data** — included ONLY for jurisdictions whose open-
+     data terms and state law permit reuse. Every such source enters through the existing
+     certified-connector + source-legal-review gates (one legal screen per source, recorded as
+     connector evidence). Where permitted, local data gives finer, fresher counts than federal
+     rollups.
+  2. **Default: FBI Crime Data Explorer** (public-domain federal data, no use restrictions) — the
+     floor that is ALWAYS legal, used wherever a local source is unavailable, unverified, or its
+     terms do not clearly permit reuse. When in doubt, default down to FBI CDE.
+  Presentation rules (unchanged, binding): county/agency-level only; methodology + as-of notes;
+  reporting-coverage caveats (UCR/NIBRS participation varies by agency); NO scores, NO heat maps,
+  NO adjectives; symmetric display across all properties; wording through LEGAL-FHA-001. The
+  source actually used (local vs FBI) is named in the report line with provenance, per the
+  source-authority doctrine.
 | Kid considerations | Playgrounds/parks within X mi, sidewalk presence, school walk distance, posted speed / road class | OSM/municipal GIS (BUILD), state DOT (BUILD) |
 | Pet considerations | Municipal animal ordinances (breed rules are code facts), dog parks, nearest vet | Municipal code (BUILD), OSM (BUILD) |
 | "Neighbor" reality — reframed | Lot size/density, owner-occupancy rate (tract-level Census fact), adjacent land uses, noise sources | Census ACS (BUILD), zoning/GIS (BUILD) |

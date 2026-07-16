@@ -147,6 +147,25 @@ pattern for the entire living-here section and is enforceable by the proposed
 | Traffic/noise | Adjacent road class + AADT count, rail line proximity, airport distance + flight-path fact | State DOT AADT (BUILD), FAA (BUILD) |
 | Daily life | Nearest grocery (+ USDA food-access tract fact — powerful in rural KS), restaurants/bars count within X mi, parks | USDA Food Access Atlas (BUILD, free), OSM (BUILD) |
 | Schools "really" | State report-card link + NCES facts (enrollment, student-teacher ratio) + nearby private/charter/co-op list; NO ratings of our own | NCES/state DOE (BUILD, free) |
+
+**FOUNDER DECISION (Caitlin, 2026-07-15) — SCHOOLS: list + state-permitted data + direct links.**
+Schools follow the same legality-first hierarchy as crime data: (1) list every nearby school
+(public, private, charter, co-op) as a fact; (2) attach whatever performance/context data the
+STATE's laws and open-data terms permit (state DOE report-card data where reuse is allowed —
+screened per-state through the source-legal-review gates), defaulting to (3) federal NCES facts
+(public domain: enrollment, grade span, student-teacher ratio) as the always-legal floor. We never
+add ratings of our own; the state's own report card is linked, not re-scored.
+
+**FOUNDER DECISION (Caitlin, 2026-07-15) — DIRECT LINKS, OPT-IN (applies to schools AND all
+amenities).** Every listed place — school, district, park, playground, dog park, grocery, vet,
+restaurant, clinic — carries a direct link to its official site where one exists, so parents and
+buyers never hunt. Presentation is **progressive disclosure**: links are hidden by default and
+revealed by an explicit customer choice (a per-section "Show links" affordance), keeping the brief
+uncluttered. Link rules: verified official domains only (school/district sites, municipal park
+pages, the business's own site) — never affiliate, ad, or aggregator links; each link recorded
+with provenance + verified-at date; unverifiable or dead links degrade to name-only (render-time
+honesty pattern). Outbound-link verification runs under the existing URL/fetch governance
+(REALITY-URL-001 posture).
 | Could I grow old here? | Distance to hospital/clinic/pharmacy, broadband availability (FCC), single-story flag when known | FCC BDC (BUILD, free), OSM/HRSA (BUILD) |
 
 ## 5. Lens: RENTAL INVESTOR (long-term + short-term)

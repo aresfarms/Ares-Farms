@@ -48,5 +48,19 @@ images:
   - ${_REPO}/furlong-core:p2
   - ${_REPO}/furlong-db-migrate:p2
 
+# The default compute service account is intentionally DISABLED (security
+# hardening — it is over-privileged), and Cloud Build defaults to it. The
+# `serviceAccount` field requires a USER-MANAGED SA, so we pin a dedicated
+# least-privilege build SA. Provision it once (owner):
+#   gcloud iam service-accounts create furlong-build --project furlong-staging-499102
+#   gcloud projects add-iam-policy-binding furlong-staging-499102 \
+#     --member=serviceAccount:furlong-build@furlong-staging-499102.iam.gserviceaccount.com \
+#     --role=roles/logging.logWriter --condition=None
+#   gcloud projects add-iam-policy-binding furlong-staging-499102 \
+#     --member=serviceAccount:furlong-build@furlong-staging-499102.iam.gserviceaccount.com \
+#     --role=roles/artifactregistry.writer --condition=None
+# CLOUD_LOGGING_ONLY is required whenever a serviceAccount is set.
+serviceAccount: projects/furlong-staging-499102/serviceAccounts/furlong-build@furlong-staging-499102.iam.gserviceaccount.com
+
 options:
   logging: CLOUD_LOGGING_ONLY

@@ -92,10 +92,13 @@ Core "wouldn't know to ask" block (every property):
   on the official site and makes their own decision. Furlong produces nothing, stores nothing,
   displays nothing. This ships without waiting on the aggregate-count question below (link wording
   still passes through LEGAL-FHA-001).
-- **Paid tiers (OPEN — counsel question):** Caitlin's working hypothesis: generalized aggregates
-  ("25 registered X within 5 miles") are probably defensible, while any identification ("Joe S
-  lives at 123 Main St, four doors away") is clearly out. **Session counterpoint recorded for
-  counsel:** the two data classes carry different risk even when aggregated —
+- **Paid tiers (DECIDED — Caitlin, 2026-07-15): the WORKSHEET PATTERN.** Paid reports include the
+  official links, step-by-step instructions, and a structured blank section the customer completes
+  from their own official search. The customer produces the information; Furlong never queries,
+  computes, stores, or displays registry data in ANY tier. Zero legal risk, ships immediately, and
+  the report still delivers completeness. A licensed-data upgrade (aggregate counts in permitted
+  states) may be revisited ONLY if counsel later issues a written determination — nothing is
+  blocked waiting on that. The analysis below is retained as the rationale for this decision:
   1. *Crime aggregates* (FBI CDE / state UCR) are public-domain federal data with no use
      restrictions: county-level counts in a paid report are LOW risk.
   2. *Offender-registry aggregates* are HIGH risk even without names: (a) producing the count
@@ -106,12 +109,11 @@ Core "wouldn't know to ask" block (every property):
      commercial redistribution, and a computed radius count is a derived redistribution; (c)
      offender density correlates with protected-class geography, so a per-property count can
      function as a steering proxy under fair-housing analysis regardless of anonymity.
-  - **Viable middle paths for counsel to weigh:** (i) licensed commercial registry data + a
-    state-by-state permitted-use matrix (only where statute allows housing-adjacent use); (ii) the
-    "worksheet pattern" — the paid report includes the official links, instructions, and a blank
-    section the customer fills from their own official search (customer produces it; we never
-    touch the data). Path (ii) is available immediately at zero legal risk.
-  - No offender-count feature is built, in any tier, before counsel signs a written determination.
+  - Path options weighed: (i) licensed commercial registry data + a state-by-state permitted-use
+    matrix (only where statute allows housing-adjacent use); (ii) the worksheet pattern. **Path
+    (ii) SELECTED** — see the decision above.
+  - Standing rule: no offender-count or registry-derived feature is built, in any tier, without a
+    prior written counsel determination. The worksheet pattern is the permanent default.
 | Kid considerations | Playgrounds/parks within X mi, sidewalk presence, school walk distance, posted speed / road class | OSM/municipal GIS (BUILD), state DOT (BUILD) |
 | Pet considerations | Municipal animal ordinances (breed rules are code facts), dog parks, nearest vet | Municipal code (BUILD), OSM (BUILD) |
 | "Neighbor" reality — reframed | Lot size/density, owner-occupancy rate (tract-level Census fact), adjacent land uses, noise sources | Census ACS (BUILD), zoning/GIS (BUILD) |

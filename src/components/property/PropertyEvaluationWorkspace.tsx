@@ -339,7 +339,7 @@ function propertySpecificSummary(context: PropertyContext, facts: PropertyFactsR
     lines.push(`Recorded physical details: ${detailBits.join(" · ")}.`);
   }
   if (record?.listingId) {
-    lines.push(`Source listing reference: ${record.listingId}${record.listingStatus ? ` · ${record.listingStatus}` : ""}.`);
+    lines.push(`Listing reference: ${record.listingId} — use this number to find the listing on the source site.`);
   }
   return lines;
 }
@@ -472,30 +472,6 @@ function sourceCandidateCopy(context: PropertyContext): string | null {
   }
 
   return lines.join(" ");
-}
-
-function propertyAnalysisHref(context: PropertyContext): string {
-  const params = new URLSearchParams();
-  params.set("mode", "possibilities");
-  params.set("entry", "property-brief");
-  if (context.propertyId) params.set("propertyId", context.propertyId);
-  params.set("propertyType", context.propertyType);
-  params.set("location", context.location);
-  params.set("title", context.title);
-  params.set("priceLabel", context.priceLabel);
-  if (context.vintage) params.set("vintage", context.vintage);
-  params.set("sourceLabel", context.sourceLabel);
-  if (context.pathwayList.length > 0) params.set("pathways", context.pathwayList.join(","));
-  if (context.town) params.set("town", context.town);
-  if (context.county) params.set("county", context.county);
-  if (context.stateCode) params.set("state", context.stateCode);
-  if (context.sourceId) params.set("sourceId", context.sourceId);
-  if (context.currentLabel) params.set("currentLabel", context.currentLabel);
-  if (context.description) params.set("description", context.description);
-  if (context.categoryLabel) params.set("categoryLabel", context.categoryLabel);
-  if (context.exactAddress) params.set("exactAddress", context.exactAddress);
-  if (context.listingUrl) params.set("listingUrl", context.listingUrl);
-  return `/discover?${params.toString()}`;
 }
 
 function propertyIntentText(context: PropertyContext, answers: DraftAnswers): string {
@@ -754,7 +730,7 @@ function buildPropertyEconomicsLines(args: {
   ];
   if (args.topProgramRanks[0]) {
     out.push(
-      `${args.topProgramRanks[0].program.name} currently looks like the lead financing lane at ${args.topProgramRanks[0].score}% relative fit because ${cleanPhrase(args.topProgramRanks[0].rationale).toLowerCase()}.`
+      `${args.topProgramRanks[0].program.name} currently looks like the lead financing lane because ${cleanPhrase(args.topProgramRanks[0].rationale).toLowerCase()}.`
     );
   }
   if (args.topProgramRanks[1]) {
@@ -1319,7 +1295,7 @@ function buildReportModel(args: {
   });
 
   const pathwayAnalysis = args.topProgramRanks.map((entry, index) =>
-    `${index + 1}. ${entry.program.name} — ${entry.score}% relative fit. ${entry.rationale} ${entry.caution}`
+    `${index + 1}. ${entry.program.name}. ${entry.rationale} ${entry.caution}`
   );
 
   const propertyVerificationSummary = (() => {
@@ -1405,15 +1381,16 @@ function buildReportModel(args: {
   });
 
   const interviewSignals = userTurns(args.navigator?.turns ?? []).slice(-4);
+  // The verdict label + explanation render immediately beside this summary,
+  // so the summary must not restate them (redesign Phase 1: each thing said
+  // once). Scores are internal ranking signals, never customer copy.
   const executiveSummary = [
-    `${args.context.title} currently screens as ${verdict.label.toLowerCase()} for this ${tier.label.toLowerCase()} packet.`,
     propertySpecificLines[0] ?? "",
-    verdict.explanation,
     args.topProgramRanks[0]
-      ? `${args.topProgramRanks[0].program.name} is the current lead financing lane at ${args.topProgramRanks[0].score}% relative fit.`
+      ? `${args.topProgramRanks[0].program.name} is the current lead financing lane.`
       : "",
     args.budgetExpectations.acquisition,
-    args.immediateSuitability.constraints[0] ? `The first real kill-point is ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
+    args.immediateSuitability.constraints[0] ? `The first thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
   ].filter(Boolean).join(" ");
 
   // Free Place Brief content folded into the report (spec 2026-07-15): the
@@ -2116,44 +2093,6 @@ export function PropertyEvaluationWorkspace({
   });
   const selectedTierAccess = tierAccess[answers.reportTier];
   const selectedTierUnlocked = selectedTierAccess.unlocked;
-  const moduleDoorways = [
-    {
-      title: "Property analysis",
-      href: propertyAnalysisHref(analysisContext),
-      description: "Stay with this property and pressure-test the deal memo.",
-      tone: "teal",
-    },
-    {
-      title: "Compass",
-      href: "/compass",
-      description: "Step back into the core platform framing and guidance.",
-      tone: "blue",
-    },
-    {
-      title: "Financing pathways",
-      href: "/financing-pathways",
-      description: "Open the separable financing module for deeper pathway work.",
-      tone: "gold",
-    },
-    {
-      title: "Readiness",
-      href: "/readiness",
-      description: "Move into readiness posture and missing-item review.",
-      tone: "blue",
-    },
-    {
-      title: "Property discovery portal",
-      href: "/portal/property-discovery",
-      description: "Use the dedicated discovery surface as its own module.",
-      tone: "gold",
-    },
-    {
-      title: "Reports and revenue",
-      href: "/portal/borrower/reports",
-      description: "Jump into borrower reports, then out to revenue review if needed.",
-      tone: "teal",
-    },
-  ] as const;
   const previewSections: PreviewSection[] = [
     {
       title: "Property snapshot",
@@ -2429,16 +2368,13 @@ export function PropertyEvaluationWorkspace({
     propertyRecord?.rawPropertyStyle
       ? `Recorded property style: ${propertyRecord.rawPropertyStyle}.`
       : `Property type in flow: ${analysisContext.propertyType}.`,
-    propertyRecord?.listingId
-      ? `Source record reference: ${propertyRecord.listingId}${propertyRecord.listingStatus ? ` · ${propertyRecord.listingStatus}` : ""}.`
-      : `Source posture: ${analysisContext.sourceLabel}${analysisContext.currentLabel ? ` · ${analysisContext.currentLabel}` : ""}.`,
+    `Listed through ${analysisContext.sourceLabel}${propertyRecord?.listingId ? ` (listing ${propertyRecord.listingId})` : ""}.`,
     analysisContext.priceLabel && !/price on request/i.test(analysisContext.priceLabel)
-      ? `Visible asking basis: ${analysisContext.priceLabel}.`
-      : "Visible asking basis is still unconfirmed from the current record.",
+      ? `Asking price: ${analysisContext.priceLabel}.`
+      : "The current price is published on the source listing — it isn't fixed in our record yet.",
   ];
-  const topVerificationPreview = report.propertyVerificationSummary.slice(0, 3);
   const topProgramPreview = topProgramRanks.slice(0, 2).map(
-    (entry, index) => `${index + 1}. ${entry.program.name} · ${entry.score}% relative fit`
+    (entry, index) => `${index + 1}. ${entry.program.name}`
   );
 
   return (
@@ -2454,9 +2390,6 @@ export function PropertyEvaluationWorkspace({
           overflow: "hidden",
         }}
       >
-        <div style={{ padding: "20px 24px 18px", borderBottom: "1px solid #e5ebf3", background: "linear-gradient(180deg, rgba(255,250,240,0.82), rgba(255,255,255,0.35))" }}>
-          <PropertyImportLaunchpadEmbedded />
-        </div>
 	        <div style={{ display: "grid", gap: 16, padding: "22px 24px 24px" }}>
 	        <div style={{ display: "grid", gap: 18, gridTemplateColumns: "minmax(0, 1.25fr) minmax(320px, 0.95fr)", alignItems: "start" }}>
 	          <div style={{ display: "grid", gap: 12 }}>
@@ -2489,15 +2422,12 @@ export function PropertyEvaluationWorkspace({
                   pathways now read as a prose line in the Place Intelligence
                   section below — same information, narrative form, no dead UI. */}
             </div>
-	            <p style={{ margin: 0, fontSize: 13.5, color: "#5d687a", lineHeight: 1.65, maxWidth: 760 }}>
-	              Furlong should open by screening the property itself first, not by asking you to perform a long intake. The page below is now meant to behave like a first-pass deal memo with exportable findings.
-	            </p>
 	          </div>
 	          <section style={{ display: "grid", gap: 10, border: "1px solid #dde6f0", borderRadius: 18, background: "linear-gradient(180deg, #fcfdff, #f7fbff)", padding: "16px 16px 14px" }}>
 	            <div style={{ display: "grid", gap: 4 }}>
 	              <span style={miniLabel}>What Furlong already knows</span>
-	              <strong style={{ fontSize: 18, color: "#162033" }}>Property-backed facts before any customer answers</strong>
-	              <span style={miniText}>These are the source-backed facts and place checks the page should surface immediately for this property.</span>
+	              <strong style={{ fontSize: 18, color: "#162033" }}>Verified before you answer anything</strong>
+	              <span style={miniText}>Pulled from the source record and our government-data snapshots — no questions asked yet.</span>
 	            </div>
 	            <div style={{ display: "grid", gap: 8 }}>
 	              {topKnownFacts.map((line) => (
@@ -2678,7 +2608,7 @@ export function PropertyEvaluationWorkspace({
 	          <div style={{ display: "grid", gap: 5 }}>
 	            <strong style={{ fontSize: 18, color: "#162033" }}>Immediate on-screen report</strong>
 	            <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-	              This is the part that should answer the property question immediately, before any deeper workspace opens.
+	              Your property question, answered from what can be verified right now.
 	            </span>
 	          </div>
           <div style={{ ...reportSection, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #fbfcfe, #ffffff)", borderRadius: 16, padding: "16px 18px" }}>
@@ -2746,14 +2676,6 @@ export function PropertyEvaluationWorkspace({
 	              )}
 	            </div>
 	          </div>
-	          <div style={reportSection}>
-	            <span style={miniLabel}>Verified place facts</span>
-	            <div style={{ display: "grid", gap: 6 }}>
-	              {topVerificationPreview.map((line) => (
-	                <span key={line} style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>{line}</span>
-	              ))}
-	            </div>
-	          </div>
 	        </div>
 	        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
 	          <span style={pillGray}>{report.tier.shortLabel}</span>
@@ -2763,38 +2685,7 @@ export function PropertyEvaluationWorkspace({
 	        </div>
 	        <p style={{ margin: 0, fontSize: 12.5, color: "#5d687a", lineHeight: 1.6, maxWidth: 900 }}>
 	          {selectedTierAccess.detail}
-	          {tierPreviewMode
-	            ? " Preview mode is currently on for testing, so premium tiers remain visible without the live paywall."
-	            : " Preview mode is off, so premium tiers stay framework-locked until live entitlement access is turned on."}
 	        </p>
-	        <section style={{ display: "grid", gap: 10, border: "1px solid #dde6f0", borderRadius: 18, background: "linear-gradient(180deg, #fcfdff, #f7fbff)", padding: "16px 16px 14px" }}>
-	          <div style={{ display: "grid", gap: 4 }}>
-	            <span style={miniLabel}>Module deck</span>
-	            <strong style={{ fontSize: 18, color: "#162033" }}>Move through the platform or peel off into a module</strong>
-	            <span style={miniText}>The core property screen stays first, but the rest of the platform still branches cleanly from here.</span>
-	          </div>
-	          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(2, minmax(0, 1fr))" }}>
-	            {moduleDoorways.map((doorway) => (
-	              <Link
-	                key={doorway.title}
-	                href={doorway.href}
-	                style={{
-	                  display: "grid",
-	                  gap: 4,
-	                  minHeight: 96,
-	                  borderRadius: 14,
-	                  border: doorway.tone === "gold" ? "1px solid #ead8aa" : doorway.tone === "teal" ? "1px solid #bfe4db" : "1px solid #d7deea",
-	                  background: doorway.tone === "gold" ? "#fffaf0" : doorway.tone === "teal" ? "#f2fbf8" : "#f7fbff",
-	                  padding: "12px 12px 10px",
-	                  textDecoration: "none",
-	                }}
-	              >
-	                <strong style={{ fontSize: 13.5, color: "#162033" }}>{doorway.title}</strong>
-	                <span style={{ fontSize: 12.2, color: "#4d596d", lineHeight: 1.5 }}>{doorway.description}</span>
-	              </Link>
-	            ))}
-	          </div>
-	        </section>
 	        </div>
 	      </section>
 
@@ -2821,14 +2712,14 @@ export function PropertyEvaluationWorkspace({
                   </strong>
                   <span style={miniText}>
                     {topProgramRanks[0]
-                      ? `${topProgramRanks[0].score}% relative fit. ${topProgramRanks[0].rationale}`
+                      ? topProgramRanks[0].rationale
                       : "The asset class still needs to be sharpened before a strong lead lane can be stated."}
                   </span>
                 </div>
                 <div style={miniCard}>
-                  <span style={miniLabel}>Likely kill-point</span>
+                  <span style={miniLabel}>Watch this first</span>
                   <strong style={{ fontSize: 18, color: "#162033" }}>
-                    {immediateSuitability.constraints[0] ? "Watch this first" : "No single blocker yet"}
+                    {immediateSuitability.constraints[0] ? "One open question" : "No single blocker yet"}
                   </strong>
                   <span style={miniText}>{immediateSuitability.constraints[0] ?? "Execution still depends on rule checks, condition, and capital structure."}</span>
                 </div>
@@ -3008,7 +2899,7 @@ export function PropertyEvaluationWorkspace({
                     <strong style={{ fontSize: 28, color: "#162033" }}>
                       {topProgramRanks[0]?.program.name ?? "TBD"}
                     </strong>
-                    <span style={miniText}>{topProgramRanks[0] ? `${topProgramRanks[0].score}% relative fit from current property facts.` : "Still classifying from the current record."}</span>
+                    <span style={miniText}>{topProgramRanks[0] ? "Ranked first from the current property facts." : "Still classifying from the current record."}</span>
                   </div>
                   <div style={miniCard}>
                     <span style={miniLabel}>Verified property-side signals</span>
@@ -3032,7 +2923,7 @@ export function PropertyEvaluationWorkspace({
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
                         <strong style={{ fontSize: 14.5, color: "#162033" }}>{index + 1}. {entry.program.name}</strong>
                         <span style={{ fontSize: 12, fontWeight: 800, color: "#0f766e" }}>
-                          {entry.score}% relative fit
+                          {index === 0 ? "Strongest current lane" : `Lane ${index + 1}`}
                         </span>
                       </div>
                       <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.55 }}>
@@ -3233,6 +3124,18 @@ export function PropertyEvaluationWorkspace({
           </section>
         </aside>
       </div>
+        </div>
+      </details>
+
+      {/* Switch-property moved from the page top to a quiet, collapsed rail at
+          the end (redesign Phase 1): the visitor came to evaluate THIS
+          property — leaving it is the last offer, not the first. */}
+      <details style={{ ...detailsStyle, background: "#ffffff", padding: "14px 18px" }}>
+        <summary style={{ ...summaryStyle, fontSize: 14 }}>
+          Evaluating a different property? Paste a link or upload a listing
+        </summary>
+        <div style={{ paddingTop: 14 }}>
+          <PropertyImportLaunchpadEmbedded />
         </div>
       </details>
     </section>

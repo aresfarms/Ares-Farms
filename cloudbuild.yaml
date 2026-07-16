@@ -59,6 +59,12 @@ images:
 #   gcloud projects add-iam-policy-binding furlong-staging-499102 \
 #     --member=serviceAccount:furlong-build@furlong-staging-499102.iam.gserviceaccount.com \
 #     --role=roles/artifactregistry.writer --condition=None
+#   # A user-managed build SA must also READ the uploaded source tarball. Grant
+#   # this on the source bucket only (least privilege), not project-wide:
+#   gcloud storage buckets add-iam-policy-binding \
+#     gs://furlong-staging-499102_cloudbuild \
+#     --member=serviceAccount:furlong-build@furlong-staging-499102.iam.gserviceaccount.com \
+#     --role=roles/storage.objectViewer
 # CLOUD_LOGGING_ONLY is required whenever a serviceAccount is set.
 serviceAccount: projects/furlong-staging-499102/serviceAccounts/furlong-build@furlong-staging-499102.iam.gserviceaccount.com
 

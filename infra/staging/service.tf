@@ -242,3 +242,41 @@ resource "google_iap_web_cloud_run_service_iam_member" "testers" {
 
   depends_on = [terraform_data.enable_iap]
 }
+
+# ---- P2.4 deploy-verify identity (IAP-aware) --------------------------------
+# The deploy:verify-manifest gate must reach the app THROUGH IAP to prove
+# health. A user credential cannot mint an IAP-audience token, so a dedicated
+# least-privilege service account holds roles/iap.httpsResourceAccessor and the
+# operator self-signs a short-lived JWT AS it (aud = service URL, direct Cloud
+# Run IAP has no OAuth brand). This SA has NO other capability — it can only be
+# authenticated-read through IAP.
+resource "google_service_account" "verify" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  project      = var.project_id
+  account_id   = "furlong-verify"
+  display_name = "Furlong P2.4 deploy-verify (IAP-aware, read-through-IAP only)"
+}
+
+resource "google_iap_web_cloud_run_service_iam_member" "verify" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  project                = var.project_id
+  location               = var.region
+  cloud_run_service_name = google_cloud_run_v2_service.core[0].name
+  role                   = "roles/iap.httpsResourceAccessor"
+  member                 = "serviceAccount:${google_service_account.verify[0].email}"
+
+  depends_on = [terraform_data.enable_iap]
+}
+
+# Operator principals may self-sign a JWT AS the verify SA (signJwt) to run the
+# gate locally. Scoped to this ONE service account — not project-wide token
+# creation.
+resource "google_service_account_iam_member" "verify_token_creator" {
+  for_each = var.core_image == "" || !var.enable_iap ? toset([]) : toset(var.invoker_principals)
+
+  service_account_id = google_service_account.verify[0].name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = each.value
+}

@@ -136,3 +136,8 @@ output "security_alert_notification_channel_names" {
   description = "Monitoring notification channel resource names attached to staging security alerts."
   value       = [for channel in google_monitoring_notification_channel.security_email : channel.name]
 }
+
+output "verify_sa_email" {
+  description = "Service account the P2.4 gate self-signs an IAP JWT as (read-through-IAP only)."
+  value       = try(google_service_account.verify[0].email, null)
+}

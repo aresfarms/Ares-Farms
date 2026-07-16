@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { canonicalTargetSchemaVersion } from "@/lib/db/canonicalGovernanceMigrations";
 
@@ -55,6 +56,10 @@ const REGION = process.env.GCP_REGION ?? "us-central1";
 const SERVICE = process.env.SERVICE ?? "furlong-core";
 const JOB = process.env.JOB ?? "furlong-db-migrate";
 const VERIFY_JOB = process.env.VERIFY_JOB ?? "furlong-runtime-verify";
+// Dedicated read-through-IAP identity (Terraform: google_service_account.verify).
+// When IAP enforces the edge, a user credential cannot mint an IAP-audience
+// token, so the operator self-signs a short-lived JWT AS this SA.
+const VERIFY_SA = process.env.VERIFY_SA ?? `furlong-verify@${PROJECT}.iam.gserviceaccount.com`;
 
 interface Check {
   name: string;
@@ -88,6 +93,38 @@ async function http(
   return { status: res.status, body: await res.text() };
 }
 
+/**
+ * Mint an IAP-audience bearer for the authenticated checks.
+ *
+ * Direct Cloud Run IAP has no OAuth brand/client, so the OIDC-token path does
+ * not apply; the supported programmatic method is a self-signed service-account
+ * JWT (IAP docs: aud = the exact resource URL) signed via the IAM signJwt API.
+ * The operator holds serviceAccountTokenCreator on VERIFY_SA, which holds
+ * iap.httpsResourceAccessor — so this proves health THROUGH IAP without
+ * weakening the edge. aud override: VERIFY_IAP_AUDIENCE (e.g. "<url>/*").
+ */
+function mintIapJwt(serviceUrl: string): string {
+  const now = Math.floor(Date.now() / 1000);
+  const claim = {
+    iss: VERIFY_SA,
+    sub: VERIFY_SA,
+    aud: process.env.VERIFY_IAP_AUDIENCE ?? serviceUrl,
+    iat: now,
+    exp: now + 600,
+    email: VERIFY_SA,
+  };
+  const dir = mkdtempSync(path.join(tmpdir(), "furlong-verify-"));
+  const claimPath = path.join(dir, "claim.json");
+  const outPath = path.join(dir, "out.jwt");
+  try {
+    writeFileSync(claimPath, JSON.stringify(claim));
+    sh("gcloud", ["iam", "service-accounts", "sign-jwt", "--iam-account", VERIFY_SA, claimPath, outPath]);
+    return readFileSync(outPath, "utf8").trim();
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
 async function main(): Promise<void> {
   console.log(`deploy:verify-manifest — ${SERVICE} @ ${PROJECT}/${REGION}\n`);
 
@@ -100,7 +137,13 @@ async function main(): Promise<void> {
   const image = gcloud(["run", "services", "describe", SERVICE, "--region", REGION, "--format", "value(spec.template.spec.containers[0].image)"]);
   const imageDigest = image.includes("@") ? image.split("@")[1] : `UNPINNED(${image})`;
   const serviceDescribeText = gcloud(["run", "services", "describe", SERVICE, "--region", REGION]);
-  const iapEnabled = /Iap Enabled:\s+true/i.test(serviceDescribeText);
+  // Prefer the annotation (authoritative) over the human-formatted text, which
+  // lags during IAP enablement propagation.
+  const iapAnnotation = gcloud([
+    "run", "services", "describe", SERVICE, "--region", REGION,
+    "--format", 'value(metadata.annotations["run.googleapis.com/iap-enabled"])',
+  ]).trim();
+  const iapEnabled = iapAnnotation === "true" || /Iap Enabled:\s+true/i.test(serviceDescribeText);
 
   const iamPolicy = JSON.parse(
     gcloud(["run", "services", "get-iam-policy", SERVICE, "--region", REGION, "--format", "json"])
@@ -121,7 +164,9 @@ async function main(): Promise<void> {
   const lastVerifyExecution = verifyExecutions[0];
   const runtimeVerifyExecution = lastVerifyExecution?.metadata?.name ?? "NONE";
 
-  const bearer = sh("gcloud", ["auth", "print-identity-token"]);
+  // Behind IAP: self-signed SA JWT (aud = service URL). Pre-IAP edge: a plain
+  // Cloud Run invoker identity token still works.
+  const bearer = iapEnabled ? mintIapJwt(serviceUrl) : sh("gcloud", ["auth", "print-identity-token"]);
 
   // ---- 2. P2.4 checks --------------------------------------------------------
   console.log("P2.4 checks:");
@@ -138,9 +183,17 @@ async function main(): Promise<void> {
     forbidden.length === 0
   );
 
-  // Anonymous invocation blocked at the edge.
+  // Anonymous invocation blocked at the edge. IAP redirects unauthenticated
+  // requests to Google sign-in (302) — still blocked, just a different signal
+  // than the raw Cloud Run 401/403.
+  const anonBlocked = (s: number) => s === 401 || s === 403 || (iapEnabled && s === 302);
   const anon = await http(`${serviceUrl}/`);
-  record("anonymous invocation blocked at edge", "401/403", `HTTP ${anon.status}`, anon.status === 401 || anon.status === 403);
+  record(
+    "anonymous invocation blocked at edge",
+    iapEnabled ? "302/401/403 (IAP)" : "401/403",
+    `HTTP ${anon.status}`,
+    anonBlocked(anon.status)
+  );
 
   // Authenticated homepage serves the app.
   const home = await http(`${serviceUrl}/`, bearer);
@@ -163,7 +216,12 @@ async function main(): Promise<void> {
 
   // Anonymous API rejected (edge; app would 401 as second layer).
   const audit = await http(`${serviceUrl}/api/audit`);
-  record("anonymous /api/audit rejected", "401/403", `HTTP ${audit.status}`, audit.status === 401 || audit.status === 403);
+  record(
+    "anonymous /api/audit rejected",
+    iapEnabled ? "302/401/403 (IAP)" : "401/403",
+    `HTTP ${audit.status}`,
+    anonBlocked(audit.status)
+  );
 
   // Migration job's latest execution succeeded (P2.2 already run).
   const jobOk = (lastExecution?.status?.succeededCount ?? 0) >= 1 && !(lastExecution?.status?.failedCount ?? 0);

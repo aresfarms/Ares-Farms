@@ -11,7 +11,9 @@
 import {
   type CanonicalProperty,
   type ExploreDetailProperty,
+  type PublicSafeProperty,
   type PropertySourceId,
+  toPublicSafe,
   toExploreDetail,
 } from "./propertyTypes";
 import {
@@ -90,6 +92,54 @@ export function anySourceLive(): boolean {
 }
 
 export const PROPERTY_SOURCE_IDS = SOURCES.map((s) => s.id);
+
+const PUBLIC_SAFE_SOURCE_PRIORITY: Record<PropertySourceId, number> = {
+  hud: 0,
+  treasury: 1,
+  "gsa-realestate": 2,
+  usda: 3,
+};
+
+export function findCanonicalPropertyById(propertyId: string): CanonicalProperty | null {
+  for (const s of SOURCES) {
+    const match = recordsOf(s).find((record) => record.canonical_property_id === propertyId);
+    if (match) return match;
+  }
+  return null;
+}
+
+export function buildPublicSafeInventoryByState(): Record<string, PublicSafeProperty[]> {
+  const byState = new Map<string, PublicSafeProperty[]>();
+
+  for (const s of SOURCES) {
+    if (!isSourceLive(s.id)) continue;
+    for (const c of recordsOf(s)) {
+      const property = toPublicSafe(c);
+      const state = property.state.toUpperCase();
+      const current = byState.get(state) ?? [];
+      current.push(property);
+      byState.set(state, current);
+    }
+  }
+
+  const out: Record<string, PublicSafeProperty[]> = {};
+  for (const [state, properties] of byState.entries()) {
+    const deduped = Array.from(new Map(properties.map((property) => [property.id, property])).values());
+    deduped.sort((a, b) => {
+      const currentDelta = Number(b.isCurrent) - Number(a.isCurrent);
+      if (currentDelta !== 0) return currentDelta;
+      const priorityDelta = PUBLIC_SAFE_SOURCE_PRIORITY[a.sourceId] - PUBLIC_SAFE_SOURCE_PRIORITY[b.sourceId];
+      if (priorityDelta !== 0) return priorityDelta;
+      const aTime = a.asOf ? Date.parse(a.asOf) : 0;
+      const bTime = b.asOf ? Date.parse(b.asOf) : 0;
+      if (aTime !== bTime) return bTime - aTime;
+      return a.id.localeCompare(b.id);
+    });
+    out[state] = deduped;
+  }
+
+  return out;
+}
 
 /** ALL ingested records for a source, regardless of live state — for the internal review screen only. */
 export function recordsForReview(sourceId: PropertySourceId): CanonicalProperty[] {

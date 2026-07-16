@@ -29,6 +29,7 @@ import { recordsForReview } from "./propertyData";
 import { recordIsCurrent, type CanonicalProperty, type PropertySourceId } from "./propertyTypes";
 import { appendAuditEvent } from "./auditLedger";
 import { writeLiveRecords } from "./liveOverlay";
+import { runtimeStatePath } from "./runtimeStatePath";
 import { fetchHudReoRecords } from "./hudAdapter";
 import { fetchTreasuryRealProperty } from "./treasuryAdapter";
 import { fetchGsaRealEstate } from "./gsaRealEstateAdapter";
@@ -48,7 +49,7 @@ const LIVE_FETCHERS: Record<string, () => Promise<{ records: CanonicalProperty[]
   "gsa-realestate": fetchGsaRealEstate,
 };
 
-const REFRESH_STATE_PATH = path.join(process.cwd(), "data", "source-refresh-state.json");
+const REFRESH_STATE_PATH = runtimeStatePath("source-refresh-state.json");
 const DOMAIN = "source-refresh";
 
 export type RefreshStatus = "REFRESHED" | "NO_CHANGE" | "SKIPPED" | "FAILED";

@@ -9,11 +9,11 @@
  */
 
 import * as fs from "node:fs";
-import * as path from "node:path";
 
 import { chainAppend } from "@/lib/security/ledgerHashChain";
+import { runtimeStatePath } from "./runtimeStatePath";
 
-const LEDGER_PATH = path.join(process.cwd(), "data", "audit-ledger.ndjson");
+const LEDGER_PATH = runtimeStatePath("audit-ledger.ndjson");
 export const AUDIT_LEDGER_PATH = LEDGER_PATH;
 
 export interface AuditEvent {

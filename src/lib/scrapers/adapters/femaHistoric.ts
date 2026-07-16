@@ -15,6 +15,8 @@
  * OFFLINE property ingest only; public render reads the frozen snapshot.
  */
 
+import { get as httpsGet } from "node:https";
+
 export const FEMA_NFHL_URL =
   "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query";
 export const NPS_NR_URL =
@@ -33,7 +35,123 @@ export interface HistoricFact {
   resourceName: string | null;
 }
 
+interface CacheEntry<T> {
+  value: T | null;
+  verifiedAtMs: number;
+}
+
+const FLOOD_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const floodLookupCache = new Map<string, CacheEntry<FloodZoneFact>>();
+
+function floodCacheKey(lon: number, lat: number): string {
+  return `${lon.toFixed(6)},${lat.toFixed(6)}`;
+}
+
+function readFloodCache(lon: number, lat: number): CacheEntry<FloodZoneFact> | null {
+  const cached = floodLookupCache.get(floodCacheKey(lon, lat));
+  if (!cached) return null;
+  if (Date.now() - cached.verifiedAtMs > FLOOD_CACHE_TTL_MS) {
+    floodLookupCache.delete(floodCacheKey(lon, lat));
+    return null;
+  }
+  return cached;
+}
+
+function writeFloodCache(lon: number, lat: number, value: FloodZoneFact | null): void {
+  floodLookupCache.set(floodCacheKey(lon, lat), {
+    value,
+    verifiedAtMs: Date.now(),
+  });
+}
+
+function fetchJsonViaHttps(url: string, timeoutMs: number): Promise<unknown> {
+  return new Promise((resolve, reject) => {
+    const req = httpsGet(
+      url,
+      {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0 FurlongPlaceFacts/1.0",
+          Connection: "close",
+        },
+      },
+      (res) => {
+        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+          res.resume();
+          reject(new Error(`HTTPS request returned ${res.statusCode ?? "unknown status"}`));
+          return;
+        }
+
+        let body = "";
+        res.setEncoding("utf8");
+        res.on("data", (chunk) => {
+          body += chunk;
+        });
+        res.on("end", () => {
+          try {
+            resolve(JSON.parse(body));
+          } catch (error) {
+            reject(
+              error instanceof Error
+                ? error
+                : new Error("HTTPS response was not valid JSON.")
+            );
+          }
+        });
+      }
+    );
+
+    req.setTimeout(timeoutMs, () => {
+      req.destroy(new Error("HTTPS request timed out."));
+    });
+    req.on("error", (error) => {
+      reject(error);
+    });
+  });
+}
+
+async function fetchJsonViaHttpsWithRetry(
+  url: string,
+  timeoutMs: number,
+  attempts = 6,
+): Promise<unknown> {
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    try {
+      if (attempt % 2 === 1) {
+        return await fetchJsonViaHttps(url, timeoutMs);
+      }
+      const res = await fetch(url, {
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "Mozilla/5.0 FurlongPlaceFacts/1.0",
+        },
+      });
+      if (!res.ok) {
+        throw new Error(`Fetch request returned ${res.status}`);
+      }
+      return await res.json();
+    } catch (error) {
+      lastError = error;
+      if (attempt < attempts) {
+        await new Promise((resolve) => setTimeout(resolve, 400 * attempt));
+      }
+    }
+  }
+
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("HTTPS request failed after multiple attempts.");
+}
+
 export async function queryFloodZone(lon: number, lat: number): Promise<FloodZoneFact | null> {
+  const cached = readFloodCache(lon, lat);
+  if (cached) {
+    return cached.value;
+  }
+
   const params = new URLSearchParams({
     geometry: `${lon},${lat}`,
     geometryType: "esriGeometryPoint",
@@ -43,12 +161,30 @@ export async function queryFloodZone(lon: number, lat: number): Promise<FloodZon
     returnGeometry: "false",
     f: "pjson",
   });
-  const res = await fetch(`${FEMA_NFHL_URL}?${params}`, { signal: AbortSignal.timeout(15_000) });
-  if (!res.ok) throw new Error(`FEMA NFHL HTTP ${res.status}`);
-  const body = await res.json();
-  const a = (body?.features ?? [])[0]?.attributes as Record<string, string> | undefined;
-  if (!a?.FLD_ZONE) return null; // unmapped area → no determination (omit)
-  return { floodZone: a.FLD_ZONE, zoneSubtype: a.ZONE_SUBTY?.trim() || null, isSfha: a.SFHA_TF === "T" };
+  try {
+    const body = (await fetchJsonViaHttpsWithRetry(
+      `${FEMA_NFHL_URL}?${params}`,
+      15_000
+    )) as { features?: Array<{ attributes?: Record<string, string> }> };
+    const a = (body?.features ?? [])[0]?.attributes as Record<string, string> | undefined;
+    if (!a?.FLD_ZONE) {
+      writeFloodCache(lon, lat, null);
+      return null; // unmapped area → no determination (omit)
+    }
+    const result = {
+      floodZone: a.FLD_ZONE,
+      zoneSubtype: a.ZONE_SUBTY?.trim() || null,
+      isSfha: a.SFHA_TF === "T",
+    };
+    writeFloodCache(lon, lat, result);
+    return result;
+  } catch (error) {
+    const stale = floodLookupCache.get(floodCacheKey(lon, lat));
+    if (stale) {
+      return stale.value;
+    }
+    throw error;
+  }
 }
 
 export async function queryNationalRegister(lon: number, lat: number): Promise<HistoricFact | null> {

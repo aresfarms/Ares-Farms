@@ -148,6 +148,99 @@ export const HUBZONE_PLACE_FACT_ACTIVATION: PlaceFactActivationRecord = {
   snapshotRenderAllowed: true,
 };
 
+/**
+ * FEMA flood place-fact source — same governance posture: the frozen snapshot
+ * may render as a public government fact, while the live request-time lookup
+ * stays behind Module 22/23 approval.
+ */
+export const FEMA_FLOOD_PLACE_FACT_ACTIVATION: PlaceFactActivationRecord = {
+  sourceId: "fema-flood",
+  sourceName: "FEMA National Flood Hazard Layer",
+  module23: {
+    status: "PENDING_HUMAN_APPROVAL",
+    facts: [
+      "Source authority: FEMA National Flood Hazard Layer (NFHL), public ArcGIS service.",
+      "Output is an informational place-fact about the mapped flood-zone posture of the location, not a benefit, approval, or eligibility determination.",
+      "Public render must stay factual and constrained: flood-zone designation only, with provenance and as-of framing.",
+      "This is U.S. Government source material and is treated as public-domain reference data.",
+    ],
+    license: "Public domain (U.S. Government work) — FEMA NFHL",
+    attributionRequired:
+      'Display "Source: FEMA National Flood Hazard Layer" with the flood-zone fact and as-of date on every place-fact.',
+    reviewedBy: null,
+    reviewedAt: null,
+  },
+  module22: {
+    status: "PENDING_HUMAN_APPROVAL",
+    capabilityGated:
+      "Request-time live fetch to the FEMA NFHL flood zone layer. Gated until a human approves live activation.",
+    liveFetchAllowed: false,
+    reviewedBy: null,
+    reviewedAt: null,
+  },
+  snapshotRenderAllowed: true,
+};
+
+/**
+ * NPS National Register historic place-fact source — same pattern: snapshot can
+ * render, live request-time lookup remains governed by Module 22/23 approval.
+ */
+export const NPS_HISTORIC_PLACE_FACT_ACTIVATION: PlaceFactActivationRecord = {
+  sourceId: "nps-historic",
+  sourceName: "NPS National Register of Historic Places",
+  module23: {
+    status: "PENDING_HUMAN_APPROVAL",
+    facts: [
+      "Source authority: National Park Service National Register of Historic Places polygons.",
+      "Output is a property-side place-fact about whether the address falls within a National Register listed area, not a tax-credit approval or rehabilitation determination.",
+      "Public render must stay factual and constrained: listed-area status plus resource name when present, with provenance and as-of framing.",
+      "This is U.S. Government source material and is treated as public-domain reference data.",
+    ],
+    license: "Public domain (U.S. Government work) — NPS NRHP",
+    attributionRequired:
+      'Display "Source: NPS National Register of Historic Places" with the historic place-fact and as-of date on every place-fact.',
+    reviewedBy: null,
+    reviewedAt: null,
+  },
+  module22: {
+    status: "PENDING_HUMAN_APPROVAL",
+    capabilityGated:
+      "Request-time live fetch to the NPS National Register polygon layer. Gated until a human approves live activation.",
+    liveFetchAllowed: false,
+    reviewedBy: null,
+    reviewedAt: null,
+  },
+  snapshotRenderAllowed: true,
+};
+
+export const NMTC_PLACE_FACT_ACTIVATION: PlaceFactActivationRecord = {
+  sourceId: "cdfi-nmtc",
+  sourceName: "CDFI Fund NMTC Qualified Tracts",
+  module23: {
+    status: "PENDING_HUMAN_APPROVAL",
+    facts: [
+      "Source authority: CDFI Fund / U.S. Treasury NMTC Qualified Tracts layer (IRC §45D low-income community qualification).",
+      "Output is a tract-level place-fact about whether the verified Census tract is NMTC-qualified, not an allocation, underwriting, or investor approval.",
+      "Public render must stay factual and constrained: tract qualification status plus tract id and as-of framing.",
+      "This is U.S. Government source material and is treated as public-domain reference data.",
+    ],
+    license: "Public domain (U.S. Government data) — CDFI Fund NMTC Qualified Tracts",
+    attributionRequired:
+      'Display "Source: CDFI Fund / U.S. Treasury NMTC Qualified Tracts" with the tract id and as-of date on every place-fact.',
+    reviewedBy: null,
+    reviewedAt: null,
+  },
+  module22: {
+    status: "PENDING_HUMAN_APPROVAL",
+    capabilityGated:
+      "Request-time live fetch to the CDFI Fund NMTC Qualified Tracts source using the verified Census tract. Gated until a human approves live activation.",
+    liveFetchAllowed: false,
+    reviewedBy: null,
+    reviewedAt: null,
+  },
+  snapshotRenderAllowed: true,
+};
+
 /** True only when BOTH modules are APPROVED — the gate for the HUBZone live fetch. */
 export function isHubzoneLiveFetchActivated(): boolean {
   const r = HUBZONE_PLACE_FACT_ACTIVATION;
@@ -192,6 +285,9 @@ export function isOzSnapshotRenderAllowed(): boolean {
 export const PLACE_FACT_ACTIVATIONS: Record<string, PlaceFactActivationRecord> = {
   "hud-opportunity-zones": OZ_PLACE_FACT_ACTIVATION,
   "sba-hubzone": HUBZONE_PLACE_FACT_ACTIVATION,
+  "fema-flood": FEMA_FLOOD_PLACE_FACT_ACTIVATION,
+  "nps-historic": NPS_HISTORIC_PLACE_FACT_ACTIVATION,
+  "cdfi-nmtc": NMTC_PLACE_FACT_ACTIVATION,
 };
 
 export const PLACE_FACT_SOURCE_IDS = Object.keys(PLACE_FACT_ACTIVATIONS);

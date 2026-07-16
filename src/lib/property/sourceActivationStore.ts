@@ -16,9 +16,10 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import { appendAuditEvent } from "./auditLedger";
+import { runtimeStatePath } from "./runtimeStatePath";
 import { SOURCE_ACTIVATION, type ReviewStatus } from "./sourceActivation";
 
-const STATE_PATH = path.join(process.cwd(), "data", "source-activation-state.json");
+const STATE_PATH = runtimeStatePath("source-activation-state.json");
 
 export type ReviewDecision = "APPROVE" | "REJECT" | "HOLD";
 

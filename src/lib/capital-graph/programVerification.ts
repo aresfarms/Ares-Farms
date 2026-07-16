@@ -31,6 +31,8 @@ export interface VerifiedPlaceFacts {
   propertyId?: string | null; // for the ledger only — never rendered
   ozTractId?: string | null; // 11-digit GEOID when the tract IS designated
   ozAsOf?: string | null;
+  nmtcTractId?: string | null;
+  nmtcAsOf?: string | null;
   hubzone?: {
     hubzoneType: string;
     geoid: string;
@@ -39,6 +41,10 @@ export interface VerifiedPlaceFacts {
     isCurrent: boolean;
   } | null;
   hubzoneAsOf?: string | null;
+  historic?: {
+    historicName: string | null;
+  } | null;
+  historicAsOf?: string | null;
 }
 
 export interface VerifiedProgramMatch {
@@ -126,6 +132,55 @@ export function verifyPropertyPrograms(facts: VerifiedPlaceFacts, now: Date = ne
           program_id: entry.program_id,
           result: hz && !hz.isCurrent ? "omitted:designation-expired" : "omitted:no-positive-determination",
         });
+      }
+      continue;
+    }
+
+    if (entry.program_id === "fed-nmtc") {
+      const tract = (facts.nmtcTractId ?? "").trim();
+      if (/^\d{11}$/.test(tract)) {
+        const asOf = facts.nmtcAsOf ?? now.toISOString().slice(0, 10);
+        out.push({
+          program_id: entry.program_id,
+          name: entry.name,
+          administering_body: entry.administering_body,
+          verifiedStatement: lockedStatement(`NMTC-qualified low-income community tract #${tract}`, asOf),
+          basis: `census tract ${tract} is qualified in the current NMTC low-income community tract dataset · as of ${asOf}`,
+          personSideCaveat: PERSON_SIDE_CAVEAT,
+          source_citation: entry.source_citation,
+          asOf,
+        });
+        checked.push({ program_id: entry.program_id, result: `verified:tract=${tract}` });
+      } else {
+        checked.push({ program_id: entry.program_id, result: "omitted:no-positive-determination" });
+      }
+      continue;
+    }
+
+    if (entry.program_id === "fed-historic") {
+      const historic = facts.historic;
+      if (historic) {
+        const asOf = facts.historicAsOf ?? now.toISOString().slice(0, 10);
+        out.push({
+          program_id: entry.program_id,
+          name: entry.name,
+          administering_body: entry.administering_body,
+          verifiedStatement: lockedStatement(
+            historic.historicName
+              ? `National Register area — ${historic.historicName}`
+              : "National Register listed area",
+            asOf,
+          ),
+          basis: historic.historicName
+            ? `location falls within National Register listed area "${historic.historicName}" · as of ${asOf}`
+            : `location falls within a National Register listed area · as of ${asOf}`,
+          personSideCaveat: PERSON_SIDE_CAVEAT,
+          source_citation: entry.source_citation,
+          asOf,
+        });
+        checked.push({ program_id: entry.program_id, result: "verified:national-register-area" });
+      } else {
+        checked.push({ program_id: entry.program_id, result: "omitted:no-positive-determination" });
       }
       continue;
     }

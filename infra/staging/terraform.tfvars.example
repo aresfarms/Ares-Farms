@@ -21,3 +21,24 @@ transaction_log_retention_days = 7
 # Leave false for Direct private-IP PostgreSQL with a normal connection string.
 # Set true ONLY if you adopt the Cloud SQL Auth Proxy / connectors.
 grant_cloudsql_client = false
+
+# --- Automatic approved-source refresh ---
+# Keeps the homepage/property inventory current without weekly manual refreshes.
+enable_source_refresh_scheduler = true
+source_refresh_schedule         = "0 9 * * *"
+source_refresh_time_zone        = "Etc/UTC"
+
+# --- Runtime privilege verification gate ---
+verify_runtime_job_timeout_seconds = 300
+
+# --- API perimeter hardening ---
+api_auth_enforcement       = "required"
+rate_limiting_enabled      = true
+api_rate_limit_window_seconds = 60
+api_rate_limit_max            = 120
+
+# --- Security observability / forensics ---
+enable_security_observability      = true
+forensics_retention_days           = 400
+security_alert_notification_channels = []
+expected_secret_reader_emails        = ["chudson@aresfarmsinc.com"]

@@ -26,12 +26,13 @@ import {
  *
  * Runs as the MIGRATOR principal (MIGRATOR_DATABASE_URL). In a single
  * transaction it:
- *   1. GRANTs the runtime role CONNECT + USAGE + SELECT/INSERT/UPDATE/DELETE on
+ *   1. Reasserts the migrator as owner of the database and `public` schema.
+ *   2. GRANTs the runtime role CONNECT + USAGE + SELECT/INSERT/UPDATE/DELETE on
  *      tables + USAGE/SELECT on sequences in `public`.
- *   2. Sets ALTER DEFAULT PRIVILEGES so FUTURE migrator-created objects are
+ *   3. Sets ALTER DEFAULT PRIVILEGES so FUTURE migrator-created objects are
  *      automatically usable by the runtime role.
- *   3. REVOKEs CREATE on `public` from the runtime role (no DDL, ever).
- *   4. Verifies the runtime role OWNS NO objects in `public` (owner = migrator).
+ *   4. REVOKEs CREATE on `public` from PUBLIC + the runtime role (no DDL, ever).
+ *   5. Verifies the runtime role OWNS NO objects in `public` (owner = migrator).
  * Any failure rolls back and exits non-zero (Cloud Run Job exit-code honesty).
  *
  * NOTE ON CREDENTIALS: this step REQUIRES MIGRATOR_DATABASE_URL. `migrate:schema`

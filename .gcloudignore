@@ -27,7 +27,6 @@ dist
 coverage
 *.log
 
-# Infra + docs (not needed in the image build context)
+# Infra (not needed in the image build context)
 infra
 artifacts
-docs

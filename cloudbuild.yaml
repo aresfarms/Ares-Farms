@@ -5,7 +5,7 @@
 # Artifact Registry. Run from the repo root (the owner machine has no local
 # Docker; Cloud Build is the P2.1 build path):
 #
-#   gcloud builds submit --config cloudbuild.yaml --project furlong-staging .
+#   gcloud builds submit --config cloudbuild.yaml --project furlong-staging-499102 .
 #
 # The upload tarball honors .gcloudignore (gcloud does NOT read .dockerignore),
 # so `.env*` and the prebuilt `.next` NEVER leave the laptop; inside Cloud
@@ -15,7 +15,7 @@
 # AFTER the build, record the pushed DIGESTS (P2.1 — Terraform pins by digest,
 # never tag):
 #   gcloud artifacts docker images describe \
-#     us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-core:p2 \
+#     us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core:p2 \
 #     --format 'value(image_summary.digest)'
 #   (same for furlong-db-migrate:p2)
 # Then set core_image / migrator_image in terraform.tfvars using
@@ -23,8 +23,7 @@
 # =============================================================================
 
 substitutions:
-  _REGION: us-central1
-  _REPO: us-central1-docker.pkg.dev/furlong-staging/furlong
+  _REPO: us-central1-docker.pkg.dev/furlong-staging-499102/furlong
 
 steps:
   # Runtime image (default final stage: runner)

@@ -75,3 +75,77 @@ resource "google_cloud_run_v2_job" "db_migrate" {
     google_secret_manager_secret_iam_member.migrator_database_url,
   ]
 }
+
+# =============================================================================
+# infra/staging — runtime privilege verification Job (gate P1.6)
+#
+# Proves the live authority split from inside the VPC:
+#   * runs AS the runtime principal (furlong-core-runtime@)
+#   * reuses the migrator image because it contains tsx + src/scripts
+#   * reads only the runtime connection secret
+#   * executes `verify:runtime-privileges`, which must prove:
+#       - runtime can perform governed DML
+#       - runtime cannot perform DDL
+#       - runtime owns no objects
+#   * invoked MANUALLY as a gate, never on service boot
+# =============================================================================
+
+resource "google_cloud_run_v2_job" "runtime_verify" {
+  count = var.migrator_image == "" ? 0 : 1
+
+  name     = "furlong-runtime-verify"
+  project  = var.project_id
+  location = var.region
+  labels   = var.labels
+
+  deletion_protection = false
+
+  template {
+    task_count  = 1
+    parallelism = 1
+
+    template {
+      service_account = google_service_account.core_runtime.email
+
+      execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
+
+      max_retries = 0
+      timeout     = "${var.verify_runtime_job_timeout_seconds}s"
+
+      vpc_access {
+        egress = "PRIVATE_RANGES_ONLY"
+        network_interfaces {
+          network    = google_compute_network.vpc.id
+          subnetwork = google_compute_subnetwork.egress.id
+        }
+      }
+
+      containers {
+        image   = var.migrator_image
+        command = ["npm"]
+        args    = ["run", "verify:runtime-privileges"]
+
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "1Gi"
+          }
+        }
+
+        env {
+          name = "DATABASE_URL"
+          value_source {
+            secret_key_ref {
+              secret  = google_secret_manager_secret.app["DATABASE_URL"].secret_id
+              version = "latest"
+            }
+          }
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    google_secret_manager_secret_iam_member.runtime_database_url,
+  ]
+}

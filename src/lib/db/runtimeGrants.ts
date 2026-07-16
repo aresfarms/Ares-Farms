@@ -19,9 +19,10 @@ import type { PoolClient } from "pg";
  *   migrator (owner)  -> owns schema + migration metadata; runs DDL.
  *   runtime           -> SELECT/INSERT/UPDATE/DELETE on tables + USAGE/SELECT on
  *                        sequences ONLY. No CREATE, no ALTER, no DROP, no
- *                        ownership. PostgreSQL 15+ already removes CREATE on the
- *                        `public` schema from PUBLIC, so the runtime role cannot
- *                        create objects unless explicitly granted (we never do).
+ *                        ownership. Some PostgreSQL estates still retain CREATE
+ *                        on the `public` schema for PUBLIC, so the hardening step
+ *                        explicitly revokes it from both PUBLIC and the runtime
+ *                        role to remove inherited DDL paths.
  *
  * IMPORTANT SCHEMA NOTE: the canonical schema lives in the DEFAULT `public`
  * schema (there is no `app` schema in this build — verified against the
@@ -66,11 +67,11 @@ export interface RuntimeGrantConfig {
 }
 
 /**
- * Build the ordered, idempotent grant statements that make the runtime role a
- * least-privilege DML principal and set default privileges so objects created
- * by FUTURE migrations are automatically usable by the runtime role without a
- * re-grant. All statements are idempotent (GRANT/ALTER DEFAULT PRIVILEGES are
- * safe to re-run).
+ * Build the ordered hardening statements that make the runtime role a
+ * least-privilege DML principal and ensure the migrator remains the owning
+ * authority. The GRANT / ALTER DEFAULT PRIVILEGES / REVOKE statements are
+ * idempotent; the ALTER OWNER statements are convergent and simply reassert the
+ * required owner when drift occurred.
  */
 export function buildRuntimeGrantStatements(
   config: RuntimeGrantConfig
@@ -81,6 +82,8 @@ export function buildRuntimeGrantStatements(
   const schema = quoteIdent(RUNTIME_GRANT_SCHEMA, "schema name");
 
   return [
+    `ALTER DATABASE ${db} OWNER TO ${migrator};`,
+    `ALTER SCHEMA ${schema} OWNER TO ${migrator};`,
     `GRANT CONNECT ON DATABASE ${db} TO ${runtime};`,
     `GRANT USAGE ON SCHEMA ${schema} TO ${runtime};`,
     `GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA ${schema} TO ${runtime};`,
@@ -89,10 +92,11 @@ export function buildRuntimeGrantStatements(
       `GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${runtime};`,
     `ALTER DEFAULT PRIVILEGES FOR ROLE ${migrator} IN SCHEMA ${schema} ` +
       `GRANT USAGE, SELECT ON SEQUENCES TO ${runtime};`,
-    // Belt-and-suspenders: PostgreSQL 15+ already removes CREATE on `public`
-    // from PUBLIC, but we REVOKE it explicitly from the runtime role so the
-    // serving principal can NEVER create objects, regardless of server version
-    // or prior grants. This is what makes DDL structurally impossible for it.
+    // Belt-and-suspenders: some estates still expose CREATE on `public` to
+    // PUBLIC, so remove that inherited path first, then revoke directly from
+    // the runtime role as well. This makes DDL structurally impossible for the
+    // serving principal regardless of server version or prior grants.
+    `REVOKE CREATE ON SCHEMA ${schema} FROM PUBLIC;`,
     `REVOKE CREATE ON SCHEMA ${schema} FROM ${runtime};`,
   ];
 }

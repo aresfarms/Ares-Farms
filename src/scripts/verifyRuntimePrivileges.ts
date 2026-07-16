@@ -69,6 +69,10 @@ function resolveConnection(): { connectionString: string; source: string } {
   );
 }
 
+function resolveMigratorRole(): string {
+  return process.env.MIGRATOR_DB_ROLE ?? "furlong_migrator";
+}
+
 async function boolCheck(
   client: PoolClient,
   sql: string,
@@ -100,6 +104,7 @@ async function main(): Promise<void> {
   const startedAtUtc = new Date().toISOString();
   const checks: Check[] = [];
   const schema = RUNTIME_GRANT_SCHEMA;
+  const migratorRole = resolveMigratorRole();
 
   try {
     const whoRes = await client.query<{
@@ -108,6 +113,18 @@ async function main(): Promise<void> {
     }>("select current_user, current_database()");
     const runtimeRole = whoRes.rows[0]?.current_user ?? "unknown";
     const databaseName = whoRes.rows[0]?.current_database ?? "unknown";
+
+    const schemaOwner = await client.query<{ owner: string }>(
+      "select pg_get_userbyid(nspowner) as owner from pg_namespace where nspname = $1",
+      [schema]
+    );
+    checks.push({
+      name: "schema public owned by migrator",
+      category: "ownership",
+      expected: migratorRole,
+      actual: schemaOwner.rows[0]?.owner ?? "unknown",
+      pass: (schemaOwner.rows[0]?.owner ?? "unknown") === migratorRole,
+    });
 
     // --- OWNERSHIP: runtime owns nothing in public ---------------------------
     const owned = await client.query<{ object_name: string }>(
@@ -251,6 +268,7 @@ async function main(): Promise<void> {
       credentialSource: source,
       databaseName,
       runtimeRole,
+      migratorRole,
       schema,
       totalChecks: checks.length,
       failedChecks: failed.length,

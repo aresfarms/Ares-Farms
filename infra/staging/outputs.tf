@@ -87,7 +87,42 @@ output "db_migrate_job_name" {
   value       = try(google_cloud_run_v2_job.db_migrate[0].name, null)
 }
 
+output "runtime_verify_job_name" {
+  description = "Runtime privilege verification Job name. Execute manually to close gate P1.6."
+  value       = try(google_cloud_run_v2_job.runtime_verify[0].name, null)
+}
+
 output "p2_invoker_principals" {
   description = "Every service-level roles/run.invoker member (deployment-manifest field p2InvokerPrincipals)."
   value       = var.invoker_principals
+}
+
+output "runtime_state_bucket" {
+  description = "Shared runtime-state bucket backing source activation + property-live refresh overlays."
+  value       = google_storage_bucket.runtime_state.name
+}
+
+output "source_refresh_scheduler_sa_email" {
+  description = "Service account email used by Cloud Scheduler to invoke the private source refresh route."
+  value       = google_service_account.source_refresh_scheduler.email
+}
+
+output "source_refresh_scheduler_job_name" {
+  description = "Cloud Scheduler job name for automatic approved-source refreshes."
+  value       = try(google_cloud_scheduler_job.source_refresh[0].name, null)
+}
+
+output "forensics_runtime_bucket_id" {
+  description = "Cloud Logging bucket id receiving runtime forensic exports."
+  value       = try(google_logging_project_bucket_config.forensics_runtime[0].bucket_id, null)
+}
+
+output "forensics_api_bucket_name" {
+  description = "GCS bucket receiving API perimeter forensic exports."
+  value       = try(google_storage_bucket.forensics_api_logs[0].name, null)
+}
+
+output "forensics_deployment_bucket_name" {
+  description = "GCS bucket receiving deployment-event forensic exports."
+  value       = try(google_storage_bucket.forensics_deployment_events[0].name, null)
 }

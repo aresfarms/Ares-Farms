@@ -53,6 +53,7 @@ const PROJECT = process.env.GCP_PROJECT ?? "furlong-staging-499102";
 const REGION = process.env.GCP_REGION ?? "us-central1";
 const SERVICE = process.env.SERVICE ?? "furlong-core";
 const JOB = process.env.JOB ?? "furlong-db-migrate";
+const VERIFY_JOB = process.env.VERIFY_JOB ?? "furlong-runtime-verify";
 
 interface Check {
   name: string;
@@ -111,6 +112,12 @@ async function main(): Promise<void> {
   const lastExecution = executions[0];
   const migrationJobExecution = lastExecution?.metadata?.name ?? "NONE";
 
+  const verifyExecutions = JSON.parse(
+    gcloud(["run", "jobs", "executions", "list", "--job", VERIFY_JOB, "--region", REGION, "--limit", "1", "--format", "json"])
+  ) as Array<{ metadata?: { name?: string }; status?: { succeededCount?: number; failedCount?: number } }>;
+  const lastVerifyExecution = verifyExecutions[0];
+  const runtimeVerifyExecution = lastVerifyExecution?.metadata?.name ?? "NONE";
+
   const bearer = sh("gcloud", ["auth", "print-identity-token"]);
 
   // ---- 2. P2.4 checks --------------------------------------------------------
@@ -158,6 +165,16 @@ async function main(): Promise<void> {
   // Migration job's latest execution succeeded (P2.2 already run).
   const jobOk = (lastExecution?.status?.succeededCount ?? 0) >= 1 && !(lastExecution?.status?.failedCount ?? 0);
   record("furlong-db-migrate latest execution SUCCEEDED", "succeeded", migrationJobExecution, jobOk);
+
+  const verifyJobOk =
+    (lastVerifyExecution?.status?.succeededCount ?? 0) >= 1 &&
+    !(lastVerifyExecution?.status?.failedCount ?? 0);
+  record(
+    "furlong-runtime-verify latest execution SUCCEEDED",
+    "succeeded",
+    runtimeVerifyExecution,
+    verifyJobOk
+  );
 
   // Strict-CSP hydration against the deployed URL (bearer forwarded).
   let cspPass = false;
@@ -209,6 +226,7 @@ async function main(): Promise<void> {
     terraformCommit,
     cloudRunRevision: revision,
     migrationJobExecution,
+    runtimeVerifyExecution,
     schemaVersion: canonicalTargetSchemaVersion(),
     p2InvokerPrincipals: invokerMembers,
     gateReportSha256: createHash("sha256").update(gateBytes).digest("hex"),

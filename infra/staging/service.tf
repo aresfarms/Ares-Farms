@@ -29,8 +29,23 @@ resource "google_cloud_run_v2_service" "core" {
   # Network-reachable; the invoker IAM check is the lock (see header).
   ingress = "INGRESS_TRAFFIC_ALL"
 
+  # Service-level floor across revisions. Cloud Run persists this separately
+  # from the revision template scaling block, so declare it explicitly to keep
+  # Terraform state aligned with the API response.
+  scaling {
+    min_instance_count = 0
+  }
+
   template {
     service_account = google_service_account.core_runtime.email
+
+    volumes {
+      name = "runtime-state"
+      gcs {
+        bucket    = google_storage_bucket.runtime_state.name
+        read_only = false
+      }
+    }
 
     # 2nd-generation execution environment — recommended for Direct VPC egress;
     # scales networking to zero with the workload (spec Rev 3 hardening).
@@ -95,6 +110,31 @@ resource "google_cloud_run_v2_service" "core" {
         value = tostring(var.secret_revision_epoch)
       }
 
+      env {
+        name  = "FURLONG_RUNTIME_STATE_DIR"
+        value = "/var/furlong-state"
+      }
+
+      env {
+        name  = "API_AUTH_ENFORCEMENT"
+        value = var.api_auth_enforcement
+      }
+
+      env {
+        name  = "RATE_LIMITING_ENABLED"
+        value = var.rate_limiting_enabled ? "true" : "false"
+      }
+
+      env {
+        name  = "API_RATE_LIMIT_WINDOW_SECONDS"
+        value = tostring(var.api_rate_limit_window_seconds)
+      }
+
+      env {
+        name  = "API_RATE_LIMIT_MAX"
+        value = tostring(var.api_rate_limit_max)
+      }
+
       dynamic "env" {
         for_each = var.nextauth_url == "" ? [] : [var.nextauth_url]
         content {
@@ -129,6 +169,11 @@ resource "google_cloud_run_v2_service" "core" {
         timeout_seconds   = 3
         failure_threshold = 3
       }
+
+      volume_mounts {
+        name       = "runtime-state"
+        mount_path = "/var/furlong-state"
+      }
     }
   }
 
@@ -137,6 +182,7 @@ resource "google_cloud_run_v2_service" "core" {
   depends_on = [
     google_secret_manager_secret_iam_member.runtime_database_url,
     google_secret_manager_secret_iam_member.runtime_nextauth_secret,
+    google_storage_bucket_iam_member.runtime_state_core_rw,
   ]
 }
 

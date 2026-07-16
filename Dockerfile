@@ -46,13 +46,13 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Defense in depth: even though .dockerignore keeps .env* out of the context,
+# assert the standalone bundle carries no env file before it can ever reach the
+# runtime stage. Fail the build loudly if one appears.
 RUN npm run build \
-    # Defense in depth: even though .dockerignore keeps .env* out of the
-    # context, assert the standalone bundle carries no env file before it can
-    # ever reach the runtime stage. Fail the build loudly if one appears.
-    && if ls .next/standalone/.env* >/dev/null 2>&1; then \
-         echo "FATAL: .env leaked into standalone output"; exit 1; \
-       fi
+ && if ls .next/standalone/.env* >/dev/null 2>&1; then \
+      echo "FATAL: .env leaked into standalone output"; exit 1; \
+    fi
 
 # -----------------------------------------------------------------------------
 # Stage 3 — migrator: the furlong-db-migrate Job image (STAGING-DEPLOY P2.2).

@@ -5,9 +5,9 @@
 # =============================================================================
 
 variable "project_id" {
-  description = "Existing GCP project id. Confirm it exists (do NOT recreate)."
+  description = "Existing GCP project id. Confirm it exists (do NOT recreate). NOTE: the bare 'furlong-staging' ID was taken globally — the real project is furlong-staging-499102 (display name 'furlong-staging')."
   type        = string
-  default     = "furlong-staging"
+  default     = "furlong-staging-499102"
 }
 
 variable "region" {
@@ -215,10 +215,82 @@ variable "core_memory" {
   default     = "1Gi"
 }
 
+variable "api_auth_enforcement" {
+  description = "API perimeter mode for the deployed Cloud Run service. `required` enforces the deny-by-default session wall."
+  type        = string
+  default     = "required"
+}
+
+variable "rate_limiting_enabled" {
+  description = "Enable API rate limiting at the perimeter proxy."
+  type        = bool
+  default     = true
+}
+
+variable "api_rate_limit_window_seconds" {
+  description = "Rate-limit window for the perimeter proxy."
+  type        = number
+  default     = 60
+}
+
+variable "api_rate_limit_max" {
+  description = "Max API requests per client+route within the perimeter rate-limit window."
+  type        = number
+  default     = 120
+}
+
 variable "migrate_job_timeout_seconds" {
   description = "Bounded task timeout for the furlong-db-migrate Job (spec P2.2)."
   type        = number
   default     = 900
+}
+
+variable "verify_runtime_job_timeout_seconds" {
+  description = "Bounded task timeout for the runtime privilege verification Job (gate P1.6)."
+  type        = number
+  default     = 300
+}
+
+variable "enable_source_refresh_scheduler" {
+  description = "Create the shared runtime-state bucket and daily Cloud Scheduler job that refreshes approved property sources automatically."
+  type        = bool
+  default     = true
+}
+
+variable "source_refresh_schedule" {
+  description = "Cron schedule for automatic approved-source property refreshes."
+  type        = string
+  default     = "0 9 * * *"
+}
+
+variable "source_refresh_time_zone" {
+  description = "Time zone for the automatic source refresh schedule."
+  type        = string
+  default     = "Etc/UTC"
+}
+
+variable "enable_security_observability" {
+  description = "Provision audit-log coverage, forensic export sinks, and baseline alert policies."
+  type        = bool
+  default     = true
+}
+
+variable "forensics_retention_days" {
+  description = "Retention window for forensic export destinations."
+  type        = number
+  default     = 400
+}
+
+variable "security_alert_notification_channels" {
+  description = "Monitoring notification channel resource names for security alerts. Empty keeps policies active but un-routed."
+  type        = list(string)
+  default     = []
+}
+
+variable "expected_secret_reader_emails" {
+  description = "Human principals allowed to read runtime secrets without triggering the unexpected-secret-access alert."
+  type        = list(string)
+  default     = ["chudson@aresfarmsinc.com"]
 }
 
 # ---- Labels -----------------------------------------------------------------

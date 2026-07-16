@@ -19,6 +19,15 @@ production baseline extends the same code.
   `NEXTAUTH_SECRET`) — **names only, no values**.
 - Two least-privilege service accounts (`furlong-core-runtime`,
   `furlong-db-migrator`) with secret access scoped to exactly what each needs.
+- One shared runtime-state bucket mounted into Cloud Run so source approvals and
+  refreshed property overlays persist outside ephemeral instance storage.
+- One Cloud Scheduler job that invokes the IAM-private source-refresh route
+  daily so approved property sources keep flowing onto the homepage map without
+  weekly manual refresh work.
+- Baseline security observability: Data Access audit-log coverage for Secret
+  Manager / Cloud SQL Admin / Cloud Run, retained forensic export sinks, and a
+  minimum viable alert set for edge 403s, app 5xxs, SQL auth failures,
+  privileged-job failures, and unexpected secret reads.
 
 ## What Terraform NEVER does (by design)
 - **Never** creates database users, passwords, or grants.
@@ -140,12 +149,35 @@ a Stage-1 apply with no images creates no Cloud Run resources.
    gcloud run jobs execute furlong-db-migrate --region us-central1 --wait
    ```
    Success = exit 0 + "Runtime grants applied" in the execution logs. This is
-   also **gate P1.6's first half**; then run `verify:runtime-privileges` (as the
-   runtime principal, from inside the VPC or a Job variant) for the proof.
-4. **NEXTAUTH_URL back-fill**: the run.app URL exists only after the first
+   also **gate P1.6's first half**.
+4. **Gate P1.6 — run the runtime privilege proof Job manually**:
+   ```bash
+   gcloud run jobs execute furlong-runtime-verify --region us-central1 --wait
+   ```
+   Success = exit 0 + JSON `outcome: "PASS"` from `verify:runtime-privileges`,
+   proving the runtime principal can perform governed DML, cannot perform DDL,
+   and owns no objects in `public`.
+5. **NEXTAUTH_URL back-fill**: the run.app URL exists only after the first
    deploy. Read `terraform output core_service_uri`, set `nextauth_url` in
    terraform.tfvars, re-apply (mints one new revision).
-5. **P2.4 + P2.5 — verify and emit the manifest (ONE command)**, from the repo
+6. **Automatic approved-source refresh is now part of the deploy**.
+   Terraform creates:
+   - a shared runtime-state bucket mounted at `/var/furlong-state`
+   - a Cloud Scheduler job that calls `POST /api/internal/source-refresh`
+     through Cloud Run IAM
+   This keeps refreshed properties flowing into the shared overlay and onto the
+   homepage map without weekly manual intervention, as long as the source itself
+   was already approved once.
+7. **Security hardening defaults now deploy with the service**.
+   Stage-2 apply also sets:
+   - `API_AUTH_ENFORCEMENT=required`
+   - `RATE_LIMITING_ENABLED=true`
+   - perimeter rate-limit window/max values
+   - audit-log coverage + baseline alerts + forensic sinks
+   The `/api/internal/source-refresh` route remains callable because it is
+   explicitly allowlisted in the proxy and still relies on Cloud Run IAM and the
+   route-local token/bearer check.
+8. **P2.4 + P2.5 — verify and emit the manifest (ONE command)**, from the repo
    root, authenticated as an invoker principal:
    ```bash
    npm run deploy:verify-manifest
@@ -172,9 +204,13 @@ a Stage-1 apply with no images creates no Cloud Run resources.
 revision so `latest` is re-resolved (spec P2.3 mechanism).
 
 ## What's next (not in this module)
-- **Gate P1.6** — `migrate:schema` Job run (as migrator) +
-  `verify:runtime-privileges` (as runtime) against this instance proves the
-  DML-only authority split.
+- **Gate P1.6** — now has a dedicated in-VPC Job:
+  `furlong-runtime-verify` runs `verify:runtime-privileges` as the runtime
+  principal against this instance to prove the DML-only authority split.
+- **Default VPC cleanup** — staged separately in
+  `infra/staging/DEFAULT_VPC_DELETION_RUNBOOK.md`; keep it as a deliberate
+  manual step because deleting the Google-created default network is
+  destructive.
 - **P3** — direct IAP on the service + tester grants. **URL not shared before P3.**
 
 ## Cost note — PITR

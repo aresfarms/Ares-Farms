@@ -85,6 +85,33 @@ Core "wouldn't know to ask" block (every property):
 |---|---|---|
 | Is the area safe? | County/agency-level reported-crime trends + link to official dashboards; NO scores/maps | FBI CDE, state repository (BUILD, **LEGAL-FHA-001 gate**) |
 | Do tracked offenders live nearby? | "Check the official registry" deep-link (user-run, official site); we never display results | NSOPW.gov + state registry (LINK-ONLY, counsel-reviewed wording) |
+
+**FOUNDER DECISION (Caitlin, 2026-07-15) — crime + offender routing:**
+- **Free tier (DECIDED):** both items render as one-click deep-links routed from the brief — the
+  official crime dashboard(s) and the official registry search — so the CUSTOMER runs the lookup
+  on the official site and makes their own decision. Furlong produces nothing, stores nothing,
+  displays nothing. This ships without waiting on the aggregate-count question below (link wording
+  still passes through LEGAL-FHA-001).
+- **Paid tiers (OPEN — counsel question):** Caitlin's working hypothesis: generalized aggregates
+  ("25 registered X within 5 miles") are probably defensible, while any identification ("Joe S
+  lives at 123 Main St, four doors away") is clearly out. **Session counterpoint recorded for
+  counsel:** the two data classes carry different risk even when aggregated —
+  1. *Crime aggregates* (FBI CDE / state UCR) are public-domain federal data with no use
+     restrictions: county-level counts in a paid report are LOW risk.
+  2. *Offender-registry aggregates* are HIGH risk even without names: (a) producing the count
+     requires querying/geocoding registry data, and several state statutes prohibit "use" of
+     registry information — with **housing/accommodations among the specifically enumerated
+     prohibited purposes** (e.g., California Penal Code §290.46(l)) — a derived aggregate in a
+     property report is still "use in connection with housing"; (b) registry terms commonly bar
+     commercial redistribution, and a computed radius count is a derived redistribution; (c)
+     offender density correlates with protected-class geography, so a per-property count can
+     function as a steering proxy under fair-housing analysis regardless of anonymity.
+  - **Viable middle paths for counsel to weigh:** (i) licensed commercial registry data + a
+    state-by-state permitted-use matrix (only where statute allows housing-adjacent use); (ii) the
+    "worksheet pattern" — the paid report includes the official links, instructions, and a blank
+    section the customer fills from their own official search (customer produces it; we never
+    touch the data). Path (ii) is available immediately at zero legal risk.
+  - No offender-count feature is built, in any tier, before counsel signs a written determination.
 | Kid considerations | Playgrounds/parks within X mi, sidewalk presence, school walk distance, posted speed / road class | OSM/municipal GIS (BUILD), state DOT (BUILD) |
 | Pet considerations | Municipal animal ordinances (breed rules are code facts), dog parks, nearest vet | Municipal code (BUILD), OSM (BUILD) |
 | "Neighbor" reality — reframed | Lot size/density, owner-occupancy rate (tract-level Census fact), adjacent land uses, noise sources | Census ACS (BUILD), zoning/GIS (BUILD) |

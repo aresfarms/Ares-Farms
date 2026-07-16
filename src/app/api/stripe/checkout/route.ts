@@ -5,7 +5,11 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
 import { PLANS } from "@/lib/billing/plans";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
-import { stripe } from "@/lib/stripe/client";
+import {
+  assertStripeCheckoutAvailable,
+  stripe,
+  stripeConfiguredForLivePayments,
+} from "@/lib/stripe/client";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
@@ -349,6 +353,8 @@ export async function POST(req: Request) {
     const selected = PLANS[body.plan];
     const baseUrl = getBaseUrl();
     const tenantId = sessionUser.tenantId ?? "dev";
+    assertStripeCheckoutAvailable();
+    const livePaymentConnector = stripeConfiguredForLivePayments();
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -420,7 +426,7 @@ export async function POST(req: Request) {
       checkoutSessionCreated: true,
       webhookReceived: false,
       entitlementGranted: false,
-      paymentConnectorLiveMode: false,
+      paymentConnectorLiveMode: livePaymentConnector,
       stubSignatureVerification: false,
       regulatedDecisionImpactAllowed: false,
       humanReviewRequired: true,

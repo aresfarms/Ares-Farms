@@ -150,7 +150,7 @@ export function roleProvisioningMode(
 export function strongCredentialSharedSecret(
   env: AuthActivationEnvironment = process.env
 ): boolean {
-  return Boolean(env.AUTH_CREDENTIAL_SHARED_SECRET?.length >= 32);
+  return Boolean((env.AUTH_CREDENTIAL_SHARED_SECRET?.length ?? 0) >= 32);
 }
 
 export function credentialAllowlistConfigured(

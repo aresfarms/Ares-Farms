@@ -1,19 +1,34 @@
 import { NextResponse } from "next/server";
 
 import { refreshAllSources } from "@/lib/property/sourceRefresh";
+import {
+  missingRequiredSecretDetail,
+  readRequiredSecret,
+  secureCompare,
+} from "@/lib/security/requestGuards";
 
 function authorized(request: Request): boolean {
-  const configured = process.env.SOURCE_REFRESH_CRON_SECRET?.trim();
-  if (!configured) return true;
+  const configured = readRequiredSecret("SOURCE_REFRESH_CRON_SECRET");
+  if (!configured) return false;
   const provided =
     request.headers.get("x-source-refresh-secret") ??
     request.headers.get("x-api-key") ??
     request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ??
     "";
-  return provided.trim() === configured;
+  return provided.trim().length > 0 && secureCompare(provided.trim(), configured);
 }
 
 export async function POST(request: Request) {
+  if (!readRequiredSecret("SOURCE_REFRESH_CRON_SECRET")) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: missingRequiredSecretDetail("SOURCE_REFRESH_CRON_SECRET"),
+      },
+      { status: 503 }
+    );
+  }
+
   if (!authorized(request)) {
     return NextResponse.json(
       {

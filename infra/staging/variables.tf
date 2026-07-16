@@ -251,6 +251,12 @@ variable "verify_runtime_job_timeout_seconds" {
   default     = 300
 }
 
+variable "source_refresh_job_timeout_seconds" {
+  description = "Bounded task timeout for the automatic approved-source refresh Job."
+  type        = number
+  default     = 900
+}
+
 variable "enable_source_refresh_scheduler" {
   description = "Create the shared runtime-state bucket and daily Cloud Scheduler job that refreshes approved property sources automatically."
   type        = bool
@@ -287,10 +293,38 @@ variable "security_alert_notification_channels" {
   default     = []
 }
 
+variable "security_alert_email_addresses" {
+  description = "Email recipients to create as Monitoring notification channels for staging security alerts."
+  type        = list(string)
+  default     = ["chudson@aresfarmsinc.com"]
+}
+
 variable "expected_secret_reader_emails" {
   description = "Human principals allowed to read runtime secrets without triggering the unexpected-secret-access alert."
   type        = list(string)
   default     = ["chudson@aresfarmsinc.com"]
+}
+
+variable "enable_iap" {
+  description = "Enable Cloud Run direct IAP for the staging service."
+  type        = bool
+  default     = true
+}
+
+variable "iap_tester_principals" {
+  description = "Principals granted IAP access to the staging Cloud Run service."
+  type        = list(string)
+  default     = ["user:chudson@aresfarmsinc.com"]
+
+  validation {
+    condition = alltrue([
+      for p in var.iap_tester_principals :
+      startswith(p, "user:") &&
+      p != "allUsers" &&
+      p != "allAuthenticatedUsers"
+    ])
+    error_message = "iap_tester_principals must be explicitly named user: principals only; groups, domains, and broad public principals are not allowed."
+  }
 }
 
 # ---- Labels -----------------------------------------------------------------

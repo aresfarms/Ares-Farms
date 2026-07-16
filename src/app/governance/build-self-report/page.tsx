@@ -228,7 +228,7 @@ export default function BuildSelfReportPage() {
         auditSafe: true,
         federationScoped: true,
         conflictPreserving: true,
-      }) as BuildSelfReportResult,
+      }) as unknown as BuildSelfReportResult,
     [reviewerRole, commit, localInput.pendingRequirements]
   );
 

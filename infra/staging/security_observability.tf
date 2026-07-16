@@ -56,6 +56,14 @@ locals {
     ]
   )
 
+  sql_admin_failure_filter = join(
+    " AND ",
+    [
+      "protoPayload.serviceName=\"sqladmin.googleapis.com\"",
+      "protoPayload.status.code!=0",
+    ]
+  )
+
   privileged_job_failure_filter = join(
     " AND ",
     [
@@ -64,6 +72,32 @@ locals {
       "(severity>=ERROR OR textPayload:\"Container called exit(1).\")",
     ]
   )
+
+  source_refresh_failure_filter = join(
+    " AND ",
+    [
+      "resource.type=\"cloud_run_job\"",
+      "resource.labels.job_name=\"furlong-source-refresh\"",
+      "(severity>=ERROR OR textPayload:\"Container called exit(1).\" OR protoPayload.status.message:\"failed\")",
+    ]
+  )
+
+  provisioned_security_alert_channels = concat(
+    var.security_alert_notification_channels,
+    [for channel in google_monitoring_notification_channel.security_email : channel.name]
+  )
+}
+
+resource "google_monitoring_notification_channel" "security_email" {
+  for_each = var.enable_security_observability ? toset(var.security_alert_email_addresses) : toset([])
+
+  project      = var.project_id
+  display_name = "Furlong staging security email: ${each.value}"
+  type         = "email"
+  enabled      = true
+  labels = {
+    email_address = each.value
+  }
 }
 
 resource "google_project_iam_audit_config" "secretmanager" {
@@ -197,7 +231,7 @@ resource "google_monitoring_alert_policy" "edge_403_probe" {
   display_name          = "Furlong staging edge 403 probe activity"
   combiner              = "OR"
   enabled               = true
-  notification_channels = var.security_alert_notification_channels
+  notification_channels = local.provisioned_security_alert_channels
 
   conditions {
     display_name = "Cloud Run 403 response observed"
@@ -226,7 +260,7 @@ resource "google_monitoring_alert_policy" "app_5xx" {
   display_name          = "Furlong staging app 5xx responses"
   combiner              = "OR"
   enabled               = true
-  notification_channels = var.security_alert_notification_channels
+  notification_channels = local.provisioned_security_alert_channels
 
   conditions {
     display_name = "Cloud Run 5xx response observed"
@@ -255,7 +289,7 @@ resource "google_monitoring_alert_policy" "sql_auth_failure" {
   display_name          = "Furlong staging SQL authentication failure"
   combiner              = "OR"
   enabled               = true
-  notification_channels = var.security_alert_notification_channels
+  notification_channels = local.provisioned_security_alert_channels
 
   conditions {
     display_name = "Cloud SQL authentication failure observed"
@@ -277,6 +311,35 @@ resource "google_monitoring_alert_policy" "sql_auth_failure" {
   }
 }
 
+resource "google_monitoring_alert_policy" "sql_admin_failure" {
+  count = var.enable_security_observability ? 1 : 0
+
+  project               = var.project_id
+  display_name          = "Furlong staging Cloud SQL admin operation failure"
+  combiner              = "OR"
+  enabled               = true
+  notification_channels = local.provisioned_security_alert_channels
+
+  conditions {
+    display_name = "Cloud SQL admin operation failure observed"
+    condition_matched_log {
+      filter = local.sql_admin_failure_filter
+    }
+  }
+
+  documentation {
+    mime_type = "text/markdown"
+    content   = "A Cloud SQL admin operation failed. Review recent clone, restore, instance, backup, or settings operations for the staging database."
+  }
+
+  alert_strategy {
+    notification_rate_limit {
+      period = "300s"
+    }
+    auto_close = "1800s"
+  }
+}
+
 resource "google_monitoring_alert_policy" "privileged_job_failure" {
   count = var.enable_security_observability && var.migrator_image != "" ? 1 : 0
 
@@ -284,7 +347,7 @@ resource "google_monitoring_alert_policy" "privileged_job_failure" {
   display_name          = "Furlong staging privileged job failure"
   combiner              = "OR"
   enabled               = true
-  notification_channels = var.security_alert_notification_channels
+  notification_channels = local.provisioned_security_alert_channels
 
   conditions {
     display_name = "Migration or runtime verification job failure observed"
@@ -313,7 +376,7 @@ resource "google_monitoring_alert_policy" "unexpected_secret_access" {
   display_name          = "Furlong staging unexpected secret access"
   combiner              = "OR"
   enabled               = true
-  notification_channels = var.security_alert_notification_channels
+  notification_channels = local.provisioned_security_alert_channels
 
   conditions {
     display_name = "Unexpected Secret Manager access observed"
@@ -325,6 +388,35 @@ resource "google_monitoring_alert_policy" "unexpected_secret_access" {
   documentation {
     mime_type = "text/markdown"
     content   = "A Secret Manager read occurred from a principal outside the expected staging runtime, migrator, or operator set. Review immediately."
+  }
+
+  alert_strategy {
+    notification_rate_limit {
+      period = "300s"
+    }
+    auto_close = "1800s"
+  }
+}
+
+resource "google_monitoring_alert_policy" "source_refresh_failure" {
+  count = var.enable_security_observability && var.enable_source_refresh_scheduler && var.migrator_image != "" ? 1 : 0
+
+  project               = var.project_id
+  display_name          = "Furlong staging source refresh failure"
+  combiner              = "OR"
+  enabled               = true
+  notification_channels = local.provisioned_security_alert_channels
+
+  conditions {
+    display_name = "Approved-source refresh job failure observed"
+    condition_matched_log {
+      filter = local.source_refresh_failure_filter
+    }
+  }
+
+  documentation {
+    mime_type = "text/markdown"
+    content   = "The scheduled approved-source refresh job failed. Review the Cloud Run Job execution logs before the next map refresh window."
   }
 
   alert_strategy {

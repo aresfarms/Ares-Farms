@@ -25,19 +25,20 @@ data "google_project" "staging" {
 
 locals {
   required_services = [
-    "run.googleapis.com",               # Cloud Run (service + migrator Job, P2)
-    "cloudscheduler.googleapis.com",    # Cloud Scheduler (source refresh automation)
-    "sqladmin.googleapis.com",          # Cloud SQL Admin
-    "secretmanager.googleapis.com",     # Secret Manager
-    "logging.googleapis.com",           # Cloud Logging (audit + forensics)
-    "monitoring.googleapis.com",        # Cloud Monitoring (alerts)
-    "iap.googleapis.com",               # Identity-Aware Proxy (P3)
-    "artifactregistry.googleapis.com",  # Artifact Registry
-    "compute.googleapis.com",           # VPC, subnet, addresses
-    "storage.googleapis.com",           # Shared runtime state bucket
-    "vpcaccess.googleapis.com",         # VPC access (connector fallback if needed)
-    "servicenetworking.googleapis.com", # Private Services Access peering
-    "cloudbuild.googleapis.com",        # P2.1 image build (owner has no local Docker)
+    "run.googleapis.com",                  # Cloud Run (service + migrator Job, P2)
+    "cloudscheduler.googleapis.com",       # Cloud Scheduler (source refresh automation)
+    "sqladmin.googleapis.com",             # Cloud SQL Admin
+    "secretmanager.googleapis.com",        # Secret Manager
+    "logging.googleapis.com",              # Cloud Logging (audit + forensics)
+    "monitoring.googleapis.com",           # Cloud Monitoring (alerts)
+    "iap.googleapis.com",                  # Identity-Aware Proxy (P3)
+    "cloudresourcemanager.googleapis.com", # IAP policy inspection / management
+    "artifactregistry.googleapis.com",     # Artifact Registry
+    "compute.googleapis.com",              # VPC, subnet, addresses
+    "storage.googleapis.com",              # Shared runtime state bucket
+    "vpcaccess.googleapis.com",            # VPC access (connector fallback if needed)
+    "servicenetworking.googleapis.com",    # Private Services Access peering
+    "cloudbuild.googleapis.com",           # P2.1 image build (owner has no local Docker)
   ]
 }
 

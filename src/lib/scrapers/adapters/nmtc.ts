@@ -6,6 +6,8 @@
  * determination or allocation approval.
  */
 
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
+
 export const NMTC_URL =
   "https://services6.arcgis.com/BAJNi3EgCdtQ1BCG/arcgis/rest/services/NMTC_Qualified_Tracts_2020/FeatureServer/3/query";
 
@@ -29,7 +31,7 @@ export async function lookupNmtcQualifiedTract(tractId: string): Promise<NmtcFac
     f: "pjson",
   });
 
-  const res = await fetch(NMTC_URL, {
+  const res = await governedFetch(NMTC_URL, {
     method: "POST",
     headers: {
       Accept: "application/json",

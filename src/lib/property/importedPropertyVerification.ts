@@ -10,6 +10,7 @@ import {
 import { queryFloodZone, queryNationalRegister } from "@/lib/scrapers/adapters/femaHistoric";
 import { lookupHubzone } from "@/lib/scrapers/adapters/hubzone";
 import { lookupNmtcQualifiedTract } from "@/lib/scrapers/adapters/nmtc";
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
 
 export type ImportedVerificationRequest = {
   propertyId?: string | null;
@@ -160,7 +161,7 @@ async function geocodeFreeformAddress(
     format: "json",
   });
 
-  const res = await fetch(
+  const res = await governedFetch(
     `${CENSUS_GEOCODER_URL.replace("/address", "/onelineaddress")}?${params.toString()}`,
     {
       headers: { Accept: "application/json" },

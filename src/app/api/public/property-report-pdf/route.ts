@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { generatePropertyEvaluationPdf } from "@/lib/pdf/generatePropertyEvaluationPdf";
+import {
+  buildReportContextKey,
+  buildReportDigest,
+  verifyReportAttestation,
+} from "@/lib/security/reportAttestation";
+import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 
 type PropertyReportRequest = {
   fileName?: string;
+  token?: string;
   report: Parameters<typeof generatePropertyEvaluationPdf>[0];
 };
 
@@ -17,9 +24,40 @@ function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json().catch(() => ({}))) as Partial<PropertyReportRequest>;
+  const parsed = await readJsonBodyWithLimit<Partial<PropertyReportRequest>>(req, {
+    maxBytes: 256 * 1024,
+  });
+  if (!parsed.ok) {
+    return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
+  }
+
+  const body = parsed.body;
   if (!body.report || typeof body.report !== "object") {
     return NextResponse.json({ ok: false, error: "A report payload is required." }, { status: 400 });
+  }
+
+  if (!body.token || typeof body.token !== "string") {
+    return NextResponse.json(
+      { ok: false, error: "A short-lived report attestation token is required before export." },
+      { status: 401 }
+    );
+  }
+
+  const digest = buildReportDigest(body.report);
+  const contextKey = buildReportContextKey({
+    propertyId:
+      (body.report.context as { propertyId?: string | null } | undefined)?.propertyId ?? null,
+    exactAddress: body.report.context?.exactAddress ?? null,
+    title: body.report.context?.title ?? null,
+    tierId: body.report.tier?.id ?? null,
+  });
+  const tokenCheck = verifyReportAttestation({
+    token: body.token,
+    digest,
+    contextKey,
+  });
+  if (!tokenCheck.ok) {
+    return NextResponse.json({ ok: false, error: tokenCheck.error }, { status: 401 });
   }
 
   const screening = body.report.context;

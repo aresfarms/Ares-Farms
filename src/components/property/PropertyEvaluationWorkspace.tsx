@@ -342,7 +342,7 @@ function propertySpecificSummary(context: PropertyContext, facts: PropertyFactsR
   return lines;
 }
 
-function verificationTone(status: PropertyFactsResponse["verification"]["status"] | undefined) {
+function verificationTone(status: NonNullable<PropertyFactsResponse["verification"]>["status"] | undefined) {
   switch (status) {
     case "verified":
       return {
@@ -375,7 +375,7 @@ function verificationTone(status: PropertyFactsResponse["verification"]["status"
   }
 }
 
-function verificationStatusCopy(status: PropertyFactsResponse["verification"]["status"] | undefined): string {
+function verificationStatusCopy(status: NonNullable<PropertyFactsResponse["verification"]>["status"] | undefined): string {
   switch (status) {
     case "verified":
       return "Imported address verified against live public place-fact sources.";

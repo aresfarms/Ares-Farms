@@ -1377,7 +1377,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
                       </p>
                       <div className="tour-popup-cta-row">
                         <a
-                          href={possibleAnalyzeHref}
+                          href={possibleAnalyzeHref ?? undefined}
                           className="tour-popup-cta tour-popup-cta-primary"
                         >
                           Analyze through Furlong

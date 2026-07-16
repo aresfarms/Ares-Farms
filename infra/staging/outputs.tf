@@ -112,6 +112,11 @@ output "source_refresh_scheduler_job_name" {
   value       = try(google_cloud_scheduler_job.source_refresh[0].name, null)
 }
 
+output "source_refresh_run_job_name" {
+  description = "Cloud Run Job name used by Cloud Scheduler for approved-source refreshes."
+  value       = try(google_cloud_run_v2_job.source_refresh[0].name, null)
+}
+
 output "forensics_runtime_bucket_id" {
   description = "Cloud Logging bucket id receiving runtime forensic exports."
   value       = try(google_logging_project_bucket_config.forensics_runtime[0].bucket_id, null)
@@ -125,4 +130,9 @@ output "forensics_api_bucket_name" {
 output "forensics_deployment_bucket_name" {
   description = "GCS bucket receiving deployment-event forensic exports."
   value       = try(google_storage_bucket.forensics_deployment_events[0].name, null)
+}
+
+output "security_alert_notification_channel_names" {
+  description = "Monitoring notification channel resource names attached to staging security alerts."
+  value       = [for channel in google_monitoring_notification_channel.security_email : channel.name]
 }

@@ -28,6 +28,14 @@ enable_source_refresh_scheduler = true
 source_refresh_schedule         = "0 9 * * *"
 source_refresh_time_zone        = "Etc/UTC"
 
+# --- Security observability / alert routing ---
+security_alert_email_addresses      = ["chudson@aresfarmsinc.com"]
+security_alert_notification_channels = []
+
+# --- IAP / tester access ---
+enable_iap            = true
+iap_tester_principals = ["user:chudson@aresfarmsinc.com"]
+
 # --- Runtime privilege verification gate ---
 verify_runtime_job_timeout_seconds = 300
 

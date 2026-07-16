@@ -26,6 +26,7 @@ import {
   type ExploreDetailProperty,
 } from "@/lib/property/propertyTypes";
 import { sanitizeIngestText } from "@/lib/security/ingestSanitizer";
+import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 
 type ImportRequest = {
   mode?: "paste" | "image";
@@ -304,7 +305,14 @@ async function extractFromImage(input: {
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json().catch(() => ({}))) as ImportRequest;
+  const parsed = await readJsonBodyWithLimit<ImportRequest>(req, {
+    maxBytes: 18 * 1024 * 1024,
+  });
+  if (!parsed.ok) {
+    return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
+  }
+
+  const body = parsed.body;
   const mode = body.mode === "image" ? "image" : "paste";
   const rawInput = sanitizeIngestText(body.rawInput, 1000);
   const notes = sanitizeIngestText(body.notes, 1000);

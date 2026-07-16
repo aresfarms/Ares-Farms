@@ -196,3 +196,49 @@ resource "google_cloud_run_v2_service_iam_member" "invokers" {
   role     = "roles/run.invoker"
   member   = each.value
 }
+
+resource "google_cloud_run_v2_service_iam_member" "iap_invoker" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.core[0].name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:service-${data.google_project.staging.number}@gcp-sa-iap.iam.gserviceaccount.com"
+}
+
+resource "terraform_data" "enable_iap" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  triggers_replace = {
+    project = var.project_id
+    region  = var.region
+    service = google_cloud_run_v2_service.core[0].name
+    mode    = "enabled"
+  }
+
+  lifecycle {
+    replace_triggered_by = [google_cloud_run_v2_service.core]
+  }
+
+  provisioner "local-exec" {
+    command = "gcloud run services update ${self.triggers_replace.service} --project ${self.triggers_replace.project} --region ${self.triggers_replace.region} --iap --quiet"
+  }
+
+  depends_on = [
+    google_cloud_run_v2_service.core,
+    google_cloud_run_v2_service_iam_member.iap_invoker,
+  ]
+}
+
+resource "google_iap_web_cloud_run_service_iam_member" "testers" {
+  for_each = var.core_image == "" || !var.enable_iap ? toset([]) : toset(var.iap_tester_principals)
+
+  project                = var.project_id
+  location               = var.region
+  cloud_run_service_name = google_cloud_run_v2_service.core[0].name
+  role                   = "roles/iap.httpsResourceAccessor"
+  member                 = each.value
+
+  depends_on = [terraform_data.enable_iap]
+}

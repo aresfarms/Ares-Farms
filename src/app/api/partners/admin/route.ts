@@ -121,7 +121,7 @@ function scopeRequired(query: PartnerAdminQuery): boolean {
 }
 
 function normalizedPartnerType(value?: string | null): string | null {
-  return normalizeText(value)?.toUpperCase() ?? null;
+  return normalizeText(value ?? null)?.toUpperCase() ?? null;
 }
 
 function rolePartnerAllowed(role: string, partnerType?: string | null): boolean {

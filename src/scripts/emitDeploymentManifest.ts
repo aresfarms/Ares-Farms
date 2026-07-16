@@ -36,10 +36,11 @@ import { canonicalTargetSchemaVersion } from "@/lib/db/canonicalGovernanceMigrat
  *      manifest is never emitted for a red deploy.
  *
  * Posture constants (combinedProductionReady=false, openBlockers=10,
- * piiPermitted=false, financingEnabled=false, dnsCutoverAuthorized=false,
- * iapEnabled=false for P2) are hard-coded HERE so they cannot be hand-edited
- * per-run; anonymousInvocationAllowed is DERIVED (edge probe + IAM scan) and
- * the run fails if it derives true. dataSeedStatus stays NOT_LOADED until P4.
+ * piiPermitted=false, financingEnabled=false, dnsCutoverAuthorized=false)
+ * are hard-coded HERE so they cannot be hand-edited per-run; iapEnabled and
+ * anonymousInvocationAllowed are DERIVED from the deployed environment and the
+ * run fails if the anonymous edge posture is open. dataSeedStatus stays
+ * NOT_LOADED until P4.
  *
  * Usage (after the Stage-2 apply):
  *   npm run deploy:verify-manifest
@@ -98,6 +99,8 @@ async function main(): Promise<void> {
   const revision = gcloud(["run", "services", "describe", SERVICE, "--region", REGION, "--format", "value(status.latestReadyRevisionName)"]);
   const image = gcloud(["run", "services", "describe", SERVICE, "--region", REGION, "--format", "value(spec.template.spec.containers[0].image)"]);
   const imageDigest = image.includes("@") ? image.split("@")[1] : `UNPINNED(${image})`;
+  const serviceDescribeText = gcloud(["run", "services", "describe", SERVICE, "--region", REGION]);
+  const iapEnabled = /Iap Enabled:\s+true/i.test(serviceDescribeText);
 
   const iamPolicy = JSON.parse(
     gcloud(["run", "services", "get-iam-policy", SERVICE, "--region", REGION, "--format", "json"])
@@ -239,7 +242,7 @@ async function main(): Promise<void> {
     piiPermitted: false,
     financingEnabled: false,
     dnsCutoverAuthorized: false,
-    iapEnabled: false,           // P2 posture; P3 flips via its own verified step
+    iapEnabled,
     anonymousInvocationAllowed: false, // DERIVED green above or we exited 1
     dataSeedStatus: "NOT_LOADED",      // P4 changes this via migrate/seed flow
   };

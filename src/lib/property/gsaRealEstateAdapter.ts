@@ -13,6 +13,7 @@
 import { createHash } from "node:crypto";
 
 import type { CanonicalProperty, PropertySourceRecord, PropertyType } from "./propertyTypes";
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
 
 export const GSA_RE_FEED_URL = "https://realestatesales.gov/our-listing/";
 export const GSA_RE_UA =
@@ -125,7 +126,9 @@ export interface GsaReFetchResult {
 /** Pull + parse the official GSA realestatesales.gov listings into canonical records. */
 export async function fetchGsaRealEstate(): Promise<GsaReFetchResult> {
   const fetchedAt = new Date().toISOString();
-  const res = await fetch(GSA_RE_FEED_URL, { headers: { "User-Agent": GSA_RE_UA } });
+  const res = await governedFetch(GSA_RE_FEED_URL, {
+    headers: { "User-Agent": GSA_RE_UA },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status} for GSA realestatesales feed`);
   const html = await res.text();
 

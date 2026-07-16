@@ -16,6 +16,7 @@
  */
 
 import { get as httpsGet } from "node:https";
+import { assertAllowedOutboundUrl, governedFetch } from "@/lib/security/outboundRequestPolicy";
 
 export const FEMA_NFHL_URL =
   "https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer/28/query";
@@ -65,6 +66,7 @@ function writeFloodCache(lon: number, lat: number, value: FloodZoneFact | null):
 }
 
 function fetchJsonViaHttps(url: string, timeoutMs: number): Promise<unknown> {
+  assertAllowedOutboundUrl(url);
   return new Promise((resolve, reject) => {
     const req = httpsGet(
       url,
@@ -122,7 +124,7 @@ async function fetchJsonViaHttpsWithRetry(
       if (attempt % 2 === 1) {
         return await fetchJsonViaHttps(url, timeoutMs);
       }
-      const res = await fetch(url, {
+      const res = await governedFetch(url, {
         signal: AbortSignal.timeout(timeoutMs),
         headers: {
           Accept: "application/json",
@@ -197,7 +199,9 @@ export async function queryNationalRegister(lon: number, lat: number): Promise<H
     returnGeometry: "false",
     f: "pjson",
   });
-  const res = await fetch(`${NPS_NR_URL}?${params}`, { signal: AbortSignal.timeout(15_000) });
+  const res = await governedFetch(`${NPS_NR_URL}?${params}`, {
+    signal: AbortSignal.timeout(15_000),
+  });
   if (!res.ok) throw new Error(`NPS NR HTTP ${res.status}`);
   const body = await res.json();
   const feat = (body?.features ?? [])[0];

@@ -35,18 +35,18 @@ resource "google_storage_bucket_iam_member" "runtime_state_core_rw" {
   member = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
-resource "google_cloud_run_v2_service_iam_member" "scheduler_invoker" {
-  count = var.core_image == "" || !var.enable_source_refresh_scheduler ? 0 : 1
+resource "google_cloud_run_v2_job_iam_member" "scheduler_source_refresh_executor" {
+  count = var.migrator_image == "" || !var.enable_source_refresh_scheduler ? 0 : 1
 
   project  = var.project_id
   location = var.region
-  name     = google_cloud_run_v2_service.core[0].name
+  name     = google_cloud_run_v2_job.source_refresh[0].name
   role     = "roles/run.invoker"
   member   = "serviceAccount:${google_service_account.source_refresh_scheduler.email}"
 }
 
 resource "google_cloud_scheduler_job" "source_refresh" {
-  count = var.core_image == "" || !var.enable_source_refresh_scheduler ? 0 : 1
+  count = var.migrator_image == "" || !var.enable_source_refresh_scheduler ? 0 : 1
 
   project     = var.project_id
   region      = var.region
@@ -57,15 +57,20 @@ resource "google_cloud_scheduler_job" "source_refresh" {
 
   http_target {
     http_method = "POST"
-    uri         = "${google_cloud_run_v2_service.core[0].uri}/api/internal/source-refresh"
+    uri         = "https://run.googleapis.com/v2/projects/${var.project_id}/locations/${var.region}/jobs/${google_cloud_run_v2_job.source_refresh[0].name}:run"
 
-    oidc_token {
+    body = base64encode("{}")
+
+    headers = {
+      "Content-Type" = "application/json"
+    }
+
+    oauth_token {
       service_account_email = google_service_account.source_refresh_scheduler.email
-      audience              = google_cloud_run_v2_service.core[0].uri
     }
   }
 
   depends_on = [
-    google_cloud_run_v2_service_iam_member.scheduler_invoker,
+    google_cloud_run_v2_job_iam_member.scheduler_source_refresh_executor,
   ]
 }

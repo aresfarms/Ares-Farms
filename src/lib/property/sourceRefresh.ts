@@ -39,7 +39,7 @@ import { fetchGsaRealEstate } from "./gsaRealEstateAdapter";
  * fetcher gets a genuine pull + diff each run; one without (USDA's source is a
  * 2018 static archive) is revalidated as a historical snapshot.
  */
-const LIVE_FETCHERS: Record<string, () => Promise<{ records: CanonicalProperty[]; fetchedAt: string }>> = {
+const LIVE_FETCHERS: Partial<Record<string, () => Promise<{ records: CanonicalProperty[]; fetchedAt: string }>>> = {
   hud: fetchHudReoRecords,
   // Auction feeds: genuine daily re-pull so the auction set stays current —
   // concluded auctions drop off the official feed (removedFromFeed), new ones

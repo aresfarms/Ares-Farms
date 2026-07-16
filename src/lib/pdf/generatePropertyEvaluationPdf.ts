@@ -214,7 +214,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     margin: 0,
     // Next's runtime bundle breaks PDFKit's implicit Helvetica lookup, so we start
     // from a concrete system font or no default font at all.
-    font: RESOLVED_FONTS.regular ?? null,
+    font: RESOLVED_FONTS.regular ?? undefined,
     info: {
       Title: `${input.branding.reportTitle} - ${input.context.title}`,
       Author: "Furlong",

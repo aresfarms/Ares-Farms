@@ -6,6 +6,12 @@ import {
   readClamAvVersion,
   scanWithLocalClamAv,
 } from "@/lib/security/clamavLocalScanner";
+import {
+  missingRequiredSecretDetail,
+  readJsonBodyWithLimit,
+  readRequiredSecret,
+  requireBearerToken,
+} from "@/lib/security/requestGuards";
 
 type UploadScanRequest = {
   base64?: string;
@@ -19,21 +25,41 @@ function createTraceId(): string {
 }
 
 function scanToken(): string | null {
-  return process.env.PROPERTY_UPLOAD_SCAN_TOKEN?.trim() || null;
+  return readRequiredSecret("PROPERTY_UPLOAD_SCAN_TOKEN");
 }
 
 function tokenAllowed(request: NextRequest): boolean {
   const configured = scanToken();
   if (!configured) {
-    return true;
+    return false;
   }
-
-  const authorization = request.headers.get("authorization")?.trim() || "";
-  return authorization === `Bearer ${configured}`;
+  return requireBearerToken(request.headers.get("authorization"), configured);
 }
 
 export async function POST(req: NextRequest) {
   const traceId = createTraceId();
+  const configuredToken = scanToken();
+
+  if (!configuredToken) {
+    appendAuditEvent({
+      actorId: "internal-anonymous",
+      actorName: "internal-anonymous",
+      domain: "public-upload-security-scan",
+      subject: "upload-security-scan",
+      decision: "UPLOAD_SECURITY_SCAN_UNAVAILABLE",
+      reason: missingRequiredSecretDetail("PROPERTY_UPLOAD_SCAN_TOKEN"),
+      detail: { traceId },
+    });
+
+    return NextResponse.json(
+      {
+        verdict: "error",
+        provider: process.env.PROPERTY_UPLOAD_SCAN_PROVIDER?.trim() || "clamav-local",
+        detail: missingRequiredSecretDetail("PROPERTY_UPLOAD_SCAN_TOKEN"),
+      },
+      { status: 503 }
+    );
+  }
 
   if (!tokenAllowed(req)) {
     appendAuditEvent({
@@ -56,7 +82,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const body = (await req.json().catch(() => ({}))) as UploadScanRequest;
+  const parsed = await readJsonBodyWithLimit<UploadScanRequest>(req, {
+    maxBytes: 18 * 1024 * 1024,
+  });
+  if (!parsed.ok) {
+    return NextResponse.json(
+      {
+        verdict: "error",
+        provider: process.env.PROPERTY_UPLOAD_SCAN_PROVIDER?.trim() || "clamav-local",
+        detail: parsed.error,
+      },
+      { status: parsed.status }
+    );
+  }
+
+  const body = parsed.body;
   const base64 = body.base64?.trim();
   const mediaType = body.mediaType?.trim();
 

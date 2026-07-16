@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { appendAuditEvent } from "@/lib/property/auditLedger";
 import { persistOperatorReviewQueueItem } from "@/lib/queues/operatorReviewQueueStore";
 import { sanitizeIngestText } from "@/lib/security/ingestSanitizer";
+import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 
 type SpecialBuildingReviewRequest = {
   propertyId?: string | null;
@@ -28,7 +29,14 @@ function createTraceId() {
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json().catch(() => ({}))) as SpecialBuildingReviewRequest;
+  const parsed = await readJsonBodyWithLimit<SpecialBuildingReviewRequest>(req, {
+    maxBytes: 16 * 1024,
+  });
+  if (!parsed.ok) {
+    return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
+  }
+
+  const body = parsed.body;
   const propertyId = typeof body.propertyId === "string" ? body.propertyId.trim() : "";
   const title = sanitizeIngestText(body.title, 160);
   const location = sanitizeIngestText(body.location, 200);

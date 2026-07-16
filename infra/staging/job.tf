@@ -149,3 +149,80 @@ resource "google_cloud_run_v2_job" "runtime_verify" {
     google_secret_manager_secret_iam_member.runtime_database_url,
   ]
 }
+
+# =============================================================================
+# infra/staging — approved-source refresh Job
+#
+# Keeps the map inventory current without routing Cloud Scheduler through the
+# browser-facing service edge. Scheduler calls the Cloud Run Jobs API directly,
+# and the job performs the governed refresh inside the VPC as the runtime
+# principal with the shared runtime-state bucket mounted.
+# =============================================================================
+
+resource "google_cloud_run_v2_job" "source_refresh" {
+  count = var.migrator_image == "" || !var.enable_source_refresh_scheduler ? 0 : 1
+
+  name     = "furlong-source-refresh"
+  project  = var.project_id
+  location = var.region
+  labels   = var.labels
+
+  deletion_protection = false
+
+  template {
+    task_count  = 1
+    parallelism = 1
+
+    template {
+      service_account = google_service_account.core_runtime.email
+
+      execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
+
+      max_retries = 0
+      timeout     = "${var.source_refresh_job_timeout_seconds}s"
+
+      volumes {
+        name = "runtime-state"
+        gcs {
+          bucket    = google_storage_bucket.runtime_state.name
+          read_only = false
+        }
+      }
+
+      vpc_access {
+        egress = "PRIVATE_RANGES_ONLY"
+        network_interfaces {
+          network    = google_compute_network.vpc.id
+          subnetwork = google_compute_subnetwork.egress.id
+        }
+      }
+
+      containers {
+        image   = var.migrator_image
+        command = ["npm"]
+        args    = ["run", "run:source-refresh"]
+
+        resources {
+          limits = {
+            cpu    = "1"
+            memory = "1Gi"
+          }
+        }
+
+        env {
+          name  = "FURLONG_RUNTIME_STATE_DIR"
+          value = "/var/furlong-state"
+        }
+
+        volume_mounts {
+          name       = "runtime-state"
+          mount_path = "/var/furlong-state"
+        }
+      }
+    }
+  }
+
+  depends_on = [
+    google_storage_bucket_iam_member.runtime_state_core_rw,
+  ]
+}

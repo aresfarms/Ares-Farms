@@ -7,6 +7,7 @@ import { designatedHubzoneForProperty } from "@/lib/property/propertyHubzones";
 import { nmtcForProperty } from "@/lib/property/propertyNmtc";
 import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones";
 import { findCanonicalPropertyById } from "@/lib/property/propertyData";
+import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 
 /**
  * Property facts API — PUBLIC, verified snapshot reads only.
@@ -16,14 +17,21 @@ import { findCanonicalPropertyById } from "@/lib/property/propertyData";
  * as the listing hub, without downgrading into illustrative language.
  */
 export async function POST(req: NextRequest) {
-  const body = (await req.json().catch(() => ({}))) as {
+  const parsed = await readJsonBodyWithLimit<{
     propertyId?: string | null;
     exactAddress?: string | null;
     location?: string | null;
     stateCode?: string | null;
     rawInput?: string | null;
     notes?: string | null;
-  };
+  }>(req, {
+    maxBytes: 24 * 1024,
+  });
+  if (!parsed.ok) {
+    return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
+  }
+
+  const body = parsed.body;
   const propertyId = body.propertyId ? String(body.propertyId) : null;
 
   if (propertyId?.startsWith("imported:") || (!propertyId && (body.exactAddress || body.location))) {

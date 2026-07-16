@@ -26,6 +26,11 @@ import { designatedHubzoneForProperty } from "./propertyHubzones";
 import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
+import {
+  PROPERTY_TENURE_FACTS,
+  PROPERTY_TENURE_PROVENANCE,
+} from "./propertyTenureGenerated";
+import { COUNTY_FMR, COUNTY_FMR_PROVENANCE } from "./countyFmrGenerated";
 
 export interface BriefFactLine {
   /** Short label, e.g. "Flood zone". */
@@ -284,6 +289,7 @@ function buildUnknowns(args: {
   priceLabel: string | null;
   floodResolved: boolean;
   isHome: boolean;
+  rentalContextAvailable: boolean;
 }): BriefUnknownLine[] {
   const unknowns: BriefUnknownLine[] = [];
   const countyKnown =
@@ -328,6 +334,14 @@ function buildUnknowns(args: {
       `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
   });
+  if (args.isHome && !args.rentalContextAvailable) {
+    unknowns.push({
+      label: "Rental context",
+      howToFind:
+        "HUD publishes Fair Market Rents by county and bedroom count — free at huduser.gov " +
+        "(datasets → Fair Market Rents). Actual asking rents come from local listings.",
+    });
+  }
   if (args.isHome) {
     unknowns.push({
       label: "Water, sewer, and utilities",
@@ -411,6 +425,42 @@ export function buildPropertyBriefIntelligence(args: {
   if (historic) verifiedFacts.push(historic);
   if (id) verifiedFacts.push(...designationFactLines(id));
 
+  // Owner-occupancy ("neighbor reality" reframed as an amenity fact — founder
+  // decision 2026-07-15). Renders only once the owner-run ACS ingest fills the
+  // snapshot; while empty, nothing is implied.
+  const tenure = id ? PROPERTY_TENURE_FACTS[id] : undefined;
+  if (tenure && isHome) {
+    verifiedFacts.push({
+      label: "Owner-occupancy",
+      text:
+        `About ${tenure.ownerOccupiedPct}% of the ${tenure.occupiedUnits.toLocaleString("en-US")} ` +
+        `occupied homes in this census tract are owner-occupied. A tract-level Census estimate — ` +
+        `useful context for how settled the immediate area is, not a statement about any neighbor.`,
+      provenance: `Source: ${PROPERTY_TENURE_PROVENANCE.acsVintage}, snapshot ${PROPERTY_TENURE_PROVENANCE.asOf}`,
+      tone: "neutral",
+    });
+  }
+
+  // Rental context (market FACT with provenance — never a rent guarantee;
+  // projections live in paid tiers under forecast labeling). County-keyed via
+  // the tract-derived FIPS.
+  const fmrFips =
+    resolvedCounty?.fips ??
+    (id ? PROPERTY_OZ_FACTS[id]?.tractId?.slice(0, 5) ?? null : null);
+  const fmr = fmrFips ? COUNTY_FMR[fmrFips] : undefined;
+  if (fmr && isHome) {
+    verifiedFacts.push({
+      label: "Rental context",
+      text:
+        `HUD's ${COUNTY_FMR_PROVENANCE.fmrYear} Fair Market Rents for this county` +
+        `${fmr.areaName ? ` (${fmr.areaName})` : ""}: about $${fmr.fmr2.toLocaleString("en-US")}/month ` +
+        `for a 2-bedroom (1BR $${fmr.fmr1.toLocaleString("en-US")}, 3BR $${fmr.fmr3.toLocaleString("en-US")}). ` +
+        `A program rent standard HUD publishes — market context, not a prediction of what this home would rent for.`,
+      provenance: `Source: ${COUNTY_FMR_PROVENANCE.source}, ${COUNTY_FMR_PROVENANCE.fmrYear}, snapshot ${COUNTY_FMR_PROVENANCE.asOf}`,
+      tone: "neutral",
+    });
+  }
+
   return {
     verifiedFacts,
     unknowns: buildUnknowns({
@@ -420,6 +470,7 @@ export function buildPropertyBriefIntelligence(args: {
       priceLabel: args.priceLabel,
       floodResolved: Boolean(flood),
       isHome,
+      rentalContextAvailable: Boolean(fmr),
     }),
     mechanics: mechanicsForSource(args.sourceId, args.propertyType),
     pathwaysProse: buildPathwaysProse({

@@ -173,6 +173,8 @@
     "verify:providers": "tsx src/scripts/verifyProviders.ts",
     "ingest:usda-resale": "tsx src/scripts/ingestUsdaResale.ts",
     "ingest:county-names": "tsx src/scripts/ingestCountyNames.ts",
+    "ingest:census-tenure": "tsx src/scripts/ingestCensusTenure.ts",
+    "ingest:hud-fmr": "tsx src/scripts/ingestHudFmr.ts",
     "ingest:hud-reo": "tsx src/scripts/ingestHudReo.ts",
     "ingest:gsa-auctions": "tsx src/scripts/ingestGsaAuctions.ts",
     "review:export-source": "tsx src/scripts/exportSourceReview.ts",

@@ -25,6 +25,7 @@ import {
 import { designatedHubzoneForProperty } from "./propertyHubzones";
 import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
+import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 
 export interface BriefFactLine {
   /** Short label, e.g. "Flood zone". */
@@ -44,6 +45,14 @@ export interface BriefUnknownLine {
   howToFind: string;
 }
 
+export interface ResolvedCounty {
+  name: string;
+  state: string;
+  fips: string;
+  /** The census tract the county was derived from. */
+  tractId: string;
+}
+
 export interface PropertyBriefIntelligence {
   verifiedFacts: BriefFactLine[];
   unknowns: BriefUnknownLine[];
@@ -51,6 +60,22 @@ export interface PropertyBriefIntelligence {
   mechanics: { heading: string; paragraphs: string[] } | null;
   /** The prose replacement for the pathway chips (founder decision). */
   pathwaysProse: string | null;
+  /** County derived from the property's census tract when the record lacked one. */
+  resolvedCounty: ResolvedCounty | null;
+}
+
+/**
+ * County from data we already hold: the OZ ingest geocoded every addressable
+ * property to a census tract, and a tract id's first five digits are the
+ * state+county FIPS. Joined against the Census county-name snapshot.
+ */
+export function countyForProperty(canonicalPropertyId: string): ResolvedCounty | null {
+  const tractId = PROPERTY_OZ_FACTS[canonicalPropertyId]?.tractId ?? null;
+  if (!tractId || tractId.length < 5) return null;
+  const fips = tractId.slice(0, 5);
+  const county = COUNTY_NAMES[fips];
+  if (!county) return null;
+  return { name: county.name, state: county.state, fips, tractId };
 }
 
 const STATE_NAMES: Record<string, string> = {
@@ -255,13 +280,16 @@ function mechanicsForSource(
 function buildUnknowns(args: {
   propertyId: string;
   county: string | null;
+  resolvedCounty: ResolvedCounty | null;
   priceLabel: string | null;
   floodResolved: boolean;
   isHome: boolean;
 }): BriefUnknownLine[] {
   const unknowns: BriefUnknownLine[] = [];
+  const countyKnown =
+    (args.county && !/unknown/i.test(args.county)) || Boolean(args.resolvedCounty);
 
-  if (!args.county || /unknown/i.test(args.county)) {
+  if (!countyKnown) {
     unknowns.push({
       label: "County",
       howToFind:
@@ -291,10 +319,13 @@ function buildUnknowns(args: {
       "Government sales are as-is and our snapshot cannot see inside the building. An independent " +
       "inspection (plus a contractor walk-through where repairs look likely) is the only real answer.",
   });
+  const taxCounty = args.resolvedCounty
+    ? `The ${args.resolvedCounty.name} treasurer/appraiser site`
+    : "The county treasurer/appraiser site";
   unknowns.push({
     label: "Annual property taxes",
     howToFind:
-      "The county treasurer/appraiser site lists the parcel's current assessment and tax history — " +
+      `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
   });
   if (args.isHome) {
@@ -358,6 +389,22 @@ export function buildPropertyBriefIntelligence(args: {
   const isHome = /home|residential|house/i.test(args.propertyType ?? "");
 
   const verifiedFacts: BriefFactLine[] = [];
+
+  // County first — it anchors taxes, floodplain administration, and permits.
+  const recordCountyKnown = Boolean(args.county && !/unknown/i.test(args.county));
+  const resolvedCounty = id && !recordCountyKnown ? countyForProperty(id) : null;
+  if (resolvedCounty) {
+    verifiedFacts.push({
+      label: "County",
+      text:
+        `This property sits in ${resolvedCounty.name}, ${resolvedCounty.state} — derived from its ` +
+        `census tract (${resolvedCounty.tractId}). The county is where property taxes, floodplain ` +
+        `administration, and permits live.`,
+      provenance: `Source: U.S. Census Bureau county codes, snapshot ${COUNTY_NAMES_PROVENANCE.asOf} · tract geocoded at OZ ingest ${PROPERTY_OZ_PROVENANCE.asOf}`,
+      tone: "positive",
+    });
+  }
+
   const flood = id ? floodFactLine(id) : null;
   if (flood) verifiedFacts.push(flood);
   const historic = id ? historicFactLine(id) : null;
@@ -369,6 +416,7 @@ export function buildPropertyBriefIntelligence(args: {
     unknowns: buildUnknowns({
       propertyId: id,
       county: args.county,
+      resolvedCounty,
       priceLabel: args.priceLabel,
       floodResolved: Boolean(flood),
       isHome,
@@ -379,5 +427,6 @@ export function buildPropertyBriefIntelligence(args: {
       stateCode: args.stateCode,
       isHome,
     }),
+    resolvedCounty,
   };
 }

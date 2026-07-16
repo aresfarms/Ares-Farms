@@ -52,6 +52,12 @@ type PropertyEvaluationPdfInput = {
   explainabilityNotes: string[];
   customerRights: string[];
   humanReviewBoundary: string[];
+  /** Free Place Brief (spec 2026-07-15): sale-mechanics paragraphs. Optional for payload back-compat. */
+  buyingProcess?: string[];
+  /** Free Place Brief: honest unknowns ("label: how to find out"). */
+  honestUnknowns?: string[];
+  /** Free Place Brief: prose financing-pathways line. */
+  financingProse?: string | null;
 };
 
 const PAGE = {
@@ -303,17 +309,33 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   bulletList(doc, input.risks, 332, startY + 32, 220);
   doc.y = startY + 190;
 
+  const placeBriefSections: Array<{ title: string; items: string[] }> = [
+    ...(input.buyingProcess?.length
+      ? [{ title: "How This Purchase Actually Works", items: input.buyingProcess }]
+      : []),
+    ...(input.financingProse
+      ? [{ title: "How People Typically Pay for a Property Like This", items: [input.financingProse] }]
+      : []),
+    ...(input.honestUnknowns?.length
+      ? [{ title: "Honest Unknowns — and How You'd Find Out", items: input.honestUnknowns }]
+      : []),
+  ];
+
   const sections: Array<{ title: string; items: string[] }> = [
     { title: "Ranked Financing Lanes", items: input.pathwayAnalysis },
     { title: "Property Verification Summary", items: input.propertyVerificationSummary },
     { title: "Property-Side Criteria and External Flags", items: input.verifiedCriteria },
+    ...placeBriefSections,
     { title: "Basis and Limits of This Analysis", items: input.explainabilityNotes },
     { title: "Questions the Platform Should Already Be Asking", items: input.keyQuestions },
     { title: "Diligence Priorities Before Commitment", items: input.nextMoves },
   ];
 
   if (input.tier.id === "paid" || input.tier.id === "environmental") {
-    sections.splice(3, 0, { title: "Optional Deeper Intake Posture", items: input.readinessSectionNotes });
+    // Insert before "Basis and Limits" — index is dynamic now that the Place
+    // Brief sections sit between the criteria and basis sections.
+    const basisIndex = sections.findIndex((section) => section.title === "Basis and Limits of This Analysis");
+    sections.splice(basisIndex >= 0 ? basisIndex : 3, 0, { title: "Optional Deeper Intake Posture", items: input.readinessSectionNotes });
   }
 
   if (input.tier.id === "free") {

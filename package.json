@@ -172,6 +172,7 @@
     "verify:property": "tsx src/scripts/verifyProperty.ts",
     "verify:providers": "tsx src/scripts/verifyProviders.ts",
     "ingest:usda-resale": "tsx src/scripts/ingestUsdaResale.ts",
+    "ingest:county-names": "tsx src/scripts/ingestCountyNames.ts",
     "ingest:hud-reo": "tsx src/scripts/ingestHudReo.ts",
     "ingest:gsa-auctions": "tsx src/scripts/ingestGsaAuctions.ts",
     "review:export-source": "tsx src/scripts/exportSourceReview.ts",

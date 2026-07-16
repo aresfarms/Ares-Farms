@@ -1215,6 +1215,12 @@ type ReportModel = {
   nextMoves: string[];
   interviewSignals: string[];
   explainabilityNotes: string[];
+  /** Free Place Brief (spec 2026-07-15): sale-mechanics paragraphs for the source. */
+  buyingProcess: string[];
+  /** Free Place Brief: honest unknowns with the official way to find out. */
+  honestUnknowns: string[];
+  /** Free Place Brief: prose financing-pathways line (replaces chips). */
+  financingProse: string | null;
   exportHtml: string;
   exportText: string;
 };
@@ -1403,6 +1409,15 @@ function buildReportModel(args: {
     args.immediateSuitability.constraints[0] ? `The first real kill-point is ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
   ].filter(Boolean).join(" ");
 
+  // Free Place Brief content folded into the report (spec 2026-07-15): the
+  // exported report IS the full free brief — mechanics, honest unknowns, and
+  // the prose pathways line travel with it.
+  const buyingProcess = args.placeIntelligence?.mechanics?.paragraphs ?? [];
+  const honestUnknowns = (args.placeIntelligence?.unknowns ?? []).map(
+    (unknown) => `${unknown.label}: ${unknown.howToFind}`
+  );
+  const financingProse = args.placeIntelligence?.pathwaysProse ?? null;
+
   const exportLines = [
     `# ${branding.reportTitle}`,
     ``,
@@ -1440,6 +1455,15 @@ function buildReportModel(args: {
     `## Property-side criteria and external flags`,
     ...verifiedCriteria.map((line) => `- ${line}`),
     ``,
+    ...(buyingProcess.length > 0
+      ? [`## How this purchase actually works`, ...buyingProcess.map((line) => `- ${line}`), ``]
+      : []),
+    ...(financingProse
+      ? [`## How people typically pay for a property like this`, `- ${financingProse}`, ``]
+      : []),
+    ...(honestUnknowns.length > 0
+      ? [`## Honest unknowns — and how you'd find out`, ...honestUnknowns.map((line) => `- ${line}`), ``]
+      : []),
     `## Basis and limits of this analysis`,
     ...explainabilityNotes.map((line) => `- ${line}`),
     ``,
@@ -1474,6 +1498,17 @@ function buildReportModel(args: {
         section("Questions the platform should already be asking", `<ul>${htmlList(platformQuestions)}</ul>`),
       ].join("")
     : "";
+  const placeBriefSections = [
+    buyingProcess.length > 0
+      ? section("How this purchase actually works", `<ul>${htmlList(buyingProcess)}</ul>`)
+      : "",
+    financingProse
+      ? section("How people typically pay for a property like this", `<p>${escapeHtml(financingProse)}</p>`)
+      : "",
+    honestUnknowns.length > 0
+      ? section("Honest unknowns — and how you'd find out", `<ul>${htmlList(honestUnknowns)}</ul>`)
+      : "",
+  ].join("");
   const exportHtml = `<!doctype html>
 <html lang="en">
   <head>
@@ -1529,6 +1564,7 @@ function buildReportModel(args: {
           tier.id === "environmental" ? "Environmental and site-side criteria" : "Property-side criteria and external flags",
           `<ul>${htmlList(verifiedCriteria)}</ul>`
         )}
+        ${placeBriefSections}
         ${section("Basis and limits of this analysis", `<ul>${htmlList(explainabilityNotes)}</ul>`)}
         ${decisionOnly}
         ${section("Diligence priorities before commitment", `<ul>${htmlList(nextMoves)}</ul>`)}
@@ -1556,6 +1592,9 @@ function buildReportModel(args: {
     nextMoves,
     interviewSignals,
     explainabilityNotes,
+    buyingProcess,
+    honestUnknowns,
+    financingProse,
     exportHtml,
     exportText: exportLines.join("\n"),
   };
@@ -2126,6 +2165,30 @@ export function PropertyEvaluationWorkspace({
         : "Property-side criteria and external flags",
       lines: report.verifiedCriteria,
     },
+    ...(report.buyingProcess.length > 0
+      ? [
+          {
+            title: "How this purchase actually works",
+            lines: report.buyingProcess,
+          },
+        ]
+      : []),
+    ...(report.financingProse
+      ? [
+          {
+            title: "How people typically pay for a property like this",
+            lines: [report.financingProse],
+          },
+        ]
+      : []),
+    ...(report.honestUnknowns.length > 0
+      ? [
+          {
+            title: "Honest unknowns — and how you'd find out",
+            lines: report.honestUnknowns,
+          },
+        ]
+      : []),
     {
       title: "Basis and limits of this analysis",
       lines: report.explainabilityNotes,
@@ -2216,6 +2279,9 @@ export function PropertyEvaluationWorkspace({
             nextMoves: report.nextMoves,
             includedSections: buildIncludedSections(answers.reportTier),
             explainabilityNotes: report.explainabilityNotes,
+            buyingProcess: report.buyingProcess,
+            honestUnknowns: report.honestUnknowns,
+            financingProse: report.financingProse,
             customerRights: buildCustomerRightsSummary(),
             humanReviewBoundary: buildHumanReviewBoundary({
               tier: { id: answers.reportTier, label: report.tier.label },

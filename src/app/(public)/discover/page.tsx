@@ -227,6 +227,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
         propertyType: propertyContext.propertyType,
         priceLabel: propertyContext.priceLabel,
         county: propertyContext.county,
+        town: propertyContext.town,
         stateCode: propertyContext.stateCode,
         pathwayList: propertyContext.pathwayList,
       })

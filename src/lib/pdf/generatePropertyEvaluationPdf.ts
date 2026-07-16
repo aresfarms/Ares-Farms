@@ -3,6 +3,8 @@ import * as path from "node:path";
 
 import PDFDocument from "pdfkit";
 
+import { reportTierIdentity } from "../reports/reportTierIdentity";
+
 type PropertyEvaluationPdfInput = {
   branding: {
     logoPath: string;
@@ -80,6 +82,12 @@ const COLORS = {
   paper: "#fbfcfe",
 };
 
+// Tier identity accent, set once per document at the top of generate(). Keeps
+// sectionTitle/bulletList signatures unchanged while every heading, rule, and
+// chip picks up the tier's personality (reportTierIdentity is the source).
+let ACCENT = COLORS.teal;
+let ACCENT_SOFT = COLORS.softBlue;
+
 const FONT_CANDIDATES = {
   regular: [
     "/System/Library/Fonts/Supplemental/Arial.ttf",
@@ -128,7 +136,7 @@ function imageIfExists(doc: any, assetPath: string, x: number, y: number, opts: 
 function sectionTitle(doc: any, label: string, y: number) {
   applyFont(doc, "bold");
   doc
-    .fillColor(COLORS.teal)
+    .fillColor(ACCENT)
     .fontSize(11)
     .text(label.toUpperCase(), PAGE.marginX, y, { width: PAGE.width - PAGE.marginX * 2, characterSpacing: 1.1 });
 }
@@ -146,7 +154,7 @@ function bulletList(doc: any, items: string[], x: number, y: number, width: numb
   for (const item of items) {
     applyFont(doc, "bold");
     doc
-      .fillColor(COLORS.gold)
+      .fillColor(ACCENT)
       .fontSize(11)
       .text("•", x, cursor);
     applyFont(doc, "regular");
@@ -198,6 +206,9 @@ function renderPageChrome(doc: any) {
 }
 
 export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput) {
+  const identity = reportTierIdentity(input.tier.id);
+  ACCENT = identity.accent;
+  ACCENT_SOFT = identity.accentSoft;
   const doc = new PDFDocument({
     size: "LETTER",
     margin: 0,
@@ -219,30 +230,53 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   imageIfExists(doc, input.branding.emblemPath, 472, 34, { fit: [84, 84], opacity: 0.14 });
   imageIfExists(doc, input.branding.logoPath, PAGE.marginX, 28, { fit: [150, 44] });
 
+  // Tier cover badge — the first thing that says "this document is different".
   applyFont(doc, "bold");
   doc
-    .fillColor(COLORS.deep)
+    .fillColor(ACCENT)
+    .fontSize(9)
+    .text(identity.coverBadge, PAGE.marginX, 116, { characterSpacing: 2.2 });
+
+  applyFont(doc, "bold");
+  doc
+    .fillColor(identity.ink)
     .fontSize(24)
-    .text(input.branding.reportTitle, PAGE.marginX, 132, { width: 330 });
+    .text(identity.displayName, PAGE.marginX, 130, { width: 340 });
 
   applyFont(doc, "regular");
   doc
+    .fillColor(COLORS.muted)
+    .fontSize(10)
+    .text(identity.tagline, PAGE.marginX, doc.y + 2, { width: 336, lineGap: 2 });
+  doc
     .fillColor(COLORS.text)
     .fontSize(11)
-    .text(input.context.title, PAGE.marginX, 166, { width: 320, lineGap: 2 })
+    .text(input.context.title, PAGE.marginX, doc.y + 6, { width: 320, lineGap: 2 })
     .text(input.context.location + (input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""), PAGE.marginX, doc.y + 2, { width: 330, lineGap: 2 });
+
+  // Tier rule treatment: single (free) / double (institutional) / thick
+  // (environmental). Left column only — the info card owns the right side.
+  const ruleY = 208;
+  const ruleRight = PAGE.width - 220;
+  doc.save().moveTo(PAGE.marginX, ruleY).lineTo(ruleRight, ruleY)
+    .lineWidth(identity.ruleStyle === "thick" ? 3 : 1).strokeColor(ACCENT).stroke();
+  if (identity.ruleStyle === "double") {
+    doc.moveTo(PAGE.marginX, ruleY + 3).lineTo(ruleRight, ruleY + 3)
+      .lineWidth(1).strokeColor(ACCENT).stroke();
+  }
+  doc.restore();
 
   doc
     .fillColor("#ffffff")
     .roundedRect(PAGE.width - 196, 132, 152, 26, 13)
-    .fill(COLORS.navy);
+    .fill(ACCENT);
   applyFont(doc, "bold");
   doc
     .fillColor("#ffffff")
     .fontSize(10.5)
     .text(`${input.tier.shortLabel} · ${input.tier.label}`, PAGE.width - 184, 140, { width: 128, align: "center" });
 
-  card(doc, PAGE.width - 210, 172, 166, 84, COLORS.softBlue);
+  card(doc, PAGE.width - 210, 172, 166, 84, ACCENT_SOFT);
   applyFont(doc, "bold");
   doc
     .fillColor(COLORS.muted)
@@ -355,11 +389,28 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     doc.y = bulletList(doc, section.items, PAGE.marginX + 16, doc.y + 16, PAGE.width - PAGE.marginX * 2 - 32) + 10;
   }
 
+  // FREE TIER: the honest upgrade preview — named sections, substance-first,
+  // no prices (tier economics founder-gated). The reason to come back.
+  if (identity.nextTierTeaser) {
+    const teaser = identity.nextTierTeaser;
+    ensureSpace(doc, 200);
+    sectionTitle(doc, teaser.heading, doc.y);
+    doc.y += 16;
+    const teaserLines = [
+      teaser.intro,
+      ...teaser.items.map((item) => `${item.name} — ${item.adds}`),
+      teaser.closing,
+    ];
+    const estimated = Math.max(120, teaserLines.length * 46 + 26);
+    card(doc, PAGE.marginX, doc.y, PAGE.width - PAGE.marginX * 2, estimated, ACCENT_SOFT);
+    doc.y = bulletList(doc, teaserLines, PAGE.marginX + 16, doc.y + 16, PAGE.width - PAGE.marginX * 2 - 32) + 10;
+  }
+
   ensureSpace(doc, 140);
   card(doc, PAGE.marginX, PAGE.height - 140, PAGE.width - PAGE.marginX * 2, 96, COLORS.paper);
   bodyText(doc, input.branding.advisoryDisclosure, PAGE.marginX + 16, PAGE.height - 126, PAGE.width - PAGE.marginX * 2 - 32);
   bodyText(doc, input.branding.dataRightsDisclosure, PAGE.marginX + 16, PAGE.height - 98, PAGE.width - PAGE.marginX * 2 - 32);
-  bodyText(doc, "Borrowers pay nothing for baseline readiness support. Export rights remain available across report tiers.", PAGE.marginX + 16, PAGE.height - 70, PAGE.width - PAGE.marginX * 2 - 32);
+  bodyText(doc, identity.footerLine, PAGE.marginX + 16, PAGE.height - 70, PAGE.width - PAGE.marginX * 2 - 32);
   doc
     .fillColor(COLORS.muted)
     .font(RESOLVED_FONTS.regular ?? "Times-Roman")

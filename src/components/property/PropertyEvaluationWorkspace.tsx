@@ -11,6 +11,7 @@ import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery"
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
+import { reportTierIdentity, type ReportTierIdentity } from "@/lib/reports/reportTierIdentity";
 import { evaluateFinancingPathways } from "@/lib/financing/pathwayEngine";
 import {
   programsForAsset,
@@ -1221,6 +1222,8 @@ type ReportModel = {
   honestUnknowns: string[];
   /** Free Place Brief: prose financing-pathways line (replaces chips). */
   financingProse: string | null;
+  /** Tier look/feel + free-tier upgrade teaser (single source: reportTierIdentity). */
+  tierIdentity: ReportTierIdentity;
   exportHtml: string;
   exportText: string;
 };
@@ -1253,6 +1256,7 @@ function buildReportModel(args: {
   }>;
 }): ReportModel {
   const tier = tierMeta(args.answers.reportTier);
+  const tierIdentity = reportTierIdentity(tier.id);
   const branding = buildReportBranding({
     explorationPath: ["Property & Land", "Property Analysis", "Readiness"],
   });
@@ -1418,8 +1422,19 @@ function buildReportModel(args: {
   );
   const financingProse = args.placeIntelligence?.pathwaysProse ?? null;
 
+  const teaserLines = tierIdentity.nextTierTeaser
+    ? [
+        ``,
+        `## ${tierIdentity.nextTierTeaser.heading}`,
+        `- ${tierIdentity.nextTierTeaser.intro}`,
+        ...tierIdentity.nextTierTeaser.items.map((item) => `- ${item.name} — ${item.adds}`),
+        `- ${tierIdentity.nextTierTeaser.closing}`,
+      ]
+    : [];
+
   const exportLines = [
-    `# ${branding.reportTitle}`,
+    `# ${tierIdentity.displayName}`,
+    `${tierIdentity.tagline}`,
     ``,
     `Tier: ${tier.label} (${tier.shortLabel})`,
     `Generated: ${branding.generatedDate}`,
@@ -1478,6 +1493,7 @@ function buildReportModel(args: {
     ``,
     `## Guided interview signals`,
     ...(interviewSignals.length > 0 ? interviewSignals.map((line) => `- ${line}`) : ["- No meaningful guided interview content captured yet."]),
+    ...teaserLines,
     ``,
     `## Disclosure`,
     `- Advisory only.`,
@@ -1509,6 +1525,14 @@ function buildReportModel(args: {
       ? section("Honest unknowns — and how you'd find out", `<ul>${htmlList(honestUnknowns)}</ul>`)
       : "",
   ].join("");
+  const teaserSectionHtml = tierIdentity.nextTierTeaser
+    ? section(
+        tierIdentity.nextTierTeaser.heading,
+        `<p>${escapeHtml(tierIdentity.nextTierTeaser.intro)}</p><ul>${htmlList(
+          tierIdentity.nextTierTeaser.items.map((item) => `${item.name} — ${item.adds}`)
+        )}</ul><p>${escapeHtml(tierIdentity.nextTierTeaser.closing)}</p>`
+      )
+    : "";
   const exportHtml = `<!doctype html>
 <html lang="en">
   <head>
@@ -1523,9 +1547,12 @@ function buildReportModel(args: {
       .report-content { position: relative; z-index: 1; display: grid; gap: 18px; }
       .brand-row { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; border-bottom: 1px solid #d7deea; padding-bottom: 18px; }
       .brand-row img.logo { width: 170px; height: auto; display: block; }
-      .tier-chip { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 7px 12px; background: #eef4fb; color: #12344d; font-size: 12px; font-weight: 700; }
-      h1 { margin: 0; font-size: 34px; line-height: 1.08; }
-      h2 { margin: 0 0 8px; font-size: 17px; color: #0f766e; letter-spacing: 0.03em; text-transform: uppercase; }
+      .tier-chip { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 7px 12px; background: ${tierIdentity.accentSoft}; color: ${tierIdentity.ink}; font-size: 12px; font-weight: 700; border: 1px solid ${tierIdentity.accent}; }
+      h1 { margin: 0; font-size: 34px; line-height: 1.08; color: ${tierIdentity.ink}; }
+      h2 { margin: 0 0 8px; font-size: 17px; color: ${tierIdentity.accent}; letter-spacing: 0.03em; text-transform: uppercase; }
+      .cover-badge { font-size: 11px; font-weight: 800; letter-spacing: 0.22em; color: ${tierIdentity.accent}; }
+      .tagline { margin: 2px 0 0; font-size: 13px; color: #66758a; }
+      .brand-row { border-bottom: ${tierIdentity.ruleStyle === "thick" ? `4px solid ${tierIdentity.accent}` : tierIdentity.ruleStyle === "double" ? `3px double ${tierIdentity.accent}` : `1px solid ${tierIdentity.accent}`} !important; }
       p, li { font-size: 14px; line-height: 1.62; }
       ul { margin: 0; padding-left: 20px; }
       .summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -1542,7 +1569,7 @@ function buildReportModel(args: {
           <div style="display:grid;gap:10px;">
             <img class="logo" src="${branding.logoPath}" alt="Furlong" />
             <span class="tier-chip">${tier.shortLabel} · ${tier.label}</span>
-            <div><h1>${escapeHtml(branding.reportTitle)}</h1><p>${escapeHtml(args.context.title)}<br/>${escapeHtml(compactLocation(args.context))}</p></div>
+            <div><span class="cover-badge">${escapeHtml(tierIdentity.coverBadge)}</span><h1>${escapeHtml(tierIdentity.displayName)}</h1><p class="tagline">${escapeHtml(tierIdentity.tagline)}</p><p>${escapeHtml(args.context.title)}<br/>${escapeHtml(compactLocation(args.context))}</p></div>
           </div>
           <div style="display:grid;gap:8px;text-align:right;max-width:280px;">
             <p><strong>Generated:</strong> ${escapeHtml(branding.generatedDate)}</p>
@@ -1568,7 +1595,8 @@ function buildReportModel(args: {
         ${section("Basis and limits of this analysis", `<ul>${htmlList(explainabilityNotes)}</ul>`)}
         ${decisionOnly}
         ${section("Diligence priorities before commitment", `<ul>${htmlList(nextMoves)}</ul>`)}
-        <section class="card disclosure"><h2>Disclosure</h2><p>${escapeHtml(branding.advisoryDisclosure)}</p><p>${escapeHtml(branding.dataRightsDisclosure)}</p><p>No approval, preapproval, eligibility determination, underwriting decision, or legal/regulatory reliance is authorized. Human review is still required before this becomes decision-grade. Borrowers pay nothing for baseline readiness support.</p></section>
+        ${teaserSectionHtml}
+        <section class="card disclosure"><h2>Disclosure</h2><p>${escapeHtml(branding.advisoryDisclosure)}</p><p>${escapeHtml(branding.dataRightsDisclosure)}</p><p>No approval, preapproval, eligibility determination, underwriting decision, or legal/regulatory reliance is authorized. Human review is still required before this becomes decision-grade. Borrowers pay nothing for baseline readiness support.</p><p>${escapeHtml(tierIdentity.footerLine)}</p></section>
         <footer class="footer"><span>${escapeHtml(branding.footerText)}</span><span>Watermarked FURLONG advisory export</span></footer>
       </div>
     </article>
@@ -1595,6 +1623,7 @@ function buildReportModel(args: {
     buyingProcess,
     honestUnknowns,
     financingProse,
+    tierIdentity,
     exportHtml,
     exportText: exportLines.join("\n"),
   };
@@ -2197,6 +2226,22 @@ export function PropertyEvaluationWorkspace({
       title: "Diligence priorities before commitment",
       lines: report.nextMoves,
     },
+    // FREE TIER: the honest upgrade preview — named sections, substance-first,
+    // no prices (tier economics founder-gated). The reason to come back.
+    ...(report.tierIdentity.nextTierTeaser
+      ? [
+          {
+            title: report.tierIdentity.nextTierTeaser.heading,
+            lines: [
+              report.tierIdentity.nextTierTeaser.intro,
+              ...report.tierIdentity.nextTierTeaser.items.map(
+                (item) => `${item.name} — ${item.adds}`
+              ),
+              report.tierIdentity.nextTierTeaser.closing,
+            ],
+          },
+        ]
+      : []),
   ];
   const visiblePreviewSections = selectedTierUnlocked
     ? previewSections

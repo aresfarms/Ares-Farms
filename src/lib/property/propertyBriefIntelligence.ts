@@ -31,6 +31,15 @@ import {
   PROPERTY_TENURE_PROVENANCE,
 } from "./propertyTenureGenerated";
 import { COUNTY_FMR, COUNTY_FMR_PROVENANCE } from "./countyFmrGenerated";
+import {
+  PROPERTY_FOOD_ACCESS_FACTS,
+  PROPERTY_FOOD_ACCESS_PROVENANCE,
+} from "./propertyFoodAccessGenerated";
+import {
+  PROPERTY_AMENITY_FACTS,
+  PROPERTY_AMENITIES_PROVENANCE,
+} from "./propertyAmenitiesGenerated";
+import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
 
 export interface BriefFactLine {
   /** Short label, e.g. "Flood zone". */
@@ -290,6 +299,8 @@ function buildUnknowns(args: {
   floodResolved: boolean;
   isHome: boolean;
   rentalContextAvailable: boolean;
+  amenitiesAvailable: boolean;
+  schoolsAvailable: boolean;
 }): BriefUnknownLine[] {
   const unknowns: BriefUnknownLine[] = [];
   const countyKnown =
@@ -340,6 +351,32 @@ function buildUnknowns(args: {
       howToFind:
         "HUD publishes Fair Market Rents by county and bedroom count — free at huduser.gov " +
         "(datasets → Fair Market Rents). Actual asking rents come from local listings.",
+    });
+  }
+  if (args.isHome && !args.amenitiesAvailable) {
+    unknowns.push({
+      label: "Daily-life amenities",
+      howToFind:
+        "Grocery, dining, pharmacy, parks, and vet distances are checkable on any map app — and " +
+        "worth an in-person drive at the times of day you'd actually use them.",
+    });
+  }
+  if (args.isHome && !args.schoolsAvailable) {
+    unknowns.push({
+      label: "Schools",
+      howToFind:
+        "The NCES school locator (nces.ed.gov/ccd/schoolsearch) lists every public school by " +
+        "address; the state Department of Education lists private and charter options and " +
+        "publishes the official report cards.",
+    });
+  }
+  if (args.isHome) {
+    unknowns.push({
+      label: "Private and alternative schools",
+      howToFind:
+        "Private, parochial, and co-op options are listed by the state Department of Education " +
+        "and the NCES private-school survey (nces.ed.gov/surveys/pss) — coverage varies, so a " +
+        "local ask often finds options directories miss.",
     });
   }
   if (args.isHome) {
@@ -396,6 +433,7 @@ export function buildPropertyBriefIntelligence(args: {
   propertyType: string | null;
   priceLabel: string | null;
   county: string | null;
+  town: string | null;
   stateCode: string | null;
   pathwayList: string[];
 }): PropertyBriefIntelligence {
@@ -447,6 +485,95 @@ export function buildPropertyBriefIntelligence(args: {
   const fmrFips =
     resolvedCounty?.fips ??
     (id ? PROPERTY_OZ_FACTS[id]?.tractId?.slice(0, 5) ?? null : null);
+  // USDA food access — the grocery-access designation that matters most in
+  // rural markets. Facts with methodology framing, never adjectives.
+  const food = id ? PROPERTY_FOOD_ACCESS_FACTS[id] : undefined;
+  if (food && isHome) {
+    if (food.lila1And10) {
+      verifiedFacts.push({
+        label: "Grocery access",
+        text:
+          `USDA designates this census tract as low-income and low-access under its 1-mile urban / ` +
+          `10-mile rural measure — the designation behind the term "food desert." Practically: plan ` +
+          `for a real drive to a full grocery store and factor that into daily life here.`,
+        provenance: `Source: ${PROPERTY_FOOD_ACCESS_PROVENANCE.source} (${PROPERTY_FOOD_ACCESS_PROVENANCE.atlasVintage}), snapshot ${PROPERTY_FOOD_ACCESS_PROVENANCE.asOf}`,
+        tone: "caution",
+      });
+    } else {
+      verifiedFacts.push({
+        label: "Grocery access",
+        text:
+          `This census tract is not designated low-income-and-low-access by USDA's food-access ` +
+          `measure${food.urban ? "" : " (rural 10-mile standard)"}.`,
+        provenance: `Source: ${PROPERTY_FOOD_ACCESS_PROVENANCE.source} (${PROPERTY_FOOD_ACCESS_PROVENANCE.atlasVintage}), snapshot ${PROPERTY_FOOD_ACCESS_PROVENANCE.asOf}`,
+        tone: "neutral",
+      });
+    }
+  }
+
+  // Daily-life amenities — distance/count facts within the snapshot radius.
+  // OSM coverage in rural areas can lag; zero means "not mapped", said plainly.
+  const amenities = id ? PROPERTY_AMENITY_FACTS[id] : undefined;
+  if (amenities && isHome) {
+    const radius = PROPERTY_AMENITIES_PROVENANCE.radiusMiles;
+    const part = (
+      key: string,
+      singular: string,
+      plural: string
+    ): string => {
+      const cat = amenities[key];
+      if (!cat || cat.count === 0) return `no ${plural} mapped`;
+      const nearest =
+        cat.nearestMiles !== null
+          ? ` (nearest${cat.nearestName ? ` ${cat.nearestName}` : ""} ~${cat.nearestMiles} mi)`
+          : "";
+      return cat.count === 1 ? `1 ${singular}${nearest}` : `${cat.count} ${plural}${nearest}`;
+    };
+    const parksCount = (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0);
+    verifiedFacts.push({
+      label: "Daily life nearby",
+      text:
+        `Within ~${radius} miles: ${part("grocery", "grocery/market", "groceries/markets")}; ` +
+        `${part("dining", "restaurant/cafe", "restaurants/cafes/bars")}; ` +
+        `${part("pharmacy", "pharmacy", "pharmacies")}; ` +
+        `${part("healthcare", "clinic/hospital", "clinics/hospitals")}; ` +
+        `${parksCount > 0 ? `${parksCount} parks/playgrounds` : "no parks/playgrounds mapped"}` +
+        `${(amenities.dogPark?.count ?? 0) > 0 ? `; ${amenities.dogPark.count} dog park(s)` : ""}` +
+        `${(amenities.vet?.count ?? 0) > 0 ? `; vet ~${amenities.vet.nearestMiles} mi` : "; no vet mapped"}. ` +
+        `"Not mapped" means absent from OpenStreetMap — rural coverage can lag reality.`,
+      provenance: `Source: ${PROPERTY_AMENITIES_PROVENANCE.source}, snapshot ${PROPERTY_AMENITIES_PROVENANCE.asOf} · ${PROPERTY_AMENITIES_PROVENANCE.license}`,
+      tone: "neutral",
+    });
+  }
+
+  // Schools — LIST + permitted data (enrollment, charter), never ratings
+  // (founder decision 2026-07-15).
+  const schoolsFips =
+    resolvedCounty?.fips ?? (id ? PROPERTY_OZ_FACTS[id]?.tractId?.slice(0, 5) ?? null : null);
+  const schools = schoolsFips ? COUNTY_SCHOOLS[schoolsFips] : undefined;
+  if (schools && schools.length > 0 && isHome) {
+    const townLower = (args.town ?? "").trim().toLowerCase();
+    const inTown = townLower
+      ? schools.filter((s) => s.city.toLowerCase() === townLower)
+      : [];
+    const sample = (inTown.length > 0 ? inTown : schools).slice(0, 4);
+    const charterCount = schools.filter((s) => s.charter).length;
+    verifiedFacts.push({
+      label: "Schools",
+      text:
+        `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
+        `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
+        `${inTown.length > 0 ? `, including ${inTown.length} in ${args.town}` : ""}. ` +
+        `Examples: ${sample
+          .map((s) => `${s.name} (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})`)
+          .join("; ")}. ` +
+        `Directory facts from federal data — Furlong does not rate schools; the state report card ` +
+        `is the official quality source.`,
+      provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
+      tone: "neutral",
+    });
+  }
+
   const fmr = fmrFips ? COUNTY_FMR[fmrFips] : undefined;
   if (fmr && isHome) {
     verifiedFacts.push({
@@ -471,6 +598,8 @@ export function buildPropertyBriefIntelligence(args: {
       floodResolved: Boolean(flood),
       isHome,
       rentalContextAvailable: Boolean(fmr),
+      amenitiesAvailable: Boolean(amenities),
+      schoolsAvailable: Boolean(schools && schools.length > 0),
     }),
     mechanics: mechanicsForSource(args.sourceId, args.propertyType),
     pathwaysProse: buildPathwaysProse({

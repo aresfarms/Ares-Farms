@@ -216,25 +216,32 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
     );
   }
 
+  // Free Place Brief intelligence (spec 2026-07-15): computed ONCE server-side
+  // from frozen snapshots, then fed to BOTH the report engine (the report's
+  // place-facts section — including explicit negatives with provenance) and
+  // the standalone Place Intelligence cards below the workspace.
+  const briefIntelligence = propertyContext
+    ? buildPropertyBriefIntelligence({
+        propertyId: propertyContext.propertyId,
+        sourceId: propertyContext.sourceId,
+        propertyType: propertyContext.propertyType,
+        priceLabel: propertyContext.priceLabel,
+        county: propertyContext.county,
+        stateCode: propertyContext.stateCode,
+        pathwayList: propertyContext.pathwayList,
+      })
+    : null;
+
   return (
     <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
       {propertyContext ? (
         <>
-          <PropertyEvaluationWorkspace context={propertyContext} tierPreviewMode={tierPreviewMode} />
-          {/* Free Place Brief intelligence (spec 2026-07-15, build step 1):
-              snapshot-backed place facts, source mechanics, honest unknowns,
-              and the prose pathways line that replaces the pathway chips. */}
-          <PropertyPlaceIntelligence
-            intelligence={buildPropertyBriefIntelligence({
-              propertyId: propertyContext.propertyId,
-              sourceId: propertyContext.sourceId,
-              propertyType: propertyContext.propertyType,
-              priceLabel: propertyContext.priceLabel,
-              county: propertyContext.county,
-              stateCode: propertyContext.stateCode,
-              pathwayList: propertyContext.pathwayList,
-            })}
+          <PropertyEvaluationWorkspace
+            context={propertyContext}
+            tierPreviewMode={tierPreviewMode}
+            placeIntelligence={briefIntelligence}
           />
+          {briefIntelligence && <PropertyPlaceIntelligence intelligence={briefIntelligence} />}
         </>
       ) : (
         <PropertyEvaluationWorkspace

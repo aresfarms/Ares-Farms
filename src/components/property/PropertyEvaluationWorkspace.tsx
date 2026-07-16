@@ -10,6 +10,7 @@ import {
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
+import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import { evaluateFinancingPathways } from "@/lib/financing/pathwayEngine";
 import {
   programsForAsset,
@@ -1229,6 +1230,7 @@ function buildReportModel(args: {
   answers: DraftAnswers;
   navigator: NavigatorSnapshot | null;
   facts: PropertyFactsResponse | null;
+  placeIntelligence: PropertyBriefIntelligence | null;
   verifiedPrograms: NonNullable<PropertyFactsResponse["verifiedPrograms"]>;
   topProgramRanks: PropertyFirstProgramRank[];
   budgetExpectations: BudgetExpectations;
@@ -1348,6 +1350,27 @@ function buildReportModel(args: {
 
     if (verification?.warnings?.length) {
       lines.push(...verification.warnings.map((warning) => `Verification caution: ${warning}`));
+    }
+
+    // Snapshot-backed place intelligence (spec 2026-07-15 unification): the
+    // frozen-snapshot facts — including explicit NEGATIVES with provenance —
+    // fill the report even when no live checks ran, so this section never
+    // renders empty for a canonical inventory property. Keyword dedupe keeps
+    // live-confirmed lines authoritative without double-reporting a topic.
+    if (args.placeIntelligence?.verifiedFacts.length) {
+      const topicKeyword: Record<string, RegExp> = {
+        "Flood zone": /flood/i,
+        "Historic status": /historic/i,
+        "Opportunity Zone": /opportunity zone/i,
+        HUBZone: /hubzone/i,
+        "New Markets Tax Credit area": /nmtc|new markets/i,
+      };
+      const existing = lines.join(" ");
+      for (const fact of args.placeIntelligence.verifiedFacts) {
+        const keyword = topicKeyword[fact.label];
+        if (keyword && keyword.test(existing)) continue;
+        lines.push(`${fact.label}: ${fact.text} [${fact.provenance}]`);
+      }
     }
 
     if (lines.length === 0) {
@@ -1542,10 +1565,13 @@ export function PropertyEvaluationWorkspace({
   context,
   tierPreviewMode,
   addressFirstFlow,
+  placeIntelligence = null,
 }: {
   context: PropertyContext;
   tierPreviewMode: boolean;
   addressFirstFlow?: DiscoveryFlow | null;
+  /** Server-computed snapshot place facts (spec 2026-07-15) — feeds the report's place-facts section. */
+  placeIntelligence?: PropertyBriefIntelligence | null;
 }) {
   const [navigator, setNavigator] = useState<NavigatorSnapshot | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
@@ -2002,6 +2028,7 @@ export function PropertyEvaluationWorkspace({
     answers,
     navigator,
     facts,
+    placeIntelligence,
     topProgramRanks,
     budgetExpectations,
     defaultQuestions,

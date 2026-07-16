@@ -101,10 +101,13 @@ laptop. Create the two principals via the **Cloud SQL control plane**:
    the `cloudsql_private_ip` output; db = `furlong`. (SSL: the instance enforces
    TLS; the exact `sslmode` / server-CA verification is finalized in P2 — start
    with `sslmode=require`.)
+   Substitute the two generated passwords and the private IP for the bracketed
+   placeholders (they intentionally contain spaces so this doc never resembles a
+   real credential to the secret scanner):
    ```bash
-   printf 'postgresql://furlong_runtime:<runtime-pw>@<PRIVATE_IP>:5432/furlong?sslmode=require' \
+   printf 'postgresql://furlong_runtime:<runtime password>@<private ip>:5432/furlong?sslmode=require' \
      | gcloud secrets versions add DATABASE_URL --data-file=-
-   printf 'postgresql://furlong_migrator:<migrator-pw>@<PRIVATE_IP>:5432/furlong?sslmode=require' \
+   printf 'postgresql://furlong_migrator:<migrator password>@<private ip>:5432/furlong?sslmode=require' \
      | gcloud secrets versions add MIGRATOR_DATABASE_URL --data-file=-
    openssl rand -base64 48 \
      | gcloud secrets versions add NEXTAUTH_SECRET --data-file=-

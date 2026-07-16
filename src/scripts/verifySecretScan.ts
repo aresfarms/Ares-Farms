@@ -21,6 +21,7 @@ const PATTERNS: Array<[string, RegExp]> = [
 const FIXTURE_ALLOWLIST = new Set([
   "src/scripts/verifyNoPersonalDocsSmokeTest.ts", // PEM block is the detector's test input
   "src/scripts/authActivationPolicySmokeTest.ts", // fake secret exercises the auth policy
+  "src/scripts/verifyRepoSecrets.ts", // sibling secret-DETECTOR: its regexes + fixture comment ARE credential-shaped by design
 ]);
 
 const files = execSync("git ls-files", { encoding: "utf8" }).split("\n").filter(Boolean)

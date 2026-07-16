@@ -101,14 +101,18 @@ async function http(
  * JWT (IAP docs: aud = the exact resource URL) signed via the IAM signJwt API.
  * The operator holds serviceAccountTokenCreator on VERIFY_SA, which holds
  * iap.httpsResourceAccessor — so this proves health THROUGH IAP without
- * weakening the edge. aud override: VERIFY_IAP_AUDIENCE (e.g. "<url>/*").
+ * weakening the edge.
+ *
+ * aud MUST be the path-wildcard form "<url>/*": IAP honors a bare-URL aud only
+ * for that exact URL (verified live 2026-07-16 — "/" 200 but /health/* 401
+ * until the wildcard). Override: VERIFY_IAP_AUDIENCE.
  */
 function mintIapJwt(serviceUrl: string): string {
   const now = Math.floor(Date.now() / 1000);
   const claim = {
     iss: VERIFY_SA,
     sub: VERIFY_SA,
-    aud: process.env.VERIFY_IAP_AUDIENCE ?? serviceUrl,
+    aud: process.env.VERIFY_IAP_AUDIENCE ?? `${serviceUrl}/*`,
     iat: now,
     exp: now + 600,
     email: VERIFY_SA,

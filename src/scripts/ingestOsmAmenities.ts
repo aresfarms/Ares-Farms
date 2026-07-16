@@ -29,6 +29,11 @@ const USER_AGENT = "FurlongPlaceBrief/1.0 (property amenity ingest; chudson@ares
 const RADIUS_M = 16000; // ~10 miles — rural-honest: nearest-town amenities still register
 const limitArg = process.argv.find((a) => a.startsWith("--limit"));
 const LIMIT = limitArg ? Number(process.argv[process.argv.indexOf(limitArg) + 1] ?? "700") : 700;
+// --refresh: re-query properties that already have a snapshot entry (needed
+// when the category matchers broaden — e.g. the 2026-07-16 pharmacy fix).
+// Existing values are kept until a re-query for that property succeeds, so an
+// interrupted refresh never loses data.
+const REFRESH = process.argv.includes("--refresh");
 
 export interface AmenityCategoryFact {
   count: number;
@@ -121,7 +126,7 @@ async function main(): Promise<void> {
   for (const sourceId of PROPERTY_SOURCE_IDS) {
     if (!isSourceLiveRuntime(sourceId)) continue;
     for (const c of recordsForReview(sourceId)) {
-      if (existing[c.canonical_property_id]) continue;
+      if (!REFRESH && existing[c.canonical_property_id]) continue;
       const r = c.source_records[0];
       if (typeof r.latitude === "number" && typeof r.longitude === "number") {
         points.push({ id: c.canonical_property_id, lon: r.longitude, lat: r.latitude });
@@ -130,7 +135,7 @@ async function main(): Promise<void> {
       }
     }
   }
-  console.log(`  already resolved: ${Object.keys(existing).length} · stored coords: ${points.length} · need geocode: ${needGeocode.length} · cap: ${LIMIT}`);
+  console.log(`  already resolved: ${Object.keys(existing).length}${REFRESH ? " (REFRESH: re-querying all)" : ""} · stored coords: ${points.length} · need geocode: ${needGeocode.length} · cap: ${LIMIT}`);
 
   needGeocode = needGeocode.slice(0, Math.max(0, LIMIT - Math.min(points.length, LIMIT)));
   for (const g of needGeocode) {

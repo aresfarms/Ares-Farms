@@ -231,28 +231,30 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   imageIfExists(doc, input.branding.logoPath, PAGE.marginX, 28, { fit: [150, 44] });
 
   // Tier cover badge — the first thing that says "this document is different".
+  // (The tagline lives in the TIER PURPOSE card; the header stays compact so
+  // long tier names never collide with the rule or the verdict cards below.)
   applyFont(doc, "bold");
   doc
     .fillColor(ACCENT)
-    .fontSize(9)
-    .text(identity.coverBadge, PAGE.marginX, 116, { characterSpacing: 2.2 });
+    .fontSize(8.5)
+    .text(identity.coverBadge, PAGE.marginX, 114, { characterSpacing: 2.2 });
 
   applyFont(doc, "bold");
   doc
     .fillColor(identity.ink)
-    .fontSize(24)
-    .text(identity.displayName, PAGE.marginX, 130, { width: 340 });
+    .fontSize(20)
+    .text(identity.displayName, PAGE.marginX, 126, { width: 340 });
 
   applyFont(doc, "regular");
   doc
-    .fillColor(COLORS.muted)
-    .fontSize(10)
-    .text(identity.tagline, PAGE.marginX, doc.y + 2, { width: 336, lineGap: 2 });
-  doc
     .fillColor(COLORS.text)
-    .fontSize(11)
-    .text(input.context.title, PAGE.marginX, doc.y + 6, { width: 320, lineGap: 2 })
-    .text(input.context.location + (input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""), PAGE.marginX, doc.y + 2, { width: 330, lineGap: 2 });
+    .fontSize(10.5)
+    .text(
+      `${input.context.title} — ${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}`,
+      PAGE.marginX,
+      Math.min(doc.y + 4, 194),
+      { width: 336, lineGap: 2, height: 26, ellipsis: true }
+    );
 
   // Tier rule treatment: single (free) / double (institutional) / thick
   // (environmental). Left column only — the info card owns the right side.
@@ -274,7 +276,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   doc
     .fillColor("#ffffff")
     .fontSize(10.5)
-    .text(`${input.tier.shortLabel} · ${input.tier.label}`, PAGE.width - 184, 140, { width: 128, align: "center" });
+    .text(input.tier.shortLabel, PAGE.width - 184, 140, { width: 128, align: "center", height: 14, ellipsis: true });
 
   card(doc, PAGE.width - 210, 172, 166, 84, ACCENT_SOFT);
   applyFont(doc, "bold");
@@ -385,8 +387,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     sectionTitle(doc, section.title, doc.y);
     doc.y += 16;
     const estimated = Math.max(88, section.items.length * 24 + 26);
-    card(doc, PAGE.marginX, doc.y, PAGE.width - PAGE.marginX * 2, estimated, "#ffffff");
-    doc.y = bulletList(doc, section.items, PAGE.marginX + 16, doc.y + 16, PAGE.width - PAGE.marginX * 2 - 32) + 10;
+    const cardTop = doc.y;
+    card(doc, PAGE.marginX, cardTop, PAGE.width - PAGE.marginX * 2, estimated, "#ffffff");
+    const bulletsEnd = bulletList(doc, section.items, PAGE.marginX + 16, cardTop + 16, PAGE.width - PAGE.marginX * 2 - 32);
+    // The next heading must clear BOTH the text and the drawn card frame.
+    doc.y = Math.max(bulletsEnd, cardTop + estimated) + 14;
   }
 
   // FREE TIER: the honest upgrade preview — named sections, substance-first,
@@ -402,8 +407,10 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       teaser.closing,
     ];
     const estimated = Math.max(120, teaserLines.length * 46 + 26);
-    card(doc, PAGE.marginX, doc.y, PAGE.width - PAGE.marginX * 2, estimated, ACCENT_SOFT);
-    doc.y = bulletList(doc, teaserLines, PAGE.marginX + 16, doc.y + 16, PAGE.width - PAGE.marginX * 2 - 32) + 10;
+    const teaserTop = doc.y;
+    card(doc, PAGE.marginX, teaserTop, PAGE.width - PAGE.marginX * 2, estimated, ACCENT_SOFT);
+    const teaserEnd = bulletList(doc, teaserLines, PAGE.marginX + 16, teaserTop + 16, PAGE.width - PAGE.marginX * 2 - 32);
+    doc.y = Math.max(teaserEnd, teaserTop + estimated) + 14;
   }
 
   ensureSpace(doc, 140);

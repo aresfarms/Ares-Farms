@@ -101,6 +101,28 @@ local vacancy/tenancy context (Census); property-management availability distanc
 Wouldn't know to ask: **does the town even allow short-term rentals?** (ordinance/permit-cap status
 — the STR killer question); state landlord-tenant basics as linked facts; utility split norms;
 insurance class differences; seasonal demand pattern for the region.
+
+**STR Permit Reality Profile (Caitlin add, 2026-07-15)** — allowance alone isn't the answer; the
+permit's cost and friction change the math. Presented as a factual process profile, never an
+"easy/hard" score:
+- **Allowed?** ordinance status: permitted by right / conditional / prohibited / silent (silence
+  itself flagged as a risk fact).
+- **What it costs:** application fee, annual permit/renewal fee, business-license fee, lodging/
+  occupancy tax rate the operator must collect, required inspection fees — each cited to the
+  municipal fee schedule with as-of date.
+- **How hard it is, in facts:** number of application steps; documented processing time; permit
+  **cap status** (cap reached → waitlist/lottery = the deal-changer); owner-occupancy requirement;
+  minimum-night rules; parking/occupancy limits; inspection + insurance minimums; renewal cadence
+  and revocation triggers; neighbor-notification or public-hearing requirement (a hearing
+  requirement is the single biggest friction fact).
+- Free tier: allowed/conditional/prohibited/silent status + fee headline where already held.
+  Tier 1: full profile with the ordinance/fee-schedule documents pulled. Tier 2: the profile
+  applied to THIS property's zoning + a labeled-assumption revenue model net of permit costs and
+  lodging tax (forecast doctrine).
+- Sourcing: municipal code libraries (Municode/American Legal — link/licensing check), town clerk
+  fee schedules; each town profiled once, cached with as-of dating and re-verified on staleness
+  (render-time honesty pattern).
+
 Paid tiers: labeled-assumption cash-flow model (forecast doctrine), comparable dispositions,
 ordinance document pull.
 

@@ -30,9 +30,43 @@ function assert(condition: boolean, message: string): asserts condition {
 }
 
 function routeFileExists(route: string): boolean {
-  const routePath = route === "/" ? "src/app/page.tsx" : `src/app${route}/page.tsx`;
+  const appRoot = path.join(repoRoot, "src/app");
+  const expectedSegments =
+    route === "/"
+      ? []
+      : route
+          .split("/")
+          .filter(Boolean);
 
-  return fs.existsSync(path.join(repoRoot, routePath));
+  const stack: Array<{ abs: string; segments: string[] }> = [{ abs: appRoot, segments: [] }];
+
+  while (stack.length > 0) {
+    const current = stack.pop();
+    if (!current) continue;
+
+    const pagePath = path.join(current.abs, "page.tsx");
+    if (
+      fs.existsSync(pagePath) &&
+      current.segments.length === expectedSegments.length &&
+      current.segments.every((segment, index) => segment === expectedSegments[index])
+    ) {
+      return true;
+    }
+
+    for (const entry of fs.readdirSync(current.abs, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+
+      const nextAbs = path.join(current.abs, entry.name);
+      const nextSegments = entry.name.startsWith("(") && entry.name.endsWith(")")
+        ? current.segments
+        : [...current.segments, entry.name];
+
+      if (nextSegments.length > expectedSegments.length) continue;
+      stack.push({ abs: nextAbs, segments: nextSegments });
+    }
+  }
+
+  return false;
 }
 
 function addMapValue<TKey, TValue>(

@@ -24,6 +24,13 @@ export const reportPolicy = {
     officialUseAllowed: false,
     description:
       "Borrower-facing baseline intake visibility, missing-document guidance, pathway context, rights notices, and export support.",
+    includes: [
+      "baseline intake visibility",
+      "missing-document guidance",
+      "initial pathway context",
+      "customer rights and export posture",
+      "advisory-only boundary",
+    ],
   },
 
   paid: {
@@ -35,6 +42,13 @@ export const reportPolicy = {
     officialUseAllowed: false,
     description:
       "Institution-funded operational coordination summary for authorized review, not a borrower charge, approval, credit decision, or financing commitment.",
+    includes: [
+      "everything in the baseline report",
+      "deeper readiness posture by section",
+      "guided customer questions still controlling the answer",
+      "institution-side coordination framing",
+      "human-review boundary and decision-grade gaps",
+    ],
   },
 
   environmental: {
@@ -46,5 +60,12 @@ export const reportPolicy = {
     officialUseAllowed: false,
     description:
       "Advisory-only environmental documentation readiness support. It is not valid for permitting, financing, legal, or regulatory reliance without independent licensed professional review.",
+    includes: [
+      "site-side and environmental documentation posture",
+      "environmental risk and evidence gaps",
+      "licensed professional review boundary",
+      "customer rights and export posture",
+      "advisory-only environmental limitations",
+    ],
   },
 };

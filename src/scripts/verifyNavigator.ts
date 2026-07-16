@@ -11,6 +11,7 @@ import {
 } from "@/lib/navigator/propertyPrivacyDoctrine";
 import { scrubPropertyRecord, assertNoBannedFields } from "@/lib/navigator/intakeScrubber";
 import { resolveListingInput } from "@/lib/navigator/listingIntake";
+import { buildImportedPropertyContext } from "@/lib/property/propertyImportIntake";
 import { assessPathways, discoveryGraphChain, EMPTY_CONTEXT } from "@/lib/navigator/possibilityCheck";
 import { interpretMessage, detectPropertyIntent, FRESH_JOURNEY, GUIDED_DISCOVERY_OPENER } from "@/lib/navigator/narrativeInterpreter";
 import { FURLONG_NAVIGATOR_MANIFEST } from "@/lib/navigator/furlongNavigatorManifest";
@@ -102,10 +103,37 @@ const z = resolveListingInput("https://www.zillow.com/homedetails/123-Main-St-Be
 ok(!!z && z.source === "zillow" && /123 Main St Beckley WV/i.test(z.addressText) && z.state === "WV" && z.parcelId === null, `zillow URL → address text (got ${JSON.stringify(z)})`);
 const c = resolveListingInput("https://www.crexi.com/properties/2400-Industrial-Ave-Toledo-OH");
 ok(!!c && c.source === "crexi" && /Industrial Ave Toledo OH/i.test(c!.addressText), "crexi URL → address text");
+const realtor = resolveListingInput("https://www.realtor.com/realestateandhomes-detail/10-S-Arm-Rd_Andover_ME_04216_M98473-14525");
+ok(!!realtor && realtor.source === "other-url" && realtor.addressText === "10 S Arm Rd Andover ME 04216", `realtor URL slug noise removed (got ${JSON.stringify(realtor)})`);
 ok(resolveListingInput("456 Oak Street, Austin TX")?.source === "plain-address", "plain address accepted");
 ok(resolveListingInput("hello there") === null, "non-address text → null (conversation asks)");
 const intakeSrc = fs.readFileSync("src/lib/navigator/listingIntake.ts", "utf8");
 ok(!/\bfetch\s*\(|axios|http\.get|XMLHttpRequest/.test(intakeSrc.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "")), "listing intake makes NO network call (lawful seam — never scrapes the source)");
+
+const imported = buildImportedPropertyContext({
+  mode: "paste",
+  rawInput: "https://www.realtor.com/realestateandhomes-detail/10-S-Arm-Rd_Andover_ME_04216_M98473-14525",
+  notes: "Historic inn / event venue / hospitality property with acreage and waterfront",
+});
+ok(!("blocked" in imported), `ordinary listing import should not be blocked (got ${JSON.stringify(imported)})`);
+if (!("blocked" in imported)) {
+  ok(imported.priceLabel === "Price not yet verified", `imported URL must not hallucinate price from slug digits (got ${imported.priceLabel})`);
+  ok(imported.propertyType === "Hospitality property", `hospitality signals should outrank farm heuristics here (got ${imported.propertyType})`);
+  ok(imported.exactAddress === "10 S Arm Rd Andover ME 04216", `imported address should strip slug artifacts (got ${imported.exactAddress})`);
+  ok(imported.pathwayList.length === 1 && imported.pathwayList[0] === "SBA", `hospitality import should route cleanly to SBA here (got ${imported.pathwayList.join(", ")})`);
+}
+
+const importedWithPastedPrice = buildImportedPropertyContext({
+  mode: "paste",
+  rawInput:
+    "10 S Arm Rd, Andover, ME 04216. Historic inn and event venue. Listed for $699,000 with waterfront and acreage.",
+  notes: "Hospitality acquisition candidate.",
+});
+ok(!("blocked" in importedWithPastedPrice), `priced pasted listing import should not be blocked (got ${JSON.stringify(importedWithPastedPrice)})`);
+if (!("blocked" in importedWithPastedPrice)) {
+  ok(importedWithPastedPrice.priceLabel === "$699,000", `pasted listing text should preserve asking price (got ${importedWithPastedPrice.priceLabel})`);
+  ok(importedWithPastedPrice.propertyType === "Hospitality property", `priced Andover-style import should still classify as hospitality (got ${importedWithPastedPrice.propertyType})`);
+}
 
 // ── Three-answer engine + confidence + why-shown + matrix ────────────────────
 const farm = assessPathways({ ...EMPTY_CONTEXT, propertyKind: "farm", acreage: 120, inHoa: false });

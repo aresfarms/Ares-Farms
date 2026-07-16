@@ -42,11 +42,17 @@ const PAGES = [
       'furlong does not make official determinations', // old flat-list item (not in new copy)
     ],
     required: [
-      // Hero "blend" copy (Build 57) — H1 → tagline → subhead → trust tag, verbatim
-      'every journey starts somewhere.',
-      "mapping america's land, funding, and business opportunities.",
-      'use 250 years of land and financial history to map your next venture',
-      'zero tracking. total transparency.',
+      'what are your possibilities? explore and find out.',
+      'explore land, funding, business, and readiness pathways with less guesswork and more clarity.',
+      'start with a property, a question, or just an idea.',
+      'explore anonymously. no account required. no hidden handoff.',
+      'what you can do here',
+      'you do not need a finished plan to begin',
+      'how furlong works',
+      'start with what you know',
+      'see what may be possible',
+      'understand the boundaries',
+      'decide your next real step',
       // New section heading
       'clear waters, no surprises',
       // Lighthouse opener

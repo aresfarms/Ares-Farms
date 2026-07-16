@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
@@ -50,51 +50,367 @@ const COVERAGE: { label: string; source: string; confidence: string; disclaimer:
   { label: "NMTC low-income community", source: "CDFI Fund NMTC-eligible tracts · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "States whether the tract is NMTC-qualified — a place-fact, not a person-side determination." },
 ];
 
-export function PlaceFirstDiscovery({ flow }: { flow: DiscoveryFlow }) {
+type PlaceFactsResponse = {
+  ok: boolean;
+  error?: string;
+  verifiedPrograms?: Array<{
+    program_id: string;
+    name: string;
+    verifiedStatement: string;
+    basis: string;
+    administering_body: string;
+    asOf: string;
+  }>;
+  placeFacts?: {
+    opportunityZone?: { tractId: string; rural: boolean; asOf: string } | null;
+    hubzone?: {
+      hubzoneType: string;
+      geoid: string;
+      effective: string;
+      expiration: string | null;
+      isCurrent: boolean;
+      asOf: string;
+    } | null;
+    flood?: { floodZone: string; asOf: string } | null;
+    historic?: { historicName: string | null; asOf: string } | null;
+    nmtc?: { tractId: string; asOf: string } | null;
+  };
+  verification?: {
+    status: "verified" | "partial" | "blocked" | "unverifiable";
+    normalizedAddress: string | null;
+    parsedAddress?: {
+      street: string;
+      city: string;
+      state: string;
+      zip: string;
+    } | null;
+    restrictions: string[];
+    warnings: string[];
+    lookupOutcomes?: {
+      opportunityZone: "matched" | "no-match" | "error" | "not-run" | "gated";
+      nmtc: "matched" | "no-match" | "error" | "not-run" | "gated";
+      hubzone: "matched" | "no-match" | "error" | "not-run" | "gated";
+      flood: "matched" | "no-match" | "error" | "not-run" | "gated";
+      historic: "matched" | "no-match" | "error" | "not-run" | "gated";
+    };
+  };
+};
+
+export function PlaceFirstDiscovery({
+  flow,
+  embedded = false,
+}: {
+  flow: DiscoveryFlow;
+  embedded?: boolean;
+}) {
   const head = HEAD[flow] ?? HEAD["place-facts"];
-  const [address, setAddress] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [city, setCity] = useState("");
   const [county, setCounty] = useState("");
   const [stateCode, setStateCode] = useState("");
   const [parcel, setParcel] = useState("");
   const [checked, setChecked] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<PlaceFactsResponse | null>(null);
+  const [jumpCue, setJumpCue] = useState<string | null>(null);
+  const resultRef = useRef<HTMLDivElement | null>(null);
 
-  const located = [address, county && stateCode ? `${county}, ${stateCode}` : "", parcel].filter(Boolean).join(" · ");
+  const fullAddress = [streetAddress.trim(), city.trim(), stateCode.trim()]
+    .filter(Boolean)
+    .join(", ");
+  const located = [
+    fullAddress,
+    county.trim() && stateCode.trim() ? `${county.trim()} County, ${stateCode.trim()}` : county.trim(),
+    parcel.trim(),
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  async function checkPlaceFacts() {
+    setChecked(true);
+    setBusy(true);
+    setError(null);
+    setJumpCue("Preparing your location results below.");
+
+    const exactAddress = fullAddress;
+    const location = [
+      city.trim(),
+      county.trim() ? `${county.trim()} County` : "",
+      stateCode.trim(),
+    ]
+      .filter(Boolean)
+      .join(", ");
+
+    if (!streetAddress.trim() || !city.trim() || !stateCode.trim()) {
+      setResult(null);
+      setError("Enter the street address, city, and state so Furlong can verify the full location against public sources.");
+      setBusy(false);
+      setJumpCue("Add the full address first, then we will jump you to the result section.");
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/public/property-facts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          exactAddress,
+          location: location || null,
+          stateCode: stateCode.trim() || null,
+          rawInput: [streetAddress.trim(), city.trim(), county.trim(), stateCode.trim(), parcel.trim()]
+            .filter(Boolean)
+            .join(" · "),
+          notes: parcel.trim() ? `Parcel reference: ${parcel.trim()}` : null,
+        }),
+      });
+
+      const data = (await res.json()) as PlaceFactsResponse;
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || "The location place-facts lookup could not be completed.");
+      }
+
+      setResult(data);
+    } catch (lookupError) {
+      setResult(null);
+      setError(
+        lookupError instanceof Error
+          ? lookupError.message
+          : "The location place-facts lookup could not be completed."
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const verification = result?.verification;
+  const verifiedPrograms = result?.verifiedPrograms ?? [];
+  const liveFacts = result?.placeFacts;
+  const sourceOutcomeCards = verification?.lookupOutcomes
+    ? [
+        {
+          id: "opportunity-zone",
+          label: "Opportunity Zone",
+          outcome: verification.lookupOutcomes.opportunityZone,
+        },
+        {
+          id: "nmtc",
+          label: "NMTC",
+          outcome: verification.lookupOutcomes.nmtc,
+        },
+        {
+          id: "hubzone",
+          label: "HUBZone",
+          outcome: verification.lookupOutcomes.hubzone,
+        },
+        {
+          id: "flood",
+          label: "FEMA flood",
+          outcome: verification.lookupOutcomes.flood,
+        },
+        {
+          id: "historic",
+          label: "Historic / NPS",
+          outcome: verification.lookupOutcomes.historic,
+        },
+      ]
+    : [];
+  const checkedSourceCount = sourceOutcomeCards.filter(
+    (item) => item.outcome === "matched" || item.outcome === "no-match"
+  ).length;
+  const additionalPositiveMatchCount =
+    sourceOutcomeCards.filter((item) => item.outcome === "matched").length;
+  const additionalSourceBottomLine =
+    sourceOutcomeCards.length === 0
+      ? null
+      : checkedSourceCount === 0
+        ? "Furlong could not complete the currently enabled source checks for this address at this time, so it cannot responsibly state that no other place-fact or program-support matches exist."
+        : additionalPositiveMatchCount === 0
+          ? "Furlong checked the currently enabled public sources and did not confirm any additional positive place-fact or program-support matches for this address."
+          : additionalPositiveMatchCount === 1
+            ? "Furlong confirmed one positive place-fact or program-support match above. No other checked sources returned an additional positive match."
+            : `Furlong confirmed ${additionalPositiveMatchCount} positive place-fact or program-support matches above. No other checked sources returned an additional positive match.`;
+  const analysisHref = (() => {
+    if (!verification || verification.status === "blocked" || verification.status === "unverifiable") {
+      return null;
+    }
+
+    const parsed = verification.parsedAddress;
+    const titleBase = verification.normalizedAddress || fullAddress || located || "Imported property";
+    const title = parsed?.street
+      ? `${parsed.street} analysis`
+      : `${titleBase} analysis`;
+    const locationLabel = parsed
+      ? [parsed.city, parsed.state].filter(Boolean).join(", ")
+      : [city.trim(), stateCode.trim()].filter(Boolean).join(", ") || located || titleBase;
+
+    const positiveSignals = [
+      liveFacts?.opportunityZone ? `Opportunity Zone tract ${liveFacts.opportunityZone.tractId}` : null,
+      liveFacts?.nmtc ? `NMTC tract ${liveFacts.nmtc.tractId}` : null,
+      liveFacts?.hubzone ? `HUBZone ${liveFacts.hubzone.hubzoneType}` : null,
+      liveFacts?.flood ? `FEMA flood zone ${liveFacts.flood.floodZone}` : null,
+      liveFacts?.historic
+        ? liveFacts.historic.historicName
+          ? `Historic area ${liveFacts.historic.historicName}`
+          : "National Register historic area"
+        : null,
+    ].filter(Boolean);
+
+    const params = new URLSearchParams();
+    params.set("mode", "possibilities");
+    params.set("entry", "property-brief");
+    params.set("propertyId", "imported:place-facts");
+    params.set("propertyType", "place-led property");
+    params.set("location", locationLabel || "Verified location");
+    params.set("title", title);
+    params.set("priceLabel", "Price not yet verified");
+    params.set("sourceLabel", "Furlong verified address check");
+    params.set("sourceVerificationStatus", "verified-address-only");
+    params.set("currentLabel", "Imported from Furlong place-facts");
+    if (verification.normalizedAddress) params.set("exactAddress", verification.normalizedAddress);
+    if (parsed?.city) params.set("town", parsed.city);
+    if (county.trim()) params.set("county", county.trim());
+    if (parsed?.state || stateCode.trim()) params.set("state", parsed?.state ?? stateCode.trim());
+    if (verifiedPrograms.length > 0) {
+      params.set("pathways", verifiedPrograms.map((program) => program.name).join(", "));
+    }
+    const descriptionParts = [
+      "Imported from the Furlong place-facts screen.",
+      positiveSignals.length > 0
+        ? `Verified place-fact signals: ${positiveSignals.join("; ")}.`
+        : "No positive place-fact matches were confirmed during the initial verification pass.",
+      additionalSourceBottomLine,
+    ].filter(Boolean);
+    params.set("description", descriptionParts.join(" "));
+    return `/discover?${params.toString()}`;
+  })();
+
+  useEffect(() => {
+    if (!checked || busy) return;
+    if (!error && !result) return;
+
+    resultRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    setJumpCue("Jumped to your location results.");
+  }, [busy, checked, error, result]);
 
   return (
     <section data-testid="place-first-discovery" data-flow={flow} aria-label="Place-first discovery"
-      style={{ display: "grid", gap: 22, maxWidth: 760, border: "1px solid #d7deea", borderRadius: 16, background: "#fff", padding: "26px 28px" }}>
-      <header style={{ display: "grid", gap: 8 }}>
-        <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#854F0B" }}>{head.eyebrow}</span>
-        <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: "#101a2b" }}>{head.title}</h1>
-        <p style={{ margin: 0, fontSize: 13.5, color: "#5d687a", lineHeight: 1.55 }}>{head.lede}</p>
-      </header>
+      style={{
+        display: "grid",
+        gap: embedded ? 18 : 22,
+        maxWidth: embedded ? "none" : 760,
+        border: embedded ? "none" : "1px solid #d7deea",
+        borderRadius: embedded ? 0 : 16,
+        background: embedded ? "transparent" : "#fff",
+        padding: embedded ? 0 : "26px 28px",
+      }}>
+      {!embedded && (
+        <header style={{ display: "grid", gap: 8 }}>
+          <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#854F0B" }}>{head.eyebrow}</span>
+          <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: "#101a2b" }}>{head.title}</h1>
+          <p style={{ margin: 0, fontSize: 13.5, color: "#5d687a", lineHeight: 1.55 }}>{head.lede}</p>
+        </header>
+      )}
 
       {/* ── Location FIRST ──────────────────────────────────────────────────── */}
-      <div data-testid="place-inputs" style={{ display: "grid", gap: 12, border: "1px solid #e6ebf2", borderRadius: 12, padding: "16px 18px" }}>
-        <strong style={{ fontSize: 13.5, color: "#1f2a3d" }}>Where is the location?</strong>
-        <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Street address (e.g. 123 Main St, Beckley WV)"
+      <div data-testid="place-inputs" style={{ display: "grid", gap: 12, border: "1px solid #e6ebf2", borderRadius: 12, padding: embedded ? "18px 18px" : "16px 18px", background: "#fff" }}>
+        <strong style={{ fontSize: embedded ? 16 : 13.5, color: "#1f2a3d" }}>
+          {embedded ? "Start with the verified address" : "Where is the location?"}
+        </strong>
+        {embedded && (
+          <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.6, maxWidth: 820 }}>
+            Verify the place first, then carry those checked facts directly into the rest of the analysis without switching screens.
+          </span>
+        )}
+        <input
+          value={streetAddress}
+          onChange={(e) => setStreetAddress(e.target.value)}
+          placeholder="Street address (e.g. 123 Main St)"
           style={{ fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }} />
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <input value={county} onChange={(e) => setCounty(e.target.value)} placeholder="County" style={{ flex: "1 1 180px", fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }} />
-          <input value={stateCode} onChange={(e) => setStateCode(e.target.value.toUpperCase().slice(0, 2))} placeholder="State (e.g. WV)" maxLength={2} style={{ width: 110, fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }} />
+          <input
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="City"
+            style={{ flex: "1 1 180px", fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }}
+          />
+          <input
+            value={stateCode}
+            onChange={(e) => setStateCode(e.target.value.toUpperCase().slice(0, 2))}
+            placeholder="State (e.g. WV)"
+            maxLength={2}
+            style={{ width: 110, fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }}
+          />
         </div>
-        <input value={parcel} onChange={(e) => setParcel(e.target.value)} placeholder="Parcel / APN (optional)"
-          style={{ fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1", maxWidth: 360 }} />
-        <button type="button" data-testid="place-check" onClick={() => setChecked(true)}
-          style={{ justifySelf: "start", fontSize: 14, fontWeight: 800, color: "#fff", background: "#854F0B", border: "none", borderRadius: 999, padding: "10px 22px", cursor: "pointer" }}>
-          Check this location's place-facts →
-        </button>
-        <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>Anonymous — no account or name needed. We use the location only to report public place-facts.</span>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <input
+            value={county}
+            onChange={(e) => setCounty(e.target.value)}
+            placeholder="County (optional but helpful)"
+            style={{ flex: "1 1 200px", fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }}
+          />
+          <input
+            value={parcel}
+            onChange={(e) => setParcel(e.target.value)}
+            placeholder="Parcel / APN (optional)"
+            style={{ flex: "1 1 220px", fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1", maxWidth: 360 }}
+          />
+        </div>
+        <div style={{ display: "grid", gap: 8, justifySelf: "start" }}>
+          <button
+            type="button"
+            data-testid="place-check"
+            onClick={() => void checkPlaceFacts()}
+            aria-describedby="place-facts-jump-cue"
+            style={{
+              justifySelf: "start",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+              minHeight: 46,
+              fontSize: 14,
+              fontWeight: 800,
+              color: "#fff",
+              background: busy ? "#9a6730" : "#854F0B",
+              border: "none",
+              borderRadius: 999,
+              padding: "10px 22px",
+              cursor: busy ? "progress" : "pointer",
+              boxShadow: busy ? "0 0 0 3px rgba(133,79,11,0.12)" : "0 10px 24px rgba(133,79,11,0.18)",
+            }}
+          >
+            <span>{busy ? "Checking and jumping to results..." : "Check this location and jump to results →"}</span>
+          </button>
+          <span
+            id="place-facts-jump-cue"
+            style={{
+              fontSize: 12.5,
+              fontWeight: 700,
+              color: busy ? "#854F0B" : jumpCue ? "#0f766e" : "#7a8aa0",
+              lineHeight: 1.45,
+            }}
+          >
+            {busy
+              ? "Furlong is verifying the address now and will move you straight to the answer block."
+              : jumpCue ?? "The answer section appears below and this control will take you straight to it."}
+          </span>
+        </div>
+        <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>
+          Enter the full street, city, and state whenever possible. County and parcel stay available because some public records begin there.
+        </span>
       </div>
 
       {/* ── Then: verified place-facts coverage + source confidence + disclaimers ─ */}
       <div data-testid="place-facts-coverage" style={{ display: "grid", gap: 10 }}>
-        <strong style={{ fontSize: 14, color: "#101a2b" }}>
+        <strong style={{ fontSize: embedded ? 15 : 14, color: "#101a2b" }}>
           {checked && located ? `Verified place-facts we report for ${located}:` : "Verified place-facts we report for any U.S. location:"}
         </strong>
-        {checked && (
+        {checked && !result && !error && (
           <p data-testid="live-gated-note" style={{ margin: 0, fontSize: 12.5, color: "#7a8aa0", lineHeight: 1.5 }}>
-            Live per-address lookup is pending operator activation (Module 22/23), so we don't compute a single-address result here yet — instead, these facts are attached to every property in the verified inventory below, and each carries its source + date.
+            Furlong is verifying the location against public place-fact sources now.
           </p>
         )}
         <div style={{ display: "grid", gap: 8 }}>
@@ -112,20 +428,194 @@ export function PlaceFirstDiscovery({ flow }: { flow: DiscoveryFlow }) {
         <p style={{ margin: 0, fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>
           Advisory only — place-facts describe the place, not your eligibility. Whether you personally benefit is a separate question for a licensed professional or the agency.
         </p>
+        {(error || result) && (
+          <div
+            id="location-verification-result"
+            ref={resultRef}
+            style={{ display: "grid", gap: 10, border: "1px solid #e6ebf2", borderRadius: 12, padding: "14px 16px", background: "#fbfdff", scrollMarginTop: 24 }}
+          >
+            <strong style={{ fontSize: 14, color: "#101a2b" }}>Location verification result</strong>
+            {error && (
+              <span style={{ fontSize: 12.5, color: "#b42318", lineHeight: 1.5 }}>{error}</span>
+            )}
+            {result && (
+              <>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: "#0f766e", background: "#ecfdf3", border: "1px solid #a6f4c5", borderRadius: 999, padding: "6px 10px" }}>
+                    {verification?.status === "verified"
+                      ? "Verified address"
+                      : verification?.status === "partial"
+                        ? "Partially verified"
+                        : verification?.status === "blocked"
+                          ? "Restricted input"
+                          : "Unverifiable input"}
+                  </span>
+                  {verification?.normalizedAddress && (
+                    <span style={{ fontSize: 12.5, color: "#475467", lineHeight: 1.5 }}>
+                      {verification.normalizedAddress}
+                    </span>
+                  )}
+                </div>
+
+                {verification?.restrictions?.length ? (
+                  <div style={{ display: "grid", gap: 6 }}>
+                    {verification.restrictions.map((item) => (
+                      <span key={item} style={{ fontSize: 12.5, color: "#b42318", lineHeight: 1.5 }}>{item}</span>
+                    ))}
+                  </div>
+                ) : null}
+
+                {verification?.warnings?.length ? (
+                  <div style={{ display: "grid", gap: 6 }}>
+                    {verification.warnings.map((item) => (
+                      <span key={item} style={{ fontSize: 12.5, color: "#8a6d3b", lineHeight: 1.5 }}>{item}</span>
+                    ))}
+                  </div>
+                ) : null}
+
+                {analysisHref && (
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+                    <Link
+                      href={analysisHref}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        minHeight: 42,
+                        fontSize: 13.5,
+                        fontWeight: 800,
+                        color: "#fff",
+                        background: "#0f766e",
+                        borderRadius: 999,
+                        padding: "10px 18px",
+                        textDecoration: "none",
+                      }}
+                    >
+                      Take this into analysis →
+                    </Link>
+                    <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.5 }}>
+                      Carry this verified address and what Furlong already checked straight into the property analysis workspace.
+                    </span>
+                  </div>
+                )}
+
+                {sourceOutcomeCards.length > 0 && (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <strong style={{ fontSize: 13.5, color: "#162033" }}>What Furlong actually checked</strong>
+                    <div style={{ display: "grid", gap: 8 }}>
+                      {sourceOutcomeCards.map((item) => (
+                        <div key={item.id} style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                          <strong style={{ fontSize: 12.75, color: "#162033" }}>{item.label}</strong>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: item.outcome === "matched" ? "#0f766e" : item.outcome === "no-match" ? "#475467" : item.outcome === "gated" ? "#854F0B" : "#b42318" }}>
+                            {item.outcome === "matched"
+                              ? "Checked and matched"
+                              : item.outcome === "no-match"
+                                ? "Checked and no positive match"
+                                : item.outcome === "gated"
+                                  ? "Not run — governed gate"
+                                  : item.outcome === "not-run"
+                                    ? "Not run"
+                                    : "Attempted but not completed"}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    {additionalSourceBottomLine && (
+                      <span style={{ fontSize: 12.5, color: "#475467", lineHeight: 1.55 }}>
+                        {additionalSourceBottomLine}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ display: "grid", gap: 8 }}>
+                  {liveFacts?.opportunityZone && (
+                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: "#162033" }}>Opportunity Zone</strong>
+                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                        Tract {liveFacts.opportunityZone.tractId}{liveFacts.opportunityZone.rural ? " · rural tract" : ""}.
+                      </span>
+                    </div>
+                  )}
+                  {liveFacts?.hubzone && (
+                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: "#162033" }}>HUBZone</strong>
+                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                        {liveFacts.hubzone.hubzoneType} · GEOID {liveFacts.hubzone.geoid}
+                        {liveFacts.hubzone.isCurrent ? " · currently designated" : " · not current"}.
+                      </span>
+                    </div>
+                  )}
+                  {liveFacts?.flood && (
+                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: "#162033" }}>FEMA flood</strong>
+                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                        Special Flood Hazard Area, Zone {liveFacts.flood.floodZone}.
+                      </span>
+                    </div>
+                  )}
+                  {liveFacts?.historic && (
+                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: "#162033" }}>Historic context</strong>
+                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                        National Register area{liveFacts.historic.historicName ? ` — ${liveFacts.historic.historicName}` : ""}.
+                      </span>
+                    </div>
+                  )}
+                  {liveFacts?.nmtc && (
+                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: "#162033" }}>NMTC tract</strong>
+                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                        Tract {liveFacts.nmtc.tractId} is NMTC-qualified in the current snapshot.
+                      </span>
+                    </div>
+                  )}
+                  {verifiedPrograms.map((program) => (
+                    <div key={program.program_id} style={{ border: "1px solid #b9e3d4", background: "#f4fbf8", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: "#0f6e56" }}>{program.name}</strong>
+                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>{program.verifiedStatement}</span>
+                      <span style={{ fontSize: 11.5, color: "#5d687a" }}>{program.basis}</span>
+                    </div>
+                  ))}
+                  {!liveFacts?.opportunityZone &&
+                    !liveFacts?.hubzone &&
+                    !liveFacts?.flood &&
+                    !liveFacts?.historic &&
+                    !liveFacts?.nmtc &&
+                    verifiedPrograms.length === 0 && (
+                      <span style={{ fontSize: 12.5, color: "#7a8aa0", lineHeight: 1.55 }}>
+                        {verification?.lookupOutcomes &&
+                        [
+                          verification.lookupOutcomes.opportunityZone,
+                          verification.lookupOutcomes.nmtc,
+                          verification.lookupOutcomes.hubzone,
+                          verification.lookupOutcomes.flood,
+                          verification.lookupOutcomes.historic,
+                        ].every((value) => value === "matched" || value === "no-match")
+                          ? "Furlong checked the currently enabled live sources for this address and did not find a positive OZ, NMTC, HUBZone, flood, or historic match."
+                          : "No positive place-fact matches were confirmed yet, and one or more source checks still did not complete cleanly."}
+                      </span>
+                    )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── Route to where the facts are already attached ───────────────────── */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", borderTop: "1px solid #e2e8f0", paddingTop: 16 }}>
-        <Link href="/explore?lane=property-land" data-testid="browse-verified-inventory"
-          style={{ fontSize: 14, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "10px 22px", textDecoration: "none" }}>
-          Browse the verified inventory →
-        </Link>
-        {/* Persona/customer-type is a SECONDARY, later step — never the first card. */}
-        <Link href="/discover?mode=possibilities" data-testid="secondary-persona-link"
-          style={{ fontSize: 13, fontWeight: 700, color: "#185FA5", textDecoration: "underline" }}>
-          Or explore by what you're trying to accomplish →
-        </Link>
-      </div>
+      {!embedded && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", borderTop: "1px solid #e2e8f0", paddingTop: 16 }}>
+          <Link href="/explore?lane=property-land" data-testid="browse-verified-inventory"
+            style={{ fontSize: 14, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "10px 22px", textDecoration: "none" }}>
+            Browse the verified inventory →
+          </Link>
+          <Link href="/discover?mode=possibilities" data-testid="secondary-persona-link"
+            style={{ fontSize: 13, fontWeight: 700, color: "#185FA5", textDecoration: "underline" }}>
+            Or explore by what you're trying to accomplish →
+          </Link>
+        </div>
+      )}
     </section>
   );
 }

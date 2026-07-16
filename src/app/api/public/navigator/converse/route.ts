@@ -35,7 +35,7 @@ import { NextResponse } from "next/server";
 import { classifyRefusal, REFUSAL_LINE } from "@/lib/navigator/propertyPrivacyDoctrine";
 import {
   interpretMessage, questionForNode, wideningLine, detectPropertyIntent,
-  GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState,
+  GUIDED_DISCOVERY_OPENER, GUIDED_DISCOVERY_FOLLOWUP, FRESH_JOURNEY, type JourneyState, describeDealType,
 } from "@/lib/navigator/narrativeInterpreter";
 import { noveltyGateClear, translatesToRealWorld, clearedGate, NOVELTY_BOUNDARY_REPLY } from "@/lib/navigator/noveltyBuildDoctrine";
 import { routeTurn, isUnlawfulEvasionAsk, extractAllowedRemainder, detectViolentThreat, detectTargetedHarassment, assessCriticalInfrastructure } from "@/lib/navigator/navigatorTurnRouter";
@@ -325,8 +325,8 @@ export async function POST(req: Request) {
       node: journey.node,
       text:
         (journey.property?.addressText
-          ? `Here's what ${journey.property.addressText} could become — honestly, including the No's and the can't-determines. `
-          : "Here's what this could become — honestly, including the No's and the can't-determines. ") +
+          ? `Here's the immediate suitability read for this ${describeDealType(journey.dealType)} at ${journey.property.addressText} — honestly, including the No's and the can't-determines. `
+          : `Here's the immediate suitability read for this ${describeDealType(journey.dealType)} — honestly, including the No's and the can't-determines. `) +
         (wideningLine(explored, pathways.map((p) => p.id)) ?? ""),
       turnIntent: "PRESENT_PATHWAYS",
       pathways,

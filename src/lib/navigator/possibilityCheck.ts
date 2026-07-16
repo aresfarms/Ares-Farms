@@ -118,6 +118,13 @@ const GRAPH: Record<string, string[]> = {
   "cropland-rent": ["crop-revenue"],
   "crop-revenue": ["sell-vs-hold", "cropland-rent"],
   "sell-vs-hold": ["crop-revenue"],
+  "main-street-retail": ["owner-user-business", "mixed-use-redevelopment"],
+  "owner-user-business": ["light-industrial-flex", "main-street-retail"],
+  "light-industrial-flex": ["warehouse-conversion", "owner-user-business"],
+  "warehouse-conversion": ["mixed-use-redevelopment", "light-industrial-flex"],
+  "boutique-lodging": ["event-venue-conversion", "mixed-use-redevelopment"],
+  "event-venue-conversion": ["boutique-lodging", "main-street-retail"],
+  "mixed-use-redevelopment": ["boutique-lodging", "warehouse-conversion"],
 };
 
 export function discoveryGraphChain(startId: string, maxLen = 7): string[] {
@@ -300,6 +307,101 @@ const DEFS: Def[] = [
       confirmWith: ["your grain buyer (current local bid vs the public benchmark)"],
       confidence: "cant-determine",
       whyShown: "We showed this because local grainery bids track the public commodity benchmark — once wired, you'll finally see whether the bid is fair.",
+      evidenceStrength: "low",
+    }),
+  },
+  {
+    id: "main-street-retail", title: "Main-street retail or service business", kinds: ["commercial", "unknown"], hoaGated: false,
+    effort: "medium", risk: "medium", timeToStart: "months",
+    assess: () => ({
+      answer: "CANT_DETERMINE",
+      detail: `A storefront, clinic, studio, or service-business use may be feasible here, but the decisive questions are current zoning, frontage/access, parking, and utility posture. ${ORDINANCE_PENDING}`,
+      confirmWith: ["the municipality (permitted use / parking)", "the utility providers or seller disclosures"],
+      confidence: "cant-determine",
+      whyShown: "We showed this because commercial properties often win on the most obvious owner-user or tenant-service lane first, especially when the site already has visibility and access.",
+      evidenceStrength: "medium",
+    }),
+  },
+  {
+    id: "owner-user-business", title: "Owner-user professional or rural business occupancy", kinds: ["commercial", "unknown"], hoaGated: false,
+    effort: "medium", risk: "medium", timeToStart: "months",
+    assess: () => ({
+      answer: "CANT_DETERMINE",
+      detail: `Using the property for an owner-operated business may be one of the cleanest SBA-style paths, but it still depends on occupancy rules, code compliance, parking, and whether the physical layout fits the operation. ${ORDINANCE_PENDING}`,
+      confirmWith: ["the municipality (occupancy / zoning)", "a lender or SBA-participating bank", "a code official or architect"],
+      confidence: "cant-determine",
+      whyShown: "We showed this because many commercial deals become stronger when the property is paired with a real operating business rather than treated as a generic building.",
+      evidenceStrength: "medium",
+    }),
+  },
+  {
+    id: "light-industrial-flex", title: "Light industrial / flex workspace", kinds: ["commercial", "unknown"], hoaGated: false,
+    effort: "medium", risk: "medium", timeToStart: "months",
+    assess: () => ({
+      answer: "CANT_DETERMINE",
+      detail: `Flex, light industrial, workshop, or maker-space use depends on the zoning district, loading/access, separation requirements, and especially power / utility capacity. ${ORDINANCE_PENDING}`,
+      confirmWith: ["the municipality (industrial / flex use)", "the electric utility or seller disclosures", "a contractor or engineer"],
+      confidence: "cant-determine",
+      whyShown: "We showed this because commercial assets often have hidden value as flex or light-industrial space when retail demand is weaker but utility and access posture are stronger.",
+      evidenceStrength: "medium",
+    }),
+  },
+  {
+    id: "warehouse-conversion", title: "Warehouse, storage, or maker conversion", kinds: ["commercial", "unknown"], hoaGated: false,
+    effort: "high", risk: "medium", timeToStart: "months",
+    assess: (c) => {
+      if (c.acreage !== null && c.acreage < 0.25) return {
+        answer: "NO",
+        detail: `At roughly ${c.acreage} acres, the site may be too constrained for meaningful loading, outdoor circulation, or storage-yard posture unless the existing building is unusually efficient.`,
+        reroute: "A smaller owner-user service or office use may fit this property better than a storage or warehouse-heavy concept.",
+        confirmWith: [],
+        confidence: "medium",
+        whyShown: "We checked this because storage and warehouse reuse can be attractive, but site circulation and yard depth matter more than people expect.",
+        evidenceStrength: "medium",
+      };
+      return {
+        answer: "CANT_DETERMINE",
+        detail: `Storage, warehouse, or maker conversion could be plausible, but the practical bottlenecks are loading access, fire/life-safety upgrades, power, and whether local code treats the use as change-of-occupancy work. ${ORDINANCE_PENDING}`,
+        confirmWith: ["the municipality (change of occupancy / fire code)", "a contractor or architect", "the utility providers or seller disclosures"],
+        confidence: "cant-determine",
+        whyShown: "We showed this because many underused commercial buildings gain their best second life through storage, warehouse, or maker-oriented reuse rather than traditional retail.",
+        evidenceStrength: "medium",
+      };
+    },
+  },
+  {
+    id: "boutique-lodging", title: "Boutique inn, lodge, or short-stay lodging", kinds: ["commercial", "farm", "unknown"], hoaGated: false,
+    effort: "high", risk: "high", timeToStart: "months",
+    assess: () => ({
+      answer: "CANT_DETERMINE",
+      detail: `A boutique lodging concept could be compelling here, but the real gates are lodging permissions, life-safety code, parking, wastewater, staffing, and whether the local market can support occupancy. ${ORDINANCE_PENDING}`,
+      confirmWith: ["the municipality (lodging / special-use rules)", "a code official or architect", "your insurer", "local market validation"],
+      confidence: "cant-determine",
+      whyShown: "We showed this because certain properties can support a much stronger hospitality thesis than a generic commercial one — but only if code and operating reality cooperate.",
+      evidenceStrength: "low",
+    }),
+  },
+  {
+    id: "event-venue-conversion", title: "Event venue or assembly-space conversion", kinds: ["commercial", "farm", "unknown"], hoaGated: false,
+    effort: "high", risk: "high", timeToStart: "months",
+    assess: () => ({
+      answer: "CANT_DETERMINE",
+      detail: `Event or assembly use often sounds attractive, but it is usually constrained by parking, ingress/egress, noise, life-safety, ADA, and assembly occupancy rules. ${ORDINANCE_PENDING}`,
+      confirmWith: ["the municipality (assembly / special-event use)", "a fire/code official", "your insurer"],
+      confidence: "cant-determine",
+      whyShown: "We showed this because some hospitality and redevelopment properties only really make sense when event economics are part of the story — but that path is regulation-heavy.",
+      evidenceStrength: "low",
+    }),
+  },
+  {
+    id: "mixed-use-redevelopment", title: "Mixed-use or adaptive-reuse redevelopment", kinds: ["commercial", "unknown"], hoaGated: false,
+    effort: "high", risk: "high", timeToStart: "months",
+    assess: () => ({
+      answer: "CANT_DETERMINE",
+      detail: `Adaptive reuse or mixed-use redevelopment may be the highest-upside lane, but it is also the most assumption-heavy: zoning flexibility, code upgrades, environmental posture, utility replacement, and construction cost all have to be validated. ${ORDINANCE_PENDING}`,
+      confirmWith: ["the municipality (zoning / overlays / incentives)", "a contractor or architect", "environmental review where applicable", "a lender or capital partner"],
+      confidence: "cant-determine",
+      whyShown: "We showed this because some commercial properties are worth more as a repositioning story than as-is occupancy — especially where retail, lodging, service, and redevelopment narratives overlap.",
       evidenceStrength: "low",
     }),
   },

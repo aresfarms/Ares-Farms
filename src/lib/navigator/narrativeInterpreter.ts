@@ -43,6 +43,14 @@ export type PropertyIntent =
   | "PROTECTED_STEERING_REFUSED"
   | null;
 
+export type DealType =
+  | "hospitality-acquisition"
+  | "working-farm"
+  | "rural-business"
+  | "redevelopment"
+  | "residential-income"
+  | "general";
+
 export interface JourneyState {
   node: ArcNode;
   /** Free-text fragments the visitor offered, in their words (no identity). */
@@ -55,6 +63,8 @@ export interface JourneyState {
   intent: PropertyIntent;
   /** Guided Property Discovery engaged — assets node is satisfied WITHOUT an address. */
   guidedDiscovery: boolean;
+  /** The best current reading of the deal rhythm for this property/opportunity. */
+  dealType: DealType;
   exploredPathways: string[];
   /** Guide prompts already sent (anti-repeat: a prompt may not repeat more than once). */
   askedPrompts: string[];
@@ -91,7 +101,7 @@ export interface JourneyState {
 
 export const FRESH_JOURNEY: JourneyState = {
   node: "person", story: [], context: EMPTY_CONTEXT, property: null, entryMode: null,
-  intent: null, guidedDiscovery: false, exploredPathways: [], askedPrompts: [],
+  intent: null, guidedDiscovery: false, dealType: "general", exploredPathways: [], askedPrompts: [],
   guardCounters: { refusals: 0, rejections: 0 },
   lastTurnIntent: null, recentTurnIntents: [], noveltyGate: null, threatHold: false, flaggedAddresses: [],
   proposedSolutionAsked: false, objectiveDiscoveryPending: false, proposedAssetLabel: null,
@@ -149,6 +159,58 @@ const KIND_HINTS: [RegExp, PropertyContext["propertyKind"]][] = [
   [/\b(?:commercial|retail|warehouse|office|storefront)\b/i, "commercial"],
 ];
 
+function inferDealType(s: JourneyState): DealType {
+  const corpus = [
+    ...s.story,
+    s.property?.addressText ?? "",
+    s.context.propertyKind,
+  ].join(" ").toLowerCase();
+
+  if (/(inn|hotel|motel|lodging|retreat|guesthouse|short[-\s]?term|vacation|wedding|event venue|hospitality|bnb)/.test(corpus)) {
+    return "hospitality-acquisition";
+  }
+  if (/(farm|ranch|orchard|pasture|acreage|crop|livestock|greenhouse|agri|homestead)/.test(corpus) || s.context.propertyKind === "farm") {
+    return "working-farm";
+  }
+  if (/(redevelop|adaptive reuse|conversion|rehab|renovat|vacant|historic|main street|warehouse|mixed[-\s]?use|brownfield|opportunity zone)/.test(corpus)) {
+    return "redevelopment";
+  }
+  if (/(commercial|retail|office|industrial|flex|service business|shop|warehouse|light industrial)/.test(corpus) || s.context.propertyKind === "commercial") {
+    return "rural-business";
+  }
+  if (/(rental|duplex|triplex|multifamily|house[-\s]?hack|owner[-\s]?occupied|single[-\s]?family|residential)/.test(corpus) || s.context.propertyKind === "residential") {
+    return "residential-income";
+  }
+  return "general";
+}
+
+export function describeDealType(dealType: DealType): string {
+  switch (dealType) {
+    case "hospitality-acquisition":
+      return "hospitality acquisition";
+    case "working-farm":
+      return "working farm";
+    case "rural-business":
+      return "rural business";
+    case "redevelopment":
+      return "redevelopment opportunity";
+    case "residential-income":
+      return "residential income opportunity";
+    default:
+      return "property opportunity";
+  }
+}
+
+export function shouldAutoPresentPathways(s: JourneyState): boolean {
+  return (
+    !s.guidedDiscovery &&
+    (
+      (s.entryMode === "own-asset" && (s.property !== null || s.context.propertyKind !== "unknown")) ||
+      (s.context.propertyKind !== "unknown" && s.story.length >= 1)
+    )
+  );
+}
+
 export function interpretMessage(prev: JourneyState, message: string): JourneyState {
   const s: JourneyState = {
     ...prev,
@@ -196,6 +258,8 @@ export function interpretMessage(prev: JourneyState, message: string): JourneySt
     }
   }
 
+  s.dealType = inferDealType(s);
+
   // Advance the arc: we move forward when the current node has what it needs.
   s.node = nextNode(s);
   return s;
@@ -214,25 +278,90 @@ function nextNode(s: JourneyState): ArcNode {
   if (hasPerson) target = "story";
   if (hasStory) target = "assets";
   if (hasAssets) target = "constraints";
+  if (shouldAutoPresentPathways(s)) target = "pathways";
   if (enough.every(Boolean) && s.story.length >= 3) target = "pathways";
   return ARC_ORDER[Math.max(at, ARC_ORDER.indexOf(target))];
 }
 
 /** The ONE next open question for the node (warm wording; AI may rephrase). */
 export function questionForNode(s: JourneyState): string {
+  const hasPropertyContext =
+    s.property !== null ||
+    s.context.propertyKind !== "unknown" ||
+    s.entryMode === "own-asset";
   switch (s.node) {
     case "person":
-      return "Who are you? Tell me a little about yourself — in your own words, however you'd say it.";
+      switch (s.dealType) {
+        case "hospitality-acquisition":
+          return "Before we get too far, tell me your role in this hospitality deal. Are you the buyer, operator, advisor, or still testing whether this could become a destination asset?";
+        case "working-farm":
+          return "Before we get too far, tell me your role here. Are you the farmer, landowner, operator, advisor, or still exploring whether this could support a real operation?";
+        case "rural-business":
+          return "Before we get too far, tell me your role in this business deal. Are you the buyer, operator, advisor, or still testing whether this site could support the business?";
+        case "redevelopment":
+          return "Before we get too far, tell me your role in this redevelopment. Are you the buyer, developer, operator, advisor, or still pressure-testing the concept?";
+        case "residential-income":
+          return "Before we get too far, tell me your role here. Are you the buyer, owner-occupant, investor, advisor, or still exploring the income possibilities?";
+        default:
+          return hasPropertyContext
+            ? "Before we get too far, tell me about your role in this deal. Are you the buyer, operator, advisor, or still just exploring it?"
+            : "Before we go further, tell me what role you're playing here. Are you the buyer, operator, advisor, or still just exploring?";
+      }
     case "story":
-      return s.entryMode === "own-asset"
-        ? "Got it — tell me the story. What drew you to this property, and what are you hoping it could become?"
-        : "Tell me a bit more of the story — what's going on in your world that brought you here today?";
+      switch (s.dealType) {
+        case "hospitality-acquisition":
+          return "What is the actual guest and revenue thesis here? Tell me what makes you think this property could become a stay, retreat, event, or destination asset if the numbers work.";
+        case "working-farm":
+          return "What is the actual operating thesis here? Tell me what you think this land could produce, support, or lease into if the numbers and constraints work.";
+        case "rural-business":
+          return "What is the actual business thesis here? Tell me what operation belongs on this site and why this property is supposed to support it.";
+        case "redevelopment":
+          return "What is the actual reuse thesis here? Tell me what this property is now, what you think it could become, and why that transformation feels credible.";
+        case "residential-income":
+          return "What is the actual income thesis here? Tell me whether you see this as owner-occupied income, rental, storage, events, or a different residential play.";
+        default:
+          return s.entryMode === "own-asset"
+            ? "What is the actual thesis here? Tell me what drew you to this property and what you believe it could become if the numbers and constraints work."
+            : hasPropertyContext
+              ? "What is the actual thesis here? Tell me what attracted you to this property and what you want it to become."
+              : "What is the real opportunity you are trying to create or evaluate?";
+      }
     case "assets":
-      return "What do you have to work with? A property or land you own, a place you're looking at — you can paste any listing link (Crexi, Zillow, Redfin, LoopNet) or just type an address.";
+      switch (s.dealType) {
+        case "hospitality-acquisition":
+          return "What do you actually have to work with so far: listing details, room count, event potential, budget, renovation scope, operator background, or draft numbers?";
+        case "working-farm":
+          return "What do you actually have to work with so far: acreage, water, soils, outbuildings, operator experience, equipment, budget, or a draft operating plan?";
+        case "rural-business":
+          return "What do you actually have to work with so far: listing details, zoning clues, utility capacity, business model, operator background, budget, or draft financials?";
+        case "redevelopment":
+          return "What do you actually have to work with so far: listing details, current condition, historic status, renovation scope, utility facts, budget, or a reuse concept?";
+        case "residential-income":
+          return "What do you actually have to work with so far: the listing, lot details, enclosed space, HOA status, budget, occupancy plan, or any draft numbers?";
+        default:
+          return hasPropertyContext
+            ? "What do you actually have to work with so far: a listing, rough budget, operating plan, renovation scope, or documents already in hand?"
+            : "What do you actually have to work with so far: a property, listing, rough budget, operator, or supporting documents?";
+      }
     case "constraints":
-      return "Anything that boxes you in? Money, time, an HOA, rules you already know about — knowing the walls helps us find the doors.";
+      switch (s.dealType) {
+        case "hospitality-acquisition":
+          return "What could break this hospitality deal first: occupancy reality, renovation cost, licensing, staffing depth, access, or capital structure?";
+        case "working-farm":
+          return "What could break this farm deal first: water, soils, infrastructure, labor, commodity risk, timing, or capital depth?";
+        case "rural-business":
+          return "What could break this business deal first: zoning, utilities, traffic/access, build-out cost, operator depth, or capital limits?";
+        case "redevelopment":
+          return "What could break this redevelopment first: code issues, contamination, historic restrictions, utility upgrades, construction cost, or financing?";
+        case "residential-income":
+          return "What could break this income play first: HOA rules, local ordinances, lot size, parking, condition, or the numbers themselves?";
+        default:
+          return hasPropertyContext
+            ? "What could break this deal first: capital limits, timing, zoning, condition, operator depth, or something else you already suspect?"
+            : "What are the real constraints here: capital, timing, rules, site issues, or operator limitations?";
+      }
     default:
-      return "Want to keep exploring? Tell me what caught your eye, or bring another property — the journey keeps going.";
+      return "If you want to keep pressure-testing this, bring the next fact, document, or property and we will keep tightening the picture.";
   }
 }
 

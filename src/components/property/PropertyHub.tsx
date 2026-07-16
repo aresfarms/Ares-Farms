@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PlaceFactBadge } from "@/components/place-facts/PlaceFactBadge";
 import { ozBadgeProps } from "@/lib/place-facts/opportunityZoneBadge";
@@ -8,12 +9,11 @@ import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones
 import { designatedHubzoneForProperty } from "@/lib/property/propertyHubzones";
 import { sfhaForProperty, historicForProperty } from "@/lib/property/propertyFloodHistoric";
 import { nmtcForProperty } from "@/lib/property/propertyNmtc";
-import { PropertyCountsMap } from "@/components/property/PropertyCountsMap";
 import { GuidedIntake } from "@/components/property/GuidedIntake";
-import { propertyStateCounts } from "@/lib/property/propertyStateCounts";
 import { guidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import { SavedTray } from "@/components/property/SavedTray";
 import { PropertySaveControls } from "@/components/property/PropertySaveControls";
+import { PropertyBriefLauncher } from "@/components/property/PropertyBriefLauncher";
 import { ProgramMatches } from "@/components/property/ProgramMatches";
 import {
   buildCategoryTree,
@@ -105,12 +105,7 @@ export function PropertyHub({
           <PendingState sources={sources} total={tree.total} />
         ) : !liveCategory ? (
           <>
-            {/* DUAL ENTRY (2026-06-10): (1) browse the map below, or (2) the
-                guided interests-only path — both free, both anonymous. */}
-            {/* Utility counts map — tile-grid, color-by-type, honest counts from
-                the governed feed (live sources, is_current only). State level
-                only; visually distinct from the homepage Living Map. */}
-            <PropertyCountsMap feed={propertyStateCounts()} />
+            <EntryChoiceIntro tree={tree} />
             <GuidedIntake feed={guidedIntakeFeed()} />
             <CategoryGrid tree={tree} />
           </>
@@ -161,6 +156,114 @@ function propertyTree() {
     node.states.sort((a, b) => a.abbr.localeCompare(b.abbr));
   }
   return tree;
+}
+
+function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree> }) {
+  return (
+    <section
+      aria-label="Choose how to start property analysis"
+      style={{
+        border: "1px solid #d7deea",
+        borderRadius: 16,
+        background: "linear-gradient(140deg, #ffffff, #f7fbfa 54%, #f6f8fb)",
+        padding: "22px 24px",
+        display: "grid",
+        gap: 18,
+      }}
+    >
+      <div style={{ display: "grid", gap: 6 }}>
+        <strong style={{ fontSize: 20, color: "#162033" }}>Start with a property two different ways.</strong>
+        <p style={{ margin: 0, fontSize: 14.5, ...muted, maxWidth: 760 }}>
+          Browse what is actually available, or verify a specific address right now. Either way, the next step
+          is the same analysis workspace.
+        </p>
+      </div>
+
+      <div
+        data-entry-choice-grid="true"
+        style={{
+          display: "grid",
+          gap: 18,
+          gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)",
+          alignItems: "start",
+        }}
+      >
+        <div
+          style={{
+            border: "1px solid #d7deea",
+            borderRadius: 14,
+            background: "#ffffff",
+            padding: "18px 18px",
+            display: "grid",
+            gap: 12,
+            alignSelf: "stretch",
+          }}
+        >
+          <div style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#0f766e" }}>
+              Option 1
+            </span>
+            <strong style={{ fontSize: 17, color: "#162033" }}>Browse current inventory</strong>
+            <p style={{ margin: 0, fontSize: 13.5, ...muted }}>
+              Start from live listings already in the hub, then open any property and move straight into analysis.
+            </p>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+            <a
+              href="#browse-by-category"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                minHeight: 42,
+                padding: "0 16px",
+                borderRadius: 999,
+                background: "#0f766e",
+                color: "#ffffff",
+                fontSize: 14,
+                fontWeight: 800,
+                textDecoration: "none",
+              }}
+            >
+              Browse by category
+            </a>
+            <span style={{ fontSize: 13, color: "#5d687a", alignSelf: "center" }}>
+              {tree.liveTotal.toLocaleString("en-US")} live listings across {tree.categories.length} categories
+            </span>
+          </div>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #d7deea",
+            borderRadius: 14,
+            background: "#ffffff",
+            padding: "18px 18px",
+            display: "grid",
+            gap: 12,
+          }}
+        >
+          <div style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#854F0B" }}>
+              Option 2
+            </span>
+            <strong style={{ fontSize: 17, color: "#162033" }}>Enter a specific address</strong>
+            <p style={{ margin: 0, fontSize: 13.5, ...muted }}>
+              Verify the address first, pull in Furlong&apos;s place-facts, and take that directly into the same analysis flow.
+            </p>
+          </div>
+          <PlaceFirstDiscovery flow="property-discovery" embedded />
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          [data-entry-choice-grid="true"] {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+    </section>
+  );
 }
 
 // ── Header (always rendered — carries the "may fit" + both-source framing) ────
@@ -219,7 +322,7 @@ function PendingState({
 // ── Level 1: category grid (only non-empty categories) ────────────────────────
 function CategoryGrid({ tree }: { tree: ReturnType<typeof buildCategoryTree> }) {
   return (
-    <section aria-label="Browse by category" style={{ display: "grid", gap: 14 }}>
+    <section id="browse-by-category" aria-label="Browse by category" style={{ display: "grid", gap: 14 }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>Browse by category</h2>
         <span style={{ fontSize: 14, color: "#5d687a" }}>
@@ -309,6 +412,23 @@ function Listings({
         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 14 }}>
           {direct.map((d) => (
             <li key={d.listingId} style={{ border: "1px solid #c7b3e6", borderRadius: 12, background: "#fdfcff", padding: "18px 20px", display: "grid", gap: 8 }}>
+              <PropertyBriefLauncher
+                property={{
+                  id: d.listingId,
+                  title: `${d.town}, ${stateName(d.state)}`,
+                  location: `${d.town}, ${stateName(d.state)}`,
+                  town: d.town,
+                  state: d.state,
+                  propertyType: d.propertyType,
+                  priceLabel: d.price && d.price > 0 ? `List price: $${d.price.toLocaleString("en-US")} · as of ${d.asOf}` : "Price on request",
+                  vintageStamp: d.freshnessNotice,
+                  sourceLabel: d.listerType === "broker" ? "Direct broker listing" : "Direct institutional / REO listing",
+                  description: d.description,
+                  pathways: categoryId === "businesses" ? ["SBA"] : ["Conventional"],
+                  categoryLabel,
+                  currentLabel: "Current direct listing",
+                }}
+              />
               <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
                 <strong style={{ fontSize: 17, color: "#162033" }}>{d.town}, {stateName(d.state)}</strong>
                 <span style={{ fontSize: 15, fontWeight: 700, color: "#5d687a" }}>
@@ -338,6 +458,35 @@ function Listings({
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 14 }}>
         {listings.map((p) => (
           <li key={p.id} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#ffffff", padding: "18px 20px", display: "grid", gap: 8 }}>
+            <PropertyBriefLauncher
+              property={{
+                id: p.id,
+                title: locationLine(p.town, p.county, p.state),
+                location: locationLine(p.town, p.county, p.state),
+                town: p.town,
+                county: p.county,
+                state: p.state,
+                propertyType: p.propertyType,
+                priceLabel: priceLabel(p.price, p.sourceId),
+                vintageStamp: p.vintageStamp,
+                sourceLabel:
+                  p.sourceId === "hud"
+                    ? "HUD Home Store"
+                    : p.sourceId === "treasury"
+                      ? "U.S. Treasury auctions"
+                    : p.sourceId === "gsa-realestate"
+                        ? "GSA realestatesales.gov"
+                        : "USDA resales portal",
+                sourceId: p.sourceId,
+                listingUrl: p.listingUrl,
+                exactAddress: p.exactAddress,
+                description: p.description,
+                sourceCitation: p.sourceCitation,
+                pathways: financingPathwayTags(p.sourceId, categoryId),
+                categoryLabel,
+                currentLabel: p.isCurrent ? "Current for-sale listing" : `${p.vintageStamp} · verify current availability`,
+              }}
+            />
             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
               <strong style={{ fontSize: 17, color: "#162033" }}>
                 {locationLine(p.town, p.county, p.state)}

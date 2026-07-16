@@ -208,6 +208,24 @@ const FALSE_POSITIVE_PATH_TOKENS: ReadonlyArray<RegExp> = [
   /^src\/scripts\/verifyNoPersonalDocsSmokeTest\.ts$/,
 ];
 
+const GENERATED_PUBLIC_ID_FILES = new Set<string>([
+  "src/lib/property/propertyFloodHistoricGenerated.ts",
+  "src/lib/property/propertyHubzonesGenerated.ts",
+  "src/lib/property/propertyNmtcGenerated.ts",
+  "src/lib/property/propertyOpportunityZonesGenerated.ts",
+  "src/lib/property/usdaResaleGenerated.ts",
+]);
+
+function isGeneratedPublicIdentifierLine(filePath: string, line: string): boolean {
+  if (!GENERATED_PUBLIC_ID_FILES.has(filePath)) return false;
+
+  return (
+    /"canonical_property_id"\s*:\s*"usda-\d+"/.test(line) ||
+    /"listingId"\s*:\s*"\d+"/.test(line) ||
+    /^\s*"usda-\d+"\s*:/.test(line)
+  );
+}
+
 // =============================================================================
 // Allowlist (config-driven; default empty)
 // =============================================================================
@@ -461,6 +479,9 @@ export function scanFileContent(
       if (
         /\b(example|fixture|sample|placeholder|synthetic|fake)\b/i.test(line)
       ) {
+        continue;
+      }
+      if (isGeneratedPublicIdentifierLine(filePath, line)) {
         continue;
       }
       if (re.exec(line) !== null) {

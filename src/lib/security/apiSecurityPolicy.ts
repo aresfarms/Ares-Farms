@@ -17,7 +17,8 @@ export type ApiSecurityEnvironment = Record<string, string | undefined>;
 export type PublicApiReason =
   | "nextauth-runtime"
   | "stripe-webhook-signature-gated"
-  | "public-surface-gateway";
+  | "public-surface-gateway"
+  | "internal-source-refresh-iam-gated";
 
 export type ClaimedActorContext = {
   role?: AccessRole | null;
@@ -43,6 +44,7 @@ const NEXTAUTH_PUBLIC_PATHS = new Set([
 
 const PUBLIC_SIGNATURE_GATED_PATHS = new Set(["/api/stripe/webhook"]);
 const PUBLIC_SURFACE_GATEWAY_PREFIX = "/api/public";
+const INTERNAL_IAM_GATED_PATHS = new Set(["/api/internal/source-refresh"]);
 
 /**
  * Public-surface APIs the anonymous public site calls directly (no session):
@@ -114,6 +116,10 @@ export function apiSecurityPublicReason(
     )
   ) {
     return "public-surface-gateway";
+  }
+
+  if (INTERNAL_IAM_GATED_PATHS.has(normalized)) {
+    return "internal-source-refresh-iam-gated";
   }
 
   return null;

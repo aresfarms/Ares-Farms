@@ -46,7 +46,24 @@ const ANSWER_STYLE: Record<string, { label: string; color: string }> = {
   CANT_DETERMINE: { label: "CAN'T DETERMINE — here's why + who to confirm with", color: "#5d687a" },
 };
 
-export function FurlongNavigator() {
+export type NavigatorSnapshot = {
+  turns: Turn[];
+  journey: JourneyState | null;
+  pathways: PathwayAssessment[] | null;
+  graphChain: string[];
+  programsSeam: string | null;
+  decision: DecisionSummary | null;
+  searchGuidance: SearchGuidance | null;
+  loading: boolean;
+};
+
+export function FurlongNavigator({
+  initialMessage,
+  onStateChange,
+}: {
+  initialMessage?: string;
+  onStateChange?: (snapshot: NavigatorSnapshot) => void;
+}) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [journey, setJourney] = useState<JourneyState | null>(null);
   const [pathways, setPathways] = useState<PathwayAssessment[] | null>(null);
@@ -103,7 +120,20 @@ export function FurlongNavigator() {
       setContinuity(true);
     }
     void (async () => {
-      try { handle(await post({}), []); } finally { setLoading(false); }
+      try {
+        const open = await post({});
+        const openTurns: Turn[] = [{ role: "guide", text: open.text, intent: open.turnIntent }];
+        setTurns(openTurns);
+        setJourney(open.journey);
+        remember(open.journey, openTurns);
+
+        if (initialMessage) {
+          const userTurns: Turn[] = [...openTurns, { role: "you", text: initialMessage }];
+          setTurns(userTurns);
+          const seededReply = await post({ message: initialMessage, journey: open.journey });
+          handle(seededReply, userTurns);
+        }
+      } finally { setLoading(false); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -139,6 +169,19 @@ export function FurlongNavigator() {
     catch { setTurns([...t, { role: "guide", text: "Something hiccuped — say that again?" }]); }
     finally { setLoading(false); }
   }
+
+  useEffect(() => {
+    onStateChange?.({
+      turns,
+      journey,
+      pathways,
+      graphChain,
+      programsSeam,
+      decision,
+      searchGuidance,
+      loading,
+    });
+  }, [decision, graphChain, journey, loading, onStateChange, pathways, programsSeam, searchGuidance, turns]);
 
   return (
     <section data-testid="furlong-navigator" aria-label="Furlong Navigator"

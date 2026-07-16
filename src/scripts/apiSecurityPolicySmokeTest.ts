@@ -47,6 +47,11 @@ function main() {
     "Public surface gateway routes should be public-safe gateway routes."
   );
   assert(
+    apiSecurityPublicReason("/api/internal/source-refresh") ===
+      "internal-source-refresh-iam-gated",
+    "Source refresh must be proxy-exempt only because the Cloud Run IAM wall and route-level token gate still apply."
+  );
+  assert(
     apiSecurityPublicReason("/api/apply") === null,
     "Protected application route should not be public."
   );

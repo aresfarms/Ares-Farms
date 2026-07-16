@@ -52,17 +52,85 @@
  *     the /about mission line. Do not reintroduce "commercial pathways".
  */
 export const HOMEPAGE_HERO = {
-  // Hero CTA restructure Option A (Caitlin, 2026-06-11): the platform is a
-  // Possibility Discovery Engine, NOT a map product. The Navigator is the
-  // discovery engine; the map supports it. Copy must make the two actions
-  // self-explanatory to a first-time visitor.
   brandName: "Furlong",
-  headline:  "Discover possibilities you didn't know existed.",
-  tagline:   "Pathways, not promises.",
+  headline:  "What are your possibilities? Explore and find out.",
+  tagline:
+    "Explore land, funding, business, and readiness pathways with less guesswork and more clarity.",
   subhead:
-    "Paste a property, describe an idea, or start with nothing at all. Furlong Navigator helps uncover " +
-    "pathways, opportunities, programs, and possibilities using evidence, transparency, and guided discovery.",
-  trustTag:  "Anonymous. No account required. We don't sell your information.",
+    "Start with a property, a question, or just an idea. Furlong helps you see what may be possible, " +
+    "where the boundaries are, and what your next steps could be before you commit to anything.",
+  trustTag:  "Explore anonymously. No account required. No hidden handoff.",
+} as const;
+
+export const HOMEPAGE_PRIMARY_ACTIONS = {
+  primaryLabel: "Start with Furlong Navigator",
+  primarySupport:
+    "Tell us what you're trying to figure out and we'll help surface pathways, options, and constraints.",
+  secondaryLabel: "Open the Compass",
+  secondarySupport:
+    "Use the Compass when you want to move through Furlong's broader pathways and modules instead of starting from a single property.",
+} as const;
+
+export const HOMEPAGE_CAPABILITIES = {
+  heading: "What you can do here",
+  intro:
+    "You do not need a finished plan to begin. Furlong is built to help you orient yourself before the paperwork, pressure, and noise take over.",
+  cards: [
+    {
+      title: "Explore without exposing yourself",
+      href: "/discover",
+      body:
+        "Look around, compare paths, and pressure-test ideas before sharing personal information or talking to anyone.",
+    },
+    {
+      title: "See pathways, not just search results",
+      href: "/explore",
+      body:
+        "Move across land, funding, business, and readiness questions in one place instead of piecing the picture together alone.",
+    },
+    {
+      title: "Understand what stands in the way",
+      href: "/readiness",
+      body:
+        "See missing pieces, likely constraints, and the boundaries around a path before you spend time chasing it.",
+    },
+    {
+      title: "Bring in a human when you're ready",
+      href: "/compass",
+      body:
+        "Use the system to get oriented first, then move to real human review when the moment actually calls for it.",
+    },
+  ],
+} as const;
+
+export const HOMEPAGE_HOW_IT_WORKS = {
+  heading: "How Furlong works",
+  steps: [
+    {
+      title: "Start with what you know",
+      href: "/discover",
+      body:
+        "A property, a place, a rough idea, or a problem you are trying to solve is enough to begin.",
+    },
+    {
+      title: "See what may be possible",
+      href: "/explore",
+      body:
+        "Furlong maps potential pathways, opportunity signals, and adjacent routes that may not be obvious at first glance.",
+    },
+    {
+      title: "Understand the boundaries",
+      href: "/readiness",
+      body:
+        "You can see constraints, readiness gaps, and what still needs human judgment before you move too far down the wrong path.",
+    },
+    {
+      title: "Decide your next real step",
+      href: "/compass",
+      body:
+        "When you are ready, move from exploration into human-guided action with more context and less confusion.",
+    },
+  ],
 } as const;
 
 export const HOMEPAGE_SECTION_HEADINGS = {

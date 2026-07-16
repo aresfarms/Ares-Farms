@@ -63,12 +63,57 @@ type SessionContext = {
   tenantId: string | null;
 };
 
+type ApiPerimeterSeverity = "info" | "warning" | "error";
+
 const rateLimitBuckets = new Map<string, RateLimitBucket>();
 
 function createSecurityTraceId(): string {
   return `api-security-${Date.now()}-${Math.random()
     .toString(36)
     .slice(2, 10)}`;
+}
+
+function logApiPerimeterEvent(input: {
+  severity: ApiPerimeterSeverity;
+  traceId: string;
+  route: string;
+  method: string;
+  policy: string;
+  outcome: "allowed" | "blocked";
+  publicReason?: string | null;
+  status?: number;
+  detail?: Record<string, unknown>;
+  req: NextRequest;
+}) {
+  const event = {
+    channel: "api-perimeter",
+    ts: new Date().toISOString(),
+    severity: input.severity,
+    traceId: input.traceId,
+    route: input.route,
+    method: input.method,
+    policy: input.policy,
+    outcome: input.outcome,
+    status: input.status ?? null,
+    publicReason: input.publicReason ?? null,
+    clientIp: clientIdentity(input.req),
+    userAgent: input.req.headers.get("user-agent") ?? null,
+    detail: input.detail ?? {},
+  };
+
+  const line = JSON.stringify(event);
+
+  if (input.severity === "error") {
+    console.error(line);
+    return;
+  }
+
+  if (input.severity === "warning") {
+    console.warn(line);
+    return;
+  }
+
+  console.log(line);
 }
 
 function jsonBlocked(
@@ -345,6 +390,22 @@ export async function proxy(req: NextRequest) {
     const rateLimit = evaluateRateLimit(req);
 
     if (!rateLimit.allowed) {
+      logApiPerimeterEvent({
+        severity: "warning",
+        traceId,
+        route,
+        method: req.method,
+        policy: "rate-limit",
+        outcome: "blocked",
+        publicReason,
+        status: 429,
+        detail: {
+          limit: rateLimit.limit,
+          remaining: rateLimit.remaining,
+          resetAt: new Date(rateLimit.resetAt).toISOString(),
+        },
+        req,
+      });
       return jsonBlocked(
         429,
         "API rate limit exceeded.",
@@ -361,16 +422,55 @@ export async function proxy(req: NextRequest) {
   }
 
   if (publicReason || req.method === "OPTIONS") {
+    if (publicReason) {
+      logApiPerimeterEvent({
+        severity: "info",
+        traceId,
+        route,
+        method: req.method,
+        policy: "public-allowlist",
+        outcome: "allowed",
+        publicReason,
+        status: 200,
+        req,
+      });
+    }
     return NextResponse.next();
   }
 
   if (!apiAuthEnforcementRequired()) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "session-required",
+      outcome: "allowed",
+      status: 200,
+      detail: {
+        reason: "API_AUTH_ENFORCEMENT not required",
+      },
+      req,
+    });
     return NextResponse.next();
   }
 
   const secret = resolveNextAuthSecret();
 
   if (!secret) {
+    logApiPerimeterEvent({
+      severity: "error",
+      traceId,
+      route,
+      method: req.method,
+      policy: "session-required",
+      outcome: "blocked",
+      status: 503,
+      detail: {
+        missingSecret: true,
+      },
+      req,
+    });
     return jsonBlocked(503, "API authentication secret is not configured.", {
       traceId,
       module: "api.security.proxy",
@@ -386,6 +486,16 @@ export async function proxy(req: NextRequest) {
   });
 
   if (!token) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "session-required",
+      outcome: "blocked",
+      status: 401,
+      req,
+    });
     return jsonBlocked(401, "Authenticated session is required.", {
       traceId,
       module: "api.security.proxy",
@@ -415,6 +525,20 @@ export async function proxy(req: NextRequest) {
       claimedTenantId: claimed.tenantId,
     })
   ) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "session-authority",
+      outcome: "blocked",
+      status: 403,
+      detail: {
+        session,
+        claimed,
+      },
+      req,
+    });
     return jsonBlocked(403, "Caller-claimed authority conflicts with session.", {
       traceId,
       module: "api.security.proxy",
@@ -429,6 +553,21 @@ export async function proxy(req: NextRequest) {
     });
   }
 
+  logApiPerimeterEvent({
+    severity: "info",
+    traceId,
+    route,
+    method: req.method,
+    policy: "session-authority",
+    outcome: "allowed",
+    status: 200,
+    detail: {
+      role: session.role,
+      tenantId: session.tenantId,
+      actorIdPresent: Boolean(session.actorId),
+    },
+    req,
+  });
   return requestWithSessionHeaders(req, session);
 }
 

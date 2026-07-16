@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   ADVISORY_ONLY_DISCLOSURE,
@@ -49,9 +50,12 @@ const actorId = "module-02-operator-work-queue";
 type ModuleData = {
   applications: LoadResult;
   queues: LoadResult;
+  specialQueues: LoadResult;
   reviews: LoadResult;
   scope: ModuleScope;
 };
+
+type QueueSlice = "all" | "special-buildings";
 
 const emptyLoad: LoadResult = {
   ok: true,
@@ -64,19 +68,44 @@ const emptyLoad: LoadResult = {
 
 function queueTitle(row: unknown): string {
   const queueItem = primaryRecord(row, ["queueItem"]);
+  const metadata = isRecord(queueItem.metadata) ? queueItem.metadata : {};
+  const title = stringValue(metadata.title);
+
+  if (stringValue(queueItem.sourceType) === "SPECIAL_BUILDING_MANUAL_REVIEW") {
+    return title ? `Special Building Review: ${title}` : "Special Building Manual Review";
+  }
 
   return normalizeStatus(queueItem.queueType ?? "Operator queue item");
 }
 
 function queueMeta(row: unknown): string {
   const queueItem = primaryRecord(row, ["queueItem"]);
+  const sourceType = stringValue(queueItem.sourceType);
   const parts = [
     `Priority ${normalizeStatus(queueItem.priority)}`,
     `Escalation ${normalizeStatus(queueItem.escalationStatus)}`,
     `Required ${normalizeStatus(queueItem.requiredRole)}`,
+    sourceType ? `Source ${normalizeStatus(sourceType)}` : null,
   ];
 
-  return parts.join(" / ");
+  return parts.filter(Boolean).join(" / ");
+}
+
+function specialQueueSummary(row: unknown): {
+  location: string | null;
+  category: string | null;
+  summary: string | null;
+} {
+  const queueItem = primaryRecord(row, ["queueItem"]);
+  const metadata = isRecord(queueItem.metadata) ? queueItem.metadata : {};
+
+  return {
+    location: stringValue(metadata.location) ?? stringValue(metadata.exactAddress),
+    category: stringValue(metadata.importScreeningCategory),
+    summary:
+      stringValue(metadata.manualReviewSummary) ??
+      stringValue(metadata.importScreeningSummary),
+  };
 }
 
 function applicationLabel(row: unknown): string {
@@ -105,9 +134,15 @@ function reviewLabel(row: unknown): string {
 }
 
 export default function OperatorQueuePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const initialSlice = searchParams.get("slice") === "special-buildings"
+    ? "special-buildings"
+    : "all";
   const [data, setData] = useState<ModuleData>({
     applications: emptyLoad,
     queues: emptyLoad,
+    specialQueues: emptyLoad,
     reviews: emptyLoad,
     scope: emptyScope,
   });
@@ -116,6 +151,7 @@ export default function OperatorQueuePage() {
   const [actionBusy, setActionBusy] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [queuePriority, setQueuePriority] = useState("HIGH");
+  const [queueSlice, setQueueSlice] = useState<QueueSlice>(initialSlice);
 
   const loadAll = useCallback(async () => {
     setRefreshing(true);
@@ -127,12 +163,18 @@ export default function OperatorQueuePage() {
     );
     const scope = scopeFromApplicationRows(applications.rows);
     const scoped = scope.applicationId || scope.tenantId || scope.borrowerId;
-    const [queues, reviews] = scoped
+    const [queues, specialQueues, reviews] = scoped
       ? await Promise.all([
           loadJsonSurface(
             `/api/queues/admin?role=governance&userId=${actorId}${scopeQuery(
               scope
             )}&status=OPEN&limit=12&includeApplication=true&includeProperty=true`,
+            ["queueItems"]
+          ),
+          loadJsonSurface(
+            `/api/queues/admin?role=governance&userId=${actorId}${scopeQuery(
+              scope
+            )}&status=OPEN&sourceType=SPECIAL_BUILDING_MANUAL_REVIEW&limit=12&includeApplication=true&includeProperty=true`,
             ["queueItems"]
           ),
           loadJsonSurface(
@@ -142,9 +184,9 @@ export default function OperatorQueuePage() {
             ["reviews"]
           ),
         ])
-      : [emptyLoad, emptyLoad];
+      : [emptyLoad, emptyLoad, emptyLoad];
 
-    setData({ applications, queues, reviews, scope });
+    setData({ applications, queues, specialQueues, reviews, scope });
     setLastLoadedAt(new Date().toLocaleTimeString());
     setRefreshing(false);
   }, []);
@@ -152,6 +194,13 @@ export default function OperatorQueuePage() {
   useEffect(() => {
     void loadAll();
   }, [loadAll]);
+
+  useEffect(() => {
+    const slice = searchParams.get("slice") === "special-buildings"
+      ? "special-buildings"
+      : "all";
+    setQueueSlice(slice);
+  }, [searchParams]);
 
   const contentClaims = useMemo(() => {
     return evaluateContentClaims({
@@ -233,6 +282,28 @@ export default function OperatorQueuePage() {
     "Internal Only",
     "No Final Action",
   ];
+  const visibleQueues =
+    queueSlice === "special-buildings" ? data.specialQueues.rows : data.queues.rows;
+  const visibleQueueCount =
+    queueSlice === "special-buildings" ? data.specialQueues.count : data.queues.count;
+
+  const setSlice = useCallback(
+    (slice: QueueSlice) => {
+      setQueueSlice(slice);
+
+      const params = new URLSearchParams(searchParams.toString());
+
+      if (slice === "special-buildings") {
+        params.set("slice", "special-buildings");
+      } else {
+        params.delete("slice");
+      }
+
+      const query = params.toString();
+      router.replace(query ? `/operator-queue?${query}` : "/operator-queue");
+    },
+    [router, searchParams]
+  );
 
   return (
     <main style={moduleShellStyle}>
@@ -252,6 +323,11 @@ export default function OperatorQueuePage() {
               label: "Open Queue Items",
               value: data.queues.count,
               color: "#0f766e",
+            },
+            {
+              label: "Special Building Reviews",
+              value: data.specialQueues.count,
+              color: "#9a3412",
             },
             {
               label: "Review Records",
@@ -327,10 +403,73 @@ export default function OperatorQueuePage() {
           }}
         >
           <div style={{ display: "grid", gap: 12 }}>
-            <h2 style={{ margin: 0, fontSize: 20 }}>Queue Records</h2>
-            {data.queues.rows.length > 0 ? (
-              data.queues.rows.map((row, index) => {
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: 12,
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ display: "grid", gap: 4 }}>
+                <h2 style={{ margin: 0, fontSize: 20 }}>
+                  {queueSlice === "special-buildings"
+                    ? "Special Building Manual Review Queue"
+                    : "Queue Records"}
+                </h2>
+                <span style={{ color: "#596579", fontSize: 13 }}>
+                  {queueSlice === "special-buildings"
+                    ? "Restricted and special assets routed for human handling after verified public disposition."
+                    : "All currently open operator queue records in this governed scope."}
+                </span>
+              </div>
+
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  onClick={() => setSlice("all")}
+                  style={{
+                    minHeight: 36,
+                    padding: "0 12px",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 999,
+                    background: queueSlice === "all" ? "#1f4f7a" : "#ffffff",
+                    color: queueSlice === "all" ? "#ffffff" : "#334155",
+                    cursor: "pointer",
+                    fontWeight: 800,
+                  }}
+                >
+                  All Open Queue ({data.queues.count})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSlice("special-buildings")}
+                  style={{
+                    minHeight: 36,
+                    padding: "0 12px",
+                    border: "1px solid #fdba74",
+                    borderRadius: 999,
+                    background:
+                      queueSlice === "special-buildings" ? "#9a3412" : "#fff7ed",
+                    color:
+                      queueSlice === "special-buildings" ? "#ffffff" : "#9a3412",
+                    cursor: "pointer",
+                    fontWeight: 800,
+                  }}
+                >
+                  Special Buildings ({data.specialQueues.count})
+                </button>
+              </div>
+            </div>
+
+            {visibleQueues.length > 0 ? (
+              visibleQueues.map((row, index) => {
                 const queueItem = primaryRecord(row, ["queueItem"]);
+                const specialSummary = specialQueueSummary(row);
+                const isSpecialBuilding =
+                  stringValue(queueItem.sourceType) ===
+                  "SPECIAL_BUILDING_MANUAL_REVIEW";
 
                 return (
                   <article
@@ -363,10 +502,68 @@ export default function OperatorQueuePage() {
                       </StatusPill>
                     </div>
 
+                    {isSpecialBuilding ? (
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: 8,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            minHeight: 26,
+                            alignItems: "center",
+                            padding: "0 9px",
+                            borderRadius: 999,
+                            background: "#fff7ed",
+                            color: "#9a3412",
+                            fontSize: 12,
+                            fontWeight: 800,
+                          }}
+                        >
+                          Manual review lane
+                        </span>
+                        {specialSummary.category ? (
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              minHeight: 26,
+                              alignItems: "center",
+                              padding: "0 9px",
+                              borderRadius: 999,
+                              background: "#f1f5f9",
+                              color: "#334155",
+                              fontSize: 12,
+                              fontWeight: 800,
+                            }}
+                          >
+                            {normalizeStatus(specialSummary.category)}
+                          </span>
+                        ) : null}
+                      </div>
+                    ) : null}
+
                     <p style={{ margin: 0, color: "#334155", lineHeight: 1.45 }}>
                       {stringValue(queueItem.reviewReason) ??
                         "Review reason not recorded."}
                     </p>
+
+                    {isSpecialBuilding && specialSummary.summary ? (
+                      <div
+                        style={{
+                          padding: 12,
+                          borderRadius: 8,
+                          background: "#fff7ed",
+                          color: "#7c2d12",
+                          lineHeight: 1.5,
+                          fontSize: 14,
+                        }}
+                      >
+                        {specialSummary.summary}
+                      </div>
+                    ) : null}
 
                     <dl
                       style={{
@@ -384,6 +581,41 @@ export default function OperatorQueuePage() {
                         {shortId(queueItem.applicationId)}
                       </dd>
 
+                      {isSpecialBuilding ? (
+                        <>
+                          <dt style={{ color: "#596579", fontWeight: 800 }}>
+                            Property
+                          </dt>
+                          <dd style={{ margin: 0, overflowWrap: "anywhere" }}>
+                            {specialSummary.location ??
+                              applicationLabel(row) ??
+                              "Property context not recorded"}
+                          </dd>
+                        </>
+                      ) : null}
+
+                      {isSpecialBuilding ? (
+                        <>
+                          <dt style={{ color: "#596579", fontWeight: 800 }}>
+                            Source
+                          </dt>
+                          <dd style={{ margin: 0, overflowWrap: "anywhere" }}>
+                            {stringValue(queueItem.sourceId) ?? "Not recorded"}
+                          </dd>
+                        </>
+                      ) : null}
+
+                      {isSpecialBuilding ? (
+                        <>
+                          <dt style={{ color: "#596579", fontWeight: 800 }}>
+                            Submitted
+                          </dt>
+                          <dd style={{ margin: 0 }}>
+                            {formatDateTime(queueItem.createdAt)}
+                          </dd>
+                        </>
+                      ) : null}
+
                       <dt style={{ color: "#596579", fontWeight: 800 }}>
                         Assigned
                       </dt>
@@ -400,7 +632,11 @@ export default function OperatorQueuePage() {
                 );
               })
             ) : (
-              <EmptyState>No open queue records in current scope.</EmptyState>
+              <EmptyState>
+                {queueSlice === "special-buildings"
+                  ? "No special building manual review items are open in this scope."
+                  : "No open queue records in current scope."}
+              </EmptyState>
             )}
           </div>
 
@@ -415,6 +651,20 @@ export default function OperatorQueuePage() {
               </span>
               <span style={{ color: "#64748b", fontSize: 13 }}>
                 Trace {shortId(data.applications.traceId)}
+              </span>
+            </article>
+
+            <article style={{ ...panelStyle, padding: 16, display: "grid", gap: 8 }}>
+              <strong>Queue Slice</strong>
+              <span style={{ color: "#334155" }}>
+                {queueSlice === "special-buildings"
+                  ? `${visibleQueueCount} special-building manual review item(s) ready for dedicated operator handling.`
+                  : `${visibleQueueCount} open queue item(s) across the current governed scope.`}
+              </span>
+              <span style={{ color: "#64748b", fontSize: 13, lineHeight: 1.45 }}>
+                {queueSlice === "special-buildings"
+                  ? "Use this lane for restricted or special assets that were verified as public disposition opportunities but still require human approval before normal Furlong handling."
+                  : "Switch to the special-building lane when the team needs to work restricted-asset submissions without sifting through the general queue."}
               </span>
             </article>
 
@@ -449,4 +699,3 @@ export default function OperatorQueuePage() {
     </main>
   );
 }
-

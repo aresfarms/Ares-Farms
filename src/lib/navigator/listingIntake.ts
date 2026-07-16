@@ -56,13 +56,34 @@ export function looksLikeAddress(text: string): boolean {
     || (/\d{1,6}\s+\S+/.test(text) && STATE_RE.test(text.toUpperCase()));
 }
 
+function stripListingArtifacts(text: string): string {
+  let cleaned = text;
+  const tokens = cleaned.split(/\s+/).filter(Boolean);
+  const stateIndex = tokens.findIndex((token) => STATE_RE.test(token.toUpperCase()));
+  if (stateIndex >= 0) {
+    const next = tokens[stateIndex + 1] ?? "";
+    const endIndex = /^\d{5}(?:-\d{4})?$/.test(next) ? stateIndex + 1 : stateIndex;
+    cleaned = tokens.slice(0, endIndex + 1).join(" ");
+  }
+
+  cleaned = cleaned
+    .replace(/\bM\d{4,}\s+\d{4,}\b/gi, "")
+    .replace(/\b(?:zpid|mls)\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+
+  return cleaned;
+}
+
 /** Turn a URL path slug into address-ish text: "123-Main-St-Beckley-WV-25801" → "123 Main St Beckley WV 25801". */
 function slugToAddress(slug: string): string {
-  return decodeURIComponent(slug)
+  return stripListingArtifacts(
+    decodeURIComponent(slug)
     .replace(/[_-]+/g, " ")
     .replace(/\s{2,}/g, " ")
     .replace(/\b(\d{5})(?:\s*\d{4})?\b\s*$/, "$1")
-    .trim();
+    .trim()
+  );
 }
 
 /**
@@ -104,7 +125,7 @@ export function resolveListingInput(raw: string): PropertyReference | null {
   if (looksLikeAddress(text)) {
     const stateMatch = text.toUpperCase().match(STATE_RE);
     return {
-      addressText: text.replace(/\s{2,}/g, " "),
+      addressText: stripListingArtifacts(text.replace(/\s{2,}/g, " ")),
       state: stateMatch ? stateMatch[1] : null,
       locality: null,
       source: "plain-address",

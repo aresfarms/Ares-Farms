@@ -138,7 +138,13 @@ async function main(): Promise<void> {
   const facts: Record<string, Fact> = { ...existing };
   let done = 0;
   for (const p of batch) {
-    const fact = await queryAmenities(p.lat, p.lon).catch(() => null);
+    // Overpass throttles bursts (HTTP 429/504 -> null). Retry once after a
+    // longer pause so rural stragglers aren't permanently skipped by bad luck.
+    let fact = await queryAmenities(p.lat, p.lon).catch(() => null);
+    if (!fact) {
+      await new Promise((resolve) => setTimeout(resolve, 6000));
+      fact = await queryAmenities(p.lat, p.lon).catch(() => null);
+    }
     if (fact) facts[p.id] = fact;
     done += 1;
     if (done % 20 === 0) console.log(`  …${done}/${batch.length} (total ${Object.keys(facts).length})`);

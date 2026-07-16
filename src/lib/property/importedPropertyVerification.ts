@@ -47,6 +47,20 @@ export type ImportedVerificationResult = {
     historic?: { historicName: string | null; asOf: string } | null;
   };
   verifiedPrograms: ReturnType<typeof verifyPropertyPrograms>;
+  /**
+   * Census geocode of the typed address, when it resolved. Exposed so the
+   * public property-facts route can build the same Place Brief (tenure, food
+   * access, county mechanics, gated live amenities) for manually-entered
+   * addresses that map-selected properties get. `null` when geocoding did not
+   * run or did not resolve.
+   */
+  geocode: {
+    tractId: string; // 11-digit GEOID (state+county+tract)
+    countyFips: string; // 5-digit county FIPS (state+county)
+    stateFips: string;
+    lat: number | null;
+    lon: number | null;
+  } | null;
   liveChecks: {
     opportunityZoneActivated: boolean;
     nmtcActivated: boolean;
@@ -69,6 +83,24 @@ type ParsedAddress = {
   state: string;
   zip: string;
 };
+
+/**
+ * Reduce a raw Census geocode to the geocode block on ImportedVerificationResult.
+ * countyFips on CensusGeocodeResult is the 3-digit county; the 5-digit county
+ * FIPS the Place Brief snapshots are keyed by is state(2)+county(3).
+ */
+function toGeocodeOut(g: CensusGeocodeResult | null): ImportedVerificationResult["geocode"] {
+  if (!g?.geoid) return null;
+  const lat = Number(g.lat);
+  const lon = Number(g.lon);
+  return {
+    tractId: g.geoid,
+    countyFips: `${g.stateFips}${g.countyFips}`,
+    stateFips: g.stateFips,
+    lat: Number.isFinite(lat) ? lat : null,
+    lon: Number.isFinite(lon) ? lon : null,
+  };
+}
 
 function cleanPart(value: string): string {
   return value.trim().replace(/^[,\s]+|[,\s]+$/g, "");
@@ -239,6 +271,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       warnings,
       placeFacts: {},
       verifiedPrograms: [],
+      geocode: null,
       liveChecks: {
         opportunityZoneActivated: ozActivated,
         nmtcActivated,
@@ -289,6 +322,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       ],
       placeFacts: {},
       verifiedPrograms: [],
+      geocode: toGeocodeOut(freeformGeocode),
       liveChecks: {
         opportunityZoneActivated: ozActivated,
         nmtcActivated,
@@ -371,11 +405,13 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
     lookupOutcomes.hubzone = "gated";
   }
 
+  // Always geocode a parsed address (not just when a live place-fact gate is
+  // open): the manual-address Place Brief needs the tract GEOID + county FIPS
+  // to resolve tenure, food access, county mechanics, and live amenities even
+  // when every OZ/NMTC/flood/historic gate is off (staging default).
   const geocode =
     freeformGeocode ??
-    ((nmtcActivated || floodActivated || historicActivated)
-      ? await geocodeToCensusTract(parsed.street, parsed.city, parsed.state, parsed.zip).catch(() => null)
-      : null);
+    (await geocodeToCensusTract(parsed.street, parsed.city, parsed.state, parsed.zip).catch(() => null));
 
   if (nmtcActivated) {
     if (geocode?.geoid) {
@@ -477,6 +513,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
     warnings,
     placeFacts,
     verifiedPrograms,
+    geocode: toGeocodeOut(geocode ?? freeformGeocode),
     liveChecks: {
       opportunityZoneActivated: ozActivated,
       nmtcActivated,

@@ -40,6 +40,12 @@ import {
   PROPERTY_AMENITIES_PROVENANCE,
 } from "./propertyAmenitiesGenerated";
 import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
+import {
+  AMENITY_RADIUS_MILES,
+  amenityLiveLookupEnabled,
+  queryAmenitiesLive,
+  type AmenityFacts,
+} from "./amenityQuery";
 
 export interface BriefFactLine {
   /** Short label, e.g. "Flood zone". */
@@ -235,6 +241,42 @@ function designationFactLines(propertyId: string): BriefFactLine[] {
   }
 
   return lines;
+}
+
+/**
+ * "Daily life nearby" fact line from an amenity fact set — shared by the frozen
+ * property snapshot (offline OSM ingest) and the gated LIVE lookup for manually
+ * typed addresses. Distance/count facts only; "not mapped" said plainly.
+ */
+function amenityFactLine(
+  amenities: AmenityFacts,
+  radiusMiles: number,
+  provenance: string
+): BriefFactLine {
+  const part = (key: string, singular: string, plural: string): string => {
+    const cat = amenities[key];
+    if (!cat || cat.count === 0) return `no ${plural} mapped`;
+    const nearest =
+      cat.nearestMiles !== null
+        ? ` (nearest${cat.nearestName ? ` ${cat.nearestName}` : ""} ~${cat.nearestMiles} mi)`
+        : "";
+    return cat.count === 1 ? `1 ${singular}${nearest}` : `${cat.count} ${plural}${nearest}`;
+  };
+  const parksCount = (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0);
+  return {
+    label: "Daily life nearby",
+    text:
+      `Within ~${radiusMiles} miles: ${part("grocery", "grocery/market", "groceries/markets")}; ` +
+      `${part("dining", "restaurant/cafe", "restaurants/cafes/bars")}; ` +
+      `${part("pharmacy", "pharmacy", "pharmacies")}; ` +
+      `${part("healthcare", "clinic/hospital", "clinics/hospitals")}; ` +
+      `${parksCount > 0 ? `${parksCount} parks/playgrounds` : "no parks/playgrounds mapped"}` +
+      `${(amenities.dogPark?.count ?? 0) > 0 ? `; ${amenities.dogPark.count} dog park(s)` : ""}` +
+      `${(amenities.vet?.count ?? 0) > 0 ? `; vet ~${amenities.vet.nearestMiles} mi` : "; no vet mapped"}. ` +
+      `"Not mapped" means absent from OpenStreetMap — rural coverage can lag reality.`,
+    provenance,
+    tone: "neutral",
+  };
 }
 
 function mechanicsForSource(
@@ -515,35 +557,13 @@ export function buildPropertyBriefIntelligence(args: {
   // OSM coverage in rural areas can lag; zero means "not mapped", said plainly.
   const amenities = id ? PROPERTY_AMENITY_FACTS[id] : undefined;
   if (amenities && isHome) {
-    const radius = PROPERTY_AMENITIES_PROVENANCE.radiusMiles;
-    const part = (
-      key: string,
-      singular: string,
-      plural: string
-    ): string => {
-      const cat = amenities[key];
-      if (!cat || cat.count === 0) return `no ${plural} mapped`;
-      const nearest =
-        cat.nearestMiles !== null
-          ? ` (nearest${cat.nearestName ? ` ${cat.nearestName}` : ""} ~${cat.nearestMiles} mi)`
-          : "";
-      return cat.count === 1 ? `1 ${singular}${nearest}` : `${cat.count} ${plural}${nearest}`;
-    };
-    const parksCount = (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0);
-    verifiedFacts.push({
-      label: "Daily life nearby",
-      text:
-        `Within ~${radius} miles: ${part("grocery", "grocery/market", "groceries/markets")}; ` +
-        `${part("dining", "restaurant/cafe", "restaurants/cafes/bars")}; ` +
-        `${part("pharmacy", "pharmacy", "pharmacies")}; ` +
-        `${part("healthcare", "clinic/hospital", "clinics/hospitals")}; ` +
-        `${parksCount > 0 ? `${parksCount} parks/playgrounds` : "no parks/playgrounds mapped"}` +
-        `${(amenities.dogPark?.count ?? 0) > 0 ? `; ${amenities.dogPark.count} dog park(s)` : ""}` +
-        `${(amenities.vet?.count ?? 0) > 0 ? `; vet ~${amenities.vet.nearestMiles} mi` : "; no vet mapped"}. ` +
-        `"Not mapped" means absent from OpenStreetMap — rural coverage can lag reality.`,
-      provenance: `Source: ${PROPERTY_AMENITIES_PROVENANCE.source}, snapshot ${PROPERTY_AMENITIES_PROVENANCE.asOf} · ${PROPERTY_AMENITIES_PROVENANCE.license}`,
-      tone: "neutral",
-    });
+    verifiedFacts.push(
+      amenityFactLine(
+        amenities,
+        PROPERTY_AMENITIES_PROVENANCE.radiusMiles,
+        `Source: ${PROPERTY_AMENITIES_PROVENANCE.source}, snapshot ${PROPERTY_AMENITIES_PROVENANCE.asOf} · ${PROPERTY_AMENITIES_PROVENANCE.license}`
+      )
+    );
   }
 
   // Schools — LIST + permitted data (enrollment, charter), never ratings
@@ -607,6 +627,244 @@ export function buildPropertyBriefIntelligence(args: {
       stateCode: args.stateCode,
       isHome,
     }),
+    resolvedCounty,
+  };
+}
+
+// ── Manual-address ("typed into the portal") Place Brief ────────────────────
+// Map-selected properties read frozen property-keyed snapshots; a manually
+// typed address has no canonical id, so this async builder resolves the SAME
+// living-here facts from the Census geocode instead:
+//   • county / FMR / schools   → keyed by the 5-digit county FIPS (direct)
+//   • OZ / NMTC / HUBZone / flood / historic → the LIVE verification placeFacts
+//   • daily-life amenities     → gated live Overpass lookup (OFF by default)
+// Tenure and USDA food-access are property-keyed with no stored tract linkage,
+// so for typed addresses they stay honest-unknowns rather than being guessed.
+
+export interface LocationBriefGeocode {
+  tractId: string;
+  countyFips: string;
+  stateFips: string;
+  lat: number | null;
+  lon: number | null;
+}
+
+export interface LocationBriefPlaceFacts {
+  opportunityZone?: { tractId: string; rural: boolean; asOf: string } | null;
+  nmtc?: { tractId: string; asOf: string } | null;
+  hubzone?: {
+    hubzoneType: string;
+    geoid: string;
+    effective: string;
+    expiration: string | null;
+    isCurrent: boolean;
+    asOf: string;
+  } | null;
+  flood?: { floodZone: string; asOf: string } | null;
+  historic?: { historicName: string | null; asOf: string } | null;
+}
+
+/** FEMA zone letter → SFHA. A- and V-prefixed zones are Special Flood Hazard Areas. */
+function floodFactFromLive(floodZone: string, asOf: string): BriefFactLine {
+  const zone = floodZone.trim().toUpperCase();
+  const provenance = `Source: FEMA National Flood Hazard Layer, verified ${asOf} · confirm at msc.fema.gov`;
+  if (/^[AV]/.test(zone)) {
+    return {
+      label: "Flood zone",
+      text:
+        `This address maps to FEMA flood zone ${zone}, inside a Special Flood Hazard Area. ` +
+        `Federally backed mortgages generally require flood insurance here, which adds a real ` +
+        `carrying cost — get an insurance quote before you bid.`,
+      provenance,
+      tone: "caution",
+    };
+  }
+  if (zone === "D") {
+    return {
+      label: "Flood zone",
+      text:
+        `This address maps to FEMA flood zone D — flood hazard undetermined (no study completed). ` +
+        `That is not the same as low risk; lenders and insurers treat zone D case-by-case.`,
+      provenance,
+      tone: "caution",
+    };
+  }
+  return {
+    label: "Flood zone",
+    text:
+      `This address maps to FEMA flood zone ${zone}, outside the Special Flood Hazard Area. ` +
+      `Flood insurance is typically optional here, though flooding can occur outside mapped zones.`,
+    provenance,
+    tone: "positive",
+  };
+}
+
+export async function buildLocationBriefIntelligence(args: {
+  geocode: LocationBriefGeocode | null;
+  placeFacts: LocationBriefPlaceFacts;
+  parsed: { street: string; city: string; state: string; zip: string } | null;
+  propertyType?: string | null;
+  amenityEnv?: NodeJS.ProcessEnv;
+}): Promise<PropertyBriefIntelligence> {
+  // Manual portal entry is residential-first; treat as a home unless a type
+  // that clearly is not a home is supplied.
+  const isHome = args.propertyType
+    ? /home|residential|house/i.test(args.propertyType)
+    : true;
+  const geocode = args.geocode;
+  const placeFacts = args.placeFacts;
+  const stateCode = args.parsed?.state ?? null;
+  const town = args.parsed?.city ?? null;
+
+  const verifiedFacts: BriefFactLine[] = [];
+
+  // County — anchors taxes, floodplain administration, permits.
+  const countyFips = geocode?.countyFips ?? null;
+  const county = countyFips ? COUNTY_NAMES[countyFips] : undefined;
+  const resolvedCounty: ResolvedCounty | null =
+    county && countyFips && geocode
+      ? { name: county.name, state: county.state, fips: countyFips, tractId: geocode.tractId }
+      : null;
+  if (resolvedCounty) {
+    verifiedFacts.push({
+      label: "County",
+      text:
+        `This address sits in ${resolvedCounty.name}, ${resolvedCounty.state} — derived from its ` +
+        `census tract (${resolvedCounty.tractId}). The county is where property taxes, floodplain ` +
+        `administration, and permits live.`,
+      provenance: `Source: U.S. Census Bureau geocoder + county codes, snapshot ${COUNTY_NAMES_PROVENANCE.asOf}`,
+      tone: "positive",
+    });
+  }
+
+  // Flood / historic / OZ / NMTC / HUBZone — from the LIVE verification lookups
+  // (present only where the corresponding place-fact gate is activated).
+  const floodResolved = Boolean(placeFacts.flood?.floodZone);
+  if (placeFacts.flood?.floodZone) {
+    verifiedFacts.push(floodFactFromLive(placeFacts.flood.floodZone, placeFacts.flood.asOf));
+  }
+  if (placeFacts.historic) {
+    verifiedFacts.push({
+      label: "Historic status",
+      text:
+        `This address falls within a National Register of Historic Places area` +
+        `${placeFacts.historic.historicName ? ` (${placeFacts.historic.historicName})` : ""}. ` +
+        `Historic designation can constrain exterior changes and can also open preservation ` +
+        `incentives — worth understanding before planning renovations.`,
+      provenance: `Source: NPS National Register of Historic Places, verified ${placeFacts.historic.asOf}`,
+      tone: "caution",
+    });
+  }
+  if (placeFacts.opportunityZone) {
+    verifiedFacts.push({
+      label: "Opportunity Zone",
+      text:
+        `This address is in a census tract designated as a Qualified Opportunity Zone` +
+        `${placeFacts.opportunityZone.rural ? " (flagged rural)" : ""}. This is a designation of the ` +
+        `place — not eligibility, qualification, or a guaranteed tax benefit for any person.`,
+      provenance: `Source: HUD GIS / Treasury (IRC §1400Z-1), verified ${placeFacts.opportunityZone.asOf}`,
+      tone: "positive",
+    });
+  }
+  if (placeFacts.nmtc) {
+    verifiedFacts.push({
+      label: "New Markets Tax Credit area",
+      text:
+        `This address's census tract qualifies as an NMTC low-income community — a designation that ` +
+        `can matter for community-facility and business financing structures. A fact about the place, ` +
+        `not eligibility for any person or project.`,
+      provenance: `Source: CDFI Fund NMTC eligibility data, verified ${placeFacts.nmtc.asOf}`,
+      tone: "positive",
+    });
+  }
+  if (placeFacts.hubzone) {
+    verifiedFacts.push({
+      label: "HUBZone",
+      text: placeFacts.hubzone.isCurrent
+        ? `This address is in a designated SBA HUBZone (${placeFacts.hubzone.hubzoneType}). Relevant ` +
+          `mainly if you would run a business here that pursues federal contracts. Designations ` +
+          `change — verify current status with SBA.`
+        : `This address had a HUBZone designation (${placeFacts.hubzone.hubzoneType}) that is now ` +
+          `historical/expired — do not rely on it as current. Verify with SBA.`,
+      provenance: `Source: SBA HUBZone layer, verified ${placeFacts.hubzone.asOf} · maps.certify.sba.gov`,
+      tone: placeFacts.hubzone.isCurrent ? "positive" : "neutral",
+    });
+  }
+
+  // Daily-life amenities — GATED live Overpass lookup (OFF by default). When the
+  // gate is closed or the query fails, amenities become an honest unknown.
+  let amenities: AmenityFacts | null = null;
+  if (
+    isHome &&
+    geocode?.lat != null &&
+    geocode?.lon != null &&
+    amenityLiveLookupEnabled(args.amenityEnv ?? process.env)
+  ) {
+    amenities = await queryAmenitiesLive(geocode.lat, geocode.lon);
+    if (amenities) {
+      verifiedFacts.push(
+        amenityFactLine(
+          amenities,
+          AMENITY_RADIUS_MILES,
+          `Source: OpenStreetMap via Overpass API (live lookup), © OpenStreetMap contributors (ODbL)`
+        )
+      );
+    }
+  }
+
+  // Schools — county-keyed directory facts, list only, never ratings.
+  const schools = countyFips ? COUNTY_SCHOOLS[countyFips] : undefined;
+  if (schools && schools.length > 0 && isHome) {
+    const townLower = (town ?? "").trim().toLowerCase();
+    const inTown = townLower ? schools.filter((s) => s.city.toLowerCase() === townLower) : [];
+    const sample = (inTown.length > 0 ? inTown : schools).slice(0, 4);
+    const charterCount = schools.filter((s) => s.charter).length;
+    verifiedFacts.push({
+      label: "Schools",
+      text:
+        `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
+        `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
+        `${inTown.length > 0 && town ? `, including ${inTown.length} in ${town}` : ""}. ` +
+        `Examples: ${sample
+          .map((s) => `${s.name} (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})`)
+          .join("; ")}. ` +
+        `Directory facts from federal data — Furlong does not rate schools; the state report card ` +
+        `is the official quality source.`,
+      provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
+      tone: "neutral",
+    });
+  }
+
+  // Rental context — county-keyed HUD Fair Market Rents.
+  const fmr = countyFips ? COUNTY_FMR[countyFips] : undefined;
+  if (fmr && isHome) {
+    verifiedFacts.push({
+      label: "Rental context",
+      text:
+        `HUD's ${COUNTY_FMR_PROVENANCE.fmrYear} Fair Market Rents for this county` +
+        `${fmr.areaName ? ` (${fmr.areaName})` : ""}: about $${fmr.fmr2.toLocaleString("en-US")}/month ` +
+        `for a 2-bedroom (1BR $${fmr.fmr1.toLocaleString("en-US")}, 3BR $${fmr.fmr3.toLocaleString("en-US")}). ` +
+        `A program rent standard HUD publishes — market context, not a prediction of what this home would rent for.`,
+      provenance: `Source: ${COUNTY_FMR_PROVENANCE.source}, ${COUNTY_FMR_PROVENANCE.fmrYear}, snapshot ${COUNTY_FMR_PROVENANCE.asOf}`,
+      tone: "neutral",
+    });
+  }
+
+  return {
+    verifiedFacts,
+    unknowns: buildUnknowns({
+      propertyId: "",
+      county: resolvedCounty?.name ?? null,
+      resolvedCounty,
+      priceLabel: null,
+      floodResolved,
+      isHome,
+      rentalContextAvailable: Boolean(fmr),
+      amenitiesAvailable: Boolean(amenities),
+      schoolsAvailable: Boolean(schools && schools.length > 0),
+    }),
+    mechanics: null,
+    pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),
     resolvedCounty,
   };
 }

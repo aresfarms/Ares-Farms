@@ -129,6 +129,8 @@ type PropertyFactsResponse = {
       historicActivated: boolean;
     };
   };
+  /** Living-here Place Brief for manually typed addresses (geocode-derived). */
+  placeIntelligence?: PropertyBriefIntelligence | null;
 };
 
 type SpecialBuildingReviewResponse = {
@@ -2091,12 +2093,15 @@ export function PropertyEvaluationWorkspace({
     facts,
     topProgramRanks,
   });
+  // Map-selected properties receive the Place Brief as a server prop; manually
+  // typed addresses get it back from the property-facts API (geocode-derived).
+  const effectivePlaceIntelligence = placeIntelligence ?? facts?.placeIntelligence ?? null;
   const report = buildReportModel({
     context: analysisContext,
     answers,
     navigator,
     facts,
-    placeIntelligence,
+    placeIntelligence: effectivePlaceIntelligence,
     topProgramRanks,
     budgetExpectations,
     defaultQuestions,

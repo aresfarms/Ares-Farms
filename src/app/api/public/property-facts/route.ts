@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPropertyPrograms } from "@/lib/capital-graph/programVerification";
 import { sfhaForProperty, historicForProperty } from "@/lib/property/propertyFloodHistoric";
 import { verifyImportedPropertyAddress } from "@/lib/property/importedPropertyVerification";
+import { buildLocationBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import { designatedHubzoneForProperty } from "@/lib/property/propertyHubzones";
 import { nmtcForProperty } from "@/lib/property/propertyNmtc";
 import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones";
@@ -43,11 +44,20 @@ export async function POST(req: NextRequest) {
       rawInput: body.rawInput ?? null,
       notes: body.notes ?? null,
     });
+    // Same living-here Place Brief a map-selected property gets, resolved from
+    // the geocode: county/FMR/schools by county FIPS, OZ/NMTC/flood/historic
+    // from the live verification, amenities via the gated live lookup.
+    const placeIntelligence = await buildLocationBriefIntelligence({
+      geocode: imported.geocode,
+      placeFacts: imported.placeFacts,
+      parsed: imported.parsedAddress,
+    });
     return NextResponse.json({
       ok: true,
       propertyId,
       placeFacts: imported.placeFacts,
       verifiedPrograms: imported.verifiedPrograms,
+      placeIntelligence,
       verification: {
         status: imported.status,
         normalizedAddress: imported.normalizedAddress,

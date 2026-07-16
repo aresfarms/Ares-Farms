@@ -115,6 +115,13 @@ Core "wouldn't know to ask" block (every property):
 | Kid considerations | Playgrounds/parks within X mi, sidewalk presence, school walk distance, posted speed / road class | OSM/municipal GIS (BUILD), state DOT (BUILD) |
 | Pet considerations | Municipal animal ordinances (breed rules are code facts), dog parks, nearest vet | Municipal code (BUILD), OSM (BUILD) |
 | "Neighbor" reality — reframed | Lot size/density, owner-occupancy rate (tract-level Census fact), adjacent land uses, noise sources | Census ACS (BUILD), zoning/GIS (BUILD) |
+
+**FOUNDER DECISION (Caitlin, 2026-07-15) — amenity-facts pattern APPROVED:** the three rows above
+ship as objective amenity/context facts (playgrounds within a mile, sidewalks, speed limits, lot
+density, owner-occupancy rate from Census) and NEVER as characterizations ("great for families,"
+"quiet neighbors"). Same information, litigation-proof form. This is the binding presentation
+pattern for the entire living-here section and is enforceable by the proposed
+`verify:fair-housing-surface` gate (banned-vocabulary grep + section symmetry).
 | HOA — and is it well-run? | HOA existence + fee + covenant highlights from recorded docs; HOA litigation count (public dockets); a "CC&R warning-signs checklist" + questions to ask the board | County records (TIER-1 pull), courts (TIER-1), checklist (HAVE: write once) |
 | Traffic/noise | Adjacent road class + AADT count, rail line proximity, airport distance + flight-path fact | State DOT AADT (BUILD), FAA (BUILD) |
 | Daily life | Nearest grocery (+ USDA food-access tract fact — powerful in rural KS), restaurants/bars count within X mi, parks | USDA Food Access Atlas (BUILD, free), OSM (BUILD) |

@@ -73,6 +73,30 @@ export interface ResolvedCounty {
   tractId: string;
 }
 
+/**
+ * A compact Answer-card chip: `short` is the at-a-glance text, `fact` is the
+ * full verified line (with provenance) it expands to. Chips are ALWAYS backed
+ * by a verified fact — interpretation never gets a chip (redesign rule:
+ * Verified / Inferred / Unknown stay visually separate).
+ */
+export interface BriefChip {
+  short: string;
+  fact: BriefFactLine;
+}
+
+/** One row of the "living here" distance strip — distances and counts only. */
+export interface LivingHereItem {
+  label: string;
+  value: string;
+}
+
+export interface LivingHereStrip {
+  radiusMiles: number;
+  items: LivingHereItem[];
+  /** ODbL requires attribution wherever these render. */
+  attribution: string;
+}
+
 export interface PropertyBriefIntelligence {
   verifiedFacts: BriefFactLine[];
   unknowns: BriefUnknownLine[];
@@ -82,6 +106,10 @@ export interface PropertyBriefIntelligence {
   pathwaysProse: string | null;
   /** County derived from the property's census tract when the record lacked one. */
   resolvedCounty: ResolvedCounty | null;
+  /** Up to four verified-fact chips for the Answer card (flood, grocery, schools, rent). */
+  chips: BriefChip[];
+  /** Amenity distances for the "living here" strip; null until amenities resolve. */
+  livingHere: LivingHereStrip | null;
 }
 
 /**
@@ -277,6 +305,103 @@ function amenityFactLine(
     provenance,
     tone: "neutral",
   };
+}
+
+/**
+ * "Living here" strip from an amenity fact set — the same distances the
+ * amenity sentence carries, re-cut as scannable rows (eye-tracking: distances
+ * beat prose). Fair-housing rule: labels are activities, values are distances
+ * and counts — never characterizations of the area or its people.
+ */
+function livingHereStrip(amenities: AmenityFacts, radiusMiles: number): LivingHereStrip {
+  const items: LivingHereItem[] = [];
+  const nearest = (key: string): string | null => {
+    const cat = amenities[key];
+    if (!cat || cat.count === 0 || cat.nearestMiles === null) return null;
+    return `${cat.nearestName ? `${cat.nearestName} · ` : ""}${cat.nearestMiles} mi`;
+  };
+  const grocery = nearest("grocery");
+  if (grocery) items.push({ label: "Grocery run", value: grocery });
+  const dining = nearest("dining");
+  if (dining) items.push({ label: "Dinner out", value: dining });
+  const pharmacy = nearest("pharmacy");
+  if (pharmacy) items.push({ label: "Pharmacy", value: pharmacy });
+  const healthcare = nearest("healthcare");
+  if (healthcare) items.push({ label: "Clinic or hospital", value: healthcare });
+  const parksCount = (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0);
+  if (parksCount > 0) {
+    items.push({ label: "Parks & playgrounds", value: `${parksCount} within ${radiusMiles} mi` });
+  }
+  const vet = nearest("vet");
+  const dogParks = amenities.dogPark?.count ?? 0;
+  if (vet || dogParks > 0) {
+    items.push({
+      label: "Pets",
+      value: [vet ? `vet ${vet}` : null, dogParks > 0 ? `${dogParks} dog park${dogParks === 1 ? "" : "s"}` : null]
+        .filter(Boolean)
+        .join(" · "),
+    });
+  }
+  return {
+    radiusMiles,
+    items,
+    attribution: "© OpenStreetMap contributors (ODbL) — \"not mapped\" means absent from OpenStreetMap; rural coverage can lag reality.",
+  };
+}
+
+/** Find a verified fact by label and pair it with chip-length text. */
+function chipFrom(
+  facts: BriefFactLine[],
+  label: string,
+  short: string | null
+): BriefChip | null {
+  if (!short) return null;
+  const fact = facts.find((f) => f.label === label);
+  return fact ? { short, fact } : null;
+}
+
+/**
+ * The four Answer-card chips: flood posture, nearest grocery, schools, and
+ * rent context — the four questions a first-look buyer asks before anything
+ * else. Every chip is backed by the verified fact it expands to.
+ */
+function buildChips(args: {
+  verifiedFacts: BriefFactLine[];
+  floodZone: string | null;
+  floodSfha: boolean | null;
+  amenities: AmenityFacts | null;
+  schoolsCount: number | null;
+  schoolsInTown: number | null;
+  town: string | null;
+  fmr2: number | null;
+}): BriefChip[] {
+  const chips: (BriefChip | null)[] = [];
+  if (args.floodZone) {
+    const posture =
+      args.floodSfha === true
+        ? "flood insurance likely required"
+        : args.floodZone.toUpperCase() === "D"
+          ? "hazard undetermined"
+          : "outside hazard area";
+    chips.push(chipFrom(args.verifiedFacts, "Flood zone", `Flood zone ${args.floodZone} — ${posture}`));
+  }
+  const groceryMiles = args.amenities?.grocery?.nearestMiles ?? null;
+  if (groceryMiles !== null) {
+    chips.push(chipFrom(args.verifiedFacts, "Daily life nearby", `Grocery ${groceryMiles} mi`));
+  }
+  if (args.schoolsCount) {
+    const short =
+      args.schoolsInTown && args.town
+        ? `${args.schoolsInTown} school${args.schoolsInTown === 1 ? "" : "s"} in ${args.town}`
+        : `${args.schoolsCount} public school${args.schoolsCount === 1 ? "" : "s"} in the county`;
+    chips.push(chipFrom(args.verifiedFacts, "Schools", short));
+  }
+  if (args.fmr2) {
+    chips.push(
+      chipFrom(args.verifiedFacts, "Rental context", `2BR rent context $${args.fmr2.toLocaleString("en-US")}/mo`)
+    );
+  }
+  return chips.filter((c): c is BriefChip => c !== null).slice(0, 4);
 }
 
 function mechanicsForSource(
@@ -608,6 +733,13 @@ export function buildPropertyBriefIntelligence(args: {
     });
   }
 
+  const floodRecord = id ? PROPERTY_FLOOD_HISTORIC_FACTS[id] : undefined;
+  const townLowerForChips = (args.town ?? "").trim().toLowerCase();
+  const schoolsInTown =
+    schools && townLowerForChips
+      ? schools.filter((s) => s.city.toLowerCase() === townLowerForChips).length
+      : 0;
+
   return {
     verifiedFacts,
     unknowns: buildUnknowns({
@@ -628,6 +760,20 @@ export function buildPropertyBriefIntelligence(args: {
       isHome,
     }),
     resolvedCounty,
+    chips: buildChips({
+      verifiedFacts,
+      floodZone: floodRecord?.floodZone ?? null,
+      floodSfha: floodRecord?.isSfha ?? null,
+      amenities: (isHome ? amenities : null) ?? null,
+      schoolsCount: isHome && schools ? schools.length : null,
+      schoolsInTown,
+      town: args.town,
+      fmr2: isHome && fmr ? fmr.fmr2 : null,
+    }),
+    livingHere:
+      amenities && isHome
+        ? livingHereStrip(amenities, PROPERTY_AMENITIES_PROVENANCE.radiusMiles)
+        : null,
   };
 }
 
@@ -866,5 +1012,19 @@ export async function buildLocationBriefIntelligence(args: {
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),
     resolvedCounty,
+    chips: buildChips({
+      verifiedFacts,
+      floodZone: placeFacts.flood?.floodZone ?? null,
+      floodSfha: placeFacts.flood?.floodZone ? /^[AV]/.test(placeFacts.flood.floodZone.trim().toUpperCase()) : null,
+      amenities,
+      schoolsCount: isHome && schools ? schools.length : null,
+      schoolsInTown:
+        schools && town
+          ? schools.filter((s) => s.city.toLowerCase() === town.trim().toLowerCase()).length
+          : 0,
+      town,
+      fmr2: isHome && fmr ? fmr.fmr2 : null,
+    }),
+    livingHere: amenities && isHome ? livingHereStrip(amenities, AMENITY_RADIUS_MILES) : null,
   };
 }

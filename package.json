@@ -330,7 +330,8 @@
     "verify:cyber-resilience": "tsx src/scripts/verifyCyberResilience.ts",
     "verify:security-governance": "tsx src/scripts/verifySecurityGovernance.ts",
     "verify:domain-governance": "tsx src/scripts/verifyDomainGovernance.ts",
-    "run:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts"
+    "run:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts",
+    "verify:brief-copy": "tsx src/scripts/verifyBriefCopy.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

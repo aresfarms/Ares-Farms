@@ -344,6 +344,60 @@ function propertySpecificSummary(context: PropertyContext, facts: PropertyFactsR
   return lines;
 }
 
+/**
+ * The Answer card (redesign memo §3.1 + founder refinements 2026-07-16): the
+ * first screen answers "what is this, what's unusual about buying it, can I
+ * orient fast" in plain language. Everything here is INTERPRETATION and is
+ * labeled "Plain-language read" — verified facts live in the chips and the
+ * trust section, never mixed in. Readiness phrases replace scores: no false
+ * precision, just what the file has and hasn't captured.
+ */
+function buildAnswerCard(args: {
+  context: PropertyContext;
+  restrictionsPresent: boolean;
+}): { headline: string; readiness: string[]; fitLine: string | null; pauseLine: string } {
+  const isHome = /home|residential|house/i.test(args.context.propertyType ?? "");
+  const sourceId = (args.context.sourceId ?? "").toLowerCase();
+  const priceOnRequest = /price on request/i.test(args.context.priceLabel ?? "");
+  const isGovSale = sourceId === "hud" || sourceId === "usda" || sourceId === "gsa";
+  const imported = Boolean(args.context.propertyId?.startsWith("imported:"));
+
+  const headline =
+    sourceId === "hud" && isHome
+      ? "An ordinary home purchase with one unusual advantage: as a live-in buyer, you get to bid before any investor is allowed to."
+      : sourceId === "usda"
+        ? "A government resale bought through USDA's own process — sold as-is, with the current price on USDA's listing page."
+        : sourceId === "gsa"
+          ? "Federal surplus sold by auction — the auction page carries the price, the deposit rules, and the timeline."
+          : imported
+            ? "A property you brought in yourself — here is what could be verified about it so far, and what couldn't."
+            : "A first look built from what can be verified about this property and its place — nothing more implied.";
+
+  const readiness: string[] = [];
+  readiness.push(args.restrictionsPresent ? "Needs review before anything else" : "Looks reviewable");
+  if (priceOnRequest) readiness.push("Price not captured here");
+  if (isGovSale) readiness.push("Needs inspection detail");
+  if (sourceId === "hud" && isHome) readiness.push("HUD owner-occupant timing matters");
+
+  const fitBits = [
+    sourceId === "hud" && isHome ? "the HUD owner-occupant bid window" : null,
+    args.context.location ? `the ${args.context.location} setting` : null,
+    "place facts that come with sources",
+  ].filter((bit): bit is string => Boolean(bit));
+  const pauseBits = [
+    priceOnRequest ? "a confirmed price" : null,
+    isGovSale ? "inspection results and a repair estimate" : "inspection results",
+    "a lender-ready package today",
+  ].filter((bit): bit is string => Boolean(bit));
+
+  return {
+    headline,
+    readiness,
+    fitLine: fitBits.length > 0 ? fitBits.join(", ") : null,
+    pauseLine: pauseBits.join(", "),
+  };
+}
+
 function verificationTone(status: NonNullable<PropertyFactsResponse["verification"]>["status"] | undefined) {
   switch (status) {
     case "verified":
@@ -983,7 +1037,7 @@ function buildStrengths(args: {
   // "too thin to state signals" fallback instead of canned characterization
   // (render-time honesty — same doctrine as the Place Brief).
   if (args.topPathways[0]) {
-    out.push(`${args.topPathways[0].label} currently appears to be the strongest planning lane in the governed pathway engine.`);
+    out.push(`${args.topPathways[0].label} currently reads as the strongest financing lane to test first.`);
   }
   if (args.verifiedPrograms.length > 0) {
     out.push(`The property already carries ${args.verifiedPrograms.length} verified property-side program or designation signal(s), which is stronger than starting from a blank asset.`);
@@ -1126,11 +1180,11 @@ function buildExplainabilityNotes(args: {
 }): string[] {
   const primaryPathway = args.topPathways[0];
   const lines = [
-    "This report combines property details, your stated use concept, the current document set, and the governed pathway/readiness engines.",
+    "This report combines property details, your stated use concept, the current document set, and Furlong's pathway and readiness checks.",
     isResidentialHomeContext(args.context) && !args.answers.usePlan.trim()
       ? "Because no specialty use concept has been entered yet, the report defaults to ordinary residential acquisition context instead of stretching for a business, farm, or tourism thesis."
       : primaryPathway
-      ? `${primaryPathway.label} is currently the lead lane because ${primaryPathway.fitReasons[0] ?? "it showed the strongest current fit in the governed pathway engine"}.`
+      ? `${primaryPathway.label} is currently the lead lane because ${primaryPathway.fitReasons[0] ?? "it currently ranks strongest against this property's facts"}.`
       : "No pathway lead can be stated yet because the current draft is still too thin.",
     args.verifiedPrograms.length > 0
       ? `${args.verifiedPrograms.length} property-side criteria signal(s) were verified from snapshot-backed place facts and used only as support, not as an approval basis.`
@@ -2077,6 +2131,11 @@ export function PropertyEvaluationWorkspace({
   // Map-selected properties receive the Place Brief as a server prop; manually
   // typed addresses get it back from the property-facts API (geocode-derived).
   const effectivePlaceIntelligence = placeIntelligence ?? facts?.placeIntelligence ?? null;
+  const answerCard = buildAnswerCard({
+    context: analysisContext,
+    restrictionsPresent: (facts?.verification?.restrictions?.length ?? 0) > 0,
+  });
+  const answerChips = effectivePlaceIntelligence?.chips ?? [];
   const report = buildReportModel({
     context: analysisContext,
     answers,
@@ -2197,9 +2256,9 @@ export function PropertyEvaluationWorkspace({
         {
           title: "Tier access",
           lines: [
-            `${report.tier.label} is currently locked on the live-screen framework.`,
+            `${report.tier.label} is not unlocked in this preview.`,
             selectedTierAccess.detail,
-            `The free tier remains visible; this premium layer can be re-opened for testing or live entitlements without rebuilding the page.`,
+            `The free brief stays fully visible and exportable either way.`,
           ],
         },
       ];
@@ -2422,6 +2481,63 @@ export function PropertyEvaluationWorkspace({
                   pathways now read as a prose line in the Place Intelligence
                   section below — same information, narrative form, no dead UI. */}
             </div>
+            {/* The Answer card: interpretation, labeled as such — verified
+                facts appear only as chips that expand to the sourced line. */}
+            <div style={{ display: "grid", gap: 10, border: "1px solid #dde6f0", borderRadius: 16, background: "#fff", padding: "14px 16px" }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
+                <span style={miniLabel}>The answer, up front</span>
+                <span style={inferredBadge}>Plain-language read</span>
+              </div>
+              <strong style={{ fontSize: 16.5, color: "#162033", lineHeight: 1.45 }}>
+                {answerCard.headline}
+              </strong>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {answerCard.readiness.map((phrase) => (
+                  <span key={phrase} style={readinessPill}>{phrase}</span>
+                ))}
+              </div>
+              <div style={{ display: "grid", gap: 4 }}>
+                {answerCard.fitLine && (
+                  <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
+                    <strong style={{ color: "#0f766e" }}>Good first-pass fit if you want:</strong> {answerCard.fitLine}.
+                  </span>
+                )}
+                <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
+                  <strong style={{ color: "#854f0b" }}>Pause if you need:</strong> {answerCard.pauseLine}.
+                </span>
+              </div>
+              {answerChips.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {answerChips.map((chip) => (
+                    <details key={chip.fact.label} style={{ display: "inline-block" }}>
+                      <summary
+                        style={{
+                          cursor: "pointer",
+                          listStyle: "none",
+                          fontSize: 12.5,
+                          fontWeight: 700,
+                          color: "#0f766e",
+                          border: "1px solid #bfe4db",
+                          background: "#f2fbf8",
+                          borderRadius: 999,
+                          padding: "5px 12px",
+                        }}
+                      >
+                        {chip.short}
+                      </summary>
+                      <div style={{ display: "grid", gap: 4, margin: "8px 0 4px", border: "1px solid #e6ebf2", borderRadius: 12, background: "#fff", padding: "10px 12px", maxWidth: 460 }}>
+                        <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: "#162033" }}>{chip.fact.label}</span>
+                          <span style={verifiedBadgeSmall}>Verified</span>
+                        </div>
+                        <span style={{ fontSize: 12.7, color: "#3b475a", lineHeight: 1.6 }}>{chip.fact.text}</span>
+                        <span style={{ fontSize: 11.5, color: "#7a8aa0", lineHeight: 1.5 }}>{chip.fact.provenance}</span>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              )}
+            </div>
 	          </div>
 	          <section style={{ display: "grid", gap: 10, border: "1px solid #dde6f0", borderRadius: 18, background: "linear-gradient(180deg, #fcfdff, #f7fbff)", padding: "16px 16px 14px" }}>
 	            <div style={{ display: "grid", gap: 4 }}>
@@ -2631,7 +2747,10 @@ export function PropertyEvaluationWorkspace({
                 <span style={pillGray}>{report.tier.label}</span>
                 <span style={selectedTierUnlocked ? pillBlue : pillGold}>{selectedTierAccess.badge}</span>
               </div>
-              <strong style={{ fontSize: 18, color: "#162033" }}>{report.verdict.label}</strong>
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <strong style={{ fontSize: 18, color: "#162033" }}>{report.verdict.label}</strong>
+                <span style={inferredBadge}>Plain-language read</span>
+              </div>
               <span style={{ fontSize: 12.75, color: "#3b475a", lineHeight: 1.6 }}>{report.verdict.explanation}</span>
               <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.65 }}>{report.executiveSummary}</span>
             </div>
@@ -3150,6 +3269,42 @@ const panelStyle = {
   background: "#fff",
   padding: "20px 22px",
 } as const;
+
+// Redesign label discipline: interpretation is visually distinct from fact.
+const inferredBadge: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 800,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  color: "#5d687a",
+  background: "#eef2f6",
+  border: "1px solid #d7deea",
+  borderRadius: 999,
+  padding: "2px 8px",
+};
+
+const verifiedBadgeSmall: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 800,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+  color: "#0f766e",
+  background: "#e4efed",
+  border: "1px solid #bfe4db",
+  borderRadius: 999,
+  padding: "2px 8px",
+};
+
+// Readiness phrases replace numeric scores (founder refinement #3).
+const readinessPill: React.CSSProperties = {
+  fontSize: 12,
+  fontWeight: 700,
+  color: "#3b475a",
+  background: "#f4f7fa",
+  border: "1px solid #d7deea",
+  borderRadius: 999,
+  padding: "4px 11px",
+};
 
 const pillBlue = {
   fontSize: 12,

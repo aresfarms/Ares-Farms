@@ -187,11 +187,15 @@ function PropertyImportLaunchpadInner({ variant }: { variant: "full" | "rail" | 
             style={inputStyle}
           />
           <span style={{ fontSize: 12.5, color: "#7a8aa0", lineHeight: 1.5 }}>
-            Best for listing screenshots, flyer captures, or a property photo paired with your notes. Imported images are used only to extract visible intake facts for this advisory workspace, and non-image or suspicious payloads are rejected automatically.
+            Best for listing screenshots, flyer captures, or a property photo paired with your notes.
           </span>
-          <span style={{ fontSize: 12, color: "#8a5a10", lineHeight: 1.5 }}>
-            Rejected uploads may be quarantined for internal security review rather than processed.
-          </span>
+          {/* Security posture appears at the moment of action, not as the
+              greeting (redesign refinement #5: no threat language before value). */}
+          {imageFile && (
+            <span style={{ fontSize: 12, color: "#8a5a10", lineHeight: 1.5 }}>
+              Images are used only to extract visible listing facts. Non-image or suspicious files are rejected automatically, and rejected uploads may be quarantined for internal security review rather than processed.
+            </span>
+          )}
         </label>
       </div>
 

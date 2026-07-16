@@ -1003,9 +1003,10 @@ function buildStrengths(args: {
   if (args.answers.revenueModel.trim()) {
     out.push(`A revenue model is beginning to form instead of leaving the business case abstract: ${sentence(args.answers.revenueModel)}`);
   }
-  if (isResidentialHomeContext(args.context) && !args.answers.usePlan.trim()) {
-    out.push("The file already behaves more like a standard residential acquisition screen than a speculative specialty-use concept.");
-  } else if (args.topPathways[0]) {
+  // No padding sentences: an empty file falls through to the section's honest
+  // "too thin to state signals" fallback instead of canned characterization
+  // (render-time honesty — same doctrine as the Place Brief).
+  if (args.topPathways[0]) {
     out.push(`${args.topPathways[0].label} currently appears to be the strongest planning lane in the governed pathway engine.`);
   }
   if (args.verifiedPrograms.length > 0) {
@@ -1458,7 +1459,10 @@ function buildReportModel(args: {
     ...conceptSummary.map((line) => `- ${line}`),
     ``,
     `## What supports the deal thesis`,
-    ...strengths.map((line) => `- ${line}`),
+    ...(strengths.length > 0
+      ? strengths
+      : ["No meaningful supporting signals can be stated yet because the file is still too thin."]
+    ).map((line) => `- ${line}`),
     ``,
     `## What could break the deal`,
     ...risks.map((line) => `- ${line}`),

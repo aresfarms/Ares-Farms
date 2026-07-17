@@ -16,6 +16,7 @@ import { MORTGAGE_RATES } from "@/lib/property/mortgageRatesGenerated";
 import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "@/lib/property/stateCropConditionsGenerated";
 import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 import { STATE_ELECTRICITY } from "@/lib/property/stateElectricityGenerated";
+import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "@/lib/property/stateGrainBidsGenerated";
 import { STATE_HPI } from "@/lib/property/stateHpiGenerated";
 
@@ -38,7 +39,13 @@ const STATE_NAMES: Record<string, string> = {
 export const NEWSLETTER_REGIONS: Record<string, { label: string; states: string[] }> = {
   delmarva: { label: "the Delmarva (Delaware · Maryland · Virginia)", states: ["DE", "MD", "VA"] },
   "corn-belt": { label: "the Corn Belt (Iowa · Illinois · Indiana)", states: ["IA", "IL", "IN"] },
+  "eastern-cornbelt": { label: "the Eastern Corn Belt (Ohio · Indiana · Kentucky)", states: ["OH", "IN", "KY"] },
   "great-plains": { label: "the Great Plains (Kansas · Nebraska · Oklahoma)", states: ["KS", "NE", "OK"] },
+  "northern-plains": { label: "the Northern Plains (North Dakota · South Dakota · Minnesota)", states: ["ND", "SD", "MN"] },
+  "mississippi-delta": { label: "the Mississippi Delta (Arkansas · Mississippi · Louisiana)", states: ["AR", "MS", "LA"] },
+  southeast: { label: "the Southeast (North Carolina · South Carolina · Georgia)", states: ["NC", "SC", "GA"] },
+  "texas-plains": { label: "the Southern Plains (Texas · Oklahoma · Kansas)", states: ["TX", "OK", "KS"] },
+  "pacific-northwest": { label: "the Pacific Northwest (Washington · Oregon · Idaho)", states: ["WA", "OR", "ID"] },
 };
 
 function stateName(code: string): string {
@@ -185,6 +192,45 @@ export function mortgageRateSignal(): NewsletterSignal {
       `, week of ${MORTGAGE_RATES.weekOf}. Every quarter-point moves the monthly payment and the income it ` +
       `takes to carry it — the number under every purchase decision this month.`,
     source: `Freddie Mac PMMS, week of ${MORTGAGE_RATES.weekOf}`,
+    tone: "neutral",
+  };
+}
+
+/**
+ * Farmland VALUE benchmark (founder correction 2026-07-17: farmers read the
+ * USDA ag-land survey, not home-price indexes). $/acre + year-over-year.
+ */
+export function farmlandValueSignal(states: string[]): NewsletterSignal | null {
+  if (STATE_FARMLAND_PROVENANCE.asOf === null) return null;
+  const pick = states.map((s) => ({ s, f: STATE_FARMLAND[s] })).find((x) => x.f);
+  if (!pick) return null;
+  const yoy = pick.f.yoyPct;
+  return {
+    headline: `${stateName(pick.s)} farmland: $${pick.f.dollarsPerAcre.toLocaleString("en-US")}/acre` + (yoy != null ? `, ${yoy >= 0 ? "+" : ""}${yoy}% year-over-year` : ""),
+    body:
+      `USDA's ${pick.f.year} farm real-estate value for ${stateName(pick.s)} is $${pick.f.dollarsPerAcre.toLocaleString("en-US")} per acre (land and buildings)` +
+      (yoy != null ? `, ${yoy >= 0 ? "up" : "down"} ${Math.abs(yoy)}% from the prior year` : "") +
+      `. The collateral and equity benchmark for ground in this state — not home prices.`,
+    source: `USDA NASS Ag Land Asset Value, ${pick.f.year}`,
+    tone: "neutral",
+  };
+}
+
+/**
+ * Farm CAPITAL context (founder correction 2026-07-17: farms and ranches use
+ * USDA/FSA/SBA/Farm Credit programs, not the consumer 30-year mortgage). A
+ * program-context signal — the rates live on the FSA site and move monthly.
+ */
+export function farmFinanceSignal(): NewsletterSignal {
+  return {
+    headline: "Farm capital: FSA, USDA Rural Development, Farm Credit, SBA",
+    body:
+      "The ground-buying and operating lanes for a farm or ranch are not consumer mortgages: USDA Farm " +
+      "Service Agency Farm Ownership and Operating loans (direct and guaranteed, including microloans and " +
+      "beginning-farmer terms), USDA Rural Development (Business & Industry, Community Facilities, and REAP " +
+      "for on-farm energy), the Farm Credit System, and SBA where a farm business qualifies. FSA sets and " +
+      "publishes its direct-loan rates monthly; a lender or the county FSA office quotes the current number.",
+    source: "USDA FSA / Rural Development program terms (fsa.usda.gov, rd.usda.gov)",
     tone: "neutral",
   };
 }

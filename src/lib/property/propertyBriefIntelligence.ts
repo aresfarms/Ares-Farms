@@ -29,6 +29,7 @@ import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "./commodityPrices
 import { COUNTY_BROADBAND, COUNTY_BROADBAND_PROVENANCE } from "./countyBroadbandGenerated";
 import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "./stateCropConditionsGenerated";
 import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "./stateDroughtGenerated";
+import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "./stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
@@ -831,6 +832,22 @@ function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
         `A statewide condition read — this parcel's ground can run better or worse, but it frames the season.`,
       provenance: `Source: USDA NASS Crop Progress ${STATE_CROP_CONDITIONS_PROVENANCE.year}, week ${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek}`,
       tone: cornPvp >= 25 || (crop.corn && crop.corn.goodExcellent <= 35) ? "caution" : "neutral",
+    });
+  }
+
+  const farmland = STATE_FARMLAND[st];
+  if (farmland && STATE_FARMLAND_PROVENANCE.asOf) {
+    const yoy = farmland.yoyPct;
+    facts.push({
+      label: "Farmland value (state)",
+      value: `$${farmland.dollarsPerAcre.toLocaleString("en-US")}/acre` + (yoy != null ? `, ${yoy >= 0 ? "+" : ""}${yoy}% YoY` : ""),
+      text:
+        `USDA's ${farmland.year} average farm real-estate value for this state is $${farmland.dollarsPerAcre.toLocaleString("en-US")} per acre ` +
+        `(land and buildings)` + (yoy != null ? `, ${yoy >= 0 ? "up" : "down"} ${Math.abs(yoy)}% year-over-year` : "") +
+        `. The state collateral and equity benchmark for ground — a parcel's price turns on its own soil, water, and improvements. ` +
+        `Farm purchases run on FSA, USDA Rural Development, Farm Credit, and SBA programs, not consumer mortgages.`,
+      provenance: `Source: USDA NASS Ag Land Asset Value, ${farmland.year}`,
+      tone: "neutral",
     });
   }
 

@@ -346,6 +346,7 @@
     "ingest:nass-crop-conditions": "tsx src/scripts/ingestNassCropConditions.ts",
     "ingest:fcc-broadband": "tsx src/scripts/ingestFccBroadband.ts",
     "ingest:nass-grain-prices": "tsx src/scripts/ingestNassGrainPrices.ts",
+    "ingest:nass-farmland": "tsx src/scripts/ingestNassFarmland.ts",
     "ingest:ams-grain-bids": "tsx src/scripts/ingestAmsGrainBids.ts",
     "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids"
   },

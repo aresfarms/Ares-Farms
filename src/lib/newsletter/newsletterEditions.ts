@@ -21,6 +21,8 @@ import {
   grainBidSignal,
   droughtSignal,
   electricitySignal,
+  farmFinanceSignal,
+  farmlandValueSignal,
   mortgageRateSignal,
   NEWSLETTER_REGIONS,
   priceTrendSignal,
@@ -91,6 +93,8 @@ export function buildNewsletterEdition(
   const power = electricitySignal(states);
   const grain = commodityPriceSignal();
   const bids = grainBidSignal(states);
+  const farmland = farmlandValueSignal(states);
+  const farmFin = farmFinanceSignal();
 
   const base = {
     audience,
@@ -128,7 +132,7 @@ export function buildNewsletterEdition(
         lead: crop ?? drought,
         sections: [
           { heading: "The water and the crop", items: compact([drought, crop]) },
-          { heading: "Prices and ground economics", items: compact([bids, grain, rent, price]) },
+          { heading: "Prices, ground value & capital", items: compact([bids, grain, rent, farmland, farmFin]) },
         ],
         meaning: [
           "A failing crop year reshapes land decisions before it reshapes the balance sheet: cash-rent terms get renegotiated, some operators sell ground to raise capital, and distressed and government-listed parcels come to market. If you're a buyer, this is when opportunity appears; if you're an owner, it's when the numbers behind holding versus selling change.",
@@ -141,7 +145,7 @@ export function buildNewsletterEdition(
         lead: drought ?? crop,
         sections: [
           { heading: "Ag credit risk in the region", items: compact([drought, crop, bids, grain, rent]) },
-          { heading: "Rates and collateral values", items: compact([rates, price]) },
+          { heading: "Farm capital & collateral", items: compact([farmFin, farmland]) },
         ],
         meaning: [
           "Drought and a weak crop translate directly to loan risk: thinner operator cash flow, pressure on ag operating lines, and softening land collateral in the hardest-hit counties. Portfolios concentrated in the region's row-crop borrowers warrant a closer look at renewal terms and reserve posture this cycle.",

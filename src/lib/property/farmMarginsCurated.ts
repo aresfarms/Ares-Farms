@@ -25,8 +25,6 @@ export type CropCommodity = "corn" | "soybeans" | "wheat";
 
 export interface CropCostBasis {
   label: string;
-  /** Test weight — corn 56 lb/bu, soybeans & wheat 60 lb/bu. */
-  bushelWeightLb: number;
   /** USDA ERS operating (cash) cost per bushel, national average. */
   operatingCostPerBu: number;
   /** USDA ERS total economic cost per bushel (adds land + capital recovery). */
@@ -35,15 +33,15 @@ export interface CropCostBasis {
   nationalPrice: number;
 }
 
-/** A legal grain load is weight-limited (~50,000 lb payload at 80k GVW). */
-const LEGAL_LOAD_LB = 50_000;
+/** A hopper truck holds 900 bushels per load (founder: 900, flat across crops). */
+const BUSHELS_PER_LOAD = 900;
 
 export const CROP_COST_BASIS: Record<CropCommodity, CropCostBasis> = {
   // Costs: ERS 2026 forecast per planted acre ÷ 2025 NASS yield (midpoint of
   // the planted/harvested range). Prices: WASDE 2026/27 season-average.
-  corn: { label: "Corn", bushelWeightLb: 56, operatingCostPerBu: 2.65, totalCostPerBu: 5.2, nationalPrice: 4.4 },
-  soybeans: { label: "Soybeans", bushelWeightLb: 60, operatingCostPerBu: 4.88, totalCostPerBu: 12.95, nationalPrice: 11.4 },
-  wheat: { label: "Wheat", bushelWeightLb: 60, operatingCostPerBu: 3.2, totalCostPerBu: 8.0, nationalPrice: 6.5 },
+  corn: { label: "Corn", operatingCostPerBu: 2.65, totalCostPerBu: 5.2, nationalPrice: 4.4 },
+  soybeans: { label: "Soybeans", operatingCostPerBu: 4.88, totalCostPerBu: 12.95, nationalPrice: 11.4 },
+  wheat: { label: "Wheat", operatingCostPerBu: 3.2, totalCostPerBu: 8.0, nationalPrice: 6.5 },
 };
 
 export const FARM_MARGINS_PROVENANCE = {
@@ -57,7 +55,7 @@ export interface TruckloadMargin {
   label: string;
   pricePerBu: number;
   priceIsLocal: boolean;
-  /** Bushels in a legal (weight-limited) load for this crop's test weight. */
+  /** Bushels per hopper-truck load (900). */
   bushelsPerLoad: number;
   gross: number;
   /** Net over operating (cash) cost — the number that feels like profit. */
@@ -80,7 +78,7 @@ export function truckloadMargin(
   const b = CROP_COST_BASIS[commodity];
   const priceIsLocal = typeof localPrice === "number" && localPrice > 0;
   const price = priceIsLocal ? (localPrice as number) : b.nationalPrice;
-  const bushelsPerLoad = Math.round(LEGAL_LOAD_LB / b.bushelWeightLb);
+  const bushelsPerLoad = BUSHELS_PER_LOAD;
   return {
     commodity,
     label: b.label,

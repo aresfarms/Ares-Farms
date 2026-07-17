@@ -61,8 +61,8 @@ export function CompassDispatchHero({ dispatch }: { dispatch: CompassDispatch })
               {dispatch.economics.heading}
             </h4>
             <p style={{ margin: "0 0 12px", fontSize: 12.5, lineHeight: 1.5, color: "#4a626f" }}>
-              Two numbers per load: what you clear over cash costs, and what&apos;s left after land and equipment.
-              A load is weight-limited — fewer bushels of the heavier beans and wheat.
+              Two numbers per load (900 bushels): what you clear over cash costs, and what&apos;s left after
+              land and equipment.
             </p>
             {dispatch.economics.crops.map((c) => (
               <div key={c.commodity} style={{ display: "grid", gap: 5, padding: "10px 0", borderBottom: "1px solid #e5ebef" }}>

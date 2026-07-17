@@ -30,6 +30,7 @@ const SCANNED_FILES = [
   "src/lib/property/similarNearbyProperties.ts",
   "src/lib/property/propertyProfile.ts",
   "src/components/property/PropertyResultCard.tsx",
+  "src/lib/property/townCharacterCurated.ts",
   "src/components/property/PropertyPlaceIntelligence.tsx",
   "src/components/property/PropertyEvaluationWorkspace.tsx",
   "src/components/property/PropertyImportLaunchpad.tsx",

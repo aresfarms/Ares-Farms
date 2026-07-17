@@ -25,8 +25,10 @@ import {
 import { designatedHubzoneForProperty } from "./propertyHubzones";
 import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
+import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
+import { townCharacterFact } from "./townCharacterCurated";
 import {
   classifyPropertyProfile,
   profileCostLines,
@@ -505,6 +507,48 @@ function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
       `Survey coverage varies — a local ask often finds options directories miss. Directory facts ` +
       `only; Furlong does not rate schools.`,
     provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}`,
+    tone: "neutral",
+  };
+}
+
+/**
+ * Higher-education directory fact (founder direction 2026-07-17: a
+ * university or community college in the county is a fact some buyers want
+ * and others avoid — say so either way). Directory facts only.
+ */
+function collegesFact(countyFips: string | null): BriefFactLine | null {
+  if (!countyFips || COUNTY_COLLEGES_PROVENANCE.asOf === null) return null;
+  const list = COUNTY_COLLEGES[countyFips] ?? [];
+  if (list.length === 0) {
+    return {
+      label: "Higher education",
+      value: "No college campus in the county",
+      text:
+        "No degree-granting college or university campus sits in this county on the federal " +
+        "directory — commuting distance to campuses in neighboring counties is a map-app check. " +
+        "Some buyers want a college town, others prefer the quiet; either way it is a fact worth " +
+        "knowing up front.",
+      provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}`,
+      tone: "neutral",
+    };
+  }
+  const fourYear = list.filter((c) => c.level === "4-year").length;
+  const twoYear = list.length - fourYear;
+  const sample = list.slice(0, 3);
+  const valueBits = [
+    fourYear > 0 ? `${fourYear} four-year` : null,
+    twoYear > 0 ? `${twoYear} two-year/community` : null,
+  ].filter(Boolean);
+  return {
+    label: "Higher education",
+    value: `${valueBits.join(" · ")} in the county`,
+    text:
+      `${list.length} degree-granting institution${list.length === 1 ? "" : "s"} in this county on the ` +
+      `federal directory: ${sample.map((c) => `${c.name} (${c.level}, ${c.city})`).join("; ")}` +
+      `${list.length > sample.length ? ` and ${list.length - sample.length} more` : ""}. ` +
+      `A campus nearby shapes rentals, dining, and season rhythms — a fact some buyers seek out ` +
+      `and others avoid. Directory facts only; Furlong does not rate institutions.`,
+    provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}`,
     tone: "neutral",
   };
 }
@@ -1114,6 +1158,16 @@ export function buildPropertyBriefIntelligence(args: {
   const privateSchools = isHome ? privateSchoolsFact(schoolsFips) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
 
+  // Higher education renders for EVERY profile — a campus shapes rentals and
+  // commerce (hospitality/commercial care too), not just family life.
+  const colleges = collegesFact(fmrFips);
+  if (colleges) verifiedFacts.push(colleges);
+
+  // The town, in a line — curated first-party place note; renders only when
+  // an entry exists (no entry, no line — the chart never pretends).
+  const townNote = townCharacterFact(args.stateCode, args.town);
+  if (townNote) verifiedFacts.push(townNote);
+
   const hazardRisk = hazardRiskFact(fmrFips);
   if (hazardRisk) verifiedFacts.push(hazardRisk);
 
@@ -1410,6 +1464,12 @@ export async function buildLocationBriefIntelligence(args: {
 
   const privateSchools = isHome ? privateSchoolsFact(countyFips) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
+
+  const colleges = collegesFact(countyFips);
+  if (colleges) verifiedFacts.push(colleges);
+
+  const locTownNote = townCharacterFact(stateCode, town);
+  if (locTownNote) verifiedFacts.push(locTownNote);
 
   const hazardRisk = hazardRiskFact(countyFips);
   if (hazardRisk) verifiedFacts.push(hazardRisk);

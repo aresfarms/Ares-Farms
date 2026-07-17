@@ -748,25 +748,17 @@ function buildUnknowns(args: {
       `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
   });
-  unknowns.push(
-    args.electricAvailable
-      ? {
-          label: "Water and sewer rates",
-          pointer: "Local utility / town office",
-          howToFind:
-            "Water and sewer rates are set locally — the serving utility or the town office " +
-            "publishes the schedule; rural properties on well and septic pay upkeep instead.",
-        }
-      : {
-          label: "Electric and utility rates",
-          pointer: "EIA state profiles + the serving utility",
-          url: "https://www.eia.gov/electricity/state/",
-          howToFind:
-            "Monthly electric bills vary widely by state and usage — EIA publishes official state " +
-            "averages (price and typical bill), and the serving utility publishes its exact rate " +
-            "sheet. Water/sewer rates come from the local utility or the town office.",
-        }
-  );
+  if (!args.electricAvailable) {
+    unknowns.push({
+      label: "Electric and utility rates",
+      pointer: "EIA state profiles + the serving utility",
+      url: "https://www.eia.gov/electricity/state/",
+      howToFind:
+        "Monthly electric bills vary widely by state and usage — EIA publishes official state " +
+        "averages (price and typical bill), and the serving utility publishes its exact rate " +
+        "sheet. Water/sewer rates come from the local utility or the town office.",
+    });
+  }
   if (args.groundRentNeeded) {
     unknowns.push({
       label: "Ground rent for open acreage",
@@ -826,7 +818,8 @@ function buildUnknowns(args: {
       howToFind:
         "Rural homes may use a private well and septic system rather than municipal service. The " +
         "listing, the county health department, and a well/septic inspection establish which — and " +
-        "their condition materially affects cost.",
+        "their condition materially affects cost. On municipal service, the utility or town office " +
+        "publishes the water/sewer rate schedule.",
     });
     unknowns.push({
       label: "HOA or covenants",

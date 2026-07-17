@@ -61,37 +61,46 @@ export function CompassDispatchHero({ dispatch }: { dispatch: CompassDispatch })
               {dispatch.economics.heading}
             </h4>
             <p style={{ margin: "0 0 12px", fontSize: 12.5, lineHeight: 1.5, color: "#4a626f" }}>
-              Two numbers per load: what you clear over cash costs, and what&apos;s left after land and
-              equipment. A hopper truck averages about 900 bushels — the working figure across grains,
-              since most grain moves by hopper.
+              Two numbers per load — what you clear over cash costs (feels like profit), and what&apos;s left
+              after land and equipment (whether the whole thing pays for itself).
             </p>
-            {dispatch.economics.crops.map((c) => (
-              <div key={c.commodity} style={{ display: "grid", gap: 5, padding: "10px 0", borderBottom: "1px solid #e5ebef" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
-                  <span style={{ fontSize: 14.5, fontWeight: 700, color: "#14212b" }}>
-                    {c.label}{" "}
-                    <span style={{ fontWeight: 500, fontSize: 12.5, color: "#708997" }}>
-                      · ${c.pricePerBu.toFixed(2)}/bu · {c.bushelsPerLoad} bu
-                    </span>
-                  </span>
-                  <span style={{ fontSize: 16, fontWeight: 750, color: "#14212b" }}>
-                    ${c.gross.toLocaleString("en-US")}
-                  </span>
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 650, padding: "2px 9px", borderRadius: 20, color: "#0f766e", background: "#e7f5f1" }}>
-                    {c.netOverOperating >= 0 ? "+" : "−"}${Math.abs(c.netOverOperating).toLocaleString("en-US")} over cash cost
-                  </span>
-                  <span style={{ fontSize: 12, fontWeight: 650, padding: "2px 9px", borderRadius: 20, color: "#c2410c", background: "#fbeee7" }}>
-                    {c.netOverTotal >= 0 ? "+" : "−"}${Math.abs(c.netOverTotal).toLocaleString("en-US")} after land &amp; equipment
-                  </span>
-                </div>
-              </div>
-            ))}
-            <p style={{ margin: "12px 0 0", fontSize: 12.5, lineHeight: 1.55, color: "#4a626f" }}>
-              {dispatch.economics.poultryNote}
-            </p>
-            <p style={{ margin: "8px 0 0", fontSize: 11, lineHeight: 1.5, color: "#9aa6b6" }}>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                <thead>
+                  <tr style={{ textAlign: "right", color: "#708997" }}>
+                    <th style={{ textAlign: "left", fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 0 7px" }}>
+                      Per 900-bu load
+                    </th>
+                    <th style={{ fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 0 7px 12px" }}>Gross</th>
+                    <th style={{ fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 0 7px 12px" }}>Over cash</th>
+                    <th style={{ fontWeight: 600, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.04em", padding: "0 0 7px 12px" }}>After land &amp; equip</th>
+                  </tr>
+                </thead>
+                <tbody style={{ fontVariantNumeric: "tabular-nums" }}>
+                  {dispatch.economics.crops.map((c) => (
+                    <tr key={c.commodity} style={{ borderTop: "1px solid #e5ebef" }}>
+                      <td style={{ padding: "9px 0", color: "#14212b" }}>
+                        <strong style={{ fontWeight: 700 }}>{c.label}</strong>{" "}
+                        <span style={{ color: "#708997", fontSize: 12 }}>${c.pricePerBu.toFixed(2)}/bu</span>
+                      </td>
+                      <td style={{ padding: "9px 0 9px 12px", textAlign: "right", fontWeight: 700 }}>
+                        ${c.gross.toLocaleString("en-US")}
+                      </td>
+                      <td style={{ padding: "9px 0 9px 12px", textAlign: "right", fontWeight: 650, color: "#0f766e" }}>
+                        {c.netOverOperating >= 0 ? "+" : "−"}${Math.abs(c.netOverOperating).toLocaleString("en-US")}
+                      </td>
+                      <td style={{ padding: "9px 0 9px 12px", textAlign: "right", fontWeight: 650, color: "#c2410c" }}>
+                        {c.netOverTotal >= 0 ? "+" : "−"}${Math.abs(c.netOverTotal).toLocaleString("en-US")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ margin: "14px 0 0", padding: "12px 14px", background: "#f1f5f8", borderRadius: 9 }}>
+              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "#4a626f" }}>{dispatch.economics.poultryNote}</p>
+            </div>
+            <p style={{ margin: "10px 0 0", fontSize: 11, lineHeight: 1.5, color: "#9aa6b6" }}>
               {dispatch.economics.provenanceNote}
             </p>
           </div>

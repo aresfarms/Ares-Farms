@@ -106,11 +106,11 @@ export const POULTRY_GROWER_NOTE = {
   integratorMarketCentsPerLb: 122, // USDA AMS wholesale composite, 2026
   asOf: "grower fee: USDA ERS 2020; market price: USDA AMS 2026",
   text:
-    "Poultry pays on a different clock. Under contract — how nearly every bird here is raised — the grower " +
-    "owns no birds and buys no feed or chicks; the integrator does. The grower is paid a housing fee of about " +
-    "5–9¢ per pound of live weight (roughly 45¢ a bird), and that fee has to cover utilities, labor, litter, " +
-    "and the debt on the houses. The ~$1.22/lb market price is the integrator's, not the grower's — so for a " +
-    "grower, \"profit per pound\" is the fee minus your own costs, not the price of chicken.",
+    "Poultry pays differently — you're paid to raise the bird, not to sell it. Under contract, which is nearly " +
+    "every bird here, the company owns the flock and buys the feed; your check is a housing fee of about 6–7¢ a " +
+    "pound of live weight, roughly 45¢ a bird. That fee is your revenue, and it has to cover your utilities, " +
+    "labor, litter, and the loan on the houses — so your profit is what's left of it. The ~$1.22/lb market " +
+    "price is the company's, not yours.",
 } as const;
 
 /** A one-line, honest read of a crop's truckload margin. */

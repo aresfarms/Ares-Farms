@@ -33,7 +33,13 @@ export interface CropCostBasis {
   nationalPrice: number;
 }
 
-/** A hopper truck holds 900 bushels per load (founder: 900, flat across crops). */
+/**
+ * A hopper truck holds 900 bushels per load — flat across all grain (founder,
+ * 2026-07-17). A semi + hopper trailer at ~900 bu runs ~80,000 lb, right at the
+ * legal limit without special permits (which not all states offer). Beans and
+ * wheat weigh more per bushel, but 900 is the working average that covers every
+ * commodity grain. Do NOT "correct" this to weight-derived per-crop bushels.
+ */
 const BUSHELS_PER_LOAD = 900;
 
 export const CROP_COST_BASIS: Record<CropCommodity, CropCostBasis> = {

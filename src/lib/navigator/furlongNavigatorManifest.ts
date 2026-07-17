@@ -30,7 +30,7 @@ export const FURLONG_NAVIGATOR_MANIFEST = {
     },
     secondary: {
       label: "Explore America's Possibilities",
-      destination: "#americas-possibilities",
+      destination: "/explore?category=land",
       support: "Browse the map, hidden-gem stories, and pathway examples before you begin.",
     },
   },

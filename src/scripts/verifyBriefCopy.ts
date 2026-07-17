@@ -36,6 +36,7 @@ const SCANNED_FILES = [
   "src/lib/property/broadbandLookup.ts",
   "src/lib/newsletter/newsletterSignals.ts",
   "src/lib/newsletter/newsletterEditions.ts",
+  "src/lib/newsletter/newsletterDispatch.ts",
   "src/lib/newsletter/farmEditorialCurated.ts",
   "src/components/property/PropertyPlaceIntelligence.tsx",
   "src/components/property/PropertyEvaluationWorkspace.tsx",

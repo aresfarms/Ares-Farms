@@ -4,8 +4,12 @@ import Link from "next/link";
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
+import { PublicMapExperience } from "@/components/public/PublicMapExperience";
 import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
+import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
+import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
 import { providersForLane } from "@/lib/providers/providerRegistry";
+import { isoWeekSeed } from "@/lib/public-content/weekSeed";
 
 /**
  * /explore — Compass-rose navigation (Build 56).
@@ -117,13 +121,24 @@ export default async function ExplorePage({
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? null;
 
   // ── Property & land lane — the first live lane (USDA Rural Development) ──────
+  // The America's Journey map lives here now (founder direction 2026-07-17:
+  // moved off the front page's middle, onto the land button's page).
   if (selected && selected.slug === "property-land") {
     return (
-      <PropertyHub
-        state={one(resolved.state)}
-        type={one(resolved.type)}
-        category={one(resolved.category)}
-      />
+      <>
+        <div className="fl-map-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "24px 20px 0" }}>
+          <PublicMapExperience
+            liveSources={getRuntimeLiveSources()}
+            mapInventoryByState={buildPublicSafeInventoryByState()}
+            weekSeed={isoWeekSeed()}
+          />
+        </div>
+        <PropertyHub
+          state={one(resolved.state)}
+          type={one(resolved.type)}
+          category={one(resolved.category)}
+        />
+      </>
     );
   }
 

@@ -66,9 +66,9 @@ export const HOMEPAGE_PRIMARY_ACTIONS = {
   primaryLabel: "Start with Furlong Navigator",
   primarySupport:
     "Tell us what you're trying to figure out and we'll help surface pathways, options, and constraints.",
-  secondaryLabel: "Open the Compass",
+  secondaryLabel: "Read this week's Compass",
   secondarySupport:
-    "Use the Compass when you want to move through Furlong's broader pathways and modules instead of starting from a single property.",
+    "This week's regional read — the real numbers on the ground, in a two-minute note, right on this page.",
 } as const;
 
 export const HOMEPAGE_CAPABILITIES = {

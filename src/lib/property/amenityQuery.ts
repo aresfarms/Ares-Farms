@@ -21,7 +21,12 @@ export type AmenityFacts = Record<string, AmenityCategoryFact>;
 
 export const AMENITY_RADIUS_MILES = 10;
 const RADIUS_M = 16000; // ~10 miles
-const OVERPASS = "https://overpass-api.de/api/interpreter";
+// overpass-api.de throttles shared cloud egress IPs; kumi.systems runs a
+// high-capacity public mirror (same API, same ODbL data). Try in order.
+const OVERPASS_MIRRORS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+];
 const USER_AGENT = "FurlongPlaceBrief/1.0 (property amenity lookup; chudson@aresfarmsinc.com)";
 
 export const AMENITY_CATEGORIES: Record<string, (t: Record<string, string>) => boolean> = {
@@ -65,18 +70,24 @@ export async function queryAmenitiesLive(
   nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|bar|pub|fast_food|pharmacy|hospital|clinic|doctors)$"];
 );
 out center tags 400;`;
-  let res: Response;
-  try {
-    res = await fetch(OVERPASS, {
-      method: "POST",
-      headers: { "User-Agent": USER_AGENT },
-      body: new URLSearchParams({ data: q }),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-  } catch {
-    return null;
+  let res: Response | null = null;
+  for (const mirror of OVERPASS_MIRRORS) {
+    try {
+      const attempt = await fetch(mirror, {
+        method: "POST",
+        headers: { "User-Agent": USER_AGENT },
+        body: new URLSearchParams({ data: q }),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      if (attempt.ok) {
+        res = attempt;
+        break;
+      }
+    } catch {
+      // fall through to the next mirror
+    }
   }
-  if (!res.ok) return null;
+  if (!res) return null;
   const data = (await res.json().catch(() => null)) as {
     elements?: Array<{ lat?: number; lon?: number; center?: { lat: number; lon: number }; tags?: Record<string, string> }>;
   } | null;

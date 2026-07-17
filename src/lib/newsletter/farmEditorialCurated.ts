@@ -143,6 +143,37 @@ const FARM_EDITORIAL: FarmEditorialItem[] = [
     pointer: "USDA SARE (sare.org); state extension enterprise budgets",
     url: "https://www.sare.org/resources/",
   },
+  // ── Grants & programs, with open/close dates ──
+  {
+    category: "regulatory",
+    title: "Open now: the conservation and disaster programs worth a call",
+    body:
+      "Several USDA programs are taking applications: EQIP and CSP (conservation cost-share) run continuous " +
+      "sign-up with periodic ranking cutoffs your NRCS office posts; NAP coverage for non-insured crops has " +
+      "crop-specific sales-closing dates; and a drought designation opens FSA emergency loans and the " +
+      "Livestock Forage Disaster Program with their own filing windows. Deadlines are set locally and move " +
+      "year to year, so confirm the exact date with your county office before you count on it. Furlong can " +
+      "help you gather records and prepare the paperwork for any federal or state farm program you may " +
+      "qualify for — the way a good farm advisor or your county FSA officer would walk you through it. " +
+      "Eligibility and every award decision rest with the agency; Furlong is not a lender or a government " +
+      "office and does not decide, approve, or guarantee any application.",
+    pointer: "County USDA Service Center (NRCS + FSA); your crop-insurance agent",
+    url: "https://www.farmers.gov/loans-and-grants",
+  },
+  // ── Environmental — new/novel components ──
+  {
+    category: "technology",
+    title: "New on the environmental side: nutrient markets, carbon, and water",
+    body:
+      "A few environmental programs are becoming real income and compliance lines for Mid-Atlantic farms: " +
+      "Chesapeake Bay nutrient-credit and cover-crop cost-share programs pay for practices that also protect " +
+      "yield in a dry year; emerging carbon and ecosystem-services markets pay for measured soil-carbon and " +
+      "practice changes (read the contract term and measurement rules carefully — they vary widely); and " +
+      "water-quality and irrigation-efficiency programs through NRCS and state agencies help fund the " +
+      "moisture-holding practices drought makes urgent. These are opportunities and obligations both — the " +
+      "state department of agriculture and your NRCS office have the current, verified terms.",
+    pointer: "State dept. of agriculture; USDA NRCS; state conservation district",
+  },
   // ── Energy / land-use trends affecting farmers ──
   {
     category: "long-term",

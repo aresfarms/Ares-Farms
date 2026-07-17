@@ -5,18 +5,21 @@
  * live amenity lookup — with the customer-facing FCC LINK always present so
  * information is never stale).
  *
- * POSTURE — deliberately deferred:
- *   - OFF by default. The gate (broadbandLiveLookupEnabled) stays false until
- *     an FCC API credential is provisioned AND the source passes Module 22/23
- *     review — the FCC availability API returns 401 without authorization, so
- *     this is a credentialed external source, not an open dataset.
- *   - When disabled (today) queryBroadbandLive returns null and the chart's
- *     FCC-map UNKNOWN carries the answer — the link the customer follows to
- *     the always-current official map. No stale snapshot is ever shown.
- *   - When enabled, results are point-in-time and labeled with an as-of; the
- *     link still renders, because the map moves faster than any cache.
+ * API REALITY (validated live 2026-07-17 with the owner's credential): the
+ * FCC's PUBLIC BDC API is a BULK-DOWNLOAD service — whole-state coverage
+ * files keyed by BDC location_id / H3 hexagon — with NO per-address lookup
+ * endpoint. (The instant address search on the map website uses a separate,
+ * non-public internal service.) So a per-address "fiber available" chip is
+ * NOT a lightweight live call; it needs a batch pipeline: download a state's
+ * availability + location files, aggregate to COUNTY level, and ship a
+ * committed snapshot (see ingest:fcc-broadband, build-later). Per-address
+ * pinpoint accuracy stays on the FCC-map LINK — always current, zero infra.
  *
- * Never a guarantee of service — the FCC map reflects PROVIDER CLAIMS.
+ * This queryBroadbandLive path is retained as a gated hook but returns null:
+ * there is no public per-lat/lon endpoint to call. The area-level chip comes
+ * from the county snapshot, and the FCC-map UNKNOWN link carries per-address.
+ *
+ * Never a guarantee of service — FCC data reflects PROVIDER CLAIMS.
  */
 
 export interface BroadbandSummary {

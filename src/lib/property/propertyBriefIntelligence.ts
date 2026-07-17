@@ -25,6 +25,7 @@ import {
 import { designatedHubzoneForProperty } from "./propertyHubzones";
 import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
+import { COUNTY_BROADBAND, COUNTY_BROADBAND_PROVENANCE } from "./countyBroadbandGenerated";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
 import { US_AIRPORTS } from "./usAirportsGenerated";
@@ -610,6 +611,36 @@ function geoSettingFact(propertyId: string): BriefFactLine | null {
       `summit, a forest — as officially named by the U.S. Board on Geographic Names, not as marketed.`,
     provenance: `Source: ${PROPERTY_GEO_SETTING_PROVENANCE.source}, snapshot ${PROPERTY_GEO_SETTING_PROVENANCE.asOf}`,
     tone: "neutral",
+  };
+}
+
+/**
+ * Broadband area fact (founder direction 2026-07-17: "can I even get WiFi
+ * here, or do I need Starlink?"). County-level share of locations with
+ * 100/20 Mbps service from the FCC's own data — the area picture; the
+ * FCC-map link (an unknown) carries the per-address truth. Renders only
+ * once the owner-keyed ingest has populated the snapshot.
+ */
+function broadbandAreaFact(countyFips: string | null): BriefFactLine | null {
+  if (!countyFips || COUNTY_BROADBAND_PROVENANCE.asOf === null) return null;
+  const b = COUNTY_BROADBAND[countyFips];
+  if (!b) return null;
+  const gap = 100 - b.pctServed;
+  return {
+    label: "Broadband (area)",
+    value:
+      b.pctServed >= 85
+        ? `${b.pctServed}% of the county has 100/20 broadband (${b.pctWired}% wired)`
+        : `Only ${b.pctServed}% served — a ${gap}% broadband gap`,
+    text:
+      `Across this county, ${b.pctServed}% of locations have fixed broadband at 100/20 Mbps or better ` +
+      `(${b.pctWired}% with a wired connection — fiber or cable), per the FCC's National Broadband Map. ` +
+      (b.pctServed < 70
+        ? "A gap this size means many parcels here rely on satellite (Starlink-class) or cellular — check the exact address on the FCC map before you count on wired internet. "
+        : "") +
+      "An area share, not a promise for one address — the FCC map gives the per-address answer.",
+    provenance: `Source: ${COUNTY_BROADBAND_PROVENANCE.source}, BDC ${COUNTY_BROADBAND_PROVENANCE.bdcAsOf}, snapshot ${COUNTY_BROADBAND_PROVENANCE.asOf}`,
+    tone: b.pctServed < 70 ? "caution" : "neutral",
   };
 }
 
@@ -1348,6 +1379,9 @@ export function buildPropertyBriefIntelligence(args: {
   const colleges = collegesFact(fmrFips);
   if (colleges) verifiedFacts.push(colleges);
 
+  const broadbandArea = broadbandAreaFact(fmrFips);
+  if (broadbandArea) verifiedFacts.push(broadbandArea);
+
   // The town, in a line — curated first-party place note; renders only when
   // an entry exists (no entry, no line — the chart never pretends).
   const townNote = townCharacterFact(args.stateCode, args.town);
@@ -1662,6 +1696,9 @@ export async function buildLocationBriefIntelligence(args: {
 
   const colleges = collegesFact(countyFips);
   if (colleges) verifiedFacts.push(colleges);
+
+  const broadbandArea = broadbandAreaFact(countyFips);
+  if (broadbandArea) verifiedFacts.push(broadbandArea);
 
   const locTownNote = townCharacterFact(stateCode, town);
   if (locTownNote) verifiedFacts.push(locTownNote);

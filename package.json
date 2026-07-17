@@ -343,7 +343,8 @@
     "ingest:property-airports": "tsx src/scripts/ingestPropertyAirports.ts",
     "ingest:property-geo-setting": "tsx src/scripts/ingestPropertyGeoSetting.ts",
     "ingest:usdm-drought": "tsx src/scripts/ingestUsdmDrought.ts",
-    "ingest:nass-crop-conditions": "tsx src/scripts/ingestNassCropConditions.ts"
+    "ingest:nass-crop-conditions": "tsx src/scripts/ingestNassCropConditions.ts",
+    "ingest:fcc-broadband": "tsx src/scripts/ingestFccBroadband.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

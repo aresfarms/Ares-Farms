@@ -10,6 +10,7 @@
  * "what it means" — it never characterizes a place or predicts.
  */
 
+import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "@/lib/property/commodityPricesGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "@/lib/property/countyCashRentsGenerated";
 import { MORTGAGE_RATES } from "@/lib/property/mortgageRatesGenerated";
 import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "@/lib/property/stateCropConditionsGenerated";
@@ -122,6 +123,30 @@ export function cashRentSignal(states: string[]): NewsletterSignal | null {
       `baseline when a drought year pressures both operators and landowners. A failed crop is exactly when ` +
       `rent terms and land ownership get reconsidered.`,
     source: `USDA NASS cash rents, ${COUNTY_CASH_RENTS_PROVENANCE.year} survey`,
+    tone: "neutral",
+  };
+}
+
+export function commodityPriceSignal(): NewsletterSignal | null {
+  if (COMMODITY_PRICES_PROVENANCE.asOf === null) return null;
+  const parts: string[] = [];
+  const label: Record<string, string> = { corn: "Corn", soybeans: "Soybeans", wheat: "Wheat" };
+  let stamp = "";
+  for (const key of ["corn", "soybeans", "wheat"]) {
+    const p = COMMODITY_PRICES[key];
+    if (p) {
+      parts.push(`${label[key]} $${p.pricePerBushel.toFixed(2)}/bu`);
+      stamp = `${p.month} ${p.year}`;
+    }
+  }
+  if (parts.length === 0) return null;
+  return {
+    headline: `Grain prices: ${parts.join(" · ")}`,
+    body:
+      `USDA's national average price received (${stamp}): ${parts.join(", ")}. This is the revenue side ` +
+      `of the drought story — a short crop meets these prices to decide whether an operation clears its ` +
+      `costs. Daily local elevator bids move around this benchmark; your buyer's board is the exact number.`,
+    source: `USDA NASS Price Received, ${stamp}`,
     tone: "neutral",
   };
 }

@@ -16,6 +16,7 @@
 
 import {
   cashRentSignal,
+  commodityPriceSignal,
   cropConditionSignal,
   droughtSignal,
   electricitySignal,
@@ -26,6 +27,7 @@ import {
 } from "./newsletterSignals";
 
 export type NewsletterAudience =
+  | "mixed"
   | "farm"
   | "residential"
   | "commercial"
@@ -54,6 +56,7 @@ export interface NewsletterEdition {
 }
 
 const AUDIENCE_LABEL: Record<NewsletterAudience, string> = {
+  mixed: "The Full Read",
   farm: "Farms & Ranches",
   residential: "Home Buyers",
   commercial: "Commercial Property",
@@ -85,6 +88,7 @@ export function buildNewsletterEdition(
   const price = priceTrendSignal(states);
   const rent = cashRentSignal(states);
   const power = electricitySignal(states);
+  const grain = commodityPriceSignal();
 
   const base = {
     audience,
@@ -99,13 +103,30 @@ export function buildNewsletterEdition(
   };
 
   switch (audience) {
+    case "mixed":
+      // The flagship / free-tier digest: the single biggest regional story,
+      // then one hit from each domain so a reader who wears several hats — or
+      // a general subscriber — gets the whole picture in one pass.
+      return {
+        ...base,
+        lead: crop ?? drought ?? rates,
+        sections: [
+          { heading: "The region this month", items: compact([drought, crop, grain]) },
+          { heading: "Money & markets", items: compact([rates, price]) },
+          { heading: "On the ground", items: compact([rent, power]) },
+        ],
+        meaning: [
+          "One month, read whole: a drought-hit crop reshapes land and lending across the region, while the mortgage rate and price trend set the math for every home, commercial, and land decision. Which of these matters most depends on which hat you're wearing — the tailored editions go deeper for each.",
+          "Furlong charts any property in the region with its verified place-facts, full cost picture, and financing path — free. When you're ready to move, your file carries forward without re-keying.",
+        ],
+      };
     case "farm":
       return {
         ...base,
         lead: crop ?? drought,
         sections: [
           { heading: "The water and the crop", items: compact([drought, crop]) },
-          { heading: "Ground economics", items: compact([rent, price]) },
+          { heading: "Prices and ground economics", items: compact([grain, rent, price]) },
         ],
         meaning: [
           "A failing crop year reshapes land decisions before it reshapes the balance sheet: cash-rent terms get renegotiated, some operators sell ground to raise capital, and distressed and government-listed parcels come to market. If you're a buyer, this is when opportunity appears; if you're an owner, it's when the numbers behind holding versus selling change.",
@@ -117,7 +138,7 @@ export function buildNewsletterEdition(
         ...base,
         lead: drought ?? crop,
         sections: [
-          { heading: "Ag credit risk in the region", items: compact([drought, crop, rent]) },
+          { heading: "Ag credit risk in the region", items: compact([drought, crop, grain, rent]) },
           { heading: "Rates and collateral values", items: compact([rates, price]) },
         ],
         meaning: [
@@ -187,6 +208,7 @@ export function buildNewsletterEdition(
 
 /** All audiences, for generating the full set for a region. */
 export const NEWSLETTER_AUDIENCES: NewsletterAudience[] = [
+  "mixed",
   "farm",
   "residential",
   "commercial",

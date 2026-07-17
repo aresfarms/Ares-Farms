@@ -4,7 +4,7 @@
  * CLIENT-SAFE: public-safe projection only — NO exact address, NO lat/long.
  * Safe to bundle into the homepage map. Written by src/scripts/ingestHudReo.ts.
  *
- * Ingested at: 2026-06-10T23:39:59.517Z
+ * Ingested at: 2026-07-17T16:15:44.498Z
  */
 
 import type { PublicSafeProperty } from "./propertyTypes";
@@ -21,7 +21,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in North Pole, AK — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -36,7 +36,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Alpine, AL — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -51,7 +51,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Summers, AR — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -66,7 +66,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Tucson, AZ — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -81,7 +81,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Banning, CA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -96,7 +96,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Alamosa, CO — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -111,7 +111,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in East Haven, CT — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -126,7 +126,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Washington, DC — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -141,7 +141,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Hawthorne, FL — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -156,7 +156,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Hephzibah, GA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -171,7 +171,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Long Grove, IA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -186,7 +186,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Weiser, ID — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -201,7 +201,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Chicago, IL — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -216,7 +216,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Lowell, IN — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -231,7 +231,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Galva, KS — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -246,7 +246,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Bardstown, KY — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -261,7 +261,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Marrero, LA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -276,7 +276,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Chicopee, MA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -291,7 +291,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Halethorpe, MD — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -306,7 +306,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Newberry, MI — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -321,7 +321,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Saint Paul, MN — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -336,7 +336,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Niangua, MO — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -351,7 +351,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in De Kalb, MS — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -366,7 +366,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Billings, MT — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -381,7 +381,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Roanoke Rapids, NC — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -396,7 +396,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Williston, ND — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -411,7 +411,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Rockaway, NJ — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -426,7 +426,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Artesia, NM — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -441,7 +441,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Ely, NV — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -456,7 +456,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Campbell, NY — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -471,7 +471,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Lebanon, OH — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -486,7 +486,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Mountain View, OK — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -501,7 +501,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Ontario, OR — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -516,7 +516,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Tremont, PA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -531,7 +531,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in San Juan, PR — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -546,7 +546,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Beaufort, SC — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -561,7 +561,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Aberdeen, SD — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -576,7 +576,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Mount Pleasant, TN — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -591,7 +591,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Snyder, TX — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -606,7 +606,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Radford, VA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -621,7 +621,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Port Orchard, WA — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -636,7 +636,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Milwaukee, WI — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -651,7 +651,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Wheeling, WV — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -666,7 +666,7 @@ export const HUD_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "HUD-owned (FHA) home in Thermopolis, WY — a current government listing; providers can help you explore financing.",
     "sourceCitation": "Source: U.S. HUD — FHA (HUD Home Store)",
-    "asOf": "2026-06-10T23:39:59.517Z",
+    "asOf": "2026-07-17T16:15:44.498Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   }

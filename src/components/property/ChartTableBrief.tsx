@@ -31,6 +31,7 @@ function Waypoint({
   accent,
   bg,
   border,
+  id,
   children,
 }: {
   pt: string;
@@ -38,16 +39,20 @@ function Waypoint({
   accent: string;
   bg: string;
   border: string;
+  /** Anchor target so signal flags can point at the waypoint that answers them. */
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
     <div
+      id={id}
       style={{
         position: "relative",
         background: bg,
         border: `1px solid ${border}`,
         borderRadius: 12,
         padding: "15px 18px",
+        scrollMarginTop: 90,
       }}
     >
       <span
@@ -94,6 +99,32 @@ function signalFlagColor(flag: string): string {
 /** Short provenance cite — the "Source: …" head without verify-URL tails. */
 function shortSource(fact: BriefFactLine): string {
   return fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim();
+}
+
+/**
+ * Where each signal flag POINTS (founder feedback 2026-07-17: flags must
+ * coordinate with the chart, not just sit there). Each flag resolves to the
+ * first AVAILABLE waypoint that answers it — e.g. "Price not captured here"
+ * jumps to the cost panel where a price can be entered.
+ */
+function flagTarget(
+  flag: string,
+  available: Record<string, string>
+): { href: string; label: string } | null {
+  const preference: Array<[RegExp, string[]]> = [
+    [/price|not captured/i, ["wp-costs", "wp-uncharted"]],
+    [/inspection|fieldwork|condition/i, ["wp-uncharted"]],
+    [/timing|window|owner-occupant/i, ["wp-mechanics"]],
+    [/needs review/i, ["wp-uncharted", "wp-mechanics"]],
+    [/looks reviewable/i, ["wp-verified"]],
+  ];
+  for (const [pattern, targets] of preference) {
+    if (!pattern.test(flag)) continue;
+    for (const target of targets) {
+      if (available[target]) return { href: `#${target}`, label: available[target] };
+    }
+  }
+  return null;
 }
 
 export interface ChartTableBriefProps {
@@ -199,6 +230,16 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
   ];
   const headline = lens.headline || props.headline;
 
+  // Anchor targets that actually render on THIS chart — flags link only to
+  // waypoints that exist (founder feedback 2026-07-17: flags coordinate).
+  const waypointAnchors: Record<string, string> = {};
+  if (facts.length > 0) waypointAnchors["wp-verified"] = lens.waypointFacts;
+  if (livingHere && livingHere.items.length > 0) waypointAnchors["wp-living"] = lens.waypointLiving;
+  if (mechanics) waypointAnchors["wp-mechanics"] = mechanics.heading;
+  if (unknowns.length > 0) waypointAnchors["wp-uncharted"] = lens.waypointUncharted;
+  if (props.costsSlot) waypointAnchors["wp-costs"] = "What it costs to buy — and to keep";
+  if ((props.similarHomes?.length ?? 0) > 0) waypointAnchors["wp-similar"] = "Also on this chart nearby";
+
   // Waypoint numbering stays sequential per lens (some waypoints are absent).
   const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
   let wp = 0;
@@ -272,11 +313,9 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
 
           <div style={{ ...plate, display: "grid", gap: 7 }}>
             <span style={kicker}>Signal flags</span>
-            {props.readiness.map((flag) => (
-              <span
-                key={flag}
-                style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12.5, color: theme.inkSoft }}
-              >
+            {props.readiness.map((flag) => {
+              const target = flagTarget(flag, waypointAnchors);
+              const pennant = (
                 <i
                   aria-hidden
                   style={{
@@ -287,9 +326,48 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                     clipPath: "polygon(0 0, 100% 0, 70% 50%, 100% 100%, 0 100%)",
                   }}
                 />
-                {flag}
-              </span>
-            ))}
+              );
+              // Every flag POINTS somewhere on the chart — click it and the
+              // waypoint that answers it scrolls into view.
+              return target ? (
+                <a
+                  key={flag}
+                  href={target.href}
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: 9,
+                    fontSize: 12.5,
+                    color: theme.inkSoft,
+                    textDecoration: "none",
+                  }}
+                >
+                  {pennant}
+                  <span>
+                    {flag}
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: 10.5,
+                        color: theme.inkFaint,
+                        textDecoration: "underline",
+                        textUnderlineOffset: 2,
+                      }}
+                    >
+                      → {target.label}
+                    </span>
+                  </span>
+                </a>
+              ) : (
+                <span
+                  key={flag}
+                  style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12.5, color: theme.inkSoft }}
+                >
+                  {pennant}
+                  {flag}
+                </span>
+              );
+            })}
             <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, paddingTop: 8, display: "grid", gap: 4 }}>
               {props.fitLine && variant === "buyer" && (
                 <span style={{ fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>
@@ -316,7 +394,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
             }}
           />
           {facts.length > 0 && (
-            <Waypoint pt={nextPt()} title={lens.waypointFacts} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+            <Waypoint pt={nextPt()} id="wp-verified" title={lens.waypointFacts} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
                 {facts.map((fact) => (
                   <div key={fact.label} style={factCell}>
@@ -337,7 +415,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           )}
 
           {livingHere && livingHere.items.length > 0 && (
-            <Waypoint pt={nextPt()} title={lens.waypointLiving} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+            <Waypoint pt={nextPt()} id="wp-living" title={lens.waypointLiving} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
                 {livingHere.items.map((item) => (
                   <div key={item.label} style={factCell}>
@@ -351,7 +429,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           )}
 
           {mechanics && (
-            <Waypoint pt={nextPt()} title={mechanics.heading} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+            <Waypoint pt={nextPt()} id="wp-mechanics" title={mechanics.heading} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gap: 8, fontSize: 13, color: theme.inkSoft }}>
                 {mechanics.stepTitles.map((stepTitle, index) => (
                   <div key={stepTitle}>
@@ -385,7 +463,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           )}
 
           {unknowns.length > 0 && (
-            <Waypoint pt={nextPt()} title={lens.waypointUncharted} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+            <Waypoint pt={nextPt()} id="wp-uncharted" title={lens.waypointUncharted} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
                 {unknowns.map((unknown) => (
                   <div key={unknown.label} style={factCell}>
@@ -441,13 +519,13 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           )}
 
           {props.costsSlot && (
-            <Waypoint pt={nextPt()} title="What it costs to buy — and to keep" accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+            <Waypoint pt={nextPt()} id="wp-costs" title="What it costs to buy — and to keep" accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               {props.costsSlot}
             </Waypoint>
           )}
 
           {(props.similarHomes?.length ?? 0) > 0 && (
-            <Waypoint pt={nextPt()} title="Also on this chart nearby" accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+            <Waypoint pt={nextPt()} id="wp-similar" title="Also on this chart nearby" accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gap: 8 }}>
                 {props.similarHomes?.map((home) => (
                   <a

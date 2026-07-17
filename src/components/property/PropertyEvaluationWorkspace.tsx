@@ -9,6 +9,7 @@ import {
 } from "@/components/navigator/FurlongNavigator";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
+import { ChartTableBrief } from "@/components/property/ChartTableBrief";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import { reportTierIdentity, type ReportTierIdentity } from "@/lib/reports/reportTierIdentity";
@@ -2458,123 +2459,53 @@ export function PropertyEvaluationWorkspace({
 
   return (
     <section style={{ display: "grid", gap: 22 }}>
-      <section
-        aria-label="Selected property evaluation workspace"
-        style={{
-          display: "grid",
-          gap: 0,
-          border: "1px solid #d7deea",
-          borderRadius: 22,
-          background: "linear-gradient(135deg, #f5faf8, #ffffff 58%, #edf4fb)",
-          overflow: "hidden",
-        }}
-      >
-	        <div style={{ display: "grid", gap: 16, padding: "22px 24px 24px" }}>
-	        <div style={{ display: "grid", gap: 18, gridTemplateColumns: "minmax(0, 1.25fr) minmax(320px, 0.95fr)", alignItems: "start" }}>
-	          <div style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: 0.08, textTransform: "uppercase", color: "#0f766e" }}>
-                Property evaluation workspace
-              </span>
-              {context.currentLabel && (
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: "#5d687a" }}>
-                  {context.currentLabel}
-                </span>
-              )}
-            </div>
-            <div style={{ display: "grid", gap: 6 }}>
-              <strong style={{ fontSize: 30, color: "#101a2b", lineHeight: 1.02 }}>
-                {context.title}
-              </strong>
-              <span style={{ fontSize: 14.5, color: "#4d596d", lineHeight: 1.6 }}>
-                {context.location}
-                {context.exactAddress ? ` · ${context.exactAddress}` : ""}
-              </span>
-              <span style={{ fontSize: 15, fontWeight: 700, color: "#0f766e" }}>
-                {analysisContext.priceLabel}
-              </span>
-            </div>
-	            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-	              <span style={pillBlue}>{analysisContext.sourceLabel}</span>
-	              <span style={pillBlue}>{analysisContext.propertyType}</span>
-              {/* Pathway chips removed (founder decision 2026-07-15): financing
-                  pathways now read as a prose line in the Place Intelligence
-                  section below — same information, narrative form, no dead UI. */}
-            </div>
-            {/* The Answer card: interpretation, labeled as such — verified
-                facts appear only as chips that expand to the sourced line. */}
-            <div style={{ display: "grid", gap: 10, border: "1px solid #dde6f0", borderRadius: 16, background: "#fff", padding: "14px 16px" }}>
-              <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
-                <span style={miniLabel}>The answer, up front</span>
-                <span style={inferredBadge}>Plain-language read</span>
-              </div>
-              <strong style={{ fontSize: 16.5, color: "#162033", lineHeight: 1.45 }}>
-                {answerCard.headline}
-              </strong>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {answerCard.readiness.map((phrase) => (
-                  <span key={phrase} style={readinessPill}>{phrase}</span>
-                ))}
-              </div>
-              <div style={{ display: "grid", gap: 4 }}>
-                {answerCard.fitLine && (
-                  <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-                    <strong style={{ color: "#0f766e" }}>Good first-pass fit if you want:</strong> {answerCard.fitLine}.
-                  </span>
-                )}
-                <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-                  <strong style={{ color: "#854f0b" }}>Pause if you need:</strong> {answerCard.pauseLine}.
-                </span>
-              </div>
-              {answerChips.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {answerChips.map((chip) => (
-                    <details key={chip.fact.label} style={{ display: "inline-block" }}>
-                      <summary
-                        style={{
-                          cursor: "pointer",
-                          listStyle: "none",
-                          fontSize: 12.5,
-                          fontWeight: 700,
-                          color: "#0f766e",
-                          border: "1px solid #bfe4db",
-                          background: "#f2fbf8",
-                          borderRadius: 999,
-                          padding: "5px 12px",
-                        }}
-                      >
-                        {chip.short}
-                      </summary>
-                      <div style={{ display: "grid", gap: 4, margin: "8px 0 4px", border: "1px solid #e6ebf2", borderRadius: 12, background: "#fff", padding: "10px 12px", maxWidth: 460 }}>
-                        <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: 12, fontWeight: 800, color: "#162033" }}>{chip.fact.label}</span>
-                          <span style={verifiedBadgeSmall}>Verified</span>
-                        </div>
-                        <span style={{ fontSize: 12.7, color: "#3b475a", lineHeight: 1.6 }}>{chip.fact.text}</span>
-                        <span style={{ fontSize: 11.5, color: "#7a8aa0", lineHeight: 1.5 }}>{chip.fact.provenance}</span>
-                      </div>
-                    </details>
-                  ))}
-                </div>
-              )}
-            </div>
-	          </div>
-	          <section style={{ display: "grid", gap: 10, border: "1px solid #dde6f0", borderRadius: 18, background: "linear-gradient(180deg, #fcfdff, #f7fbff)", padding: "16px 16px 14px" }}>
-	            <div style={{ display: "grid", gap: 4 }}>
-	              <span style={miniLabel}>What Furlong already knows</span>
-	              <strong style={{ fontSize: 18, color: "#162033" }}>Verified before you answer anything</strong>
-	              <span style={miniText}>Pulled from the source record and our government-data snapshots — no questions asked yet.</span>
-	            </div>
-	            <div style={{ display: "grid", gap: 6 }}>
-	              {topKnownFacts.map((fact) => (
-	                <div key={fact.label} style={{ ...factCard, display: "grid", gridTemplateColumns: "92px 1fr", gap: 8, alignItems: "baseline", padding: "8px 12px" }}>
-	                  <span style={{ fontSize: 11, fontWeight: 800, color: "#5d687a", textTransform: "uppercase", letterSpacing: "0.04em" }}>{fact.label}</span>
-	                  <span style={{ fontSize: 13.5, fontWeight: 700, color: "#162033", lineHeight: 1.45 }}>{fact.value}</span>
-	                </div>
-	              ))}
-	            </div>
-	          </section>
-	        </div>
+      <ChartTableBrief
+        title={context.title}
+        location={`${context.location}${context.exactAddress ? ` · ${context.exactAddress}` : ""}`}
+        sourceLabel={analysisContext.sourceLabel}
+        propertyType={analysisContext.propertyType}
+        priceLabel={analysisContext.priceLabel}
+        fileNo={facts?.propertyRecord?.listingId ?? null}
+        tierLabel={report.tier.label}
+        headline={answerCard.headline}
+        readiness={answerCard.readiness}
+        fitLine={answerCard.fitLine}
+        pauseLine={answerCard.pauseLine}
+        intelligence={effectivePlaceIntelligence}
+        financingLanes={topProgramPreview}
+        actionsSlot={
+          <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
+	        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+	          {context.listingUrl && (
+	            <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
+              Open the source listing ↗
+            </Link>
+          )}
+          <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
+            Save draft in this session
+          </button>
+          <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+            {pdfBusy === "export" ? "Preparing PDF export..." : "Export watermarked report"}
+          </button>
+          <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+            {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
+          </button>
+          {savedAt && (
+            <span style={{ fontSize: 12, color: "#7a8aa0" }}>
+              Saved {new Date(savedAt).toLocaleString()}
+            </span>
+          )}
+        </div>
+        {pdfError && (
+          <p style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 860 }}>
+            PDF generation hit an issue: {pdfError}
+          </p>
+        )}
+          </div>
+        }
+      />
+      {/* Imported-address verification status stays visible below the chart. */}
+      <div style={{ display: "grid", gap: 16 }}>
 	        {context.propertyId?.startsWith("imported:") && (
 	          <div style={{ display: "grid", gap: 6 }}>
             <p style={{ margin: 0, fontSize: 12.5, color: "#854F0B", lineHeight: 1.6, maxWidth: 840 }}>
@@ -2715,121 +2646,7 @@ export function PropertyEvaluationWorkspace({
             </div>
           </section>
         )}
-	        <section style={{ ...panelStyle, background: "linear-gradient(135deg, #fbfcfe, #ffffff)", gap: 14 }}>
-	          <div style={{ display: "grid", gap: 5 }}>
-	            <strong style={{ fontSize: 18, color: "#162033" }}>Immediate on-screen report</strong>
-	            <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-	              Your property question, answered from what can be verified right now.
-	            </span>
-	          </div>
-          <div style={{ ...reportSection, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #fbfcfe, #ffffff)", borderRadius: 16, padding: "16px 18px" }}>
-            <div
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                inset: 0,
-                backgroundImage: `url(${report.branding.compassWatermarkPath})`,
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-                backgroundSize: "240px",
-                opacity: 0.08,
-                pointerEvents: "none",
-              }}
-            />
-            <div style={{ position: "relative", zIndex: 1, display: "grid", gap: 8 }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                <span style={pillGray}>{report.tier.shortLabel}</span>
-                <span style={pillGray}>{report.tier.label}</span>
-                <span style={selectedTierUnlocked ? pillBlue : pillGold}>{selectedTierAccess.badge}</span>
-              </div>
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                <strong style={{ fontSize: 18, color: "#162033" }}>{report.verdict.label}</strong>
-                <span style={inferredBadge}>Plain-language read</span>
-              </div>
-              <span style={{ fontSize: 12.75, color: "#3b475a", lineHeight: 1.6 }}>{report.verdict.explanation}</span>
-              <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.65 }}>{report.executiveSummary}</span>
-            </div>
-          </div>
-	          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-	            {headlinePreviewSections.map((section) => {
-              const sectionLines = section.lines.length > 0 ? section.lines : section.emptyFallback ? [section.emptyFallback] : [];
-              return (
-                <div key={section.title} style={reportSection}>
-                  <span style={miniLabel}>{section.title}</span>
-                  <div style={{ display: "grid", gap: 6 }}>
-                    {(section.title === "Property snapshot" ? sectionLines : sectionLines.slice(0, 4)).map((line) => (
-                      <span key={line} style={{ fontSize: 12.8, color: "#3b475a", lineHeight: 1.55 }}>{line}</span>
-                    ))}
-                  </div>
-                </div>
-              );
-	            })}
-	          </div>
-	        </section>
-	        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-	          <div style={reportSection}>
-	            <span style={miniLabel}>Immediate suitability read</span>
-	            <strong style={{ fontSize: 18, color: "#162033", lineHeight: 1.35 }}>
-	              {immediateSuitability.dealLabel}
-	            </strong>
-	            <div style={{ display: "grid", gap: 6 }}>
-	              {immediateSuitability.signals.slice(0, 3).map((line) => (
-	                <span key={line} style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>{line}</span>
-	              ))}
-	            </div>
-	          </div>
-	          <div style={reportSection}>
-	            <span style={miniLabel}>Most likely financing lanes</span>
-	            <div style={{ display: "grid", gap: 6 }}>
-	              {topProgramPreview.length > 0 ? topProgramPreview.map((line) => (
-	                <span key={line} style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>{line}</span>
-	              )) : (
-	                <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-	                  Program ranking is still too thin because the record does not yet expose enough asset-specific detail.
-	                </span>
-	              )}
-	            </div>
-	          </div>
-	        </div>
-        {/* Actions live BELOW the report they act on (founder feedback
-            2026-07-16: the report was buried under the buttons). */}
-	        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-	          {context.listingUrl && (
-	            <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
-              Open the source listing ↗
-            </Link>
-          )}
-          <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
-            Save draft in this session
-          </button>
-          <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-            {pdfBusy === "export" ? "Preparing PDF export..." : "Export watermarked report"}
-          </button>
-          <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
-            {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
-          </button>
-          {savedAt && (
-            <span style={{ fontSize: 12, color: "#7a8aa0" }}>
-              Saved {new Date(savedAt).toLocaleString()}
-            </span>
-          )}
-        </div>
-        {pdfError && (
-          <p style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 860 }}>
-            PDF generation hit an issue: {pdfError}
-          </p>
-        )}
-	        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-	          <span style={pillGray}>{report.tier.shortLabel}</span>
-	          <span style={pillGray}>{report.tier.label}</span>
-	          <span style={selectedTierUnlocked ? pillBlue : pillGold}>{selectedTierAccess.badge}</span>
-	          <span style={pillGray}>Watermarked FURLONG export enabled</span>
-	        </div>
-	        <p style={{ margin: 0, fontSize: 12.5, color: "#5d687a", lineHeight: 1.6, maxWidth: 900 }}>
-	          {selectedTierAccess.detail}
-	        </p>
-	        </div>
-	      </section>
+      </div>
 
       <details style={{ ...detailsStyle, background: "#ffffff", padding: "16px 18px" }}>
         <summary style={{ ...summaryStyle, fontSize: 14 }}>

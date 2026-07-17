@@ -237,12 +237,13 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
     <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
       {propertyContext ? (
         <>
+          {/* The Chart Table renders the full Place Brief (chart concept,
+              founder-selected 2026-07-16) — no separate intelligence section. */}
           <PropertyEvaluationWorkspace
             context={propertyContext}
             tierPreviewMode={tierPreviewMode}
             placeIntelligence={briefIntelligence}
           />
-          {briefIntelligence && <PropertyPlaceIntelligence intelligence={briefIntelligence} />}
         </>
       ) : (
         <PropertyEvaluationWorkspace

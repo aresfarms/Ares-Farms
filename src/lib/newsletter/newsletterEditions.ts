@@ -45,6 +45,17 @@ export type NewsletterAudience =
   | "land"
   | "finance";
 
+/**
+ * Two cadences from one composer (founder direction 2026-07-17: "people stop
+ * reading after 2–5 minutes — say what you need upfront, save the speeches for
+ * the digest").
+ *   - "weekly": the bottom-line-up-front skim — a hero finding, a tight board
+ *     of ≤4 scannable takeaways, ONE move. Designed to be read in ~2 minutes.
+ *   - "monthly": the digest — the full sourced sections, the decision framing,
+ *     and the editorial. Where the speeches live.
+ */
+export type NewsletterCadence = "weekly" | "monthly";
+
 export interface NewsletterSection {
   heading: string;
   items: NewsletterSignal[];
@@ -53,17 +64,55 @@ export interface NewsletterSection {
 export interface NewsletterEdition {
   audience: NewsletterAudience;
   audienceLabel: string;
+  cadence: NewsletterCadence;
+  /** Deterministic read-time estimate, whole minutes (word count / 220). */
+  readMinutes: number;
   regionKey: string;
   regionLabel: string;
-  /** The Regional Read — the lead story, one paragraph. */
+  /** The Regional Read — the lead story (weekly shows headline + takeaway). */
   lead: NewsletterSignal | null;
   sections: NewsletterSection[];
-  /** What It Means For You — audience-specific decision framing. */
+  /** What It Means For You — audience-specific. Weekly = one line; monthly = full. */
   meaning: string[];
-  /** Editorial briefs (farm edition): tech, safety, tax, regulatory, long-view. */
+  /** Editorial briefs (monthly digest only): tech, safety, tax, regulatory, long-view. */
   editorial?: FarmEditorialItem[];
   asOf: string;
   disclaimers: string[];
+}
+
+/**
+ * The single "one move" line per audience — the weekly's whole call to action.
+ * The monthly digest keeps the fuller decision framing in `meaning`.
+ */
+const WEEKLY_MOVE: Record<NewsletterAudience, string> = {
+  mixed: "Read the one edition that fits your work — each goes deep on its own board.",
+  farm: "Document drought conditions now — the July photo is the fall claim.",
+  finance: "Re-check renewal terms and reserve posture on row-crop borrowers.",
+  residential: "On a private well? Confirm depth and condition before you make an offer.",
+  commercial: "Underwrite on debt-service coverage, and watch farm-linked demand.",
+  hospitality: "Confirm occupancy and ADR history before you underwrite.",
+  "mobile-home-park": "Read the lot-rent roll against the region's conditions.",
+  land: "Water and cash rent set the value — check both before you bid.",
+};
+
+/** Deterministic read-time from the rendered word count (~220 wpm, min 2). */
+function estimateReadMinutes(
+  lead: NewsletterSignal | null,
+  sections: NewsletterSection[],
+  meaning: string[],
+  editorial: FarmEditorialItem[] | undefined,
+  cadence: NewsletterCadence
+): number {
+  const words = (s: string): number => s.trim().split(/\s+/).filter(Boolean).length;
+  let n = 0;
+  if (lead) n += words(lead.headline) + words(cadence === "weekly" ? lead.takeaway : lead.body);
+  for (const sec of sections) {
+    n += words(sec.heading);
+    for (const it of sec.items) n += words(it.headline) + words(cadence === "weekly" ? it.takeaway : it.body);
+  }
+  for (const m of meaning) n += words(m);
+  for (const e of editorial ?? []) n += words(e.title) + words(e.body) + words(e.pointer);
+  return Math.max(2, Math.round(n / 220));
 }
 
 const AUDIENCE_LABEL: Record<NewsletterAudience, string> = {
@@ -80,14 +129,58 @@ const AUDIENCE_LABEL: Record<NewsletterAudience, string> = {
 const compact = (items: Array<NewsletterSignal | null>): NewsletterSignal[] =>
   items.filter((s): s is NewsletterSignal => s !== null);
 
+/** The rich, monthly-shaped content each audience case returns before cadence trimming. */
+type FullEdition = Omit<NewsletterEdition, "cadence" | "readMinutes">;
+
+/** The weekly's single tight footer — sources and detail move to the monthly digest. */
+const WEEKLY_DISCLAIMER =
+  "Every number here is a sourced, dated public fact (U.S. Drought Monitor, USDA, Freddie Mac, FHFA, EIA). Furlong reports them — it does not predict prices, yields, or markets, and it is not a lender. The monthly digest carries every source and the full detail.";
+
+/** Trim the full (monthly) content to the chosen cadence and stamp read-time. */
+function finalizeEdition(full: FullEdition, cadence: NewsletterCadence): NewsletterEdition {
+  if (cadence === "monthly") {
+    return {
+      ...full,
+      cadence: "monthly",
+      readMinutes: estimateReadMinutes(full.lead, full.sections, full.meaning, full.editorial, "monthly"),
+    };
+  }
+  // Weekly: hero lead + ONE board of ≤4 scannable takeaways (never repeating
+  // the lead) + ONE move. No editorial, one-line footer. Built for a 2-min skim.
+  const seen = new Set<string>();
+  if (full.lead) seen.add(full.lead.headline);
+  const board: NewsletterSignal[] = [];
+  outer: for (const sec of full.sections) {
+    for (const it of sec.items) {
+      if (seen.has(it.headline)) continue;
+      seen.add(it.headline);
+      board.push(it);
+      if (board.length >= 4) break outer;
+    }
+  }
+  const sections: NewsletterSection[] = [{ heading: "The board", items: board }];
+  const meaning = [WEEKLY_MOVE[full.audience]];
+  return {
+    ...full,
+    cadence: "weekly",
+    readMinutes: estimateReadMinutes(full.lead, sections, meaning, undefined, "weekly"),
+    sections,
+    meaning,
+    editorial: undefined,
+    disclaimers: [WEEKLY_DISCLAIMER],
+  };
+}
+
 /**
  * Compose one edition. `asOf` is passed in (deterministic; no clock in the
- * pure composer) so the same inputs always render the same edition.
+ * pure composer) so the same inputs always render the same edition. `cadence`
+ * selects the weekly BLUF skim (default) or the monthly digest.
  */
 export function buildNewsletterEdition(
   audience: NewsletterAudience,
   regionKey: string,
-  asOf: string
+  asOf: string,
+  cadence: NewsletterCadence = "weekly"
 ): NewsletterEdition | null {
   const region = NEWSLETTER_REGIONS[regionKey];
   if (!region) return null;
@@ -123,6 +216,7 @@ export function buildNewsletterEdition(
     ],
   };
 
+  const full: FullEdition | null = ((): FullEdition | null => {
   switch (audience) {
     case "mixed":
       // The flagship / free-tier digest: DELIBERATELY BROAD, not a rehash of
@@ -236,6 +330,10 @@ export function buildNewsletterEdition(
     default:
       return null;
   }
+  })();
+
+  if (!full) return null;
+  return finalizeEdition(full, cadence);
 }
 
 /** All audiences, for generating the full set for a region. */

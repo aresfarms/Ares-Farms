@@ -3,12 +3,14 @@
 import { useMemo, useState } from "react";
 
 import type { ChartTheme } from "@/lib/property/chartThemes";
+import { financingProgramsFor } from "@/lib/property/financingProgramsCurated";
 import {
   buildEquityOutlook,
   buildOwnershipCostModel,
   buildPriceContext,
   type OwnershipCostContext,
 } from "@/lib/property/ownershipCostModel";
+import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 
 /**
  * OwnershipCostPanel — "what it costs to buy, and then what it costs to KEEP"
@@ -33,6 +35,8 @@ export interface OwnershipCostPanelProps {
   farmShaped: boolean;
   /** Working-farm/ranch — use FSA/USDA farm-loan lanes, not consumer mortgages. */
   farmMode?: boolean;
+  /** Classified profile — drives the "programs you may also qualify for" block. */
+  profileId?: PropertyProfileId;
 }
 
 export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
@@ -370,6 +374,76 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
                     {line}
                   </p>
                 ))}
+              </div>
+            );
+          })()}
+
+          {(() => {
+            const group = props.profileId ? financingProgramsFor(props.profileId) : null;
+            if (!group) return null;
+            return (
+              <div
+                style={{
+                  display: "grid",
+                  gap: 12,
+                  padding: "16px 18px",
+                  borderRadius: 12,
+                  background: theme.plate,
+                  border: `1px solid ${theme.plateBorder}`,
+                }}
+              >
+                <div style={{ display: "grid", gap: 4 }}>
+                  <h4 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: theme.ink }}>
+                    Programs you may also qualify for
+                  </h4>
+                  <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>
+                    Beyond the purchase lanes above — grants and government-backed programs, with their real
+                    mechanism and where to confirm. Not offers or approvals.
+                  </p>
+                </div>
+                {group.note && (
+                  <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>{group.note}</p>
+                )}
+                <div style={{ display: "grid", gap: 10 }}>
+                  {group.programs.map((prog) => (
+                    <div
+                      key={prog.id}
+                      style={{
+                        display: "grid",
+                        gap: 3,
+                        padding: "10px 12px",
+                        borderRadius: 9,
+                        background: theme.cellBg,
+                        border: `1px solid ${theme.cellBorder}`,
+                      }}
+                    >
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: 8 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: theme.ink }}>{prog.name}</span>
+                        <span
+                          style={{
+                            fontSize: 10.5,
+                            fontWeight: 600,
+                            textTransform: "uppercase",
+                            letterSpacing: 0.4,
+                            color: theme.accent,
+                          }}
+                        >
+                          {prog.mechanism}
+                        </span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: theme.ink }}>{prog.terms}</p>
+                      <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: theme.inkSoft }}>
+                        <strong style={{ fontWeight: 600 }}>Who qualifies:</strong> {prog.eligibility}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: theme.inkFaint }}>
+                        Confirm at {prog.confirmAt}. {prog.source} · {prog.asOf}.
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.55, color: theme.inkFaint }}>
+                  {group.disclaimer}
+                </p>
               </div>
             );
           })()}

@@ -2890,6 +2890,7 @@ export function PropertyEvaluationWorkspace({
               isHome={isResidentialHomeContext(analysisContext)}
               farmShaped={workspaceProfile.id === "farm"}
               farmMode={workspaceProfile.id === "farm"}
+              profileId={workspaceProfile.id}
             />
           ) : null
         }

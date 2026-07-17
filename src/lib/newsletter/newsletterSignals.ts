@@ -8,6 +8,13 @@
  * rates, FHFA price trends, Census county taxes, EIA electricity, NASS cash
  * rents. A signal states the number and, where useful, the plain-language
  * "what it means" — it never characterizes a place or predicts.
+ *
+ * Two read-lengths draw from the same signal (founder direction 2026-07-17:
+ * "people stop reading after 2–5 minutes — say what you need upfront, save
+ * the speeches for the digest"):
+ *   - `headline` + `takeaway` = the WEEKLY bottom-line-up-front skim (one big
+ *     number, one line of so-what).
+ *   - `body` = the MONTHLY digest, where the full explanation lives.
  */
 
 import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "@/lib/property/commodityPricesGenerated";
@@ -24,7 +31,9 @@ import { STATE_HPI } from "@/lib/property/stateHpiGenerated";
 export interface NewsletterSignal {
   /** Short bold lead, e.g. "Corn is failing across the Delmarva". */
   headline: string;
-  /** The sourced number + plain-language read. */
+  /** BLUF so-what, ≤ ~12 words — the weekly skim reads headline + this. */
+  takeaway: string;
+  /** The sourced number + full plain-language read (monthly digest). */
   body: string;
   source: string;
   /** "alarm" (bad news the reader must hear), "watch", "neutral", "opportunity". */
@@ -78,6 +87,7 @@ export function droughtSignal(states: string[]): NewsletterSignal | null {
     .join(", ");
   return {
     headline: `${stateName(worst.code)} is ${worst.severePlus}% in severe drought or worse`,
+    takeaway: "The water reality behind every number below.",
     body:
       `As of the ${worst.mapDate} U.S. Drought Monitor, ${worst.severePlus}% of ${stateName(worst.code)} sits in ` +
       `severe drought or worse (D2–D4), ${worst.extremePlus}% in extreme drought (D3+).` +
@@ -101,6 +111,7 @@ export function cropConditionSignal(states: string[]): NewsletterSignal | null {
   const soy = STATE_CROP_CONDITIONS[worst.code]?.soybeans;
   return {
     headline: `${stateName(worst.code)} corn: only ${worst.ge}% good-or-excellent, ${worst.pvp}% poor-or-worse`,
+    takeaway: "A failing crop, in the government's own survey.",
     body:
       `USDA's week-${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek} Crop Progress rates ${stateName(worst.code)} corn ` +
       `${worst.ge}% good-or-excellent and ${worst.pvp}% poor-or-very-poor` +
@@ -132,6 +143,7 @@ export function cashRentSignal(states: string[]): NewsletterSignal | null {
   const avg = Math.round(rents.reduce((a, b) => a + b, 0) / rents.length);
   return {
     headline: `Cropland cash rent across the region: about $${avg}/acre`,
+    takeaway: "The baseline when a dry year reopens rent talks.",
     body:
       `USDA NASS county cash-rent averages run about $${avg}/acre for cropland across the region's counties — ` +
       `the negotiation baseline when a drought year pressures both operators and landowners. A failed crop is ` +
@@ -156,6 +168,7 @@ export function grainBidSignal(states: string[]): NewsletterSignal | null {
   if (parts.length === 0) return null;
   return {
     headline: `${stateName(pick.s)} elevator cash bids: ${parts.join(" · ")}`,
+    takeaway: "What your local elevator is actually paying now.",
     body:
       `The average local grain-buyer bid in ${stateName(pick.s)} (USDA Market News, ${pick.g.reportDate}): ` +
       `${parts.join(", ")} per bushel — the public record of what the region's elevators are actually paying, ` +
@@ -180,6 +193,7 @@ export function commodityPriceSignal(): NewsletterSignal | null {
   if (parts.length === 0) return null;
   return {
     headline: `Grain prices: ${parts.join(" · ")}`,
+    takeaway: "The national benchmark your short crop has to beat.",
     body:
       `USDA's national average price received (${stamp}): ${parts.join(", ")}. This is the revenue side ` +
       `of the drought story — a short crop meets these prices to decide whether an operation clears its ` +
@@ -192,6 +206,7 @@ export function commodityPriceSignal(): NewsletterSignal | null {
 export function mortgageRateSignal(): NewsletterSignal {
   return {
     headline: `30-year mortgage: ${MORTGAGE_RATES.rate30}% (week of ${MORTGAGE_RATES.weekOf})`,
+    takeaway: "The number under every home purchase this month.",
     body:
       `Freddie Mac's national average 30-year fixed is ${MORTGAGE_RATES.rate30}%` +
       (MORTGAGE_RATES.rate15 ? `, 15-year ${MORTGAGE_RATES.rate15}%` : "") +
@@ -214,6 +229,7 @@ export function farmlandValueSignal(states: string[]): NewsletterSignal | null {
   const year = rows[0].f.year;
   return {
     headline: `Farmland across the region: ${parts.join(" · ")}/acre`,
+    takeaway: "Your collateral and equity benchmark for ground.",
     body:
       `USDA's ${year} farm real-estate values (land and buildings), year-over-year change in parentheses: ` +
       `${parts.join(", ")} per acre. The collateral and equity benchmark for ground in the region — your parcel ` +
@@ -231,6 +247,7 @@ export function farmlandValueSignal(states: string[]): NewsletterSignal | null {
 export function farmFinanceSignal(): NewsletterSignal {
   return {
     headline: "Farm capital: FSA, USDA Rural Development, Farm Credit, SBA",
+    takeaway: "Farm ground uses FSA/USDA/Farm Credit — not a mortgage.",
     body:
       "The ground-buying and operating lanes for a farm or ranch are not consumer mortgages: USDA Farm " +
       "Service Agency Farm Ownership and Operating loans (direct and guaranteed, including microloans and " +
@@ -246,6 +263,7 @@ export function farmFinanceSignal(): NewsletterSignal {
 export function commercialFinanceSignal(): NewsletterSignal {
   return {
     headline: "Commercial capital: SBA 504/7(a), bank commercial mortgage",
+    takeaway: "Owner-users buy on SBA 504/7(a) — not FHA.",
     body:
       "Owner-occupied commercial property is financed very differently from a home: SBA 504 (long-term, " +
       "fixed, for owner-users buying real estate) and SBA 7(a), conventional commercial mortgages from a " +
@@ -261,6 +279,7 @@ export function commercialFinanceSignal(): NewsletterSignal {
 export function hospitalityFinanceSignal(): NewsletterSignal {
   return {
     headline: "Lodging capital: SBA 504/7(a), hotel-experienced commercial lenders",
+    takeaway: "Hotels finance on RevPAR through SBA and hotel lenders.",
     body:
       "Hotels and inns are a specialized commercial asset: SBA 504 and 7(a) are the workhorse lanes for " +
       "owner-operated lodging (the SBA finances a large share of independent hotels), alongside conventional " +
@@ -275,6 +294,7 @@ export function hospitalityFinanceSignal(): NewsletterSignal {
 export function mhpFinanceSignal(): NewsletterSignal {
   return {
     headline: "Park capital: agency (Fannie/Freddie MHC), bank, SBA",
+    takeaway: "Parks run on agency + SBA, underwriting the rent roll.",
     body:
       "Manufactured-housing communities have their own capital stack: Fannie Mae and Freddie Mac both run " +
       "dedicated MHC loan programs (often the best terms for stabilized parks), plus commercial bank debt " +
@@ -289,6 +309,7 @@ export function mhpFinanceSignal(): NewsletterSignal {
 export function landFinanceSignal(): NewsletterSignal {
   return {
     headline: "Land capital: land loans, seller financing, Farm Credit for rural ground",
+    takeaway: "Land loans want more down and a shorter term.",
     body:
       "Raw and unimproved land is financed on its own terms — land loans carry higher down payments (often " +
       "20–50%) and shorter terms than a home mortgage, seller financing is common, and for agricultural or " +
@@ -305,6 +326,7 @@ export function priceTrendSignal(states: string[]): NewsletterSignal | null {
   const pick = withHpi[0];
   return {
     headline: `${stateName(pick.c)} home prices: ${pick.h.longRunAnnualPct}%/yr over ${pick.h.longRunSpanYears} years`,
+    takeaway: "Long-run history — the baseline, not a forecast.",
     body:
       `FHFA's index puts ${stateName(pick.c)}'s long-run home-price change at about ${pick.h.longRunAnnualPct}% a year ` +
       `(${pick.h.longRunSpanYears}-year average), latest data ${pick.h.latestQuarter}. History, not a forecast — but ` +
@@ -320,6 +342,7 @@ export function electricitySignal(states: string[]): NewsletterSignal | null {
   const parts = rows.map((x) => `${stateName(x.c)} ~$${x.e.resAvgMonthlyBill} (${x.e.resPriceCentsKwh}¢)`);
   return {
     headline: `Power across the region: ${parts.map((p) => p.split(" ~")[0] + " $" + p.split("~$")[1].split(" ")[0]).join(" · ")}`,
+    takeaway: "A fixed cost of ownership — and an irrigation input.",
     body:
       `EIA state-average residential electric bills across the region: ${parts.join(", ")} per month. ` +
       `A fixed cost of ownership — and, for irrigation and poultry-house operations, a real input line when the ` +
@@ -350,6 +373,7 @@ export function inputCostSignal(): NewsletterSignal | null {
   const worst = Math.max(...["fertilizer", "seed", "fuel", "feed"].map((k) => INPUT_COSTS[k]?.yoyPct ?? 0));
   return {
     headline: `Input costs year-over-year: ${parts.join(" · ")}`,
+    takeaway: "Run these against next year's plan now.",
     body:
       `USDA Prices Paid, ${stamp}, year-over-year: ${parts.join(", ")}. These are the numbers to run against next ` +
       `year's plan now — a short crop meeting rising fuel and fertilizer is exactly the squeeze that decides ` +

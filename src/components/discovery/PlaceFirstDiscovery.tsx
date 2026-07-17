@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
+import { CHART_TONES, type ChartTone } from "@/lib/property/chartThemes";
 
 /**
  * Place-first discovery card — the correct PRIMARY journey for place/property
@@ -18,6 +19,11 @@ import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
  * result — it collects the location, states exactly which verified facts we
  * cover with their source + confidence + advisory disclaimers, and routes to the
  * verified inventory where those facts are already attached to each listing.
+ *
+ * Chart Table cohesion (founder 2026-07-17): tone="light" is the /discover
+ * front door (stays light); tone="dark" sits the same cells on the navigator
+ * stage (property hub) using CHART_TONES — shared tokens, no per-surface hexes.
+ * PRESENTATION ONLY — the tone changes colors, never data or copy.
  *
  * Governance basis: Master Volume VI — Property Discovery & Canonical Property
  * Governance, separated from general customer/revenue intelligence.
@@ -99,11 +105,14 @@ type PlaceFactsResponse = {
 export function PlaceFirstDiscovery({
   flow,
   embedded = false,
+  tone = "light",
 }: {
   flow: DiscoveryFlow;
   embedded?: boolean;
+  tone?: ChartTone;
 }) {
   const head = HEAD[flow] ?? HEAD["place-facts"];
+  const t = CHART_TONES[tone];
   const [streetAddress, setStreetAddress] = useState("");
   const [city, setCity] = useState("");
   const [county, setCounty] = useState("");
@@ -115,6 +124,19 @@ export function PlaceFirstDiscovery({
   const [result, setResult] = useState<PlaceFactsResponse | null>(null);
   const [jumpCue, setJumpCue] = useState<string | null>(null);
   const resultRef = useRef<HTMLDivElement | null>(null);
+
+  const inputStyle = {
+    fontSize: 13.5,
+    padding: "9px 12px",
+    borderRadius: 10,
+    border: `1.5px solid ${t.inputBorder}`,
+    background: t.inputBg,
+    color: t.inputInk,
+  } as const;
+  const coverageChipStyle =
+    tone === "dark"
+      ? { color: t.badgeInk, border: `1px solid ${t.badgeBorder}`, background: t.badgeBg }
+      : { color: "#0f766e", border: "1px solid #bfe4db", background: "#f2fbf8" };
 
   const fullAddress = [streetAddress.trim(), city.trim(), stateCode.trim()]
     .filter(Boolean)
@@ -297,31 +319,31 @@ export function PlaceFirstDiscovery({
   }, [busy, checked, error, result]);
 
   return (
-    <section data-testid="place-first-discovery" data-flow={flow} aria-label="Place-first discovery"
+    <section data-testid="place-first-discovery" data-flow={flow} data-tone={tone} aria-label="Place-first discovery"
       style={{
         display: "grid",
         gap: embedded ? 18 : 22,
         maxWidth: embedded ? "none" : 760,
-        border: embedded ? "none" : "1px solid #d7deea",
+        border: embedded ? "none" : `1px solid ${t.sectionBorder}`,
         borderRadius: embedded ? 0 : 16,
-        background: embedded ? "transparent" : "#fff",
+        background: embedded ? "transparent" : t.sectionBg,
         padding: embedded ? 0 : "26px 28px",
       }}>
       {!embedded && (
         <header style={{ display: "grid", gap: 8 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#854F0B" }}>{head.eyebrow}</span>
-          <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: "#101a2b" }}>{head.title}</h1>
-          <p style={{ margin: 0, fontSize: 13.5, color: "#5d687a", lineHeight: 1.55 }}>{head.lede}</p>
+          <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: t.eyebrow }}>{head.eyebrow}</span>
+          <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: t.headingInk }}>{head.title}</h1>
+          <p style={{ margin: 0, fontSize: 13.5, color: t.bodyInk, lineHeight: 1.55 }}>{head.lede}</p>
         </header>
       )}
 
       {/* ── Location FIRST ──────────────────────────────────────────────────── */}
-      <div data-testid="place-inputs" style={{ display: "grid", gap: 12, border: "1px solid #e6ebf2", borderRadius: 12, padding: embedded ? "18px 18px" : "16px 18px", background: "#fff" }}>
-        <strong style={{ fontSize: embedded ? 16 : 13.5, color: "#1f2a3d" }}>
+      <div data-testid="place-inputs" style={{ display: "grid", gap: 12, border: `1px solid ${t.cardBorder}`, borderRadius: 12, padding: embedded ? "18px 18px" : "16px 18px", background: t.cardBg }}>
+        <strong style={{ fontSize: embedded ? 16 : 13.5, color: t.labelInk }}>
           {embedded ? "Start with the verified address" : "Where is the location?"}
         </strong>
         {embedded && (
-          <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.6, maxWidth: 820 }}>
+          <span style={{ fontSize: 13, color: t.bodyInk, lineHeight: 1.6, maxWidth: 820 }}>
             Results appear right below — checked facts carry into the analysis automatically.
           </span>
         )}
@@ -329,20 +351,20 @@ export function PlaceFirstDiscovery({
           value={streetAddress}
           onChange={(e) => setStreetAddress(e.target.value)}
           placeholder="Street address (e.g. 123 Main St)"
-          style={{ fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }} />
+          style={inputStyle} />
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <input
             value={city}
             onChange={(e) => setCity(e.target.value)}
             placeholder="City"
-            style={{ flex: "1 1 180px", fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }}
+            style={{ ...inputStyle, flex: "1 1 180px" }}
           />
           <input
             value={stateCode}
             onChange={(e) => setStateCode(e.target.value.toUpperCase().slice(0, 2))}
             placeholder="State (e.g. WV)"
             maxLength={2}
-            style={{ width: 110, fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }}
+            style={{ ...inputStyle, width: 110 }}
           />
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -350,13 +372,13 @@ export function PlaceFirstDiscovery({
             value={county}
             onChange={(e) => setCounty(e.target.value)}
             placeholder="County (optional but helpful)"
-            style={{ flex: "1 1 200px", fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1" }}
+            style={{ ...inputStyle, flex: "1 1 200px" }}
           />
           <input
             value={parcel}
             onChange={(e) => setParcel(e.target.value)}
             placeholder="Parcel / APN (optional)"
-            style={{ flex: "1 1 220px", fontSize: 13.5, padding: "9px 12px", borderRadius: 10, border: "1.5px solid #cbd5e1", maxWidth: 360 }}
+            style={{ ...inputStyle, flex: "1 1 220px", maxWidth: 360 }}
           />
         </div>
         <div style={{ display: "grid", gap: 8, justifySelf: "start" }}>
@@ -389,7 +411,7 @@ export function PlaceFirstDiscovery({
             style={{
               fontSize: 12.5,
               fontWeight: 700,
-              color: busy ? "#854F0B" : jumpCue ? "#0f766e" : "#7a8aa0",
+              color: busy ? t.warnInk : jumpCue ? t.accent : t.quietInk,
               lineHeight: 1.45,
             }}
           >
@@ -398,18 +420,18 @@ export function PlaceFirstDiscovery({
               : jumpCue ?? ""}
           </span>
         </div>
-        <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>
+        <span style={{ fontSize: 11.5, color: t.faintInk }}>
           County and parcel are optional — some public records start there.
         </span>
       </div>
 
       {/* ── Then: verified place-facts coverage + source confidence + disclaimers ─ */}
       <div data-testid="place-facts-coverage" style={{ display: "grid", gap: 10 }}>
-        <strong style={{ fontSize: embedded ? 15 : 14, color: "#101a2b" }}>
+        <strong style={{ fontSize: embedded ? 15 : 14, color: t.headingInk }}>
           {checked && located ? `We check ${located} for:` : "We check any U.S. address for:"}
         </strong>
         {checked && !result && !error && (
-          <p data-testid="live-gated-note" style={{ margin: 0, fontSize: 12.5, color: "#7a8aa0", lineHeight: 1.5 }}>
+          <p data-testid="live-gated-note" style={{ margin: 0, fontSize: 12.5, color: t.quietInk, lineHeight: 1.5 }}>
             Furlong is verifying the location against public place-fact sources now.
           </p>
         )}
@@ -417,46 +439,46 @@ export function PlaceFirstDiscovery({
           {COVERAGE.map((c) => (
             <span
               key={c.label}
-              style={{ fontSize: 12, fontWeight: 700, color: "#0f766e", border: "1px solid #bfe4db", background: "#f2fbf8", borderRadius: 999, padding: "4px 11px" }}
+              style={{ fontSize: 12, fontWeight: 700, borderRadius: 999, padding: "4px 11px", ...coverageChipStyle }}
             >
               {c.label}
             </span>
           ))}
         </div>
         <details>
-          <summary style={{ cursor: "pointer", listStyle: "none", fontSize: 12, color: "#7a8aa0" }}>
+          <summary style={{ cursor: "pointer", listStyle: "none", fontSize: 12, color: t.quietInk }}>
             What each check means + sources ▸
           </summary>
           <div style={{ display: "grid", gap: 8, paddingTop: 8 }}>
             {COVERAGE.map((c) => (
-              <div key={c.label} style={{ border: "1px solid #e6ebf2", borderRadius: 10, padding: "10px 14px", display: "grid", gap: 3, background: "#fff" }}>
+              <div key={c.label} style={{ border: `1px solid ${t.cardBorder}`, borderRadius: 10, padding: "10px 14px", display: "grid", gap: 3, background: t.cellBg }}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                  <strong style={{ fontSize: 13.5, color: "#1f2a3d" }}>{c.label}</strong>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: "#0f766e" }}>{c.confidence}</span>
+                  <strong style={{ fontSize: 13.5, color: t.labelInk }}>{c.label}</strong>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: t.accent }}>{c.confidence}</span>
                 </div>
-                <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.45 }}>{c.disclaimer}</span>
-                <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>Source: {c.source}</span>
+                <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.45 }}>{c.disclaimer}</span>
+                <span style={{ fontSize: 11.5, color: t.faintInk }}>Source: {c.source}</span>
               </div>
             ))}
           </div>
         </details>
-        <p style={{ margin: 0, fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>
+        <p style={{ margin: 0, fontSize: 12, color: t.quietInk, lineHeight: 1.5 }}>
           Advisory only — place-facts describe the place, not your eligibility.
         </p>
         {(error || result) && (
           <div
             id="location-verification-result"
             ref={resultRef}
-            style={{ display: "grid", gap: 10, border: "1px solid #e6ebf2", borderRadius: 12, padding: "14px 16px", background: "#fbfdff", scrollMarginTop: 24 }}
+            style={{ display: "grid", gap: 10, border: `1px solid ${t.cardBorder}`, borderRadius: 12, padding: "14px 16px", background: tone === "dark" ? t.cardBg : "#fbfdff", scrollMarginTop: 24 }}
           >
-            <strong style={{ fontSize: 14, color: "#101a2b" }}>Location verification result</strong>
+            <strong style={{ fontSize: 14, color: t.headingInk }}>Location verification result</strong>
             {error && (
-              <span style={{ fontSize: 12.5, color: "#b42318", lineHeight: 1.5 }}>{error}</span>
+              <span style={{ fontSize: 12.5, color: t.errorInk, lineHeight: 1.5 }}>{error}</span>
             )}
             {result && (
               <>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 800, color: "#0f766e", background: "#ecfdf3", border: "1px solid #a6f4c5", borderRadius: 999, padding: "6px 10px" }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: t.badgeInk, background: t.badgeBg, border: `1px solid ${t.badgeBorder}`, borderRadius: 999, padding: "6px 10px" }}>
                     {verification?.status === "verified"
                       ? "Verified address"
                       : verification?.status === "partial"
@@ -466,7 +488,7 @@ export function PlaceFirstDiscovery({
                           : "Unverifiable input"}
                   </span>
                   {verification?.normalizedAddress && (
-                    <span style={{ fontSize: 12.5, color: "#475467", lineHeight: 1.5 }}>
+                    <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>
                       {verification.normalizedAddress}
                     </span>
                   )}
@@ -475,7 +497,7 @@ export function PlaceFirstDiscovery({
                 {verification?.restrictions?.length ? (
                   <div style={{ display: "grid", gap: 6 }}>
                     {verification.restrictions.map((item) => (
-                      <span key={item} style={{ fontSize: 12.5, color: "#b42318", lineHeight: 1.5 }}>{item}</span>
+                      <span key={item} style={{ fontSize: 12.5, color: t.errorInk, lineHeight: 1.5 }}>{item}</span>
                     ))}
                   </div>
                 ) : null}
@@ -483,7 +505,7 @@ export function PlaceFirstDiscovery({
                 {verification?.warnings?.length ? (
                   <div style={{ display: "grid", gap: 6 }}>
                     {verification.warnings.map((item) => (
-                      <span key={item} style={{ fontSize: 12.5, color: "#8a6d3b", lineHeight: 1.5 }}>{item}</span>
+                      <span key={item} style={{ fontSize: 12.5, color: t.warnInk, lineHeight: 1.5 }}>{item}</span>
                     ))}
                   </div>
                 ) : null}
@@ -508,7 +530,7 @@ export function PlaceFirstDiscovery({
                     >
                       Take this into analysis →
                     </Link>
-                    <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.5 }}>
+                    <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>
                       Carry this verified address and what Furlong already checked straight into the property analysis workspace.
                     </span>
                   </div>
@@ -516,12 +538,12 @@ export function PlaceFirstDiscovery({
 
                 {sourceOutcomeCards.length > 0 && (
                   <div style={{ display: "grid", gap: 8 }}>
-                    <strong style={{ fontSize: 13.5, color: "#162033" }}>What Furlong actually checked</strong>
+                    <strong style={{ fontSize: 13.5, color: t.headingInk }}>What Furlong actually checked</strong>
                     <div style={{ display: "grid", gap: 8 }}>
                       {sourceOutcomeCards.map((item) => (
-                        <div key={item.id} style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                          <strong style={{ fontSize: 12.75, color: "#162033" }}>{item.label}</strong>
-                          <span style={{ fontSize: 12, fontWeight: 800, color: item.outcome === "matched" ? "#0f766e" : item.outcome === "no-match" ? "#475467" : item.outcome === "gated" ? "#854F0B" : "#b42318" }}>
+                        <div key={item.id} style={{ border: `1px solid ${t.cellBorder}`, background: t.cellBg, borderRadius: 10, padding: "10px 12px", display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                          <strong style={{ fontSize: 12.75, color: t.labelInk }}>{item.label}</strong>
+                          <span style={{ fontSize: 12, fontWeight: 800, color: item.outcome === "matched" ? t.accent : item.outcome === "no-match" ? t.bodyInk : item.outcome === "gated" ? t.eyebrow : t.errorInk }}>
                             {item.outcome === "matched"
                               ? "Checked and matched"
                               : item.outcome === "no-match"
@@ -536,7 +558,7 @@ export function PlaceFirstDiscovery({
                       ))}
                     </div>
                     {additionalSourceBottomLine && (
-                      <span style={{ fontSize: 12.5, color: "#475467", lineHeight: 1.55 }}>
+                      <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.55 }}>
                         {additionalSourceBottomLine}
                       </span>
                     )}
@@ -545,51 +567,51 @@ export function PlaceFirstDiscovery({
 
                 <div style={{ display: "grid", gap: 8 }}>
                   {liveFacts?.opportunityZone && (
-                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
-                      <strong style={{ fontSize: 13.5, color: "#162033" }}>Opportunity Zone</strong>
-                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                    <div style={{ border: `1px solid ${t.cellBorder}`, background: t.cellBg, borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: t.labelInk }}>Opportunity Zone</strong>
+                      <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>
                         Tract {liveFacts.opportunityZone.tractId}{liveFacts.opportunityZone.rural ? " · rural tract" : ""}.
                       </span>
                     </div>
                   )}
                   {liveFacts?.hubzone && (
-                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
-                      <strong style={{ fontSize: 13.5, color: "#162033" }}>HUBZone</strong>
-                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                    <div style={{ border: `1px solid ${t.cellBorder}`, background: t.cellBg, borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: t.labelInk }}>HUBZone</strong>
+                      <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>
                         {liveFacts.hubzone.hubzoneType} · GEOID {liveFacts.hubzone.geoid}
                         {liveFacts.hubzone.isCurrent ? " · currently designated" : " · not current"}.
                       </span>
                     </div>
                   )}
                   {liveFacts?.flood && (
-                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
-                      <strong style={{ fontSize: 13.5, color: "#162033" }}>FEMA flood</strong>
-                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                    <div style={{ border: `1px solid ${t.cellBorder}`, background: t.cellBg, borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: t.labelInk }}>FEMA flood</strong>
+                      <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>
                         Special Flood Hazard Area, Zone {liveFacts.flood.floodZone}.
                       </span>
                     </div>
                   )}
                   {liveFacts?.historic && (
-                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
-                      <strong style={{ fontSize: 13.5, color: "#162033" }}>Historic context</strong>
-                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                    <div style={{ border: `1px solid ${t.cellBorder}`, background: t.cellBg, borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: t.labelInk }}>Historic context</strong>
+                      <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>
                         National Register area{liveFacts.historic.historicName ? ` — ${liveFacts.historic.historicName}` : ""}.
                       </span>
                     </div>
                   )}
                   {liveFacts?.nmtc && (
-                    <div style={{ border: "1px solid #dbe4ee", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
-                      <strong style={{ fontSize: 13.5, color: "#162033" }}>NMTC tract</strong>
-                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
+                    <div style={{ border: `1px solid ${t.cellBorder}`, background: t.cellBg, borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: t.labelInk }}>NMTC tract</strong>
+                      <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>
                         Tract {liveFacts.nmtc.tractId} is NMTC-qualified in the current snapshot.
                       </span>
                     </div>
                   )}
                   {verifiedPrograms.map((program) => (
-                    <div key={program.program_id} style={{ border: "1px solid #b9e3d4", background: "#f4fbf8", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
-                      <strong style={{ fontSize: 13.5, color: "#0f6e56" }}>{program.name}</strong>
-                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>{program.verifiedStatement}</span>
-                      <span style={{ fontSize: 11.5, color: "#5d687a" }}>{program.basis}</span>
+                    <div key={program.program_id} style={{ border: `1px solid ${t.programBorder}`, background: t.programBg, borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
+                      <strong style={{ fontSize: 13.5, color: t.accent }}>{program.name}</strong>
+                      <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>{program.verifiedStatement}</span>
+                      <span style={{ fontSize: 11.5, color: t.faintInk }}>{program.basis}</span>
                     </div>
                   ))}
                   {!liveFacts?.opportunityZone &&
@@ -598,7 +620,7 @@ export function PlaceFirstDiscovery({
                     !liveFacts?.historic &&
                     !liveFacts?.nmtc &&
                     verifiedPrograms.length === 0 && (
-                      <span style={{ fontSize: 12.5, color: "#7a8aa0", lineHeight: 1.55 }}>
+                      <span style={{ fontSize: 12.5, color: t.quietInk, lineHeight: 1.55 }}>
                         {verification?.lookupOutcomes &&
                         [
                           verification.lookupOutcomes.opportunityZone,
@@ -620,7 +642,7 @@ export function PlaceFirstDiscovery({
 
       {/* ── Route to where the facts are already attached ───────────────────── */}
       {!embedded && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", borderTop: "1px solid #e2e8f0", paddingTop: 16 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", borderTop: `1px solid ${t.cardBorder}`, paddingTop: 16 }}>
           <Link href="/explore?lane=property-land" data-testid="browse-verified-inventory"
             style={{ fontSize: 14, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "10px 22px", textDecoration: "none" }}>
             Browse the verified inventory →

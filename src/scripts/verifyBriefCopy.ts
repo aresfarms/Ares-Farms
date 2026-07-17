@@ -28,6 +28,8 @@ const SCANNED_FILES = [
   "src/components/property/PropertyPlaceIntelligence.tsx",
   "src/components/property/PropertyEvaluationWorkspace.tsx",
   "src/components/property/PropertyImportLaunchpad.tsx",
+  "src/components/property/PropertyHub.tsx",
+  "src/components/discovery/PlaceFirstDiscovery.tsx",
 ];
 
 interface Rule {

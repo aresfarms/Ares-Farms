@@ -235,6 +235,107 @@ export const CHART_LENS_COPY: Record<ChartVariant, ChartLensCopy> = {
   },
 };
 
+/**
+ * Chart tone tokens — semantic slots for customer form/card surfaces that
+ * embed INSIDE a stage (address-first discovery, intake panels, lane cards).
+ *
+ * "light" is the front-door treatment — /discover stays light (founder
+ * direction). "dark" sits the same cells on the navigator stage and derives
+ * every value from CHART_THEMES.buyer so no surface re-invents hexes.
+ */
+export type ChartTone = "light" | "dark";
+
+export interface ChartToneTokens {
+  /** Card shell around a form or standalone section. */
+  sectionBg: string;
+  sectionBorder: string;
+  /** Headings / strong labels. */
+  headingInk: string;
+  labelInk: string;
+  /** Reading text, quiet helper text, faintest metadata. */
+  bodyInk: string;
+  quietInk: string;
+  faintInk: string;
+  /** Kicker/eyebrow honey ink (brand caution family). */
+  eyebrow: string;
+  /** Verified/confidence ink (teal family). */
+  accent: string;
+  warnInk: string;
+  errorInk: string;
+  /** Inner panels (inputs group, result block). */
+  cardBg: string;
+  cardBorder: string;
+  /** Fact cells. */
+  cellBg: string;
+  cellBorder: string;
+  /** Verified-status badge chip. */
+  badgeBg: string;
+  badgeBorder: string;
+  badgeInk: string;
+  /** Verified-program highlight card. */
+  programBg: string;
+  programBorder: string;
+  /** Text inputs. */
+  inputBg: string;
+  inputBorder: string;
+  inputInk: string;
+}
+
+const navigator = CHART_THEMES.buyer;
+
+export const CHART_TONES: Record<ChartTone, ChartToneTokens> = {
+  light: {
+    sectionBg: "#ffffff",
+    sectionBorder: "#d7deea",
+    headingInk: "#101a2b",
+    labelInk: "#1f2a3d",
+    bodyInk: "#5d687a",
+    quietInk: "#7a8aa0",
+    faintInk: "#9aa6b6",
+    eyebrow: "#854F0B",
+    accent: "#0f766e",
+    warnInk: "#8a6d3b",
+    errorInk: "#b42318",
+    cardBg: "#ffffff",
+    cardBorder: "#e6ebf2",
+    cellBg: "#ffffff",
+    cellBorder: "#dbe4ee",
+    badgeBg: "#ecfdf3",
+    badgeBorder: "#a6f4c5",
+    badgeInk: "#0f766e",
+    programBg: "#f4fbf8",
+    programBorder: "#b9e3d4",
+    inputBg: "#ffffff",
+    inputBorder: "#cbd5e1",
+    inputInk: "#101a2b",
+  },
+  dark: {
+    sectionBg: "transparent",
+    sectionBorder: navigator.plateBorder,
+    headingInk: navigator.ink,
+    labelInk: navigator.ink,
+    bodyInk: navigator.inkSoft,
+    quietInk: "#7ea4bb",
+    faintInk: "#7ea4bb",
+    eyebrow: navigator.accent,
+    accent: "#7fc4b8",
+    warnInk: navigator.honey,
+    errorInk: "#f19c8e",
+    cardBg: navigator.waypointBg,
+    cardBorder: navigator.waypointBorder,
+    cellBg: navigator.cellBg,
+    cellBorder: navigator.cellBorder,
+    badgeBg: "rgba(15, 118, 110, 0.18)",
+    badgeBorder: "#2f6f62",
+    badgeInk: "#7fc4b8",
+    programBg: "rgba(15, 110, 86, 0.14)",
+    programBorder: "#2f6f62",
+    inputBg: navigator.cellBg,
+    inputBorder: navigator.plateBorder,
+    inputInk: navigator.ink,
+  },
+};
+
 /** Order facts for a lens: priority labels first (in order), the rest after. */
 export function orderFactsForLens<T extends { label: string }>(
   facts: T[],

@@ -14,8 +14,12 @@
  * verify.
  */
 
+import { COUNTY_TAX_CONTEXT } from "./countyTaxContextGenerated";
 import { buildPropertyAnalysisHref } from "./propertyAnalysisHref";
+import { countyForProperty } from "./propertyBriefIntelligence";
+import { PROPERTY_AMENITY_FACTS } from "./propertyAmenitiesGenerated";
 import { findCanonicalPropertyById, listExploreDetail } from "./propertyData";
+import { PROPERTY_FLOOD_HISTORIC_FACTS } from "./propertyFloodHistoricGenerated";
 import { classifyPropertyProfile } from "./propertyProfile";
 import { priceBand, toExploreDetail, type CanonicalProperty, type ExploreDetailProperty } from "./propertyTypes";
 
@@ -29,10 +33,48 @@ export interface SimilarPropertyCard {
   comparison: "lower" | "similar" | "higher" | null;
   /** Straight-line miles, rounded — only when both records carry coordinates. */
   distanceMiles: number | null;
+  /** What we can VERIFY about this alternative from here (founder feedback
+      2026-07-17: a bare card tells the reader nothing) — flood posture
+      compared to the subject, nearest grocery, county tax rate and median.
+      Price and condition live on each listing; the card says so. */
+  signals: string[];
   isCurrent: boolean;
   vintage: string;
   sourceLabel: string;
   href: string;
+}
+
+/** Verifiable differentiators for a candidate, phrased against the subject. */
+function candidateSignals(candidateId: string, subjectId: string): string[] {
+  const signals: string[] = [];
+  const flood = PROPERTY_FLOOD_HISTORIC_FACTS[candidateId];
+  const subjectFlood = PROPERTY_FLOOD_HISTORIC_FACTS[subjectId];
+  if (flood?.floodZone) {
+    let compare = "";
+    if (subjectFlood?.floodZone) {
+      compare =
+        flood.isSfha === subjectFlood.isSfha
+          ? " — same flood posture as this one"
+          : flood.isSfha
+            ? " — IN the flood hazard area, unlike this one"
+            : " — outside the flood hazard area, unlike this one";
+    } else if (flood.isSfha) {
+      compare = " — inside the flood hazard area";
+    }
+    signals.push(`Flood zone ${flood.floodZone}${compare}`);
+  }
+  const grocery = PROPERTY_AMENITY_FACTS[candidateId]?.grocery;
+  if (grocery?.nearestMiles != null) {
+    signals.push(`grocery ~${grocery.nearestMiles} mi`);
+  }
+  const fips = countyForProperty(candidateId)?.fips;
+  const tax = fips ? COUNTY_TAX_CONTEXT[fips] : undefined;
+  if (tax) {
+    signals.push(
+      `county: taxes ~${tax.effectiveRatePct}%/yr, typical home $${Math.round(tax.medianHomeValue / 1000)}k`
+    );
+  }
+  return signals;
 }
 
 const SOURCE_LABELS: Record<string, string> = {
@@ -69,7 +111,8 @@ function coordsOf(c: CanonicalProperty): { lat: number; lon: number } | null {
 function toCard(
   listing: ExploreDetailProperty,
   subjectPrice: number | null,
-  distanceMiles: number | null
+  distanceMiles: number | null,
+  subjectId: string
 ): SimilarPropertyCard {
   const typeTitle = `${listing.propertyType[0]?.toUpperCase() ?? ""}${listing.propertyType.slice(1)}`;
   const location = `${listing.town}${listing.county && listing.county !== "Unknown" ? `, ${listing.county} County` : ""}, ${listing.state}`;
@@ -88,6 +131,7 @@ function toCard(
     price: listing.price,
     comparison,
     distanceMiles,
+    signals: candidateSignals(listing.id, subjectId),
     isCurrent: listing.isCurrent,
     vintage: listing.vintageStamp,
     sourceLabel,
@@ -162,7 +206,7 @@ export function similarNearbyProperties(
     if (listing.isCurrent) score += 15;
     if (listing.propertyType === subjectRecord.propertyType) score += 10;
 
-    scored.push({ card: toCard(listing, subjectPrice, distanceMiles), score });
+    scored.push({ card: toCard(listing, subjectPrice, distanceMiles, subjectListing.id), score });
   }
 
   scored.sort((a, b) => b.score - a.score || a.card.id.localeCompare(b.card.id));

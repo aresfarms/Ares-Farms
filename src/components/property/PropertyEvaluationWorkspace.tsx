@@ -1063,7 +1063,7 @@ function reportVerdict(args: {
 }): { label: string; explanation: string } {
   if (isResidentialHomeContext(args.context) && !args.answers.usePlan.trim()) {
     return {
-      label: "A regular house for sale — nothing unusual here",
+      label: "A regular house for sale — one real possibility",
       explanation:
         `This is a house listed for sale through ${args.context.sourceLabel}. Buying it works the same way as buying any house: make an offer, get an inspection, line up a loan, close. This profile pulls together what we could verify about the place — flood risk, schools, what it costs to buy and own — so you can decide whether it deserves an offer.`,
     };
@@ -2543,7 +2543,8 @@ export function PropertyEvaluationWorkspace({
                     (home.comparison === "lower" ? " (less than this one)" : home.comparison === "higher" ? " (more than this one)" : home.comparison === "similar" ? " (about the same)" : "") +
                     ` · ${home.location}` +
                     (home.distanceMiles != null ? ` · ~${home.distanceMiles} mi away` : "") +
-                    ` · ${home.sourceLabel}${home.isCurrent ? "" : ` · ${home.vintage}`}`,
+                    ` · ${home.sourceLabel}${home.isCurrent ? "" : ` · ${home.vintage}`}` +
+                    ((home.signals?.length ?? 0) > 0 ? ` · ${home.signals?.join(" · ")}` : ""),
                 }))
               : undefined,
             customerRights: buildCustomerRightsSummary(),

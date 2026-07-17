@@ -159,6 +159,8 @@ export interface SimilarHomeLine {
   priceLabel: string;
   comparison: "lower" | "similar" | "higher" | null;
   distanceMiles: number | null;
+  /** Verifiable differentiators (flood vs this one, grocery, county taxes). */
+  signals?: string[];
   vintage: string;
   isCurrent: boolean;
   sourceLabel: string;
@@ -537,6 +539,12 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           {(props.similarHomes?.length ?? 0) > 0 && (
             <Waypoint pt={nextPt()} id="wp-similar" title="Also on this chart nearby" accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gap: 8 }}>
+                <span style={{ fontSize: 12.5, lineHeight: 1.6, color: theme.inkSoft }}>
+                  Other properties from the same government inventory, close enough to matter. Each
+                  line lists what we can verify from here — whether one beats the property above
+                  comes down to price and condition, and every card opens the same full chart so
+                  you can compare like for like.
+                </span>
                 {props.similarHomes?.map((home) => (
                   <a
                     key={home.id}
@@ -561,6 +569,11 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                         {home.distanceMiles != null ? ` · ~${home.distanceMiles} mi away` : ""} · {home.sourceLabel}
                         {home.isCurrent ? "" : ` · ${home.vintage}`}
                       </span>
+                      {(home.signals?.length ?? 0) > 0 && (
+                        <span style={{ fontSize: 11.5, lineHeight: 1.5, color: theme.inkSoft }}>
+                          {home.signals?.join(" · ")}
+                        </span>
+                      )}
                     </span>
                     <span style={{ fontSize: 13, fontWeight: 800, color: theme.accent, whiteSpace: "nowrap" }}>
                       {home.priceLabel}
@@ -572,8 +585,9 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                 ))}
                 <span style={{ fontSize: 10.5, color: theme.inkFaint, lineHeight: 1.5 }}>
                   From the government-listing inventory Furlong tracks (HUD, USDA, Treasury, GSA) —
-                  not the whole market. A local agent will see more; these are the ones we can verify.
-                  Each opens its own chart.
+                  not the whole market. A local agent will see more; these are the ones we can
+                  verify. See a listing somewhere else? Paste its link or address into Furlong and
+                  it gets the same chart.
                 </span>
               </div>
             </Waypoint>

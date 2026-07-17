@@ -2749,6 +2749,41 @@ export function PropertyEvaluationWorkspace({
   ]
     .filter(Boolean)
     .join(" ");
+  // The case, honestly (founder direction 2026-07-17: the report should say
+  // WHY someone might buy or walk — argued from verified facts, never a
+  // verdict; good-buy-or-pass turns on price and condition, which stay
+  // the reader's to establish).
+  const cardPriceContext =
+    ownershipContext && listedPrice != null ? buildPriceContext(listedPrice, ownershipContext) : null;
+  const caseForBits = [
+    ...cardGreenFlags.slice(0, 3).map((flag) => `${flag.label.toLowerCase()} — ${flag.value}`),
+    cardPriceContext && cardPriceContext.ratio <= 1.0
+      ? `priced at about ${Math.round(cardPriceContext.ratio * 100)}% of the county's typical home value`
+      : null,
+    ownershipContext?.taxContext && ownershipContext.taxContext.effectiveRatePct < 1.0
+      ? `county property taxes run light (~${ownershipContext.taxContext.effectiveRatePct}% of value per year)`
+      : null,
+    (analysisContext.sourceId ?? "") === "hud" && workspaceProfile.id === "residential"
+      ? "as a live-in buyer you bid in the HUD owner-occupant window, before any investor is allowed"
+      : null,
+  ].filter((bit): bit is string => Boolean(bit));
+  const caseAgainstBits = [
+    "condition is unknown until an inspection — this is an as-is sale",
+    ...cardWatchFlags
+      .filter((flag) => !/condition/i.test(flag.label))
+      .slice(0, 2)
+      .map((flag) => `${flag.label.toLowerCase()} still needs an answer (${flag.value.replace(/ answers it$/, "")})`),
+    cardModel
+      ? `carrying it comfortably typically takes household income around $${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr`
+      : null,
+    cardPriceContext && cardPriceContext.ratio > 1.15
+      ? `priced above the county's typical home value — the appraisal will test it`
+      : null,
+  ].filter((bit): bit is string => Boolean(bit));
+  const cardCaseFor = caseForBits.length > 0 ? `The case for: ${caseForBits.join("; ")}.` : null;
+  const cardCaseAgainst = `The case against — or still open: ${caseAgainstBits.join("; ")}.`;
+  const cardDecisionLine =
+    "Good buy or pass? That turns on the two things nobody can verify from a distance — the negotiated price and what the inspection finds. This chart arms that decision; it never makes it. If this one doesn't fit, the nearby alternatives on the chart are the honest next look, and any listing from anywhere can be pasted in for the same treatment.";
   const cardTierLine =
     "The full chart below is free and complete. Paid tiers add the why — lender-ready packaging, county records pulls, and your personalized file.";
 
@@ -2811,6 +2846,9 @@ export function PropertyEvaluationWorkspace({
           watchFlags={cardWatchFlags}
           numbersLine={cardNumbersLine}
           overallRead={cardOverallRead}
+          caseFor={cardCaseFor}
+          caseAgainst={cardCaseAgainst}
+          decisionLine={cardDecisionLine}
           tierLine={cardTierLine}
           chartOpen={chartOpen}
           onToggleChart={() => setChartOpen((current) => !current)}

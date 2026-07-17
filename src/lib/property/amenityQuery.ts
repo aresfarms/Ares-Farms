@@ -42,6 +42,10 @@ export const AMENITY_CATEGORIES: Record<string, (t: Record<string, string>) => b
   pharmacy: (t) =>
     t.amenity === "pharmacy" || t.healthcare === "pharmacy" || t.shop === "chemist",
   healthcare: (t) => /^(hospital|clinic|doctors)$/.test(t.amenity ?? ""),
+  // Getting around (founder direction 2026-07-17): can you live here without
+  // a car? Bus stops and rail/metro stations as the map community tagged them.
+  busStop: (t) => t.highway === "bus_stop" || t.amenity === "bus_station",
+  railStation: (t) => /^(station|halt|tram_stop)$/.test(t.railway ?? ""),
 };
 
 /** Live-lookup gate — OFF by default; set AMENITY_LIVE_LOOKUP_ENABLED=true to activate. */
@@ -70,7 +74,9 @@ export async function queryAmenitiesLive(
   nwr(around:${RADIUS_M},${lat},${lon})["shop"~"^(supermarket|convenience|greengrocer|chemist)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["leisure"~"^(park|playground|dog_park)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["healthcare"="pharmacy"];
-  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors)$"];
+  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors|bus_station)$"];
+  nwr(around:${RADIUS_M},${lat},${lon})["highway"="bus_stop"];
+  nwr(around:${RADIUS_M},${lat},${lon})["railway"~"^(station|halt|tram_stop)$"];
 );
 out center tags 400;`;
   let res: Response | null = null;

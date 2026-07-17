@@ -33,6 +33,11 @@ export interface PropertyResultCardProps {
   numbersLine: string | null;
   /** 3–5 line overall read. */
   overallRead: string;
+  /** Fact-argued case lines (founder 2026-07-17): why buy, why walk — never
+      a verdict; the decision line says whose call it is. */
+  caseFor: string | null;
+  caseAgainst: string;
+  decisionLine: string;
   /** What the paid tiers add — one line, depth not withholding. */
   tierLine: string;
   chartOpen: boolean;
@@ -123,6 +128,29 @@ export function PropertyResultCard(props: PropertyResultCardProps) {
       )}
 
       <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: theme.inkSoft }}>{props.overallRead}</p>
+
+      <div
+        style={{
+          display: "grid",
+          gap: 8,
+          padding: "12px 14px",
+          border: `1px solid ${theme.plateBorder}`,
+          borderRadius: 12,
+          background: theme.plate,
+        }}
+      >
+        {props.caseFor && (
+          <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: theme.inkSoft }}>
+            <strong style={{ color: "#6fbf8f" }}>{props.caseFor.split(":")[0]}:</strong>
+            {props.caseFor.slice(props.caseFor.indexOf(":") + 1)}
+          </p>
+        )}
+        <p style={{ margin: 0, fontSize: 13, lineHeight: 1.65, color: theme.inkSoft }}>
+          <strong style={{ color: "#e2b34c" }}>{props.caseAgainst.split(":")[0]}:</strong>
+          {props.caseAgainst.slice(props.caseAgainst.indexOf(":") + 1)}
+        </p>
+        <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.65, color: theme.inkFaint }}>{props.decisionLine}</p>
+      </div>
 
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <button

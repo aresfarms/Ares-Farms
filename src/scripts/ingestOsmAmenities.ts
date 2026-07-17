@@ -55,6 +55,9 @@ const CATEGORIES: Record<string, (t: Record<string, string>) => boolean> = {
   pharmacy: (t) =>
     t.amenity === "pharmacy" || t.healthcare === "pharmacy" || t.shop === "chemist",
   healthcare: (t) => /^(hospital|clinic|doctors)$/.test(t.amenity ?? ""),
+  // Getting around (founder direction 2026-07-17) — mirrors amenityQuery.ts.
+  busStop: (t) => t.highway === "bus_stop" || t.amenity === "bus_station",
+  railStation: (t) => /^(station|halt|tram_stop)$/.test(t.railway ?? ""),
 };
 
 function haversineMiles(aLat: number, aLon: number, bLat: number, bLon: number): number {
@@ -82,7 +85,9 @@ async function queryAmenities(lat: number, lon: number): Promise<Fact | null> {
   nwr(around:${RADIUS_M},${lat},${lon})["shop"~"^(supermarket|convenience|greengrocer|chemist)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["leisure"~"^(park|playground|dog_park)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["healthcare"="pharmacy"];
-  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors)$"];
+  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors|bus_station)$"];
+  nwr(around:${RADIUS_M},${lat},${lon})["highway"="bus_stop"];
+  nwr(around:${RADIUS_M},${lat},${lon})["railway"~"^(station|halt|tram_stop)$"];
 );
 out center tags 400;`;
   const res = await fetch(OVERPASS, {

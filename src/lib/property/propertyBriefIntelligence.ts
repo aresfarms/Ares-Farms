@@ -26,12 +26,14 @@ import { designatedHubzoneForProperty } from "./propertyHubzones";
 import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
+import { findCanonicalPropertyById } from "./propertyData";
 import {
   classifyPropertyProfile,
   profileCostLines,
   profileQuestionLines,
   type PropertyProfile,
 } from "./propertyProfile";
+import { parseAcres } from "./propertyTypes";
 import {
   PROPERTY_TENURE_FACTS,
   PROPERTY_TENURE_PROVENANCE,
@@ -390,6 +392,20 @@ function livingHereStrip(amenities: AmenityFacts, radiusMiles: number): LivingHe
   const parksCount = (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0);
   if (parksCount > 0) {
     items.push({ label: "Parks & playgrounds", value: `${parksCount} within ${radiusMiles} mi` });
+  }
+  // Getting around (founder direction 2026-07-17): can you live here without
+  // a car? Renders only when the snapshot carries the transit categories
+  // (older snapshots predate them and simply omit the line).
+  const bus = amenities.busStop;
+  const rail = amenities.railStation;
+  if (bus || rail) {
+    const bits: string[] = [];
+    if (bus && bus.count > 0 && bus.nearestMiles !== null) bits.push(`bus stop ${bus.nearestMiles} mi`);
+    if (rail && rail.count > 0 && rail.nearestMiles !== null) bits.push(`rail/metro ${rail.nearestMiles} mi`);
+    items.push({
+      label: "Getting around",
+      value: bits.length > 0 ? bits.join(" · ") : `no transit mapped within ${radiusMiles} mi — plan on a car`,
+    });
   }
   const vet = nearest("vet");
   const dogParks = amenities.dogPark?.count ?? 0;
@@ -764,6 +780,30 @@ function buildUnknowns(args: {
       "Government sales are as-is and our snapshot cannot see inside the building. An independent " +
       "inspection (plus a contractor walk-through where repairs look likely) is the only real answer.",
   });
+  // What you'd actually OWN (founder direction 2026-07-17): lot size, and
+  // whether the ground conveys or only the building — commercial deals and
+  // some homes separate them, and leasehold ground carries rent.
+  unknowns.push({
+    label: "Size, lot, and what conveys",
+    pointer: "County parcel viewer + deed/title search",
+    howToFind:
+      "The county parcel/GIS viewer shows the lot's exact dimensions and acreage free. The deed " +
+      "and title search confirm precisely what conveys — the ground AND the building, or the " +
+      "building only. Where the ground is leased rather than owned, the recorded ground lease " +
+      "states the rent and term; for open acreage, the county cash-rent averages above are the " +
+      "negotiation context.",
+  });
+  // Crime: official statistics only — Furlong links sources and never
+  // characterizes an area (fair-housing doctrine).
+  unknowns.push({
+    label: "Crime statistics",
+    pointer: "FBI Crime Data Explorer + local police",
+    url: "https://cde.ucr.cjis.gov/",
+    howToFind:
+      "Furlong links official statistics and never characterizes an area. The FBI's Crime Data " +
+      "Explorer publishes agency-level figures, and the local police or sheriff's office publishes " +
+      "local reports — read them alongside your own visits at different times of day.",
+  });
   const taxCounty = args.resolvedCounty
     ? `The ${args.resolvedCounty.name} treasurer/appraiser site`
     : "The county treasurer/appraiser site";
@@ -912,6 +952,47 @@ export function buildPropertyBriefIntelligence(args: {
   const isHome = profile.id === "residential";
 
   const verifiedFacts: BriefFactLine[] = [];
+
+  // Size & shape — from the source listing record where the source publishes
+  // it (founder direction 2026-07-17: "exactly how big is this property?").
+  // HUD/GSA feeds publish no size fields; the "what conveys" unknown carries
+  // the pointer for those.
+  const sourceRecord = id && !id.startsWith("imported:") ? findCanonicalPropertyById(id)?.source_records[0] : null;
+  if (sourceRecord) {
+    const acreageBit = (() => {
+      const txt = sourceRecord.acreageText;
+      if (!txt) return null;
+      const acres = parseAcres(txt);
+      if (acres !== null) return `${acres} acres`;
+      const n = Number(txt.replace(/[^0-9.]/g, ""));
+      if (!Number.isFinite(n) || n <= 0) return txt;
+      // USDA publishes bare lot square footage; convert for readability.
+      return n >= 1000
+        ? `${(n / 43560).toFixed(2)}-acre lot (${Math.round(n).toLocaleString("en-US")} sq ft)`
+        : `${n} acres`;
+    })();
+    const sizeBits = [
+      sourceRecord.bedrooms ? `${sourceRecord.bedrooms}BR` : null,
+      sourceRecord.squareFeet ? `${sourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : null,
+      acreageBit,
+      // Source feeds occasionally carry junk years ("9"); only a plausible
+      // four-digit year renders.
+      sourceRecord.yearBuilt && sourceRecord.yearBuilt >= 1700 && sourceRecord.yearBuilt <= 2100
+        ? `built ${sourceRecord.yearBuilt}`
+        : null,
+    ].filter((bit): bit is string => Boolean(bit));
+    if (sizeBits.length > 0) {
+      verifiedFacts.push({
+        label: "Size",
+        value: sizeBits.join(" · "),
+        text:
+          `Per the source listing record: ${sizeBits.join(", ")}. The county parcel record and an ` +
+          `appraisal confirm official dimensions — and the deed confirms exactly what land conveys.`,
+        provenance: "Source: the source listing record, as published",
+        tone: "neutral",
+      });
+    }
+  }
 
   // County first — it anchors taxes, floodplain administration, and permits.
   const recordCountyKnown = Boolean(args.county && !/unknown/i.test(args.county));

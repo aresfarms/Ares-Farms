@@ -78,6 +78,19 @@ function Waypoint({
   );
 }
 
+/**
+ * Signal-flag hues — distinct COLORS by meaning, not shades (founder feedback
+ * 2026-07-17). Tuned for all four dark stages: green = clear to proceed,
+ * amber = information gap, sky = fieldwork needed, violet = timing rule.
+ */
+function signalFlagColor(flag: string): string {
+  if (/looks reviewable|window open/i.test(flag)) return "#6fbf8f";
+  if (/price|not captured/i.test(flag)) return "#e2b34c";
+  if (/inspection|fieldwork/i.test(flag)) return "#6aa9d8";
+  if (/timing|window|review before/i.test(flag)) return "#b48ed0";
+  return "#9db4c4";
+}
+
 /** Short provenance cite — the "Source: …" head without verify-URL tails. */
 function shortSource(fact: BriefFactLine): string {
   return fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim();
@@ -240,27 +253,24 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
 
           <div style={{ ...plate, display: "grid", gap: 7 }}>
             <span style={kicker}>Signal flags</span>
-            {props.readiness.map((flag) => {
-              const warn = /not captured|needs|review before/i.test(flag);
-              return (
-                <span
-                  key={flag}
-                  style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12.5, color: theme.inkSoft }}
-                >
-                  <i
-                    aria-hidden
-                    style={{
-                      width: 10,
-                      height: 14,
-                      flex: "none",
-                      background: warn ? theme.warn : theme.accent,
-                      clipPath: "polygon(0 0, 100% 0, 70% 50%, 100% 100%, 0 100%)",
-                    }}
-                  />
-                  {flag}
-                </span>
-              );
-            })}
+            {props.readiness.map((flag) => (
+              <span
+                key={flag}
+                style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12.5, color: theme.inkSoft }}
+              >
+                <i
+                  aria-hidden
+                  style={{
+                    width: 10,
+                    height: 14,
+                    flex: "none",
+                    background: signalFlagColor(flag),
+                    clipPath: "polygon(0 0, 100% 0, 70% 50%, 100% 100%, 0 100%)",
+                  }}
+                />
+                {flag}
+              </span>
+            ))}
             <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, paddingTop: 8, display: "grid", gap: 4 }}>
               {props.fitLine && variant === "buyer" && (
                 <span style={{ fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>

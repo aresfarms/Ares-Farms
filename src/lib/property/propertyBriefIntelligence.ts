@@ -695,10 +695,10 @@ function buildUnknowns(args: {
     });
     unknowns.push({
       label: "HOA or covenants",
-      pointer: "County register of deeds",
+      pointer: "Seller disclosure + title search",
       howToFind:
-        "Recorded covenants and any HOA appear in the county register of deeds records for the " +
-        "parcel; the title search during purchase will surface them definitively.",
+        "Ask the seller or listing agent for any HOA and recorded covenants up front; the title " +
+        "search during purchase surfaces them definitively.",
     });
   }
   return unknowns;

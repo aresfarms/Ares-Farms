@@ -23,6 +23,8 @@ const ROOT = process.cwd();
 
 const SCANNED_FILES = [
   "src/lib/property/propertyBriefIntelligence.ts",
+  "src/lib/property/chartThemes.ts",
+  "src/components/property/ChartTableBrief.tsx",
   "src/components/property/PropertyPlaceIntelligence.tsx",
   "src/components/property/PropertyEvaluationWorkspace.tsx",
   "src/components/property/PropertyImportLaunchpad.tsx",

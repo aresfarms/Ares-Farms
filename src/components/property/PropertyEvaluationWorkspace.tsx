@@ -10,6 +10,7 @@ import {
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import { ChartTableBrief } from "@/components/property/ChartTableBrief";
+import type { ChartVariant } from "@/lib/property/chartThemes";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import { reportTierIdentity, type ReportTierIdentity } from "@/lib/reports/reportTierIdentity";
@@ -1670,12 +1671,15 @@ export function PropertyEvaluationWorkspace({
   tierPreviewMode,
   addressFirstFlow,
   placeIntelligence = null,
+  chartVariant = "buyer",
 }: {
   context: PropertyContext;
   tierPreviewMode: boolean;
   addressFirstFlow?: DiscoveryFlow | null;
   /** Server-computed snapshot place facts (spec 2026-07-15) — feeds the report's place-facts section. */
   placeIntelligence?: PropertyBriefIntelligence | null;
+  /** Chart Table audience lens (buyer | environmental | finance | commercial). */
+  chartVariant?: ChartVariant;
 }) {
   const [navigator, setNavigator] = useState<NavigatorSnapshot | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
@@ -2460,6 +2464,7 @@ export function PropertyEvaluationWorkspace({
   return (
     <section style={{ display: "grid", gap: 22 }}>
       <ChartTableBrief
+        variant={chartVariant}
         title={context.title}
         location={`${context.location}${context.exactAddress ? ` · ${context.exactAddress}` : ""}`}
         sourceLabel={analysisContext.sourceLabel}

@@ -4,6 +4,7 @@ import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyEvaluationWorkspace } from "@/components/property/PropertyEvaluationWorkspace";
 import { PropertyPlaceIntelligence } from "@/components/property/PropertyPlaceIntelligence";
 import { buildPropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
+import type { ChartVariant } from "@/lib/property/chartThemes";
 import { resolveDiscoveryFlow, isPlaceFirstFlow } from "@/lib/discovery/discoveryFlow";
 
 /**
@@ -220,6 +221,15 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
   // from frozen snapshots, then fed to BOTH the report engine (the report's
   // place-facts section — including explicit negatives with provenance) and
   // the standalone Place Intelligence cards below the workspace.
+  // Chart Table audience lens: explicit ?lens= wins; commercial-shaped
+  // property types default to the commercial chart; homes stay buyer.
+  const lensParam = one(query.lens);
+  const chartVariant: ChartVariant =
+    lensParam === "environmental" || lensParam === "finance" || lensParam === "commercial" || lensParam === "buyer"
+      ? lensParam
+      : propertyContext && !/home|residential|house/i.test(propertyContext.propertyType)
+        ? "commercial"
+        : "buyer";
   const briefIntelligence = propertyContext
     ? buildPropertyBriefIntelligence({
         propertyId: propertyContext.propertyId,
@@ -243,6 +253,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
             context={propertyContext}
             tierPreviewMode={tierPreviewMode}
             placeIntelligence={briefIntelligence}
+            chartVariant={chartVariant}
           />
         </>
       ) : (

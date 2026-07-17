@@ -2,98 +2,50 @@ import type {
   BriefFactLine,
   PropertyBriefIntelligence,
 } from "@/lib/property/propertyBriefIntelligence";
+import {
+  CHART_LENS_COPY,
+  CHART_THEMES,
+  orderFactsForLens,
+  type ChartVariant,
+} from "@/lib/property/chartThemes";
 
 /**
- * ChartTableBrief — the "Chart Table" presentation of the free Place Brief
- * (founder-selected concept, 2026-07-16: compass-to-capital literalized).
+ * ChartTableBrief — the "Chart Table" presentation family (founder-selected
+ * concept 2026-07-16, extended same day to all audience lenses).
  *
- * A navigator's chart: a FIXED instrument panel (the answer + signal flags —
- * never scrolls away) beside a plotted route of five waypoints:
- *   I. The place, verified   → sourced facts (value-first, provenance on expand)
- *   II. Living here          → amenity distances
- *   III. How the deal works  → sale mechanics steps + how people pay
- *   IV. Uncharted            → honest unknowns with the official pointer
- *   V. Your next move        → export actions + deeper-waters tiers
+ * One chart language — a FIXED instrument panel (the answer + signal flags,
+ * never scrolls away) beside a plotted route of waypoints — themed per lens:
+ * buyer (navigator teal/gold), environmental (surveyor green), finance
+ * (ledger gold/slate, bankers), commercial (harbor copper).
  *
- * PRESENTATION ONLY: consumes the same PropertyBriefIntelligence the exports
- * use — no new data paths, no governed logic here. Interpretation stays
- * labeled (plain-language read); facts carry sources; unknowns stay honest.
- * Copy rules enforced by verify:brief-copy. Tier names carry NO pricing
- * (tier economics are founder-gated).
+ * PRESENTATION ONLY: every lens consumes the same PropertyBriefIntelligence
+ * the exports use — a lens reorders and reframes; it never invents data.
+ * The finance lens is facts + open items ONLY (no products, terms, rates, or
+ * eligibility — FINANCING_NODE_LIVE stays false; counsel gate respected).
+ * Copy rules enforced by verify:brief-copy. Tier names carry NO pricing.
  */
-
-const GOLD = "#d4b06a";
-const INK = "#dce8ee";
-const PLATE_BORDER = "#2c5876";
-
-const plate: React.CSSProperties = {
-  background: "linear-gradient(160deg, #12354a, #0d283a)",
-  border: `1px solid ${PLATE_BORDER}`,
-  borderRadius: 12,
-  padding: "16px 18px",
-};
-
-const kicker: React.CSSProperties = {
-  fontSize: 10,
-  fontWeight: 800,
-  letterSpacing: "0.2em",
-  textTransform: "uppercase",
-  color: GOLD,
-};
-
-const factCell: React.CSSProperties = {
-  background: "rgba(9, 28, 41, 0.8)",
-  border: "1px solid #234a63",
-  borderRadius: 8,
-  padding: "8px 11px",
-};
-
-const factLab: React.CSSProperties = {
-  fontSize: 9.5,
-  fontWeight: 800,
-  letterSpacing: "0.12em",
-  textTransform: "uppercase",
-  color: "#7ea4bb",
-};
-
-const factVal: React.CSSProperties = {
-  fontSize: 13.5,
-  fontWeight: 700,
-  color: "#eaf3f7",
-  marginTop: 2,
-  lineHeight: 1.35,
-};
-
-const factSrc: React.CSSProperties = {
-  fontSize: 10,
-  color: "#5b7f95",
-  marginTop: 3,
-  fontFamily: "ui-monospace, 'Courier New', monospace",
-};
-
-const expandSummary: React.CSSProperties = {
-  cursor: "pointer",
-  listStyle: "none",
-  fontSize: 10.5,
-  color: "#6f96ac",
-  marginTop: 4,
-};
 
 function Waypoint({
   pt,
   title,
+  accent,
+  bg,
+  border,
   children,
 }: {
   pt: string;
   title: string;
+  accent: string;
+  bg: string;
+  border: string;
   children: React.ReactNode;
 }) {
   return (
     <div
       style={{
         position: "relative",
-        background: "rgba(16, 45, 64, 0.74)",
-        border: "1px solid #29536f",
+        background: bg,
+        border: `1px solid ${border}`,
         borderRadius: 12,
         padding: "15px 18px",
       }}
@@ -107,9 +59,9 @@ function Waypoint({
           width: 24,
           height: 24,
           borderRadius: "50%",
-          background: "#0c2233",
-          border: `2px solid ${GOLD}`,
-          color: GOLD,
+          background: "rgba(0,0,0,0.35)",
+          border: `2px solid ${accent}`,
+          color: accent,
           fontSize: 11,
           fontWeight: 900,
           display: "grid",
@@ -118,7 +70,7 @@ function Waypoint({
       >
         {pt}
       </span>
-      <h3 style={{ margin: "0 0 10px", fontSize: 15, color: "#f2f7fa", letterSpacing: "0.02em" }}>
+      <h3 style={{ margin: "0 0 10px", fontSize: 15, color: "inherit", letterSpacing: "0.02em" }}>
         {title}
       </h3>
       {children}
@@ -132,6 +84,7 @@ function shortSource(fact: BriefFactLine): string {
 }
 
 export interface ChartTableBriefProps {
+  variant?: ChartVariant;
   title: string;
   location: string;
   sourceLabel: string;
@@ -145,30 +98,105 @@ export interface ChartTableBriefProps {
   pauseLine: string;
   intelligence: PropertyBriefIntelligence | null;
   financingLanes: string[];
-  /** Export/save buttons — rendered inside waypoint V. */
+  /** Export/save buttons — rendered inside the final waypoint. */
   actionsSlot?: React.ReactNode;
-  /** Deeper analysis workspace + switch-property rail — rendered after the route. */
-  deeperSlot?: React.ReactNode;
 }
 
 export function ChartTableBrief(props: ChartTableBriefProps) {
+  const variant: ChartVariant = props.variant ?? "buyer";
+  const theme = CHART_THEMES[variant];
+  const lens = CHART_LENS_COPY[variant];
+
+  const kicker: React.CSSProperties = {
+    fontSize: 10,
+    fontWeight: 800,
+    letterSpacing: "0.2em",
+    textTransform: "uppercase",
+    color: theme.accent,
+  };
+  const plate: React.CSSProperties = {
+    background: theme.plate,
+    border: `1px solid ${theme.plateBorder}`,
+    borderRadius: 12,
+    padding: "16px 18px",
+  };
+  const factCell: React.CSSProperties = {
+    background: theme.cellBg,
+    border: `1px solid ${theme.cellBorder}`,
+    borderRadius: 8,
+    padding: "8px 11px",
+  };
+  const factLab: React.CSSProperties = {
+    fontSize: 9.5,
+    fontWeight: 800,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase",
+    color: theme.inkSoft,
+  };
+  const factVal: React.CSSProperties = {
+    fontSize: 13.5,
+    fontWeight: 700,
+    color: theme.ink,
+    marginTop: 2,
+    lineHeight: 1.35,
+  };
+  const factSrc: React.CSSProperties = {
+    fontSize: 10,
+    color: theme.inkFaint,
+    marginTop: 3,
+    fontFamily: "ui-monospace, 'Courier New', monospace",
+  };
+  const expandSummary: React.CSSProperties = {
+    cursor: "pointer",
+    listStyle: "none",
+    fontSize: 10.5,
+    color: theme.inkFaint,
+    marginTop: 4,
+  };
+
   const intelligence = props.intelligence;
-  const facts = (intelligence?.verifiedFacts ?? []).filter(
-    (fact) => fact.label !== "Daily life nearby"
+  const facts = orderFactsForLens(
+    (intelligence?.verifiedFacts ?? []).filter((fact) => fact.label !== "Daily life nearby"),
+    variant
   );
-  const livingHere = intelligence?.livingHere ?? null;
+  const livingHere = lens.showLiving ? intelligence?.livingHere ?? null : null;
   const mechanics = intelligence?.mechanics ?? null;
-  const unknowns = intelligence?.unknowns ?? [];
+  const unknowns = [
+    ...(intelligence?.unknowns ?? []),
+    ...lens.extraUnknowns,
+  ];
+  const headline = lens.headline || props.headline;
+
+  // Waypoint numbering stays sequential per lens (some waypoints are absent).
+  const numerals = ["I", "II", "III", "IV", "V"];
+  let wp = 0;
+  const nextPt = () => numerals[Math.min(wp++, numerals.length - 1)];
+
+  const tierLines = [
+    {
+      key: "coordination",
+      color: "#d4b06a",
+      width: 46,
+      text: "Institutional Coordination Report — financing coordination & program mapping",
+    },
+    {
+      key: "environmental",
+      color: "#5f9450",
+      width: 74,
+      text: "Environmental Screen — site history and environmental context",
+    },
+  ].sort((a, b) => (a.key === lens.tierLead ? -1 : b.key === lens.tierLead ? 1 : 0));
 
   return (
     <section
       aria-label="Place brief chart"
       data-testid="chart-table-brief"
+      data-chart-variant={variant}
       style={{
-        background: "linear-gradient(180deg, #0c2233, #0a1b29 60%, #081521)",
+        background: theme.stage,
         borderRadius: 20,
         padding: "30px 22px 34px",
-        color: INK,
+        color: theme.ink,
       }}
     >
       <div
@@ -182,30 +210,30 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
         {/* ── Instrument panel — the answer never scrolls out of view ── */}
         <aside style={{ position: "sticky", top: 16, display: "grid", gap: 12 }}>
           <div style={plate}>
-            <span style={kicker}>The fix on this property</span>
-            <h2 style={{ margin: "6px 0 2px", fontSize: 20, color: "#f2f7fa", lineHeight: 1.2 }}>
+            <span style={kicker}>{lens.panelKicker}</span>
+            <h2 style={{ margin: "6px 0 2px", fontSize: 20, color: theme.ink, lineHeight: 1.2 }}>
               {props.title}
             </h2>
-            <span style={{ fontSize: 12.5, color: "#8fb0c4", display: "block" }}>
+            <span style={{ fontSize: 12.5, color: theme.inkSoft, display: "block" }}>
               {props.propertyType} · {props.sourceLabel}
               {props.fileNo ? ` · #${props.fileNo}` : ""}
             </span>
-            <span style={{ fontSize: 12.5, color: "#8fb0c4", display: "block" }}>
+            <span style={{ fontSize: 12.5, color: theme.inkSoft, display: "block" }}>
               {props.location} · {props.priceLabel}
             </span>
             <p
               style={{
                 fontSize: 14.5,
                 lineHeight: 1.55,
-                color: "#cfe0ea",
+                color: theme.inkSoft,
                 margin: "10px 0 0",
-                borderTop: "1px dashed #2c5876",
+                borderTop: `1px dashed ${theme.plateBorder}`,
                 paddingTop: 10,
               }}
             >
-              {props.headline}
+              {headline}
             </p>
-            <span style={{ fontSize: 10, color: "#6f96ac", display: "block", marginTop: 6 }}>
+            <span style={{ fontSize: 10, color: theme.inkFaint, display: "block", marginTop: 6 }}>
               Plain-language read — not an approval or determination.
             </span>
           </div>
@@ -217,7 +245,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
               return (
                 <span
                   key={flag}
-                  style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12.5, color: "#b7ccd9" }}
+                  style={{ display: "flex", alignItems: "center", gap: 9, fontSize: 12.5, color: theme.inkSoft }}
                 >
                   <i
                     aria-hidden
@@ -225,7 +253,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                       width: 10,
                       height: 14,
                       flex: "none",
-                      background: warn ? "#cf8a4a" : GOLD,
+                      background: warn ? theme.warn : theme.accent,
                       clipPath: "polygon(0 0, 100% 0, 70% 50%, 100% 100%, 0 100%)",
                     }}
                   />
@@ -233,28 +261,21 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                 </span>
               );
             })}
-            <div style={{ borderTop: "1px dashed #2c5876", paddingTop: 8, display: "grid", gap: 4 }}>
-              {props.fitLine && (
-                <span style={{ fontSize: 12, lineHeight: 1.55, color: "#b7ccd9" }}>
-                  <strong style={{ color: "#7fc4b8" }}>Fits if you want:</strong> {props.fitLine}.
+            <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, paddingTop: 8, display: "grid", gap: 4 }}>
+              {props.fitLine && variant === "buyer" && (
+                <span style={{ fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>
+                  <strong style={{ color: theme.accent }}>Fits if you want:</strong> {props.fitLine}.
                 </span>
               )}
-              <span style={{ fontSize: 12, lineHeight: 1.55, color: "#b7ccd9" }}>
-                <strong style={{ color: "#e8c088" }}>Pause if you need:</strong> {props.pauseLine}.
+              <span style={{ fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>
+                <strong style={{ color: theme.warn }}>Pause if you need:</strong> {props.pauseLine}.
               </span>
             </div>
           </div>
         </aside>
 
-        {/* ── The route — five waypoints down the chart ── */}
-        <main
-          style={{
-            position: "relative",
-            paddingLeft: 34,
-            display: "grid",
-            gap: 14,
-          }}
-        >
+        {/* ── The route — waypoints down the chart ── */}
+        <main style={{ position: "relative", paddingLeft: 34, display: "grid", gap: 14 }}>
           <span
             aria-hidden
             style={{
@@ -262,11 +283,11 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
               left: 12,
               top: 18,
               bottom: 30,
-              borderLeft: "2px dashed #3e6d8e",
+              borderLeft: `2px dashed ${theme.waypointBorder}`,
             }}
           />
           {facts.length > 0 && (
-            <Waypoint pt="I" title="The place, verified">
+            <Waypoint pt={nextPt()} title={lens.waypointFacts} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
                 {facts.map((fact) => (
                   <div key={fact.label} style={factCell}>
@@ -275,7 +296,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                     <div style={factSrc}>{shortSource(fact)}</div>
                     <details>
                       <summary style={expandSummary}>full fact ▸</summary>
-                      <div style={{ fontSize: 11.5, lineHeight: 1.6, color: "#a9c3d2", marginTop: 4 }}>
+                      <div style={{ fontSize: 11.5, lineHeight: 1.6, color: theme.inkSoft, marginTop: 4 }}>
                         {fact.text}
                         <div style={{ ...factSrc, marginTop: 4 }}>{fact.provenance}</div>
                       </div>
@@ -287,7 +308,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           )}
 
           {livingHere && livingHere.items.length > 0 && (
-            <Waypoint pt="II" title="Living here, in distances">
+            <Waypoint pt={nextPt()} title={lens.waypointLiving} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
                 {livingHere.items.map((item) => (
                   <div key={item.label} style={factCell}>
@@ -301,30 +322,30 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           )}
 
           {mechanics && (
-            <Waypoint pt="III" title={mechanics.heading}>
-              <div style={{ display: "grid", gap: 8, fontSize: 13, color: "#c3d6e1" }}>
+            <Waypoint pt={nextPt()} title={mechanics.heading} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+              <div style={{ display: "grid", gap: 8, fontSize: 13, color: theme.inkSoft }}>
                 {mechanics.stepTitles.map((stepTitle, index) => (
                   <div key={stepTitle}>
-                    <strong style={{ color: "#eaf3f7" }}>{stepTitle}</strong>
+                    <strong style={{ color: theme.ink }}>{stepTitle}</strong>
                     <details>
                       <summary style={expandSummary}>the details ▸</summary>
-                      <p style={{ margin: "4px 0 0", fontSize: 12.5, lineHeight: 1.6, color: "#a9c3d2" }}>
+                      <p style={{ margin: "4px 0 0", fontSize: 12.5, lineHeight: 1.6, color: theme.inkSoft }}>
                         {mechanics.paragraphs[index] ?? ""}
                       </p>
                     </details>
                   </div>
                 ))}
               </div>
-              {(props.financingLanes.length > 0 || intelligence?.pathwaysProse) && (
-                <div style={{ borderTop: "1px dashed #2c5876", marginTop: 12, paddingTop: 10, display: "grid", gap: 6 }}>
+              {variant !== "finance" && (props.financingLanes.length > 0 || intelligence?.pathwaysProse) && (
+                <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, marginTop: 12, paddingTop: 10, display: "grid", gap: 6 }}>
                   <span style={kicker}>How people typically pay</span>
                   {props.financingLanes.map((lane) => (
-                    <span key={lane} style={{ fontSize: 13, fontWeight: 700, color: "#eaf3f7" }}>{lane}</span>
+                    <span key={lane} style={{ fontSize: 13, fontWeight: 700, color: theme.ink }}>{lane}</span>
                   ))}
                   {intelligence?.pathwaysProse && (
                     <details>
                       <summary style={expandSummary}>the full picture ▸</summary>
-                      <p style={{ margin: "4px 0 0", fontSize: 12.5, lineHeight: 1.6, color: "#a9c3d2" }}>
+                      <p style={{ margin: "4px 0 0", fontSize: 12.5, lineHeight: 1.6, color: theme.inkSoft }}>
                         {intelligence.pathwaysProse}
                       </p>
                     </details>
@@ -335,15 +356,15 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           )}
 
           {unknowns.length > 0 && (
-            <Waypoint pt="IV" title="Uncharted — what nobody can tell you yet">
+            <Waypoint pt={nextPt()} title={lens.waypointUncharted} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
                 {unknowns.map((unknown) => (
                   <div key={unknown.label} style={factCell}>
                     <div style={factLab}>{unknown.label}</div>
-                    <div style={{ ...factVal, color: "#e8c088" }}>{unknown.pointer}</div>
+                    <div style={{ ...factVal, color: theme.warn }}>{unknown.pointer}</div>
                     <details>
                       <summary style={expandSummary}>how exactly ▸</summary>
-                      <div style={{ fontSize: 11.5, lineHeight: 1.6, color: "#a9c3d2", marginTop: 4 }}>
+                      <div style={{ fontSize: 11.5, lineHeight: 1.6, color: theme.inkSoft, marginTop: 4 }}>
                         {unknown.howToFind}
                       </div>
                     </details>
@@ -353,26 +374,24 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
             </Waypoint>
           )}
 
-          <Waypoint pt="V" title="Your next move">
+          <Waypoint pt={nextPt()} title={lens.waypointNext} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
             <div style={{ display: "grid", gap: 12 }}>
-              <span style={{ fontSize: 13, color: "#c3d6e1", lineHeight: 1.55 }}>
+              <span style={{ fontSize: 13, color: theme.inkSoft, lineHeight: 1.55 }}>
                 Take the brief with you — the export carries every fact, source, and open item on
                 this chart.
               </span>
               {props.actionsSlot}
-              <div style={{ borderTop: "1px solid #29536f", paddingTop: 12 }}>
+              <div style={{ borderTop: `1px solid ${theme.waypointBorder}`, paddingTop: 12 }}>
                 <span style={kicker}>Deeper waters — charted, not yet sailed</span>
                 <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                  <span style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 12.5, color: "#b7ccd9" }}>
-                    <span aria-hidden style={{ width: 46, height: 8, borderRadius: 4, background: GOLD, flex: "none" }} />
-                    Institutional Coordination Report — financing coordination &amp; program mapping
-                  </span>
-                  <span style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 12.5, color: "#b7ccd9" }}>
-                    <span aria-hidden style={{ width: 74, height: 8, borderRadius: 4, background: "#5f9450", flex: "none" }} />
-                    Environmental Screen — site history and environmental context
-                  </span>
+                  {tierLines.map((tier) => (
+                    <span key={tier.key} style={{ display: "flex", gap: 10, alignItems: "center", fontSize: 12.5, color: theme.inkSoft }}>
+                      <span aria-hidden style={{ width: tier.width, height: 8, borderRadius: 4, background: tier.color, flex: "none" }} />
+                      {tier.text}
+                    </span>
+                  ))}
                 </div>
-                <span style={{ fontSize: 10.5, color: "#6f96ac", display: "block", marginTop: 8 }}>
+                <span style={{ fontSize: 10.5, color: theme.inkFaint, display: "block", marginTop: 8 }}>
                   {props.tierLabel} — this free chart stays complete and exportable either way.
                 </span>
               </div>
@@ -380,7 +399,6 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
           </Waypoint>
         </main>
       </div>
-      {props.deeperSlot && <div style={{ marginTop: 18 }}>{props.deeperSlot}</div>}
     </section>
   );
 }

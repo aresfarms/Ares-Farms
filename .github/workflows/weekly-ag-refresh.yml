@@ -53,7 +53,8 @@ jobs:
           if git diff --quiet -- src/lib/property/stateDroughtGenerated.ts \
                src/lib/property/stateCropConditionsGenerated.ts \
                src/lib/property/commodityPricesGenerated.ts \
-               src/lib/property/stateGrainBidsGenerated.ts; then
+               src/lib/property/stateGrainBidsGenerated.ts \
+               src/lib/property/inputCostsGenerated.ts; then
             echo "No agricultural-data changes this week — nothing to PR."
             exit 0
           fi
@@ -65,7 +66,8 @@ jobs:
           git add src/lib/property/stateDroughtGenerated.ts \
                   src/lib/property/stateCropConditionsGenerated.ts \
                   src/lib/property/commodityPricesGenerated.ts \
-                  src/lib/property/stateGrainBidsGenerated.ts
+                  src/lib/property/stateGrainBidsGenerated.ts \
+                  src/lib/property/inputCostsGenerated.ts
           git commit -m "Weekly ag data refresh — ${STAMP} (drought, crop conditions, grain bids, prices)"
           git push --set-upstream origin "$BRANCH"
           gh pr create \

@@ -349,7 +349,7 @@
     "ingest:nass-farmland": "tsx src/scripts/ingestNassFarmland.ts",
     "ingest:nass-input-costs": "tsx src/scripts/ingestNassInputCosts.ts",
     "ingest:ams-grain-bids": "tsx src/scripts/ingestAmsGrainBids.ts",
-    "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids"
+    "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids && npm run ingest:nass-input-costs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

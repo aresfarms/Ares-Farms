@@ -343,13 +343,15 @@ function amenityFactLine(
     value: shortBits.charAt(0).toUpperCase() + shortBits.slice(1),
     text:
       `Within ~${radiusMiles} miles: ${part("grocery", "grocery/market", "groceries/markets")}; ` +
-      `${part("dining", "restaurant/cafe", "restaurants/cafes/bars")}; ` +
+      `${part("dining", "restaurant/cafe", "restaurants/cafes")}; ` +
       `${part("pharmacy", "pharmacy", "pharmacies")}; ` +
       `${part("healthcare", "clinic/hospital", "clinics/hospitals")}; ` +
       `${parksCount > 0 ? `${parksCount} parks/playgrounds` : "no parks/playgrounds mapped"}` +
       `${(amenities.dogPark?.count ?? 0) > 0 ? `; ${amenities.dogPark.count} dog park(s)` : ""}` +
       `${(amenities.vet?.count ?? 0) > 0 ? `; vet ~${amenities.vet.nearestMiles} mi` : "; no vet mapped"}. ` +
-      `"Not mapped" means absent from OpenStreetMap — rural coverage can lag reality.`,
+      `"Not mapped" means absent from OpenStreetMap — rural coverage can lag reality, and ` +
+      `venue names and categories are as the map community tagged them; check a place before ` +
+      `you count on it.`,
     provenance,
     tone: "neutral",
   };
@@ -393,7 +395,7 @@ function livingHereStrip(amenities: AmenityFacts, radiusMiles: number): LivingHe
   return {
     radiusMiles,
     items,
-    attribution: "© OpenStreetMap contributors (ODbL) — \"not mapped\" means absent from OpenStreetMap; rural coverage can lag reality.",
+    attribution: "© OpenStreetMap contributors (ODbL) — \"not mapped\" means absent from OpenStreetMap; names and categories are as the map community tagged them, so check a place before you count on it.",
   };
 }
 

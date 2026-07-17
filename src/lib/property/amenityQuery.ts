@@ -35,7 +35,10 @@ export const AMENITY_CATEGORIES: Record<string, (t: Record<string, string>) => b
   playground: (t) => t.leisure === "playground",
   dogPark: (t) => t.leisure === "dog_park",
   vet: (t) => t.amenity === "veterinary",
-  dining: (t) => /^(restaurant|cafe|bar|pub|fast_food)$/.test(t.amenity ?? ""),
+  // Bars/pubs are deliberately EXCLUDED: a bar headlining "Dinner out" is a
+  // mischaracterization (founder-reported 2026-07-17 — a biker bar rendered
+  // as the nearest restaurant). Dining = places whose primary tag is food.
+  dining: (t) => /^(restaurant|cafe|fast_food)$/.test(t.amenity ?? ""),
   pharmacy: (t) =>
     t.amenity === "pharmacy" || t.healthcare === "pharmacy" || t.shop === "chemist",
   healthcare: (t) => /^(hospital|clinic|doctors)$/.test(t.amenity ?? ""),
@@ -67,7 +70,7 @@ export async function queryAmenitiesLive(
   nwr(around:${RADIUS_M},${lat},${lon})["shop"~"^(supermarket|convenience|greengrocer|chemist)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["leisure"~"^(park|playground|dog_park)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["healthcare"="pharmacy"];
-  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|bar|pub|fast_food|pharmacy|hospital|clinic|doctors)$"];
+  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors)$"];
 );
 out center tags 400;`;
   let res: Response | null = null;

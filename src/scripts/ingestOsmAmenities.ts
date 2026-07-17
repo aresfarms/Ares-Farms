@@ -48,7 +48,8 @@ const CATEGORIES: Record<string, (t: Record<string, string>) => boolean> = {
   playground: (t) => t.leisure === "playground",
   dogPark: (t) => t.leisure === "dog_park",
   vet: (t) => t.amenity === "veterinary",
-  dining: (t) => /^(restaurant|cafe|bar|pub|fast_food)$/.test(t.amenity ?? ""),
+  // Bars/pubs excluded — see amenityQuery.ts (founder-reported 2026-07-17).
+  dining: (t) => /^(restaurant|cafe|fast_food)$/.test(t.amenity ?? ""),
   // Pharmacies are tagged inconsistently — amenity=pharmacy, healthcare=pharmacy,
   // or shop=chemist (common for rural/grocery-attached counters).
   pharmacy: (t) =>
@@ -81,7 +82,7 @@ async function queryAmenities(lat: number, lon: number): Promise<Fact | null> {
   nwr(around:${RADIUS_M},${lat},${lon})["shop"~"^(supermarket|convenience|greengrocer|chemist)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["leisure"~"^(park|playground|dog_park)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["healthcare"="pharmacy"];
-  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|bar|pub|fast_food|pharmacy|hospital|clinic|doctors)$"];
+  nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors)$"];
 );
 out center tags 400;`;
   const res = await fetch(OVERPASS, {

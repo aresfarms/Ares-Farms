@@ -26,6 +26,8 @@ import { designatedHubzoneForProperty } from "./propertyHubzones";
 import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
+import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
+import { US_AIRPORTS } from "./usAirportsGenerated";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
 import { townCharacterFact } from "./townCharacterCurated";
@@ -409,6 +411,22 @@ function livingHereStrip(amenities: AmenityFacts, radiusMiles: number): LivingHe
       value: bits.length > 0 ? bits.join(" · ") : `no transit mapped within ${radiusMiles} mi — plan on a car`,
     });
   }
+  // Right-next-door checks (founder 2026-07-17): active tracks close enough
+  // to hear, and whether a mapped road reaches the parcel at all.
+  const railLine = amenities.railLine;
+  if (railLine && railLine.count > 0 && railLine.nearestMiles !== null && railLine.nearestMiles <= 0.5) {
+    items.push({
+      label: "Rail line",
+      value: `active tracks ~${railLine.nearestMiles} mi — visit and listen`,
+    });
+  }
+  const road = amenities.roadNearby;
+  if (road && road.count === 0) {
+    items.push({
+      label: "Road access",
+      value: "no mapped road within ~800 ft — confirm how you legally get there",
+    });
+  }
   const vet = nearest("vet");
   const dogParks = amenities.dogPark?.count ?? 0;
   if (vet || dogParks > 0) {
@@ -509,6 +527,62 @@ function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
     provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}`,
     tone: "neutral",
   };
+}
+
+/**
+ * Airports & flight paths (founder direction 2026-07-17: an airport next
+ * door — or a 90-minute drive to the nearest one — matters BEFORE you visit,
+ * for any property type). Straight-line miles from the CC0 OurAirports data;
+ * within ~6 miles the tone flips to caution and points at FAA noise maps.
+ */
+function airportsFactFromData(d: PropertyAirportFact | null): BriefFactLine | null {
+  if (!d) return null;
+  const close = d.nearestMiles <= 6;
+  return {
+    label: "Airports & flight paths",
+    value: close
+      ? `${d.nearestName} ~${d.nearestMiles} mi — noise check advised`
+      : `${d.majorName} ~${d.majorMiles} mi`,
+    text:
+      `The nearest major (scheduled-service) airport is ${d.majorName}, about ${d.majorMiles} miles ` +
+      `straight-line${
+        d.nearestSize !== "major" || d.nearestName !== d.majorName
+          ? `; the nearest airfield of any size is ${d.nearestName}, ~${d.nearestMiles} miles`
+          : ""
+      }. ` +
+      (close
+        ? "An airport this close can mean regular overhead traffic — the FAA publishes noise-exposure maps, and an hour on-site at different times of day tells you more. "
+        : "") +
+      "Convenience and noise are the two sides of this fact — drive time is a map-app check.",
+    provenance: `Source: ${PROPERTY_AIRPORTS_PROVENANCE.source}, snapshot ${PROPERTY_AIRPORTS_PROVENANCE.asOf}`,
+    tone: close ? "caution" : "neutral",
+  };
+}
+
+/** Same fact computed live from a geocode (imported addresses). */
+function airportsFactFromCoords(lat: number, lon: number): BriefFactLine | null {
+  let nearestAny: { name: string; miles: number; size: string } | null = null;
+  let nearestMajor: { name: string; miles: number } | null = null;
+  for (const airport of US_AIRPORTS) {
+    const dLat = ((airport.lat - lat) * Math.PI) / 180;
+    const dLon = ((airport.lon - lon) * Math.PI) / 180;
+    const s =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat * Math.PI) / 180) * Math.cos((airport.lat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    const miles = 2 * 3958.8 * Math.asin(Math.sqrt(s));
+    if (!nearestAny || miles < nearestAny.miles) nearestAny = { name: airport.name, miles, size: airport.size };
+    if (airport.size === "major" && (!nearestMajor || miles < nearestMajor.miles)) {
+      nearestMajor = { name: airport.name, miles };
+    }
+  }
+  if (!nearestAny || !nearestMajor) return null;
+  return airportsFactFromData({
+    nearestName: nearestAny.name,
+    nearestMiles: Math.round(nearestAny.miles),
+    nearestSize: nearestAny.size,
+    majorName: nearestMajor.name,
+    majorMiles: Math.round(nearestMajor.miles),
+  });
 }
 
 /**
@@ -833,9 +907,26 @@ function buildUnknowns(args: {
     howToFind:
       "The county parcel/GIS viewer shows the lot's exact dimensions and acreage free. The deed " +
       "and title search confirm precisely what conveys — the ground AND the building, or the " +
-      "building only. Where the ground is leased rather than owned, the recorded ground lease " +
-      "states the rent and term; for open acreage, the county cash-rent averages above are the " +
+      "building only — and how you legally GET there: a few rural, island, and waterfront parcels " +
+      "are reachable only by boat or across someone else's land (an easement the title search " +
+      "reveals). Where the ground is leased rather than owned, the recorded ground lease states " +
+      "the rent and term; for open acreage, the county cash-rent averages above are the " +
       "negotiation context.",
+  });
+  // Connectivity (founder direction 2026-07-17): broadband, cell coverage,
+  // and delivery are the facts people discover AFTER moving in — the FCC map
+  // answers the first two at address level, free.
+  unknowns.push({
+    label: "Broadband, cell service, and delivery",
+    pointer: "FCC National Broadband Map",
+    url: "https://broadbandmap.fcc.gov/",
+    howToFind:
+      "Type the exact address into the FCC's National Broadband Map — it lists every provider " +
+      "claiming wired or wireless internet service at that location, plus mobile coverage by " +
+      "carrier. Rural parcels (and some beach communities) can be dead zones where satellite " +
+      "service (Starlink-class) is the only real option, so check before you commit, not after. " +
+      "While you're at it, open a delivery app for the address too — whether anyone will bring a " +
+      "pizza out here is an address-level truth people usually discover after moving in.",
   });
   // Crime: official statistics only — Furlong links sources and never
   // characterizes an area (fair-housing doctrine).
@@ -1168,6 +1259,9 @@ export function buildPropertyBriefIntelligence(args: {
   const townNote = townCharacterFact(args.stateCode, args.town);
   if (townNote) verifiedFacts.push(townNote);
 
+  const airports = airportsFactFromData(id ? PROPERTY_AIRPORTS[id] ?? null : null);
+  if (airports) verifiedFacts.push(airports);
+
   const hazardRisk = hazardRiskFact(fmrFips);
   if (hazardRisk) verifiedFacts.push(hazardRisk);
 
@@ -1470,6 +1564,11 @@ export async function buildLocationBriefIntelligence(args: {
 
   const locTownNote = townCharacterFact(stateCode, town);
   if (locTownNote) verifiedFacts.push(locTownNote);
+
+  if (geocode?.lat != null && geocode?.lon != null) {
+    const locAirports = airportsFactFromCoords(Number(geocode.lat), Number(geocode.lon));
+    if (locAirports) verifiedFacts.push(locAirports);
+  }
 
   const hazardRisk = hazardRiskFact(countyFips);
   if (hazardRisk) verifiedFacts.push(hazardRisk);

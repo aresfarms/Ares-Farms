@@ -58,6 +58,12 @@ const CATEGORIES: Record<string, (t: Record<string, string>) => boolean> = {
   // Getting around (founder direction 2026-07-17) — mirrors amenityQuery.ts.
   busStop: (t) => t.highway === "bus_stop" || t.amenity === "bus_station",
   railStation: (t) => /^(station|halt|tram_stop)$/.test(t.railway ?? ""),
+  // Right-next-door checks (founder 2026-07-17): active rail tracks within
+  // ~0.5 mi (trains pass — visit and listen) and whether a mapped road exists
+  // within ~800 ft at all (a few parcels are boat- or easement-access only).
+  railLine: (t) => t.railway === "rail",
+  roadNearby: (t) =>
+    /^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|track)$/.test(t.highway ?? ""),
 };
 
 function haversineMiles(aLat: number, aLon: number, bLat: number, bLon: number): number {
@@ -88,6 +94,8 @@ async function queryAmenities(lat: number, lon: number): Promise<Fact | null> {
   nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors|bus_station)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["highway"="bus_stop"];
   nwr(around:${RADIUS_M},${lat},${lon})["railway"~"^(station|halt|tram_stop)$"];
+  way(around:800,${lat},${lon})["railway"="rail"];
+  way(around:250,${lat},${lon})["highway"~"^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|track)$"];
 );
 out center tags 400;`;
   const res = await fetch(OVERPASS, {

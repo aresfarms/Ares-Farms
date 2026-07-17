@@ -46,6 +46,12 @@ export const AMENITY_CATEGORIES: Record<string, (t: Record<string, string>) => b
   // a car? Bus stops and rail/metro stations as the map community tagged them.
   busStop: (t) => t.highway === "bus_stop" || t.amenity === "bus_station",
   railStation: (t) => /^(station|halt|tram_stop)$/.test(t.railway ?? ""),
+  // Right-next-door checks (founder 2026-07-17): active rail tracks within
+  // ~0.5 mi (trains pass — visit and listen) and whether a mapped road exists
+  // within ~800 ft at all (a few parcels are boat- or easement-access only).
+  railLine: (t) => t.railway === "rail",
+  roadNearby: (t) =>
+    /^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|track)$/.test(t.highway ?? ""),
 };
 
 /** Live-lookup gate — OFF by default; set AMENITY_LIVE_LOOKUP_ENABLED=true to activate. */
@@ -77,6 +83,8 @@ export async function queryAmenitiesLive(
   nwr(around:${RADIUS_M},${lat},${lon})["amenity"~"^(veterinary|restaurant|cafe|fast_food|pharmacy|hospital|clinic|doctors|bus_station)$"];
   nwr(around:${RADIUS_M},${lat},${lon})["highway"="bus_stop"];
   nwr(around:${RADIUS_M},${lat},${lon})["railway"~"^(station|halt|tram_stop)$"];
+  way(around:800,${lat},${lon})["railway"="rail"];
+  way(around:250,${lat},${lon})["highway"~"^(motorway|trunk|primary|secondary|tertiary|unclassified|residential|service|track)$"];
 );
 out center tags 400;`;
   let res: Response | null = null;

@@ -225,3 +225,26 @@ approved, set it `false` in `terraform.tfvars` to keep only daily backups.
 Cloud SQL has deletion protection at two layers. To tear down, set
 `cloudsql_deletion_protection = false`, `terraform apply`, then
 `terraform destroy`.
+
+## P3 — granting IAP tester access (the runbook)
+
+The staging URL stays IAM+IAP-private. Handing it to a tester is ONE
+Terraform change — no code, no redeploy:
+
+1. Add the tester to `iap_tester_principals` in `terraform.tfvars`
+   (explicit `user:` principals only — validation rejects groups,
+   domains, and public principals):
+
+       iap_tester_principals = [
+         "user:chudson@aresfarmsinc.com",
+         "user:tester@example.com",
+       ]
+
+2. `terraform apply` — creates the per-user
+   `roles/iap.httpsResourceAccessor` binding on the service.
+3. Send the tester the service URL. They sign in with that Google
+   account at the IAP screen; no other access is granted anywhere.
+4. Revoke by removing the line and re-applying.
+
+Every grant is an explicit, auditable IAM binding; the invoker IAM edge
+underneath stays owner+IAP-only regardless of the tester list.

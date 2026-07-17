@@ -60,6 +60,10 @@ type PropertyEvaluationPdfInput = {
   honestUnknowns?: string[];
   /** Free Place Brief: prose financing-pathways line. */
   financingProse?: string | null;
+  /** Scannable place facts (label → value → short source) — replaces the wall of bullets. */
+  placeFacts?: Array<{ label: string; value: string; source: string }>;
+  /** Typical diligence cost guidance lines (plain-language ranges, never quotes). */
+  diligenceCosts?: Array<{ label: string; range: string; note: string | null }>;
 };
 
 /**
@@ -341,18 +345,20 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   const emblemFull = publicAssetPath(input.branding.emblemPath);
   if (fs.existsSync(emblemFull)) doc.image(emblemFull, PAGE.width - PAGE.marginX - 44, 36, { fit: [44, 44] });
 
+  // ONE header phrase (founder: the badge/title pair was redundant); the
+  // PROPERTY is the hero line.
   y = 96;
   setFont("bold", 8.5, ACCENT);
   doc.text(identity.coverBadge, PAGE.marginX, y, { characterSpacing: 2.2 });
-  y = doc.y + 6;
+  y = doc.y + 8;
 
   setFont("bold", 22, identity.ink);
-  doc.text(identity.displayName, PAGE.marginX, y, { width: CONTENT_W - 140 });
+  doc.text(input.context.title, PAGE.marginX, y, { width: CONTENT_W - 140 });
   y = doc.y + 4;
 
   setFont("regular", 11, COLORS.text);
   doc.text(
-    `${input.context.title} — ${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}`,
+    `${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}`,
     PAGE.marginX,
     y,
     { width: CONTENT_W - 140, lineGap: 2 }
@@ -391,10 +397,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   // Document meta row — pro-forma style.
   factsTable([
-    { label: "Generated", value: input.branding.generatedDate },
-    { label: "Path", value: ["Furlong", ...input.branding.explorationPath].join(" → ") },
-    { label: "Source posture", value: input.context.currentLabel ?? input.context.sourceLabel },
-    { label: "Tier purpose", value: input.tier.description },
+    { label: "Prepared", value: input.branding.generatedDate },
+    {
+      label: "Listed through",
+      value: `${input.context.sourceLabel}${input.context.currentLabel ? ` — ${input.context.currentLabel.toLowerCase()}` : ""}`,
+    },
   ]);
 
   // ── VERDICT + EXECUTIVE SUMMARY ────────────────────────────────────────────
@@ -410,7 +417,6 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     { label: "Asset", value: input.context.title },
     { label: "Location", value: `${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}` },
     { label: "Type", value: input.context.propertyType },
-    { label: "Source", value: input.context.sourceLabel },
     { label: "Price posture", value: input.context.priceLabel },
     ...input.propertySummary
       .map((line) => {
@@ -424,18 +430,34 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   // ── COST POSTURE ───────────────────────────────────────────────────────────
 
-  heading("Expected Cost Posture and Capital Frame");
+  heading("What This Is Likely to Cost You");
   bullets(input.conceptSummary);
+  if (input.diligenceCosts?.length) {
+    setFont("bold", 9.5, COLORS.muted);
+    ensure(24);
+    doc.text("TYPICAL OUT-OF-POCKET RANGES — GUIDANCE, NOT QUOTES", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    factsTable(
+      input.diligenceCosts.map((cost) => ({
+        label: cost.label,
+        value: `${cost.range}${cost.note ? ` — ${cost.note}` : ""}`,
+      }))
+    );
+    paragraph(
+      "National ballparks so you can budget — get local numbers. Outside as-is government sales, many of these are negotiable as seller credits.",
+      { size: 9, color: COLORS.muted }
+    );
+  }
 
   // ── SIGNALS / RISKS side by side ───────────────────────────────────────────
 
-  heading("Signals and Constraints");
+  heading("Your Bearings");
   twoColumns(
     {
-      title: "Strongest signals",
+      title: "Compass — working in your favor",
       lines: input.strengths.length > 0 ? input.strengths : ["No meaningful signals can be stated yet because the file is still too thin."],
     },
-    { title: "Risks and blockers", lines: input.risks }
+    { title: "Lighthouse — watch these first", lines: input.risks }
   );
 
   // ── FLOWING SECTIONS ───────────────────────────────────────────────────────
@@ -453,8 +475,13 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   ];
 
   const sections: Array<{ title: string; items: string[] }> = [
-    { title: "Ranked Financing Lanes", items: input.pathwayAnalysis },
-    { title: "Property Verification Summary", items: input.propertyVerificationSummary },
+    { title: "Financing Options, Most Likely First", items: input.pathwayAnalysis },
+    // The verified-facts WALL is replaced by the scannable table below when
+    // structured facts are present; the bullets remain only as a fallback
+    // for older payloads.
+    ...(input.placeFacts?.length
+      ? []
+      : [{ title: "Property Verification Summary", items: input.propertyVerificationSummary }]),
     { title: "Property-Side Criteria and External Flags", items: input.verifiedCriteria },
     ...placeBriefSections,
     { title: "Basis and Limits of This Analysis", items: input.explainabilityNotes },
@@ -468,15 +495,46 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   }
 
   if (input.tier.id === "free") {
-    sections[0] = { title: "Ranked Financing Lanes", items: input.pathwayAnalysis.slice(0, 1) };
+    // Founder direction 2026-07-17: every applicable lane prints, ordered by
+    // likelihood (the ranking engine's order) — never a guarantee.
     const controllingQuestionIndex = sections.findIndex((section) => section.title === "Questions the Platform Should Already Be Asking");
     if (controllingQuestionIndex >= 0) sections.splice(controllingQuestionIndex, 1);
   }
 
+  let factsRendered = false;
   for (const section of sections) {
     if (section.items.length === 0) continue;
     heading(section.title);
     bullets(section.items);
+    if (section.title === "Financing Options, Most Likely First") {
+      // Partner coordination — informational, inside the platform's
+      // boundary rule: "Furlong informs. Compass/Five Borough performs
+      // professional financing work when separately activated." No external
+      // URL (domain activation stays governance-gated), no approval claims.
+      panel({
+        title: "When you're ready to move",
+        lines: [
+          "Furlong coordinates financing files with Five Borough Capital, the professional financing module in the Furlong ecosystem. When you're ready, your profile and documents can carry forward — nothing re-typed, nothing resold.",
+          "Worth having ready: photo ID, recent income documentation, a rough source-of-funds picture, and (once you have one) the property contract. Your readiness list above tracks what's still missing.",
+          "Financing decisions belong to licensed lenders — Furlong never approves, guarantees, or determines eligibility.",
+        ],
+        fill: ACCENT_SOFT,
+      });
+    }
+    if (!factsRendered && input.placeFacts?.length && section.title === "Financing Options, Most Likely First") {
+      factsRendered = true;
+      heading("The Place, Verified — At a Glance");
+      factsTable(
+        input.placeFacts.map((fact) => ({
+          label: fact.label,
+          value: `${fact.value}  ·  ${fact.source}`,
+        }))
+      );
+      paragraph(
+        "Every line above is a sourced, dated government fact — the full statements with verification links travel in your on-screen chart.",
+        { size: 9, color: COLORS.muted }
+      );
+    }
   }
 
   // ── FREE-TIER TEASER (accent panel, measured) ──────────────────────────────
@@ -505,6 +563,18 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i += 1) {
     doc.switchToPage(i);
+    // Diagonal watermark on every printed page (founder direction).
+    doc.save();
+    doc.rotate(-32, { origin: [PAGE.width / 2, PAGE.height / 2] });
+    setFont("bold", 30, COLORS.deep);
+    doc.fillOpacity(0.045);
+    doc.text("FURLONG — FOR INFORMATIONAL PURPOSES · NOT FOR REPRODUCTION", 30, PAGE.height / 2 - 14, {
+      width: PAGE.width + 120,
+      align: "center",
+      lineBreak: false,
+    });
+    doc.fillOpacity(1);
+    doc.restore();
     doc
       .save()
       .moveTo(PAGE.marginX, 752)

@@ -627,9 +627,9 @@ function buildBudgetExpectations(context: PropertyContext): BudgetExpectations {
   const price = parsePriceSignal(context.priceLabel);
   if (price === null) {
     return {
-      acquisition: "The listing does not expose a firm asking price, so the acquisition basis is still soft.",
-      softCosts: "Expect real diligence costs for legal, appraisal, inspections, environmental review, and financing work before commitment.",
-      buildout: "Improvement and contingency exposure cannot be responsibly bounded yet from the current listing detail alone.",
+      acquisition: "The price lives on the source listing and can change as bid periods reset — check it there before you run numbers.",
+      softCosts: "Plan on real out-of-pocket costs before closing: inspection, appraisal, title work, and insurance quotes. Typical ranges are itemized in the cost guide below.",
+      buildout: "Repair and improvement costs can't be estimated until someone walks the property — budget a contingency and get contractor numbers after the inspection.",
     };
   }
 
@@ -662,7 +662,7 @@ function buildPropertyFirstProgramRanking(args: {
           citation: "HUD Home Store / FHA disposition context",
         },
         score: 74,
-        rationale: "The property is a current HUD single-family home listing, so standard residential/FHA-style owner-occupant context is the first lane to pressure-test before inventing a more exotic use case.",
+        rationale: "This is a HUD home listing, and if you plan to live in it, an FHA-style owner-occupant loan is the most common way homes like this are bought. A lender confirms what fits your situation.",
         caution: "This is not an eligibility or approval signal, and the file is still thin because the source record does not publish an asking price or condition here.",
       },
       {
@@ -793,7 +793,7 @@ function buildPropertyEconomicsLines(args: {
   }
   if (args.topProgramRanks[1]) {
     out.push(
-      `${args.topProgramRanks[1].program.name} appears to be the next-best fallback if the lead lane weakens under actual diligence.`
+      `${args.topProgramRanks[1].program.name} is the usual backup if the first option doesn't fit.`
     );
   }
   return out.slice(0, 5);
@@ -964,9 +964,9 @@ function reportVerdict(args: {
 }): { label: string; explanation: string } {
   if (isResidentialHomeContext(args.context) && !args.answers.usePlan.trim()) {
     return {
-      label: "Current residential listing screen",
+      label: "A straightforward home purchase",
       explanation:
-        `${args.context.sourceLabel} is presenting this asset as a current residential listing, so the right first read is ordinary home-acquisition suitability before any specialty use idea is layered on. The file still stays shallow until price, condition, and borrower-side strength are confirmed.`,
+        `This is listed as a regular home for sale through ${args.context.sourceLabel}. Read it first as a place to live: check the current price on the listing, plan an inspection, and see how the numbers feel. Everything else in this profile is here to support that decision.`,
     };
   }
 
@@ -985,7 +985,7 @@ function reportVerdict(args: {
 
   if (hasConcept && detailScore >= 7 && args.readinessPercent >= 40 && avgFit >= 65) {
     return {
-      label: "Promising but still review-bound",
+      label: "Taking shape — review comes next",
       explanation:
         args.verifiedProgramsCount > 0
           ? "The concept, operating posture, and document base are becoming credible, and some property-side facts are already verified, but human review and a few decisive confirmations still separate this from a truly decision-grade file."
@@ -995,7 +995,7 @@ function reportVerdict(args: {
 
   if (hasConcept && args.readinessPercent >= 65 && avgFit >= 60) {
     return {
-      label: "Promising with conditions",
+      label: "Promising, with homework left",
       explanation:
         args.verifiedProgramsCount > 0
           ? "The property has a credible use case, meaningful pathway alignment, and at least some property-side criteria already verified, but the file still needs human review and missing confirmations."
@@ -1005,7 +1005,7 @@ function reportVerdict(args: {
 
   if (hasConcept) {
     return {
-      label: "Plausible but underdeveloped",
+      label: "A real idea that needs more detail",
       explanation:
         "There is a real concept here, but the capital plan, operating model, or support file is still too thin to produce a strong customer-facing advisory report without more specificity.",
     };
@@ -1069,7 +1069,10 @@ function buildRisks(args: {
     .filter((f) => f.tone === "caution")
     .slice(0, 2)
     .map((f) => `${f.label}: ${f.value} (${f.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim()}).`);
-  out.push(...args.readinessMissing.map((item) => `The file still lacks ${item}, which weakens the evaluation.`));
+  // One honest flag, not a litany (founder feedback 2026-07-17).
+  if (args.readinessMissing.length > 0) {
+    out.push(`To complete your file, Furlong still needs: ${args.readinessMissing.join("; ")}.`);
+  }
   if (!args.answers.capitalPlan.trim()) {
     out.push("The capital plan is still vague, so renovation, equipment, working capital, and timing risk are not decision-grade yet.");
   }
@@ -1458,7 +1461,7 @@ function buildReportModel(args: {
   // once). Scores are internal ranking signals, never customer copy.
   const executiveSummary = [
     args.topProgramRanks[0]
-      ? `${args.topProgramRanks[0].program.name} is the current lead financing lane.`
+      ? `The most likely financing starting point here is ${args.topProgramRanks[0].program.name.replace(/ context$/i, "")} — a lender confirms what fits your situation.`
       : "",
     args.immediateSuitability.constraints[0] ? `First thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
   ].filter(Boolean).join(" ");
@@ -2393,6 +2396,12 @@ export function PropertyEvaluationWorkspace({
             buyingProcess: report.buyingProcess,
             honestUnknowns: report.honestUnknowns,
             financingProse: report.financingProse,
+            placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? []).map((fact) => ({
+              label: fact.label,
+              value: fact.value,
+              source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
+            })),
+            diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
             customerRights: buildCustomerRightsSummary(),
             humanReviewBoundary: buildHumanReviewBoundary({
               tier: { id: answers.reportTier, label: report.tier.label },

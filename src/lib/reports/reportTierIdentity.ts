@@ -56,9 +56,9 @@ export interface ReportTierIdentity {
 const IDENTITIES: Record<ReportTierId, ReportTierIdentity> = {
   free: {
     id: "free",
-    displayName: "Furlong Place Brief",
+    displayName: "Furlong Property Profile",
     tagline: "The facts of this place — sourced, dated, and honest about what isn't known yet.",
-    coverBadge: "COMPLIMENTARY PLACE BRIEF",
+    coverBadge: "FURLONG COMPLIMENTARY PROPERTY PROFILE",
     accent: "#0f766e",
     accentSoft: "#e8f4f2",
     ink: "#162033",

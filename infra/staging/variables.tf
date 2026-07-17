@@ -327,6 +327,12 @@ variable "iap_tester_principals" {
   }
 }
 
+variable "amenity_live_lookup_enabled" {
+  description = "Founder activation: live OSM amenity lookups for manually typed addresses (bounded per-request Overpass query)."
+  type        = bool
+  default     = false
+}
+
 # ---- Labels -----------------------------------------------------------------
 
 variable "labels" {

@@ -130,6 +130,11 @@ resource "google_cloud_run_v2_service" "core" {
       }
 
       env {
+        name  = "AMENITY_LIVE_LOOKUP_ENABLED"
+        value = var.amenity_live_lookup_enabled ? "true" : "false"
+      }
+
+      env {
         name  = "RATE_LIMITING_ENABLED"
         value = var.rate_limiting_enabled ? "true" : "false"
       }

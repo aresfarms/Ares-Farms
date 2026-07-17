@@ -25,6 +25,16 @@ const ROOT = process.cwd();
 const OUT = path.join(ROOT, "src/lib/property/countySchoolsGenerated.ts");
 const CCD_YEAR = 2022;
 const MAX_PER_COUNTY = 60;
+// --all: national coverage (every county, tighter sample cap) — manual
+// addresses can be anywhere (founder-reported gap 2026-07-17).
+const ALL_COUNTIES = process.argv.includes("--all");
+const MAX_PER_COUNTY_ALL = 20;
+const ALL_STATE_FIPS = [
+  "01","02","04","05","06","08","09","10","11","12","13","15","16","17","18",
+  "19","20","21","22","23","24","25","26","27","28","29","30","31","32","33",
+  "34","35","36","37","38","39","40","41","42","44","45","46","47","48","49",
+  "50","51","53","54","55","56",
+];
 
 export interface CountySchool {
   name: string;
@@ -74,8 +84,14 @@ async function main(): Promise<void> {
   for (const fact of Object.values(PROPERTY_OZ_FACTS)) {
     if (fact.tractId && fact.tractId.length >= 5) counties.add(fact.tractId.slice(0, 5));
   }
-  const states = [...new Set([...counties].map((c) => c.slice(0, 2)))].sort();
-  console.log(`  target: ${counties.size} counties across ${states.length} states (CCD ${CCD_YEAR})`);
+  const states = ALL_COUNTIES
+    ? ALL_STATE_FIPS
+    : [...new Set([...counties].map((c) => c.slice(0, 2)))].sort();
+  console.log(
+    ALL_COUNTIES
+      ? `  target: ALL counties, ${states.length} states (CCD ${CCD_YEAR})`
+      : `  target: ${counties.size} counties across ${states.length} states (CCD ${CCD_YEAR})`
+  );
 
   const byCounty = new Map<string, CountySchool[]>();
   let stateDone = 0;
@@ -84,7 +100,8 @@ async function main(): Promise<void> {
       const records = await fetchStatePages(state);
       for (const record of records) {
         const county = String(record.county_code ?? "").padStart(5, "0");
-        if (!counties.has(county)) continue;
+        if (!ALL_COUNTIES && !counties.has(county)) continue;
+        if (!/^\d{5}$/.test(county) || county === "00000") continue;
         // school_status 1 = open (keep unknowns too; drop confirmed-closed 2/6/7).
         if (record.school_status != null && [2, 6, 7].includes(Number(record.school_status))) continue;
         const list = byCounty.get(county) ?? [];
@@ -112,7 +129,7 @@ async function main(): Promise<void> {
     const capped = schools
       .filter((s) => s.name)
       .sort((a, b) => (b.enrollment ?? -1) - (a.enrollment ?? -1))
-      .slice(0, MAX_PER_COUNTY);
+      .slice(0, ALL_COUNTIES ? MAX_PER_COUNTY_ALL : MAX_PER_COUNTY);
     entries.push(`  ${JSON.stringify(county)}: ${JSON.stringify(capped)},`);
   }
 

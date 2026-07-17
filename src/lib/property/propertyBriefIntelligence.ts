@@ -42,6 +42,7 @@ import {
 import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
 import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
+import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
 import {
   AMENITY_RADIUS_MILES,
   amenityLiveLookupEnabled,
@@ -493,6 +494,7 @@ function diligenceCostLines(args: {
 }): DiligenceCostLine[] {
   if (!args.isHome && !args.farmShaped) return [];
   const lines: DiligenceCostLine[] = [
+    { label: "Homeowners insurance (annual)", range: "$1,500–$3,000", note: "typical nationally; wind, wildfire, and flood-exposed areas run higher — get local quotes" },
     { label: "General property inspection", range: "$300–$500", note: "larger or rural properties can run more" },
     { label: "Pest / termite inspection", range: "$75–$150", note: "some loan types require it" },
     { label: "Septic inspection", range: "$250–$500", note: "if not on municipal sewer; pumping adds ~$300–$600" },
@@ -508,6 +510,50 @@ function diligenceCostLines(args: {
     });
   }
   return lines;
+}
+
+const HAZARD_SEVERITY = ["Very Low", "Relatively Low", "Relatively Moderate", "Relatively High", "Very High"];
+const hazardRank = (rating: string | null) => (rating ? HAZARD_SEVERITY.indexOf(rating) : -1);
+
+/**
+ * County natural-hazard profile from FEMA's National Risk Index — the
+ * published relative ratings, verbatim, plus the insurance conversations
+ * they imply (founder direction 2026-07-17). A fact about the place with
+ * provenance; NEVER a prediction, a premium, or an insurability call —
+ * the rider list is framed as questions for a licensed agent.
+ */
+function hazardRiskFact(countyFips: string | null): BriefFactLine | null {
+  if (!countyFips) return null;
+  const risk = COUNTY_HAZARD_RISK[countyFips];
+  if (!risk || !risk.overall) return null;
+  const hazards: { name: string; rating: string | null; rider: string }[] = [
+    { name: "Hurricane", rating: risk.hurricane, rider: "a windstorm/hurricane deductible or rider" },
+    { name: "Wildfire", rating: risk.wildfire, rider: "wildfire coverage terms" },
+    { name: "Tornado", rating: risk.tornado, rider: "the wind/hail deductible" },
+    { name: "Earthquake", rating: risk.earthquake, rider: "a separate earthquake policy (never in standard homeowners)" },
+    { name: "Inland flooding", rating: risk.floodInland, rider: "an NFIP or private flood policy (never in standard homeowners)" },
+    { name: "Coastal flooding", rating: risk.floodCoastal, rider: "an NFIP or private flood policy (never in standard homeowners)" },
+  ];
+  const elevated = hazards.filter((h) => hazardRank(h.rating) >= 2); // Relatively Moderate+
+  const valueBits =
+    elevated.length > 0
+      ? elevated.map((h) => `${h.name.toLowerCase()} ${h.rating}`).join(" · ")
+      : "no hazard rated above Relatively Low";
+  const riders = [...new Set(elevated.map((h) => h.rider))];
+  const rated = hazards.filter((h) => h.rating !== null);
+  return {
+    label: "Natural hazard profile",
+    value: `Overall ${risk.overall} — ${valueBits}`,
+    text:
+      `FEMA's National Risk Index rates this county ${risk.overall} overall relative to all U.S. ` +
+      `counties. By hazard: ${rated.map((h) => `${h.name.toLowerCase()} ${h.rating}`).join(", ")}. ` +
+      (riders.length > 0
+        ? `Worth asking a licensed insurance agent about ${riders.join("; ")}. `
+        : "") +
+      `Relative ratings of the place — not a prediction, a premium, or an insurability determination.`,
+    provenance: `Source: ${COUNTY_HAZARD_RISK_PROVENANCE.source}, snapshot ${COUNTY_HAZARD_RISK_PROVENANCE.asOf}`,
+    tone: elevated.some((h) => hazardRank(h.rating) >= 3) ? "caution" : "neutral",
+  };
 }
 
 /** Farm/land-shaped property types get ground-rent context automatically. */
@@ -675,6 +721,15 @@ function buildUnknowns(args: {
     howToFind:
       `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
+  });
+  unknowns.push({
+    label: "Electric and utility rates",
+    pointer: "EIA state profiles + the serving utility",
+    url: "https://www.eia.gov/electricity/state/",
+    howToFind:
+      "Monthly electric bills vary widely by state and usage — EIA publishes official state " +
+      "averages (price and typical bill), and the serving utility publishes its exact rate " +
+      "sheet. Water/sewer rates come from the local utility or the town office.",
   });
   if (args.groundRentNeeded) {
     unknowns.push({
@@ -910,6 +965,9 @@ export function buildPropertyBriefIntelligence(args: {
 
   const privateSchools = isHome ? privateSchoolsFact(schoolsFips) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
+
+  const hazardRisk = hazardRiskFact(fmrFips);
+  if (hazardRisk) verifiedFacts.push(hazardRisk);
 
   const fmr = fmrFips ? COUNTY_FMR[fmrFips] : undefined;
   if (fmr && isHome) {
@@ -1197,6 +1255,9 @@ export async function buildLocationBriefIntelligence(args: {
 
   const privateSchools = isHome ? privateSchoolsFact(countyFips) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
+
+  const hazardRisk = hazardRiskFact(countyFips);
+  if (hazardRisk) verifiedFacts.push(hazardRisk);
 
   // Ground rent — manual imports rarely carry a reliable property type, so
   // the fact frames its own applicability ("if the parcel includes open

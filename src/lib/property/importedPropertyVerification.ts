@@ -443,15 +443,14 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
     if (geocode?.lat && geocode?.lon) {
       const flood = await queryFloodZone(Number(geocode.lon), Number(geocode.lat)).catch(() => undefined);
       if (flood?.floodZone) {
-        if (flood.isSfha) {
-          placeFacts.flood = {
-            floodZone: flood.floodZone,
-            asOf: new Date().toISOString().slice(0, 10),
-          };
-          lookupOutcomes.flood = "matched";
-        } else {
-          lookupOutcomes.flood = "no-match";
-        }
+        // Symmetric honesty: a non-SFHA zone (e.g. X) is a FACT the buyer
+        // needs ("outside hazard area"), not a no-match — record it either
+        // way (founder-reported gap 2026-07-17).
+        placeFacts.flood = {
+          floodZone: flood.floodZone,
+          asOf: new Date().toISOString().slice(0, 10),
+        };
+        lookupOutcomes.flood = "matched";
       } else if (flood === null) {
         lookupOutcomes.flood = "no-match";
       } else {

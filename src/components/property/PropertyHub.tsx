@@ -121,7 +121,7 @@ export function PropertyHub({
         <Link href="/explore" style={backLink}>
           ← Back to the compass
         </Link>
-        <Disclosures variant="full" />
+        <Disclosures variant="full" tone="dark" />
       </div>
     </main>
   );

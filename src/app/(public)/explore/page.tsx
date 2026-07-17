@@ -4,15 +4,18 @@ import Link from "next/link";
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
+import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
 import { providersForLane } from "@/lib/providers/providerRegistry";
 
 /**
  * /explore — Compass-rose navigation (Build 56).
  *
- * The eight exploration lanes radiate as spokes around the Furlong emblem on a
- * deep-navy compass hero band (the chosen DARK treatment). NAVIGATION ONLY —
- * each spoke links to its /explore?lane=<id> route; the lane landing pages /
- * onboarding / search platform are intentionally deferred (not built here).
+ * The eight exploration lanes radiate as spokes around the Furlong emblem on
+ * the navigator stage (Chart Table cohesion rollout, founder 2026-07-17: every
+ * compass surface shares the chart language — stage, plates, kickers, gold
+ * plotted-route spokes from CHART_THEMES.buyer; no per-surface hexes).
+ * NAVIGATION ONLY — each spoke links to its /explore?lane=<id> route; the lane
+ * landing pages / onboarding / search platform are intentionally deferred.
  *
  * No-account promise: spokes stay inside /explore (?lane=) — never /onboarding.
  * The shared <Disclosures> strip renders below the dark band on the light page.
@@ -79,10 +82,27 @@ function LaneIcon({ name }: { name: IconName }) {
   }
 }
 
-// ── Shared tokens ─────────────────────────────────────────────────────────────
-const NAVY = "#11151C";
-const lightContainer = { maxWidth: 880, margin: "0 auto", padding: "32px 24px 80px", display: "grid", gap: 24 } as const;
-const muted = { color: "#5d687a", lineHeight: 1.6 } as const;
+// ── Shared tokens — the navigator chart theme (Chart Table family) ───────────
+const theme = CHART_THEMES.buyer;
+const dark = CHART_TONES.dark;
+const stageContainer = {
+  maxWidth: 880,
+  margin: "0 auto",
+  padding: "32px 24px 60px",
+  display: "grid",
+  gap: 24,
+  background: theme.stage,
+  borderRadius: 20,
+  color: theme.ink,
+} as const;
+const muted = { color: theme.inkSoft, lineHeight: 1.6 } as const;
+const kicker = {
+  fontSize: 11,
+  fontWeight: 800,
+  letterSpacing: "0.18em",
+  textTransform: "uppercase",
+  color: theme.accent,
+} as const;
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default async function ExplorePage({
@@ -119,9 +139,9 @@ export default async function ExplorePage({
       .filter(Boolean);
     return (
       <main>
-        <div style={lightContainer}>
+        <div style={stageContainer}>
           <header style={{ display: "grid", gap: 10 }}>
-            <h1 style={{ margin: 0, fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.12 }}>
+            <h1 style={{ margin: 0, fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.12, color: theme.ink }}>
               {selected.label}
             </h1>
             <p style={{ margin: 0, fontSize: 17, ...muted, maxWidth: 620 }}>
@@ -131,14 +151,14 @@ export default async function ExplorePage({
           </header>
           <section
             aria-label={`Exploring: ${selected.label}`}
-            style={{ background: "#ecfdf5", border: "2px solid #0f766e", borderRadius: 14, padding: "24px 28px", display: "grid", gap: 12 }}
+            style={{ background: theme.plate, border: `1px solid ${theme.plateBorder}`, borderRadius: 14, padding: "24px 28px", display: "grid", gap: 12 }}
           >
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#0f766e", textTransform: "uppercase", letterSpacing: 0.4 }}>
+            <span style={kicker}>
               Exploring — no account needed
             </span>
-            <strong style={{ fontSize: 22, color: "#162033" }}>{selected.label}</strong>
+            <strong style={{ fontSize: 22, color: theme.ink }}>{selected.label}</strong>
             <p style={{ margin: 0, fontSize: 16, ...muted }}>{selected.blurb}</p>
-            <Link href="/explore" style={{ fontSize: 14, fontWeight: 700, color: "#0f766e", textDecoration: "none", width: "fit-content" }}>
+            <Link href="/explore" style={{ fontSize: 14, fontWeight: 700, color: dark.accent, textDecoration: "none", width: "fit-content" }}>
               ← Back to the compass
             </Link>
           </section>
@@ -146,16 +166,16 @@ export default async function ExplorePage({
           {fromProperty && (
             <section
               aria-label="Next step — explore financing for a property you found"
-              style={{ background: "#eef6ff", border: "1px solid #b9d4f1", borderRadius: 14, padding: "20px 24px", display: "grid", gap: 8 }}
+              style={{ background: theme.waypointBg, border: `1px solid ${theme.waypointBorder}`, borderRadius: 14, padding: "20px 24px", display: "grid", gap: 8 }}
             >
-              <strong style={{ fontSize: 16, color: "#185FA5" }}>
+              <strong style={{ fontSize: 16, color: theme.accent }}>
                 Exploring financing for a property you found
               </strong>
               <p style={{ margin: 0, fontSize: 15, ...muted }}>
                 {pathwayTags.length > 0 ? (
-                  <>It <strong>may fit a {pathwayTags.join(" / ")} pathway</strong> — providers below can help you explore it.</>
+                  <>It <strong style={{ color: theme.ink }}>may fit a {pathwayTags.join(" / ")} pathway</strong> — providers below can help you explore it.</>
                 ) : (
-                  <>It <strong>may fit a USDA / SBA / conventional pathway</strong> — providers below can help you explore it.</>
+                  <>It <strong style={{ color: theme.ink }}>may fit a USDA / SBA / conventional pathway</strong> — providers below can help you explore it.</>
                 )}{" "}
                 Furlong is advisory only — we don&apos;t lend, approve, or determine eligibility, and we
                 pass none of your information. You choose whether to engage a provider directly.
@@ -165,31 +185,31 @@ export default async function ExplorePage({
 
           {providersForLane(selected.slug).length > 0 && (
             <section aria-label="Providers in this lane" style={{ display: "grid", gap: 12 }}>
-              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#162033" }}>Providers in this lane</h2>
-              <p style={{ margin: 0, fontSize: 13, color: "#5d687a" }}>
+              <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: theme.ink }}>Providers in this lane</h2>
+              <p style={{ margin: 0, fontSize: 13, ...muted }}>
                 Independent, licensed companies — each a separate business that pays a flat license fee to be
                 listed. Furlong takes no referral fee and submits none of your information.
               </p>
               <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 10 }}>
                 {providersForLane(selected.slug).map((p) => (
-                  <li key={p.slug} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#fff", padding: "16px 18px", display: "grid", gap: 4 }}>
-                    <Link href={`/providers/${p.slug}`} style={{ fontSize: 17, fontWeight: 700, color: "#0f766e", textDecoration: "none" }}>
+                  <li key={p.slug} style={{ border: `1px solid ${theme.cellBorder}`, borderRadius: 12, background: theme.cellBg, padding: "16px 18px", display: "grid", gap: 4 }}>
+                    <Link href={`/providers/${p.slug}`} style={{ fontSize: 17, fontWeight: 700, color: dark.accent, textDecoration: "none" }}>
                       {p.name} →
                     </Link>
-                    <span style={{ fontSize: 14, color: "#5d687a" }}>{p.tagline}</span>
-                    <span style={{ fontSize: 12, color: "#9a3412" }}>{p.separateCompanyLabel}</span>
+                    <span style={{ fontSize: 14, ...muted }}>{p.tagline}</span>
+                    <span style={{ fontSize: 12, color: theme.honey }}>{p.separateCompanyLabel}</span>
                   </li>
                 ))}
               </ul>
             </section>
           )}
-          <Disclosures variant="full" />
+          <Disclosures variant="full" tone="dark" />
         </div>
       </main>
     );
   }
 
-  // ── Compass-rose index (dark hero band) ─────────────────────────────────────
+  // ── Compass-rose index (the navigator stage) ────────────────────────────────
   return (
     <main>
       <style>{`
@@ -211,7 +231,7 @@ export default async function ExplorePage({
           border-radius: 12px;
         }
         .cr-node:hover { transform: translate(-50%, -50%) scale(1.07); }
-        /* Real, visible keyboard focus ring (white on the navy band) + glow. */
+        /* Real, visible keyboard focus ring (white on the chart stage) + glow. */
         .cr-node:focus-visible {
           transform: translate(-50%, -50%) scale(1.07);
           outline: 2px solid #ffffff; outline-offset: 6px;
@@ -226,7 +246,7 @@ export default async function ExplorePage({
         .cr-node:hover .cr-chip, .cr-node:focus-visible .cr-chip {
           box-shadow: 0 0 0 4px var(--ring), 0 0 22px var(--ring), 0 6px 16px rgba(0,0,0,0.5);
         }
-        .cr-label { color: #eef3fb; font-size: 13px; font-weight: 600; text-align: center; line-height: 1.3; }
+        .cr-label { color: ${theme.ink}; font-size: 13px; font-weight: 600; text-align: center; line-height: 1.3; }
 
         /* Phone: radial doesn't fit — collapse to emblem-on-top + stacked list. */
         @media (max-width: 640px) {
@@ -245,26 +265,27 @@ export default async function ExplorePage({
         }
       `}</style>
 
-      {/* ── Dark compass hero band (full width) ──────────────────────────────── */}
+      {/* ── The chart stage (full width) — plotted routes radiate from the hub ── */}
       <section
         aria-label="Explore the eight Furlong lanes"
-        style={{ background: NAVY, color: "#eef3fb", padding: "clamp(36px, 6vw, 64px) 24px" }}
+        style={{ background: theme.stage, color: theme.ink, padding: "clamp(36px, 6vw, 64px) 24px" }}
       >
         <div style={{ maxWidth: 720, margin: "0 auto 28px", textAlign: "center", display: "grid", gap: 12 }}>
-          <h1 style={{ margin: 0, fontSize: "clamp(28px, 4.5vw, 42px)", fontWeight: 800, letterSpacing: "-0.02em", color: "#ffffff" }}>
+          <h1 style={{ margin: 0, fontSize: "clamp(28px, 4.5vw, 42px)", fontWeight: 800, letterSpacing: "-0.02em", color: theme.ink }}>
             Explore your opportunities
           </h1>
-          <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6, color: "#c2cee0" }}>
+          <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6, color: theme.inkSoft }}>
             Discover what's possible before you commit. No account, no personal data, and no footprints
             required. Change direction at any time.
           </p>
         </div>
 
         <div className="cr-rose">
-          {/* Decorative spokes — light-blue lines from the emblem toward each lane. */}
+          {/* Decorative spokes — dashed plotted routes from the emblem toward each
+              lane, in the chart's gold accent (the waypoint-route language). */}
           <svg className="cr-spokes" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
             {LANES.map((l) => (
-              <line key={l.slug} x1={50} y1={50} x2={l.left} y2={l.top} stroke="#85B7EB" strokeWidth={0.5} opacity={0.6} />
+              <line key={l.slug} x1={50} y1={50} x2={l.left} y2={l.top} stroke={theme.accent} strokeWidth={0.5} strokeDasharray="1.8 1.8" opacity={0.55} />
             ))}
           </svg>
 

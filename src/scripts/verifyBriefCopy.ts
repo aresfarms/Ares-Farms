@@ -30,6 +30,7 @@ const SCANNED_FILES = [
   "src/components/property/PropertyImportLaunchpad.tsx",
   "src/components/property/PropertyHub.tsx",
   "src/components/discovery/PlaceFirstDiscovery.tsx",
+  "src/app/(public)/explore/page.tsx",
 ];
 
 interface Rule {

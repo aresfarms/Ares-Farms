@@ -33,6 +33,8 @@ const SCANNED_FILES = [
   "src/lib/property/townCharacterCurated.ts",
   "src/lib/property/stateNarrativeCurated.ts",
   "src/lib/property/broadbandLookup.ts",
+  "src/lib/newsletter/newsletterSignals.ts",
+  "src/lib/newsletter/newsletterEditions.ts",
   "src/components/property/PropertyPlaceIntelligence.tsx",
   "src/components/property/PropertyEvaluationWorkspace.tsx",
   "src/components/property/PropertyImportLaunchpad.tsx",

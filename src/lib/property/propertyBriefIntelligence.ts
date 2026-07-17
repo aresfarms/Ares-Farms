@@ -110,6 +110,18 @@ export interface LivingHereStrip {
   attribution: string;
 }
 
+/**
+ * A typical diligence cost line — PLAIN-LANGUAGE GUIDANCE, never a fact:
+ * national ballpark ranges so a buyer can budget the answers to the
+ * unknowns. Always rendered under a guidance label with the negotiation
+ * note; never sourced, never a quote.
+ */
+export interface DiligenceCostLine {
+  label: string;
+  range: string;
+  note: string | null;
+}
+
 export interface PropertyBriefIntelligence {
   verifiedFacts: BriefFactLine[];
   unknowns: BriefUnknownLine[];
@@ -126,6 +138,8 @@ export interface PropertyBriefIntelligence {
   chips: BriefChip[];
   /** Amenity distances for the "living here" strip; null until amenities resolve. */
   livingHere: LivingHereStrip | null;
+  /** Typical costs of answering the unknowns — guidance, not quotes. */
+  diligenceCosts: DiligenceCostLine[];
 }
 
 /**
@@ -464,6 +478,36 @@ function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
     provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}`,
     tone: "neutral",
   };
+}
+
+/**
+ * Typical out-of-pocket costs for the inspections that answer the unknowns
+ * (founder direction 2026-07-17). National ballpark ranges, deliberately
+ * round — local quotes vary, and outside as-is government sales many of
+ * these are negotiable as seller credits. GUIDANCE ONLY, never a quote.
+ * `conditional` items state their own applicability ("if the home has…").
+ */
+function diligenceCostLines(args: {
+  isHome: boolean;
+  farmShaped: boolean;
+}): DiligenceCostLine[] {
+  if (!args.isHome && !args.farmShaped) return [];
+  const lines: DiligenceCostLine[] = [
+    { label: "General property inspection", range: "$300–$500", note: "larger or rural properties can run more" },
+    { label: "Pest / termite inspection", range: "$75–$150", note: "some loan types require it" },
+    { label: "Septic inspection", range: "$250–$500", note: "if not on municipal sewer; pumping adds ~$300–$600" },
+    { label: "Well inspection", range: "$300–$500", note: "if the property has a well" },
+    { label: "Well water testing", range: "$150–$350", note: "basic potability panel; full panels cost more" },
+    { label: "Solar panel inspection", range: "$150–$300", note: "if panels are present" },
+  ];
+  if (args.farmShaped) {
+    lines.push({
+      label: "Irrigation well flow / yield test",
+      range: "quote-based, often $300–$800",
+      note: "local well contractors quote by depth and pump setup",
+    });
+  }
+  return lines;
 }
 
 /** Farm/land-shaped property types get ground-rent context automatically. */
@@ -932,6 +976,7 @@ export function buildPropertyBriefIntelligence(args: {
       amenities && isHome
         ? livingHereStrip(amenities, PROPERTY_AMENITIES_PROVENANCE.radiusMiles)
         : null,
+    diligenceCosts: diligenceCostLines({ isHome, farmShaped }),
   };
 }
 
@@ -1210,5 +1255,6 @@ export async function buildLocationBriefIntelligence(args: {
       fmr4: isHome && fmr ? fmr.fmr4 : null,
     }),
     livingHere: amenities && isHome ? livingHereStrip(amenities, AMENITY_RADIUS_MILES) : null,
+    diligenceCosts: diligenceCostLines({ isHome, farmShaped: locFarmShaped || !args.propertyType }),
   };
 }

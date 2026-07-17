@@ -392,6 +392,32 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                   </div>
                 ))}
               </div>
+              {(intelligence?.diligenceCosts?.length ?? 0) > 0 && (
+                <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, marginTop: 12, paddingTop: 10, display: "grid", gap: 6 }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", textTransform: "uppercase", color: theme.accent }}>
+                      What these answers typically cost
+                    </span>
+                    <span style={{ fontSize: 9.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: theme.inkFaint, border: `1px solid ${theme.cellBorder}`, borderRadius: 999, padding: "2px 8px" }}>
+                      Plain-language guidance
+                    </span>
+                  </div>
+                  <div style={{ display: "grid", gap: 4 }}>
+                    {intelligence?.diligenceCosts?.map((cost) => (
+                      <div key={cost.label} style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap", fontSize: 12.5 }}>
+                        <span style={{ color: theme.inkSoft, minWidth: 210 }}>{cost.label}</span>
+                        <strong style={{ color: theme.ink }}>{cost.range}</strong>
+                        {cost.note && <span style={{ color: theme.inkFaint, fontSize: 11.5 }}>{cost.note}</span>}
+                      </div>
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 10.5, color: theme.inkFaint, lineHeight: 1.5 }}>
+                    Typical national ranges, not quotes — get local numbers. Outside as-is government
+                    sales, many of these are negotiable as seller credits; in as-is sales the
+                    inspection informs your decision, not a repair negotiation.
+                  </span>
+                </div>
+              )}
             </Waypoint>
           )}
 

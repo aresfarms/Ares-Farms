@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { TesterFeedbackBanner } from "@/components/public/TesterFeedbackBanner";
 
 import { PlatformChrome } from "@/components/platform/PlatformChrome";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
@@ -38,6 +39,7 @@ export function PlatformShell({ children }: { children: ReactNode }) {
           '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       }}
     >
+      <TesterFeedbackBanner />
       {/*
         Skip-to-main link — visually hidden until focused (WCAG 2.4.1).
         Must appear BEFORE PlatformChrome so it is the first focusable element

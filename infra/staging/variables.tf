@@ -333,6 +333,18 @@ variable "amenity_live_lookup_enabled" {
   default     = false
 }
 
+variable "stable_revision" {
+  description = "Revision pinned to the 'stable' traffic tag (0% traffic, own URL) so testers keep a blessed build while latest churns. Empty = no tag."
+  type        = string
+  default     = ""
+}
+
+variable "tester_feedback_email" {
+  description = "When set, the app renders the staging tester banner (build stamp + mailto feedback). Never set in production."
+  type        = string
+  default     = ""
+}
+
 # ---- Labels -----------------------------------------------------------------
 
 variable "labels" {

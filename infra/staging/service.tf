@@ -134,6 +134,14 @@ resource "google_cloud_run_v2_service" "core" {
         value = var.amenity_live_lookup_enabled ? "true" : "false"
       }
 
+      dynamic "env" {
+        for_each = var.tester_feedback_email == "" ? [] : [var.tester_feedback_email]
+        content {
+          name  = "FURLONG_TESTER_FEEDBACK_EMAIL"
+          value = env.value
+        }
+      }
+
       env {
         name  = "RATE_LIMITING_ENABLED"
         value = var.rate_limiting_enabled ? "true" : "false"
@@ -188,6 +196,23 @@ resource "google_cloud_run_v2_service" "core" {
         name       = "runtime-state"
         mount_path = "/var/furlong-state"
       }
+    }
+  }
+
+  # Traffic: latest serves 100%; an optional "stable" tag pins a blessed
+  # revision on its own URL (0% of default traffic) so testers keep a known
+  # build while the owner iterates on latest (P3, founder 2026-07-17).
+  traffic {
+    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+    percent = 100
+  }
+  dynamic "traffic" {
+    for_each = var.stable_revision == "" ? [] : [var.stable_revision]
+    content {
+      type     = "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION"
+      revision = traffic.value
+      tag      = "stable"
+      percent  = 0
     }
   }
 

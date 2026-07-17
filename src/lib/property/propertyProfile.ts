@@ -74,16 +74,38 @@ export function classifyPropertyProfile(args: {
   description?: string | null;
   acreageText?: string | null;
 }): PropertyProfile {
-  const text = `${args.propertyType ?? ""} ${args.description ?? ""}`.toLowerCase();
+  // Puerto Rico's property registry calls each recorded parcel a "farm"
+  // (finca): descriptions read "Recorded at farm 7015, book 2…" on ordinary
+  // subdivision houses. Strip that registry citation before matching so the
+  // word "farm" in a folio reference never classifies a house as agricultural
+  // (founder-caught 2026-07-17).
+  let cleanedDesc = (args.description ?? "")
+    // Broker contact boilerplate: "Office 787-…", "Broker:", "Address:" lines
+    // carry words ("office", "business") that falsely read as commercial use.
+    .replace(/\b(?:office|broker|phone|fax|cell|tel)\s*[:#]?\s*[\d(]/gi, " ")
+    .replace(/\bproperties\s+inc\b/gi, " ");
+  // Puerto Rico's property registry calls each recorded parcel a "farm"
+  // (finca): descriptions read "REC AT FARM 7015", "Recorded farm-12,577",
+  // "Book 240 Farm Number 3" on ordinary subdivision houses. "farm" directly
+  // followed by a folio number (any punctuation, optional "number"/"no"/"#")
+  // is ALWAYS a registry reference — a genuine farm listing writes "farm
+  // land"/"farm with…", never "farm 7015". Strip it so the word never
+  // classifies a house as agricultural (founder-caught 2026-07-17). Real
+  // farms carry pasture/crop/ranch language and still classify correctly.
+  cleanedDesc = cleanedDesc.replace(
+    /\bfarm[\s.-]*(?:number|núm\.?|num\.?|no\.?|n[°º]?\.?|inf\.?|#)?[\s.-]*[\d,]+/gi,
+    " "
+  );
+  const text = `${args.propertyType ?? ""} ${cleanedDesc}`.toLowerCase();
 
   const id: PropertyProfileId =
     /mobile home park|manufactured housing (community|park)|mhp|trailer park|rv park/.test(text)
       ? "mobile-home-park"
       : /hotel|motel|inn\b|lodge|lodging|bed and breakfast|b&b|resort|hospitality|short[- ]term rental/.test(text)
         ? "hospitality"
-        : /commercial|retail|office|industrial|warehouse|storage|restaurant|business|mixed[- ]use/.test(text)
+        : /commercial|retail|industrial|warehouse|restaurant|mixed[- ]use|office (?:building|space|unit|suite)|(?:self[- ]|storage )storage|business (?:park|center)/.test(text)
           ? "commercial"
-          : /farm|ranch|agric|crop|pasture|orchard|vineyard|homestead|dairy/.test(text)
+          : /\bfarm\b|ranch|agric|crop|pasture|orchard|vineyard|homestead|dairy/.test(text)
             ? "farm"
             : /\bland\b|\blot\b|vacant|acreage|parcel only|unimproved/.test(text)
               ? "land"

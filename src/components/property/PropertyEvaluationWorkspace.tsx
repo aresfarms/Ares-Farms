@@ -1016,46 +1016,58 @@ function reportVerdict(args: {
   };
 }
 
+/**
+ * Facts-doctrine rework (founder task 2026-07-16): strengths derive from the
+ * VERIFIED place facts (positive-tone lines, with their sources) plus the
+ * customer's own inputs — labeled as the customer's inputs, never dressed as
+ * findings. No padding: an empty file falls through to the section's honest
+ * "too thin to state signals" fallback.
+ */
 function buildStrengths(args: {
   context: PropertyContext;
   answers: DraftAnswers;
   verifiedPrograms: NonNullable<PropertyFactsResponse["verifiedPrograms"]>;
   topPathways: Array<{ label: string; fitScore: number }>;
+  placeIntelligence: PropertyBriefIntelligence | null;
 }): string[] {
   const out: string[] = [];
-  if (args.answers.possibility.trim()) {
-    out.push(`A concrete concept is emerging around ${cleanPhrase(args.answers.possibility)}.`);
+
+  // 1. Verified positive place facts — the strongest signals, with cites.
+  for (const fact of (args.placeIntelligence?.verifiedFacts ?? []).filter((f) => f.tone === "positive").slice(0, 3)) {
+    out.push(`${fact.label}: ${fact.value} (${fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim()}).`);
   }
+  if (args.verifiedPrograms.length > 0) {
+    out.push(`${args.verifiedPrograms.length} property-side program signal(s) verified against government sources — support, never an approval basis.`);
+  }
+
+  // 2. The customer's own inputs — labeled as theirs.
   if (args.answers.usePlan.trim()) {
-    out.push(`The operating thesis is starting to take shape: ${sentence(args.answers.usePlan)}`);
+    out.push(`Your stated plan: ${sentence(args.answers.usePlan)}`);
   }
   if (args.answers.operatorExperience.trim()) {
-    out.push(`Operator experience is now part of the file, which makes the execution story more credible: ${sentence(args.answers.operatorExperience)}`);
+    out.push(`Your stated experience: ${sentence(args.answers.operatorExperience)}`);
   }
-  if (args.answers.revenueModel.trim()) {
-    out.push(`A revenue model is beginning to form instead of leaving the business case abstract: ${sentence(args.answers.revenueModel)}`);
-  }
-  // No padding sentences: an empty file falls through to the section's honest
-  // "too thin to state signals" fallback instead of canned characterization
-  // (render-time honesty — same doctrine as the Place Brief).
+
+  // 3. Engine-derived lane, in plain language.
   if (args.topPathways[0]) {
     out.push(`${args.topPathways[0].label} currently reads as the strongest financing lane to test first.`);
   }
-  if (args.verifiedPrograms.length > 0) {
-    out.push(`The property already carries ${args.verifiedPrograms.length} verified property-side program or designation signal(s), which is stronger than starting from a blank asset.`);
-  }
-  if (/commercial|hospitality|business/i.test(args.context.propertyType)) {
-    out.push("The property type lends itself to SBA-style use-case exploration if the operating plan and capital stack become credible.");
-  }
-  return out.slice(0, 4);
+  return out.slice(0, 5);
 }
 
 function buildRisks(args: {
   answers: DraftAnswers;
   readinessMissing: string[];
   verifiedPrograms: NonNullable<PropertyFactsResponse["verifiedPrograms"]>;
+  placeIntelligence: PropertyBriefIntelligence | null;
 }): string[] {
-  const out = args.readinessMissing.map((item) => `The file still lacks ${item}, which weakens the evaluation.`);
+  // Verified caution-tone place facts lead (flood hazard, elevated natural-
+  // hazard ratings…) — real, sourced risks before file-thinness ones.
+  const out = (args.placeIntelligence?.verifiedFacts ?? [])
+    .filter((f) => f.tone === "caution")
+    .slice(0, 2)
+    .map((f) => `${f.label}: ${f.value} (${f.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim()}).`);
+  out.push(...args.readinessMissing.map((item) => `The file still lacks ${item}, which weakens the evaluation.`));
   if (!args.answers.capitalPlan.trim()) {
     out.push("The capital plan is still vague, so renovation, equipment, working capital, and timing risk are not decision-grade yet.");
   }
@@ -1307,11 +1319,13 @@ function buildReportModel(args: {
     answers: args.answers,
     verifiedPrograms: args.verifiedPrograms,
     topPathways: args.topPathways,
+    placeIntelligence: args.placeIntelligence,
   });
   const risks = buildRisks({
     answers: args.answers,
     readinessMissing: contextualMissingItems(args.readinessResult.missingItems, args.context, args.answers),
     verifiedPrograms: args.verifiedPrograms,
+    placeIntelligence: args.placeIntelligence,
   });
   const keyQuestions = buildKeyQuestions({
     context: args.context,

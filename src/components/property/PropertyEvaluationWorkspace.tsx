@@ -2145,7 +2145,11 @@ export function PropertyEvaluationWorkspace({
   });
   // Map-selected properties receive the Place Brief as a server prop; manually
   // typed addresses get it back from the property-facts API (geocode-derived).
-  const effectivePlaceIntelligence = placeIntelligence ?? facts?.placeIntelligence ?? null;
+  // For imported ids the API brief is authoritative — a property-keyed server
+  // brief can only be empty/negative for an address with no canonical record.
+  const effectivePlaceIntelligence = context.propertyId?.startsWith("imported:")
+    ? facts?.placeIntelligence ?? placeIntelligence ?? null
+    : placeIntelligence ?? facts?.placeIntelligence ?? null;
   const answerCard = buildAnswerCard({
     context: analysisContext,
     restrictionsPresent: (facts?.verification?.restrictions?.length ?? 0) > 0,

@@ -230,7 +230,12 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
       : propertyContext && !/home|residential|house/i.test(propertyContext.propertyType)
         ? "commercial"
         : "buyer";
-  const briefIntelligence = propertyContext
+  // Imported/manual addresses have no canonical id, so the property-keyed
+  // snapshot builder can only return an EMPTY brief with snapshot negatives —
+  // which would then shadow the geocode-based brief the property-facts API
+  // builds from the live checks (bug found 2026-07-16: rich verification,
+  // empty chart). Skip it; the workspace falls back to the API's brief.
+  const briefIntelligence = propertyContext && !propertyContext.propertyId?.startsWith("imported:")
     ? buildPropertyBriefIntelligence({
         propertyId: propertyContext.propertyId,
         sourceId: propertyContext.sourceId,

@@ -18,6 +18,8 @@
  * Public Alpha remains PENDING.
  */
 
+import { CHART_TONES, type ChartTone } from "@/lib/property/chartThemes";
+
 const FULL_TEXT =
   "This information is advisory only and is not an approval, guarantee, or official determination. " +
   "No legal reliance, no regulatory reliance, and no official reliance may be placed on this information. " +
@@ -35,14 +37,22 @@ const COMPACT_TEXT =
   "Free for borrowers. Borrowers pay nothing. Your information belongs to you. " +
   "Furlong does not secretly submit, sell, or distribute your information. No silent submission. No information sale.";
 
-export function Disclosures({ variant = "full" }: { variant?: "full" | "compact" }) {
+export function Disclosures({
+  variant = "full",
+  tone = "light",
+}: {
+  variant?: "full" | "compact";
+  /** Chart Table cohesion: "dark" keeps the disclosure text readable when the
+      strip sits on a chart stage (CHART_TONES ink) — text is identical. */
+  tone?: ChartTone;
+}) {
   return (
     <p
       aria-label="Furlong disclosures"
       style={{
         margin:     0,
         fontSize:   13,
-        color:      "#5d687a",
+        color:      tone === "dark" ? CHART_TONES.dark.bodyInk : "#5d687a",
         lineHeight: 1.65,
       }}
     >

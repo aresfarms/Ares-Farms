@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { borrowerOnboardingInitialState } from "@/lib/borrower/onboardingCore";
+import { chartSurface } from "@/lib/property/chartThemes";
 import {
   ReadinessAssessmentInput,
   ReadinessAssessmentResult,
@@ -26,6 +27,9 @@ import {
  * - Vol V-VII: preserves public-surface disclosures, source authority,
  *   conformance, and no-live-action boundaries.
  * Build 50 — moved to (public) group. Shell removed; layout provides background, font, and minHeight.
+ *
+ * Chart Table cohesion rollout (founder 2026-07-17): the page sits on the
+ * navigator stage via chartSurface("buyer") — shared tokens, presentation only.
  */
 
 type ApiResponse = {
@@ -49,36 +53,20 @@ type ApiResponse = {
   };
 };
 
-const containerStyle = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  padding: 24,
-  display: "grid",
-  gap: 18,
-} as const;
+const surface = chartSurface("buyer");
+const theme = surface.theme;
 
-const panelStyle = {
-  background: "#ffffff",
-  border: "1px solid #d7deea",
-  borderRadius: 8,
-} as const;
-
-const mutedText = {
-  color: "#5d687a",
-  lineHeight: 1.5,
-} as const;
+const containerStyle = surface.container;
+const panelStyle = surface.panel;
+const mutedText = surface.muted;
+const inputStyle = surface.input;
+const fieldLabelStyle = { fontSize: 14, fontWeight: 700, color: theme.inkSoft } as const;
 
 function StatusBadge(props: {
   tone: "ready" | "review" | "blocked" | "neutral";
   text: string;
 }) {
-  const tones = {
-    ready: { background: "#e7f5ed", color: "#047857" },
-    review: { background: "#fff7ed", color: "#9a3412" },
-    blocked: { background: "#fff1f0", color: "#b42318" },
-    neutral: { background: "#eef2f7", color: "#475569" },
-  } as const;
-  const tone = tones[props.tone];
+  const tone = surface.badges[props.tone];
 
   return (
     <span
@@ -299,40 +287,38 @@ export default function ReadinessAssessmentPage() {
         <section
           aria-label="Public Alpha readiness review"
           style={{
-            background: "#ffffff",
-            border: "1px solid #d7deea",
-            borderRadius: 12,
+            ...panelStyle,
             padding: 28,
             marginBottom: 16,
           }}
         >
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "#162033" }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: theme.ink }}>
             Readiness review
           </h1>
-          <p style={{ marginTop: 12, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 12, fontSize: 14, color: theme.inkSoft, lineHeight: 1.6 }}>
             Every readiness assessment is advisory. A named credentialed
             reviewer can review your readiness with you on request
             (human review).
           </p>
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: theme.ink }}>
             Readiness indicators
           </h2>
-          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 8, fontSize: 14, color: theme.inkSoft, lineHeight: 1.6 }}>
             The signals we computed about your project, with a plain-English &ldquo;why this matters&rdquo; for each.
           </p>
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: "#162033" }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: theme.ink }}>
             Missing items
           </h2>
-          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 8, fontSize: 14, color: theme.inkSoft, lineHeight: 1.6 }}>
             What you still need to provide for a readiness assessment to be complete, each with a plain-English &ldquo;why this matters.&rdquo;
           </p>
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: "#162033" }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 20, color: theme.ink }}>
             Documentation recommendations
           </h2>
-          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 8, fontSize: 14, color: theme.inkSoft, lineHeight: 1.6 }}>
             Documents we recommend you prepare. Each carries a &ldquo;why this matters&rdquo; sentence.
           </p>
-          <p style={{ marginTop: 20, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: theme.inkFaint, lineHeight: 1.6 }}>
             This information is advisory only and is not an approval,
             guarantee, or official determination. No legal, regulatory,
             or official reliance may be placed on this information. You
@@ -359,17 +345,10 @@ export default function ReadinessAssessmentPage() {
             }}
           >
             <div style={{ display: "grid", gap: 8, maxWidth: 760 }}>
-              <span
-                style={{
-                  color: "#456077",
-                  fontSize: 13,
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                }}
-              >
+              <span style={surface.kicker}>
                 Borrower Readiness Assessment
               </span>
-              <h1 style={{ margin: 0, fontSize: 34, lineHeight: 1.1 }}>
+              <h1 style={{ margin: 0, fontSize: 34, lineHeight: 1.1, color: theme.ink }}>
                 Readiness Assessment
               </h1>
               <p style={{ ...mutedText, margin: 0 }}>
@@ -395,42 +374,28 @@ export default function ReadinessAssessmentPage() {
             }}
           >
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
+              <span style={fieldLabelStyle}>
                 Borrower ID
               </span>
               <input
                 value={borrowerId}
                 onChange={(event) => setBorrowerId(event.target.value)}
-                style={{
-                  minHeight: 42,
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  fontSize: 14,
-                  background: "#ffffff",
-                }}
+                style={inputStyle}
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
+              <span style={fieldLabelStyle}>
                 Application ID
               </span>
               <input
                 value={applicationId}
                 onChange={(event) => setApplicationId(event.target.value)}
                 placeholder="Optional"
-                style={{
-                  minHeight: 42,
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  fontSize: 14,
-                  background: "#ffffff",
-                }}
+                style={inputStyle}
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
+              <span style={fieldLabelStyle}>
                 Documents requested
               </span>
               <input
@@ -438,18 +403,11 @@ export default function ReadinessAssessmentPage() {
                 min="0"
                 value={requestedCount}
                 onChange={(event) => setRequestedCount(event.target.value)}
-                style={{
-                  minHeight: 42,
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  fontSize: 14,
-                  background: "#ffffff",
-                }}
+                style={inputStyle}
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
+              <span style={fieldLabelStyle}>
                 Documents received
               </span>
               <input
@@ -457,18 +415,11 @@ export default function ReadinessAssessmentPage() {
                 min="0"
                 value={receivedCount}
                 onChange={(event) => setReceivedCount(event.target.value)}
-                style={{
-                  minHeight: 42,
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  fontSize: 14,
-                  background: "#ffffff",
-                }}
+                style={inputStyle}
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
+              <span style={fieldLabelStyle}>
                 Documents pending review
               </span>
               <input
@@ -476,18 +427,11 @@ export default function ReadinessAssessmentPage() {
                 min="0"
                 value={pendingReviewCount}
                 onChange={(event) => setPendingReviewCount(event.target.value)}
-                style={{
-                  minHeight: 42,
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  fontSize: 14,
-                  background: "#ffffff",
-                }}
+                style={inputStyle}
               />
             </label>
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#334155" }}>
+              <span style={fieldLabelStyle}>
                 Discovery advisory views
               </span>
               <input
@@ -495,14 +439,7 @@ export default function ReadinessAssessmentPage() {
                 min="0"
                 value={discoveryViews}
                 onChange={(event) => setDiscoveryViews(event.target.value)}
-                style={{
-                  minHeight: 42,
-                  border: "1px solid #cbd5e1",
-                  borderRadius: 6,
-                  padding: "8px 10px",
-                  fontSize: 14,
-                  background: "#ffffff",
-                }}
+                style={inputStyle}
               />
             </label>
             <label
@@ -512,7 +449,7 @@ export default function ReadinessAssessmentPage() {
                 gap: 8,
                 marginTop: 22,
                 fontSize: 14,
-                color: "#334155",
+                color: theme.inkSoft,
               }}
             >
               <input
@@ -531,7 +468,7 @@ export default function ReadinessAssessmentPage() {
                 gap: 8,
                 marginTop: 22,
                 fontSize: 14,
-                color: "#334155",
+                color: theme.inkSoft,
               }}
             >
               <input
@@ -551,13 +488,10 @@ export default function ReadinessAssessmentPage() {
             disabled={submitting}
             style={{
               justifySelf: "start",
-              minHeight: 42,
-              border: 0,
-              borderRadius: 6,
-              padding: "0 16px",
-              background: submitting ? "#94a3b8" : "#1d4ed8",
-              color: "#ffffff",
-              fontWeight: 800,
+              ...surface.primaryButton,
+              background: submitting
+                ? surface.primaryButtonBusyBg
+                : surface.primaryButton.background,
               cursor: submitting ? "default" : "pointer",
             }}
           >
@@ -567,16 +501,7 @@ export default function ReadinessAssessmentPage() {
           </button>
 
           {error ? (
-            <div
-              style={{
-                border: "1px solid #fecaca",
-                background: "#fff1f0",
-                color: "#991b1b",
-                borderRadius: 8,
-                padding: 12,
-                fontWeight: 700,
-              }}
-            >
+            <div style={surface.errorPanel}>
               {error}
             </div>
           ) : null}
@@ -590,12 +515,12 @@ export default function ReadinessAssessmentPage() {
           }}
         >
           <div style={{ ...panelStyle, padding: 18, display: "grid", gap: 12 }}>
-            <h2 style={{ margin: 0, fontSize: 22 }}>Overall Readiness</h2>
+            <h2 style={{ margin: 0, fontSize: 22, color: theme.ink }}>Overall Readiness</h2>
             <div
               style={{
                 height: 12,
                 borderRadius: 999,
-                background: "#e2e8f0",
+                background: surface.meterTrack,
                 overflow: "hidden",
               }}
             >
@@ -605,12 +530,12 @@ export default function ReadinessAssessmentPage() {
                   width: `${assessment.overallReadinessPercent}%`,
                   background:
                     assessment.overallReadinessPercent >= 80
-                      ? "#059669"
-                      : "#ca8a04",
+                      ? surface.meterGood
+                      : surface.meterWarn,
                 }}
               />
             </div>
-            <strong style={{ fontSize: 28 }}>
+            <strong style={{ fontSize: 28, color: theme.ink }}>
               {assessment.overallReadinessPercent}%
             </strong>
             <p style={{ ...mutedText, margin: 0 }}>
@@ -618,13 +543,13 @@ export default function ReadinessAssessmentPage() {
               approval, or regulatory reliance is created or implied.
             </p>
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 15 }}>Missing Items</h3>
+              <h3 style={{ margin: 0, fontSize: 15, color: theme.ink }}>Missing Items</h3>
               {assessment.missingItems.length === 0 ? (
                 <p style={{ ...mutedText, margin: 0 }}>
                   No missing items detected. Continue to human review.
                 </p>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                   {assessment.missingItems.slice(0, 10).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -632,8 +557,8 @@ export default function ReadinessAssessmentPage() {
               )}
             </div>
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 15 }}>Review Signals</h3>
-              <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+              <h3 style={{ margin: 0, fontSize: 15, color: theme.ink }}>Review Signals</h3>
+              <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                 {assessment.reviewSignals.slice(0, 6).map((signal) => (
                   <li key={signal}>{signal}</li>
                 ))}
@@ -662,7 +587,7 @@ export default function ReadinessAssessmentPage() {
                   }}
                 >
                   <div>
-                    <h2 style={{ margin: 0, fontSize: 20 }}>{section.label}</h2>
+                    <h2 style={{ margin: 0, fontSize: 20, color: theme.ink }}>{section.label}</h2>
                     <p style={{ ...mutedText, margin: "4px 0 0" }}>
                       Next step: {section.nextRoute}
                     </p>
@@ -680,14 +605,14 @@ export default function ReadinessAssessmentPage() {
                 </div>
                 {section.missingItems.length > 0 ? (
                   <div>
-                    <h3 style={{ margin: "0 0 6px", fontSize: 14 }}>
+                    <h3 style={{ margin: "0 0 6px", fontSize: 14, color: theme.ink }}>
                       Missing items
                     </h3>
                     <ul
                       style={{
                         margin: 0,
                         paddingLeft: 18,
-                        color: "#475569",
+                        color: theme.inkSoft,
                       }}
                     >
                       {section.missingItems.slice(0, 8).map((item) => (
@@ -697,10 +622,10 @@ export default function ReadinessAssessmentPage() {
                   </div>
                 ) : null}
                 <div>
-                  <h3 style={{ margin: "0 0 6px", fontSize: 14 }}>
+                  <h3 style={{ margin: "0 0 6px", fontSize: 14, color: theme.ink }}>
                     Review signals
                   </h3>
-                  <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                  <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                     {section.reviewSignals.slice(0, 4).map((signal) => (
                       <li key={signal}>{signal}</li>
                     ))}
@@ -712,7 +637,7 @@ export default function ReadinessAssessmentPage() {
         </section>
 
         <section style={{ ...panelStyle, padding: 18, display: "grid", gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 22 }}>Governance Evidence</h2>
+          <h2 style={{ margin: 0, fontSize: 22, color: theme.ink }}>Governance Evidence</h2>
           <div
             style={{
               display: "grid",
@@ -753,11 +678,7 @@ export default function ReadinessAssessmentPage() {
               <Link
                 key={route}
                 href={route}
-                style={{
-                  color: "#1d4ed8",
-                  fontWeight: 800,
-                  textDecoration: "none",
-                }}
+                style={surface.link}
               >
                 {route}
               </Link>
@@ -766,8 +687,8 @@ export default function ReadinessAssessmentPage() {
         </section>
 
         <section style={{ ...panelStyle, padding: 18 }}>
-          <h2 style={{ marginTop: 0, fontSize: 22 }}>Disclosures</h2>
-          <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+          <h2 style={{ marginTop: 0, fontSize: 22, color: theme.ink }}>Disclosures</h2>
+          <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
             {assessment.disclosures.slice(0, 14).map((disclosure) => (
               <li key={disclosure}>{disclosure}</li>
             ))}

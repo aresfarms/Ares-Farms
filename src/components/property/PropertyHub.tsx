@@ -26,6 +26,7 @@ import {
   financingPathwayTags,
   type PropertyCategoryId,
 } from "@/lib/property/propertyCategories";
+import { CHART_THEMES } from "@/lib/property/chartThemes";
 import { renderableListings } from "@/lib/source-intelligence/listing-intake/listingStore";
 import { STATE_NAMES } from "@/lib/property/stateNames";
 import type { PropertySourceId } from "@/lib/property/propertyTypes";
@@ -48,6 +49,8 @@ import type { PropertySourceId } from "@/lib/property/propertyTypes";
  * personal data leaves Furlong; the provider's own intake handles any data).
  */
 
+// Chart Table tokens — the hub is themed by CHART_THEMES.buyer (navigator).
+const navigatorTheme = CHART_THEMES.buyer;
 const muted = { color: "#b7ccd9", lineHeight: 1.6 } as const;
 
 /**
@@ -118,7 +121,7 @@ export function PropertyHub({
         <Link href="/explore" style={backLink}>
           ← Back to the compass
         </Link>
-        <Disclosures variant="full" />
+        <Disclosures variant="full" tone="dark" />
       </div>
     </main>
   );
@@ -163,9 +166,9 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
     <section
       aria-label="Choose how to start property analysis"
       style={{
-        border: "1px solid #29536f",
+        border: `1px solid ${navigatorTheme.waypointBorder}`,
         borderRadius: 16,
-        background: "rgba(16, 45, 64, 0.74)",
+        background: navigatorTheme.waypointBg,
         padding: "22px 24px",
         display: "grid",
         gap: 18,
@@ -184,9 +187,9 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
       >
         <div
           style={{
-            border: "1px solid #29536f",
+            border: `1px solid ${navigatorTheme.waypointBorder}`,
             borderRadius: 14,
-            background: "rgba(9, 28, 41, 0.8)",
+            background: navigatorTheme.cellBg,
             padding: "18px 18px",
             display: "grid",
             gap: 12,
@@ -225,9 +228,9 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
 
         <div
           style={{
-            border: "1px solid #29536f",
+            border: `1px solid ${navigatorTheme.waypointBorder}`,
             borderRadius: 14,
-            background: "rgba(9, 28, 41, 0.8)",
+            background: navigatorTheme.cellBg,
             padding: "18px 18px",
             display: "grid",
             gap: 12,
@@ -239,7 +242,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
             </span>
             <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Enter a specific address</strong>
           </div>
-          <PlaceFirstDiscovery flow="property-discovery" embedded />
+          <PlaceFirstDiscovery flow="property-discovery" embedded tone="dark" />
         </div>
       </div>
 
@@ -445,7 +448,7 @@ function Listings({
 
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 14 }}>
         {listings.map((p) => (
-          <li key={p.id} style={{ border: "1px solid #29536f", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)", padding: "18px 20px", display: "grid", gap: 8 }}>
+          <li key={p.id} style={{ border: `1px solid ${navigatorTheme.waypointBorder}`, borderRadius: 12, background: navigatorTheme.cellBg, padding: "18px 20px", display: "grid", gap: 8 }}>
             <PropertyBriefLauncher
               property={{
                 id: p.id,
@@ -778,7 +781,7 @@ function stateHref(categoryId: string, abbr: string): string {
 
 const cardLink = {
   display: "flex", flexDirection: "column", gap: 6,
-  border: "1px solid #29536f", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)",
+  border: `1px solid ${navigatorTheme.waypointBorder}`, borderRadius: 12, background: navigatorTheme.cellBg,
   padding: "16px 18px", textDecoration: "none", height: "100%",
 } as const;
 const countPill = {
@@ -795,7 +798,7 @@ const lightContainer = {
   padding: "32px 24px 60px",
   display: "grid",
   gap: 24,
-  background: "linear-gradient(180deg, #0c2233, #0a1b29 60%, #081521)",
+  background: navigatorTheme.stage,
   borderRadius: 20,
-  color: "#eaf3f7",
+  color: navigatorTheme.ink,
 } as const;

@@ -224,9 +224,14 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
   );
   const livingHere = lens.showLiving ? intelligence?.livingHere ?? null : null;
   const mechanics = intelligence?.mechanics ?? null;
+  // Lens extras merge AFTER the brief's unknowns (which now carry the
+  // property-profile question bank) — dedupe by label so a topic both know
+  // about renders once.
+  const briefUnknowns = intelligence?.unknowns ?? [];
+  const briefUnknownLabels = new Set(briefUnknowns.map((u) => u.label.toLowerCase()));
   const unknowns = [
-    ...(intelligence?.unknowns ?? []),
-    ...lens.extraUnknowns,
+    ...briefUnknowns,
+    ...lens.extraUnknowns.filter((u) => !briefUnknownLabels.has(u.label.toLowerCase())),
   ];
   const headline = lens.headline || props.headline;
 
@@ -291,6 +296,11 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
               {props.propertyType} · {props.sourceLabel}
               {props.fileNo ? ` · #${props.fileNo}` : ""}
             </span>
+            {intelligence?.profile && (
+              <span style={{ fontSize: 11.5, color: theme.accent, display: "block", marginTop: 2 }}>
+                Charted as: {intelligence.profile.label} — the questions below match it
+              </span>
+            )}
             <span style={{ fontSize: 12.5, color: theme.inkSoft, display: "block" }}>
               {props.location} · {props.priceLabel}
             </span>

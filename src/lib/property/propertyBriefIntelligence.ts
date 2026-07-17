@@ -27,6 +27,12 @@ import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 import {
+  classifyPropertyProfile,
+  profileCostLines,
+  profileQuestionLines,
+  type PropertyProfile,
+} from "./propertyProfile";
+import {
   PROPERTY_TENURE_FACTS,
   PROPERTY_TENURE_PROVENANCE,
 } from "./propertyTenureGenerated";
@@ -142,6 +148,9 @@ export interface PropertyBriefIntelligence {
   livingHere: LivingHereStrip | null;
   /** Typical costs of answering the unknowns — guidance, not quotes. */
   diligenceCosts: DiligenceCostLine[];
+  /** Canonical property profile (axis 1 of the tailoring philosophy) —
+      drives the per-type question bank; optional for payload back-compat. */
+  profile?: PropertyProfile | null;
 }
 
 /**
@@ -583,9 +592,24 @@ function hazardRiskFact(countyFips: string | null): BriefFactLine | null {
   };
 }
 
-/** Farm/land-shaped property types get ground-rent context automatically. */
+/** Farm/land-shaped property types get ground-rent context automatically.
+    (Ground rent applies to open acreage on BOTH farm and land profiles, so
+    this stays broader than the farm profile alone — classifyPropertyProfile
+    is the canonical taxonomy for everything else.) */
 function isFarmShaped(propertyType: string | null): boolean {
   return /farm|ranch|land|acre|agric|crop|pasture|homestead/i.test(propertyType ?? "");
+}
+
+/** Append the profile's question bank, skipping labels the base set covers. */
+function withProfileQuestions(
+  unknowns: BriefUnknownLine[],
+  profile: PropertyProfile
+): BriefUnknownLine[] {
+  const seen = new Set(unknowns.map((line) => line.label.toLowerCase()));
+  const additions = profileQuestionLines(profile.id).filter(
+    (line) => !seen.has(line.label.toLowerCase())
+  );
+  return [...unknowns, ...additions];
 }
 
 /**
@@ -875,7 +899,11 @@ export function buildPropertyBriefIntelligence(args: {
   pathwayList: string[];
 }): PropertyBriefIntelligence {
   const id = args.propertyId ?? "";
-  const isHome = /home|residential|house/i.test(args.propertyType ?? "");
+  // Canonical profile (axis 1) — classified ONCE here, drives the home-shaped
+  // gating and the per-type question bank. The old bare regex called a
+  // "mobile home park" a home because it contains the word "home".
+  const profile = classifyPropertyProfile({ propertyType: args.propertyType });
+  const isHome = profile.id === "residential";
 
   const verifiedFacts: BriefFactLine[] = [];
 
@@ -1033,20 +1061,23 @@ export function buildPropertyBriefIntelligence(args: {
 
   return {
     verifiedFacts,
-    unknowns: buildUnknowns({
-      propertyId: id,
-      county: args.county,
-      resolvedCounty,
-      priceLabel: args.priceLabel,
-      floodResolved: Boolean(flood),
-      isHome,
-      rentalContextAvailable: Boolean(fmr),
-      amenitiesAvailable: Boolean(amenities),
-      schoolsAvailable: Boolean(schools && schools.length > 0),
-      groundRentNeeded: farmShaped && !groundRent,
-      privateSchoolsAvailable: Boolean(privateSchools),
-      electricAvailable: Boolean(electric),
-    }),
+    unknowns: withProfileQuestions(
+      buildUnknowns({
+        propertyId: id,
+        county: args.county,
+        resolvedCounty,
+        priceLabel: args.priceLabel,
+        floodResolved: Boolean(flood),
+        isHome,
+        rentalContextAvailable: Boolean(fmr),
+        amenitiesAvailable: Boolean(amenities),
+        schoolsAvailable: Boolean(schools && schools.length > 0),
+        groundRentNeeded: farmShaped && !groundRent,
+        privateSchoolsAvailable: Boolean(privateSchools),
+        electricAvailable: Boolean(electric),
+      }),
+      profile
+    ),
     mechanics: mechanicsForSource(args.sourceId, args.propertyType),
     pathwaysProse: buildPathwaysProse({
       pathwayList: args.pathwayList,
@@ -1069,7 +1100,8 @@ export function buildPropertyBriefIntelligence(args: {
       amenities && isHome
         ? livingHereStrip(amenities, PROPERTY_AMENITIES_PROVENANCE.radiusMiles)
         : null,
-    diligenceCosts: diligenceCostLines({ isHome, farmShaped }),
+    diligenceCosts: [...diligenceCostLines({ isHome, farmShaped }), ...profileCostLines(profile.id)],
+    profile,
   };
 }
 
@@ -1151,11 +1183,10 @@ export async function buildLocationBriefIntelligence(args: {
   propertyType?: string | null;
   amenityEnv?: NodeJS.ProcessEnv;
 }): Promise<PropertyBriefIntelligence> {
-  // Manual portal entry is residential-first; treat as a home unless a type
-  // that clearly is not a home is supplied.
-  const isHome = args.propertyType
-    ? /home|residential|house/i.test(args.propertyType)
-    : true;
+  // Manual portal entry is residential-first; treat as a home unless the
+  // canonical classifier says the supplied type is something else.
+  const locProfile = classifyPropertyProfile({ propertyType: args.propertyType ?? null });
+  const isHome = args.propertyType ? locProfile.id === "residential" : true;
   const geocode = args.geocode;
   const placeFacts = args.placeFacts;
   const stateCode = args.parsed?.state ?? null;
@@ -1323,20 +1354,23 @@ export async function buildLocationBriefIntelligence(args: {
 
   return {
     verifiedFacts,
-    unknowns: buildUnknowns({
-      propertyId: "",
-      county: resolvedCounty?.name ?? null,
-      resolvedCounty,
-      priceLabel: null,
-      floodResolved,
-      isHome,
-      rentalContextAvailable: Boolean(fmr),
-      amenitiesAvailable: Boolean(amenities),
-      schoolsAvailable: Boolean(schools && schools.length > 0),
-      groundRentNeeded: !groundRent,
-      privateSchoolsAvailable: Boolean(privateSchools),
-      electricAvailable: Boolean(electric),
-    }),
+    unknowns: withProfileQuestions(
+      buildUnknowns({
+        propertyId: "",
+        county: resolvedCounty?.name ?? null,
+        resolvedCounty,
+        priceLabel: null,
+        floodResolved,
+        isHome,
+        rentalContextAvailable: Boolean(fmr),
+        amenitiesAvailable: Boolean(amenities),
+        schoolsAvailable: Boolean(schools && schools.length > 0),
+        groundRentNeeded: !groundRent,
+        privateSchoolsAvailable: Boolean(privateSchools),
+        electricAvailable: Boolean(electric),
+      }),
+      locProfile
+    ),
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),
     resolvedCounty,
@@ -1355,6 +1389,10 @@ export async function buildLocationBriefIntelligence(args: {
       fmr4: isHome && fmr ? fmr.fmr4 : null,
     }),
     livingHere: amenities && isHome ? livingHereStrip(amenities, AMENITY_RADIUS_MILES) : null,
-    diligenceCosts: diligenceCostLines({ isHome, farmShaped: locFarmShaped || !args.propertyType }),
+    diligenceCosts: [
+      ...diligenceCostLines({ isHome, farmShaped: locFarmShaped || !args.propertyType }),
+      ...profileCostLines(locProfile.id),
+    ],
+    profile: locProfile,
   };
 }

@@ -16,6 +16,7 @@
 
 import { buildPropertyAnalysisHref } from "./propertyAnalysisHref";
 import { findCanonicalPropertyById, listExploreDetail } from "./propertyData";
+import { classifyPropertyProfile } from "./propertyProfile";
 import { priceBand, toExploreDetail, type CanonicalProperty, type ExploreDetailProperty } from "./propertyTypes";
 
 export interface SimilarPropertyCard {
@@ -64,8 +65,6 @@ function coordsOf(c: CanonicalProperty): { lat: number; lon: number } | null {
   const r = c.source_records[0];
   return r.latitude != null && r.longitude != null ? { lat: r.latitude, lon: r.longitude } : null;
 }
-
-const HOME_SHAPED = /home|house|resid|multi|cottage|cabin/i;
 
 function toCard(
   listing: ExploreDetailProperty,
@@ -128,16 +127,17 @@ export function similarNearbyProperties(
   const subjectListing = toExploreDetail(subject);
   const subjectPrice = subjectRecord.price;
   const subjectCoords = coordsOf(subject);
-  const subjectHomeShaped = HOME_SHAPED.test(subjectRecord.propertyType);
+  const subjectProfile = classifyPropertyProfile({ propertyType: subjectRecord.propertyType }).id;
 
   const { listings } = listExploreDetail({ state: subjectRecord.state });
   const scored: Array<{ card: SimilarPropertyCard; score: number }> = [];
 
   for (const listing of listings) {
     if (listing.id === subjectListing.id) continue;
-    // Similar means similar in kind: home-shaped subjects compare against
-    // home-shaped alternatives; land/farm subjects against land/farm.
-    if (subjectHomeShaped !== HOME_SHAPED.test(listing.propertyType)) continue;
+    // Similar means similar in kind — same canonical property profile
+    // (homes against homes, farms against farms, commercial against
+    // commercial), via the one classifier every surface shares.
+    if (classifyPropertyProfile({ propertyType: listing.propertyType }).id !== subjectProfile) continue;
 
     let distanceMiles: number | null = null;
     if (subjectCoords) {

@@ -15,6 +15,7 @@ import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildOwnershipCostModel, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
+import { classifyPropertyProfile, profileUsesResidentialLanes } from "@/lib/property/propertyProfile";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import { reportTierIdentity, type ReportTierIdentity } from "@/lib/reports/reportTierIdentity";
@@ -2247,6 +2248,11 @@ export function PropertyEvaluationWorkspace({
   const effectivePlaceIntelligence = context.propertyId?.startsWith("imported:")
     ? facts?.placeIntelligence ?? placeIntelligence ?? null
     : placeIntelligence ?? facts?.placeIntelligence ?? null;
+  // Canonical property profile (axis 1) — the brief's server classification
+  // wins; fall back to classifying the context type for older API payloads.
+  const workspaceProfile =
+    effectivePlaceIntelligence?.profile ??
+    classifyPropertyProfile({ propertyType: analysisContext.propertyType });
   const answerCard = buildAnswerCard({
     context: analysisContext,
     restrictionsPresent: (facts?.verification?.restrictions?.length ?? 0) > 0,
@@ -2477,12 +2483,15 @@ export function PropertyEvaluationWorkspace({
             })),
             diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
             ownershipCosts:
-              listedPrice != null && ownershipContext && chartVariant !== "finance" && chartVariant !== "commercial"
+              listedPrice != null &&
+              ownershipContext &&
+              chartVariant !== "finance" &&
+              profileUsesResidentialLanes(workspaceProfile.id)
                 ? formatOwnershipCostsForPdf({
                     listedPrice,
                     ownershipContext,
                     isHome: isResidentialHomeContext(analysisContext),
-                    farmShaped: /farm|ranch|agric/i.test(analysisContext.propertyType),
+                    farmShaped: workspaceProfile.id === "farm",
                   })
                 : undefined,
             similarHomes: similarHomes.length
@@ -2680,14 +2689,18 @@ export function PropertyEvaluationWorkspace({
         financingLanes={topProgramPreview}
         costsSlot={
           // The finance lens carries no products/terms/rates (counsel gate);
-          // the residential program table doesn't fit commercial assets.
-          ownershipContext && chartVariant !== "finance" && chartVariant !== "commercial" ? (
+          // the home-mortgage lane table only fits residential/farm profiles
+          // (canonical classifier — commercial/hospitality/MHP/land get their
+          // own profile questions instead).
+          ownershipContext &&
+          chartVariant !== "finance" &&
+          profileUsesResidentialLanes(workspaceProfile.id) ? (
             <OwnershipCostPanel
               theme={CHART_THEMES[chartVariant]}
               context={ownershipContext}
               listedPrice={listedPrice}
               isHome={isResidentialHomeContext(analysisContext)}
-              farmShaped={/farm|ranch|agric/i.test(analysisContext.propertyType)}
+              farmShaped={workspaceProfile.id === "farm"}
             />
           ) : null
         }

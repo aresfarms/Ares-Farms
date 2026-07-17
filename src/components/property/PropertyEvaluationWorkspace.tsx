@@ -2715,32 +2715,6 @@ export function PropertyEvaluationWorkspace({
             </div>
           </section>
         )}
-	        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-	          {context.listingUrl && (
-	            <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
-              Open the source listing ↗
-            </Link>
-          )}
-          <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
-            Save draft in this session
-          </button>
-          <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-            {pdfBusy === "export" ? "Preparing PDF export..." : "Export watermarked report"}
-          </button>
-          <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
-            {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
-          </button>
-          {savedAt && (
-            <span style={{ fontSize: 12, color: "#7a8aa0" }}>
-              Saved {new Date(savedAt).toLocaleString()}
-            </span>
-          )}
-        </div>
-        {pdfError && (
-          <p style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 860 }}>
-            PDF generation hit an issue: {pdfError}
-          </p>
-        )}
 	        <section style={{ ...panelStyle, background: "linear-gradient(135deg, #fbfcfe, #ffffff)", gap: 14 }}>
 	          <div style={{ display: "grid", gap: 5 }}>
 	            <strong style={{ fontSize: 18, color: "#162033" }}>Immediate on-screen report</strong>
@@ -2817,6 +2791,34 @@ export function PropertyEvaluationWorkspace({
 	            </div>
 	          </div>
 	        </div>
+        {/* Actions live BELOW the report they act on (founder feedback
+            2026-07-16: the report was buried under the buttons). */}
+	        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+	          {context.listingUrl && (
+	            <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
+              Open the source listing ↗
+            </Link>
+          )}
+          <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
+            Save draft in this session
+          </button>
+          <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+            {pdfBusy === "export" ? "Preparing PDF export..." : "Export watermarked report"}
+          </button>
+          <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+            {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
+          </button>
+          {savedAt && (
+            <span style={{ fontSize: 12, color: "#7a8aa0" }}>
+              Saved {new Date(savedAt).toLocaleString()}
+            </span>
+          )}
+        </div>
+        {pdfError && (
+          <p style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 860 }}>
+            PDF generation hit an issue: {pdfError}
+          </p>
+        )}
 	        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
 	          <span style={pillGray}>{report.tier.shortLabel}</span>
 	          <span style={pillGray}>{report.tier.label}</span>

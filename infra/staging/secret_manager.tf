@@ -9,6 +9,8 @@
 #   DATABASE_URL           -> furlong_runtime connection string (runtime SA reads)
 #   MIGRATOR_DATABASE_URL  -> furlong_migrator connection string (migrator SA reads)
 #   NEXTAUTH_SECRET        -> strong random >=32 chars (runtime SA reads)
+#   REPORT_SIGNING_SECRET  -> strong random >=32 chars (runtime SA reads; signs
+#                             the short-lived report-export attestations)
 # Stripe/GSA/etc. stay unset/dormant.
 # =============================================================================
 
@@ -18,6 +20,7 @@ locals {
     "DATABASE_URL",
     "MIGRATOR_DATABASE_URL",
     "NEXTAUTH_SECRET",
+    "REPORT_SIGNING_SECRET",
   ]
 }
 

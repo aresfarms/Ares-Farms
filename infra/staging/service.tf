@@ -102,6 +102,15 @@ resource "google_cloud_run_v2_service" "core" {
           }
         }
       }
+      env {
+        name = "REPORT_SIGNING_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app["REPORT_SIGNING_SECRET"].secret_id
+            version = "latest"
+          }
+        }
+      }
 
       # Non-secret revision forcer: incrementing var.secret_revision_epoch
       # after a rotation mints a new revision so `latest` is re-resolved.
@@ -182,6 +191,7 @@ resource "google_cloud_run_v2_service" "core" {
   depends_on = [
     google_secret_manager_secret_iam_member.runtime_database_url,
     google_secret_manager_secret_iam_member.runtime_nextauth_secret,
+    google_secret_manager_secret_iam_member.runtime_report_signing,
     google_storage_bucket_iam_member.runtime_state_core_rw,
   ]
 }

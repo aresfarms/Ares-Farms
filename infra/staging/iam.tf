@@ -50,6 +50,13 @@ resource "google_secret_manager_secret_iam_member" "runtime_nextauth_secret" {
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "runtime_report_signing" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.app["REPORT_SIGNING_SECRET"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
 # ---- Secret access: migrator SA -> MIGRATOR_DATABASE_URL only ---------------
 
 resource "google_secret_manager_secret_iam_member" "migrator_database_url" {

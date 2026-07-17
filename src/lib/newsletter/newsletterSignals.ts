@@ -16,6 +16,7 @@ import { MORTGAGE_RATES } from "@/lib/property/mortgageRatesGenerated";
 import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "@/lib/property/stateCropConditionsGenerated";
 import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 import { STATE_ELECTRICITY } from "@/lib/property/stateElectricityGenerated";
+import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "@/lib/property/stateGrainBidsGenerated";
 import { STATE_HPI } from "@/lib/property/stateHpiGenerated";
 
 export interface NewsletterSignal {
@@ -123,6 +124,30 @@ export function cashRentSignal(states: string[]): NewsletterSignal | null {
       `baseline when a drought year pressures both operators and landowners. A failed crop is exactly when ` +
       `rent terms and land ownership get reconsidered.`,
     source: `USDA NASS cash rents, ${COUNTY_CASH_RENTS_PROVENANCE.year} survey`,
+    tone: "neutral",
+  };
+}
+
+export function grainBidSignal(states: string[]): NewsletterSignal | null {
+  if (STATE_GRAIN_BIDS_PROVENANCE.asOf === null) return null;
+  // Lead with the region's own buyer board (falls back to the first member
+  // state with a report).
+  const pick = states.map((s) => ({ s, g: STATE_GRAIN_BIDS[s] })).find((x) => x.g);
+  if (!pick) return null;
+  const arrow = (d: string | null) => (d === "UP" ? "▲" : d === "DOWN" ? "▼" : "");
+  const parts: string[] = [];
+  for (const [key, lbl] of [["corn", "Corn"], ["soybeans", "Soybeans"], ["wheat", "Wheat"]] as const) {
+    const b = pick.g.bids[key];
+    if (b) parts.push(`${lbl} $${b.avg.toFixed(2)}${arrow(b.direction)}`);
+  }
+  if (parts.length === 0) return null;
+  return {
+    headline: `${stateName(pick.s)} elevator cash bids: ${parts.join(" · ")}`,
+    body:
+      `The average local grain-buyer bid in ${stateName(pick.s)} (USDA Market News, ${pick.g.reportDate}): ` +
+      `${parts.join(", ")} per bushel — the public record of what the region's elevators are actually paying, ` +
+      `arrows showing the day-over-day move. This is the price a short crop has to meet.`,
+    source: `USDA AMS Market News grain bids, ${pick.g.reportDate}`,
     tone: "neutral",
   };
 }

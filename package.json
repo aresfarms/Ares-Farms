@@ -345,7 +345,8 @@
     "ingest:usdm-drought": "tsx src/scripts/ingestUsdmDrought.ts",
     "ingest:nass-crop-conditions": "tsx src/scripts/ingestNassCropConditions.ts",
     "ingest:fcc-broadband": "tsx src/scripts/ingestFccBroadband.ts",
-    "ingest:nass-grain-prices": "tsx src/scripts/ingestNassGrainPrices.ts"
+    "ingest:nass-grain-prices": "tsx src/scripts/ingestNassGrainPrices.ts",
+    "ingest:ams-grain-bids": "tsx src/scripts/ingestAmsGrainBids.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

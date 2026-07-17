@@ -62,31 +62,40 @@ type PropertyEvaluationPdfInput = {
   financingProse?: string | null;
 };
 
+/**
+ * Pro-forma report layout (founder direction 2026-07-17: "a really nice pro
+ * forma report"). Principles that keep it from ever overlapping again:
+ *
+ * 1. NOTHING body-level is absolutely positioned — every block is MEASURED
+ *    (heightOfString with the actual font applied) before it is drawn, and
+ *    the cursor advances by real heights.
+ * 2. Page breaks are explicit: a block that will not fit starts a new page;
+ *    long bullet runs flow item-by-item so a single section can span pages
+ *    without escaping a box that was sized by guesswork.
+ * 3. Chrome (header rule, footer, page numbers) is stamped in a FINAL pass
+ *    over buffered pages, so it can never collide with content.
+ * 4. The translucent compass watermark asset is gone (it rendered its baked
+ *    transparency checkerboard); branding is the logo + emblem, small and
+ *    opaque, plus the tier's accent language.
+ */
+
 const PAGE = {
   width: 612,
   height: 792,
-  marginX: 44,
-  marginTop: 42,
-  marginBottom: 40,
+  marginX: 48,
+  contentTop: 64,
+  contentBottom: 736, // footer band starts below this
 };
+const CONTENT_W = PAGE.width - PAGE.marginX * 2;
 
 const COLORS = {
-  navy: "#12344d",
   deep: "#162033",
-  teal: "#0f766e",
-  gold: "#9c6b1b",
-  softBlue: "#eef4fb",
-  line: "#d7deea",
   text: "#3b475a",
   muted: "#66758a",
-  paper: "#fbfcfe",
+  faint: "#9aa6b6",
+  line: "#d7deea",
+  paper: "#f7f9fb",
 };
-
-// Tier identity accent, set once per document at the top of generate(). Keeps
-// sectionTitle/bulletList signatures unchanged while every heading, rule, and
-// chip picks up the tier's personality (reportTierIdentity is the source).
-let ACCENT = COLORS.teal;
-let ACCENT_SOFT = COLORS.softBlue;
 
 const FONT_CANDIDATES = {
   regular: [
@@ -113,107 +122,21 @@ const RESOLVED_FONTS = {
   bold: resolveFontPath("bold"),
 };
 
-function applyFont(doc: any, weight: keyof typeof RESOLVED_FONTS) {
-  const resolved = RESOLVED_FONTS[weight];
-  if (resolved) {
-    doc.font(resolved);
-    return;
-  }
-  doc.font(weight === "bold" ? "Times-Bold" : "Times-Roman");
-}
-
 function publicAssetPath(assetPath: string): string {
   return path.join(process.cwd(), "public", assetPath.replace(/^\//, ""));
 }
 
-function imageIfExists(doc: any, assetPath: string, x: number, y: number, opts: Record<string, unknown> = {}) {
-  const full = publicAssetPath(assetPath);
-  if (fs.existsSync(full)) {
-    doc.image(full, x, y, opts);
-  }
-}
-
-function sectionTitle(doc: any, label: string, y: number) {
-  applyFont(doc, "bold");
-  doc
-    .fillColor(ACCENT)
-    .fontSize(11)
-    .text(label.toUpperCase(), PAGE.marginX, y, { width: PAGE.width - PAGE.marginX * 2, characterSpacing: 1.1 });
-}
-
-function bodyText(doc: any, text: string, x: number, y: number, width: number, opts?: Record<string, unknown>) {
-  applyFont(doc, "regular");
-  doc
-    .fillColor(COLORS.text)
-    .fontSize(10.5)
-    .text(text, x, y, { width, lineGap: 3, ...opts });
-}
-
-function bulletList(doc: any, items: string[], x: number, y: number, width: number) {
-  let cursor = y;
-  for (const item of items) {
-    applyFont(doc, "bold");
-    doc
-      .fillColor(ACCENT)
-      .fontSize(11)
-      .text("•", x, cursor);
-    applyFont(doc, "regular");
-    doc
-      .fillColor(COLORS.text)
-      .fontSize(10.5)
-      .text(item, x + 12, cursor - 1, { width: width - 12, lineGap: 3 });
-    cursor = doc.y + 6;
-  }
-  return cursor;
-}
-
-function card(doc: any, x: number, y: number, w: number, h: number, fill = "#ffffff") {
-  doc
-    .save()
-    .roundedRect(x, y, w, h, 12)
-    .fillAndStroke(fill, COLORS.line)
-    .restore();
-}
-
-function ensureSpace(doc: any, neededHeight: number) {
-  if (doc.y + neededHeight <= PAGE.height - PAGE.marginBottom) return;
-  doc.addPage();
-  renderPageChrome(doc);
-  doc.y = PAGE.marginTop;
-}
-
-function renderPageChrome(doc: any) {
-  doc
-    .save()
-    .rect(0, 0, PAGE.width, PAGE.height)
-    .fill("#ffffff")
-    .restore();
-
-  doc
-    .save()
-    .rect(0, 0, PAGE.width, 116)
-    .fill(COLORS.paper)
-    .restore();
-
-  doc
-    .save()
-    .moveTo(PAGE.marginX, 108)
-    .lineTo(PAGE.width - PAGE.marginX, 108)
-    .lineWidth(1)
-    .strokeColor(COLORS.line)
-    .stroke()
-    .restore();
-}
-
 export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput) {
   const identity = reportTierIdentity(input.tier.id);
-  ACCENT = identity.accent;
-  ACCENT_SOFT = identity.accentSoft;
+  const ACCENT = identity.accent;
+  const ACCENT_SOFT = identity.accentSoft;
+
   const doc = new PDFDocument({
     size: "LETTER",
     margin: 0,
-    // Next's runtime bundle breaks PDFKit's implicit Helvetica lookup, so we start
-    // from a concrete system font or no default font at all.
+    bufferPages: true,
+    // Next's runtime bundle breaks PDFKit's implicit Helvetica lookup, so we
+    // start from a concrete system font or an explicit built-in.
     font: RESOLVED_FONTS.regular ?? undefined,
     info: {
       Title: `${input.branding.reportTitle} - ${input.context.title}`,
@@ -224,126 +147,298 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     },
   });
 
-  renderPageChrome(doc);
+  const setFont = (weight: "regular" | "bold", size: number, color: string) => {
+    const resolved = RESOLVED_FONTS[weight];
+    if (resolved) doc.font(resolved);
+    else doc.font(weight === "bold" ? "Times-Bold" : "Times-Roman");
+    doc.fontSize(size).fillColor(color);
+  };
 
-  imageIfExists(doc, input.branding.compassWatermarkPath, 150, 180, { fit: [320, 320], opacity: 0.06 });
-  imageIfExists(doc, input.branding.emblemPath, 472, 34, { fit: [84, 84], opacity: 0.14 });
-  imageIfExists(doc, input.branding.logoPath, PAGE.marginX, 28, { fit: [150, 44] });
+  const measure = (text: string, width: number, weight: "regular" | "bold", size: number, lineGap = 3): number => {
+    setFont(weight, size, COLORS.text);
+    return doc.heightOfString(text, { width, lineGap });
+  };
 
-  // Tier cover badge — the first thing that says "this document is different".
-  // (The tagline lives in the TIER PURPOSE card; the header stays compact so
-  // long tier names never collide with the rule or the verdict cards below.)
-  applyFont(doc, "bold");
+  let y = PAGE.contentTop;
+
+  const newPage = () => {
+    doc.addPage();
+    y = PAGE.contentTop;
+  };
+
+  const ensure = (needed: number) => {
+    if (y + needed > PAGE.contentBottom) newPage();
+  };
+
+  // ── Flowing primitives (measure → draw → advance) ─────────────────────────
+
+  const heading = (label: string) => {
+    ensure(44);
+    setFont("bold", 10.5, ACCENT);
+    doc.text(label.toUpperCase(), PAGE.marginX, y, { width: CONTENT_W, characterSpacing: 1.4 });
+    y = doc.y + 4;
+    doc
+      .save()
+      .moveTo(PAGE.marginX, y)
+      .lineTo(PAGE.marginX + 42, y)
+      .lineWidth(identity.ruleStyle === "thick" ? 2.5 : 1.5)
+      .strokeColor(ACCENT)
+      .stroke()
+      .restore();
+    y += 12;
+  };
+
+  const paragraph = (text: string, opts: { size?: number; color?: string; width?: number; x?: number } = {}) => {
+    const size = opts.size ?? 10.5;
+    const width = opts.width ?? CONTENT_W;
+    const x = opts.x ?? PAGE.marginX;
+    const blockH = measure(text, width, "regular", size);
+    // Flow long paragraphs across pages naturally: draw what fits.
+    if (y + blockH > PAGE.contentBottom && blockH < PAGE.contentBottom - PAGE.contentTop) {
+      if (y + 30 > PAGE.contentBottom) newPage();
+    }
+    setFont("regular", size, opts.color ?? COLORS.text);
+    doc.text(text, x, y, { width, lineGap: 3 });
+    y = doc.y + 8;
+  };
+
+  const bullets = (items: string[], opts: { width?: number; x?: number } = {}) => {
+    const width = (opts.width ?? CONTENT_W) - 14;
+    const x = opts.x ?? PAGE.marginX;
+    for (const item of items) {
+      const itemH = measure(item, width, "regular", 10.5);
+      ensure(itemH + 4);
+      setFont("bold", 10.5, ACCENT);
+      doc.text("–", x, y);
+      setFont("regular", 10.5, COLORS.text);
+      doc.text(item, x + 14, y, { width, lineGap: 3 });
+      y = doc.y + 6;
+    }
+    y += 4;
+  };
+
+  /** Pro-forma facts table: "Label" column + value column, ruled rows. */
+  const factsTable = (rows: Array<{ label: string; value: string }>) => {
+    const labelW = 150;
+    const valueW = CONTENT_W - labelW - 16;
+    for (const row of rows) {
+      // Estimate for the page-break check only; the row ADVANCES from the
+      // actual drawn bottoms (characterSpacing widens the label beyond any
+      // plain measurement, so estimates must never drive the cursor).
+      const h = Math.max(
+        measure(row.label.toUpperCase(), labelW, "bold", 9.5),
+        measure(row.value, valueW, "regular", 10.5)
+      );
+      ensure(h + 16);
+      setFont("bold", 9.5, COLORS.muted);
+      doc.text(row.label.toUpperCase(), PAGE.marginX, y + 2, { width: labelW, characterSpacing: 0.6, lineGap: 2 });
+      const labelBottom = doc.y;
+      setFont("regular", 10.5, COLORS.deep);
+      doc.text(row.value, PAGE.marginX + labelW + 16, y, { width: valueW, lineGap: 2 });
+      y = Math.max(labelBottom, doc.y) + 9;
+      doc
+        .save()
+        .moveTo(PAGE.marginX, y - 4)
+        .lineTo(PAGE.width - PAGE.marginX, y - 4)
+        .lineWidth(0.5)
+        .strokeColor(COLORS.line)
+        .stroke()
+        .restore();
+    }
+    y += 6;
+  };
+
+  /** Accent-tinted panel sized by MEASURED content (never overflows). */
+  const panel = (opts: { title?: string; lines: string[]; fill?: string; asBullets?: boolean }) => {
+    const pad = 14;
+    const innerW = CONTENT_W - pad * 2;
+    let contentH = opts.title ? measure(opts.title, innerW, "bold", 9.5) + 8 : 0;
+    for (const line of opts.lines) {
+      contentH += measure(line, opts.asBullets ? innerW - 14 : innerW, "regular", 10.5) + 6;
+    }
+    const boxH = contentH + pad * 2;
+    // A panel taller than a page falls back to flowing content (no box).
+    if (boxH > PAGE.contentBottom - PAGE.contentTop) {
+      if (opts.title) {
+        setFont("bold", 9.5, COLORS.muted);
+        ensure(20);
+        doc.text(opts.title.toUpperCase(), PAGE.marginX, y, { characterSpacing: 0.8 });
+        y = doc.y + 6;
+      }
+      if (opts.asBullets) bullets(opts.lines);
+      else for (const line of opts.lines) paragraph(line);
+      return;
+    }
+    ensure(boxH + 6);
+    doc
+      .save()
+      .roundedRect(PAGE.marginX, y, CONTENT_W, boxH, 8)
+      .fillAndStroke(opts.fill ?? "#ffffff", COLORS.line)
+      .restore();
+    let cursor = y + pad;
+    if (opts.title) {
+      setFont("bold", 9.5, COLORS.muted);
+      doc.text(opts.title.toUpperCase(), PAGE.marginX + pad, cursor, { characterSpacing: 0.8 });
+      cursor = doc.y + 8;
+    }
+    for (const line of opts.lines) {
+      if (opts.asBullets) {
+        setFont("bold", 10.5, ACCENT);
+        doc.text("–", PAGE.marginX + pad, cursor);
+        setFont("regular", 10.5, COLORS.text);
+        doc.text(line, PAGE.marginX + pad + 14, cursor, { width: innerW - 14, lineGap: 3 });
+      } else {
+        setFont("regular", 10.5, COLORS.text);
+        doc.text(line, PAGE.marginX + pad, cursor, { width: innerW, lineGap: 3 });
+      }
+      cursor = doc.y + 6;
+    }
+    y += boxH + 12;
+  };
+
+  /** Two measured columns, side by side; the row advances by the taller one. */
+  const twoColumns = (
+    left: { title: string; lines: string[] },
+    right: { title: string; lines: string[] }
+  ) => {
+    const colW = (CONTENT_W - 20) / 2;
+    const colH = (col: { title: string; lines: string[] }) => {
+      let h = measure(col.title, colW, "bold", 9.5) + 8;
+      for (const line of col.lines) h += measure(line, colW - 14, "regular", 10.5) + 6;
+      return h;
+    };
+    const totalH = Math.max(colH(left), colH(right));
+    // Too tall for one page → stack instead of forcing a box.
+    if (totalH > PAGE.contentBottom - PAGE.contentTop - 20) {
+      panel({ title: left.title, lines: left.lines, asBullets: true });
+      panel({ title: right.title, lines: right.lines, asBullets: true });
+      return;
+    }
+    ensure(totalH + 8);
+    const startY = y;
+    const drawCol = (col: { title: string; lines: string[] }, x: number) => {
+      let cursor = startY;
+      setFont("bold", 9.5, COLORS.muted);
+      doc.text(col.title.toUpperCase(), x, cursor, { characterSpacing: 0.8, width: colW });
+      cursor = doc.y + 8;
+      for (const line of col.lines) {
+        setFont("bold", 10.5, ACCENT);
+        doc.text("–", x, cursor);
+        setFont("regular", 10.5, COLORS.text);
+        doc.text(line, x + 14, cursor, { width: colW - 14, lineGap: 3 });
+        cursor = doc.y + 6;
+      }
+    };
+    drawCol(left, PAGE.marginX);
+    drawCol(right, PAGE.marginX + colW + 20);
+    y = startY + totalH + 14;
+  };
+
+  // ── COVER HEADER (the only carefully hand-placed region) ──────────────────
+
+  const logoFull = publicAssetPath(input.branding.logoPath);
+  if (fs.existsSync(logoFull)) doc.image(logoFull, PAGE.marginX, 40, { fit: [130, 40] });
+  const emblemFull = publicAssetPath(input.branding.emblemPath);
+  if (fs.existsSync(emblemFull)) doc.image(emblemFull, PAGE.width - PAGE.marginX - 44, 36, { fit: [44, 44] });
+
+  y = 96;
+  setFont("bold", 8.5, ACCENT);
+  doc.text(identity.coverBadge, PAGE.marginX, y, { characterSpacing: 2.2 });
+  y = doc.y + 6;
+
+  setFont("bold", 22, identity.ink);
+  doc.text(identity.displayName, PAGE.marginX, y, { width: CONTENT_W - 140 });
+  y = doc.y + 4;
+
+  setFont("regular", 11, COLORS.text);
+  doc.text(
+    `${input.context.title} — ${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}`,
+    PAGE.marginX,
+    y,
+    { width: CONTENT_W - 140, lineGap: 2 }
+  );
+  y = doc.y + 10;
+
+  // Tier badge, right-aligned beside the title block.
+  const badgeW = 124;
   doc
-    .fillColor(ACCENT)
-    .fontSize(8.5)
-    .text(identity.coverBadge, PAGE.marginX, 114, { characterSpacing: 2.2 });
+    .save()
+    .roundedRect(PAGE.width - PAGE.marginX - badgeW, 98, badgeW, 24, 12)
+    .fill(ACCENT)
+    .restore();
+  setFont("bold", 9.5, "#ffffff");
+  doc.text(input.tier.shortLabel, PAGE.width - PAGE.marginX - badgeW + 8, 105, {
+    width: badgeW - 16,
+    align: "center",
+    height: 12,
+    ellipsis: true,
+  });
 
-  applyFont(doc, "bold");
-  doc
-    .fillColor(identity.ink)
-    .fontSize(20)
-    .text(identity.displayName, PAGE.marginX, 126, { width: 340 });
+  // Tier rule (single / double / thick) under the title block.
+  const ruleAt = (offset: number, weight: number) => {
+    doc
+      .save()
+      .moveTo(PAGE.marginX, y + offset)
+      .lineTo(PAGE.width - PAGE.marginX, y + offset)
+      .lineWidth(weight)
+      .strokeColor(ACCENT)
+      .stroke()
+      .restore();
+  };
+  ruleAt(0, identity.ruleStyle === "thick" ? 3 : 1.2);
+  if (identity.ruleStyle === "double") ruleAt(3.5, 1.2);
+  y += 14;
 
-  applyFont(doc, "regular");
-  doc
-    .fillColor(COLORS.text)
-    .fontSize(10.5)
-    .text(
-      `${input.context.title} — ${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}`,
-      PAGE.marginX,
-      Math.min(doc.y + 4, 194),
-      { width: 336, lineGap: 2, height: 26, ellipsis: true }
-    );
+  // Document meta row — pro-forma style.
+  factsTable([
+    { label: "Generated", value: input.branding.generatedDate },
+    { label: "Path", value: ["Furlong", ...input.branding.explorationPath].join(" → ") },
+    { label: "Source posture", value: input.context.currentLabel ?? input.context.sourceLabel },
+    { label: "Tier purpose", value: input.tier.description },
+  ]);
 
-  // Tier rule treatment: single (free) / double (institutional) / thick
-  // (environmental). Left column only — the info card owns the right side.
-  const ruleY = 208;
-  const ruleRight = PAGE.width - 220;
-  doc.save().moveTo(PAGE.marginX, ruleY).lineTo(ruleRight, ruleY)
-    .lineWidth(identity.ruleStyle === "thick" ? 3 : 1).strokeColor(ACCENT).stroke();
-  if (identity.ruleStyle === "double") {
-    doc.moveTo(PAGE.marginX, ruleY + 3).lineTo(ruleRight, ruleY + 3)
-      .lineWidth(1).strokeColor(ACCENT).stroke();
-  }
-  doc.restore();
+  // ── VERDICT + EXECUTIVE SUMMARY ────────────────────────────────────────────
 
-  doc
-    .fillColor("#ffffff")
-    .roundedRect(PAGE.width - 196, 132, 152, 26, 13)
-    .fill(ACCENT);
-  applyFont(doc, "bold");
-  doc
-    .fillColor("#ffffff")
-    .fontSize(10.5)
-    .text(input.tier.shortLabel, PAGE.width - 184, 140, { width: 128, align: "center", height: 14, ellipsis: true });
+  panel({ title: "Verdict", lines: [input.verdict.label, input.verdict.explanation], fill: ACCENT_SOFT });
+  heading("Executive Summary");
+  paragraph(input.executiveSummary);
 
-  card(doc, PAGE.width - 210, 172, 166, 84, ACCENT_SOFT);
-  applyFont(doc, "bold");
-  doc
-    .fillColor(COLORS.muted)
-    .fontSize(9.5)
-    .text("Generated", PAGE.width - 194, 186)
-    .text("Path", PAGE.width - 194, 212)
-    .text("Source posture", PAGE.width - 194, 238);
-  applyFont(doc, "regular");
-  doc
-    .fillColor(COLORS.deep)
-    .fontSize(10)
-    .text(input.branding.generatedDate, PAGE.width - 126, 186, { width: 72, align: "right" })
-    .text(["Furlong", ...input.branding.explorationPath].join(" → "), PAGE.width - 126, 212, { width: 72, align: "right" })
-    .text(input.context.currentLabel ?? input.context.sourceLabel, PAGE.width - 126, 238, { width: 72, align: "right" });
+  // ── PROPERTY SNAPSHOT — a real facts table ─────────────────────────────────
 
-  card(doc, PAGE.marginX, 218, 250, 88, "#ffffff");
-  applyFont(doc, "bold");
-  doc.fillColor(COLORS.muted).fontSize(9.5).text("VERDICT", PAGE.marginX + 16, 232);
-  applyFont(doc, "bold");
-  doc.fillColor(COLORS.deep).fontSize(18).text(input.verdict.label, PAGE.marginX + 16, 248, { width: 218 });
-  bodyText(doc, input.verdict.explanation, PAGE.marginX + 16, 274, 218);
+  heading("Property Snapshot");
+  factsTable([
+    { label: "Asset", value: input.context.title },
+    { label: "Location", value: `${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}` },
+    { label: "Type", value: input.context.propertyType },
+    { label: "Source", value: input.context.sourceLabel },
+    { label: "Price posture", value: input.context.priceLabel },
+    ...input.propertySummary
+      .map((line) => {
+        const idx = line.indexOf(":");
+        return idx > 0 && idx < 40
+          ? { label: line.slice(0, idx), value: line.slice(idx + 1).trim() }
+          : { label: "Detail", value: line };
+      })
+      .filter((row) => !/^(asset|location|asking posture|immediate deal type|asset type|source)$/i.test(row.label)),
+  ]);
 
-  card(doc, 312, 218, 256, 88, "#ffffff");
-  applyFont(doc, "bold");
-  doc.fillColor(COLORS.muted).fontSize(9.5).text("TIER PURPOSE", 328, 232);
-  bodyText(doc, input.tier.description, 328, 250, 224);
+  // ── COST POSTURE ───────────────────────────────────────────────────────────
 
-  sectionTitle(doc, "Executive Summary", 332);
-  card(doc, PAGE.marginX, 348, PAGE.width - PAGE.marginX * 2, 92, "#ffffff");
-  bodyText(doc, input.executiveSummary, PAGE.marginX + 18, 364, PAGE.width - PAGE.marginX * 2 - 36);
+  heading("Expected Cost Posture and Capital Frame");
+  bullets(input.conceptSummary);
 
-  sectionTitle(doc, "Property Snapshot", 464);
-  card(doc, PAGE.marginX, 480, 252, 122, "#ffffff");
-  let leftY = bulletList(doc, input.propertySummary, PAGE.marginX + 16, 496, 220);
-  doc.y = Math.max(leftY, 604);
+  // ── SIGNALS / RISKS side by side ───────────────────────────────────────────
 
-  card(doc, 316, 480, 252, 122, "#ffffff");
-  bodyText(
-    doc,
-    `${input.context.propertyType} · ${input.context.sourceLabel}\n${input.context.priceLabel}`,
-    332,
-    496,
-    220
+  heading("Signals and Constraints");
+  twoColumns(
+    {
+      title: "Strongest signals",
+      lines: input.strengths.length > 0 ? input.strengths : ["No meaningful signals can be stated yet because the file is still too thin."],
+    },
+    { title: "Risks and blockers", lines: input.risks }
   );
 
-  doc.y = 628;
-  ensureSpace(doc, 200);
-  sectionTitle(doc, "Expected Cost Posture and Capital Frame", doc.y);
-  doc.y += 16;
-  card(doc, PAGE.marginX, doc.y, PAGE.width - PAGE.marginX * 2, 140, "#ffffff");
-  doc.y = bulletList(doc, input.conceptSummary, PAGE.marginX + 16, doc.y + 16, PAGE.width - PAGE.marginX * 2 - 32) + 8;
-
-  ensureSpace(doc, 250);
-  sectionTitle(doc, "Signals and Constraints", doc.y);
-  doc.y += 16;
-  const startY = doc.y;
-  card(doc, PAGE.marginX, startY, 252, 170, "#ffffff");
-  applyFont(doc, "bold");
-  doc.fillColor(COLORS.muted).fontSize(9.5).text("STRONGEST SIGNALS", PAGE.marginX + 16, startY + 14);
-  bulletList(doc, input.strengths.length > 0 ? input.strengths : ["No meaningful strengths can be stated yet because the file is still too thin."], PAGE.marginX + 16, startY + 32, 220);
-  card(doc, 316, startY, 252, 170, "#ffffff");
-  applyFont(doc, "bold");
-  doc.fillColor(COLORS.muted).fontSize(9.5).text("RISKS AND BLOCKERS", 332, startY + 14);
-  bulletList(doc, input.risks, 332, startY + 32, 220);
-  doc.y = startY + 190;
+  // ── FLOWING SECTIONS ───────────────────────────────────────────────────────
 
   const placeBriefSections: Array<{ title: string; items: string[] }> = [
     ...(input.buyingProcess?.length
@@ -368,8 +463,6 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   ];
 
   if (input.tier.id === "paid" || input.tier.id === "environmental") {
-    // Insert before "Basis and Limits" — index is dynamic now that the Place
-    // Brief sections sit between the criteria and basis sections.
     const basisIndex = sections.findIndex((section) => section.title === "Basis and Limits of This Analysis");
     sections.splice(basisIndex >= 0 ? basisIndex : 3, 0, { title: "Optional Deeper Intake Posture", items: input.readinessSectionNotes });
   }
@@ -377,53 +470,63 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   if (input.tier.id === "free") {
     sections[0] = { title: "Ranked Financing Lanes", items: input.pathwayAnalysis.slice(0, 1) };
     const controllingQuestionIndex = sections.findIndex((section) => section.title === "Questions the Platform Should Already Be Asking");
-    if (controllingQuestionIndex >= 0) {
-      sections.splice(controllingQuestionIndex, 1);
-    }
+    if (controllingQuestionIndex >= 0) sections.splice(controllingQuestionIndex, 1);
   }
 
   for (const section of sections) {
-    ensureSpace(doc, 120);
-    sectionTitle(doc, section.title, doc.y);
-    doc.y += 16;
-    const estimated = Math.max(88, section.items.length * 24 + 26);
-    const cardTop = doc.y;
-    card(doc, PAGE.marginX, cardTop, PAGE.width - PAGE.marginX * 2, estimated, "#ffffff");
-    const bulletsEnd = bulletList(doc, section.items, PAGE.marginX + 16, cardTop + 16, PAGE.width - PAGE.marginX * 2 - 32);
-    // The next heading must clear BOTH the text and the drawn card frame.
-    doc.y = Math.max(bulletsEnd, cardTop + estimated) + 14;
+    if (section.items.length === 0) continue;
+    heading(section.title);
+    bullets(section.items);
   }
 
-  // FREE TIER: the honest upgrade preview — named sections, substance-first,
-  // no prices (tier economics founder-gated). The reason to come back.
+  // ── FREE-TIER TEASER (accent panel, measured) ──────────────────────────────
+
   if (identity.nextTierTeaser) {
     const teaser = identity.nextTierTeaser;
-    ensureSpace(doc, 200);
-    sectionTitle(doc, teaser.heading, doc.y);
-    doc.y += 16;
-    const teaserLines = [
-      teaser.intro,
-      ...teaser.items.map((item) => `${item.name} — ${item.adds}`),
-      teaser.closing,
-    ];
-    const estimated = Math.max(120, teaserLines.length * 46 + 26);
-    const teaserTop = doc.y;
-    card(doc, PAGE.marginX, teaserTop, PAGE.width - PAGE.marginX * 2, estimated, ACCENT_SOFT);
-    const teaserEnd = bulletList(doc, teaserLines, PAGE.marginX + 16, teaserTop + 16, PAGE.width - PAGE.marginX * 2 - 32);
-    doc.y = Math.max(teaserEnd, teaserTop + estimated) + 14;
+    heading(teaser.heading);
+    panel({
+      lines: [teaser.intro, ...teaser.items.map((item) => `${item.name} — ${item.adds}`), teaser.closing],
+      fill: ACCENT_SOFT,
+      asBullets: true,
+    });
   }
 
-  ensureSpace(doc, 140);
-  card(doc, PAGE.marginX, PAGE.height - 140, PAGE.width - PAGE.marginX * 2, 96, COLORS.paper);
-  bodyText(doc, input.branding.advisoryDisclosure, PAGE.marginX + 16, PAGE.height - 126, PAGE.width - PAGE.marginX * 2 - 32);
-  bodyText(doc, input.branding.dataRightsDisclosure, PAGE.marginX + 16, PAGE.height - 98, PAGE.width - PAGE.marginX * 2 - 32);
-  bodyText(doc, identity.footerLine, PAGE.marginX + 16, PAGE.height - 70, PAGE.width - PAGE.marginX * 2 - 32);
-  doc
-    .fillColor(COLORS.muted)
-    .font(RESOLVED_FONTS.regular ?? "Times-Roman")
-    .fontSize(9)
-    .text(input.branding.footerText, PAGE.marginX, PAGE.height - 24, { width: PAGE.width - PAGE.marginX * 2, align: "left" })
-    .text("Watermarked FURLONG advisory export", PAGE.marginX, PAGE.height - 24, { width: PAGE.width - PAGE.marginX * 2, align: "right" });
+  // ── BASIS & DISCLOSURES (flow — never pinned to a fixed offset) ────────────
+
+  ensure(170); // keep the heading with its panel — no orphaned headings
+  heading("Advisory Basis and Your Rights");
+  panel({
+    lines: [input.branding.advisoryDisclosure, input.branding.dataRightsDisclosure, identity.footerLine],
+    fill: COLORS.paper,
+  });
+
+  // ── FINAL PASS: footer + page numbers on every buffered page ───────────────
+
+  const range = doc.bufferedPageRange();
+  for (let i = range.start; i < range.start + range.count; i += 1) {
+    doc.switchToPage(i);
+    doc
+      .save()
+      .moveTo(PAGE.marginX, 752)
+      .lineTo(PAGE.width - PAGE.marginX, 752)
+      .lineWidth(0.5)
+      .strokeColor(COLORS.line)
+      .stroke()
+      .restore();
+    setFont("regular", 8, COLORS.faint);
+    doc.text(input.branding.footerText, PAGE.marginX, 760, {
+      width: CONTENT_W - 150,
+      height: 20,
+      ellipsis: true,
+      lineBreak: false,
+    });
+    setFont("bold", 8, COLORS.muted);
+    doc.text(`Watermarked FURLONG export · Page ${i - range.start + 1} of ${range.count}`, PAGE.marginX + CONTENT_W - 220, 760, {
+      width: 220,
+      align: "right",
+      lineBreak: false,
+    });
+  }
 
   doc.end();
   return doc;

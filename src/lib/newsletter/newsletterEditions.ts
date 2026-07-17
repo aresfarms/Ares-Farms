@@ -23,11 +23,13 @@ import {
   electricitySignal,
   farmFinanceSignal,
   farmlandValueSignal,
+  inputCostSignal,
   mortgageRateSignal,
   NEWSLETTER_REGIONS,
   priceTrendSignal,
   type NewsletterSignal,
 } from "./newsletterSignals";
+import { farmEditorialItems, type FarmEditorialItem } from "./farmEditorialCurated";
 
 export type NewsletterAudience =
   | "mixed"
@@ -54,6 +56,8 @@ export interface NewsletterEdition {
   sections: NewsletterSection[];
   /** What It Means For You — audience-specific decision framing. */
   meaning: string[];
+  /** Editorial briefs (farm edition): tech, safety, tax, regulatory, long-view. */
+  editorial?: FarmEditorialItem[];
   asOf: string;
   disclaimers: string[];
 }
@@ -95,6 +99,9 @@ export function buildNewsletterEdition(
   const bids = grainBidSignal(states);
   const farmland = farmlandValueSignal(states);
   const farmFin = farmFinanceSignal();
+  const inputs = inputCostSignal();
+  const month = Number((asOf.match(/-(\d{2})-/) || [])[1] || "1");
+  const editorial = farmEditorialItems(month, regionKey);
 
   const base = {
     audience,
@@ -110,20 +117,27 @@ export function buildNewsletterEdition(
 
   switch (audience) {
     case "mixed":
-      // The flagship / free-tier digest: the single biggest regional story,
-      // then one hit from each domain so a reader who wears several hats — or
-      // a general subscriber — gets the whole picture in one pass.
+      // The flagship / free-tier digest: DELIBERATELY BROAD, not a rehash of
+      // any tailored edition — ONE headline per domain, no depth. The tailored
+      // editions carry the detail; this is the whole-picture skim.
       return {
         ...base,
         lead: crop ?? drought ?? rates,
         sections: [
-          { heading: "The region this month", items: compact([drought, crop, bids, grain]) },
-          { heading: "Money & markets", items: compact([rates, price]) },
-          { heading: "On the ground", items: compact([rent, power]) },
+          {
+            heading: "One read across the region",
+            items: compact([
+              // The single most important signal from each domain — no more.
+              drought ?? crop, // land/weather
+              bids ?? grain, // ag markets
+              rates, // housing money
+              farmland ?? price, // value
+            ]),
+          },
         ],
         meaning: [
-          "One month, read whole: a drought-hit crop reshapes land and lending across the region, while the mortgage rate and price trend set the math for every home, commercial, and land decision. Which of these matters most depends on which hat you're wearing — the tailored editions go deeper for each.",
-          "Furlong charts any property in the region with its verified place-facts, full cost picture, and financing path — free. When you're ready to move, your file carries forward without re-keying.",
+          "That's the month in one pass — weather and crop, grain markets, the cost of money, and land value. Which line matters most depends on which hat you wear, and each tailored edition of The Furlong Compass goes deep on one: Farms & Ranches, Home Buyers, Commercial, Lodging, Mobile Home Parks, Land, and Lenders.",
+          "Furlong charts any property in the region with its verified place-facts, full cost picture, and financing path — free. Subscribe to the edition that fits your work, or read this Full Read for the whole board.",
         ],
       };
     case "farm":
@@ -132,24 +146,28 @@ export function buildNewsletterEdition(
         lead: crop ?? drought,
         sections: [
           { heading: "The water and the crop", items: compact([drought, crop]) },
-          { heading: "Prices, ground value & capital", items: compact([bids, grain, rent, farmland, farmFin]) },
+          { heading: "Prices & inputs", items: compact([bids, grain, inputs]) },
+          { heading: "Ground value & your capital", items: compact([rent, farmland, farmFin]) },
         ],
         meaning: [
-          "A failing crop year reshapes land decisions before it reshapes the balance sheet: cash-rent terms get renegotiated, some operators sell ground to raise capital, and distressed and government-listed parcels come to market. If you're a buyer, this is when opportunity appears; if you're an owner, it's when the numbers behind holding versus selling change.",
-          "Practical moves this month: confirm crop-insurance claim deadlines with your agent, document conditions now, and — if you're weighing land — track the government-listing inventory (USDA, FSA) that tends to grow in stressed years. Furlong charts each parcel with its water, soil, and financing picture.",
+          "A failing crop year reshapes decisions before it reshapes the balance sheet: cash-rent terms get renegotiated, input budgets get rebuilt against next year's fuel and fertilizer, and some operators sell ground to raise capital while others buy the parcels that come to market. And if your operation is poultry, livestock, or diversified, feed cost and contract terms move your P&L as much as the rain — read the desk notes below with that in mind.",
+          "Practical moves this month: confirm crop-insurance and disaster-program claim deadlines with your agent and county FSA office, document conditions now (the July photo is the fall claim), and price next year's inputs against the trend above. Furlong charts each parcel — cropland, pasture, or poultry ground — with its water, soil, and USDA/FSA financing picture.",
         ],
+        editorial,
       };
     case "finance":
       return {
         ...base,
-        lead: drought ?? crop,
+        // Lenders lead with the CREDIT signal, not the weather — drought
+        // matters here only as portfolio risk, and it's framed that way.
+        lead: farmFin,
         sections: [
-          { heading: "Ag credit risk in the region", items: compact([drought, crop, bids, grain, rent]) },
+          { heading: "Ag portfolio risk this cycle", items: compact([crop, bids, inputs, rent]) },
           { heading: "Farm capital & collateral", items: compact([farmFin, farmland]) },
         ],
         meaning: [
-          "Drought and a weak crop translate directly to loan risk: thinner operator cash flow, pressure on ag operating lines, and softening land collateral in the hardest-hit counties. Portfolios concentrated in the region's row-crop borrowers warrant a closer look at renewal terms and reserve posture this cycle.",
-          "On the residential and commercial side, the rate above sets today's debt-service math; the FHFA trend anchors collateral-value expectations. Furlong can carry a property's verified place-facts, cost model, and financing picture straight into a lender file when a borrower moves — nothing re-keyed.",
+          "The credit read this cycle: a weak crop and rising input costs thin operator cash flow and pressure ag operating lines, while farmland values (above) hold the collateral side up. Portfolios concentrated in the region's row-crop borrowers warrant a closer look at renewal terms, working-capital covenants, and reserve posture; diversified and poultry operations carry a different — often steadier — risk profile.",
+          "Much of the region's farm capital moves through FSA and USDA guarantees rather than balance-sheet mortgages, which changes both the risk transfer and the timeline. Furlong can carry a property's verified place-facts, cost model, and financing picture straight into a lender file when a borrower moves — nothing re-keyed.",
         ],
       };
     case "residential":

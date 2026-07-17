@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { America250Banner } from "@/components/brand/America250Banner";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
+import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
 import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
@@ -682,6 +683,16 @@ export default async function HomePage({
             weekSeed={weekSeed}
           />
         </div>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            3. THE SHELF — scrolling rail of CURRENT public-safe listings
+            (founder feedback 2026-07-16: the front door shows real
+            inventory, not only the weekly tour stop). Week-seeded rotation;
+            every card opens the /discover place brief.
+            ══════════════════════════════════════════════════════════════ */}
+        <section className="fl-section" aria-label="Current listings shelf">
+          <PropertyShowcaseRail inventoryByState={mapInventoryByState} weekSeed={weekSeed} />
+        </section>
 
         {/* ═══════════════════════════════════════════════════════════════
             4. CLEAR WATERS, NO SURPRISES

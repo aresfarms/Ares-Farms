@@ -1258,9 +1258,11 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
                     <path
                       key={`state-${fi}`}
                       d={d}
-                      fill={isFeatured ? `${GOLD}18` : "#edf2fb"}
-                      stroke={isFeatured ? GOLD : "#c5d3e8"}
-                      strokeWidth={isFeatured ? 1.8 : 0.5}
+                      // Founder feedback 2026-07-16: the old #edf2fb/#c5d3e8 @0.5
+                      // faded into the white page — the map must READ as a map.
+                      fill={isFeatured ? `${GOLD}18` : "#dbe6f4"}
+                      stroke={isFeatured ? GOLD : "#7f9cc4"}
+                      strokeWidth={isFeatured ? 1.8 : 0.9}
                       strokeLinejoin="round"
                     />
                   );

@@ -1797,9 +1797,6 @@ export function PropertyEvaluationWorkspace({
             overflow: "hidden",
           }}
         >
-          <div style={{ padding: "20px 24px 18px", borderBottom: "1px solid #e5ebf3", background: "linear-gradient(180deg, rgba(255,250,240,0.82), rgba(255,255,255,0.35))" }}>
-            <PropertyImportLaunchpadEmbedded />
-          </div>
           <div style={{ display: "grid", gap: 18, padding: "22px 24px 24px" }}>
             <div style={{ display: "grid", gap: 6 }}>
               <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: 0.08, textTransform: "uppercase", color: "#0f766e" }}>
@@ -1808,11 +1805,19 @@ export function PropertyEvaluationWorkspace({
               <strong style={{ fontSize: 26, color: "#101a2b", lineHeight: 1.08 }}>
                 Start with the property. Furlong will build the first-pass analysis from there.
               </strong>
-              <span style={{ fontSize: 13.5, color: "#5d687a", lineHeight: 1.6, maxWidth: 860 }}>
-                Enter an address below or switch properties through a pasted link or upload above. The goal is an immediate, readable analysis screen first, not a long intake wall.
-              </span>
             </div>
             <PlaceFirstDiscovery flow={addressFirstFlow} embedded />
+            {/* ONE front door (founder feedback 2026-07-16): the address form
+                above is how a property comes in; paste/upload is the same task,
+                so it lives here folded, not as a second open form. */}
+            <details style={{ ...detailsStyle, background: "#ffffff", padding: "12px 16px" }}>
+              <summary style={{ ...summaryStyle, fontSize: 13.5 }}>
+                Have a listing link or a screenshot instead? Paste or upload it
+              </summary>
+              <div style={{ paddingTop: 12 }}>
+                <PropertyImportLaunchpadEmbedded />
+              </div>
+            </details>
           </div>
         </section>
       </section>
@@ -1833,8 +1838,15 @@ export function PropertyEvaluationWorkspace({
             overflow: "hidden",
           }}
         >
-          <div style={{ padding: "20px 24px 18px", borderBottom: "1px solid #e5ebf3", background: "linear-gradient(180deg, rgba(255,250,240,0.82), rgba(255,255,255,0.35))" }}>
-            <PropertyImportLaunchpadEmbedded />
+          <div style={{ padding: "14px 24px", borderBottom: "1px solid #e5ebf3" }}>
+            <details style={{ ...detailsStyle, background: "transparent", border: "none", padding: 0 }}>
+              <summary style={{ ...summaryStyle, fontSize: 13.5 }}>
+                Evaluating a different property? Paste a link or upload a listing
+              </summary>
+              <div style={{ paddingTop: 12 }}>
+                <PropertyImportLaunchpadEmbedded />
+              </div>
+            </details>
           </div>
           <div style={{ display: "grid", gap: 18, padding: "22px 24px 24px" }}>
             <div style={{ display: "grid", gap: 8 }}>

@@ -8,6 +8,7 @@ import {
   type NavigatorSnapshot,
 } from "@/components/navigator/FurlongNavigator";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
+import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import { ChartTableBrief } from "@/components/property/ChartTableBrief";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
@@ -1829,6 +1830,7 @@ export function PropertyEvaluationWorkspace({
                 Start with the property. Furlong will build the first-pass analysis from there.
               </strong>
             </div>
+            <SavedDraftsRail />
             <PlaceFirstDiscovery flow={addressFirstFlow} embedded />
             {/* ONE front door (founder feedback 2026-07-16): the address form
                 above is how a property comes in; paste/upload is the same task,
@@ -2339,6 +2341,9 @@ export function PropertyEvaluationWorkspace({
     savePropertyEvaluationDraft({
       propertyId: context.propertyId,
       updatedAt,
+      // Enough to list + resume this draft weeks later — the analysis URL
+      // carries only property context, never the visitor's answers.
+      resume: { title: context.title, location: context.location, href: baseHref },
       answers,
     });
     setSavedAt(updatedAt);
@@ -2579,7 +2584,7 @@ export function PropertyEvaluationWorkspace({
             </Link>
           )}
           <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
-            Save draft in this session
+            Save draft on this device
           </button>
           <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
             {pdfBusy === "view" ? "Opening PDF..." : "View watermarked PDF ↗"}

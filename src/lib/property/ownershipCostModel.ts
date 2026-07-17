@@ -63,6 +63,18 @@ export interface ProgramScenario {
   /** FHA MIP / USDA annual fee / conventional PMI, monthly dollars. */
   monthlyMortgageInsurance: number;
   mortgageInsuranceNote: string | null;
+  /** Household income that typically supports this lane's payment (founder
+      direction 2026-07-17: people should see up front whether their income
+      bracket can plausibly fund this — without disclosing anything). */
+  incomeGuidance: {
+    /** Annual household income where this payment fits the program's standard
+        housing ratio — the "typically works from about" number. */
+    comfortableAnnual: number;
+    /** Stretch floor — approvals happen down here with strong compensating
+        factors, below it the payment rarely fits. */
+    stretchAnnual: number;
+    note: string;
+  };
 }
 
 export interface CostRangeLine {
@@ -120,7 +132,8 @@ export function buildOwnershipCostModel(
   if (!Number.isFinite(price) || price < 10_000 || price > 50_000_000) return null;
 
   const rate = context.rates.rate30;
-  const scenarios: ProgramScenario[] = [];
+  // Income guidance attaches after taxes/insurance are known (buildIncome below).
+  const scenarios: Array<Omit<ProgramScenario, "incomeGuidance">> = [];
 
   // USDA Rural Development — 0% down, 1% upfront guarantee fee (financeable),
   // 0.35%/yr annual fee (published USDA RD fee schedule).
@@ -290,6 +303,43 @@ export function buildOwnershipCostModel(
     provenance: "National guidance",
   });
 
+  // ── Income guidance per lane (founder direction 2026-07-17) ─────────────
+  // Lenders size the house payment (PITI) against gross income using each
+  // program's customary housing ratio. Publishing the bracket lets a visitor
+  // see whether their income plausibly funds this WITHOUT disclosing it.
+  const taxLine = monthly.find((line) => line.label === "Property taxes");
+  const insuranceLine = monthly.find((line) => line.label === "Homeowner's insurance");
+  const taxesMid = taxLine ? (taxLine.low + taxLine.high) / 2 : 0;
+  const insuranceMid = insuranceLine ? (insuranceLine.low + insuranceLine.high) / 2 : 0;
+  const HOUSING_RATIOS: Record<string, number> = {
+    "USDA Rural Development (0% down)": 0.29,
+    "FHA (3.5% down)": 0.31,
+    "VA (0% down, eligible veterans)": 0.31,
+    "Conventional (5% down)": 0.28,
+    "Conventional (20% down)": 0.28,
+  };
+  const roundK = (n: number): number => Math.round(n / 1000) * 1000;
+  const fullScenarios: ProgramScenario[] = scenarios.map((s) => {
+    const piti = s.monthlyPrincipalInterest + s.monthlyMortgageInsurance + taxesMid + insuranceMid;
+    const ratio = HOUSING_RATIOS[s.program] ?? 0.29;
+    const comfortableAnnual = roundK((piti * 12) / ratio);
+    const stretchAnnual = roundK((piti * 12) / (ratio + 0.08));
+    const capNote = s.program.startsWith("USDA")
+      ? " USDA also CAPS eligible household income by county (the moderate-income limit) — USDA's eligibility site or a lender confirms the county cap."
+      : "";
+    return {
+      ...s,
+      incomeGuidance: {
+        comfortableAnnual,
+        stretchAnnual,
+        note:
+          `Household income from about $${stretchAnnual.toLocaleString("en-US")} can sometimes carry this payment with strong compensating factors; ` +
+          `around $${comfortableAnnual.toLocaleString("en-US")} it fits the program's customary ~${Math.round(ratio * 100)}% housing ratio comfortably. ` +
+          `Lenders qualify on the whole picture — existing debts, credit, and down payment — never income alone.${capNote}`,
+      },
+    };
+  });
+
   const recurringLow = monthly.reduce((sum, line) => sum + line.low, 0);
   const recurringHigh = monthly.reduce((sum, line) => sum + line.high, 0);
 
@@ -316,7 +366,7 @@ export function buildOwnershipCostModel(
     rateWeekOf: context.rates.weekOf,
     rate30Pct: rate,
     purchase: {
-      scenarios,
+      scenarios: fullScenarios,
       closingLow: round10(price * 0.02),
       closingHigh: round10(price * 0.05),
       closingNote:

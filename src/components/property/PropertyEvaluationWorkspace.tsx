@@ -997,9 +997,12 @@ function formatOwnershipCostsForPdf(args: {
       downPayment: s.downPayment === 0 ? "$0 (0%)" : `${dollars(s.downPayment)} (${s.downPaymentPct}%)`,
       monthly:
         `${dollars(s.monthlyPrincipalInterest)} P&I` +
-        (s.monthlyMortgageInsurance > 0 ? ` + ${dollars(s.monthlyMortgageInsurance)} mortgage ins.` : ", no mortgage ins."),
+        (s.monthlyMortgageInsurance > 0 ? ` + ${dollars(s.monthlyMortgageInsurance)} mortgage ins.` : ", no mortgage ins.") +
+        `  ·  Income that works: ≈${dollars(s.incomeGuidance.comfortableAnnual)}/yr (sometimes from ${dollars(s.incomeGuidance.stretchAnnual)})` +
+        (s.program.startsWith("USDA") ? "; county income caps apply" : ""),
     })),
     closingLine:
+      `Income guidance sizes each lane's full house payment (with taxes and insurance) against that program's customary housing ratio — lenders qualify on the whole picture, never income alone. ` +
       `Closing costs add roughly ${dollars(model.purchase.closingLow)}–${dollars(model.purchase.closingHigh)} on top of the down payment. ${model.purchase.closingNote}`,
     monthlyLines: model.monthly.map((line) => ({
       label: line.label,

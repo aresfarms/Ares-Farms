@@ -159,6 +159,7 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
                     <th style={headStyle}>Down payment</th>
                     <th style={headStyle}>Monthly P&amp;I</th>
                     <th style={headStyle}>Mortgage ins.</th>
+                    <th style={headStyle}>Income that works</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -182,11 +183,26 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
                           <div style={{ fontSize: 11.5, color: theme.inkFaint, marginTop: 2 }}>{s.mortgageInsuranceNote}</div>
                         )}
                       </td>
+                      <td style={{ ...cellStyle, whiteSpace: "nowrap" }}>
+                        ≈{fmt(s.incomeGuidance.comfortableAnnual)}/yr
+                        <div style={{ fontSize: 11.5, color: theme.inkFaint, marginTop: 2, whiteSpace: "normal" }}>
+                          sometimes from {fmt(s.incomeGuidance.stretchAnnual)}
+                          {s.program.startsWith("USDA") ? " · county income caps apply" : ""}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+            <p style={{ margin: "8px 0 0", fontSize: 12, lineHeight: 1.6, color: theme.inkFaint }}>
+              The income column sizes each lane&apos;s full house payment (with taxes and insurance)
+              against that program&apos;s customary housing ratio — so you can see whether your bracket
+              plausibly funds this without telling anyone your income. Lenders qualify on the whole
+              picture — existing debts, credit, down payment — never income alone. USDA additionally
+              caps eligible household income by county; USDA&apos;s eligibility site or a lender confirms
+              the county cap.
+            </p>
             <p style={{ margin: "8px 0 0", fontSize: 12.5, lineHeight: 1.6, color: theme.inkSoft }}>
               On top of the down payment, closing costs typically run{" "}
               <strong style={{ color: theme.ink }}>

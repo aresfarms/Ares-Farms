@@ -250,6 +250,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
         town: propertyContext.town,
         stateCode: propertyContext.stateCode,
         pathwayList: propertyContext.pathwayList,
+        description: propertyContext.description,
       })
     : null;
 

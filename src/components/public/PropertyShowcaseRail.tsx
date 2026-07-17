@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
+import { classifyPropertyProfile, type PropertyProfileId } from "@/lib/property/propertyProfile";
 import type { PublicSafeProperty } from "@/lib/property/propertyTypes";
 
 /**
@@ -44,19 +45,36 @@ export function PropertyShowcaseRail({
   weekSeed: number;
   limit?: number;
 }) {
-  // Interleave states so the rail sweeps the country instead of exhausting
-  // one state before the next.
-  const states = rotate(Object.keys(inventoryByState).sort(), weekSeed);
-  const queues = states.map((s) => [...(inventoryByState[s] ?? [])]);
+  // Interleave by PROPERTY KIND first (founder direction 2026-07-17: the
+  // shelf shows a variety, not just HUD homes), then by state within each
+  // kind so the rail still sweeps the country. Small groups (commercial,
+  // land) surface up front every week instead of drowning under the
+  // hundreds of homes.
+  const current: PublicSafeProperty[] = [];
+  for (const state of rotate(Object.keys(inventoryByState).sort(), weekSeed)) {
+    for (const property of inventoryByState[state] ?? []) {
+      if (property.isCurrent) current.push(property);
+    }
+  }
+  const byProfile = new Map<PropertyProfileId, PublicSafeProperty[]>();
+  for (const property of current) {
+    const profileId = classifyPropertyProfile({ propertyType: property.propertyType }).id;
+    const bucket = byProfile.get(profileId) ?? [];
+    bucket.push(property);
+    byProfile.set(profileId, bucket);
+  }
+  const profileQueues = [...byProfile.entries()]
+    .sort(([, a], [, b]) => a.length - b.length) // scarce kinds lead
+    .map(([, bucket]) => rotate(bucket, weekSeed));
   const picks: PublicSafeProperty[] = [];
   let drained = false;
   while (picks.length < limit && !drained) {
     drained = true;
-    for (const queue of queues) {
+    for (const queue of profileQueues) {
       const next = queue.shift();
       if (!next) continue;
       drained = false;
-      if (next.isCurrent) picks.push(next);
+      picks.push(next);
       if (picks.length >= limit) break;
     }
   }

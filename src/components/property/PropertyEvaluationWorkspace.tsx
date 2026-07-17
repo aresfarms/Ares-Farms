@@ -2258,7 +2258,10 @@ export function PropertyEvaluationWorkspace({
   // wins; fall back to classifying the context type for older API payloads.
   const workspaceProfile =
     effectivePlaceIntelligence?.profile ??
-    classifyPropertyProfile({ propertyType: analysisContext.propertyType });
+    classifyPropertyProfile({
+      propertyType: analysisContext.propertyType,
+      description: analysisContext.description ?? null,
+    });
   const answerCard = buildAnswerCard({
     context: analysisContext,
     restrictionsPresent: (facts?.verification?.restrictions?.length ?? 0) > 0,

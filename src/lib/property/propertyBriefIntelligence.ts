@@ -897,12 +897,18 @@ export function buildPropertyBriefIntelligence(args: {
   town: string | null;
   stateCode: string | null;
   pathwayList: string[];
+  /** Listing description — sharpens profile classification (a "commercial"
+      record whose description says "vacant motel" charts as hospitality). */
+  description?: string | null;
 }): PropertyBriefIntelligence {
   const id = args.propertyId ?? "";
   // Canonical profile (axis 1) — classified ONCE here, drives the home-shaped
   // gating and the per-type question bank. The old bare regex called a
   // "mobile home park" a home because it contains the word "home".
-  const profile = classifyPropertyProfile({ propertyType: args.propertyType });
+  const profile = classifyPropertyProfile({
+    propertyType: args.propertyType,
+    description: args.description ?? null,
+  });
   const isHome = profile.id === "residential";
 
   const verifiedFacts: BriefFactLine[] = [];

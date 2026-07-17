@@ -2,7 +2,9 @@ import Link from "next/link";
 
 import { America250Banner } from "@/components/brand/America250Banner";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
+import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
+import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
 import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
@@ -120,6 +122,7 @@ export default async function HomePage({
     : isoWeekSeed();
   const liveSources = getRuntimeLiveSources();
   const mapInventoryByState = buildPublicSafeInventoryByState();
+  const frontDoorGroups = buildFrontDoorGroups();
   return (
     <>
       {/* America 250 full-width commemorative banner — outside max-width container */}
@@ -670,9 +673,18 @@ export default async function HomePage({
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            2. AMERICA'S JOURNEY MAP
+            2. GROUPED FRONT DOOR — property kinds over the canonical
+            profile taxonomy (founder direction 2026-07-17: one cohesive
+            platform; real groups only; the journey map becomes supporting
+            texture below rather than the lead).
+            ══════════════════════════════════════════════════════════════ */}
+        <section className="fl-section" aria-label="Property kinds front door">
+          <PropertyGroupsFrontDoor groups={frontDoorGroups} />
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            2b. AMERICA'S JOURNEY MAP — supporting exploration texture.
             Canonical stop pool from americasJourneyStops.ts.
-            PublicMapExperience manages its own data — no props needed here.
             ══════════════════════════════════════════════════════════════ */}
         {/* id = the secondary CTA's scroll target ("Explore America's
             Possibilities" → the map experience, the supporting exploration). */}

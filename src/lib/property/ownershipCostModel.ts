@@ -25,6 +25,13 @@
  */
 export interface OwnershipCostContext {
   rates: { weekOf: string; rate30: number; rate15: number | null };
+  /** Current USDA FSA published farm-loan rates (farmMode only). */
+  fsa?: {
+    ownershipDirectPct: number;
+    operatingDirectPct: number;
+    downPaymentPct: number | null;
+    effective: string | null;
+  } | null;
   taxContext: {
     medianAnnualTax: number;
     medianHomeValue: number;
@@ -281,25 +288,31 @@ export function buildOwnershipCostModel(
   const scenarios: Array<Omit<ProgramScenario, "incomeGuidance">> = [];
 
   // ── FARM-LOAN LANES (working farm/ranch) ─────────────────────────────────
-  // FSA/USDA/Farm Credit, not consumer mortgages. Rates are set monthly by
-  // FSA and negotiated by ag lenders — the payment here is illustrative at the
-  // labeled rate; the county FSA office quotes the real number. FSA Farm
+  // FSA/USDA/Farm Credit, not consumer mortgages. The FSA Direct rate is the
+  // agency's own PUBLISHED monthly rate (fsaRatesGenerated); the FSA-guaranteed
+  // and Farm Credit lanes are lender-negotiated, so those payments are shown at
+  // the FSA Direct rate as a reasonable benchmark and labeled as such. The
+  // county FSA office and the ag lender quote the binding number. FSA Farm
   // Ownership loans run up to 40-year terms.
   if (inputs.farmMode) {
-    const farmRate = rate; // illustrative proxy; FSA/lender sets the real rate
+    // Published FSA Direct Farm Ownership rate when available; PMMS proxy only
+    // if the snapshot is missing (keeps the model total even without the slice).
+    const fsaDirect = context.fsa?.ownershipDirectPct ?? rate;
+    const fsaEffective = context.fsa?.effective ?? null;
+    const effNote = fsaEffective ? ` (FSA Direct rate effective ${fsaEffective})` : "";
     // FSA Direct Farm Ownership — up to $600k, as low as 5% down, 40-yr term.
     {
       const down = price * 0.05;
       const loan = price - down;
       scenarios.push({
         program: "FSA Direct Farm Ownership (~5% down)",
-        fit: "USDA Farm Service Agency direct loan — beginning and underserved farmers; up to $600,000, terms to 40 years. FSA sets the rate monthly.",
+        fit: `USDA Farm Service Agency direct loan — beginning and underserved farmers; up to $600,000, terms to 40 years${effNote}.`,
         downPaymentPct: 5,
         downPayment: Math.round(down),
         loanAmount: Math.round(loan),
         upfrontFeeNote: "No mortgage insurance; loan-making is through the county FSA office.",
-        ratePct: farmRate,
-        monthlyPrincipalInterest: round10(monthlyPayment(loan, farmRate, 40)),
+        ratePct: fsaDirect,
+        monthlyPrincipalInterest: round10(monthlyPayment(loan, fsaDirect, 40)),
         monthlyMortgageInsurance: 0,
         mortgageInsuranceNote: null,
       });
@@ -310,13 +323,13 @@ export function buildOwnershipCostModel(
       const loan = price - down;
       scenarios.push({
         program: "FSA Guaranteed Farm Ownership (~10% down)",
-        fit: "A commercial lender's loan with an FSA guarantee (up to ~$2.25M); terms to 40 years, rate negotiated with the lender.",
+        fit: "A commercial lender's loan with an FSA guarantee (up to ~$2.25M); terms to 40 years. Rate is negotiated with the lender — shown here at the FSA Direct benchmark.",
         downPaymentPct: 10,
         downPayment: Math.round(down),
         loanAmount: Math.round(loan),
         upfrontFeeNote: "FSA guarantee fee applies; the lender sets the rate.",
-        ratePct: farmRate,
-        monthlyPrincipalInterest: round10(monthlyPayment(loan, farmRate, 30)),
+        ratePct: fsaDirect,
+        monthlyPrincipalInterest: round10(monthlyPayment(loan, fsaDirect, 30)),
         monthlyMortgageInsurance: 0,
         mortgageInsuranceNote: null,
       });
@@ -327,13 +340,13 @@ export function buildOwnershipCostModel(
       const loan = price - down;
       scenarios.push({
         program: "Farm Credit / ag lender (~25% down)",
-        fit: "The Farm Credit System or a commercial ag bank — typically 20–30% down, 15–30 year terms, no government cap.",
+        fit: "The Farm Credit System or a commercial ag bank — typically 20–30% down, 15–30 year terms, no government cap. Rate is lender-set — shown here at the FSA Direct benchmark.",
         downPaymentPct: 25,
         downPayment: Math.round(down),
         loanAmount: Math.round(loan),
         upfrontFeeNote: null,
-        ratePct: farmRate,
-        monthlyPrincipalInterest: round10(monthlyPayment(loan, farmRate, 25)),
+        ratePct: fsaDirect,
+        monthlyPrincipalInterest: round10(monthlyPayment(loan, fsaDirect, 25)),
         monthlyMortgageInsurance: 0,
         mortgageInsuranceNote: null,
       });
@@ -629,7 +642,13 @@ export function buildOwnershipCostModel(
     horizon,
     disclaimers: [
       inputs.farmMode
-        ? `Farm-loan payments are ILLUSTRATIVE at ${rate}% — FSA sets its direct-loan rate monthly and ag lenders negotiate theirs; the county FSA office and your lender quote the real number, and FSA loans run longer terms (up to 40 years) than the consumer rate shown.`
+        ? (() => {
+            const fsaDirect = context.fsa?.ownershipDirectPct ?? rate;
+            const eff = context.fsa?.effective;
+            return context.fsa
+              ? `The FSA Direct Farm Ownership payment uses USDA FSA's published direct-loan rate (${fsaDirect}%${eff ? `, effective ${eff}` : ""}); FSA updates it monthly. The FSA-guaranteed and Farm Credit lanes are lender-negotiated and shown at that same FSA Direct rate as a benchmark — your lender quotes the real number. FSA loans run longer terms (up to 40 years) than a consumer mortgage.`
+              : `Farm-loan payments are ILLUSTRATIVE at ${rate}% — FSA sets its direct-loan rate monthly and ag lenders negotiate theirs; the county FSA office and your lender quote the real number, and FSA loans run longer terms (up to 40 years) than the consumer rate shown.`;
+          })()
         : `Payment estimates use the Freddie Mac national average 30-year rate (${rate}%, week of ${context.rates.weekOf}). Rates move weekly, and your quoted rate depends on credit, points, program, and lender.`,
       inputs.priceIsAssumption
         ? "Built on the price you entered — not a listed price, an appraisal, or an opinion of value."

@@ -6,6 +6,7 @@
  */
 
 import { COUNTY_TAX_CONTEXT } from "@/lib/property/countyTaxContextGenerated";
+import { FSA_RATES, FSA_RATES_PROVENANCE } from "@/lib/property/fsaRatesGenerated";
 import { MORTGAGE_RATES } from "@/lib/property/mortgageRatesGenerated";
 import type { OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { STATE_ELECTRICITY } from "@/lib/property/stateElectricityGenerated";
@@ -23,6 +24,12 @@ export function resolveOwnershipCostContext(
       weekOf: MORTGAGE_RATES.weekOf,
       rate30: MORTGAGE_RATES.rate30,
       rate15: MORTGAGE_RATES.rate15,
+    },
+    fsa: {
+      ownershipDirectPct: FSA_RATES.ownershipDirect,
+      operatingDirectPct: FSA_RATES.operatingDirect,
+      downPaymentPct: FSA_RATES.downPayment ?? null,
+      effective: FSA_RATES_PROVENANCE.effective,
     },
     taxContext: taxContext
       ? {

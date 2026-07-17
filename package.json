@@ -337,6 +337,7 @@
     "ingest:fema-nri": "tsx src/scripts/ingestFemaNri.ts",
     "ingest:eia-electricity": "tsx src/scripts/ingestEiaElectricity.ts",
     "ingest:pmms-rates": "tsx src/scripts/ingestPmmsRates.ts",
+    "ingest:fsa-rates": "tsx src/scripts/ingestFsaRates.ts",
     "ingest:census-tax-rates": "tsx src/scripts/ingestCensusTaxRates.ts",
     "ingest:fhfa-hpi": "tsx src/scripts/ingestFhfaHpi.ts",
     "ingest:ipeds-colleges": "tsx src/scripts/ingestIpedsColleges.ts",
@@ -349,7 +350,7 @@
     "ingest:nass-farmland": "tsx src/scripts/ingestNassFarmland.ts",
     "ingest:nass-input-costs": "tsx src/scripts/ingestNassInputCosts.ts",
     "ingest:ams-grain-bids": "tsx src/scripts/ingestAmsGrainBids.ts",
-    "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids && npm run ingest:nass-input-costs"
+    "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids && npm run ingest:nass-input-costs && npm run ingest:fsa-rates"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

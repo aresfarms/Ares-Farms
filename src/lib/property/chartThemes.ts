@@ -154,7 +154,7 @@ export const CHART_LENS_COPY: Record<ChartVariant, ChartLensCopy> = {
     waypointUncharted: "Unscreened — fieldwork and records checks",
     waypointNext: "Scoping the screen",
     factPriority: ["Flood zone", "Historic status", "County", "Grocery access"],
-    showLiving: false,
+    showLiving: true,
     extraUnknowns: [
       {
         label: "Prior site uses",
@@ -194,7 +194,7 @@ export const CHART_LENS_COPY: Record<ChartVariant, ChartLensCopy> = {
     waypointUncharted: "The file still needs",
     waypointNext: "Where this file goes next",
     factPriority: ["Rental context", "Owner-occupancy", "Flood zone", "County"],
-    showLiving: false,
+    showLiving: true,
     extraUnknowns: [
       {
         label: "Appraised value",
@@ -225,7 +225,7 @@ export const CHART_LENS_COPY: Record<ChartVariant, ChartLensCopy> = {
     waypointUncharted: "Uncharted — what nobody can tell you yet",
     waypointNext: "Your next move",
     factPriority: ["County", "Flood zone", "Opportunity Zone", "HUBZone", "New Markets Tax Credit area"],
-    showLiving: false,
+    showLiving: true,
     extraUnknowns: [
       {
         label: "Zoning and permitted use",

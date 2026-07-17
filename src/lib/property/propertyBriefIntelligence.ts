@@ -1436,7 +1436,7 @@ export function buildPropertyBriefIntelligence(args: {
   // Daily-life amenities — distance/count facts within the snapshot radius.
   // OSM coverage in rural areas can lag; zero means "not mapped", said plainly.
   const amenities = id ? PROPERTY_AMENITY_FACTS[id] : undefined;
-  if (amenities && isHome) {
+  if (amenities) {
     verifiedFacts.push(
       amenityFactLine(
         amenities,
@@ -1577,10 +1577,9 @@ export function buildPropertyBriefIntelligence(args: {
       fmr2: isHome && fmr ? fmr.fmr2 : null,
       fmr4: isHome && fmr ? fmr.fmr4 : null,
     }),
-    livingHere:
-      amenities && isHome
-        ? livingHereStrip(amenities, PROPERTY_AMENITIES_PROVENANCE.radiusMiles)
-        : null,
+    livingHere: amenities
+      ? livingHereStrip(amenities, PROPERTY_AMENITIES_PROVENANCE.radiusMiles)
+      : null,
     diligenceCosts: [...diligenceCostLines({ isHome, farmShaped }), ...profileCostLines(profile.id)],
     profile,
   };
@@ -1759,7 +1758,6 @@ export async function buildLocationBriefIntelligence(args: {
   // gate is closed or the query fails, amenities become an honest unknown.
   let amenities: AmenityFacts | null = null;
   if (
-    isHome &&
     geocode?.lat != null &&
     geocode?.lon != null &&
     amenityLiveLookupEnabled(args.amenityEnv ?? process.env)
@@ -1824,7 +1822,6 @@ export async function buildLocationBriefIntelligence(args: {
   // Module 22/23 + an FCC credential). When the gate is closed or the lookup
   // fails, the FCC-map UNKNOWN carries the answer — the always-current link.
   if (
-    isHome &&
     geocode?.lat != null &&
     geocode?.lon != null &&
     broadbandLiveLookupEnabled(args.amenityEnv ?? process.env)
@@ -1917,7 +1914,7 @@ export async function buildLocationBriefIntelligence(args: {
       fmr2: isHome && fmr ? fmr.fmr2 : null,
       fmr4: isHome && fmr ? fmr.fmr4 : null,
     }),
-    livingHere: amenities && isHome ? livingHereStrip(amenities, AMENITY_RADIUS_MILES) : null,
+    livingHere: amenities ? livingHereStrip(amenities, AMENITY_RADIUS_MILES) : null,
     diligenceCosts: [
       ...diligenceCostLines({ isHome, farmShaped: locFarmShaped || !args.propertyType }),
       ...profileCostLines(locProfile.id),

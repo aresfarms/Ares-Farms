@@ -3486,25 +3486,11 @@ export function PropertyEvaluationWorkspace({
       </div>
         </div>
         </section>
-      ) : (
-        <a
-          href={deepHref}
-          data-testid="open-deep-analysis"
-          style={{
-            display: "block",
-            border: "1px solid #d7deea",
-            borderRadius: 14,
-            background: "#ffffff",
-            padding: "16px 18px",
-            fontSize: 14.5,
-            fontWeight: 700,
-            color: "#162033",
-            textDecoration: "none",
-          }}
-        >
-          Open the deeper analysis workspace → <span style={{ fontWeight: 400, color: "#5d687a", fontSize: 12.5 }}>full-page, your draft answers come with you</span>
-        </a>
-      )}
+      ) : null}
+      {/* The separate "deeper analysis workspace" link was removed (founder
+          direction 2026-07-17): the chart already carries the full analysis
+          — facts, costs, financing, and open items — and the watermarked PDF
+          is the formal document. A middle report page was redundant. */}
 
       {/* Switch-property moved from the page top to a quiet, collapsed rail at
           the end (redesign Phase 1): the visitor came to evaluate THIS

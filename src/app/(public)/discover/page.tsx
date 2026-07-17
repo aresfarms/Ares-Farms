@@ -224,10 +224,12 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
   // Chart Table audience lens: explicit ?lens= wins; commercial-shaped
   // property types default to the commercial chart; homes stay buyer.
   const lensParam = one(query.lens);
+  // Commercial only for CLEARLY commercial-shaped types — manual imports carry
+  // vague types ("place-led property") and default to the buyer chart.
   const chartVariant: ChartVariant =
     lensParam === "environmental" || lensParam === "finance" || lensParam === "commercial" || lensParam === "buyer"
       ? lensParam
-      : propertyContext && !/home|residential|house/i.test(propertyContext.propertyType)
+      : propertyContext && /commercial|retail|office|industrial|warehouse|hospitality|business|mixed[- ]use/i.test(propertyContext.propertyType)
         ? "commercial"
         : "buyer";
   // Imported/manual addresses have no canonical id, so the property-keyed

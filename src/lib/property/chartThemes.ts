@@ -32,8 +32,11 @@ export interface ChartTheme {
   waypointBorder: string;
   /** The accent (kickers, waypoint numerals, primary flags). */
   accent: string;
-  /** Warning flag color. */
+  /** Warning flag color (small pennants only). */
   warn: string;
+  /** Soft caution ink for text (pause lines, unknown pointers) — the approved
+      mock used light honey, never burnt orange, for reading-size text. */
+  honey: string;
   /** Fact cell background/border. */
   cellBg: string;
   cellBorder: string;
@@ -58,7 +61,7 @@ export interface ChartLensCopy {
   /** Whether the living-here waypoint renders for this lens. */
   showLiving: boolean;
   /** Extra lens-specific open items (official pointers only). */
-  extraUnknowns: { label: string; pointer: string; howToFind: string }[];
+  extraUnknowns: { label: string; pointer: string; url?: string; howToFind: string }[];
   /** Tier ladder order: which deeper-waters line leads. */
   tierLead: "coordination" | "environmental";
 }
@@ -72,6 +75,7 @@ export const CHART_THEMES: Record<ChartVariant, ChartTheme> = {
     waypointBorder: "#29536f",
     accent: "#d4b06a",
     warn: "#cf8a4a",
+    honey: "#e8c088",
     cellBg: "rgba(9, 28, 41, 0.8)",
     cellBorder: "#234a63",
     ink: "#eaf3f7",
@@ -86,6 +90,7 @@ export const CHART_THEMES: Record<ChartVariant, ChartTheme> = {
     waypointBorder: "#2e5c42",
     accent: "#a8c66c",
     warn: "#cf9a4a",
+    honey: "#d8cf9a",
     cellBg: "rgba(10, 30, 19, 0.8)",
     cellBorder: "#27503a",
     ink: "#ecf5ec",
@@ -100,6 +105,7 @@ export const CHART_THEMES: Record<ChartVariant, ChartTheme> = {
     waypointBorder: "#44403a",
     accent: "#d4b06a",
     warn: "#c96f52",
+    honey: "#e3cf9e",
     cellBg: "rgba(24, 25, 30, 0.85)",
     cellBorder: "#3c3a33",
     ink: "#f0eee8",
@@ -114,6 +120,7 @@ export const CHART_THEMES: Record<ChartVariant, ChartTheme> = {
     waypointBorder: "#5a3f34",
     accent: "#d69a6b",
     warn: "#cf8a4a",
+    honey: "#edc9a3",
     cellBg: "rgba(30, 20, 18, 0.8)",
     cellBorder: "#4c352c",
     ink: "#f5ede8",
@@ -155,12 +162,14 @@ export const CHART_LENS_COPY: Record<ChartVariant, ChartLensCopy> = {
       {
         label: "Nearby regulated facilities",
         pointer: "EPA Envirofacts / FRS",
+        url: "https://www.epa.gov/frs",
         howToFind:
           "EPA's Envirofacts and Facility Registry Service list permitted and regulated facilities near any address — free, official, searchable by location.",
       },
       {
         label: "Wetlands on or near the parcel",
         pointer: "USFWS National Wetlands Inventory",
+        url: "https://www.fws.gov/program/national-wetlands-inventory/wetlands-mapper",
         howToFind:
           "The National Wetlands Inventory mapper shows mapped wetlands; a jurisdictional determination from the Corps of Engineers is the official answer for a specific parcel.",
       },

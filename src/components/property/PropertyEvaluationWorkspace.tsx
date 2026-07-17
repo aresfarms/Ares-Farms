@@ -2315,12 +2315,10 @@ export function PropertyEvaluationWorkspace({
     setPdfError(null);
     const fileStem = `${context.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "property-evaluation"}-${report.tier.id}`;
     try {
-      const res = await fetch("/api/public/property-report-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: `${fileStem}.pdf`,
-          report: {
+      // The PDF route requires a short-lived attestation minted from the
+      // IDENTICAL report payload (digest + context key must match), so build
+      // the payload once, mint, then export.
+      const reportPayload = {
             branding: report.branding,
             tier: report.tier,
             context: {
@@ -2359,7 +2357,27 @@ export function PropertyEvaluationWorkspace({
               answers,
               readinessMissing: contextualMissingItems(readinessResult.missingItems, analysisContext, answers),
             }),
-          },
+      };
+
+      const tokenRes = await fetch("/api/public/property-report-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ report: reportPayload }),
+      });
+      const tokenBody = (await tokenRes.json().catch(() => null)) as
+        | { ok?: boolean; token?: string; error?: string }
+        | null;
+      if (!tokenRes.ok || !tokenBody?.ok || !tokenBody.token) {
+        throw new Error(tokenBody?.error || "The report attestation service returned an unexpected error.");
+      }
+
+      const res = await fetch("/api/public/property-report-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: `${fileStem}.pdf`,
+          report: reportPayload,
+          token: tokenBody.token,
         }),
       });
       if (!res.ok) {

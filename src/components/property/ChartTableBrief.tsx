@@ -268,7 +268,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                 </span>
               )}
               <span style={{ fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>
-                <strong style={{ color: theme.warn }}>Pause if you need:</strong> {props.pauseLine}.
+                <strong style={{ color: theme.honey }}>Pause if you need:</strong> {props.pauseLine}.
               </span>
             </div>
           </div>
@@ -361,7 +361,18 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                 {unknowns.map((unknown) => (
                   <div key={unknown.label} style={factCell}>
                     <div style={factLab}>{unknown.label}</div>
-                    <div style={{ ...factVal, color: theme.warn }}>{unknown.pointer}</div>
+                    {"url" in unknown && unknown.url ? (
+                      <a
+                        href={unknown.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ ...factVal, color: theme.honey, display: "block", textDecoration: "underline", textUnderlineOffset: 2 }}
+                      >
+                        {unknown.pointer} ↗
+                      </a>
+                    ) : (
+                      <div style={{ ...factVal, color: theme.honey }}>{unknown.pointer}</div>
+                    )}
                     <details>
                       <summary style={expandSummary}>how exactly ▸</summary>
                       <div style={{ fontSize: 11.5, lineHeight: 1.6, color: theme.inkSoft, marginTop: 4 }}>

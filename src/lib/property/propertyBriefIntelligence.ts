@@ -41,6 +41,7 @@ import {
 } from "./propertyAmenitiesGenerated";
 import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
+import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
 import {
   AMENITY_RADIUS_MILES,
   amenityLiveLookupEnabled,
@@ -70,6 +71,9 @@ export interface BriefUnknownLine {
   label: string;
   /** Short pointer to the official source ("County treasurer site"). */
   pointer: string;
+  /** Stable official URL for the pointer, when one exists nationally. County
+      offices have no stable national URL scheme — those stay text. */
+  url?: string;
   /** How the customer finds out (official path, no live fetch by us). */
   howToFind: string;
 }
@@ -437,6 +441,31 @@ function buildChips(args: {
   return chips.filter((c): c is BriefChip => c !== null).slice(0, 4);
 }
 
+/**
+ * Private/parochial school directory fact — LIST + permitted data only,
+ * never ratings (same founder rule as public schools). Count is the county
+ * total; examples are the largest by enrollment.
+ */
+function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
+  if (!countyFips) return null;
+  const entry = COUNTY_PRIVATE_SCHOOLS[countyFips];
+  if (!entry || entry.count === 0) return null;
+  const sample = entry.schools.slice(0, 3);
+  return {
+    label: "Private & parochial schools",
+    value: `${entry.count} in the county`,
+    text:
+      `${entry.count} private or parochial school${entry.count === 1 ? "" : "s"} on the federal ` +
+      `survey for this county. Example${sample.length === 1 ? "" : "s"}: ${sample
+        .map((s) => `${s.name}${s.city ? ` (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})` : s.enrollment != null ? ` (${s.enrollment} students)` : ""}`)
+        .join("; ")}. ` +
+      `Survey coverage varies — a local ask often finds options directories miss. Directory facts ` +
+      `only; Furlong does not rate schools.`,
+    provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}`,
+    tone: "neutral",
+  };
+}
+
 /** Farm/land-shaped property types get ground-rent context automatically. */
 function isFarmShaped(propertyType: string | null): boolean {
   return /farm|ranch|land|acre|agric|crop|pasture|homestead/i.test(propertyType ?? "");
@@ -552,6 +581,7 @@ function buildUnknowns(args: {
   schoolsAvailable: boolean;
   /** Farm-shaped or type-unknown property with NO resolved county cash-rent data. */
   groundRentNeeded: boolean;
+  privateSchoolsAvailable: boolean;
 }): BriefUnknownLine[] {
   const unknowns: BriefUnknownLine[] = [];
   const countyKnown =
@@ -579,6 +609,7 @@ function buildUnknowns(args: {
     unknowns.push({
       label: "Flood zone",
       pointer: "msc.fema.gov",
+      url: "https://msc.fema.gov/portal/home",
       howToFind:
         "We have not yet resolved this location against the FEMA flood map snapshot. Look up the " +
         "address at msc.fema.gov (FEMA Map Service Center) — it is free and official.",
@@ -605,6 +636,7 @@ function buildUnknowns(args: {
     unknowns.push({
       label: "Ground rent for open acreage",
       pointer: "USDA NASS cash rents survey",
+      url: "https://quickstats.nass.usda.gov/",
       howToFind:
         "USDA NASS publishes county-average cropland and pasture cash rents " +
         "(quickstats.nass.usda.gov) — free and official; the county extension office knows the " +
@@ -615,6 +647,7 @@ function buildUnknowns(args: {
     unknowns.push({
       label: "Rental context",
       pointer: "huduser.gov (Fair Market Rents)",
+      url: "https://www.huduser.gov/portal/datasets/fmr.html",
       howToFind:
         "HUD publishes Fair Market Rents by county and bedroom count — free at huduser.gov " +
         "(datasets → Fair Market Rents). Actual asking rents come from local listings.",
@@ -633,16 +666,18 @@ function buildUnknowns(args: {
     unknowns.push({
       label: "Schools",
       pointer: "NCES school locator",
+      url: "https://nces.ed.gov/ccd/schoolsearch/",
       howToFind:
         "The NCES school locator (nces.ed.gov/ccd/schoolsearch) lists every public school by " +
         "address; the state Department of Education lists private and charter options and " +
         "publishes the official report cards.",
     });
   }
-  if (args.isHome) {
+  if (args.isHome && !args.privateSchoolsAvailable) {
     unknowns.push({
       label: "Private and alternative schools",
       pointer: "State Dept. of Education",
+      url: "https://nces.ed.gov/surveys/pss/privateschoolsearch/",
       howToFind:
         "Private, parochial, and co-op options are listed by the state Department of Education " +
         "and the NCES private-school survey (nces.ed.gov/surveys/pss) — coverage varies, so a " +
@@ -829,6 +864,9 @@ export function buildPropertyBriefIntelligence(args: {
     });
   }
 
+  const privateSchools = isHome ? privateSchoolsFact(schoolsFips) : null;
+  if (privateSchools) verifiedFacts.push(privateSchools);
+
   const fmr = fmrFips ? COUNTY_FMR[fmrFips] : undefined;
   if (fmr && isHome) {
     verifiedFacts.push({
@@ -870,6 +908,7 @@ export function buildPropertyBriefIntelligence(args: {
       amenitiesAvailable: Boolean(amenities),
       schoolsAvailable: Boolean(schools && schools.length > 0),
       groundRentNeeded: farmShaped && !groundRent,
+      privateSchoolsAvailable: Boolean(privateSchools),
     }),
     mechanics: mechanicsForSource(args.sourceId, args.propertyType),
     pathwaysProse: buildPathwaysProse({
@@ -1111,6 +1150,9 @@ export async function buildLocationBriefIntelligence(args: {
     });
   }
 
+  const privateSchools = isHome ? privateSchoolsFact(countyFips) : null;
+  if (privateSchools) verifiedFacts.push(privateSchools);
+
   // Ground rent — manual imports rarely carry a reliable property type, so
   // the fact frames its own applicability ("if the parcel includes open
   // cropland…"). Farm-shaped stated types get the direct framing.
@@ -1148,6 +1190,7 @@ export async function buildLocationBriefIntelligence(args: {
       amenitiesAvailable: Boolean(amenities),
       schoolsAvailable: Boolean(schools && schools.length > 0),
       groundRentNeeded: !groundRent,
+      privateSchoolsAvailable: Boolean(privateSchools),
     }),
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),

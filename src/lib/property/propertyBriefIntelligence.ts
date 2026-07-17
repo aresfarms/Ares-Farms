@@ -32,6 +32,8 @@ import { PROPERTY_GEO_SETTING, PROPERTY_GEO_SETTING_PROVENANCE } from "./propert
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
 import { townCharacterFact } from "./townCharacterCurated";
+import { stateNarrativeFact } from "./stateNarrativeCurated";
+import { broadbandLiveLookupEnabled, queryBroadbandLive } from "./broadbandLookup";
 import {
   classifyPropertyProfile,
   profileCostLines,
@@ -1351,6 +1353,10 @@ export function buildPropertyBriefIntelligence(args: {
   const townNote = townCharacterFact(args.stateCode, args.town);
   if (townNote) verifiedFacts.push(townNote);
 
+  // The state, in brief — first-party narrative layer above GNIS geography.
+  const stateNote = stateNarrativeFact(args.stateCode);
+  if (stateNote) verifiedFacts.push(stateNote);
+
   const geoSetting = geoSettingFact(id);
   if (geoSetting) verifiedFacts.push(geoSetting);
 
@@ -1660,9 +1666,38 @@ export async function buildLocationBriefIntelligence(args: {
   const locTownNote = townCharacterFact(stateCode, town);
   if (locTownNote) verifiedFacts.push(locTownNote);
 
+  const locStateNote = stateNarrativeFact(stateCode);
+  if (locStateNote) verifiedFacts.push(locStateNote);
+
   if (geocode?.lat != null && geocode?.lon != null) {
     const locAirports = airportsFactFromCoords(Number(geocode.lat), Number(geocode.lon));
     if (locAirports) verifiedFacts.push(locAirports);
+  }
+
+  // Broadband — GATED live FCC lookup (OFF by default; activates behind
+  // Module 22/23 + an FCC credential). When the gate is closed or the lookup
+  // fails, the FCC-map UNKNOWN carries the answer — the always-current link.
+  if (
+    isHome &&
+    geocode?.lat != null &&
+    geocode?.lon != null &&
+    broadbandLiveLookupEnabled(args.amenityEnv ?? process.env)
+  ) {
+    const broadband = await queryBroadbandLive(Number(geocode.lat), Number(geocode.lon), args.amenityEnv ?? process.env);
+    if (broadband) {
+      verifiedFacts.push({
+        label: "Broadband",
+        value: broadband.chip,
+        text:
+          `The FCC National Broadband Map shows ${broadband.providerCount} fixed-broadband ` +
+          `provider${broadband.providerCount === 1 ? "" : "s"} claiming service at this address, best ` +
+          `technology ${broadband.bestTech.replace(/-/g, " ")} (as of ${broadband.asOf}). Provider ` +
+          `CLAIMS, not a guarantee — confirm the actual plan and speed with the provider, and open the ` +
+          `FCC map for the current picture.`,
+        provenance: `Source: FCC National Broadband Map (broadbandmap.fcc.gov), lookup ${broadband.asOf}`,
+        tone: broadband.bestTech === "satellite-only" || broadband.bestTech === "none" ? "caution" : "neutral",
+      });
+    }
   }
 
   const hazardRisk = hazardRiskFact(countyFips);

@@ -47,8 +47,13 @@ async function main(): Promise<void> {
     throw new Error(`FHFA CSV header changed (${header.join(",")}) — snapshot NOT overwritten.`);
   }
 
-  // state → {baseSum, baseCount, latest: {yr, period, index}}
-  const byState = new Map<string, { baseSum: number; baseCount: number; latestYr: number; latestPeriod: number; latestIndex: number }>();
+  // state → {baseSum, baseCount, latest, thirtyYearsAgo} — the 30-year-ago
+  // index anchors the long-run CAGR used by the equity-outlook scenarios.
+  const byState = new Map<string, {
+    baseSum: number; baseCount: number;
+    latestYr: number; latestPeriod: number; latestIndex: number;
+    oldYr: number; oldPeriod: number; oldIndex: number;
+  }>();
   for (let i = 1; i < lines.length; i += 1) {
     const cells = lines[i].split(",");
     if (unquote(cells[levelC]) !== "State") continue;
@@ -60,7 +65,11 @@ async function main(): Promise<void> {
     const period = Number(cells[periodC]);
     const index = Number(cells[nsaC]);
     if (!/^[A-Z]{2}$/.test(state) || !Number.isFinite(index) || index <= 0) continue;
-    const entry = byState.get(state) ?? { baseSum: 0, baseCount: 0, latestYr: 0, latestPeriod: 0, latestIndex: 0 };
+    const entry = byState.get(state) ?? {
+      baseSum: 0, baseCount: 0,
+      latestYr: 0, latestPeriod: 0, latestIndex: 0,
+      oldYr: 0, oldPeriod: 0, oldIndex: 0,
+    };
     if (yr === BASE_YEAR) {
       entry.baseSum += index;
       entry.baseCount += 1;
@@ -73,14 +82,46 @@ async function main(): Promise<void> {
     byState.set(state, entry);
   }
 
+  // Second pass: the index closest to 30 years before each state's latest.
+  for (let i = 1; i < lines.length; i += 1) {
+    const cells = lines[i].split(",");
+    if (unquote(cells[levelC]) !== "State") continue;
+    if (unquote(cells[typeC]) !== "traditional") continue;
+    if (unquote(cells[flavorC]) !== "all-transactions") continue;
+    if (unquote(cells[freqC]) !== "quarterly") continue;
+    const state = unquote(cells[placeC]).toUpperCase();
+    const entry = byState.get(state);
+    if (!entry) continue;
+    const yr = Number(cells[yrC]);
+    const period = Number(cells[periodC]);
+    const index = Number(cells[nsaC]);
+    if (!Number.isFinite(index) || index <= 0) continue;
+    const targetYr = entry.latestYr - 30;
+    const distance = Math.abs((yr + period / 4) - (targetYr + entry.latestPeriod / 4));
+    const bestDistance = entry.oldIndex > 0
+      ? Math.abs((entry.oldYr + entry.oldPeriod / 4) - (targetYr + entry.latestPeriod / 4))
+      : Infinity;
+    if (distance < bestDistance) {
+      entry.oldYr = yr;
+      entry.oldPeriod = period;
+      entry.oldIndex = index;
+    }
+  }
+
   const entries = [...byState.entries()]
-    .filter(([, e]) => e.baseCount > 0 && e.latestIndex > 0 && e.latestYr >= BASE_YEAR)
+    .filter(([, e]) => e.baseCount > 0 && e.latestIndex > 0 && e.latestYr >= BASE_YEAR && e.oldIndex > 0)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([state, e]) => {
       const factor = Number((e.latestIndex / (e.baseSum / e.baseCount)).toFixed(4));
+      const spanYears = (e.latestYr + e.latestPeriod / 4) - (e.oldYr + e.oldPeriod / 4);
+      const longRunAnnualPct = Number(
+        ((Math.pow(e.latestIndex / e.oldIndex, 1 / spanYears) - 1) * 100).toFixed(2)
+      );
       return `  ${JSON.stringify(state)}: ${JSON.stringify({
         factorSinceBase: factor,
         latestQuarter: `${e.latestYr}Q${e.latestPeriod}`,
+        longRunAnnualPct,
+        longRunSpanYears: Math.round(spanYears),
       })},`;
     });
   if (entries.length < 45) {
@@ -111,6 +152,11 @@ export interface StateHpi {
   factorSinceBase: number;
   /** Latest quarter in the series, e.g. "2026Q1". */
   latestQuarter: string;
+  /** The state's PUBLISHED long-run annualized price change, percent —
+      basis for equity-outlook scenarios (history, never a prediction). */
+  longRunAnnualPct: number;
+  /** Years the long-run rate spans (~30). */
+  longRunSpanYears: number;
 }
 
 export const STATE_HPI: Record<string, StateHpi> = {

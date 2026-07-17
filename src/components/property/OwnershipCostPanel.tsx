@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import type { ChartTheme } from "@/lib/property/chartThemes";
 import {
+  buildEquityOutlook,
   buildOwnershipCostModel,
   buildPriceContext,
   type OwnershipCostContext,
@@ -287,14 +288,88 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
                 </strong>
               </div>
             ))}
-            <div style={{ fontSize: 13, color: theme.ink }}>
-              Years 1–5, everything included:{" "}
-              <strong style={{ color: theme.accent }}>
-                {fmt(model.fiveYear.cumulativeLow)}–{fmt(model.fiveYear.cumulativeHigh)}
-              </strong>
+            <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, paddingTop: 8, display: "grid", gap: 8 }}>
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent }}>
+                The cost horizon (FHA path, today&apos;s dollars)
+              </span>
+              {(
+                [
+                  ["Year 1 — buying in", model.horizon.year1],
+                  ["Years 2–5", model.horizon.years2to5],
+                  ["Years 6–10", model.horizon.years6to10],
+                  ["Years 11–30", model.horizon.years11to30],
+                ] as const
+              ).map(([label, band]) => (
+                <div key={label} style={{ display: "grid", gap: 2 }}>
+                  <div style={{ fontSize: 13, color: theme.ink }}>
+                    <strong>{label}:</strong>{" "}
+                    <strong style={{ color: theme.accent }}>
+                      {fmt(band.low)}–{fmt(band.high)}
+                    </strong>
+                  </div>
+                  <span style={{ fontSize: 11.5, lineHeight: 1.55, color: theme.inkFaint }}>{band.note}</span>
+                </div>
+              ))}
             </div>
-            <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: theme.inkSoft }}>{model.fiveYear.note}</p>
           </div>
+
+          {/* ── Equity outlook — the long view (scenarios, never predictions) ── */}
+          {price != null && (() => {
+            const outlook = buildEquityOutlook(price, props.context);
+            if (!outlook) return null;
+            return (
+              <div style={{ display: "grid", gap: 8 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent }}>
+                  If you hold it — value and equity scenarios
+                </div>
+                <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.6, color: theme.inkSoft }}>{outlook.intro}</p>
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", background: theme.cellBg, borderRadius: 10 }}>
+                    <thead>
+                      <tr>
+                        {["Year", "Still owed", "Flat (0%)", `Slower (${outlook.slowerRatePct}%)`, `Steady (${outlook.steadyRatePct}%)`].map((head) => (
+                          <th
+                            key={head}
+                            style={{ padding: "7px 10px", fontSize: 11, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: theme.inkSoft, borderBottom: `1px solid ${theme.cellBorder}`, textAlign: "left" }}
+                          >
+                            {head}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {outlook.rows.map((row) => (
+                        <tr key={row.year}>
+                          <td style={{ padding: "6px 10px", fontSize: 12.5, fontWeight: 700, color: theme.ink, borderBottom: `1px solid ${theme.cellBorder}` }}>
+                            {row.year}
+                          </td>
+                          <td style={{ padding: "6px 10px", fontSize: 12.5, color: theme.inkSoft, borderBottom: `1px solid ${theme.cellBorder}`, whiteSpace: "nowrap" }}>
+                            {row.loanBalance > 0 ? fmt(row.loanBalance) : "Paid off"}
+                          </td>
+                          {([row.flat, row.slower, row.steady] as const).map((scenario, index) => (
+                            <td
+                              key={index}
+                              style={{ padding: "6px 10px", fontSize: 12.5, color: theme.ink, borderBottom: `1px solid ${theme.cellBorder}`, whiteSpace: "nowrap" }}
+                            >
+                              {fmt(scenario.value)}
+                              <span style={{ display: "block", fontSize: 11, color: theme.inkFaint }}>
+                                equity ≈ {fmt(scenario.equity)}
+                              </span>
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {outlook.disclaimers.map((line) => (
+                  <p key={line} style={{ margin: 0, fontSize: 11.5, lineHeight: 1.55, color: theme.inkFaint }}>
+                    {line}
+                  </p>
+                ))}
+              </div>
+            );
+          })()}
 
           <div style={{ display: "grid", gap: 4 }}>
             {model.disclaimers.map((line) => (

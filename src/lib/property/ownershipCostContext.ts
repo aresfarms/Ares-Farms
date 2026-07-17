@@ -42,6 +42,8 @@ export function resolveOwnershipCostContext(
           factorSinceBase: hpi.factorSinceBase,
           latestQuarter: hpi.latestQuarter,
           baseYear: STATE_HPI_PROVENANCE.baseYear,
+          longRunAnnualPct: hpi.longRunAnnualPct,
+          longRunSpanYears: hpi.longRunSpanYears,
         }
       : null,
   };

@@ -74,7 +74,12 @@ type PropertyEvaluationPdfInput = {
     closingLine: string;
     monthlyLines: Array<{ label: string; range: string; note: string }>;
     totalsLines: string[];
-    fiveYearLine: string;
+    /** Cost horizon bands (Year 1 / 2–5 / 6–10 / 11–30), pre-formatted. */
+    horizonLines: Array<{ label: string; value: string }>;
+    /** Equity-outlook scenario table (never predictions), pre-formatted. */
+    equityIntro?: string;
+    equityRows?: Array<{ label: string; value: string }>;
+    equityDisclaimers?: string[];
     disclaimers: string[];
   };
   /** Alternatives from the tracked government inventory (honest-label rule). */
@@ -523,7 +528,18 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
         value: `${line.range} — ${line.note}`,
       }))
     );
-    panel({ lines: [...own.totalsLines, own.fiveYearLine], fill: ACCENT_SOFT });
+    panel({ lines: own.totalsLines, fill: ACCENT_SOFT });
+    setFont("bold", 9.5, COLORS.muted);
+    ensure(24);
+    doc.text("THE COST HORIZON — FHA PATH, TODAY'S DOLLARS", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    factsTable(own.horizonLines);
+    if (own.equityIntro && own.equityRows?.length) {
+      heading("If You Hold It — Value and Equity Scenarios");
+      paragraph(own.equityIntro, { size: 9.5 });
+      factsTable(own.equityRows);
+      for (const line of own.equityDisclaimers ?? []) paragraph(line, { size: 8.5, color: COLORS.muted });
+    }
     for (const line of own.disclaimers) paragraph(line, { size: 8.5, color: COLORS.muted });
   }
 

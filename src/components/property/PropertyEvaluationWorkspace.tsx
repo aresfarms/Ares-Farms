@@ -15,7 +15,7 @@ import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { PropertyResultCard } from "@/components/property/PropertyResultCard";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
-import { buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
+import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { classifyPropertyProfile, profileUsesResidentialLanes } from "@/lib/property/propertyProfile";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
@@ -976,7 +976,10 @@ function formatOwnershipCostsForPdf(args: {
       closingLine: string;
       monthlyLines: Array<{ label: string; range: string; note: string }>;
       totalsLines: string[];
-      fiveYearLine: string;
+      horizonLines: Array<{ label: string; value: string }>;
+      equityIntro?: string;
+      equityRows?: Array<{ label: string; value: string }>;
+      equityDisclaimers?: string[];
       disclaimers: string[];
     }
   | undefined {
@@ -1016,8 +1019,37 @@ function formatOwnershipCostsForPdf(args: {
     totalsLines: model.monthlyTotals.map(
       (total) => `All-in monthly on ${total.program}: ${dollars(total.low)}–${dollars(total.high)}`
     ),
-    fiveYearLine:
-      `Years 1–5, everything included: ${dollars(model.fiveYear.cumulativeLow)}–${dollars(model.fiveYear.cumulativeHigh)}. ${model.fiveYear.note}`,
+    horizonLines: (
+      [
+        ["Year 1 — buying in", model.horizon.year1],
+        ["Years 2–5", model.horizon.years2to5],
+        ["Years 6–10", model.horizon.years6to10],
+        ["Years 11–30", model.horizon.years11to30],
+      ] as const
+    ).map(([label, band]) => ({
+      label,
+      value: `${dollars(band.low)}–${dollars(band.high)} — ${band.note}`,
+    })),
+    ...((): {
+      equityIntro?: string;
+      equityRows?: Array<{ label: string; value: string }>;
+      equityDisclaimers?: string[];
+    } => {
+      const outlook = buildEquityOutlook(args.listedPrice, args.ownershipContext);
+      if (!outlook) return {};
+      return {
+        equityIntro: outlook.intro,
+        equityRows: outlook.rows.map((row) => ({
+          label: `Year ${row.year}`,
+          value:
+            `Still owed ${row.loanBalance > 0 ? dollars(row.loanBalance) : "$0 (paid off)"}  ·  ` +
+            `flat ${dollars(row.flat.value)} (eq. ${dollars(row.flat.equity)})  ·  ` +
+            `slower ${dollars(row.slower.value)} (eq. ${dollars(row.slower.equity)})  ·  ` +
+            `steady ${dollars(row.steady.value)} (eq. ${dollars(row.steady.equity)})`,
+        })),
+        equityDisclaimers: outlook.disclaimers,
+      };
+    })(),
     disclaimers: model.disclaimers,
   };
 }
@@ -2705,7 +2737,7 @@ export function PropertyEvaluationWorkspace({
         )
       : null;
   const cardNumbersLine = cardModel
-    ? `All-in monthly on ${cardModel.monthlyTotals[0].program}: $${cardModel.monthlyTotals[0].low.toLocaleString("en-US")}–$${cardModel.monthlyTotals[0].high.toLocaleString("en-US")} · typically works from ≈$${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr household income · years 1–5 all-in $${cardModel.fiveYear.cumulativeLow.toLocaleString("en-US")}–$${cardModel.fiveYear.cumulativeHigh.toLocaleString("en-US")}. Illustrative guidance at the current Freddie Mac average rate — never a quote or approval.`
+    ? `All-in monthly on ${cardModel.monthlyTotals[0].program}: $${cardModel.monthlyTotals[0].low.toLocaleString("en-US")}–$${cardModel.monthlyTotals[0].high.toLocaleString("en-US")} · typically works from ≈$${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr household income · year 1 all-in $${cardModel.horizon.year1.low.toLocaleString("en-US")}–$${cardModel.horizon.year1.high.toLocaleString("en-US")}, then $${cardModel.horizon.years2to5.low.toLocaleString("en-US")}–$${cardModel.horizon.years2to5.high.toLocaleString("en-US")} across years 2–5. Illustrative guidance at the current Freddie Mac average rate — never a quote or approval.`
     : /price on request/i.test(analysisContext.priceLabel ?? "")
       ? "No published price on this listing — open the full chart and enter the price you would offer; the complete cost and income picture fills in on this page only."
       : null;

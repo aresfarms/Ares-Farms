@@ -35,7 +35,14 @@ export interface OwnershipCostContext {
     resAvgMonthlyBill: number | null;
   } | null;
   /** State FHFA trend factor walking the ACS-vintage median to today. */
-  hpi: { factorSinceBase: number; latestQuarter: string; baseYear: number } | null;
+  hpi: {
+    factorSinceBase: number;
+    latestQuarter: string;
+    baseYear: number;
+    /** State's published long-run annualized price change, percent (~30 yrs). */
+    longRunAnnualPct: number;
+    longRunSpanYears: number;
+  } | null;
 }
 
 /**
@@ -152,13 +159,100 @@ export interface OwnershipCostModel {
     low: number;
     high: number;
   }[];
-  fiveYear: {
-    /** Cumulative years 1–5 all-in (payments + recurring + maintenance). */
-    cumulativeLow: number;
-    cumulativeHigh: number;
-    note: string;
+  /** Cost horizon in bands (founder direction 2026-07-17): year 1 stands
+      alone (it carries the cash to start), then 2–5, 6–10, and 11–30. */
+  horizon: {
+    year1: { low: number; high: number; note: string };
+    years2to5: { low: number; high: number; note: string };
+    years6to10: { low: number; high: number; note: string };
+    years11to30: { low: number; high: number; note: string };
   };
   disclaimers: string[];
+}
+
+/**
+ * Equity outlook — what ownership MIGHT be worth later (founder direction
+ * 2026-07-17: potential value and equity at 3/5/10/15/20/30/50 years).
+ * SCENARIO ILLUSTRATIONS ONLY, anchored to the state's PUBLISHED long-run
+ * FHFA trend: a steady path repeating that history, a slower path at half
+ * of it, and a flat path at zero. No one can predict prices — these show
+ * how the arithmetic of appreciation scenarios and loan paydown interacts,
+ * never a prediction, valuation, or investment advice.
+ */
+export interface EquityOutlookRow {
+  year: number;
+  /** Remaining FHA-path loan balance, dollars (0 once the loan retires). */
+  loanBalance: number;
+  flat: { value: number; equity: number };
+  slower: { value: number; equity: number };
+  steady: { value: number; equity: number };
+}
+
+export interface EquityOutlook {
+  rows: EquityOutlookRow[];
+  steadyRatePct: number;
+  slowerRatePct: number;
+  spanYears: number;
+  intro: string;
+  disclaimers: string[];
+}
+
+const EQUITY_YEARS = [3, 5, 10, 15, 20, 30, 50];
+
+/** Remaining balance on a fixed-rate loan after `months` payments. */
+function remainingBalance(loanAmount: number, annualRatePct: number, years: number, months: number): number {
+  const r = annualRatePct / 100 / 12;
+  const n = years * 12;
+  if (months >= n) return 0;
+  if (r <= 0) return loanAmount * (1 - months / n);
+  const growth = Math.pow(1 + r, n);
+  const paid = Math.pow(1 + r, months);
+  return loanAmount * ((growth - paid) / (growth - 1));
+}
+
+export function buildEquityOutlook(
+  price: number,
+  context: OwnershipCostContext
+): EquityOutlook | null {
+  if (!context.hpi) return null;
+  if (!Number.isFinite(price) || price < 10_000 || price > 50_000_000) return null;
+  const steadyRate = context.hpi.longRunAnnualPct / 100;
+  const slowerRate = steadyRate / 2;
+  // FHA representative path — consistent with the cost model's horizon.
+  const loan = price * 0.965 * 1.0175;
+  const rate = context.rates.rate30;
+
+  const rows: EquityOutlookRow[] = EQUITY_YEARS.map((year) => {
+    const loanBalance = Math.round(remainingBalance(loan, rate, 30, year * 12));
+    const valueAt = (annualRate: number) => Math.round(price * Math.pow(1 + annualRate, year));
+    const rowFor = (annualRate: number) => {
+      const value = valueAt(annualRate);
+      return { value, equity: Math.max(0, value - loanBalance) };
+    };
+    return {
+      year,
+      loanBalance,
+      flat: rowFor(0),
+      slower: rowFor(slowerRate),
+      steady: rowFor(steadyRate),
+    };
+  });
+
+  return {
+    rows,
+    steadyRatePct: context.hpi.longRunAnnualPct,
+    slowerRatePct: Number((context.hpi.longRunAnnualPct / 2).toFixed(2)),
+    spanYears: context.hpi.longRunSpanYears,
+    intro:
+      `What ownership might be WORTH later, under three price scenarios: flat (0%/yr), slower ` +
+      `(${(context.hpi.longRunAnnualPct / 2).toFixed(1)}%/yr), and steady — the state's own published ` +
+      `${context.hpi.longRunSpanYears}-year average of ${context.hpi.longRunAnnualPct}%/yr (FHFA House Price Index). ` +
+      `Equity = scenario value minus what would still be owed on the loan (FHA path).`,
+    disclaimers: [
+      "Scenario illustrations, not predictions — past price trends do not guarantee future ones, and any single property can move very differently from its state. Not a valuation, an appraisal, or investment advice.",
+      "Selling typically costs about 6–10% of the sale price (agent commissions, transfer taxes, closing) — subtract that from any equity figure you act on. A state-licensed appraisal is the official value at any point in time.",
+    ],
+  };
 }
 
 /** Standard amortization: monthly payment on a fixed-rate loan. */
@@ -398,15 +492,38 @@ export function buildOwnershipCostModel(
     high: round10(s.monthlyPrincipalInterest + s.monthlyMortgageInsurance + recurringHigh),
   }));
 
-  // Years 1–5, all-in, using the FHA scenario as the representative
-  // financed path (most common first-home program).
+  // Cost horizon in bands, using the FHA scenario as the representative
+  // financed path (most common first-home program). Year 1 stands alone
+  // because it carries the cash to start; later bands note what changes.
   const fha = scenarios[1];
   const fhaMonthly = fha.monthlyPrincipalInterest + fha.monthlyMortgageInsurance;
-  const fiveYear = {
-    cumulativeLow: round10((fhaMonthly + recurringLow) * 60),
-    cumulativeHigh: round10((fhaMonthly + recurringHigh) * 60),
-    note:
-      "Five years of payments, taxes, insurance, utilities, and the maintenance reserve on the FHA path — before any renovation you choose to take on. Not to scare anyone: these are the numbers that decide whether ownership stays comfortable, and knowing them up front is the whole point.",
+  const annualLow = (fhaMonthly + recurringLow) * 12;
+  const annualHigh = (fhaMonthly + recurringHigh) * 12;
+  const horizon = {
+    year1: {
+      low: round10(fha.downPayment + price * 0.02 + annualLow),
+      high: round10(fha.downPayment + price * 0.05 + annualHigh),
+      note:
+        "The expensive year: down payment, closing costs, and twelve months of payments, taxes, insurance, utilities, and reserve — plus the inspections itemized above and any move-in repairs.",
+    },
+    years2to5: {
+      low: round10(annualLow * 4),
+      high: round10(annualHigh * 4),
+      note:
+        "Four steady years — payments, taxes, insurance, utilities, and the maintenance reserve. The years that decide whether ownership stays comfortable.",
+    },
+    years6to10: {
+      low: round10(annualLow * 5),
+      high: round10(annualHigh * 5),
+      note:
+        "Five more years — and the window where big systems start coming due: a roof, HVAC, or water heater usually arrives in this stretch, which is exactly what the maintenance reserve has been for.",
+    },
+    years11to30: {
+      low: round10(annualLow * 20),
+      high: round10(annualHigh * 20),
+      note:
+        "The long haul, in today's dollars. Taxes and insurance drift up over decades; the FHA annual mortgage insurance runs the life of the loan at minimum down (many owners refinance out of it at ~20% equity); at year 30 the loan itself retires and the payment drops to taxes, insurance, and upkeep.",
+    },
   };
 
   return {
@@ -421,7 +538,7 @@ export function buildOwnershipCostModel(
     },
     monthly,
     monthlyTotals,
-    fiveYear,
+    horizon,
     disclaimers: [
       `Payment estimates use the Freddie Mac national average 30-year rate (${rate}%, week of ${context.rates.weekOf}). Rates move weekly, and your quoted rate depends on credit, points, program, and lender.`,
       inputs.priceIsAssumption

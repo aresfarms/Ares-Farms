@@ -1,12 +1,8 @@
 import Link from "next/link";
 
 import { America250Banner } from "@/components/brand/America250Banner";
-import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
-import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
-import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
+import { CompassRose } from "@/components/public/CompassRose";
 import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
-import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
-import { isoWeekSeed } from "@/lib/public-content/weekSeed";
 import { Disclosures } from "@/components/public/Disclosures";
 import {
   HOMEPAGE_CAPABILITIES,
@@ -103,23 +99,7 @@ function CapabilityGlyph({ kind }: { kind: "private" | "pathways" | "boundaries"
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default async function HomePage({
-  searchParams,
-}: {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  // Weekly place-rotation seed: the ISO week, computed server-side so SSR and
-  // the client agree (no hydration drift). `?week=N` (alias `?mapWeek=N`) is a
-  // read-only dev/proof override so any week's featured journey can be rendered
-  // on demand — same as the holiday engine's `?holidayDate=`.
-  const resolved = searchParams ? await searchParams : {};
-  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
-  const rawWeek = one(resolved.week) ?? one(resolved.mapWeek);
-  const weekSeed = rawWeek != null && rawWeek !== "" && Number.isFinite(Number(rawWeek))
-    ? Number(rawWeek)
-    : isoWeekSeed();
-  const mapInventoryByState = buildPublicSafeInventoryByState();
-  const frontDoorGroups = buildFrontDoorGroups();
+export default async function HomePage() {
   return (
     <>
       {/* America 250 full-width commemorative banner — outside max-width container */}
@@ -647,6 +627,17 @@ export default async function HomePage({
           </header>
         </section>
 
+        {/* ═══════════════════════════════════════════════════════════════
+            THE COMPASS — the /explore compass-rose explorer, moved to the
+            front page intact (founder direction 2026-07-17: keep it exactly,
+            just put it on the main page in place of the property-type grid +
+            listings shelf). Full-bleed dark stage; breaks out of the max-width
+            container the way the America 250 banner does.
+            ══════════════════════════════════════════════════════════════ */}
+        <div style={{ marginInline: "calc(50% - 50vw)" }}>
+          <CompassRose />
+        </div>
+
         <section className="fl-section" aria-label="What you can do here">
           <h2 className="fl-section-title">{HOMEPAGE_CAPABILITIES.heading}</h2>
           <p className="fl-section-intro">{HOMEPAGE_CAPABILITIES.intro}</p>
@@ -669,29 +660,9 @@ export default async function HomePage({
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════════
-            2. GROUPED FRONT DOOR — property kinds over the canonical
-            profile taxonomy (founder direction 2026-07-17: one cohesive
-            platform; real groups only; the journey map becomes supporting
-            texture below rather than the lead).
-            ══════════════════════════════════════════════════════════════ */}
-        <section className="fl-section" aria-label="Property kinds front door">
-          <PropertyGroupsFrontDoor groups={frontDoorGroups} />
-        </section>
-
-        {/* The America's Journey map moved to the /explore land lane
-            (founder direction 2026-07-17: off the front page's middle, onto
-            the land button's page). See src/app/(public)/explore/page.tsx. */}
-
-        {/* ═══════════════════════════════════════════════════════════════
-            3. THE SHELF — scrolling rail of CURRENT public-safe listings
-            (founder feedback 2026-07-16: the front door shows real
-            inventory, not only the weekly tour stop). Week-seeded rotation;
-            every card opens the /discover place brief.
-            ══════════════════════════════════════════════════════════════ */}
-        <section className="fl-section" aria-label="Current listings shelf">
-          <PropertyShowcaseRail inventoryByState={mapInventoryByState} weekSeed={weekSeed} />
-        </section>
+        {/* The property-type grid + listings shelf were replaced by the compass
+            above; the America's Journey map moved to the /explore land lane
+            (founder direction 2026-07-17). */}
 
         {/* ═══════════════════════════════════════════════════════════════
             4. CLEAR WATERS, NO SURPRISES

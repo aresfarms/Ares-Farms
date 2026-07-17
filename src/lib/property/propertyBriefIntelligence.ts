@@ -43,6 +43,7 @@ import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenera
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
 import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
+import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
 import {
   AMENITY_RADIUS_MILES,
   amenityLiveLookupEnabled,
@@ -512,6 +513,30 @@ function diligenceCostLines(args: {
   return lines;
 }
 
+/**
+ * State-average electric cost context (EIA) — how cheap or expensive power
+ * runs where the property sits. State AVERAGES with provenance; the serving
+ * utility's rate sheet decides actuals (founder direction 2026-07-17).
+ */
+function electricCostFact(stateCode: string | null): BriefFactLine | null {
+  if (!stateCode || STATE_ELECTRICITY_PROVENANCE.asOf === null) return null;
+  const state = STATE_ELECTRICITY[stateCode.trim().toUpperCase()];
+  if (!state) return null;
+  const bill = state.resAvgMonthlyBill;
+  return {
+    label: "Electric cost context",
+    value: `~${state.resPriceCentsKwh.toFixed(1)}¢/kWh${bill ? ` · avg bill ~$${bill.toLocaleString("en-US")}/mo` : ""} (state avg)`,
+    text:
+      `EIA's ${STATE_ELECTRICITY_PROVENANCE.year} state averages: residential power runs about ` +
+      `${state.resPriceCentsKwh.toFixed(1)}¢/kWh${bill ? `, a typical residential bill about $${bill.toLocaleString("en-US")}/month` : ""}` +
+      `${state.comPriceCentsKwh ? `; commercial about ${state.comPriceCentsKwh.toFixed(1)}¢/kWh` : ""}. ` +
+      `State averages — the serving utility's published rate sheet and your usage decide the ` +
+      `actual bill.`,
+    provenance: `Source: ${STATE_ELECTRICITY_PROVENANCE.source}, ${STATE_ELECTRICITY_PROVENANCE.year}, snapshot ${STATE_ELECTRICITY_PROVENANCE.asOf}`,
+    tone: "neutral",
+  };
+}
+
 const HAZARD_SEVERITY = ["Very Low", "Relatively Low", "Relatively Moderate", "Relatively High", "Very High"];
 const hazardRank = (rating: string | null) => (rating ? HAZARD_SEVERITY.indexOf(rating) : -1);
 
@@ -672,6 +697,7 @@ function buildUnknowns(args: {
   /** Farm-shaped or type-unknown property with NO resolved county cash-rent data. */
   groundRentNeeded: boolean;
   privateSchoolsAvailable: boolean;
+  electricAvailable: boolean;
 }): BriefUnknownLine[] {
   const unknowns: BriefUnknownLine[] = [];
   const countyKnown =
@@ -722,15 +748,25 @@ function buildUnknowns(args: {
       `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
   });
-  unknowns.push({
-    label: "Electric and utility rates",
-    pointer: "EIA state profiles + the serving utility",
-    url: "https://www.eia.gov/electricity/state/",
-    howToFind:
-      "Monthly electric bills vary widely by state and usage — EIA publishes official state " +
-      "averages (price and typical bill), and the serving utility publishes its exact rate " +
-      "sheet. Water/sewer rates come from the local utility or the town office.",
-  });
+  unknowns.push(
+    args.electricAvailable
+      ? {
+          label: "Water and sewer rates",
+          pointer: "Local utility / town office",
+          howToFind:
+            "Water and sewer rates are set locally — the serving utility or the town office " +
+            "publishes the schedule; rural properties on well and septic pay upkeep instead.",
+        }
+      : {
+          label: "Electric and utility rates",
+          pointer: "EIA state profiles + the serving utility",
+          url: "https://www.eia.gov/electricity/state/",
+          howToFind:
+            "Monthly electric bills vary widely by state and usage — EIA publishes official state " +
+            "averages (price and typical bill), and the serving utility publishes its exact rate " +
+            "sheet. Water/sewer rates come from the local utility or the town office.",
+        }
+  );
   if (args.groundRentNeeded) {
     unknowns.push({
       label: "Ground rent for open acreage",
@@ -969,6 +1005,9 @@ export function buildPropertyBriefIntelligence(args: {
   const hazardRisk = hazardRiskFact(fmrFips);
   if (hazardRisk) verifiedFacts.push(hazardRisk);
 
+  const electric = electricCostFact(args.stateCode);
+  if (electric) verifiedFacts.push(electric);
+
   const fmr = fmrFips ? COUNTY_FMR[fmrFips] : undefined;
   if (fmr && isHome) {
     verifiedFacts.push({
@@ -1011,6 +1050,7 @@ export function buildPropertyBriefIntelligence(args: {
       schoolsAvailable: Boolean(schools && schools.length > 0),
       groundRentNeeded: farmShaped && !groundRent,
       privateSchoolsAvailable: Boolean(privateSchools),
+      electricAvailable: Boolean(electric),
     }),
     mechanics: mechanicsForSource(args.sourceId, args.propertyType),
     pathwaysProse: buildPathwaysProse({
@@ -1259,6 +1299,9 @@ export async function buildLocationBriefIntelligence(args: {
   const hazardRisk = hazardRiskFact(countyFips);
   if (hazardRisk) verifiedFacts.push(hazardRisk);
 
+  const electric = electricCostFact(stateCode);
+  if (electric) verifiedFacts.push(electric);
+
   // Ground rent — manual imports rarely carry a reliable property type, so
   // the fact frames its own applicability ("if the parcel includes open
   // cropland…"). Farm-shaped stated types get the direct framing.
@@ -1297,6 +1340,7 @@ export async function buildLocationBriefIntelligence(args: {
       schoolsAvailable: Boolean(schools && schools.length > 0),
       groundRentNeeded: !groundRent,
       privateSchoolsAvailable: Boolean(privateSchools),
+      electricAvailable: Boolean(electric),
     }),
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),

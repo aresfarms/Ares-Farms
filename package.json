@@ -334,7 +334,8 @@
     "verify:brief-copy": "tsx src/scripts/verifyBriefCopy.ts",
     "ingest:nass-cash-rents": "tsx src/scripts/ingestNassCashRents.ts",
     "ingest:nces-private-schools": "tsx src/scripts/ingestNcesPrivateSchools.ts",
-    "ingest:fema-nri": "tsx src/scripts/ingestFemaNri.ts"
+    "ingest:fema-nri": "tsx src/scripts/ingestFemaNri.ts",
+    "ingest:eia-electricity": "tsx src/scripts/ingestEiaElectricity.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

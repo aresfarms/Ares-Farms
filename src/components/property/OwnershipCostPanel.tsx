@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import type { ChartTheme } from "@/lib/property/chartThemes";
 import {
   buildOwnershipCostModel,
+  buildPriceContext,
   type OwnershipCostContext,
 } from "@/lib/property/ownershipCostModel";
 
@@ -143,6 +144,28 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
           </button>
         </span>
       </div>
+
+      {model && price != null && (() => {
+        const priceContext = buildPriceContext(price, props.context);
+        return priceContext ? (
+          <div
+            style={{
+              padding: "10px 14px",
+              border: `1px solid ${theme.plateBorder}`,
+              borderRadius: 10,
+              background: theme.plate,
+              fontSize: 12.5,
+              lineHeight: 1.6,
+              color: theme.inkSoft,
+            }}
+          >
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent, display: "block", marginBottom: 4 }}>
+              Price context — against published benchmarks
+            </span>
+            {priceContext.text} <em style={{ color: theme.inkFaint }}>[{priceContext.provenance}]</em>
+          </div>
+        ) : null;
+      })()}
 
       {model && (
         <>

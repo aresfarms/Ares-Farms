@@ -143,6 +143,11 @@ export function PropertyShowcaseRail({
         Location shown to the town level here; the full brief opens with verified place facts and
         sources. Listings and prices live on the source sites and change as bid periods reset.
       </span>
+      {/* Quiet roadmap nod (founder direction 2026-07-17) — states nothing,
+          promises no dates, pretends no inventory. */}
+      <span style={{ fontSize: 11.5, fontStyle: "italic", color: "#9aa6b6" }}>
+        More territories being charted.
+      </span>
     </section>
   );
 }

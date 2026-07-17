@@ -9,6 +9,7 @@ import { COUNTY_TAX_CONTEXT } from "@/lib/property/countyTaxContextGenerated";
 import { MORTGAGE_RATES } from "@/lib/property/mortgageRatesGenerated";
 import type { OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { STATE_ELECTRICITY } from "@/lib/property/stateElectricityGenerated";
+import { STATE_HPI, STATE_HPI_PROVENANCE } from "@/lib/property/stateHpiGenerated";
 
 export function resolveOwnershipCostContext(
   stateCode: string | null,
@@ -16,6 +17,7 @@ export function resolveOwnershipCostContext(
 ): OwnershipCostContext {
   const taxContext = countyFips ? COUNTY_TAX_CONTEXT[countyFips] ?? null : null;
   const electricity = stateCode ? STATE_ELECTRICITY[stateCode.toUpperCase()] ?? null : null;
+  const hpi = stateCode ? STATE_HPI[stateCode.toUpperCase()] ?? null : null;
   return {
     rates: {
       weekOf: MORTGAGE_RATES.weekOf,
@@ -33,6 +35,13 @@ export function resolveOwnershipCostContext(
       ? {
           resPriceCentsKwh: electricity.resPriceCentsKwh,
           resAvgMonthlyBill: electricity.resAvgMonthlyBill,
+        }
+      : null,
+    hpi: hpi
+      ? {
+          factorSinceBase: hpi.factorSinceBase,
+          latestQuarter: hpi.latestQuarter,
+          baseYear: STATE_HPI_PROVENANCE.baseYear,
         }
       : null,
   };

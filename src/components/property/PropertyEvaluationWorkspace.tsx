@@ -12,9 +12,10 @@ import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
+import { PropertyResultCard } from "@/components/property/PropertyResultCard";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
-import { buildOwnershipCostModel, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
+import { buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { classifyPropertyProfile, profileUsesResidentialLanes } from "@/lib/property/propertyProfile";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
@@ -990,9 +991,11 @@ function formatOwnershipCostsForPdf(args: {
   );
   if (!model) return undefined;
   const dollars = (n: number) => `$${n.toLocaleString("en-US")}`;
+  const priceContext = buildPriceContext(args.listedPrice, args.ownershipContext);
   return {
     priceLine:
-      `Figured at the listed price of ${dollars(args.listedPrice)}. These are the numbers that decide whether ownership stays comfortable — worth knowing before the offer, not after.`,
+      `Figured at the listed price of ${dollars(args.listedPrice)}. These are the numbers that decide whether ownership stays comfortable — worth knowing before the offer, not after.` +
+      (priceContext ? ` ${priceContext.text}` : ""),
     scenarios: model.purchase.scenarios.map((s) => ({
       program: s.program,
       downPayment: s.downPayment === 0 ? "$0 (0%)" : `${dollars(s.downPayment)} (${s.downPaymentPct}%)`,
@@ -1788,6 +1791,9 @@ export function PropertyEvaluationWorkspace({
   const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
   const [manualReviewError, setManualReviewError] = useState<string | null>(null);
   const [manualPriceLabel, setManualPriceLabel] = useState("");
+  // Result card is the DEFAULT free-tier view (founder direction 2026-07-17);
+  // the complete chart stays one click behind it — depth, not withholding.
+  const [chartOpen, setChartOpen] = useState(false);
   const [answers, setAnswers] = useState<DraftAnswers>({
     reportTier: "free",
     possibility: "",
@@ -2669,9 +2675,113 @@ export function PropertyEvaluationWorkspace({
     (entry, index) => `${index + 1}. ${entry.program.name}`
   );
 
+  // ── Result card content (free tier default view, ≤10 numbered bullets) ────
+  const cardGreenFlags = (effectivePlaceIntelligence?.verifiedFacts ?? [])
+    .filter((fact) => fact.tone === "positive")
+    .slice(0, 4)
+    .map((fact) => ({ label: fact.label, value: fact.value }));
+  const cardWatchFlags = [
+    ...(effectivePlaceIntelligence?.verifiedFacts ?? [])
+      .filter((fact) => fact.tone === "caution")
+      .map((fact) => ({ label: fact.label, value: fact.value })),
+    ...(effectivePlaceIntelligence?.unknowns ?? []).map((unknown) => ({
+      label: unknown.label,
+      value: `${unknown.pointer} answers it`,
+    })),
+  ].slice(0, 4);
+  const cardModel =
+    ownershipContext && listedPrice != null && profileUsesResidentialLanes(workspaceProfile.id)
+      ? buildOwnershipCostModel(
+          {
+            price: listedPrice,
+            priceIsAssumption: false,
+            isHome: isResidentialHomeContext(analysisContext),
+            farmShaped: workspaceProfile.id === "farm",
+          },
+          ownershipContext
+        )
+      : null;
+  const cardNumbersLine = cardModel
+    ? `All-in monthly on ${cardModel.monthlyTotals[0].program}: $${cardModel.monthlyTotals[0].low.toLocaleString("en-US")}–$${cardModel.monthlyTotals[0].high.toLocaleString("en-US")} · typically works from ≈$${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr household income · years 1–5 all-in $${cardModel.fiveYear.cumulativeLow.toLocaleString("en-US")}–$${cardModel.fiveYear.cumulativeHigh.toLocaleString("en-US")}. Illustrative guidance at the current Freddie Mac average rate — never a quote or approval.`
+    : /price on request/i.test(analysisContext.priceLabel ?? "")
+      ? "No published price on this listing — open the full chart and enter the price you would offer; the complete cost and income picture fills in on this page only."
+      : null;
+  const cardOverallRead = [
+    report.verdict.explanation,
+    answerCard.fitLine ? `Fits if you want: ${answerCard.fitLine}.` : null,
+    `Pause if you need: ${answerCard.pauseLine}.`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const cardTierLine =
+    "The full chart below is free and complete. Paid tiers add the why — lender-ready packaging, county records pulls, and your personalized file.";
+
+  const chartActionsSlot = (
+    <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+        {context.listingUrl && (
+          <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
+            Open the source listing ↗
+          </Link>
+        )}
+        <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
+          Save draft on this device
+        </button>
+        {/* The PLATFORM save is the existing governed borrower pathway —
+            onboarding collects identity under the established consent and
+            data-rights framework; no parallel PII store is created here
+            (public-alpha posture: piiPermitted stays a founder/counsel
+            flag). Device save stays the zero-PII default. */}
+        <Link
+          href={`/onboarding?from=${encodeURIComponent(chartHref)}`}
+          style={{ ...actionButtonSecondary, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+        >
+          Save with Furlong — start your borrower file
+        </Link>
+        <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+          {pdfBusy === "view" ? "Opening PDF..." : "View watermarked PDF ↗"}
+        </button>
+        <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+          {pdfBusy === "export" ? "Preparing PDF export..." : "Download PDF"}
+        </button>
+        <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+          {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
+        </button>
+        {savedAt && (
+          <span style={{ fontSize: 12, color: "#7a8aa0" }}>
+            Saved {new Date(savedAt).toLocaleString()}
+          </span>
+        )}
+      </div>
+      {pdfError && (
+        <p style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 860 }}>
+          PDF generation hit an issue: {pdfError}
+        </p>
+      )}
+    </div>
+  );
+
   return (
     <section style={{ display: "grid", gap: 22 }}>
       {!deepView && (
+        <PropertyResultCard
+          theme={CHART_THEMES[chartVariant]}
+          title={context.title}
+          location={context.location}
+          priceLabel={analysisContext.priceLabel}
+          profileLabel={workspaceProfile.label}
+          verdictLine={answerCard.headline}
+          greenFlags={cardGreenFlags}
+          watchFlags={cardWatchFlags}
+          numbersLine={cardNumbersLine}
+          overallRead={cardOverallRead}
+          tierLine={cardTierLine}
+          chartOpen={chartOpen}
+          onToggleChart={() => setChartOpen((current) => !current)}
+          actionsSlot={chartActionsSlot}
+        />
+      )}
+      {!deepView && chartOpen && (
       <ChartTableBrief
         variant={chartVariant}
         title={context.title}
@@ -2705,50 +2815,7 @@ export function PropertyEvaluationWorkspace({
           ) : null
         }
         similarHomes={similarHomes}
-        actionsSlot={
-          <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
-	        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-	          {context.listingUrl && (
-	            <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
-              Open the source listing ↗
-            </Link>
-          )}
-          <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
-            Save draft on this device
-          </button>
-          {/* The PLATFORM save is the existing governed borrower pathway —
-              onboarding collects identity under the established consent and
-              data-rights framework; no parallel PII store is created here
-              (public-alpha posture: piiPermitted stays a founder/counsel
-              flag). Device save stays the zero-PII default. */}
-          <Link
-            href={`/onboarding?from=${encodeURIComponent(chartHref)}`}
-            style={{ ...actionButtonSecondary, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
-          >
-            Save with Furlong — start your borrower file
-          </Link>
-          <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-            {pdfBusy === "view" ? "Opening PDF..." : "View watermarked PDF ↗"}
-          </button>
-          <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
-            {pdfBusy === "export" ? "Preparing PDF export..." : "Download PDF"}
-          </button>
-          <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
-            {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
-          </button>
-          {savedAt && (
-            <span style={{ fontSize: 12, color: "#7a8aa0" }}>
-              Saved {new Date(savedAt).toLocaleString()}
-            </span>
-          )}
-        </div>
-        {pdfError && (
-          <p style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 860 }}>
-            PDF generation hit an issue: {pdfError}
-          </p>
-        )}
-          </div>
-        }
+        actionsSlot={chartActionsSlot}
       />
       )}
       {/* Imported-address verification status stays visible below the chart. */}

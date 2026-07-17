@@ -337,7 +337,8 @@
     "ingest:fema-nri": "tsx src/scripts/ingestFemaNri.ts",
     "ingest:eia-electricity": "tsx src/scripts/ingestEiaElectricity.ts",
     "ingest:pmms-rates": "tsx src/scripts/ingestPmmsRates.ts",
-    "ingest:census-tax-rates": "tsx src/scripts/ingestCensusTaxRates.ts"
+    "ingest:census-tax-rates": "tsx src/scripts/ingestCensusTaxRates.ts",
+    "ingest:fhfa-hpi": "tsx src/scripts/ingestFhfaHpi.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

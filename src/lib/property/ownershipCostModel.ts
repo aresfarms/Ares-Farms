@@ -34,6 +34,53 @@ export interface OwnershipCostContext {
     resPriceCentsKwh: number;
     resAvgMonthlyBill: number | null;
   } | null;
+  /** State FHFA trend factor walking the ACS-vintage median to today. */
+  hpi: { factorSinceBase: number; latestQuarter: string; baseYear: number } | null;
+}
+
+/**
+ * Price context against PUBLISHED benchmarks (founder direction 2026-07-17):
+ * the county's ACS median home value, walked forward by the state's FHFA
+ * price trend, compared to this price. Context only — never an appraisal, an
+ * opinion of value, or a bid recommendation. Opinion-of-value features stay
+ * behind the counsel gate.
+ */
+export interface PriceContext {
+  /** County median walked forward to the latest FHFA quarter, dollars. */
+  adjustedMedian: number;
+  /** price / adjustedMedian, e.g. 0.4 = 40% of the county's typical value. */
+  ratio: number;
+  text: string;
+  provenance: string;
+}
+
+export function buildPriceContext(
+  price: number,
+  context: OwnershipCostContext
+): PriceContext | null {
+  if (!context.taxContext || !context.hpi) return null;
+  if (!Number.isFinite(price) || price < 10_000) return null;
+  const adjustedMedian = Math.round(context.taxContext.medianHomeValue * context.hpi.factorSinceBase);
+  const ratio = price / adjustedMedian;
+  const pct = Math.round(ratio * 100);
+  const read =
+    ratio < 0.5
+      ? `well below the county's typical owner-occupied home value — a gap that usually reflects condition, an as-is sale posture, or a distressed disposition. The inspection explains the gap; the gap does not explain itself.`
+      : ratio < 0.85
+        ? `below the county's typical owner-occupied home value.`
+        : ratio <= 1.15
+          ? `in line with the county's typical owner-occupied home value.`
+          : `above the county's typical owner-occupied home value — the appraisal will test whether this parcel supports it.`;
+  return {
+    adjustedMedian,
+    ratio: Number(ratio.toFixed(2)),
+    text:
+      `This price is about ${pct}% of the county's typical home value ` +
+      `(median $${context.taxContext.medianHomeValue.toLocaleString("en-US")} in the ${context.hpi.baseYear} Census survey, ` +
+      `about $${adjustedMedian.toLocaleString("en-US")} walked forward by the state's FHFA price trend through ${context.hpi.latestQuarter}) — ${read} ` +
+      `Context against published benchmarks only — not an appraisal, an opinion of value, or advice; a state-licensed appraisal is the official value.`,
+    provenance: "Census ACS county median (B25077) + FHFA House Price Index state trend",
+  };
 }
 
 export interface OwnershipCostInputs {

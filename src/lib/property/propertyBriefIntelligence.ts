@@ -25,7 +25,11 @@ import {
 import { designatedHubzoneForProperty } from "./propertyHubzones";
 import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
+import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "./commodityPricesGenerated";
 import { COUNTY_BROADBAND, COUNTY_BROADBAND_PROVENANCE } from "./countyBroadbandGenerated";
+import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "./stateCropConditionsGenerated";
+import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "./stateDroughtGenerated";
+import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
 import { US_AIRPORTS } from "./usAirportsGenerated";
@@ -785,6 +789,89 @@ function hazardRiskFact(countyFips: string | null): BriefFactLine | null {
   };
 }
 
+/**
+ * Agricultural conditions for a FARM/RANCH analysis (founder direction
+ * 2026-07-17: the newsletter's regional ag intelligence belongs in the
+ * advanced analysis for farms and ranches too). State-keyed drought, crop
+ * conditions, local grain-buyer cash bids, and commodity prices — the same
+ * authoritative, dated, sourced data that leads The Furlong Compass.
+ * Facts, never predictions or characterizations.
+ */
+function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
+  const st = stateCode?.toUpperCase() ?? null;
+  if (!st) return [];
+  const facts: BriefFactLine[] = [];
+
+  const drought = STATE_DROUGHT[st];
+  if (drought && STATE_DROUGHT_PROVENANCE.mapDate && drought.severePlus >= 5) {
+    facts.push({
+      label: "Drought status",
+      value: `${drought.severePlus}% of the state in severe drought or worse`,
+      text:
+        `As of the ${drought.mapDate} U.S. Drought Monitor, ${drought.severePlus}% of this state sits in ` +
+        `severe drought or worse (D2–D4), ${drought.extremePlus}% in extreme drought (D3+). The water ` +
+        `reality behind this year's yields, irrigation demand, and ground economics.`,
+      provenance: `Source: U.S. Drought Monitor (USDA/NOAA/NDMC), map ${drought.mapDate}`,
+      tone: drought.severePlus >= 40 ? "caution" : "neutral",
+    });
+  }
+
+  const crop = STATE_CROP_CONDITIONS[st];
+  if (crop && STATE_CROP_CONDITIONS_PROVENANCE.asOf && (crop.corn || crop.soybeans)) {
+    const bits = [
+      crop.corn ? `corn ${crop.corn.goodExcellent}% good-or-excellent (${crop.corn.poorVeryPoor}% poor-or-worse)` : null,
+      crop.soybeans ? `soybeans ${crop.soybeans.goodExcellent}% good-or-excellent` : null,
+    ].filter(Boolean);
+    const cornPvp = crop.corn?.poorVeryPoor ?? 0;
+    facts.push({
+      label: "Crop conditions",
+      value: crop.corn ? `Corn ${crop.corn.goodExcellent}% good-or-excellent statewide` : bits[0] ?? "",
+      text:
+        `USDA's week-${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek} Crop Progress rates this state's ${bits.join(", ")}. ` +
+        `A statewide condition read — this parcel's ground can run better or worse, but it frames the season.`,
+      provenance: `Source: USDA NASS Crop Progress ${STATE_CROP_CONDITIONS_PROVENANCE.year}, week ${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek}`,
+      tone: cornPvp >= 25 || (crop.corn && crop.corn.goodExcellent <= 35) ? "caution" : "neutral",
+    });
+  }
+
+  const bids = STATE_GRAIN_BIDS[st];
+  if (bids && STATE_GRAIN_BIDS_PROVENANCE.asOf) {
+    const arrow = (d: string | null) => (d === "UP" ? " ▲" : d === "DOWN" ? " ▼" : "");
+    const parts = (["corn", "soybeans", "wheat"] as const)
+      .map((k) => (bids.bids[k] ? `${k[0].toUpperCase()}${k.slice(1)} $${bids.bids[k]!.avg.toFixed(2)}${arrow(bids.bids[k]!.direction)}` : null))
+      .filter(Boolean);
+    if (parts.length > 0) {
+      facts.push({
+        label: "Local grain bids",
+        value: parts.join(" · "),
+        text:
+          `Average local grain-buyer cash bid in this state (USDA Market News, ${bids.reportDate}): ` +
+          `${parts.join(", ")} per bushel — the public record of what nearby elevators are paying, arrows show ` +
+          `the day-over-day move. Your buyer's board is the exact number; this is the regional benchmark.`,
+        provenance: `Source: USDA AMS Market News grain bids, ${bids.reportDate}`,
+        tone: "neutral",
+      });
+    }
+  }
+
+  if (COMMODITY_PRICES_PROVENANCE.asOf && (COMMODITY_PRICES.corn || COMMODITY_PRICES.soybeans)) {
+    const p = (k: string) => (COMMODITY_PRICES[k] ? `${k[0].toUpperCase()}${k.slice(1)} $${COMMODITY_PRICES[k].pricePerBushel.toFixed(2)}` : null);
+    const parts = ["corn", "soybeans", "wheat"].map(p).filter(Boolean);
+    const stamp = COMMODITY_PRICES.corn ? `${COMMODITY_PRICES.corn.month} ${COMMODITY_PRICES.corn.year}` : "";
+    facts.push({
+      label: "Commodity prices (national)",
+      value: parts.join(" · "),
+      text:
+        `USDA national average price received (${stamp}): ${parts.join(", ")} per bushel — the benchmark ` +
+        `the local bid moves around, and the revenue side of any operating plan for this ground.`,
+      provenance: `Source: USDA NASS Price Received, ${stamp}`,
+      tone: "neutral",
+    });
+  }
+
+  return facts;
+}
+
 /** Farm/land-shaped property types get ground-rent context automatically.
     (Ground rent applies to open acreage on BOTH farm and land profiles, so
     this stays broader than the farm profile alone — classifyPropertyProfile
@@ -1424,6 +1511,11 @@ export function buildPropertyBriefIntelligence(args: {
   const groundRent = farmShaped ? groundRentFact(fmrFips, false) : null;
   if (groundRent) verifiedFacts.push(groundRent);
 
+  // Advanced ag analysis for farms/ranches — regional conditions by state.
+  if (profile.id === "farm" || farmShaped) {
+    for (const f of agConditionsFacts(args.stateCode)) verifiedFacts.push(f);
+  }
+
   const floodRecord = id ? PROPERTY_FLOOD_HISTORIC_FACTS[id] : undefined;
   const townLowerForChips = (args.town ?? "").trim().toLowerCase();
   const schoolsInTown =
@@ -1749,6 +1841,11 @@ export async function buildLocationBriefIntelligence(args: {
   const locFarmShaped = isFarmShaped(args.propertyType ?? null);
   const groundRent = groundRentFact(countyFips, !locFarmShaped);
   if (groundRent) verifiedFacts.push(groundRent);
+
+  // Advanced ag analysis for farms/ranches — regional conditions by state.
+  if (locProfile.id === "farm" || locFarmShaped) {
+    for (const f of agConditionsFacts(stateCode)) verifiedFacts.push(f);
+  }
 
   // Rental context — county-keyed HUD Fair Market Rents.
   const fmr = countyFips ? COUNTY_FMR[countyFips] : undefined;

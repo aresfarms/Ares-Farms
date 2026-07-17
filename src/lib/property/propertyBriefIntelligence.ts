@@ -760,6 +760,35 @@ function isFarmShaped(propertyType: string | null): boolean {
   return /farm|ranch|land|acre|agric|crop|pasture|homestead/i.test(propertyType ?? "");
 }
 
+/**
+ * Honest lot-size display from the source feed's free-text field (data-bug
+ * fix 2026-07-17: a bare "600" from a Puerto Rico record — 600 SQUARE METERS
+ * — was being rendered "600 acres"). The USDA feed's lot field carries mixed
+ * units: acres, square meters ("sm"), square feet, and — for 88% of records —
+ * a BARE NUMBER with no unit, ranging from 28 to 35 million. A wrong acreage
+ * is a material misstatement on a listing, so we render a size ONLY when the
+ * unit is explicit or safely inferable (Puerto Rico municipio records are
+ * square meters). A bare number with no unit and no PR context yields NULL —
+ * the "Size, lot, and what conveys" unknown then routes to the parcel viewer.
+ */
+export function lotSizeDisplay(raw: string | null, state: string | null): string | null {
+  if (!raw) return null;
+  const n = Number(raw.replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const t = raw.toLowerCase();
+  const acreLot = (acres: number, unitLabel: string) =>
+    `${acres < 0.1 ? acres.toFixed(3) : acres.toFixed(2)}-acre lot (${Math.round(n).toLocaleString("en-US")} ${unitLabel})`;
+  if (/acre/.test(t)) return `${n} acres`;
+  // Square meters — explicit "sm"/"sq m"/"m2"/"metros", or a Puerto Rico
+  // record (the municipio land registry records lots in square meters).
+  if (/\bsm\b|sq\.?\s*m|m2|metros/.test(t) || state === "PR") {
+    return acreLot(n * 0.000247105, "m²");
+  }
+  if (/sq\.?\s*ft|sf\b/.test(t)) return acreLot(n / 43560, "sq ft");
+  // Bare number, mainland — unit genuinely unknown; do NOT guess.
+  return null;
+}
+
 /** Append the profile's question bank, skipping labels the base set covers. */
 function withProfileQuestions(
   unknowns: BriefUnknownLine[],
@@ -1167,18 +1196,10 @@ export function buildPropertyBriefIntelligence(args: {
   // the pointer for those.
   const sourceRecord = id && !id.startsWith("imported:") ? findCanonicalPropertyById(id)?.source_records[0] : null;
   if (sourceRecord) {
-    const acreageBit = (() => {
-      const txt = sourceRecord.acreageText;
-      if (!txt) return null;
-      const acres = parseAcres(txt);
-      if (acres !== null) return `${acres} acres`;
-      const n = Number(txt.replace(/[^0-9.]/g, ""));
-      if (!Number.isFinite(n) || n <= 0) return txt;
-      // USDA publishes bare lot square footage; convert for readability.
-      return n >= 1000
-        ? `${(n / 43560).toFixed(2)}-acre lot (${Math.round(n).toLocaleString("en-US")} sq ft)`
-        : `${n} acres`;
-    })();
+    const acreageBit = lotSizeDisplay(
+      sourceRecord.acreageText,
+      (args.stateCode ?? sourceRecord.state ?? null)?.toUpperCase() ?? null
+    );
     const sizeBits = [
       sourceRecord.bedrooms ? `${sourceRecord.bedrooms}BR` : null,
       sourceRecord.squareFeet ? `${sourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : null,

@@ -163,21 +163,15 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
     <section
       aria-label="Choose how to start property analysis"
       style={{
-        border: "1px solid #d7deea",
+        border: "1px solid #29536f",
         borderRadius: 16,
-        background: "linear-gradient(140deg, #ffffff, #f7fbfa 54%, #f6f8fb)",
+        background: "rgba(16, 45, 64, 0.74)",
         padding: "22px 24px",
         display: "grid",
         gap: 18,
       }}
     >
-      <div style={{ display: "grid", gap: 6 }}>
-        <strong style={{ fontSize: 20, color: "#eaf3f7" }}>Start with a property two different ways.</strong>
-        <p style={{ margin: 0, fontSize: 14.5, ...muted, maxWidth: 760 }}>
-          Browse what is actually available, or verify a specific address right now. Either way, the next step
-          is the same analysis workspace.
-        </p>
-      </div>
+      <strong style={{ fontSize: 20, color: "#eaf3f7" }}>Two ways in — same analysis either way.</strong>
 
       <div
         data-entry-choice-grid="true"
@@ -190,7 +184,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
       >
         <div
           style={{
-            border: "1px solid #d7deea",
+            border: "1px solid #29536f",
             borderRadius: 14,
             background: "rgba(9, 28, 41, 0.8)",
             padding: "18px 18px",
@@ -204,9 +198,6 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
               Option 1
             </span>
             <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Browse current inventory</strong>
-            <p style={{ margin: 0, fontSize: 13.5, ...muted }}>
-              Start from live listings already in the hub, then open any property and move straight into analysis.
-            </p>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
             <a
@@ -234,7 +225,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
 
         <div
           style={{
-            border: "1px solid #d7deea",
+            border: "1px solid #29536f",
             borderRadius: 14,
             background: "rgba(9, 28, 41, 0.8)",
             padding: "18px 18px",
@@ -247,9 +238,6 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
               Option 2
             </span>
             <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Enter a specific address</strong>
-            <p style={{ margin: 0, fontSize: 13.5, ...muted }}>
-              Verify the address first, pull in Furlong&apos;s place-facts, and take that directly into the same analysis flow.
-            </p>
           </div>
           <PlaceFirstDiscovery flow="property-discovery" embedded />
         </div>
@@ -457,7 +445,7 @@ function Listings({
 
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 14 }}>
         {listings.map((p) => (
-          <li key={p.id} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)", padding: "18px 20px", display: "grid", gap: 8 }}>
+          <li key={p.id} style={{ border: "1px solid #29536f", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)", padding: "18px 20px", display: "grid", gap: 8 }}>
             <PropertyBriefLauncher
               property={{
                 id: p.id,
@@ -790,7 +778,7 @@ function stateHref(categoryId: string, abbr: string): string {
 
 const cardLink = {
   display: "flex", flexDirection: "column", gap: 6,
-  border: "1px solid #d7deea", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)",
+  border: "1px solid #29536f", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)",
   padding: "16px 18px", textDecoration: "none", height: "100%",
 } as const;
 const countPill = {

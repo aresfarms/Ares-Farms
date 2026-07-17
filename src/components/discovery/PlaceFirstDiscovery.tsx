@@ -322,7 +322,7 @@ export function PlaceFirstDiscovery({
         </strong>
         {embedded && (
           <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.6, maxWidth: 820 }}>
-            Verify the place first, then carry those checked facts directly into the rest of the analysis without switching screens.
+            Results appear right below — checked facts carry into the analysis automatically.
           </span>
         )}
         <input
@@ -395,38 +395,53 @@ export function PlaceFirstDiscovery({
           >
             {busy
               ? "Furlong is verifying the address now and will move you straight to the answer block."
-              : jumpCue ?? "The answer section appears below and this control will take you straight to it."}
+              : jumpCue ?? ""}
           </span>
         </div>
         <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>
-          Enter the full street, city, and state whenever possible. County and parcel stay available because some public records begin there.
+          County and parcel are optional — some public records start there.
         </span>
       </div>
 
       {/* ── Then: verified place-facts coverage + source confidence + disclaimers ─ */}
       <div data-testid="place-facts-coverage" style={{ display: "grid", gap: 10 }}>
         <strong style={{ fontSize: embedded ? 15 : 14, color: "#101a2b" }}>
-          {checked && located ? `Verified place-facts we report for ${located}:` : "Verified place-facts we report for any U.S. location:"}
+          {checked && located ? `We check ${located} for:` : "We check any U.S. address for:"}
         </strong>
         {checked && !result && !error && (
           <p data-testid="live-gated-note" style={{ margin: 0, fontSize: 12.5, color: "#7a8aa0", lineHeight: 1.5 }}>
             Furlong is verifying the location against public place-fact sources now.
           </p>
         )}
-        <div style={{ display: "grid", gap: 8 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
           {COVERAGE.map((c) => (
-            <div key={c.label} style={{ border: "1px solid #e6ebf2", borderRadius: 10, padding: "10px 14px", display: "grid", gap: 3 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                <strong style={{ fontSize: 13.5, color: "#1f2a3d" }}>{c.label}</strong>
-                <span style={{ fontSize: 11.5, fontWeight: 700, color: "#0f766e" }}>{c.confidence}</span>
-              </div>
-              <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.45 }}>{c.disclaimer}</span>
-              <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>Source: {c.source}</span>
-            </div>
+            <span
+              key={c.label}
+              style={{ fontSize: 12, fontWeight: 700, color: "#0f766e", border: "1px solid #bfe4db", background: "#f2fbf8", borderRadius: 999, padding: "4px 11px" }}
+            >
+              {c.label}
+            </span>
           ))}
         </div>
+        <details>
+          <summary style={{ cursor: "pointer", listStyle: "none", fontSize: 12, color: "#7a8aa0" }}>
+            What each check means + sources ▸
+          </summary>
+          <div style={{ display: "grid", gap: 8, paddingTop: 8 }}>
+            {COVERAGE.map((c) => (
+              <div key={c.label} style={{ border: "1px solid #e6ebf2", borderRadius: 10, padding: "10px 14px", display: "grid", gap: 3, background: "#fff" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                  <strong style={{ fontSize: 13.5, color: "#1f2a3d" }}>{c.label}</strong>
+                  <span style={{ fontSize: 11.5, fontWeight: 700, color: "#0f766e" }}>{c.confidence}</span>
+                </div>
+                <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.45 }}>{c.disclaimer}</span>
+                <span style={{ fontSize: 11.5, color: "#9aa6b6" }}>Source: {c.source}</span>
+              </div>
+            ))}
+          </div>
+        </details>
         <p style={{ margin: 0, fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>
-          Advisory only — place-facts describe the place, not your eligibility. Whether you personally benefit is a separate question for a licensed professional or the agency.
+          Advisory only — place-facts describe the place, not your eligibility.
         </p>
         {(error || result) && (
           <div

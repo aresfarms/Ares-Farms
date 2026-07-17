@@ -23,6 +23,15 @@ import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDro
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "@/lib/property/stateGrainBidsGenerated";
 
+import {
+  FARM_MARGINS_PROVENANCE,
+  POULTRY_GROWER_NOTE,
+  truckloadLine,
+  truckloadMargin,
+  type CropCommodity,
+  type TruckloadMargin,
+} from "@/lib/property/farmMarginsCurated";
+
 import { landFinanceSignal, NEWSLETTER_REGIONS, stateName } from "./newsletterSignals";
 import type { NewsletterAudience } from "./newsletterEditions";
 
@@ -40,6 +49,13 @@ export interface CompassDispatch {
   paragraphs: string[];
   /** The one thing to do this week. */
   move: string;
+  /** What the prices actually MEAN — per-truckload margins (farm only). */
+  economics?: {
+    heading: string;
+    crops: Array<TruckloadMargin & { line: string }>;
+    poultryNote: string;
+    provenanceNote: string;
+  };
   /** Hands the depth to the monthly digest. */
   signoff: string;
   /** One tight sourcing/disclaimer line. */
@@ -110,12 +126,32 @@ function cornFact(states: string[]): { name: string; ge: number; pvp: number } |
 }
 
 function cornBidFact(states: string[]): number | null {
+  return localBid(states, "corn");
+}
+
+/** Region's local elevator bid for a commodity (first member with a report). */
+function localBid(states: string[], commodity: CropCommodity): number | null {
   if (STATE_GRAIN_BIDS_PROVENANCE.asOf === null) return null;
   for (const c of states) {
-    const corn = STATE_GRAIN_BIDS[c]?.bids?.corn;
-    if (corn) return corn.avg;
+    const bid = STATE_GRAIN_BIDS[c]?.bids?.[commodity];
+    if (bid) return bid.avg;
   }
   return null;
+}
+
+/** Per-truckload economics for the region's crops — what the prices MEAN. */
+function farmEconomics(states: string[]): NonNullable<CompassDispatch["economics"]> {
+  const commodities: CropCommodity[] = ["corn", "soybeans", "wheat"];
+  const crops = commodities.map((c) => {
+    const m = truckloadMargin(c, localBid(states, c));
+    return { ...m, line: truckloadLine(m) };
+  });
+  return {
+    heading: "What that means, by the truckload",
+    crops,
+    poultryNote: POULTRY_GROWER_NOTE.text,
+    provenanceNote: `${FARM_MARGINS_PROVENANCE.costSource}. ${FARM_MARGINS_PROVENANCE.note}`,
+  };
 }
 
 function cornPriceFact(): number | null {
@@ -265,6 +301,7 @@ export function buildCompassDispatch(
     stamp: `The Furlong Compass · the ${short} · ${longDate(asOf)}`,
     paragraphs,
     move: MOVE[audience],
+    economics: audience === "farm" || audience === "mixed" ? farmEconomics(states) : undefined,
     signoff: "The full numbers and the month's deeper reads are in the monthly digest. — Furlong",
     disclaimer:
       "Every number here is a sourced, dated public fact (U.S. Drought Monitor, USDA, Freddie Mac, FHFA, EIA). Furlong reports them — it does not predict prices, yields, or markets, and it is not a lender.",

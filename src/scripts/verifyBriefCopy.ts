@@ -28,6 +28,7 @@ const SCANNED_FILES = [
   "src/components/property/OwnershipCostPanel.tsx",
   "src/lib/property/ownershipCostModel.ts",
   "src/lib/property/financingProgramsCurated.ts",
+  "src/lib/property/farmMarginsCurated.ts",
   "src/lib/property/similarNearbyProperties.ts",
   "src/lib/property/propertyProfile.ts",
   "src/components/property/PropertyResultCard.tsx",

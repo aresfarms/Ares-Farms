@@ -55,6 +55,47 @@ export function CompassDispatchHero({ dispatch }: { dispatch: CompassDispatch })
           </p>
         ))}
 
+        {dispatch.economics && (
+          <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid #d6dfe5" }}>
+            <h4 style={{ margin: "0 0 3px", fontSize: 15, fontWeight: 700, color: "#14212b" }}>
+              {dispatch.economics.heading}
+            </h4>
+            <p style={{ margin: "0 0 12px", fontSize: 12.5, lineHeight: 1.5, color: "#4a626f" }}>
+              Two numbers per load: what you clear over cash costs, and what&apos;s left after land and equipment.
+              A load is weight-limited — fewer bushels of the heavier beans and wheat.
+            </p>
+            {dispatch.economics.crops.map((c) => (
+              <div key={c.commodity} style={{ display: "grid", gap: 5, padding: "10px 0", borderBottom: "1px solid #e5ebef" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12 }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 700, color: "#14212b" }}>
+                    {c.label}{" "}
+                    <span style={{ fontWeight: 500, fontSize: 12.5, color: "#708997" }}>
+                      · ${c.pricePerBu.toFixed(2)}/bu · {c.bushelsPerLoad} bu
+                    </span>
+                  </span>
+                  <span style={{ fontSize: 16, fontWeight: 750, color: "#14212b" }}>
+                    ${c.gross.toLocaleString("en-US")}
+                  </span>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  <span style={{ fontSize: 12, fontWeight: 650, padding: "2px 9px", borderRadius: 20, color: "#0f766e", background: "#e7f5f1" }}>
+                    {c.netOverOperating >= 0 ? "+" : "−"}${Math.abs(c.netOverOperating).toLocaleString("en-US")} over cash cost
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 650, padding: "2px 9px", borderRadius: 20, color: "#c2410c", background: "#fbeee7" }}>
+                    {c.netOverTotal >= 0 ? "+" : "−"}${Math.abs(c.netOverTotal).toLocaleString("en-US")} after land &amp; equipment
+                  </span>
+                </div>
+              </div>
+            ))}
+            <p style={{ margin: "12px 0 0", fontSize: 12.5, lineHeight: 1.55, color: "#4a626f" }}>
+              {dispatch.economics.poultryNote}
+            </p>
+            <p style={{ margin: "8px 0 0", fontSize: 11, lineHeight: 1.5, color: "#9aa6b6" }}>
+              {dispatch.economics.provenanceNote}
+            </p>
+          </div>
+        )}
+
         <p
           style={{
             margin: "16px 0 0",

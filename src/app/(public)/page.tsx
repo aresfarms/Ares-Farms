@@ -1,12 +1,9 @@
 import Link from "next/link";
 
 import { America250Banner } from "@/components/brand/America250Banner";
-import { CompassDispatchHero } from "@/components/public/CompassDispatchHero";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
-import { buildCompassDispatch } from "@/lib/newsletter/newsletterDispatch";
 import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
-import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import { isoWeekSeed } from "@/lib/public-content/weekSeed";
@@ -123,10 +120,6 @@ export default async function HomePage({
     : isoWeekSeed();
   const mapInventoryByState = buildPublicSafeInventoryByState();
   const frontDoorGroups = buildFrontDoorGroups();
-  // The actual Furlong Compass leads the page — this week's regional Dispatch,
-  // dated to the freshest weekly signal (the drought map), not the render clock.
-  const compassAsOf = STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-17";
-  const compassDispatch = buildCompassDispatch("farm", "delmarva", compassAsOf);
   return (
     <>
       {/* America 250 full-width commemorative banner — outside max-width container */}
@@ -642,8 +635,8 @@ export default async function HomePage({
                   </span>
                 </div>
                 <div className="fl-hero-action">
-                  <Link href="#compass-this-week" className="fl-cta-secondary" data-testid="cta-explore-map">
-                    {HOMEPAGE_PRIMARY_ACTIONS.secondaryLabel} ↓
+                  <Link href="/explore" className="fl-cta-secondary" data-testid="cta-explore-map">
+                    {HOMEPAGE_PRIMARY_ACTIONS.secondaryLabel} →
                   </Link>
                   <span data-testid="cta-explore-support" className="fl-hero-action-support">
                     {HOMEPAGE_PRIMARY_ACTIONS.secondarySupport}
@@ -653,17 +646,6 @@ export default async function HomePage({
             )}
           </header>
         </section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            THE FURLONG COMPASS — this week's regional Dispatch leads the
-            body as a living signal (founder direction 2026-07-17: the actual
-            Compass on the front page, in place of the old pathways link).
-            ══════════════════════════════════════════════════════════════ */}
-        {compassDispatch && (
-          <section className="fl-section" aria-label="This week on the Furlong Compass">
-            <CompassDispatchHero dispatch={compassDispatch} />
-          </section>
-        )}
 
         <section className="fl-section" aria-label="What you can do here">
           <h2 className="fl-section-title">{HOMEPAGE_CAPABILITIES.heading}</h2>

@@ -66,9 +66,9 @@ export const HOMEPAGE_PRIMARY_ACTIONS = {
   primaryLabel: "Start with Furlong Navigator",
   primarySupport:
     "Tell us what you're trying to figure out and we'll help surface pathways, options, and constraints.",
-  secondaryLabel: "Read this week's Compass",
+  secondaryLabel: "Open the Compass",
   secondarySupport:
-    "This week's regional read — the real numbers on the ground, in a two-minute note, right on this page.",
+    "Move through the Furlong Compass — your pathways across land, farms, business, financing, and grants.",
 } as const;
 
 export const HOMEPAGE_CAPABILITIES = {

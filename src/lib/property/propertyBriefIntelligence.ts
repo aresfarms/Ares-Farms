@@ -40,6 +40,7 @@ import {
   PROPERTY_AMENITIES_PROVENANCE,
 } from "./propertyAmenitiesGenerated";
 import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
+import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
 import {
   AMENITY_RADIUS_MILES,
   amenityLiveLookupEnabled,
@@ -401,6 +402,7 @@ function buildChips(args: {
   schoolsInTown: number | null;
   town: string | null;
   fmr2: number | null;
+  fmr4: number | null;
 }): BriefChip[] {
   const chips: (BriefChip | null)[] = [];
   if (args.floodZone) {
@@ -425,10 +427,49 @@ function buildChips(args: {
   }
   if (args.fmr2) {
     chips.push(
-      chipFrom(args.verifiedFacts, "Rental context", `2BR rent context $${args.fmr2.toLocaleString("en-US")}/mo`)
+      chipFrom(
+        args.verifiedFacts,
+        "Rental context",
+        `Rent context $${args.fmr2.toLocaleString("en-US")}–$${(args.fmr4 ?? args.fmr2).toLocaleString("en-US")}/mo (2–4BR)`
+      )
     );
   }
   return chips.filter((c): c is BriefChip => c !== null).slice(0, 4);
+}
+
+/** Farm/land-shaped property types get ground-rent context automatically. */
+function isFarmShaped(propertyType: string | null): boolean {
+  return /farm|ranch|land|acre|agric|crop|pasture|homestead/i.test(propertyType ?? "");
+}
+
+/**
+ * Ground-rent context for open acreage — county-average cash rents from the
+ * USDA NASS survey. `conditional` framing is used when the property type is
+ * unknown (manual imports): the fact states its own applicability honestly.
+ * County averages only — never an appraisal, an offer, or a parcel rate.
+ */
+function groundRentFact(countyFips: string | null, conditional: boolean): BriefFactLine | null {
+  if (!countyFips || COUNTY_CASH_RENTS_PROVENANCE.asOf === null) return null;
+  const rent = COUNTY_CASH_RENTS[countyFips];
+  if (!rent || (rent.cropland === null && rent.pasture === null)) return null;
+  const bits = [
+    rent.cropland !== null ? `cropland ~$${rent.cropland.toLocaleString("en-US")}/acre` : null,
+    rent.pasture !== null ? `pasture ~$${rent.pasture.toLocaleString("en-US")}/acre` : null,
+  ].filter((bit): bit is string => bit !== null);
+  const lead = conditional
+    ? "If the parcel includes open cropland or pasture: county-average cash rents run about "
+    : "County-average cash rents for open ground run about ";
+  return {
+    label: "Ground rent context",
+    value: `${bits.join(" · ")} (county avg/yr)`,
+    text:
+      lead +
+      bits.join(" and ") +
+      " per year in this county (USDA NASS survey). Negotiation context for ground you might " +
+      "rent out — a county average, not an appraisal, an offer, or a parcel-specific rate.",
+    provenance: `Source: ${COUNTY_CASH_RENTS_PROVENANCE.source}, ${COUNTY_CASH_RENTS_PROVENANCE.year} survey, snapshot ${COUNTY_CASH_RENTS_PROVENANCE.asOf}`,
+    tone: "neutral",
+  };
 }
 
 function mechanicsForSource(
@@ -509,6 +550,8 @@ function buildUnknowns(args: {
   rentalContextAvailable: boolean;
   amenitiesAvailable: boolean;
   schoolsAvailable: boolean;
+  /** Farm-shaped or type-unknown property with NO resolved county cash-rent data. */
+  groundRentNeeded: boolean;
 }): BriefUnknownLine[] {
   const unknowns: BriefUnknownLine[] = [];
   const countyKnown =
@@ -558,6 +601,16 @@ function buildUnknowns(args: {
       `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
   });
+  if (args.groundRentNeeded) {
+    unknowns.push({
+      label: "Ground rent for open acreage",
+      pointer: "USDA NASS cash rents survey",
+      howToFind:
+        "USDA NASS publishes county-average cropland and pasture cash rents " +
+        "(quickstats.nass.usda.gov) — free and official; the county extension office knows the " +
+        "parcel-level market.",
+    });
+  }
   if (args.isHome && !args.rentalContextAvailable) {
     unknowns.push({
       label: "Rental context",
@@ -780,16 +833,22 @@ export function buildPropertyBriefIntelligence(args: {
   if (fmr && isHome) {
     verifiedFacts.push({
       label: "Rental context",
-      value: `$${fmr.fmr2.toLocaleString("en-US")}/mo 2BR (HUD FMR)`,
+      value: `2BR $${fmr.fmr2.toLocaleString("en-US")} · 3BR $${fmr.fmr3.toLocaleString("en-US")} · 4BR $${fmr.fmr4.toLocaleString("en-US")}/mo (HUD FMR)`,
       text:
         `HUD's ${COUNTY_FMR_PROVENANCE.fmrYear} Fair Market Rents for this county` +
-        `${fmr.areaName ? ` (${fmr.areaName})` : ""}: about $${fmr.fmr2.toLocaleString("en-US")}/month ` +
-        `for a 2-bedroom (1BR $${fmr.fmr1.toLocaleString("en-US")}, 3BR $${fmr.fmr3.toLocaleString("en-US")}). ` +
+        `${fmr.areaName ? ` (${fmr.areaName})` : ""}: 1BR $${fmr.fmr1.toLocaleString("en-US")}, ` +
+        `2BR $${fmr.fmr2.toLocaleString("en-US")}, 3BR $${fmr.fmr3.toLocaleString("en-US")}, ` +
+        `4BR $${fmr.fmr4.toLocaleString("en-US")} per month. ` +
         `A program rent standard HUD publishes — market context, not a prediction of what this home would rent for.`,
       provenance: `Source: ${COUNTY_FMR_PROVENANCE.source}, ${COUNTY_FMR_PROVENANCE.fmrYear}, snapshot ${COUNTY_FMR_PROVENANCE.asOf}`,
       tone: "neutral",
     });
   }
+
+  // Ground rent for open acreage — automatic for farm/land-shaped types.
+  const farmShaped = isFarmShaped(args.propertyType);
+  const groundRent = farmShaped ? groundRentFact(fmrFips, false) : null;
+  if (groundRent) verifiedFacts.push(groundRent);
 
   const floodRecord = id ? PROPERTY_FLOOD_HISTORIC_FACTS[id] : undefined;
   const townLowerForChips = (args.town ?? "").trim().toLowerCase();
@@ -810,6 +869,7 @@ export function buildPropertyBriefIntelligence(args: {
       rentalContextAvailable: Boolean(fmr),
       amenitiesAvailable: Boolean(amenities),
       schoolsAvailable: Boolean(schools && schools.length > 0),
+      groundRentNeeded: farmShaped && !groundRent,
     }),
     mechanics: mechanicsForSource(args.sourceId, args.propertyType),
     pathwaysProse: buildPathwaysProse({
@@ -827,6 +887,7 @@ export function buildPropertyBriefIntelligence(args: {
       schoolsInTown,
       town: args.town,
       fmr2: isHome && fmr ? fmr.fmr2 : null,
+      fmr4: isHome && fmr ? fmr.fmr4 : null,
     }),
     livingHere:
       amenities && isHome
@@ -1050,16 +1111,24 @@ export async function buildLocationBriefIntelligence(args: {
     });
   }
 
+  // Ground rent — manual imports rarely carry a reliable property type, so
+  // the fact frames its own applicability ("if the parcel includes open
+  // cropland…"). Farm-shaped stated types get the direct framing.
+  const locFarmShaped = isFarmShaped(args.propertyType ?? null);
+  const groundRent = groundRentFact(countyFips, !locFarmShaped);
+  if (groundRent) verifiedFacts.push(groundRent);
+
   // Rental context — county-keyed HUD Fair Market Rents.
   const fmr = countyFips ? COUNTY_FMR[countyFips] : undefined;
   if (fmr && isHome) {
     verifiedFacts.push({
       label: "Rental context",
-      value: `$${fmr.fmr2.toLocaleString("en-US")}/mo 2BR (HUD FMR)`,
+      value: `2BR $${fmr.fmr2.toLocaleString("en-US")} · 3BR $${fmr.fmr3.toLocaleString("en-US")} · 4BR $${fmr.fmr4.toLocaleString("en-US")}/mo (HUD FMR)`,
       text:
         `HUD's ${COUNTY_FMR_PROVENANCE.fmrYear} Fair Market Rents for this county` +
-        `${fmr.areaName ? ` (${fmr.areaName})` : ""}: about $${fmr.fmr2.toLocaleString("en-US")}/month ` +
-        `for a 2-bedroom (1BR $${fmr.fmr1.toLocaleString("en-US")}, 3BR $${fmr.fmr3.toLocaleString("en-US")}). ` +
+        `${fmr.areaName ? ` (${fmr.areaName})` : ""}: 1BR $${fmr.fmr1.toLocaleString("en-US")}, ` +
+        `2BR $${fmr.fmr2.toLocaleString("en-US")}, 3BR $${fmr.fmr3.toLocaleString("en-US")}, ` +
+        `4BR $${fmr.fmr4.toLocaleString("en-US")} per month. ` +
         `A program rent standard HUD publishes — market context, not a prediction of what this home would rent for.`,
       provenance: `Source: ${COUNTY_FMR_PROVENANCE.source}, ${COUNTY_FMR_PROVENANCE.fmrYear}, snapshot ${COUNTY_FMR_PROVENANCE.asOf}`,
       tone: "neutral",
@@ -1078,6 +1147,7 @@ export async function buildLocationBriefIntelligence(args: {
       rentalContextAvailable: Boolean(fmr),
       amenitiesAvailable: Boolean(amenities),
       schoolsAvailable: Boolean(schools && schools.length > 0),
+      groundRentNeeded: !groundRent,
     }),
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),
@@ -1094,6 +1164,7 @@ export async function buildLocationBriefIntelligence(args: {
           : 0,
       town,
       fmr2: isHome && fmr ? fmr.fmr2 : null,
+      fmr4: isHome && fmr ? fmr.fmr4 : null,
     }),
     livingHere: amenities && isHome ? livingHereStrip(amenities, AMENITY_RADIUS_MILES) : null,
   };

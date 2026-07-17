@@ -969,6 +969,7 @@ function formatOwnershipCostsForPdf(args: {
   ownershipContext: OwnershipCostContext;
   isHome: boolean;
   farmShaped: boolean;
+  farmMode?: boolean;
 }):
   | {
       priceLine: string;
@@ -989,6 +990,7 @@ function formatOwnershipCostsForPdf(args: {
       priceIsAssumption: false,
       isHome: args.isHome,
       farmShaped: args.farmShaped,
+      farmMode: args.farmMode,
     },
     args.ownershipContext
   );
@@ -2533,6 +2535,7 @@ export function PropertyEvaluationWorkspace({
                     ownershipContext,
                     isHome: isResidentialHomeContext(analysisContext),
                     farmShaped: workspaceProfile.id === "farm",
+                    farmMode: workspaceProfile.id === "farm",
                   })
                 : undefined,
             similarHomes: similarHomes.length
@@ -2733,6 +2736,7 @@ export function PropertyEvaluationWorkspace({
             priceIsAssumption: false,
             isHome: isResidentialHomeContext(analysisContext),
             farmShaped: workspaceProfile.id === "farm",
+                    farmMode: workspaceProfile.id === "farm",
           },
           ownershipContext
         )
@@ -2885,6 +2889,7 @@ export function PropertyEvaluationWorkspace({
               listedPrice={listedPrice}
               isHome={isResidentialHomeContext(analysisContext)}
               farmShaped={workspaceProfile.id === "farm"}
+              farmMode={workspaceProfile.id === "farm"}
             />
           ) : null
         }

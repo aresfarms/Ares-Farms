@@ -114,6 +114,50 @@ const FARM_EDITORIAL: FarmEditorialItem[] = [
     pointer: "County FSA office; your crop-insurance agent",
     seasonMonths: [6, 7, 8, 9],
   },
+  // ── Poultry economics + diversification alternatives ──
+  {
+    category: "production",
+    title: "Poultry economics: is the chicken house still worth it?",
+    body:
+      "Broiler integration is a contract business, and the math has tightened: house upgrades (tunnel " +
+      "ventilation, controllers, litter systems) that integrators increasingly require run six figures, " +
+      "financed against a contract that can change, while feed and energy — up double digits in a dry, hot " +
+      "year — squeeze the grower's already thin per-bird margin. It still pencils for many operations with " +
+      "modern houses and a solid integrator relationship, but a new entrant should run the full cost of the " +
+      "houses against the contract terms, not the gross check. Extension farm-management specialists publish " +
+      "enterprise budgets that model it honestly.",
+    pointer: "State extension poultry enterprise budgets; your integrator's contract terms",
+    regions: ["delmarva"],
+  },
+  {
+    category: "production",
+    title: "Alternatives with a similar revenue profile — worth the switch?",
+    body:
+      "When commodity corn and beans don't clear costs, the alternatives that come up — specialty and " +
+      "food-grade grains, vegetables for the Mid-Atlantic fresh market, small-grain/cover-crop seed " +
+      "production, hemp, aquaculture, and value-added or direct-market lines — each trade lower acreage for " +
+      "higher management, different capital, and a market you have to build. The honest cost-benefit is rarely " +
+      "'higher price per unit'; it's whether you have the labor, the buyer, and the working capital to carry a " +
+      "new enterprise through its learning curve. USDA SARE and extension publish enterprise budgets and " +
+      "case studies for exactly this comparison — run one before you switch an acre.",
+    pointer: "USDA SARE (sare.org); state extension enterprise budgets",
+    url: "https://www.sare.org/resources/",
+  },
+  // ── Energy / land-use trends affecting farmers ──
+  {
+    category: "long-term",
+    title: "Data centers, solar, and battery farms: the new bidder for your ground",
+    body:
+      "Across the Mid-Atlantic, data centers, utility-scale solar, and battery storage are competing for " +
+      "farmland — and it cuts both ways. Upside: a solar or storage lease can pay far more per acre than crop " +
+      "rent, with a long fixed term that steadies income through drought years, and it's reversible on many " +
+      "sites. Downside: it takes ground out of production, can strain local grid capacity and water for " +
+      "cooling, may reshape a neighbor's viewshed and drainage, and long leases bind the land for decades — " +
+      "with decommissioning and soil-restoration terms that matter enormously and are easy to underwrite " +
+      "poorly. Read any option or lease with an ag attorney before you sign, and check the county's solar and " +
+      "data-center zoning — several jurisdictions are rewriting it now.",
+    pointer: "Ag attorney; county planning/zoning; extension solar-lease guides",
+  },
   // ── Long-term ──
   {
     category: "long-term",

@@ -99,6 +99,10 @@ export interface OwnershipCostInputs {
   isHome: boolean;
   /** Farm-shaped — adds irrigation/outbuilding upkeep expectations. */
   farmShaped: boolean;
+  /** Working-farm/ranch purchase (founder direction 2026-07-17): swap the
+      consumer mortgage lanes for FSA/USDA/Farm Credit farm-loan lanes — no
+      farmer finances working ground with FHA or a conventional mortgage. */
+  farmMode?: boolean;
 }
 
 export interface ProgramScenario {
@@ -276,6 +280,66 @@ export function buildOwnershipCostModel(
   // Income guidance attaches after taxes/insurance are known (buildIncome below).
   const scenarios: Array<Omit<ProgramScenario, "incomeGuidance">> = [];
 
+  // ── FARM-LOAN LANES (working farm/ranch) ─────────────────────────────────
+  // FSA/USDA/Farm Credit, not consumer mortgages. Rates are set monthly by
+  // FSA and negotiated by ag lenders — the payment here is illustrative at the
+  // labeled rate; the county FSA office quotes the real number. FSA Farm
+  // Ownership loans run up to 40-year terms.
+  if (inputs.farmMode) {
+    const farmRate = rate; // illustrative proxy; FSA/lender sets the real rate
+    // FSA Direct Farm Ownership — up to $600k, as low as 5% down, 40-yr term.
+    {
+      const down = price * 0.05;
+      const loan = price - down;
+      scenarios.push({
+        program: "FSA Direct Farm Ownership (~5% down)",
+        fit: "USDA Farm Service Agency direct loan — beginning and underserved farmers; up to $600,000, terms to 40 years. FSA sets the rate monthly.",
+        downPaymentPct: 5,
+        downPayment: Math.round(down),
+        loanAmount: Math.round(loan),
+        upfrontFeeNote: "No mortgage insurance; loan-making is through the county FSA office.",
+        ratePct: farmRate,
+        monthlyPrincipalInterest: round10(monthlyPayment(loan, farmRate, 40)),
+        monthlyMortgageInsurance: 0,
+        mortgageInsuranceNote: null,
+      });
+    }
+    // FSA Guaranteed Farm Ownership — via a commercial lender, FSA guarantee.
+    {
+      const down = price * 0.1;
+      const loan = price - down;
+      scenarios.push({
+        program: "FSA Guaranteed Farm Ownership (~10% down)",
+        fit: "A commercial lender's loan with an FSA guarantee (up to ~$2.25M); terms to 40 years, rate negotiated with the lender.",
+        downPaymentPct: 10,
+        downPayment: Math.round(down),
+        loanAmount: Math.round(loan),
+        upfrontFeeNote: "FSA guarantee fee applies; the lender sets the rate.",
+        ratePct: farmRate,
+        monthlyPrincipalInterest: round10(monthlyPayment(loan, farmRate, 30)),
+        monthlyMortgageInsurance: 0,
+        mortgageInsuranceNote: null,
+      });
+    }
+    // Farm Credit System / conventional ag lender — larger down, shorter term.
+    {
+      const down = price * 0.25;
+      const loan = price - down;
+      scenarios.push({
+        program: "Farm Credit / ag lender (~25% down)",
+        fit: "The Farm Credit System or a commercial ag bank — typically 20–30% down, 15–30 year terms, no government cap.",
+        downPaymentPct: 25,
+        downPayment: Math.round(down),
+        loanAmount: Math.round(loan),
+        upfrontFeeNote: null,
+        ratePct: farmRate,
+        monthlyPrincipalInterest: round10(monthlyPayment(loan, farmRate, 25)),
+        monthlyMortgageInsurance: 0,
+        mortgageInsuranceNote: null,
+      });
+    }
+  } else {
+
   // USDA Rural Development — 0% down, 1% upfront guarantee fee (financeable),
   // 0.35%/yr annual fee (published USDA RD fee schedule).
   {
@@ -368,6 +432,8 @@ export function buildOwnershipCostModel(
       mortgageInsuranceNote: null,
     });
   }
+
+  } // end consumer-mortgage lanes (else of farmMode)
 
   // ── Recurring non-mortgage monthly costs ────────────────────────────────
   const monthly: CostRangeLine[] = [];
@@ -462,6 +528,26 @@ export function buildOwnershipCostModel(
   const roundK = (n: number): number => Math.round(n / 1000) * 1000;
   const fullScenarios: ProgramScenario[] = scenarios.map((s) => {
     const piti = s.monthlyPrincipalInterest + s.monthlyMortgageInsurance + taxesMid + insuranceMid;
+    // Farm loans qualify on the OPERATION's debt-service coverage, not a
+    // household income ratio — reflect that instead of a consumer bracket.
+    if (inputs.farmMode) {
+      const annualDebt = (s.monthlyPrincipalInterest + taxesMid + insuranceMid) * 12;
+      const comfortableAnnual = roundK(annualDebt * 1.25); // 1.25x DSCR is a common ag floor
+      const stretchAnnual = roundK(annualDebt * 1.1);
+      return {
+        ...s,
+        incomeGuidance: {
+          comfortableAnnual,
+          stretchAnnual,
+          note:
+            `Farm loans qualify on the OPERATION's cash flow, not a household paycheck: lenders want net farm ` +
+            `income (plus off-farm income) to cover the payment with a cushion — a debt-service coverage ratio ` +
+            `around 1.25x is a common floor, so roughly $${comfortableAnnual.toLocaleString("en-US")}/yr of income available ` +
+            `to service debt fits comfortably, $${stretchAnnual.toLocaleString("en-US")} is tighter. The county FSA office and your ` +
+            `ag lender run the actual cash-flow projection.`,
+        },
+      };
+    }
     const ratio = HOUSING_RATIOS[s.program] ?? 0.29;
     const comfortableAnnual = roundK((piti * 12) / ratio);
     const stretchAnnual = roundK((piti * 12) / (ratio + 0.08));
@@ -492,17 +578,17 @@ export function buildOwnershipCostModel(
     high: round10(s.monthlyPrincipalInterest + s.monthlyMortgageInsurance + recurringHigh),
   }));
 
-  // Cost horizon in bands, using the FHA scenario as the representative
-  // financed path (most common first-home program). Year 1 stands alone
-  // because it carries the cash to start; later bands note what changes.
-  const fha = scenarios[1];
-  const fhaMonthly = fha.monthlyPrincipalInterest + fha.monthlyMortgageInsurance;
-  const annualLow = (fhaMonthly + recurringLow) * 12;
-  const annualHigh = (fhaMonthly + recurringHigh) * 12;
+  // Cost horizon in bands, using a representative financed path (the second
+  // scenario — FHA for a home, FSA Guaranteed for a farm). Year 1 stands
+  // alone because it carries the cash to start; later bands note what changes.
+  const repPath = scenarios[1];
+  const repMonthly = repPath.monthlyPrincipalInterest + repPath.monthlyMortgageInsurance;
+  const annualLow = (repMonthly + recurringLow) * 12;
+  const annualHigh = (repMonthly + recurringHigh) * 12;
   const horizon = {
     year1: {
-      low: round10(fha.downPayment + price * 0.02 + annualLow),
-      high: round10(fha.downPayment + price * 0.05 + annualHigh),
+      low: round10(repPath.downPayment + price * 0.02 + annualLow),
+      high: round10(repPath.downPayment + price * 0.05 + annualHigh),
       note:
         "The expensive year: down payment, closing costs, and twelve months of payments, taxes, insurance, utilities, and reserve — plus the inspections itemized above and any move-in repairs.",
     },
@@ -522,7 +608,9 @@ export function buildOwnershipCostModel(
       low: round10(annualLow * 20),
       high: round10(annualHigh * 20),
       note:
-        "The long haul, in today's dollars. Taxes and insurance drift up over decades; the FHA annual mortgage insurance runs the life of the loan at minimum down (many owners refinance out of it at ~20% equity); at year 30 the loan itself retires and the payment drops to taxes, insurance, and upkeep.",
+        inputs.farmMode
+        ? "The long haul, in today's dollars. Taxes and insurance drift up over decades; FSA Farm Ownership loans run up to 40-year terms, so at year 40 the loan retires and the payment drops to taxes, insurance, and upkeep — sooner if you prepay or refinance."
+        : "The long haul, in today's dollars. Taxes and insurance drift up over decades; the FHA annual mortgage insurance runs the life of the loan at minimum down (many owners refinance out of it at ~20% equity); at year 30 the loan itself retires and the payment drops to taxes, insurance, and upkeep.",
     },
   };
 
@@ -540,7 +628,9 @@ export function buildOwnershipCostModel(
     monthlyTotals,
     horizon,
     disclaimers: [
-      `Payment estimates use the Freddie Mac national average 30-year rate (${rate}%, week of ${context.rates.weekOf}). Rates move weekly, and your quoted rate depends on credit, points, program, and lender.`,
+      inputs.farmMode
+        ? `Farm-loan payments are ILLUSTRATIVE at ${rate}% — FSA sets its direct-loan rate monthly and ag lenders negotiate theirs; the county FSA office and your lender quote the real number, and FSA loans run longer terms (up to 40 years) than the consumer rate shown.`
+        : `Payment estimates use the Freddie Mac national average 30-year rate (${rate}%, week of ${context.rates.weekOf}). Rates move weekly, and your quoted rate depends on credit, points, program, and lender.`,
       inputs.priceIsAssumption
         ? "Built on the price you entered — not a listed price, an appraisal, or an opinion of value."
         : "Built on the listed price — the negotiated price and appraisal decide the real numbers.",

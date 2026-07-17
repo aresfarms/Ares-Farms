@@ -31,6 +31,8 @@ export interface OwnershipCostPanelProps {
   listedPrice: number | null;
   isHome: boolean;
   farmShaped: boolean;
+  /** Working-farm/ranch — use FSA/USDA farm-loan lanes, not consumer mortgages. */
+  farmMode?: boolean;
 }
 
 export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
@@ -50,11 +52,12 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
               priceIsAssumption,
               isHome: props.isHome,
               farmShaped: props.farmShaped,
+              farmMode: props.farmMode,
             },
             props.context
           )
         : null,
-    [price, priceIsAssumption, props.isHome, props.farmShaped, props.context]
+    [price, priceIsAssumption, props.isHome, props.farmShaped, props.farmMode, props.context]
   );
 
   const applyPriceInput = () => {

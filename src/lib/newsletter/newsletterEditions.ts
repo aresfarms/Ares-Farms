@@ -16,6 +16,7 @@
 
 import {
   cashRentSignal,
+  commercialFinanceSignal,
   commodityPriceSignal,
   cropConditionSignal,
   grainBidSignal,
@@ -23,7 +24,10 @@ import {
   electricitySignal,
   farmFinanceSignal,
   farmlandValueSignal,
+  hospitalityFinanceSignal,
   inputCostSignal,
+  landFinanceSignal,
+  mhpFinanceSignal,
   mortgageRateSignal,
   NEWSLETTER_REGIONS,
   priceTrendSignal,
@@ -100,6 +104,10 @@ export function buildNewsletterEdition(
   const farmland = farmlandValueSignal(states);
   const farmFin = farmFinanceSignal();
   const inputs = inputCostSignal();
+  const commercialFin = commercialFinanceSignal();
+  const hospitalityFin = hospitalityFinanceSignal();
+  const mhpFin = mhpFinanceSignal();
+  const landFin = landFinanceSignal();
   const month = Number((asOf.match(/-(\d{2})-/) || [])[1] || "1");
   const editorial = farmEditorialItems(month, regionKey);
 
@@ -186,42 +194,42 @@ export function buildNewsletterEdition(
     case "commercial":
       return {
         ...base,
-        lead: rates,
-        sections: [{ heading: "Financing and value context", items: compact([rates, price]) }],
+        lead: commercialFin,
+        sections: [{ heading: "Capital and value context", items: compact([commercialFin, price]) }],
         meaning: [
-          "Commercial debt-service math turns on the rate above; the regional price trend frames where collateral values sit. In an ag-stressed region, watch demand tied to farm income — implement dealers, grain handling, and main-street retail in row-crop towns feel a bad crop year on a lag.",
+          "Commercial debt is not a consumer mortgage — SBA 504/7(a) for owner-users, or conventional commercial debt underwritten on debt-service coverage, not a personal income ratio. In an ag-stressed region, watch demand tied to farm income: implement dealers, grain handling, and main-street retail in row-crop towns feel a bad crop year on a lag.",
           "Furlong charts each commercial listing with its zoning, environmental, and financing questions surfaced up front — the diligence that decides the deal, before the tour.",
         ],
       };
     case "hospitality":
       return {
         ...base,
-        lead: drought ?? rates,
-        sections: [{ heading: "Demand and financing context", items: compact([drought, rates, price]) }],
+        lead: hospitalityFin,
+        sections: [{ heading: "Capital and demand context", items: compact([hospitalityFin, price]) }],
         meaning: [
-          "Lodging demand tracks the region's draw — a drought that dims farm income and outdoor-recreation water levels can soften a shoulder season, while the rate sets acquisition math. Confirm occupancy and rate history against the local tourism bureau's seasonality before you underwrite.",
+          "Lodging is a specialized commercial asset — financed through SBA 504/7(a) and hospitality-experienced lenders on occupancy, ADR, and RevPAR, not a home mortgage. Demand tracks the region's draw, so a drought that dims farm income or recreation water can soften a shoulder season; confirm occupancy and rate history against the local tourism bureau before you underwrite.",
           "Furlong flags the lodging-specific questions — STR ordinance, life-safety, license transfer — that most often reprice a hospitality deal after the handshake.",
         ],
       };
     case "mobile-home-park":
       return {
         ...base,
-        lead: rates,
-        sections: [{ heading: "Financing and operating context", items: compact([rates, price, power]) }],
+        lead: mhpFin,
+        sections: [{ heading: "Capital and operating context", items: compact([mhpFin, power]) }],
         meaning: [
-          "Park economics turn on the lot-rent roll against financing cost; the rate above sets the debt-service math, and utility costs shape what pass-throughs the market bears. A stressed local farm economy can pressure tenant incomes — worth reading alongside the rent roll.",
+          "Park capital runs through agency (Fannie/Freddie MHC), commercial banks, and SBA — underwritten on the lot-rent roll, occupancy, and utility structure, not a consumer mortgage. A stressed local farm economy can pressure tenant incomes, so read the rent roll alongside the region's conditions.",
           "Furlong surfaces the park-specific diligence — park-owned versus tenant-owned homes, master metering, and local rent-stabilization or closure ordinances — that decides the deal.",
         ],
       };
     case "land":
       return {
         ...base,
-        lead: drought ?? rent,
+        lead: landFin,
         sections: [
-          { heading: "Ground value and water", items: compact([drought, rent, price]) },
+          { heading: "Capital, ground value & water", items: compact([landFin, farmland, rent, drought]) },
         ],
         meaning: [
-          "Land value in an ag region rides on water and rent. A drought year pressures cash rents and brings ground to market — opportunity for a patient buyer, a reason for owners to reassess. Water rights, access, and mineral rights are the facts that separate a good parcel from a trap.",
+          "Land is financed on its own terms — land loans (higher down, shorter term), seller financing, or Farm Credit/USDA for rural and ag ground; a home mortgage generally does not apply. Value rides on water and rent, and a drought year pressures cash rents and brings ground to market — opportunity for a patient buyer, a reason for owners to reassess.",
           "Furlong charts each parcel with its water, soil (USDA Web Soil Survey), access, and mineral-rights questions up front — the diligence that decides whether the price is real.",
         ],
       };

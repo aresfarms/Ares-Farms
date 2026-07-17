@@ -242,6 +242,63 @@ export function farmFinanceSignal(): NewsletterSignal {
   };
 }
 
+/** Commercial capital — SBA + commercial mortgage, not consumer FHA/conventional. */
+export function commercialFinanceSignal(): NewsletterSignal {
+  return {
+    headline: "Commercial capital: SBA 504/7(a), bank commercial mortgage",
+    body:
+      "Owner-occupied commercial property is financed very differently from a home: SBA 504 (long-term, " +
+      "fixed, for owner-users buying real estate) and SBA 7(a), conventional commercial mortgages from a " +
+      "bank or credit union (typically 20–30% down, shorter terms, periodic balloons/resets), and " +
+      "life-company or CMBS debt on larger deals. No FHA, no 30-year consumer fixed. Debt-service coverage, " +
+      "not a personal income ratio, drives the underwriting.",
+    source: "SBA 504/7(a) program terms (sba.gov); commercial lending norms",
+    tone: "neutral",
+  };
+}
+
+/** Hospitality capital — SBA 504 is the classic owner-operated-hotel lane. */
+export function hospitalityFinanceSignal(): NewsletterSignal {
+  return {
+    headline: "Lodging capital: SBA 504/7(a), hotel-experienced commercial lenders",
+    body:
+      "Hotels and inns are a specialized commercial asset: SBA 504 and 7(a) are the workhorse lanes for " +
+      "owner-operated lodging (the SBA finances a large share of independent hotels), alongside conventional " +
+      "hospitality lenders, franchise-affiliated financing, and CMBS on larger flags. Underwriting turns on " +
+      "occupancy, ADR, and RevPAR history — not a consumer mortgage rate, which does not apply here.",
+    source: "SBA 504/7(a) program terms (sba.gov); hospitality lending norms",
+    tone: "neutral",
+  };
+}
+
+/** Mobile-home-park capital — agency + commercial, not consumer mortgage. */
+export function mhpFinanceSignal(): NewsletterSignal {
+  return {
+    headline: "Park capital: agency (Fannie/Freddie MHC), bank, SBA",
+    body:
+      "Manufactured-housing communities have their own capital stack: Fannie Mae and Freddie Mac both run " +
+      "dedicated MHC loan programs (often the best terms for stabilized parks), plus commercial bank debt " +
+      "and SBA for smaller or value-add deals. Lenders underwrite the lot-rent roll, occupancy, and " +
+      "utility structure — a consumer home mortgage does not apply to a park.",
+    source: "Fannie Mae / Freddie Mac MHC programs; commercial lending norms",
+    tone: "neutral",
+  };
+}
+
+/** Land capital — land loans / seller finance / Farm Credit for rural ground. */
+export function landFinanceSignal(): NewsletterSignal {
+  return {
+    headline: "Land capital: land loans, seller financing, Farm Credit for rural ground",
+    body:
+      "Raw and unimproved land is financed on its own terms — land loans carry higher down payments (often " +
+      "20–50%) and shorter terms than a home mortgage, seller financing is common, and for agricultural or " +
+      "rural acreage the Farm Credit System and USDA/FSA programs apply. A conventional home mortgage " +
+      "generally does not finance vacant land.",
+    source: "Farm Credit System; USDA/FSA; land-lending norms",
+    tone: "neutral",
+  };
+}
+
 export function priceTrendSignal(states: string[]): NewsletterSignal | null {
   const withHpi = states.map((c) => ({ c, h: STATE_HPI[c] })).filter((x) => x.h);
   if (withHpi.length === 0) return null;

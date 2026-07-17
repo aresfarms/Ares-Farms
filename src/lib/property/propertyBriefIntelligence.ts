@@ -28,6 +28,7 @@ import { nmtcForProperty } from "./propertyNmtc";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
 import { US_AIRPORTS } from "./usAirportsGenerated";
+import { PROPERTY_GEO_SETTING, PROPERTY_GEO_SETTING_PROVENANCE } from "./propertyGeoSettingGenerated";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
 import { townCharacterFact } from "./townCharacterCurated";
@@ -586,6 +587,31 @@ function airportsFactFromCoords(lat: number, lon: number): BriefFactLine | null 
 }
 
 /**
+ * Geographic setting (founder direction 2026-07-17: "a beach town on X Bay"
+ * — from an authority that is NOT publicly editable). Nearest named
+ * identity-making features from USGS GNIS (the federal naming authority).
+ * Distance facts, never characterizations.
+ */
+function geoSettingFact(propertyId: string): BriefFactLine | null {
+  if (!propertyId || PROPERTY_GEO_SETTING_PROVENANCE.asOf === null) return null;
+  const features = PROPERTY_GEO_SETTING[propertyId] ?? [];
+  if (features.length === 0) return null;
+  const phrase = (f: { name: string; cls: string; miles: number }) =>
+    `${f.name} (${f.cls.toLowerCase()}) ~${f.miles} mi`;
+  return {
+    label: "The lay of the land",
+    value: features.slice(0, 3).map((f) => `${f.name} ~${f.miles} mi`).join(" · "),
+    text:
+      `The named landscape around this property, from the USGS geographic names authority: ${features
+        .map(phrase)
+        .join("; ")}. These are the features that give a place its character — a bay, a beach, a ` +
+      `summit, a forest — as officially named by the U.S. Board on Geographic Names, not as marketed.`,
+    provenance: `Source: ${PROPERTY_GEO_SETTING_PROVENANCE.source}, snapshot ${PROPERTY_GEO_SETTING_PROVENANCE.asOf}`,
+    tone: "neutral",
+  };
+}
+
+/**
  * Higher-education directory fact (founder direction 2026-07-17: a
  * university or community college in the county is a fact some buyers want
  * and others avoid — say so either way). Directory facts only.
@@ -928,6 +954,51 @@ function buildUnknowns(args: {
       "While you're at it, open a delivery app for the address too — whether anyone will bring a " +
       "pizza out here is an address-level truth people usually discover after moving in.",
   });
+  // Planned public works & eminent domain (founder direction 2026-07-17):
+  // approved road-widenings, new hospitals, bridge closures, and transit
+  // changes that a seller need not disclose but will reshape the block for
+  // years. The state DOT's STIP and the local MPO's TIP are the public
+  // record of what is already funded and coming.
+  unknowns.push({
+    label: "Planned construction and public works nearby",
+    pointer: "State DOT project map + county planning + local MPO (TIP/STIP)",
+    howToFind:
+      "Approved-but-unbuilt projects — a widened highway, a new hospital or subdivision behind " +
+      "the lot, a multi-year bridge closure, an added or removed transit stop — can reshape " +
+      "traffic, noise, and value for years, and a seller is rarely required to disclose them. " +
+      "The state DOT's project map and STIP, the county or city planning department's pending " +
+      "rezonings and permits, and the regional planning organization's TIP are the free public " +
+      "record. Where a project needs land, eminent domain can take part of a parcel at " +
+      "government-set compensation — worth knowing before you fall for the view.",
+  });
+  // Access & easements (founder direction 2026-07-17): shared roads and
+  // driveways, and automatic utility easements — the pros AND cons.
+  unknowns.push({
+    label: "Shared access and easements",
+    pointer: "Title search + recorded easement/road-maintenance agreement",
+    howToFind:
+      "A shared road or driveway can lower cost and build neighborliness — but who plows, repairs, " +
+      "and pays is governed by a recorded road-maintenance agreement (or, too often, a handshake); " +
+      "ask for it in writing before closing. Utility easements are near-universal and usually " +
+      "harmless: they let the power, water, or pipeline company cross a strip to reach equipment, " +
+      "but they can limit where you build a fence, shed, or addition, and the utility may enter to " +
+      "maintain lines. The title search lists every recorded easement; read what each one actually " +
+      "allows.",
+  });
+  // Mineral & subsurface rights (founder direction 2026-07-17): severed
+  // estates — you can own the surface and not what's under it.
+  unknowns.push({
+    label: "Mineral and subsurface rights",
+    pointer: "Title search + county deed records",
+    howToFind:
+      "Owning the surface does not automatically mean owning the oil, gas, coal, metals, or stone " +
+      "beneath it. In much of the country — especially energy and mining regions — the mineral " +
+      "estate was legally 'severed' from the surface by a prior owner and may belong to someone " +
+      "else entirely, who can hold the right to access and extract. A full title search and the " +
+      "county deed records show whether minerals convey with this sale, are reserved, or were long " +
+      "ago separated; if minerals matter to you, make conveying them an explicit term of the " +
+      "contract rather than an assumption.",
+  });
   // Crime: official statistics only — Furlong links sources and never
   // characterizes an area (fair-housing doctrine).
   unknowns.push({
@@ -1258,6 +1329,9 @@ export function buildPropertyBriefIntelligence(args: {
   // an entry exists (no entry, no line — the chart never pretends).
   const townNote = townCharacterFact(args.stateCode, args.town);
   if (townNote) verifiedFacts.push(townNote);
+
+  const geoSetting = geoSettingFact(id);
+  if (geoSetting) verifiedFacts.push(geoSetting);
 
   const airports = airportsFactFromData(id ? PROPERTY_AIRPORTS[id] ?? null : null);
   if (airports) verifiedFacts.push(airports);

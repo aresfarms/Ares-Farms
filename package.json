@@ -340,7 +340,8 @@
     "ingest:census-tax-rates": "tsx src/scripts/ingestCensusTaxRates.ts",
     "ingest:fhfa-hpi": "tsx src/scripts/ingestFhfaHpi.ts",
     "ingest:ipeds-colleges": "tsx src/scripts/ingestIpedsColleges.ts",
-    "ingest:property-airports": "tsx src/scripts/ingestPropertyAirports.ts"
+    "ingest:property-airports": "tsx src/scripts/ingestPropertyAirports.ts",
+    "ingest:property-geo-setting": "tsx src/scripts/ingestPropertyGeoSetting.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

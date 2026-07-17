@@ -335,7 +335,9 @@
     "ingest:nass-cash-rents": "tsx src/scripts/ingestNassCashRents.ts",
     "ingest:nces-private-schools": "tsx src/scripts/ingestNcesPrivateSchools.ts",
     "ingest:fema-nri": "tsx src/scripts/ingestFemaNri.ts",
-    "ingest:eia-electricity": "tsx src/scripts/ingestEiaElectricity.ts"
+    "ingest:eia-electricity": "tsx src/scripts/ingestEiaElectricity.ts",
+    "ingest:pmms-rates": "tsx src/scripts/ingestPmmsRates.ts",
+    "ingest:census-tax-rates": "tsx src/scripts/ingestCensusTaxRates.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -64,6 +64,21 @@ type PropertyEvaluationPdfInput = {
   placeFacts?: Array<{ label: string; value: string; source: string }>;
   /** Typical diligence cost guidance lines (plain-language ranges, never quotes). */
   diligenceCosts?: Array<{ label: string; range: string; note: string | null }>;
+  /** Ownership-cost guidance (founder direction 2026-07-17) — present only
+      when the source record publishes a price, so the signed artifact stays
+      deterministic; visitor-entered price assumptions stay on-page. All
+      strings pre-formatted by the workspace. */
+  ownershipCosts?: {
+    priceLine: string;
+    scenarios: Array<{ program: string; downPayment: string; monthly: string }>;
+    closingLine: string;
+    monthlyLines: Array<{ label: string; range: string; note: string }>;
+    totalsLines: string[];
+    fiveYearLine: string;
+    disclaimers: string[];
+  };
+  /** Alternatives from the tracked government inventory (honest-label rule). */
+  similarHomes?: Array<{ title: string; detail: string }>;
 };
 
 /**
@@ -78,9 +93,12 @@ type PropertyEvaluationPdfInput = {
  *    without escaping a box that was sized by guesswork.
  * 3. Chrome (header rule, footer, page numbers) is stamped in a FINAL pass
  *    over buffered pages, so it can never collide with content.
- * 4. The translucent compass watermark asset is gone (it rendered its baked
- *    transparency checkerboard); branding is the logo + emblem, small and
- *    opaque, plus the tier's accent language.
+ * 4. Watermarks live in the final pass: the official Furlong seal
+ *    (public/brand/furlong-logo.png — solid white ground, so faint opacity
+ *    over paper leaves only the seal) full-size behind-feeling at page
+ *    center, plus the diagonal informational-purposes line. The old
+ *    translucent asset that rendered a baked transparency checkerboard
+ *    stays retired.
  */
 
 const PAGE = {
@@ -114,6 +132,20 @@ const FONT_CANDIDATES = {
   ],
 };
 
+/**
+ * Watermark seal asset PATH (not a buffer): PDFKit caches path-keyed images
+ * once per document, so the seal embeds a single time no matter how many
+ * pages stamp it. The dedicated -watermark.jpg is a ~90KB downscale of the
+ * 6MB brand PNG — JPEG is fine because the seal sits on a solid white ground.
+ */
+let cachedSealPath: string | null | undefined;
+function furlongSealPath(): string | null {
+  if (cachedSealPath !== undefined) return cachedSealPath;
+  const candidate = path.join(process.cwd(), "public/brand/furlong-logo-watermark.jpg");
+  cachedSealPath = fs.existsSync(candidate) ? candidate : null; // missing asset must never block a report
+  return cachedSealPath;
+}
+
 function resolveFontPath(weight: keyof typeof FONT_CANDIDATES): string | null {
   for (const candidate of FONT_CANDIDATES[weight]) {
     if (fs.existsSync(candidate)) return candidate;
@@ -126,7 +158,22 @@ const RESOLVED_FONTS = {
   bold: resolveFontPath("bold"),
 };
 
+/**
+ * Print-size substitutions: the brand PNGs are multi-megabyte web assets, and
+ * PDFKit embeds whatever it is given — a 6MB source for a 130-pt header logo
+ * made every export ~4MB. When a dedicated -print downscale exists, use it.
+ */
+const PRINT_ASSET_SUBSTITUTIONS: Record<string, string> = {
+  "/brand/furlong-logo.png": "/brand/furlong-logo-print.jpg",
+  "/brand/furlong-emblem.png": "/brand/furlong-emblem-print.png",
+};
+
 function publicAssetPath(assetPath: string): string {
+  const substitute = PRINT_ASSET_SUBSTITUTIONS[assetPath];
+  if (substitute) {
+    const substitutePath = path.join(process.cwd(), "public", substitute.replace(/^\//, ""));
+    if (fs.existsSync(substitutePath)) return substitutePath;
+  }
   return path.join(process.cwd(), "public", assetPath.replace(/^\//, ""));
 }
 
@@ -449,6 +496,46 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     );
   }
 
+  // ── OWNERSHIP COSTS — buy it, then keep it (founder direction 2026-07-17) ──
+
+  if (input.ownershipCosts) {
+    const own = input.ownershipCosts;
+    heading("Buying It, Then Owning It — the Numbers That Decide Comfort");
+    paragraph(own.priceLine);
+    setFont("bold", 9.5, COLORS.muted);
+    ensure(24);
+    doc.text("CASH TO CLOSE AND MONTHLY PAYMENT, BY FINANCING LANE", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    factsTable(
+      own.scenarios.map((s) => ({
+        label: s.program,
+        value: `Down: ${s.downPayment}  ·  Monthly: ${s.monthly}`,
+      }))
+    );
+    paragraph(own.closingLine, { size: 9.5 });
+    setFont("bold", 9.5, COLORS.muted);
+    ensure(24);
+    doc.text("THE REST OF THE MONTHLY BILL — THE PART PEOPLE UNDERESTIMATE", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    factsTable(
+      own.monthlyLines.map((line) => ({
+        label: line.label,
+        value: `${line.range} — ${line.note}`,
+      }))
+    );
+    panel({ lines: [...own.totalsLines, own.fiveYearLine], fill: ACCENT_SOFT });
+    for (const line of own.disclaimers) paragraph(line, { size: 8.5, color: COLORS.muted });
+  }
+
+  if (input.similarHomes?.length) {
+    heading("Also Tracked Nearby — Worth Comparing");
+    factsTable(input.similarHomes.map((home) => ({ label: home.title, value: home.detail })));
+    paragraph(
+      "From the government-listing inventory Furlong tracks (HUD, USDA, Treasury, GSA) — not the whole market. A local agent will see more; these are the ones we can verify.",
+      { size: 9, color: COLORS.muted }
+    );
+  }
+
   // ── SIGNALS / RISKS side by side ───────────────────────────────────────────
 
   heading("Your Bearings");
@@ -563,6 +650,18 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i += 1) {
     doc.switchToPage(i);
+    // Full-size Furlong seal at page center, print-safe opacity (founder
+    // direction 2026-07-17: the actual logo as watermark on every page).
+    const seal = furlongSealPath();
+    if (seal) {
+      const sealW = 430;
+      const sealH = sealW * (687 / 800); // asset aspect ratio
+      doc.save();
+      doc.opacity(0.05);
+      doc.image(seal, (PAGE.width - sealW) / 2, (PAGE.height - sealH) / 2, { width: sealW });
+      doc.opacity(1);
+      doc.restore();
+    }
     // Diagonal watermark on every printed page (founder direction).
     doc.save();
     doc.rotate(-32, { origin: [PAGE.width / 2, PAGE.height / 2] });

@@ -113,6 +113,25 @@ export interface ChartTableBriefProps {
   financingLanes: string[];
   /** Export/save buttons — rendered inside the final waypoint. */
   actionsSlot?: React.ReactNode;
+  /** Ownership-cost panel (OwnershipCostPanel) — its own waypoint. The parent
+      decides which lenses carry it (finance lens: never — no products/terms). */
+  costsSlot?: React.ReactNode;
+  /** Alternatives from the government-listing inventory Furlong tracks. */
+  similarHomes?: SimilarHomeLine[];
+}
+
+/** Public-safe similar-property line (server-selected; no coordinates). */
+export interface SimilarHomeLine {
+  id: string;
+  title: string;
+  location: string;
+  priceLabel: string;
+  comparison: "lower" | "similar" | "higher" | null;
+  distanceMiles: number | null;
+  vintage: string;
+  isCurrent: boolean;
+  sourceLabel: string;
+  href: string;
 }
 
 export function ChartTableBrief(props: ChartTableBriefProps) {
@@ -181,7 +200,7 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
   const headline = lens.headline || props.headline;
 
   // Waypoint numbering stays sequential per lens (some waypoints are absent).
-  const numerals = ["I", "II", "III", "IV", "V"];
+  const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
   let wp = 0;
   const nextPt = () => numerals[Math.min(wp++, numerals.length - 1)];
 
@@ -418,6 +437,57 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                   </span>
                 </div>
               )}
+            </Waypoint>
+          )}
+
+          {props.costsSlot && (
+            <Waypoint pt={nextPt()} title="What it costs to buy — and to keep" accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+              {props.costsSlot}
+            </Waypoint>
+          )}
+
+          {(props.similarHomes?.length ?? 0) > 0 && (
+            <Waypoint pt={nextPt()} title="Also on this chart nearby" accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
+              <div style={{ display: "grid", gap: 8 }}>
+                {props.similarHomes?.map((home) => (
+                  <a
+                    key={home.id}
+                    href={home.href}
+                    style={{
+                      display: "flex",
+                      gap: 10,
+                      alignItems: "baseline",
+                      flexWrap: "wrap",
+                      justifyContent: "space-between",
+                      background: theme.cellBg,
+                      border: `1px solid ${theme.cellBorder}`,
+                      borderRadius: 8,
+                      padding: "9px 12px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <span style={{ display: "grid", gap: 2 }}>
+                      <strong style={{ fontSize: 13, color: theme.ink }}>{home.title}</strong>
+                      <span style={{ fontSize: 11.5, color: theme.inkFaint }}>
+                        {home.location}
+                        {home.distanceMiles != null ? ` · ~${home.distanceMiles} mi away` : ""} · {home.sourceLabel}
+                        {home.isCurrent ? "" : ` · ${home.vintage}`}
+                      </span>
+                    </span>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: theme.accent, whiteSpace: "nowrap" }}>
+                      {home.priceLabel}
+                      {home.comparison === "lower" && <span style={{ fontWeight: 700, color: theme.inkSoft }}> · less than this one</span>}
+                      {home.comparison === "higher" && <span style={{ fontWeight: 700, color: theme.inkSoft }}> · more than this one</span>}
+                      {home.comparison === "similar" && <span style={{ fontWeight: 700, color: theme.inkSoft }}> · about the same</span>}
+                    </span>
+                  </a>
+                ))}
+                <span style={{ fontSize: 10.5, color: theme.inkFaint, lineHeight: 1.5 }}>
+                  From the government-listing inventory Furlong tracks (HUD, USDA, Treasury, GSA) —
+                  not the whole market. A local agent will see more; these are the ones we can verify.
+                  Each opens its own chart.
+                </span>
+              </div>
             </Waypoint>
           )}
 

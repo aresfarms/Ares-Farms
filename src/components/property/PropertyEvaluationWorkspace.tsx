@@ -10,9 +10,11 @@ import {
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
-import { ChartTableBrief } from "@/components/property/ChartTableBrief";
+import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/ChartTableBrief";
+import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
-import type { ChartVariant } from "@/lib/property/chartThemes";
+import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
+import { buildOwnershipCostModel, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import { reportTierIdentity, type ReportTierIdentity } from "@/lib/reports/reportTierIdentity";
@@ -955,6 +957,64 @@ function rankPropertyPathways(args: {
     .sort((a, b) => b.fitScore - a.fitScore);
 }
 
+/**
+ * Format the ownership-cost model for the PDF (founder direction 2026-07-17).
+ * LISTED prices only — the signed artifact stays deterministic; a price the
+ * visitor typed stays on the page it was typed on.
+ */
+function formatOwnershipCostsForPdf(args: {
+  listedPrice: number;
+  ownershipContext: OwnershipCostContext;
+  isHome: boolean;
+  farmShaped: boolean;
+}):
+  | {
+      priceLine: string;
+      scenarios: Array<{ program: string; downPayment: string; monthly: string }>;
+      closingLine: string;
+      monthlyLines: Array<{ label: string; range: string; note: string }>;
+      totalsLines: string[];
+      fiveYearLine: string;
+      disclaimers: string[];
+    }
+  | undefined {
+  const model = buildOwnershipCostModel(
+    {
+      price: args.listedPrice,
+      priceIsAssumption: false,
+      isHome: args.isHome,
+      farmShaped: args.farmShaped,
+    },
+    args.ownershipContext
+  );
+  if (!model) return undefined;
+  const dollars = (n: number) => `$${n.toLocaleString("en-US")}`;
+  return {
+    priceLine:
+      `Figured at the listed price of ${dollars(args.listedPrice)}. These are the numbers that decide whether ownership stays comfortable — worth knowing before the offer, not after.`,
+    scenarios: model.purchase.scenarios.map((s) => ({
+      program: s.program,
+      downPayment: s.downPayment === 0 ? "$0 (0%)" : `${dollars(s.downPayment)} (${s.downPaymentPct}%)`,
+      monthly:
+        `${dollars(s.monthlyPrincipalInterest)} P&I` +
+        (s.monthlyMortgageInsurance > 0 ? ` + ${dollars(s.monthlyMortgageInsurance)} mortgage ins.` : ", no mortgage ins."),
+    })),
+    closingLine:
+      `Closing costs add roughly ${dollars(model.purchase.closingLow)}–${dollars(model.purchase.closingHigh)} on top of the down payment. ${model.purchase.closingNote}`,
+    monthlyLines: model.monthly.map((line) => ({
+      label: line.label,
+      range: `${dollars(line.low)}–${dollars(line.high)}/mo`,
+      note: `${line.note} [${line.provenance}]`,
+    })),
+    totalsLines: model.monthlyTotals.map(
+      (total) => `All-in monthly on ${total.program}: ${dollars(total.low)}–${dollars(total.high)}`
+    ),
+    fiveYearLine:
+      `Years 1–5, everything included: ${dollars(model.fiveYear.cumulativeLow)}–${dollars(model.fiveYear.cumulativeHigh)}. ${model.fiveYear.note}`,
+    disclaimers: model.disclaimers,
+  };
+}
+
 function reportVerdict(args: {
   context: PropertyContext;
   answers: DraftAnswers;
@@ -964,9 +1024,9 @@ function reportVerdict(args: {
 }): { label: string; explanation: string } {
   if (isResidentialHomeContext(args.context) && !args.answers.usePlan.trim()) {
     return {
-      label: "A straightforward home purchase",
+      label: "A regular house for sale — nothing unusual here",
       explanation:
-        `This is listed as a regular home for sale through ${args.context.sourceLabel}. Read it first as a place to live: check the current price on the listing, plan an inspection, and see how the numbers feel. Everything else in this profile is here to support that decision.`,
+        `This is a house listed for sale through ${args.context.sourceLabel}. Buying it works the same way as buying any house: make an offer, get an inspection, line up a loan, close. This profile pulls together what we could verify about the place — flood risk, schools, what it costs to buy and own — so you can decide whether it deserves an offer.`,
     };
   }
 
@@ -1461,7 +1521,7 @@ function buildReportModel(args: {
   // once). Scores are internal ranking signals, never customer copy.
   const executiveSummary = [
     args.topProgramRanks[0]
-      ? `The most likely financing starting point here is ${args.topProgramRanks[0].program.name.replace(/ context$/i, "")} — a lender confirms what fits your situation.`
+      ? `${args.topProgramRanks[0].program.name.replace(/ context$/i, "")} is usually the first financing lane checked for a property like this — it is not the only one. The financing section lists every lane that could fit, most likely first. Which lane you qualify for comes down to credit, income, and whether you will live here; already owning a home does not by itself rule these out — most programs simply ask that this one become your primary residence. A lender confirms the fit in one conversation.`
       : "",
     args.immediateSuitability.constraints[0] ? `First thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
   ].filter(Boolean).join(" ");
@@ -1692,6 +1752,9 @@ export function PropertyEvaluationWorkspace({
   placeIntelligence = null,
   chartVariant = "buyer",
   deepView = false,
+  ownershipContext = null,
+  listedPrice = null,
+  similarHomes = [],
 }: {
   context: PropertyContext;
   tierPreviewMode: boolean;
@@ -1702,6 +1765,14 @@ export function PropertyEvaluationWorkspace({
   chartVariant?: ChartVariant;
   /** Render the deeper-analysis workspace as the page (same-tab ?view=deep). */
   deepView?: boolean;
+  /** Server-resolved snapshot slice for the ownership-cost model (founder
+      direction 2026-07-17) — rates, county tax medians, state electricity. */
+  ownershipContext?: OwnershipCostContext | null;
+  /** Listed price from the canonical source record (server-resolved — the
+      priceLabel param may carry only a band). Null → panel asks the visitor. */
+  listedPrice?: number | null;
+  /** Server-selected alternatives from the tracked government inventory. */
+  similarHomes?: SimilarHomeLine[];
 }) {
   const [navigator, setNavigator] = useState<NavigatorSnapshot | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
@@ -2402,6 +2473,26 @@ export function PropertyEvaluationWorkspace({
               source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
             })),
             diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
+            ownershipCosts:
+              listedPrice != null && ownershipContext && chartVariant !== "finance" && chartVariant !== "commercial"
+                ? formatOwnershipCostsForPdf({
+                    listedPrice,
+                    ownershipContext,
+                    isHome: isResidentialHomeContext(analysisContext),
+                    farmShaped: /farm|ranch|agric/i.test(analysisContext.propertyType),
+                  })
+                : undefined,
+            similarHomes: similarHomes.length
+              ? similarHomes.map((home) => ({
+                  title: home.title,
+                  detail:
+                    `${home.priceLabel}` +
+                    (home.comparison === "lower" ? " (less than this one)" : home.comparison === "higher" ? " (more than this one)" : home.comparison === "similar" ? " (about the same)" : "") +
+                    ` · ${home.location}` +
+                    (home.distanceMiles != null ? ` · ~${home.distanceMiles} mi away` : "") +
+                    ` · ${home.sourceLabel}${home.isCurrent ? "" : ` · ${home.vintage}`}`,
+                }))
+              : undefined,
             customerRights: buildCustomerRightsSummary(),
             humanReviewBoundary: buildHumanReviewBoundary({
               tier: { id: answers.reportTier, label: report.tier.label },
@@ -2584,6 +2675,20 @@ export function PropertyEvaluationWorkspace({
         pauseLine={answerCard.pauseLine}
         intelligence={effectivePlaceIntelligence}
         financingLanes={topProgramPreview}
+        costsSlot={
+          // The finance lens carries no products/terms/rates (counsel gate);
+          // the residential program table doesn't fit commercial assets.
+          ownershipContext && chartVariant !== "finance" && chartVariant !== "commercial" ? (
+            <OwnershipCostPanel
+              theme={CHART_THEMES[chartVariant]}
+              context={ownershipContext}
+              listedPrice={listedPrice}
+              isHome={isResidentialHomeContext(analysisContext)}
+              farmShaped={/farm|ranch|agric/i.test(analysisContext.propertyType)}
+            />
+          ) : null
+        }
+        similarHomes={similarHomes}
         actionsSlot={
           <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
 	        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>

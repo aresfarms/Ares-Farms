@@ -1,0 +1,271 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
+import type { ChartTheme } from "@/lib/property/chartThemes";
+import {
+  buildOwnershipCostModel,
+  type OwnershipCostContext,
+} from "@/lib/property/ownershipCostModel";
+
+/**
+ * OwnershipCostPanel — "what it costs to buy, and then what it costs to KEEP"
+ * (founder direction 2026-07-17). Renders inside the Chart Table as its own
+ * waypoint: cash-to-close by financing lane, the full monthly bill including
+ * the costs people underestimate (taxes, insurance, electricity, maintenance),
+ * and the years-1–5 total. Pure client math over a tiny server-resolved
+ * context slice; every figure is labeled illustrative guidance.
+ *
+ * Price-on-request listings ask the visitor for the price they would offer —
+ * that number stays on this page (component state only; never sent anywhere).
+ */
+
+const fmt = (n: number): string => `$${n.toLocaleString("en-US")}`;
+
+export interface OwnershipCostPanelProps {
+  theme: ChartTheme;
+  context: OwnershipCostContext;
+  /** Listed price when the source record carries one; null → ask the visitor. */
+  listedPrice: number | null;
+  isHome: boolean;
+  farmShaped: boolean;
+}
+
+export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
+  const { theme } = props;
+  const [assumedPrice, setAssumedPrice] = useState<number | null>(null);
+  const [priceInput, setPriceInput] = useState("");
+
+  const price = assumedPrice ?? props.listedPrice;
+  const priceIsAssumption = assumedPrice !== null;
+
+  const model = useMemo(
+    () =>
+      price != null
+        ? buildOwnershipCostModel(
+            {
+              price,
+              priceIsAssumption,
+              isHome: props.isHome,
+              farmShaped: props.farmShaped,
+            },
+            props.context
+          )
+        : null,
+    [price, priceIsAssumption, props.isHome, props.farmShaped, props.context]
+  );
+
+  const applyPriceInput = () => {
+    const parsed = Number(priceInput.replace(/[^0-9.]/g, ""));
+    if (Number.isFinite(parsed) && parsed >= 10_000) setAssumedPrice(Math.round(parsed));
+  };
+
+  const cellStyle: React.CSSProperties = {
+    padding: "7px 10px",
+    fontSize: 12.5,
+    color: theme.ink,
+    borderBottom: `1px solid ${theme.cellBorder}`,
+    textAlign: "left" as const,
+    verticalAlign: "top" as const,
+  };
+  const headStyle: React.CSSProperties = {
+    ...cellStyle,
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase" as const,
+    color: theme.inkSoft,
+  };
+
+  return (
+    <div style={{ display: "grid", gap: 14 }}>
+      {/* Price line / assumption input */}
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          alignItems: "center",
+          flexWrap: "wrap",
+          fontSize: 13,
+          color: theme.inkSoft,
+        }}
+      >
+        {price != null ? (
+          <span>
+            Figured at <strong style={{ color: theme.ink }}>{fmt(price)}</strong>
+            {priceIsAssumption
+              ? " — the price you entered."
+              : " — the listed price. Try a different number any time:"}
+          </span>
+        ) : (
+          <span>
+            This listing does not publish a price. Enter the price you would offer and the numbers
+            fill in — the number stays on this page:
+          </span>
+        )}
+        <span style={{ display: "inline-flex", gap: 6 }}>
+          <input
+            inputMode="numeric"
+            aria-label="Price to estimate with, dollars"
+            placeholder="e.g. 250,000"
+            value={priceInput}
+            onChange={(event) => setPriceInput(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") applyPriceInput();
+            }}
+            style={{
+              font: "inherit",
+              fontSize: 13,
+              width: 120,
+              padding: "6px 10px",
+              borderRadius: 8,
+              border: `1px solid ${theme.plateBorder}`,
+              background: theme.cellBg,
+              color: theme.ink,
+            }}
+          />
+          <button
+            type="button"
+            onClick={applyPriceInput}
+            style={{
+              font: "inherit",
+              fontSize: 12.5,
+              fontWeight: 800,
+              padding: "6px 14px",
+              borderRadius: 8,
+              border: `1px solid ${theme.accent}`,
+              background: "transparent",
+              color: theme.accent,
+              cursor: "pointer",
+            }}
+          >
+            Estimate
+          </button>
+        </span>
+      </div>
+
+      {model && (
+        <>
+          {/* ── Cash to close ─────────────────────────────────────────── */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent, marginBottom: 6 }}>
+              Cash to close, by financing lane
+            </div>
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", background: theme.cellBg, borderRadius: 10 }}>
+                <thead>
+                  <tr>
+                    <th style={headStyle}>Lane</th>
+                    <th style={headStyle}>Down payment</th>
+                    <th style={headStyle}>Monthly P&amp;I</th>
+                    <th style={headStyle}>Mortgage ins.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {model.purchase.scenarios.map((s) => (
+                    <tr key={s.program}>
+                      <td style={cellStyle}>
+                        <strong>{s.program}</strong>
+                        <div style={{ fontSize: 11.5, color: theme.inkFaint, marginTop: 2 }}>{s.fit}</div>
+                        {s.upfrontFeeNote && (
+                          <div style={{ fontSize: 11.5, color: theme.inkFaint, marginTop: 2 }}>{s.upfrontFeeNote}</div>
+                        )}
+                      </td>
+                      <td style={cellStyle}>
+                        {s.downPayment === 0 ? "$0" : fmt(s.downPayment)}
+                        <div style={{ fontSize: 11.5, color: theme.inkFaint }}>{s.downPaymentPct}%</div>
+                      </td>
+                      <td style={cellStyle}>{fmt(s.monthlyPrincipalInterest)}/mo</td>
+                      <td style={cellStyle}>
+                        {s.monthlyMortgageInsurance > 0 ? `${fmt(s.monthlyMortgageInsurance)}/mo` : "None"}
+                        {s.mortgageInsuranceNote && (
+                          <div style={{ fontSize: 11.5, color: theme.inkFaint, marginTop: 2 }}>{s.mortgageInsuranceNote}</div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p style={{ margin: "8px 0 0", fontSize: 12.5, lineHeight: 1.6, color: theme.inkSoft }}>
+              On top of the down payment, closing costs typically run{" "}
+              <strong style={{ color: theme.ink }}>
+                {fmt(model.purchase.closingLow)}–{fmt(model.purchase.closingHigh)}
+              </strong>
+              . {model.purchase.closingNote} Inspection and insurance set-up costs are itemized in the
+              diligence section above.
+            </p>
+          </div>
+
+          {/* ── The monthly bill beyond the mortgage ──────────────────── */}
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent, marginBottom: 6 }}>
+              The rest of the monthly bill — the part people underestimate
+            </div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {model.monthly.map((line) => (
+                <div
+                  key={line.label}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "minmax(120px, 170px) minmax(90px, 130px) 1fr",
+                    gap: 10,
+                    padding: "7px 10px",
+                    background: theme.cellBg,
+                    border: `1px solid ${theme.cellBorder}`,
+                    borderRadius: 8,
+                    alignItems: "baseline",
+                  }}
+                >
+                  <strong style={{ fontSize: 12.5, color: theme.ink }}>{line.label}</strong>
+                  <span style={{ fontSize: 12.5, color: theme.ink, whiteSpace: "nowrap" }}>
+                    {fmt(line.low)}–{fmt(line.high)}/mo
+                  </span>
+                  <span style={{ fontSize: 11.5, lineHeight: 1.55, color: theme.inkFaint }}>
+                    {line.note} <em>[{line.provenance}]</em>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Totals + five-year view ───────────────────────────────── */}
+          <div
+            style={{
+              display: "grid",
+              gap: 8,
+              padding: "12px 14px",
+              border: `1px solid ${theme.plateBorder}`,
+              borderRadius: 10,
+              background: theme.plate,
+            }}
+          >
+            {model.monthlyTotals.map((total) => (
+              <div key={total.program} style={{ fontSize: 13, color: theme.ink }}>
+                All-in monthly on <strong>{total.program}</strong>:{" "}
+                <strong style={{ color: theme.accent }}>
+                  {fmt(total.low)}–{fmt(total.high)}
+                </strong>
+              </div>
+            ))}
+            <div style={{ fontSize: 13, color: theme.ink }}>
+              Years 1–5, everything included:{" "}
+              <strong style={{ color: theme.accent }}>
+                {fmt(model.fiveYear.cumulativeLow)}–{fmt(model.fiveYear.cumulativeHigh)}
+              </strong>
+            </div>
+            <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: theme.inkSoft }}>{model.fiveYear.note}</p>
+          </div>
+
+          <div style={{ display: "grid", gap: 4 }}>
+            {model.disclaimers.map((line) => (
+              <p key={line} style={{ margin: 0, fontSize: 11.5, lineHeight: 1.55, color: theme.inkFaint }}>
+                {line}
+              </p>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

@@ -6,6 +6,9 @@ import { PropertyPlaceIntelligence } from "@/components/property/PropertyPlaceIn
 import { buildPropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import type { ChartVariant } from "@/lib/property/chartThemes";
 import { resolveDiscoveryFlow, isPlaceFirstFlow } from "@/lib/discovery/discoveryFlow";
+import { resolveOwnershipCostContext } from "@/lib/property/ownershipCostContext";
+import { findCanonicalPropertyById } from "@/lib/property/propertyData";
+import { similarNearbyProperties } from "@/lib/property/similarNearbyProperties";
 
 /**
  * /discover — the discovery front door. The journey is chosen UP FRONT by the
@@ -250,6 +253,30 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
       })
     : null;
 
+  // Ownership-cost context (founder direction 2026-07-17): the server slices
+  // the committed snapshots (PMMS rates, county tax medians, state
+  // electricity) to the few numbers the pure client model needs, resolves the
+  // real listed price from the canonical record (the priceLabel param may
+  // carry only a band), and picks similar alternatives from the tracked
+  // government inventory. Imported addresses get rates/electricity context
+  // too — the model falls back to labeled national tax guidance.
+  const isCanonicalSubject = Boolean(
+    propertyContext?.propertyId && !propertyContext.propertyId.startsWith("imported:")
+  );
+  const canonicalSubject = isCanonicalSubject
+    ? findCanonicalPropertyById(propertyContext!.propertyId!)
+    : null;
+  const ownershipContext = propertyContext
+    ? resolveOwnershipCostContext(
+        propertyContext.stateCode,
+        briefIntelligence?.resolvedCounty?.fips ?? null
+      )
+    : null;
+  const listedPrice = canonicalSubject?.source_records[0]?.price ?? null;
+  const similarHomes = isCanonicalSubject
+    ? similarNearbyProperties(propertyContext!.propertyId!)
+    : [];
+
   return (
     <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
       {propertyContext ? (
@@ -262,6 +289,9 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
             placeIntelligence={briefIntelligence}
             chartVariant={chartVariant}
             deepView={one(query.view) === "deep"}
+            ownershipContext={ownershipContext}
+            listedPrice={listedPrice}
+            similarHomes={similarHomes}
           />
         </>
       ) : (

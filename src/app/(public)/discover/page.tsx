@@ -261,6 +261,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
             tierPreviewMode={tierPreviewMode}
             placeIntelligence={briefIntelligence}
             chartVariant={chartVariant}
+            deepView={one(query.view) === "deep"}
           />
         </>
       ) : (

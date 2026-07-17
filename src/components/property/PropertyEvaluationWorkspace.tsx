@@ -10,6 +10,7 @@ import {
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import { ChartTableBrief } from "@/components/property/ChartTableBrief";
+import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import type { ChartVariant } from "@/lib/property/chartThemes";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
@@ -1686,6 +1687,7 @@ export function PropertyEvaluationWorkspace({
   addressFirstFlow,
   placeIntelligence = null,
   chartVariant = "buyer",
+  deepView = false,
 }: {
   context: PropertyContext;
   tierPreviewMode: boolean;
@@ -1694,12 +1696,14 @@ export function PropertyEvaluationWorkspace({
   placeIntelligence?: PropertyBriefIntelligence | null;
   /** Chart Table audience lens (buyer | environmental | finance | commercial). */
   chartVariant?: ChartVariant;
+  /** Render the deeper-analysis workspace as the page (same-tab ?view=deep). */
+  deepView?: boolean;
 }) {
   const [navigator, setNavigator] = useState<NavigatorSnapshot | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
-  const [pdfBusy, setPdfBusy] = useState<"export" | "print" | null>(null);
+  const [pdfBusy, setPdfBusy] = useState<"export" | "print" | "view" | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [manualReviewBusy, setManualReviewBusy] = useState(false);
   const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
@@ -2169,6 +2173,25 @@ export function PropertyEvaluationWorkspace({
     restrictionsPresent: (facts?.verification?.restrictions?.length ?? 0) > 0,
   });
   const answerChips = effectivePlaceIntelligence?.chips ?? [];
+  const baseHref = buildPropertyAnalysisHref({
+    propertyId: context.propertyId ?? "",
+    title: context.title,
+    location: context.location,
+    propertyType: context.propertyType,
+    priceLabel: context.priceLabel,
+    vintage: context.vintage ?? "",
+    sourceLabel: context.sourceLabel,
+    pathways: context.pathwayList,
+    town: context.town,
+    county: context.county,
+    state: context.stateCode,
+    sourceId: context.sourceId,
+    exactAddress: context.exactAddress,
+    listingUrl: context.listingUrl,
+    currentLabel: context.currentLabel,
+  });
+  const deepHref = `${baseHref}&view=deep`;
+  const chartHref = baseHref;
   const report = buildReportModel({
     context: analysisContext,
     answers,
@@ -2409,6 +2432,38 @@ export function PropertyEvaluationWorkspace({
     }
   }
 
+  function viewPdfTab() {
+    // SECURITY: the window is opened SYNCHRONOUSLY on the click (popup-blocker
+    // safe), its opener is severed (no reverse-tabnabbing), and the PDF loads
+    // from an ephemeral same-origin blob URL — no server-stored file, nothing
+    // enumerable, revoked after handoff. The attestation flow is unchanged.
+    const viewer = window.open("about:blank", "_blank");
+    if (viewer) viewer.opener = null;
+    void (async () => {
+      setPdfBusy("view");
+      try {
+        const payload = await requestReportPdf();
+        if (!payload) {
+          viewer?.close();
+          return;
+        }
+        const url = window.URL.createObjectURL(payload.blob);
+        if (viewer) {
+          viewer.location = url;
+        } else {
+          // Popup blocked: fall back to download.
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = `${payload.fileStem}.pdf`;
+          anchor.click();
+        }
+        window.setTimeout(() => window.URL.revokeObjectURL(url), 60_000);
+      } finally {
+        setPdfBusy(null);
+      }
+    })();
+  }
+
   function exportDraft() {
     void (async () => {
       setPdfBusy("export");
@@ -2499,6 +2554,7 @@ export function PropertyEvaluationWorkspace({
 
   return (
     <section style={{ display: "grid", gap: 22 }}>
+      {!deepView && (
       <ChartTableBrief
         variant={chartVariant}
         title={context.title}
@@ -2525,8 +2581,11 @@ export function PropertyEvaluationWorkspace({
           <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
             Save draft in this session
           </button>
-          <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-            {pdfBusy === "export" ? "Preparing PDF export..." : "Export watermarked report"}
+          <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+            {pdfBusy === "view" ? "Opening PDF..." : "View watermarked PDF ↗"}
+          </button>
+          <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+            {pdfBusy === "export" ? "Preparing PDF export..." : "Download PDF"}
           </button>
           <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
             {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
@@ -2545,6 +2604,7 @@ export function PropertyEvaluationWorkspace({
           </div>
         }
       />
+      )}
       {/* Imported-address verification status stays visible below the chart. */}
       <div style={{ display: "grid", gap: 16 }}>
 	        {context.propertyId?.startsWith("imported:") && (
@@ -2689,10 +2749,18 @@ export function PropertyEvaluationWorkspace({
         )}
       </div>
 
-      <details style={{ ...detailsStyle, background: "#ffffff", padding: "16px 18px" }}>
-        <summary style={{ ...summaryStyle, fontSize: 14 }}>
-          Open the deeper analysis workspace
-        </summary>
+      {/* Deeper analysis: a DEDICATED PAGE in the same tab (?view=deep) so the
+          in-session draft (sessionStorage, per-tab by privacy design) rides
+          along; browser Back returns to the chart. Not a new window: separate
+          windows would silently drop the visitor's draft answers. */}
+      {deepView ? (
+        <section style={{ display: "grid", gap: 16 }}>
+          <a
+            href={chartHref}
+            style={{ fontSize: 13.5, fontWeight: 700, color: "#0f766e", textDecoration: "underline", textUnderlineOffset: 2, justifySelf: "start" }}
+          >
+            ← Back to the property chart
+          </a>
         <div style={{ paddingTop: 16 }}>
       <div style={{ display: "grid", gap: 20, gridTemplateColumns: "minmax(0, 1.18fr) minmax(340px, 0.92fr)", alignItems: "start" }}>
         <div style={{ display: "grid", gap: 22 }}>
@@ -3125,7 +3193,26 @@ export function PropertyEvaluationWorkspace({
         </aside>
       </div>
         </div>
-      </details>
+        </section>
+      ) : (
+        <a
+          href={deepHref}
+          data-testid="open-deep-analysis"
+          style={{
+            display: "block",
+            border: "1px solid #d7deea",
+            borderRadius: 14,
+            background: "#ffffff",
+            padding: "16px 18px",
+            fontSize: 14.5,
+            fontWeight: 700,
+            color: "#162033",
+            textDecoration: "none",
+          }}
+        >
+          Open the deeper analysis workspace → <span style={{ fontWeight: 400, color: "#5d687a", fontSize: 12.5 }}>full-page, your draft answers come with you</span>
+        </a>
+      )}
 
       {/* Switch-property moved from the page top to a quiet, collapsed rail at
           the end (redesign Phase 1): the visitor came to evaluate THIS

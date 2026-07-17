@@ -31,6 +31,11 @@ const SCANNED_FILES = [
   "src/components/property/PropertyHub.tsx",
   "src/components/discovery/PlaceFirstDiscovery.tsx",
   "src/app/(public)/explore/page.tsx",
+  "src/app/(public)/compass/page.tsx",
+  "src/app/(public)/financing-pathways/page.tsx",
+  "src/app/(public)/readiness/page.tsx",
+  "src/app/portal/property-discovery/page.tsx",
+  "src/app/portal/borrower/environmental-intake/page.tsx",
 ];
 
 interface Rule {

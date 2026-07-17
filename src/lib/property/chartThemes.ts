@@ -336,6 +336,93 @@ export const CHART_TONES: Record<ChartTone, ChartToneTokens> = {
   },
 };
 
+/**
+ * chartSurface — shared page-surface styles for a chart variant (Chart Table
+ * cohesion rollout). Module pages (compass, financing-pathways, readiness,
+ * intake, portal surfaces) consume these instead of re-declaring panel/input/
+ * badge hexes. All values derive from CHART_THEMES; the signal hues match
+ * ChartTableBrief's signal-flag family (green=clear, amber=review, red=blocked).
+ */
+export function chartSurface(variant: ChartVariant) {
+  const t = CHART_THEMES[variant];
+  return {
+    theme: t,
+    /** The stage the whole page sits on (rounded dark panel on the light shell). */
+    container: {
+      maxWidth: 1180,
+      margin: "0 auto",
+      padding: "28px 24px 48px",
+      display: "grid",
+      gap: 18,
+      background: t.stage,
+      borderRadius: 20,
+      color: t.ink,
+    },
+    /** Instrument plate — primary sections. */
+    panel: {
+      background: t.plate,
+      border: `1px solid ${t.plateBorder}`,
+      borderRadius: 12,
+    },
+    /** Fact cell — inner cards, chips, source rows. */
+    cell: {
+      background: t.cellBg,
+      border: `1px solid ${t.cellBorder}`,
+      borderRadius: 10,
+    },
+    kicker: {
+      fontSize: 11,
+      fontWeight: 800,
+      letterSpacing: "0.18em",
+      textTransform: "uppercase",
+      color: t.accent,
+    },
+    muted: { color: t.inkSoft, lineHeight: 1.6 },
+    label: { color: t.inkSoft, fontSize: 13, fontWeight: 800 },
+    input: {
+      width: "100%",
+      minHeight: 42,
+      border: `1px solid ${t.plateBorder}`,
+      borderRadius: 8,
+      padding: "8px 10px",
+      fontSize: 14,
+      color: t.ink,
+      background: t.cellBg,
+    },
+    link: { color: t.accent, fontWeight: 800, textDecoration: "none" },
+    /** Brand CTA (same honey button family as the discovery form). */
+    primaryButton: {
+      minHeight: 42,
+      border: 0,
+      borderRadius: 999,
+      padding: "0 18px",
+      background: "#854F0B",
+      color: "#ffffff",
+      fontWeight: 800,
+    },
+    primaryButtonBusyBg: "#9a6730",
+    errorPanel: {
+      border: "1px solid rgba(207, 138, 74, 0.55)",
+      background: "rgba(201, 111, 82, 0.14)",
+      color: "#f19c8e",
+      borderRadius: 10,
+      padding: 12,
+      fontWeight: 700,
+    },
+    /** Progress meter — track + the signal-flag hues. */
+    meterTrack: "rgba(255, 255, 255, 0.12)",
+    meterGood: "#6fbf8f",
+    meterWarn: "#e2b34c",
+    /** Status badge tones (signal-flag family, legible on every stage). */
+    badges: {
+      ready: { background: "rgba(111, 191, 143, 0.16)", color: "#6fbf8f" },
+      review: { background: "rgba(226, 179, 76, 0.16)", color: "#e2b34c" },
+      blocked: { background: "rgba(207, 138, 74, 0.18)", color: "#f19c8e" },
+      neutral: { background: "rgba(255, 255, 255, 0.08)", color: t.inkSoft },
+    },
+  } as const;
+}
+
 /** Order facts for a lens: priority labels first (in order), the rest after. */
 export function orderFactsForLens<T extends { label: string }>(
   facts: T[],

@@ -801,8 +801,10 @@ function buildUnknowns(args: {
     url: "https://cde.ucr.cjis.gov/",
     howToFind:
       "Furlong links official statistics and never characterizes an area. The FBI's Crime Data " +
-      "Explorer publishes agency-level figures, and the local police or sheriff's office publishes " +
-      "local reports — read them alongside your own visits at different times of day.",
+      `Explorer publishes agency-level figures — search it for ${
+        args.resolvedCounty ? `${args.resolvedCounty.name} agencies` : "the county's agencies"
+      } — and the local police or sheriff's office publishes local reports. Read them alongside ` +
+      "your own visits at different times of day.",
   });
   const taxCounty = args.resolvedCounty
     ? `The ${args.resolvedCounty.name} treasurer/appraiser site`

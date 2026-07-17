@@ -48,7 +48,7 @@ import type { PropertySourceId } from "@/lib/property/propertyTypes";
  * personal data leaves Furlong; the provider's own intake handles any data).
  */
 
-const muted = { color: "#5d687a", lineHeight: 1.6 } as const;
+const muted = { color: "#b7ccd9", lineHeight: 1.6 } as const;
 
 /**
  * Honest price label. The feed's listed/asking price — NOT Furlong's valuation,
@@ -172,7 +172,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
       }}
     >
       <div style={{ display: "grid", gap: 6 }}>
-        <strong style={{ fontSize: 20, color: "#162033" }}>Start with a property two different ways.</strong>
+        <strong style={{ fontSize: 20, color: "#eaf3f7" }}>Start with a property two different ways.</strong>
         <p style={{ margin: 0, fontSize: 14.5, ...muted, maxWidth: 760 }}>
           Browse what is actually available, or verify a specific address right now. Either way, the next step
           is the same analysis workspace.
@@ -192,7 +192,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
           style={{
             border: "1px solid #d7deea",
             borderRadius: 14,
-            background: "#ffffff",
+            background: "rgba(9, 28, 41, 0.8)",
             padding: "18px 18px",
             display: "grid",
             gap: 12,
@@ -200,10 +200,10 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
           }}
         >
           <div style={{ display: "grid", gap: 6 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#0f766e" }}>
+            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#7fc4b8" }}>
               Option 1
             </span>
-            <strong style={{ fontSize: 17, color: "#162033" }}>Browse current inventory</strong>
+            <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Browse current inventory</strong>
             <p style={{ margin: 0, fontSize: 13.5, ...muted }}>
               Start from live listings already in the hub, then open any property and move straight into analysis.
             </p>
@@ -226,7 +226,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
             >
               Browse by category
             </a>
-            <span style={{ fontSize: 13, color: "#5d687a", alignSelf: "center" }}>
+            <span style={{ fontSize: 13, color: "#b7ccd9", alignSelf: "center" }}>
               {tree.liveTotal.toLocaleString("en-US")} live listings across {tree.categories.length} categories
             </span>
           </div>
@@ -236,17 +236,17 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
           style={{
             border: "1px solid #d7deea",
             borderRadius: 14,
-            background: "#ffffff",
+            background: "rgba(9, 28, 41, 0.8)",
             padding: "18px 18px",
             display: "grid",
             gap: 12,
           }}
         >
           <div style={{ display: "grid", gap: 6 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#854F0B" }}>
+            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#d4b06a" }}>
               Option 2
             </span>
-            <strong style={{ fontSize: 17, color: "#162033" }}>Enter a specific address</strong>
+            <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Enter a specific address</strong>
             <p style={{ margin: 0, fontSize: 13.5, ...muted }}>
               Verify the address first, pull in Furlong&apos;s place-facts, and take that directly into the same analysis flow.
             </p>
@@ -270,7 +270,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
 function Header({ sources }: { sources: ReturnType<typeof propertySourceStatuses> }) {
   return (
     <header style={{ display: "grid", gap: 10 }}>
-      <span style={{ fontSize: 13, fontWeight: 700, color: "#0f766e", textTransform: "uppercase", letterSpacing: 0.4 }}>
+      <span style={{ fontSize: 13, fontWeight: 700, color: "#7fc4b8", textTransform: "uppercase", letterSpacing: 0.4 }}>
         Property &amp; land — no account needed
       </span>
       <h1 style={{ margin: 0, fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.12 }}>
@@ -282,7 +282,7 @@ function Header({ sources }: { sources: ReturnType<typeof propertySourceStatuses
         listing are <strong>verified property-side facts</strong>, never assumptions. Furlong is advisory
         only — we don&apos;t lend, approve, or determine eligibility. Pathways, not promises.
       </p>
-      <p style={{ margin: 0, fontSize: 13, color: "#7a8aa0" }}>
+      <p style={{ margin: 0, fontSize: 13, color: "#7ea4bb" }}>
         {sources.map((s) => `${s.sourceName}: ${s.live ? "live" : "pending review"} (${s.total.toLocaleString("en-US")})`).join(" · ")} · public-domain open data
       </p>
     </header>
@@ -324,8 +324,8 @@ function CategoryGrid({ tree }: { tree: ReturnType<typeof buildCategoryTree> }) 
   return (
     <section id="browse-by-category" aria-label="Browse by category" style={{ display: "grid", gap: 14 }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>Browse by category</h2>
-        <span style={{ fontSize: 14, color: "#5d687a" }}>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#eaf3f7" }}>Browse by category</h2>
+        <span style={{ fontSize: 14, color: "#b7ccd9" }}>
           {tree.liveTotal.toLocaleString("en-US")} listings across {tree.categories.length}{" "}
           {tree.categories.length === 1 ? "category" : "categories"}
         </span>
@@ -335,10 +335,10 @@ function CategoryGrid({ tree }: { tree: ReturnType<typeof buildCategoryTree> }) 
           <li key={c.id}>
             <Link href={catHref(c.id)} style={cardLink}>
               <span style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
-                <strong style={{ fontSize: 17, color: "#162033" }}>{c.label}</strong>
+                <strong style={{ fontSize: 17, color: "#eaf3f7" }}>{c.label}</strong>
                 <span style={countPill}>{c.count.toLocaleString("en-US")}</span>
               </span>
-              <span style={{ fontSize: 13, color: "#5d687a" }}>
+              <span style={{ fontSize: 13, color: "#b7ccd9" }}>
                 {c.states.length} {c.states.length === 1 ? "state" : "states"} with inventory →
               </span>
             </Link>
@@ -355,8 +355,8 @@ function StateList({ category }: { category: ReturnType<typeof buildCategoryTree
     <section aria-label={`${category.label} — states with inventory`} style={{ display: "grid", gap: 14 }}>
       <Breadcrumb categoryLabel={category.label} />
       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>{category.label}</h2>
-        <span style={{ fontSize: 14, color: "#5d687a" }}>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#eaf3f7" }}>{category.label}</h2>
+        <span style={{ fontSize: 14, color: "#b7ccd9" }}>
           {category.count.toLocaleString("en-US")} listings in {category.states.length}{" "}
           {category.states.length === 1 ? "state" : "states"}
         </span>
@@ -365,7 +365,7 @@ function StateList({ category }: { category: ReturnType<typeof buildCategoryTree
         {category.states.map((s) => (
           <li key={s.abbr}>
             <Link href={stateHref(category.id, s.abbr)} style={{ ...cardLink, flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
-              <strong style={{ fontSize: 15, color: "#162033" }}>{stateName(s.abbr)}</strong>
+              <strong style={{ fontSize: 15, color: "#eaf3f7" }}>{stateName(s.abbr)}</strong>
               <span style={countPill}>{s.count.toLocaleString("en-US")}</span>
             </Link>
           </li>
@@ -398,7 +398,7 @@ function Listings({
   return (
     <section aria-label={`${categoryLabel} in ${stateName(abbr)}`} style={{ display: "grid", gap: 14 }}>
       <Breadcrumb categoryLabel={categoryLabel} categoryId={categoryId} stateAbbr={abbr} />
-      <p style={{ margin: 0, fontSize: 14, color: "#5d687a" }}>
+      <p style={{ margin: 0, fontSize: 14, color: "#b7ccd9" }}>
         {(listings.length + direct.length).toLocaleString("en-US")} {listings.length + direct.length === 1 ? "property" : "properties"} ·{" "}
         {categoryLabel} in {stateName(abbr)} —{" "}
         <strong>{(currentCount + direct.length).toLocaleString("en-US")} current</strong>
@@ -430,8 +430,8 @@ function Listings({
                 }}
               />
               <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-                <strong style={{ fontSize: 17, color: "#162033" }}>{d.town}, {stateName(d.state)}</strong>
-                <span style={{ fontSize: 15, fontWeight: 700, color: "#5d687a" }}>
+                <strong style={{ fontSize: 17, color: "#eaf3f7" }}>{d.town}, {stateName(d.state)}</strong>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#b7ccd9" }}>
                   {d.price && d.price > 0 ? `List price: $${d.price.toLocaleString("en-US")} · as of ${d.asOf} · subject to change` : "Price on request"}
                 </span>
               </div>
@@ -447,8 +447,8 @@ function Listings({
                 </span>
               )}
               <p style={{ margin: 0, fontSize: 14, ...muted }}>{d.description}</p>
-              <p style={{ margin: 0, fontSize: 12, color: "#7a8aa0" }}>{d.venueDisclaimer}</p>
-              <p style={{ margin: 0, fontSize: 11, color: "#7a8aa0" }}>{d.freshnessNotice}</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#7ea4bb" }}>{d.venueDisclaimer}</p>
+              <p style={{ margin: 0, fontSize: 11, color: "#7ea4bb" }}>{d.freshnessNotice}</p>
               <DirectFinanceBridge categoryId={categoryId} />
             </li>
           ))}
@@ -457,7 +457,7 @@ function Listings({
 
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 14 }}>
         {listings.map((p) => (
-          <li key={p.id} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#ffffff", padding: "18px 20px", display: "grid", gap: 8 }}>
+          <li key={p.id} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)", padding: "18px 20px", display: "grid", gap: 8 }}>
             <PropertyBriefLauncher
               property={{
                 id: p.id,
@@ -488,10 +488,10 @@ function Listings({
               }}
             />
             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-              <strong style={{ fontSize: 17, color: "#162033" }}>
+              <strong style={{ fontSize: 17, color: "#eaf3f7" }}>
                 {locationLine(p.town, p.county, p.state)}
               </strong>
-              <span style={{ fontSize: 15, fontWeight: 700, color: "#5d687a" }}>
+              <span style={{ fontSize: 15, fontWeight: 700, color: "#b7ccd9" }}>
                 {priceLabel(p.price, p.sourceId)}
               </span>
             </div>
@@ -509,13 +509,13 @@ function Listings({
                 : `${p.vintageStamp} — historical · verify current availability`}
             </span>
             {p.asOf && (
-              <div style={{ fontSize: 11, color: "#7a8aa0" }}>
+              <div style={{ fontSize: 11, color: "#7ea4bb" }}>
                 as of {new Date(p.asOf).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                 {p.isCurrent ? " (source snapshot)" : ""}
               </div>
             )}
             {p.exactAddress && (
-              <div style={{ fontSize: 14, color: "#162033" }}>{p.exactAddress}{p.zip ? `, ${p.state} ${p.zip}` : ""}</div>
+              <div style={{ fontSize: 14, color: "#eaf3f7" }}>{p.exactAddress}{p.zip ? `, ${p.state} ${p.zip}` : ""}</div>
             )}
 
             {/* Place-fact attribute (6 / OZ): coarse tract-level government fact —
@@ -542,10 +542,10 @@ function Listings({
                 program hedge. Programs now render ONLY as verified facts via
                 ProgramMatchesWithPlaceFacts below. */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", alignItems: "center" }}>
-              <a href={p.listingUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 700, color: "#0f766e", textDecoration: "underline" }}>
+              <a href={p.listingUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 700, color: "#7fc4b8", textDecoration: "underline" }}>
                 {p.sourceId === "hud" ? "View on HUD Home Store ↗" : p.sourceId === "treasury" ? "View on Treasury auctions ↗" : p.sourceId === "gsa-realestate" ? "View on GSA realestatesales.gov ↗" : "View on USDA resales portal ↗"}
               </a>
-              <span style={{ fontSize: 12, color: "#7a8aa0" }}>{p.sourceCitation} · {p.vintageStamp}</span>
+              <span style={{ fontSize: 12, color: "#7ea4bb" }}>{p.sourceCitation} · {p.vintageStamp}</span>
             </div>
 
             {/* Save (in-session, no account, no PII) — the property's own public
@@ -768,10 +768,10 @@ function Breadcrumb({
         <>
           <Link href={catHref(categoryId)} style={crumbLink}>{categoryLabel}</Link>
           <span aria-hidden="true" style={{ color: "#9db4d8" }}>›</span>
-          <span style={{ color: "#162033", fontWeight: 700 }}>{stateName(stateAbbr)}</span>
+          <span style={{ color: "#eaf3f7", fontWeight: 700 }}>{stateName(stateAbbr)}</span>
         </>
       ) : (
-        <span style={{ color: "#162033", fontWeight: 700 }}>{categoryLabel}</span>
+        <span style={{ color: "#eaf3f7", fontWeight: 700 }}>{categoryLabel}</span>
       )}
     </nav>
   );
@@ -790,13 +790,24 @@ function stateHref(categoryId: string, abbr: string): string {
 
 const cardLink = {
   display: "flex", flexDirection: "column", gap: 6,
-  border: "1px solid #d7deea", borderRadius: 12, background: "#ffffff",
+  border: "1px solid #d7deea", borderRadius: 12, background: "rgba(9, 28, 41, 0.8)",
   padding: "16px 18px", textDecoration: "none", height: "100%",
 } as const;
 const countPill = {
-  fontSize: 13, fontWeight: 700, color: "#0f766e", background: "#e1f5ee",
+  fontSize: 13, fontWeight: 700, color: "#7fc4b8", background: "#e1f5ee",
   border: "1px solid #b9e3d4", borderRadius: 999, padding: "1px 10px",
 } as const;
-const crumbLink = { color: "#0f766e", textDecoration: "none", fontWeight: 600 } as const;
-const backLink = { fontSize: 14, fontWeight: 700, color: "#0f766e", textDecoration: "none", width: "fit-content" } as const;
-const lightContainer = { maxWidth: 880, margin: "0 auto", padding: "32px 24px 80px", display: "grid", gap: 24 } as const;
+const crumbLink = { color: "#7fc4b8", textDecoration: "none", fontWeight: 600 } as const;
+const backLink = { fontSize: 14, fontWeight: 700, color: "#7fc4b8", textDecoration: "none", width: "fit-content" } as const;
+// Chart Table cohesion rollout (founder 2026-07-17): the hub sits on the
+// navigator stage — same tokens as ChartTableBrief's buyer theme.
+const lightContainer = {
+  maxWidth: 920,
+  margin: "0 auto",
+  padding: "32px 24px 60px",
+  display: "grid",
+  gap: 24,
+  background: "linear-gradient(180deg, #0c2233, #0a1b29 60%, #081521)",
+  borderRadius: 20,
+  color: "#eaf3f7",
+} as const;

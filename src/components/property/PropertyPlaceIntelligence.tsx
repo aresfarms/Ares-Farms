@@ -171,9 +171,19 @@ export function PropertyPlaceIntelligence({
                 >
                   {index + 1}
                 </span>
-                <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.65 }}>
-                  {paragraph}
-                </p>
+                <div style={{ display: "grid", gap: 2 }}>
+                  <strong style={{ fontSize: 13.5, color: "#162033", lineHeight: 1.4 }}>
+                    {mechanics.stepTitles[index] ?? ""}
+                  </strong>
+                  <details>
+                    <summary style={{ cursor: "pointer", fontSize: 11.5, color: "#7a8aa0", listStyle: "none" }}>
+                      The details ▸
+                    </summary>
+                    <p style={{ margin: "6px 0 0", fontSize: 12.7, color: "#3b475a", lineHeight: 1.65 }}>
+                      {paragraph}
+                    </p>
+                  </details>
+                </div>
               </div>
             ))}
           </div>
@@ -208,23 +218,29 @@ export function PropertyPlaceIntelligence({
                     key={fact.label}
                     style={{
                       display: "grid",
-                      gap: 4,
+                      gap: 2,
                       border: "1px solid #e6ebf2",
                       borderRadius: 12,
                       background: "#fff",
-                      padding: "10px 12px",
+                      padding: "8px 12px",
                     }}
                   >
                     <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: toneColor[fact.tone] }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 800, color: toneColor[fact.tone], textTransform: "uppercase", letterSpacing: "0.04em" }}>
                         {fact.label}
                       </span>
                       <span style={verifiedBadge}>Verified</span>
                     </div>
-                    <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>{fact.text}</span>
-                    <span style={{ fontSize: 11.5, color: "#7a8aa0", lineHeight: 1.5 }}>
-                      {fact.provenance}
-                    </span>
+                    <span style={{ fontSize: 14.5, fontWeight: 700, color: "#162033", lineHeight: 1.4 }}>{fact.value}</span>
+                    <details>
+                      <summary style={{ cursor: "pointer", fontSize: 11.5, color: "#7a8aa0", listStyle: "none" }}>
+                        What this means + source ▸
+                      </summary>
+                      <div style={{ display: "grid", gap: 4, paddingTop: 6 }}>
+                        <span style={{ fontSize: 12.7, color: "#3b475a", lineHeight: 1.6 }}>{fact.text}</span>
+                        <span style={{ fontSize: 11.5, color: "#7a8aa0", lineHeight: 1.5 }}>{fact.provenance}</span>
+                      </div>
+                    </details>
                   </div>
                 ))}
               </div>
@@ -236,22 +252,30 @@ export function PropertyPlaceIntelligence({
                     key={unknown.label}
                     style={{
                       display: "grid",
-                      gap: 3,
+                      gap: 2,
                       border: "1px dashed #d9c8a6",
                       borderRadius: 12,
                       background: "#fffdf7",
-                      padding: "10px 12px",
+                      padding: "8px 12px",
                     }}
                   >
                     <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: "#854f0b" }}>
+                      <span style={{ fontSize: 11.5, fontWeight: 800, color: "#854f0b", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                         {unknown.label}
                       </span>
                       <span style={unknownBadge}>Unknown</span>
                     </div>
-                    <span style={{ fontSize: 12.7, color: "#3b475a", lineHeight: 1.6 }}>
-                      {unknown.howToFind}
+                    <span style={{ fontSize: 13.5, fontWeight: 700, color: "#162033", lineHeight: 1.4 }}>
+                      Find out: {unknown.pointer}
                     </span>
+                    <details>
+                      <summary style={{ cursor: "pointer", fontSize: 11.5, color: "#a08147", listStyle: "none" }}>
+                        How exactly ▸
+                      </summary>
+                      <span style={{ display: "block", paddingTop: 6, fontSize: 12.7, color: "#3b475a", lineHeight: 1.6 }}>
+                        {unknown.howToFind}
+                      </span>
+                    </details>
                   </div>
                 ))}
               </div>

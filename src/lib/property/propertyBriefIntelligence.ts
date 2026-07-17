@@ -50,7 +50,13 @@ import {
 export interface BriefFactLine {
   /** Short label, e.g. "Flood zone". */
   label: string;
-  /** The fact sentence — facts + program context only, no eligibility. */
+  /**
+   * The scannable headline value ("Zone X — outside hazard area"). Redesign
+   * round 2 (2026-07-17): the page must SCAN, not read — the value carries
+   * the answer; the sentence and provenance sit behind an expand.
+   */
+  value: string;
+  /** The full fact sentence — facts + program context only, no eligibility. */
   text: string;
   /** Source + as-of provenance line. */
   provenance: string;
@@ -61,6 +67,8 @@ export interface BriefFactLine {
 export interface BriefUnknownLine {
   /** What we cannot verify yet. */
   label: string;
+  /** Short pointer to the official source ("County treasurer site"). */
+  pointer: string;
   /** How the customer finds out (official path, no live fetch by us). */
   howToFind: string;
 }
@@ -100,8 +108,11 @@ export interface LivingHereStrip {
 export interface PropertyBriefIntelligence {
   verifiedFacts: BriefFactLine[];
   unknowns: BriefUnknownLine[];
-  /** Per-source "how buying this actually works" explainer paragraphs. */
-  mechanics: { heading: string; paragraphs: string[] } | null;
+  /**
+   * Per-source "how buying this actually works" explainer. stepTitles align
+   * 1:1 with paragraphs — the title scans, the paragraph explains on expand.
+   */
+  mechanics: { heading: string; paragraphs: string[]; stepTitles: string[] } | null;
   /** The prose replacement for the pathway chips (founder decision). */
   pathwaysProse: string | null;
   /** County derived from the property's census tract when the record lacked one. */
@@ -153,6 +164,7 @@ function floodFactLine(propertyId: string): BriefFactLine | null {
   if (f.isSfha) {
     return {
       label: "Flood zone",
+      value: `Zone ${f.floodZone} — inside hazard area`,
       text:
         `This location maps to FEMA flood zone ${f.floodZone}, inside a Special Flood Hazard Area. ` +
         `Federally backed mortgages generally require flood insurance in this zone, which adds a real ` +
@@ -164,6 +176,7 @@ function floodFactLine(propertyId: string): BriefFactLine | null {
   if (f.floodZone === "D") {
     return {
       label: "Flood zone",
+      value: "Zone D — hazard undetermined",
       text:
         `This location maps to FEMA flood zone D — an area where flood hazards are undetermined ` +
         `(no study has been completed). That is not the same as low risk; lenders and insurers treat ` +
@@ -174,6 +187,7 @@ function floodFactLine(propertyId: string): BriefFactLine | null {
   }
   return {
     label: "Flood zone",
+    value: `Zone ${f.floodZone} — outside hazard area`,
     text:
       `This location maps to FEMA flood zone ${f.floodZone}, outside the Special Flood Hazard Area. ` +
       `Flood insurance is typically optional here, though flooding can occur outside mapped zones.`,
@@ -189,6 +203,7 @@ function historicFactLine(propertyId: string): BriefFactLine | null {
   if (f.inNationalRegisterArea) {
     return {
       label: "Historic status",
+      value: "In a National Register area",
       text:
         `This location falls within a National Register of Historic Places area` +
         `${f.historicName ? ` (${f.historicName})` : ""}. Historic designation can constrain exterior ` +
@@ -199,6 +214,7 @@ function historicFactLine(propertyId: string): BriefFactLine | null {
   }
   return {
     label: "Historic status",
+    value: "No overlap found",
     text: `No National Register historic-area overlap was found for this location in our snapshot.`,
     provenance: `Source: NPS National Register of Historic Places, snapshot ${asOf}`,
     tone: "neutral",
@@ -215,6 +231,7 @@ function designationFactLines(propertyId: string): BriefFactLine[] {
       oz.designated
         ? {
             label: "Opportunity Zone",
+            value: `Designated QOZ${oz.rural ? " (rural)" : ""}`,
             text:
               `This location is in a census tract designated as a Qualified Opportunity Zone` +
               `${oz.rural ? " (flagged rural)" : ""}. This is a designation of the place — not ` +
@@ -224,6 +241,7 @@ function designationFactLines(propertyId: string): BriefFactLine[] {
           }
         : {
             label: "Opportunity Zone",
+            value: "Not designated",
             text: `This location's census tract is not a designated Opportunity Zone.`,
             provenance: `Source: HUD GIS / Treasury (IRC §1400Z-1), snapshot ${PROPERTY_OZ_PROVENANCE.asOf}`,
             tone: "neutral",
@@ -236,6 +254,7 @@ function designationFactLines(propertyId: string): BriefFactLine[] {
   if (hub) {
     lines.push({
       label: "HUBZone",
+      value: hub.isCurrent ? `Designated — ${hub.hubzoneType}` : `Expired — ${hub.hubzoneType}`,
       text: hub.isCurrent
         ? `This location is in a designated SBA HUBZone (${hub.hubzoneType}). Relevant mainly if you ` +
           `would run a business here that pursues federal contracts. Designations change — verify ` +
@@ -248,6 +267,7 @@ function designationFactLines(propertyId: string): BriefFactLine[] {
   } else {
     lines.push({
       label: "HUBZone",
+      value: "None on record",
       text: `No current HUBZone designation is on record for this location in our snapshot — verify current status with SBA.`,
       provenance: `Source: SBA HUBZone layer, snapshot ${PROPERTY_HUBZONE_PROVENANCE.asOf} · maps.certify.sba.gov`,
       tone: "neutral",
@@ -259,6 +279,7 @@ function designationFactLines(propertyId: string): BriefFactLine[] {
   if (nmtc) {
     lines.push({
       label: "New Markets Tax Credit area",
+      value: "Qualifies — low-income community",
       text:
         `This location's census tract qualifies as an NMTC low-income community — a designation that ` +
         `can matter for community-facility and business financing structures. A fact about the place, ` +
@@ -291,8 +312,14 @@ function amenityFactLine(
     return cat.count === 1 ? `1 ${singular}${nearest}` : `${cat.count} ${plural}${nearest}`;
   };
   const parksCount = (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0);
+  const shortBits = [
+    amenities.grocery?.nearestMiles != null ? `grocery ${amenities.grocery.nearestMiles} mi` : "no grocery mapped",
+    amenities.dining?.nearestMiles != null ? `dining ${amenities.dining.nearestMiles} mi` : null,
+    amenities.pharmacy?.nearestMiles != null ? `pharmacy ${amenities.pharmacy.nearestMiles} mi` : null,
+  ].filter(Boolean).join(" · ");
   return {
     label: "Daily life nearby",
+    value: shortBits.charAt(0).toUpperCase() + shortBits.slice(1),
     text:
       `Within ~${radiusMiles} miles: ${part("grocery", "grocery/market", "groceries/markets")}; ` +
       `${part("dining", "restaurant/cafe", "restaurants/cafes/bars")}; ` +
@@ -413,6 +440,12 @@ function mechanicsForSource(
     case "hud":
       return {
         heading: "How buying a HUD home actually works",
+        stepTitles: [
+          "Sealed bid — owner-occupants get the first window",
+          "The price lives on the HUD listing, not here",
+          "Sold strictly as-is — inspect for yourself",
+          "You bid through a HUD-registered agent",
+        ],
         paragraphs: [
           `HUD homes are FHA-foreclosed properties resold by the government through HUD Home Store. ` +
             `They are sold by sealed bid, not ordinary offer-and-counter: listings open with a bid ` +
@@ -433,6 +466,10 @@ function mechanicsForSource(
     case "usda":
       return {
         heading: "How USDA resale properties actually work",
+        stepTitles: [
+          "USDA runs the sale from its own listing page",
+          "Sold as-is — budget for condition up front",
+        ],
         paragraphs: [
           `These are USDA Rural Development real-estate-owned (REO) properties being resold by the ` +
             `government. Sales run through USDA's process and its listing pages state the current ` +
@@ -444,6 +481,10 @@ function mechanicsForSource(
     case "gsa":
       return {
         heading: "How federal surplus property sales actually work",
+        stepTitles: [
+          "Auction-style — the auction page is the source of truth",
+          "As-is, sometimes with special sale conditions",
+        ],
         paragraphs: [
           `This is federal surplus real property offered through GSA auctions (realestatesales.gov). ` +
             `Sales are auction-style with registration, deposit, and bid-period rules stated on each ` +
@@ -476,6 +517,7 @@ function buildUnknowns(args: {
   if (!countyKnown) {
     unknowns.push({
       label: "County",
+      pointer: "State parcel/GIS viewer",
       howToFind:
         "The county determines property taxes, floodplain administration, and permits. The county " +
         "appears on the source listing and on the state's parcel/GIS viewer.",
@@ -484,6 +526,7 @@ function buildUnknowns(args: {
   if (args.priceLabel && /price on request/i.test(args.priceLabel)) {
     unknowns.push({
       label: "Current price and bid deadline",
+      pointer: "The source listing page",
       howToFind:
         "Government listings publish price and bid timing on the source listing page, and both can " +
         "change as bid periods reset — check the listing before planning numbers.",
@@ -492,6 +535,7 @@ function buildUnknowns(args: {
   if (!args.floodResolved) {
     unknowns.push({
       label: "Flood zone",
+      pointer: "msc.fema.gov",
       howToFind:
         "We have not yet resolved this location against the FEMA flood map snapshot. Look up the " +
         "address at msc.fema.gov (FEMA Map Service Center) — it is free and official.",
@@ -499,6 +543,7 @@ function buildUnknowns(args: {
   }
   unknowns.push({
     label: "Condition and repair scope",
+    pointer: "Independent inspection",
     howToFind:
       "Government sales are as-is and our snapshot cannot see inside the building. An independent " +
       "inspection (plus a contractor walk-through where repairs look likely) is the only real answer.",
@@ -508,6 +553,7 @@ function buildUnknowns(args: {
     : "The county treasurer/appraiser site";
   unknowns.push({
     label: "Annual property taxes",
+    pointer: "County treasurer/appraiser site",
     howToFind:
       `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
@@ -515,6 +561,7 @@ function buildUnknowns(args: {
   if (args.isHome && !args.rentalContextAvailable) {
     unknowns.push({
       label: "Rental context",
+      pointer: "huduser.gov (Fair Market Rents)",
       howToFind:
         "HUD publishes Fair Market Rents by county and bedroom count — free at huduser.gov " +
         "(datasets → Fair Market Rents). Actual asking rents come from local listings.",
@@ -523,6 +570,7 @@ function buildUnknowns(args: {
   if (args.isHome && !args.amenitiesAvailable) {
     unknowns.push({
       label: "Daily-life amenities",
+      pointer: "Any map app + a drive-by",
       howToFind:
         "Grocery, dining, pharmacy, parks, and vet distances are checkable on any map app — and " +
         "worth an in-person drive at the times of day you'd actually use them.",
@@ -531,6 +579,7 @@ function buildUnknowns(args: {
   if (args.isHome && !args.schoolsAvailable) {
     unknowns.push({
       label: "Schools",
+      pointer: "NCES school locator",
       howToFind:
         "The NCES school locator (nces.ed.gov/ccd/schoolsearch) lists every public school by " +
         "address; the state Department of Education lists private and charter options and " +
@@ -540,6 +589,7 @@ function buildUnknowns(args: {
   if (args.isHome) {
     unknowns.push({
       label: "Private and alternative schools",
+      pointer: "State Dept. of Education",
       howToFind:
         "Private, parochial, and co-op options are listed by the state Department of Education " +
         "and the NCES private-school survey (nces.ed.gov/surveys/pss) — coverage varies, so a " +
@@ -549,6 +599,7 @@ function buildUnknowns(args: {
   if (args.isHome) {
     unknowns.push({
       label: "Water, sewer, and utilities",
+      pointer: "Well/septic inspection",
       howToFind:
         "Rural homes may use a private well and septic system rather than municipal service. The " +
         "listing, the county health department, and a well/septic inspection establish which — and " +
@@ -556,6 +607,7 @@ function buildUnknowns(args: {
     });
     unknowns.push({
       label: "HOA or covenants",
+      pointer: "County register of deeds",
       howToFind:
         "Recorded covenants and any HOA appear in the county register of deeds records for the " +
         "parcel; the title search during purchase will surface them definitively.",
@@ -615,6 +667,7 @@ export function buildPropertyBriefIntelligence(args: {
   if (resolvedCounty) {
     verifiedFacts.push({
       label: "County",
+      value: `${resolvedCounty.name}, ${resolvedCounty.state}`,
       text:
         `This property sits in ${resolvedCounty.name}, ${resolvedCounty.state} — derived from its ` +
         `census tract (${resolvedCounty.tractId}). The county is where property taxes, floodplain ` +
@@ -637,6 +690,7 @@ export function buildPropertyBriefIntelligence(args: {
   if (tenure && isHome) {
     verifiedFacts.push({
       label: "Owner-occupancy",
+      value: `${tenure.ownerOccupiedPct}% owner-occupied (tract)`,
       text:
         `About ${tenure.ownerOccupiedPct}% of the ${tenure.occupiedUnits.toLocaleString("en-US")} ` +
         `occupied homes in this census tract are owner-occupied. A tract-level Census estimate — ` +
@@ -659,6 +713,7 @@ export function buildPropertyBriefIntelligence(args: {
     if (food.lila1And10) {
       verifiedFacts.push({
         label: "Grocery access",
+        value: "USDA low-income & low-access tract",
         text:
           `USDA designates this census tract as low-income and low-access under its 1-mile urban / ` +
           `10-mile rural measure — the designation behind the term "food desert." Practically: plan ` +
@@ -669,6 +724,7 @@ export function buildPropertyBriefIntelligence(args: {
     } else {
       verifiedFacts.push({
         label: "Grocery access",
+        value: "No USDA low-access designation",
         text:
           `This census tract is not designated low-income-and-low-access by USDA's food-access ` +
           `measure${food.urban ? "" : " (rural 10-mile standard)"}.`,
@@ -705,6 +761,7 @@ export function buildPropertyBriefIntelligence(args: {
     const charterCount = schools.filter((s) => s.charter).length;
     verifiedFacts.push({
       label: "Schools",
+      value: `${schools.length} in the county${inTown.length > 0 ? ` · ${inTown.length} in ${args.town}` : ""}`,
       text:
         `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
         `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
@@ -723,6 +780,7 @@ export function buildPropertyBriefIntelligence(args: {
   if (fmr && isHome) {
     verifiedFacts.push({
       label: "Rental context",
+      value: `$${fmr.fmr2.toLocaleString("en-US")}/mo 2BR (HUD FMR)`,
       text:
         `HUD's ${COUNTY_FMR_PROVENANCE.fmrYear} Fair Market Rents for this county` +
         `${fmr.areaName ? ` (${fmr.areaName})` : ""}: about $${fmr.fmr2.toLocaleString("en-US")}/month ` +
@@ -817,6 +875,7 @@ function floodFactFromLive(floodZone: string, asOf: string): BriefFactLine {
   if (/^[AV]/.test(zone)) {
     return {
       label: "Flood zone",
+      value: `Zone ${zone} — inside hazard area`,
       text:
         `This address maps to FEMA flood zone ${zone}, inside a Special Flood Hazard Area. ` +
         `Federally backed mortgages generally require flood insurance here, which adds a real ` +
@@ -828,6 +887,7 @@ function floodFactFromLive(floodZone: string, asOf: string): BriefFactLine {
   if (zone === "D") {
     return {
       label: "Flood zone",
+      value: "Zone D — hazard undetermined",
       text:
         `This address maps to FEMA flood zone D — flood hazard undetermined (no study completed). ` +
         `That is not the same as low risk; lenders and insurers treat zone D case-by-case.`,
@@ -837,6 +897,7 @@ function floodFactFromLive(floodZone: string, asOf: string): BriefFactLine {
   }
   return {
     label: "Flood zone",
+    value: `Zone ${zone} — outside hazard area`,
     text:
       `This address maps to FEMA flood zone ${zone}, outside the Special Flood Hazard Area. ` +
       `Flood insurance is typically optional here, though flooding can occur outside mapped zones.`,
@@ -874,6 +935,7 @@ export async function buildLocationBriefIntelligence(args: {
   if (resolvedCounty) {
     verifiedFacts.push({
       label: "County",
+      value: `${resolvedCounty.name}, ${resolvedCounty.state}`,
       text:
         `This address sits in ${resolvedCounty.name}, ${resolvedCounty.state} — derived from its ` +
         `census tract (${resolvedCounty.tractId}). The county is where property taxes, floodplain ` +
@@ -892,6 +954,7 @@ export async function buildLocationBriefIntelligence(args: {
   if (placeFacts.historic) {
     verifiedFacts.push({
       label: "Historic status",
+      value: "In a National Register area",
       text:
         `This address falls within a National Register of Historic Places area` +
         `${placeFacts.historic.historicName ? ` (${placeFacts.historic.historicName})` : ""}. ` +
@@ -904,6 +967,7 @@ export async function buildLocationBriefIntelligence(args: {
   if (placeFacts.opportunityZone) {
     verifiedFacts.push({
       label: "Opportunity Zone",
+      value: `Designated QOZ${placeFacts.opportunityZone.rural ? " (rural)" : ""}`,
       text:
         `This address is in a census tract designated as a Qualified Opportunity Zone` +
         `${placeFacts.opportunityZone.rural ? " (flagged rural)" : ""}. This is a designation of the ` +
@@ -915,6 +979,7 @@ export async function buildLocationBriefIntelligence(args: {
   if (placeFacts.nmtc) {
     verifiedFacts.push({
       label: "New Markets Tax Credit area",
+      value: "Qualifies — low-income community",
       text:
         `This address's census tract qualifies as an NMTC low-income community — a designation that ` +
         `can matter for community-facility and business financing structures. A fact about the place, ` +
@@ -926,6 +991,9 @@ export async function buildLocationBriefIntelligence(args: {
   if (placeFacts.hubzone) {
     verifiedFacts.push({
       label: "HUBZone",
+      value: placeFacts.hubzone.isCurrent
+        ? `Designated — ${placeFacts.hubzone.hubzoneType}`
+        : `Expired — ${placeFacts.hubzone.hubzoneType}`,
       text: placeFacts.hubzone.isCurrent
         ? `This address is in a designated SBA HUBZone (${placeFacts.hubzone.hubzoneType}). Relevant ` +
           `mainly if you would run a business here that pursues federal contracts. Designations ` +
@@ -967,6 +1035,7 @@ export async function buildLocationBriefIntelligence(args: {
     const charterCount = schools.filter((s) => s.charter).length;
     verifiedFacts.push({
       label: "Schools",
+      value: `${schools.length} in the county${inTown.length > 0 && town ? ` · ${inTown.length} in ${town}` : ""}`,
       text:
         `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
         `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
@@ -986,6 +1055,7 @@ export async function buildLocationBriefIntelligence(args: {
   if (fmr && isHome) {
     verifiedFacts.push({
       label: "Rental context",
+      value: `$${fmr.fmr2.toLocaleString("en-US")}/mo 2BR (HUD FMR)`,
       text:
         `HUD's ${COUNTY_FMR_PROVENANCE.fmrYear} Fair Market Rents for this county` +
         `${fmr.areaName ? ` (${fmr.areaName})` : ""}: about $${fmr.fmr2.toLocaleString("en-US")}/month ` +

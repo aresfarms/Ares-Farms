@@ -1439,12 +1439,10 @@ function buildReportModel(args: {
   // so the summary must not restate them (redesign Phase 1: each thing said
   // once). Scores are internal ranking signals, never customer copy.
   const executiveSummary = [
-    propertySpecificLines[0] ?? "",
     args.topProgramRanks[0]
       ? `${args.topProgramRanks[0].program.name} is the current lead financing lane.`
       : "",
-    args.budgetExpectations.acquisition,
-    args.immediateSuitability.constraints[0] ? `The first thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
+    args.immediateSuitability.constraints[0] ? `First thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
   ].filter(Boolean).join(" ");
 
   // Free Place Brief content folded into the report (spec 2026-07-15): the
@@ -2418,19 +2416,29 @@ export function PropertyEvaluationWorkspace({
   }
 
   const propertyRecord = facts?.propertyRecord ?? null;
-  const topKnownFacts = [
-    propertyRecord?.exactAddress
-      ? `Verified property record address: ${propertyRecord.exactAddress}${propertyRecord.zip ? ` ${propertyRecord.zip}` : ""}.`
-      : analysisContext.exactAddress
-        ? `Input address: ${analysisContext.exactAddress}.`
-        : `Location in flow: ${analysisContext.location}.`,
-    propertyRecord?.rawPropertyStyle
-      ? `Recorded property style: ${propertyRecord.rawPropertyStyle}.`
-      : `Property type in flow: ${analysisContext.propertyType}.`,
-    `Listed through ${analysisContext.sourceLabel}${propertyRecord?.listingId ? ` (listing ${propertyRecord.listingId})` : ""}.`,
-    analysisContext.priceLabel && !/price on request/i.test(analysisContext.priceLabel)
-      ? `Asking price: ${analysisContext.priceLabel}.`
-      : "The current price is published on the source listing — it isn't fixed in our record yet.",
+  // Label/value rows, not sentences — the panel scans (redesign round 2).
+  const topKnownFacts: { label: string; value: string }[] = [
+    {
+      label: "Address",
+      value: propertyRecord?.exactAddress
+        ? `${propertyRecord.exactAddress}${propertyRecord.zip ? ` ${propertyRecord.zip}` : ""}`
+        : analysisContext.exactAddress ?? analysisContext.location,
+    },
+    {
+      label: "Style",
+      value: propertyRecord?.rawPropertyStyle ?? analysisContext.propertyType,
+    },
+    {
+      label: "Listed through",
+      value: `${analysisContext.sourceLabel}${propertyRecord?.listingId ? ` · #${propertyRecord.listingId}` : ""}`,
+    },
+    {
+      label: "Price",
+      value:
+        analysisContext.priceLabel && !/price on request/i.test(analysisContext.priceLabel)
+          ? analysisContext.priceLabel
+          : "On the source listing — changes as bid periods reset",
+    },
   ];
   const topProgramPreview = topProgramRanks.slice(0, 2).map(
     (entry, index) => `${index + 1}. ${entry.program.name}`
@@ -2545,10 +2553,11 @@ export function PropertyEvaluationWorkspace({
 	              <strong style={{ fontSize: 18, color: "#162033" }}>Verified before you answer anything</strong>
 	              <span style={miniText}>Pulled from the source record and our government-data snapshots — no questions asked yet.</span>
 	            </div>
-	            <div style={{ display: "grid", gap: 8 }}>
-	              {topKnownFacts.map((line) => (
-	                <div key={line} style={factCard}>
-	                  <span style={{ fontSize: 12.7, color: "#3b475a", lineHeight: 1.55 }}>{line}</span>
+	            <div style={{ display: "grid", gap: 6 }}>
+	              {topKnownFacts.map((fact) => (
+	                <div key={fact.label} style={{ ...factCard, display: "grid", gridTemplateColumns: "92px 1fr", gap: 8, alignItems: "baseline", padding: "8px 12px" }}>
+	                  <span style={{ fontSize: 11, fontWeight: 800, color: "#5d687a", textTransform: "uppercase", letterSpacing: "0.04em" }}>{fact.label}</span>
+	                  <span style={{ fontSize: 13.5, fontWeight: 700, color: "#162033", lineHeight: 1.45 }}>{fact.value}</span>
 	                </div>
 	              ))}
 	            </div>

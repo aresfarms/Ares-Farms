@@ -40,7 +40,8 @@ export function SavedDraftsRail() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
         <strong style={{ fontSize: 15, color: "#f2f7fa" }}>Pick up where you left off</strong>
         <span style={{ fontSize: 11, color: "#7ea4bb" }}>
-          Saved on this device only — never sent anywhere. Delete anytime.
+          Saved on this device only — never sent anywhere. Delete anytime. Prefer a file that
+          travels with you? Any analysis can be saved with Furlong by starting your borrower file.
         </span>
       </div>
       <div style={{ display: "grid", gap: 8 }}>

@@ -89,7 +89,9 @@ const IDENTITIES: Record<ReportTierId, ReportTierIdentity> = {
       ],
       closing:
         "Both reviews stay anchored to this property and this county — nothing generic, nothing " +
-        "resold. When tier access opens, your Place Brief carries forward into them unchanged.",
+        "resold. Every tier above the free brief also includes the Furlong newsletter automatically " +
+        "— no separate signup. When tier access opens, your Place Brief carries forward into them " +
+        "unchanged.",
     },
   },
   paid: {

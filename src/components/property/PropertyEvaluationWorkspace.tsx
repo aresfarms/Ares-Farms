@@ -2586,6 +2586,17 @@ export function PropertyEvaluationWorkspace({
           <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
             Save draft on this device
           </button>
+          {/* The PLATFORM save is the existing governed borrower pathway —
+              onboarding collects identity under the established consent and
+              data-rights framework; no parallel PII store is created here
+              (public-alpha posture: piiPermitted stays a founder/counsel
+              flag). Device save stays the zero-PII default. */}
+          <Link
+            href={`/onboarding?from=${encodeURIComponent(chartHref)}`}
+            style={{ ...actionButtonSecondary, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
+          >
+            Save with Furlong — start your borrower file
+          </Link>
           <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
             {pdfBusy === "view" ? "Opening PDF..." : "View watermarked PDF ↗"}
           </button>

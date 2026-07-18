@@ -104,13 +104,25 @@ export function truckloadMargin(
 export const POULTRY_GROWER_NOTE = {
   growerFeeCentsPerLb: { low: 4.3, median: 6.8, high: 9.6 }, // USDA ERS, 2020 median
   integratorMarketCentsPerLb: 122, // USDA AMS wholesale composite, 2026
-  asOf: "grower fee: USDA ERS 2020; market price: USDA AMS 2026",
+  asOf: "grower fee: USDA ERS 2020; market price: USDA AMS 2026; house costs/flock counts: industry norms, illustrative",
+  /** Paragraphs separated by \n\n — surfaces render each as its own paragraph. */
   text:
-    "Poultry pays differently — you're paid to raise the bird, not to sell it. Under contract, which is nearly " +
-    "every bird here, the company owns the flock and buys the feed; your check is a housing fee of about 6–7¢ a " +
-    "pound of live weight, roughly 45¢ a bird. That fee is your revenue, and it has to cover your utilities, " +
-    "labor, litter, and the loan on the houses — so your profit is what's left of it. The ~$1.22/lb market " +
-    "price is the company's, not yours.",
+    "Chickens: the deal, the math, and whether it's worth it. Raising broilers here almost always means " +
+    "CONTRACT growing: the company owns the birds and buys all the feed — you provide the houses, the " +
+    "utilities, and the daily work. You are paid for housing and care, not for the chicken: about 5–9¢ per " +
+    "pound of live weight (6–7¢ is typical), roughly 45¢ a bird. The ~$1.22/lb the chicken sells for is the " +
+    "company's revenue, not yours.\n\n" +
+    "The real math, per house: one modern house holds roughly 25,000–30,000 birds and turns 5–6 flocks a " +
+    "year — call it $55,000–$70,000 a year in grower pay. Out of that come propane and electricity (often " +
+    "$15,000–$20,000 a year), litter handling, repairs, insurance, and your own labor. Houses paid off? A " +
+    "house can clear roughly $30,000–$40,000 a year. Still paying for them? New houses run $300,000–$500,000 " +
+    "EACH, and the loan payment eats most of what's left — many growers net only a few thousand dollars per " +
+    "house per year until the debt retires.\n\n" +
+    "So is it worth it? With paid-off houses and a solid contract, it's a steady income floor that doesn't " +
+    "depend on rain. With new-house debt, you are mostly building equity, not income — while your pay moves " +
+    "under a ranking (\"tournament\") system against other growers, and contracts typically renew flock to " +
+    "flock, not for the life of your loan. The two questions that decide it: what does the contract actually " +
+    "guarantee, and how many years of debt are left on the houses.",
 } as const;
 
 /** A one-line, honest read of a crop's truckload margin. */

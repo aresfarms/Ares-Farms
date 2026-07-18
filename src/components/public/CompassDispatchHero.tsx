@@ -97,8 +97,12 @@ export function CompassDispatchHero({ dispatch }: { dispatch: CompassDispatch })
                 </tbody>
               </table>
             </div>
-            <div style={{ margin: "14px 0 0", padding: "12px 14px", background: "#f1f5f8", borderRadius: 9 }}>
-              <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "#4a626f" }}>{dispatch.economics.poultryNote}</p>
+            <div style={{ margin: "14px 0 0", padding: "12px 14px", background: "#f1f5f8", borderRadius: 9, display: "grid", gap: 8 }}>
+              {dispatch.economics.poultryNote.split("\n\n").map((para, i) => (
+                <p key={para.slice(0, 24)} style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: i === 0 ? "#14212b" : "#4a626f" }}>
+                  {para}
+                </p>
+              ))}
             </div>
             <p style={{ margin: "10px 0 0", fontSize: 11, lineHeight: 1.5, color: "#9aa6b6" }}>
               {dispatch.economics.provenanceNote}

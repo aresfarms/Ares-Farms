@@ -54,7 +54,7 @@ const COVERAGE: { label: string; source: string; confidence: string; disclaimer:
   { label: "Flood (FEMA)", source: "FEMA National Flood Hazard Layer · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "Reports the published Special Flood Hazard Area status of the place — verify current status with FEMA." },
   { label: "Historic (NPS)", source: "National Register of Historic Places (NPS) · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "Reports the published historic listing of the place — not a person's eligibility for any credit." },
   { label: "NMTC low-income community", source: "CDFI Fund NMTC-eligible tracts · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "States whether the tract is NMTC-qualified — a place-fact, not a person-side determination." },
-  { label: "SBA HUBZone", source: "SBA HUBZone map (Historically Underutilized Business Zones) · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "Reports whether the location sits in an SBA HUBZone — a place-based federal-contracting designation. SBA loan eligibility is a separate, business-side determination." },
+  { label: "SBA 504/7(a) financing fit", source: "Property type vs. SBA owner-occupied commercial rules (SBA SOP 50 10)", confidence: "Guidance from the property type — not a government place-fact", disclaimer: "Flags whether the property is the owner-occupied commercial kind SBA 504/7(a) can finance. A property-type read, not a determination of anyone's eligibility — the lender and SBA decide that on the business." },
 ];
 
 type PlaceFactsResponse = {

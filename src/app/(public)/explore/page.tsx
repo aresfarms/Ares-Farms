@@ -270,8 +270,15 @@ export default async function ExplorePage({
           <CommunityCta />
         </div>
         {/* The map is width-responsive now (960×580 aspect held at any width),
-            so it keeps its side column at normal widths; only narrow screens stack. */}
-        <style>{`@media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>
+            so it keeps its side column at normal widths; only narrow screens stack.
+            min-width:0 on the grid children lets them shrink into the single mobile
+            column instead of forcing an 8px page overflow (their min-content is
+            wider than a phone); overflow-x:clip guards against any residual. */}
+        <style>{`
+          .land-top-row { overflow-x: clip; }
+          .land-top-row > * { min-width: 0; }
+          @media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }
+        `}</style>
       </>
     );
   }

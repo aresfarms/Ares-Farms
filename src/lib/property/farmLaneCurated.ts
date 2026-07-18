@@ -28,13 +28,59 @@ export interface TickerItem {
   asOf: string;
 }
 
+/** One region's average cash bid across its reporting states. */
+export interface RegionBids {
+  name: string;
+  /** null where no reporting state in the region carries that crop. */
+  corn: number | null;
+  soybeans: number | null;
+  wheat: number | null;
+  /** true if at least one crop has a regional average. */
+  hasData: boolean;
+}
+
+/**
+ * The five parts of the country (founder direction 2026-07-18: show regional
+ * cash bids — NE, Mid-Atlantic, South, Midwest, West — not just Maryland).
+ * States are the full membership; only those present in the USDA snapshot
+ * contribute, so coverage grows as the ingest resolves more states.
+ */
+const TICKER_REGIONS: Array<{ name: string; states: string[] }> = [
+  { name: "Northeast", states: ["PA", "NY", "ME", "NH", "VT", "MA", "CT", "RI"] },
+  { name: "Mid-Atlantic", states: ["MD", "DE", "VA", "NC", "WV", "NJ"] },
+  { name: "South", states: ["KY", "TN", "AL", "GA", "SC", "FL", "AR", "MS", "LA", "OK", "TX"] },
+  { name: "Midwest", states: ["OH", "IN", "IL", "MI", "WI", "IA", "KS", "MO", "MN", "NE", "ND", "SD"] },
+  { name: "West", states: ["CO", "MT", "ID", "WY", "UT", "NV", "AZ", "NM", "CA", "OR", "WA"] },
+];
+
+// Sanity bounds — a cash bid outside these is a bad AMS record (e.g. a stray
+// non-grain contract) and is dropped from the average so the ticker never
+// shows an implausible number to a farmer who'd know better.
+const BID_BOUNDS: Record<"corn" | "soybeans" | "wheat", [number, number]> = {
+  corn: [2, 9],
+  soybeans: [7, 20],
+  wheat: [3, 12],
+};
+
+function regionCropAvg(states: string[], crop: "corn" | "soybeans" | "wheat"): number | null {
+  const [lo, hi] = BID_BOUNDS[crop];
+  const vals: number[] = [];
+  for (const st of states) {
+    const bid = STATE_GRAIN_BIDS[st]?.bids?.[crop];
+    if (bid && typeof bid.avg === "number" && bid.avg >= lo && bid.avg <= hi) vals.push(bid.avg);
+  }
+  if (vals.length === 0) return null;
+  return vals.reduce((a, b) => a + b, 0) / vals.length;
+}
+
 /**
  * The ticker strip — USDA-published prices from the committed snapshots
  * (weekly refresh). HONEST LABEL: these are USDA cash prices/bids, refreshed
  * weekly — not a live exchange feed; true real-time futures quotes require a
- * licensed market-data feed (flagged to the founder).
+ * licensed market-data feed (flagged to the founder). Local bids are grouped
+ * into the five regions of the country.
  */
-export function buildCommodityTicker(): { items: TickerItem[]; note: string } {
+export function buildCommodityTicker(): { items: TickerItem[]; regions: RegionBids[]; note: string } {
   const items: TickerItem[] = [];
   const label: Record<string, string> = { corn: "Corn", soybeans: "Soybeans", wheat: "Wheat" };
 
@@ -47,21 +93,6 @@ export function buildCommodityTicker(): { items: TickerItem[]; note: string } {
         direction: null,
         asOf: `USDA ${p.month} ${p.year}`,
       });
-    }
-  }
-  // Local elevator bids (Delmarva anchor: MD) with day-over-day direction.
-  const md = STATE_GRAIN_BIDS.MD;
-  if (md && STATE_GRAIN_BIDS_PROVENANCE.asOf !== null) {
-    for (const key of ["corn", "soybeans", "wheat"] as const) {
-      const b = md.bids[key];
-      if (b) {
-        items.push({
-          label: `${label[key]} (MD bid)`,
-          value: `$${b.avg.toFixed(2)}`,
-          direction: b.direction === "UP" ? "up" : b.direction === "DOWN" ? "down" : null,
-          asOf: `USDA AMS ${md.reportDate}`,
-        });
-      }
     }
   }
   if (INPUT_COSTS_PROVENANCE.asOf !== null) {
@@ -84,10 +115,21 @@ export function buildCommodityTicker(): { items: TickerItem[]; note: string } {
     asOf: FSA_RATES_PROVENANCE.effective ? `effective ${FSA_RATES_PROVENANCE.effective}` : "current",
   });
 
+  const regions: RegionBids[] =
+    STATE_GRAIN_BIDS_PROVENANCE.asOf !== null
+      ? TICKER_REGIONS.map((r) => {
+          const corn = regionCropAvg(r.states, "corn");
+          const soybeans = regionCropAvg(r.states, "soybeans");
+          const wheat = regionCropAvg(r.states, "wheat");
+          return { name: r.name, corn, soybeans, wheat, hasData: corn != null || soybeans != null || wheat != null };
+        })
+      : [];
+
   return {
     items,
+    regions,
     note:
-      `USDA-published prices and bids, refreshed weekly — not a live exchange feed. ` +
+      `USDA-published prices and regional cash bids, refreshed weekly — not a live exchange feed. ` +
       `Sources: USDA NASS (${COMMODITY_PRICES_PROVENANCE.asOf ? "prices received" : "prices"}), USDA AMS Market News, USDA Prices Paid, USDA FSA.`,
   };
 }

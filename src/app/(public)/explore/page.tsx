@@ -207,6 +207,14 @@ export default async function ExplorePage({
             <PropertyGroupsFrontDoor groups={laneGroups} compact />
           </div>
         </div>
+        {/* The farmer sections as cards, ABOVE the listings shelf (founder
+            direction 2026-07-18): enterprise economics, land-money options,
+            equipment, module cross-links — in the listing-card visual language. */}
+        {isFarmLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
+            <FarmLaneSections />
+          </div>
+        )}
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
           <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} />
         </div>
@@ -216,13 +224,6 @@ export default async function ExplorePage({
           category={one(resolved.category)}
           lane={selected.slug}
         />
-        {/* The farmer sections: enterprise economics, land-money options,
-            equipment + suppliers, module cross-links. */}
-        {isFarmLane && (
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "8px 20px 0" }}>
-            <FarmLaneSections />
-          </div>
-        )}
         {/* Newsletters at the BOTTOM of the page (founder direction 2026-07-18). */}
         {audience && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0" }}>

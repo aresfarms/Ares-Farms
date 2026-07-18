@@ -193,7 +193,7 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
             padding: "18px 18px",
             display: "grid",
             gap: 12,
-            alignSelf: "stretch",
+            alignSelf: "start",
           }}
         >
           <div style={{ display: "grid", gap: 6 }}>
@@ -201,6 +201,9 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
               Option 1
             </span>
             <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Browse current inventory</strong>
+            <span style={{ fontSize: 14, color: "#b7ccd9", lineHeight: 1.5 }}>
+              See the government listings we&apos;re tracking right now — pick a category and scan what&apos;s live.
+            </span>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
             <a

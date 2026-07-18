@@ -314,8 +314,8 @@ export const EXPLORATION_CATEGORIES: ExplorationCategory[] = [
   },
   {
     slug: "housing-development",
-    label: "Housing & Development",
-    blurb: "Funding, infrastructure, readiness, and community impact.",
+    label: "Newsletter & Podcasts",
+    blurb: "The Furlong Compass — your industry's weekly read and the podcast, in your voice.",
   },
   {
     slug: "programs-incentives",

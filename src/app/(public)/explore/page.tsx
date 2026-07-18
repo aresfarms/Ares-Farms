@@ -2,14 +2,27 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
+import { CompassDispatchHero } from "@/components/public/CompassDispatchHero";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
+import { buildCompassDispatch } from "@/lib/newsletter/newsletterDispatch";
+import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
+import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 import { providersForLane } from "@/lib/providers/providerRegistry";
 import { isoWeekSeed } from "@/lib/public-content/weekSeed";
+
+/**
+ * Each emblem on the wheel gets its own themed newsletter (founder direction
+ * 2026-07-17). Mapped lanes render their Dispatch in the lane view; the rest
+ * slot in as their letters are written (the deeper newsletter work is later).
+ */
+const LANE_AUDIENCE: Record<string, NewsletterAudience> = {
+  "farms-agriculture": "farm",
+};
 
 /**
  * /explore — Compass-rose navigation (Build 56).
@@ -61,12 +74,12 @@ const LANES: LaneNode[] = [
   { slug: "small-business-growth",    label: "Small Business",        icon: "store",          tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
   { slug: "environmental-compliance", label: "Environmental",         icon: "leaf",           tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
   { slug: "financing-capital",        label: "Financing & Capital",   icon: "coin",           tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S
-  { slug: "housing-development",      label: "Housing & Development", icon: "home",           tint: "#FAECE7", color: "#993C1D", top: 76, left: 22 }, // SW
+  { slug: "housing-development",      label: "Newsletter & Podcasts", icon: "mail",           tint: "#FAECE7", color: "#993C1D", top: 76, left: 22 }, // SW
   { slug: "programs-incentives",      label: "Grants & Programs",     icon: "gift",           tint: "#FBEAF0", color: "#993556", top: 50, left: 12 }, // W
   { slug: "not-sure",                 label: "I'm Not Sure Yet",      icon: "compass",        tint: "#E6F1FB", color: "#185FA5", top: 24, left: 22 }, // NW
 ];
 
-type IconName = "map-pin" | "plant" | "store" | "leaf" | "coin" | "home" | "gift" | "compass";
+type IconName = "map-pin" | "plant" | "store" | "leaf" | "coin" | "mail" | "gift" | "compass";
 
 function LaneIcon({ name }: { name: IconName }) {
   const common = {
@@ -80,7 +93,7 @@ function LaneIcon({ name }: { name: IconName }) {
     case "store":    return (<svg {...common}><path d="M4.5 9.5V19a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.5" /><path d="M3 9.5 4.6 5h14.8L21 9.5a2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-5 0 2.5 2.5 0 0 1-3 0z" /><path d="M9.5 20v-5h5v5" /></svg>);
     case "leaf":     return (<svg {...common}><path d="M5 19s-.5-8.5 8-11.5c4-1.4 5.5-2 5.5-2s.5 9.5-5.5 13.5C8.5 21 5 19 5 19z" /><path d="M5 19c4-4.5 7.5-6.5 11-7.5" /></svg>);
     case "coin":     return (<svg {...common}><circle cx="12" cy="12" r="8.2" /><path d="M12 7.5v9" /><path d="M14.4 9.7c0-1.1-1-1.7-2.6-1.7s-2.6.7-2.6 1.7 1 1.4 2.6 1.6 2.6.5 2.6 1.6-1 1.7-2.6 1.7-2.6-.6-2.6-1.7" /></svg>);
-    case "home":     return (<svg {...common}><path d="M4 11l8-7 8 7" /><path d="M6 10v10h12V10" /><path d="M10 20v-6h4v6" /></svg>);
+    case "mail":     return (<svg {...common}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3.5 7 8.5 6 8.5-6" /></svg>);
     case "gift":     return (<svg {...common}><rect x="4" y="9.5" width="16" height="10.5" rx="1" /><path d="M3 9.5h18v3H3z" /><path d="M12 9.5V20" /><path d="M12 9.5C12 9.5 11 4.5 8.3 4.5 6.5 4.5 6.5 7 8 8s4 1.5 4 1.5zM12 9.5s1-5 3.7-5C17.5 4.5 17.5 7 16 8s-4 1.5-4 1.5z" /></svg>);
     case "compass":  return (<svg {...common}><circle cx="12" cy="12" r="8.5" /><path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2z" /></svg>);
   }
@@ -164,6 +177,17 @@ export default async function ExplorePage({
               required. Change direction at any time.
             </p>
           </header>
+
+          {/* This emblem's own newsletter (founder direction 2026-07-17: each
+              lane gets a themed newsletter). Mapped lanes only for now. */}
+          {(() => {
+            const audience = LANE_AUDIENCE[selected.slug];
+            if (!audience) return null;
+            const asOf = STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-17";
+            const dispatch = buildCompassDispatch(audience, "delmarva", asOf);
+            return dispatch ? <CompassDispatchHero dispatch={dispatch} /> : null;
+          })()}
+
           <section
             aria-label={`Exploring: ${selected.label}`}
             style={{ background: theme.plate, border: `1px solid ${theme.plateBorder}`, borderRadius: 14, padding: "24px 28px", display: "grid", gap: 12 }}

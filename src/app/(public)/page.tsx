@@ -614,14 +614,8 @@ export default async function HomePage() {
                     {HOMEPAGE_PRIMARY_ACTIONS.primarySupport}
                   </span>
                 </div>
-                <div className="fl-hero-action">
-                  <Link href="/explore" className="fl-cta-secondary" data-testid="cta-explore-map">
-                    {HOMEPAGE_PRIMARY_ACTIONS.secondaryLabel} →
-                  </Link>
-                  <span data-testid="cta-explore-support" className="fl-hero-action-support">
-                    {HOMEPAGE_PRIMARY_ACTIONS.secondarySupport}
-                  </span>
-                </div>
+                {/* "Open the Compass" secondary CTA removed — the compass is
+                    right below on the page now (founder direction 2026-07-17). */}
               </div>
             )}
           </header>

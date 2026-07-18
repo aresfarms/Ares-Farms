@@ -4,20 +4,21 @@ import Link from "next/link";
 import { PREMIUM } from "@/lib/property/laneThemes";
 
 /**
- * /neighborhood — the informational Furlong Neighborhood page (founder
- * direction 2026-07-18: the gold community entity, renamed "Neighborhood," is
- * the compass's SW emblem; the newsletters/podcasts are PART of it).
+ * /guild — the informational Furlong Guild page (founder direction 2026-07-18:
+ * the gold membership entity, named "The Guild" after a naming study — distinct,
+ * ownable, premium; earned belonging + mutual aid across trades; it's the
+ * compass's SW emblem, and the newsletters/podcasts are PART of it).
  *
  * GOVERNANCE: membership economics are shelved until the founders + counsel
  * session. This page collects NOTHING (no signup form, no email capture, no
- * payment), states NO prices, and is explicit that the Neighborhood is forming.
- * It describes the vision only — the "what," never a checkout.
+ * payment), states NO prices, and is explicit that the Guild is forming. It
+ * describes the vision only — the "what," never a checkout.
  */
 
 export const metadata: Metadata = {
-  title: "The Furlong Neighborhood | Furlong",
+  title: "The Furlong Guild | Furlong",
   description:
-    "A neighborhood of owners, operators, and the people who fund them. Forming now — the vision, honestly, with no sign-up yet.",
+    "A guild of owners, operators, and the people who fund them. Forming now — the vision, honestly, with no sign-up yet.",
 };
 
 const PILLARS: Array<{ title: string; body: string }> = [
@@ -59,14 +60,14 @@ export default function CommunityPage() {
         }}
       >
         <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: PREMIUM.gold }}>
-          ✦ The Furlong Neighborhood
+          ✦ The Furlong Guild
         </span>
         <h1 style={{ margin: 0, fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 800, color: PREMIUM.goldBright, lineHeight: 1.15 }}>
-          Where owners, operators, and the people who fund them meet.
+          Owners, operators, and the people who fund them — one guild.
         </h1>
         <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.65, color: "#c8d6ea", maxWidth: 640 }}>
-          Furlong is free to explore, and always will be. The Neighborhood is the next step for people who want
-          to go deeper — together. It is being built right now.
+          Furlong is free to explore, and always will be. The Guild is the next step for people who want to go
+          deeper — together, and looking out for each other. It is being built right now.
         </p>
       </section>
 
@@ -85,8 +86,8 @@ export default function CommunityPage() {
           Being built now
         </span>
         <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: "#4a3d1e" }}>
-          There is no sign-up yet, and we are not quoting prices. The Neighborhood takes shape once our founders
-          and counsel finalize it — and when it opens, everything you already use on Furlong carries forward
+          There is no sign-up yet, and we are not quoting prices. The Guild takes shape once our founders and
+          counsel finalize it — and when it opens, everything you already use on Furlong carries forward
           unchanged. Nothing you explore today ever costs you anything.
         </p>
       </section>

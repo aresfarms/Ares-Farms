@@ -50,7 +50,7 @@ const SCANNED_FILES = [
   "src/components/property/PropertyHub.tsx",
   "src/components/discovery/PlaceFirstDiscovery.tsx",
   "src/app/(public)/explore/page.tsx",
-  "src/app/(public)/neighborhood/page.tsx",
+  "src/app/(public)/guild/page.tsx",
   "src/components/public/CommunityCta.tsx",
   "src/app/(public)/compass/page.tsx",
   "src/app/(public)/financing-pathways/page.tsx",

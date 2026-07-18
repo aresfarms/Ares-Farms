@@ -16,7 +16,7 @@ import { PREMIUM } from "@/lib/property/laneThemes";
 export function CommunityCta() {
   return (
     <section
-      aria-label="The Furlong Neighborhood"
+      aria-label="The Furlong Guild"
       style={{
         background: `linear-gradient(155deg, ${PREMIUM.ink} 0%, ${PREMIUM.inkSoft} 100%)`,
         border: `1px solid ${PREMIUM.gold}`,
@@ -27,19 +27,19 @@ export function CommunityCta() {
       }}
     >
       <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: PREMIUM.gold }}>
-        ✦ The Furlong Neighborhood
+        ✦ The Furlong Guild
       </span>
       <strong style={{ fontSize: 20, color: PREMIUM.goldBright, lineHeight: 1.2, fontWeight: 800 }}>
-        Where owners, operators, and the people who fund them meet.
+        Owners, operators, and the people who fund them — one guild.
       </strong>
       <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: "#c8d6ea", maxWidth: 620 }}>
-        The newsletter, the podcasts, and the deeper analysis all lead to one place: a neighborhood of people
-        working the same problems you are. It&apos;s being built now — no sign-up yet — and it opens once we
-        finalize it with our founders and counsel.
+        The newsletter, the podcasts, and the deeper analysis all lead to one place: a guild of people working
+        the same problems you are, looking out for each other. It&apos;s being built now — no sign-up yet — and
+        it opens once we finalize it with our founders and counsel.
       </p>
       <div>
         <Link
-          href="/neighborhood"
+          href="/guild"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -53,7 +53,7 @@ export function CommunityCta() {
             textDecoration: "none",
           }}
         >
-          See what the Neighborhood is →
+          See what the Guild is →
         </Link>
       </div>
     </section>

@@ -97,7 +97,7 @@ type LaneNode = {
   color: string;     // icon + focus ring color
   top: number;       // % position of the node centre
   left: number;
-  href?: string;     // override the /explore?lane= link (e.g. the Neighborhood → /neighborhood)
+  href?: string;     // override the /explore?lane= link (e.g. The Guild → /guild)
 };
 
 // Positions pulled inward from the square's edges (verticals 13–87, diagonals
@@ -109,7 +109,7 @@ const LANES: LaneNode[] = [
   { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
   { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
   { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S
-  { slug: "neighborhood",             label: "Neighborhood",                    icon: "community", tint: "#faf3e6", color: "#b8862f", top: 76, left: 22, href: "/neighborhood" }, // SW — the gold community entity
+  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", top: 76, left: 22, href: "/guild" }, // SW — the gold membership entity
   { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556", top: 50, left: 12 }, // W
   { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5", top: 24, left: 22 }, // NW
 ];

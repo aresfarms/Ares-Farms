@@ -61,11 +61,20 @@ export const LANE_THEMES = {
     tileLabel: "#93b89a",
     tileValue: "#eaf5ea",
   },
-  // RESIDENTIAL → BLUE / TEAL. Blue tones signal trust, stability, and
-  // dependability — the reassurance behind a home purchase; blue is also the
-  // most broadly preferred color across demographics, which is why banks and
-  // insurers lead with it. (Current default; kept as this lane's identity.)
+  // RESIDENTIAL → BLUE. Blue signals trust, stability, and dependability — the
+  // reassurance behind the biggest trust decision most people make; it is also
+  // the most broadly preferred color across demographics, which is why banks
+  // and insurers lead with it. Navy tiles stay (same blue family).
   residential: {
+    accent: "#1c5aa0",
+    tileBg: "#0f2036",
+    tileLabel: "#8fb0cf",
+    tileValue: "#eaf1fa",
+  },
+  // COMMERCIAL → TEAL. Teal reads as clarity, competence, and level-headed
+  // enterprise — a working, get-it-done color that sits between the residential
+  // blue and any green, so the three property lanes stay distinct at a glance.
+  commercial: {
     accent: "#0f766e",
     tileBg: "#0f2430",
     tileLabel: "#7fa8b8",

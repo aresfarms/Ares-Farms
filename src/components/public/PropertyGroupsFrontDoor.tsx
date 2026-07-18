@@ -16,24 +16,28 @@ import type { FrontDoorGroup } from "@/lib/property/propertyFrontDoor";
 export function PropertyGroupsFrontDoor({
   groups,
   compact = false,
+  accent = "#0f766e",
 }: {
   groups: FrontDoorGroup[];
   /** Side-panel mode (beside the map): a light "Live listings" label instead
       of the full front-door heading, which was written for a full-width page
       (founder direction 2026-07-18). */
   compact?: boolean;
+  /** Lane accent color (founder direction 2026-07-18: each module wears its
+      own color). Defaults to the shared teal for un-themed surfaces. */
+  accent?: string;
 }) {
   if (groups.length === 0) return null;
 
   return (
     <section aria-label="Property groups" style={{ display: "grid", gap: 14 }}>
       {compact ? (
-        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: accent }}>
           Live listings
         </span>
       ) : (
         <div style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: accent }}>
             The front door
           </span>
           <strong style={{ fontSize: 24, color: "#101a2b", lineHeight: 1.15 }}>
@@ -61,7 +65,7 @@ export function PropertyGroupsFrontDoor({
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
               <strong style={{ fontSize: 17, color: "#101a2b" }}>{group.label}</strong>
-              <span style={{ fontSize: 12, fontWeight: 800, color: "#0f766e", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: 12, fontWeight: 800, color: accent, whiteSpace: "nowrap" }}>
                 {group.count.toLocaleString("en-US")} tracked
               </span>
             </div>
@@ -86,7 +90,7 @@ export function PropertyGroupsFrontDoor({
                 </Link>
               ))}
             </div>
-            <Link href={group.browseHref} style={{ fontSize: 12.8, fontWeight: 700, color: "#0f766e", textDecoration: "none" }}>
+            <Link href={group.browseHref} style={{ fontSize: 12.8, fontWeight: 700, color: accent, textDecoration: "none" }}>
               See all {group.label.toLowerCase()} →
             </Link>
           </div>

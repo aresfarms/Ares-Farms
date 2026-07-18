@@ -15,6 +15,7 @@ import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
 import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
 import { categoryForType } from "@/lib/property/propertyCategories";
+import { LANE_THEMES } from "@/lib/property/laneThemes";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
@@ -178,6 +179,13 @@ export default async function ExplorePage({
     const audience = LANE_AUDIENCE[selected.slug];
     const isFarmLane = selected.slug === "farms-agriculture";
     const isResidentialLane = selected.slug === "property-land";
+    // Each property module wears its own accent (founder direction 2026-07-18):
+    // farms green, residential blue, commercial teal.
+    const laneAccent = isFarmLane
+      ? LANE_THEMES.farm.accent
+      : isResidentialLane
+        ? LANE_THEMES.residential.accent
+        : LANE_THEMES.commercial.accent;
     return (
       <>
         {/* Farms lane leads with the commodity ticker (founder direction
@@ -213,9 +221,9 @@ export default async function ExplorePage({
               tiles sit under the "Homes to live in" box (founder direction
               2026-07-18). Other lanes keep the full-width shelf below. */}
           <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
-            <PropertyGroupsFrontDoor groups={laneGroups} compact />
+            <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
             {isFarmLane && (
-              <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} limit={6} layout="column" />
+              <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} limit={6} layout="column" accent={laneAccent} />
             )}
             {isResidentialLane && <ResidentialRateTiles />}
           </div>
@@ -230,7 +238,7 @@ export default async function ExplorePage({
         {/* Non-farm lanes keep the full-width listings shelf below the map. */}
         {!isFarmLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
-            <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} />
+            <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} accent={laneAccent} />
           </div>
         )}
         {/* Residential lane: the full loan-options table full-width below the

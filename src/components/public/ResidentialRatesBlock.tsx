@@ -7,6 +7,10 @@
  */
 
 import { buildResidentialRates } from "@/lib/property/residentialRatesCurated";
+import { LANE_THEMES } from "@/lib/property/laneThemes";
+
+// The Residential module wears its BLUE identity (trust/stability/security).
+const R = LANE_THEMES.residential;
 
 const card = {
   border: "1px solid #d7deea",
@@ -17,10 +21,10 @@ const card = {
 
 function RateTile({ label, rate, sub }: { label: string; rate: number; sub: string }) {
   return (
-    <div style={{ ...card, background: "#0f2430", border: "1px solid #0f2430", display: "grid", gap: 2, minWidth: 150, flex: "1 1 150px" }}>
-      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#7fa8b8" }}>{label}</span>
-      <strong style={{ fontSize: 30, color: "#eaf3f7", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{rate.toFixed(2)}%</strong>
-      <span style={{ fontSize: 11.5, color: "#7fa8b8" }}>{sub}</span>
+    <div style={{ ...card, background: R.tileBg, border: `1px solid ${R.tileBg}`, display: "grid", gap: 2, minWidth: 150, flex: "1 1 150px" }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: R.tileLabel }}>{label}</span>
+      <strong style={{ fontSize: 30, color: R.tileValue, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{rate.toFixed(2)}%</strong>
+      <span style={{ fontSize: 11.5, color: R.tileLabel }}>{sub}</span>
     </div>
   );
 }
@@ -31,7 +35,7 @@ export function ResidentialRateTiles() {
   return (
     <section aria-label="Current residential mortgage rates" style={{ display: "grid", gap: 10 }}>
       <div style={{ display: "grid", gap: 3 }}>
-        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: R.accent }}>
           Today&apos;s mortgage rates
         </span>
         <strong style={{ fontSize: 17, color: "#101a2b", lineHeight: 1.15 }}>What it costs to borrow right now</strong>
@@ -53,7 +57,7 @@ export function ResidentialLoanTable() {
   return (
     <section aria-label="Residential loan options" style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 4 }}>
-        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: R.accent }}>
           Every way to finance a home
         </span>
         <strong style={{ fontSize: 22, color: "#101a2b", lineHeight: 1.15 }}>Which loan fits which buyer</strong>
@@ -76,7 +80,7 @@ export function ResidentialLoanTable() {
                   {o.name}
                   {o.note && <span style={{ display: "block", fontSize: 11.5, fontWeight: 400, color: "#9a3412", marginTop: 3, lineHeight: 1.45 }}>{o.note}</span>}
                 </td>
-                <td style={{ padding: "9px 12px 9px 0", color: "#0f766e", fontWeight: 700, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{o.rateLabel}</td>
+                <td style={{ padding: "9px 12px 9px 0", color: R.accent, fontWeight: 700, whiteSpace: "nowrap", fontVariantNumeric: "tabular-nums" }}>{o.rateLabel}</td>
                 <td style={{ padding: "9px 12px 9px 0", color: "#101a2b", whiteSpace: "nowrap" }}>{o.downPayment}</td>
                 <td style={{ padding: "9px 12px 9px 0", color: "#4d596d" }}>{o.mortgageInsurance}</td>
                 <td style={{ padding: "9px 0", color: "#4d596d" }}>{o.whoFor}</td>

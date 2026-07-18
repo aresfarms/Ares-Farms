@@ -41,6 +41,7 @@ export function PropertyShowcaseRail({
   weekSeed,
   limit = 24,
   layout = "shelf",
+  accent = "#0f766e",
 }: {
   inventoryByState: Record<string, PublicSafeProperty[]>;
   weekSeed: number;
@@ -48,6 +49,9 @@ export function PropertyShowcaseRail({
   /** "shelf" = horizontal scroll (default); "column" = vertical stack that
       fills the dead space beside the map (founder direction 2026-07-18). */
   layout?: "shelf" | "column";
+  /** Lane accent color (founder direction 2026-07-18: each module wears its
+      own color). Defaults to the shared teal for un-themed surfaces. */
+  accent?: string;
 }) {
   const isColumn = layout === "column";
   // Interleave by PROPERTY KIND first (founder direction 2026-07-17: the
@@ -89,14 +93,14 @@ export function PropertyShowcaseRail({
     <section aria-label="Current government-listed properties" style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: accent }}>
             On the shelf this week
           </span>
           <strong style={{ fontSize: isColumn ? 17 : 22, color: "#101a2b", lineHeight: 1.15 }}>
             Real listings, straight from government sources
           </strong>
         </div>
-        <Link href="/explore" style={{ fontSize: 13.5, fontWeight: 700, color: "#0f766e" }}>
+        <Link href="/explore" style={{ fontSize: 13.5, fontWeight: 700, color: accent }}>
           Browse all inventory →
         </Link>
       </div>
@@ -148,7 +152,7 @@ export function PropertyShowcaseRail({
                 scrollSnapAlign: isColumn ? undefined : "start",
               }}
             >
-              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", color: "#0f766e" }}>
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", color: accent }}>
                 {property.state} · {sourceLabel(property.sourceId)}
               </span>
               <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>{title}</strong>
@@ -159,7 +163,7 @@ export function PropertyShowcaseRail({
               <span style={{ fontSize: 11.5, color: "#7a8aa0" }}>
                 Current listing{property.asOf ? ` · as of ${property.asOf.slice(0, 10)}` : ""}
               </span>
-              <span style={{ fontSize: 12.5, fontWeight: 700, color: "#0f766e" }}>
+              <span style={{ fontSize: 12.5, fontWeight: 700, color: accent }}>
                 See the place brief →
               </span>
             </Link>

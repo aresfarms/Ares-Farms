@@ -51,13 +51,16 @@ const GROUP_LABELS: Record<PropertyProfileId, string> = {
   "mobile-home-park": "Mobile home parks",
 };
 
+// Lane-aware "See all" targets — keep the lane so the drill-down stays in
+// context (founder direction 2026-07-17). Each profile → its home lane + the
+// category its listings fall into (via categoryForType).
 const BROWSE_HREFS: Record<PropertyProfileId, string> = {
-  residential: "/explore?category=homes",
-  farm: "/explore",
-  commercial: "/explore?category=commercial",
-  land: "/explore?category=land",
-  hospitality: "/explore",
-  "mobile-home-park": "/explore",
+  residential: "/explore?lane=property-land&category=homes",
+  farm: "/explore?lane=farms-agriculture&category=farms-ranches",
+  land: "/explore?lane=farms-agriculture&category=land",
+  commercial: "/explore?lane=small-business-growth&category=commercial",
+  hospitality: "/explore?lane=small-business-growth&category=hospitality",
+  "mobile-home-park": "/explore?lane=small-business-growth&category=commercial",
 };
 
 const SOURCE_LABELS: Record<string, string> = {

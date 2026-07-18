@@ -81,10 +81,13 @@ function stateName(abbr: string): string {
 export function PropertyHub({
   state,
   category,
+  lane = "property-land",
 }: {
   state?: string | null;
   type?: string | null;
   category?: string | null;
+  /** The compass lane this hub is browsing — kept in every internal link. */
+  lane?: string;
 }) {
   const tree = propertyTree();
   const sources = propertySourceStatuses();
@@ -118,12 +121,12 @@ export function PropertyHub({
                 listings above (founder direction 2026-07-17). */}
           </>
         ) : !selectedAbbr ? (
-          <StateList category={liveCategory} />
+          <StateList category={liveCategory} lane={lane} />
         ) : (
-          <Listings categoryId={liveCategory.id} categoryLabel={liveCategory.label} abbr={selectedAbbr} />
+          <Listings categoryId={liveCategory.id} categoryLabel={liveCategory.label} abbr={selectedAbbr} lane={lane} />
         )}
 
-        <Link href="/explore" style={backLink}>
+        <Link href={`/explore?lane=${encodeURIComponent(lane)}`} style={backLink}>
           ← Back to the compass
         </Link>
         <Disclosures variant="full" tone="dark" />
@@ -225,10 +228,10 @@ function PendingState({
 
 // ── Level 1: category grid (only non-empty categories) ────────────────────────
 // ── Level 2: states within a category (only non-empty states) ─────────────────
-function StateList({ category }: { category: ReturnType<typeof buildCategoryTree>["categories"][number] }) {
+function StateList({ category, lane }: { category: ReturnType<typeof buildCategoryTree>["categories"][number]; lane: string }) {
   return (
     <section aria-label={`${category.label} — states with inventory`} style={{ display: "grid", gap: 14 }}>
-      <Breadcrumb categoryLabel={category.label} />
+      <Breadcrumb categoryLabel={category.label} lane={lane} />
       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
         <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#eaf3f7" }}>{category.label}</h2>
         <span style={{ fontSize: 14, color: "#b7ccd9" }}>
@@ -239,7 +242,7 @@ function StateList({ category }: { category: ReturnType<typeof buildCategoryTree
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
         {category.states.map((s) => (
           <li key={s.abbr}>
-            <Link href={stateHref(category.id, s.abbr)} style={{ ...cardLink, flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
+            <Link href={stateHref(lane, category.id, s.abbr)} style={{ ...cardLink, flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
               <strong style={{ fontSize: 15, color: "#eaf3f7" }}>{stateName(s.abbr)}</strong>
               <span style={countPill}>{s.count.toLocaleString("en-US")}</span>
             </Link>
@@ -252,11 +255,12 @@ function StateList({ category }: { category: ReturnType<typeof buildCategoryTree
 
 // ── Level 3: the listings for category + state ────────────────────────────────
 function Listings({
-  categoryId, categoryLabel, abbr,
+  categoryId, categoryLabel, abbr, lane,
 }: {
   categoryId: PropertyCategoryId;
   categoryLabel: string;
   abbr: string;
+  lane: string;
 }) {
   const { listings } = listExploreDetail({ state: abbr, category: categoryId });
   // B10 reconciliation: the list deliberately includes HISTORICAL examples
@@ -272,7 +276,7 @@ function Listings({
   );
   return (
     <section aria-label={`${categoryLabel} in ${stateName(abbr)}`} style={{ display: "grid", gap: 14 }}>
-      <Breadcrumb categoryLabel={categoryLabel} categoryId={categoryId} stateAbbr={abbr} />
+      <Breadcrumb categoryLabel={categoryLabel} categoryId={categoryId} stateAbbr={abbr} lane={lane} />
       <p style={{ margin: 0, fontSize: 14, color: "#b7ccd9" }}>
         {(listings.length + direct.length).toLocaleString("en-US")} {listings.length + direct.length === 1 ? "property" : "properties"} ·{" "}
         {categoryLabel} in {stateName(abbr)} —{" "}
@@ -629,19 +633,20 @@ function FinanceBridge({ sourceId, categoryId }: { sourceId: PropertySourceId; c
 
 // ── Breadcrumb ────────────────────────────────────────────────────────────────
 function Breadcrumb({
-  categoryLabel, categoryId, stateAbbr,
+  categoryLabel, categoryId, stateAbbr, lane,
 }: {
   categoryLabel: string;
   categoryId?: PropertyCategoryId;
   stateAbbr?: string;
+  lane: string;
 }) {
   return (
     <nav aria-label="Breadcrumb" style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", fontSize: 13 }}>
-      <Link href={allHref()} style={crumbLink}>All categories</Link>
+      <Link href={allHref(lane)} style={crumbLink}>All categories</Link>
       <span aria-hidden="true" style={{ color: "#9db4d8" }}>›</span>
       {stateAbbr && categoryId ? (
         <>
-          <Link href={catHref(categoryId)} style={crumbLink}>{categoryLabel}</Link>
+          <Link href={catHref(lane, categoryId)} style={crumbLink}>{categoryLabel}</Link>
           <span aria-hidden="true" style={{ color: "#9db4d8" }}>›</span>
           <span style={{ color: "#eaf3f7", fontWeight: 700 }}>{stateName(stateAbbr)}</span>
         </>
@@ -653,14 +658,14 @@ function Breadcrumb({
 }
 
 // ── href + style helpers ──────────────────────────────────────────────────────
-function allHref(): string {
-  return `/explore?${new URLSearchParams({ lane: "property-land" }).toString()}`;
+function allHref(lane: string): string {
+  return `/explore?${new URLSearchParams({ lane }).toString()}`;
 }
-function catHref(categoryId: string): string {
-  return `/explore?${new URLSearchParams({ lane: "property-land", category: categoryId }).toString()}`;
+function catHref(lane: string, categoryId: string): string {
+  return `/explore?${new URLSearchParams({ lane, category: categoryId }).toString()}`;
 }
-function stateHref(categoryId: string, abbr: string): string {
-  return `/explore?${new URLSearchParams({ lane: "property-land", category: categoryId, state: abbr }).toString()}`;
+function stateHref(lane: string, categoryId: string, abbr: string): string {
+  return `/explore?${new URLSearchParams({ lane, category: categoryId, state: abbr }).toString()}`;
 }
 
 const cardLink = {

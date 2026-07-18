@@ -37,7 +37,7 @@ const LANE_AUDIENCE: Record<string, NewsletterAudience> = {
 const PROPERTY_LANE_FILTERS: Record<string, { categories: string[]; profiles: PropertyProfileId[] }> = {
   "property-land": { categories: ["homes"], profiles: ["residential"] },
   "farms-agriculture": { categories: ["farms-ranches", "land"], profiles: ["farm", "land"] },
-  "small-business-growth": { categories: ["commercial", "misc"], profiles: ["commercial", "hospitality", "mobile-home-park"] },
+  "small-business-growth": { categories: ["commercial", "hospitality", "businesses", "misc"], profiles: ["commercial", "hospitality", "mobile-home-park"] },
 };
 
 /** Keep only the listings whose category is in the lane's set (drops empty states). */
@@ -213,6 +213,7 @@ export default async function ExplorePage({
           state={one(resolved.state)}
           type={one(resolved.type)}
           category={one(resolved.category)}
+          lane={selected.slug}
         />
         <style>{`@media (max-width: 1240px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>
       </>

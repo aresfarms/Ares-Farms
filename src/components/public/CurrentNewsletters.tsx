@@ -12,7 +12,7 @@ import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CURRENT_NEWSLETTERS } from "@/lib/newsletter/newsletterRegistry";
 import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 
-export function CurrentNewsletters({ audiences }: { audiences?: NewsletterAudience[] }) {
+export function CurrentNewsletters({ audiences, accent = "#0f766e" }: { audiences?: NewsletterAudience[]; accent?: string }) {
   const asOf = STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-18";
   const listings = CURRENT_NEWSLETTERS.filter(
     (n) => !audiences || audiences.includes(n.audience)
@@ -32,7 +32,7 @@ export function CurrentNewsletters({ audiences }: { audiences?: NewsletterAudien
         padding: "16px 20px",
       }}
     >
-      <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+      <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: accent }}>
         Current Newsletters
       </span>
       {newsletters.length === 0 ? (
@@ -45,7 +45,7 @@ export function CurrentNewsletters({ audiences }: { audiences?: NewsletterAudien
               <li key={n.key}>
                 <Link
                   href={`/newsletters/${n.key}`}
-                  style={{ fontSize: 14, fontWeight: 700, color: "#0f766e", textDecoration: "none" }}
+                  style={{ fontSize: 14, fontWeight: 700, color: accent, textDecoration: "none" }}
                 >
                   {n.title} →
                 </Link>
@@ -66,7 +66,7 @@ export function CurrentNewsletters({ audiences }: { audiences?: NewsletterAudien
         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 8 }}>
           {podcasts.map((p) => (
             <li key={p.key}>
-              <Link href={`/newsletters/${p.key}`} style={{ fontSize: 14, fontWeight: 700, color: "#0f766e", textDecoration: "none" }}>
+              <Link href={`/newsletters/${p.key}`} style={{ fontSize: 14, fontWeight: 700, color: accent, textDecoration: "none" }}>
                 {p.title} →
               </Link>
             </li>

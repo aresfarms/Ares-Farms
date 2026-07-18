@@ -81,3 +81,38 @@ export const LANE_THEMES = {
     tileValue: "#eaf3f7",
   },
 } as const satisfies Record<string, LaneTheme>;
+
+/**
+ * Per-lane accent by compass slug — the full set, so EVERY module wears its own
+ * separate-but-cohesive color (founder direction 2026-07-18). Two variants each:
+ * `onLight` for content that sits on white (the property lanes' browse box,
+ * tiles, chart), `onDark` for the dark navy stage the deferred lanes render on.
+ * Hue choices are psychology-matched and spread around the wheel so no two
+ * lanes read the same at a glance. GOLD is intentionally absent — it belongs to
+ * the community cue alone; giving the deferred lanes their own colors also frees
+ * gold from being their default chart accent.
+ */
+export interface LaneAccentPair {
+  onLight: string;
+  onDark: string;
+}
+
+export const LANE_ACCENT_MAP: Record<string, LaneAccentPair> = {
+  // Property lanes (onLight matches LANE_THEMES above; onDark unused today).
+  "property-land": { onLight: "#1c5aa0", onDark: "#7fb0e0" }, // blue — trust
+  "farms-agriculture": { onLight: "#2f6d12", onDark: "#8fd0a2" }, // green — growth
+  "small-business-growth": { onLight: "#0f766e", onDark: "#7fc4b8" }, // teal — enterprise
+  // Deferred lanes (rendered on the dark stage → onDark is what shows).
+  "environmental-compliance": { onLight: "#127a4f", onDark: "#6fd0a0" }, // emerald — nature/renewal
+  "financing-capital": { onLight: "#534AB7", onDark: "#a99cf0" }, // purple — wealth/ambition
+  "housing-development": { onLight: "#a5441d", onDark: "#f0a17c" }, // rust/coral — warm editorial (newsletters)
+  "programs-incentives": { onLight: "#a8324f", onDark: "#ec8aa6" }, // raspberry — opportunity (grants)
+  "not-sure": { onLight: "#475569", onDark: "#9fb6da" }, // slate — official/precise (taxes/regs)
+};
+
+/** Resolve a lane's accent for a light or dark surface; teal fallback. */
+export function accentForLane(slug: string, on: "light" | "dark" = "light"): string {
+  const pair = LANE_ACCENT_MAP[slug];
+  if (!pair) return on === "dark" ? "#7fc4b8" : "#0f766e";
+  return on === "dark" ? pair.onDark : pair.onLight;
+}

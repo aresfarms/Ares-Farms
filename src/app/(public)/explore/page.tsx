@@ -15,7 +15,7 @@ import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
 import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
 import { categoryForType } from "@/lib/property/propertyCategories";
-import { LANE_THEMES } from "@/lib/property/laneThemes";
+import { accentForLane } from "@/lib/property/laneThemes";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
@@ -179,13 +179,9 @@ export default async function ExplorePage({
     const audience = LANE_AUDIENCE[selected.slug];
     const isFarmLane = selected.slug === "farms-agriculture";
     const isResidentialLane = selected.slug === "property-land";
-    // Each property module wears its own accent (founder direction 2026-07-18):
-    // farms green, residential blue, commercial teal.
-    const laneAccent = isFarmLane
-      ? LANE_THEMES.farm.accent
-      : isResidentialLane
-        ? LANE_THEMES.residential.accent
-        : LANE_THEMES.commercial.accent;
+    // Each module wears its own accent (founder direction 2026-07-18). These
+    // property lanes render on white → the onLight variant.
+    const laneAccent = accentForLane(selected.slug, "light");
     return (
       <>
         {/* Farms lane leads with the commodity ticker (founder direction
@@ -277,6 +273,11 @@ export default async function ExplorePage({
       .split(",")
       .map((t) => t.trim())
       .filter(Boolean);
+    // Each deferred module wears its own accent (founder direction 2026-07-18).
+    // The stage is dark navy → the onDark (light) variant; the newsletter cards
+    // are white → the onLight variant.
+    const laneAccentDark = accentForLane(selected.slug, "dark");
+    const laneAccentLight = accentForLane(selected.slug, "light");
     return (
       <main>
         <div style={stageContainer}>
@@ -294,21 +295,21 @@ export default async function ExplorePage({
               (and podcasts once running) — links, not inline letters (founder
               direction 2026-07-18). Other mapped lanes list their own. */}
           {selected.slug === "housing-development" ? (
-            <CurrentNewsletters />
+            <CurrentNewsletters accent={laneAccentLight} />
           ) : LANE_AUDIENCE[selected.slug] ? (
-            <CurrentNewsletters audiences={[LANE_AUDIENCE[selected.slug]]} />
+            <CurrentNewsletters audiences={[LANE_AUDIENCE[selected.slug]]} accent={laneAccentLight} />
           ) : null}
 
           <section
             aria-label={`Exploring: ${selected.label}`}
             style={{ background: theme.plate, border: `1px solid ${theme.plateBorder}`, borderRadius: 14, padding: "24px 28px", display: "grid", gap: 12 }}
           >
-            <span style={kicker}>
+            <span style={{ ...kicker, color: laneAccentDark }}>
               Exploring — no account needed
             </span>
             <strong style={{ fontSize: 22, color: theme.ink }}>{selected.label}</strong>
             <p style={{ margin: 0, fontSize: 16, ...muted }}>{selected.blurb}</p>
-            <Link href="/explore" style={{ fontSize: 14, fontWeight: 700, color: dark.accent, textDecoration: "none", width: "fit-content" }}>
+            <Link href="/explore" style={{ fontSize: 14, fontWeight: 700, color: laneAccentDark, textDecoration: "none", width: "fit-content" }}>
               ← Back to the compass
             </Link>
           </section>
@@ -318,7 +319,7 @@ export default async function ExplorePage({
               aria-label="Next step — explore financing for a property you found"
               style={{ background: theme.waypointBg, border: `1px solid ${theme.waypointBorder}`, borderRadius: 14, padding: "20px 24px", display: "grid", gap: 8 }}
             >
-              <strong style={{ fontSize: 16, color: theme.accent }}>
+              <strong style={{ fontSize: 16, color: laneAccentDark }}>
                 Exploring financing for a property you found
               </strong>
               <p style={{ margin: 0, fontSize: 15, ...muted }}>
@@ -343,7 +344,7 @@ export default async function ExplorePage({
               <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 10 }}>
                 {providersForLane(selected.slug).map((p) => (
                   <li key={p.slug} style={{ border: `1px solid ${theme.cellBorder}`, borderRadius: 12, background: theme.cellBg, padding: "16px 18px", display: "grid", gap: 4 }}>
-                    <Link href={`/providers/${p.slug}`} style={{ fontSize: 17, fontWeight: 700, color: dark.accent, textDecoration: "none" }}>
+                    <Link href={`/providers/${p.slug}`} style={{ fontSize: 17, fontWeight: 700, color: laneAccentDark, textDecoration: "none" }}>
                       {p.name} →
                     </Link>
                     <span style={{ fontSize: 14, ...muted }}>{p.tagline}</span>

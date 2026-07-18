@@ -289,18 +289,18 @@ export type ExplorationCategory = {
 export const EXPLORATION_CATEGORIES: ExplorationCategory[] = [
   {
     slug: "property-land",
-    label: "Property & Land",
-    blurb: "Acquisition, readiness, and what a property could support.",
+    label: "Residential",
+    blurb: "Homes to live in — cost to own, financing, and the place-facts that matter.",
   },
   {
     slug: "farms-agriculture",
-    label: "Farms & Agriculture",
-    blurb: "Financing, conservation, infrastructure, and programs.",
+    label: "Farms, Agriculture & Land",
+    blurb: "Farms, ranches, and land — financing, conservation, programs, and what the ground can support.",
   },
   {
     slug: "small-business-growth",
-    label: "Small Business Growth",
-    blurb: "Readiness gaps, capital paths, and next questions.",
+    label: "Commercial Properties",
+    blurb: "Owner-occupied commercial real estate — SBA and commercial financing, zoning, and the diligence that decides a deal.",
   },
   {
     slug: "environmental-compliance",
@@ -319,13 +319,13 @@ export const EXPLORATION_CATEGORIES: ExplorationCategory[] = [
   },
   {
     slug: "programs-incentives",
-    label: "Grants, Programs & Incentives",
-    blurb: "Grants, tax credits, cost-share, and incentive programs people often don't know to explore — the add-ons that stack onto a project.",
+    label: "Grants & State and Federal Programs",
+    blurb: "Grants, tax credits, cost-share, and state and federal incentive programs people often don't know to explore — the add-ons that stack onto a project.",
   },
   {
     slug: "not-sure",
-    label: "I'm Not Sure Yet",
-    blurb: "Start broad and explore the full map at your own pace.",
+    label: "Taxes, Accounting & Regulations",
+    blurb: "Tax planning, accounting, and the rules that shape a deal — what to line up before you move.",
   },
 ];
 

@@ -130,6 +130,22 @@ export const COMMERCIAL_BRIEFS: CommercialBrief[] = [
     pointer: "A business broker + commercial broker together; a CPA and attorney on how to structure the two",
   },
   {
+    id: "competition-commercial",
+    question: "Who's my competition — and how close is too close?",
+    answer:
+      "For location-dependent commercial — hotels, laundromats, car washes, self-storage, retail — competition and " +
+      "market saturation are often the whole ballgame. Before you buy, map every similar operation in the trade area " +
+      "(a few miles for a daily-use service, much wider for a destination), check occupancy and pricing where you " +
+      "can, and drive it yourself at different hours. For credit-tenant retail and industrial it matters less — the " +
+      "lease and tenant credit drive value — but for an owner-operated service business, the competitive map can " +
+      "decide whether the deal works at all.",
+    pointer: "A commercial broker's market study; the county/city planning department; drive the trade area yourself",
+    watch:
+      "The permit pipeline is the blind spot: today's numbers assume today's competition. A rival facility that's " +
+      "approved but not yet built won't appear in any current report — ask the planning department directly what's " +
+      "in the queue before you close.",
+  },
+  {
     id: "leases",
     question: "NNN vs gross lease — who actually pays what?",
     answer:

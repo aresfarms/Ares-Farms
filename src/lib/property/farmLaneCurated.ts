@@ -265,6 +265,48 @@ export const ENTERPRISE_BRIEFS: FarmBrief[] = [
       "records, road frontage (they want the sign seen), and an operator who'll actually follow the protocol.",
     pointer: "Your regional seed dealer / district agronomist; state extension variety-trial programs",
   },
+  {
+    id: "livestock-sourcing",
+    question: "Where do I buy reliable livestock — auction or private breeder?",
+    answer:
+      "Both work; the honest answer is it depends on what you're buying and why. AUCTION (the sale barn): fast, real " +
+      "price discovery, and volume — but you rarely know the animal's health history, vaccination status, or " +
+      "genetics, and commingling raises biosecurity risk (shipping fever and worse). Good for feeder/commodity " +
+      "animals when you can absorb some risk and will quarantine. PRIVATE BREEDER: you get known genetics, a real " +
+      "health history, papers, and usually breeder support — at a higher price and fewer head. Best for breeding " +
+      "stock, registered animals, or when disease-free status matters. The rule either way: buy from a reputable " +
+      "source, get a vet check and health papers, and QUARANTINE new arrivals 2–3 weeks before they touch your herd.",
+    pointer: "USDA AMS livestock market reports (auction barns & prices); the breed-association registry for breeders; your veterinarian on a health protocol",
+    url: "https://www.ams.usda.gov/market-news/livestock-poultry-grain",
+  },
+  {
+    id: "processing",
+    question: "Where will I get animals butchered — and does low vs high volume matter?",
+    answer:
+      "It matters a lot, and it comes down to who you can legally SELL to. LOW VOLUME / your own use: a " +
+      "CUSTOM-EXEMPT local butcher can process animals for the owner's own table (or 'custom' for a few named " +
+      "buyers who bought the animal live) — the meat is stamped 'Not for Sale.' STATE-INSPECTED plants let you sell " +
+      "within your state. HIGH VOLUME / selling to the public or across state lines: you need a USDA-INSPECTED " +
+      "(FSIS) slaughterhouse — required for retail, wholesale, or interstate sales. The catch nobody warns you " +
+      "about: appointment backlogs at inspected plants can run months, so you book your kill dates before the " +
+      "animals are ready. How far the nearest inspected plant sits from a property is a real cost — hauling live " +
+      "animals stresses them and shrinks weight, so proximity to processing is worth checking before you buy ground.",
+    pointer: "USDA FSIS Meat, Poultry & Egg Inspection Directory (searchable by state and location); your state department of agriculture for state-inspected plants",
+    url: "https://www.fsis.usda.gov/inspection/establishments/meat-poultry-and-egg-product-inspection-directory",
+  },
+  {
+    id: "competition-farm",
+    question: "Who am I competing with — and does it even matter?",
+    answer:
+      "It depends entirely on how you sell. If you grow COMMODITY crops or sell at auction, you're a price-taker in " +
+      "a global market — your neighbor isn't your competition, the exchange is, and local competition barely moves " +
+      "your price. But if you DIRECT-MARKET (produce, cut flowers, eggs, meat, a CSA, a farm stand, agritourism), " +
+      "local competition is decisive: count the farmers markets, CSAs, farm stands, and u-picks already serving your " +
+      "draw radius, and find the gap they're not filling. Being the fourth CSA in a small county is a very different " +
+      "bet than being the only flower farmer within an hour — check before you plant, not after.",
+    pointer: "USDA Local Food Directories (farmers markets, CSAs, food hubs, on-farm markets); your county extension on the local direct-market scene",
+    url: "https://www.usdalocalfoodportal.com/",
+  },
 ];
 
 // ── Land-money questions — solar, easements, selling, programs ──────────────
@@ -503,3 +545,27 @@ export const EQUIPMENT_NOTE =
   "number. Equipment loans and leases run through dealers, AgDirect/Farm Credit, and FSA microloans; the " +
   "honest scale rule: custom hire (planting, spraying, harvest) usually beats owning until the acres justify " +
   "the iron. Supplier links are independent companies — Furlong has no affiliation and earns nothing from them.";
+
+// ── Agricultural hauling ─────────────────────────────────────────────────────
+
+export interface AgHauler {
+  name: string;
+  role: string;
+  /** Affiliation disclosure (ECON-CONFLICT-001) — shown on the listing. */
+  disclosure?: string;
+}
+
+export const AG_HAULERS: AgHauler[] = [
+  { name: "Ares Farms Inc", role: "Licensed agricultural & equipment transport", disclosure: "Affiliated with a Furlong founder — disclosed" },
+  { name: "Eal Cole & Sons Trucking", role: "Reliable agriculture & equipment hauling" },
+  { name: "Giddens Trucking", role: "Reliable agriculture & equipment hauling" },
+];
+
+export const HAULING_NOTE =
+  "Before you hire ANY carrier — including these — verify active operating authority (DOT#/MC#) and current " +
+  "insurance on the FMCSA SAFER system; a lapsed authority or no cargo insurance is the fast way to lose a load. " +
+  "Livestock haulers need the right trailer and animal-welfare handling; oversize equipment moves need lowboys and " +
+  "state permits. These are independent companies and Furlong earns no referral fee. Ares Farms Inc is affiliated " +
+  "with a Furlong founder and is listed with that disclosure for transparency.";
+
+export const FMCSA_SAFER_URL = "https://safer.fmcsa.dot.gov/CompanySnapshot.aspx";

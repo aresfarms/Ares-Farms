@@ -11,8 +11,11 @@
 import Link from "next/link";
 
 import {
+  AG_HAULERS,
   buildFarmMarketView,
   ENTERPRISE_BRIEFS,
+  FMCSA_SAFER_URL,
+  HAULING_NOTE,
   LAND_OPTION_BRIEFS,
   type FarmBrief,
 } from "@/lib/property/farmLaneCurated";
@@ -230,6 +233,36 @@ export function FarmLaneSections() {
       {/* Equipment — interactive: suppliers inside each box + a recommend-for-
           my-operation picker (founder direction 2026-07-18). */}
       <FarmEquipmentExplorer />
+
+      {/* Agricultural hauling (founder direction 2026-07-18). */}
+      <section aria-label="Agricultural hauling" style={{ display: "grid", gap: 12 }}>
+        <span style={sectionKicker}>Agricultural hauling — livestock, grain &amp; equipment</span>
+        <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
+          Reliable hauling makes or breaks a delivery — of animals, grain, or a $200,000 combine. Verify any
+          carrier&apos;s authority and insurance first, then line up a hauler that runs your kind of load.
+        </p>
+        <div style={cardGrid}>
+          {AG_HAULERS.map((h) => (
+            <div key={h.name} style={card}>
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", color: FARM.accent }}>Hauler</span>
+              <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>{h.name}</strong>
+              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{h.role}</span>
+              {h.disclosure && (
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#9a3412" }}>⚠ {h.disclosure}</span>
+              )}
+            </div>
+          ))}
+        </div>
+        <a
+          href={FMCSA_SAFER_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: 12.5, fontWeight: 700, color: FARM.accent, border: "1px solid #d7deea", borderRadius: 999, padding: "6px 13px", textDecoration: "none", background: "#ffffff", width: "fit-content" }}
+        >
+          Verify a carrier on FMCSA SAFER ↗
+        </a>
+        <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{HAULING_NOTE}</span>
+      </section>
 
       {/* Cross-links to the sibling modules */}
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>

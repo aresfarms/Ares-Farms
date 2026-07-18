@@ -5,8 +5,11 @@ import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorati
 import { CompassDispatchHero } from "@/components/public/CompassDispatchHero";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
+import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
+import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
 import { buildCompassDispatch } from "@/lib/newsletter/newsletterDispatch";
+import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
 import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
@@ -74,7 +77,7 @@ const LANES: LaneNode[] = [
   { slug: "small-business-growth",    label: "Small Business",        icon: "store",          tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
   { slug: "environmental-compliance", label: "Environmental",         icon: "leaf",           tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
   { slug: "financing-capital",        label: "Financing & Capital",   icon: "coin",           tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S
-  { slug: "housing-development",      label: "Newsletter & Podcasts", icon: "mail",           tint: "#FAECE7", color: "#993C1D", top: 76, left: 22 }, // SW
+  { slug: "housing-development",      label: "Newsletters & Podcasts", icon: "mail",           tint: "#FAECE7", color: "#993C1D", top: 76, left: 22 }, // SW
   { slug: "programs-incentives",      label: "Grants & Programs",     icon: "gift",           tint: "#FBEAF0", color: "#993556", top: 50, left: 12 }, // W
   { slug: "not-sure",                 label: "I'm Not Sure Yet",      icon: "compass",        tint: "#E6F1FB", color: "#185FA5", top: 24, left: 22 }, // NW
 ];
@@ -137,14 +140,25 @@ export default async function ExplorePage({
   // The America's Journey map lives here now (founder direction 2026-07-17:
   // moved off the front page's middle, onto the land button's page).
   if (selected && selected.slug === "property-land") {
+    const landInventory = buildPublicSafeInventoryByState();
+    const landWeekSeed = isoWeekSeed();
     return (
       <>
         <div className="fl-map-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "24px 20px 0" }}>
           <PublicMapExperience
             liveSources={getRuntimeLiveSources()}
-            mapInventoryByState={buildPublicSafeInventoryByState()}
-            weekSeed={isoWeekSeed()}
+            mapInventoryByState={landInventory}
+            weekSeed={landWeekSeed}
           />
+        </div>
+        {/* Real listings, place 1 — the scrolling shelf between the map and the
+            address box (founder direction 2026-07-17: like the old home page). */}
+        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "20px 20px 0" }}>
+          <PropertyShowcaseRail inventoryByState={landInventory} weekSeed={landWeekSeed} />
+        </div>
+        {/* Real listings, place 2 — grouped by kind, where the categories are. */}
+        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "8px 20px 0" }}>
+          <PropertyGroupsFrontDoor groups={buildFrontDoorGroups()} />
         </div>
         <PropertyHub
           state={one(resolved.state)}

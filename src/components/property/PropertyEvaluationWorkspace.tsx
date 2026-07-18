@@ -2799,6 +2799,13 @@ export function PropertyEvaluationWorkspace({
             Open the source listing ↗
           </Link>
         )}
+        {/* Streamlined to three distinct actions (founder direction
+            2026-07-17): one PDF button (view/download/print were three routes
+            to the same watermarked PDF), the zero-PII device draft, and the
+            governed Furlong account path. */}
+        <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+          {pdfBusy !== null ? "Preparing PDF..." : "Download the PDF"}
+        </button>
         <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
           Save draft on this device
         </button>
@@ -2811,17 +2818,8 @@ export function PropertyEvaluationWorkspace({
           href={`/onboarding?from=${encodeURIComponent(chartHref)}`}
           style={{ ...actionButtonSecondary, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
         >
-          Save with Furlong — start your borrower file
+          Save with Furlong →
         </Link>
-        <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-          {pdfBusy === "view" ? "Opening PDF..." : "View watermarked PDF ↗"}
-        </button>
-        <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
-          {pdfBusy === "export" ? "Preparing PDF export..." : "Download PDF"}
-        </button>
-        <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
-          {pdfBusy === "print" ? "Opening print-ready PDF..." : "Print / save as PDF"}
-        </button>
         {savedAt && (
           <span style={{ fontSize: 12, color: "#7a8aa0" }}>
             Saved {new Date(savedAt).toLocaleString()}

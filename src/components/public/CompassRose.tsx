@@ -37,7 +37,7 @@ const LANES: LaneNode[] = [
   { slug: "small-business-growth",    label: "Small Business",        icon: "store",          tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
   { slug: "environmental-compliance", label: "Environmental",         icon: "leaf",           tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
   { slug: "financing-capital",        label: "Financing & Capital",   icon: "coin",           tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S
-  { slug: "housing-development",      label: "Newsletter & Podcasts", icon: "mail",           tint: "#FAECE7", color: "#993C1D", top: 76, left: 22 }, // SW
+  { slug: "housing-development",      label: "Newsletters & Podcasts", icon: "mail",           tint: "#FAECE7", color: "#993C1D", top: 76, left: 22 }, // SW
   { slug: "programs-incentives",      label: "Grants & Programs",     icon: "gift",           tint: "#FBEAF0", color: "#993556", top: 50, left: 12 }, // W
   { slug: "not-sure",                 label: "I'm Not Sure Yet",      icon: "compass",        tint: "#E6F1FB", color: "#185FA5", top: 24, left: 22 }, // NW
 ];
@@ -60,7 +60,7 @@ function LaneIcon({ name }: { name: IconName }) {
   }
 }
 
-export function CompassRose() {
+export function CompassRose({ showHeading = true }: { showHeading?: boolean }) {
   return (
     <>
       <style>{`
@@ -115,15 +115,17 @@ export function CompassRose() {
         aria-label="Explore the eight Furlong lanes"
         style={{ background: theme.stage, color: theme.ink, padding: "clamp(36px, 6vw, 64px) 24px" }}
       >
-        <div style={{ maxWidth: 720, margin: "0 auto 28px", textAlign: "center", display: "grid", gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: "clamp(28px, 4.5vw, 42px)", fontWeight: 800, letterSpacing: "-0.02em", color: theme.ink }}>
-            Explore your opportunities
-          </h2>
-          <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6, color: theme.inkSoft }}>
-            Discover what&apos;s possible before you commit. No account, no personal data, and no footprints
-            required. Change direction at any time.
-          </p>
-        </div>
+        {showHeading && (
+          <div style={{ maxWidth: 720, margin: "0 auto 28px", textAlign: "center", display: "grid", gap: 12 }}>
+            <h2 style={{ margin: 0, fontSize: "clamp(28px, 4.5vw, 42px)", fontWeight: 800, letterSpacing: "-0.02em", color: theme.ink }}>
+              Explore your opportunities
+            </h2>
+            <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6, color: theme.inkSoft }}>
+              Discover what&apos;s possible before you commit. No account, no personal data, and no footprints
+              required. Change direction at any time.
+            </p>
+          </div>
+        )}
 
         <div className="cr-rose">
           <svg className="cr-spokes" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">

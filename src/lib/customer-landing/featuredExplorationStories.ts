@@ -314,8 +314,8 @@ export const EXPLORATION_CATEGORIES: ExplorationCategory[] = [
   },
   {
     slug: "housing-development",
-    label: "Newsletter & Podcasts",
-    blurb: "The Furlong Compass — your industry's weekly read and the podcast, in your voice.",
+    label: "Newsletters & Podcasts",
+    blurb: "The Furlong Compass — your industry's tailored newsletters and podcasts, in your voice.",
   },
   {
     slug: "programs-incentives",

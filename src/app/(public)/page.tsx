@@ -603,34 +603,35 @@ export default async function HomePage() {
             <p className="fl-hero-sub">
               {HOMEPAGE_HERO.subhead}
             </p>
-            <p className="fl-hero-trust">{HOMEPAGE_HERO.trustTag}</p>
-            {discoveryPrimary() && (
-              <div className="fl-hero-actions">
-                <div className="fl-hero-action">
-                  <Link href="/navigator" className="fl-cta-primary" data-testid="cta-navigator">
-                    {HOMEPAGE_PRIMARY_ACTIONS.primaryLabel} →
-                  </Link>
-                  <span data-testid="cta-navigator-support" className="fl-hero-action-support">
-                    {HOMEPAGE_PRIMARY_ACTIONS.primarySupport}
-                  </span>
-                </div>
-                {/* "Open the Compass" secondary CTA removed — the compass is
-                    right below on the page now (founder direction 2026-07-17). */}
-              </div>
-            )}
           </header>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
             THE COMPASS — the /explore compass-rose explorer, moved to the
-            front page intact (founder direction 2026-07-17: keep it exactly,
-            just put it on the main page in place of the property-type grid +
-            listings shelf). Full-bleed dark stage; breaks out of the max-width
-            container the way the America 250 banner does.
+            front page intact (founder direction 2026-07-17: keep it exactly).
+            Its "Explore your opportunities" heading is hidden here (redundant
+            with the hero above); the Navigator CTA sits BELOW it. Full-bleed
+            dark stage; breaks out of the max-width container.
             ══════════════════════════════════════════════════════════════ */}
         <div style={{ marginInline: "calc(50% - 50vw)" }}>
-          <CompassRose />
+          <CompassRose showHeading={false} />
         </div>
+
+        {/* Start-with-Furlong CTA — moved below the compass (founder direction
+            2026-07-17). */}
+        {discoveryPrimary() && (
+          <section className="fl-section" aria-label="Start with Furlong" style={{ textAlign: "center", display: "grid", gap: 12, justifyItems: "center" }}>
+            <p className="fl-hero-trust" style={{ margin: 0 }}>{HOMEPAGE_HERO.trustTag}</p>
+            <div className="fl-hero-action" style={{ display: "grid", gap: 8, justifyItems: "center" }}>
+              <Link href="/navigator" className="fl-cta-primary" data-testid="cta-navigator">
+                {HOMEPAGE_PRIMARY_ACTIONS.primaryLabel} →
+              </Link>
+              <span data-testid="cta-navigator-support" className="fl-hero-action-support">
+                {HOMEPAGE_PRIMARY_ACTIONS.primarySupport}
+              </span>
+            </div>
+          </section>
+        )}
 
         <section className="fl-section" aria-label="What you can do here">
           <h2 className="fl-section-title">{HOMEPAGE_CAPABILITIES.heading}</h2>

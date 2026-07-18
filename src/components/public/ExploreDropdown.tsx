@@ -20,7 +20,7 @@ const EXPLORE_OPTIONS = [
   { slug: "small-business-growth",     label: "Small Business Growth" },
   { slug: "environmental-compliance",  label: "Environmental & Compliance" },
   { slug: "financing-capital",         label: "Financing & Capital" },
-  { slug: "housing-development",       label: "Newsletter & Podcasts" },
+  { slug: "housing-development",       label: "Newsletters & Podcasts" },
   { slug: "programs-incentives",       label: "Grants, Programs & Incentives" },
   { slug: "not-sure",                  label: "I'm Not Sure Yet" },
 ] as const;

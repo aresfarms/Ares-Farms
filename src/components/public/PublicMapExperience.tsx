@@ -1606,28 +1606,8 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
         </span>
       </div>
 
-      <div style={{ marginTop: 18, display: "flex", justifyContent: "center" }}>
-        <a
-          href="/explore"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-            padding: "12px 18px",
-            borderRadius: 999,
-            background: "linear-gradient(135deg, rgba(184,134,47,0.14), rgba(91,184,173,0.14))",
-            border: "1px solid rgba(184,134,47,0.35)",
-            color: "#12344d",
-            fontSize: 14,
-            fontWeight: 800,
-            letterSpacing: "0.01em",
-            textDecoration: "none",
-          }}
-        >
-          <span>What are your possibilities?</span>
-          <span aria-hidden="true">→</span>
-        </a>
-      </div>
+      {/* "What are your possibilities?" CTA removed — redundant under the map
+          (founder direction 2026-07-17). */}
 
       {/* ── Privacy and advisory footnote ──────────────────────────────────────── */}
       <p style={{ margin: "12px 0 0", fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>

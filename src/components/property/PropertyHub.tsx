@@ -108,7 +108,7 @@ export function PropertyHub({
           <PendingState sources={sources} total={tree.total} />
         ) : !liveCategory ? (
           <>
-            <EntryChoiceIntro tree={tree} />
+            <EntryChoiceIntro />
             <GuidedIntake feed={guidedIntakeFeed()} />
             <CategoryGrid tree={tree} />
           </>
@@ -161,10 +161,10 @@ function propertyTree() {
   return tree;
 }
 
-function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree> }) {
+function EntryChoiceIntro() {
   return (
     <section
-      aria-label="Choose how to start property analysis"
+      aria-label="Start property analysis by address"
       style={{
         border: `1px solid ${navigatorTheme.waypointBorder}`,
         borderRadius: 16,
@@ -174,88 +174,16 @@ function EntryChoiceIntro({ tree }: { tree: ReturnType<typeof buildCategoryTree>
         gap: 18,
       }}
     >
-      <strong style={{ fontSize: 20, color: "#eaf3f7" }}>Two ways in — same analysis either way.</strong>
-
-      <div
-        data-entry-choice-grid="true"
-        style={{
-          display: "grid",
-          gap: 18,
-          gridTemplateColumns: "minmax(0, 0.92fr) minmax(0, 1.08fr)",
-          alignItems: "start",
-        }}
-      >
-        <div
-          style={{
-            border: `1px solid ${navigatorTheme.waypointBorder}`,
-            borderRadius: 14,
-            background: navigatorTheme.cellBg,
-            padding: "18px 18px",
-            display: "grid",
-            gap: 12,
-            alignSelf: "start",
-          }}
-        >
-          <div style={{ display: "grid", gap: 6 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#7fc4b8" }}>
-              Option 1
-            </span>
-            <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Browse current inventory</strong>
-            <span style={{ fontSize: 14, color: "#b7ccd9", lineHeight: 1.5 }}>
-              See the government listings we&apos;re tracking right now — pick a category and scan what&apos;s live.
-            </span>
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-            <a
-              href="#browse-by-category"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                minHeight: 42,
-                padding: "0 16px",
-                borderRadius: 999,
-                background: "#0f766e",
-                color: "#ffffff",
-                fontSize: 14,
-                fontWeight: 800,
-                textDecoration: "none",
-              }}
-            >
-              Browse by category
-            </a>
-            <span style={{ fontSize: 13, color: "#b7ccd9", alignSelf: "center" }}>
-              {tree.liveTotal.toLocaleString("en-US")} live listings across {tree.categories.length} categories
-            </span>
-          </div>
-        </div>
-
-        <div
-          style={{
-            border: `1px solid ${navigatorTheme.waypointBorder}`,
-            borderRadius: 14,
-            background: navigatorTheme.cellBg,
-            padding: "18px 18px",
-            display: "grid",
-            gap: 12,
-          }}
-        >
-          <div style={{ display: "grid", gap: 6 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#d4b06a" }}>
-              Option 2
-            </span>
-            <strong style={{ fontSize: 17, color: "#eaf3f7" }}>Enter a specific address</strong>
-          </div>
-          <PlaceFirstDiscovery flow="property-discovery" embedded tone="dark" />
-        </div>
+      <div style={{ display: "grid", gap: 6 }}>
+        <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#d4b06a" }}>
+          Start with the verified address
+        </span>
+        <strong style={{ fontSize: 20, color: "#eaf3f7" }}>Check a specific address</strong>
+        <span style={{ fontSize: 14, color: "#b7ccd9", lineHeight: 1.5 }}>
+          Results appear right below — the checked facts carry into the analysis automatically.
+        </span>
       </div>
-
-      <style>{`
-        @media (max-width: 900px) {
-          [data-entry-choice-grid="true"] {
-            grid-template-columns: 1fr;
-          }
-        }
-      `}</style>
+      <PlaceFirstDiscovery flow="property-discovery" embedded tone="dark" />
     </section>
   );
 }

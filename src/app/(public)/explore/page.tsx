@@ -5,7 +5,7 @@ import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorati
 import { CommunityCta } from "@/components/public/CommunityCta";
 import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
-import { ResidentialRatesBlock } from "@/components/public/ResidentialRatesBlock";
+import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
@@ -208,15 +208,16 @@ export default async function ExplorePage({
               fillHeight={isFarmLane}
             />
           </div>
-          {/* Right column beside the map. On the Farms/Land lane the Real
-              Listings fill the dead space under the browse box, next to the map
-              (founder direction 2026-07-18). Other lanes keep the full-width
-              shelf below. */}
+          {/* Right column beside the map. Farms/Land: the Real Listings fill the
+              dead space under the browse box. Residential: the mortgage-rate
+              tiles sit under the "Homes to live in" box (founder direction
+              2026-07-18). Other lanes keep the full-width shelf below. */}
           <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
             <PropertyGroupsFrontDoor groups={laneGroups} compact />
             {isFarmLane && (
               <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} limit={6} layout="column" />
             )}
+            {isResidentialLane && <ResidentialRateTiles />}
           </div>
         </div>
         {/* The farmer sections as cards (founder direction 2026-07-18):
@@ -232,11 +233,11 @@ export default async function ExplorePage({
             <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} />
           </div>
         )}
-        {/* Residential lane: current mortgage rates under the live listings
-            (founder direction 2026-07-18). */}
+        {/* Residential lane: the full loan-options table full-width below the
+            shelf (the rate tiles already sit next to the map above). */}
         {isResidentialLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
-            <ResidentialRatesBlock />
+            <ResidentialLoanTable />
           </div>
         )}
         <PropertyHub

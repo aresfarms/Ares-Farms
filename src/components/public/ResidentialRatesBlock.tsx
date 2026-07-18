@@ -1,9 +1,9 @@
 /**
- * ResidentialRatesBlock — current residential mortgage rates that track and
- * change as rates move (founder direction 2026-07-18), for the Residential
- * lane. Two live benchmark rates (PMMS 30- and 15-year fixed) up top, then the
- * applicable loan options with structure. Server component; every figure
- * sourced and labeled — not a rate offer.
+ * Residential mortgage rates that track and change as rates move (founder
+ * direction 2026-07-18), for the Residential lane. Split into two pieces so the
+ * at-a-glance rate TILES can sit in the column beside the map (under the "Homes
+ * to live in" box) while the wide loan-options TABLE stays full-width below.
+ * Server components; every figure sourced and labeled — not a rate offer.
  */
 
 import { buildResidentialRates } from "@/lib/property/residentialRatesCurated";
@@ -15,49 +15,49 @@ const card = {
   padding: "14px 15px",
 } as const;
 
-export function ResidentialRatesBlock() {
+function RateTile({ label, rate, sub }: { label: string; rate: number; sub: string }) {
+  return (
+    <div style={{ ...card, background: "#0f2430", border: "1px solid #0f2430", display: "grid", gap: 2, minWidth: 150, flex: "1 1 150px" }}>
+      <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#7fa8b8" }}>{label}</span>
+      <strong style={{ fontSize: 30, color: "#eaf3f7", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>{rate.toFixed(2)}%</strong>
+      <span style={{ fontSize: 11.5, color: "#7fa8b8" }}>{sub}</span>
+    </div>
+  );
+}
+
+/** Compact rate tiles — for the column beside the map. */
+export function ResidentialRateTiles() {
   const view = buildResidentialRates();
   return (
-    <section aria-label="Current residential mortgage rates" style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-        <div style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
-            Today&apos;s mortgage rates
-          </span>
-          <strong style={{ fontSize: 22, color: "#101a2b", lineHeight: 1.15 }}>
-            What it costs to borrow right now
-          </strong>
-        </div>
+    <section aria-label="Current residential mortgage rates" style={{ display: "grid", gap: 10 }}>
+      <div style={{ display: "grid", gap: 3 }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+          Today&apos;s mortgage rates
+        </span>
+        <strong style={{ fontSize: 17, color: "#101a2b", lineHeight: 1.15 }}>What it costs to borrow right now</strong>
         {view.weekOf && (
-          <span style={{ fontSize: 12, color: "#7a8aa0" }}>Tracks Freddie Mac PMMS · week of {view.weekOf}</span>
+          <span style={{ fontSize: 11.5, color: "#7a8aa0" }}>Tracks Freddie Mac PMMS · week of {view.weekOf}</span>
         )}
       </div>
-
-      {/* The two live benchmark rates */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-        <div style={{ ...card, background: "#0f2430", border: "1px solid #0f2430", display: "grid", gap: 2, minWidth: 180, flex: "1 1 180px" }}>
-          <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#7fa8b8" }}>
-            30-year fixed
-          </span>
-          <strong style={{ fontSize: 30, color: "#eaf3f7", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-            {view.rate30.toFixed(2)}%
-          </strong>
-          <span style={{ fontSize: 11.5, color: "#7fa8b8" }}>Freddie Mac national average</span>
-        </div>
-        {view.rate15 != null && (
-          <div style={{ ...card, background: "#0f2430", border: "1px solid #0f2430", display: "grid", gap: 2, minWidth: 180, flex: "1 1 180px" }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#7fa8b8" }}>
-              15-year fixed
-            </span>
-            <strong style={{ fontSize: 30, color: "#eaf3f7", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
-              {view.rate15.toFixed(2)}%
-            </strong>
-            <span style={{ fontSize: 11.5, color: "#7fa8b8" }}>Higher payment, less total interest</span>
-          </div>
-        )}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+        <RateTile label="30-year fixed" rate={view.rate30} sub="Freddie Mac national average" />
+        {view.rate15 != null && <RateTile label="15-year fixed" rate={view.rate15} sub="Higher payment, less total interest" />}
       </div>
+    </section>
+  );
+}
 
-      {/* The applicable loan options */}
+/** Full loan-options table — full width, below the listings shelf. */
+export function ResidentialLoanTable() {
+  const view = buildResidentialRates();
+  return (
+    <section aria-label="Residential loan options" style={{ display: "grid", gap: 12 }}>
+      <div style={{ display: "grid", gap: 4 }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+          Every way to finance a home
+        </span>
+        <strong style={{ fontSize: 22, color: "#101a2b", lineHeight: 1.15 }}>Which loan fits which buyer</strong>
+      </div>
       <div style={{ ...card, overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>

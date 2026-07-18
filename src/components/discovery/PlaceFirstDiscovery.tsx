@@ -54,6 +54,7 @@ const COVERAGE: { label: string; source: string; confidence: string; disclaimer:
   { label: "Flood (FEMA)", source: "FEMA National Flood Hazard Layer · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "Reports the published Special Flood Hazard Area status of the place — verify current status with FEMA." },
   { label: "Historic (NPS)", source: "National Register of Historic Places (NPS) · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "Reports the published historic listing of the place — not a person's eligibility for any credit." },
   { label: "NMTC low-income community", source: "CDFI Fund NMTC-eligible tracts · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "States whether the tract is NMTC-qualified — a place-fact, not a person-side determination." },
+  { label: "SBA HUBZone", source: "SBA HUBZone map (Historically Underutilized Business Zones) · public domain", confidence: "Verified government snapshot (dated)", disclaimer: "Reports whether the location sits in an SBA HUBZone — a place-based federal-contracting designation. SBA loan eligibility is a separate, business-side determination." },
 ];
 
 type PlaceFactsResponse = {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
+import { CommunityCta } from "@/components/public/CommunityCta";
 import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
 import { ResidentialRatesBlock } from "@/components/public/ResidentialRatesBlock";
@@ -244,13 +245,12 @@ export default async function ExplorePage({
           category={one(resolved.category)}
           lane={selected.slug}
         />
-        {/* Newsletters & podcasts at the BOTTOM (founder direction 2026-07-18;
-            residential + farm lanes both carry a themed edition list). */}
-        {audience && (
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0" }}>
-            <CurrentNewsletters audiences={[audience]} />
-          </div>
-        )}
+        {/* Newsletters & podcasts, then the gold Community cue, at the BOTTOM
+            of every lane (founder direction 2026-07-18). */}
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0", display: "grid", gap: 16 }}>
+          {audience && <CurrentNewsletters audiences={[audience]} />}
+          <CommunityCta />
+        </div>
         {/* The map is width-responsive now (960×580 aspect held at any width),
             so it keeps its side column at normal widths; only narrow screens stack. */}
         <style>{`@media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>
@@ -344,6 +344,9 @@ export default async function ExplorePage({
               </ul>
             </section>
           )}
+          {/* The gold Community cue at the bottom of every lane (founder
+              direction 2026-07-18). */}
+          <CommunityCta />
           <Disclosures variant="full" tone="dark" />
         </div>
       </main>

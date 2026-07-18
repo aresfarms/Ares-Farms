@@ -34,6 +34,23 @@ export interface LaneTheme {
   tileValue: string;
 }
 
+/**
+ * PREMIUM — the reserved "Compass to Capital" gold, used ONLY for the paid
+ * community / upgrade cue, never for ordinary lane content. Gold reads as
+ * prestige, value, and achievement; keeping it exclusive to belonging moments
+ * teaches visitors — on every lane — what joining the community looks like.
+ * Gold sits on a navy ground (never as small text on white, where it fails
+ * contrast); the button uses dark ink on gold for a high-contrast premium feel.
+ */
+export const PREMIUM = {
+  gold: "#b8862f",       // brand gold — accents, borders, kickers on navy
+  goldBright: "#e0a94a", // brighter gold for a headline pop on navy
+  ink: "#12233d",        // navy ground the gold sits on
+  inkSoft: "#1b3050",    // lighter navy for inner panels
+  onGold: "#12233d",     // dark ink for text on a solid-gold button
+  paper: "#faf3e6",      // soft gold tint for light-mode chips
+} as const;
+
 export const LANE_THEMES = {
   // FARMS / AG / LAND → GREEN. Green is the single most agriculture- and
   // growth-associated color (nature, crops, "money", "go"); it also lowers

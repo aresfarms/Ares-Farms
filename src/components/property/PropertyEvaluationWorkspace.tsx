@@ -1889,11 +1889,16 @@ export function PropertyEvaluationWorkspace({
     }
     let canceled = false;
     setFactsLoading(true);
+    // Cap the facts load so the workspace never spins forever if a live source
+    // is slow/unreachable (founder-caught 2026-07-18).
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
     void (async () => {
       try {
         const res = await fetch("/api/public/property-facts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
           body: JSON.stringify({
             propertyId: context.propertyId,
             exactAddress: context.exactAddress,
@@ -1907,12 +1912,19 @@ export function PropertyEvaluationWorkspace({
         });
         const data = (await res.json()) as PropertyFactsResponse;
         if (!canceled) setFacts(data);
+      } catch {
+        // Aborted or failed — leave facts null; the workspace renders from the
+        // context it already has rather than hanging on the spinner.
+        if (!canceled) setFacts(null);
       } finally {
+        clearTimeout(timeout);
         if (!canceled) setFactsLoading(false);
       }
     })();
     return () => {
       canceled = true;
+      clearTimeout(timeout);
+      controller.abort();
     };
   }, [context.propertyId, profileOverride]);
 

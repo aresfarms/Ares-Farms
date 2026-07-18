@@ -73,7 +73,7 @@ function haversineMiles(aLat: number, aLon: number, bLat: number, bLon: number):
 export async function queryAmenitiesLive(
   lat: number,
   lon: number,
-  timeoutMs = 40000
+  timeoutMs = 8000
 ): Promise<AmenityFacts | null> {
   const q = `[out:json][timeout:25];
 (

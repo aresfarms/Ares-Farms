@@ -257,33 +257,3 @@ export const COMMERCIAL_UNKNOWN_BRIEFS: CommercialBrief[] = [
     pointer: "Your lender's reserve requirement; a commercial attorney to collect estoppels before closing",
   },
 ];
-
-// ── Capital rates (commercial) ───────────────────────────────────────────────
-// HONEST SOURCING: we do NOT fabricate live SBA/Prime/504 numbers — those need
-// a market-data feed (FRED DPRIME, NADCO/DCFC debenture pricing). What's shown
-// is how each program is PRICED (factual, structural) plus the one published
-// USDA number we track (FSA), with a hard "set at closing" disclaimer. `asOf`
-// is a curated stamp the team refreshes.
-
-export interface CapitalRateLine {
-  program: string;
-  /** How the rate is set (factual, doesn't fluctuate day to day). */
-  basis: string;
-  /** A hard current figure where we genuinely have one. */
-  current?: string;
-}
-
-export const COMMERCIAL_CAPITAL_RATES: { asOf: string; lines: CapitalRateLine[]; note: string } = {
-  asOf: "July 2026",
-  lines: [
-    { program: "SBA 7(a)", basis: "Prime + a lender-negotiated spread (SBA-capped); usually variable." },
-    { program: "SBA 504", basis: "A fixed rate set at each monthly debenture sale — it locks when your loan funds." },
-    { program: "USDA Business & Industry (B&I)", basis: "Lender-negotiated, backed by a USDA guarantee." },
-    { program: "USDA / FSA (ag-commercial)", basis: "Published program rate.", current: "FSA Farm Ownership 6.0%" },
-    { program: "Conventional commercial", basis: "Bank-set — often the 5-yr Treasury or SOFR + a spread; frequently a balloon." },
-  ],
-  note:
-    "Your actual rate is set at your loan's CLOSING date and depends on the program, term, lender, and your file — " +
-    "these are how each program is priced, not a quote. Live SBA / Prime / 504 numbers need a market-data feed; the " +
-    "Financing & Capital module has the lanes in detail.",
-};

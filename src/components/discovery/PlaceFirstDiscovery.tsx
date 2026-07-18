@@ -174,10 +174,16 @@ export function PlaceFirstDiscovery({
       return;
     }
 
+    // Never let the button spin forever — abort the request after 30s and
+    // surface a clear message instead of a hang (founder-caught 2026-07-18:
+    // the address box would just spin when a live source was slow/unreachable).
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30_000);
     try {
       const res = await fetch("/api/public/property-facts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           exactAddress,
           location: location || null,
@@ -197,12 +203,17 @@ export function PlaceFirstDiscovery({
       setResult(data);
     } catch (lookupError) {
       setResult(null);
+      const aborted = lookupError instanceof DOMException && lookupError.name === "AbortError";
       setError(
-        lookupError instanceof Error
-          ? lookupError.message
-          : "The location place-facts lookup could not be completed."
+        aborted
+          ? "This is taking longer than expected — a public source may be slow right now. Please try again in a moment."
+          : lookupError instanceof Error
+            ? lookupError.message
+            : "The location place-facts lookup could not be completed."
       );
+      setJumpCue(null);
     } finally {
+      clearTimeout(timeout);
       setBusy(false);
     }
   }

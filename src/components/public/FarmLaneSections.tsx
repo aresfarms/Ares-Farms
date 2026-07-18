@@ -19,6 +19,7 @@ import {
   LAND_OPTION_BRIEFS,
   type FarmBrief,
 } from "@/lib/property/farmLaneCurated";
+import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 
@@ -263,6 +264,10 @@ export function FarmLaneSections() {
         </a>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{HAULING_NOTE}</span>
       </section>
+
+      {/* SBA / prime / 504 / USDA capital rates (founder direction 2026-07-18:
+          added to both farm and commercial). */}
+      <CapitalRatesBlock accent={FARM.accent} subtitle="FSA, SBA & USDA financing" />
 
       {/* Cross-links to the sibling modules */}
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>

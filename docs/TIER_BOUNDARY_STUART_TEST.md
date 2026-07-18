@@ -1,50 +1,64 @@
-# Tier boundary — what Stuart is testing, and the verdict we need
+# Tier boundary — settled by the Master Volumes; what Stuart validates
 
-**Status:** built for evaluation only. No payments, no prices, no checkout —
-tier economics stay founder-gated per the standing rule (membership economics
-decided by founders + counsel, not by the build). This exists so the boundary
-can be FELT before it is priced.
+**Status (2026-07-18):** the who-pays question is NOT open — the Master Volume
+Series decided it, and the build now implements that decision. What remains for
+Stuart is validating the institutional side, which is his bailiwick.
 
-## The question
+## The constitutional answer (implemented)
 
-Caitlin's framing (2026-07-18): the free report is generous — so why would
-anyone pay? The candidate answer built here:
+From the Borrower Complete Edition and Volume 0 §7.5 (Revenue Model), with
+ECON-CONFLICT-001 (Vol I §3.34) making revenue neutrality constitutional:
 
-> **The screen and the watermarked PDF are free — the artifact you take into a
-> transaction is the product.**
+> **"Furlong is free for borrowers. No fees, no charges, ever."** No
+> application fees, service charges, or per-transaction costs to borrowers at
+> any point in the process.
 
-- **Free tier** — everything on screen, plus the **watermarked** PDF export
-  ("FOR INFORMATIONAL PURPOSES · NOT FOR REPRODUCTION" diagonal, "Watermarked
-  FURLONG export" footer). Free forever; every shared copy advertises Furlong.
-- **Paid tiers** (Institutional Coordination / Environmental Readiness) — the
-  same engine, deeper content, and a **clean export**: no diagonal watermark,
-  "FURLONG institutional export" footer — the package you hand a lender across
-  a desk. The brand seal and every advisory disclosure remain on all tiers.
+> **"Furlong is paid by the institutions** — lenders, agencies, partners — for
+> access to the platform infrastructure. The pricing model is **institutional
+> subscription-based** — a platform access fee, not a per-transaction or
+> per-loan charge. Platform pricing is not tied to loan outcomes."
 
-The theory being tested: people take the free brief, hit the moment they need
-to *show someone* (a lender, a partner, an agency), and come back for the
-clean package — and for financing coordination through the module itself.
+Vol 0 §7.5 revenue streams (all institution-side): SaaS platform licensing
+(tier-based by participant scale), per-transaction *governance* fees,
+certification & onboarding, government program coordination, advisory &
+implementation, premium compliance services.
 
-## How to test (staging, IAP allowlist)
+**Therefore:**
+- The borrower-side "token fee for the PDF" idea is dead — it would breach the
+  founding commitment. Everything the borrower touches is free, including
+  their watermarked export, forever.
+- The **clean (watermark-free) institutional export** still exists — but it is
+  an **institution-side deliverable**: produced when a participating
+  institution coordinates the borrower's file, covered by that institution's
+  subscription. The borrower never buys it; their lender's platform access
+  includes it.
+- The free brief's closing now states this plainly (paid by institutions,
+  never by you, never outcome-linked — see `reportTierIdentity.ts`).
 
-1. Run any property analysis (browse a listing or check an address).
-2. Export the PDF on the **free tier** — see the watermark and footer.
-3. Switch the report tier to **Institutional Coordination** (unlocked on
-   staging via `FURLONG_TIER_PREVIEW_MODE` — badge shows "Testing unlock").
-4. Export again — same file, clean: no diagonal, institutional footer.
-5. Compare the two side by side AS A LENDER WOULD SEE THEM.
+## The artifact boundary (unchanged mechanics, corrected payer)
 
-## The verdict we need from Stuart
+- **Borrower export** — watermarked ("FOR INFORMATIONAL PURPOSES"), free
+  forever, share anywhere.
+- **Institutional export** — clean, "FURLONG institutional export" footer,
+  advisory disclosures intact — generated under the paid tiers, which map to
+  institutional subscription access, not borrower checkout.
 
-1. Is the watermarked-free / clean-paid line the **right boundary** — would a
-   borrower's lender actually care about the difference?
-2. Is the free version giving away too much, too little, or exactly enough to
-   force the return visit?
-3. Does the Institutional Coordination content (ranked lanes, lender question
-   set, county pulls) match what an institution actually asks for — what's
-   missing before he'd put his name near it?
-4. Token-fee vs tier-subscription for the clean export — which fits how these
-   customers actually buy?
+## What Stuart validates (staging; tier preview is unlocked)
 
-Economics (prices, what bundles where, hours/credits) stay parked for the
-founders + counsel session — this build only makes the boundary testable.
+1. **Institutional packaging quality** — export the Institutional
+   Coordination Report (tier switch shows "Testing unlock", export is clean).
+   Is this what a lender actually wants across the desk? What's missing before
+   he'd put his name near it?
+2. **The subscription frame** — Vol 0 prices platform access by participant
+   scale and program volume. Does that structure fit how the lenders he knows
+   actually buy? What would a Five Borough-sized shop expect to pay for seat
+   + export access?
+3. **The governance-fee stream** — per-workflow governance fees (origination
+   events, eligibility documentation) — real-world palatable, or does it read
+   as a junk fee to an institution?
+4. **The handoff moment** — walk the borrower flow to the point where a file
+   would move to an institution. Is the moment the clean export unlocks the
+   right moment, and is the free brief generous enough to get borrowers there?
+
+Institutional price POINTS (dollar amounts) remain founder-gated for the
+founders + counsel session — the Volumes fix the structure, not the numbers.

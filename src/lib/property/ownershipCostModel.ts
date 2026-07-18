@@ -700,6 +700,11 @@ export function buildOwnershipCostModel(
       inputs.priceIsAssumption
         ? "Built on the price you entered — not a listed price, an appraisal, or an opinion of value."
         : "Built on the listed price — the negotiated price and appraisal decide the real numbers.",
+      ...(inputs.farmMode
+        ? []
+        : [
+            "Consumer mortgages generally do not take other property as collateral the way ag and commercial lenders do — but if you own other real estate, borrowing against its equity (a home-equity loan or HELOC) is the common way to raise the down payment without selling. That is a separate loan with its own payment; count both.",
+          ]),
       "Illustrative guidance only — not a quote, a pre-approval, an eligibility determination, or financial advice. Program terms (USDA, FHA, VA) have their own eligibility rules a lender confirms.",
     ],
   };

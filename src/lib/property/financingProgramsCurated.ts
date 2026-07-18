@@ -234,7 +234,10 @@ const PROFILE_NOTE: Partial<Record<PropertyProfileId, string>> = {
   farm: FARM_NOTE,
   commercial:
     "Rural commercial property adds two USDA lanes to the SBA options: REAP for an on-site energy project, and the " +
-    "Business & Industry guarantee for a business in a community of 50,000 or fewer.",
+    "Business & Industry guarantee for a business in a community of 50,000 or fewer. And as in ag lending, the down " +
+    "payment doesn't have to be cash: SBA and commercial lenders routinely take additional collateral — equity in " +
+    "other real estate you own — to reduce or replace the cash injection (a cross-collateral or blanket lien; the " +
+    "pledged property carries the lien until released).",
   "mobile-home-park":
     "Parks have their own capital stack — agency (Fannie/Freddie MHC) programs sit alongside the SBA for smaller " +
     "or value-add deals.",

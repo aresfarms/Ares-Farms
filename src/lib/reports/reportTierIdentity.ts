@@ -89,10 +89,11 @@ const IDENTITIES: Record<ReportTierId, ReportTierIdentity> = {
       ],
       closing:
         "Both reviews stay anchored to this property and this county — nothing generic, nothing " +
-        "resold. This free brief is yours to keep and share, watermarked; the paid reviews export " +
-        "clean — the watermark-free, lender-ready package you hand across a desk. Every tier above " +
-        "the free brief also includes the Furlong newsletter automatically — no separate signup. " +
-        "When tier access opens, your Place Brief carries forward into them unchanged.",
+        "resold. Everything you touch here stays free — that is a founding commitment, not a promo: " +
+        "Furlong is paid by participating institutions for platform access, never by you, and never " +
+        "based on any loan's outcome. This brief is yours to keep and share, watermarked; the deeper " +
+        "reviews export clean — the lender-ready package — and are delivered through the " +
+        "institution coordinating your file. Your Place Brief carries forward into them unchanged.",
     },
   },
   paid: {

@@ -19,6 +19,12 @@ import {
   SUPPLIER_LINKS,
   type FarmBrief,
 } from "@/lib/property/farmLaneCurated";
+import { LANE_THEMES } from "@/lib/property/laneThemes";
+
+// This whole module wears the FARM lane's color identity (green — growth,
+// agriculture, money) so it's visibly its own world while keeping the exact
+// same structure as the residential chart.
+const FARM = LANE_THEMES.farm;
 
 // Listing-card visual language (matches PropertyShowcaseRail cards).
 const card = {
@@ -36,7 +42,7 @@ const cardKicker = {
   fontWeight: 800,
   letterSpacing: "0.05em",
   textTransform: "uppercase",
-  color: "#0f766e",
+  color: FARM.accent,
 } as const;
 
 const cardTitle = { fontSize: 15.5, color: "#101a2b", lineHeight: 1.25, fontWeight: 700 } as const;
@@ -46,7 +52,7 @@ const sectionKicker = {
   fontWeight: 800,
   letterSpacing: "0.08em",
   textTransform: "uppercase",
-  color: "#0f766e",
+  color: FARM.accent,
 } as const;
 
 const cardGrid = {
@@ -62,7 +68,7 @@ function BriefCard({ tag, brief }: { tag: string; brief: FarmBrief }) {
       <summary style={{ ...card, cursor: "pointer", listStyle: "none", margin: 0 }}>
         <span style={cardKicker}>{tag}</span>
         <strong style={cardTitle}>{brief.question}</strong>
-        <span style={{ fontSize: 12.5, fontWeight: 700, color: "#0f766e" }}>
+        <span style={{ fontSize: 12.5, fontWeight: 700, color: FARM.accent }}>
           <span className="fl-closed-only">Read →</span>
           <span className="fl-open-only">Close ▲</span>
         </span>
@@ -90,7 +96,7 @@ function BriefCard({ tag, brief }: { tag: string; brief: FarmBrief }) {
           {brief.url && (
             <>
               {" · "}
-              <a href={brief.url} target="_blank" rel="noopener noreferrer" style={{ color: "#0f766e" }}>
+              <a href={brief.url} target="_blank" rel="noopener noreferrer" style={{ color: FARM.accent }}>
                 {new URL(brief.url).hostname.replace("www.", "")} ↗
               </a>
             </>
@@ -123,7 +129,7 @@ export function FarmCommodityTicker() {
       {/* Header — same shape as the residential rates block. */}
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 4 }}>
-          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: FARM.accent }}>
             The grain market this week
           </span>
           <strong style={{ fontSize: 22, color: "#101a2b", lineHeight: 1.15 }}>
@@ -138,13 +144,13 @@ export function FarmCommodityTicker() {
       {/* Headline national prices — navy number tiles. */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
         {view.headlinePrices.map((p) => (
-          <div key={p.crop} style={{ ...card, background: "#0f2430", border: "1px solid #0f2430", display: "grid", gap: 2, minWidth: 150, flex: "1 1 150px" }}>
-            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#7fa8b8" }}>{p.crop}</span>
-            <strong style={{ fontSize: 28, color: "#eaf3f7", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+          <div key={p.crop} style={{ ...card, background: FARM.tileBg, border: `1px solid ${FARM.tileBg}`, display: "grid", gap: 2, minWidth: 150, flex: "1 1 150px" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: FARM.tileLabel }}>{p.crop}</span>
+            <strong style={{ fontSize: 28, color: FARM.tileValue, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
               ${p.value.toFixed(2)}
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#7fa8b8" }}>/bu</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: FARM.tileLabel }}>/bu</span>
             </strong>
-            <span style={{ fontSize: 11, color: "#7fa8b8" }}>USDA national average</span>
+            <span style={{ fontSize: 11, color: FARM.tileLabel }}>USDA national average</span>
           </div>
         ))}
       </div>
@@ -166,9 +172,9 @@ export function FarmCommodityTicker() {
                   <td style={{ padding: "9px 12px 9px 0", fontWeight: 700, color: "#101a2b" }}>{r.name}</td>
                   {r.hasData ? (
                     <>
-                      <td style={{ padding: "9px 12px 9px 0", color: "#0f766e", fontWeight: 700 }}>{fmt(r.corn)}</td>
-                      <td style={{ padding: "9px 12px 9px 0", color: "#0f766e", fontWeight: 700 }}>{fmt(r.soybeans)}</td>
-                      <td style={{ padding: "9px 0", color: "#0f766e", fontWeight: 700 }}>{fmt(r.wheat)}</td>
+                      <td style={{ padding: "9px 12px 9px 0", color: FARM.accent, fontWeight: 700 }}>{fmt(r.corn)}</td>
+                      <td style={{ padding: "9px 12px 9px 0", color: FARM.accent, fontWeight: 700 }}>{fmt(r.soybeans)}</td>
+                      <td style={{ padding: "9px 0", color: FARM.accent, fontWeight: 700 }}>{fmt(r.wheat)}</td>
                     </>
                   ) : (
                     <td colSpan={3} style={{ padding: "9px 0", color: "#9aa6b6", fontStyle: "italic" }}>no reporting bids yet</td>
@@ -186,7 +192,7 @@ export function FarmCommodityTicker() {
         {view.inputs.map((i) => (
           <span key={i.label} style={{ whiteSpace: "nowrap" }}>
             {i.label} y/y{" "}
-            <strong style={{ color: i.direction === "up" ? "#c2410c" : i.direction === "down" ? "#0f766e" : "#101a2b" }}>
+            <strong style={{ color: i.direction === "up" ? "#c2410c" : i.direction === "down" ? FARM.accent : "#101a2b" }}>
               {i.pct >= 0 ? "+" : ""}{i.pct}%
             </strong>
           </span>
@@ -224,7 +230,7 @@ export function FarmLaneSections() {
             <div key={line.category} style={card}>
               <span style={cardKicker}>Equipment</span>
               <strong style={cardTitle}>{line.category}</strong>
-              <span style={{ fontSize: 13.5, fontWeight: 700, color: "#0f766e", fontVariantNumeric: "tabular-nums" }}>{line.typicalCost}</span>
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: FARM.accent, fontVariantNumeric: "tabular-nums" }}>{line.typicalCost}</span>
               <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{line.note}</span>
             </div>
           ))}
@@ -236,7 +242,7 @@ export function FarmLaneSections() {
               href={s.url}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ fontSize: 12.5, fontWeight: 700, color: "#0f766e", border: "1px solid #d7deea", borderRadius: 999, padding: "6px 13px", textDecoration: "none", background: "#ffffff" }}
+              style={{ fontSize: 12.5, fontWeight: 700, color: FARM.accent, border: "1px solid #d7deea", borderRadius: 999, padding: "6px 13px", textDecoration: "none", background: "#ffffff" }}
               title={s.role}
             >
               {s.name} ↗

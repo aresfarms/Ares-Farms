@@ -18,14 +18,18 @@ import { FSA_RATES, FSA_RATES_PROVENANCE } from "@/lib/property/fsaRatesGenerate
 import { INPUT_COSTS, INPUT_COSTS_PROVENANCE } from "@/lib/property/inputCostsGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "@/lib/property/stateGrainBidsGenerated";
 
-// ── Commodity ticker ─────────────────────────────────────────────────────────
+// ── Commodity market view ────────────────────────────────────────────────────
 
-export interface TickerItem {
-  label: string;
-  value: string;
-  /** "up" | "down" | null — day/period direction where the source carries one. */
-  direction: "up" | "down" | null;
+export interface HeadlinePrice {
+  crop: string;
+  value: number;
   asOf: string;
+}
+
+export interface InputCostItem {
+  label: string;
+  pct: number;
+  direction: "up" | "down" | null;
 }
 
 /** One region's average cash bid across its reporting states. */
@@ -73,47 +77,46 @@ function regionCropAvg(states: string[], crop: "corn" | "soybeans" | "wheat"): n
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
+export interface FarmMarketView {
+  /** Week stamp for the header (AMS bids are the freshest weekly signal). */
+  weekOf: string | null;
+  /** National season-average prices — the headline tiles. */
+  headlinePrices: HeadlinePrice[];
+  /** Input-cost year-over-year moves — a compact supporting row. */
+  inputs: InputCostItem[];
+  /** FSA Farm Ownership direct rate. */
+  fsaRate: number;
+  fsaEffective: string | null;
+  /** The five parts of the country — the regional cash-bid table. */
+  regions: RegionBids[];
+  note: string;
+}
+
 /**
- * The ticker strip — USDA-published prices from the committed snapshots
- * (weekly refresh). HONEST LABEL: these are USDA cash prices/bids, refreshed
- * weekly — not a live exchange feed; true real-time futures quotes require a
- * licensed market-data feed (flagged to the founder). Local bids are grouped
- * into the five regions of the country.
+ * Farm market snapshot — USDA-published prices and bids from the committed
+ * snapshots (weekly refresh). HONEST LABEL: not a live exchange feed; true
+ * real-time futures quotes require a licensed market-data feed (flagged to the
+ * founder). Structured so the module can render it as a clean chart (headline
+ * tiles + regional-bid table), like the residential rates block.
  */
-export function buildCommodityTicker(): { items: TickerItem[]; regions: RegionBids[]; note: string } {
-  const items: TickerItem[] = [];
+export function buildFarmMarketView(): FarmMarketView {
   const label: Record<string, string> = { corn: "Corn", soybeans: "Soybeans", wheat: "Wheat" };
 
+  const headlinePrices: HeadlinePrice[] = [];
   for (const key of ["corn", "soybeans", "wheat"]) {
     const p = COMMODITY_PRICES[key];
-    if (p) {
-      items.push({
-        label: label[key],
-        value: `$${p.pricePerBushel.toFixed(2)}/bu`,
-        direction: null,
-        asOf: `USDA ${p.month} ${p.year}`,
-      });
-    }
+    if (p) headlinePrices.push({ crop: label[key], value: p.pricePerBushel, asOf: `USDA ${p.month} ${p.year}` });
   }
+
+  const inputs: InputCostItem[] = [];
   if (INPUT_COSTS_PROVENANCE.asOf !== null) {
     for (const [key, lbl] of [["fertilizer", "Fertilizer"], ["fuel", "Fuel"], ["feed", "Feed"]] as const) {
       const c = INPUT_COSTS[key];
       if (c?.yoyPct != null) {
-        items.push({
-          label: `${lbl} y/y`,
-          value: `${c.yoyPct >= 0 ? "+" : ""}${Math.round(c.yoyPct)}%`,
-          direction: c.yoyPct > 0 ? "up" : c.yoyPct < 0 ? "down" : null,
-          asOf: `USDA ${c.period} ${c.year}`,
-        });
+        inputs.push({ label: lbl, pct: Math.round(c.yoyPct), direction: c.yoyPct > 0 ? "up" : c.yoyPct < 0 ? "down" : null });
       }
     }
   }
-  items.push({
-    label: "FSA Farm Ownership rate",
-    value: `${FSA_RATES.ownershipDirect}%`,
-    direction: null,
-    asOf: FSA_RATES_PROVENANCE.effective ? `effective ${FSA_RATES_PROVENANCE.effective}` : "current",
-  });
 
   const regions: RegionBids[] =
     STATE_GRAIN_BIDS_PROVENANCE.asOf !== null
@@ -126,7 +129,11 @@ export function buildCommodityTicker(): { items: TickerItem[]; regions: RegionBi
       : [];
 
   return {
-    items,
+    weekOf: STATE_GRAIN_BIDS_PROVENANCE.asOf,
+    headlinePrices,
+    inputs,
+    fsaRate: FSA_RATES.ownershipDirect,
+    fsaEffective: FSA_RATES_PROVENANCE.effective ?? null,
     regions,
     note:
       `USDA-published prices and regional cash bids, refreshed weekly — not a live exchange feed. ` +

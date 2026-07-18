@@ -11,7 +11,7 @@
 import Link from "next/link";
 
 import {
-  buildCommodityTicker,
+  buildFarmMarketView,
   ENTERPRISE_BRIEFS,
   EQUIPMENT_LINES,
   EQUIPMENT_NOTE,
@@ -116,47 +116,88 @@ function CardSection({ title, tag, briefs, intro }: { title: string; tag: string
 }
 
 export function FarmCommodityTicker() {
-  const ticker = buildCommodityTicker();
-  const priceRegions = ticker.regions;
+  const view = buildFarmMarketView();
   const fmt = (n: number | null): string => (n == null ? "—" : `$${n.toFixed(2)}`);
   return (
-    <section aria-label="Commodity prices and regional cash bids" style={{ display: "grid", gap: 6 }}>
-      <div style={{ border: "1px solid #d7deea", background: "#0f2430", borderRadius: 12, padding: "10px 16px", display: "grid", gap: 9 }}>
-        {/* National prices, input costs, FSA rate */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "8px 18px", alignItems: "baseline" }}>
-          {ticker.items.map((item) => (
-            <span key={item.label} style={{ fontSize: 13, color: "#b7ccd9", whiteSpace: "nowrap" }}>
-              <strong style={{ color: "#eaf3f7", fontWeight: 700 }}>{item.label}</strong>{" "}
-              <span style={{ color: "#eaf3f7", fontVariantNumeric: "tabular-nums" }}>{item.value}</span>
-              {item.direction === "up" && <span style={{ color: "#f0864f" }}> ▲</span>}
-              {item.direction === "down" && <span style={{ color: "#5ec6bb" }}> ▼</span>}
-            </span>
-          ))}
+    <section aria-label="Commodity prices and regional cash bids" style={{ display: "grid", gap: 12 }}>
+      {/* Header — same shape as the residential rates block. */}
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+            The grain market this week
+          </span>
+          <strong style={{ fontSize: 22, color: "#101a2b", lineHeight: 1.15 }}>
+            What the crop is worth right now
+          </strong>
         </div>
-        {/* Regional cash bids — the five parts of the country */}
-        {priceRegions.length > 0 && (
-          <div style={{ borderTop: "1px solid #23434f", paddingTop: 8, display: "grid", gap: 5 }}>
-            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.09em", textTransform: "uppercase", color: "#6f97a6" }}>
-              Regional cash bids · corn · soy · wheat
-            </span>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 20px", alignItems: "baseline" }}>
-              {priceRegions.map((r) => (
-                <span key={r.name} style={{ fontSize: 12.5, color: "#b7ccd9", whiteSpace: "nowrap" }}>
-                  <strong style={{ color: "#eaf3f7", fontWeight: 700 }}>{r.name}</strong>{" "}
-                  {r.hasData ? (
-                    <span style={{ color: "#cfe0e8", fontVariantNumeric: "tabular-nums" }}>
-                      {fmt(r.corn)} · {fmt(r.soybeans)} · {fmt(r.wheat)}
-                    </span>
-                  ) : (
-                    <span style={{ color: "#6f97a6", fontStyle: "italic" }}>no reporting bids yet</span>
-                  )}
-                </span>
-              ))}
-            </div>
-          </div>
+        {view.weekOf && (
+          <span style={{ fontSize: 12, color: "#7a8aa0" }}>Tracks USDA · week of {view.weekOf}</span>
         )}
       </div>
-      <span style={{ fontSize: 11, color: "#9aa6b6" }}>{ticker.note}</span>
+
+      {/* Headline national prices — navy number tiles. */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+        {view.headlinePrices.map((p) => (
+          <div key={p.crop} style={{ ...card, background: "#0f2430", border: "1px solid #0f2430", display: "grid", gap: 2, minWidth: 150, flex: "1 1 150px" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "#7fa8b8" }}>{p.crop}</span>
+            <strong style={{ fontSize: 28, color: "#eaf3f7", lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+              ${p.value.toFixed(2)}
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#7fa8b8" }}>/bu</span>
+            </strong>
+            <span style={{ fontSize: 11, color: "#7fa8b8" }}>USDA national average</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Regional cash bids — a clean table (the loan-options analog). */}
+      {view.regions.length > 0 && (
+        <div style={{ ...card, overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+            <thead>
+              <tr style={{ textAlign: "left", color: "#708997" }}>
+                {["Region cash bid", "Corn", "Soybeans", "Wheat"].map((h) => (
+                  <th key={h} style={{ padding: "0 12px 8px 0", fontWeight: 600, fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody style={{ fontVariantNumeric: "tabular-nums" }}>
+              {view.regions.map((r) => (
+                <tr key={r.name} style={{ borderTop: "1px solid #e5ebef" }}>
+                  <td style={{ padding: "9px 12px 9px 0", fontWeight: 700, color: "#101a2b" }}>{r.name}</td>
+                  {r.hasData ? (
+                    <>
+                      <td style={{ padding: "9px 12px 9px 0", color: "#0f766e", fontWeight: 700 }}>{fmt(r.corn)}</td>
+                      <td style={{ padding: "9px 12px 9px 0", color: "#0f766e", fontWeight: 700 }}>{fmt(r.soybeans)}</td>
+                      <td style={{ padding: "9px 0", color: "#0f766e", fontWeight: 700 }}>{fmt(r.wheat)}</td>
+                    </>
+                  ) : (
+                    <td colSpan={3} style={{ padding: "9px 0", color: "#9aa6b6", fontStyle: "italic" }}>no reporting bids yet</td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Supporting line — input costs + FSA rate, quiet, not a dark strip. */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 16px", alignItems: "baseline", fontSize: 12.5, color: "#4d596d" }}>
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#708997" }}>Also this week</span>
+        {view.inputs.map((i) => (
+          <span key={i.label} style={{ whiteSpace: "nowrap" }}>
+            {i.label} y/y{" "}
+            <strong style={{ color: i.direction === "up" ? "#c2410c" : i.direction === "down" ? "#0f766e" : "#101a2b" }}>
+              {i.pct >= 0 ? "+" : ""}{i.pct}%
+            </strong>
+          </span>
+        ))}
+        <span style={{ whiteSpace: "nowrap" }}>
+          FSA Farm Ownership <strong style={{ color: "#101a2b" }}>{view.fsaRate}%</strong>
+          {view.fsaEffective ? ` (eff. ${view.fsaEffective})` : ""}
+        </span>
+      </div>
+
+      <span style={{ fontSize: 11, color: "#9aa6b6" }}>{view.note}</span>
     </section>
   );
 }

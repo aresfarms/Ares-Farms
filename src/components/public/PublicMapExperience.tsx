@@ -328,10 +328,16 @@ export function PublicMapExperience({
   liveSources = {},
   weekSeed = 0,
   mapInventoryByState = {},
+  fillHeight = false,
 }: {
   liveSources?: LiveSources;
   weekSeed?: number;
   mapInventoryByState?: PublicSafeInventoryByState;
+  /** Taller map that fills a tall side column, top-aligning the U.S. drawing so
+      the panel gradient fills below (founder direction 2026-07-18: fill the
+      empty space under the map on lanes where the right column runs long). The
+      popup math stays correct because the drawing top-aligns to the SVG box. */
+  fillHeight?: boolean;
 }) {
   // ── Tour state ──────────────────────────────────────────────────────────────
   /**
@@ -1202,8 +1208,11 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
               // into a side column, not command the full page top). The
               // ResizeObserver re-measures scale on resize, so the on-map
               // popup card tracks correctly at every size.
-              aspectRatio:    "960 / 580",
-              maxHeight:      520,
+              // Taller box on fillHeight lanes so the map reaches down toward
+              // the long side column; the U.S. drawing top-aligns (xMidYMin)
+              // and the panel gradient fills the space below it.
+              aspectRatio:    fillHeight ? "960 / 720" : "960 / 580",
+              maxHeight:      fillHeight ? 600 : 520,
               minHeight:      200, // room for the loading/unavailable notes
               display:        "flex",
               alignItems:     "center",
@@ -1229,7 +1238,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
               <svg
                 ref={svgRef}
                 viewBox="0 -20 960 580"
-                preserveAspectRatio="xMidYMid meet"
+                preserveAspectRatio={fillHeight ? "xMidYMin meet" : "xMidYMid meet"}
                 aria-label={
                   place
                     ? `Full U.S. map — ${place.name}, ${tourState?.state ?? ""}, ${place.era}. Illustrative exploration; not based on your location.`

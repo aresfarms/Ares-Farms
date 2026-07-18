@@ -204,6 +204,7 @@ export default async function ExplorePage({
               liveSources={getRuntimeLiveSources()}
               mapInventoryByState={laneInventory}
               weekSeed={landWeekSeed}
+              fillHeight={isFarmLane}
             />
           </div>
           {/* Right column beside the map. On the Farms/Land lane the Real

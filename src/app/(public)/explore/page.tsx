@@ -144,27 +144,45 @@ export default async function ExplorePage({
     const landWeekSeed = isoWeekSeed();
     return (
       <>
-        <div className="fl-map-section" style={{ maxWidth: 1120, margin: "0 auto", padding: "24px 20px 0" }}>
-          <PublicMapExperience
-            liveSources={getRuntimeLiveSources()}
-            mapInventoryByState={landInventory}
-            weekSeed={landWeekSeed}
-          />
+        {/* Map + grouped listings side by side to shorten the page (founder
+            direction 2026-07-17: smaller map, listings beside it). Stacks on
+            narrow screens. */}
+        <div
+          className="land-top-row"
+          style={{
+            maxWidth: 1340,
+            margin: "0 auto",
+            padding: "24px 20px 0",
+            display: "grid",
+            gap: 24,
+            gridTemplateColumns: "minmax(0, 2.1fr) minmax(0, 1fr)",
+            alignItems: "start",
+          }}
+        >
+          <div className="fl-map-section">
+            <PublicMapExperience
+              liveSources={getRuntimeLiveSources()}
+              mapInventoryByState={landInventory}
+              weekSeed={landWeekSeed}
+            />
+          </div>
+          <div>
+            <PropertyGroupsFrontDoor groups={buildFrontDoorGroups()} />
+          </div>
         </div>
-        {/* Real listings, place 1 — the scrolling shelf between the map and the
-            address box (founder direction 2026-07-17: like the old home page). */}
-        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "20px 20px 0" }}>
+        {/* The scrolling shelf runs full-width below the map row. */}
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
           <PropertyShowcaseRail inventoryByState={landInventory} weekSeed={landWeekSeed} />
-        </div>
-        {/* Real listings, place 2 — grouped by kind, where the categories are. */}
-        <div style={{ maxWidth: 1120, margin: "0 auto", padding: "8px 20px 0" }}>
-          <PropertyGroupsFrontDoor groups={buildFrontDoorGroups()} />
         </div>
         <PropertyHub
           state={one(resolved.state)}
           type={one(resolved.type)}
           category={one(resolved.category)}
         />
+        {/* The America's Journey map has a fixed ~794px render width, so it only
+            sits beside the listings on wide screens; below that it stacks
+            full-width (no clipping). */}
+        <style>{`@media (max-width: 1240px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>
       </>
     );
   }

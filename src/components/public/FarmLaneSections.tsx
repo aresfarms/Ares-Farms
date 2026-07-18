@@ -58,6 +58,40 @@ function BriefList({ title, briefs, intro }: { title: string; briefs: FarmBrief[
             </summary>
             <div style={{ padding: "0 20px 16px", display: "grid", gap: 8 }}>
               <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.6, color: "#3b475a" }}>{brief.answer}</p>
+              {brief.liability && (
+                <div
+                  style={{
+                    background: "#fdf3e7",
+                    borderLeft: "3px solid #c2410c",
+                    borderRadius: "0 8px 8px 0",
+                    padding: "9px 12px",
+                    display: "grid",
+                    gap: 3,
+                  }}
+                >
+                  <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9a3412" }}>
+                    ⚠ Liability &amp; insurance
+                  </span>
+                  <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "#7c2d12" }}>{brief.liability}</p>
+                </div>
+              )}
+              {brief.financing && (
+                <div
+                  style={{
+                    background: "#eef0fe",
+                    borderLeft: "3px solid #534AB7",
+                    borderRadius: "0 8px 8px 0",
+                    padding: "9px 12px",
+                    display: "grid",
+                    gap: 3,
+                  }}
+                >
+                  <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#534AB7" }}>
+                    Financing note
+                  </span>
+                  <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "#312a6b" }}>{brief.financing}</p>
+                </div>
+              )}
               <span style={{ fontSize: 11.5, color: "#708997" }}>
                 Where to go: {brief.pointer}
                 {brief.url && (

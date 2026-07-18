@@ -100,6 +100,13 @@ export interface FarmBrief {
   answer: string;
   pointer: string;
   url?: string;
+  /** Highlighted liability & insurance warning — rendered in its own callout
+      (founder direction 2026-07-18: people think it's a great idea until they
+      get sued). Present on every visitor/animal/paying-guest use. */
+  liability?: string;
+  /** Highlighted financing note — for enterprises whose lending is unusual
+      (e.g. equestrian: sometimes USDA RD/SBA finance it, sometimes not). */
+  financing?: string;
 }
 
 export const ENTERPRISE_BRIEFS: FarmBrief[] = [
@@ -127,6 +134,34 @@ export const ENTERPRISE_BRIEFS: FarmBrief[] = [
       "eggs turn cash fastest but take daily labor and processing logistics. Fencing and water are the real " +
       "startup costs people forget — plan several dollars per foot of fence before the first animal arrives.",
     pointer: "State extension livestock enterprise budgets; USDA NASS cattle reports",
+  },
+  {
+    id: "equestrian",
+    question: "An equestrian operation — boarding, lessons, or breeding?",
+    answer:
+      "Horses are a business people fall in love with before they run the numbers. Full board commonly bills " +
+      "$300–$800 per horse per month, and lessons, training, and hauling add more — but the hidden costs are " +
+      "relentless and year-round: hay and grain through the winter, a farrier every 6–8 weeks per horse, " +
+      "routine and emergency vet, dental and vaccinations, bedding, and a real manure-management plan. The " +
+      "facility is capital-heavy: safe horse fencing runs several dollars a foot, plus a barn or run-in sheds, " +
+      "water to every paddock, and — for anyone riding in winter — an indoor arena that can cost as much as a " +
+      "house. Many barns roughly break even on board and actually earn on lessons and training. Plan the " +
+      "facility and the manure plan before the first horse arrives.",
+    liability:
+      "Equestrian is one of the highest-liability rural enterprises there is — a thrown or kicked rider, a " +
+      "boarder's horse, a lesson student. Most states have an Equine Activity Liability Act that limits your " +
+      "exposure IF you post the required signage and use written liability releases, but that protection is " +
+      "only partial, and boarding, lessons, or any public riding still need serious commercial equine " +
+      "liability plus care-custody-and-control coverage for horses in your care. A standard farm policy almost " +
+      "never covers a horse business — budget for a real equine commercial policy from day one.",
+    financing:
+      "Financing is its own hurdle. Lenders often read a horse operation as recreational rather than " +
+      "agricultural, and specialized arenas and barns are hard to appraise (special-purpose improvements), so " +
+      "a conventional ag loan may not fit. Sometimes USDA Rural Development or SBA WILL finance an equestrian " +
+      "facility — especially boarding or training run as a genuine, documented business — and sometimes they " +
+      "won't, treating it as recreational. Go in with a business plan and clean books; the Financing & Capital " +
+      "module below covers which lanes actually apply.",
+    pointer: "Your state's Equine Activity Liability Act + required signage; an equine-experienced insurance agent; state extension horse program",
   },
   {
     id: "diversified",
@@ -236,8 +271,12 @@ export const LAND_OPTION_BRIEFS: FarmBrief[] = [
       "10%). Glamping (outfitted tents, cabins, a dome) raises the nightly rate but turns it into a hospitality " +
       "business with permits, insurance, and guest management. VIABLE ONLY IF the parcel actually supports it: a " +
       "real attraction within a reasonable drive, legal road access, county zoning that allows short-term " +
-      "camping or a farm-stay use, and workable water/toilet arrangements. Check the zoning and your liability " +
-      "carrier before the first booking, not after.",
+      "camping or a farm-stay use, and workable water/toilet arrangements.",
+    liability:
+      "Paying guests create premises liability the moment they set foot on your land. Hipcamp includes host " +
+      "liability coverage up to a stated limit — confirm the amount and exactly what it excludes — and a " +
+      "standard FARM policy usually will NOT cover paying overnight guests. Carry a host or short-term-rental " +
+      "liability policy, and tell your insurance agent before you list, not after a claim.",
     pointer: "Hipcamp host resources; county zoning/short-term-use rules; your liability insurer",
     url: "https://www.hipcamp.com/en-US/l/hosts",
   },
@@ -252,6 +291,11 @@ export const LAND_OPTION_BRIEFS: FarmBrief[] = [
       "capital, but strong per-square-foot returns where demand is underserved. VIABLE ONLY IF the parcel has " +
       "good road access, is near enough to town or a boating/RV corridor to draw renters, and the zoning allows " +
       "a commercial storage use — rural-residential zoning often does not without a special-use permit.",
+    liability:
+      "Storing other people's property makes you responsible when something happens to it — fire, theft, " +
+      "water, wind. Require renters to insure their own goods in the rental agreement, and carry a commercial " +
+      "policy for the operation; a farm policy will not respond to a storage business. Have the lease terms " +
+      "and the coverage reviewed before you take the first RV.",
     pointer: "County zoning (commercial storage / special-use permit); a local self-storage feasibility study before building",
   },
   {
@@ -264,8 +308,12 @@ export const LAND_OPTION_BRIEFS: FarmBrief[] = [
       "paintball, disc golf, an events field, a model-aircraft strip — work on the same logic. Income is modest " +
       "to moderate and depends entirely on being close enough to a population that will drive to you. VIABLE " +
       "ONLY IF the parcel is within reach of enough people, the zoning permits a commercial recreation or animal " +
-      "use, and you carry the right liability coverage — animals and paying visitors both raise the insurance " +
-      "question.",
+      "use.",
+    liability:
+      "This is the one people underestimate: dogs bite, visitors trip, and both sue. Any operation with " +
+      "paying visitors and animals needs commercial general liability, and boarding or daycare needs " +
+      "care-custody-and-control coverage for the animals themselves. Waivers help but do NOT replace " +
+      "insurance — line up the policy before you take a single booking.",
     pointer: "Sniffspot / booking platforms; county zoning for commercial recreation or kennel use; liability insurer",
     url: "https://www.sniffspot.com/",
   },
@@ -281,6 +329,11 @@ export const LAND_OPTION_BRIEFS: FarmBrief[] = [
       "unit or department is actually looking near you and the parcel fits their need (size, buffer from " +
       "neighbors for noise, road access, and zoning that tolerates the activity). Worth a direct inquiry to the " +
       "nearest installation or department; don't count on it as base income.",
+    liability:
+      "The agency usually carries its own coverage, but get indemnification and the insurance requirements IN " +
+      "WRITING in the lease — training activity (vehicles, K-9, live fire, burns) carries real risk, and an " +
+      "ambiguous agreement is exactly what you don't want when something goes wrong. Have an attorney review " +
+      "any government lease before you sign.",
     pointer: "Nearest National Guard/reserve installation facilities office; county sheriff/fire academy logistics; an attorney on any government lease",
   },
   {
@@ -296,6 +349,12 @@ export const LAND_OPTION_BRIEFS: FarmBrief[] = [
       "is met — game and huntable ground, a real coverage gap, or permitted highway frontage. Never sign a " +
       "tower or billboard lease (often 20–30 years) without an attorney; the escalation and buyout clauses are " +
       "where the money is.",
+    liability:
+      "For hunting, liability is the classic worry — but many states have recreational-use statutes that " +
+      "limit a landowner's liability when access isn't sold purely for profit, and a written lease that " +
+      "REQUIRES hunters to carry liability insurance naming you as an additional insured closes most of the " +
+      "rest of the gap. A tower or billboard puts a contractor on your land for decades; put their coverage " +
+      "and indemnification in the contract.",
     pointer: "State wildlife agency lease guides; a telecom-lease attorney for tower/billboard terms; state DOT for outdoor-advertising permits",
   },
 ];

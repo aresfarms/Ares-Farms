@@ -2,13 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
-import { CompassDispatchHero } from "@/components/public/CompassDispatchHero";
+import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
-import { buildCompassDispatch } from "@/lib/newsletter/newsletterDispatch";
 import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
 import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
@@ -173,14 +172,13 @@ export default async function ExplorePage({
     const laneGroups = buildFrontDoorGroups().filter((g) => laneFilter.profiles.includes(g.profileId));
     const landWeekSeed = isoWeekSeed();
     const audience = LANE_AUDIENCE[selected.slug];
-    const dispatch = audience
-      ? buildCompassDispatch(audience, "delmarva", STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-17")
-      : null;
     return (
       <>
-        {dispatch && (
+        {/* This lane's newsletters render as LINKS (founder direction
+            2026-07-18: "Current Newsletters" list; the letter is a page). */}
+        {audience && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0" }}>
-            <CompassDispatchHero dispatch={dispatch} />
+            <CurrentNewsletters audiences={[audience]} />
           </div>
         )}
         <div
@@ -245,15 +243,14 @@ export default async function ExplorePage({
             </p>
           </header>
 
-          {/* This emblem's own newsletter (founder direction 2026-07-17: each
-              lane gets a themed newsletter). Mapped lanes only for now. */}
-          {(() => {
-            const audience = LANE_AUDIENCE[selected.slug];
-            if (!audience) return null;
-            const asOf = STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-17";
-            const dispatch = buildCompassDispatch(audience, "delmarva", asOf);
-            return dispatch ? <CompassDispatchHero dispatch={dispatch} /> : null;
-          })()}
+          {/* The Newsletters & Podcasts emblem lists ALL current newsletters
+              (and podcasts once running) — links, not inline letters (founder
+              direction 2026-07-18). Other mapped lanes list their own. */}
+          {selected.slug === "housing-development" ? (
+            <CurrentNewsletters />
+          ) : LANE_AUDIENCE[selected.slug] ? (
+            <CurrentNewsletters audiences={[LANE_AUDIENCE[selected.slug]]} />
+          ) : null}
 
           <section
             aria-label={`Exploring: ${selected.label}`}

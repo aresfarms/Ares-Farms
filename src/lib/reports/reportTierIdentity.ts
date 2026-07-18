@@ -89,12 +89,13 @@ const IDENTITIES: Record<ReportTierId, ReportTierIdentity> = {
       ],
       closing:
         "Both reviews stay anchored to this property and this county — nothing generic, nothing " +
-        "resold. The free side is a founding commitment, not a promo: exploring, this brief, and " +
-        "applying for financing never cost you anything, and Furlong never earns based on any " +
-        "loan's outcome. The deeper reviews are optional professional engagements you choose — " +
-        "expert working time on your file, delivered as the clean, lender-ready package — and " +
-        "participating institutions also carry packaging access under their own platform " +
-        "subscriptions. Your Place Brief carries forward into them unchanged.",
+        "resold. The free side is a founding commitment, not a promo: exploring, the facts, this " +
+        "brief, and having Furlong facilitate your financing — through any lending partner — never " +
+        "cost you anything, and Furlong never earns based on any loan's outcome. What can be " +
+        "purchased is people, not information: optional professional engagements — expert working " +
+        "time on your file, delivered as the clean, lender-ready package — and participating " +
+        "institutions carry packaging access under their own platform subscriptions. Your Place " +
+        "Brief carries forward unchanged.",
     },
   },
   paid: {

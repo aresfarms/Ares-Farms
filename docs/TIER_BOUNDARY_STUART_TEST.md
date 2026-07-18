@@ -1,64 +1,73 @@
-# Tier boundary — settled by the Master Volumes; what Stuart validates
+# Tier boundary — the Master Volumes' three-layer model; what Stuart validates
 
-**Status (2026-07-18):** the who-pays question is NOT open — the Master Volume
-Series decided it, and the build now implements that decision. What remains for
-Stuart is validating the institutional side, which is his bailiwick.
+**Status (2026-07-18):** reconciled against the Master Volume Series at the
+founder's direction. The Volumes carry BOTH revenue doors — customer-paid
+professional engagements (bootstrap) and institutional subscriptions
+(recurring) — on top of a constitutionally free core. The build now implements
+that three-layer model. Dollar amounts remain founder+counsel-gated.
 
-## The constitutional answer (implemented)
+## Layer 1 — The free core (constitutional; never gated)
 
-From the Borrower Complete Edition and Volume 0 §7.5 (Revenue Model), with
-ECON-CONFLICT-001 (Vol I §3.34) making revenue neutrality constitutional:
+Borrower Complete Edition (stated three times): **"Furlong is free for
+borrowers. No fees, no charges, ever"** — no application fees, service
+charges, or per-transaction costs at any point in the process. ECON-CONFLICT-001
+(Vol I §3.34) makes revenue neutrality constitutional — nothing outcome-linked.
 
-> **"Furlong is free for borrowers. No fees, no charges, ever."** No
-> application fees, service charges, or per-transaction costs to borrowers at
-> any point in the process.
+In the build: anonymous exploration, the full analysis on screen, the
+watermarked Place Brief PDF (free forever, share anywhere), and the financing
+*application/coordination process itself*. None of this ever costs the
+customer anything.
 
-> **"Furlong is paid by the institutions** — lenders, agencies, partners — for
-> access to the platform infrastructure. The pricing model is **institutional
-> subscription-based** — a platform access fee, not a per-transaction or
-> per-loan charge. Platform pricing is not tied to loan outcomes."
+## Layer 2 — Customer-paid professional engagements (bootstrap revenue)
 
-Vol 0 §7.5 revenue streams (all institution-side): SaaS platform licensing
-(tier-based by participant scale), per-transaction *governance* fees,
-certification & onboarding, government program coordination, advisory &
-implementation, premium compliance services.
+The Volumes' own words:
+- Financing-node spec: the paid **"Begin Engagement / feasibility study" layer
+  that lives beyond Furlong's free informational front.** Personalized
+  feasibility, structuring, and advice are LICENSED territory — delivered
+  through Stuart's licensed finance module (Five Borough) or licensed
+  directory providers; Furlong routes, it does not advise.
+- Vol 0 §7.5: **"Advisory & Implementation Support — professional services
+  revenue"** is one of the six named streams.
+- Founder direction 2026-06-10: memberships bundle scarce expert time
+  (Stuart/Caitlin 1:1 at top tier only) and licensed deliverables (e.g. a
+  Phase I credit); capacity-capped; credits expire annually.
 
-**Therefore:**
-- The borrower-side "token fee for the PDF" idea is dead — it would breach the
-  founding commitment. Everything the borrower touches is free, including
-  their watermarked export, forever.
-- The **clean (watermark-free) institutional export** still exists — but it is
-  an **institution-side deliverable**: produced when a participating
-  institution coordinates the borrower's file, covered by that institution's
-  subscription. The borrower never buys it; their lender's platform access
-  includes it.
-- The free brief's closing now states this plainly (paid by institutions,
-  never by you, never outcome-linked — see `reportTierIdentity.ts`).
+In the build: the paid tiers (Institutional Coordination Report,
+Environmental Documentation Readiness Review) are **optional engagements the
+customer chooses to purchase** — expert working time on their file, delivered
+as the clean (watermark-free) lender-ready export. Buying an engagement is not
+a fee to apply — the free core stays whole. This is how the platform makes
+money before institutional payouts arrive.
 
-## The artifact boundary (unchanged mechanics, corrected payer)
+## Layer 3 — Institutional subscriptions (recurring revenue)
 
-- **Borrower export** — watermarked ("FOR INFORMATIONAL PURPOSES"), free
-  forever, share anywhere.
-- **Institutional export** — clean, "FURLONG institutional export" footer,
-  advisory disclosures intact — generated under the paid tiers, which map to
-  institutional subscription access, not borrower checkout.
+Vol 0 §7.5: SaaS platform licensing (tier-based by participant scale),
+per-workflow governance fees, certification & onboarding, program
+coordination, premium compliance packages. Institutions with platform access
+also reach packaging under their own subscriptions. Never per-loan, never
+outcome-linked.
 
-## What Stuart validates (staging; tier preview is unlocked)
+## The artifact boundary (mechanics)
 
-1. **Institutional packaging quality** — export the Institutional
-   Coordination Report (tier switch shows "Testing unlock", export is clean).
-   Is this what a lender actually wants across the desk? What's missing before
-   he'd put his name near it?
-2. **The subscription frame** — Vol 0 prices platform access by participant
-   scale and program volume. Does that structure fit how the lenders he knows
-   actually buy? What would a Five Borough-sized shop expect to pay for seat
-   + export access?
-3. **The governance-fee stream** — per-workflow governance fees (origination
-   events, eligibility documentation) — real-world palatable, or does it read
-   as a junk fee to an institution?
-4. **The handoff moment** — walk the borrower flow to the point where a file
-   would move to an institution. Is the moment the clean export unlocks the
-   right moment, and is the free brief generous enough to get borrowers there?
+- **Free export** — watermarked ("FOR INFORMATIONAL PURPOSES"), free forever.
+- **Engagement/institutional export** — clean, "FURLONG institutional export"
+  footer, advisory disclosures intact. Reached by purchasing an engagement
+  (Layer 2) or through an institution's subscription (Layer 3).
 
-Institutional price POINTS (dollar amounts) remain founder-gated for the
-founders + counsel session — the Volumes fix the structure, not the numbers.
+## What Stuart validates (staging; tier preview unlocked, badge "Testing unlock")
+
+1. **Engagement packaging** — export free (watermarked) and Institutional
+   Coordination (clean) for the same property. Is the clean package
+   lender-grade? What's missing before he'd put his name near it?
+2. **Engagement pricing shape** — one-off engagement fees vs membership
+   bundles (per the 2026-06-10 direction: async/group at lower tiers, 1:1 only
+   at top, capacity-capped, credits expire annually). Which fits how these
+   customers buy, and at what rough price points? (His numbers feed the
+   founders+counsel session — nothing is charged until then.)
+3. **The licensing seam** — personalized feasibility/structuring must land in
+   the licensed module or a licensed provider, never in Furlong's advisory
+   layer. Does the current handoff respect that line?
+4. **Institutional subscription structure** — platform access priced by
+   participant scale + governance fees per workflow: does that match how the
+   lenders he knows actually buy, and what would a Five Borough-sized shop
+   expect to pay?

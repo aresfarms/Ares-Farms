@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
 import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
+import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
@@ -172,13 +173,15 @@ export default async function ExplorePage({
     const laneGroups = buildFrontDoorGroups().filter((g) => laneFilter.profiles.includes(g.profileId));
     const landWeekSeed = isoWeekSeed();
     const audience = LANE_AUDIENCE[selected.slug];
+    const isFarmLane = selected.slug === "farms-agriculture";
     return (
       <>
-        {/* This lane's newsletters render as LINKS (founder direction
-            2026-07-18: "Current Newsletters" list; the letter is a page). */}
-        {audience && (
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0" }}>
-            <CurrentNewsletters audiences={[audience]} />
+        {/* Farms lane leads with the commodity ticker (founder direction
+            2026-07-18: the module answers what agricultural people actually
+            want to know — prices first). */}
+        {isFarmLane && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "20px 20px 0" }}>
+            <FarmCommodityTicker />
           </div>
         )}
         <div
@@ -213,6 +216,19 @@ export default async function ExplorePage({
           category={one(resolved.category)}
           lane={selected.slug}
         />
+        {/* The farmer sections: enterprise economics, land-money options,
+            equipment + suppliers, module cross-links. */}
+        {isFarmLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "8px 20px 0" }}>
+            <FarmLaneSections />
+          </div>
+        )}
+        {/* Newsletters at the BOTTOM of the page (founder direction 2026-07-18). */}
+        {audience && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0" }}>
+            <CurrentNewsletters audiences={[audience]} />
+          </div>
+        )}
         {/* The map is width-responsive now (960×580 aspect held at any width),
             so it keeps its side column at normal widths; only narrow screens stack. */}
         <style>{`@media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>

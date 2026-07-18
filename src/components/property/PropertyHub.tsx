@@ -114,7 +114,8 @@ export function PropertyHub({
           <>
             <EntryChoiceIntro />
             <GuidedIntake feed={guidedIntakeFeed()} />
-            <CategoryGrid tree={tree} />
+            {/* "Browse by category" grid removed — redundant with the grouped
+                listings above (founder direction 2026-07-17). */}
           </>
         ) : !selectedAbbr ? (
           <StateList category={liveCategory} />
@@ -223,35 +224,6 @@ function PendingState({
 }
 
 // ── Level 1: category grid (only non-empty categories) ────────────────────────
-function CategoryGrid({ tree }: { tree: ReturnType<typeof buildCategoryTree> }) {
-  return (
-    <section id="browse-by-category" aria-label="Browse by category" style={{ display: "grid", gap: 14 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#eaf3f7" }}>Browse by category</h2>
-        <span style={{ fontSize: 14, color: "#b7ccd9" }}>
-          {tree.liveTotal.toLocaleString("en-US")} listings across {tree.categories.length}{" "}
-          {tree.categories.length === 1 ? "category" : "categories"}
-        </span>
-      </div>
-      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
-        {tree.categories.map((c) => (
-          <li key={c.id}>
-            <Link href={catHref(c.id)} style={cardLink}>
-              <span style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
-                <strong style={{ fontSize: 17, color: "#eaf3f7" }}>{c.label}</strong>
-                <span style={countPill}>{c.count.toLocaleString("en-US")}</span>
-              </span>
-              <span style={{ fontSize: 13, color: "#b7ccd9" }}>
-                {c.states.length} {c.states.length === 1 ? "state" : "states"} with inventory →
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 // ── Level 2: states within a category (only non-empty states) ─────────────────
 function StateList({ category }: { category: ReturnType<typeof buildCategoryTree>["categories"][number] }) {
   return (

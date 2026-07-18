@@ -120,6 +120,36 @@ export const COMMERCIAL_BRIEFS: CommercialBrief[] = [
     pointer: "Your own rebuilt operating statement; a lender's DSCR test; a CPA on after-tax cash flow",
   },
   {
+    id: "operating-capital",
+    question: "Can I roll operating (working) capital into my loan — and how much do I need?",
+    answer:
+      "Yes — and it's one of the biggest advantages of SBA financing that buyers routinely miss. An SBA 7(a) loan " +
+      "can include WORKING CAPITAL alongside the real estate, equipment, or business purchase — cash to actually run " +
+      "the place from day one: payroll, inventory, marketing, and the slow first months. (A 504 is for fixed assets, " +
+      "so working capital rides on a 7(a) or a companion line.) How much? Size it to your cash-flow gap: build a " +
+      "month-by-month projection for the first 6–12 months, find the deepest point where money out exceeds money in " +
+      "(plus a cushion for the ramp-up), and that trough is roughly your working-capital need. Underfunding it is a " +
+      "top reason acquisitions fail — the business is fine, but the new owner runs out of cash in month four.",
+    pointer: "An SBA-preferred lender on 7(a) working-capital eligibility; a CPA to build the cash-flow projection",
+    financing:
+      "The structure that works: put the building on a 504 (long term, low down) and the working capital + business " +
+      "on a 7(a) — one relationship, two notes, sized to both the asset and the cash you need to operate. Bring the " +
+      "cash-flow projection to the lender; it's what sizes the working-capital piece and proves you can service it.",
+  },
+  {
+    id: "equipment-financing",
+    question: "Can I finance the equipment too — and should it go in the same loan?",
+    answer:
+      "Yes. Equipment can go into an SBA 504 (with the real estate, as a fixed asset — long term, low down) or a " +
+      "7(a) (bundled with the business and working capital), and there are equipment-specific lenders and leases " +
+      "outside SBA too. The real question is TERM MATCHING: finance equipment over a term that fits its useful " +
+      "life, not the building's. Rolling a 7-year machine into a 25-year real-estate loan means you're still paying " +
+      "for it long after it's worn out; a shorter equipment note or a lease keeps the debt honest. New vs used, buy " +
+      "vs lease, and whether the equipment holds value all move the math — and heavy, specialized equipment can " +
+      "sometimes serve as its own collateral, lowering what you put down.",
+    pointer: "An SBA-preferred lender or an equipment-finance company; your CPA on lease-vs-buy and depreciation",
+  },
+  {
     id: "business-or-re",
     question: "Should I buy the business, the real estate, or both?",
     answer:
@@ -227,3 +257,33 @@ export const COMMERCIAL_UNKNOWN_BRIEFS: CommercialBrief[] = [
     pointer: "Your lender's reserve requirement; a commercial attorney to collect estoppels before closing",
   },
 ];
+
+// ── Capital rates (commercial) ───────────────────────────────────────────────
+// HONEST SOURCING: we do NOT fabricate live SBA/Prime/504 numbers — those need
+// a market-data feed (FRED DPRIME, NADCO/DCFC debenture pricing). What's shown
+// is how each program is PRICED (factual, structural) plus the one published
+// USDA number we track (FSA), with a hard "set at closing" disclaimer. `asOf`
+// is a curated stamp the team refreshes.
+
+export interface CapitalRateLine {
+  program: string;
+  /** How the rate is set (factual, doesn't fluctuate day to day). */
+  basis: string;
+  /** A hard current figure where we genuinely have one. */
+  current?: string;
+}
+
+export const COMMERCIAL_CAPITAL_RATES: { asOf: string; lines: CapitalRateLine[]; note: string } = {
+  asOf: "July 2026",
+  lines: [
+    { program: "SBA 7(a)", basis: "Prime + a lender-negotiated spread (SBA-capped); usually variable." },
+    { program: "SBA 504", basis: "A fixed rate set at each monthly debenture sale — it locks when your loan funds." },
+    { program: "USDA Business & Industry (B&I)", basis: "Lender-negotiated, backed by a USDA guarantee." },
+    { program: "USDA / FSA (ag-commercial)", basis: "Published program rate.", current: "FSA Farm Ownership 6.0%" },
+    { program: "Conventional commercial", basis: "Bank-set — often the 5-yr Treasury or SOFR + a spread; frequently a balloon." },
+  ],
+  note:
+    "Your actual rate is set at your loan's CLOSING date and depends on the program, term, lender, and your file — " +
+    "these are how each program is priced, not a quote. Live SBA / Prime / 504 numbers need a market-data feed; the " +
+    "Financing & Capital module has the lanes in detail.",
+};

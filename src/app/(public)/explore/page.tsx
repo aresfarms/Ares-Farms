@@ -5,6 +5,7 @@ import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorati
 import { CommunityCta } from "@/components/public/CommunityCta";
 import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { CommercialLaneSections } from "@/components/public/CommercialLaneSections";
+import { CommercialRatesBlock } from "@/components/public/CommercialRatesBlock";
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
 import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
@@ -226,6 +227,7 @@ export default async function ExplorePage({
               <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} limit={6} layout="column" accent={laneAccent} />
             )}
             {isResidentialLane && <ResidentialRateTiles />}
+            {isCommercialLane && <CommercialRatesBlock />}
           </div>
         </div>
         {/* The farmer sections as cards (founder direction 2026-07-18):

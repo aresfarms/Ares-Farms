@@ -307,6 +307,39 @@ export const ENTERPRISE_BRIEFS: FarmBrief[] = [
     pointer: "USDA Local Food Directories (farmers markets, CSAs, food hubs, on-farm markets); your county extension on the local direct-market scene",
     url: "https://www.usdalocalfoodportal.com/",
   },
+  {
+    id: "grain-marketing",
+    question: "I've grown the grain — now what? How and where do I sell it?",
+    answer:
+      "You have more choices than 'haul it to the elevator today.' The main channels: (1) CASH SALE at the local " +
+      "elevator or co-op — simple and immediate, priced off the futures board minus the local BASIS (the elevator's " +
+      "spread); (2) FORWARD CONTRACT — lock a price now for delivery later, taking the guesswork out; (3) STORE IT — " +
+      "on-farm bins or commercial storage, then sell into a better basis or a post-harvest rally (storage costs money " +
+      "and grain can go out of condition, so it's a bet); (4) BASIS or hedge-to-arrive contracts if you want to " +
+      "separate the futures price from the local basis. Direct-to-user — a local mill, feed buyer, distiller, or " +
+      "food-grade/organic contract — can pay a premium if you can hit their spec and volume. The discipline: know " +
+      "your cost per bushel (the truckload math in the newsletter), watch your local basis, and don't sell the whole " +
+      "crop on a single day.",
+    pointer: "Your local elevator/co-op for bids & basis; USDA AMS grain market reports; a grain-marketing advisor or your extension marketing program",
+    url: "https://www.ams.usda.gov/market-news/grain",
+  },
+  {
+    id: "usda-number",
+    question: "Do I need a USDA farm number — or can I farm without one? Doesn't USDA dictate what I grow?",
+    answer:
+      "Two honest answers. First: you do NOT need a USDA farm number to grow crops or raise animals on your own land " +
+      "and sell them — plenty of operations never visit the FSA office. A USDA/FSA FARM NUMBER is a free, voluntary " +
+      "registration at your county Farm Service Agency that you need only to ACCESS USDA programs: FSA loans, " +
+      "commodity/price-support and disaster payments, crop insurance tied to reported acreage, and conservation " +
+      "programs (CRP/EQIP). No number, no programs — but also no obligations. Second, the misconception: USDA does " +
+      "NOT tell you what to grow on your own land. What you plant is your call. Program RULES only bite if you " +
+      "voluntarily enroll — 'base acres' and payment history, or conservation compliance (don't crop a wetland or " +
+      "highly-erodible ground you signed into a program) — and they apply because you took the benefit, not because " +
+      "you own the dirt. Register if you want the programs and the safety net; skip it if you'd rather stay fully " +
+      "independent.",
+    pointer: "Your county USDA Service Center / Farm Service Agency (FSA) to get a farm number; USDA FSA program pages",
+    url: "https://www.fsa.usda.gov/",
+  },
 ];
 
 // ── Land-money questions — solar, easements, selling, programs ──────────────

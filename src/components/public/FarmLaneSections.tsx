@@ -13,12 +13,10 @@ import Link from "next/link";
 import {
   buildFarmMarketView,
   ENTERPRISE_BRIEFS,
-  EQUIPMENT_LINES,
-  EQUIPMENT_NOTE,
   LAND_OPTION_BRIEFS,
-  SUPPLIER_LINKS,
   type FarmBrief,
 } from "@/lib/property/farmLaneCurated";
+import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 
 // This whole module wears the FARM lane's color identity (green — growth,
@@ -186,20 +184,27 @@ export function FarmCommodityTicker() {
         </div>
       )}
 
-      {/* Supporting line — input costs + FSA rate, quiet, not a dark strip. */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 16px", alignItems: "baseline", fontSize: 12.5, color: "#4d596d" }}>
+      {/* Supporting line — input costs + FSA rate, now bold PILLS so they stand
+          out instead of fading into the page (founder direction 2026-07-18). */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
         <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#708997" }}>Also this week</span>
-        {view.inputs.map((i) => (
-          <span key={i.label} style={{ whiteSpace: "nowrap" }}>
-            {i.label} y/y{" "}
-            <strong style={{ color: i.direction === "up" ? "#c2410c" : i.direction === "down" ? FARM.accent : "#101a2b" }}>
-              {i.pct >= 0 ? "+" : ""}{i.pct}%
-            </strong>
-          </span>
-        ))}
-        <span style={{ whiteSpace: "nowrap" }}>
-          FSA Farm Ownership <strong style={{ color: "#101a2b" }}>{view.fsaRate}%</strong>
-          {view.fsaEffective ? ` (eff. ${view.fsaEffective})` : ""}
+        {view.inputs.map((i) => {
+          const dirColor = i.direction === "up" ? "#c2410c" : i.direction === "down" ? FARM.accent : "#101a2b";
+          return (
+            <span
+              key={i.label}
+              style={{ whiteSpace: "nowrap", fontSize: 13, fontWeight: 700, color: "#101a2b", background: "#eef2f6", borderRadius: 999, padding: "5px 12px" }}
+            >
+              {i.label} y/y{" "}
+              <strong style={{ fontWeight: 800, color: dirColor }}>
+                {i.pct >= 0 ? "+" : ""}{i.pct}%{i.direction === "up" ? " ▲" : i.direction === "down" ? " ▼" : ""}
+              </strong>
+            </span>
+          );
+        })}
+        <span style={{ whiteSpace: "nowrap", fontSize: 13, fontWeight: 700, color: "#101a2b", background: "#eef2f6", borderRadius: 999, padding: "5px 12px" }}>
+          FSA Farm Ownership <strong style={{ fontWeight: 800, color: FARM.accent }}>{view.fsaRate}%</strong>
+          {view.fsaEffective ? <span style={{ fontWeight: 500, color: "#4d596d" }}>{` · eff. ${view.fsaEffective}`}</span> : null}
         </span>
       </div>
 
@@ -222,35 +227,9 @@ export function FarmLaneSections() {
         intro="Every option below is real — but each one is only worth it if this particular parcel supports it: the zoning, the road access, and the demand nearby all have to line up. Read each as 'possible here if…', never as a promise. Confirm the zoning and your insurance before acting on any of them."
       />
 
-      {/* Equipment — as cards, then supplier chips */}
-      <section aria-label="Farm equipment" style={{ display: "grid", gap: 12 }}>
-        <span style={sectionKicker}>Farm equipment — what the iron costs</span>
-        <div style={cardGrid}>
-          {EQUIPMENT_LINES.map((line) => (
-            <div key={line.category} style={card}>
-              <span style={cardKicker}>Equipment</span>
-              <strong style={cardTitle}>{line.category}</strong>
-              <span style={{ fontSize: 13.5, fontWeight: 700, color: FARM.accent, fontVariantNumeric: "tabular-nums" }}>{line.typicalCost}</span>
-              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{line.note}</span>
-            </div>
-          ))}
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {SUPPLIER_LINKS.map((s) => (
-            <a
-              key={s.name}
-              href={s.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ fontSize: 12.5, fontWeight: 700, color: FARM.accent, border: "1px solid #d7deea", borderRadius: 999, padding: "6px 13px", textDecoration: "none", background: "#ffffff" }}
-              title={s.role}
-            >
-              {s.name} ↗
-            </a>
-          ))}
-        </div>
-        <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{EQUIPMENT_NOTE}</span>
-      </section>
+      {/* Equipment — interactive: suppliers inside each box + a recommend-for-
+          my-operation picker (founder direction 2026-07-18). */}
+      <FarmEquipmentExplorer />
 
       {/* Cross-links to the sibling modules */}
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>

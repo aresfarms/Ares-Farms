@@ -410,19 +410,75 @@ export const LAND_OPTION_BRIEFS: FarmBrief[] = [
 
 // ── Farm equipment — costs + suppliers ──────────────────────────────────────
 
+/** Farming specialties — drive the equipment "recommend for my operation" picker. */
+export interface FarmSpecialty {
+  id: string;
+  label: string;
+}
+
+export const FARM_SPECIALTIES: FarmSpecialty[] = [
+  { id: "any", label: "Not sure — recommend for me" },
+  { id: "rowcrops", label: "Row crops (corn / soy / wheat)" },
+  { id: "livestock", label: "Livestock & pasture" },
+  { id: "hay", label: "Hay & forage" },
+  { id: "produce", label: "Produce & cut flowers" },
+  { id: "orchard", label: "Orchard & vineyard" },
+  { id: "diversified", label: "Diversified operation" },
+];
+
 export interface EquipmentLine {
   category: string;
   typicalCost: string;
   note: string;
+  /** Supplier names (resolve to SUPPLIER_LINKS) shown inside this box. */
+  suppliers: string[];
+  /** Specialty ids this piece is recommended for. */
+  specialties: string[];
 }
 
 export const EQUIPMENT_LINES: EquipmentLine[] = [
-  { category: "Compact / utility tractor (25–75 hp)", typicalCost: "$25,000–$75,000 new", note: "The small-farm workhorse; strong used market at roughly half of new." },
-  { category: "Row-crop tractor (150–300 hp)", typicalCost: "$150,000–$450,000 new", note: "The big line item after land; most operations buy used or lease." },
-  { category: "Combine + heads", typicalCost: "$400,000–$800,000 new", note: "Why custom harvesting exists — hiring the combine often beats owning under ~1,000 acres." },
-  { category: "Planter / drill", typicalCost: "$50,000–$300,000", note: "Width and tech (section control, monitors) drive the spread." },
-  { category: "Sprayer (pull-type → self-propelled)", typicalCost: "$40,000–$400,000", note: "Custom application is the common alternative below scale." },
-  { category: "Hay line (mower, rake, baler)", typicalCost: "$60,000–$200,000 for the set", note: "Round balers $30,000–$70,000 new; the used market is deep." },
+  {
+    category: "Compact / utility tractor (25–75 hp)",
+    typicalCost: "$25,000–$75,000 new",
+    note: "The small-farm workhorse; strong used market at roughly half of new.",
+    suppliers: ["Kubota", "John Deere", "New Holland", "Case IH", "TractorHouse", "Machinery Pete", "AgDirect"],
+    specialties: ["livestock", "hay", "produce", "orchard", "diversified"],
+  },
+  {
+    category: "Row-crop tractor (150–300 hp)",
+    typicalCost: "$150,000–$450,000 new",
+    note: "The big line item after land; most operations buy used or lease.",
+    suppliers: ["John Deere", "Case IH", "New Holland", "AGCO (Massey Ferguson · Fendt)", "TractorHouse", "Machinery Pete", "AgDirect"],
+    specialties: ["rowcrops", "diversified"],
+  },
+  {
+    category: "Combine + heads",
+    typicalCost: "$400,000–$800,000 new",
+    note: "Why custom harvesting exists — hiring the combine often beats owning under ~1,000 acres.",
+    suppliers: ["John Deere", "Case IH", "New Holland", "AGCO (Massey Ferguson · Fendt)", "TractorHouse", "Machinery Pete", "AgDirect"],
+    specialties: ["rowcrops"],
+  },
+  {
+    category: "Planter / drill",
+    typicalCost: "$50,000–$300,000",
+    note: "Width and tech (section control, monitors) drive the spread.",
+    suppliers: ["John Deere", "Case IH", "AGCO (Massey Ferguson · Fendt)", "TractorHouse", "Machinery Pete", "AgDirect"],
+    specialties: ["rowcrops", "hay", "produce", "diversified"],
+  },
+  {
+    category: "Sprayer (pull-type → self-propelled)",
+    typicalCost: "$40,000–$400,000",
+    note: "Custom application is the common alternative below scale.",
+    suppliers: ["John Deere", "Case IH", "AGCO (Massey Ferguson · Fendt)", "TractorHouse", "Machinery Pete", "AgDirect"],
+    specialties: ["rowcrops", "orchard", "diversified"],
+  },
+  {
+    category: "Hay line (mower, rake, baler)",
+    typicalCost: "$60,000–$200,000 for the set",
+    note: "Round balers $30,000–$70,000 new; the used market is deep.",
+    suppliers: ["John Deere", "Case IH", "New Holland", "Kubota", "AGCO (Massey Ferguson · Fendt)", "TractorHouse", "Machinery Pete", "AgDirect"],
+    specialties: ["livestock", "hay", "diversified"],
+  },
 ];
 
 export interface SupplierLink {

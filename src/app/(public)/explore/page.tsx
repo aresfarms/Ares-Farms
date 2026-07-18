@@ -4,6 +4,7 @@ import Link from "next/link";
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
 import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
+import { ResidentialRatesBlock } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
@@ -27,6 +28,7 @@ import { isoWeekSeed } from "@/lib/public-content/weekSeed";
  */
 const LANE_AUDIENCE: Record<string, NewsletterAudience> = {
   "farms-agriculture": "farm",
+  "property-land": "residential",
 };
 
 /**
@@ -174,6 +176,7 @@ export default async function ExplorePage({
     const landWeekSeed = isoWeekSeed();
     const audience = LANE_AUDIENCE[selected.slug];
     const isFarmLane = selected.slug === "farms-agriculture";
+    const isResidentialLane = selected.slug === "property-land";
     return (
       <>
         {/* Farms lane leads with the commodity ticker (founder direction
@@ -203,28 +206,45 @@ export default async function ExplorePage({
               weekSeed={landWeekSeed}
             />
           </div>
-          <div>
+          {/* Right column beside the map. On the Farms/Land lane the Real
+              Listings fill the dead space under the browse box, next to the map
+              (founder direction 2026-07-18). Other lanes keep the full-width
+              shelf below. */}
+          <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
             <PropertyGroupsFrontDoor groups={laneGroups} compact />
+            {isFarmLane && (
+              <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} limit={6} layout="column" />
+            )}
           </div>
         </div>
-        {/* The farmer sections as cards, ABOVE the listings shelf (founder
-            direction 2026-07-18): enterprise economics, land-money options,
-            equipment, module cross-links — in the listing-card visual language. */}
+        {/* The farmer sections as cards (founder direction 2026-07-18):
+            enterprise economics, land-money options, equipment, cross-links. */}
         {isFarmLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
             <FarmLaneSections />
           </div>
         )}
-        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
-          <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} />
-        </div>
+        {/* Non-farm lanes keep the full-width listings shelf below the map. */}
+        {!isFarmLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
+            <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} />
+          </div>
+        )}
+        {/* Residential lane: current mortgage rates under the live listings
+            (founder direction 2026-07-18). */}
+        {isResidentialLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
+            <ResidentialRatesBlock />
+          </div>
+        )}
         <PropertyHub
           state={one(resolved.state)}
           type={one(resolved.type)}
           category={one(resolved.category)}
           lane={selected.slug}
         />
-        {/* Newsletters at the BOTTOM of the page (founder direction 2026-07-18). */}
+        {/* Newsletters & podcasts at the BOTTOM (founder direction 2026-07-18;
+            residential + farm lanes both carry a themed edition list). */}
         {audience && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0" }}>
             <CurrentNewsletters audiences={[audience]} />

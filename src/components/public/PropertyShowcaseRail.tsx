@@ -40,11 +40,16 @@ export function PropertyShowcaseRail({
   inventoryByState,
   weekSeed,
   limit = 24,
+  layout = "shelf",
 }: {
   inventoryByState: Record<string, PublicSafeProperty[]>;
   weekSeed: number;
   limit?: number;
+  /** "shelf" = horizontal scroll (default); "column" = vertical stack that
+      fills the dead space beside the map (founder direction 2026-07-18). */
+  layout?: "shelf" | "column";
 }) {
+  const isColumn = layout === "column";
   // Interleave by PROPERTY KIND first (founder direction 2026-07-17: the
   // shelf shows a variety, not just HUD homes), then by state within each
   // kind so the rail still sweeps the country. Small groups (commercial,
@@ -87,7 +92,7 @@ export function PropertyShowcaseRail({
           <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
             On the shelf this week
           </span>
-          <strong style={{ fontSize: 22, color: "#101a2b", lineHeight: 1.15 }}>
+          <strong style={{ fontSize: isColumn ? 17 : 22, color: "#101a2b", lineHeight: 1.15 }}>
             Real listings, straight from government sources
           </strong>
         </div>
@@ -96,15 +101,19 @@ export function PropertyShowcaseRail({
         </Link>
       </div>
       <div
-        style={{
-          display: "grid",
-          gridAutoFlow: "column",
-          gridAutoColumns: "minmax(230px, 260px)",
-          gap: 12,
-          overflowX: "auto",
-          paddingBottom: 8,
-          scrollSnapType: "x proximity",
-        }}
+        style={
+          isColumn
+            ? { display: "grid", gridTemplateColumns: "1fr", gap: 10 }
+            : {
+                display: "grid",
+                gridAutoFlow: "column",
+                gridAutoColumns: "minmax(230px, 260px)",
+                gap: 12,
+                overflowX: "auto",
+                paddingBottom: 8,
+                scrollSnapType: "x proximity",
+              }
+        }
       >
         {picks.map((property) => {
           const title = `${property.propertyType[0]?.toUpperCase() ?? ""}${property.propertyType.slice(1)} in ${property.town}`;
@@ -136,7 +145,7 @@ export function PropertyShowcaseRail({
                 background: "#ffffff",
                 padding: "14px 15px",
                 textDecoration: "none",
-                scrollSnapAlign: "start",
+                scrollSnapAlign: isColumn ? undefined : "start",
               }}
             >
               <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", color: "#0f766e" }}>

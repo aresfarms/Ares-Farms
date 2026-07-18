@@ -100,7 +100,11 @@ export function PropertyHub({
   return (
     <main>
       <div style={lightContainer}>
-        <Header sources={sources} />
+        {/* Header block (title + blurb + sources line) removed — founder
+            direction 2026-07-17: cut it out completely. */}
+        <h1 style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", border: 0 }}>
+          Government property listings
+        </h1>
 
         {tree.anyLive && <SavedTray />}
 
@@ -185,29 +189,6 @@ function EntryChoiceIntro() {
       </div>
       <PlaceFirstDiscovery flow="property-discovery" embedded tone="dark" />
     </section>
-  );
-}
-
-// ── Header (always rendered — carries the "may fit" + both-source framing) ────
-function Header({ sources }: { sources: ReturnType<typeof propertySourceStatuses> }) {
-  return (
-    <header style={{ display: "grid", gap: 10 }}>
-      <span style={{ fontSize: 13, fontWeight: 700, color: "#7fc4b8", textTransform: "uppercase", letterSpacing: 0.4 }}>
-        Property &amp; land — no account needed
-      </span>
-      <h1 style={{ margin: 0, fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.12 }}>
-        Government property listings
-      </h1>
-      <p style={{ margin: 0, fontSize: 17, ...muted, maxWidth: 680 }}>
-        Real listings from federal housing programs — current <strong>HUD (FHA) homes for sale</strong>{" "}
-        and historical <strong>USDA Rural Development examples</strong>. Program criteria shown on a
-        listing are <strong>verified property-side facts</strong>, never assumptions. Furlong is advisory
-        only — we don&apos;t lend, approve, or determine eligibility. Pathways, not promises.
-      </p>
-      <p style={{ margin: 0, fontSize: 13, color: "#7ea4bb" }}>
-        {sources.map((s) => `${s.sourceName}: ${s.live ? "live" : "pending review"} (${s.total.toLocaleString("en-US")})`).join(" · ")} · public-domain open data
-      </p>
-    </header>
   );
 }
 

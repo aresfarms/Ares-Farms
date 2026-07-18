@@ -258,6 +258,43 @@ async function main(): Promise<void> {
   }
   record("verify:csp-hydration @ deployed URL", "PASS", cspTail.slice(0, 160), cspPass);
 
+  // ---- 2b. P3 checks — IAP tester access (URL shareable with NAMED testers) ---
+  // P3 = the staging URL may be shared with explicitly named testers: IAP
+  // enforces Google sign-in at the edge, and the IAP web-user allowlist holds
+  // ONLY user: principals + the verify SA — never allUsers/groups/domains.
+  console.log("\nP3 checks (IAP tester access):");
+  record("IAP enabled on service", "true", iapAnnotation || "false", iapEnabled);
+
+  let testerPrincipals: string[] = [];
+  if (iapEnabled) {
+    const iapPolicy = JSON.parse(
+      gcloud([
+        "iap", "web", "get-iam-policy",
+        "--resource-type=cloud-run", `--service=${SERVICE}`, `--region=${REGION}`,
+        "--format", "json",
+      ])
+    ) as { bindings?: Array<{ role: string; members: string[] }> };
+    const accessors = (iapPolicy.bindings ?? [])
+      .filter((b) => b.role === "roles/iap.httpsResourceAccessor")
+      .flatMap((b) => b.members);
+    testerPrincipals = accessors;
+    const broad = accessors.filter(
+      (m) => m === "allUsers" || m === "allAuthenticatedUsers" || m.startsWith("group:") || m.startsWith("domain:")
+    );
+    const named = accessors.filter((m) => m.startsWith("user:"));
+    record(
+      "IAP allowlist is named principals only",
+      "user:* + verify SA; no allUsers/group/domain",
+      accessors.join(", ") || "(empty)",
+      broad.length === 0 && named.length >= 1
+    );
+    // The edge redirect target must be Google sign-in (the IAP interstitial),
+    // proving an unlisted visitor gets an auth wall, not an error page.
+    const anonEdge = await http(`${serviceUrl}/`);
+    const location = anonEdge.status === 302 ? "google-signin" : `HTTP ${anonEdge.status}`;
+    record("unlisted visitor gets Google sign-in wall", "302 → sign-in", location, anonEdge.status === 302);
+  }
+
   // ---- 3. Gate report + manifest ---------------------------------------------
   const failed = checks.filter((c) => !c.pass);
   const deployedAtUtc = new Date().toISOString();
@@ -305,13 +342,19 @@ async function main(): Promise<void> {
     financingEnabled: false,
     dnsCutoverAuthorized: false,
     iapEnabled,
+    p3TesterPrincipals: testerPrincipals, // IAP httpsResourceAccessor allowlist at deploy time
     anonymousInvocationAllowed: false, // DERIVED green above or we exited 1
     dataSeedStatus: "NOT_LOADED",      // P4 changes this via migrate/seed flow
   };
   const manifestPath = path.join(outDir, `${stamp}-${gitHead}.json`);
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   console.log(`manifest:    ${path.relative(process.cwd(), manifestPath)}`);
-  console.log(`\n✓ P2.4 PASS — manifest emitted. URL stays UNSHARED until P3 (IAP).`);
+  if (iapEnabled) {
+    const testers = testerPrincipals.filter((m) => m.startsWith("user:")).join(", ") || "—";
+    console.log(`\n✓ P2.4 + P3 PASS — manifest emitted. URL shareable with ALLOWLISTED IAP testers only (${testers}). See docs/STAGING_TESTER_ACCESS.md.`);
+  } else {
+    console.log(`\n✓ P2.4 PASS — manifest emitted. URL stays UNSHARED until P3 (IAP).`);
+  }
 }
 
 main().catch((error: unknown) => {

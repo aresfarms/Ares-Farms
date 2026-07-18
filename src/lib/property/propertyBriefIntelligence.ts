@@ -1286,9 +1286,12 @@ function buildPathwaysProse(args: {
         : `Homes like this`;
     return (
       `${named} ${place} are typically bought with FHA loans (often the 203(k) variant when repairs ` +
-      `are part of the plan), conventional loans, or USDA rural programs. Which of those fits is a ` +
-      `personal-situation question — a provider can walk you through it; nothing here is a ` +
-      `qualification or approval.`
+      `are part of the plan), conventional loans, or USDA rural programs. One hard boundary to know: ` +
+      `if the property is a working farm or the land is the main value — large acreage, ` +
+      `income-producing ground — FHA and USDA Rural Development home loans generally will NOT ` +
+      `underwrite it; that purchase lives in the agricultural lanes (FSA farm loans, Farm Credit) ` +
+      `instead. Which lane fits is a personal-situation question — a provider can walk you through ` +
+      `it; nothing here is a qualification or approval.`
     );
   }
   const named =

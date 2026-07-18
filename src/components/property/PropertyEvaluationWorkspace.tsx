@@ -16,7 +16,13 @@ import { PropertyResultCard } from "@/components/property/PropertyResultCard";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
-import { classifyPropertyProfile, profileUsesResidentialLanes } from "@/lib/property/propertyProfile";
+import {
+  allProfiles,
+  classifyPropertyProfile,
+  profileById,
+  profileUsesResidentialLanes,
+  type PropertyProfileId,
+} from "@/lib/property/propertyProfile";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
 import { reportTierIdentity, type ReportTierIdentity } from "@/lib/reports/reportTierIdentity";
@@ -1831,6 +1837,10 @@ export function PropertyEvaluationWorkspace({
   similarHomes?: SimilarHomeLine[];
 }) {
   const [navigator, setNavigator] = useState<NavigatorSnapshot | null>(null);
+  // Visitor's answer to "what is this property?" — an imported address carries
+  // no type, and the wrong default (a working farm read as a home) sends every
+  // lane wrong (founder-caught on her own farm, 2026-07-18). Session-only.
+  const [profileOverride, setProfileOverride] = useState<PropertyProfileId | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -1889,6 +1899,10 @@ export function PropertyEvaluationWorkspace({
             exactAddress: context.exactAddress,
             location: context.location,
             stateCode: context.stateCode,
+            // The visitor's "what is this property?" declaration — the server
+            // rebuilds the whole Place Brief in that shape (farm lanes for a
+            // farm, never home-mortgage copy on a working farm).
+            declaredPropertyType: profileOverride,
           }),
         });
         const data = (await res.json()) as PropertyFactsResponse;
@@ -1900,7 +1914,7 @@ export function PropertyEvaluationWorkspace({
     return () => {
       canceled = true;
     };
-  }, [context.propertyId]);
+  }, [context.propertyId, profileOverride]);
 
   async function submitSpecialBuildingReview() {
     setManualReviewBusy(true);
@@ -2305,12 +2319,15 @@ export function PropertyEvaluationWorkspace({
     : placeIntelligence ?? facts?.placeIntelligence ?? null;
   // Canonical property profile (axis 1) — the brief's server classification
   // wins; fall back to classifying the context type for older API payloads.
-  const workspaceProfile =
-    effectivePlaceIntelligence?.profile ??
-    classifyPropertyProfile({
-      propertyType: analysisContext.propertyType,
-      description: analysisContext.description ?? null,
-    });
+  // The VISITOR'S declaration wins over any machine classification — the
+  // owner knows it's a working farm; the classifier can only read type text.
+  const workspaceProfile = profileOverride
+    ? profileById(profileOverride)
+    : effectivePlaceIntelligence?.profile ??
+      classifyPropertyProfile({
+        propertyType: analysisContext.propertyType,
+        description: analysisContext.description ?? null,
+      });
   const answerCard = buildAnswerCard({
     context: analysisContext,
     restrictionsPresent: (facts?.verification?.restrictions?.length ?? 0) > 0,
@@ -2872,6 +2889,63 @@ export function PropertyEvaluationWorkspace({
           actionsSlot={chartActionsSlot}
         />
       )}
+      {/* "What is this property?" — imported addresses carry no type, and the
+          wrong guess mis-lanes everything (a working farm shown FHA/USDA-rural
+          home loans it can never get — founder-caught on her own farm,
+          2026-07-18). The owner's answer reshapes the whole analysis. */}
+      {context.propertyId?.startsWith("imported:") && (
+        <section
+          aria-label="What is this property?"
+          style={{
+            display: "grid",
+            gap: 10,
+            border: "1px solid #d7deea",
+            background: "#ffffff",
+            borderRadius: 14,
+            padding: "14px 18px",
+            margin: "0 0 14px",
+          }}
+        >
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: 8 }}>
+            <strong style={{ fontSize: 14.5, color: "#101a2b" }}>What is this property?</strong>
+            <span style={{ fontSize: 12.5, color: "#4d596d" }}>
+              An address alone can&apos;t tell us — and the financing lanes, costs, and questions all follow
+              your answer. A working farm is not underwritten like a home.
+            </span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {allProfiles().map((profile) => {
+              const active = workspaceProfile.id === profile.id;
+              return (
+                <button
+                  key={profile.id}
+                  type="button"
+                  onClick={() => setProfileOverride(profile.id)}
+                  aria-pressed={active}
+                  style={{
+                    padding: "7px 14px",
+                    borderRadius: 999,
+                    border: active ? "1px solid #0f766e" : "1px solid #d7deea",
+                    background: active ? "#0f766e" : "#ffffff",
+                    color: active ? "#ffffff" : "#3b475a",
+                    fontSize: 13,
+                    fontWeight: active ? 700 : 500,
+                    cursor: "pointer",
+                  }}
+                >
+                  {profile.label}
+                </button>
+              );
+            })}
+          </div>
+          {profileOverride && (
+            <span style={{ fontSize: 12, color: "#0f766e" }}>
+              Read as: {workspaceProfile.label}. The chart below follows this shape.
+            </span>
+          )}
+        </section>
+      )}
+
       {!deepView && chartOpen && (
       <ChartTableBrief
         variant={chartVariant}

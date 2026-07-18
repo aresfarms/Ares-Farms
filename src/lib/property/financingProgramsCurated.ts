@@ -214,7 +214,12 @@ const MHC_AGENCY: FinancingProgram = {
 const FARM_NOTE =
   "Beyond the FSA lanes priced above, a farm can reach USDA Rural Development's energy and value-added programs. " +
   "One rule to know: the SBA sends primary crop and livestock production to USDA/FSA — the SBA's own loans are for " +
-  "the value-added or commercial side of an operation, not the field.";
+  "the value-added or commercial side of an operation, not the field. And when the standard ag lanes don't fit — " +
+  "the FSA direct cap is too small for the purchase, the timeline is too tight, or the operation's history doesn't " +
+  "read the way an underwriter wants — the deal isn't dead: FSA-guaranteed loans through a commercial lender carry " +
+  "a much higher cap, community ag banks and specialty agricultural lenders underwrite differently than the Farm " +
+  "Credit associations, and seller financing or a land contract is one of the most common ways working farms " +
+  "actually change hands. Finding which of those fits a specific operation is exactly the work Furlong is built for.";
 
 const PROFILE_PROGRAMS: Record<PropertyProfileId, FinancingProgram[]> = {
   farm: [FSA_FARM, REAP, VAPG, SBA_504_7A_FARM],

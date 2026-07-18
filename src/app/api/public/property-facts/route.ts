@@ -25,6 +25,9 @@ export async function POST(req: NextRequest) {
     stateCode?: string | null;
     rawInput?: string | null;
     notes?: string | null;
+    /** Visitor's "what is this property?" declaration (imported addresses
+        carry no type; the owner knows — founder-caught 2026-07-18). */
+    declaredPropertyType?: string | null;
   }>(req, {
     maxBytes: 24 * 1024,
   });
@@ -34,6 +37,12 @@ export async function POST(req: NextRequest) {
 
   const body = parsed.body;
   const propertyId = body.propertyId ? String(body.propertyId) : null;
+  // Allowlisted profile ids only — never free text into the classifier.
+  const DECLARABLE = new Set(["residential", "farm", "commercial", "hospitality", "mobile-home-park", "land"]);
+  const declaredPropertyType =
+    body.declaredPropertyType && DECLARABLE.has(String(body.declaredPropertyType))
+      ? String(body.declaredPropertyType)
+      : null;
 
   if (propertyId?.startsWith("imported:") || (!propertyId && (body.exactAddress || body.location))) {
     const imported = await verifyImportedPropertyAddress({
@@ -51,6 +60,7 @@ export async function POST(req: NextRequest) {
       geocode: imported.geocode,
       placeFacts: imported.placeFacts,
       parsed: imported.parsedAddress,
+      propertyType: declaredPropertyType,
     });
     return NextResponse.json({
       ok: true,

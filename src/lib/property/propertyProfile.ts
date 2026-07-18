@@ -119,6 +119,16 @@ export function profileUsesResidentialLanes(id: PropertyProfileId): boolean {
   return id === "residential" || id === "farm";
 }
 
+/** Profile record for a known id (visitor override on imported properties). */
+export function profileById(id: PropertyProfileId): PropertyProfile {
+  return { id, label: PROFILE_LABELS[id] };
+}
+
+/** All profiles, for the "what is this property?" visitor selector. */
+export function allProfiles(): PropertyProfile[] {
+  return (Object.keys(PROFILE_LABELS) as PropertyProfileId[]).map((id) => ({ id, label: PROFILE_LABELS[id] }));
+}
+
 /**
  * The questions THIS property type demands — appended to the chart's
  * "Uncharted" waypoint and the report's honest unknowns. Every line follows

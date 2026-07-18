@@ -662,6 +662,14 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   });
 
   // ── FINAL PASS: footer + page numbers on every buffered page ───────────────
+  //
+  // THE TIER ARTIFACT BOUNDARY (founder direction 2026-07-18, for Stuart's
+  // tier verdict): the FREE export keeps the diagonal informational watermark
+  // — free forever, share it anywhere, it advertises Furlong. The PAID tiers
+  // export CLEAN: no diagonal line, a "prepared for institutional use" footer
+  // — the take-it-to-your-lender artifact IS the paid product. The brand seal
+  // and every advisory disclosure remain on all tiers.
+  const cleanExport = identity.id !== "free";
 
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i += 1) {
@@ -678,18 +686,20 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       doc.opacity(1);
       doc.restore();
     }
-    // Diagonal watermark on every printed page (founder direction).
-    doc.save();
-    doc.rotate(-32, { origin: [PAGE.width / 2, PAGE.height / 2] });
-    setFont("bold", 30, COLORS.deep);
-    doc.fillOpacity(0.045);
-    doc.text("FURLONG — FOR INFORMATIONAL PURPOSES · NOT FOR REPRODUCTION", 30, PAGE.height / 2 - 14, {
-      width: PAGE.width + 120,
-      align: "center",
-      lineBreak: false,
-    });
-    doc.fillOpacity(1);
-    doc.restore();
+    // Diagonal watermark — FREE tier only (the paid artifact is the clean one).
+    if (!cleanExport) {
+      doc.save();
+      doc.rotate(-32, { origin: [PAGE.width / 2, PAGE.height / 2] });
+      setFont("bold", 30, COLORS.deep);
+      doc.fillOpacity(0.045);
+      doc.text("FURLONG — FOR INFORMATIONAL PURPOSES · NOT FOR REPRODUCTION", 30, PAGE.height / 2 - 14, {
+        width: PAGE.width + 120,
+        align: "center",
+        lineBreak: false,
+      });
+      doc.fillOpacity(1);
+      doc.restore();
+    }
     doc
       .save()
       .moveTo(PAGE.marginX, 752)
@@ -706,11 +716,16 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       lineBreak: false,
     });
     setFont("bold", 8, COLORS.muted);
-    doc.text(`Watermarked FURLONG export · Page ${i - range.start + 1} of ${range.count}`, PAGE.marginX + CONTENT_W - 220, 760, {
-      width: 220,
-      align: "right",
-      lineBreak: false,
-    });
+    doc.text(
+      `${cleanExport ? "FURLONG institutional export" : "Watermarked FURLONG export"} · Page ${i - range.start + 1} of ${range.count}`,
+      PAGE.marginX + CONTENT_W - 220,
+      760,
+      {
+        width: 220,
+        align: "right",
+        lineBreak: false,
+      }
+    );
   }
 
   doc.end();

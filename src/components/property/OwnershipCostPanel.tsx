@@ -297,7 +297,7 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
             ))}
             <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, paddingTop: 8, display: "grid", gap: 8 }}>
               <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent }}>
-                The cost horizon (FHA path, today&apos;s dollars)
+                The cost horizon ({props.farmMode ? "FSA" : "FHA"} path, today&apos;s dollars)
               </span>
               {(
                 [
@@ -322,7 +322,7 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
 
           {/* ── Equity outlook — the long view (scenarios, never predictions) ── */}
           {price != null && (() => {
-            const outlook = buildEquityOutlook(price, props.context);
+            const outlook = buildEquityOutlook(price, props.context, props.farmMode ?? false);
             if (!outlook) return null;
             return (
               <div style={{ display: "grid", gap: 8 }}>

@@ -223,7 +223,8 @@ function remainingBalance(loanAmount: number, annualRatePct: number, years: numb
 
 export function buildEquityOutlook(
   price: number,
-  context: OwnershipCostContext
+  context: OwnershipCostContext,
+  farmMode = false
 ): EquityOutlook | null {
   if (!context.hpi) return null;
   if (!Number.isFinite(price) || price < 10_000 || price > 50_000_000) return null;
@@ -258,7 +259,7 @@ export function buildEquityOutlook(
       `What ownership might be WORTH later, under three price scenarios: flat (0%/yr), slower ` +
       `(${(context.hpi.longRunAnnualPct / 2).toFixed(1)}%/yr), and steady — the state's own published ` +
       `${context.hpi.longRunSpanYears}-year average of ${context.hpi.longRunAnnualPct}%/yr (FHFA House Price Index). ` +
-      `Equity = scenario value minus what would still be owed on the loan (FHA path).`,
+      `Equity = scenario value minus what would still be owed on the loan (${farmMode ? "FSA" : "FHA"} path).`,
     disclaimers: [
       "Scenario illustrations, not predictions — past price trends do not guarantee future ones, and any single property can move very differently from its state. Not a valuation, an appraisal, or investment advice.",
       "Selling typically costs about 6–10% of the sale price (agent commissions, transfer taxes, closing) — subtract that from any equity figure you act on. A state-licensed appraisal is the official value at any point in time.",
@@ -298,21 +299,48 @@ export function buildOwnershipCostModel(
     // Published FSA Direct Farm Ownership rate when available; PMMS proxy only
     // if the snapshot is missing (keeps the model total even without the slice).
     const fsaDirect = context.fsa?.ownershipDirectPct ?? rate;
+    // The Down Payment PROGRAM's own subsidized rate (2.0% at ingest).
+    const fsaDpRate = context.fsa?.downPaymentPct ?? Math.max(1.5, fsaDirect - 4);
     const fsaEffective = context.fsa?.effective ?? null;
-    const effNote = fsaEffective ? ` (FSA Direct rate effective ${fsaEffective})` : "";
-    // FSA Direct Farm Ownership — up to $600k, as low as 5% down, 40-yr term.
+    const effNote = fsaEffective ? ` (FSA rates effective ${fsaEffective})` : "";
+
+    // FSA Direct Farm Ownership — can finance UP TO 100% of the purchase
+    // (founder correction 2026-07-18: cash down is NOT required when the
+    // security supports the loan; the old "~5% down" here wrongly borrowed
+    // the Down Payment Program's figure).
     {
-      const down = price * 0.05;
-      const loan = price - down;
       scenarios.push({
-        program: "FSA Direct Farm Ownership (~5% down)",
-        fit: `USDA Farm Service Agency direct loan — beginning and underserved farmers; up to $600,000, terms to 40 years${effNote}.`,
-        downPaymentPct: 5,
-        downPayment: Math.round(down),
-        loanAmount: Math.round(loan),
+        program: "FSA Direct Farm Ownership (up to 100% financed — $0 down possible)",
+        fit: `USDA Farm Service Agency direct loan — can finance up to 100% of the purchase when the security supports it; up to $600,000, terms to 40 years${effNote}.`,
+        downPaymentPct: 0,
+        downPayment: 0,
+        loanAmount: Math.round(price),
         upfrontFeeNote: "No mortgage insurance; loan-making is through the county FSA office.",
         ratePct: fsaDirect,
-        monthlyPrincipalInterest: round10(monthlyPayment(loan, fsaDirect, 40)),
+        monthlyPrincipalInterest: round10(monthlyPayment(price, fsaDirect, 40)),
+        monthlyMortgageInsurance: 0,
+        mortgageInsuranceNote: null,
+      });
+    }
+    // FSA Down Payment Program — the beginning/underserved-farmer structure:
+    // borrower 5%, FSA 45% at the program's SUBSIDIZED rate (20-yr), a
+    // commercial lender the remaining 50% (priced here at the Direct benchmark,
+    // 30-yr). Payment is the honest blend of the two notes.
+    {
+      const down = price * 0.05;
+      const fsaShare = price * 0.45;
+      const lenderShare = price * 0.5;
+      const blendedMonthly = monthlyPayment(fsaShare, fsaDpRate, 20) + monthlyPayment(lenderShare, fsaDirect, 30);
+      const blendedRate = Math.round(((fsaShare * fsaDpRate + lenderShare * fsaDirect) / (fsaShare + lenderShare)) * 10) / 10;
+      scenarios.push({
+        program: "FSA Down Payment Program (beginning farmer — 5% down)",
+        fit: `The beginning/underserved-farmer structure: you put 5% down, FSA lends 45% at its subsidized ${fsaDpRate}% Down Payment rate (20 years), and a commercial lender carries the rest (shown at the Direct benchmark)${effNote}.`,
+        downPaymentPct: 5,
+        downPayment: Math.round(down),
+        loanAmount: Math.round(price - down),
+        upfrontFeeNote: "No mortgage insurance; the lender share is separately priced by that lender.",
+        ratePct: blendedRate,
+        monthlyPrincipalInterest: round10(blendedMonthly),
         monthlyMortgageInsurance: 0,
         mortgageInsuranceNote: null,
       });
@@ -322,8 +350,8 @@ export function buildOwnershipCostModel(
       const down = price * 0.1;
       const loan = price - down;
       scenarios.push({
-        program: "FSA Guaranteed Farm Ownership (~10% down)",
-        fit: "A commercial lender's loan with an FSA guarantee (up to ~$2.25M); terms to 40 years. Rate is negotiated with the lender — shown here at the FSA Direct benchmark.",
+        program: "FSA Guaranteed Farm Ownership (0–10% down)",
+        fit: "A commercial lender's loan with an FSA guarantee (up to ~$2.25M); terms to 40 years — and it can finance up to 100% when the collateral supports it. Rate is negotiated with the lender — shown here at the FSA Direct benchmark on 10% down.",
         downPaymentPct: 10,
         downPayment: Math.round(down),
         loanAmount: Math.round(loan),
@@ -334,13 +362,31 @@ export function buildOwnershipCostModel(
         mortgageInsuranceNote: null,
       });
     }
-    // Farm Credit System / conventional ag lender — larger down, shorter term.
+    // Equity-secured / cross-collateralized — the "I'm not spending my cash"
+    // lane (founder correction 2026-07-18: her own farm closed at essentially
+    // zero down with other land pledged as security; ag lenders do this
+    // routinely and the table must show it).
+    {
+      scenarios.push({
+        program: "Equity-secured ag loan ($0 cash — other land as collateral)",
+        fit: "Instead of cash, equity in land you already own stands in as the down payment (a blanket or cross-collateral lien). Farm Credit associations and ag banks structure purchases this way routinely — 100% of THIS purchase financed, secured by both properties. Shown at the FSA Direct benchmark.",
+        downPaymentPct: 0,
+        downPayment: 0,
+        loanAmount: Math.round(price),
+        upfrontFeeNote: "The pledged land carries the lien until released — its equity is committed, not spent.",
+        ratePct: fsaDirect,
+        monthlyPrincipalInterest: round10(monthlyPayment(price, fsaDirect, 25)),
+        monthlyMortgageInsurance: 0,
+        mortgageInsuranceNote: null,
+      });
+    }
+    // Farm Credit System / conventional ag lender — the classic cash-down case.
     {
       const down = price * 0.25;
       const loan = price - down;
       scenarios.push({
-        program: "Farm Credit / ag lender (~25% down)",
-        fit: "The Farm Credit System or a commercial ag bank — typically 20–30% down, 15–30 year terms, no government cap. Rate is lender-set — shown here at the FSA Direct benchmark.",
+        program: "Farm Credit / ag lender (~25% cash down)",
+        fit: "The Farm Credit System or a commercial ag bank with cash equity in — typically 20–30% down, 15–30 year terms, no government cap; pledged land can replace some or all of the cash (see the equity-secured lane). Rate is lender-set — shown here at the FSA Direct benchmark.",
         downPaymentPct: 25,
         downPayment: Math.round(down),
         loanAmount: Math.round(loan),
@@ -592,8 +638,9 @@ export function buildOwnershipCostModel(
   }));
 
   // Cost horizon in bands, using a representative financed path (the second
-  // scenario — FHA for a home, FSA Guaranteed for a farm). Year 1 stands
-  // alone because it carries the cash to start; later bands note what changes.
+  // scenario — FHA for a home, the FSA Down Payment Program for a farm). Year 1
+  // stands alone because it carries the cash to start; later bands note what
+  // changes.
   const repPath = scenarios[1];
   const repMonthly = repPath.monthlyPrincipalInterest + repPath.monthlyMortgageInsurance;
   const annualLow = (repMonthly + recurringLow) * 12;
@@ -646,7 +693,7 @@ export function buildOwnershipCostModel(
             const fsaDirect = context.fsa?.ownershipDirectPct ?? rate;
             const eff = context.fsa?.effective;
             return context.fsa
-              ? `The FSA Direct Farm Ownership payment uses USDA FSA's published direct-loan rate (${fsaDirect}%${eff ? `, effective ${eff}` : ""}); FSA updates it monthly. The FSA-guaranteed and Farm Credit lanes are lender-negotiated and shown at that same FSA Direct rate as a benchmark — your lender quotes the real number. FSA loans run longer terms (up to 40 years) than a consumer mortgage.`
+              ? `The FSA Direct Farm Ownership payment uses USDA FSA's published direct-loan rate (${fsaDirect}%${eff ? `, effective ${eff}` : ""}); FSA updates it monthly. The FSA-guaranteed and Farm Credit lanes are lender-negotiated and shown at that same FSA Direct rate as a benchmark — your lender quotes the real number. Down payments shown are CASH scenarios: in ag lending, equity in land you already own routinely stands in for some or all of the cash (see the equity-secured lane), so a strong balance sheet can close with little or none of its own cash spent. FSA loans run longer terms (up to 40 years) than a consumer mortgage.`
               : `Farm-loan payments are ILLUSTRATIVE at ${rate}% — FSA sets its direct-loan rate monthly and ag lenders negotiate theirs; the county FSA office and your lender quote the real number, and FSA loans run longer terms (up to 40 years) than the consumer rate shown.`;
           })()
         : `Payment estimates use the Freddie Mac national average 30-year rate (${rate}%, week of ${context.rates.weekOf}). Rates move weekly, and your quoted rate depends on credit, points, program, and lender.`,

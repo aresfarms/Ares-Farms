@@ -34,10 +34,13 @@ const kicker = {
   color: "#0f766e",
 } as const;
 
-function BriefList({ title, briefs }: { title: string; briefs: FarmBrief[] }) {
+function BriefList({ title, briefs, intro }: { title: string; briefs: FarmBrief[]; intro?: string }) {
   return (
     <section aria-label={title} style={{ display: "grid", gap: 12 }}>
       <span style={kicker}>{title}</span>
+      {intro && (
+        <p style={{ margin: 0, fontSize: 12.5, lineHeight: 1.55, color: "#708997" }}>{intro}</p>
+      )}
       <div style={{ display: "grid", gap: 12 }}>
         {briefs.map((brief) => (
           <details key={brief.id} style={{ ...card, padding: 0, overflow: "hidden" }}>
@@ -108,7 +111,12 @@ export function FarmLaneSections() {
   return (
     <div style={{ display: "grid", gap: 24 }}>
       <BriefList title="The questions farmers actually ask" briefs={ENTERPRISE_BRIEFS} />
-      <BriefList title="What your land could earn besides crops" briefs={LAND_OPTION_BRIEFS} />
+      <BriefList
+        title="What your land could earn besides crops"
+        briefs={LAND_OPTION_BRIEFS}
+        intro="Every option below is real — but each one is only worth it if this particular parcel supports it: the zoning, the road access, and the demand nearby all have to line up. Read each as 'possible here if…', never as a promise. Confirm the zoning and your insurance before acting on any of them."
+      />
+
 
       {/* Equipment — costs + suppliers */}
       <section aria-label="Farm equipment" style={{ display: "grid", gap: 12 }}>

@@ -226,6 +226,78 @@ export const LAND_OPTION_BRIEFS: FarmBrief[] = [
     pointer: "County USDA Service Center (FSA + NRCS); state department of agriculture conservation programs",
     url: "https://www.fsa.usda.gov/resources/programs/conservation-reserve-enhancement-program-crep",
   },
+  {
+    id: "camping-agritourism",
+    question: "Camping, glamping, and agritourism (Hipcamp and the like)?",
+    answer:
+      "Booking platforms (Hipcamp, and Airbnb for a farm stay) turn an unused corner into cash without breaking " +
+      "ground: hosts commonly clear a few thousand dollars a season, more when the parcel sits near a park, " +
+      "beach, wine trail, or festival draw — the platform handles booking and takes a cut (Hipcamp is around " +
+      "10%). Glamping (outfitted tents, cabins, a dome) raises the nightly rate but turns it into a hospitality " +
+      "business with permits, insurance, and guest management. VIABLE ONLY IF the parcel actually supports it: a " +
+      "real attraction within a reasonable drive, legal road access, county zoning that allows short-term " +
+      "camping or a farm-stay use, and workable water/toilet arrangements. Check the zoning and your liability " +
+      "carrier before the first booking, not after.",
+    pointer: "Hipcamp host resources; county zoning/short-term-use rules; your liability insurer",
+    url: "https://www.hipcamp.com/en-US/l/hosts",
+  },
+  {
+    id: "storage-parking",
+    question: "Storage — RV/boat, containers, or self-storage?",
+    answer:
+      "Outdoor storage is the low-lift version: a graded, fenced lot for RVs, boats, and trailers commonly rents " +
+      "at $50–$150 per space per month, and shipping-container or equipment storage is similar — modest per " +
+      "unit, but real income from ground that grows nothing, with low startup if access and a gravel pad " +
+      "already exist. Built self-storage is a different animal: a genuine construction project with real " +
+      "capital, but strong per-square-foot returns where demand is underserved. VIABLE ONLY IF the parcel has " +
+      "good road access, is near enough to town or a boating/RV corridor to draw renters, and the zoning allows " +
+      "a commercial storage use — rural-residential zoning often does not without a special-use permit.",
+    pointer: "County zoning (commercial storage / special-use permit); a local self-storage feasibility study before building",
+  },
+  {
+    id: "dog-recreation",
+    question: "A dog park, pet boarding, or recreation business?",
+    answer:
+      "Dog-focused uses fit farmland well: fenced off-leash \"sniff parks\" rented by the hour to one dog or one " +
+      "household at a time (the Sniffspot model) turn a fenced acre into bookings, and boarding/daycare or an " +
+      "agility field is a bigger step into a licensed animal business. Other low-footprint recreation leases — " +
+      "paintball, disc golf, an events field, a model-aircraft strip — work on the same logic. Income is modest " +
+      "to moderate and depends entirely on being close enough to a population that will drive to you. VIABLE " +
+      "ONLY IF the parcel is within reach of enough people, the zoning permits a commercial recreation or animal " +
+      "use, and you carry the right liability coverage — animals and paying visitors both raise the insurance " +
+      "question.",
+    pointer: "Sniffspot / booking platforms; county zoning for commercial recreation or kennel use; liability insurer",
+    url: "https://www.sniffspot.com/",
+  },
+  {
+    id: "government-military",
+    question: "Leasing to government — police, fire, or military training?",
+    answer:
+      "Public agencies do lease private land: a National Guard or reserve unit may want acreage for periodic " +
+      "field training or staging, a sheriff's office or fire academy may need ground for K-9 work, a driving " +
+      "track, or live burn-house practice, and public-safety agencies lease sites for communications towers. " +
+      "These are relationship-and-procurement deals — you reach them through the agency's facilities or " +
+      "logistics office, not a listing — and they tend to be episodic rather than steady rent. VIABLE ONLY IF a " +
+      "unit or department is actually looking near you and the parcel fits their need (size, buffer from " +
+      "neighbors for noise, road access, and zoning that tolerates the activity). Worth a direct inquiry to the " +
+      "nearest installation or department; don't count on it as base income.",
+    pointer: "Nearest National Guard/reserve installation facilities office; county sheriff/fire academy logistics; an attorney on any government lease",
+  },
+  {
+    id: "hunting-tower-billboard",
+    question: "Hunting leases, cell towers, and billboards?",
+    answer:
+      "Three classic passive uses, each gated by geography: a HUNTING/recreation lease pays roughly $5–$50+ per " +
+      "acre per year depending on region and game, needs almost no work, and mainly asks that you sort out " +
+      "liability and access rules in writing. A CELL TOWER ground lease can pay hundreds to a few thousand " +
+      "dollars a month — but ONLY if a carrier has a coverage gap at your spot; you can't create the demand, the " +
+      "tower company finds you. A BILLBOARD pays a few hundred to a few thousand a year but needs highway " +
+      "frontage and sign-permit eligibility, which many roads don't have. VIABLE ONLY IF the specific condition " +
+      "is met — game and huntable ground, a real coverage gap, or permitted highway frontage. Never sign a " +
+      "tower or billboard lease (often 20–30 years) without an attorney; the escalation and buyout clauses are " +
+      "where the money is.",
+    pointer: "State wildlife agency lease guides; a telecom-lease attorney for tower/billboard terms; state DOT for outdoor-advertising permits",
+  },
 ];
 
 // ── Farm equipment — costs + suppliers ──────────────────────────────────────

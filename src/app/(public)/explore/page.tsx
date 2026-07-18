@@ -12,7 +12,9 @@ import { buildCompassDispatch } from "@/lib/newsletter/newsletterDispatch";
 import { buildFrontDoorGroups } from "@/lib/property/propertyFrontDoor";
 import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CHART_THEMES, CHART_TONES } from "@/lib/property/chartThemes";
+import { categoryForType } from "@/lib/property/propertyCategories";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
+import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
 import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 import { providersForLane } from "@/lib/providers/providerRegistry";
@@ -26,6 +28,30 @@ import { isoWeekSeed } from "@/lib/public-content/weekSeed";
 const LANE_AUDIENCE: Record<string, NewsletterAudience> = {
   "farms-agriculture": "farm",
 };
+
+/**
+ * The three property-browsing lanes, each showing ONLY its own inventory
+ * (founder direction 2026-07-17). `categories` filters the map + shelf (via
+ * categoryForType); `profiles` filters the grouped front door (via profileId).
+ */
+const PROPERTY_LANE_FILTERS: Record<string, { categories: string[]; profiles: PropertyProfileId[] }> = {
+  "property-land": { categories: ["homes"], profiles: ["residential"] },
+  "farms-agriculture": { categories: ["farms-ranches", "land"], profiles: ["farm", "land"] },
+  "small-business-growth": { categories: ["commercial", "misc"], profiles: ["commercial", "hospitality", "mobile-home-park"] },
+};
+
+/** Keep only the listings whose category is in the lane's set (drops empty states). */
+function filterInventoryByCategories(
+  inv: ReturnType<typeof buildPublicSafeInventoryByState>,
+  categories: Set<string>
+): ReturnType<typeof buildPublicSafeInventoryByState> {
+  const out: ReturnType<typeof buildPublicSafeInventoryByState> = {};
+  for (const [state, props] of Object.entries(inv)) {
+    const kept = props.filter((p) => categories.has(categoryForType(p.propertyType)));
+    if (kept.length) out[state] = kept;
+  }
+  return out;
+}
 
 /**
  * /explore — Compass-rose navigation (Build 56).
@@ -137,17 +163,26 @@ export default async function ExplorePage({
   const selected  = EXPLORATION_CATEGORIES.find((c) => c.slug === laneSlug) ?? null;
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? null;
 
-  // ── Property & land lane — the first live lane (USDA Rural Development) ──────
-  // The America's Journey map lives here now (founder direction 2026-07-17:
-  // moved off the front page's middle, onto the land button's page).
-  if (selected && selected.slug === "property-land") {
-    const landInventory = buildPublicSafeInventoryByState();
+  // ── Property lanes — Residential / Farms-Ag-Land / Commercial — each browses
+  // ONLY its own inventory (founder direction 2026-07-17). The Farms lane also
+  // carries its newsletter at the top. Map + grouped listings sit side by side
+  // (map has a fixed ~794px width → side-by-side on wide screens, stacks below).
+  const laneFilter = selected ? PROPERTY_LANE_FILTERS[selected.slug] : undefined;
+  if (selected && laneFilter) {
+    const laneInventory = filterInventoryByCategories(buildPublicSafeInventoryByState(), new Set(laneFilter.categories));
+    const laneGroups = buildFrontDoorGroups().filter((g) => laneFilter.profiles.includes(g.profileId));
     const landWeekSeed = isoWeekSeed();
+    const audience = LANE_AUDIENCE[selected.slug];
+    const dispatch = audience
+      ? buildCompassDispatch(audience, "delmarva", STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-17")
+      : null;
     return (
       <>
-        {/* Map + grouped listings side by side to shorten the page (founder
-            direction 2026-07-17: smaller map, listings beside it). Stacks on
-            narrow screens. */}
+        {dispatch && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0" }}>
+            <CompassDispatchHero dispatch={dispatch} />
+          </div>
+        )}
         <div
           className="land-top-row"
           style={{
@@ -163,26 +198,22 @@ export default async function ExplorePage({
           <div className="fl-map-section">
             <PublicMapExperience
               liveSources={getRuntimeLiveSources()}
-              mapInventoryByState={landInventory}
+              mapInventoryByState={laneInventory}
               weekSeed={landWeekSeed}
             />
           </div>
           <div>
-            <PropertyGroupsFrontDoor groups={buildFrontDoorGroups()} />
+            <PropertyGroupsFrontDoor groups={laneGroups} />
           </div>
         </div>
-        {/* The scrolling shelf runs full-width below the map row. */}
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
-          <PropertyShowcaseRail inventoryByState={landInventory} weekSeed={landWeekSeed} />
+          <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} />
         </div>
         <PropertyHub
           state={one(resolved.state)}
           type={one(resolved.type)}
           category={one(resolved.category)}
         />
-        {/* The America's Journey map has a fixed ~794px render width, so it only
-            sits beside the listings on wide screens; below that it stacks
-            full-width (no clipping). */}
         <style>{`@media (max-width: 1240px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>
       </>
     );

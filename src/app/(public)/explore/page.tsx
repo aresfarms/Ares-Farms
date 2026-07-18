@@ -203,7 +203,7 @@ export default async function ExplorePage({
             />
           </div>
           <div>
-            <PropertyGroupsFrontDoor groups={laneGroups} />
+            <PropertyGroupsFrontDoor groups={laneGroups} compact />
           </div>
         </div>
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>

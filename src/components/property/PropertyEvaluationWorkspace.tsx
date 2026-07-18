@@ -100,6 +100,7 @@ type PropertyFactsResponse = {
     administering_body: string;
     verifiedStatement: string;
     basis: string;
+    whyItMatters?: string;
     personSideCaveat: string;
     source_citation: string;
     asOf: string;
@@ -337,11 +338,22 @@ function propertySpecificSummary(context: PropertyContext, facts: PropertyFactsR
   if (record?.rawPropertyStyle) {
     lines.push(`Recorded property style: ${record.rawPropertyStyle}.`);
   }
+  // Size ALWAYS gets its own line (founder direction 2026-07-18: a property
+  // analysis that never says how big the property is fails the reader) —
+  // the recorded figure when the source states one, the honest free lookup
+  // when it doesn't.
+  const sizeBits = [
+    record?.acreageText ? record.acreageText : null,
+    record?.squareFeet ? `${record.squareFeet.toLocaleString("en-US")} sq ft building` : null,
+  ].filter(Boolean);
+  lines.push(
+    sizeBits.length > 0
+      ? `Size: ${sizeBits.join(" · ")}.`
+      : "Size: not stated by the source — the county parcel/GIS viewer shows the exact lot dimensions and acreage free (see the size entry under Honest Unknowns)."
+  );
   const detailBits = [
     record?.bedrooms ? `${record.bedrooms} bedroom${record.bedrooms === 1 ? "" : "s"}` : null,
-    record?.squareFeet ? `${record.squareFeet.toLocaleString("en-US")} sq ft` : null,
     record?.yearBuilt ? `built ${record.yearBuilt}` : null,
-    record?.acreageText ? record.acreageText : null,
   ].filter(Boolean);
   if (detailBits.length > 0) {
     lines.push(`Recorded physical details: ${detailBits.join(" · ")}.`);
@@ -1546,7 +1558,10 @@ function buildReportModel(args: {
   })();
 
   const verifiedCriteria = args.verifiedPrograms.length > 0
-    ? args.verifiedPrograms.map((program) => `${program.name}: ${program.verifiedStatement} Basis: ${program.basis}`)
+    ? args.verifiedPrograms.map((program) =>
+        `${program.name}: ${program.verifiedStatement} Basis: ${program.basis}` +
+        (program.whyItMatters ? ` ${program.whyItMatters}` : "")
+      )
     : ["No verified property-side program criteria surfaced from the current snapshot set yet."];
 
   const readinessSectionNotes = args.readinessResult.sections.map((section) => {
@@ -3364,6 +3379,9 @@ export function PropertyEvaluationWorkspace({
                   <div key={program.program_id} style={{ border: "1px solid #b9e3d4", background: "#f4fbf8", borderRadius: 12, padding: "12px 14px", display: "grid", gap: 4 }}>
                     <strong style={{ fontSize: 13.5, color: "#0f6e56" }}>{program.name}</strong>
                     <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{program.verifiedStatement}</span>
+                    {program.whyItMatters && (
+                      <span style={{ fontSize: 12.5, color: "#0f6e56", lineHeight: 1.55 }}>{program.whyItMatters}</span>
+                    )}
                     <span style={{ fontSize: 11.5, color: "#5d687a" }}>{program.basis}</span>
                   </div>
                 ))}

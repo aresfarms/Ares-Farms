@@ -13,23 +13,38 @@ import type { FrontDoorGroup } from "@/lib/property/propertyFrontDoor";
  * and prices — no characterizations.
  */
 
-export function PropertyGroupsFrontDoor({ groups }: { groups: FrontDoorGroup[] }) {
+export function PropertyGroupsFrontDoor({
+  groups,
+  compact = false,
+}: {
+  groups: FrontDoorGroup[];
+  /** Side-panel mode (beside the map): a light "Live listings" label instead
+      of the full front-door heading, which was written for a full-width page
+      (founder direction 2026-07-18). */
+  compact?: boolean;
+}) {
   if (groups.length === 0) return null;
 
   return (
     <section aria-label="Property groups" style={{ display: "grid", gap: 14 }}>
-      <div style={{ display: "grid", gap: 4 }}>
+      {compact ? (
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
-          The front door
+          Live listings
         </span>
-        <strong style={{ fontSize: 24, color: "#101a2b", lineHeight: 1.15 }}>
-          Start with the kind of property you&apos;re looking for
-        </strong>
-        <span style={{ fontSize: 13.5, color: "#4d596d", lineHeight: 1.55 }}>
-          Every kind gets its own questions, its own costs, and its own chart — the platform reads
-          the property first, and the analysis follows its shape.
-        </span>
-      </div>
+      ) : (
+        <div style={{ display: "grid", gap: 4 }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#0f766e" }}>
+            The front door
+          </span>
+          <strong style={{ fontSize: 24, color: "#101a2b", lineHeight: 1.15 }}>
+            Start with the kind of property you&apos;re looking for
+          </strong>
+          <span style={{ fontSize: 13.5, color: "#4d596d", lineHeight: 1.55 }}>
+            Every kind gets its own questions, its own costs, and its own chart — the platform reads
+            the property first, and the analysis follows its shape.
+          </span>
+        </div>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 14 }}>
         {groups.map((group) => (
           <div
@@ -77,9 +92,11 @@ export function PropertyGroupsFrontDoor({ groups }: { groups: FrontDoorGroup[] }
           </div>
         ))}
       </div>
-      <span style={{ fontSize: 11.5, fontStyle: "italic", color: "#9aa6b6" }}>
-        More territories being charted.
-      </span>
+      {!compact && (
+        <span style={{ fontSize: 11.5, fontStyle: "italic", color: "#9aa6b6" }}>
+          More territories being charted.
+        </span>
+      )}
     </section>
   );
 }

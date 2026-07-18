@@ -65,6 +65,7 @@ type PlaceFactsResponse = {
     name: string;
     verifiedStatement: string;
     basis: string;
+    whyItMatters?: string;
     administering_body: string;
     asOf: string;
   }>;
@@ -612,6 +613,9 @@ export function PlaceFirstDiscovery({
                     <div key={program.program_id} style={{ border: `1px solid ${t.programBorder}`, background: t.programBg, borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
                       <strong style={{ fontSize: 13.5, color: t.accent }}>{program.name}</strong>
                       <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.5 }}>{program.verifiedStatement}</span>
+                      {program.whyItMatters && (
+                        <span style={{ fontSize: 12.5, color: t.accent, lineHeight: 1.5 }}>{program.whyItMatters}</span>
+                      )}
                       <span style={{ fontSize: 11.5, color: t.faintInk }}>{program.basis}</span>
                     </div>
                   ))}

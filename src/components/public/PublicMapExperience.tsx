@@ -1197,7 +1197,14 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
             onMouseEnter={handleMapMouseEnter}
             onMouseLeave={handleMapMouseLeave}
             style={{
-              height:         480,   // extra height vs. old 460 to give popup room near top
+              // Width-driven: the container keeps the SVG's 960×580 shape at
+              // ANY width (founder direction 2026-07-18: the map must shrink
+              // into a side column, not command the full page top). The
+              // ResizeObserver re-measures scale on resize, so the on-map
+              // popup card tracks correctly at every size.
+              aspectRatio:    "960 / 580",
+              maxHeight:      520,
+              minHeight:      200, // room for the loading/unavailable notes
               display:        "flex",
               alignItems:     "center",
               justifyContent: "center",
@@ -1228,7 +1235,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
                     ? `Full U.S. map — ${place.name}, ${tourState?.state ?? ""}, ${place.era}. Illustrative exploration; not based on your location.`
                     : "Full U.S. map. Illustrative exploration."
                 }
-                style={{ width: "auto", height: "100%", maxHeight: 480, display: "block" }}
+                style={{ width: "100%", height: "100%", display: "block" }}
               >
                 <defs>
                   <filter id="tour-glow" x="-80%" y="-80%" width="260%" height="260%">
@@ -1322,6 +1329,14 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
                     ? `translate(-50%, calc(-100% - ${CARD_GAP}px))`  // floats above marker
                     : `translate(-50%, ${CARD_GAP + 4}px)`,           // drops below (north states)
                   cursor: cardNavigateHref ? "pointer" : "default",
+                  // The map now scales into side columns; a full card can be
+                  // taller than a small container, so clamp to the container
+                  // and scroll internally (measuredCardH follows via the
+                  // ResizeObserver, keeping the anchor math consistent).
+                  maxHeight: svgMeasure
+                    ? Math.max(180, svgMeasure.containerHeight - CARD_MARGIN * 2)
+                    : undefined,
+                  overflowY: "auto",
                 }}
               >
                 {propertyGatewayActive && possibleProp ? (

@@ -186,12 +186,12 @@ export default async function ExplorePage({
         <div
           className="land-top-row"
           style={{
-            maxWidth: 1340,
+            maxWidth: 1280,
             margin: "0 auto",
             padding: "24px 20px 0",
             display: "grid",
             gap: 24,
-            gridTemplateColumns: "minmax(0, 2.1fr) minmax(0, 1fr)",
+            gridTemplateColumns: "minmax(0, 1.35fr) minmax(0, 1fr)",
             alignItems: "start",
           }}
         >
@@ -215,7 +215,9 @@ export default async function ExplorePage({
           category={one(resolved.category)}
           lane={selected.slug}
         />
-        <style>{`@media (max-width: 1240px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>
+        {/* The map is width-responsive now (960×580 aspect held at any width),
+            so it keeps its side column at normal widths; only narrow screens stack. */}
+        <style>{`@media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }`}</style>
       </>
     );
   }

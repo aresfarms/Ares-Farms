@@ -43,6 +43,17 @@ resource "google_secret_manager_secret_iam_member" "runtime_database_url" {
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+# SENDGRID_API_KEY is created + versioned out of band by the owner (not TF), so
+# it is referenced by literal name. Grant the runtime SA read access only when
+# notifications are configured (EMAIL_FROM set).
+resource "google_secret_manager_secret_iam_member" "runtime_sendgrid_api_key" {
+  count     = var.email_from == "" ? 0 : 1
+  project   = var.project_id
+  secret_id = "SENDGRID_API_KEY"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
 resource "google_secret_manager_secret_iam_member" "runtime_nextauth_secret" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.app["NEXTAUTH_SECRET"].secret_id

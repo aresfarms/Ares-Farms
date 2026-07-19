@@ -148,6 +148,22 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # SendGrid API key — the secret is created + versioned OUT OF BAND by the
+      # owner (never Terraform, never the agent). Wired only when EMAIL_FROM is
+      # set, so an unconfigured env can't reference a missing secret.
+      dynamic "env" {
+        for_each = var.email_from == "" ? [] : [1]
+        content {
+          name = "SENDGRID_API_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "SENDGRID_API_KEY"
+              version = "latest"
+            }
+          }
+        }
+      }
+
       env {
         name  = "AMENITY_LIVE_LOOKUP_ENABLED"
         value = var.amenity_live_lookup_enabled ? "true" : "false"
@@ -241,6 +257,7 @@ resource "google_cloud_run_v2_service" "core" {
     google_secret_manager_secret_iam_member.runtime_database_url,
     google_secret_manager_secret_iam_member.runtime_nextauth_secret,
     google_secret_manager_secret_iam_member.runtime_report_signing,
+    google_secret_manager_secret_iam_member.runtime_sendgrid_api_key,
     google_storage_bucket_iam_member.runtime_state_core_rw,
   ]
 }

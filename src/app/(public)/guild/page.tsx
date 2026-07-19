@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { NewsletterSignup } from "@/components/public/NewsletterSignup";
 import { PREMIUM } from "@/lib/property/laneThemes";
 
 /**
@@ -10,9 +11,10 @@ import { PREMIUM } from "@/lib/property/laneThemes";
  * compass's SW emblem, and the newsletters/podcasts are PART of it).
  *
  * GOVERNANCE: membership economics are shelved until the founders + counsel
- * session. This page collects NOTHING (no signup form, no email capture, no
- * payment), states NO prices, and is explicit that the Guild is forming. It
- * describes the vision only — the "what," never a checkout.
+ * session. This page states NO prices, has NO membership signup or checkout, and
+ * is explicit that the Guild is forming. It describes the vision only — the
+ * "what," never a price. The ONE capture is the Dispatch newsletter (email only,
+ * free, approved 2026-07-19) — a newsletter subscribe, not a membership.
  */
 
 export const metadata: Metadata = {
@@ -20,6 +22,25 @@ export const metadata: Metadata = {
   description:
     "A guild of owners, operators, and the people who fund them. Forming now — the vision, honestly, with no sign-up yet.",
 };
+
+const INSIDE: Array<{ title: string; body: string }> = [
+  {
+    title: "The Dispatch",
+    body: "Your industry newsletters and podcasts — rates, commodity moves, and what's worth knowing — bundled, not billed separately.",
+  },
+  {
+    title: "Credits toward the licensed work",
+    body: "Guild tiers put credit toward the professional work you'd otherwise order à la carte — a Phase I, advisory hours, feasibility support.",
+  },
+  {
+    title: "Priority professional time",
+    body: "When you need a licensed PE or lender, members move to the front of the line — real people on your file, not just information.",
+  },
+  {
+    title: "A room of operators — and the people who fund them",
+    body: "Farmers, business owners, and the lenders and advisors who back them, working the same land and the same deals you are.",
+  },
+];
 
 const PILLARS: Array<{ title: string; body: string }> = [
   {
@@ -79,6 +100,31 @@ export default function CommunityPage() {
           </div>
         ))}
       </div>
+
+      {/* What the Guild brings together — informational, describes the WHAT,
+          never a price (governance: economics shelved). */}
+      <section style={{ display: "grid", gap: 12 }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8a6414" }}>
+          What the Guild brings together
+        </span>
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {INSIDE.map((i) => (
+            <div key={i.title} style={{ border: `1px solid ${PREMIUM.gold}`, background: PREMIUM.paper, borderRadius: 12, padding: "14px 16px", display: "grid", gap: 4 }}>
+              <strong style={{ fontSize: 14.5, color: "#3a2f12" }}>{i.title}</strong>
+              <span style={{ fontSize: 13, lineHeight: 1.55, color: "#4a3d1e" }}>{i.body}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* The ONE capture: the Dispatch newsletter (free, email only) — the way
+          to stay connected while the Guild forms. Not a membership signup. */}
+      <section style={{ display: "grid", gap: 8, justifyItems: "start" }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8a6414" }}>
+          Start free — the Dispatch is part of the Guild
+        </span>
+        <NewsletterSignup accent="#8a6414" />
+      </section>
 
       {/* Honest status — no signup, no prices (governance: economics shelved). */}
       <section style={{ border: `1px solid ${PREMIUM.gold}`, background: PREMIUM.paper, borderRadius: 14, padding: "18px 20px", display: "grid", gap: 6 }}>

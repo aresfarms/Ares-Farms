@@ -19,7 +19,7 @@ function laneHref(slug: string): string {
   return `/explore?lane=${encodeURIComponent(slug)}`;
 }
 
-type IconName = "map-pin" | "plant" | "store" | "leaf" | "coin" | "mail" | "gift" | "compass" | "doc";
+type IconName = "map-pin" | "plant" | "store" | "leaf" | "coin" | "mail" | "gift" | "compass" | "doc" | "community";
 
 type LaneNode = {
   slug: string;
@@ -29,6 +29,8 @@ type LaneNode = {
   color: string;
   top: number;
   left: number;
+  /** Optional destination override (else /explore?lane=slug). */
+  href?: string;
 };
 
 const LANES: LaneNode[] = [
@@ -37,7 +39,7 @@ const LANES: LaneNode[] = [
   { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
   { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
   { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S
-  { slug: "housing-development",      label: "Newsletters & Podcasts",          icon: "mail",    tint: "#FAECE7", color: "#993C1D", top: 76, left: 22 }, // SW
+  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", top: 76, left: 22, href: "/guild" }, // SW — the gold membership entity
   { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556", top: 50, left: 12 }, // W
   { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5", top: 24, left: 22 }, // NW
 ];
@@ -58,6 +60,7 @@ function LaneIcon({ name }: { name: IconName }) {
     case "gift":     return (<svg {...common}><rect x="4" y="9.5" width="16" height="10.5" rx="1" /><path d="M3 9.5h18v3H3z" /><path d="M12 9.5V20" /><path d="M12 9.5C12 9.5 11 4.5 8.3 4.5 6.5 4.5 6.5 7 8 8s4 1.5 4 1.5zM12 9.5s1-5 3.7-5C17.5 4.5 17.5 7 16 8s-4 1.5-4 1.5z" /></svg>);
     case "compass":  return (<svg {...common}><circle cx="12" cy="12" r="8.5" /><path d="M15.6 8.4l-2 5.2-5.2 2 2-5.2z" /></svg>);
     case "doc":      return (<svg {...common}><rect x="5" y="3" width="14" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h4" /></svg>);
+    case "community":return (<svg {...common}><circle cx="9" cy="8" r="3" /><path d="M3.5 19c0-3 2.4-5 5.5-5s5.5 2 5.5 5" /><path d="M15.5 6.2a3 3 0 0 1 0 5.6" /><path d="M16.5 14.2c2.1.5 3.7 2.3 3.7 4.8" /></svg>);
   }
 }
 
@@ -143,7 +146,7 @@ export function CompassRose({ showHeading = true }: { showHeading?: boolean }) {
           {LANES.map((l) => (
             <Link
               key={l.slug}
-              href={laneHref(l.slug)}
+              href={l.href ?? laneHref(l.slug)}
               className="cr-node"
               style={{ top: `${l.top}%`, left: `${l.left}%`, ["--ring" as string]: l.color }}
               aria-label={`Explore ${l.label}`}

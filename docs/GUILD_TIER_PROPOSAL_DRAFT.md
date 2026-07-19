@@ -89,3 +89,66 @@ Equity means: **the tier price funds fair-market pay for whoever does the work.*
   sign-off. The membership-tiers-shelved rule holds until this session happens.
 - Until then, the portal shows the *services* and *"Guild credits apply"* framing
   (already built) — but no live tier prices or checkout.
+
+---
+
+## 7. Credit mechanics (DRAFT — founders + counsel set the numbers)
+
+Model: each membership loads a **credit balance**; services have a **price in
+credits**; add-ons/top-ups when a member runs low. Illustrative only.
+
+**Service → credits price list (illustrative; PE/broker set real values):**
+
+| Service | ~Credits (placeholder) |
+|---|---|
+| The Compass (newsletter) | included, no credits |
+| 30-min advisory / consult | small |
+| Loan-fit & paperwork session | medium |
+| Phase I ESA | large |
+| Feasibility study (VAPG/REAP) | largest |
+
+**Rules to decide with counsel:**
+- **Credit value** — the $-per-credit conversion (must be stated in the TOS).
+- **Rollover** — "use it or lose it" per term vs. limited rollover. Given
+  multi-year terms hold *unearned licensed fees*, rollover interacts with trust
+  accounting (see §9) — decide together.
+- **Add-ons / top-ups** — one-off services or extra credit blocks at a member
+  rate; these are à la carte at the member discount.
+- **Professional pay** — every redeemed credit for licensed work funds a
+  fair-market CompensationEvent to the PE/broker (the equity rule, §2).
+
+## 8. Billing cadence — NO monthly (founder direction 2026-07-19)
+
+Charge **annually, every 2 years, 5 years, or lifetime** — never monthly.
+- **Lifetime = one-time** → no auto-renewal → simplest legally (ROSCA/auto-
+  renewal laws largely don't apply to a non-recurring charge).
+- **Multi-year (2/5-yr)** → prefer **one-time, non-auto-renewing** terms; if any
+  auto-renews, ROSCA + state auto-renewal law apply (explicit consent, clear
+  terms, easy cancel).
+- Trade-off to weigh: longer prepaid term = more unearned licensed fees held
+  upfront = more trust-accounting weight (§9).
+
+## 9. Counsel + accountant checklist (from Caitlin's research — BLOCKS live billing)
+
+- **IOLTA / trust accounting (the sharp one):** multi-year/lifetime upfront =
+  holding *years of unearned professional fees* (credits fund licensed PE +
+  broker work). Determine whether prepaid credits must sit in trust and be
+  revenue-recognized only on redemption, with refund-on-cancel obligations.
+  Protects the PE license + the broker license. **Counsel + accountant.**
+- **TOS:** define a credit, the $-conversion, how credits deduct, and what
+  happens to unused credits on cancellation.
+- **Auto-renewal (ROSCA + state laws):** only if any term auto-renews — consent,
+  clear/conspicuous terms, one-click cancel. Lifetime/one-time avoids it.
+- **Limited-scope retainer / fractional engagement:** the membership is
+  limited-scope — not 24/7 full-service; prevents scope creep + liability.
+- **RESPA / PE-ethics on bundling** (already flagged): counsel + PE board bless
+  bundling licensed work into a membership that also routes loans.
+
+## 10. Tech stack — no custom billing engine needed
+
+- **Stripe** (already wired in this stack, currently test mode): sells credit
+  packs + tiers + multi-year one-time or recurring terms, and can drive the
+  charge. Chargebee/Maxio are unnecessary given Stripe is already integrated.
+- **The credit LEDGER** (issue / deduct / balance / rollover / refund, audited)
+  IS the treasury spine (`REG-TREASURY-001`) — build post-launch, replay-certify,
+  then wire Stripe live. Until then: design only.

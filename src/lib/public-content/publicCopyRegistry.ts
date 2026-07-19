@@ -103,6 +103,50 @@ export const HOMEPAGE_CAPABILITIES = {
   ],
 } as const;
 
+export const HOMEPAGE_MODULES = {
+  heading: "Where do you want to go?",
+  intro:
+    "Bring the property or the question — we bring the analysis. Explore any lane free; bring in a licensed professional only when you're ready.",
+  cards: [
+    {
+      title: "Farms, Agriculture & Land",
+      href: "/explore?lane=farms-agriculture",
+      accent: "#2f6d12",
+      lead: "Know what the land can actually earn.",
+      body:
+        "Commodity economics, two honest net lines, equipment and hauling — the numbers behind the dirt before you commit.",
+      cta: "Explore farms & land",
+    },
+    {
+      title: "Commercial & Small Business",
+      href: "/explore?lane=small-business-growth",
+      accent: "#0f766e",
+      lead: "See what a building is really worth to a business.",
+      body:
+        "Worth, cash flow, operating capital, leases — the questions a lender will ask, answered before you make an offer.",
+      cta: "Explore commercial",
+    },
+    {
+      title: "Environmental & Compliance",
+      href: "/explore?lane=environmental-compliance",
+      accent: "#127a4f",
+      lead: "Find the deal-killers before they find you.",
+      body:
+        "Phase I, wetlands, contamination, water rights — read it all free, then order a licensed assessment from a PE.",
+      cta: "Explore environmental",
+    },
+    {
+      title: "Financing & Capital",
+      href: "/explore?lane=financing-capital",
+      accent: "#534AB7",
+      lead: "Bring the deal to a licensed lender.",
+      body:
+        "SBA, USDA, and conventional — see how the programs map to your project, then send your deal to a licensed lender.",
+      cta: "Explore financing",
+    },
+  ],
+} as const;
+
 export const HOMEPAGE_HOW_IT_WORKS = {
   heading: "How Furlong works",
   steps: [

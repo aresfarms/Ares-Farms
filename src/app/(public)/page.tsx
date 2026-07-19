@@ -7,6 +7,7 @@ import { Disclosures } from "@/components/public/Disclosures";
 import {
   HOMEPAGE_CAPABILITIES,
   HOMEPAGE_HERO,
+  HOMEPAGE_MODULES,
   HOMEPAGE_PRIMARY_ACTIONS,
   HOMEPAGE_CLEAR_WATERS,
 } from "@/lib/public-content/publicCopyRegistry";
@@ -231,6 +232,61 @@ export default async function HomePage() {
           /* ── Map section ───────────────────────────────────────────── */
           .fl-map-section {
             margin-top: 16px;
+          }
+
+          /* ── Module conversion grid ────────────────────────────────── */
+          .fl-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+          }
+          .fl-module-card {
+            display: grid;
+            gap: 8px;
+            align-content: start;
+            background: #ffffff;
+            border: 1px solid #d7deea;
+            border-left: 4px solid var(--mod-accent, #0f766e);
+            border-radius: 16px;
+            padding: 22px 22px;
+            text-decoration: none;
+            color: inherit;
+            transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease;
+          }
+          .fl-module-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 34px rgba(22,32,51,0.10);
+          }
+          .fl-module-card:focus-visible {
+            outline: 3px solid var(--mod-accent, #0f766e);
+            outline-offset: 3px;
+          }
+          .fl-module-eyebrow {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--mod-accent, #0f766e);
+          }
+          .fl-module-lead {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: #162033;
+            line-height: 1.2;
+          }
+          .fl-module-body {
+            margin: 0;
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: #5d687a;
+          }
+          .fl-module-cta {
+            margin-top: 2px;
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--mod-accent, #0f766e);
           }
 
           /* ── Section spacing ───────────────────────────────────────── */
@@ -585,6 +641,7 @@ export default async function HomePage() {
               gap: 6px;
             }
             .fl-steps-grid { grid-template-columns: 1fr; }
+            .fl-modules-grid { grid-template-columns: 1fr; }
           }
 
         `}</style>
@@ -632,6 +689,31 @@ export default async function HomePage() {
             </div>
           </section>
         )}
+
+        {/* ═══════════════════════════════════════════════════════════════
+            MODULE CONVERSION — the four live modules, benefit-led, each a
+            direct path in. Bring the property/question, get the analysis;
+            explore free, bring in a licensed professional when ready.
+            ══════════════════════════════════════════════════════════════ */}
+        <section className="fl-section" aria-label="Where do you want to go">
+          <h2 className="fl-section-title">{HOMEPAGE_MODULES.heading}</h2>
+          <p className="fl-section-intro">{HOMEPAGE_MODULES.intro}</p>
+          <div className="fl-modules-grid">
+            {HOMEPAGE_MODULES.cards.map((card) => (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="fl-module-card"
+                style={{ ["--mod-accent" as string]: card.accent }}
+              >
+                <span className="fl-module-eyebrow">{card.title}</span>
+                <p className="fl-module-lead">{card.lead}</p>
+                <p className="fl-module-body">{card.body}</p>
+                <span className="fl-module-cta">{card.cta} →</span>
+              </Link>
+            ))}
+          </div>
+        </section>
 
         <section className="fl-section" aria-label="What you can do here">
           <h2 className="fl-section-title">{HOMEPAGE_CAPABILITIES.heading}</h2>

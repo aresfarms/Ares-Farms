@@ -8,6 +8,7 @@ import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { CommercialLaneSections } from "@/components/public/CommercialLaneSections";
 import { EnvironmentalLaneSections } from "@/components/public/EnvironmentalLaneSections";
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
+import { FinancingLaneSections } from "@/components/public/FinancingLaneSections";
 import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
@@ -304,6 +305,32 @@ export default async function ExplorePage({
             </p>
           </header>
           <EnvironmentalLaneSections />
+          <CommunityCta />
+          <Disclosures variant="full" />
+        </div>
+      </main>
+    );
+  }
+
+  // Financial & Capital — a licensed module: learn how financing works, see live
+  // public rates, then submit a deal routed to the licensed lender (founder
+  // direction 2026-07-18). Purple accent. Facilitation only — never a lender.
+  if (selected && selected.slug === "financing-capital") {
+    return (
+      <main>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "28px 20px 48px", display: "grid", gap: 24 }}>
+          <header style={{ display: "grid", gap: 8 }}>
+            <Link href="/explore" style={{ fontSize: 13, fontWeight: 700, color: accentForLane(selected.slug, "light"), textDecoration: "none", width: "fit-content" }}>
+              ← Back to the compass
+            </Link>
+            <h1 style={{ margin: 0, fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.15, color: "#101a2b" }}>
+              {selected.label}
+            </h1>
+            <p style={{ margin: 0, fontSize: 16, color: "#4d596d", lineHeight: 1.6, maxWidth: 640 }}>
+              The capital side of every property decision — learn the programs and see today&apos;s rates free, then bring your deal to a licensed lender when you&apos;re ready.
+            </p>
+          </header>
+          <FinancingLaneSections />
           <CommunityCta />
           <Disclosures variant="full" />
         </div>

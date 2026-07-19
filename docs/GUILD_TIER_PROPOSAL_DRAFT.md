@@ -360,7 +360,7 @@ research's "keep lifetime < 5–10% of users" as a policy cap; it's partly self-
 enforcing. Tag lifetime members in the entitlement/treasury records so the pool +
 its capped hours are legible to a future buyer.
 
-**TOS clauses for counsel (adopt the structure):**
+**TOS clauses for counsel — FOUNDER-AGREED 2026-07-19 (structure locked; counsel drafts wording):**
 - **"Lifetime" = operational lifespan of the product/entity, NOT the human buyer** —
   and DISCLOSED plainly at purchase (honest only if disclosed up front).
 - **Assignment / successor clause** — agreement assignable at Furlong's discretion;
@@ -369,19 +369,32 @@ its capped hours are legible to a future buyer.
 - **Substantial-change-of-service clause** — lifetime access attaches to the current
   product iteration/scope.
 
-**TRUST-BRAND RECONCILIATION (steer away from the research here).** The research's
-"successor may terminate at discretion" is buyer-favorable to the point of bait-and-
-switch — it collides with the constitutional consumer-protection ethos. Adopt the
-structural clauses BUT pair them with a **fair-treatment floor**: on dissolution or
-fundamental restructure, guarantee a **fair, RESERVE-FUNDED buyout or refund**
-(exactly what the Continuity + Dispute reserves are for, CANON-TREASURY-001 §3). Both
-M&A-ready AND consistent with "we don't exploit you." Never a bare terminate-at-will.
+**TRUST-BRAND FAIR-TREATMENT FLOOR — FOUNDER-AGREED 2026-07-19.** The research's
+"successor may terminate at discretion" is bait-and-switch and collides with the
+constitutional consumer-protection ethos — REJECTED. The structural clauses above are
+adopted ONLY when paired with the fair-treatment floor: on dissolution or fundamental
+restructure, Furlong (or the successor) guarantees a **fair, RESERVE-FUNDED buyout or
+refund** (funded from the Continuity + Dispute reserves, CANON-TREASURY-001 §3). Both
+M&A-ready AND consistent with "we don't exploit you." **Never a bare terminate-at-will.**
 
 **Buyer transition scenarios (buyer's call at sale, noted for founders):**
 grandfather-into-legacy-tier / paid sunset-with-grace-period+discount / buyout-
 allocation-at-cost. Our job now is only to make all three CLEAN via tag + cap + fund.
-This whole section is counsel-drafted TOS — structure decided here, wording + any
-price/refund figures stay founders + counsel.
+
+**BUILD OBLIGATIONS registered on the treasury spine (REG-TREASURY-001, post-launch,
+gated).** When the treasury spine is built, it MUST include — so the fair-treatment
+floor is real, not aspirational:
+1. **Tag** — every membership entitlement record carries: tier, term type (annual /
+   2yr / 5yr / lifetime), person-vs-entity holder, and a lifetime flag → the pool +
+   capped hours are legible for diligence and for the <5–10% policy cap.
+2. **Cap** — annual-hours allotment + velocity caps enforced per TreasuryPolicy;
+   step-down schedule (§15) applied by contract year.
+3. **Fund** — Continuity + Dispute reserves carry a governed floor sized to cover the
+   outstanding fair-buyout/refund obligation for active lifetime members; breaching
+   the floor requires TreasuryApproval (CANON-TREASURY-001 §3).
+These are counsel-drafted TOS + treasury-spine build items — no live code today
+(shelved economics + Backend-First gate); wording + price/refund figures stay
+founders + counsel.
 
 ## 17. Top luxury / institutional tier — the Veblen anchor (2026-07-19)
 

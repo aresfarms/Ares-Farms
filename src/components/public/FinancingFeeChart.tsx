@@ -34,17 +34,38 @@ export function FinancingFeeChart() {
     <section aria-label="Financing fees" style={{ display: "grid", gap: 12 }}>
       <div
         style={{
-          background: "#eef7f1",
-          border: "1px solid #cfe6d8",
-          borderLeft: "4px solid #127a4f",
-          borderRadius: 12,
-          padding: "14px 16px",
-          display: "grid",
-          gap: 4,
+          background: "#e7f6ee",
+          border: "2px solid #127a4f",
+          borderRadius: 16,
+          padding: "20px 22px",
+          display: "flex",
+          gap: 16,
+          alignItems: "flex-start",
+          boxShadow: "0 6px 20px rgba(18,122,79,0.12)",
         }}
       >
-        <strong style={{ fontSize: 16, color: "#12513a" }}>{FINANCING_FREE_STATEMENT.lead}</strong>
-        <p style={{ margin: 0, fontSize: 13, color: "#2f5f49", lineHeight: 1.6 }}>{FINANCING_FREE_STATEMENT.body}</p>
+        <span
+          style={{
+            flexShrink: 0,
+            fontSize: 12,
+            fontWeight: 900,
+            letterSpacing: "0.08em",
+            color: "#ffffff",
+            background: "#127a4f",
+            borderRadius: 999,
+            padding: "6px 13px",
+            marginTop: 3,
+            whiteSpace: "nowrap",
+          }}
+        >
+          FREE
+        </span>
+        <div style={{ display: "grid", gap: 6 }}>
+          <strong style={{ fontSize: 22, color: "#0f5236", lineHeight: 1.2, letterSpacing: "-0.01em" }}>
+            {FINANCING_FREE_STATEMENT.lead}
+          </strong>
+          <p style={{ margin: 0, fontSize: 14, color: "#2f5f49", lineHeight: 1.6 }}>{FINANCING_FREE_STATEMENT.body}</p>
+        </div>
       </div>
 
       <div style={{ display: "grid", gap: 4 }}>

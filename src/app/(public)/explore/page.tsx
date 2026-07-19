@@ -300,7 +300,7 @@ export default async function ExplorePage({
               {selected.label}
             </h1>
             <p style={{ margin: 0, fontSize: 16, color: "#4d596d", lineHeight: 1.6, maxWidth: 640 }}>
-              What the ground can tell you before you commit — no account, no personal data, no footprints.
+              What the ground can tell you before you commit — read it all free, then order a licensed assessment from a PE when you&apos;re ready.
             </p>
           </header>
           <EnvironmentalLaneSections />

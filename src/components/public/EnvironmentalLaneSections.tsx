@@ -11,6 +11,7 @@ import Link from "next/link";
 
 import { ENVIRONMENTAL_BRIEFS, ENVIRONMENTAL_NOTE, type EnvBrief } from "@/lib/property/environmentalLaneCurated";
 import { accentForLane } from "@/lib/property/laneThemes";
+import { EnvironmentalOrderPanel } from "@/components/public/EnvironmentalOrderPanel";
 
 const EMERALD = accentForLane("environmental-compliance", "light"); // #127a4f
 
@@ -87,6 +88,8 @@ export function EnvironmentalLaneSections() {
         </div>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{ENVIRONMENTAL_NOTE}</span>
       </section>
+
+      <EnvironmentalOrderPanel />
 
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
         <Link href="/explore?lane=financing-capital" style={{ ...card, textDecoration: "none" }}>

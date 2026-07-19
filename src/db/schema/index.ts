@@ -106,5 +106,6 @@ export * from "./reviewWorkflows";
 export * from "./ruleOverlayRegistry";
 export * from "./schemaRegistry";
 export * from "./scraperSourceGovernance";
+export * from "./serviceRequests";
 export * from "./sovereignConsentGatewayRecords";
 export * from "./versionRegistry";

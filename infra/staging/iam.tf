@@ -54,6 +54,16 @@ resource "google_secret_manager_secret_iam_member" "runtime_sendgrid_api_key" {
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+# AUTH_CREDENTIAL_SHARED_SECRET — created out of band by the owner; grant the
+# runtime SA read access only when operator credential login is enabled.
+resource "google_secret_manager_secret_iam_member" "runtime_auth_shared_secret" {
+  count     = var.auth_credentials_mode == "" ? 0 : 1
+  project   = var.project_id
+  secret_id = "AUTH_CREDENTIAL_SHARED_SECRET"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
 resource "google_secret_manager_secret_iam_member" "runtime_nextauth_secret" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.app["NEXTAUTH_SECRET"].secret_id

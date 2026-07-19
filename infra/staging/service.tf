@@ -164,6 +164,36 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # ---- Operator credential login --------------------------------------
+      # Enabled only when auth_credentials_mode is set. The shared-secret value
+      # is created out of band by the owner; TF only references it by name.
+      dynamic "env" {
+        for_each = var.auth_credentials_mode == "" ? [] : [var.auth_credentials_mode]
+        content {
+          name  = "AUTH_CREDENTIALS_MODE"
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = var.auth_credentials_mode == "" ? [] : [var.auth_credential_email_allowlist]
+        content {
+          name  = "AUTH_CREDENTIAL_EMAIL_ALLOWLIST"
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = var.auth_credentials_mode == "" ? [] : [1]
+        content {
+          name = "AUTH_CREDENTIAL_SHARED_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = "AUTH_CREDENTIAL_SHARED_SECRET"
+              version = "latest"
+            }
+          }
+        }
+      }
+
       env {
         name  = "AMENITY_LIVE_LOOKUP_ENABLED"
         value = var.amenity_live_lookup_enabled ? "true" : "false"
@@ -258,6 +288,7 @@ resource "google_cloud_run_v2_service" "core" {
     google_secret_manager_secret_iam_member.runtime_nextauth_secret,
     google_secret_manager_secret_iam_member.runtime_report_signing,
     google_secret_manager_secret_iam_member.runtime_sendgrid_api_key,
+    google_secret_manager_secret_iam_member.runtime_auth_shared_secret,
     google_storage_bucket_iam_member.runtime_state_core_rw,
   ]
 }

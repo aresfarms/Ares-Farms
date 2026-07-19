@@ -368,6 +368,21 @@ variable "email_from" {
   default     = ""
 }
 
+# ---- Operator credential login -----------------------------------------------
+# Enables the email + shared-secret operator login (internal/approval screens).
+# The AUTH_CREDENTIAL_SHARED_SECRET secret is created out of band by the owner.
+variable "auth_credentials_mode" {
+  description = "Set to 'email-allowlist' to enable operator credential login. Empty = login stays blocked (dev-open in prod-like)."
+  type        = string
+  default     = ""
+}
+
+variable "auth_credential_email_allowlist" {
+  description = "Comma-separated operator emails allowed to log in with the shared secret."
+  type        = string
+  default     = ""
+}
+
 # ---- Labels -----------------------------------------------------------------
 
 variable "labels" {

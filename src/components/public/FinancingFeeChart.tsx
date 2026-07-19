@@ -2,6 +2,8 @@ import {
   FINANCING_FEE_LINES,
   FINANCING_FEE_NOTES,
   FINANCING_FREE_STATEMENT,
+  FINANCING_OFFERINGS,
+  FINANCING_TRUST,
 } from "@/lib/financing/financingFeeSchedule";
 import { accentForLane } from "@/lib/property/laneThemes";
 
@@ -87,6 +89,31 @@ export function FinancingFeeChart() {
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{FINANCING_FEE_NOTES.guild}</span>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{FINANCING_FEE_NOTES.broker}</span>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{FINANCING_FEE_NOTES.disclosure}</span>
+      </div>
+
+      <div style={{ display: "grid", gap: 10 }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
+          What your licensed broker does for you
+        </span>
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {FINANCING_OFFERINGS.map((o) => (
+            <div key={o.title} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#ffffff", padding: "12px 14px", display: "grid", gap: 3 }}>
+              <strong style={{ fontSize: 13.5, color: "#101a2b" }}>{o.title}</strong>
+              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{o.body}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px", display: "grid", gap: 8 }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
+          How you&apos;re protected
+        </span>
+        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+          {FINANCING_TRUST.map((t) => (
+            <li key={t} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{t}</li>
+          ))}
+        </ul>
       </div>
     </section>
   );

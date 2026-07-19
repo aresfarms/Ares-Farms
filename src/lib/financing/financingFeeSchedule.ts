@@ -35,30 +35,67 @@ export interface FinFeeLine {
 
 export const FINANCING_FEE_LINES: FinFeeLine[] = [
   {
-    service: "One-on-one time with the licensed lender",
-    detail: "Sitting down with the licensed lender to talk through your situation and options.",
+    service: "Hourly consulting",
+    detail: "Strategic planning, credit-repair guidance, or complex financial structuring — for when you just want advice, not to apply yet.",
     fee: `$${FINANCING_ADVISORY_HOURLY_USD}/hr`,
     feeConfirmed: true,
   },
   {
-    service: "Loan-fit & paperwork-readiness session",
-    detail: "Going over which programs might fit and getting your paperwork ready before you apply.",
-    fee: `$${FINANCING_ADVISORY_HOURLY_USD}/hr`,
+    service: "Engagement retainer",
+    detail: "A flat fee to evaluate tax returns, assess debt-to-income, and map a long-term borrowing strategy. Credited back to you if a loan closes.",
+    fee: "$500 – $2,500",
     feeConfirmed: true,
   },
   {
-    service: "Financial analysis & mortgage-brokerage consulting",
-    detail: "Deeper financial analysis and consulting the licensed mortgage broker can provide.",
-    fee: `$${FINANCING_ADVISORY_HOURLY_USD}/hr`,
+    service: "Flat advisory fee",
+    detail: "Shopping the market, negotiating with multiple wholesale lenders, and reviewing tailored loan offers on your behalf.",
+    fee: "$500 – $2,000",
     feeConfirmed: true,
   },
+];
+
+/** What the licensed mortgage broker does for you — descriptive, no fee. */
+export const FINANCING_OFFERINGS: { title: string; body: string }[] = [
+  {
+    title: "Market sourcing",
+    body: "Access to wholesale lenders and products that aren't offered directly to the public.",
+  },
+  {
+    title: "Credit analysis & repair strategy",
+    body: "A close read of your credit report to catch errors and a step-by-step plan to strengthen your score before you shop.",
+  },
+  {
+    title: "DTI & affordability modeling",
+    body: "Structuring non-traditional income, self-employment, or complex assets so you can actually qualify.",
+  },
+  {
+    title: "Pre-approval & documentation prep",
+    body: "Collecting, organizing, and vetting your paperwork into a rock-solid pre-approval that makes you competitive.",
+  },
+  {
+    title: "Loan structuring & negotiation",
+    body: "Helping you pick the right loan — FHA, VA, conventional, jumbo, or non-QM — and negotiating the terms.",
+  },
+  {
+    title: "Coordination through closing",
+    body: "Acting as your liaison with the underwriter, appraiser, and title company all the way to the closing table.",
+  },
+];
+
+/** Trust + compliance signals for a licensed mortgage broker. */
+export const FINANCING_TRUST: string[] = [
+  "Licensed mortgage broker, registered in the NMLS — you can verify the license and status in the NMLS Consumer Access database.",
+  "By federal law, a broker cannot be paid by both you and the lender on the same transaction.",
+  "Broker fees are capped by federal law and are never tied to the interest rate you're given.",
+  "Every fee is itemized in writing on your fee agreement and Loan Estimate (CFPB / TILA / RESPA).",
+  "A broker owes you a fiduciary duty — to act in your best interest, not a lender's.",
 ];
 
 export const FINANCING_FEE_NOTES = {
   guild:
     "Guild members receive this advisory time included or credited — the more complete tiers include one-on-one hours outright.",
   broker:
-    "Additional services a licensed mortgage broker can offer are quoted to scope — confirm what you need and you'll get a written quote first.",
+    "Fee ranges are typical; you receive a written quote for your specific engagement before any work begins.",
   disclosure:
     "The advisory service is separate from originating a loan: you can use it and take a loan anywhere. Fees are quoted and approved before any work, and Furlong takes no compensation tied to your transaction.",
 };

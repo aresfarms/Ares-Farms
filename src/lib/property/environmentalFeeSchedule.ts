@@ -33,22 +33,34 @@ export interface EnvFeeLine {
 
 export const ENVIRONMENTAL_FEE_LINES: EnvFeeLine[] = [
   {
+    service: "Phase I Environmental Site Assessment (ESA)",
+    detail: "ASTM E1527 records + history + site-walk review (no sampling). The baseline due-diligence report standard for real estate transactions.",
+    fee: "$1,900 – $4,500",
+    feeConfirmed: true,
+  },
+  {
+    service: "Phase II ESA & subsurface testing",
+    detail: "Triggered when a Phase I flags a recognized environmental condition — soil and groundwater sampling (lab analysis coordinated).",
+    fee: "$5,000 – $35,000",
+    feeConfirmed: true,
+  },
+  {
+    service: "Environmental Impact Assessment (EIA)",
+    detail: "Extensive assessment of larger developments and their local ecosystems.",
+    fee: "$10,000 – $60,000",
+    feeConfirmed: true,
+  },
+  {
+    service: "Permit application support",
+    detail: "Tailored reports to secure municipal, state, or federal environmental permits (stormwater, wetland, NEPA).",
+    fee: "$5,000 – $25,000",
+    feeConfirmed: true,
+  },
+  {
     service: "General environmental / chemical engineering",
-    detail: "Consulting, review, and stamped professional judgment, billed by the hour.",
+    detail: "Consulting, review, site monitoring, soil mapping, water-rights review, and stamped professional judgment, billed by the hour.",
     fee: `$${ENV_GENERAL_HOURLY_USD}/hr`,
     feeConfirmed: true,
-  },
-  {
-    service: "Site monitoring & inspection",
-    detail: "Ongoing site monitoring and compliance inspections (no laboratory required).",
-    fee: `$${ENV_GENERAL_HOURLY_USD}/hr`,
-    feeConfirmed: true,
-  },
-  {
-    service: "Soil mapping / survey",
-    detail: "Soil mapping and field survey for a site's condition and suitability.",
-    fee: "Quoted to scope",
-    feeConfirmed: false,
   },
   {
     service: "Conservation easement — baseline & documentation",
@@ -62,37 +74,13 @@ export const ENVIRONMENTAL_FEE_LINES: EnvFeeLine[] = [
     fee: "Quoted to scope",
     feeConfirmed: false,
   },
-  {
-    service: "Phase I Environmental Site Assessment",
-    detail: "ASTM E1527 records + history + site-walk review (no sampling).",
-    fee: "Quoted to scope",
-    feeConfirmed: false,
-  },
-  {
-    service: "Stormwater / erosion & sediment control planning",
-    detail: "Engineered stormwater and erosion-control plans for permitting.",
-    fee: "Quoted to scope",
-    feeConfirmed: false,
-  },
-  {
-    service: "Environmental permitting & NEPA support",
-    detail: "Permit strategy and NEPA screening/documentation support.",
-    fee: `$${ENV_GENERAL_HOURLY_USD}/hr`,
-    feeConfirmed: true,
-  },
-  {
-    service: "Water rights consulting",
-    detail: "Review of water-right seniority, transfer, and use questions.",
-    fee: `$${ENV_GENERAL_HOURLY_USD}/hr`,
-    feeConfirmed: true,
-  },
 ];
 
 export const ENVIRONMENTAL_FEE_NOTES = {
   guild:
     "Guild members receive credits toward these services — the more complete tiers include one or more assessments outright.",
   labs:
-    "These are field and consulting services. Where laboratory analysis is required (for example Phase II sampling), it is coordinated with a certified laboratory and quoted separately.",
+    "Report fees are typical market ranges; the final fee is quoted to the specific site and scope. Where laboratory analysis is required (for example Phase II sampling), a certified laboratory is coordinated and included in the quote. Senior/principal hourly work typically runs $175–$375/hr in the market; this practice bills at $300/hr.",
   disclosure:
-    "Typical fees are illustrative. Every engagement is quoted in writing and approved before any work begins — there are no post-hoc fees, and the fee is never contingent on a loan or transaction.",
+    "Every engagement is quoted in writing and approved before any work begins — there are no post-hoc fees, and the fee is never contingent on a loan or transaction.",
 };

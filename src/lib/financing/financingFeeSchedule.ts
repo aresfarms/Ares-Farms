@@ -33,6 +33,8 @@ export interface FinFeeLine {
   feeConfirmed: boolean;
   /** How this line is handled for Guild members. */
   guild: string;
+  /** An emphasized selling-point line rendered in bold under the detail. */
+  emphasis?: string;
 }
 
 export const FINANCING_FEE_LINES: FinFeeLine[] = [
@@ -45,7 +47,8 @@ export const FINANCING_FEE_LINES: FinFeeLine[] = [
   },
   {
     service: "Engagement retainer",
-    detail: "A flat fee to evaluate tax returns, assess debt-to-income, and map a long-term borrowing strategy. Credited back to you if a loan closes.",
+    detail: "A flat fee to evaluate tax returns, assess debt-to-income, and map a long-term borrowing strategy.",
+    emphasis: "Credited back to you in full if a loan closes.",
     fee: "$500 – $2,500",
     feeConfirmed: true,
     guild: "Free — every tier",
@@ -87,13 +90,25 @@ export const FINANCING_OFFERINGS: { title: string; body: string }[] = [
   },
 ];
 
+export interface FinancingTrustLine {
+  text: string;
+  /** Optional trailing link (e.g. the NMLS Consumer Access lookup). */
+  link?: { label: string; href: string };
+}
+
 /** Trust + compliance signals for a licensed mortgage broker. */
-export const FINANCING_TRUST: string[] = [
-  "Licensed mortgage broker, registered in the NMLS — you can verify the license and status in the NMLS Consumer Access database.",
-  "By federal law, a broker cannot be paid by both you and the lender on the same transaction.",
-  "Broker fees are capped by federal law and are never tied to the interest rate you're given.",
-  "Every fee is itemized in writing on your fee agreement and Loan Estimate (CFPB / TILA / RESPA).",
-  "A broker owes you a fiduciary duty — to act in your best interest, not a lender's.",
+export const FINANCING_TRUST: FinancingTrustLine[] = [
+  {
+    text: "Licensed mortgage broker, registered in the NMLS — verify the license and status in the",
+    link: {
+      label: "NMLS Consumer Access database",
+      href: "https://www.nmlsconsumeraccess.org/",
+    },
+  },
+  { text: "By federal law, a broker cannot be paid by both you and the lender on the same transaction." },
+  { text: "Broker fees are capped by federal law and are never tied to the interest rate you're given." },
+  { text: "Every fee is itemized in writing on your fee agreement and Loan Estimate (CFPB / TILA / RESPA)." },
+  { text: "A broker owes you a fiduciary duty — to act in your best interest, not a lender's." },
 ];
 
 export const FINANCING_FEE_NOTES = {

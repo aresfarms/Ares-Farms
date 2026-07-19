@@ -72,6 +72,11 @@ export function FinancingFeeChart() {
                 <td style={cellBase}>
                   <strong style={{ color: "#101a2b", fontSize: 13.5 }}>{line.service}</strong>
                   <div style={{ fontSize: 12, color: "#708997", marginTop: 3 }}>{line.detail}</div>
+                  {line.emphasis && (
+                    <div style={{ fontSize: 12.5, color: "#12513a", fontWeight: 800, marginTop: 4 }}>
+                      {line.emphasis}
+                    </div>
+                  )}
                 </td>
                 <td style={{ ...cellBase, whiteSpace: "nowrap", fontWeight: 700, color: line.feeConfirmed ? "#101a2b" : "#9a6b12" }}>
                   {line.fee}
@@ -111,7 +116,18 @@ export function FinancingFeeChart() {
         </span>
         <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
           {FINANCING_TRUST.map((t) => (
-            <li key={t} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{t}</li>
+            <li key={t.text} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>
+              {t.text}
+              {t.link && (
+                <>
+                  {" "}
+                  <a href={t.link.href} target="_blank" rel="noopener noreferrer" style={{ color: PURPLE, fontWeight: 700 }}>
+                    {t.link.label}
+                  </a>
+                  .
+                </>
+              )}
+            </li>
           ))}
         </ul>
       </div>

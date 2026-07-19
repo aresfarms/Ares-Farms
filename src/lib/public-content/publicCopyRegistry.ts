@@ -53,12 +53,12 @@
  */
 export const HOMEPAGE_HERO = {
   brandName: "Furlong",
-  headline:  "What are your possibilities? Explore and find out.",
+  headline:  "Bring the property. We bring the analysis.",
   tagline:
-    "Explore land, funding, business, and readiness pathways with less guesswork and more clarity.",
+    "What the land can earn, what a building's really worth, the deal-killers to dodge, the financing that fits — see it free before you commit to anything.",
   subhead:
-    "Start with a property, a question, or just an idea. Furlong helps you see what may be possible, " +
-    "where the boundaries are, and what your next steps could be before you commit to anything.",
+    "Start with a property, a place, or just a question. Furlong shows you what's possible, where the " +
+    "boundaries are, and your next move — before you talk to anyone or share a thing.",
   trustTag:  "Explore anonymously. No account required. No hidden handoff.",
 } as const;
 

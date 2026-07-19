@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { America250Banner } from "@/components/brand/America250Banner";
 import { CompassRose } from "@/components/public/CompassRose";
+import { NewsletterSignup } from "@/components/public/NewsletterSignup";
 import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
 import { Disclosures } from "@/components/public/Disclosures";
 import {
@@ -713,6 +714,11 @@ export default async function HomePage() {
               </Link>
             ))}
           </div>
+        </section>
+
+        {/* Retention loop — capture the visitor who liked the free value. */}
+        <section className="fl-section" aria-label="Get the Dispatch" style={{ justifyItems: "center" }}>
+          <NewsletterSignup />
         </section>
 
         <section className="fl-section" aria-label="What you can do here">

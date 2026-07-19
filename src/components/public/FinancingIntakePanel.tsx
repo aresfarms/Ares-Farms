@@ -266,7 +266,7 @@ export function FinancingIntakePanel() {
       </div>
 
       <div>
-        <label style={label} htmlFor="fin-address">Your mailing address</label>
+        <label style={label} htmlFor="fin-address">Your mailing address (optional — the lender collects it later)</label>
         <input id="fin-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} />
       </div>
 

@@ -259,7 +259,7 @@ export function EnvironmentalOrderPanel() {
       </div>
 
       <div>
-        <label style={label} htmlFor="env-address">Your mailing address</label>
+        <label style={label} htmlFor="env-address">Your mailing address (optional — we collect it with your quote)</label>
         <input id="env-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} />
       </div>
 

@@ -29,8 +29,12 @@ const INSIDE: Array<{ title: string; body: string }> = [
     body: "Your industry newsletters and podcasts — rates, commodity moves, and what's worth knowing — bundled, not billed separately.",
   },
   {
-    title: "Credits toward the licensed work",
-    body: "Guild tiers put credit toward the professional work you'd otherwise order à la carte — a Phase I, advisory hours, feasibility support.",
+    title: "Included advisory time",
+    body: "Guild tiers include a set block of advisory time each year with a licensed PE and lender — annual reviews, compliance questions, the working sessions you'd otherwise book hour by hour.",
+  },
+  {
+    title: "A member rate on the bigger work",
+    body: "When a project needs the full licensed deliverable — a Phase I, a feasibility study — members get a preferred rate on it, on top of their included time.",
   },
   {
     title: "Priority professional time",

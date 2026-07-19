@@ -92,63 +92,203 @@ Equity means: **the tier price funds fair-market pay for whoever does the work.*
 
 ---
 
-## 7. Credit mechanics (DRAFT — founders + counsel set the numbers)
+## 7. Time-included tiers — NOT credits (founder direction 2026-07-19)
 
-Model: each membership loads a **credit balance**; services have a **price in
-credits**; add-ons/top-ups when a member runs low. Illustrative only.
+Founder rejected credits as "too transactional." The model is a **flat price per
+tier that includes a set bundle of professional consultation TIME**, with tiers
+as options (not à la carte purchasing). Time is the included benefit — the unit
+a member understands and the unit that anchors to the existing fee schedules
+(Stuart advisory **$250/hr**, Caitlin environmental PE **$300/hr**).
 
-**Service → credits price list (illustrative; PE/broker set real values):**
+**How included time works:**
+- Each tier includes a set number of **consultation hours** with the two
+  professionals (Stuart / advisory, Caitlin / environmental PE).
+- **Hours are fungible.** If a member needs no environmental review, that hour
+  **combines into advisory time** instead — e.g. entry tier's *1 hr Stuart + 1 hr
+  environmental* becomes *2 hrs with Stuart* when the PE hour isn't needed.
+- **The fee schedules still anchor everything.** Overage beyond included hours,
+  and standalone orders (a Phase I, a feasibility study), are billed at the
+  existing member/published rates — no new pricing invented.
+- **Professional pay is preserved (equity rule §2):** when a member uses an
+  included hour, the professional is still paid fair-market from the membership
+  pool via a CompensationEvent. Furlong keeps subscription margin only.
 
-| Service | ~Credits (placeholder) |
-|---|---|
-| The Compass (newsletter) | included, no credits |
-| 30-min advisory / consult | small |
-| Loan-fit & paperwork session | medium |
-| Phase I ESA | large |
-| Feasibility study (VAPG/REAP) | largest |
+**DECIDED (founder 2026-07-19): equal-hours conversion for both Caitlin and
+Stuart.** 1 PE hr ↔ 1 advisory hr, one-for-one — the member-facing promise is
+simply "hours," fully interchangeable between the two professionals. The real
+$250/$300 rate difference is reconciled **only in internal compensation**, never
+surfaced to the member. (Rejected: equal-dollars / 1.2×-style conversion.)
 
-**Rules to decide with counsel:**
-- **Credit value** — the $-per-credit conversion (must be stated in the TOS).
-- **Rollover** — "use it or lose it" per term vs. limited rollover. Given
-  multi-year terms hold *unearned licensed fees*, rollover interacts with trust
-  accounting (see §9) — decide together.
-- **Add-ons / top-ups** — one-off services or extra credit blocks at a member
-  rate; these are à la carte at the member discount.
-- **Professional pay** — every redeemed credit for licensed work funds a
-  fair-market CompensationEvent to the PE/broker (the equity rule, §2).
+## 8. Illustrative tier ladder — HOURS ONLY, no prices (prices stay gated)
 
-## 8. Billing cadence — NO monthly (founder direction 2026-07-19)
+Shapes only; hour counts + prices are founders + counsel. Never publish prices
+until that session (§10, [[membership-tiers-shelved]]).
+
+| Tier | The Compass | Included time (fungible) | Also included |
+|---|---|---|---|
+| **Entry** | ✓ | 1 hr Stuart + 1 hr PE (or 2 hrs combined) | Priority scheduling |
+| **Mid** | ✓ | more hours (e.g. 3 advisory + 2 PE, fungible) | Member rate on a Phase I / feasibility |
+| **Top** | ✓ | most hours (e.g. 6 advisory + 4 PE, fungible) | A licensed deliverable offset + direct line |
+
+## 9. Billing cadence — NO monthly (founder direction 2026-07-19)
 
 Charge **annually, every 2 years, 5 years, or lifetime** — never monthly.
-- **Lifetime = one-time** → no auto-renewal → simplest legally (ROSCA/auto-
-  renewal laws largely don't apply to a non-recurring charge).
-- **Multi-year (2/5-yr)** → prefer **one-time, non-auto-renewing** terms; if any
-  auto-renews, ROSCA + state auto-renewal law apply (explicit consent, clear
-  terms, easy cancel).
-- Trade-off to weigh: longer prepaid term = more unearned licensed fees held
-  upfront = more trust-accounting weight (§9).
+- **NO automatic renewals — ever (founder direction 2026-07-19).** Every term is
+  one-time; nothing recurring is charged. A membership simply expires unless the
+  member chooses to re-subscribe.
+- **Wind-down reminder flow (manual re-subscribe):** as a term nears its end,
+  email the member **90 days out** and again at **30 days out** so they can
+  re-subscribe on their own. No card is charged without a fresh, deliberate
+  purchase.
+- **Loyalty re-subscribe discount: 35% off** the next term (2-year, 5-year, or
+  lifetime) for members who renew via the reminder flow. (The discount RATE is
+  set; the base prices it applies to stay gated — §10, [[membership-tiers-shelved]].)
+- **Lifetime = one-time**, no renewal at all.
+- **Included hours should reset per year, not stockpile.** If a 5-year member's
+  hours are annual (use-it-or-lose-it, or capped rollover), Furlong only ever
+  holds ~one year of unearned professional time at a time — even on a lifetime
+  membership. That deliberately keeps the trust-accounting exposure small (§10).
 
-## 9. Counsel + accountant checklist (from Caitlin's research — BLOCKS live billing)
+## 10. Counsel + accountant checklist (BLOCKS live billing)
 
-- **IOLTA / trust accounting (the sharp one):** multi-year/lifetime upfront =
-  holding *years of unearned professional fees* (credits fund licensed PE +
-  broker work). Determine whether prepaid credits must sit in trust and be
-  revenue-recognized only on redemption, with refund-on-cancel obligations.
-  Protects the PE license + the broker license. **Counsel + accountant.**
-- **TOS:** define a credit, the $-conversion, how credits deduct, and what
-  happens to unused credits on cancellation.
-- **Auto-renewal (ROSCA + state laws):** only if any term auto-renews — consent,
-  clear/conspicuous terms, one-click cancel. Lifetime/one-time avoids it.
+- **Availability-retainer framing — but Furlong segregates anyway (see §14, controlling doctrine).**
+  Counsel drafts the fee as an **earned-upon-receipt availability retainer** (member
+  pays to *reserve* Caitlin's / Stuart's capacity, not to pre-buy billable hours),
+  and **strict use-it-or-lose-it (§12) is what makes that framing true**. This helps
+  revenue recognition and the refund baseline. **However — the outside research's
+  next step ("…so it can bypass the trust account and go to operating capital") is
+  NOT the Furlong-canonical path.** Per REG-TREASURY-001 + CANON-TREASURY-001 (§14),
+  refund-exposed subscription funds are held in a governed **Dispute/restricted
+  reserve**, tracked in the Treasury Account Registry — kept separate for refund +
+  legal safety (founder-confirmed 2026-07-19), NOT swept to operating cash. Confirm
+  per jurisdiction. **Counsel + accountant.**
+- **TOS:** define what a tier includes, the fungibility rule (§7), whether unused
+  hours roll over or expire, and cancellation/refund treatment.
+- **Auto-renewal (ROSCA + state laws): N/A — resolved by design.** No term
+  auto-renews; renewal is a fresh manual purchase after the 90/30-day reminders
+  (§9). This removes the entire auto-renewal-law surface. (Still keep the reminder
+  emails truthful + the re-subscribe path easy — good practice, not a mandate.)
 - **Limited-scope retainer / fractional engagement:** the membership is
-  limited-scope — not 24/7 full-service; prevents scope creep + liability.
+  limited-scope — a defined block of hours, not 24/7 full-service; prevents scope
+  creep + liability.
 - **RESPA / PE-ethics on bundling** (already flagged): counsel + PE board bless
   bundling licensed work into a membership that also routes loans.
 
-## 10. Tech stack — no custom billing engine needed
+## 11. Tech stack — no custom billing engine needed
 
-- **Stripe** (already wired in this stack, currently test mode): sells credit
-  packs + tiers + multi-year one-time or recurring terms, and can drive the
-  charge. Chargebee/Maxio are unnecessary given Stripe is already integrated.
-- **The credit LEDGER** (issue / deduct / balance / rollover / refund, audited)
-  IS the treasury spine (`REG-TREASURY-001`) — build post-launch, replay-certify,
-  then wire Stripe live. Until then: design only.
+- **Stripe** (already wired, test mode): flat tier subscriptions + multi-year
+  one-time or recurring terms. **Simpler than credits** — no per-unit deduction
+  engine; a tier is a subscription + an entitlement of included hours.
+- **Included-hours tracking** (grant on purchase / decrement on a booked consult /
+  annual reset / audited) rides the treasury spine (`REG-TREASURY-001`) — build
+  post-launch, replay-certify, then wire Stripe live. Until then: design only.
+
+## 12. Annual Capacity Reservation Model (2026-07-19 refinement)
+
+Present the whole thing to counsel as an **"Annual Capacity Reservation Model with
+Velocity Caps"** — an organized professional-services firm, not an unregulated
+prepaid bank. Mechanics adopted:
+
+- **Annual allotment:** each tier = a set number of hours **per year**, discounted
+  vs. the standard $250/$300 rate to reward the subscription.
+- **Retail-price anchor:** the contract states the $-value of the included hours
+  (e.g. "includes 50 hours valued at $250/hr"). This is the legal baseline for any
+  refund/breach math — and it's an internal contract term, not a member "credit."
+- **Reset = strict use-it-or-lose-it (Option A, adopted).** On the membership
+  anniversary, unused hours drop to zero and a fresh block issues. This is what
+  turns the fee into an earned **capacity-reservation / availability retainer**
+  (§10). *Fallback if founders want goodwill:* Option B — cap rollover at 10–20%,
+  usable only in the first 60 days of the new year (max liability ≈ 1.2 yr).
+- **Top-up blocks:** if a member burns their annual pool early, they buy more time
+  at a **subscriber rate (~10% off retail)**; top-ups **expire at that year's end**
+  — no free overflow, no perpetual banking.
+- **Velocity caps:** hours have a per-month ceiling (e.g. 100/yr but ≤15 in any
+  single month without prior written approval) — stops one client from dumping a
+  huge project and burning out the team. **Adopt this.**
+- **Multi-year / lifetime = consecutive ANNUAL capacity blocks, not a lump sum.**
+  Lifetime clause (counsel to finalize): *"Lifetime membership grants a
+  non-transferable right to access up to X hours of service per calendar year.
+  Unused annual allocations do not accumulate, have no cash redemption value, and
+  expire fully at the end of each contract year."* Keeps lifetime liability at
+  ~one year, always.
+
+**Reconciliation note — auto-renewal disclosure does NOT apply to us.** The source
+research assumes auto-renewal (15–30-day ARL renewal notices). Furlong does **not**
+auto-renew (§9): nothing recurring is charged, renewal is a fresh manual purchase.
+Our 90/30-day emails are courtesy nudges + the 35% loyalty offer, not ARL-mandated
+disclosures. Do not let the capacity model reintroduce auto-billing.
+
+## 13. Advisory vs. Transactional scope split — the liability moat (2026-07-19)
+
+The included hours cover **advisory time only**. **Transactional execution is
+always excluded** and billed separately (member gets a preferred rate). Contracts
+must state this line explicitly — it's what protects the licenses and the labor.
+
+| Discipline | Advisory — INCLUDED in Guild hours | Transactional — EXCLUDED (billed separately) |
+|---|---|---|
+| **Environmental (Caitlin, PE)** | compliance Q&A, EPA/state reg-update reviews, high-level desktop audits | Phase I/II ESAs, fieldwork, sampling, lab fees → member **discount** (e.g. 15%) on orders via the existing env order flow |
+| **Mortgage (Stuart)** | annual mortgage review, HELOC/equity optimization, credit-health check | actual origination / underwriting / loan processing |
+
+**MORTGAGE RECONCILIATION (critical — do not skip).** The source research says the
+mortgage transactional bucket = "standard origination fees." That collides with the
+constitutional rule *"Furlong is free for borrowers — no fees, ever"* ([[membership-tiers-shelved]] layer 1;
+[[licensed-module-fee-and-kyc-model]]). Correct mapping for Furlong:
+- Advisory hours (reviews, optimization, credit-health) → Guild subscription. ✅
+- Transactional loan execution → **lender-paid compensation** (founder-clarified
+  2026-07-19): the borrower's origination cost is billed by the **lender**, the
+  lender pays Stuart, and **neither Stuart nor Furlong bills the borrower directly**.
+  So the transactional bucket never touches a Furlong invoice *or* a Stuart-to-
+  borrower invoice — it's the lender's charge. This is the cleanest possible fit
+  with the loans-free rule: the platform touches none of it.
+- This seam (anything that looks like charging around a loan) is a **RESPA** item →
+  **Stuart's pre-launch compliance review (#34)** confirms the lender-paid-comp
+  mechanics per his licensing.
+
+Environmental has no such collision — transactional env work is legitimately a
+paid order today; the Guild just adds an advisory layer + member discount on top.
+
+**Launch sequencing (recommendation, founders' call):** if one paid advisory
+retainer goes first, **environmental leads** — it has the cleaner compliance seam
+(no loans-free/RESPA adjacency), Caitlin controls it directly as the PE, and the
+order flow + real fee schedule already exist. The mortgage advisory retainer should
+follow Stuart's RESPA/Reg-Z review (#34). Either way, NEITHER goes live (paid) until
+the founders + counsel session + treasury spine — Labor Day ships the informational
+Guild page + test-mode intake only.
+
+## 14. Controlling Master Volume doctrine — subscription money is HELD SEPARATE
+
+The Master Volumes already govern where subscription money goes, and they are MORE
+conservative than the outside research. This section is authority, not proposal.
+
+**REG-TREASURY-001** (Vol II, Batch 27 — *Treasury, Capital Allocation & Reserve
+Governance*). Core Rule: no capital may be "received, allocated, transferred,
+distributed, reserved, or spent outside governed treasury controls." Binding
+required controls that apply to Guild subscription revenue:
+1. **Treasury Account Registry** of all bank/payment/**reserve/restricted/escrow**
+   accounts + custody locations — restricted/escrow funds are first-class + tracked
+   separately.
+4. **Revenue waterfall** (taxes → costs → **restricted obligations** → reserves →
+   compensation → reinvestment → distributions).
+5. **Operating + a *separate* emergency reserve** with defined targets.
+6. **Separation of powers** — no single actor controls approval, execution,
+   reconciliation, and attestation.
+
+**CANON-TREASURY-001** (Vol V §3 — Reserve Architecture): six governed reserve
+types, including **Dispute Reserve — "funds held pending resolution of contested
+treasury events"** (the refund/dispute holdback). Each reserve has a floor;
+breaching it needs a `TreasuryApproval`. Subscription income enters as a classified
+`RevenueEvent` and flows the waterfall — it is **not** swept into operating cash.
+
+**Consequences for the Guild build:**
+- Subscription money is **held separate** for refund + legal safety (Dispute /
+  restricted reserve + Treasury Account Registry) — supersedes §10's operating-
+  capital shortcut. Founder-confirmed 2026-07-19.
+- The availability-retainer framing (§10/§12) still applies for recognition, but
+  does **not** exempt Furlong from segregating refund-exposed funds.
+- **This IS the treasury spine.** REG-TREASURY-001 is DESIGNED-not-built; the reserve
+  types, registry, waterfall, and separation-of-powers must exist before any live
+  subscription charge. Confirms the sequence: modules launch test-mode; live Guild
+  billing waits on the treasury-spine build + counsel (post-launch).
+- Vol II also **"prohibits kickbacks, unearned fees, and referral fees in any
+  settlement service arrangement"** (RESPA §8) — independent confirmation of the
+  mortgage reconciliation (§13): transactional loan work can't be a Furlong fee.

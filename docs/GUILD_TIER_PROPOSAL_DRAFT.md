@@ -292,3 +292,48 @@ breaching it needs a `TreasuryApproval`. Subscription income enters as a classif
 - Vol II also **"prohibits kickbacks, unearned fees, and referral fees in any
   settlement service arrangement"** (RESPA §8) — independent confirmation of the
   mortgage reconciliation (§13): transactional loan work can't be a Furlong fee.
+
+## 15. Inflation & cost-escalation protection — 5-year / lifetime tiers (2026-07-19)
+
+A fixed lifetime price with fixed hours forever LOSES money as fuel, Stuart's
+compliance costs, and base billable worth rise. 5-yr/lifetime tiers MUST carry an
+escalation mechanism. Adopted (corrected to fit prior decisions + doctrine):
+
+**A. Hours step-down — NOT a dollar burn-rate.** The annual capacity block shrinks
+on a published schedule, expressed in HOURS (illustrative):
+- Years 1–5: 15 hrs/yr → Years 6–10: 12 hrs/yr → Years 11+: 10 hrs/yr.
+- **Rejected: the "$X time-credit that buys fewer hours" (CPI burn-rate) variant** —
+  it reintroduces the CREDIT model the founder rejected 2026-07-19 (§7). Keep it in
+  hours. (If founders ever want true CPI indexing, index the hour schedule via a
+  stated formula, still expressed to the member as hours.)
+- Fits §12's "consecutive annual capacity blocks" — each block's size just steps
+  down on schedule; encoded in the versioned TreasuryPolicy (CANON-VER-001).
+
+**B. Pass-through surcharges for HARD costs — disclosed at intake, billed per-incident
+(NOT a silent card-on-file auto-charge).** Included hours cover intellectual labor
+only; hard/fluctuating costs pass through separately:
+- Site visits / field travel → mileage + fuel surcharge (e.g. IRS standard rate +
+  offset); third-party software pulls, credit reports, external regulatory/state
+  filing fees → billed **at cost**.
+- **CORRECTION vs. source research:** the research bills these "automatically to the
+  card on file." That reintroduces the auto-billing the founder eliminated (§9) AND
+  violates Vol II §9.1 ("fee disclosure at intake; no post-hoc fee assessment").
+  Instead: **disclose the full pass-through schedule at intake**, and bill each as a
+  **discrete, itemized, member-authorized charge** tied to a specific service event
+  (member knows a site visit carries the surcharge before it happens). Each = its
+  own governed `RevenueEvent`.
+- Bonus: keeping hard costs OUT of the hours strengthens the availability-retainer
+  framing (§10) — the retainer stays pure intellectual labor = cleaner earned-upon-
+  receipt argument.
+
+**C. Regulatory Force Majeure → "Specialized Execution" (extends §13).** If a new
+local/state/federal compliance framework fundamentally raises the baseline labor for
+a standard advisory workflow, the affected workflow reclassifies OUT of the annual
+allotment into transactional "Specialized Execution," billable at the professional's
+current specialized rate, subject to the standard member discount. Applies to both
+env (new EPA/state rule) and mortgage (new lending reg). Put in the 5-yr/lifetime
+terms.
+
+**Prices stay gated.** The source research's "$35,000 lifetime" is illustrative
+STRUCTURE only — actual upfront price, hour counts, step-down schedule, surcharge
+rates, and discount % are founders + counsel ([[membership-tiers-shelved]]).

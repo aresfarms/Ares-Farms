@@ -6,6 +6,7 @@ import { CommunityCta } from "@/components/public/CommunityCta";
 import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { CommercialLaneSections } from "@/components/public/CommercialLaneSections";
+import { EnvironmentalLaneSections } from "@/components/public/EnvironmentalLaneSections";
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
 import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
@@ -280,6 +281,33 @@ export default async function ExplorePage({
           @media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }
         `}</style>
       </>
+    );
+  }
+
+  // ── Content-module lanes (real modules, no property inventory) ─────────────
+  // Light page: header + the module's own sections + the Guild cue. Environmental
+  // is live; Financing joins here when its module is built (founder direction
+  // 2026-07-18). Emerald accent for environmental.
+  if (selected && selected.slug === "environmental-compliance") {
+    return (
+      <main>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "28px 20px 48px", display: "grid", gap: 24 }}>
+          <header style={{ display: "grid", gap: 8 }}>
+            <Link href="/explore" style={{ fontSize: 13, fontWeight: 700, color: accentForLane(selected.slug, "light"), textDecoration: "none", width: "fit-content" }}>
+              ← Back to the compass
+            </Link>
+            <h1 style={{ margin: 0, fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.15, color: "#101a2b" }}>
+              {selected.label}
+            </h1>
+            <p style={{ margin: 0, fontSize: 16, color: "#4d596d", lineHeight: 1.6, maxWidth: 640 }}>
+              What the ground can tell you before you commit — no account, no personal data, no footprints.
+            </p>
+          </header>
+          <EnvironmentalLaneSections />
+          <CommunityCta />
+          <Disclosures variant="full" />
+        </div>
+      </main>
     );
   }
 

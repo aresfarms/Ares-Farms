@@ -34,6 +34,8 @@ const SCANNED_FILES = [
   "src/lib/property/residentialRatesCurated.ts",
   "src/lib/property/commercialLaneCurated.ts",
   "src/components/public/CommercialLaneSections.tsx",
+  "src/lib/property/environmentalLaneCurated.ts",
+  "src/components/public/EnvironmentalLaneSections.tsx",
   "src/components/public/CapitalRatesBlock.tsx",
   "src/lib/property/capitalRatesCurated.ts",
   "src/lib/property/similarNearbyProperties.ts",

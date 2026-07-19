@@ -77,7 +77,7 @@ export function FinancingFeeChart() {
                   {line.fee}
                 </td>
                 <td style={{ ...cellBase, whiteSpace: "nowrap", color: PURPLE, fontWeight: 700 }}>
-                  Included / credited
+                  {line.guild}
                 </td>
               </tr>
             ))}

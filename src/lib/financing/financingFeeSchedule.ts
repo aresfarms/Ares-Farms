@@ -31,6 +31,8 @@ export interface FinFeeLine {
   detail: string;
   fee: string;
   feeConfirmed: boolean;
+  /** How this line is handled for Guild members. */
+  guild: string;
 }
 
 export const FINANCING_FEE_LINES: FinFeeLine[] = [
@@ -39,18 +41,21 @@ export const FINANCING_FEE_LINES: FinFeeLine[] = [
     detail: "Strategic planning, credit-repair guidance, or complex financial structuring — for when you just want advice, not to apply yet.",
     fee: `$${FINANCING_ADVISORY_HOURLY_USD}/hr`,
     feeConfirmed: true,
+    guild: "Included / credited",
   },
   {
     service: "Engagement retainer",
     detail: "A flat fee to evaluate tax returns, assess debt-to-income, and map a long-term borrowing strategy. Credited back to you if a loan closes.",
     fee: "$500 – $2,500",
     feeConfirmed: true,
+    guild: "Free — every tier",
   },
   {
     service: "Flat advisory fee",
     detail: "Shopping the market, negotiating with multiple wholesale lenders, and reviewing tailored loan offers on your behalf.",
     fee: "$500 – $2,000",
     feeConfirmed: true,
+    guild: "Included / credited",
   },
 ];
 

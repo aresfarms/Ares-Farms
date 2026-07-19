@@ -69,7 +69,7 @@ export function FinancingLaneSections() {
     <div style={{ display: "grid", gap: 20 }}>
       <section aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
-          Bring the deal — we route it to a licensed lender
+          Our dedicated licensed lender
         </span>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6, maxWidth: 720 }}>
           The capital side of every property decision. Learn how the programs

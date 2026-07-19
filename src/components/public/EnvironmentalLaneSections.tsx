@@ -12,6 +12,7 @@ import Link from "next/link";
 import { ENVIRONMENTAL_BRIEFS, ENVIRONMENTAL_NOTE, type EnvBrief } from "@/lib/property/environmentalLaneCurated";
 import { accentForLane } from "@/lib/property/laneThemes";
 import { EnvironmentalOrderPanel } from "@/components/public/EnvironmentalOrderPanel";
+import { EnvironmentalFeeChart } from "@/components/public/EnvironmentalFeeChart";
 
 const EMERALD = accentForLane("environmental-compliance", "light"); // #127a4f
 
@@ -88,6 +89,8 @@ export function EnvironmentalLaneSections() {
         </div>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{ENVIRONMENTAL_NOTE}</span>
       </section>
+
+      <EnvironmentalFeeChart />
 
       <EnvironmentalOrderPanel />
 

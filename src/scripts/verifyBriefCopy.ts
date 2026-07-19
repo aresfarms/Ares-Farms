@@ -37,6 +37,8 @@ const SCANNED_FILES = [
   "src/lib/property/environmentalLaneCurated.ts",
   "src/components/public/EnvironmentalLaneSections.tsx",
   "src/components/public/EnvironmentalOrderPanel.tsx",
+  "src/components/public/EnvironmentalFeeChart.tsx",
+  "src/lib/property/environmentalFeeSchedule.ts",
   "src/lib/environmental/orderRuntime.ts",
   "src/components/public/FinancingLaneSections.tsx",
   "src/components/public/FinancingIntakePanel.tsx",

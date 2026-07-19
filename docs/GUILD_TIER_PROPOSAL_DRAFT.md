@@ -382,3 +382,39 @@ grandfather-into-legacy-tier / paid sunset-with-grace-period+discount / buyout-
 allocation-at-cost. Our job now is only to make all three CLEAN via tag + cap + fund.
 This whole section is counsel-drafted TOS — structure decided here, wording + any
 price/refund figures stay founders + counsel.
+
+## 17. Top luxury / institutional tier — the Veblen anchor (2026-07-19)
+
+A deliberately high top tier ("Legacy Founder" / corporate advisory shield) aimed at
+UHNW / institutional buyers. Two functions: (1) **price anchor** — it frames the 2-yr
+and 5-yr tiers as reasonable; (2) **real capital injection** from the rare buyer.
+
+**Adopt:**
+- **Anchor role** — legitimate BECAUSE the tier is genuinely deliverable, not a decoy
+  we won't honor (deliverability is a constitutional-honesty requirement).
+- **Corporate transferable asset** — tie the top tier to the buyer's ENTITY;
+  transfers with the business on sale. This is the §16 assignment clause aimed at the
+  realistic buyer: the institutional dev/real-estate firm writing it off as CapEx.
+- **Genuine capacity scarcity (NOT "artificial").** The 5–10 slot cap is real — two
+  professionals' finite hours + velocity caps physically bound it (§16 natural cap).
+  Honest scarcity > manufactured scarcity, and it reads as more prestigious.
+- **Managed concierge channel** — a dedicated priority line, but ROUTED THROUGH A
+  MANAGED CHANNEL, never a principal's personal cell/WhatsApp (founder safety posture:
+  no personal exposure — anti-swatting, minor children). Same proximity feel, safe.
+
+**Three corrections vs. the source research (it fights prior decisions):**
+- **"Non-refundable capital" → NO.** Top-tier money is still held separate + governed
+  (Dispute/Continuity reserve, §14) with the fair reserve-funded buyout/refund floor
+  (§16). A real capital injection, but governed + reserved — never "keep it all."
+- **"Zero additional cost forever" → partial.** A luxury tier MAY lock the
+  professional's HOURLY RATE on the CAPPED hours as its premium perk — but ONLY if
+  priced to fund ~20 yrs of rate inflation on those bounded hours, AND **hard pass-
+  throughs still pass through at cost (§15B) at any price.** Honest promise: "your
+  advisory RATE is locked for life; third-party hard costs billed at cost" — NOT
+  "zero cost." Do not promise absorption of costs you don't control (fuel, filings).
+- **Concierge line → managed channel, not personal cell** (safety, above).
+
+**Prices + slot count stay gated.** The research's "$50k–$100k / 5–10 slots" and the
+"price it until it's uncomfortable" philosophy are founders + counsel calls
+([[membership-tiers-shelved]]). If nobody buys it, it still earns its keep by driving
+clients into the 2-yr / 5-yr packages (anchor value).

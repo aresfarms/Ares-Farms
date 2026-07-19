@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
       ok: true,
       propertyId,
       placeFacts: imported.placeFacts,
-      verifiedPrograms: imported.verifiedPrograms,
+      verifiedPrograms: verifyPropertyPrograms(imported.placeFactsForPrograms),
       placeIntelligence,
       verification: {
         status: imported.status,

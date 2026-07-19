@@ -1,4 +1,3 @@
-import { verifyPropertyPrograms, type VerifiedPlaceFacts } from "@/lib/capital-graph/programVerification";
 import { isOwnershipProbe, isSteeringProbe } from "@/lib/navigator/propertyPrivacyDoctrine";
 import { isPlaceFactLiveFetchActivatedRuntime } from "@/lib/place-facts/placeFactActivationStore";
 import { lookupOpportunityZone } from "@/lib/scrapers/adapters/opportunity-zones";
@@ -11,6 +10,32 @@ import { queryFloodZone, queryNationalRegister } from "@/lib/scrapers/adapters/f
 import { lookupHubzone } from "@/lib/scrapers/adapters/hubzone";
 import { lookupNmtcQualifiedTract } from "@/lib/scrapers/adapters/nmtc";
 import { governedFetch } from "@/lib/security/outboundRequestPolicy";
+
+/**
+ * Place-facts handed to the financing program matcher. Declared LOCALLY
+ * (structurally identical to capital-graph's VerifiedPlaceFacts) so this
+ * source-intelligence file holds no financing-intelligence import — the CORE
+ * routes run verifyPropertyPrograms on this. (verify:module-separability)
+ */
+export interface ImportedPlaceFacts {
+  propertyId?: string | null;
+  ozTractId?: string | null;
+  ozAsOf?: string | null;
+  nmtcTractId?: string | null;
+  nmtcAsOf?: string | null;
+  hubzone?: {
+    hubzoneType: string;
+    geoid: string;
+    effective: string;
+    expiration: string | null;
+    isCurrent: boolean;
+  } | null;
+  hubzoneAsOf?: string | null;
+  historic?: {
+    historicName: string | null;
+  } | null;
+  historicAsOf?: string | null;
+}
 
 export type ImportedVerificationRequest = {
   propertyId?: string | null;
@@ -46,7 +71,12 @@ export type ImportedVerificationResult = {
     flood?: { floodZone: string; asOf: string } | null;
     historic?: { historicName: string | null; asOf: string } | null;
   };
-  verifiedPrograms: ReturnType<typeof verifyPropertyPrograms>;
+  /**
+   * The place-facts to run through the financing program matcher. The CORE
+   * route calls verifyPropertyPrograms(placeFactsForPrograms) — this file no
+   * longer imports the financing unit.
+   */
+  placeFactsForPrograms: ImportedPlaceFacts;
   /**
    * Census geocode of the typed address, when it resolved. Exposed so the
    * public property-facts route can build the same Place Brief (tenure, food
@@ -270,7 +300,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       restrictions,
       warnings,
       placeFacts: {},
-      verifiedPrograms: [],
+      placeFactsForPrograms: {},
       geocode: null,
       liveChecks: {
         opportunityZoneActivated: ozActivated,
@@ -321,7 +351,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
         ...warnings,
       ],
       placeFacts: {},
-      verifiedPrograms: [],
+      placeFactsForPrograms: {},
       geocode: toGeocodeOut(freeformGeocode),
       liveChecks: {
         opportunityZoneActivated: ozActivated,
@@ -340,7 +370,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
     };
   }
 
-  const facts: VerifiedPlaceFacts = {
+  const facts: ImportedPlaceFacts = {
     propertyId: input.propertyId ?? null,
   };
   const placeFacts: ImportedVerificationResult["placeFacts"] = {};
@@ -494,7 +524,6 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
     lookupOutcomes.historic = "gated";
   }
 
-  const verifiedPrograms = verifyPropertyPrograms(facts);
   const anyLiveFact = Boolean(placeFacts.opportunityZone || placeFacts.nmtc || placeFacts.hubzone || placeFacts.flood || placeFacts.historic);
   const anyGateOpen = ozActivated || nmtcActivated || hubzoneActivated || floodActivated || historicActivated;
 
@@ -511,7 +540,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
     restrictions,
     warnings,
     placeFacts,
-    verifiedPrograms,
+    placeFactsForPrograms: facts,
     geocode: toGeocodeOut(geocode ?? freeformGeocode),
     liveChecks: {
       opportunityZoneActivated: ozActivated,

@@ -67,6 +67,7 @@ export function EnvironmentalOrderPanel() {
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [contactAddress, setContactAddress] = useState("");
   const [propertyDescriptor, setPropertyDescriptor] = useState("");
   const [state, setState] = useState("");
   const [county, setCounty] = useState("");
@@ -82,6 +83,7 @@ export function EnvironmentalOrderPanel() {
       contactName,
       contactEmail,
       contactPhone,
+      contactAddress,
       propertyDescriptor,
       location: { state, county },
       scopeSummary,
@@ -94,6 +96,7 @@ export function EnvironmentalOrderPanel() {
       contactName,
       contactEmail,
       contactPhone,
+      contactAddress,
       propertyDescriptor,
       state,
       county,
@@ -171,6 +174,9 @@ export function EnvironmentalOrderPanel() {
           You&apos;ll receive a written quote to approve before any work or
           charge. Nothing is billed without your acknowledgement.
         </span>
+        <a href="/status" style={{ fontSize: 12.5, fontWeight: 700, color: EMERALD, textDecoration: "none" }}>
+          Check your status anytime with this reference →
+        </a>
       </section>
     );
   }
@@ -250,6 +256,11 @@ export function EnvironmentalOrderPanel() {
           <label style={label} htmlFor="env-phone">Phone (optional)</label>
           <input id="env-phone" style={field} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
         </div>
+      </div>
+
+      <div>
+        <label style={label} htmlFor="env-address">Your mailing address</label>
+        <input id="env-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} />
       </div>
 
       <div>

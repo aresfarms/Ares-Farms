@@ -341,6 +341,7 @@ export async function POST(req: NextRequest) {
       humanReviewRequired: true,
       metadata: {
         route: "/api/environmental/order",
+        contactAddress: body.contactAddress ?? null,
         timeline: body.timeline ?? null,
         readinessPercent: orderResult.readiness.readinessPercent,
       },

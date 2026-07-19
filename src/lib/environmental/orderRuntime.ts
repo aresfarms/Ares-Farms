@@ -82,6 +82,7 @@ export interface EnvironmentalOrderInput {
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;
+  contactAddress?: string | null;
   propertyDescriptor?: string | null;
   location?: {
     state?: string | null;

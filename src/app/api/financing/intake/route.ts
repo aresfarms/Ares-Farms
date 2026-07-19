@@ -344,6 +344,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         route: "/api/financing/intake",
         purpose: intakeResult.purpose?.code ?? null,
+        contactAddress: body.contactAddress ?? null,
         timeline: body.timeline ?? null,
         readinessPercent: intakeResult.readiness.readinessPercent,
       },

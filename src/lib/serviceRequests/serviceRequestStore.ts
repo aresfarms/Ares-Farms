@@ -108,6 +108,50 @@ export async function persistServiceRequest(
   return row;
 }
 
+export type ServiceRequestStatusView = {
+  found: boolean;
+  serviceRequestId?: string;
+  requestType?: ServiceRequestType;
+  routedTo?: string;
+  status?: string;
+  submittedAt?: string | null;
+};
+
+/**
+ * Customer-facing status lookup. Requires BOTH the reference id AND the email
+ * used on the request (case-insensitive) — a reference id alone reveals
+ * nothing. Returns status only; never contact PII, property, or scope. This is
+ * the minimum-disclosure read behind the customer status portal.
+ */
+export async function getServiceRequestStatus(
+  serviceRequestId: string,
+  email: string
+): Promise<ServiceRequestStatusView> {
+  const ref = serviceRequestId.trim();
+  const mail = email.trim().toLowerCase();
+  if (!ref || !mail) return { found: false };
+
+  const rows = await db
+    .select()
+    .from(serviceRequests)
+    .where(eq(serviceRequests.serviceRequestId, ref))
+    .limit(1);
+
+  const row = rows[0];
+  if (!row || (row.contactEmail ?? "").trim().toLowerCase() !== mail) {
+    return { found: false };
+  }
+
+  return {
+    found: true,
+    serviceRequestId: row.serviceRequestId,
+    requestType: row.requestType as ServiceRequestType,
+    routedTo: row.routedTo,
+    status: row.status,
+    submittedAt: row.occurredAt ? row.occurredAt.toISOString() : null,
+  };
+}
+
 export type ListServiceRequestsInput = {
   requestType?: ServiceRequestType | null;
   routedTo?: string | null;

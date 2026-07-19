@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { FinancingIntakePanel } from "@/components/public/FinancingIntakePanel";
 import { accentForLane } from "@/lib/property/laneThemes";
+import { activePartners } from "@/lib/modules/licensedModuleRegistry";
 
 /**
  * FinancingLaneSections — the Financial & Capital module's sections. The
@@ -80,6 +81,20 @@ export function FinancingLaneSections() {
             <div key={b.title} style={card}>
               <strong style={{ fontSize: 14.5, color: "#101a2b", lineHeight: 1.25 }}>{b.title}</strong>
               <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.55 }}>{b.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section aria-label="Who reviews your deal" style={{ display: "grid", gap: 8 }}>
+        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
+          Who reviews your deal
+        </span>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {activePartners("financing-capital").map((p) => (
+            <div key={p.slug} style={card}>
+              <strong style={{ fontSize: 14, color: "#101a2b" }}>{p.name}</strong>
+              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{p.blurb}</span>
             </div>
           ))}
         </div>

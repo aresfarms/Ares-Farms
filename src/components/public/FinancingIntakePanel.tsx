@@ -71,6 +71,7 @@ export function FinancingIntakePanel() {
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [contactAddress, setContactAddress] = useState("");
   const [propertyDescriptor, setPropertyDescriptor] = useState("");
   const [state, setState] = useState("");
   const [county, setCounty] = useState("");
@@ -88,6 +89,7 @@ export function FinancingIntakePanel() {
       contactName,
       contactEmail,
       contactPhone,
+      contactAddress,
       propertyDescriptor,
       location: { state, county },
       estimatedProjectCost: estimatedProjectCost
@@ -104,6 +106,7 @@ export function FinancingIntakePanel() {
       contactName,
       contactEmail,
       contactPhone,
+      contactAddress,
       propertyDescriptor,
       state,
       county,
@@ -183,6 +186,9 @@ export function FinancingIntakePanel() {
           licensed lender makes that call, and nothing is committed until you and
           the lender agree.
         </span>
+        <a href="/status" style={{ fontSize: 12.5, fontWeight: 700, color: PURPLE, textDecoration: "none" }}>
+          Check your status anytime with this reference →
+        </a>
       </section>
     );
   }
@@ -257,6 +263,11 @@ export function FinancingIntakePanel() {
           <label style={label} htmlFor="fin-phone">Phone (optional)</label>
           <input id="fin-phone" style={field} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
         </div>
+      </div>
+
+      <div>
+        <label style={label} htmlFor="fin-address">Your mailing address</label>
+        <input id="fin-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} />
       </div>
 
       <div>

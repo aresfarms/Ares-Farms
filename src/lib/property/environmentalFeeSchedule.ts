@@ -34,8 +34,8 @@ export interface EnvFeeLine {
 export const ENVIRONMENTAL_FEE_LINES: EnvFeeLine[] = [
   {
     service: "Phase I Environmental Site Assessment (ESA)",
-    detail: "ASTM E1527 records + history + site-walk review (no sampling). The baseline due-diligence report standard for real estate transactions.",
-    fee: "$1,900 – $4,500",
+    detail: "ASTM E1527 records + history + site-walk review (no sampling) — the baseline due-diligence report for a real estate transaction. A straightforward property is usually $1,900; it rises to about $3,000–$4,500+ only if something turns up and it takes more digging to sort out what you'd need to do next.",
+    fee: "Usually $1,900",
     feeConfirmed: true,
   },
   {

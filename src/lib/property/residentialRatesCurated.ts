@@ -56,20 +56,12 @@ export const RESIDENTIAL_LOAN_OPTIONS: ResidentialLoanOption[] = [
     whoFor: "Veterans, active service members, and eligible spouses.",
   },
   {
-    name: "USDA 502 Guaranteed",
-    rateKind: "near",
-    downPayment: "0%",
-    mortgageInsurance: "Upfront + annual guarantee fee (lower than FHA MIP)",
-    whoFor: "Moderate-income buyers in rural-eligible areas, through a regular lender.",
-    note: "One hard boundary: USDA-RD is for a RURAL HOME — it will not finance a working farm or income-producing acreage (that lives in the FSA/Farm Credit lanes).",
-  },
-  {
     name: "USDA 502 Direct (low-income)",
     rateKind: "usdaDirect",
     downPayment: "0%",
     mortgageInsurance: "None — the loan is made directly by USDA",
     whoFor: "Low- and very-low-income buyers in rural areas who can't get a conventional loan.",
-    note: "The 'direct' version: USDA lends to you itself, and payment assistance can lower the effective rate for as long as you qualify — for a modest, safe rural home within the program's income and size limits.",
+    note: "USDA lends to you directly, and payment assistance can lower the effective rate for as long as you qualify — for a modest, safe rural home within the program's income and size limits. (USDA's farm and rural-business financing lives on the Farm and Commercial lanes.)",
   },
   {
     name: "Adjustable-rate (ARM)",

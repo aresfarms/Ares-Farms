@@ -345,6 +345,29 @@ variable "tester_feedback_email" {
   default     = ""
 }
 
+# ---- Response notifications (email) -----------------------------------------
+# Recipients + sender for the "a human needs to respond" notifier. Non-secret;
+# the SendGrid API key is added separately as a secret when notifications go
+# live (see docs). Until EMAIL_FROM + SENDGRID_API_KEY are both present, the
+# notifier records attempts but sends nothing.
+variable "notify_pe_email" {
+  description = "Recipient for new environmental orders (the licensed PE)."
+  type        = string
+  default     = "chudson@aresfarmsinc.com"
+}
+
+variable "notify_lender_email" {
+  description = "Recipient for new financing deals (the licensed lender)."
+  type        = string
+  default     = "stuart@aresfarmsinc.com"
+}
+
+variable "email_from" {
+  description = "Verified sender address for outbound notifications. Empty = notifications stay off (recorded, not sent)."
+  type        = string
+  default     = ""
+}
+
 # ---- Labels -----------------------------------------------------------------
 
 variable "labels" {

@@ -129,6 +129,25 @@ resource "google_cloud_run_v2_service" "core" {
         value = var.api_auth_enforcement
       }
 
+      # ---- Response notifications ------------------------------------------
+      # Recipients are always set; sending stays OFF until EMAIL_FROM +
+      # SENDGRID_API_KEY (secret) are both present.
+      env {
+        name  = "NOTIFY_PE_EMAIL"
+        value = var.notify_pe_email
+      }
+      env {
+        name  = "NOTIFY_LENDER_EMAIL"
+        value = var.notify_lender_email
+      }
+      dynamic "env" {
+        for_each = var.email_from == "" ? [] : [var.email_from]
+        content {
+          name  = "EMAIL_FROM"
+          value = env.value
+        }
+      }
+
       env {
         name  = "AMENITY_LIVE_LOOKUP_ENABLED"
         value = var.amenity_live_lookup_enabled ? "true" : "false"

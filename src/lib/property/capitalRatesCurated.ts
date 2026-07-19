@@ -12,6 +12,7 @@
 
 import { CAPITAL_RATES, CAPITAL_RATES_PROVENANCE } from "@/lib/property/capitalRatesGenerated";
 import { FSA_RATES, FSA_RATES_PROVENANCE } from "@/lib/property/fsaRatesGenerated";
+import { readCapitalRatesLive } from "@/lib/property/capitalRatesLive";
 
 export interface CapitalRateLine {
   program: string;
@@ -28,12 +29,22 @@ export interface CapitalRatesView {
 }
 
 export function buildCapitalRates(): CapitalRatesView {
-  const prime = CAPITAL_RATES.prime;
+  // Prefer the auto-refreshed overlay (scheduled FRED pull); fall back to the
+  // committed snapshot. Never fabricated — a missing value is simply omitted.
+  const live = readCapitalRatesLive();
+  const prime = live?.prime ?? CAPITAL_RATES.prime;
   const deb = CAPITAL_RATES.sba504Debenture;
+  const treasury5yr = live?.treasury5yr ?? null;
+  const sofr = live?.sofr ?? null;
 
   const sba7aBasis = prime != null
     ? `Prime ${prime}% + a lender-negotiated spread (SBA-capped); usually variable.`
     : "Prime + a lender-negotiated spread (SBA-capped); usually variable.";
+
+  const conventionalBasis =
+    treasury5yr != null || sofr != null
+      ? `Bank-set — often the 5-yr Treasury${treasury5yr != null ? ` (${treasury5yr}%)` : ""} or SOFR${sofr != null ? ` (${sofr}%)` : ""} + a spread; frequently a balloon.`
+      : "Bank-set — often the 5-yr Treasury or SOFR + a spread; frequently a balloon.";
 
   const lines: CapitalRateLine[] = [
     { program: "SBA 7(a)", basis: sba7aBasis, current: prime != null ? `Prime ${prime}%` : undefined },
@@ -44,11 +55,11 @@ export function buildCapitalRates(): CapitalRatesView {
     },
     { program: "USDA Business & Industry (B&I)", basis: "Lender-negotiated, backed by a USDA guarantee." },
     { program: "USDA / FSA program", basis: "Published program rate.", current: `FSA Farm Ownership ${FSA_RATES.ownershipDirect}%` },
-    { program: "Conventional", basis: "Bank-set — often the 5-yr Treasury or SOFR + a spread; frequently a balloon." },
+    { program: "Conventional", basis: conventionalBasis },
   ];
 
-  // Prefer the freshest stamp we actually have.
-  const asOf = CAPITAL_RATES_PROVENANCE.asOf ?? FSA_RATES_PROVENANCE.effective ?? "current";
+  // Prefer the freshest stamp we actually have (live overlay > committed).
+  const asOf = live?.asOf ?? CAPITAL_RATES_PROVENANCE.asOf ?? FSA_RATES_PROVENANCE.effective ?? "current";
 
   return {
     asOf,

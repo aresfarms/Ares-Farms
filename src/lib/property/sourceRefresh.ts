@@ -224,5 +224,26 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     /* place-fact refresh is best-effort; property refresh results stand */
   }
 
+  // Market capital-rate refresh: pull keyless FRED (prime / 5-yr Treasury /
+  // SOFR) into the runtime-state overlay so the displayed rates track the
+  // Fed/market. Best-effort — a failure keeps the committed snapshot live.
+  try {
+    const { refreshCapitalRates } = await import("./capitalRatesRefresh");
+    const rate = await refreshCapitalRates();
+    appendAuditEvent({
+      actorId: "system:source-refresh",
+      actorName: "source-refresh-job",
+      domain: DOMAIN,
+      subject: "capital-rates",
+      decision: rate.status === "FAILED" ? "ALERT" : "REFRESH",
+      reason:
+        rate.status === "FAILED"
+          ? "capital-rate refresh failed — committed snapshot kept live"
+          : `capital rates ${rate.status.toLowerCase()} (prime ${rate.prime ?? "—"}, 5yr ${rate.treasury5yr ?? "—"}, SOFR ${rate.sofr ?? "—"}) as of ${rate.asOf}`,
+    });
+  } catch {
+    /* capital-rate refresh is best-effort; committed snapshot stands */
+  }
+
   return results;
 }

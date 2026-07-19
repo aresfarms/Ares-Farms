@@ -8,7 +8,6 @@ import {
   EnvironmentalIntakeResult,
   evaluateEnvironmentalIntake,
 } from "@/lib/environmental/intakeRuntime";
-import { chartSurface } from "@/lib/property/chartThemes";
 
 /**
  * Borrower Environmental Intake Page
@@ -52,7 +51,44 @@ type ApiResponse = {
   };
 };
 
-const surface = chartSurface("environmental");
+// Self-contained surveyor-green surface. Previously chartSurface("environmental")
+// from the source-intelligence unit; inlined here so this borrower-experience
+// page holds no cross-unit import (verify:module-separability). Values resolved
+// from the environmental CHART_THEME.
+const ENV = {
+  stage: "linear-gradient(180deg, #0e2620, #0a1e18 60%, #07160f)",
+  plate: "linear-gradient(160deg, #163d30, #103023)",
+  plateBorder: "#2f6b52",
+  accent: "#8fd0a2",
+  cellBg: "rgba(9, 30, 22, 0.8)",
+  cellBorder: "#255040",
+  ink: "#ecf5ef",
+  inkSoft: "#b3d0bd",
+} as const;
+
+const surface = {
+  theme: { ink: ENV.ink, inkSoft: ENV.inkSoft },
+  container: { maxWidth: 1180, margin: "0 auto", padding: "28px 24px 48px", display: "grid", gap: 18, background: ENV.stage, borderRadius: 20, color: ENV.ink },
+  panel: { background: ENV.plate, border: `1px solid ${ENV.plateBorder}`, borderRadius: 12 },
+  cell: { background: ENV.cellBg, border: `1px solid ${ENV.cellBorder}`, borderRadius: 10 },
+  kicker: { fontSize: 11, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: ENV.accent },
+  muted: { color: ENV.inkSoft, lineHeight: 1.6 },
+  label: { color: ENV.inkSoft, fontSize: 13, fontWeight: 800 },
+  input: { width: "100%", minHeight: 42, border: `1px solid ${ENV.plateBorder}`, borderRadius: 8, padding: "8px 10px", fontSize: 14, color: ENV.ink, background: ENV.cellBg },
+  link: { color: ENV.accent, fontWeight: 800, textDecoration: "none" },
+  primaryButton: { minHeight: 42, border: 0, borderRadius: 999, padding: "0 18px", background: "#0f766e", color: "#ffffff", fontWeight: 800 },
+  primaryButtonBusyBg: "#9a6730",
+  errorPanel: { border: "1px solid rgba(207, 138, 74, 0.55)", background: "rgba(201, 111, 82, 0.14)", color: "#f19c8e", borderRadius: 10, padding: 12, fontWeight: 700 },
+  meterTrack: "rgba(255, 255, 255, 0.12)",
+  meterGood: "#6fbf8f",
+  meterWarn: "#e2b34c",
+  badges: {
+    ready: { background: "rgba(111, 191, 143, 0.16)", color: "#6fbf8f" },
+    review: { background: "rgba(226, 179, 76, 0.16)", color: "#e2b34c" },
+    blocked: { background: "rgba(207, 138, 74, 0.18)", color: "#f19c8e" },
+    neutral: { background: "rgba(255, 255, 255, 0.08)", color: ENV.inkSoft },
+  },
+} as const;
 const theme = surface.theme;
 
 const shellStyle = {

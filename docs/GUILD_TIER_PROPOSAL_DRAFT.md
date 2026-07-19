@@ -337,3 +337,48 @@ terms.
 **Prices stay gated.** The source research's "$35,000 lifetime" is illustrative
 STRUCTURE only — actual upfront price, hour counts, step-down schedule, surcharge
 rates, and discount % are founders + counsel ([[membership-tiers-shelved]]).
+
+## 16. M&A / exit readiness — lifetime tier (2026-07-19)
+
+Unstructured lifetime members tank valuation (buyers see open-ended, unfunded
+liability). Build the exit rules in on day one; they can't be retrofitted.
+
+**The model already defuses most of the risk — SEE THIS FIRST.** The research treats
+lifetime as a liability bomb, but our architecture caps and funds it:
+- Use-it-or-lose-it annual hours (§12) → unfunded liability is ~ONE YEAR at a time,
+  never "a lifetime of hours."
+- Refund-segregated Dispute/Continuity reserves (§14) → that one year is already
+  funded + held separate.
+- Earned-upon-receipt availability retainer (§10) → each year's fee is recognized.
+- Result: diligence finds a **capped, funded, tagged** liability, not an open
+  obligation. The research's own golden rule ("tag them so a buyer sees capped hours
+  protect the bottom line") is how we're already built = an advantage at sale.
+
+**Natural capacity cap.** Lifetime capacity is bounded by two professionals' finite
+hours + the velocity caps (§12) — you physically can't oversell it. Formalize the
+research's "keep lifetime < 5–10% of users" as a policy cap; it's partly self-
+enforcing. Tag lifetime members in the entitlement/treasury records so the pool +
+its capped hours are legible to a future buyer.
+
+**TOS clauses for counsel (adopt the structure):**
+- **"Lifetime" = operational lifespan of the product/entity, NOT the human buyer** —
+  and DISCLOSED plainly at purchase (honest only if disclosed up front).
+- **Assignment / successor clause** — agreement assignable at Furlong's discretion;
+  an acquiring entity may transition/modify/buy out the terms. (Ties to Vol II
+  Batch-27 institutional-succession doctrine.)
+- **Substantial-change-of-service clause** — lifetime access attaches to the current
+  product iteration/scope.
+
+**TRUST-BRAND RECONCILIATION (steer away from the research here).** The research's
+"successor may terminate at discretion" is buyer-favorable to the point of bait-and-
+switch — it collides with the constitutional consumer-protection ethos. Adopt the
+structural clauses BUT pair them with a **fair-treatment floor**: on dissolution or
+fundamental restructure, guarantee a **fair, RESERVE-FUNDED buyout or refund**
+(exactly what the Continuity + Dispute reserves are for, CANON-TREASURY-001 §3). Both
+M&A-ready AND consistent with "we don't exploit you." Never a bare terminate-at-will.
+
+**Buyer transition scenarios (buyer's call at sale, noted for founders):**
+grandfather-into-legacy-tier / paid sunset-with-grace-period+discount / buyout-
+allocation-at-cost. Our job now is only to make all three CLEAN via tag + cap + fund.
+This whole section is counsel-drafted TOS — structure decided here, wording + any
+price/refund figures stay founders + counsel.

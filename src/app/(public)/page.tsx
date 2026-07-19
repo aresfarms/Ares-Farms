@@ -717,7 +717,7 @@ export default async function HomePage() {
         </section>
 
         {/* Retention loop — capture the visitor who liked the free value. */}
-        <section className="fl-section" aria-label="Get the Dispatch" style={{ justifyItems: "center" }}>
+        <section className="fl-section" aria-label="Get the Compass" style={{ justifyItems: "center" }}>
           <NewsletterSignup />
         </section>
 

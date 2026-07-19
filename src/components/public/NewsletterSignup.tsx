@@ -4,7 +4,7 @@ import { useState } from "react";
 
 /**
  * NewsletterSignup — the retention loop closer. A single-field "get the
- * Dispatch" capture: email + consent → POST /api/newsletter/subscribe (the ESP
+ * Compass" capture: email + consent → POST /api/newsletter/subscribe (the ESP
  * holds the list; no account, minimum PII). Customer surface (brief-copy
  * scanned).
  */
@@ -41,16 +41,16 @@ export function NewsletterSignup({ accent = ACCENT }: { accent?: string }) {
       <section aria-label="Subscribed" style={{ border: `1.5px solid ${accent}`, background: "#f1fbfa", borderRadius: 14, padding: "18px 20px", display: "grid", gap: 4 }}>
         <strong style={{ fontSize: 15, color: "#0b4f49" }}>You&apos;re on the list.</strong>
         <span style={{ fontSize: 13, color: "#2f5f5a", lineHeight: 1.5 }}>
-          The Dispatch — this week&apos;s rates, commodity moves, and what&apos;s worth knowing — lands in your inbox. No spam, unsubscribe anytime.
+          The Compass — this week&apos;s rates, commodity moves, and what&apos;s worth knowing — lands in your inbox. No spam, unsubscribe anytime.
         </span>
       </section>
     );
   }
 
   return (
-    <section aria-label="Get the Dispatch" style={{ border: "1px solid #d7deea", background: "#ffffff", borderRadius: 14, padding: "18px 20px", display: "grid", gap: 10, maxWidth: 560 }}>
+    <section aria-label="Get the Compass" style={{ border: "1px solid #d7deea", background: "#ffffff", borderRadius: 14, padding: "18px 20px", display: "grid", gap: 10, maxWidth: 560 }}>
       <div style={{ display: "grid", gap: 3 }}>
-        <strong style={{ fontSize: 16, color: "#101a2b" }}>Get this week&apos;s Dispatch</strong>
+        <strong style={{ fontSize: 16, color: "#101a2b" }}>Get this week&apos;s Compass</strong>
         <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.5 }}>
           Rates, commodity moves, and the property signals worth knowing — free, weekly, no account.
         </span>
@@ -84,7 +84,7 @@ export function NewsletterSignup({ accent = ACCENT }: { accent?: string }) {
       </div>
       <label style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12, color: "#5d687a", lineHeight: 1.5 }}>
         <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ marginTop: 2 }} />
-        <span>Yes, email me the Dispatch. I can unsubscribe anytime, and my email is never sold.</span>
+        <span>Yes, email me the Compass. I can unsubscribe anytime, and my email is never sold.</span>
       </label>
       {state === "error" && <span style={{ fontSize: 12.5, color: "#b42318" }}>{error}</span>}
     </section>

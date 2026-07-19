@@ -13,7 +13,7 @@ import { PREMIUM } from "@/lib/property/laneThemes";
  * GOVERNANCE: membership economics are shelved until the founders + counsel
  * session. This page states NO prices, has NO membership signup or checkout, and
  * is explicit that the Guild is forming. It describes the vision only — the
- * "what," never a price. The ONE capture is the Dispatch newsletter (email only,
+ * "what," never a price. The ONE capture is the Compass newsletter (email only,
  * free, approved 2026-07-19) — a newsletter subscribe, not a membership.
  */
 
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 const INSIDE: Array<{ title: string; body: string }> = [
   {
-    title: "The Dispatch",
+    title: "The Compass",
     body: "Your industry newsletters and podcasts — rates, commodity moves, and what's worth knowing — bundled, not billed separately.",
   },
   {
@@ -117,11 +117,11 @@ export default function CommunityPage() {
         </div>
       </section>
 
-      {/* The ONE capture: the Dispatch newsletter (free, email only) — the way
+      {/* The ONE capture: the Compass newsletter (free, email only) — the way
           to stay connected while the Guild forms. Not a membership signup. */}
       <section style={{ display: "grid", gap: 8, justifyItems: "start" }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#8a6414" }}>
-          Start free — the Dispatch is part of the Guild
+          Start free — the Compass is part of the Guild
         </span>
         <NewsletterSignup accent="#8a6414" />
       </section>

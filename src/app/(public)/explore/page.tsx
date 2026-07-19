@@ -9,6 +9,7 @@ import { CommercialLaneSections } from "@/components/public/CommercialLaneSectio
 import { EnvironmentalLaneSections } from "@/components/public/EnvironmentalLaneSections";
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
 import { FinancingLaneSections } from "@/components/public/FinancingLaneSections";
+import { GrantsLaneSections } from "@/components/public/GrantsLaneSections";
 import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
@@ -331,6 +332,32 @@ export default async function ExplorePage({
             </p>
           </header>
           <FinancingLaneSections />
+          <CommunityCta />
+          <Disclosures variant="full" />
+        </div>
+      </main>
+    );
+  }
+
+  // Grants & Programs — a content module: the federal/state grant programs a
+  // rural owner should know (founder direction 2026-07-19). Raspberry accent.
+  // Educational, never a promise of an award.
+  if (selected && selected.slug === "programs-incentives") {
+    return (
+      <main>
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "28px 20px 48px", display: "grid", gap: 24 }}>
+          <header style={{ display: "grid", gap: 8 }}>
+            <Link href="/explore" style={{ fontSize: 13, fontWeight: 700, color: accentForLane(selected.slug, "light"), textDecoration: "none", width: "fit-content" }}>
+              ← Back to the compass
+            </Link>
+            <h1 style={{ margin: 0, fontSize: "clamp(26px, 4vw, 36px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.15, color: "#101a2b" }}>
+              {selected.label}
+            </h1>
+            <p style={{ margin: 0, fontSize: 16, color: "#4d596d", lineHeight: 1.6, maxWidth: 640 }}>
+              Grants and cost-share programs can fund a real slice of a project — free to learn here, and the programs most people miss.
+            </p>
+          </header>
+          <GrantsLaneSections />
           <CommunityCta />
           <Disclosures variant="full" />
         </div>

@@ -17,6 +17,7 @@ import {
   type CommercialBrief,
 } from "@/lib/property/commercialLaneCurated";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
+import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 
 const COM = LANE_THEMES.commercial;
 
@@ -120,6 +121,8 @@ export function CommercialLaneSections() {
         </div>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{COMMERCIAL_TYPES_NOTE}</span>
       </section>
+
+      <HundredPercentFinancingCallout />
 
       <BriefSection title="The questions commercial owners actually ask" tag="The essentials" briefs={COMMERCIAL_BRIEFS} />
       <BriefSection

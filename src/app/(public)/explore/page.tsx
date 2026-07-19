@@ -10,6 +10,7 @@ import { EnvironmentalLaneSections } from "@/components/public/EnvironmentalLane
 import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
 import { FinancingLaneSections } from "@/components/public/FinancingLaneSections";
 import { GrantsLaneSections } from "@/components/public/GrantsLaneSections";
+import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
@@ -230,6 +231,7 @@ export default async function ExplorePage({
               <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} limit={6} layout="column" accent={laneAccent} />
             )}
             {isResidentialLane && <ResidentialRateTiles />}
+            {isResidentialLane && <HundredPercentFinancingCallout />}
             {isCommercialLane && <CapitalRatesBlock accent={laneAccent} />}
           </div>
         </div>

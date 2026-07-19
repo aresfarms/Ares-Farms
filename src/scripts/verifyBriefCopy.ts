@@ -32,6 +32,7 @@ const SCANNED_FILES = [
   "src/lib/property/farmLaneCurated.ts",
   "src/components/public/FarmEquipmentExplorer.tsx",
   "src/lib/property/residentialRatesCurated.ts",
+  "src/components/public/HundredPercentFinancingCallout.tsx",
   "src/lib/property/commercialLaneCurated.ts",
   "src/components/public/CommercialLaneSections.tsx",
   "src/lib/property/environmentalLaneCurated.ts",

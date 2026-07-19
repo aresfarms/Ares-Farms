@@ -42,6 +42,8 @@ const SCANNED_FILES = [
   "src/lib/environmental/orderRuntime.ts",
   "src/components/public/FinancingLaneSections.tsx",
   "src/components/public/FinancingIntakePanel.tsx",
+  "src/components/public/FinancingFeeChart.tsx",
+  "src/lib/financing/financingFeeSchedule.ts",
   "src/lib/financing/intakeRuntime.ts",
   "src/app/(public)/status/page.tsx",
   "src/components/public/CapitalRatesBlock.tsx",

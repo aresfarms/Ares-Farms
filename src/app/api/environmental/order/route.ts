@@ -15,6 +15,7 @@ import {
   evaluateVersionRuntime,
 } from "@/lib/runtime/versionRuntime";
 import { persistServiceRequest } from "@/lib/serviceRequests/serviceRequestStore";
+import { notifyOnServiceRequest } from "@/lib/notifications/notificationDispatch";
 
 /**
  * Environmental Service Order API (customer orders a Phase I/II/III or PE review)
@@ -345,6 +346,14 @@ export async function POST(req: NextRequest) {
         timeline: body.timeline ?? null,
         readinessPercent: orderResult.readiness.readinessPercent,
       },
+    });
+
+    // Alert the PE that an order is waiting (min-disclosure, never blocks).
+    await notifyOnServiceRequest({
+      requestType: "environmental_report_order",
+      serviceRequestId,
+      routedTo: orderResult.routedTo,
+      traceId,
     });
 
     return NextResponse.json({

@@ -15,6 +15,7 @@ import {
   evaluateVersionRuntime,
 } from "@/lib/runtime/versionRuntime";
 import { persistServiceRequest } from "@/lib/serviceRequests/serviceRequestStore";
+import { notifyOnServiceRequest } from "@/lib/notifications/notificationDispatch";
 
 /**
  * Financing Deal Intake API (customer submits a deal → licensed lender)
@@ -348,6 +349,14 @@ export async function POST(req: NextRequest) {
         timeline: body.timeline ?? null,
         readinessPercent: intakeResult.readiness.readinessPercent,
       },
+    });
+
+    // Alert the licensed lender that a deal is waiting (min-disclosure, never blocks).
+    await notifyOnServiceRequest({
+      requestType: "financing_deal_intake",
+      serviceRequestId,
+      routedTo: intakeResult.routedTo,
+      traceId,
     });
 
     return NextResponse.json({

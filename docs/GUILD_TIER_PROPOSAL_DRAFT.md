@@ -431,3 +431,37 @@ and 5-yr tiers as reasonable; (2) **real capital injection** from the rare buyer
 "price it until it's uncomfortable" philosophy are founders + counsel calls
 ([[membership-tiers-shelved]]). If nobody buys it, it still earns its keep by driving
 clients into the 2-yr / 5-yr packages (anchor value).
+
+## 18. Capacity-governed enrollment — ALL tiers (founder-agreed 2026-07-19)
+
+Founder principle: capacity is finite across EVERY tier, not just lifetime — bounded
+by licensed-professional hours. AI helps, but only so far (below). Scarcity is real
+and uniform. Enrollment is limited-now-with-governed-growth. Better than arbitrary
+slot numbers:
+
+- **Capacity-DERIVED slots, not marketing numbers.** Available slots per tier =
+  *(professional hours committable to the Guild) − (hours already promised to active
+  members, expected-utilization-weighted) − (safety reserve)*, converted to openings.
+  The number is always TRUE, self-enforcing (can't sell a desk the hours can't back),
+  and it **rises automatically when capacity is added** — "open more slots" becomes a
+  governed capacity event, not a marketing guess.
+- **Waitlist, not a closed door.** When full, interest joins a waitlist → prestige
+  (a waitlist IS exclusivity) + warm pipeline + a demand signal that tells you when
+  to add capacity. Admit the next cohort when a seat frees (expiry) or capacity grows.
+- **Reserve buffer — never sell to 100%.** Hold a slice of hours unsold for overage,
+  velocity spikes (§12), and delivery quality. Same discipline as the treasury reserve
+  floors (§14), applied to TIME.
+- **AI raises the ceiling; licensed-human hours stay the hard cap.** AI extends
+  throughput on ROUTINE advisory (triage, drafting, research, common Q&A) so each
+  professional hour goes further — but it does NOT extend the licensed/judgment/
+  relationship hours (PE sign-off, lender advisory, "real person on your file"). The
+  capacity ledger counts HUMAN LICENSED HOURS as the binding constraint, with AI as a
+  throughput multiplier. Keeps scarcity honest even as efficiency rises.
+- **Consumer-protection alignment:** this enforces the existing rule *"never sell
+  hours that can't be delivered"* structurally, not aspirationally.
+
+**Build obligation (adds to task #35 / treasury spine, gated):** a **capacity ledger**
+(professional-hours supply vs. committed demand, expected-utilization-weighted, with a
+reserve buffer) governs enrollment for every tier; **waitlist state**; slot-opening as
+a governed capacity event under TreasuryPolicy. No live code pre-launch; utilization
+assumptions + the buffer size + per-tier slot math stay founders + counsel.

@@ -298,6 +298,75 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     y += 4;
   };
 
+  /**
+   * Ledger chapter header (founder direction 2026-07-20: split the charted truth
+   * into distinct "Ledger Chapters"). A serif "CHAPTER <n>" eyebrow sitting on
+   * the margin rule, the chapter title, an optional subtitle, and a full rule —
+   * the bound divisions of the record.
+   */
+  const chapter = (numeral: string, title: string, subtitle?: string, label = "CHAPTER") => {
+    ensure(64);
+    y += 6;
+    setFont("serifBold", 8.5, ACCENT);
+    doc.text(`${label} ${numeral}`, PAGE.marginX, y, { characterSpacing: 2 });
+    y = doc.y + 3;
+    setFont("serifBold", 16, COLORS.deep);
+    doc.text(title, PAGE.marginX, y, { width: CONTENT_W });
+    y = doc.y + (subtitle ? 2 : 6);
+    if (subtitle) {
+      setFont("serif", 9.5, COLORS.muted);
+      doc.text(subtitle, PAGE.marginX, y, { width: CONTENT_W });
+      y = doc.y + 6;
+    }
+    doc
+      .save()
+      .moveTo(PAGE.marginX, y)
+      .lineTo(PAGE.width - PAGE.marginX, y)
+      .lineWidth(1)
+      .strokeColor(COLORS.margin)
+      .stroke()
+      .restore();
+    y += 12;
+  };
+
+  /**
+   * Due-diligence checklist: each item drawn with a hollow [ ] checkbox so the
+   * printed page IS a workbook the reader can tick with a pen (founder
+   * direction 2026-07-20). The label (before the first colon) is bold; the rest
+   * flows as guidance.
+   */
+  const checklist = (items: string[]) => {
+    const boxX = PAGE.marginX;
+    const textX = PAGE.marginX + 20;
+    const width = CONTENT_W - 20;
+    for (const item of items) {
+      const itemH = measure(item, width, "regular", 10.5);
+      ensure(itemH + 8);
+      const rowTop = y;
+      // Hollow checkbox.
+      doc
+        .save()
+        .roundedRect(boxX, rowTop + 1, 11, 11, 2)
+        .lineWidth(1)
+        .strokeColor(COLORS.margin)
+        .stroke()
+        .restore();
+      const colon = item.indexOf(":");
+      if (colon > 0 && colon < 60) {
+        setFont("serifBold", 10.5, COLORS.deep);
+        const lead = item.slice(0, colon + 1);
+        doc.text(lead, textX, rowTop, { continued: true });
+        setFont("regular", 10.5, COLORS.text);
+        doc.text(` ${item.slice(colon + 1).trim()}`, { width, lineGap: 3 });
+      } else {
+        setFont("regular", 10.5, COLORS.text);
+        doc.text(item, textX, rowTop, { width, lineGap: 3 });
+      }
+      y = doc.y + 9;
+    }
+    y += 2;
+  };
+
   /** Pro-forma facts table: "Label" column + value column, ruled rows. */
   const factsTable = (rows: Array<{ label: string; value: string }>) => {
     const labelW = 150;
@@ -529,22 +598,10 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   heading("What This Is Likely to Cost You");
   bullets(input.conceptSummary);
-  if (input.diligenceCosts?.length) {
-    setFont("bold", 9.5, COLORS.muted);
-    ensure(24);
-    doc.text("TYPICAL OUT-OF-POCKET RANGES — GUIDANCE, NOT QUOTES", PAGE.marginX, y, { characterSpacing: 0.8 });
-    y = doc.y + 8;
-    factsTable(
-      input.diligenceCosts.map((cost) => ({
-        label: cost.label,
-        value: `${cost.range}${cost.note ? ` — ${cost.note}` : ""}`,
-      }))
-    );
-    paragraph(
-      "National ballparks so you can budget — get local numbers. Outside as-is government sales, many of these are negotiable as seller credits.",
-      { size: 9, color: COLORS.muted }
-    );
-  }
+  // The out-of-pocket diligence ranges no longer sit isolated here (founder
+  // direction 2026-07-20: stop the flip-back-and-forth). They now travel INSIDE
+  // the Uncharted Ledger chapter, as the "Provisions & Allocations" budget that
+  // sits directly with the blindspots those dollars answer.
 
   // ── OWNERSHIP COSTS — buy it, then keep it (founder direction 2026-07-17) ──
 
@@ -608,81 +665,101 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     { title: "Lighthouse — watch these first", lines: input.risks }
   );
 
-  // ── FLOWING SECTIONS ───────────────────────────────────────────────────────
+  // ── THE CHARTED TRUTH — bound ledger chapters ─────────────────────────────
+  //
+  // Explicit, ordered render (founder direction 2026-07-20: distinct Ledger
+  // Chapters, not one continuous vertical stream of boxes). The tier rules that
+  // used to live in an array splice are preserved inline below.
 
-  const placeBriefSections: Array<{ title: string; items: string[] }> = [
-    ...(input.buyingProcess?.length
-      ? [{ title: "How This Purchase Actually Works", items: input.buyingProcess }]
-      : []),
-    ...(input.financingProse
-      ? [{ title: "How People Typically Pay for a Property Like This", items: [input.financingProse] }]
-      : []),
-    ...(input.honestUnknowns?.length
-      ? [{ title: "Honest Unknowns — and How You'd Find Out", items: input.honestUnknowns }]
-      : []),
-  ];
-
-  const sections: Array<{ title: string; items: string[] }> = [
-    { title: "Financing Options, Most Likely First", items: input.pathwayAnalysis },
-    // The verified-facts WALL is replaced by the scannable table below when
-    // structured facts are present; the bullets remain only as a fallback
-    // for older payloads.
-    ...(input.placeFacts?.length
-      ? []
-      : [{ title: "Property Verification Summary", items: input.propertyVerificationSummary }]),
-    { title: "Property-Side Criteria and External Flags", items: input.verifiedCriteria },
-    ...placeBriefSections,
-    { title: "Basis and Limits of This Analysis", items: input.explainabilityNotes },
-    { title: "Questions the Platform Should Already Be Asking", items: input.keyQuestions },
-    { title: "Diligence Priorities Before Commitment", items: input.nextMoves },
-  ];
-
-  if (input.tier.id === "paid" || input.tier.id === "environmental") {
-    const basisIndex = sections.findIndex((section) => section.title === "Basis and Limits of This Analysis");
-    sections.splice(basisIndex >= 0 ? basisIndex : 3, 0, { title: "Optional Deeper Intake Posture", items: input.readinessSectionNotes });
+  // CHAPTER I — the statutory levers (Sovereign Decrees).
+  if (input.verifiedCriteria.length > 0) {
+    chapter("I", "Sovereign Tax & Trade Levers", "Statutory designations attached to this tract — support, never an approval.");
+    bullets(input.verifiedCriteria);
   }
 
-  if (input.tier.id === "free") {
-    // Founder direction 2026-07-17: every applicable lane prints, ordered by
-    // likelihood (the ranking engine's order) — never a guarantee.
-    const controllingQuestionIndex = sections.findIndex((section) => section.title === "Questions the Platform Should Already Be Asking");
-    if (controllingQuestionIndex >= 0) sections.splice(controllingQuestionIndex, 1);
+  // CHAPTER II — the sourced place facts.
+  if (input.placeFacts?.length) {
+    chapter("II", "The Charted Place", "Sourced, dated government facts for this ground.");
+    factsTable(
+      input.placeFacts.map((fact) => ({ label: fact.label, value: `${fact.value}  ·  ${fact.source}` }))
+    );
+    paragraph(
+      "Every line above is a sourced, dated government fact — the full statements with verification links travel in your on-screen chart.",
+      { size: 9, color: COLORS.muted }
+    );
+  } else if (input.propertyVerificationSummary.length > 0) {
+    chapter("II", "The Charted Place", "What the record confirms for this ground.");
+    bullets(input.propertyVerificationSummary);
   }
 
-  let factsRendered = false;
-  for (const section of sections) {
-    if (section.items.length === 0) continue;
-    heading(section.title);
-    bullets(section.items);
-    if (section.title === "Financing Options, Most Likely First") {
-      // Partner coordination — informational, inside the platform's
-      // boundary rule: "Furlong informs. Compass/Five Borough performs
-      // professional financing work when separately activated." No external
-      // URL (domain activation stays governance-gated), no approval claims.
-      panel({
-        title: "When you're ready to move",
-        lines: [
-          "Furlong coordinates financing files with Five Borough Capital, the professional financing module in the Furlong ecosystem. When you're ready, your profile and documents can carry forward — nothing re-typed, nothing resold.",
-          "Worth having ready: photo ID, recent income documentation, a rough source-of-funds picture, and (once you have one) the property contract. Your readiness list above tracks what's still missing.",
-          "Financing decisions belong to licensed lenders — Furlong never approves, guarantees, or determines eligibility.",
-        ],
-        fill: ACCENT_SOFT,
-      });
-    }
-    if (!factsRendered && input.placeFacts?.length && section.title === "Financing Options, Most Likely First") {
-      factsRendered = true;
-      heading("The Place, Verified — At a Glance");
+  // Financing lanes — a guide to how ground like this is paid for (not a
+  // chapter of the record). Partner coordination stays informational, inside
+  // the platform boundary: Furlong informs; licensed lenders decide.
+  if (input.pathwayAnalysis.length > 0) {
+    heading("Financing Options, Most Likely First");
+    bullets(input.pathwayAnalysis);
+    panel({
+      title: "When you're ready to move",
+      lines: [
+        "Furlong coordinates financing files with Five Borough Capital, the professional financing module in the Furlong ecosystem. When you're ready, your profile and documents can carry forward — nothing re-typed, nothing resold.",
+        "Worth having ready: photo ID, recent income documentation, a rough source-of-funds picture, and (once you have one) the property contract. Your readiness list tracks what's still missing.",
+        "Financing decisions belong to licensed lenders — Furlong never approves, guarantees, or determines eligibility.",
+      ],
+      fill: ACCENT_SOFT,
+    });
+  }
+  if (input.buyingProcess?.length) {
+    heading("How This Purchase Actually Works");
+    bullets(input.buyingProcess);
+  }
+  if (input.financingProse) {
+    heading("How People Typically Pay for a Property Like This");
+    bullets([input.financingProse]);
+  }
+
+  // CHAPTER III — the uncharted ledger: a due-diligence WORKBOOK with tickable
+  // [ ] boxes, and the provisions budget nested right where the blindspots are
+  // (founder direction 2026-07-20: no more flipping to an isolated cost table).
+  if (input.honestUnknowns?.length) {
+    chapter("III", "The Uncharted Ledger", "What no snapshot can confirm — tick each blindspot as you clear it.");
+    checklist(input.honestUnknowns);
+    if (input.diligenceCosts?.length) {
+      ensure(28);
+      setFont("serifBold", 9.5, COLORS.muted);
+      doc.text("PROVISIONS & ALLOCATIONS — WHAT THESE ANSWERS TYPICALLY COST", PAGE.marginX, y, { characterSpacing: 0.6 });
+      y = doc.y + 5;
+      paragraph(
+        "If you check these blindspots yourself, this is the budget to set aside for independent local professionals — guidance, never a quote.",
+        { size: 9.5, color: COLORS.muted }
+      );
       factsTable(
-        input.placeFacts.map((fact) => ({
-          label: fact.label,
-          value: `${fact.value}  ·  ${fact.source}`,
-        }))
+        input.diligenceCosts.map((cost) => ({ label: cost.label, value: `${cost.range}${cost.note ? ` — ${cost.note}` : ""}` }))
       );
       paragraph(
-        "Every line above is a sourced, dated government fact — the full statements with verification links travel in your on-screen chart.",
-        { size: 9, color: COLORS.muted }
+        "National ballparks — get local numbers. Outside as-is government sales, many are negotiable as seller credits.",
+        { size: 8.5, color: COLORS.muted }
       );
     }
+  }
+
+  // Basis, tier extras, and priorities (tier rules preserved inline).
+  if (input.explainabilityNotes.length > 0) {
+    heading("Basis and Limits of This Analysis");
+    bullets(input.explainabilityNotes);
+  }
+  if ((input.tier.id === "paid" || input.tier.id === "environmental") && input.readinessSectionNotes.length > 0) {
+    heading("Optional Deeper Intake Posture");
+    bullets(input.readinessSectionNotes);
+  }
+  // Free tier drops the "questions the platform should be asking" list (founder
+  // direction 2026-07-17: the free brief just answers, it doesn't interrogate).
+  if (input.tier.id !== "free" && input.keyQuestions.length > 0) {
+    heading("Questions the Platform Should Already Be Asking");
+    bullets(input.keyQuestions);
+  }
+  if (input.nextMoves.length > 0) {
+    heading("Diligence Priorities Before Commitment");
+    bullets(input.nextMoves);
   }
 
   // ── FREE-TIER TEASER (accent panel, measured) ──────────────────────────────
@@ -697,14 +774,39 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     });
   }
 
-  // ── BASIS & DISCLOSURES (flow — never pinned to a fixed offset) ────────────
+  // ── SCHEDULE X — the covenant, disclosures (once), and routing ─────────────
+  //
+  // A single, definitive closing page (founder direction 2026-07-20): the
+  // manifesto as the closing statement, the advisory/data-rights disclosures
+  // stated ONCE, and the professional routing offered as tickable coordination
+  // choices — never as pressure.
+  newPage();
+  chapter("X", "The Covenant & Next Coordinates", "Disclosures, the covenant, and where this file may go next.", "SCHEDULE");
 
-  ensure(170); // keep the heading with its panel — no orphaned headings
+  setFont("serifBold", 11, COLORS.deep);
+  doc.text("Why we lay it all out.", PAGE.marginX, y, { continued: true });
+  setFont("regular", 11, COLORS.text);
+  doc.text(
+    " We open every figure with its source and date because this is your ground, not ours to gate. No account, no data capture, no handoff — a guarantee about our own conduct, the part we fully control. Read it, check it, and carry it wherever you like.",
+    { width: CONTENT_W, lineGap: 3 }
+  );
+  y = doc.y + 14;
+
   heading("Advisory Basis and Your Rights");
   panel({
     lines: [input.branding.advisoryDisclosure, input.branding.dataRightsDisclosure, identity.footerLine],
     fill: COLORS.paper,
   });
+
+  heading("Route This File — Your Next Coordinates");
+  checklist([
+    "Route this dossier to the licensed lending desk for financing coordination — USDA, SBA, or conventional mapping.",
+    "Route this dossier to the Guild's licensed PE for environmental review — wetland boundary and Phase I.",
+  ]);
+  paragraph(
+    "These route to Furlong's own disclosed people. Furlong facilitates the introduction; it never decides your deal and takes no cut of your transaction.",
+    { size: 9, color: COLORS.muted }
+  );
 
   // ── FINAL PASS: footer + page numbers on every buffered page ───────────────
   //

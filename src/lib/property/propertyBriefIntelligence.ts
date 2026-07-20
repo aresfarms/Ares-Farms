@@ -76,6 +76,11 @@ import {
 import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
 import { COUNTY_YIELDS } from "./countyYieldsGenerated";
+import {
+  answerResidentialQuestions,
+  answerCommercialQuestions,
+  type LaneAnswer,
+} from "./laneAnswerEngine";
 import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
@@ -180,6 +185,13 @@ export interface PropertyBriefIntelligence {
       enterprise scored for THIS parcel, the best named, incl. change-of-use,
       solar, and developer-friendliness. Null for non-farm-shaped properties. */
   farmBestUse: FarmBestUse | null;
+  /** Residential lane "burning questions" answered FOR THIS property (cost-to-own,
+      flood, schools, rent, daily life, resale) from the facts we hold, with honest
+      "confirm at X" fallbacks. Null unless the property is residential-shaped. */
+  residentialAnswers: LaneAnswer[] | null;
+  /** Commercial lane "burning questions" answered FOR THIS property (use/zoning,
+      income, financing fit, deal-killers, location). Null unless commercial. */
+  commercialAnswers: LaneAnswer[] | null;
   /** County derived from the property's census tract when the record lacked one. */
   resolvedCounty: ResolvedCounty | null;
   /** Up to four verified-fact chips for the Answer card (flood, grocery, schools, rent). */
@@ -1702,6 +1714,42 @@ export function buildPropertyBriefIntelligence(args: {
           yieldYear: fmrFips ? COUNTY_YIELDS[fmrFips]?.year ?? null : null,
         })
       : null,
+    residentialAnswers:
+      profile.id === "residential"
+        ? answerResidentialQuestions({
+            county: resolvedCounty?.name ?? null,
+            state: resolvedCounty?.state ?? args.stateCode ?? null,
+            town: args.town ?? null,
+            floodZone: floodRecord?.floodZone ?? null,
+            inFloodHazard: floodRecord?.floodZone
+              ? /^[AV]/.test(floodRecord.floodZone.trim().toUpperCase())
+              : null,
+            schoolsCount: schools ? schools.length : null,
+            schoolsInTown: schoolsInTown || null,
+            rent2BR: fmr?.fmr2 ?? null,
+            rent3BR: fmr?.fmr3 ?? null,
+            nearestGroceryMiles: amenities?.grocery?.nearestMiles ?? null,
+            diningNearby: amenities ? amenities.dining?.nearestMiles != null : null,
+            parksNearby: amenities
+              ? (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0) > 0
+              : null,
+            collegeNearby: fmrFips ? (COUNTY_COLLEGES[fmrFips]?.length ?? 0) > 0 : null,
+          })
+        : null,
+    commercialAnswers:
+      profile.id === "commercial"
+        ? answerCommercialQuestions({
+            county: resolvedCounty?.name ?? null,
+            state: resolvedCounty?.state ?? args.stateCode ?? null,
+            town: args.town ?? null,
+            propertyType: args.propertyType ?? null,
+            floodZone: floodRecord?.floodZone ?? null,
+            inFloodHazard: floodRecord?.floodZone
+              ? /^[AV]/.test(floodRecord.floodZone.trim().toUpperCase())
+              : null,
+            nearestMetroMiles: id ? PROPERTY_AIRPORTS[id]?.majorMiles ?? null : null,
+          })
+        : null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,
@@ -2072,6 +2120,45 @@ export async function buildLocationBriefIntelligence(args: {
           yieldYear: countyFips ? COUNTY_YIELDS[countyFips]?.year ?? null : null,
         })
       : null,
+    residentialAnswers:
+      locProfile.id === "residential"
+        ? answerResidentialQuestions({
+            county: resolvedCounty?.name ?? null,
+            state: resolvedCounty?.state ?? stateCode ?? null,
+            town,
+            floodZone: placeFacts.flood?.floodZone ?? null,
+            inFloodHazard: placeFacts.flood?.floodZone
+              ? /^[AV]/.test(placeFacts.flood.floodZone.trim().toUpperCase())
+              : null,
+            schoolsCount: schools ? schools.length : null,
+            schoolsInTown:
+              schools && town
+                ? schools.filter((s) => s.city.toLowerCase() === town.trim().toLowerCase()).length
+                : null,
+            rent2BR: fmr?.fmr2 ?? null,
+            rent3BR: fmr?.fmr3 ?? null,
+            nearestGroceryMiles: amenities?.grocery?.nearestMiles ?? null,
+            diningNearby: amenities ? amenities.dining?.nearestMiles != null : null,
+            parksNearby: amenities
+              ? (amenities.park?.count ?? 0) + (amenities.playground?.count ?? 0) > 0
+              : null,
+            collegeNearby: countyFips ? (COUNTY_COLLEGES[countyFips]?.length ?? 0) > 0 : null,
+          })
+        : null,
+    commercialAnswers:
+      locProfile.id === "commercial"
+        ? answerCommercialQuestions({
+            county: resolvedCounty?.name ?? null,
+            state: resolvedCounty?.state ?? stateCode ?? null,
+            town,
+            propertyType: args.propertyType ?? null,
+            floodZone: placeFacts.flood?.floodZone ?? null,
+            inFloodHazard: placeFacts.flood?.floodZone
+              ? /^[AV]/.test(placeFacts.flood.floodZone.trim().toUpperCase())
+              : null,
+            nearestMetroMiles: null,
+          })
+        : null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,

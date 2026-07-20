@@ -1606,6 +1606,12 @@ function buildReportModel(args: {
   const bestUseLines = bestUse
     ? bestUse.options.map((o) => `[${o.tier.toUpperCase()}] ${o.name} — ${o.grossPerAcre} — ${o.why}`)
     : [];
+  // Residential / commercial burning-questions answered FOR THIS PROPERTY
+  // (null on the other profiles). Each renders as "Question — answer (Confirm: …)".
+  const laneAnswerText = (answers: { question: string; answer: string; confirm: string | null }[]) =>
+    answers.map((a) => `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`);
+  const residentialAnswerText = laneAnswerText(args.placeIntelligence?.residentialAnswers ?? []);
+  const commercialAnswerText = laneAnswerText(args.placeIntelligence?.commercialAnswers ?? []);
 
   const teaserLines = tierIdentity.nextTierTeaser
     ? [
@@ -1670,6 +1676,12 @@ function buildReportModel(args: {
     ...(farmAnswerText.length > 0
       ? [`## Your farm questions — answered for this property`, ...farmAnswerText.map((l) => `- ${l}`), ``]
       : []),
+    ...(residentialAnswerText.length > 0
+      ? [`## Your questions — answered for this home`, ...residentialAnswerText.map((l) => `- ${l}`), ``]
+      : []),
+    ...(commercialAnswerText.length > 0
+      ? [`## Your questions — answered for this property`, ...commercialAnswerText.map((l) => `- ${l}`), ``]
+      : []),
     ...(honestUnknowns.length > 0
       ? [`## Honest unknowns — and how you'd find out`, ...honestUnknowns.map((line) => `- ${line}`), ``]
       : []),
@@ -1720,6 +1732,12 @@ function buildReportModel(args: {
       : "",
     farmAnswerText.length > 0
       ? section("Your farm questions — answered for this property", `<ul>${htmlList(farmAnswerText)}</ul>`)
+      : "",
+    residentialAnswerText.length > 0
+      ? section("Your questions — answered for this home", `<ul>${htmlList(residentialAnswerText)}</ul>`)
+      : "",
+    commercialAnswerText.length > 0
+      ? section("Your questions — answered for this property", `<ul>${htmlList(commercialAnswerText)}</ul>`)
       : "",
     honestUnknowns.length > 0
       ? section("Honest unknowns — and how you'd find out", `<ul>${htmlList(honestUnknowns)}</ul>`)

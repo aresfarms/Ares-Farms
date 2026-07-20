@@ -3113,6 +3113,7 @@ export function PropertyEvaluationWorkspace({
       {!deepView && chartOpen && (
       <ChartTableBrief
         variant={chartVariant}
+        propertyId={context.propertyId ?? context.title}
         title={context.title}
         location={`${context.location}${context.exactAddress ? ` · ${context.exactAddress}` : ""}`}
         sourceLabel={analysisContext.sourceLabel}

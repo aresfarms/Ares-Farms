@@ -8,6 +8,7 @@ import {
   orderFactsForLens,
   type ChartVariant,
 } from "@/lib/property/chartThemes";
+import { DiligenceChecklist } from "@/components/property/DiligenceChecklist";
 
 /**
  * ChartTableBrief — the "Chart Table" presentation family (founder-selected
@@ -133,6 +134,8 @@ function flagTarget(
 
 export interface ChartTableBriefProps {
   variant?: ChartVariant;
+  /** Device key for the due-diligence checkbox state (zero-PII, localStorage). */
+  propertyId: string;
   title: string;
   location: string;
   sourceLabel: string;
@@ -548,31 +551,27 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
 
           {unknowns.length > 0 && (
             <Waypoint pt={nextPt()} id="wp-uncharted" title={lens.waypointUncharted} accent={theme.accent} bg={theme.waypointBg} border={theme.waypointBorder}>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 }}>
-                {unknowns.map((unknown) => (
-                  <div key={unknown.label} style={factCell}>
-                    <div style={factLab}>{unknown.label}</div>
-                    {"url" in unknown && unknown.url ? (
-                      <a
-                        href={unknown.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ ...factVal, color: theme.honey, display: "block", textDecoration: "underline", textUnderlineOffset: 2 }}
-                      >
-                        {unknown.pointer} ↗
-                      </a>
-                    ) : (
-                      <div style={{ ...factVal, color: theme.honey }}>{unknown.pointer}</div>
-                    )}
-                    <details>
-                      <summary style={expandSummary}>how exactly ▸</summary>
-                      <div style={{ fontSize: 11.5, lineHeight: 1.6, color: theme.inkSoft, marginTop: 4 }}>
-                        {unknown.howToFind}
-                      </div>
-                    </details>
-                  </div>
-                ))}
-              </div>
+              <DiligenceChecklist
+                propertyId={props.propertyId}
+                items={unknowns.map((unknown) => ({
+                  label: unknown.label,
+                  pointer: unknown.pointer,
+                  howToFind: unknown.howToFind,
+                  url: "url" in unknown ? unknown.url ?? null : null,
+                }))}
+                colors={{
+                  accent: theme.accent,
+                  honey: theme.honey,
+                  cellBg: theme.cellBg,
+                  cellBorder: theme.cellBorder,
+                  ink: theme.ink,
+                  inkSoft: theme.inkSoft,
+                  inkFaint: theme.inkFaint,
+                }}
+                cellStyle={factCell}
+                labelStyle={factLab}
+                summaryStyle={expandSummary}
+              />
               {(intelligence?.diligenceCosts?.length ?? 0) > 0 && (
                 <div style={{ borderTop: `1px dashed ${theme.plateBorder}`, marginTop: 12, paddingTop: 10, display: "grid", gap: 6 }}>
                   <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>

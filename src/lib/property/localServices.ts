@@ -105,7 +105,7 @@ export function buildLocalServices(f: LocalServicesFacts): LocalServices {
     {
       category: "Public safety",
       detail:
-        "Furlong doesn't rank or map neighborhoods by crime — that data invites unfair steering. Look up reported crime for this area yourself on the official FBI source, and the local sheriff's office is the authority on this address.",
+        `Consistent with fair-housing rules, Furlong does not publish, rate, or map ${where}'s neighborhoods by crime — attaching crime data to listings is a documented steering risk (it's why major portals pulled their crime maps). The data is public, though, and you should check it: look up reported crime on the official FBI source, and the local sheriff's office is the authority for this exact address.`,
       url: FBI_CDE,
       urlLabel: "FBI Crime Data Explorer",
     },

@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PlaceFactBadge } from "@/components/place-facts/PlaceFactBadge";
 import { ozBadgeProps } from "@/lib/place-facts/opportunityZoneBadge";
@@ -115,7 +114,10 @@ export function PropertyHub({
           <PendingState sources={sources} total={tree.total} />
         ) : !liveCategory ? (
           <>
-            <EntryChoiceIntro />
+            {/* The address-check box was removed here (founder direction
+                2026-07-20): the compact place-first check now lives directly
+                under each lane's map, so a second one at the bottom of the hub
+                was redundant. */}
             <GuidedIntake feed={guidedIntakeFeed()} />
             {/* "Browse by category" grid removed — redundant with the grouped
                 listings above (founder direction 2026-07-17). */}
@@ -167,33 +169,6 @@ function propertyTree() {
     node.states.sort((a, b) => a.abbr.localeCompare(b.abbr));
   }
   return tree;
-}
-
-function EntryChoiceIntro() {
-  return (
-    <section
-      aria-label="Start property analysis by address"
-      style={{
-        border: `1px solid ${navigatorTheme.waypointBorder}`,
-        borderRadius: 16,
-        background: navigatorTheme.waypointBg,
-        padding: "22px 24px",
-        display: "grid",
-        gap: 18,
-      }}
-    >
-      <div style={{ display: "grid", gap: 6 }}>
-        <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.5, textTransform: "uppercase", color: "#d4b06a" }}>
-          Start with the verified address
-        </span>
-        <strong style={{ fontSize: 20, color: "#eaf3f7" }}>Check a specific address</strong>
-        <span style={{ fontSize: 14, color: "#b7ccd9", lineHeight: 1.5 }}>
-          Results appear right below — the checked facts carry into the analysis automatically.
-        </span>
-      </div>
-      <PlaceFirstDiscovery flow="property-discovery" embedded tone="dark" />
-    </section>
-  );
 }
 
 // ── Pending activation (no source live) ───────────────────────────────────────

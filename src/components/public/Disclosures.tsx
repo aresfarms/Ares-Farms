@@ -64,6 +64,26 @@ export function Disclosures({
         padding: "12px 16px",
       }}
     >
+      {/* The Straight-Talk preface (founder direction 2026-07-20): the human WHY
+          above the honest WHAT. Framed as our promise, not an accusation about
+          named competitors — keeps the "we only say what we can stand behind"
+          credibility. Full variant only. */}
+      {variant === "full" && (
+        <p
+          style={{
+            margin: "0 0 2px",
+            fontSize: 12.5,
+            fontWeight: 700,
+            color: dark ? "#eef3f6" : "#3b3730",
+            lineHeight: 1.55,
+          }}
+        >
+          <span style={{ color: dark ? "#d4b06a" : "#96742f" }}>Why we lay it all out.</span>{" "}
+          Most sites bury the fine print and quietly route what you type to whoever pays for the lead. We
+          don&apos;t do either — no account, no data capture, no handoff. The parameters below are exactly how a
+          federal regulator or an underwriter reads a deal: unfiltered, unbiased, and entirely in your hands.
+        </p>
+      )}
       <span
         style={{
           fontSize: 10.5,

@@ -1130,10 +1130,18 @@ function reportVerdict(args: {
     };
   }
 
+  // No operating thesis yet (an address-first place brief). This is NOT a
+  // failing grade on the property (founder direction 2026-07-20: "we already
+  // know what it is — stop reprimanding"). State what IS established — the
+  // verified statutory place-facts — and frame the operating thesis as the one
+  // open variable, which is the visitor's to set, not a deficiency.
+  const signals = args.verifiedProgramsCount;
   return {
-    label: "Too early to rely on",
+    label: "Place established · operating thesis open",
     explanation:
-      "The property may still be interesting, but the intended use and operating thesis are not yet defined tightly enough for a meaningful evaluation.",
+      signals > 0
+        ? `The statutory place-facts for this tract are verified and logged below — ${signals} sourced signal${signals === 1 ? "" : "s"} attached. What is still open is the operating thesis: how the ground would be used. That is yours to set, and it shapes which financing lanes and questions apply — not whether these place-facts hold.`
+        : "The verified place-facts for this tract are logged below. What is still open is the operating thesis: how the ground would be used. Naming it — home, working farm, or commercial — sharpens the financing lanes and the questions that follow.",
   };
 }
 

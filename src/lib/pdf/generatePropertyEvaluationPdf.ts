@@ -115,25 +115,44 @@ const PAGE = {
 };
 const CONTENT_W = PAGE.width - PAGE.marginX * 2;
 
+// Ledger palette (founder direction 2026-07-20: "not a banking algorithm — a
+// timeless land ledger / ship's log"). Corporate navy/blue is gone; ink is a
+// deep forest-charcoal, neutrals are warm sepia, panels sit on aged paper.
 const COLORS = {
-  deep: "#162033",
-  text: "#3b475a",
-  muted: "#66758a",
-  faint: "#9aa6b6",
-  line: "#d7deea",
-  paper: "#f7f9fb",
+  deep: "#20302a",   // deep forest-charcoal — headers & hero ink
+  text: "#33352c",   // charcoal body
+  muted: "#6b6252",  // sepia-muted labels
+  faint: "#9a917c",  // faint sepia (sources, fine print)
+  line: "#cabfa4", // aged ruling
+  paper: "#f6f1e3",  // warm paper for panels
+  margin: "#4d5b3f", // dark-olive margin rule (surveyor's logbook line)
 };
 
 const FONT_CANDIDATES = {
+  // Body / raw source data stays a clean, scannable sans (founder: serif for
+  // headers and numbers, sans for the technical source facts).
   regular: [
     "/System/Library/Fonts/Supplemental/Arial.ttf",
-    "/System/Library/Fonts/Supplemental/Times New Roman.ttf",
     "/System/Library/Fonts/Supplemental/Georgia.ttf",
+    "/System/Library/Fonts/Supplemental/Times New Roman.ttf",
   ],
   bold: [
     "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
-    "/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf",
     "/System/Library/Fonts/Supplemental/Georgia Bold.ttf",
+    "/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf",
+  ],
+  // Headers, the hero title, chapter numerals — an elegant serif for the
+  // handwritten-ledger feel.
+  serif: [
+    "/System/Library/Fonts/Supplemental/Georgia.ttf",
+    "/System/Library/Fonts/Supplemental/Baskerville.ttc",
+    "/System/Library/Fonts/Supplemental/Times New Roman.ttf",
+    "/System/Library/Fonts/Supplemental/Palatino.ttc",
+  ],
+  serifBold: [
+    "/System/Library/Fonts/Supplemental/Georgia Bold.ttf",
+    "/System/Library/Fonts/Supplemental/Times New Roman Bold.ttf",
+    "/System/Library/Fonts/Supplemental/Baskerville.ttc",
   ],
 };
 
@@ -161,6 +180,8 @@ function resolveFontPath(weight: keyof typeof FONT_CANDIDATES): string | null {
 const RESOLVED_FONTS = {
   regular: resolveFontPath("regular"),
   bold: resolveFontPath("bold"),
+  serif: resolveFontPath("serif"),
+  serifBold: resolveFontPath("serifBold"),
 };
 
 /**
@@ -203,14 +224,18 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     },
   });
 
-  const setFont = (weight: "regular" | "bold", size: number, color: string) => {
+  const setFont = (
+    weight: "regular" | "bold" | "serif" | "serifBold",
+    size: number,
+    color: string
+  ) => {
     const resolved = RESOLVED_FONTS[weight];
     if (resolved) doc.font(resolved);
-    else doc.font(weight === "bold" ? "Times-Bold" : "Times-Roman");
+    else doc.font(weight === "bold" || weight === "serifBold" ? "Times-Bold" : "Times-Roman");
     doc.fontSize(size).fillColor(color);
   };
 
-  const measure = (text: string, width: number, weight: "regular" | "bold", size: number, lineGap = 3): number => {
+  const measure = (text: string, width: number, weight: "regular" | "bold" | "serif" | "serifBold", size: number, lineGap = 3): number => {
     setFont(weight, size, COLORS.text);
     return doc.heightOfString(text, { width, lineGap });
   };
@@ -230,8 +255,8 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   const heading = (label: string) => {
     ensure(44);
-    setFont("bold", 10.5, ACCENT);
-    doc.text(label.toUpperCase(), PAGE.marginX, y, { width: CONTENT_W, characterSpacing: 1.4 });
+    setFont("serifBold", 13, COLORS.deep);
+    doc.text(label, PAGE.marginX, y, { width: CONTENT_W, characterSpacing: 0.3 });
     y = doc.y + 4;
     doc
       .save()
@@ -397,15 +422,26 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   const emblemFull = publicAssetPath(input.branding.emblemPath);
   if (fs.existsSync(emblemFull)) doc.image(emblemFull, PAGE.width - PAGE.marginX - 44, 36, { fit: [44, 44] });
 
-  // ONE header phrase (founder: the badge/title pair was redundant); the
-  // PROPERTY is the hero line.
-  y = 96;
-  setFont("bold", 8.5, ACCENT);
-  doc.text(identity.coverBadge, PAGE.marginX, y, { characterSpacing: 2.2 });
-  y = doc.y + 8;
+  // Institutional land-register masthead (founder direction 2026-07-20): not
+  // "COMPLIMENTARY PROPERTY PROFILE" (spammy) — THE FURLONG RECORD, with a
+  // deterministic Furlong file number (our own reference, never implying a
+  // government registry), the tract, and the logged date.
+  const fileNo = (() => {
+    let h = 0;
+    const s = `${input.context.title}|${input.context.location}`;
+    for (let i = 0; i < s.length; i += 1) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+    const code = h.toString(36).toUpperCase().slice(0, 4).padStart(4, "0");
+    return `FR-${input.branding.generatedDate.replace(/-/g, "")}-${code}`;
+  })();
+  const tractLine = input.context.exactAddress ?? input.context.title;
 
-  setFont("bold", 22, identity.ink);
-  doc.text(input.context.title, PAGE.marginX, y, { width: CONTENT_W - 140 });
+  y = 96;
+  setFont("serifBold", 9, ACCENT);
+  doc.text("THE FURLONG RECORD · LAND REGISTER", PAGE.marginX, y, { characterSpacing: 1.6 });
+  y = doc.y + 9;
+
+  setFont("serifBold", 23, COLORS.deep);
+  doc.text(input.context.title, PAGE.marginX, y, { width: CONTENT_W - 130 });
   y = doc.y + 4;
 
   setFont("regular", 11, COLORS.text);
@@ -413,7 +449,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     `${input.context.location}${input.context.exactAddress ? ` · ${input.context.exactAddress}` : ""}`,
     PAGE.marginX,
     y,
-    { width: CONTENT_W - 140, lineGap: 2 }
+    { width: CONTENT_W - 130, lineGap: 2 }
   );
   y = doc.y + 10;
 
@@ -424,7 +460,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     .roundedRect(PAGE.width - PAGE.marginX - badgeW, 98, badgeW, 24, 12)
     .fill(ACCENT)
     .restore();
-  setFont("bold", 9.5, "#ffffff");
+  setFont("serifBold", 9.5, "#ffffff");
   doc.text(input.tier.shortLabel, PAGE.width - PAGE.marginX - badgeW + 8, 105, {
     width: badgeW - 16,
     align: "center",
@@ -432,7 +468,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     ellipsis: true,
   });
 
-  // Tier rule (single / double / thick) under the title block.
+  // Register rule under the title block (aged ledger ruling).
   const ruleAt = (offset: number, weight: number) => {
     doc
       .save()
@@ -445,21 +481,30 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   };
   ruleAt(0, identity.ruleStyle === "thick" ? 3 : 1.2);
   if (identity.ruleStyle === "double") ruleAt(3.5, 1.2);
-  y += 14;
+  y += 12;
 
-  // Document meta row — pro-forma style.
+  // Register meta line — File No · Tract · Logged, in ledger serif.
+  setFont("serif", 9.5, COLORS.muted);
+  doc.text(
+    `Furlong File No. ${fileNo}     ·     Tract: ${tractLine}     ·     Logged ${input.branding.generatedDate}`,
+    PAGE.marginX,
+    y,
+    { width: CONTENT_W, lineGap: 2 }
+  );
+  y = doc.y + 12;
+
+  // Source posture stays visible (honest provenance), one ledger row.
   factsTable([
-    { label: "Prepared", value: input.branding.generatedDate },
     {
-      label: "Listed through",
+      label: "Entered through",
       value: `${input.context.sourceLabel}${input.context.currentLabel ? ` — ${input.context.currentLabel.toLowerCase()}` : ""}`,
     },
   ]);
 
   // ── VERDICT + EXECUTIVE SUMMARY ────────────────────────────────────────────
 
-  panel({ title: "Verdict", lines: [input.verdict.label, input.verdict.explanation], fill: ACCENT_SOFT });
-  heading("Executive Summary");
+  panel({ title: "Current Posture — the open ledger", lines: [input.verdict.label, input.verdict.explanation], fill: ACCENT_SOFT });
+  heading("The Navigator's Summary");
   paragraph(input.executiveSummary);
 
   // ── PROPERTY SNAPSHOT — a real facts table ─────────────────────────────────
@@ -681,22 +726,37 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       const sealW = 430;
       const sealH = sealW * (687 / 800); // asset aspect ratio
       doc.save();
-      doc.opacity(0.05);
+      doc.opacity(0.03);
       doc.image(seal, (PAGE.width - sealW) / 2, (PAGE.height - sealH) / 2, { width: sealW });
       doc.opacity(1);
       doc.restore();
     }
-    // Diagonal watermark — FREE tier only (the paid artifact is the clean one).
+    // Surveyor's logbook margin rule — a dark-olive vertical line down the left
+    // of every page (founder direction 2026-07-20: structural metadata to the
+    // left of the line, facts to the right). The bound edge of the ledger.
+    doc
+      .save()
+      .moveTo(PAGE.marginX - 16, PAGE.contentTop - 30)
+      .lineTo(PAGE.marginX - 16, 748)
+      .lineWidth(1.1)
+      .strokeColor(COLORS.margin)
+      .stroke()
+      .restore();
+
+    // Vertical side-stamp along the outer margin — FREE/unverified tier only.
+    // Replaces the old diagonal banner that bled off the page edge. An elegant
+    // alpha entry stamp, not a broken diagnostic watermark.
     if (!cleanExport) {
       doc.save();
-      doc.rotate(-32, { origin: [PAGE.width / 2, PAGE.height / 2] });
-      setFont("bold", 30, COLORS.deep);
-      doc.fillOpacity(0.045);
-      doc.text("FURLONG — FOR INFORMATIONAL PURPOSES · NOT FOR REPRODUCTION", 30, PAGE.height / 2 - 14, {
-        width: PAGE.width + 120,
-        align: "center",
-        lineBreak: false,
-      });
+      doc.rotate(-90, { origin: [PAGE.width - 26, PAGE.height / 2] });
+      setFont("serifBold", 8, COLORS.faint);
+      doc.fillOpacity(0.55);
+      doc.text(
+        `α  //  FURLONG UNVERIFIED ENTRY  ·  ${input.branding.generatedDate}`,
+        PAGE.width - 26 - 150,
+        PAGE.height / 2 - 6,
+        { width: 300, align: "center", characterSpacing: 1.2, lineBreak: false }
+      );
       doc.fillOpacity(1);
       doc.restore();
     }

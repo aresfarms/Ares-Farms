@@ -27,7 +27,7 @@ import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
 import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 import { providersForLane } from "@/lib/providers/providerRegistry";
-import { isoWeekSeed, visitRotationSeed } from "@/lib/public-content/weekSeed";
+import { isoWeekSeed } from "@/lib/public-content/weekSeed";
 
 /**
  * Each emblem on the wheel gets its own themed newsletter (founder direction
@@ -184,10 +184,6 @@ export default async function ExplorePage({
     const laneInventory = filterInventoryByCategories(buildPublicSafeInventoryByState(), new Set(laneFilter.categories));
     const laneGroups = buildFrontDoorGroups().filter((g) => laneFilter.profiles.includes(g.profileId));
     const landWeekSeed = isoWeekSeed();
-    // The live-listings shelf cycles per visit (founder 2026-07-19) so it walks
-    // the full inventory instead of a fixed weekly window; the map keeps the
-    // weekly narrative seed.
-    const shelfSeed = visitRotationSeed();
     const audience = LANE_AUDIENCE[selected.slug];
     const isFarmLane = selected.slug === "farms-agriculture";
     const isResidentialLane = selected.slug === "property-land";
@@ -232,7 +228,7 @@ export default async function ExplorePage({
           <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
             <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
             {isFarmLane && (
-              <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={shelfSeed} limit={6} layout="column" accent={laneAccent} />
+              <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} limit={6} layout="column" accent={laneAccent} />
             )}
             {isResidentialLane && <ResidentialRateTiles />}
             {isResidentialLane && <HundredPercentFinancingCallout />}
@@ -256,7 +252,7 @@ export default async function ExplorePage({
         {/* Non-farm lanes keep the full-width listings shelf below the map. */}
         {!isFarmLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
-            <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={shelfSeed} accent={laneAccent} />
+            <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={landWeekSeed} accent={laneAccent} />
           </div>
         )}
         {/* Residential lane: the full loan-options table full-width below the

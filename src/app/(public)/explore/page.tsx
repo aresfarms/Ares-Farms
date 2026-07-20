@@ -240,13 +240,25 @@ export default async function ExplorePage({
             alignItems: "start",
           }}
         >
-          <div className="fl-map-section">
+          <div className="fl-map-section" style={{ display: "grid", gap: 12, alignContent: "start" }}>
             <PublicMapExperience
               liveSources={getRuntimeLiveSources()}
               mapInventoryByState={laneInventory}
               weekSeed={landWeekSeed}
-              fillHeight={isFarmLane}
             />
+            {/* Compact address-check tucked directly under the map, at the map's
+                width, filling the space below it (founder direction 2026-07-20). */}
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={{ display: "grid", gap: 3 }}>
+                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>
+                  Have an address in mind?
+                </span>
+                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>
+                  Check a specific location&apos;s verified place-facts right here — or keep browsing the map above.
+                </p>
+              </div>
+              <PlaceFirstDiscovery flow="place-facts" compact />
+            </div>
           </div>
           {/* Right column beside the map. Farms/Land: the Real Listings fill the
               dead space under the browse box. Residential: the mortgage-rate
@@ -261,21 +273,6 @@ export default async function ExplorePage({
             {isResidentialLane && <HundredPercentFinancingCallout />}
             {isCommercialLane && <CapitalRatesBlock accent={laneAccent} />}
           </div>
-        </div>
-        {/* Compact address-check directly under the map — residential, farm, and
-            commercial lanes only (founder direction 2026-07-20). A slim
-            place-first check so a visitor looking at THIS lane's map can drop an
-            address in; the full check with sources lives on /discover. */}
-        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 20px 0" }}>
-          <div style={{ display: "grid", gap: 6, marginBottom: 14 }}>
-            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>
-              Have an address in mind?
-            </span>
-            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "#4d596d", maxWidth: 720 }}>
-              Check a specific location&apos;s verified place-facts right here — or keep browsing the map above.
-            </p>
-          </div>
-          <PlaceFirstDiscovery flow="place-facts" compact />
         </div>
         {/* The farmer sections as cards (founder direction 2026-07-18):
             enterprise economics, land-money options, equipment, cross-links. */}

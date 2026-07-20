@@ -1110,6 +1110,22 @@ function buildUnknowns(args: {
   const countyKnown =
     (args.county && !/unknown/i.test(args.county)) || Boolean(args.resolvedCounty);
 
+  // County-specific official resources (parcel viewer, treasurer, recorder, DOT
+  // planning) have NO stable national URL scheme. Rather than leave these as dead
+  // text (founder 2026-07-19: "useless without links"), we hand the customer a
+  // one-click, pre-filled search scoped to their county/state — it lands on the
+  // right official page far faster than typing it cold. National deep links (FCC,
+  // FEMA, FBI CDE, EIA) stay direct.
+  const countyLabel = args.resolvedCounty
+    ? `${args.resolvedCounty.name} County ${args.resolvedCounty.state}`
+    : args.county && !/unknown/i.test(args.county)
+      ? args.county
+      : null;
+  const officialSearch = (terms: string): string | undefined =>
+    countyLabel
+      ? `https://www.google.com/search?q=${encodeURIComponent(`${countyLabel} ${terms}`)}`
+      : undefined;
+
   if (!countyKnown) {
     unknowns.push({
       label: "County",
@@ -1141,6 +1157,7 @@ function buildUnknowns(args: {
   unknowns.push({
     label: "Condition and repair scope",
     pointer: "Independent inspection",
+    url: "https://www.nachi.org/find-an-inspector",
     howToFind:
       "Government sales are as-is and our snapshot cannot see inside the building. An independent " +
       "inspection (plus a contractor walk-through where repairs look likely) is the only real answer.",
@@ -1151,6 +1168,7 @@ function buildUnknowns(args: {
   unknowns.push({
     label: "Size, lot, and what conveys",
     pointer: "County parcel viewer + deed/title search",
+    url: officialSearch("parcel viewer GIS lot size acreage property search"),
     howToFind:
       "The county parcel/GIS viewer shows the lot's exact dimensions and acreage free. The deed " +
       "and title search confirm precisely what conveys — the ground AND the building, or the " +
@@ -1183,6 +1201,7 @@ function buildUnknowns(args: {
   unknowns.push({
     label: "Planned construction and public works nearby",
     pointer: "State DOT project map + county planning + local MPO (TIP/STIP)",
+    url: officialSearch("DOT STIP project map + county planning pending rezoning MPO TIP"),
     howToFind:
       "Approved-but-unbuilt projects — a widened highway, a new hospital or subdivision behind " +
       "the lot, a multi-year bridge closure, an added or removed transit stop — can reshape " +
@@ -1197,6 +1216,7 @@ function buildUnknowns(args: {
   unknowns.push({
     label: "Shared access and easements",
     pointer: "Title search + recorded easement/road-maintenance agreement",
+    url: officialSearch("county recorder clerk recorded easements deeds search"),
     howToFind:
       "A shared road or driveway can lower cost and build neighborliness — but who plows, repairs, " +
       "and pays is governed by a recorded road-maintenance agreement (or, too often, a handshake); " +
@@ -1211,6 +1231,7 @@ function buildUnknowns(args: {
   unknowns.push({
     label: "Mineral and subsurface rights",
     pointer: "Title search + county deed records",
+    url: officialSearch("county deed records mineral rights severed estate search"),
     howToFind:
       "Owning the surface does not automatically mean owning the oil, gas, coal, metals, or stone " +
       "beneath it. In much of the country — especially energy and mining regions — the mineral " +
@@ -1239,6 +1260,7 @@ function buildUnknowns(args: {
   unknowns.push({
     label: "Annual property taxes",
     pointer: "County treasurer/appraiser site",
+    url: officialSearch("treasurer appraiser property tax assessment parcel search"),
     howToFind:
       `${taxCounty} lists the parcel's current assessment and tax history — ` +
       "free public records, searchable by address.",
@@ -1914,10 +1936,12 @@ export async function buildLocationBriefIntelligence(args: {
   if (electric) verifiedFacts.push(electric);
 
   // Ground rent — manual imports rarely carry a reliable property type, so
-  // the fact frames its own applicability ("if the parcel includes open
-  // cropland…"). Farm-shaped stated types get the direct framing.
+  // Ground rent (cropland/pasture cash rents) is FARM/LAND ONLY — it must never
+  // appear on residential or unknown-type properties (founder-reported 2026-07-19:
+  // "cropland shouldn't show up in residential at all"). Matches the committed
+  // path's farm-shaped gate; the conditional framing is retired.
   const locFarmShaped = isFarmShaped(args.propertyType ?? null);
-  const groundRent = groundRentFact(countyFips, !locFarmShaped);
+  const groundRent = locFarmShaped ? groundRentFact(countyFips, false) : null;
   if (groundRent) verifiedFacts.push(groundRent);
 
   // Advanced ag analysis for farms/ranches — regional conditions by state.

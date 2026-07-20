@@ -15,6 +15,7 @@ import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
+import { InteractiveCompassRose } from "@/components/public/InteractiveCompassRose";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
@@ -512,58 +513,6 @@ export default async function ExplorePage({
   // ── Compass-rose index (the navigator stage) ────────────────────────────────
   return (
     <main>
-      <style>{`
-        /* Desktop radial. Smaller rose so all 8 nodes + labels fit without
-           scrolling; overflow visible so nothing clips at the band edges. */
-        .cr-rose { position: relative; width: 100%; max-width: 520px; margin: 4px auto 0; aspect-ratio: 1 / 1; overflow: visible; }
-        .cr-spokes { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-        .cr-hub {
-          position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-          width: 36%; max-width: 200px; aspect-ratio: 1 / 1; border-radius: 50%;
-          overflow: hidden; z-index: 2; box-shadow: 0 0 48px rgba(201,168,76,0.30);
-          background: rgba(201,168,76,0.04);
-        }
-        .cr-hub img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .cr-node {
-          position: absolute; transform: translate(-50%, -50%); z-index: 3;
-          display: flex; flex-direction: column; align-items: center; gap: 8px;
-          width: 116px; text-decoration: none; transition: transform .14s ease;
-          border-radius: 12px;
-        }
-        .cr-node:hover { transform: translate(-50%, -50%) scale(1.07); }
-        /* Real, visible keyboard focus ring (white on the chart stage) + glow. */
-        .cr-node:focus-visible {
-          transform: translate(-50%, -50%) scale(1.07);
-          outline: 2px solid #ffffff; outline-offset: 6px;
-        }
-        .cr-chip {
-          width: 56px; height: 56px; border-radius: 50%; display: flex;
-          align-items: center; justify-content: center;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.35);
-          transition: box-shadow .14s ease;
-        }
-        /* Hover/focus glow — colored ring + soft bloom in the lane's own color. */
-        .cr-node:hover .cr-chip, .cr-node:focus-visible .cr-chip {
-          box-shadow: 0 0 0 4px var(--ring), 0 0 22px var(--ring), 0 6px 16px rgba(0,0,0,0.5);
-        }
-        .cr-label { color: ${theme.ink}; font-size: 13px; font-weight: 600; text-align: center; line-height: 1.3; }
-
-        /* Phone: radial doesn't fit — collapse to emblem-on-top + stacked list. */
-        @media (max-width: 640px) {
-          .cr-rose { aspect-ratio: auto; display: flex; flex-direction: column; align-items: stretch; gap: 10px; max-width: 400px; margin: 0 auto; }
-          .cr-spokes { display: none !important; }
-          .cr-hub { position: static !important; transform: none !important; width: 150px; align-self: center; margin-bottom: 6px; }
-          .cr-node {
-            position: static !important; transform: none !important;
-            flex-direction: row; justify-content: flex-start; gap: 14px;
-            width: 100%; padding: 10px 14px; border-radius: 12px;
-            background: rgba(255,255,255,0.04);
-          }
-          .cr-node:hover, .cr-node:focus-visible { transform: none !important; background: rgba(255,255,255,0.09); outline-offset: -2px; }
-          .cr-chip { width: 46px; height: 46px; flex-shrink: 0; }
-          .cr-label { text-align: left; font-size: 15px; }
-        }
-      `}</style>
 
       {/* ── The chart stage (full width) — plotted routes radiate from the hub ── */}
       <section
@@ -580,37 +529,10 @@ export default async function ExplorePage({
           </p>
         </div>
 
-        <div className="cr-rose">
-          {/* Decorative spokes — dashed plotted routes from the emblem toward each
-              lane, in the chart's gold accent (the waypoint-route language). */}
-          <svg className="cr-spokes" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            {LANES.map((l) => (
-              <line key={l.slug} x1={50} y1={50} x2={l.left} y2={l.top} stroke={theme.accent} strokeWidth={0.5} strokeDasharray="1.8 1.8" opacity={0.55} />
-            ))}
-          </svg>
-
-          {/* Center hub — the Furlong emblem (circular frame). */}
-          <div className="cr-hub">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/furlong-emblem.png" alt="Furlong emblem — a guide through uncertain waters" />
-          </div>
-
-          {/* Eight lane spokes (real links). */}
-          {LANES.map((l) => (
-            <Link
-              key={l.slug}
-              href={l.href ?? laneHref(l.slug)}
-              className="cr-node"
-              style={{ top: `${l.top}%`, left: `${l.left}%`, ["--ring" as string]: l.color }}
-              aria-label={`Explore ${l.label}`}
-            >
-              <span className="cr-chip" style={{ background: l.tint, color: l.color }}>
-                <LaneIcon name={l.icon} />
-              </span>
-              <span className="cr-label">{l.label}</span>
-            </Link>
-          ))}
-        </div>
+        {/* The compass, made interactive (founder direction 2026-07-20): a live
+            needle + hover/keyboard bloom + a "point me toward…" objective picker.
+            Progressive enhancement over real links. */}
+        <InteractiveCompassRose lanes={LANES} ink={theme.ink} accent={theme.accent} />
       </section>
 
       {/* ── Light page below the band — tightened shared disclosures strip ────── */}

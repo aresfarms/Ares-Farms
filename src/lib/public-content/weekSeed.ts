@@ -19,3 +19,20 @@ export function isoWeekSeed(d: Date = new Date()): number {
   }
   return 1 + Math.round((firstThursday - date.getTime()) / 604_800_000);
 }
+
+/**
+ * visitRotationSeed — a seed that ADVANCES EACH VISIT, for the live-listings
+ * shelf (founder direction 2026-07-19: the shelf should cycle through the full
+ * inventory across residential/farm/commercial, not show the same listings every
+ * time — unlike the map's narrative tour, which stays on a weekly featured stop).
+ *
+ * Pages are rendered per-request (force-dynamic), so this is computed once on the
+ * server and passed to the shelf as a prop → SSR and hydration still agree within
+ * a single render, but a fresh slice shows on the next load. The rotate() offset
+ * is `seed % inventoryLength`, so successive visits walk across the whole feed.
+ * Per-second granularity → each reload shows a fresh slice, still stable within a
+ * single server render (computed once, passed as a prop → no hydration drift).
+ */
+export function visitRotationSeed(d: Date = new Date()): number {
+  return Math.floor(d.getTime() / 1000);
+}

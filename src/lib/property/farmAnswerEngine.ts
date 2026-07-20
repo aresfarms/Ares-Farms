@@ -32,6 +32,13 @@ export interface FarmPropertyFacts {
   capabilityClass?: number | null;
   /** USDA plant-hardiness zone, e.g. "7b". */
   hardinessZone?: string | null;
+  /** County-average crop yields, bu/acre (USDA NASS Survey), when resolved — a
+      productivity benchmark for the parcel's county, never a parcel guarantee. */
+  cornYieldPerAcre?: number | null;
+  soybeanYieldPerAcre?: number | null;
+  wheatYieldPerAcre?: number | null;
+  /** Survey year the county yields are drawn from. */
+  yieldYear?: number | null;
 }
 
 export interface BestUseOption {
@@ -148,6 +155,24 @@ export function answerFarmQuestions(f: FarmPropertyFacts): FarmPropertyAnswer[] 
     confirm: null,
   });
 
+  // County productivity — grounded in the ACTUAL USDA county yield when we have it.
+  // A benchmark to underwrite against, never a parcel guarantee.
+  const yieldParts = [
+    f.cornYieldPerAcre != null ? `corn ~${f.cornYieldPerAcre.toLocaleString("en-US")} bu/ac` : null,
+    f.soybeanYieldPerAcre != null ? `soybeans ~${f.soybeanYieldPerAcre.toLocaleString("en-US")} bu/ac` : null,
+    f.wheatYieldPerAcre != null ? `wheat ~${f.wheatYieldPerAcre.toLocaleString("en-US")} bu/ac` : null,
+  ].filter(Boolean);
+  if (yieldParts.length > 0) {
+    out.push({
+      id: "productivity",
+      propertyAnswer: `Row-crop ground${where} averages ${yieldParts.join(", ")} (USDA NASS${
+        f.yieldYear ? ` ${f.yieldYear}` : ""
+      } county average). Your parcel's real number swings with its own soils, drainage, and management — but that county figure is the benchmark to underwrite any commodity or cash-rent math against, not a promise for this ground.`,
+      confirm:
+        "County averages blend every farm in the county. Pull this parcel's soils on the NRCS Web Soil Survey to see whether it runs above or below that benchmark.",
+    });
+  }
+
   out.push({
     id: "usda-number",
     propertyAnswer: `Yes — if you'll operate this as a farm, get a USDA farm number: it's free, it does NOT dictate what you grow, and it's the key to FSA loans, disaster programs, and most USDA cost-share. Take a deed or lease for this parcel to your ${
@@ -187,6 +212,14 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
   const isPrime = /prime farmland/i.test(f.primeFarmland ?? "") && !/not prime/i.test(f.primeFarmland ?? "");
   const goodSoil = isPrime || (cap != null && cap <= 3);
   const limitedSoil = cap != null && cap >= 5;
+  // County yield signal (USDA NASS): corn is the most widely reported county
+  // crop, so it's the primary read; fall back to soybeans. US county corn
+  // averages ~175 bu/ac — >175 strong, >150 healthy, <120 weak ground.
+  const cornY = f.cornYieldPerAcre ?? null;
+  const soyY = f.soybeanYieldPerAcre ?? null;
+  const strongYield = cornY != null ? cornY >= 175 : soyY != null ? soyY >= 58 : false;
+  const goodYield = cornY != null ? cornY >= 150 : soyY != null ? soyY >= 50 : false;
+  const weakYield = cornY != null ? cornY < 120 : soyY != null ? soyY < 38 : false;
   const where = acreLabel(f.county, f.state).replace(/^ in /, "");
 
   const raw: Array<{ name: string; score: number; grossPerAcre: string; why: string }> = [
@@ -194,19 +227,28 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
       name: "Commodity row crops (corn/soy/wheat)",
       score:
         40 + (large && goodCropland ? 30 : 0) - (small ? 30 : 0) - (poorCropland ? 18 : 0) +
-        (goodSoil ? 18 : 0) - (limitedSoil ? 22 : 0),
+        (goodSoil ? 18 : 0) - (limitedSoil ? 22 : 0) +
+        (strongYield ? 12 : goodYield ? 6 : 0) - (weakYield ? 12 : 0),
       grossPerAcre: "~$0–$150 net/ac — often a loss on FULL cost at today's prices",
-      why: limitedSoil
-        ? `USDA soil here is land-capability class ${cap} — better suited to pasture or specialty than row crops`
-        : goodSoil
-          ? large
-            ? "prime / high-capability cropland at scale — a commodity base genuinely fits here"
-            : "the soil is prime cropland, but the parcel is small for commodity to pay a living"
-          : large
-            ? goodCropland
-              ? "the acreage and county cash rent both support a commodity base"
-              : "big enough for commodity, but average ground means thin margins"
-            : "this parcel is too small for commodity crops to pay a living",
+      why:
+        (limitedSoil
+          ? `USDA soil here is land-capability class ${cap} — better suited to pasture or specialty than row crops`
+          : goodSoil
+            ? large
+              ? "prime / high-capability cropland at scale — a commodity base genuinely fits here"
+              : "the soil is prime cropland, but the parcel is small for commodity to pay a living"
+            : large
+              ? goodCropland
+                ? "the acreage and county cash rent both support a commodity base"
+                : "big enough for commodity, but average ground means thin margins"
+              : "this parcel is too small for commodity crops to pay a living") +
+        (cornY != null
+          ? weakYield
+            ? ` — and county corn yields run light (~${cornY} bu/ac), thinning margins further`
+            : strongYield
+              ? ` — and county corn yields run strong (~${cornY} bu/ac), which helps commodity pencil`
+              : ` (county corn ~${cornY} bu/ac)`
+          : ""),
     },
     {
       name: "Pasture livestock (cattle, sheep, goats)",
@@ -299,9 +341,18 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
     : f.hardinessZone
       ? ` Plant-hardiness zone ${f.hardinessZone}.`
       : "";
+  const yieldParts = [
+    cornY != null ? `corn ~${cornY} bu/ac` : null,
+    soyY != null ? `soybeans ~${soyY} bu/ac` : null,
+    f.wheatYieldPerAcre != null ? `wheat ~${f.wheatYieldPerAcre} bu/ac` : null,
+  ].filter(Boolean);
+  const yieldNote =
+    yieldParts.length > 0
+      ? ` County row-crop yields (USDA NASS${f.yieldYear ? ` ${f.yieldYear}` : ""}): ${yieldParts.join(", ")} — a county benchmark, not this parcel's guarantee.`
+      : "";
   const headline = beatsCommodity
-    ? `For ${parcel}${place}, the numbers lean toward ${top.name.replace(/\s*\(.*\)/, "").toLowerCase()} over commodity row crops — ${top.why}.${soilNote} Read the ranked options below as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`
-    : `For ${parcel}${place}, the ranked options below weigh real per-acre economics for this ground.${soilNote} Read each as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`;
+    ? `For ${parcel}${place}, the numbers lean toward ${top.name.replace(/\s*\(.*\)/, "").toLowerCase()} over commodity row crops — ${top.why}.${soilNote}${yieldNote} Read the ranked options below as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`
+    : `For ${parcel}${place}, the ranked options below weigh real per-acre economics for this ground.${soilNote}${yieldNote} Read each as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`;
 
   return { headline, options };
 }

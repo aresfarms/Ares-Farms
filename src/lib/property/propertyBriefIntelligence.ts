@@ -75,6 +75,7 @@ import {
 } from "./propertyAmenitiesGenerated";
 import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
+import { COUNTY_YIELDS } from "./countyYieldsGenerated";
 import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
@@ -1676,6 +1677,10 @@ export function buildPropertyBriefIntelligence(args: {
           stateFarmlandPerAcre:
             (args.stateCode ? STATE_FARMLAND[args.stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
           nearestMetroMiles: id ? PROPERTY_AIRPORTS[id]?.majorMiles ?? null : null,
+          cornYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.corn ?? null : null,
+          soybeanYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.soybeans ?? null : null,
+          wheatYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.wheat ?? null : null,
+          yieldYear: fmrFips ? COUNTY_YIELDS[fmrFips]?.year ?? null : null,
         })
       : null,
     farmBestUse: farmShaped
@@ -1691,6 +1696,10 @@ export function buildPropertyBriefIntelligence(args: {
           primeFarmland: id ? PROPERTY_SOIL[id]?.primeFarmland ?? null : null,
           capabilityClass: id ? PROPERTY_SOIL[id]?.capabilityClass ?? null : null,
           hardinessZone: id ? PROPERTY_SOIL[id]?.hardinessZone ?? null : null,
+          cornYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.corn ?? null : null,
+          soybeanYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.soybeans ?? null : null,
+          wheatYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.wheat ?? null : null,
+          yieldYear: fmrFips ? COUNTY_YIELDS[fmrFips]?.year ?? null : null,
         })
       : null,
     resolvedCounty,
@@ -2041,6 +2050,10 @@ export async function buildLocationBriefIntelligence(args: {
           pastureRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.pasture ?? null : null,
           stateFarmlandPerAcre:
             (stateCode ? STATE_FARMLAND[stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+          cornYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.corn ?? null : null,
+          soybeanYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.soybeans ?? null : null,
+          wheatYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.wheat ?? null : null,
+          yieldYear: countyFips ? COUNTY_YIELDS[countyFips]?.year ?? null : null,
         })
       : null,
     farmBestUse: locFarmShaped
@@ -2053,6 +2066,10 @@ export async function buildLocationBriefIntelligence(args: {
           stateFarmlandPerAcre:
             (stateCode ? STATE_FARMLAND[stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
           nearestMetroMiles: null,
+          cornYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.corn ?? null : null,
+          soybeanYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.soybeans ?? null : null,
+          wheatYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.wheat ?? null : null,
+          yieldYear: countyFips ? COUNTY_YIELDS[countyFips]?.year ?? null : null,
         })
       : null,
     resolvedCounty,

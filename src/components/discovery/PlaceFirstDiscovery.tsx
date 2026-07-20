@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import { CHART_TONES, type ChartTone } from "@/lib/property/chartThemes";
@@ -119,6 +120,7 @@ export function PlaceFirstDiscovery({
 }) {
   const head = HEAD[flow] ?? HEAD["place-facts"];
   const t = CHART_TONES[tone];
+  const router = useRouter();
   const [streetAddress, setStreetAddress] = useState("");
   const [city, setCity] = useState("");
   const [county, setCounty] = useState("");
@@ -328,12 +330,20 @@ export function PlaceFirstDiscovery({
     if (!checked || busy) return;
     if (!error && !result) return;
 
+    // Compact (lane) check: a successful verification goes STRAIGHT to the full
+    // analysis report, not the place-facts summary (founder direction 2026-07-20).
+    if (compact && result && analysisHref) {
+      setJumpCue("Opening your full analysis report…");
+      router.push(analysisHref);
+      return;
+    }
+
     resultRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
     setJumpCue("Jumped to your location results.");
-  }, [busy, checked, error, result]);
+  }, [busy, checked, error, result, compact, analysisHref, router]);
 
   return (
     <section data-testid="place-first-discovery" data-flow={flow} data-tone={tone} aria-label="Place-first discovery"

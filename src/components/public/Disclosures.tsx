@@ -40,11 +40,16 @@ const COMPACT_TEXT =
 export function Disclosures({
   variant = "full",
   tone = "light",
+  showManifesto = true,
 }: {
   variant?: "full" | "compact";
   /** Chart Table cohesion: "dark" keeps the disclosure text readable when the
       strip sits on a chart stage (CHART_TONES ink) — text is identical. */
   tone?: ChartTone;
+  /** The "Why we lay it all out" preface. Off on surfaces that already carry
+      the elevated Sovereignty Guarantee box (the property report), so the same
+      manifesto doesn't appear twice on one page. Governance text is unaffected. */
+  showManifesto?: boolean;
 }) {
   // Presentation only (founder direction 2026-07-20): the governance-locked text
   // is UNCHANGED, but it's framed as an old-ledger "Field note" — a soft cream
@@ -68,7 +73,7 @@ export function Disclosures({
           above the honest WHAT. Framed as our promise, not an accusation about
           named competitors — keeps the "we only say what we can stand behind"
           credibility. Full variant only. */}
-      {variant === "full" && (
+      {variant === "full" && showManifesto && (
         <p
           style={{
             margin: "0 0 2px",

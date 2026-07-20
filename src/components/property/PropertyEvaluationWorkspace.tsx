@@ -3019,6 +3019,73 @@ export function PropertyEvaluationWorkspace({
           </div>
         </div>
       )}
+      {/* Property Type Stamp (Chaptered Blueprint, founder direction 2026-07-20):
+          the property type is front-loaded — right under the header, before the
+          verdict — because the financing lanes, costs, and questions all follow
+          it (a working farm is not underwritten like a home; founder-caught on
+          her own farm, 2026-07-18). Imported addresses carry no type, so this is
+          an active picker; a typed listing shows it as a confirming stamp you can
+          still correct. */}
+      {!deepView && (() => {
+        const imported = context.propertyId?.startsWith("imported:");
+        return (
+          <section
+            aria-label="Property type on file"
+            style={{
+              display: "grid",
+              gap: 9,
+              border: "1px solid #e2d7bd",
+              borderLeft: "4px solid #b8862f",
+              background: "#faf6ec",
+              borderRadius: 12,
+              padding: "12px 16px",
+            }}
+          >
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 10px" }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "#96742f", fontFamily: "Georgia, serif" }}>
+                Property type
+              </span>
+              <span style={{ fontSize: 12.5, color: "#4d596d" }}>
+                {imported ? (
+                  <>An address alone can&apos;t tell us — pick the type. The financing lanes, costs, and questions all follow your answer.</>
+                ) : (
+                  <>Read as a <strong style={{ color: "#101a2b" }}>{workspaceProfile.label}</strong>. The lanes, costs, and questions below all follow this — not right? Set the true type.</>
+                )}
+              </span>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {allProfiles().map((profile) => {
+                const active = workspaceProfile.id === profile.id;
+                return (
+                  <button
+                    key={profile.id}
+                    type="button"
+                    onClick={() => setProfileOverride(profile.id)}
+                    aria-pressed={active}
+                    style={{
+                      padding: "6px 13px",
+                      borderRadius: 999,
+                      border: active ? "1px solid #0f766e" : "1px solid #d7deea",
+                      background: active ? "#0f766e" : "#ffffff",
+                      color: active ? "#ffffff" : "#3b475a",
+                      fontSize: 12.5,
+                      fontWeight: active ? 700 : 500,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {active ? "✓ " : ""}{profile.label}
+                  </button>
+                );
+              })}
+            </div>
+            {profileOverride && (
+              <span style={{ fontSize: 12, color: "#0f766e" }}>
+                Read as: {workspaceProfile.label}. Everything below follows this shape.
+              </span>
+            )}
+          </section>
+        );
+      })()}
       {!deepView && (
         <PropertyResultCard
           theme={CHART_THEMES[chartVariant]}
@@ -3040,62 +3107,8 @@ export function PropertyEvaluationWorkspace({
           actionsSlot={chartActionsSlot}
         />
       )}
-      {/* "What is this property?" — imported addresses carry no type, and the
-          wrong guess mis-lanes everything (a working farm shown FHA/USDA-rural
-          home loans it can never get — founder-caught on her own farm,
-          2026-07-18). The owner's answer reshapes the whole analysis. */}
-      {context.propertyId?.startsWith("imported:") && (
-        <section
-          aria-label="What is this property?"
-          style={{
-            display: "grid",
-            gap: 10,
-            border: "1px solid #d7deea",
-            background: "#ffffff",
-            borderRadius: 14,
-            padding: "14px 18px",
-            margin: "0 0 14px",
-          }}
-        >
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: 8 }}>
-            <strong style={{ fontSize: 14.5, color: "#101a2b" }}>What is this property?</strong>
-            <span style={{ fontSize: 12.5, color: "#4d596d" }}>
-              An address alone can&apos;t tell us — and the financing lanes, costs, and questions all follow
-              your answer. A working farm is not underwritten like a home.
-            </span>
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {allProfiles().map((profile) => {
-              const active = workspaceProfile.id === profile.id;
-              return (
-                <button
-                  key={profile.id}
-                  type="button"
-                  onClick={() => setProfileOverride(profile.id)}
-                  aria-pressed={active}
-                  style={{
-                    padding: "7px 14px",
-                    borderRadius: 999,
-                    border: active ? "1px solid #0f766e" : "1px solid #d7deea",
-                    background: active ? "#0f766e" : "#ffffff",
-                    color: active ? "#ffffff" : "#3b475a",
-                    fontSize: 13,
-                    fontWeight: active ? 700 : 500,
-                    cursor: "pointer",
-                  }}
-                >
-                  {profile.label}
-                </button>
-              );
-            })}
-          </div>
-          {profileOverride && (
-            <span style={{ fontSize: 12, color: "#0f766e" }}>
-              Read as: {workspaceProfile.label}. The chart below follows this shape.
-            </span>
-          )}
-        </section>
-      )}
+      {/* (The imported-only "What is this property?" picker is now the
+          front-loaded Property Type Stamp above — shown for every property.) */}
 
       {!deepView && chartOpen && (
       <ChartTableBrief
@@ -3610,6 +3623,46 @@ export function PropertyEvaluationWorkspace({
           direction 2026-07-17): the chart already carries the full analysis
           — facts, costs, financing, and open items — and the watermarked PDF
           is the formal document. A middle report page was redundant. */}
+
+      {/* The Furlong Sovereignty Guarantee (Chaptered Blueprint, founder
+          direction 2026-07-20): the "why we lay it all out" manifesto, elevated
+          from footer marginalia to a stamped guarantee just before the bridge.
+          It is a guarantee of OUR OWN CONDUCT — things we fully control — not a
+          promise about any outcome, which keeps "Guarantee" honest. */}
+      {!deepView && (
+        <section
+          aria-label="The Furlong Sovereignty Guarantee"
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            display: "grid",
+            gap: 10,
+            border: "1px solid #b8862f",
+            borderRadius: 14,
+            background: "linear-gradient(180deg,#10233b,#14293f)",
+            color: "#eef3f8",
+            padding: "18px 20px",
+            fontFamily: "Georgia, 'Times New Roman', serif",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span aria-hidden style={{ fontSize: 15, color: "#d4b06a" }}>❧</span>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#d4b06a" }}>
+              The Furlong Sovereignty Guarantee
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "#eef3f8" }}>
+            We lay out every figure with its source and date because this is your ground, not ours to
+            gate. That is a guarantee about how <em>we</em> conduct ourselves — the part we fully control:
+          </p>
+          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 5, fontSize: 13, lineHeight: 1.55, color: "#dce8f2" }}>
+            <li><strong style={{ color: "#f4f7fa" }}>No capture.</strong> No account, no login, no personal data required to read this.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>No sale.</strong> We never sell, broker, or hand your information to a third party.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>No cut of your deal.</strong> Furlong facilitates introductions; it never decides your deal and takes no piece of your transaction.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>Sources, always.</strong> Every figure carries its origin and date — you can check our work.</li>
+          </ul>
+        </section>
+      )}
 
       {/* Tailored community bridge (founder direction 2026-07-20): the report's
           verified results connect to the exact licensed person who solves that

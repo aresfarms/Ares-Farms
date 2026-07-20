@@ -215,7 +215,9 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
           tierPreviewMode={tierPreviewMode}
           addressFirstFlow={flow}
         />
-        <Disclosures />
+        {/* Manifesto off here: the report carries the elevated Sovereignty
+            Guarantee box, so the "why we lay it all out" preface isn't repeated. */}
+        <Disclosures showManifesto={false} />
       </main>
     );
   }
@@ -303,7 +305,9 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
         />
       )}
 
-      <Disclosures />
+      {/* Manifesto off here: the report carries the elevated Sovereignty
+          Guarantee box, so the "why we lay it all out" preface isn't repeated. */}
+      <Disclosures showManifesto={false} />
     </main>
   );
 }

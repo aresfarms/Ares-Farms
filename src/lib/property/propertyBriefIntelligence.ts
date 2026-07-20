@@ -40,6 +40,7 @@ import {
   type PropertyMilitaryBaseFact,
 } from "./propertyMilitaryBasesGenerated";
 import { US_MILITARY_BASES } from "./usMilitaryBasesGenerated";
+import { PROPERTY_SOIL } from "./propertySoilGenerated";
 import { PROPERTY_GEO_SETTING, PROPERTY_GEO_SETTING_PROVENANCE } from "./propertyGeoSettingGenerated";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
@@ -1687,6 +1688,9 @@ export function buildPropertyBriefIntelligence(args: {
           stateFarmlandPerAcre:
             (args.stateCode ? STATE_FARMLAND[args.stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
           nearestMetroMiles: id ? PROPERTY_AIRPORTS[id]?.majorMiles ?? null : null,
+          primeFarmland: id ? PROPERTY_SOIL[id]?.primeFarmland ?? null : null,
+          capabilityClass: id ? PROPERTY_SOIL[id]?.capabilityClass ?? null : null,
+          hardinessZone: id ? PROPERTY_SOIL[id]?.hardinessZone ?? null : null,
         })
       : null,
     resolvedCounty,

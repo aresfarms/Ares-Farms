@@ -26,6 +26,12 @@ export interface FarmPropertyFacts {
       metro/market proximity, which drives direct-market specialty, agritourism,
       and developer interest. Null when unresolved. */
   nearestMetroMiles?: number | null;
+  /** USDA-NRCS SSURGO dominant-soil facts (public), when resolved. */
+  primeFarmland?: string | null; // e.g. "All areas are prime farmland" | "Not prime farmland"
+  /** Non-irrigated land-capability class 1–8 (1–4 = arable cropland; 5–8 = pasture/limited). */
+  capabilityClass?: number | null;
+  /** USDA plant-hardiness zone, e.g. "7b". */
+  hardinessZone?: string | null;
 }
 
 export interface BestUseOption {
@@ -175,26 +181,44 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
   const rent = f.croplandRentPerAcre;
   const goodCropland = rent != null && rent >= 180;
   const poorCropland = rent != null && rent < 130;
+  // Soil signals (USDA-NRCS): capability class 1–4 = arable cropland, 5–8 =
+  // pasture/limited; prime-farmland is the strongest "grow commodity here" flag.
+  const cap = f.capabilityClass ?? null;
+  const isPrime = /prime farmland/i.test(f.primeFarmland ?? "") && !/not prime/i.test(f.primeFarmland ?? "");
+  const goodSoil = isPrime || (cap != null && cap <= 3);
+  const limitedSoil = cap != null && cap >= 5;
   const where = acreLabel(f.county, f.state).replace(/^ in /, "");
 
   const raw: Array<{ name: string; score: number; grossPerAcre: string; why: string }> = [
     {
       name: "Commodity row crops (corn/soy/wheat)",
-      score: 40 + (large && goodCropland ? 30 : 0) - (small ? 30 : 0) - (poorCropland ? 18 : 0),
+      score:
+        40 + (large && goodCropland ? 30 : 0) - (small ? 30 : 0) - (poorCropland ? 18 : 0) +
+        (goodSoil ? 18 : 0) - (limitedSoil ? 22 : 0),
       grossPerAcre: "~$0–$150 net/ac — often a loss on FULL cost at today's prices",
-      why: large
-        ? goodCropland
-          ? "the acreage and productive ground can carry a commodity base"
-          : "big enough for commodity, but the county's cash rent says the ground is only average — margins will be thin"
-        : "this parcel is too small for commodity crops to pay a living",
+      why: limitedSoil
+        ? `USDA soil here is land-capability class ${cap} — better suited to pasture or specialty than row crops`
+        : goodSoil
+          ? large
+            ? "prime / high-capability cropland at scale — a commodity base genuinely fits here"
+            : "the soil is prime cropland, but the parcel is small for commodity to pay a living"
+          : large
+            ? goodCropland
+              ? "the acreage and county cash rent both support a commodity base"
+              : "big enough for commodity, but average ground means thin margins"
+            : "this parcel is too small for commodity crops to pay a living",
     },
     {
       name: "Pasture livestock (cattle, sheep, goats)",
-      score: 52 + (mid || large ? 15 : 0) + (poorCropland ? 10 : 0) - (small && a! < 10 ? 15 : 0),
+      score:
+        52 + (mid || large ? 15 : 0) + (poorCropland ? 10 : 0) + (limitedSoil ? 12 : 0) -
+        (small && a! < 10 ? 15 : 0),
       grossPerAcre: "~$50–$200 net/ac on good pasture; rewards paid-off land",
-      why: poorCropland
-        ? "cheaper ground that underperforms for crops often pencils better under grazing"
-        : "a solid, lower-labor base that fits most mid-to-large parcels",
+      why: limitedSoil
+        ? `class ${cap} ground that won't pay as cropland often pencils better under grazing`
+        : poorCropland
+          ? "cheaper ground that underperforms for crops often pencils better under grazing"
+          : "a solid, lower-labor base that fits most mid-to-large parcels",
     },
     {
       name: "Cut flowers / market produce (intensive)",
@@ -270,9 +294,14 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
   const beatsCommodity = top.name !== commodity.name && top.score > commodity.score + 8;
   const parcel = acresKnown ? `this ~${a!.toLocaleString("en-US")}-acre parcel` : "this parcel";
   const place = where ? ` in ${where}` : "";
+  const soilNote = f.primeFarmland
+    ? ` USDA soil: ${f.primeFarmland.toLowerCase()}${cap != null ? `, land-capability class ${cap}` : ""}${f.hardinessZone ? `, hardiness zone ${f.hardinessZone}` : ""}.`
+    : f.hardinessZone
+      ? ` Plant-hardiness zone ${f.hardinessZone}.`
+      : "";
   const headline = beatsCommodity
-    ? `For ${parcel}${place}, the numbers lean toward ${top.name.replace(/\s*\(.*\)/, "").toLowerCase()} over commodity row crops — ${top.why}. Read the ranked options below as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`
-    : `For ${parcel}${place}, the ranked options below weigh real per-acre economics for this ground. Read each as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`;
+    ? `For ${parcel}${place}, the numbers lean toward ${top.name.replace(/\s*\(.*\)/, "").toLowerCase()} over commodity row crops — ${top.why}.${soilNote} Read the ranked options below as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`
+    : `For ${parcel}${place}, the ranked options below weigh real per-acre economics for this ground.${soilNote} Read each as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`;
 
   return { headline, options };
 }

@@ -55,25 +55,29 @@ function Waypoint({
         scrollMarginTop: 90,
       }}
     >
+      {/* Bound-docket section marker (founder direction 2026-07-20): a squared
+          tab seated on the solid margin rail — SECTION I, II, III down the axis,
+          so the chart reads like a bound legal docket, not a loose stack. */}
       <span
         aria-hidden
         style={{
           position: "absolute",
-          left: -34,
-          top: 14,
-          width: 24,
-          height: 24,
-          borderRadius: "50%",
-          background: "rgba(0,0,0,0.35)",
+          left: -40,
+          top: 13,
+          width: 30,
+          minHeight: 30,
+          borderRadius: 5,
+          background: bg,
           border: `2px solid ${accent}`,
+          boxShadow: `0 0 0 3px ${bg}`,
           color: accent,
-          fontSize: 11,
-          fontWeight: 900,
           display: "grid",
           placeItems: "center",
+          padding: "3px 0",
         }}
       >
-        {pt}
+        <span style={{ fontSize: 6.5, fontWeight: 800, letterSpacing: "0.06em", lineHeight: 1, opacity: 0.8 }}>SEC</span>
+        <span style={{ fontSize: 12, fontWeight: 900, lineHeight: 1.05 }}>{pt}</span>
       </span>
       <h3 style={{ margin: "0 0 10px", fontSize: 15, color: "inherit", letterSpacing: "0.02em" }}>
         {title}
@@ -395,14 +399,19 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
 
         {/* ── The route — waypoints down the chart ── */}
         <main style={{ position: "relative", paddingLeft: 34, display: "grid", gap: 14 }}>
+          {/* The engineering margin line — solid and crisp, the bound edge of
+              the docket that the SECTION tabs seat on (founder direction
+              2026-07-20: no longer a faint dashed boundary that reads as an
+              accidental layout line). */}
           <span
             aria-hidden
             style={{
               position: "absolute",
-              left: 12,
-              top: 18,
+              left: 11,
+              top: 14,
               bottom: 30,
-              borderLeft: `2px dashed ${theme.waypointBorder}`,
+              borderLeft: `2px solid ${theme.accent}`,
+              opacity: 0.85,
             }}
           />
           {facts.length > 0 && (
@@ -574,6 +583,10 @@ export function ChartTableBrief(props: ChartTableBriefProps) {
                       Plain-language guidance
                     </span>
                   </div>
+                  <span style={{ fontSize: 12, lineHeight: 1.55, color: theme.inkSoft }}>
+                    If you check these blindspots yourself, here&apos;s the budget to set aside for
+                    independent local professionals — before you fall for a place or walk from it.
+                  </span>
                   <div style={{ display: "grid", gap: 4 }}>
                     {intelligence?.diligenceCosts?.map((cost) => (
                       <div key={cost.label} style={{ display: "flex", gap: 10, alignItems: "baseline", flexWrap: "wrap", fontSize: 12.5 }}>

@@ -34,6 +34,12 @@ import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsG
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
 import { US_AIRPORTS } from "./usAirportsGenerated";
+import {
+  PROPERTY_MILITARY_BASES,
+  PROPERTY_MILITARY_BASES_PROVENANCE,
+  type PropertyMilitaryBaseFact,
+} from "./propertyMilitaryBasesGenerated";
+import { US_MILITARY_BASES } from "./usMilitaryBasesGenerated";
 import { PROPERTY_GEO_SETTING, PROPERTY_GEO_SETTING_PROVENANCE } from "./propertyGeoSettingGenerated";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
@@ -597,6 +603,49 @@ function airportsFactFromCoords(lat: number, lon: number): BriefFactLine | null 
     nearestSize: nearestAny.size,
     majorName: nearestMajor.name,
     majorMiles: Math.round(nearestMajor.miles),
+  });
+}
+
+/**
+ * Military installations (founder direction 2026-07-19: base proximity matters
+ * BEFORE you visit — especially for service members and military families who
+ * relocate on orders). Nearest DoD installation (Air Force / Army / Navy / Marine
+ * Corps + WHS) from the HIFLD/DoD MIRTA dataset; straight-line miles. Facilities
+ * and distances only — never a demographic or steering frame.
+ */
+function militaryFactFromData(d: PropertyMilitaryBaseFact | null): BriefFactLine | null {
+  if (!d) return null;
+  return {
+    label: "Military installations",
+    value: `${d.nearestName} (${d.nearestBranch}) ~${d.nearestMiles} mi`,
+    text:
+      `The nearest military installation is ${d.nearestName} (${d.nearestBranch}), about ` +
+      `${d.nearestMiles} miles straight-line. Base proximity affects commute, on-base ` +
+      `access, and relocation logistics for anyone with military ties — drive time is a ` +
+      `map-app check. (DoD sites: Air Force, Army, Navy, and Marine Corps. Coast Guard air ` +
+      `stations appear under Airports & flight paths.)`,
+    provenance: `Source: ${PROPERTY_MILITARY_BASES_PROVENANCE.source}, snapshot ${PROPERTY_MILITARY_BASES_PROVENANCE.asOf}`,
+    tone: "neutral",
+  };
+}
+
+/** Same fact computed live from a geocode (imported addresses). */
+function militaryFactFromCoords(lat: number, lon: number): BriefFactLine | null {
+  let best: { name: string; branch: string; miles: number } | null = null;
+  for (const base of US_MILITARY_BASES) {
+    const dLat = ((base.lat - lat) * Math.PI) / 180;
+    const dLon = ((base.lon - lon) * Math.PI) / 180;
+    const s =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat * Math.PI) / 180) * Math.cos((base.lat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    const miles = 2 * 3958.8 * Math.asin(Math.sqrt(s));
+    if (!best || miles < best.miles) best = { name: base.name, branch: base.branch, miles };
+  }
+  if (!best) return null;
+  return militaryFactFromData({
+    nearestName: best.name,
+    nearestBranch: best.branch,
+    nearestMiles: Math.round(best.miles),
   });
 }
 
@@ -1510,6 +1559,9 @@ export function buildPropertyBriefIntelligence(args: {
   const airports = airportsFactFromData(id ? PROPERTY_AIRPORTS[id] ?? null : null);
   if (airports) verifiedFacts.push(airports);
 
+  const military = militaryFactFromData(id ? PROPERTY_MILITARY_BASES[id] ?? null : null);
+  if (military) verifiedFacts.push(military);
+
   const hazardRisk = hazardRiskFact(fmrFips);
   if (hazardRisk) verifiedFacts.push(hazardRisk);
 
@@ -1825,6 +1877,9 @@ export async function buildLocationBriefIntelligence(args: {
   if (geocode?.lat != null && geocode?.lon != null) {
     const locAirports = airportsFactFromCoords(Number(geocode.lat), Number(geocode.lon));
     if (locAirports) verifiedFacts.push(locAirports);
+
+    const locMilitary = militaryFactFromCoords(Number(geocode.lat), Number(geocode.lon));
+    if (locMilitary) verifiedFacts.push(locMilitary);
   }
 
   // Broadband — GATED live FCC lookup (OFF by default; activates behind

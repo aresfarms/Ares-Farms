@@ -22,6 +22,23 @@ export interface FarmPropertyFacts {
   pastureRentPerAcre: number | null;
   /** State average farm real-estate value, $/acre (USDA), when resolved. */
   stateFarmlandPerAcre: number | null;
+  /** Straight-line miles to the nearest MAJOR (metro) airport — a proxy for
+      metro/market proximity, which drives direct-market specialty, agritourism,
+      and developer interest. Null when unresolved. */
+  nearestMetroMiles?: number | null;
+}
+
+export interface BestUseOption {
+  name: string;
+  /** best | strong | possible | marginal — a ranked verdict for THIS parcel. */
+  tier: "best" | "strong" | "possible" | "marginal";
+  grossPerAcre: string;
+  why: string;
+}
+
+export interface FarmBestUse {
+  headline: string;
+  options: BestUseOption[];
 }
 
 export interface FarmPropertyAnswer {
@@ -134,4 +151,128 @@ export function answerFarmQuestions(f: FarmPropertyFacts): FarmPropertyAnswer[] 
   });
 
   return out;
+}
+
+/**
+ * Highest-and-best-USE for this parcel (founder direction 2026-07-19): don't just
+ * answer "can I grow commodity" — rank EVERY realistic enterprise by the numbers
+ * for THIS parcel and name the best, including outside-the-box changes of use
+ * (flowers, orchard, vineyard/winery, Christmas trees, agritourism), passive
+ * income (solar/battery land lease), and whether it reads developer-friendly.
+ * Heuristic + honest — a starting rank a real budget refines, never a promise.
+ * Grounded in acreage + region + county cash rent + metro proximity; soil (NRCS
+ * SSURGO) + climate zone are the next data wires to sharpen it.
+ */
+export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
+  const a = f.acres;
+  const acresKnown = typeof a === "number" && a > 0;
+  const small = acresKnown && a! < 20;
+  const mid = acresKnown && a! >= 20 && a! <= 120;
+  const large = acresKnown && a! > 120;
+  const m = f.nearestMetroMiles ?? null;
+  const metroNear = m != null && m <= 40;
+  const metroMid = m != null && m <= 90;
+  const rent = f.croplandRentPerAcre;
+  const goodCropland = rent != null && rent >= 180;
+  const poorCropland = rent != null && rent < 130;
+  const where = acreLabel(f.county, f.state).replace(/^ in /, "");
+
+  const raw: Array<{ name: string; score: number; grossPerAcre: string; why: string }> = [
+    {
+      name: "Commodity row crops (corn/soy/wheat)",
+      score: 40 + (large && goodCropland ? 30 : 0) - (small ? 30 : 0) - (poorCropland ? 18 : 0),
+      grossPerAcre: "~$0–$150 net/ac — often a loss on FULL cost at today's prices",
+      why: large
+        ? goodCropland
+          ? "the acreage and productive ground can carry a commodity base"
+          : "big enough for commodity, but the county's cash rent says the ground is only average — margins will be thin"
+        : "this parcel is too small for commodity crops to pay a living",
+    },
+    {
+      name: "Pasture livestock (cattle, sheep, goats)",
+      score: 52 + (mid || large ? 15 : 0) + (poorCropland ? 10 : 0) - (small && a! < 10 ? 15 : 0),
+      grossPerAcre: "~$50–$200 net/ac on good pasture; rewards paid-off land",
+      why: poorCropland
+        ? "cheaper ground that underperforms for crops often pencils better under grazing"
+        : "a solid, lower-labor base that fits most mid-to-large parcels",
+    },
+    {
+      name: "Cut flowers / market produce (intensive)",
+      score: 46 + (small || mid ? 28 : 0) + (metroNear ? 26 : metroMid ? 12 : 0) - (large ? 18 : 0),
+      grossPerAcre: "$25k–$35k GROSS/ac at intensive scale — labor-heavy, market is the job",
+      why: metroNear
+        ? "a nearby metro is the buyer (florists, restaurants, markets, CSAs) — 2–10 intensive acres here can out-earn 100 of commodity"
+        : "highest revenue per acre by far, but you must build the sales channel yourself",
+    },
+    {
+      name: "Orchard / fruit",
+      score: 42 + (mid ? 15 : 0) + (metroMid ? 16 : 0),
+      grossPerAcre: "$5k–$20k+ gross/ac at maturity — 3–5 yr to bear, then decades",
+      why: metroMid
+        ? "pick-your-own + farm-stand demand from the metro rewards fruit near a market"
+        : "high long-run value, but a multi-year establishment cost before the first crop",
+    },
+    {
+      name: "Vineyard / winery",
+      score: 36 + (metroMid ? 22 : 0) + (mid ? 10 : 0),
+      grossPerAcre: "$8k–$25k+ gross/ac — heavy capital + 3–4 yr, tasting-room margin is the prize",
+      why: metroMid
+        ? "agritourism + a tasting room turns a mid-size parcel near a metro into an experience business, not just a crop"
+        : "high ceiling, but capital- and expertise-intensive and slow to return",
+    },
+    {
+      name: "Christmas trees",
+      score: 34 + (metroMid ? 16 : 0) + (mid ? 10 : 0),
+      grossPerAcre: "$10k–$25k gross/ac at harvest — a 7–10 yr cycle, choose-and-cut is the margin",
+      why: metroMid
+        ? "choose-and-cut demand from a nearby metro pays a premium and stacks with agritourism"
+        : "steady long-cycle income on ground that doesn't need to be prime",
+    },
+    {
+      name: "Agritourism (pick-your-own, events, glamping)",
+      score: 30 + (metroNear ? 34 : metroMid ? 15 : 0),
+      grossPerAcre: "highly variable — the margin is in the experience, not the acre",
+      why: metroNear
+        ? "close to a metro is the whole game for agritourism — weekend visitors are the revenue"
+        : "works best paired with a crop or animals as a second income line",
+    },
+    {
+      name: "Solar / battery land lease (passive)",
+      score: 30 + (large ? 25 : mid ? 10 : 0),
+      grossPerAcre: "$500–$2,000/ac/yr passive — depends entirely on grid/substation access",
+      why: large
+        ? "a large parcel with transmission access can earn more leasing to solar than farming — zero-labor income"
+        : "possible on smaller acreage, but developers want scale and a nearby substation",
+    },
+    {
+      name: "Sell or hold for development",
+      score: 18 + (metroNear ? 40 : metroMid ? 15 : 0),
+      grossPerAcre: "one-time land sale — value tracks metro demand + zoning",
+      why: metroNear
+        ? "close enough to a metro to read developer-friendly now or soon — worth knowing what the ground is worth as future lots, not just as a farm"
+        : "rural enough that development isn't the near-term play",
+    },
+  ];
+
+  const sorted = raw
+    .map((o) => ({ ...o, score: Math.max(0, Math.min(100, o.score)) }))
+    .sort((x, y) => y.score - x.score);
+
+  const options: BestUseOption[] = sorted.map((o, i) => ({
+    name: o.name,
+    tier: i === 0 ? "best" : o.score >= 55 ? "strong" : o.score >= 42 ? "possible" : "marginal",
+    grossPerAcre: o.grossPerAcre,
+    why: o.why,
+  }));
+
+  const top = sorted[0];
+  const commodity = sorted.find((o) => o.name.startsWith("Commodity"))!;
+  const beatsCommodity = top.name !== commodity.name && top.score > commodity.score + 8;
+  const parcel = acresKnown ? `this ~${a!.toLocaleString("en-US")}-acre parcel` : "this parcel";
+  const place = where ? ` in ${where}` : "";
+  const headline = beatsCommodity
+    ? `For ${parcel}${place}, the numbers lean toward ${top.name.replace(/\s*\(.*\)/, "").toLowerCase()} over commodity row crops — ${top.why}. Read the ranked options below as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`
+    : `For ${parcel}${place}, the ranked options below weigh real per-acre economics for this ground. Read each as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`;
+
+  return { headline, options };
 }

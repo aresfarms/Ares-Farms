@@ -53,7 +53,12 @@ import {
   type PropertyProfile,
 } from "./propertyProfile";
 import { parseAcres } from "./propertyTypes";
-import { answerFarmQuestions, type FarmPropertyAnswer } from "./farmAnswerEngine";
+import {
+  answerFarmQuestions,
+  farmBestUse,
+  type FarmBestUse,
+  type FarmPropertyAnswer,
+} from "./farmAnswerEngine";
 import {
   PROPERTY_TENURE_FACTS,
   PROPERTY_TENURE_PROVENANCE,
@@ -169,6 +174,10 @@ export interface PropertyBriefIntelligence {
    * this is the per-property answer layer inside the analysis + PDF.
    */
   farmEnterpriseAnswers: FarmPropertyAnswer[] | null;
+  /** Highest-and-best-USE ranking for a farm/land parcel — every realistic
+      enterprise scored for THIS parcel, the best named, incl. change-of-use,
+      solar, and developer-friendliness. Null for non-farm-shaped properties. */
+  farmBestUse: FarmBestUse | null;
   /** County derived from the property's census tract when the record lacked one. */
   resolvedCounty: ResolvedCounty | null;
   /** Up to four verified-fact chips for the Answer card (flood, grocery, schools, rent). */
@@ -1665,6 +1674,19 @@ export function buildPropertyBriefIntelligence(args: {
           pastureRentPerAcre: fmrFips ? COUNTY_CASH_RENTS[fmrFips]?.pasture ?? null : null,
           stateFarmlandPerAcre:
             (args.stateCode ? STATE_FARMLAND[args.stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+          nearestMetroMiles: id ? PROPERTY_AIRPORTS[id]?.majorMiles ?? null : null,
+        })
+      : null,
+    farmBestUse: farmShaped
+      ? farmBestUse({
+          acres: parseAcres(sourceRecord?.acreageText ?? null),
+          county: resolvedCounty?.name ?? null,
+          state: resolvedCounty?.state ?? args.stateCode ?? null,
+          croplandRentPerAcre: fmrFips ? COUNTY_CASH_RENTS[fmrFips]?.cropland ?? null : null,
+          pastureRentPerAcre: fmrFips ? COUNTY_CASH_RENTS[fmrFips]?.pasture ?? null : null,
+          stateFarmlandPerAcre:
+            (args.stateCode ? STATE_FARMLAND[args.stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+          nearestMetroMiles: id ? PROPERTY_AIRPORTS[id]?.majorMiles ?? null : null,
         })
       : null,
     resolvedCounty,
@@ -2015,6 +2037,18 @@ export async function buildLocationBriefIntelligence(args: {
           pastureRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.pasture ?? null : null,
           stateFarmlandPerAcre:
             (stateCode ? STATE_FARMLAND[stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+        })
+      : null,
+    farmBestUse: locFarmShaped
+      ? farmBestUse({
+          acres: null,
+          county: resolvedCounty?.name ?? null,
+          state: resolvedCounty?.state ?? stateCode ?? null,
+          croplandRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.cropland ?? null : null,
+          pastureRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.pasture ?? null : null,
+          stateFarmlandPerAcre:
+            (stateCode ? STATE_FARMLAND[stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+          nearestMetroMiles: null,
         })
       : null,
     resolvedCounty,

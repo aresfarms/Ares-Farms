@@ -1601,6 +1601,11 @@ function buildReportModel(args: {
   const farmAnswerText = farmAnswers.map(
     (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`
   );
+  // Highest-and-best-use ranking for a farm/land parcel.
+  const bestUse = args.placeIntelligence?.farmBestUse ?? null;
+  const bestUseLines = bestUse
+    ? bestUse.options.map((o) => `[${o.tier.toUpperCase()}] ${o.name} — ${o.grossPerAcre} — ${o.why}`)
+    : [];
 
   const teaserLines = tierIdentity.nextTierTeaser
     ? [
@@ -1659,6 +1664,9 @@ function buildReportModel(args: {
     ...(financingProse
       ? [`## How people typically pay for a property like this`, `- ${financingProse}`, ``]
       : []),
+    ...(bestUse
+      ? [`## Best use for this parcel — ranked by the numbers`, `- ${bestUse.headline}`, ...bestUseLines.map((l) => `- ${l}`), ``]
+      : []),
     ...(farmAnswerText.length > 0
       ? [`## Your farm questions — answered for this property`, ...farmAnswerText.map((l) => `- ${l}`), ``]
       : []),
@@ -1706,6 +1714,9 @@ function buildReportModel(args: {
       : "",
     financingProse
       ? section("How people typically pay for a property like this", `<p>${escapeHtml(financingProse)}</p>`)
+      : "",
+    bestUse
+      ? section("Best use for this parcel — ranked by the numbers", `<p>${escapeHtml(bestUse.headline)}</p><ul>${htmlList(bestUseLines)}</ul>`)
       : "",
     farmAnswerText.length > 0
       ? section("Your farm questions — answered for this property", `<ul>${htmlList(farmAnswerText)}</ul>`)

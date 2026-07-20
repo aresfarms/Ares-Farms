@@ -346,107 +346,154 @@ export function PlaceFirstDiscovery({
         background: embedded ? "transparent" : t.sectionBg,
         padding: embedded ? 0 : "26px 28px",
       }}>
-      {!embedded && (
+      {/* Compact mode: the host page supplies the heading, so the card skips its
+          own header and renders as a bare slim strip. */}
+      {!embedded && !compact && (
         <header style={{ display: "grid", gap: 8 }}>
           <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: t.eyebrow }}>{head.eyebrow}</span>
-          {compact ? (
-            // Second heading on a page that already has an h1 (the compass) →
-            // render an h2 at a tighter size for correct document outline.
-            <h2 style={{ margin: 0, fontSize: 20, lineHeight: 1.2, color: t.headingInk }}>{head.title}</h2>
-          ) : (
-            <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: t.headingInk }}>{head.title}</h1>
-          )}
+          <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: t.headingInk }}>{head.title}</h1>
           <p style={{ margin: 0, fontSize: 13.5, color: t.bodyInk, lineHeight: 1.55 }}>{head.lede}</p>
         </header>
       )}
 
       {/* ── Location FIRST ──────────────────────────────────────────────────── */}
-      <div data-testid="place-inputs" style={{ display: "grid", gap: 12, border: `1px solid ${t.cardBorder}`, borderRadius: 12, padding: embedded ? "18px 18px" : "16px 18px", background: t.cardBg }}>
-        <strong style={{ fontSize: embedded ? 16 : 13.5, color: t.labelInk }}>
-          {embedded ? "Start with the verified address" : "Where is the location?"}
-        </strong>
-        {embedded && (
-          <span style={{ fontSize: 13, color: t.bodyInk, lineHeight: 1.6, maxWidth: 820 }}>
-            Results appear right below — checked facts carry into the analysis automatically.
-          </span>
-        )}
-        <input
-          value={streetAddress}
-          onChange={(e) => setStreetAddress(e.target.value)}
-          placeholder="Street address (e.g. 123 Main St)"
-          style={inputStyle} />
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <input
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="City"
-            style={{ ...inputStyle, flex: "1 1 180px" }}
-          />
-          <input
-            value={stateCode}
-            onChange={(e) => setStateCode(e.target.value.toUpperCase().slice(0, 2))}
-            placeholder="State (e.g. WV)"
-            maxLength={2}
-            style={{ ...inputStyle, width: 110 }}
-          />
-        </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <input
-            value={county}
-            onChange={(e) => setCounty(e.target.value)}
-            placeholder="County (optional but helpful)"
-            style={{ ...inputStyle, flex: "1 1 200px" }}
-          />
-          <input
-            value={parcel}
-            onChange={(e) => setParcel(e.target.value)}
-            placeholder="Parcel / APN (optional)"
-            style={{ ...inputStyle, flex: "1 1 220px", maxWidth: 360 }}
-          />
-        </div>
-        <div style={{ display: "grid", gap: 8, justifySelf: "start" }}>
+      {compact ? (
+        // Slim horizontal strip (founder direction 2026-07-20): one long, skinny
+        // row of fields + an inline button, so it fits the page under the map
+        // instead of a tall stacked card.
+        <div
+          data-testid="place-inputs"
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: 8,
+            border: `1px solid ${t.cardBorder}`,
+            borderRadius: 12,
+            padding: "12px 14px",
+            background: t.cardBg,
+          }}
+        >
+          <input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="Street address" style={{ ...inputStyle, flex: "3 1 200px" }} />
+          <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="City" style={{ ...inputStyle, flex: "1 1 110px" }} />
+          <input value={stateCode} onChange={(e) => setStateCode(e.target.value.toUpperCase().slice(0, 2))} placeholder="State" maxLength={2} style={{ ...inputStyle, flex: "0 0 74px", width: 74 }} />
+          <input value={county} onChange={(e) => setCounty(e.target.value)} placeholder="County (opt.)" style={{ ...inputStyle, flex: "1 1 120px" }} />
+          <input value={parcel} onChange={(e) => setParcel(e.target.value)} placeholder="Parcel (opt.)" style={{ ...inputStyle, flex: "1 1 120px" }} />
           <button
             type="button"
             data-testid="place-check"
             onClick={() => void checkPlaceFacts()}
             aria-describedby="place-facts-jump-cue"
             style={{
-              justifySelf: "start",
+              flex: "0 0 auto",
               display: "inline-flex",
               alignItems: "center",
-              gap: 10,
-              minHeight: 46,
-              fontSize: 14,
+              minHeight: 42,
+              fontSize: 13.5,
               fontWeight: 800,
               color: "#fff",
               background: busy ? "#9a6730" : "#854F0B",
               border: "none",
               borderRadius: 999,
-              padding: "10px 22px",
+              padding: "9px 18px",
               cursor: busy ? "progress" : "pointer",
-              boxShadow: busy ? "0 0 0 3px rgba(133,79,11,0.12)" : "0 10px 24px rgba(133,79,11,0.18)",
+              whiteSpace: "nowrap",
             }}
           >
-            <span>{busy ? "Checking and jumping to results..." : "Check this location and jump to results →"}</span>
+            {busy ? "Checking…" : "Check this address →"}
           </button>
-          <span
-            id="place-facts-jump-cue"
-            style={{
-              fontSize: 12.5,
-              fontWeight: 700,
-              color: busy ? t.warnInk : jumpCue ? t.accent : t.quietInk,
-              lineHeight: 1.45,
-            }}
-          >
-            {busy
-              ? "Furlong is verifying the address now and will move you straight to the answer block."
-              : jumpCue ?? ""}
+          <span id="place-facts-jump-cue" style={{ flexBasis: "100%", fontSize: 11.5, fontWeight: 600, color: busy ? t.warnInk : jumpCue ? t.accent : t.faintInk, lineHeight: 1.4 }}>
+            {busy ? "Verifying the address now…" : jumpCue ?? "County & parcel are optional — some public records start there."}
           </span>
         </div>
-        <span style={{ fontSize: 11.5, color: t.faintInk }}>
-          County and parcel are optional — some public records start there.
-        </span>
-      </div>
+      ) : (
+        <div data-testid="place-inputs" style={{ display: "grid", gap: 12, border: `1px solid ${t.cardBorder}`, borderRadius: 12, padding: embedded ? "18px 18px" : "16px 18px", background: t.cardBg }}>
+          <strong style={{ fontSize: embedded ? 16 : 13.5, color: t.labelInk }}>
+            {embedded ? "Start with the verified address" : "Where is the location?"}
+          </strong>
+          {embedded && (
+            <span style={{ fontSize: 13, color: t.bodyInk, lineHeight: 1.6, maxWidth: 820 }}>
+              Results appear right below — checked facts carry into the analysis automatically.
+            </span>
+          )}
+          <input
+            value={streetAddress}
+            onChange={(e) => setStreetAddress(e.target.value)}
+            placeholder="Street address (e.g. 123 Main St)"
+            style={inputStyle} />
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <input
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="City"
+              style={{ ...inputStyle, flex: "1 1 180px" }}
+            />
+            <input
+              value={stateCode}
+              onChange={(e) => setStateCode(e.target.value.toUpperCase().slice(0, 2))}
+              placeholder="State (e.g. WV)"
+              maxLength={2}
+              style={{ ...inputStyle, width: 110 }}
+            />
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <input
+              value={county}
+              onChange={(e) => setCounty(e.target.value)}
+              placeholder="County (optional but helpful)"
+              style={{ ...inputStyle, flex: "1 1 200px" }}
+            />
+            <input
+              value={parcel}
+              onChange={(e) => setParcel(e.target.value)}
+              placeholder="Parcel / APN (optional)"
+              style={{ ...inputStyle, flex: "1 1 220px", maxWidth: 360 }}
+            />
+          </div>
+          <div style={{ display: "grid", gap: 8, justifySelf: "start" }}>
+            <button
+              type="button"
+              data-testid="place-check"
+              onClick={() => void checkPlaceFacts()}
+              aria-describedby="place-facts-jump-cue"
+              style={{
+                justifySelf: "start",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                minHeight: 46,
+                fontSize: 14,
+                fontWeight: 800,
+                color: "#fff",
+                background: busy ? "#9a6730" : "#854F0B",
+                border: "none",
+                borderRadius: 999,
+                padding: "10px 22px",
+                cursor: busy ? "progress" : "pointer",
+                boxShadow: busy ? "0 0 0 3px rgba(133,79,11,0.12)" : "0 10px 24px rgba(133,79,11,0.18)",
+              }}
+            >
+              <span>{busy ? "Checking and jumping to results..." : "Check this location and jump to results →"}</span>
+            </button>
+            <span
+              id="place-facts-jump-cue"
+              style={{
+                fontSize: 12.5,
+                fontWeight: 700,
+                color: busy ? t.warnInk : jumpCue ? t.accent : t.quietInk,
+                lineHeight: 1.45,
+              }}
+            >
+              {busy
+                ? "Furlong is verifying the address now and will move you straight to the answer block."
+                : jumpCue ?? ""}
+            </span>
+          </div>
+          <span style={{ fontSize: 11.5, color: t.faintInk }}>
+            County and parcel are optional — some public records start there.
+          </span>
+        </div>
+      )}
 
       {/* ── Then: verified place-facts coverage + source confidence + disclaimers ─ */}
       <div data-testid="place-facts-coverage" style={{ display: "grid", gap: 10 }}>

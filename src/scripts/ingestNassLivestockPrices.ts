@@ -9,6 +9,9 @@
  * $/bushel. Public data, FREE owner NASS key (the SAME key that populates the
  * grain prices).
  *
+ * Run it and paste the key when prompted (nothing is stored):
+ *   npm run ingest:nass-livestock-prices
+ * …or pass it inline if you prefer:
  *   NASS_API_KEY=<key> npm run ingest:nass-livestock-prices
  *
  * This is why livestock is not yet showing: the pipe is built, but the snapshot
@@ -17,11 +20,33 @@
 
 import * as fs from "node:fs";
 import * as path from "node:path";
+import * as readline from "node:readline";
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "src/lib/property/livestockPricesGenerated.ts");
 const API = "https://quickstats.nass.usda.gov/api/api_GET/";
-const KEY = process.env.NASS_API_KEY?.trim();
+// Set from env if provided, else prompted in the terminal (hidden) at run time.
+let KEY = process.env.NASS_API_KEY?.trim();
+
+/** Prompt for the NASS key in the terminal without echoing the keystrokes. */
+function promptForKeyHidden(): Promise<string> {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const question = "  Paste your USDA NASS API key (free at quickstats.nass.usda.gov/api), then press Enter:\n  > ";
+    // Suppress echo of the typed key (still shows the prompt + the Enter newline).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (rl as any)._writeToOutput = (s: string) => {
+      if (s.includes("Paste your") || s.includes(">") || s === "\n" || s === "\r\n") {
+        process.stdout.write(s);
+      }
+    };
+    rl.question(question, (answer) => {
+      rl.close();
+      process.stdout.write("\n");
+      resolve(answer.trim());
+    });
+  });
+}
 const YEAR = new Date(process.env.NASS_AS_OF ? Date.parse(process.env.NASS_AS_OF) : Date.now()).getFullYear();
 
 const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
@@ -50,7 +75,14 @@ async function latest(commodity: string, year: number): Promise<{ month: string;
 
 async function main(): Promise<void> {
   console.log("\n━━━ ingest:nass-livestock-prices ━━━━━━━━━━━━━━━━━━━━━━━━━━");
-  if (!KEY) { console.error("  NASS_API_KEY required (free: quickstats.nass.usda.gov/api) — same key as grain prices.\n"); process.exit(1); }
+  if (!KEY) {
+    console.log("  No NASS_API_KEY in the environment — paste it below (it is used only for this run, never stored).");
+    KEY = await promptForKeyHidden();
+  }
+  if (!KEY) {
+    console.error("  No key provided — nothing fetched. (Free key: quickstats.nass.usda.gov/api — same one as grain.)\n");
+    process.exit(1);
+  }
   const commodities: Array<[string, string]> = [["CATTLE", "cattle"], ["HOGS", "hogs"], ["MILK", "milk"]];
   const out: Record<string, { month: string; year: number; pricePerCwt: number }> = {};
   for (const [nass, key] of commodities) {

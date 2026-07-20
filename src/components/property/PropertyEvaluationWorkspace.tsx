@@ -9,6 +9,7 @@ import {
 } from "@/components/navigator/FurlongNavigator";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
+import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
@@ -3705,6 +3706,20 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
+
+      {/* Bound-edition reservation (ALPHA "mock the desire", founder direction
+          2026-07-20): a physical bound edition of this ledger is a future Guild
+          benefit; this only measures who wants one. Waitlist signal — no
+          payment, no shipping, no PII on the anonymous surface. */}
+      {!deepView && (
+        <BoundEditionReserve
+          propertyId={context.propertyId ?? context.title}
+          title={context.title}
+          location={context.location}
+          propertyType={workspaceProfile.label}
+          lane={chartVariant}
+        />
+      )}
 
       {/* Switch-property moved from the page top to a quiet, collapsed rail at
           the end (redesign Phase 1): the visitor came to evaluate THIS

@@ -28,6 +28,7 @@ const SCANNED_FILES = [
   "src/lib/property/localServices.ts",
   "src/lib/property/chartThemes.ts",
   "src/components/property/ChartTableBrief.tsx",
+  "src/components/property/BoundEditionReserve.tsx",
   "src/components/property/OwnershipCostPanel.tsx",
   "src/lib/property/ownershipCostModel.ts",
   "src/lib/property/financingProgramsCurated.ts",

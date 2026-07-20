@@ -68,6 +68,10 @@ const FINANCING_BRIEFS: FinBrief[] = [
 export function FinancingLaneSections() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
+      {/* FREE lending-applications callout — sits between the lane header and the
+          "Our dedicated licensed lender" intro (founder direction 2026-07-20). */}
+      <FinancingFeeChart />
+
       <section aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
           Our dedicated licensed lender
@@ -86,10 +90,6 @@ export function FinancingLaneSections() {
           ))}
         </div>
       </section>
-
-      {/* FREE lending-applications callout — moved up to be front-and-center
-          (founder direction 2026-07-20): it's the headline promise, not a footnote. */}
-      <FinancingFeeChart />
 
       <section aria-label="Who reviews your deal" style={{ display: "grid", gap: 8 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>

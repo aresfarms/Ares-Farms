@@ -2950,6 +2950,32 @@ export function PropertyEvaluationWorkspace({
 
   return (
     <section style={{ display: "grid", gap: 22 }}>
+      {/* Ship's Ledger masthead (founder direction 2026-07-20): the report opens
+          like an official, stamped land ledger — emblem seal, THE LAND LEDGER
+          nameplate, the parcel, and a "DATA VERIFIED" stamp. Furlong = 220 yards
+          of ground: a parcel measured, sourced, and logged. */}
+      {!deepView && (
+        <div className="nl-doc" style={{ position: "relative", overflow: "hidden", borderRadius: 16, border: "1px solid #d7deea", boxShadow: "0 6px 22px rgba(16,26,43,0.08)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", padding: "20px 24px", background: "linear-gradient(180deg,#10233b,#14293f)", borderBottom: "3px solid #b8862f" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={report.branding.emblemPath} alt="Furlong seal" width={58} height={58} style={{ width: 58, height: 58, borderRadius: "50%", flexShrink: 0, boxShadow: "0 0 0 2px rgba(201,168,76,0.45)" }} />
+            <div style={{ display: "grid", gap: 3, flex: "1 1 240px", fontFamily: "Georgia, 'Times New Roman', serif" }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#d4b06a" }}>Furlong · The Land Ledger</span>
+              <strong style={{ fontSize: "clamp(20px,3.4vw,27px)", lineHeight: 1.12, color: "#f4f7fa", fontWeight: 700 }}>{context.title}</strong>
+              {context.location && <span style={{ fontSize: 13.5, color: "#b9cbd9" }}>{context.location}</span>}
+            </div>
+            <div aria-label={`Data verified ${report.branding.generatedDate}`} style={{ transform: "rotate(-4deg)", border: "2px solid #c9a84c", borderRadius: 8, padding: "7px 12px", textAlign: "center", flexShrink: 0, background: "rgba(201,168,76,0.06)" }}>
+              <span style={{ display: "block", fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: "#d4b06a" }}>DATA VERIFIED</span>
+              <span style={{ display: "block", fontSize: 14, fontWeight: 800, fontFamily: "Georgia, serif", letterSpacing: "0.03em", color: "#eec07a" }}>{report.branding.generatedDate}</span>
+            </div>
+          </div>
+          <div style={{ padding: "7px 24px", background: "#faf6ec", borderTop: "1px solid #e9ddc4" }}>
+            <span style={{ fontSize: 11, color: "#96742f", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
+              A furlong — 220 yards of ground — measured, sourced, and logged. Every figure below carries its origin and date.
+            </span>
+          </div>
+        </div>
+      )}
       {!deepView && (
         <PropertyResultCard
           theme={CHART_THEMES[chartVariant]}
@@ -3541,6 +3567,39 @@ export function PropertyEvaluationWorkspace({
           direction 2026-07-17): the chart already carries the full analysis
           — facts, costs, financing, and open items — and the watermarked PDF
           is the formal document. A middle report page was redundant. */}
+
+      {/* Tailored community bridge (founder direction 2026-07-20): the report's
+          verified results connect to the exact licensed person who solves that
+          exact problem — routed to Furlong's OWN disclosed people (the licensed
+          lending desk + the Guild's licensed PE), never generic third parties.
+          The logical next step, not a generic "contact us". */}
+      {!deepView && (() => {
+        const pf = facts?.placeFacts;
+        const rows: { finding: string; step: string; href: string; accent: string }[] = [];
+        if (pf?.flood) rows.push({ finding: `This site maps to FEMA flood zone ${pf.flood.floodZone}`, step: "Review the boundary + a Phase I with the Guild's licensed PE", href: "/explore?lane=environmental-compliance", accent: "#0f6e56" });
+        if (pf?.opportunityZone?.rural) rows.push({ finding: "USDA-rural eligible ground", step: "Line up the USDA loan with the licensed lending desk", href: "/explore?lane=financing-capital", accent: "#534AB7" });
+        if (pf?.opportunityZone || pf?.nmtc) rows.push({ finding: pf?.opportunityZone && pf?.nmtc ? "Opportunity Zone + NMTC tract" : pf?.opportunityZone ? "Opportunity Zone tract" : "NMTC low-income community tract", step: "Map the capital-gains / community-lending structure with the licensed desk", href: "/explore?lane=financing-capital", accent: "#534AB7" });
+        if (rows.length === 0) rows.push({ finding: "Your verified results, above", step: "Bring the whole picture to the licensed lending desk", href: "/explore?lane=financing-capital", accent: "#534AB7" });
+        return (
+          <section aria-label="Your next step from these results" style={{ display: "grid", gap: 12, border: "1px solid #e9ddc4", borderLeft: "3px solid #c9a84c", background: "#faf6ec", borderRadius: 14, padding: "16px 20px" }}>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#96742f", fontFamily: "Georgia, serif" }}>
+              From these results — your logical next step
+            </span>
+            <div style={{ display: "grid", gap: 10 }}>
+              {rows.map((r) => (
+                <div key={r.finding} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px 12px", padding: "10px 12px", background: "#ffffff", border: "1px solid #e4e9f0", borderRadius: 10 }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#162033", flex: "1 1 200px" }}>{r.finding}</span>
+                  <span aria-hidden style={{ color: "#96742f", fontWeight: 800 }}>→</span>
+                  <a href={r.href} style={{ fontSize: 13, fontWeight: 800, color: r.accent, textDecoration: "none", flex: "1 1 240px" }}>{r.step} →</a>
+                </div>
+              ))}
+            </div>
+            <span style={{ fontSize: 11.5, color: "#7c6f57", lineHeight: 1.55, fontFamily: "Georgia, serif", fontStyle: "italic" }}>
+              These route to Furlong&apos;s own disclosed people — the licensed lending desk and the Guild&apos;s licensed PE. Furlong facilitates the introduction; it never decides your deal, and takes no cut of your transaction.
+            </span>
+          </section>
+        );
+      })()}
 
       {/* Switch-property moved from the page top to a quiet, collapsed rail at
           the end (redesign Phase 1): the visitor came to evaluate THIS

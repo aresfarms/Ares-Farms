@@ -53,24 +53,36 @@ const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV
 
 interface NassRow { reference_period_desc?: string; unit_desc?: string; short_desc?: string; Value?: string }
 
-async function latest(commodity: string, year: number): Promise<{ month: string; price: number; year: number; unit: string } | null> {
+/** Diagnostic breadcrumbs printed if nothing resolves — so a failure is legible. */
+const DIAG: string[] = [];
+
+async function latest(commodity: string, year: number): Promise<{ month: string; price: number; year: number } | null> {
   const params = new URLSearchParams({
     key: KEY as string, commodity_desc: commodity, statisticcat_desc: "PRICE RECEIVED",
     agg_level_desc: "NATIONAL", year: String(year), format: "JSON",
   });
   const res = await fetch(`${API}?${params}`, { signal: AbortSignal.timeout(60000) });
-  if (!res.ok) return null;
+  if (!res.ok) { DIAG.push(`${commodity} ${year}: HTTP ${res.status}`); return null; }
   const rows = ((await res.json()) as { data?: NassRow[] }).data ?? [];
-  let best: { idx: number; month: string; price: number; unit: string } | null = null;
+  DIAG.push(`${commodity} ${year}: ${rows.length} rows`);
+  // Accept $/CWT rows on ANY reporting period — livestock price-received is often
+  // annual/marketing-year, not monthly (that's what broke the first run). Rank by
+  // month when monthly, else treat annual as year-end so the latest wins.
+  let best: { rank: number; label: string; price: number } | null = null;
   for (const r of rows) {
-    if (!/\$ ?\/ ?CWT/i.test(r.unit_desc ?? "")) continue;
-    const m = (r.reference_period_desc ?? "").trim().toUpperCase();
-    const idx = MONTHS.indexOf(m);
+    const unit = (r.unit_desc ?? "").toUpperCase();
+    if (unit && !unit.includes("CWT")) continue;
     const price = Number((r.Value ?? "").replace(/,/g, ""));
-    if (idx < 0 || !Number.isFinite(price) || price <= 0) continue;
-    if (!best || idx > best.idx) best = { idx, month: m, price, unit: r.unit_desc ?? "$/CWT" };
+    if (!Number.isFinite(price) || price <= 0) continue;
+    const per = (r.reference_period_desc ?? "").trim().toUpperCase();
+    const mi = MONTHS.indexOf(per);
+    const rank = mi >= 0 ? mi : per.includes("YEAR") ? 11 : -1;
+    if (!best || rank > best.rank) best = { rank, label: mi >= 0 ? per : String(year), price };
   }
-  return best ? { month: best.month, price: best.price, year, unit: best.unit } : null;
+  if (!best && rows.length) {
+    DIAG.push(`  ${commodity}: units=[${[...new Set(rows.map((r) => r.unit_desc))].slice(0, 3).join(" | ")}] periods=[${[...new Set(rows.map((r) => r.reference_period_desc))].slice(0, 3).join(" | ")}]`);
+  }
+  return best ? { month: best.label, price: best.price, year } : null;
 }
 
 async function main(): Promise<void> {
@@ -89,7 +101,11 @@ async function main(): Promise<void> {
     const p = (await latest(nass, YEAR).catch(() => null)) ?? (await latest(nass, YEAR - 1).catch(() => null));
     if (p) { out[key] = { month: p.month, year: p.year, pricePerCwt: p.price }; console.log(`  ${key}: $${p.price}/cwt (${p.month} ${p.year})`); }
   }
-  if (Object.keys(out).length === 0) throw new Error("No livestock prices resolved — snapshot NOT overwritten.");
+  if (Object.keys(out).length === 0) {
+    console.error("  Diagnostics (what NASS returned):");
+    DIAG.forEach((d) => console.error("    " + d));
+    throw new Error("No livestock prices resolved — snapshot NOT overwritten. Paste the diagnostics above to me and I'll pinpoint the query.");
+  }
 
   const asOf = new Date().toISOString().slice(0, 10);
   fs.writeFileSync(

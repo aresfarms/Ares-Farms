@@ -12,33 +12,49 @@
 
 import type { CompassDispatch } from "@/lib/newsletter/newsletterDispatch";
 
-export function CompassDispatchHero({ dispatch }: { dispatch: CompassDispatch }) {
+export function CompassDispatchHero({
+  dispatch,
+  hideStamp = false,
+  bare = false,
+}: {
+  dispatch: CompassDispatch;
+  /** Suppress the internal stamp line — the newsletter masthead shows it. */
+  hideStamp?: boolean;
+  /** Drop the card chrome (border/shadow/padding) — the newsletter shell frames it. */
+  bare?: boolean;
+}) {
   return (
     <section aria-label="This week on the Furlong Compass" id="compass-this-week">
       <div
-        style={{
-          maxWidth: 640,
-          margin: "0 auto",
-          background: "var(--fl-card, #ffffff)",
-          border: "1px solid #d6dfe5",
-          borderLeft: "4px solid #0f766e",
-          borderRadius: 14,
-          padding: "22px 26px 20px",
-          boxShadow: "0 1px 2px rgba(16,26,43,0.04)",
-        }}
+        style={
+          bare
+            ? { maxWidth: 640, margin: "0 auto" }
+            : {
+                maxWidth: 640,
+                margin: "0 auto",
+                background: "var(--fl-card, #ffffff)",
+                border: "1px solid #d6dfe5",
+                borderLeft: "4px solid #0f766e",
+                borderRadius: 14,
+                padding: "22px 26px 20px",
+                boxShadow: "0 1px 2px rgba(16,26,43,0.04)",
+              }
+        }
       >
-        <p
-          style={{
-            margin: "0 0 14px",
-            fontSize: 11,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "#0f766e",
-            fontWeight: 700,
-          }}
-        >
-          {dispatch.stamp}
-        </p>
+        {!hideStamp && (
+          <p
+            style={{
+              margin: "0 0 14px",
+              fontSize: 11,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "#0f766e",
+              fontWeight: 700,
+            }}
+          >
+            {dispatch.stamp}
+          </p>
+        )}
 
         {dispatch.paragraphs.map((para, i) => (
           <p

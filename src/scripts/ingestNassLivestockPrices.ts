@@ -49,7 +49,28 @@ interface NassRow { reference_period_desc?: string; unit_desc?: string; short_de
 /** Diagnostic breadcrumbs printed if nothing resolves — so a failure is legible. */
 const DIAG: string[] = [];
 
-async function latest(commodity: string, year: number): Promise<{ month: string; price: number; year: number } | null> {
+/**
+ * NASS "CATTLE" PRICE RECEIVED returns MULTIPLE classes — calves, cows, steers &
+ * heifers, all-cattle — in the same $/CWT unit. An unfiltered read grabs whatever
+ * period is latest, which is how the first run landed on the CALVES class (~$513/cwt)
+ * instead of fed cattle. `preferClasses`, when set, is an ALLOWLIST matched against
+ * short_desc: only those classes are accepted (dropping calves-only and cows), and
+ * earlier entries win, so fed cattle (steers & heifers) beats the blended averages.
+ */
+interface CommoditySpec {
+  nass: string;
+  key: string;
+  preferClasses?: string[];
+}
+
+const COMMODITIES: CommoditySpec[] = [
+  { nass: "CATTLE", key: "cattle", preferClasses: ["STEERS & HEIFERS", "EXCL CALVES", "INCL CALVES"] },
+  { nass: "HOGS", key: "hogs" },
+  { nass: "MILK", key: "milk" },
+];
+
+async function latest(spec: CommoditySpec, year: number): Promise<{ month: string; price: number; year: number } | null> {
+  const { nass: commodity, preferClasses } = spec;
   const params = new URLSearchParams({
     key: KEY as string, commodity_desc: commodity, statisticcat_desc: "PRICE RECEIVED",
     agg_level_desc: "NATIONAL", year: String(year), format: "JSON",
@@ -59,21 +80,30 @@ async function latest(commodity: string, year: number): Promise<{ month: string;
   const rows = ((await res.json()) as { data?: NassRow[] }).data ?? [];
   DIAG.push(`${commodity} ${year}: ${rows.length} rows`);
   // Accept $/CWT rows on ANY reporting period — livestock price-received is often
-  // annual/marketing-year, not monthly (that's what broke the first run). Rank by
-  // month when monthly, else treat annual as year-end so the latest wins.
-  let best: { rank: number; label: string; price: number } | null = null;
+  // annual/marketing-year, not monthly (that's what broke the first run). Rank
+  // first by CLASS (fed cattle over calves/cows/blended), then by period so the
+  // latest wins within a class.
+  let best: { classScore: number; rank: number; label: string; price: number } | null = null;
   for (const r of rows) {
     const unit = (r.unit_desc ?? "").toUpperCase();
     if (unit && !unit.includes("CWT")) continue;
     const price = Number((r.Value ?? "").replace(/,/g, ""));
     if (!Number.isFinite(price) || price <= 0) continue;
+    let classScore = 0;
+    if (preferClasses) {
+      const sd = (r.short_desc ?? "").toUpperCase();
+      const ci = preferClasses.findIndex((c) => sd.includes(c));
+      if (ci < 0) continue; // not an allowed class → drop (calves-only, cows)
+      classScore = preferClasses.length - ci; // earlier = more preferred = higher
+    }
     const per = (r.reference_period_desc ?? "").trim().toUpperCase();
     const mi = MONTHS.indexOf(per);
     const rank = mi >= 0 ? mi : per.includes("YEAR") ? 11 : -1;
-    if (!best || rank > best.rank) best = { rank, label: mi >= 0 ? per : String(year), price };
+    const better = !best || classScore > best.classScore || (classScore === best.classScore && rank > best.rank);
+    if (better) best = { classScore, rank, label: mi >= 0 ? per : String(year), price };
   }
   if (!best && rows.length) {
-    DIAG.push(`  ${commodity}: units=[${[...new Set(rows.map((r) => r.unit_desc))].slice(0, 3).join(" | ")}] periods=[${[...new Set(rows.map((r) => r.reference_period_desc))].slice(0, 3).join(" | ")}]`);
+    DIAG.push(`  ${commodity}: units=[${[...new Set(rows.map((r) => r.unit_desc))].slice(0, 3).join(" | ")}] classes=[${[...new Set(rows.map((r) => r.short_desc))].slice(0, 4).join(" | ")}]`);
   }
   return best ? { month: best.label, price: best.price, year } : null;
 }
@@ -89,11 +119,10 @@ async function main(): Promise<void> {
     process.exit(1);
   }
   console.log(`  Key received (${KEY.length} characters) — querying USDA NASS…`);
-  const commodities: Array<[string, string]> = [["CATTLE", "cattle"], ["HOGS", "hogs"], ["MILK", "milk"]];
   const out: Record<string, { month: string; year: number; pricePerCwt: number }> = {};
-  for (const [nass, key] of commodities) {
-    const p = (await latest(nass, YEAR).catch(() => null)) ?? (await latest(nass, YEAR - 1).catch(() => null));
-    if (p) { out[key] = { month: p.month, year: p.year, pricePerCwt: p.price }; console.log(`  ${key}: $${p.price}/cwt (${p.month} ${p.year})`); }
+  for (const spec of COMMODITIES) {
+    const p = (await latest(spec, YEAR).catch(() => null)) ?? (await latest(spec, YEAR - 1).catch(() => null));
+    if (p) { out[spec.key] = { month: p.month, year: p.year, pricePerCwt: p.price }; console.log(`  ${spec.key}: $${p.price}/cwt (${p.month} ${p.year})`); }
   }
   if (Object.keys(out).length === 0) {
     console.error("  Diagnostics (what NASS returned):");

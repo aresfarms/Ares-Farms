@@ -547,17 +547,23 @@ function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
 function airportsFactFromData(d: PropertyAirportFact | null): BriefFactLine | null {
   if (!d) return null;
   const close = d.nearestMiles <= 6;
+  const sameAsMajor = d.nearestName === d.majorName;
   return {
     label: "Airports & flight paths",
-    value: close
-      ? `${d.nearestName} ~${d.nearestMiles} mi — noise check advised`
-      : `${d.majorName} ~${d.majorMiles} mi`,
+    // Lead with the genuinely NEAREST airport of any kind — regional fields and
+    // military airfields (e.g. an Air Force base) are the real closest for many
+    // properties; the nearest major/scheduled-service hub is shown after it when
+    // they differ. (Fix 2026-07-19: the block previously headlined only the
+    // nearest major, hiding closer regional/military fields.)
+    value: sameAsMajor
+      ? `${d.nearestName} ~${d.nearestMiles} mi${close ? " — noise check advised" : ""}`
+      : `${d.nearestName} ~${d.nearestMiles} mi${close ? " — noise check advised" : ""} · nearest major ${d.majorName} ~${d.majorMiles} mi`,
     text:
-      `The nearest major (scheduled-service) airport is ${d.majorName}, about ${d.majorMiles} miles ` +
-      `straight-line${
-        d.nearestSize !== "major" || d.nearestName !== d.majorName
-          ? `; the nearest airfield of any size is ${d.nearestName}, ~${d.nearestMiles} miles`
-          : ""
+      `The nearest airport is ${d.nearestName}, about ${d.nearestMiles} miles straight-line` +
+      `${
+        sameAsMajor
+          ? ""
+          : `; the nearest major (scheduled-service) hub is ${d.majorName}, ~${d.majorMiles} miles`
       }. ` +
       (close
         ? "An airport this close can mean regular overhead traffic — the FAA publishes noise-exposure maps, and an hour on-site at different times of day tells you more. "

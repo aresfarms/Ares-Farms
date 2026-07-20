@@ -344,6 +344,7 @@
     "ingest:property-airports": "tsx src/scripts/ingestPropertyAirports.ts",
     "ingest:property-military": "tsx src/scripts/ingestPropertyMilitaryBases.ts",
     "ingest:property-soil": "tsx src/scripts/ingestPropertySoil.ts",
+    "ingest:nass-livestock-prices": "tsx src/scripts/ingestNassLivestockPrices.ts",
     "ingest:property-geo-setting": "tsx src/scripts/ingestPropertyGeoSetting.ts",
     "ingest:usdm-drought": "tsx src/scripts/ingestUsdmDrought.ts",
     "ingest:nass-crop-conditions": "tsx src/scripts/ingestNassCropConditions.ts",

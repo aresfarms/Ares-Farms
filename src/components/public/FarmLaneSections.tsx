@@ -19,7 +19,7 @@ import {
   LAND_OPTION_BRIEFS,
   type FarmBrief,
 } from "@/lib/property/farmLaneCurated";
-import { LIVESTOCK_PRICES } from "@/lib/property/livestockPricesGenerated";
+import { buildCommodityPrices, buildLivestockPrices } from "@/lib/property/commodityPricesLive";
 import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
@@ -126,7 +126,8 @@ function CardSection({ title, tag, briefs, intro }: { title: string; tag: string
 }
 
 export function FarmCommodityTicker() {
-  const view = buildFarmMarketView();
+  const view = buildFarmMarketView(buildCommodityPrices());
+  const livestock = buildLivestockPrices();
   const fmt = (n: number | null): string => (n == null ? "—" : `$${n.toFixed(2)}`);
   return (
     <section aria-label="Commodity prices and regional cash bids" style={{ display: "grid", gap: 12 }}>
@@ -162,13 +163,13 @@ export function FarmCommodityTicker() {
       {/* Livestock — renders only once the NASS livestock snapshot is populated
           (npm run ingest:nass-livestock-prices with the owner's key); no
           fabricated numbers before that. $/CWT, not $/bushel. */}
-      {Object.keys(LIVESTOCK_PRICES).length > 0 && (
+      {Object.keys(livestock).length > 0 && (
         <div style={{ display: "grid", gap: 6 }}>
           <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: FARM.accent }}>
             Livestock
           </span>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            {Object.entries(LIVESTOCK_PRICES).map(([name, p]) => (
+            {Object.entries(livestock).map(([name, p]) => (
               <div key={name} style={{ ...card, background: FARM.tileBg, border: `1px solid ${FARM.tileBg}`, display: "grid", gap: 2, minWidth: 150, flex: "1 1 150px" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: FARM.tileLabel }}>
                   {name.charAt(0).toUpperCase() + name.slice(1)}

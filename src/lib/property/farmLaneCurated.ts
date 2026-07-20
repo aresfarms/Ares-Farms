@@ -13,7 +13,7 @@
  * the team. Scanned by verify:brief-copy.
  */
 
-import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "@/lib/property/commodityPricesGenerated";
+import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE, type CommodityPrice } from "@/lib/property/commodityPricesGenerated";
 import { FSA_RATES, FSA_RATES_PROVENANCE } from "@/lib/property/fsaRatesGenerated";
 import { INPUT_COSTS, INPUT_COSTS_PROVENANCE } from "@/lib/property/inputCostsGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "@/lib/property/stateGrainBidsGenerated";
@@ -99,12 +99,15 @@ export interface FarmMarketView {
  * founder). Structured so the module can render it as a clean chart (headline
  * tiles + regional-bid table), like the residential rates block.
  */
-export function buildFarmMarketView(): FarmMarketView {
+// The server ticker passes the overlay-preferring prices (buildCommodityPrices);
+// the default keeps this file client-safe (no node:fs import) for the callers
+// that reach it through client components (e.g. FarmEquipmentExplorer).
+export function buildFarmMarketView(prices: Record<string, CommodityPrice> = COMMODITY_PRICES): FarmMarketView {
   const label: Record<string, string> = { corn: "Corn", soybeans: "Soybeans", wheat: "Wheat" };
 
   const headlinePrices: HeadlinePrice[] = [];
   for (const key of ["corn", "soybeans", "wheat"]) {
-    const p = COMMODITY_PRICES[key];
+    const p = prices[key];
     if (p) headlinePrices.push({ crop: label[key], value: p.pricePerBushel, asOf: `USDA ${p.month} ${p.year}` });
   }
 

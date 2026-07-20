@@ -245,5 +245,29 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     /* capital-rate refresh is best-effort; committed snapshot stands */
   }
 
+  // Market commodity + livestock refresh: pull USDA NASS price-received (grain
+  // $/bu, livestock $/cwt) into the runtime-state overlay so the market tiles
+  // track USDA. Needs NASS_API_KEY in the job env; SKIPPED without it. Best-effort
+  // — a failure keeps the committed snapshot live.
+  try {
+    const { refreshCommodityPrices } = await import("./commodityPricesRefresh");
+    const c = await refreshCommodityPrices();
+    appendAuditEvent({
+      actorId: "system:source-refresh",
+      actorName: "source-refresh-job",
+      domain: DOMAIN,
+      subject: "commodity-prices",
+      decision: c.status === "FAILED" ? "ALERT" : "REFRESH",
+      reason:
+        c.status === "SKIPPED"
+          ? "commodity refresh skipped — NASS_API_KEY not set in the refresh job"
+          : c.status === "FAILED"
+            ? "commodity/livestock refresh failed — committed snapshot kept live"
+            : `commodity prices ${c.status.toLowerCase()} (${c.grain} grain, ${c.livestock} livestock)`,
+    });
+  } catch {
+    /* commodity refresh is best-effort; committed snapshot stands */
+  }
+
   return results;
 }

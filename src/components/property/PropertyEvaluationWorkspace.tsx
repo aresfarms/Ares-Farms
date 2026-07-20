@@ -1920,9 +1920,11 @@ export function PropertyEvaluationWorkspace({
   const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
   const [manualReviewError, setManualReviewError] = useState<string | null>(null);
   const [manualPriceLabel, setManualPriceLabel] = useState("");
-  // Result card is the DEFAULT free-tier view (founder direction 2026-07-17);
-  // the complete chart stays one click behind it — depth, not withholding.
-  const [chartOpen, setChartOpen] = useState(false);
+  // The report opens with its FULL chart already expanded (founder direction
+  // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
+  // visibly open reads as broken). The summary card still leads; the complete
+  // chart renders right below it — collapsible, but open by default.
+  const [chartOpen, setChartOpen] = useState(true);
   const [answers, setAnswers] = useState<DraftAnswers>({
     reportTier: "free",
     possibility: "",

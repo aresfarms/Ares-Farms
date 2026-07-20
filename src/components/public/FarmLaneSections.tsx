@@ -247,70 +247,50 @@ export function FarmCommodityTicker() {
   );
 }
 
-export function FarmLaneSections() {
+// The Farms module is now tabbed (founder direction 2026-07-20): the lane home
+// shows a short grid of topic buttons, and each opens its own focused page
+// (?lane=farms-agriculture&section=<key>) instead of one very long scroll.
+export const FARM_SECTIONS: { key: string; title: string; blurb: string }[] = [
+  { key: "questions", title: "The questions farmers actually ask", blurb: "Enterprise economics, liability, and financing for real farm ventures." },
+  { key: "land-earnings", title: "What your land could earn besides crops", blurb: "Solar leases, hunting, agritourism, timber — money beyond the crop." },
+  { key: "financial-health", title: "Farm financial health — self-check", blurb: "Run your own numbers against the standard Farm Financial Scorecard." },
+  { key: "equipment", title: "Farm equipment — what the iron costs", blurb: "New/used price ranges, suppliers, and a recommend-for-me picker." },
+  { key: "hauling", title: "Agricultural hauling — livestock, grain & equipment", blurb: "Line up carriers — verify authority and insurance first." },
+  { key: "loan-comparison", title: "Which program fits? SBA vs USDA, side by side", blurb: "7(a), 504, B&I, Express — max size, equity, terms, and fit." },
+  { key: "capital-rates", title: "Today's capital rates — FSA, SBA & USDA financing", blurb: "Live public rates for the programs that fund farm ground." },
+  { key: "newsletters", title: "Newsletters & podcasts — Ag edition", blurb: "The Dispatch and audio for farms & land." },
+];
+
+const menuCard = {
+  ...card,
+  textDecoration: "none",
+  borderTop: `3px solid ${FARM.accent}`,
+  minHeight: 108,
+  gap: 8,
+} as const;
+
+/** The lane home: a grid of topic buttons + a report button + module cross-links. */
+export function FarmLaneMenu({ hrefFor, reportHref }: { hrefFor: (key: string) => string; reportHref: string }) {
   return (
-    <div style={{ display: "grid", gap: 24 }}>
-      {/* details[open] label toggle — no client JS needed. */}
-      <style>{`.fl-open-only{display:none}details[open] .fl-open-only{display:inline}details[open] .fl-closed-only{display:none}`}</style>
-
-      <CardSection title="The questions farmers actually ask" tag="Farm enterprise" briefs={ENTERPRISE_BRIEFS} />
-      <CardSection
-        title="What your land could earn besides crops"
-        tag="Land option"
-        briefs={LAND_OPTION_BRIEFS}
-        intro="Every option below is real — but each one is only worth it if this particular parcel supports it: the zoning, the road access, and the demand nearby all have to line up. Read each as 'possible here if…', never as a promise. Confirm the zoning and your insurance before acting on any of them."
-      />
-
-      {/* Farm financial health self-check — the operation view (is the OPERATION
-          healthy) to complement the parcel view (what the LAND should do).
-          Public Farm Financial Scorecard, facts+calculator only, routes to the
-          Guild at the licensing seam (founder direction 2026-07-20). */}
-      <FarmFinancialHealthCheck />
-
-      {/* Equipment — interactive: suppliers inside each box + a recommend-for-
-          my-operation picker (founder direction 2026-07-18). */}
-      <FarmEquipmentExplorer />
-
-      {/* Agricultural hauling (founder direction 2026-07-18). */}
-      <section aria-label="Agricultural hauling" style={{ display: "grid", gap: 12 }}>
-        <span style={sectionKicker}>Agricultural hauling — livestock, grain &amp; equipment</span>
-        <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-          Reliable hauling makes or breaks a delivery — of animals, grain, or a $200,000 combine. Verify any
-          carrier&apos;s authority and insurance first, then line up a hauler that runs your kind of load.
-        </p>
-        <div style={cardGrid}>
-          {AG_HAULERS.map((h) => (
-            <div key={h.name} style={card}>
-              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", color: FARM.accent }}>Hauler</span>
-              <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>{h.name}</strong>
-              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{h.role}</span>
-              {h.disclosure && (
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#9a3412" }}>⚠ {h.disclosure}</span>
-              )}
-            </div>
+    <div style={{ display: "grid", gap: 16 }}>
+      <section aria-label="Farms module topics" style={{ display: "grid", gap: 12 }}>
+        <span style={sectionKicker}>The Farms module — pick a topic</span>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12, alignItems: "stretch" }}>
+          {FARM_SECTIONS.map((s) => (
+            <Link key={s.key} href={hrefFor(s.key)} style={menuCard}>
+              <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>{s.title}</strong>
+              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{s.blurb}</span>
+              <span style={{ fontSize: 12.5, fontWeight: 800, color: FARM.accent }}>Open →</span>
+            </Link>
           ))}
+          {/* The analysis report — opens the written property analysis in a new tab. */}
+          <a href={reportHref} target="_blank" rel="noopener noreferrer" style={{ ...menuCard, borderTop: "3px solid #b8862f", background: "#fdfaf2" }}>
+            <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>Run a property analysis report ↗</strong>
+            <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>Enter an address and open the full written analysis in a new tab.</span>
+            <span style={{ fontSize: 12.5, fontWeight: 800, color: "#b8862f" }}>Open in new tab ↗</span>
+          </a>
         </div>
-        <a
-          href={FMCSA_SAFER_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ fontSize: 12.5, fontWeight: 700, color: FARM.accent, border: "1px solid #d7deea", borderRadius: 999, padding: "6px 13px", textDecoration: "none", background: "#ffffff", width: "fit-content" }}
-        >
-          Verify a carrier on FMCSA SAFER ↗
-        </a>
-        <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{HAULING_NOTE}</span>
       </section>
-
-      {/* SBA-vs-USDA program comparison (with equity/down-payment) then the live
-          capital rates (founder direction 2026-07-20: the comparison rides all
-          three property lanes, not just Financing). */}
-      <LoanProgramComparison />
-
-      {/* SBA / prime / 504 / USDA capital rates (founder direction 2026-07-18:
-          added to both farm and commercial). */}
-      <CapitalRatesBlock accent={FARM.accent} subtitle="FSA, SBA & USDA financing" />
-
-      <HundredPercentFinancingCallout />
 
       {/* Cross-links to the sibling modules */}
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
@@ -329,4 +309,80 @@ export function FarmLaneSections() {
       </section>
     </div>
   );
+}
+
+const detailsToggleStyle = (
+  <style>{`.fl-open-only{display:none}details[open] .fl-open-only{display:inline}details[open] .fl-closed-only{display:none}`}</style>
+);
+
+/** Render one farm section on its own focused page (newsletters is handled by the
+    page, since it needs the audience prop). Returns null for an unknown key. */
+export function FarmLaneSection({ sectionKey }: { sectionKey: string }) {
+  switch (sectionKey) {
+    case "questions":
+      return (
+        <div style={{ display: "grid", gap: 24 }}>
+          {detailsToggleStyle}
+          <CardSection title="The questions farmers actually ask" tag="Farm enterprise" briefs={ENTERPRISE_BRIEFS} />
+        </div>
+      );
+    case "land-earnings":
+      return (
+        <div style={{ display: "grid", gap: 24 }}>
+          {detailsToggleStyle}
+          <CardSection
+            title="What your land could earn besides crops"
+            tag="Land option"
+            briefs={LAND_OPTION_BRIEFS}
+            intro="Every option below is real — but each one is only worth it if this particular parcel supports it: the zoning, the road access, and the demand nearby all have to line up. Read each as 'possible here if…', never as a promise. Confirm the zoning and your insurance before acting on any of them."
+          />
+        </div>
+      );
+    case "financial-health":
+      return <FarmFinancialHealthCheck />;
+    case "equipment":
+      return <FarmEquipmentExplorer />;
+    case "hauling":
+      return (
+        <section aria-label="Agricultural hauling" style={{ display: "grid", gap: 12 }}>
+          <span style={sectionKicker}>Agricultural hauling — livestock, grain &amp; equipment</span>
+          <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
+            Reliable hauling makes or breaks a delivery — of animals, grain, or a $200,000 combine. Verify any
+            carrier&apos;s authority and insurance first, then line up a hauler that runs your kind of load.
+          </p>
+          <div style={cardGrid}>
+            {AG_HAULERS.map((h) => (
+              <div key={h.name} style={card}>
+                <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.05em", textTransform: "uppercase", color: FARM.accent }}>Hauler</span>
+                <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>{h.name}</strong>
+                <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{h.role}</span>
+                {h.disclosure && (
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#9a3412" }}>⚠ {h.disclosure}</span>
+                )}
+              </div>
+            ))}
+          </div>
+          <a
+            href={FMCSA_SAFER_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: 12.5, fontWeight: 700, color: FARM.accent, border: "1px solid #d7deea", borderRadius: 999, padding: "6px 13px", textDecoration: "none", background: "#ffffff", width: "fit-content" }}
+          >
+            Verify a carrier on FMCSA SAFER ↗
+          </a>
+          <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{HAULING_NOTE}</span>
+        </section>
+      );
+    case "loan-comparison":
+      return <LoanProgramComparison />;
+    case "capital-rates":
+      return (
+        <div style={{ display: "grid", gap: 24 }}>
+          <CapitalRatesBlock accent={FARM.accent} subtitle="FSA, SBA & USDA financing" />
+          <HundredPercentFinancingCallout />
+        </div>
+      );
+    default:
+      return null;
+  }
 }

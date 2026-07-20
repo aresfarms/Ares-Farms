@@ -7,7 +7,7 @@ import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { CommercialLaneSections } from "@/components/public/CommercialLaneSections";
 import { EnvironmentalLaneSections } from "@/components/public/EnvironmentalLaneSections";
-import { FarmCommodityTicker, FarmLaneSections } from "@/components/public/FarmLaneSections";
+import { FarmCommodityTicker, FarmLaneMenu, FarmLaneSection, FARM_SECTIONS } from "@/components/public/FarmLaneSections";
 import { FinancingLaneSections } from "@/components/public/FinancingLaneSections";
 import { GrantsLaneSections } from "@/components/public/GrantsLaneSections";
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
@@ -196,6 +196,28 @@ export default async function ExplorePage({
     // Each module wears its own accent (founder direction 2026-07-18). These
     // property lanes render on white → the onLight variant.
     const laneAccent = accentForLane(selected.slug, "light");
+
+    // Tabbed Farms module (founder direction 2026-07-20): ?section=<key> opens a
+    // single focused page instead of the long scroll. The report button opens the
+    // written analysis flow in a new tab.
+    const section = one(resolved.section);
+    const farmReportHref = "/discover?flow=place-facts";
+    if (isFarmLane && section && FARM_SECTIONS.some((s) => s.key === section)) {
+      return (
+        <main>
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 48px", display: "grid", gap: 20 }}>
+            <Link href="/explore?lane=farms-agriculture" style={{ fontSize: 13, fontWeight: 700, color: laneAccent, textDecoration: "none", width: "fit-content" }}>
+              ← Back to the Farms module
+            </Link>
+            {section === "newsletters"
+              ? audience && <CurrentNewsletters audiences={[audience]} />
+              : <FarmLaneSection sectionKey={section} />}
+            <CommunityCta />
+          </div>
+        </main>
+      );
+    }
+
     return (
       <>
         {/* Farms lane leads with the commodity ticker (founder direction
@@ -259,7 +281,10 @@ export default async function ExplorePage({
             enterprise economics, land-money options, equipment, cross-links. */}
         {isFarmLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
-            <FarmLaneSections />
+            <FarmLaneMenu
+              hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`}
+              reportHref={farmReportHref}
+            />
           </div>
         )}
         {/* The commercial sections (founder direction 2026-07-18): the kinds of
@@ -291,7 +316,7 @@ export default async function ExplorePage({
         {/* Newsletters & podcasts, then the gold Community cue, at the BOTTOM
             of every lane (founder direction 2026-07-18). */}
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0", display: "grid", gap: 16 }}>
-          {audience && <CurrentNewsletters audiences={[audience]} />}
+          {audience && !isFarmLane && <CurrentNewsletters audiences={[audience]} />}
           <CommunityCta />
         </div>
         {/* The map is width-responsive now (960×580 aspect held at any width),

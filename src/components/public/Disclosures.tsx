@@ -46,17 +46,47 @@ export function Disclosures({
       strip sits on a chart stage (CHART_TONES ink) — text is identical. */
   tone?: ChartTone;
 }) {
+  // Presentation only (founder direction 2026-07-20): the governance-locked text
+  // is UNCHANGED, but it's framed as an old-ledger "Field note" — a soft cream
+  // marginalia box, muted serif — so the legal disclosure keeps the cozy book
+  // vibe instead of reading like a cold corporate wall.
+  const dark = tone === "dark";
   return (
-    <p
+    <aside
       aria-label="Furlong disclosures"
       style={{
-        margin:     0,
-        fontSize:   13,
-        color:      tone === "dark" ? CHART_TONES.dark.bodyInk : "#5d687a",
-        lineHeight: 1.65,
+        display: "grid",
+        gap: 6,
+        background: dark ? "rgba(255,255,255,0.05)" : "#faf6ec",
+        border: `1px solid ${dark ? "rgba(201,168,76,0.28)" : "#e9ddc4"}`,
+        borderLeft: `3px solid ${dark ? "rgba(201,168,76,0.55)" : "#c9a84c"}`,
+        borderRadius: 10,
+        padding: "12px 16px",
       }}
     >
-      {variant === "compact" ? COMPACT_TEXT : FULL_TEXT}
-    </p>
+      <span
+        style={{
+          fontSize: 10.5,
+          fontWeight: 800,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: dark ? "#d4b06a" : "#96742f",
+        }}
+      >
+        ❧ Field note &amp; limitations
+      </span>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "Georgia, 'Times New Roman', serif",
+          fontSize: 12.5,
+          fontStyle: "italic",
+          color: dark ? CHART_TONES.dark.bodyInk : "#6b6152",
+          lineHeight: 1.65,
+        }}
+      >
+        {variant === "compact" ? COMPACT_TEXT : FULL_TEXT}
+      </p>
+    </aside>
   );
 }

@@ -59,6 +59,7 @@ export const CANONICAL_GOVERNANCE_MIGRATION_FILES = [
   "0032_external_source_stack_governance.sql",
   "0033_environmental_compliance_records.sql",
   "0034_service_requests.sql",
+  "0035_treasury_spine.sql",
 ] as const;
 
 /** Directory holding the canonical governance migration SQL files. */

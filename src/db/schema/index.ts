@@ -108,4 +108,5 @@ export * from "./schemaRegistry";
 export * from "./scraperSourceGovernance";
 export * from "./serviceRequests";
 export * from "./sovereignConsentGatewayRecords";
+export * from "./treasury";
 export * from "./versionRegistry";

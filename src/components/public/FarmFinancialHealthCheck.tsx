@@ -162,6 +162,36 @@ export function FarmFinancialHealthCheck() {
     setRaw({});
   };
 
+  // Download the operator's own numbers as a local ledger (founder direction
+  // 2026-07-20). Device-side only — nothing is sent to or stored on the server;
+  // the file is built in the browser from the current inputs + computed measures.
+  const downloadLedger = () => {
+    const payload = {
+      document: "Furlong — Farm Financial Health self-check",
+      generatedOn: new Date().toISOString().slice(0, 10),
+      privacy: "Your numbers stay on your device. Furlong stored nothing.",
+      yourNumbers: inputs,
+      netFarmIncome: result.netFarmIncome,
+      measures: result.measures.map((m) => ({
+        measure: m.label,
+        category: m.category,
+        value: m.display,
+        band: m.zoneLabel,
+        benchmark: m.benchmark,
+      })),
+      sources: "Farm Financial Standards Council; University of Minnesota CFFM / FINBIN. Illustrative, not advice.",
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "furlong-farm-financials.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   const groups = Array.from(new Set(FIELDS.map((f) => f.group)));
   const anyComputed = result.computedCount > 0;
 
@@ -219,23 +249,49 @@ export function FarmFinancialHealthCheck() {
           <span style={{ fontSize: 11.5, color: "#8a97a8" }}>
             Enter whatever you have — every ratio computes on its own as soon as its inputs are filled.
           </span>
-          <button
-            type="button"
-            onClick={reset}
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#4d596d",
-              background: "#ffffff",
-              border: "1px solid #d7deea",
-              borderRadius: 999,
-              padding: "6px 14px",
-              cursor: "pointer",
-            }}
-          >
-            Clear
-          </button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {anyComputed && (
+              <button
+                type="button"
+                onClick={downloadLedger}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 800,
+                  color: "#ffffff",
+                  background: FARM.accent,
+                  border: "none",
+                  borderRadius: 999,
+                  padding: "6px 14px",
+                  cursor: "pointer",
+                }}
+              >
+                ↓ Download my numbers
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={reset}
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#4d596d",
+                background: "#ffffff",
+                border: "1px solid #d7deea",
+                borderRadius: 999,
+                padding: "6px 14px",
+                cursor: "pointer",
+              }}
+            >
+              Clear
+            </button>
+          </div>
         </div>
+        {anyComputed && (
+          <span style={{ fontSize: 11, color: "#8a97a8", lineHeight: 1.5 }}>
+            &ldquo;Download my numbers&rdquo; saves your figures + these ratios to a file on your device — your
+            local ledger. Nothing is sent to us or stored on our servers.
+          </span>
+        )}
       </div>
 
       {/* Results */}

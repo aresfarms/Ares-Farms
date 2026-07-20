@@ -108,10 +108,14 @@ export function PlaceFirstDiscovery({
   flow,
   embedded = false,
   tone = "light",
+  compact = false,
 }: {
   flow: DiscoveryFlow;
   embedded?: boolean;
   tone?: ChartTone;
+  /** Slim variant for the /explore compass front door: framed card, chips-only
+      coverage with a link to the full check, no bottom routing footer. */
+  compact?: boolean;
 }) {
   const head = HEAD[flow] ?? HEAD["place-facts"];
   const t = CHART_TONES[tone];
@@ -345,7 +349,13 @@ export function PlaceFirstDiscovery({
       {!embedded && (
         <header style={{ display: "grid", gap: 8 }}>
           <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: t.eyebrow }}>{head.eyebrow}</span>
-          <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: t.headingInk }}>{head.title}</h1>
+          {compact ? (
+            // Second heading on a page that already has an h1 (the compass) →
+            // render an h2 at a tighter size for correct document outline.
+            <h2 style={{ margin: 0, fontSize: 20, lineHeight: 1.2, color: t.headingInk }}>{head.title}</h2>
+          ) : (
+            <h1 style={{ margin: 0, fontSize: 24, lineHeight: 1.18, color: t.headingInk }}>{head.title}</h1>
+          )}
           <p style={{ margin: 0, fontSize: 13.5, color: t.bodyInk, lineHeight: 1.55 }}>{head.lede}</p>
         </header>
       )}
@@ -458,23 +468,35 @@ export function PlaceFirstDiscovery({
             </span>
           ))}
         </div>
-        <details>
-          <summary style={{ cursor: "pointer", listStyle: "none", fontSize: 12, color: t.quietInk }}>
-            What each check means + sources ▸
-          </summary>
-          <div style={{ display: "grid", gap: 8, paddingTop: 8 }}>
-            {COVERAGE.map((c) => (
-              <div key={c.label} style={{ border: `1px solid ${t.cardBorder}`, borderRadius: 10, padding: "10px 14px", display: "grid", gap: 3, background: t.cellBg }}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                  <strong style={{ fontSize: 13.5, color: t.labelInk }}>{c.label}</strong>
-                  <span style={{ fontSize: 11.5, fontWeight: 700, color: t.accent }}>{c.confidence}</span>
+        {compact ? (
+          /* Slim variant: chips above + a link to the full check (sources +
+             disclaimers) rather than the inline details grid. Honesty pointer
+             preserved — the full sourcing lives one click away on /discover. */
+          <Link
+            href="/discover?flow=place-facts"
+            style={{ fontSize: 12.5, fontWeight: 700, color: t.accent, textDecoration: "underline", width: "fit-content" }}
+          >
+            See exactly what we check — with sources &amp; disclaimers →
+          </Link>
+        ) : (
+          <details>
+            <summary style={{ cursor: "pointer", listStyle: "none", fontSize: 12, color: t.quietInk }}>
+              What each check means + sources ▸
+            </summary>
+            <div style={{ display: "grid", gap: 8, paddingTop: 8 }}>
+              {COVERAGE.map((c) => (
+                <div key={c.label} style={{ border: `1px solid ${t.cardBorder}`, borderRadius: 10, padding: "10px 14px", display: "grid", gap: 3, background: t.cellBg }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                    <strong style={{ fontSize: 13.5, color: t.labelInk }}>{c.label}</strong>
+                    <span style={{ fontSize: 11.5, fontWeight: 700, color: t.accent }}>{c.confidence}</span>
+                  </div>
+                  <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.45 }}>{c.disclaimer}</span>
+                  <span style={{ fontSize: 11.5, color: t.faintInk }}>Source: {c.source}</span>
                 </div>
-                <span style={{ fontSize: 12.5, color: t.bodyInk, lineHeight: 1.45 }}>{c.disclaimer}</span>
-                <span style={{ fontSize: 11.5, color: t.faintInk }}>Source: {c.source}</span>
-              </div>
-            ))}
-          </div>
-        </details>
+              ))}
+            </div>
+          </details>
+        )}
         <p style={{ margin: 0, fontSize: 12, color: t.quietInk, lineHeight: 1.5 }}>
           Advisory only — place-facts describe the place, not your eligibility.
         </p>
@@ -657,7 +679,7 @@ export function PlaceFirstDiscovery({
       </div>
 
       {/* ── Route to where the facts are already attached ───────────────────── */}
-      {!embedded && (
+      {!embedded && !compact && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 14, alignItems: "center", borderTop: `1px solid ${t.cardBorder}`, paddingTop: 16 }}>
           <Link href="/explore?lane=property-land" data-testid="browse-verified-inventory"
             style={{ fontSize: 14, fontWeight: 800, color: "#fff", background: "#0f766e", borderRadius: 999, padding: "10px 22px", textDecoration: "none" }}>

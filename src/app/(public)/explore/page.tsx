@@ -14,6 +14,7 @@ import { HundredPercentFinancingCallout } from "@/components/public/HundredPerce
 import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/ResidentialRatesBlock";
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
+import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
 import { PublicMapExperience } from "@/components/public/PublicMapExperience";
@@ -574,6 +575,22 @@ export default async function ExplorePage({
           ))}
         </div>
       </section>
+
+      {/* ── Compact address-check directly under the compass (founder direction
+          2026-07-20): a slim place-first check so a visitor can drop an address
+          in right here, before picking a lane — no account, honest by
+          construction. The full check with sources lives on /discover. ── */}
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "28px 24px 8px" }}>
+        <div style={{ textAlign: "center", display: "grid", gap: 6, marginBottom: 16 }}>
+          <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#854F0B" }}>
+            Have an address in mind?
+          </span>
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "#4d596d" }}>
+            Check a specific location&apos;s verified place-facts right here — or pick a lane above to browse first.
+          </p>
+        </div>
+        <PlaceFirstDiscovery flow="place-facts" compact />
+      </div>
 
       {/* ── Light page below the band — tightened shared disclosures strip ────── */}
       <div style={{ maxWidth: 880, margin: "0 auto", padding: "20px 24px 48px" }}>

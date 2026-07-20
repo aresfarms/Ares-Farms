@@ -23,6 +23,7 @@ import { buildCommodityPrices, buildLivestockPrices } from "@/lib/property/commo
 import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
+import { FarmFinancialHealthCheck } from "@/components/public/FarmFinancialHealthCheck";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 
 // This whole module wears the FARM lane's color identity (green — growth,
@@ -258,6 +259,12 @@ export function FarmLaneSections() {
         briefs={LAND_OPTION_BRIEFS}
         intro="Every option below is real — but each one is only worth it if this particular parcel supports it: the zoning, the road access, and the demand nearby all have to line up. Read each as 'possible here if…', never as a promise. Confirm the zoning and your insurance before acting on any of them."
       />
+
+      {/* Farm financial health self-check — the operation view (is the OPERATION
+          healthy) to complement the parcel view (what the LAND should do).
+          Public Farm Financial Scorecard, facts+calculator only, routes to the
+          Guild at the licensing seam (founder direction 2026-07-20). */}
+      <FarmFinancialHealthCheck />
 
       {/* Equipment — interactive: suppliers inside each box + a recommend-for-
           my-operation picker (founder direction 2026-07-18). */}

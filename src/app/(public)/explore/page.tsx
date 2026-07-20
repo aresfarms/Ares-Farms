@@ -28,7 +28,7 @@ import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
 import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
 import { providersForLane } from "@/lib/providers/providerRegistry";
-import { isoWeekSeed, visitRotationSeed } from "@/lib/public-content/weekSeed";
+import { isoWeekSeed, dayRotationSeed } from "@/lib/public-content/weekSeed";
 
 /**
  * Each emblem on the wheel gets its own themed newsletter (founder direction
@@ -188,7 +188,7 @@ export default async function ExplorePage({
     // The live-listings shelf cycles per visit (founder 2026-07-19) so it walks
     // the full inventory instead of a fixed weekly window; the map keeps the
     // weekly narrative seed.
-    const shelfSeed = visitRotationSeed();
+    const shelfSeed = dayRotationSeed();
     const audience = LANE_AUDIENCE[selected.slug];
     const isFarmLane = selected.slug === "farms-agriculture";
     const isResidentialLane = selected.slug === "property-land";

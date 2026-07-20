@@ -36,3 +36,16 @@ export function isoWeekSeed(d: Date = new Date()): number {
 export function visitRotationSeed(d: Date = new Date()): number {
   return Math.floor(d.getTime() / 1000);
 }
+
+/**
+ * dayRotationSeed — a seed that ADVANCES ONCE PER DAY (UTC), for the live-listings
+ * shelf (founder direction 2026-07-20: the shelf should rotate daily — a fresh
+ * slice each day, stable within the day — rather than reshuffling on every reload).
+ *
+ * Day-of-epoch granularity, so `seed % inventoryLength` walks the whole feed one
+ * step per day. Computed once on the server per request and passed as a prop → SSR
+ * and hydration agree. Pure, edge-safe.
+ */
+export function dayRotationSeed(d: Date = new Date()): number {
+  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86_400_000);
+}

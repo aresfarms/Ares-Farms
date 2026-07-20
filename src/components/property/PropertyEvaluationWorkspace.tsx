@@ -3671,6 +3671,11 @@ export function PropertyEvaluationWorkspace({
             <li><strong style={{ color: "#f4f7fa" }}>No cut of your deal.</strong> Furlong facilitates introductions; it never decides your deal and takes no piece of your transaction.</li>
             <li><strong style={{ color: "#f4f7fa" }}>Sources, always.</strong> Every figure carries its origin and date — you can check our work.</li>
           </ul>
+          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#b9cbd9" }}>
+            The one exception, stated plainly: if <em>you</em> choose to join a waitlist or the Guild, we
+            ask for your name and email — only to reach you, and we tell you exactly why right where you
+            enter it. Reading and analyzing stay anonymous, always.
+          </p>
         </section>
       )}
 

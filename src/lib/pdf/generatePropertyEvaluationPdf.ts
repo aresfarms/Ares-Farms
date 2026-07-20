@@ -787,7 +787,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   doc.text("Why we lay it all out.", PAGE.marginX, y, { continued: true });
   setFont("regular", 11, COLORS.text);
   doc.text(
-    " We open every figure with its source and date because this is your ground, not ours to gate. No account, no data capture, no handoff — a guarantee about our own conduct, the part we fully control. Read it, check it, and carry it wherever you like.",
+    " We open every figure with its source and date because this is your ground, not ours to gate. Reading and analyzing stay anonymous — no account, no data capture, no handoff. The one exception, stated plainly: if you choose to join a waitlist or the Guild, we ask your name and email only to reach you, and tell you exactly why. That is a guarantee about our own conduct — the part we fully control. Read it, check it, and carry it wherever you like.",
     { width: CONTENT_W, lineGap: 3 }
   );
   y = doc.y + 14;

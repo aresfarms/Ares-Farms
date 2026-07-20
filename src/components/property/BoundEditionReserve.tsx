@@ -3,20 +3,20 @@
 import { useEffect, useState } from "react";
 
 /**
- * BoundEditionReserve — the alpha "mock the desire" reservation prompt (founder
- * direction 2026-07-20). Physical bound editions of the Land Register are a
- * future Guild benefit; here we only MEASURE who wants one. Reserving is a
- * waitlist signal — no payment, no shipping, no Guild token, and NO personal
- * PII (a mailing address only ever lives inside the identified, opt-in Guild).
+ * BoundEditionReserve — the alpha Bound Register WAITLIST (founder direction
+ * 2026-07-20). Physical bound editions of the Land Register are a future Guild
+ * benefit; this is the real waitlist so reservers are first in line.
  *
- * The click records an anonymous, property-context-only interest signal to the
- * operator queue (server), and remembers the reserved state ON THIS DEVICE so
- * the prompt reflects it and never re-nags. Server persistence is best-effort:
- * the device-local state is authoritative for the UI (works even where the DB
- * isn't reachable, e.g. local preview).
+ * PII: this is the ONE place the free surface asks who you are, and it is a
+ * CONSCIOUS, EXPLICIT OPT-IN. It collects NAME + EMAIL only — never a mailing
+ * address (that comes later, at ship, inside the Guild). The consent + "why" is
+ * stated on the surface. No payment, no account, no Guild token. The device
+ * remembers only that this tract was reserved (so the card reflects it and
+ * doesn't re-nag); the name/email go to the operator queue, not localStorage.
  */
 
 const STORE_KEY = "furlong.bound-edition-reserved.v1";
+const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type ReservedMap = Record<string, { binding: string; at: string }>;
 
@@ -45,8 +45,11 @@ export function BoundEditionReserve({
   lane?: string;
 }) {
   const [binding, setBinding] = useState<"standalone" | "portfolio">("standalone");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [reserved, setReserved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setReserved(Boolean(readReserved()[propertyId]));
@@ -54,26 +57,60 @@ export function BoundEditionReserve({
 
   const reserve = () => {
     if (busy || reserved) return;
-    setBusy(true);
-    // Device-local state is authoritative for the UI.
-    try {
-      const all = readReserved();
-      all[propertyId] = { binding, at: new Date().toISOString() };
-      window.localStorage.setItem(STORE_KEY, JSON.stringify(all));
-    } catch {
-      /* best effort */
+    if (!name.trim()) {
+      setError("Your name holds your place in line.");
+      return;
     }
-    setReserved(true);
-    // Best-effort anonymous demand signal — property context ONLY, no PII.
+    if (!EMAIL_SHAPE.test(email.trim())) {
+      setError("A valid email lets us tell you first.");
+      return;
+    }
+    setError(null);
+    setBusy(true);
     void fetch("/api/public/bound-edition-interest", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ propertyId, title, location, propertyType, binding, lane }),
+      body: JSON.stringify({
+        propertyId,
+        title,
+        location,
+        propertyType,
+        binding,
+        lane,
+        name: name.trim(),
+        email: email.trim(),
+      }),
     })
-      .catch(() => {
-        /* the reservation still stands on this device */
+      .then(async (res) => {
+        const body = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+        if (!res.ok || !body?.ok) {
+          throw new Error(body?.error || "The reservation could not be recorded — please try again.");
+        }
+        // Device remembers ONLY the reserved flag (never the contact details).
+        try {
+          const all = readReserved();
+          all[propertyId] = { binding, at: new Date().toISOString() };
+          window.localStorage.setItem(STORE_KEY, JSON.stringify(all));
+        } catch {
+          /* best effort */
+        }
+        setReserved(true);
+      })
+      .catch((err: unknown) => {
+        setError(err instanceof Error ? err.message : "The reservation could not be recorded — please try again.");
       })
       .finally(() => setBusy(false));
+  };
+
+  const inputStyle: React.CSSProperties = {
+    fontFamily: "system-ui, sans-serif",
+    fontSize: 14,
+    color: "#efe9d8",
+    background: "rgba(0,0,0,0.28)",
+    border: "1px solid #3a4230",
+    borderRadius: 8,
+    padding: "9px 11px",
+    width: "100%",
   };
 
   return (
@@ -100,8 +137,8 @@ export function BoundEditionReserve({
       </div>
       <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "#efe9d8" }}>
         A hardbound, foil-stamped edition of this ledger — your tract&apos;s verified record pre-printed,
-        with ruled field-note margins to write in by hand. Shipped to Guild members; reserving here just
-        holds your place while we open it.
+        with ruled field-note margins to write in by hand. Shipped to Guild members; join the waitlist to
+        be first when editions open.
       </p>
 
       {reserved ? (
@@ -117,7 +154,7 @@ export function BoundEditionReserve({
           }}
         >
           <span aria-hidden>✓</span>
-          Your place is reserved on this device. Bound editions arrive with the Guild — we&apos;ll bring it up when it opens.
+          You&apos;re on the list. We&apos;ll email you the moment bound editions open — you&apos;ll be first.
         </div>
       ) : (
         <>
@@ -160,6 +197,36 @@ export function BoundEditionReserve({
             })}
           </fieldset>
 
+          <div style={{ display: "grid", gap: 8, fontFamily: "system-ui, sans-serif" }}>
+            <label style={{ display: "grid", gap: 4 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: "#c9bfa4" }}>Name</span>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Who should we hold the edition for?"
+                autoComplete="name"
+                style={inputStyle}
+              />
+            </label>
+            <label style={{ display: "grid", gap: 4 }}>
+              <span style={{ fontSize: 11.5, fontWeight: 700, color: "#c9bfa4" }}>Email</span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+                style={inputStyle}
+              />
+            </label>
+          </div>
+
+          {error && (
+            <span role="alert" style={{ fontSize: 12.5, color: "#e7a17a", fontFamily: "system-ui, sans-serif" }}>
+              {error}
+            </span>
+          )}
+
           <button
             type="button"
             onClick={reserve}
@@ -181,8 +248,9 @@ export function BoundEditionReserve({
           </button>
 
           <span style={{ fontSize: 11.5, color: "#9ca884", lineHeight: 1.5, fontFamily: "system-ui, sans-serif" }}>
-            No payment, no address, no account. Reserving only tells us you&apos;d want one — a shipping
-            address is asked for later, and only inside the Guild.
+            This is the one place we ask who you are — and only because you asked to be first. We hold your
+            name and email solely to tell you when editions open, never sell them, and delete them on request.
+            No payment, no account, and no mailing address until you actually order one, inside the Guild.
           </span>
         </>
       )}

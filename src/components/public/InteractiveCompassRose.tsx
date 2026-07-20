@@ -66,10 +66,13 @@ export function InteractiveCompassRose({
   lanes,
   ink,
   accent,
+  showObjectives = true,
 }: {
   lanes: CompassLane[];
   ink: string;
   accent: string;
+  /** Show the "Point me toward…" objective picker (default on). */
+  showObjectives?: boolean;
 }) {
   const [hovered, setHovered] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
@@ -80,6 +83,7 @@ export function InteractiveCompassRose({
   return (
     <div style={{ display: "grid", gap: 18, justifyItems: "center" }}>
       {/* Objective picker — guidance, not a funnel. */}
+      {showObjectives && (
       <div className="cr-obj" role="group" aria-label="Point the compass toward what you want to do">
         <span className="cr-obj-lead">Point me toward…</span>
         {OBJECTIVES.map((o) => (
@@ -95,6 +99,7 @@ export function InteractiveCompassRose({
           </button>
         ))}
       </div>
+      )}
 
       <div className="cr-rose">
         {/* Decorative dashed spokes. */}

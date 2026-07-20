@@ -672,7 +672,7 @@ export default async function HomePage() {
             dark stage; breaks out of the max-width container.
             ══════════════════════════════════════════════════════════════ */}
         <div style={{ marginInline: "calc(50% - 50vw)" }}>
-          <CompassRose showHeading={false} />
+          <CompassRose showHeading={false} showObjectives />
         </div>
 
         {/* Start-with-Furlong CTA — moved below the compass (founder direction

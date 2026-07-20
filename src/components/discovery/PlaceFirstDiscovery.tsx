@@ -373,6 +373,14 @@ export function PlaceFirstDiscovery({
         // instead of a tall stacked card.
         <div
           data-testid="place-inputs"
+          onKeyDown={(e) => {
+            // Keyboard-only operation (WCAG 2.1.1): Enter in any field runs the
+            // query, so the whole lookup works on Tab + Enter with no mouse.
+            if (e.key === "Enter") {
+              e.preventDefault();
+              void checkPlaceFacts();
+            }
+          }}
           style={{
             display: "flex",
             flexWrap: "wrap",
@@ -417,7 +425,16 @@ export function PlaceFirstDiscovery({
           </span>
         </div>
       ) : (
-        <div data-testid="place-inputs" style={{ display: "grid", gap: 12, border: `1px solid ${t.cardBorder}`, borderRadius: 12, padding: embedded ? "18px 18px" : "16px 18px", background: t.cardBg }}>
+        <div
+          data-testid="place-inputs"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              void checkPlaceFacts();
+            }
+          }}
+          style={{ display: "grid", gap: 12, border: `1px solid ${t.cardBorder}`, borderRadius: 12, padding: embedded ? "18px 18px" : "16px 18px", background: t.cardBg }}
+        >
           <strong style={{ fontSize: embedded ? 16 : 13.5, color: t.labelInk }}>
             {embedded ? "Start with the verified address" : "Where is the location?"}
           </strong>

@@ -191,7 +191,7 @@ export function FarmCommodityTicker() {
         <div style={{ ...card, overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
-              <tr style={{ textAlign: "left", color: "#708997" }}>
+              <tr style={{ textAlign: "left", color: "#4d596d" }}>
                 {["Region cash bid", "Corn", "Soybeans", "Wheat"].map((h) => (
                   <th key={h} style={{ padding: "0 12px 8px 0", fontWeight: 600, fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.04em" }}>{h}</th>
                 ))}

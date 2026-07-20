@@ -65,6 +65,24 @@ export function PlatformShell({ children }: { children: ReactNode }) {
           outline: 3px solid #c9a84c;
           outline-offset: 2px;
         }
+        /* FURLONG-ish keyboard focus (founder direction 2026-07-20): a compass-
+           brass ledger ring on any keyboard-focused control instead of the generic
+           browser blue (WCAG 2.4.7 / 2.4.11 non-text contrast). #8a5a12 clears 3:1
+           on white and reads clearly on the dark chart stage. Component-specific
+           focus styles (higher specificity — e.g. the compass's white ring on
+           navy) still win where a surface needs its own. Mouse clicks are
+           unaffected (:focus-visible only). */
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible,
+        summary:focus-visible,
+        [tabindex]:focus-visible {
+          outline: 3px solid #8a5a12;
+          outline-offset: 2px;
+          border-radius: 3px;
+        }
       `}</style>
       <a href="#main-content" className="skip-to-main">
         Skip to main content

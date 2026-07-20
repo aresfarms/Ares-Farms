@@ -2109,7 +2109,7 @@ export function PropertyEvaluationWorkspace({
               <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
                 {context.listingUrl && (
                   <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
-                    Open the public source ↗
+                    See the current price on the official listing ↗
                   </Link>
                 )}
                 {context.manualReviewRequired && (
@@ -2840,7 +2840,7 @@ export function PropertyEvaluationWorkspace({
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
         {context.listingUrl && (
           <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
-            Open the source listing ↗
+            See the current price on the official listing ↗
           </Link>
         )}
         {/* Streamlined to three distinct actions (founder direction

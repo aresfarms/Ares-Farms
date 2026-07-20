@@ -2951,7 +2951,48 @@ export function PropertyEvaluationWorkspace({
   );
 
   return (
-    <section style={{ display: "grid", gap: 22 }}>
+    <section className="furlong-report-print" data-print="report" style={{ display: "grid", gap: 22 }}>
+      {/* Immaculate print / "Download as a document" styling (founder direction
+          2026-07-20): a browser Print (Ctrl+P) of the live ledger must NOT come
+          out a navy web-page screenshot with buttons. This strips the whole page
+          down to the ledger alone, forces crisp monochrome on white, drops every
+          interactive control, and keeps each section whole across page breaks —
+          so it lands like an underwriting brief on a dining table or a truck
+          dashboard, not a webpage. (The "Download the PDF" button is a separately
+          generated document already; this covers the Ctrl+P path.) */}
+      <style>{`
+        @media print {
+          /* Reveal only the ledger — hide nav, footer, shelves, everything else. */
+          body * { visibility: hidden !important; }
+          .furlong-report-print, .furlong-report-print * { visibility: visible !important; }
+          .furlong-report-print {
+            position: absolute !important; left: 0; top: 0; width: 100%;
+            margin: 0 !important; padding: 0 !important; gap: 12px !important;
+          }
+          /* Monochrome, ink-frugal, crisp white backing. */
+          .furlong-report-print, .furlong-report-print * {
+            background: #fff !important; color: #111 !important;
+            box-shadow: none !important; text-shadow: none !important;
+          }
+          .furlong-report-print a { color: #111 !important; text-decoration: none !important; }
+          /* Soften every inline border to a hairline rule. */
+          .furlong-report-print [style*="border"] { border-color: #cfcfcf !important; }
+          /* The navy masthead prints as a black-rule letterhead. */
+          .furlong-report-print .nl-doc { border: none !important; }
+          .furlong-report-print .nl-doc > div:first-child { border-bottom: 2px solid #111 !important; }
+          /* No interactive chrome belongs on paper. */
+          .furlong-report-print button,
+          .furlong-report-print [data-testid="saved-drafts-rail"],
+          .furlong-report-print .no-print { display: none !important; }
+          /* Keep sections/cards whole across page breaks. */
+          .furlong-report-print section,
+          .furlong-report-print article,
+          .furlong-report-print .card,
+          .furlong-report-print .report-section { break-inside: avoid; page-break-inside: avoid; }
+          .furlong-report-print img { filter: grayscale(100%); }
+          @page { margin: 0.6in; }
+        }
+      `}</style>
       {/* Ship's Ledger masthead (founder direction 2026-07-20): the report opens
           like an official, stamped land ledger — emblem seal, THE LAND LEDGER
           nameplate, the parcel, and a "DATA VERIFIED" stamp. Furlong = 220 yards

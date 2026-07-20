@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { FinancingIntakePanel } from "@/components/public/FinancingIntakePanel";
 import { FinancingFeeChart } from "@/components/public/FinancingFeeChart";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
@@ -107,8 +106,6 @@ export function FinancingLaneSections() {
       </section>
 
       <LoanProgramComparison />
-
-      <CapitalRatesBlock accent={PURPLE} subtitle="SBA, USDA & conventional — today's public rates" />
 
       <FinancingIntakePanel />
 

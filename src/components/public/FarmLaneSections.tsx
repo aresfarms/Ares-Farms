@@ -20,7 +20,6 @@ import {
   type FarmBrief,
 } from "@/lib/property/farmLaneCurated";
 import { buildCommodityPrices, buildLivestockPrices } from "@/lib/property/commodityPricesLive";
-import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
@@ -256,8 +255,7 @@ export const FARM_SECTIONS: { key: string; title: string; blurb: string }[] = [
   { key: "financial-health", title: "Farm financial health — self-check", blurb: "Run your own numbers against the standard Farm Financial Scorecard." },
   { key: "equipment", title: "Farm equipment — what the iron costs", blurb: "New/used price ranges, suppliers, and a recommend-for-me picker." },
   { key: "hauling", title: "Agricultural hauling — livestock, grain & equipment", blurb: "Line up carriers — verify authority and insurance first." },
-  { key: "loan-comparison", title: "Which program fits? SBA vs USDA, side by side", blurb: "7(a), 504, B&I, Express — max size, equity, terms, and fit." },
-  { key: "capital-rates", title: "Today's capital rates — FSA, SBA & USDA financing", blurb: "Live public rates for the programs that fund farm ground." },
+  { key: "loan-comparison", title: "Financing programs & today's rates", blurb: "SBA 7(a)/504, USDA B&I, FSA — how each is built and what it's priced at now." },
   { key: "newsletters", title: "Newsletters & podcasts — Ag edition", blurb: "The Dispatch and audio for farms & land." },
 ];
 
@@ -374,11 +372,11 @@ export function FarmLaneSection({ sectionKey }: { sectionKey: string }) {
         </section>
       );
     case "loan-comparison":
-      return <LoanProgramComparison />;
-    case "capital-rates":
+      // Merged program comparison + today's rates (founder direction 2026-07-20),
+      // with the 100%-financing callout underneath.
       return (
         <div style={{ display: "grid", gap: 24 }}>
-          <CapitalRatesBlock accent={FARM.accent} subtitle="FSA, SBA & USDA financing" />
+          <LoanProgramComparison />
           <HundredPercentFinancingCallout />
         </div>
       );

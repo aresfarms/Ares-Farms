@@ -592,7 +592,7 @@ export interface AgHauler {
 }
 
 export const AG_HAULERS: AgHauler[] = [
-  { name: "Ares Farms Inc", role: "Licensed agricultural & equipment transport", disclosure: "Affiliated with a Furlong founder — disclosed" },
+  { name: "Ares Farms Inc", role: "Licensed agricultural & equipment transport", disclosure: "Affiliated with a Furlong founder" },
   { name: "Eal Cole & Sons Trucking", role: "Reliable agriculture & equipment hauling" },
   { name: "Giddens Trucking", role: "Reliable agriculture & equipment hauling" },
 ];

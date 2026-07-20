@@ -68,9 +68,9 @@ const FINANCING_BRIEFS: FinBrief[] = [
 export function FinancingLaneSections() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      {/* FREE lending-applications callout — sits between the lane header and the
-          "Our dedicated licensed lender" intro (founder direction 2026-07-20). */}
-      <FinancingFeeChart />
+      {/* Program comparison + today's rates leads the page (founder direction
+          2026-07-20); the paid-advisory fee block moves to the bottom. */}
+      <LoanProgramComparison />
 
       <section aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
@@ -105,8 +105,6 @@ export function FinancingLaneSections() {
         </div>
       </section>
 
-      <LoanProgramComparison />
-
       <FinancingIntakePanel />
 
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
@@ -123,6 +121,10 @@ export function FinancingLaneSections() {
           </span>
         </Link>
       </section>
+
+      {/* Paid advisory services (free applications + the only paid one-on-one time)
+          at the BOTTOM (founder direction 2026-07-20). */}
+      <FinancingFeeChart />
     </div>
   );
 }

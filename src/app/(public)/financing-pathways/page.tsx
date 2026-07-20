@@ -60,9 +60,10 @@ const panelStyle = surface.panel;
 const mutedText = surface.muted;
 const inputStyle = surface.input;
 
-function FieldLabel(props: { children: string }) {
+function FieldLabel(props: { children: string; htmlFor?: string }) {
   return (
-    <span
+    <label
+      htmlFor={props.htmlFor}
       style={{
         display: "block",
         marginBottom: 6,
@@ -72,7 +73,7 @@ function FieldLabel(props: { children: string }) {
       }}
     >
       {props.children}
-    </span>
+    </label>
   );
 }
 
@@ -329,16 +330,18 @@ export default function FinancingPathwaysPage() {
             }}
           >
             <div>
-              <FieldLabel>Borrower ID</FieldLabel>
+              <FieldLabel htmlFor="fp-borrower-id">Borrower ID</FieldLabel>
               <input
+                id="fp-borrower-id"
                 style={inputStyle}
                 value={borrowerId}
                 onChange={(event) => setBorrowerId(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Application ID</FieldLabel>
+              <FieldLabel htmlFor="fp-application-id">Application ID</FieldLabel>
               <input
+                id="fp-application-id"
                 style={inputStyle}
                 value={applicationId}
                 onChange={(event) => setApplicationId(event.target.value)}
@@ -346,40 +349,45 @@ export default function FinancingPathwaysPage() {
               />
             </div>
             <div>
-              <FieldLabel>State</FieldLabel>
+              <FieldLabel htmlFor="fp-state">State</FieldLabel>
               <input
+                id="fp-state"
                 style={inputStyle}
                 value={stateCode}
                 onChange={(event) => setStateCode(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>County</FieldLabel>
+              <FieldLabel htmlFor="fp-county">County</FieldLabel>
               <input
+                id="fp-county"
                 style={inputStyle}
                 value={county}
                 onChange={(event) => setCounty(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Farm Types</FieldLabel>
+              <FieldLabel htmlFor="fp-farm-types">Farm Types</FieldLabel>
               <input
+                id="fp-farm-types"
                 style={inputStyle}
                 value={farmTypes}
                 onChange={(event) => setFarmTypes(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Goals</FieldLabel>
+              <FieldLabel htmlFor="fp-goals">Goals</FieldLabel>
               <input
+                id="fp-goals"
                 style={inputStyle}
                 value={goals}
                 onChange={(event) => setGoals(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Acreage</FieldLabel>
+              <FieldLabel htmlFor="fp-acreage">Acreage</FieldLabel>
               <input
+                id="fp-acreage"
                 style={inputStyle}
                 type="number"
                 min="0"
@@ -388,8 +396,9 @@ export default function FinancingPathwaysPage() {
               />
             </div>
             <div>
-              <FieldLabel>Requested Amount</FieldLabel>
+              <FieldLabel htmlFor="fp-requested-amount">Requested Amount</FieldLabel>
               <input
+                id="fp-requested-amount"
                 style={inputStyle}
                 type="number"
                 min="0"
@@ -398,16 +407,18 @@ export default function FinancingPathwaysPage() {
               />
             </div>
             <div>
-              <FieldLabel>Supporting Documents</FieldLabel>
+              <FieldLabel htmlFor="fp-documents">Supporting Documents</FieldLabel>
               <input
+                id="fp-documents"
                 style={inputStyle}
                 value={documents}
                 onChange={(event) => setDocuments(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Purpose</FieldLabel>
+              <FieldLabel htmlFor="fp-purpose">Purpose</FieldLabel>
               <input
+                id="fp-purpose"
                 style={inputStyle}
                 value={purpose}
                 onChange={(event) => setPurpose(event.target.value)}

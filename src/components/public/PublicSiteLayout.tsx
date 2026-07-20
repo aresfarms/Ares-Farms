@@ -177,7 +177,7 @@ export function PublicSiteLayout({
             style={{
               margin:     0,
               fontSize:   12,
-              color:      "#9aabb8",
+              color:      "#5b6a77",
               lineHeight: 1.5,
               marginLeft: "auto",
               maxWidth:   600,

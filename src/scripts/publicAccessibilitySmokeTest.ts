@@ -113,7 +113,9 @@ type CriterionResult = {
 };
 
 function runAcceptanceCriteria(): CriterionResult[] {
-  const homepage = readSrc("src/app/page.tsx");
+  // Homepage lives in the (public) route group (relocated during the compass-rose
+  // redesign); the prior "src/app/page.tsx" path no longer exists.
+  const homepage = readSrc("src/app/(public)/page.tsx");
 
   return [
     {

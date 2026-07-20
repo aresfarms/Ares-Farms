@@ -81,6 +81,7 @@ import {
   answerCommercialQuestions,
   type LaneAnswer,
 } from "./laneAnswerEngine";
+import { buildLocalServices, type LocalServices } from "./localServices";
 import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
@@ -192,6 +193,10 @@ export interface PropertyBriefIntelligence {
   /** Commercial lane "burning questions" answered FOR THIS property (use/zoning,
       income, financing fit, deal-killers, location). Null unless commercial. */
   commercialAnswers: LaneAnswer[] | null;
+  /** Utilities to line up, public-safety look-up (link-out only), and planned-
+      construction diligence — authoritative links, never fabricated providers or
+      embedded crime data. Applies to every property. */
+  localServices: LocalServices | null;
   /** County derived from the property's census tract when the record lacked one. */
   resolvedCounty: ResolvedCounty | null;
   /** Up to four verified-fact chips for the Answer card (flood, grocery, schools, rent). */
@@ -1750,6 +1755,16 @@ export function buildPropertyBriefIntelligence(args: {
             nearestMetroMiles: id ? PROPERTY_AIRPORTS[id]?.majorMiles ?? null : null,
           })
         : null,
+    localServices: buildLocalServices({
+      stateCode: args.stateCode ?? null,
+      stateName: stateName(args.stateCode ?? null),
+      county: resolvedCounty?.name ?? null,
+      electricCentsPerKwh: args.stateCode
+        ? STATE_ELECTRICITY[args.stateCode.toUpperCase()]?.resPriceCentsKwh ?? null
+        : null,
+      broadbandPctServed: fmrFips ? COUNTY_BROADBAND[fmrFips]?.pctServed ?? null : null,
+      broadbandPctWired: fmrFips ? COUNTY_BROADBAND[fmrFips]?.pctWired ?? null : null,
+    }),
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,
@@ -2159,6 +2174,16 @@ export async function buildLocationBriefIntelligence(args: {
             nearestMetroMiles: null,
           })
         : null,
+    localServices: buildLocalServices({
+      stateCode: stateCode ?? null,
+      stateName: stateName(stateCode ?? null),
+      county: resolvedCounty?.name ?? null,
+      electricCentsPerKwh: stateCode
+        ? STATE_ELECTRICITY[stateCode.toUpperCase()]?.resPriceCentsKwh ?? null
+        : null,
+      broadbandPctServed: countyFips ? COUNTY_BROADBAND[countyFips]?.pctServed ?? null : null,
+      broadbandPctWired: countyFips ? COUNTY_BROADBAND[countyFips]?.pctWired ?? null : null,
+    }),
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,

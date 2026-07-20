@@ -25,6 +25,7 @@ const SCANNED_FILES = [
   "src/lib/property/propertyBriefIntelligence.ts",
   "src/lib/property/laneAnswerEngine.ts",
   "src/lib/property/farmAnswerEngine.ts",
+  "src/lib/property/localServices.ts",
   "src/lib/property/chartThemes.ts",
   "src/components/property/ChartTableBrief.tsx",
   "src/components/property/OwnershipCostPanel.tsx",

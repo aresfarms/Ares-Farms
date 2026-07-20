@@ -1612,6 +1612,13 @@ function buildReportModel(args: {
     answers.map((a) => `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`);
   const residentialAnswerText = laneAnswerText(args.placeIntelligence?.residentialAnswers ?? []);
   const commercialAnswerText = laneAnswerText(args.placeIntelligence?.commercialAnswers ?? []);
+  // Utilities, public-safety (link-out only), and planned-construction diligence.
+  const localServices = args.placeIntelligence?.localServices ?? null;
+  const localServicesLines = localServices
+    ? [...localServices.utilities, ...localServices.publicSafety, ...localServices.plannedConstruction].map(
+        (s) => `${s.category}: ${s.detail}${s.url ? ` (${s.urlLabel ?? "source"}: ${s.url})` : ""}`
+      )
+    : [];
 
   const teaserLines = tierIdentity.nextTierTeaser
     ? [
@@ -1682,6 +1689,9 @@ function buildReportModel(args: {
     ...(commercialAnswerText.length > 0
       ? [`## Your questions — answered for this property`, ...commercialAnswerText.map((l) => `- ${l}`), ``]
       : []),
+    ...(localServicesLines.length > 0
+      ? [`## Utilities, services & diligence links`, ...localServicesLines.map((l) => `- ${l}`), ``]
+      : []),
     ...(honestUnknowns.length > 0
       ? [`## Honest unknowns — and how you'd find out`, ...honestUnknowns.map((line) => `- ${line}`), ``]
       : []),
@@ -1738,6 +1748,26 @@ function buildReportModel(args: {
       : "",
     commercialAnswerText.length > 0
       ? section("Your questions — answered for this property", `<ul>${htmlList(commercialAnswerText)}</ul>`)
+      : "",
+    localServicesLines.length > 0
+      ? section(
+          "Utilities, services & diligence links",
+          `<ul>${(localServices
+            ? [...localServices.utilities, ...localServices.publicSafety, ...localServices.plannedConstruction]
+            : []
+          )
+            .map(
+              (s) =>
+                `<li><strong>${escapeHtml(s.category)}:</strong> ${escapeHtml(s.detail)}${
+                  s.url
+                    ? ` <a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(
+                        s.urlLabel ?? "source"
+                      )} ↗</a>`
+                    : ""
+                }</li>`
+            )
+            .join("")}</ul>`
+        )
       : "",
     honestUnknowns.length > 0
       ? section("Honest unknowns — and how you'd find out", `<ul>${htmlList(honestUnknowns)}</ul>`)

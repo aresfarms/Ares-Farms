@@ -214,6 +214,23 @@ resource "google_cloud_run_v2_job" "source_refresh" {
           value = "/var/furlong-state"
         }
 
+        # USDA NASS key for the daily grain + livestock price refresh. The secret
+        # is created + versioned out of band by the owner (not TF), same as
+        # SENDGRID_API_KEY; gated on var.nass_api_key_enabled so TF never requires
+        # it. Without it the refresh SKIPs and the committed price snapshot stays.
+        dynamic "env" {
+          for_each = var.nass_api_key_enabled ? [1] : []
+          content {
+            name = "NASS_API_KEY"
+            value_source {
+              secret_key_ref {
+                secret  = "NASS_API_KEY"
+                version = "latest"
+              }
+            }
+          }
+        }
+
         volume_mounts {
           name       = "runtime-state"
           mount_path = "/var/furlong-state"

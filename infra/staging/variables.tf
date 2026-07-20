@@ -368,6 +368,12 @@ variable "email_from" {
   default     = ""
 }
 
+variable "nass_api_key_enabled" {
+  description = "When true, the daily source-refresh job reads NASS_API_KEY (an out-of-band Secret Manager secret) to auto-refresh grain + livestock prices. Requires the secret to exist. Default false = prices stay on the committed snapshot."
+  type        = bool
+  default     = false
+}
+
 # ---- Operator credential login -----------------------------------------------
 # Enables the email + shared-secret operator login (internal/approval screens).
 # The AUTH_CREDENTIAL_SHARED_SECRET secret is created out of band by the owner.

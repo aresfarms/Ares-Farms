@@ -1596,6 +1596,11 @@ function buildReportModel(args: {
     (unknown) => `${unknown.label}: ${unknown.howToFind}`
   );
   const financingProse = args.placeIntelligence?.pathwaysProse ?? null;
+  // Farm-lane questions answered FOR THIS PROPERTY (null on non-farm profiles).
+  const farmAnswers = args.placeIntelligence?.farmEnterpriseAnswers ?? [];
+  const farmAnswerText = farmAnswers.map(
+    (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`
+  );
 
   const teaserLines = tierIdentity.nextTierTeaser
     ? [
@@ -1654,6 +1659,9 @@ function buildReportModel(args: {
     ...(financingProse
       ? [`## How people typically pay for a property like this`, `- ${financingProse}`, ``]
       : []),
+    ...(farmAnswerText.length > 0
+      ? [`## Your farm questions — answered for this property`, ...farmAnswerText.map((l) => `- ${l}`), ``]
+      : []),
     ...(honestUnknowns.length > 0
       ? [`## Honest unknowns — and how you'd find out`, ...honestUnknowns.map((line) => `- ${line}`), ``]
       : []),
@@ -1698,6 +1706,9 @@ function buildReportModel(args: {
       : "",
     financingProse
       ? section("How people typically pay for a property like this", `<p>${escapeHtml(financingProse)}</p>`)
+      : "",
+    farmAnswerText.length > 0
+      ? section("Your farm questions — answered for this property", `<ul>${htmlList(farmAnswerText)}</ul>`)
       : "",
     honestUnknowns.length > 0
       ? section("Honest unknowns — and how you'd find out", `<ul>${htmlList(honestUnknowns)}</ul>`)

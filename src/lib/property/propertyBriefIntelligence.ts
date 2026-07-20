@@ -53,6 +53,7 @@ import {
   type PropertyProfile,
 } from "./propertyProfile";
 import { parseAcres } from "./propertyTypes";
+import { answerFarmQuestions, type FarmPropertyAnswer } from "./farmAnswerEngine";
 import {
   PROPERTY_TENURE_FACTS,
   PROPERTY_TENURE_PROVENANCE,
@@ -161,6 +162,13 @@ export interface PropertyBriefIntelligence {
   mechanics: { heading: string; paragraphs: string[]; stepTitles: string[] } | null;
   /** The prose replacement for the pathway chips (founder decision). */
   pathwaysProse: string | null;
+  /**
+   * Farm-lane "questions farmers actually ask", answered FOR THIS PROPERTY
+   * (acreage/county/cash-rent-grounded, with honest "confirm at X" fallbacks).
+   * Null for non-farm-shaped properties. The lane PAGE keeps its generic cards;
+   * this is the per-property answer layer inside the analysis + PDF.
+   */
+  farmEnterpriseAnswers: FarmPropertyAnswer[] | null;
   /** County derived from the property's census tract when the record lacked one. */
   resolvedCounty: ResolvedCounty | null;
   /** Up to four verified-fact chips for the Answer card (flood, grocery, schools, rent). */
@@ -1648,6 +1656,17 @@ export function buildPropertyBriefIntelligence(args: {
       stateCode: args.stateCode,
       isHome,
     }),
+    farmEnterpriseAnswers: farmShaped
+      ? answerFarmQuestions({
+          acres: parseAcres(sourceRecord?.acreageText ?? null),
+          county: resolvedCounty?.name ?? null,
+          state: resolvedCounty?.state ?? args.stateCode ?? null,
+          croplandRentPerAcre: fmrFips ? COUNTY_CASH_RENTS[fmrFips]?.cropland ?? null : null,
+          pastureRentPerAcre: fmrFips ? COUNTY_CASH_RENTS[fmrFips]?.pasture ?? null : null,
+          stateFarmlandPerAcre:
+            (args.stateCode ? STATE_FARMLAND[args.stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+        })
+      : null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,
@@ -1987,6 +2006,17 @@ export async function buildLocationBriefIntelligence(args: {
     ),
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),
+    farmEnterpriseAnswers: locFarmShaped
+      ? answerFarmQuestions({
+          acres: null,
+          county: resolvedCounty?.name ?? null,
+          state: resolvedCounty?.state ?? stateCode ?? null,
+          croplandRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.cropland ?? null : null,
+          pastureRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.pasture ?? null : null,
+          stateFarmlandPerAcre:
+            (stateCode ? STATE_FARMLAND[stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+        })
+      : null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,

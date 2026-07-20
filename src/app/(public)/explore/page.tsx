@@ -240,6 +240,21 @@ export default async function ExplorePage({
             {isCommercialLane && <CapitalRatesBlock accent={laneAccent} />}
           </div>
         </div>
+        {/* Compact address-check directly under the map — residential, farm, and
+            commercial lanes only (founder direction 2026-07-20). A slim
+            place-first check so a visitor looking at THIS lane's map can drop an
+            address in; the full check with sources lives on /discover. */}
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 20px 0" }}>
+          <div style={{ display: "grid", gap: 6, marginBottom: 14 }}>
+            <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>
+              Have an address in mind?
+            </span>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "#4d596d", maxWidth: 720 }}>
+              Check a specific location&apos;s verified place-facts right here — or keep browsing the map above.
+            </p>
+          </div>
+          <PlaceFirstDiscovery flow="place-facts" compact />
+        </div>
         {/* The farmer sections as cards (founder direction 2026-07-18):
             enterprise economics, land-money options, equipment, cross-links. */}
         {isFarmLane && (
@@ -575,22 +590,6 @@ export default async function ExplorePage({
           ))}
         </div>
       </section>
-
-      {/* ── Compact address-check directly under the compass (founder direction
-          2026-07-20): a slim place-first check so a visitor can drop an address
-          in right here, before picking a lane — no account, honest by
-          construction. The full check with sources lives on /discover. ── */}
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "28px 24px 8px" }}>
-        <div style={{ textAlign: "center", display: "grid", gap: 6, marginBottom: 16 }}>
-          <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#854F0B" }}>
-            Have an address in mind?
-          </span>
-          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: "#4d596d" }}>
-            Check a specific location&apos;s verified place-facts right here — or pick a lane above to browse first.
-          </p>
-        </div>
-        <PlaceFirstDiscovery flow="place-facts" compact />
-      </div>
 
       {/* ── Light page below the band — tightened shared disclosures strip ────── */}
       <div style={{ maxWidth: 880, margin: "0 auto", padding: "20px 24px 48px" }}>

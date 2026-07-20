@@ -61,6 +61,7 @@ export function LoanProgramComparison() {
             </div>
             <div style={{ fontSize: 13, color: PURPLE, fontWeight: 700, lineHeight: 1.4 }}>{p.bestFor}</div>
             <Row label="Max size" value={p.maxSize} />
+            <Row label="Equity / down payment" value={p.equity} />
             <Row label="Use of proceeds" value={p.useOfProceeds} />
             <Row label="Term" value={p.term} />
             <Row label="How the rate is set" value={p.rateStructure} />

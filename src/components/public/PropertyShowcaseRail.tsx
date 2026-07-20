@@ -89,6 +89,17 @@ export function PropertyShowcaseRail({
   }
   if (picks.length === 0) return null;
 
+  // "Ledger updated" freshness stamp (founder direction 2026-07-20): the return-
+  // visit hook, built from the real provenance dates we already carry — the most
+  // recently-updated listing on the shelf. Honest by construction; never faked.
+  const ledgerAsOf =
+    picks
+      .map((p) => p.asOf)
+      .filter((d): d is string => Boolean(d))
+      .map((d) => d.slice(0, 10))
+      .sort()
+      .pop() ?? null;
+
   return (
     <section aria-label="Current government-listed properties" style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
@@ -99,6 +110,12 @@ export function PropertyShowcaseRail({
           <strong style={{ fontSize: isColumn ? 17 : 22, color: "#101a2b", lineHeight: 1.15 }}>
             Real listings, straight from government sources
           </strong>
+          {ledgerAsOf && (
+            <span style={{ fontSize: 11.5, fontWeight: 700, color: "#5e7a86", display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <span aria-hidden style={{ width: 7, height: 7, borderRadius: "50%", background: "#16a34a", boxShadow: "0 0 0 3px rgba(22,163,74,0.18)" }} />
+              Ledger updated · {ledgerAsOf} — check back for what&apos;s new
+            </span>
+          )}
         </div>
         <Link href="/explore" style={{ fontSize: 13.5, fontWeight: 700, color: accent }}>
           Browse all inventory →

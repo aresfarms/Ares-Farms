@@ -18,6 +18,7 @@ import {
 } from "@/lib/property/commercialLaneCurated";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
+import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
 
 const COM = LANE_THEMES.commercial;
 
@@ -123,6 +124,10 @@ export function CommercialLaneSections() {
       </section>
 
       <HundredPercentFinancingCallout />
+
+      {/* SBA-vs-USDA program comparison with equity/down-payment (founder
+          direction 2026-07-20: the same comparison on all three property lanes). */}
+      <LoanProgramComparison />
 
       <BriefSection title="The questions commercial owners actually ask" tag="The essentials" briefs={COMMERCIAL_BRIEFS} />
       <BriefSection

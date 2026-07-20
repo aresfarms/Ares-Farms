@@ -21,6 +21,7 @@ import {
 } from "@/lib/property/farmLaneCurated";
 import { buildCommodityPrices, buildLivestockPrices } from "@/lib/property/commodityPricesLive";
 import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
+import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
 import { FarmFinancialHealthCheck } from "@/components/public/FarmFinancialHealthCheck";
@@ -299,6 +300,11 @@ export function FarmLaneSections() {
         </a>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{HAULING_NOTE}</span>
       </section>
+
+      {/* SBA-vs-USDA program comparison (with equity/down-payment) then the live
+          capital rates (founder direction 2026-07-20: the comparison rides all
+          three property lanes, not just Financing). */}
+      <LoanProgramComparison />
 
       {/* SBA / prime / 504 / USDA capital rates (founder direction 2026-07-18:
           added to both farm and commercial). */}

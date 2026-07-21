@@ -363,7 +363,8 @@
     "ingest:capital-rates": "tsx src/scripts/ingestCapitalRates.ts",
     "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts",
     "smoke:canonical-domain-fail-closed": "tsx src/scripts/canonicalDomainFailClosedSmokeTest.ts",
-    "seed:staging": "tsx src/scripts/runStagingSeed.ts"
+    "seed:staging": "tsx src/scripts/runStagingSeed.ts",
+    "acceptance:p5": "tsx src/scripts/runP5SeededWorkflowAcceptance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

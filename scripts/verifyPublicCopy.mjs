@@ -42,17 +42,14 @@ const PAGES = [
       'furlong does not make official determinations', // old flat-list item (not in new copy)
     ],
     required: [
-      'what are your possibilities? explore and find out.',
-      'explore land, funding, business, and readiness pathways with less guesswork and more clarity.',
-      'start with a property, a question, or just an idea.',
+      'bring the property. we bring the analysis.',
+      "what the land can earn, what a building's really worth, the deal-killers to dodge, the financing that fits",
+      'start with a property, a place, or just a question.',
       'explore anonymously. no account required. no hidden handoff.',
       'what you can do here',
       'you do not need a finished plan to begin',
-      'how furlong works',
-      'start with what you know',
-      'see what may be possible',
-      'understand the boundaries',
-      'decide your next real step',
+      'start with furlong navigator',
+      'where do you want to go?',
       // New section heading
       'clear waters, no surprises',
       // Lighthouse opener

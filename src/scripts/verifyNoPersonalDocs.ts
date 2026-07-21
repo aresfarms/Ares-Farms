@@ -456,10 +456,34 @@ export type ContentHit = {
   // (###-##-####)"); the line number is safe to print.
 };
 
-const MAX_CONTENT_BYTES = 2 * 1024 * 1024; // 2 MiB
+const MAX_CONTENT_BYTES = 8 * 1024 * 1024; // 8 MiB; generated public datasets can exceed 2 MiB
 
 function isFalsePositivePath(filePath: string): boolean {
   return FALSE_POSITIVE_PATH_TOKENS.some((re) => re.test(filePath));
+}
+
+function passesLuhn(candidate: string): boolean {
+  const digits = candidate.replace(/[^0-9]/g, "");
+  if (digits.length < 13 || digits.length > 19) return false;
+  let sum = 0;
+  let doubleNext = false;
+  for (let i = digits.length - 1; i >= 0; i -= 1) {
+    let value = Number(digits[i]);
+    if (doubleNext) {
+      value *= 2;
+      if (value > 9) value -= 9;
+    }
+    sum += value;
+    doubleNext = !doubleNext;
+  }
+  return sum % 10 === 0;
+}
+
+function isApprovedPublicProductCopy(filePath: string, line: string, signatureId: string): boolean {
+  return (
+    signatureId === "credit-report-label" &&
+    filePath.replace(/\\/g, "/").endsWith("src/lib/financing/financingFeeSchedule.ts")
+  );
 }
 
 export function scanFileContent(
@@ -484,7 +508,14 @@ export function scanFileContent(
       if (isGeneratedPublicIdentifierLine(filePath, line)) {
         continue;
       }
-      if (re.exec(line) !== null) {
+      if (isApprovedPublicProductCopy(filePath, line, def.id)) {
+        continue;
+      }
+      const match = re.exec(line);
+      if (match !== null) {
+        if (def.id === "credit-card-16" && !passesLuhn(match[0])) {
+          continue;
+        }
         hits.push({
           path: filePath,
           signatureId: def.id,

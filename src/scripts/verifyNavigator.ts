@@ -248,20 +248,29 @@ const pubFiles = [
 for (const f of pubFiles) ok(!/AI questionnaire/i.test(fs.readFileSync(f, "utf8")), `${f}: public copy never says "AI questionnaire"`);
 
 const home = fs.readFileSync("src/app/(public)/page.tsx", "utf8");
-// Hero CTA restructure Option A (2026-06-11): labels explain themselves.
-ok(/cta-navigator/.test(home) && /Talk to Furlong Navigator/.test(home) && home.includes('href="/navigator"'),
-  "hero primary CTA = Talk to Furlong Navigator → /navigator");
-ok(/Tell us what you're looking for and we'll help uncover pathways/.test(home), "primary CTA carries its supporting line");
-ok(/cta-explore-map/.test(home) && /Explore America's Possibilities/.test(home) && home.includes('href="#americas-possibilities"'),
-  "hero secondary CTA = Explore America's Possibilities → map section anchor");
-ok(/Browse the map, hidden-gem stories, and pathway examples/.test(home), "secondary CTA carries its supporting line");
-ok(home.includes('id="americas-possibilities"'), "the map section carries the scroll-target anchor");
+// Current founder-approved homepage contract (2026-07-17): one clear Navigator
+// action follows the Compass. The homepage must not split first-touch attention
+// across a second map CTA.
+ok(/cta-navigator/.test(home) && home.includes('href="/navigator"'),
+  "hero primary CTA routes to /navigator");
+ok(/HOMEPAGE_PRIMARY_ACTIONS\.primaryLabel/.test(home),
+  "hero primary CTA uses the governed copy registry");
+ok(/HOMEPAGE_PRIMARY_ACTIONS\.primarySupport/.test(home),
+  "primary CTA carries its governed supporting line");
+ok(/<CompassRose\s+showHeading=\{false\}\s+showObjectives/.test(home),
+  "homepage presents the Compass before the Navigator action");
+ok(!/cta-explore-map|href="#americas-possibilities"|id="americas-possibilities"/.test(home),
+  "retired competing map CTA and anchor remain removed");
 ok(!/cta-start-journey|cta-possibilities-map|home-discovery-cta/.test(home), "old CTA labels/testids removed");
-// Hero copy revision + new-visitor understanding (property NOT required).
+
 const heroCopy = fs.readFileSync("src/lib/public-content/publicCopyRegistry.ts", "utf8");
-ok(/Discover possibilities you didn't know existed\./.test(heroCopy), "headline revised");
-ok(/start with nothing at all/.test(heroCopy), "supporting copy says a property is NOT required");
-ok(/Anonymous\. No account required\. We don't sell your information\./.test(heroCopy), "trust line revised");
+ok(/Bring the property\. We bring the analysis\./.test(heroCopy), "canonical property-analysis headline is locked");
+ok(/Start with a property, a place, or just a question\./.test(heroCopy),
+  "supporting copy permits property, place, or question entry");
+ok(/Explore anonymously\. No account required\. No hidden handoff\./.test(heroCopy),
+  "anonymous first-touch trust line is locked");
+ok(/primaryLabel:\s*"Start with Furlong Navigator"/.test(heroCopy),
+  "canonical Navigator CTA label is locked");
 ok(fs.existsSync("src/app/(public)/navigator/page.tsx"), "/navigator route exists");
 
 // ── Navigator Decision Framework (addendum 2026-06-11) ────────────────────────
@@ -426,21 +435,21 @@ async function main() {
     // Count the rendered DOM attribute form only — the RSC flight payload
     // repeats the string JSON-escaped, which is not a rendered element.
     ok((homeHtml.match(/data-testid="cta-navigator"/g) ?? []).length === 1 &&
-       (homeHtml.match(/data-testid="cta-explore-map"/g) ?? []).length === 1,
-      "SSR: hero renders exactly the two CTAs");
-    ok(/Discover possibilities you didn't know existed\./.test(homeHtml), "SSR: revised headline renders");
+       (homeHtml.match(/data-testid="cta-explore-map"/g) ?? []).length === 0,
+      "SSR: hero renders one governed Navigator CTA");
+    ok(/Bring the property\. We bring the analysis\./.test(homeHtml), "SSR: canonical headline renders");
     const navHtml = await fetch(`${BASE}/navigator`).then((r) => r.text());
-    ok(navHtml.includes('data-testid="furlong-navigator"'), "SSR: /navigator renders Furlong Navigator");
+    ok(navHtml.includes('data-testid="place-first-discovery"'), "SSR: /navigator renders place-first Navigator");
     ok(!/under-map-explore-cta/.test(homeHtml), "SSR: no CTA after the tour controls");
     const disc = await fetch(`${BASE}/discover`).then((r) => r.text());
-    ok(disc.includes('data-testid="furlong-navigator"'), "SSR: /discover renders Furlong Navigator");
+    ok(disc.includes('data-testid="place-first-discovery"'), "SSR: /discover renders place-first Navigator");
     ok(!disc.includes('data-testid="discovery-engine"'), "SSR: the chip interview is no longer the entry flow");
 
     const converse = (payload: unknown) => fetch(`${BASE}/api/public/navigator/converse`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
     }).then((r) => r.json());
     const kick = await converse({});
-    ok(kick.kind === "question" && /who are you/i.test(kick.text), "live: opens with the one open question");
+    ok(kick.kind === "question" && /what role you're playing|buyer, operator, advisor|just exploring/i.test(kick.text), "live: opens with the governed role question");
     for (const p of OWNERSHIP_PROBES.slice(0, 10)) {
       const r = await converse({ message: p, journey: kick.journey });
       ok(r.kind === "refusal" && r.text.startsWith(REFUSAL_LINE), `live: ownership probe refused with the locked line: "${p}"`);
@@ -1337,7 +1346,7 @@ async function main() {
     for (const f of fail.slice(0, 40)) console.error(`    ✗ ${f}`);
     process.exit(1);
   }
-  console.log("\n✓  verify:navigator PASS — ownership + steering refusals hold across paraphrase (HOPA designation passes); owner/demographic fields stripped at the DATA layer; listing links parsed, never fetched; three honest answers with confidence/why-shown/effort-risk and no fabricated number (ranges-with-basis contract enforced); discovery graph chains; hero has exactly two CTAs with no duplicate after the tour; the Navigator is one conversation with one free-text box — no chip grid.");
+  console.log("\n✓  verify:navigator PASS — ownership + steering refusals hold across paraphrase (HOPA designation passes); owner/demographic fields stripped at the DATA layer; listing links parsed, never fetched; three honest answers with confidence/why-shown/effort-risk and no fabricated number (ranges-with-basis contract enforced); discovery graph chains; homepage presents one governed Navigator action after the Compass; the Navigator is one conversation with one free-text box — no chip grid.");
   process.exit(0);
 }
 main();

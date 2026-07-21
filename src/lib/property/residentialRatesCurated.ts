@@ -61,7 +61,7 @@ export const RESIDENTIAL_LOAN_OPTIONS: ResidentialLoanOption[] = [
     downPayment: "0%",
     mortgageInsurance: "None — the loan is made directly by USDA",
     whoFor: "Low- and very-low-income buyers in rural areas who can't get a conventional loan.",
-    note: "USDA lends to you directly, and payment assistance can lower the effective rate for as long as you qualify — for a modest, safe rural home within the program's income and size limits. (USDA's farm and rural-business financing lives on the Farm and Commercial lanes.)",
+    note: "USDA 502 Direct is administered directly by USDA. Payment assistance may reduce the effective rate for eligible borrowers while they remain eligible, subject to USDA review, available funding, property limits, and program rules. Furlong does not determine eligibility or approval. (USDA farm and rural-business pathways live on the Farm and Commercial lanes.)",
   },
   {
     name: "Adjustable-rate (ARM)",

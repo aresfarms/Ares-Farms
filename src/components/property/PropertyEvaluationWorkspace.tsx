@@ -2999,6 +2999,13 @@ export function PropertyEvaluationWorkspace({
           .furlong-report-print .card,
           .furlong-report-print .report-section { break-inside: avoid; page-break-inside: avoid; }
           .furlong-report-print img { filter: grayscale(100%); }
+          /* A ledger printed mid-load must announce itself as incomplete. */
+          .furlong-report-print .furlong-print-only {
+            display: block !important;
+            font-weight: 800 !important;
+            border: 2px solid #111 !important;
+            padding: 6px 10px !important;
+          }
           @page { margin: 0.6in; }
         }
       `}</style>
@@ -3028,6 +3035,43 @@ export function PropertyEvaluationWorkspace({
           </div>
         </div>
       )}
+      {/* STILL GATHERING (founder-caught 2026-07-21): the ledger used to render
+          complete — masthead, verdict, Sovereignty, Bound Register — while the
+          place-facts fetch was still in flight, so an early print produced a
+          hollow document that LOOKED finished (16 verified facts and 12 open
+          items were simply not back yet). A report must never look done while
+          it is empty. This band says so on screen, and prints as an explicit
+          INCOMPLETE stamp so a premature copy can never pass as the real one. */}
+      {!deepView && factsLoading && (
+        <div
+          data-facts-loading="true"
+          role="status"
+          aria-live="polite"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            flexWrap: "wrap",
+            border: "1px solid #e2d7bd",
+            borderLeft: "4px solid #b8862f",
+            background: "#faf6ec",
+            borderRadius: 12,
+            padding: "12px 16px",
+          }}
+        >
+          <span aria-hidden style={{ fontSize: 15 }}>⏳</span>
+          <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.55 }}>
+            <strong style={{ color: "#101a2b" }}>Still gathering this tract&apos;s public records.</strong>{" "}
+            Flood, tax, program, county and utility facts are still coming in — the ledger below is not
+            complete yet. Give it a moment before you print, save, or judge it.
+          </span>
+          <span className="furlong-print-only" style={{ display: "none" }}>
+            INCOMPLETE COPY — the record was still loading when this was printed. Reprint once the ledger
+            has finished gathering.
+          </span>
+        </div>
+      )}
+
       {/* Property Type Stamp (Chaptered Blueprint, founder direction 2026-07-20):
           the property type is front-loaded — right under the header, before the
           verdict — because the financing lanes, costs, and questions all follow

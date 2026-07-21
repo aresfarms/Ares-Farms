@@ -26,6 +26,19 @@ substitutions:
   _REPO: us-central1-docker.pkg.dev/furlong-staging-499102/furlong
 
 steps:
+  # Deployment-blocking canonical authority gates. These run in Cloud Build
+  # before either image is built or published, so Artifact Registry can never
+  # receive an image that bypasses a registered domain authority boundary.
+  - name: node:20-bookworm
+    id: verify-canonical-authorities
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        npm ci
+        npm run verify:canonical-domain
+        npm run smoke:canonical-domain-fail-closed
+
   # Runtime image (default final stage: runner)
   - name: gcr.io/cloud-builders/docker
     id: build-core

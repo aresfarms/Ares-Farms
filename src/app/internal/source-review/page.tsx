@@ -19,7 +19,7 @@ import {
   recordSourceDecision,
   type ReviewDecision,
 } from "@/lib/property/sourceActivationStore";
-import { PLACE_FACT_ACTIVATIONS } from "@/lib/place-facts/placeFactActivation";
+import { canonicalPlaceAuthority } from "@/lib/platform/authorities/place";
 import {
   listRuntimePlaceFactActivations,
   readPlaceFactAudit,
@@ -283,7 +283,7 @@ function PlaceFactReviewGroup({ mayApprove }: { mayApprove: boolean }) {
       </div>
 
       {sources.map((s) => {
-        const base = PLACE_FACT_ACTIVATIONS[s.sourceId];
+        const base = canonicalPlaceAuthority.activations[s.sourceId];
         const audit = readPlaceFactAudit(s.sourceId, 5);
         const live = s.module22 === "APPROVED" && s.module23 === "APPROVED" && s.liveFetchAllowed;
         return (

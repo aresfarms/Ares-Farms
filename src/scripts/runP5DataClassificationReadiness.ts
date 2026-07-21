@@ -10,7 +10,7 @@ import {
 } from "@/lib/governance/productionDataClassificationInventory";
 
 const PROJECT = process.env.GCP_PROJECT ?? "furlong-staging-499102";
-const REVISION = process.env.P5_DATA_REVISION ?? "furlong-core-00095-xxr";
+const REVISION = process.env.P5_DATA_REVISION ?? "furlong-core-00096-s4t";
 
 function sh(cmd: string, args: string[]): string {
   return execFileSync(cmd, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();

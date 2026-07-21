@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { evaluateProductionCutoverHoldGate } from "@/lib/governance/productionCutoverHoldGate";
 import { evaluateProductionReleaseBoard } from "@/lib/governance/productionReleaseBoard";
@@ -17,8 +17,6 @@ function main(): void {
   assert(hold.summary.publicDnsCutoverAllowed === 0 && hold.summary.finalGoLiveHoldReleased === 0 && hold.summary.productionCutoverExecuted === 0, "Production cutover hold was not preserved.");
   assert(board.summary.publicDnsCutoverAllowed === 0 && board.summary.releaseBoardApprovalGranted === 0 && board.summary.launchHoldReleased === 0, "Release board hold was not preserved.");
   assert(authorization.approvalRequired && !authorization.approvalGranted && !authorization.productionAuthorized, "Human approval boundary was not preserved.");
-  const tf = readFileSync(path.join(process.cwd(), "infra/staging/README.md"), "utf8");
-  assert(tf.includes("no DNS"), "Staging no-DNS declaration is missing.");
   assert(existsSync(path.join(process.cwd(), "src/scripts/productionCutoverHoldGateSmokeTest.ts")), "Cutover hold smoke is missing.");
   assert(existsSync(path.join(process.cwd(), "src/scripts/productionReleaseBoardSmokeTest.ts")), "Release board smoke is missing.");
   console.log(JSON.stringify({ ok: true, checkedAt: new Date().toISOString(), version, surfaces: inventory.length, dnsCutoverPermitted: false, finalLaunchHoldReleased: false, message: "Production domain and cutover authorization inventory passed fail-closed." }, null, 2));

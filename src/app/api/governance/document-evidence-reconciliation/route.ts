@@ -4,7 +4,7 @@ import {
   DOCUMENT_EVIDENCE_RECONCILIATION_RUNTIME_VERSION,
   DocumentEvidenceReconciliationInput,
   composeDocumentEvidenceReconciliation,
-} from "@/lib/evidence/documentEvidenceReconciliationRuntime";
+} from "@/lib/platform/authorities/evidence";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";

@@ -54,6 +54,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Land Register",
     authorityModule: "src/lib/platform/authorities/landRegister.ts",
     authorityExport: "canonicalLandRegisterAuthority",
+    restrictedImplementationModules: ["@/lib/property/auditLedger"],
     canonicalIdField: "land_register_id",
     governanceTags: ["TECH-LEDGER-001", "TECH-REPLAY-001", "SOURCE-PROV-001"],
     projectionRule: "Land Register outputs must remain replayable, append-oriented, and traceable to evidence and source records.",

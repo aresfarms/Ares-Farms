@@ -254,7 +254,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   // ── Flowing primitives (measure → draw → advance) ─────────────────────────
 
   const heading = (label: string) => {
-    ensure(44);
+    // Reserve the heading PLUS the first lines of whatever follows. At 44 a
+    // heading could land alone at the foot of a page with its body pushed over
+    // ("Where the file goes next" + half a blank page — founder-caught
+    // 2026-07-21, the "huge empty vertical gaps"). Never orphan a heading.
+    ensure(118);
     setFont("serifBold", 13, COLORS.deep);
     doc.text(label, PAGE.marginX, y, { width: CONTENT_W, characterSpacing: 0.3 });
     y = doc.y + 4;
@@ -305,7 +309,9 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
    * the bound divisions of the record.
    */
   const chapter = (numeral: string, title: string, subtitle?: string, label = "CHAPTER") => {
-    ensure(64);
+    // A chapter opener must never end a page alone — keep it with its first
+    // entries (same orphan rule as heading()).
+    ensure(150);
     y += 6;
     setFont("serifBold", 8.5, ACCENT);
     doc.text(`${label} ${numeral}`, PAGE.marginX, y, { characterSpacing: 2 });
@@ -396,6 +402,52 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
         .restore();
     }
     y += 6;
+  };
+
+  /**
+   * Ledger-cell grid — TWO facts per row as bounded log entries (founder
+   * direction 2026-07-21). Chapter II used full-width stacked rows, so ~18
+   * sourced facts sprawled across two pages like an unstyled HTML table. As a
+   * 2-up matrix of ledger cells it reads like a ship's-log page and costs about
+   * half the paper. Each cell: LABEL / value / source, measured before drawn.
+   */
+  const ledgerGrid = (cells: Array<{ label: string; value: string; source: string }>) => {
+    const gap = 12;
+    const colW = (CONTENT_W - gap) / 2;
+    const pad = 8;
+    const innerW = colW - pad * 2;
+    const cellH = (c: { label: string; value: string; source: string }) =>
+      measure(c.label.toUpperCase(), innerW, "bold", 8) +
+      measure(c.value, innerW, "regular", 10) +
+      measure(c.source, innerW, "regular", 7.5) +
+      pad * 2 + 8;
+
+    for (let i = 0; i < cells.length; i += 2) {
+      const pair = cells.slice(i, i + 2);
+      const rowH = Math.max(...pair.map(cellH));
+      ensure(rowH + 8);
+      const rowY = y;
+      pair.forEach((c, col) => {
+        const x = PAGE.marginX + col * (colW + gap);
+        doc
+          .save()
+          .roundedRect(x, rowY, colW, rowH, 4)
+          .lineWidth(0.6)
+          .fillAndStroke(COLORS.paper, COLORS.line)
+          .restore();
+        let cy = rowY + pad;
+        setFont("bold", 8, COLORS.muted);
+        doc.text(c.label.toUpperCase(), x + pad, cy, { width: innerW, characterSpacing: 0.5 });
+        cy = doc.y + 1;
+        setFont("regular", 10, COLORS.deep);
+        doc.text(c.value, x + pad, cy, { width: innerW, lineGap: 1 });
+        cy = doc.y + 1;
+        setFont("regular", 7.5, COLORS.faint);
+        doc.text(c.source, x + pad, cy, { width: innerW, lineGap: 0.5 });
+      });
+      y = rowY + rowH + 8;
+    }
+    y += 2;
   };
 
   /** Accent-tinted panel sized by MEASURED content (never overflows). */
@@ -680,8 +732,8 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   // CHAPTER II — the sourced place facts.
   if (input.placeFacts?.length) {
     chapter("II", "The Charted Place", "Sourced, dated government facts for this ground.");
-    factsTable(
-      input.placeFacts.map((fact) => ({ label: fact.label, value: `${fact.value}  ·  ${fact.source}` }))
+    ledgerGrid(
+      input.placeFacts.map((fact) => ({ label: fact.label, value: fact.value, source: fact.source }))
     );
     paragraph(
       "Every line above is a sourced, dated government fact — the full statements with verification links travel in your on-screen chart.",
@@ -766,6 +818,14 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   if (identity.nextTierTeaser) {
     const teaser = identity.nextTierTeaser;
+    // Keep this heading with its (tall) panel. heading()'s generic 118pt reserve
+    // is not enough here — the panel runs several hundred points, so the heading
+    // fit at the foot of a page while the box jumped to the next one, leaving an
+    // orphaned title over half a blank page (founder-caught 2026-07-21). Measure
+    // the panel first and demand room for BOTH, or start them together overleaf.
+    const teaserLines = [teaser.intro, ...teaser.items.map((item) => `${item.name} — ${item.adds}`), teaser.closing];
+    const teaserBodyH = teaserLines.reduce((sum, line) => sum + measure(line, CONTENT_W - 42, "regular", 10.5) + 6, 0);
+    ensure(teaserBodyH + 96);
     heading(teaser.heading);
     panel({
       lines: [teaser.intro, ...teaser.items.map((item) => `${item.name} — ${item.adds}`), teaser.closing],
@@ -821,18 +881,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   const range = doc.bufferedPageRange();
   for (let i = range.start; i < range.start + range.count; i += 1) {
     doc.switchToPage(i);
-    // Full-size Furlong seal at page center, print-safe opacity (founder
-    // direction 2026-07-17: the actual logo as watermark on every page).
-    const seal = furlongSealPath();
-    if (seal) {
-      const sealW = 430;
-      const sealH = sealW * (687 / 800); // asset aspect ratio
-      doc.save();
-      doc.opacity(0.03);
-      doc.image(seal, (PAGE.width - sealW) / 2, (PAGE.height - sealH) / 2, { width: sealW });
-      doc.opacity(1);
-      doc.restore();
-    }
+    // The full-page centre seal is GONE (founder direction 2026-07-21). Even at
+    // 3% it ghosted through the body text on every page and read as a broken
+    // background watermark. The seal already appears crisply in the masthead;
+    // a land register does not need it bled behind its own facts. Identity now
+    // rides on the margin rule + the side stamp, which never touch the text.
     // Surveyor's logbook margin rule — a dark-olive vertical line down the left
     // of every page (founder direction 2026-07-20: structural metadata to the
     // left of the line, facts to the right). The bound edge of the ledger.
@@ -850,14 +903,16 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     // alpha entry stamp, not a broken diagnostic watermark.
     if (!cleanExport) {
       doc.save();
-      doc.rotate(-90, { origin: [PAGE.width - 26, PAGE.height / 2] });
-      setFont("serifBold", 8, COLORS.faint);
-      doc.fillOpacity(0.55);
+      // Sits at x≈PAGE.width-20, a clear 20pt outside the text column (which
+      // ends at marginX + CONTENT_W), so it can never touch a line of copy.
+      doc.rotate(-90, { origin: [PAGE.width - 20, PAGE.height / 2] });
+      setFont("regular", 7, COLORS.faint);
+      doc.fillOpacity(0.4);
       doc.text(
-        `α  //  FURLONG UNVERIFIED ENTRY  ·  ${input.branding.generatedDate}`,
-        PAGE.width - 26 - 150,
-        PAGE.height / 2 - 6,
-        { width: 300, align: "center", characterSpacing: 1.2, lineBreak: false }
+        `α // FURLONG UNVERIFIED ENTRY · ${input.branding.generatedDate}`,
+        PAGE.width - 20 - 130,
+        PAGE.height / 2 - 5,
+        { width: 260, align: "center", characterSpacing: 1, lineBreak: false }
       );
       doc.fillOpacity(1);
       doc.restore();

@@ -369,7 +369,9 @@
     "acceptance:p6-security": "tsx src/scripts/runP6SecurityIncidentReadiness.ts",
     "acceptance:p5-database-recovery": "tsx src/scripts/finalizeP5DatabaseRecoveryReadiness.ts",
     "smoke:production-data-classification": "tsx src/scripts/productionDataClassificationSmokeTest.ts",
-    "acceptance:p5-data-classification": "tsx src/scripts/runP5DataClassificationReadiness.ts"
+    "acceptance:p5-data-classification": "tsx src/scripts/runP5DataClassificationReadiness.ts",
+    "smoke:production-source-legal": "tsx src/scripts/productionSourceLegalApprovalSmokeTest.ts",
+    "acceptance:p5-source-legal": "tsx src/scripts/runP5SourceLegalReadiness.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

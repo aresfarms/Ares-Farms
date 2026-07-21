@@ -5,7 +5,7 @@ function assert(v: unknown, m: string): asserts v { if (!v) throw new Error(m); 
 const pack = composeLenderWorkflowV2({});
 assert(productionFinancingAuthority.ownerPresent, "Credit/Eligibility Authority is missing.");
 assert(financingActivationControls.length >= 12, "Financing activation controls are incomplete.");
-assert(financingBoundaryMatrix.every((r) => r.furlong !== "QUALIFIED_HUMAN_ONLY"), "Furlong cannot hold credit authority.");
+assert(financingBoundaryMatrix.every((r) => new Set<string>(["COORDINATION_ONLY", "ADVISORY_ONLY", "PROHIBITED", "BLOCKED_PENDING_CONTROLLED_DELIVERY"]).has(r.furlong)), "Furlong cannot hold credit authority.");
 assert(pack.productionBlocked && pack.noUnderwritingReliance && pack.noOfficialCreditDecision && pack.noLenderCommitment, "Lender workflow failed closed boundary.");
 assert(!productionFinancingAuthority.qualifiedHumanApprovalGranted, "Automation cannot grant financing approval.");
 assert(!productionFinancingAuthority.productionFinancingPermitted, "Production financing must remain blocked.");

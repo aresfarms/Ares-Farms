@@ -84,6 +84,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Program",
     authorityModule: "src/lib/platform/authorities/program.ts",
     authorityExport: "canonicalProgramAuthority",
+    restrictedImplementationModules: ["@/lib/program-graph"],
     canonicalIdField: "program_id",
     governanceTags: ["PROGRAM-GRAPH-001", "PUBLIC-CLAIMS-001", "TECH-REPLAY-001"],
     projectionRule: "Program matches remain advisory projections and may not imply eligibility, approval, reservation, or funding commitment.",

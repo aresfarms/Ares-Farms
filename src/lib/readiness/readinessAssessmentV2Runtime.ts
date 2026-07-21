@@ -10,7 +10,7 @@ import {
 } from "@/lib/capital-graph/capitalGraphRuntime";
 import { CUSTOMER_TYPE_REGISTRY } from "@/lib/customer-types/customerTypeRuntime";
 import { FINANCING_PATHWAY_ENGINE_V2_RUNTIME_VERSION } from "@/lib/financing/pathwayEngineV2Runtime";
-import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/opportunity/discoveryV2Runtime";
+import { OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION } from "@/lib/platform/authorities/opportunity";
 import {
   READINESS_ASSESSMENT_RUNTIME_VERSION,
   READINESS_DISCLOSURES,

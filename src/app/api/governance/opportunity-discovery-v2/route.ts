@@ -5,7 +5,7 @@ import {
   OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION,
   OpportunityDiscoveryV2Input,
   composeOpportunityDiscoveryV2,
-} from "@/lib/opportunity/discoveryV2Runtime";
+} from "@/lib/platform/authorities/opportunity";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";

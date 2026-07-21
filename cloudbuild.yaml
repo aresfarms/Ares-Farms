@@ -43,6 +43,7 @@ steps:
         npm run smoke:production-connector-activation
         npm run smoke:production-official-report-authority
         npm run smoke:production-payments-treasury-authorization
+        npm run smoke:production-domain-cutover-authorization
         npm run smoke:production-data-classification
 
   # Runtime image (default final stage: runner)

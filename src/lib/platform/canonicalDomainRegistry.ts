@@ -109,6 +109,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Opportunity",
     authorityModule: "src/lib/platform/authorities/opportunity.ts",
     authorityExport: "canonicalOpportunityAuthority",
+    restrictedImplementationModules: ["@/lib/opportunity/discoveryV2Runtime"],
     canonicalIdField: "opportunity_id",
     governanceTags: ["REVENUE-INTEL-001", "PUBLIC-CLAIMS-001", "TECH-REPLAY-001"],
     projectionRule: "Opportunity outputs are hypotheses for review, not promises of feasibility, revenue, eligibility, or financing.",

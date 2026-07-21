@@ -14,6 +14,7 @@
  * end (overlay + store files removed) — the committed default stays locked.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -25,7 +26,6 @@ import {
 } from "@/lib/source-intelligence/listing-intake/listingSourceActivationStore";
 import { canListingRender, listingRenderEligibility } from "@/lib/source-intelligence/listing-intake/listingRenderGate";
 import { propertyStateCounts } from "@/lib/property/propertyStateCounts";
-import { readAuditEvents } from "@/lib/property/auditLedger";
 
 const fail: string[] = [];
 const ok = (c: boolean, m: string) => { if (!c) fail.push(m); };
@@ -110,7 +110,7 @@ async function main() {
   if (liveHtml) ok(liveProof, "approved broker listing must render on the live hospitality/VA page with venue framing");
 
   // ── 7. Ledger: every stage recorded ─────────────────────────────────────────
-  const events = readAuditEvents({ domain: "listing-source-review" });
+  const events = canonicalLandRegisterAuthority.read({ domain: "listing-source-review" });
   for (const d of ["LISTER_REGISTERED", "SUBMITTED", "PROVENANCE_CHECK", "COUNSEL_CLEARED", "APPROVE"]) {
     ok(events.some((e) => e.decision === d), `ledger must contain a ${d} event`);
   }

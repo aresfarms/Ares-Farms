@@ -15,10 +15,10 @@
  *   renderableListings (listingRenderGate; default false).
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { appendAuditEvent } from "@/lib/property/auditLedger";
 import { buildLicenseVerification, licensePublicLine } from "./licenseVerification";
 import { sanitizeIngestText } from "@/lib/security/ingestSanitizer";
 import { fairHousingScan } from "./fairHousingGuard";
@@ -77,7 +77,7 @@ export function registerLister(input: {
     registeredAt: new Date().toISOString(),
   };
   writeStore(s);
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.actorId, actorName: input.actorName, domain: DOMAIN,
     subject: `lister:${input.listerId}`, decision: "LISTER_REGISTERED",
     reason: `${input.credential.listerType} onboarding`,
@@ -130,7 +130,7 @@ export function submitListing(input: {
   };
   s.listings[listing.listingId] = listing;
   writeStore(s);
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.actorId, actorName: input.actorName, domain: DOMAIN,
     subject: listing.listingId, decision: "SUBMITTED",
     reason: `direct listing submitted (${listing.listerType})`,
@@ -190,7 +190,7 @@ export function recordProvenanceCheck(input: {
     l.status = "SHELVED_PENDING_PROVENANCE";
   }
   writeStore(s);
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.actorId, actorName: input.actorName, domain: DOMAIN,
     subject: input.listingId, decision: "PROVENANCE_CHECK",
     reason: input.evidence,
@@ -220,7 +220,7 @@ export function confirmListingActive(input: { listingId: string; actorId: string
   if (!l) throw new Error(`Unknown listing "${input.listingId}".`);
   l.lastConfirmedAt = new Date().toISOString();
   writeStore(s);
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.actorId, actorName: input.actorName, domain: DOMAIN,
     subject: input.listingId, decision: "RECONFIRMED", reason: "listing re-confirmed active",
     detail: { lastConfirmedAt: l.lastConfirmedAt },
@@ -240,7 +240,7 @@ export function setListingStatusInternal(input: {
   if (!l) return;
   l.status = input.status;
   writeStore(s);
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.actorId, actorName: input.actorName, domain: DOMAIN,
     subject: input.listingId, decision: input.status, reason: input.reason,
     detail: { statusNow: input.status },

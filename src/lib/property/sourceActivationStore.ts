@@ -15,7 +15,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { appendAuditEvent } from "./auditLedger";
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
+
 import { runtimeStatePath } from "./runtimeStatePath";
 import { SOURCE_ACTIVATION, type ReviewStatus } from "./sourceActivation";
 
@@ -114,7 +115,7 @@ export function recordSourceDecision(input: {
   };
   writeOverlay(overlay);
 
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.reviewerId,
     actorName: input.reviewerName,
     domain: "source-review",

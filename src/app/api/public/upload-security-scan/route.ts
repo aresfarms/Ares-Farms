@@ -1,6 +1,6 @@
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { NextRequest, NextResponse } from "next/server";
 
-import { appendAuditEvent } from "@/lib/property/auditLedger";
 import {
   readClamAvSignatureStatus,
   readClamAvVersion,
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   const configuredToken = scanToken();
 
   if (!configuredToken) {
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "internal-anonymous",
       actorName: "internal-anonymous",
       domain: "public-upload-security-scan",
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!tokenAllowed(req)) {
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "internal-anonymous",
       actorName: "internal-anonymous",
       domain: "public-upload-security-scan",
@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
       fileName: body.fileName ?? null,
     });
 
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "internal-anonymous",
       actorName: "internal-anonymous",
       domain: "public-upload-security-scan",
@@ -147,7 +147,7 @@ export async function POST(req: NextRequest) {
     const version = await readClamAvVersion().catch(() => null);
     const detail = error instanceof Error ? error.message : "Local upload malware scanning failed unexpectedly.";
 
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "internal-anonymous",
       actorName: "internal-anonymous",
       domain: "public-upload-security-scan",

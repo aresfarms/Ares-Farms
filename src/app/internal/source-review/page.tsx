@@ -1,3 +1,5 @@
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
+import type { AuditEvent } from "@/lib/platform/authorities/landRegister";
 import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
 
@@ -7,7 +9,6 @@ import {
   operatorByEmail,
   sourceLegalApprovers,
 } from "@/lib/auth/operatorRegistry";
-import { readAuditEvents } from "@/lib/property/auditLedger";
 import {
   PROPERTY_SOURCE_IDS,
   recordsForReview,
@@ -156,7 +157,7 @@ function PropertySourceCard({ sourceId, mayApprove }: { sourceId: PropertySource
   const base = SOURCE_ACTIVATION[sourceId];
   const activation = getRuntimeActivation(sourceId);
   const records = recordsForReview(sourceId);
-  const audit = readAuditEvents({ domain: "source-review", subject: sourceId }).slice(-5).reverse();
+  const audit: AuditEvent[] = canonicalLandRegisterAuthority.read({ domain: "source-review", subject: sourceId }).slice(-5).reverse();
 
   const dates = records.map((c) => c.source_records[0].listingDate).filter((d): d is string => !!d).map((d) => d.slice(0, 4)).sort();
   const states = new Set(records.map((c) => c.source_records[0].state));

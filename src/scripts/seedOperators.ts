@@ -11,15 +11,15 @@
  * development so they can sign in to the internal review screens.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { seedLocalOperators } from "../lib/auth/localOperatorStore";
-import { appendAuditEvent } from "../lib/property/auditLedger";
 
 function main(): void {
   const by = process.argv.find((a) => a.startsWith("--by="))?.slice(5) || "bootstrap";
   const accounts = seedLocalOperators(by);
 
   for (const a of accounts) {
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: by,
       actorName: by,
       domain: "operator-provisioning",

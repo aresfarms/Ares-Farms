@@ -1,6 +1,6 @@
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { NextRequest, NextResponse } from "next/server";
 
-import { appendAuditEvent } from "@/lib/property/auditLedger";
 import { persistOperatorReviewQueueItem } from "@/lib/queues/operatorReviewQueueStore";
 import { sanitizeIngestText } from "@/lib/security/ingestSanitizer";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "public-anonymous",
       actorName: "public-anonymous",
       domain: "public-special-building-review",

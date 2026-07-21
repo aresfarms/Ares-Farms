@@ -7,10 +7,10 @@
  * reads its real status (stub/partial/pending), never a green it hasn't earned.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { securityHardeningStatus, SECURITY_HARDENING_GOVERNANCE } from "./securityHardeningManifest";
 import { verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 import { readIncidentState } from "./securityIncidentRunbook";
-import { AUDIT_LEDGER_PATH } from "@/lib/property/auditLedger";
 import { domainDashboardPanel, type ControlLight } from "./domainSecurityVerification";
 import { securityResilienceDashboard } from "./securityResilienceDashboard";
 
@@ -34,7 +34,7 @@ export function securityDashboard(): {
   resilience: ReturnType<typeof securityResilienceDashboard>;
 } {
   const status = securityHardeningStatus();
-  const chain = verifyLedgerChain(AUDIT_LEDGER_PATH);
+  const chain = verifyLedgerChain(canonicalLandRegisterAuthority.path);
   const incident = readIncidentState();
   const domains = domainDashboardPanel();
   const resilience = securityResilienceDashboard();

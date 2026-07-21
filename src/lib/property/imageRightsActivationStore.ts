@@ -13,10 +13,10 @@
  * THIRD_PARTY_COURTESY can never be auto-cleared.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { appendAuditEvent, readAuditEvents } from "./auditLedger";
 import {
   IMAGE_RIGHTS_ACTIVATION,
   IMAGE_RIGHTS_SOURCE_IDS,
@@ -93,7 +93,7 @@ export function listRuntimeImageRights(): EffectiveImageRights[] {
 }
 
 export function readImageRightsAudit(sourceId: string, limit = 10) {
-  return readAuditEvents({ domain: IMAGE_RIGHTS_AUDIT_DOMAIN, subject: sourceId })
+  return canonicalLandRegisterAuthority.read({ domain: IMAGE_RIGHTS_AUDIT_DOMAIN, subject: sourceId })
     .slice(-limit)
     .reverse();
 }
@@ -145,7 +145,7 @@ export function recordImageRightsDecision(input: {
   };
   writeOverlay(overlay);
 
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.reviewerId,
     actorName: input.reviewerName,
     domain: IMAGE_RIGHTS_AUDIT_DOMAIN,

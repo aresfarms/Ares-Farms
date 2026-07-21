@@ -1,8 +1,8 @@
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { createHash } from "node:crypto";
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { appendAuditEvent } from "@/lib/property/auditLedger";
 import {
   categoryForType,
   financingPathwayTags,
@@ -329,7 +329,7 @@ export async function POST(req: NextRequest) {
     const uploadTraceId = createTraceId("public-property-upload");
     const decoded = imageParts(body.imageDataUrl);
     if (!decoded) {
-      appendAuditEvent({
+      canonicalLandRegisterAuthority.append({
         actorId: "public-anonymous",
         actorName: "public-anonymous",
         domain: "public-property-import",
@@ -366,7 +366,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!imageGate.ok) {
-      appendAuditEvent({
+      canonicalLandRegisterAuthority.append({
         actorId: "public-anonymous",
         actorName: "public-anonymous",
         domain: "public-property-import",
@@ -418,7 +418,7 @@ export async function POST(req: NextRequest) {
           ? "Uploaded property image was rejected because the external malware scan flagged it as suspicious."
           : "Uploaded property image was rejected because required external malware scanning was unavailable.";
 
-      appendAuditEvent({
+      canonicalLandRegisterAuthority.append({
         actorId: "public-anonymous",
         actorName: "public-anonymous",
         domain: "public-property-import",
@@ -479,7 +479,7 @@ export async function POST(req: NextRequest) {
 
   const context = buildImportedPropertyContext(importInput);
   if ("blocked" in context) {
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "public-anonymous",
       actorName: "public-anonymous",
       domain: "public-property-import",
@@ -511,7 +511,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (verification.status === "blocked") {
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "public-anonymous",
       actorName: "public-anonymous",
       domain: "public-property-import",
@@ -619,7 +619,7 @@ export async function POST(req: NextRequest) {
     .digest("hex")
     .slice(0, 16);
 
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: "public-anonymous",
     actorName: "public-anonymous",
     domain: "public-property-import",

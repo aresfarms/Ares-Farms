@@ -30,7 +30,7 @@
  * re-verification. It never invents a verification.
  */
 
-import { appendAuditEvent } from "@/lib/property/auditLedger";
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { isLicenseRenderValid, licenseRuleApplies, LICENSE_RECHECK_WINDOW_DAYS } from "./licenseVerification";
 import { allListers, allListings, setListingStatusInternal } from "./listingStore";
 
@@ -103,6 +103,6 @@ export function runDirectListingFreshness(now: Date = new Date()): FreshnessRunR
   }
 
   r.reason = `weekly freshness: ${r.confirmedCurrent} current · ${r.auctionsExpired} auctions expired · ${r.suspendedStale} stale-suspended · ${r.suspendedLicense} license-suspended · ${r.listersDueForReverification.length} lister(s) due for license re-verification`;
-  appendAuditEvent({ ...ACTOR, domain: DOMAIN, subject: "direct-listings", decision: "FRESHNESS_RUN", reason: r.reason, detail: { ...r, asOf: now.toISOString() } });
+  canonicalLandRegisterAuthority.append({ ...ACTOR, domain: DOMAIN, subject: "direct-listings", decision: "FRESHNESS_RUN", reason: r.reason, detail: { ...r, asOf: now.toISOString() } });
   return r;
 }

@@ -20,6 +20,7 @@
  * ledger (same unit) → data/audit-ledger.ndjson.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -27,7 +28,6 @@ import { SOURCE_ACTIVATION } from "./sourceActivation";
 import { getRuntimeActivation, isSourceLiveRuntime } from "./sourceActivationStore";
 import { recordsForReview } from "./propertyData";
 import { recordIsCurrent, type CanonicalProperty, type PropertySourceId } from "./propertyTypes";
-import { appendAuditEvent } from "./auditLedger";
 import { writeLiveRecords } from "./liveOverlay";
 import { runtimeStatePath } from "./runtimeStatePath";
 import { fetchHudReoRecords } from "./hudAdapter";
@@ -87,7 +87,7 @@ function writeRefreshState(sourceId: string, r: SourceRefreshResult, now: Date):
 }
 
 function log(sourceId: string, decision: string, r: SourceRefreshResult): void {
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: "system:source-refresh",
     actorName: "source-refresh-job",
     domain: DOMAIN,
@@ -200,7 +200,7 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
         reason: `feed fetch failed — last-good data kept live: ${(e as Error).message}`,
       });
       log(sourceId, "FAILURE", r);
-      appendAuditEvent({
+      canonicalLandRegisterAuthority.append({
         actorId: "system:source-refresh",
         actorName: "source-refresh-job",
         domain: DOMAIN,
@@ -230,7 +230,7 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
   try {
     const { refreshCapitalRates } = await import("./capitalRatesRefresh");
     const rate = await refreshCapitalRates();
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "system:source-refresh",
       actorName: "source-refresh-job",
       domain: DOMAIN,
@@ -252,7 +252,7 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
   try {
     const { refreshCommodityPrices } = await import("./commodityPricesRefresh");
     const c = await refreshCommodityPrices();
-    appendAuditEvent({
+    canonicalLandRegisterAuthority.append({
       actorId: "system:source-refresh",
       actorName: "source-refresh-job",
       domain: DOMAIN,

@@ -3,12 +3,12 @@
  * Read-only (the monitor path is separate from the write path). Schedule via
  * Cloud Scheduler → Cloud Run Job in production. Fails (exit 1) on any break.
  */
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { verifyLedgerChain } from "@/lib/security/ledgerHashChain";
-import { AUDIT_LEDGER_PATH } from "@/lib/property/auditLedger";
 import * as path from "node:path";
 
 const LEDGERS = [
-  ["audit", AUDIT_LEDGER_PATH],
+  ["audit", canonicalLandRegisterAuthority.path],
   ["security-events", path.join(process.cwd(), "data", "security-events.ndjson")],
 ] as const;
 

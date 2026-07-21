@@ -11,6 +11,21 @@ function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+function sourceFiles(root: string): string[] {
+  return fs.readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
+    const absolutePath = path.join(root, entry.name);
+    if (entry.isDirectory()) return sourceFiles(absolutePath);
+    return /\.(?:ts|tsx)$/.test(entry.name) ? [absolutePath] : [];
+  });
+}
+
+function importedModules(source: string): string[] {
+  const modules: string[] = [];
+  const pattern = /(?:import|export)\s+(?:type\s+)?(?:[\s\S]*?\s+from\s+)?["']([^"']+)["']/g;
+  for (const match of source.matchAll(pattern)) modules.push(match[1]);
+  return modules;
+}
+
 function main(): void {
   const keys = canonicalDomainRegistry.map((entry) => entry.key);
   const modules = canonicalDomainRegistry.map((entry) => entry.authorityModule);
@@ -42,6 +57,17 @@ function main(): void {
     assert(domain.governanceTags.length >= 3, `${domain.displayName} must carry at least three governance tags.`);
     assert(new Set(domain.governanceTags).size === domain.governanceTags.length, `${domain.displayName} governance tags must be unique.`);
     assert(domain.projectionRule.length >= 80, `${domain.displayName} projection rule is not sufficiently explicit.`);
+
+    for (const restrictedModule of domain.restrictedImplementationModules ?? []) {
+      const violations = sourceFiles(path.join(repoRoot, "src"))
+        .filter((filePath) => path.relative(repoRoot, filePath) !== domain.authorityModule)
+        .filter((filePath) => importedModules(fs.readFileSync(filePath, "utf8")).includes(restrictedModule))
+        .map((filePath) => path.relative(repoRoot, filePath));
+      assert(
+        violations.length === 0,
+        `${domain.displayName} implementation module must only be imported by its canonical authority: ${restrictedModule}\n${violations.join("\n")}`
+      );
+    }
   }
 
   console.log(JSON.stringify({

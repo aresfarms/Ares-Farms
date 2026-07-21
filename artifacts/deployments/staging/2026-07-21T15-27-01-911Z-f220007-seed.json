@@ -1,0 +1,24 @@
+{
+  "environment": "staging",
+  "outcome": "PASS",
+  "gitHead": "f220007",
+  "project": "furlong-staging-499102",
+  "region": "us-central1",
+  "service": "furlong-core",
+  "serviceUrl": "https://furlong-core-mwei3cj3jq-uc.a.run.app",
+  "cloudRunRevision": "furlong-core-00094-b5b",
+  "imageDigest": "sha256:10e00056b431a7a0d437698ca58f89d836f7242f88a2a89f5c45b63e93755ca6",
+  "seedRunId": "staging-p4-furlong-core-00094-b5b",
+  "applicationId": "staging-p4-furlong-core-00094-b5b-application",
+  "seededSteps": 14,
+  "guardrails": {
+    "officialReportGenerated": false,
+    "liveExternalCallPerformed": false,
+    "rawDocumentContentAccepted": false,
+    "paymentCaptured": false,
+    "finalDecisionIssued": false,
+    "borrowerNoticeSent": false,
+    "publicVerificationEnabled": false
+  },
+  "generatedAtUtc": "2026-07-21T15:27:01.911Z"
+}

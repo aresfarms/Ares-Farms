@@ -39,6 +39,7 @@ steps:
         npm run verify:canonical-domain
         npm run smoke:canonical-domain-fail-closed
         npm run smoke:production-source-legal
+        npm run smoke:production-financing-authority
         npm run smoke:production-data-classification
 
   # Runtime image (default final stage: runner)

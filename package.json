@@ -371,7 +371,9 @@
     "smoke:production-data-classification": "tsx src/scripts/productionDataClassificationSmokeTest.ts",
     "acceptance:p5-data-classification": "tsx src/scripts/runP5DataClassificationReadiness.ts",
     "smoke:production-source-legal": "tsx src/scripts/productionSourceLegalApprovalSmokeTest.ts",
-    "acceptance:p5-source-legal": "tsx src/scripts/runP5SourceLegalReadiness.ts"
+    "acceptance:p5-source-legal": "tsx src/scripts/runP5SourceLegalReadiness.ts",
+    "smoke:production-financing-authority": "tsx src/scripts/productionFinancingAuthoritySmokeTest.ts",
+    "acceptance:p5-financing-authority": "tsx src/scripts/runP5FinancingAuthorityReadiness.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

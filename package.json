@@ -375,7 +375,9 @@
     "smoke:production-financing-authority": "tsx src/scripts/productionFinancingAuthoritySmokeTest.ts",
     "acceptance:p5-financing-authority": "tsx src/scripts/runP5FinancingAuthorityReadiness.ts",
     "smoke:production-connector-activation": "tsx src/scripts/productionConnectorActivationSmokeTest.ts",
-    "acceptance:p5-connector-activation": "tsx src/scripts/runP5ConnectorActivationReadiness.ts"
+    "acceptance:p5-connector-activation": "tsx src/scripts/runP5ConnectorActivationReadiness.ts",
+    "smoke:production-official-report-authority": "tsx src/scripts/productionOfficialReportAuthoritySmokeTest.ts",
+    "acceptance:p5-official-report-authority": "tsx src/scripts/runP5OfficialReportAuthorityReadiness.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

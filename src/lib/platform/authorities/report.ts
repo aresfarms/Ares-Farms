@@ -10,3 +10,10 @@ export const canonicalReportAuthority = Object.freeze({
   getAdminScope: getReportAdminScopeRecord,
   listAdminRecords: listReportAdminRecords,
 });
+
+export type {
+  ListReportAdminRecordsInput,
+  PersistReportRecordInput,
+  ReportAdminRecord,
+  ReportAdminScopeRecord,
+} from "@/lib/reports/reportRecordStore";

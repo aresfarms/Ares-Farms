@@ -102,6 +102,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Report",
     authorityModule: "src/lib/platform/authorities/report.ts",
     authorityExport: "canonicalReportAuthority",
+    restrictedImplementationModules: ["@/lib/reports/reportRecordStore"],
     canonicalIdField: "report_id",
     governanceTags: ["SOURCE-PROV-001", "TECH-REPLAY-001", "PUBLIC-CLAIMS-001"],
     projectionRule: "Reports must be deterministic, versioned, advisory, and reproducible from their recorded inputs and governance version.",

@@ -60,6 +60,7 @@ type RateLimitBucket = {
 
 type SessionContext = {
   actorId: string | null;
+  email: string | null;
   role: string | null;
   tenantId: string | null;
 };
@@ -264,6 +265,7 @@ function combineClaimedContexts(
 function extractSessionContext(token: Record<string, unknown>): SessionContext {
   return {
     actorId: normalizeOptionalText(token.id ?? token.sub ?? token.email),
+    email: normalizeOptionalText(token.email),
     role: normalizeOptionalRole(token.role),
     tenantId: normalizeOptionalText(token.tenantId),
   };
@@ -277,6 +279,10 @@ function requestWithSessionHeaders(
 
   if (session.actorId) {
     requestHeaders.set("x-ares-authenticated-user-id", session.actorId);
+  }
+
+  if (session.email) {
+    requestHeaders.set("x-ares-authenticated-email", session.email);
   }
 
   if (session.role) {

@@ -36,6 +36,7 @@ export const INTERNAL_CHROME_PREFIXES = [
   "/doctrine-gap-ledger", "/controlled-promotion-activation",
   "/live-scraper-activation", "/release-candidate-freeze",
   "/deployment-environment-readiness", "/environmental-compliance",
+  "/named-tester-acceptance",
   "/source-", "/production-",
 ] as const;
 

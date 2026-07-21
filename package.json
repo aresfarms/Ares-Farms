@@ -364,7 +364,8 @@
     "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts",
     "smoke:canonical-domain-fail-closed": "tsx src/scripts/canonicalDomainFailClosedSmokeTest.ts",
     "seed:staging": "tsx src/scripts/runStagingSeed.ts",
-    "acceptance:p5": "tsx src/scripts/runP5SeededWorkflowAcceptance.ts"
+    "acceptance:p5": "tsx src/scripts/runP5SeededWorkflowAcceptance.ts",
+    "verify:p6-named-tester": "tsx src/scripts/p6NamedTesterAcceptanceSmokeTest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -389,6 +389,13 @@ variable "auth_credential_email_allowlist" {
   default     = ""
 }
 
+
+variable "staging_seed_enabled" {
+  description = "Enable the one-purpose P4 staging seed authority. Never enable in production."
+  type        = bool
+  default     = false
+}
+
 # ---- Labels -----------------------------------------------------------------
 
 variable "labels" {

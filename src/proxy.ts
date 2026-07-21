@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
 import { isProtectedPage } from "@/lib/auth/protectedRoutes";
+import { secureCompare } from "@/lib/security/requestGuards";
 import {
   ClaimedActorContext,
   apiAuthEnforcementRequired,
@@ -66,6 +67,27 @@ type SessionContext = {
 type ApiPerimeterSeverity = "info" | "warning" | "error";
 
 const rateLimitBuckets = new Map<string, RateLimitBucket>();
+
+const STAGING_SEED_ROUTES = new Set([
+  "/api/onboard",
+  "/api/apply",
+  "/api/documents/submit",
+  "/api/documents/storage-handoff",
+  "/api/queues/operator",
+  "/api/connectors/source-check",
+  "/api/rules/evaluate",
+  "/api/reviews/human",
+  "/api/connectors/credentialed-ingestion",
+  "/api/partners/workflows",
+  "/api/reports/pdf",
+]);
+
+function stagingSeedAuthorityAllowed(req: NextRequest, route: string): boolean {
+  if (req.method !== "POST" || !STAGING_SEED_ROUTES.has(route)) return false;
+  const expected = process.env.STAGING_SEED_SHARED_SECRET?.trim();
+  const provided = req.headers.get("x-furlong-staging-seed-secret")?.trim();
+  return Boolean(expected && provided && secureCompare(provided, expected));
+}
 
 function createSecurityTraceId(): string {
   return `api-security-${Date.now()}-${Math.random()
@@ -435,6 +457,15 @@ export async function proxy(req: NextRequest) {
         req,
       });
     }
+    return NextResponse.next();
+  }
+
+  if (stagingSeedAuthorityAllowed(req, route)) {
+    logApiPerimeterEvent({
+      severity: "info", traceId, route, method: req.method,
+      policy: "staging-seed-authority", outcome: "allowed", status: 200, req,
+      detail: { restrictedRoute: true, productionAuthority: false },
+    });
     return NextResponse.next();
   }
 

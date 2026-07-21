@@ -113,3 +113,13 @@ resource "google_project_iam_member" "migrator_cloudsql_client" {
   role    = "roles/cloudsql.client"
   member  = "serviceAccount:${google_service_account.db_migrator.email}"
 }
+
+# STAGING_SEED_SHARED_SECRET is created and versioned out of band. It grants
+# one-purpose access to the fixed P4 seed route allowlist; it is not a user login.
+resource "google_secret_manager_secret_iam_member" "runtime_staging_seed_secret" {
+  count     = var.staging_seed_enabled ? 1 : 0
+  project   = var.project_id
+  secret_id = "STAGING_SEED_SHARED_SECRET"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}

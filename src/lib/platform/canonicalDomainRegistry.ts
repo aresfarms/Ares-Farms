@@ -22,6 +22,7 @@ export type CanonicalDomainDefinition = {
   displayName: string;
   authorityModule: string;
   authorityExport: string;
+  restrictedImplementationModules?: readonly string[];
   canonicalIdField: string;
   governanceTags: string[];
   projectionRule: string;
@@ -42,6 +43,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Place",
     authorityModule: "src/lib/platform/authorities/place.ts",
     authorityExport: "canonicalPlaceAuthority",
+    restrictedImplementationModules: ["@/lib/place-facts/placeFactActivation"],
     canonicalIdField: "place_id",
     governanceTags: ["SOURCE-AUTH-001", "SOURCE-PROV-001", "PUBLIC-CLAIMS-001"],
     projectionRule: "Place summaries are governed projections of registered place facts, never independent factual authorities.",
@@ -87,6 +89,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Provider",
     authorityModule: "src/lib/platform/authorities/provider.ts",
     authorityExport: "canonicalProviderAuthority",
+    restrictedImplementationModules: ["@/lib/providers/providerRegistry"],
     canonicalIdField: "provider_id",
     governanceTags: ["CANON-SOVEREIGNTY-001", "PUBLIC-CLAIMS-001", "UX-GOV-001"],
     projectionRule: "Provider surfaces must remain neutral directory projections without endorsement, ranking, or guaranteed availability claims.",

@@ -381,7 +381,9 @@
     "smoke:production-payments-treasury-authorization": "tsx src/scripts/productionPaymentsTreasuryAuthorizationSmokeTest.ts",
     "acceptance:p5-payments-treasury-authorization": "tsx src/scripts/runP5PaymentsTreasuryAuthorizationReadiness.ts",
     "smoke:production-domain-cutover-authorization": "tsx src/scripts/productionDomainCutoverAuthorizationSmokeTest.ts",
-    "acceptance:p5-domain-cutover-authorization": "tsx src/scripts/runP5DomainCutoverAuthorizationReadiness.ts"
+    "acceptance:p5-domain-cutover-authorization": "tsx src/scripts/runP5DomainCutoverAuthorizationReadiness.ts",
+    "smoke:consolidated-launch-authorization": "tsx src/scripts/consolidatedLaunchAuthorizationLedgerSmokeTest.ts",
+    "acceptance:consolidated-launch-authorization": "tsx src/scripts/runConsolidatedLaunchAuthorizationReadiness.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

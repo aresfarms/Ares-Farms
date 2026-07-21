@@ -4,6 +4,8 @@ import path from "path";
 import { canonicalDomainRegistry } from "@/lib/platform/canonicalDomainRegistry";
 
 const repoRoot = process.cwd();
+const authorityRoot = "src/lib/platform/authorities/";
+const authorityBarrelPath = path.join(repoRoot, authorityRoot, "index.ts");
 
 function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -18,14 +20,24 @@ function main(): void {
   assert(new Set(modules).size === modules.length, "Each canonical domain must have one distinct authority module.");
   assert(new Set(idFields).size === idFields.length, "Canonical identifier fields must be unique.");
 
+  const authorityBarrelSource = fs.readFileSync(authorityBarrelPath, "utf8");
+
   for (const domain of canonicalDomainRegistry) {
+    assert(
+      domain.authorityModule.startsWith(authorityRoot) && domain.authorityModule !== `${authorityRoot}index.ts`,
+      `${domain.displayName} must resolve through a dedicated canonical authority boundary.`
+    );
     const authorityPath = path.join(repoRoot, domain.authorityModule);
     assert(fs.existsSync(authorityPath), `${domain.displayName} authority module is missing: ${domain.authorityModule}`);
     assert(domain.authorityExport.length > 0, `${domain.displayName} must declare an authority export.`);
     const authoritySource = fs.readFileSync(authorityPath, "utf8");
     assert(
-      authoritySource.includes(domain.authorityExport),
-      `${domain.displayName} authority export is missing: ${domain.authorityExport}`
+      authoritySource.includes(`export const ${domain.authorityExport}`),
+      `${domain.displayName} authority contract is missing: ${domain.authorityExport}`
+    );
+    assert(
+      authorityBarrelSource.includes(domain.authorityExport),
+      `${domain.displayName} authority contract is not exposed by the canonical authority barrel.`
     );
     assert(domain.governanceTags.length >= 3, `${domain.displayName} must carry at least three governance tags.`);
     assert(new Set(domain.governanceTags).size === domain.governanceTags.length, `${domain.displayName} governance tags must be unique.`);

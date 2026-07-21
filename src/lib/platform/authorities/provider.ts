@@ -1,5 +1,6 @@
 import {
   PROVIDERS,
+  licenseModelStatement,
   providerBySlug,
   providersForLane,
 } from "@/lib/providers/providerRegistry";
@@ -9,4 +10,5 @@ export const canonicalProviderAuthority = Object.freeze({
   all: PROVIDERS,
   bySlug: providerBySlug,
   forLane: providersForLane,
+  licenseModelStatement,
 });

@@ -28,7 +28,7 @@ import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
 import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
-import { providersForLane } from "@/lib/providers/providerRegistry";
+import { canonicalProviderAuthority } from "@/lib/platform/authorities/provider";
 import { isoWeekSeed, dayRotationSeed } from "@/lib/public-content/weekSeed";
 
 /**
@@ -481,7 +481,7 @@ export default async function ExplorePage({
             </section>
           )}
 
-          {providersForLane(selected.slug).length > 0 && (
+          {canonicalProviderAuthority.forLane(selected.slug).length > 0 && (
             <section aria-label="Providers in this lane" style={{ display: "grid", gap: 12 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: theme.ink }}>Providers in this lane</h2>
               <p style={{ margin: 0, fontSize: 13, ...muted }}>
@@ -489,7 +489,7 @@ export default async function ExplorePage({
                 listed. Furlong takes no referral fee and submits none of your information.
               </p>
               <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 10 }}>
-                {providersForLane(selected.slug).map((p) => (
+                {canonicalProviderAuthority.forLane(selected.slug).map((p) => (
                   <li key={p.slug} style={{ border: `1px solid ${theme.cellBorder}`, borderRadius: 12, background: theme.cellBg, padding: "16px 18px", display: "grid", gap: 4 }}>
                     <Link href={`/providers/${p.slug}`} style={{ fontSize: 17, fontWeight: 700, color: laneAccentDark, textDecoration: "none" }}>
                       {p.name} →

@@ -63,6 +63,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Evidence",
     authorityModule: "src/lib/platform/authorities/evidence.ts",
     authorityExport: "canonicalEvidenceAuthority",
+    restrictedImplementationModules: ["@/lib/evidence/documentEvidenceReconciliationRuntime"],
     canonicalIdField: "evidence_id",
     governanceTags: ["SOURCE-PROV-001", "TECH-REPLAY-001", "CANON-CLASS-001"],
     projectionRule: "Evidence may be summarized but its classification, provenance, conflicts, and review state must be preserved.",

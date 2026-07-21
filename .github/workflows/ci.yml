@@ -74,6 +74,12 @@ jobs:
       - name: Personal document git guard smoke
         run: npm run smoke:no-personal-docs
 
+      - name: Canonical domain authority boundary
+        run: npm run verify:canonical-domain
+
+      - name: Canonical domain fail-closed proof
+        run: npm run smoke:canonical-domain-fail-closed
+
       - name: TypeScript noEmit
         run: npx tsc --noEmit
 

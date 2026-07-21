@@ -361,7 +361,8 @@
     "ingest:listhub": "tsx src/scripts/ingestListhubListings.ts",
     "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids && npm run ingest:nass-input-costs && npm run ingest:fsa-rates",
     "ingest:capital-rates": "tsx src/scripts/ingestCapitalRates.ts",
-    "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts"
+    "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts",
+    "smoke:canonical-domain-fail-closed": "tsx src/scripts/canonicalDomainFailClosedSmokeTest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

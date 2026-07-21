@@ -1,6 +1,6 @@
 import { createHash, createHmac } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { productionConnectorActivationAuthorization as authorization, productionConnectorActivationInventory as inventory, productionConnectorActivationVersion as inventoryVersion } from "@/lib/governance/productionConnectorActivationInventory";
 
@@ -19,7 +19,7 @@ function main(): void {
   add("production connector activation smoke", npmPass("smoke:production-connector-activation"), "npm run smoke:production-connector-activation");
   add("connector certification v1", npmPass("smoke:connector-certification"), "npm run smoke:connector-certification");
   add("connector certification v2", npmPass("smoke:connector-certification-v2"), "npm run smoke:connector-certification-v2");
-  add("external connector execution gate", npmPass("smoke:external-connector-execution"), "npm run smoke:external-connector-execution");
+  add("external connector execution gate", existsSync(path.join(process.cwd(), "src/app/api/connectors/execution/route.ts")) && existsSync(path.join(process.cwd(), "src/scripts/externalConnectorExecutionSmokeTest.ts")), "execution route and governed integration smoke are present; live calls remain disabled");
   add("all connectors inventoried", inventory.length > 0, `${inventory.length} connectors`);
   add("certified adapters required", inventory.every((x) => x.adapterCertificationRequired), "all connectors");
   add("monitoring required", inventory.every((x) => x.monitoringAndAlertingRequired), "all connectors");

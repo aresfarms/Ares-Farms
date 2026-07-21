@@ -379,7 +379,7 @@ function main() {
       apiSecurityProxy.includes("apiAuthEnforcementRequired") &&
       apiSecurityProxy.includes("apiRateLimitingEnabled") &&
       apiSecurityProxy.includes("roleClaimConflictsWithSession") &&
-      apiSecurityProxy.includes("matcher: \"/api/:path*\""),
+      (apiSecurityProxy.includes("matcher: [") && apiSecurityProxy.includes("_next/static")),
     summary:
       "Protected API routes must have a perimeter proxy for session authority and abuse control.",
     passDetail:

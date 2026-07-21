@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 
+import { InterestFirstDiscovery } from "@/components/discovery/InterestFirstDiscovery";
 import type { GuidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import type { PropertyCategoryId } from "@/lib/property/propertyCategories";
 
@@ -97,10 +98,25 @@ export function GuidedIntake({ feed }: { feed: GuidedIntakeFeed }) {
     >
       <div style={{ display: "grid", gap: 4 }}>
         <strong style={{ fontSize: 17, color: "#162033" }}>What are you interested in?</strong>
-        <span style={{ fontSize: 12, color: "#7a8aa0" }}>
+        {/* WCAG AA: #7a8aa0 on white is 3.52:1 — below the 4.5:1 floor. */}
+        <span style={{ fontSize: 12, color: "#4d596d" }}>
           Anonymous — your interests only. No personal information, no qualification questions; whether
           a program fits <em>you</em> is for a licensed professional, your lender, or the agency.
         </span>
+      </div>
+
+      {/* Place-first (founder direction 2026-07-20): "I don't know, but I want
+          to live in Athens, GA" must be the FIRST move — a person with a place
+          in mind should not have to hunt for their state in a 47-box grid. The
+          inventory filter below stays as the browse path. */}
+      <InterestFirstDiscovery embedded />
+
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <span style={{ flex: 1, height: 1, background: "#e4e9f0" }} />
+        <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#4d596d" }}>
+          Or browse what we currently track
+        </span>
+        <span style={{ flex: 1, height: 1, background: "#e4e9f0" }} />
       </div>
 
       {/* Step 1 — states (only states with current inventory are offered). */}

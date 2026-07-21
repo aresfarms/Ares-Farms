@@ -67,7 +67,7 @@ const STEPS: Step[] = [
 const ink = "#101a2b";
 const line = "#d7deea";
 
-export function InterestFirstDiscovery() {
+export function InterestFirstDiscovery({ embedded = false }: { embedded?: boolean } = {}) {
   const [place, setPlace] = useState("");
   const [stateCode, setStateCode] = useState("");
   const [stepIndex, setStepIndex] = useState(-1); // -1 = place entry
@@ -130,20 +130,33 @@ export function InterestFirstDiscovery() {
   return (
     <section
       aria-label="What are you interested in?"
-      style={{ display: "grid", gap: 16, border: `1px solid ${line}`, borderRadius: 18, background: "#fff", padding: "22px 24px" }}
+      style={
+        embedded
+          ? { display: "grid", gap: 12 }
+          : { display: "grid", gap: 16, border: `1px solid ${line}`, borderRadius: 18, background: "#fff", padding: "22px 24px" }
+      }
     >
-      <div style={{ display: "grid", gap: 6 }}>
-        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0f766e" }}>
-          What are you interested in?
-        </span>
-        <strong style={{ fontSize: 25, lineHeight: 1.12, color: ink }}>
-          You don&apos;t need an address yet. Start with the place.
+      {/* Embedded inside GuidedIntake, the host already carries the
+          "What are you interested in?" heading + the anonymity promise. */}
+      {!embedded && (
+        <div style={{ display: "grid", gap: 6 }}>
+          <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#0f766e" }}>
+            What are you interested in?
+          </span>
+          <strong style={{ fontSize: 25, lineHeight: 1.12, color: ink }}>
+            You don&apos;t need an address yet. Start with the place.
+          </strong>
+          <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.6 }}>
+            Anonymous — your interests only. No personal information and no qualification questions; whether
+            a program fits <em>you</em> is for a licensed professional, your lender, or the agency.
+          </span>
+        </div>
+      )}
+      {embedded && stepIndex < 0 && (
+        <strong style={{ fontSize: 14, color: ink }}>
+          Have a place in mind? Start there — no address needed.
         </strong>
-        <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.6 }}>
-          Anonymous — your interests only. No personal information and no qualification questions; whether
-          a program fits <em>you</em> is for a licensed professional, your lender, or the agency.
-        </span>
-      </div>
+      )}
 
       {step === null ? (
         <div style={{ display: "grid", gap: 10 }}>

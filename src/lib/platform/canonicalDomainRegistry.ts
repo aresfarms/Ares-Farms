@@ -72,6 +72,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Source",
     authorityModule: "src/lib/platform/authorities/source.ts",
     authorityExport: "canonicalSourceAuthority",
+    restrictedImplementationModules: ["@/lib/source-stack/sourceStackRuntime"],
     canonicalIdField: "source_id",
     governanceTags: ["SOURCE-AUTH-001", "SOURCE-INGEST-001", "SOURCE-PROV-001"],
     projectionRule: "Every sourced claim must resolve to the governed source stack and its authority, freshness, and permitted-use posture.",

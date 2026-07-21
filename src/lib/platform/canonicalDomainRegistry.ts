@@ -34,6 +34,7 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     displayName: "Property",
     authorityModule: "src/lib/platform/authorities/property.ts",
     authorityExport: "canonicalPropertyAuthority",
+    restrictedImplementationModules: ["@/lib/canonical-properties"],
     canonicalIdField: "canonical_property_id",
     governanceTags: ["CANON-SOVEREIGNTY-001", "SOURCE-AUTH-001", "SOURCE-PROV-001"],
     projectionRule: "All property views must reference the canonical property identifier and preserve source lineage.",

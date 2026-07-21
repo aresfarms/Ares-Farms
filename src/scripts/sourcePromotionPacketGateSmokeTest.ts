@@ -5,7 +5,7 @@ import { evaluateSourcePromotionPacketGate } from "@/lib/governance/sourcePromot
 import { eventContractRegistry } from "@/lib/modules/eventContractRegistry";
 import { crossModuleHandoffMap } from "@/lib/modules/handoffMap";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
-import { SOURCE_STACK_REGISTRY } from "@/lib/source-stack/sourceStackRuntime";
+import { SOURCE_STACK_REGISTRY } from "@/lib/platform/authorities/source";
 
 /**
  * Source Promotion Packet Gate Smoke Test

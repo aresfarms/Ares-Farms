@@ -1,3 +1,5 @@
+export * from "@/lib/source-stack/sourceStackRuntime";
+
 import {
   CANONICAL_ENTITY_PROFILES,
   SOURCE_STACK_REGISTRY,

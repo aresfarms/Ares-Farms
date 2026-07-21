@@ -11,7 +11,7 @@ import {
   SOURCE_STACK_SOURCES,
   SOURCE_STACK_VERSION,
   dispatchSourceStackAction,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";
 
 /**
  * Source Stack API Helper

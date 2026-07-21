@@ -1,4 +1,4 @@
-import { SOURCE_STACK_REGISTRY } from "@/lib/source-stack/sourceStackRuntime";
+import { SOURCE_STACK_REGISTRY } from "@/lib/platform/authorities/source";
 import { sandboxUrl } from "@/security/realityPlatform/urlIngestionSandbox";
 
 export type SourceCandidateStatus =

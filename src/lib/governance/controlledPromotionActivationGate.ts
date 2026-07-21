@@ -2,7 +2,7 @@ import {
   SOURCE_STACK_PRODUCTION_RESTRICTIONS,
   SOURCE_STACK_REQUIRED_DISCLOSURES,
   SOURCE_STACK_VERSION,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";
 import {
   SOURCE_PRODUCTION_READINESS_GATE_VERSION,
   evaluateSourceProductionReadinessGate,

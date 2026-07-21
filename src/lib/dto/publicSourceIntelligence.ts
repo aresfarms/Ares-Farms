@@ -12,7 +12,7 @@ import {
   SOURCE_STACK_REQUIRED_DISCLOSURES,
   SOURCE_STACK_SOURCES,
   SOURCE_STACK_VERSION,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";
 import { REQUIRED_SURFACE_STATUS_MESSAGES } from "@/lib/dto/shared";
 
 /**

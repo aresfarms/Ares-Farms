@@ -13,7 +13,7 @@ import {
   createRuntimeVersionRef,
   evaluateVersionRuntime,
 } from "@/lib/runtime/versionRuntime";
-import { SOURCE_STACK_SOURCES, SOURCE_STACK_VERSION } from "@/lib/source-stack/sourceStackRuntime";
+import { SOURCE_STACK_SOURCES, SOURCE_STACK_VERSION } from "@/lib/platform/authorities/source";
 
 /**
  * Public Source Intelligence API Helper

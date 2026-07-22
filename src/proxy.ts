@@ -68,6 +68,7 @@ type SessionContext = {
 type ApiPerimeterSeverity = "info" | "warning" | "error";
 
 const rateLimitBuckets = new Map<string, RateLimitBucket>();
+const MAX_RATE_LIMIT_BUCKETS = 10_000;
 
 const STAGING_SEED_ROUTES = new Set([
   "/api/onboard",
@@ -85,6 +86,7 @@ const STAGING_SEED_ROUTES = new Set([
 
 function stagingSeedAuthorityAllowed(req: NextRequest, route: string): boolean {
   if (req.method !== "POST" || !STAGING_SEED_ROUTES.has(route)) return false;
+  if (process.env.STAGING_SEED_ENABLED !== "true") return false;
   const expected = process.env.STAGING_SEED_SHARED_SECRET?.trim();
   const provided = req.headers.get("x-furlong-staging-seed-secret")?.trim();
   return Boolean(expected && provided && secureCompare(provided, expected));
@@ -119,8 +121,8 @@ function logApiPerimeterEvent(input: {
     outcome: input.outcome,
     status: input.status ?? null,
     publicReason: input.publicReason ?? null,
-    clientIp: clientIdentity(input.req),
-    userAgent: input.req.headers.get("user-agent") ?? null,
+    clientContextPresent: clientIdentity(input.req) !== "unknown-client",
+    userAgentPresent: Boolean(input.req.headers.get("user-agent")),
     detail: input.detail ?? {},
   };
 
@@ -190,6 +192,16 @@ function evaluateRateLimit(req: NextRequest): {
   );
   const limit = parsePositiveInteger(process.env.API_RATE_LIMIT_MAX, 120);
   const now = Date.now();
+  if (rateLimitBuckets.size >= MAX_RATE_LIMIT_BUCKETS) {
+    for (const [bucketKey, bucket] of rateLimitBuckets) {
+      if (bucket.resetAt <= now) rateLimitBuckets.delete(bucketKey);
+    }
+    while (rateLimitBuckets.size >= MAX_RATE_LIMIT_BUCKETS) {
+      const oldestKey = rateLimitBuckets.keys().next().value as string | undefined;
+      if (!oldestKey) break;
+      rateLimitBuckets.delete(oldestKey);
+    }
+  }
   const key = `${clientIdentity(req)}:${req.nextUrl.pathname}`;
   const existing = rateLimitBuckets.get(key);
 
@@ -248,6 +260,27 @@ async function readBodyClaimedActorContext(
     return extractClaimedActorContext(body);
   } catch {
     return {};
+  }
+}
+
+function requestBodyExceedsLimit(req: NextRequest): boolean {
+  const contentLength = req.headers.get("content-length");
+  if (!contentLength) return false;
+  if (!/^\d+$/.test(contentLength)) return true;
+  const bytes = Number(contentLength);
+  const maxBytes = parsePositiveInteger(process.env.API_MAX_JSON_BODY_BYTES, 1_048_576);
+  return !Number.isFinite(bytes) || bytes < 0 || bytes > maxBytes;
+}
+
+function isCrossSiteMutation(req: NextRequest): boolean {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return false;
+  if (req.headers.get("sec-fetch-site") === "cross-site") return true;
+  const origin = req.headers.get("origin");
+  if (!origin) return false;
+  try {
+    return new URL(origin).origin !== req.nextUrl.origin;
+  } catch {
+    return true;
   }
 }
 
@@ -313,7 +346,7 @@ function previewGate(req: NextRequest): NextResponse | null {
   const pass = process.env.PREVIEW_BASIC_AUTH_PASSWORD;
   if (!user || !pass) return null; // not a locked preview → no-op
   const expected = `Basic ${btoa(`${user}:${pass}`)}`;
-  if ((req.headers.get("authorization") ?? "") !== expected) {
+  if (!secureCompare(req.headers.get("authorization") ?? "", expected)) {
     return new NextResponse("Authentication required", {
       status: 401,
       headers: {
@@ -355,7 +388,7 @@ function pageResponseWithCsp(req: NextRequest): NextResponse {
       ]
     : [
         "default-src 'self'",
-        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https: http:`,
+        `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "connect-src 'self'",
@@ -412,7 +445,7 @@ export async function proxy(req: NextRequest) {
   // ── API perimeter ───────────────────────────────────────────────────────────
   const traceId = createSecurityTraceId();
   const publicReason = apiSecurityPublicReason(route);
-  const rateLimitEnabled = apiRateLimitingEnabled();
+  const rateLimitEnabled = apiRateLimitingEnabled() || Boolean(publicReason);
 
   if (rateLimitEnabled) {
     const rateLimit = evaluateRateLimit(req);
@@ -492,6 +525,44 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (requestBodyExceedsLimit(req)) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "request-size",
+      outcome: "blocked",
+      status: 413,
+      req,
+    });
+    return jsonBlocked(413, "Request body exceeds the governed API limit.", {
+      traceId,
+      module: "api.security.proxy",
+      route,
+      policy: "request-size",
+    });
+  }
+
+  if (isCrossSiteMutation(req)) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "same-origin-mutation",
+      outcome: "blocked",
+      status: 403,
+      req,
+    });
+    return jsonBlocked(403, "Cross-site mutation requests are not allowed.", {
+      traceId,
+      module: "api.security.proxy",
+      route,
+      policy: "same-origin-mutation",
+    });
+  }
+
   const secret = resolveNextAuthSecret();
 
   if (!secret) {
@@ -548,20 +619,20 @@ export async function proxy(req: NextRequest) {
   const bodyClaims = await readBodyClaimedActorContext(req);
   const claimed = combineClaimedContexts(queryClaims, bodyClaims);
 
-  if (
-    roleClaimConflictsWithSession({
-      sessionRole: session.role,
-      claimedRole: claimed.role,
-    }) ||
-    actorClaimConflictsWithSession({
-      sessionActorId: session.actorId,
-      claimedActorId: claimed.actorId,
-    }) ||
-    tenantClaimConflictsWithSession({
-      sessionTenantId: session.tenantId,
-      claimedTenantId: claimed.tenantId,
-    })
-  ) {
+  const roleConflict = roleClaimConflictsWithSession({
+    sessionRole: session.role,
+    claimedRole: claimed.role,
+  });
+  const actorConflict = actorClaimConflictsWithSession({
+    sessionActorId: session.actorId,
+    claimedActorId: claimed.actorId,
+  });
+  const tenantConflict = tenantClaimConflictsWithSession({
+    sessionTenantId: session.tenantId,
+    claimedTenantId: claimed.tenantId,
+  });
+
+  if (roleConflict || actorConflict || tenantConflict) {
     logApiPerimeterEvent({
       severity: "warning",
       traceId,
@@ -571,8 +642,10 @@ export async function proxy(req: NextRequest) {
       outcome: "blocked",
       status: 403,
       detail: {
-        session,
-        claimed,
+        roleConflict,
+        actorConflict,
+        tenantConflict,
+        sessionRole: session.role,
       },
       req,
     });
@@ -581,12 +654,11 @@ export async function proxy(req: NextRequest) {
       module: "api.security.proxy",
       route,
       policy: "session-authority",
-      session: {
-        actorId: session.actorId,
-        role: session.role,
-        tenantId: session.tenantId,
+      conflicts: {
+        role: roleConflict,
+        actor: actorConflict,
+        tenant: tenantConflict,
       },
-      claimed,
     });
   }
 

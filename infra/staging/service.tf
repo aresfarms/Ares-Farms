@@ -197,6 +197,14 @@ resource "google_cloud_run_v2_service" "core" {
       dynamic "env" {
         for_each = var.staging_seed_enabled ? [1] : []
         content {
+          name  = "STAGING_SEED_ENABLED"
+          value = "true"
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.staging_seed_enabled ? [1] : []
+        content {
           name = "STAGING_SEED_SHARED_SECRET"
           value_source {
             secret_key_ref {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import type { PreliminaryCapitalPlan, PlanningRange } from "@/lib/intelligence/preliminaryCapitalPlan";
 import type { CollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
+import type { MarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -59,6 +60,7 @@ export function PropertyBestCoursePanel({
   downloadBusy,
   capitalPlan,
   collateralPlan,
+  marketComparablePlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -69,6 +71,7 @@ export function PropertyBestCoursePanel({
   downloadBusy: boolean;
   capitalPlan: PreliminaryCapitalPlan;
   collateralPlan: CollateralEquityPlan;
+  marketComparablePlan: MarketComparablePlan;
 }) {
   const tracks = tracksFor(profileId);
   const complex = requiresComplexPipeline(profileId);
@@ -143,6 +146,28 @@ export function PropertyBestCoursePanel({
             Lead lane to test: <strong>{capitalPlan.leadPathway ?? "Still classifying"}</strong>{capitalPlan.backupPathway ? ` · backup: ${capitalPlan.backupPathway}` : ""}.
           </span>
         )}
+      </section>
+
+      <section aria-label="Comparable sales and market competition" style={{ display: "grid", gap: 11, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#fbfcfe" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <strong style={{ fontSize: 15, color: "#162033" }}>Comparable sales, nearby alternatives, and market competition</strong>
+          <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{marketComparablePlan.marketModel}</span>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Comparable support</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{marketComparablePlan.acquisitionComparables.length} nearby property reference{marketComparablePlan.acquisitionComparables.length === 1 ? "" : "s"} currently available to test price and fit. Closed-sale support still controls lender value.</span>
+          </div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Better-property check</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{marketComparablePlan.alternativePropertyCount} nearby lower- or similarly-priced alternative{marketComparablePlan.alternativePropertyCount === 1 ? "" : "s"} should be tested before recommending this parcel.</span>
+          </div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Decision rule</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{marketComparablePlan.decisionRules[0]}</span>
+          </div>
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>Furlong treats nearby properties as acquisition alternatives and business-market evidence, not merely a list of addresses.</span>
       </section>
 
       <section aria-label="Comparable-supported collateral analysis" style={{ display: "grid", gap: 11, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#f8fafc" }}>

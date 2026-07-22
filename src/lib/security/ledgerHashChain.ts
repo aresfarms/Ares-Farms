@@ -121,3 +121,131 @@ export function verifyLedgerChain(filePath: string): { ok: boolean; chained: num
   }
   return { ok: true, chained, legacy, brokenAt: null };
 }
+
+export type ForensicLedgerRolloverResult = Readonly<{
+  ok: true;
+  action: "ROLLED_OVER";
+  originalSha256: string;
+  originalLineCount: number;
+  brokenAtIndex: number;
+  brokenAtLine: number;
+  archivePath: string;
+  manifestPath: string;
+  newLedgerPath: string;
+}>;
+
+/**
+ * Preserve a broken ledger byte-for-byte and start a new, independently
+ * verifiable chain. This never repairs or rewrites historical evidence.
+ *
+ * The verify/archive/replace sequence shares the same cross-process lock used
+ * by chainAppend, preventing a writer from landing between verification and
+ * preservation.
+ */
+export function forensicRolloverLedger(
+  filePath: string,
+  input: Readonly<{
+    preservedAt: string;
+    reason: string;
+    actorId: string;
+  }>,
+): ForensicLedgerRolloverResult {
+  return withLedgerLock(filePath, () => {
+    const stat = fs.lstatSync(filePath);
+    if (!stat.isFile() || stat.isSymbolicLink()) {
+      throw new Error("Audit ledger rollover requires a regular, non-symlink file.");
+    }
+
+    const verification = verifyLedgerChain(filePath);
+    if (verification.ok || verification.brokenAt === null) {
+      throw new Error("Audit ledger is intact; forensic rollover is not permitted.");
+    }
+
+    const original = fs.readFileSync(filePath);
+    const originalSha256 = createHash("sha256").update(original).digest("hex");
+    const originalLineCount = original.toString("utf8").split("\n").filter(Boolean).length;
+    const stamp = input.preservedAt.replace(/[^0-9A-Za-z]/g, "-");
+    const baseName = path.basename(filePath, path.extname(filePath));
+    const directory = path.dirname(filePath);
+    const archiveName = `${baseName}.forensic-${stamp}-${originalSha256.slice(0, 12)}.ndjson`;
+    const manifestName = `${archiveName}.manifest.json`;
+    const archivePath = path.join(directory, archiveName);
+    const manifestPath = path.join(directory, manifestName);
+    const manifestTempPath = `${manifestPath}.tmp`;
+
+    for (const candidate of [archivePath, manifestPath, manifestTempPath]) {
+      if (fs.existsSync(candidate)) {
+        throw new Error(`Forensic rollover target already exists: ${path.basename(candidate)}`);
+      }
+    }
+
+    const manifest = {
+      schemaVersion: 1,
+      classification: "RESTRICTED_FORENSIC_EVIDENCE",
+      event: "AUDIT_LEDGER_FORENSIC_ROLLOVER",
+      preservedAt: input.preservedAt,
+      preservedBy: input.actorId,
+      reason: input.reason,
+      sourceLedger: path.basename(filePath),
+      archiveLedger: archiveName,
+      originalSha256,
+      originalBytes: original.byteLength,
+      originalLineCount,
+      brokenAtIndex: verification.brokenAt,
+      brokenAtLine: verification.brokenAt + 1,
+      verifiedEntriesBeforeBreak: verification.chained,
+      legacyEntries: verification.legacy,
+      preservationRule: "Original bytes preserved; historical chain not repaired or rewritten.",
+    } as const;
+
+    fs.writeFileSync(manifestTempPath, `${JSON.stringify(manifest, null, 2)}\n`, {
+      encoding: "utf8",
+      flag: "wx",
+      mode: 0o600,
+    });
+
+    try {
+      fs.renameSync(filePath, archivePath);
+      fs.renameSync(manifestTempPath, manifestPath);
+
+      const payload = {
+        ts: input.preservedAt,
+        actorId: input.actorId,
+        actorName: "Governed forensic rollover",
+        domain: "audit-ledger-integrity",
+        subject: path.basename(filePath),
+        decision: "FORENSIC_ROLLOVER",
+        reason: input.reason,
+        detail: {
+          archiveLedger: archiveName,
+          manifest: manifestName,
+          originalSha256,
+          originalLineCount,
+          brokenAtIndex: verification.brokenAt,
+          brokenAtLine: verification.brokenAt + 1,
+        },
+      };
+      const record = { ...payload, prevHash: GENESIS, hash: digest(GENESIS, payload) };
+      fs.writeFileSync(filePath, `${JSON.stringify(record)}\n`, {
+        encoding: "utf8",
+        flag: "wx",
+        mode: 0o600,
+      });
+    } catch (error) {
+      try { if (fs.existsSync(manifestTempPath)) fs.unlinkSync(manifestTempPath); } catch { /* preserve primary error */ }
+      throw error;
+    }
+
+    return {
+      ok: true,
+      action: "ROLLED_OVER",
+      originalSha256,
+      originalLineCount,
+      brokenAtIndex: verification.brokenAt,
+      brokenAtLine: verification.brokenAt + 1,
+      archivePath,
+      manifestPath,
+      newLedgerPath: filePath,
+    };
+  });
+}

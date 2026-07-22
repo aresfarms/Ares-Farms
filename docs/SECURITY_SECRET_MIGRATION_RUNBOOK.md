@@ -28,11 +28,18 @@ Execute the governed migration after reviewing the plan:
 npm run secrets:migrate
 ```
 
-Run an ingestion command with short-lived process environment variables loaded
-from Secret Manager (values are not persisted locally):
+Run an ingestion command with only the named short-lived process environment
+variable loaded from Secret Manager (values are not persisted locally). The
+helper refuses to inject the entire governed inventory:
 
 ```text
-npm run with:staging-secrets -- npm run ingest:eia-electricity
+npm run with:staging-secrets -- --secret=EIA_API_KEY -- npm run ingest:eia-electricity
+```
+
+Review the selection without accessing Secret Manager or starting the command:
+
+```text
+npm run with:staging-secrets -- --plan --secret=EIA_API_KEY -- npm run ingest:eia-electricity
 ```
 
 ## Rotation evidence

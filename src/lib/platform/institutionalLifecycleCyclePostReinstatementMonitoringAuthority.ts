@@ -1,20 +1,20 @@
 import type { InstitutionalLifecycleCycleReinstatementEvaluation } from "@/lib/platform/institutionalLifecycleCycleReinstatementAuthority";
-import type { AppealRemandReopeningSuspensionScope } from "@/lib/platform/institutionalAppealRemandArchiveReopeningSuspensionAuthority";
+import type { InstitutionalLifecycleCycleSuspensionScope } from "@/lib/platform/institutionalLifecycleCycleSuspensionAuthority";
 
 export const INSTITUTIONAL_LIFECYCLE_CYCLE_POST_REINSTATEMENT_MONITORING_SCHEMA_VERSION = "institutional-lifecycle-cycle-post-reinstatement-monitoring-v1";
-export type AppealRemandPostReinstatementSignalSeverity = "INFO" | "WARNING" | "MATERIAL" | "CRITICAL";
+export type InstitutionalLifecycleCyclePostReinstatementSignalSeverity = "INFO" | "WARNING" | "MATERIAL" | "CRITICAL";
 export type InstitutionalLifecycleCyclePostReinstatementMonitoringDecision = "CONTINUE" | "REVIEW_REQUIRED" | "RESUSPEND" | "ESCALATE";
 export type InstitutionalLifecycleCyclePostReinstatementMonitoringState = "ACTIVE" | "REVIEW_PENDING" | "RESUSPENSION_REQUIRED" | "ESCALATED" | "COMPLETE";
 
 export type InstitutionalLifecycleCyclePostReinstatementMonitoringPolicy = Readonly<{
-  policyId:string; governanceVersion:string; monitoredScopes:readonly AppealRemandReopeningSuspensionScope[];
+  policyId:string; governanceVersion:string; monitoredScopes:readonly InstitutionalLifecycleCycleSuspensionScope[];
   reviewThreshold:number; resuspensionThreshold:number; criticalSignalForcesEscalation:boolean;
   requireHumanReviewForMaterialSignals:boolean; requireNoticeOnResuspension:boolean;
   requiredEvidenceRefs:readonly string[]; auditRefs:readonly string[]; replayRef:string; versionRefs:readonly string[];
 }>;
 
 export type InstitutionalLifecycleCyclePostReinstatementMonitoringSignal = Readonly<{
-  signalId:string; scope:AppealRemandReopeningSuspensionScope; severity:AppealRemandPostReinstatementSignalSeverity;
+  signalId:string; scope:InstitutionalLifecycleCycleSuspensionScope; severity:InstitutionalLifecycleCyclePostReinstatementSignalSeverity;
   score:number; evidenceRefs:readonly string[]; observedAt:string;
 }>;
 
@@ -22,7 +22,7 @@ export type InstitutionalLifecycleCyclePostReinstatementMonitoringEvaluation = R
   schemaVersion:typeof INSTITUTIONAL_LIFECYCLE_CYCLE_POST_REINSTATEMENT_MONITORING_SCHEMA_VERSION;
   cyclePolicyId:string; cycleId:string; generation:number; reinstatementPolicyId:string; monitoringPolicyId:string; canonicalObjectId:string;
   decision:InstitutionalLifecycleCyclePostReinstatementMonitoringDecision; resultingState:InstitutionalLifecycleCyclePostReinstatementMonitoringState;
-  aggregateScore:number; reasons:readonly string[]; affectedScopes:readonly AppealRemandReopeningSuspensionScope[];
+  aggregateScore:number; reasons:readonly string[]; affectedScopes:readonly InstitutionalLifecycleCycleSuspensionScope[];
   signalRefs:readonly string[]; reviewRefs:readonly string[]; evidenceRefs:readonly string[];
   evaluatedAt:string; auditRefs:readonly string[]; replayRef:string;
 }>;

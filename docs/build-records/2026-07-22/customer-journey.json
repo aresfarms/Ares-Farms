@@ -2,7 +2,7 @@
   "ok": true,
   "runtimeVersion": "verify-customer-journey-runtime-v0.1.0",
   "docRef": "docs/PUBLIC_ALPHA_SURFACE_CONTENT.md",
-  "commit": "68285a12190ac50a832bd072c6350fc9a8b7b6c7",
+  "commit": "f41a890067f3437147aad44d320872c5ca8e1ab6",
   "branch": "feature/p2-cloud-run-private",
   "sectionCount": 7,
   "sectionsPass": 7,

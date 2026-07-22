@@ -26,6 +26,15 @@ resource "google_cloud_run_v2_service" "core" {
   # deliberate teardown. The DATABASE carries deletion protection instead.
   deletion_protection = false
 
+  # Direct-IAP enablement is currently reasserted with gcloud because the
+  # provider does not expose the Cloud Run service annotation directly. That
+  # command stamps these two client metadata fields. Ignore only those stamps
+  # so Terraform does not manufacture a perpetual service update/IAP replay;
+  # every material service field remains governed by this resource.
+  lifecycle {
+    ignore_changes = [client, client_version]
+  }
+
   # Network-reachable; the invoker IAM check is the lock (see header).
   ingress = "INGRESS_TRAFFIC_ALL"
 

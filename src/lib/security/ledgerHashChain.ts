@@ -206,6 +206,7 @@ export function forensicRolloverLedger(
 
     try {
       fs.renameSync(filePath, archivePath);
+      fs.chmodSync(archivePath, 0o600);
       fs.renameSync(manifestTempPath, manifestPath);
 
       const payload = {

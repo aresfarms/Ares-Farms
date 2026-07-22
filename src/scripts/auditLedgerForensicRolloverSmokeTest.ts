@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -38,6 +38,11 @@ try {
   if (!archived.equals(original) || result.originalSha256 !== expectedHash) {
     throw new Error("Forensic archive did not preserve the original bytes and digest.");
   }
+  for (const protectedPath of [result.archivePath, result.manifestPath, result.newLedgerPath]) {
+    if ((statSync(protectedPath).mode & 0o777) !== 0o600) {
+      throw new Error("Forensic rollover artifacts must be owner-readable and owner-writable only.");
+    }
+  }
 
   const manifest = JSON.parse(readFileSync(result.manifestPath, "utf8")) as Record<string, unknown>;
   if (manifest.originalSha256 !== expectedHash || manifest.brokenAtLine !== 2) {
@@ -60,6 +65,7 @@ try {
     manifestVerified: true,
     replacementChainVerified: true,
     postRolloverAppendVerified: true,
+    ownerOnlyPermissionsVerified: true,
   }, null, 2));
 } finally {
   rmSync(directory, { recursive: true, force: true });

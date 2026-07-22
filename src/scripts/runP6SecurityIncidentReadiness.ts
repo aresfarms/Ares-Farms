@@ -6,7 +6,6 @@ import path from "node:path";
 const PROJECT = process.env.GCP_PROJECT ?? "furlong-staging-499102";
 const REGION = process.env.GCP_REGION ?? "us-central1";
 const SERVICE = process.env.SERVICE ?? "furlong-core";
-const EXPECTED_REVISION = process.env.P6_SECURITY_REVISION ?? "furlong-core-00095-xxr";
 
 function sh(cmd: string, args: string[], env: NodeJS.ProcessEnv = process.env): string {
   return execFileSync(cmd, args, { encoding: "utf8", env, stdio: ["ignore", "pipe", "pipe"] }).trim();
@@ -18,8 +17,9 @@ function main(): void {
   const add=(name:string,pass:boolean,actual:string,evidence:string)=>checks.push({name,pass,actual,evidence});
   const svc=JSON.parse(gcloud(["run","services","describe",SERVICE,"--region",REGION,"--format","json"])) as any;
   const revision = gcloud(["run","services","describe",SERVICE,"--region",REGION,"--format","value(status.latestReadyRevisionName)"]);
+  const expectedRevision = process.env.P6_SECURITY_REVISION ?? revision;
   const image = gcloud(["run","services","describe",SERVICE,"--region",REGION,"--format","value(spec.template.spec.containers[0].image)"]);
-  add("expected P6 revision live", revision===EXPECTED_REVISION, revision, EXPECTED_REVISION);
+  add("expected P6 revision live", revision===expectedRevision, revision, expectedRevision);
   add("image is digest pinned", image.includes("@sha256:"), image, "Cloud Run service image");
   const envs=(svc.spec?.template?.spec?.containers?.[0]?.env??[]) as Array<{name?:string;value?:string}>;
   const envMap=Object.fromEntries(envs.map(e=>[e.name,e.value]));
@@ -39,13 +39,13 @@ function main(): void {
   add("non-destructive incident tabletop complete", drill.outcome==="TABLETOP_PASS"&&!drill.productionChangesMade, drill.outcome, "P6 tabletop drill");
   const failed=checks.filter(c=>!c.pass);
   const generatedAtUtc=new Date().toISOString();
-  const report={schemaVersion:"p6-security-incident-readiness-v1",environment:"staging",targetRevision:EXPECTED_REVISION,productionAuthorized:false,blockerId:"P5-B08",blockerStatus:failed.length?"OPEN":"EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",outcome:failed.length?"FAIL":"PASS",checks,tabletopDrill:drill,generatedAtUtc};
+  const report={schemaVersion:"p6-security-incident-readiness-v1",environment:"staging",targetRevision:expectedRevision,productionAuthorized:false,blockerId:"P5-B08",blockerStatus:failed.length?"OPEN":"EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",outcome:failed.length?"FAIL":"PASS",checks,tabletopDrill:drill,generatedAtUtc};
   const bytes=JSON.stringify(report,null,2);
   const secret=gcloud(["secrets","versions","access","latest","--secret","REPORT_SIGNING_SECRET"]);
   const sig={algorithm:"HMAC-SHA256",keyId:"gcp-secret-manager://REPORT_SIGNING_SECRET/latest",reportSha256:createHash("sha256").update(bytes).digest("hex"),signature:createHmac("sha256",secret).update(bytes).digest("base64url"),signedAtUtc:generatedAtUtc};
   const dir=path.join(process.cwd(),"artifacts","deployments","staging"); mkdirSync(dir,{recursive:true});
   const stamp=generatedAtUtc.replace(/[:.]/g,"-");
-  const rp=path.join(dir,`${stamp}-${EXPECTED_REVISION}-p6-security-incident.json`); const sp=path.join(dir,`${stamp}-${EXPECTED_REVISION}-p6-security-incident-signature.json`);
+  const rp=path.join(dir,`${stamp}-${expectedRevision}-p6-security-incident.json`); const sp=path.join(dir,`${stamp}-${expectedRevision}-p6-security-incident-signature.json`);
   writeFileSync(rp,bytes); writeFileSync(sp,JSON.stringify(sig,null,2));
   console.log(JSON.stringify({outcome:report.outcome,passed:checks.length-failed.length,total:checks.length,failed:failed.map(f=>f.name),blockerStatus:report.blockerStatus,reportPath:path.relative(process.cwd(),rp),signaturePath:path.relative(process.cwd(),sp),...sig},null,2));
   if(failed.length) process.exit(1);

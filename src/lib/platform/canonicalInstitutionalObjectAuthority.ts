@@ -14,6 +14,13 @@ import {
   canonicalEvidenceAuthority,
   canonicalLandRegisterAuthority,
   canonicalOpportunityAuthority,
+  canonicalOrganizationAuthority,
+  canonicalPersonAuthority,
+  canonicalAssetAuthority,
+  canonicalTransactionAuthority,
+  canonicalCaseAuthority,
+  canonicalOperationAuthority,
+  canonicalEventAuthority,
   canonicalPlaceAuthority,
   canonicalProgramAuthority,
   canonicalPropertyAuthority,
@@ -121,6 +128,13 @@ const institutionalAuthorities = Object.freeze({
   provider: canonicalProviderAuthority,
   report: canonicalReportAuthority,
   opportunity: canonicalOpportunityAuthority,
+  organization: canonicalOrganizationAuthority,
+  person: canonicalPersonAuthority,
+  asset: canonicalAssetAuthority,
+  transaction: canonicalTransactionAuthority,
+  case: canonicalCaseAuthority,
+  operation: canonicalOperationAuthority,
+  event: canonicalEventAuthority,
 } satisfies Record<CanonicalDomainKey, object>);
 
 function assertNonEmpty(value: string, field: string): void {

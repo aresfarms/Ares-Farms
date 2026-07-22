@@ -15,7 +15,14 @@ export type CanonicalDomainKey =
   | "program"
   | "provider"
   | "report"
-  | "opportunity";
+  | "opportunity"
+  | "organization"
+  | "person"
+  | "asset"
+  | "transaction"
+  | "case"
+  | "operation"
+  | "event";
 
 export type CanonicalDomainDefinition = {
   key: CanonicalDomainKey;
@@ -118,6 +125,70 @@ export const canonicalDomainRegistry: readonly CanonicalDomainDefinition[] = [
     canonicalIdField: "opportunity_id",
     governanceTags: ["REVENUE-INTEL-001", "PUBLIC-CLAIMS-001", "TECH-REPLAY-001"],
     projectionRule: "Opportunity outputs are hypotheses for review, not promises of feasibility, revenue, eligibility, or financing.",
+  },
+
+  {
+    key: "organization",
+    displayName: "Organization",
+    authorityModule: "src/lib/platform/authorities/organization.ts",
+    authorityExport: "canonicalOrganizationAuthority",
+    canonicalIdField: "organization_id",
+    governanceTags: ["CANON-SOVEREIGNTY-001", "CANON-CLASS-001", "TECH-REPLAY-001"],
+    projectionRule: "Organization projections must preserve legal identity, governing relationships, authority boundaries, classification, provenance, and replay context.",
+  },
+  {
+    key: "person",
+    displayName: "Person",
+    authorityModule: "src/lib/platform/authorities/person.ts",
+    authorityExport: "canonicalPersonAuthority",
+    canonicalIdField: "person_id",
+    governanceTags: ["CANON-SOVEREIGNTY-001", "CANON-CLASS-001", "CONST-PROPERTY-PRIVACY-001"],
+    projectionRule: "Person projections must minimize personal data, preserve consent and classification boundaries, and never silently expand identity use across modules.",
+  },
+  {
+    key: "asset",
+    displayName: "Asset",
+    authorityModule: "src/lib/platform/authorities/asset.ts",
+    authorityExport: "canonicalAssetAuthority",
+    canonicalIdField: "asset_id",
+    governanceTags: ["CANON-SOVEREIGNTY-001", "SOURCE-PROV-001", "TECH-REPLAY-001"],
+    projectionRule: "Asset projections must retain ownership context, valuation basis, source lineage, lifecycle state, and restrictions on reliance or transfer.",
+  },
+  {
+    key: "transaction",
+    displayName: "Transaction",
+    authorityModule: "src/lib/platform/authorities/transaction.ts",
+    authorityExport: "canonicalTransactionAuthority",
+    canonicalIdField: "transaction_id",
+    governanceTags: ["CANON-SOVEREIGNTY-001", "TECH-REPLAY-001", "PUBLIC-CLAIMS-001"],
+    projectionRule: "Transaction projections must distinguish advisory analysis from execution, preserve parties and evidence lineage, and remain replayable through every state transition.",
+  },
+  {
+    key: "case",
+    displayName: "Case",
+    authorityModule: "src/lib/platform/authorities/case.ts",
+    authorityExport: "canonicalCaseAuthority",
+    canonicalIdField: "case_id",
+    governanceTags: ["CANON-SOVEREIGNTY-001", "CANON-CLASS-001", "TECH-REPLAY-001"],
+    projectionRule: "Case projections must preserve jurisdiction, participants, evidence references, review authority, deadlines, lifecycle state, and complete audit replay context.",
+  },
+  {
+    key: "operation",
+    displayName: "Operation",
+    authorityModule: "src/lib/platform/authorities/operation.ts",
+    authorityExport: "canonicalOperationAuthority",
+    canonicalIdField: "operation_id",
+    governanceTags: ["CANON-SOVEREIGNTY-001", "TECH-REPLAY-001", "UX-GOV-001"],
+    projectionRule: "Operation projections must preserve accountable authority, declared inputs and outputs, execution state, dependencies, exceptions, and audit replay references.",
+  },
+  {
+    key: "event",
+    displayName: "Event",
+    authorityModule: "src/lib/platform/authorities/event.ts",
+    authorityExport: "canonicalEventAuthority",
+    canonicalIdField: "event_id",
+    governanceTags: ["CANON-SOVEREIGNTY-001", "SOURCE-PROV-001", "TECH-REPLAY-001"],
+    projectionRule: "Event projections must preserve occurrence time, recording time, actor or source context, classification, causality references, and deterministic replay ordering.",
   },
 ] as const;
 

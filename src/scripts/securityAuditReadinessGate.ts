@@ -11,6 +11,10 @@ import {
   isLocalDevelopmentNextAuthSecret,
   resolveNextAuthSecret,
 } from "@/lib/auth/nextAuthSecurity";
+import {
+  externalSecretInventory,
+  validateExternalSecretInventory,
+} from "@/lib/security/externalSecretInventory";
 
 /**
  * Security & Audit Readiness Gate
@@ -162,8 +166,21 @@ function main() {
   const checks: GateCheck[] = [];
   const databasePosture = getPostgresSslPosture();
   const nextAuthSecret = resolveNextAuthSecret();
-  const envKeys = parseEnvFileKeys(".env");
-  const suspiciousKeys = suspiciousCredentialEnvKeys(envKeys);
+  const localEnvFiles = [
+    ".env",
+    ".env.local",
+    ".env.development",
+    ".env.development.local",
+    ".env.test",
+    ".env.test.local",
+  ].filter(exists);
+  const suspiciousKeys = localEnvFiles.flatMap((pathname) =>
+    suspiciousCredentialEnvKeys(parseEnvFileKeys(pathname)).map((key) => `${pathname}:${key}`)
+  );
+  const secretInventoryIssues = validateExternalSecretInventory();
+  const pendingSecretRotations = externalSecretInventory.secrets.filter(
+    (entry) => entry.rotationStatus !== "ROTATED"
+  );
   const dbIndex = exists("src/lib/db/index.ts")
     ? read("src/lib/db/index.ts")
     : "";
@@ -201,22 +218,36 @@ function main() {
   check(checks, {
     id: "security.env-file-ignored",
     area: "secrets",
-    passed: !exists(".env") || gitCheckIgnored(".env"),
-    summary: ".env must not be committed.",
-    passDetail: ".env is ignored by git.",
-    failDetail: ".env exists but is not ignored by git.",
+    passed: localEnvFiles.every(gitCheckIgnored),
+    summary: "Local environment files must not be committed.",
+    passDetail: "Every detected local environment file is ignored by git.",
+    failDetail: `One or more local environment files are not ignored: ${localEnvFiles
+      .filter((pathname) => !gitCheckIgnored(pathname))
+      .join(", ")}`,
   });
 
   check(checks, {
     id: "security.env-no-raw-agency-credentials",
     area: "secrets",
     passed: suspiciousKeys.length === 0,
-    summary: "Environment file must not contain raw agency credentials.",
+    summary: "Local environment files must not contain raw agency credentials.",
     passDetail:
-      "No suspicious raw agency credential keys were found in the local .env file.",
-    failDetail: `Suspicious credential-like keys found in .env: ${suspiciousKeys.join(
+      "No suspicious raw agency credential keys were found in local environment files.",
+    failDetail: `Suspicious credential-like keys found in local environment files: ${suspiciousKeys.join(
       ", "
     )}`,
+  });
+
+  check(checks, {
+    id: "security.external-secret-rotation-evidence",
+    area: "secrets",
+    passed: secretInventoryIssues.length === 0 && pendingSecretRotations.length === 0,
+    summary: "Migrated secrets must have recorded rotation evidence.",
+    passDetail: "Every governed migrated secret has recorded rotation evidence.",
+    failDetail: [
+      ...secretInventoryIssues,
+      ...pendingSecretRotations.map((entry) => `${entry.name}:${entry.rotationStatus}`),
+    ].join(", "),
   });
 
   check(checks, {

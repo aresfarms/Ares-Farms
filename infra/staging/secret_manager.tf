@@ -11,7 +11,10 @@
 #   NEXTAUTH_SECRET        -> strong random >=32 chars (runtime SA reads)
 #   REPORT_SIGNING_SECRET  -> strong random >=32 chars (runtime SA reads; signs
 #                             the short-lived report-export attestations)
-# Stripe/GSA/etc. stay unset/dormant.
+# Optional owner-operated ingestion credentials (NASS, EIA, FCC, MARS,
+# Smithsonian, licensed listing sources) are created and versioned out of band.
+# They are governed by config/security/external-secret-inventory.json and are
+# never passed through Terraform state. Stripe/GSA/etc. stay unset/dormant.
 # =============================================================================
 
 locals {

@@ -211,6 +211,11 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      env {
+        name  = "NAMED_TESTER_ACCEPTANCE_BACKEND"
+        value = var.named_tester_acceptance_backend
+      }
+
       dynamic "env" {
         for_each = var.staging_seed_enabled ? [1] : []
         content {

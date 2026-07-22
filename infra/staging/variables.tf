@@ -396,6 +396,12 @@ variable "staging_seed_enabled" {
   default     = false
 }
 
+variable "named_tester_acceptance_backend" {
+  description = "Durable backend for named tester attestations. PostgreSQL is required before P5-B01 can close."
+  type        = string
+  default     = "postgres"
+}
+
 # ---- Labels -----------------------------------------------------------------
 
 variable "labels" {

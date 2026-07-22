@@ -373,7 +373,7 @@
     "ingest:listhub": "tsx src/scripts/ingestListhubListings.ts",
     "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids && npm run ingest:nass-input-costs && npm run ingest:fsa-rates",
     "ingest:capital-rates": "tsx src/scripts/ingestCapitalRates.ts",
-    "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts && tsx src/scripts/verifyCanonicalInstitutionalObjectAuthority.ts && npm run verify:canonical-identities && npm run verify:institutional-graph && npm run verify:institutional-claims && npm run verify:institutional-publication && npm run verify:institutional-reliance && npm run verify:institutional-actions && npm run verify:institutional-execution-receipts && npm run verify:institutional-outcome-reconciliation && npm run verify:institutional-remediation && npm run verify:institutional-closure && npm run verify:institutional-reopening && npm run verify:institutional-suspension && npm run verify:institutional-reinstatement && npm run verify:institutional-post-reinstatement-monitoring",
+    "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts && tsx src/scripts/verifyCanonicalInstitutionalObjectAuthority.ts && npm run verify:canonical-identities && npm run verify:institutional-graph && npm run verify:institutional-claims && npm run verify:institutional-publication && npm run verify:institutional-reliance && npm run verify:institutional-actions && npm run verify:institutional-execution-receipts && npm run verify:institutional-outcome-reconciliation && npm run verify:institutional-remediation && npm run verify:institutional-closure && npm run verify:institutional-reopening && npm run verify:institutional-suspension && npm run verify:institutional-reinstatement && npm run verify:institutional-post-reinstatement-monitoring && npm run verify:institutional-revocation",
     "verify:canonical-relationships": "tsx src/scripts/verifyCanonicalRelationshipAuthority.ts",
     "smoke:canonical-domain-fail-closed": "tsx src/scripts/canonicalDomainFailClosedSmokeTest.ts",
     "seed:staging": "tsx src/scripts/runStagingSeed.ts",
@@ -411,7 +411,8 @@
     "verify:institutional-reopening": "tsx src/scripts/verifyInstitutionalReopeningAuthority.ts",
     "verify:institutional-suspension": "tsx src/scripts/verifyInstitutionalSuspensionAuthority.ts",
     "verify:institutional-reinstatement": "tsx src/scripts/verifyInstitutionalReinstatementAuthority.ts",
-    "verify:institutional-post-reinstatement-monitoring": "tsx src/scripts/verifyInstitutionalPostReinstatementMonitoringAuthority.ts"
+    "verify:institutional-post-reinstatement-monitoring": "tsx src/scripts/verifyInstitutionalPostReinstatementMonitoringAuthority.ts",
+    "verify:institutional-revocation": "tsx src/scripts/verifyInstitutionalRevocationAuthority.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

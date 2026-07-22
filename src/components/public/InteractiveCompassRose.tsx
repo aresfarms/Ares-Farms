@@ -52,7 +52,7 @@ const OBJECTIVES: { label: string; slug: string }[] = [
 ];
 
 function laneHref(l: CompassLane): string {
-  return l.href ?? `/explore?lane=${encodeURIComponent(l.slug)}`;
+  return l.href ?? `/navigator?flow=property-discovery&lens=${encodeURIComponent(l.slug)}`;
 }
 
 /** Bearing (deg, clockwise from north) from the hub to a lane node. */

@@ -16,6 +16,9 @@ export const metadata: Metadata = {
     "Paste a property, describe an idea, or start with nothing at all. Anonymous, no account required.",
 };
 
-export default function NavigatorPage() {
-  return <DiscoverSurface route="/navigator" query={{}} />;
+type SP = Record<string, string | string[] | undefined>;
+
+export default async function NavigatorPage({ searchParams }: { searchParams?: Promise<SP> }) {
+  const query = searchParams ? await searchParams : {};
+  return <DiscoverSurface route="/navigator" query={query} />;
 }

@@ -14,6 +14,9 @@ import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyI
 import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { PropertyResultCard } from "@/components/property/PropertyResultCard";
+import { PropertyBestCoursePanel } from "@/components/property/PropertyBestCoursePanel";
+import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
+import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
@@ -1896,6 +1899,7 @@ export function PropertyEvaluationWorkspace({
   ownershipContext = null,
   listedPrice = null,
   similarHomes = [],
+  startingLens = null,
 }: {
   context: PropertyContext;
   tierPreviewMode: boolean;
@@ -1914,6 +1918,8 @@ export function PropertyEvaluationWorkspace({
   listedPrice?: number | null;
   /** Server-selected alternatives from the tracked government inventory. */
   similarHomes?: SimilarHomeLine[];
+  /** Compass lane that opened this case. It guides the first view but never limits whole-property analysis. */
+  startingLens?: string | null;
 }) {
   const [navigator, setNavigator] = useState<NavigatorSnapshot | null>(null);
   // Visitor's answer to "what is this property?" — an imported address carries
@@ -2069,6 +2075,11 @@ export function PropertyEvaluationWorkspace({
               <strong style={{ fontSize: 26, color: "#101a2b", lineHeight: 1.08 }}>
                 Start with the property. Furlong will build the first-pass analysis from there.
               </strong>
+              {startingLens && (
+                <span style={{ fontSize: 13.5, color: "#4d596d", lineHeight: 1.6 }}>
+                  You entered through <strong>{startingLens.replace(/-/g, " ")}</strong>. We will use that as the starting lens, then test the property across every plausible use, market, cost, environmental, and financing pathway.
+                </span>
+              )}
             </div>
             <SavedDraftsRail />
             <PlaceFirstDiscovery flow={addressFirstFlow} embedded />
@@ -2838,6 +2849,16 @@ export function PropertyEvaluationWorkspace({
   const topProgramPreview = topProgramRanks.slice(0, 2).map(
     (entry, index) => `${index + 1}. ${entry.program.name}`
   );
+  const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
+    profileId: workspaceProfile.id,
+    listedPrice: listedPrice ?? parsePriceSignal(analysisContext.priceLabel),
+    requestedAmount: parsePriceSignal(answers.requestedAmount),
+    pathwayNames: topProgramRanks.map((entry) => entry.program.name),
+  });
+  const collateralPlan = buildCollateralEquityPlan({
+    authorized: false,
+  });
+
 
   // ── Result card content (free tier default view, ≤10 numbered bullets) ────
   const cardGreenFlags = (effectivePlaceIntelligence?.verifiedFacts ?? [])
@@ -3139,6 +3160,19 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
+      {!deepView && (
+        <PropertyBestCoursePanel
+          profileId={workspaceProfile.id}
+          startingLens={startingLens}
+          deepHref={deepHref}
+          environmentalHref={`/portal/borrower/environmental-intake?from=${encodeURIComponent(chartHref)}`}
+          financingHref={`/financing-pathways?from=${encodeURIComponent(chartHref)}`}
+          onDownload={exportDraft}
+          downloadBusy={pdfBusy !== null}
+          capitalPlan={preliminaryCapitalPlan}
+          collateralPlan={collateralPlan}
+        />
+      )}
       {!deepView && (
         <PropertyResultCard
           theme={CHART_THEMES[chartVariant]}

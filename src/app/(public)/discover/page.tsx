@@ -214,6 +214,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
           context={addressFirstContext!}
           tierPreviewMode={tierPreviewMode}
           addressFirstFlow={flow}
+          startingLens={one(query.lens)}
         />
         {/* Manifesto off here: the report carries the elevated Sovereignty
             Guarantee box, so the "why we lay it all out" preface isn't repeated. */}
@@ -302,6 +303,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
           context={defaultPropertyContext!}
           tierPreviewMode={tierPreviewMode}
           addressFirstFlow="property-discovery"
+          startingLens={one(query.lens)}
         />
       )}
 

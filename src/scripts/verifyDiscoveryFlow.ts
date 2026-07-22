@@ -44,7 +44,8 @@ ok(!isPlaceFirstFlow("possibilities-persona"), "persona flow is NOT place-first"
 // ── 2. structural — the page wires the resolver + renders the place-first card ─
 const pageSrc = fs.readFileSync("src/app/(public)/discover/page.tsx", "utf8");
 ok(/resolveDiscoveryFlow/.test(pageSrc) && /isPlaceFirstFlow/.test(pageSrc), "page calls the resolver before rendering");
-ok(/PlaceFirstDiscovery/.test(pageSrc), "page renders the place-first card for place flows");
+const workspaceSrc = fs.readFileSync("src/components/property/PropertyEvaluationWorkspace.tsx", "utf8");
+ok(/PropertyEvaluationWorkspace/.test(pageSrc) && /PlaceFirstDiscovery/.test(workspaceSrc), "page routes place flows into the workspace that renders the place-first card");
 ok(fs.existsSync("src/app/(public)/discover/opportunity-zone/page.tsx"), "/discover/opportunity-zone path entrypoint exists");
 const ozRoute = fs.readFileSync("src/app/(public)/discover/opportunity-zone/page.tsx", "utf8");
 ok(/opportunity-zone/.test(ozRoute), "OZ route resolves the opportunity-zone flow");

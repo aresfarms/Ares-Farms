@@ -44,9 +44,25 @@ function withLedgerLock<T>(filePath: string, operation: () => T): T {
         : null;
       if (code !== "EEXIST") throw error;
 
-      const lockAge = Date.now() - (fs.statSync(lockPath).mtimeMs || Date.now());
+      let lockAge: number;
+      try {
+        lockAge = Date.now() - (fs.statSync(lockPath).mtimeMs || Date.now());
+      } catch (statError) {
+        const statCode = statError instanceof Error && "code" in statError
+          ? String((statError as NodeJS.ErrnoException).code)
+          : null;
+        if (statCode === "ENOENT") continue;
+        throw statError;
+      }
       if (lockAge > STALE_LOCK_MS) {
-        fs.unlinkSync(lockPath);
+        try {
+          fs.unlinkSync(lockPath);
+        } catch (unlinkError) {
+          const unlinkCode = unlinkError instanceof Error && "code" in unlinkError
+            ? String((unlinkError as NodeJS.ErrnoException).code)
+            : null;
+          if (unlinkCode !== "ENOENT") throw unlinkError;
+        }
         continue;
       }
       if (Date.now() >= deadline) {

@@ -327,6 +327,7 @@
     "ingest:property-nmtc": "tsx src/scripts/ingestPropertyNmtc.ts",
     "verify:secret-scan": "tsx src/scripts/verifySecretScan.ts",
     "verify:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts",
+    "smoke:ledger-concurrency": "tsx src/scripts/ledgerHashChainConcurrencySmokeTest.ts",
     "verify:security-conformance": "tsx src/scripts/verifySecurityConformance.ts",
     "verify:cyber-resilience": "tsx src/scripts/verifyCyberResilience.ts",
     "verify:security-governance": "tsx src/scripts/verifySecurityGovernance.ts",

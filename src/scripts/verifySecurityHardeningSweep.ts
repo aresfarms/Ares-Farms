@@ -21,6 +21,7 @@ function sourceFiles(root: string): string[] {
 
 const proxy = read("src/proxy.ts");
 const session = read("src/lib/auth/session.ts");
+const ledgerHashChain = read("src/lib/security/ledgerHashChain.ts");
 const nextConfig = read("next.config.mjs");
 const stagingService = read("infra/staging/service.tf");
 const applicationSources = sourceFiles(path.join(repoRoot, "src"));
@@ -37,8 +38,11 @@ assert(proxy.includes("same-origin-mutation"), "Protected mutation requests must
 assert(proxy.includes("API_MAX_JSON_BODY_BYTES"), "Perimeter JSON claim inspection must be size-bounded.");
 assert(proxy.includes("MAX_RATE_LIMIT_BUCKETS"), "In-memory rate-limit state must have a hard cardinality bound.");
 assert(proxy.includes("apiRateLimitingEnabled() || Boolean(publicReason)"), "Anonymous public APIs must always be rate limited.");
+assert(proxy.includes('process.env.API_LOG_PUBLIC_ALLOW_EVENTS === "true"'), "Successful anonymous-request logs must be opt-in to prevent log-volume abuse.");
 assert(session.includes('secure: process.env.NODE_ENV === "production"'), "Session cookies must be Secure in production.");
 assert(nextConfig.includes('X-DNS-Prefetch-Control'), "Global response headers must disable DNS prefetch leakage.");
+assert(ledgerHashChain.includes('fs.openSync(lockPath, "wx"'), "Ledger append must use an exclusive cross-process lock.");
+assert(ledgerHashChain.includes("LOCK_TIMEOUT_MS"), "Ledger lock acquisition must fail closed on a bounded timeout.");
 
 const forbiddenPatterns: Array<[RegExp, string]> = [
   [/\bdangerouslySetInnerHTML\s*=/, "dangerouslySetInnerHTML"],
@@ -65,7 +69,9 @@ console.log(JSON.stringify({
     "environment-scoped staging seed authority",
     "same-origin protected mutations",
     "bounded request and rate-limit state",
+    "opt-in successful-public-request telemetry",
     "production-secure legacy session cookie",
+    "cross-process hash-chain append serialization",
     "forbidden dynamic execution and HTML sinks absent",
   ],
   message: "Security hardening sweep regression checks passed.",

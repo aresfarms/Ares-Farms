@@ -483,7 +483,7 @@ export async function proxy(req: NextRequest) {
   }
 
   if (publicReason || req.method === "OPTIONS") {
-    if (publicReason) {
+    if (publicReason && process.env.API_LOG_PUBLIC_ALLOW_EVENTS === "true") {
       logApiPerimeterEvent({
         severity: "info",
         traceId,

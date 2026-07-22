@@ -52,8 +52,15 @@ For provider-issued API credentials:
 3. Exercise the intended connector with the replacement.
 4. Disable or revoke the old provider credential.
 5. Record a non-secret evidence reference (provider event ID, dated operator
-   record, or governed build-record path) in the inventory.
+   record, and passing connector check) in a JSON artifact under `artifacts/`.
 6. Set `rotationStatus` to `ROTATED`.
+
+The evidence artifact must bind the provider event to the governed secret and
+GCP project, name the activated Secret Manager version, affirm that the old
+provider credential was revoked, reference a passing connector check, affirm
+that no secret value was displayed, and preserve
+`combinedProductionReady=false`. A missing, unrelated, or malformed evidence
+path fails verification.
 
 For `REPORT_SIGNING_SECRET`, retain the previous verification key/version for
 already-issued attestations, deploy a new explicit secret version, verify a new
@@ -64,6 +71,7 @@ Run the readiness check:
 
 ```text
 npm run verify:external-secret-readiness
+npm run verify:secret-rotation-evidence
 ```
 
 The check fails closed if any governed credential remains pending or a rotated

@@ -373,7 +373,7 @@
     "ingest:listhub": "tsx src/scripts/ingestListhubListings.ts",
     "refresh:weekly-ag": "npm run ingest:usdm-drought && npm run ingest:nass-crop-conditions && npm run ingest:nass-grain-prices && npm run ingest:ams-grain-bids && npm run ingest:nass-input-costs && npm run ingest:fsa-rates",
     "ingest:capital-rates": "tsx src/scripts/ingestCapitalRates.ts",
-    "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts && tsx src/scripts/verifyCanonicalInstitutionalObjectAuthority.ts && npm run verify:canonical-identities && npm run verify:institutional-graph && npm run verify:institutional-claims && npm run verify:institutional-publication && npm run verify:institutional-reliance",
+    "verify:canonical-domain": "tsx src/scripts/verifyCanonicalDomainRegistry.ts && tsx src/scripts/verifyCanonicalInstitutionalObjectAuthority.ts && npm run verify:canonical-identities && npm run verify:institutional-graph && npm run verify:institutional-claims && npm run verify:institutional-publication && npm run verify:institutional-reliance && npm run verify:institutional-actions",
     "verify:canonical-relationships": "tsx src/scripts/verifyCanonicalRelationshipAuthority.ts",
     "smoke:canonical-domain-fail-closed": "tsx src/scripts/canonicalDomainFailClosedSmokeTest.ts",
     "seed:staging": "tsx src/scripts/runStagingSeed.ts",
@@ -402,7 +402,8 @@
     "verify:institutional-graph": "tsx src/scripts/verifyUniversalInstitutionalGraphRuntime.ts",
     "verify:institutional-claims": "tsx src/scripts/verifyInstitutionalClaimAuthority.ts",
     "verify:institutional-publication": "tsx src/scripts/verifyInstitutionalPublicationAuthority.ts",
-    "verify:institutional-reliance": "tsx src/scripts/verifyInstitutionalRelianceAuthority.ts"
+    "verify:institutional-reliance": "tsx src/scripts/verifyInstitutionalRelianceAuthority.ts",
+    "verify:institutional-actions": "tsx src/scripts/verifyInstitutionalActionAuthority.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

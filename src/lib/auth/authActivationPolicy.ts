@@ -147,10 +147,21 @@ export function roleProvisioningMode(
   return "locked";
 }
 
+export function credentialSharedSecretMinimumLength(
+  env: AuthActivationEnvironment = process.env
+): number {
+  const configured = Number(env.AUTH_CREDENTIAL_MIN_LENGTH ?? 32);
+  if (!Number.isInteger(configured)) return 32;
+  return Math.min(32, Math.max(20, configured));
+}
+
 export function strongCredentialSharedSecret(
   env: AuthActivationEnvironment = process.env
 ): boolean {
-  return Boolean((env.AUTH_CREDENTIAL_SHARED_SECRET?.length ?? 0) >= 32);
+  return Boolean(
+    (env.AUTH_CREDENTIAL_SHARED_SECRET?.length ?? 0) >=
+      credentialSharedSecretMinimumLength(env)
+  );
 }
 
 export function credentialAllowlistConfigured(

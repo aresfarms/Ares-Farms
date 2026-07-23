@@ -8,6 +8,7 @@ import type { CollateralEquityPlan } from "@/lib/intelligence/collateralEquityPl
 import type { MarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
 import type { ScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan";
 import type { TransactionTimelinePlan } from "@/lib/intelligence/transactionTimelinePlan";
+import type { FinancialCapacityPlan } from "@/lib/intelligence/financialCapacityPlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -65,6 +66,7 @@ export function PropertyBestCoursePanel({
   marketComparablePlan,
   scenarioRankingPlan,
   transactionTimelinePlan,
+  financialCapacityPlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -78,6 +80,7 @@ export function PropertyBestCoursePanel({
   marketComparablePlan: MarketComparablePlan;
   scenarioRankingPlan: ScenarioRankingPlan;
   transactionTimelinePlan: TransactionTimelinePlan;
+  financialCapacityPlan: FinancialCapacityPlan;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -181,6 +184,28 @@ export function PropertyBestCoursePanel({
             Lead lane to test: <strong>{capitalPlan.leadPathway ?? "Still classifying"}</strong>{capitalPlan.backupPathway ? ` · backup: ${capitalPlan.backupPathway}` : ""}.
           </span>
         )}
+      </section>
+
+      <section aria-label="Customer financial authorization and house-poor analysis" style={{ display: "grid", gap: 11, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#f8fafc" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <strong style={{ fontSize: 15, color: "#162033" }}>Customer capacity and house-poor check</strong>
+          <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>Property potential is ranked separately from whether this customer can responsibly carry the acquisition, improvements, operations, and existing obligations.</span>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Authorization</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{financialCapacityPlan.authorization === "authorized" ? "Authorized financial review" : "Customer authorization required before personalized affordability is calculated."}</span>
+          </div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Current posture</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{financialCapacityPlan.posture.replace(/-/g, " ")}</span>
+          </div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>House-poor gate</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{financialCapacityPlan.housePoorGates[0]}</span>
+          </div>
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{financialCapacityPlan.decisionRule}</span>
       </section>
 
       <section aria-label="Comparable sales and market competition" style={{ display: "grid", gap: 11, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#fbfcfe" }}>

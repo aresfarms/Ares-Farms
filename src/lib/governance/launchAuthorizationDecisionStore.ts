@@ -4,6 +4,7 @@ import path from "node:path";
 import { runtimeStatePath } from "@/lib/property/runtimeStatePath";
 import { readRequiredSecret } from "@/lib/security/requestGuards";
 import { launchAuthorizationRequirements, type HumanDecision } from "@/lib/governance/consolidatedLaunchAuthorizationLedger";
+import { launchAuthorityAssignmentFor } from "@/lib/governance/launchAuthorityAssignmentRegistry";
 
 export type RecordedLaunchDecision = {
   blockerId: string; authorityRole: string; decision: Exclude<HumanDecision, "PENDING">;
@@ -17,14 +18,29 @@ export function readLaunchDecisionStore(): Store { try { return JSON.parse(readF
 function writeStore(store: Store) { mkdirSync(path.dirname(storePath()), { recursive: true }); const temp = `${storePath()}.tmp-${process.pid}`; writeFileSync(temp, JSON.stringify(store, null, 2)); renameSync(temp, storePath()); }
 
 function assignments(): Record<string, string[]> {
-  const defaults: Record<string, string[]> = {
-    CAITLIN_NAMED_TESTER: ["chudson@aresfarmsinc.com"],
-    STUART_NAMED_TESTER: ["stuart@aresfarmsinc.com"],
-  };
+  const defaults: Record<string, string[]> = {};
+  for (const requirement of launchAuthorizationRequirements) {
+    for (const role of requirement.authorityRoles) {
+      const assignment = launchAuthorityAssignmentFor(role);
+      if (assignment?.status === "ASSIGNED") {
+        defaults[role] = [...assignment.identities];
+      }
+    }
+  }
   try {
-    const configured = JSON.parse(process.env.LAUNCH_AUTHORITY_ASSIGNMENTS_JSON ?? "{}") as Record<string, unknown>;
-    for (const [role, values] of Object.entries(configured)) if (Array.isArray(values)) defaults[role] = values.filter((x): x is string => typeof x === "string").map((x) => x.trim().toLowerCase());
-  } catch { /* fail closed to defaults */ }
+    const configured = JSON.parse(
+      process.env.LAUNCH_AUTHORITY_ASSIGNMENTS_JSON ?? "{}"
+    ) as Record<string, unknown>;
+    for (const [role, values] of Object.entries(configured)) {
+      if (!Array.isArray(values)) continue;
+      defaults[role] = values
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.trim().toLowerCase())
+        .filter(Boolean);
+    }
+  } catch {
+    // Invalid runtime overrides fail closed to the governed registry.
+  }
   return defaults;
 }
 export function actorMayDecide(email: string, authorityRole: string): boolean { return assignments()[authorityRole]?.includes(email.trim().toLowerCase()) ?? false; }
@@ -41,7 +57,20 @@ export function recordLaunchDecision(input: Omit<RecordedLaunchDecision, "decide
 }
 export function buildLaunchDecisionRollup() {
   const store = readLaunchDecisionStore();
-  const slots = launchAuthorizationRequirements.flatMap((r) => r.authorityRoles.map((role) => ({ blockerId: r.blockerId, title: r.title, authorityRole: role, decision: store.decisions.find((d) => d.blockerId === r.blockerId && d.authorityRole === role) ?? null })));
+  const slots = launchAuthorizationRequirements.flatMap((requirement) =>
+    requirement.authorityRoles.map((authorityRole) => ({
+      blockerId: requirement.blockerId,
+      title: requirement.title,
+      authorityRole,
+      assignment: launchAuthorityAssignmentFor(authorityRole),
+      decision:
+        store.decisions.find(
+          (decision) =>
+            decision.blockerId === requirement.blockerId &&
+            decision.authorityRole === authorityRole
+        ) ?? null,
+    }))
+  );
   const approvalsComplete = slots.every((s) => s.decision && ["APPROVE", "APPROVE_WITH_CONDITIONS"].includes(s.decision.decision));
   const rejected = slots.some((s) => s.decision?.decision === "REJECT");
   const body = { schemaVersion: "p6-launch-authorization-rollup-v1", slots, required: slots.length, completed: slots.filter((s) => s.decision).length, approvalsComplete, rejected, finalLaunchHoldReleased: false, productionAuthorized: false, generatedAtUtc: new Date().toISOString() };

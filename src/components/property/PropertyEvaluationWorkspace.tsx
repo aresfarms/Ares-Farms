@@ -1958,8 +1958,11 @@ export function PropertyEvaluationWorkspace({
   const [releaseHistoryError, setReleaseHistoryError] = useState<string | null>(null);
   const [releaseRecordBusy, setReleaseRecordBusy] = useState(false);
   const [releaseRecordMessage, setReleaseRecordMessage] = useState<string | null>(null);
+  const [escalationAcknowledgeBusy, setEscalationAcknowledgeBusy] = useState(false);
+  const [escalationAcknowledgeMessage, setEscalationAcknowledgeMessage] = useState<string | null>(null);
   const [pendingReleaseReviews, setPendingReleaseReviews] = useState<Array<{
     releaseId: string;
+    attestationCycleId: string;
     currentActorAlreadyAttested: boolean;
     canCountersign: boolean;
     firstAttestedAt: string;
@@ -1968,6 +1971,8 @@ export function PropertyEvaluationWorkspace({
     urgencyState: "normal" | "due-soon" | "critical" | "expired";
     remainingSeconds: number;
     escalationRequired: boolean;
+    escalationAcknowledged: boolean;
+    acknowledgedByCurrentActor: boolean;
   }>>([]);
   // The report opens with its FULL chart already expanded (founder direction
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
@@ -2055,7 +2060,7 @@ export function PropertyEvaluationWorkspace({
       void fetch(`/api/recommendation-releases/pending?${query.toString()}`, { cache: "no-store" })
         .then(async (response) => {
           if (response.status === 401 || response.status === 403) return { ok: false, rows: [] };
-          return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean }> }>;
+          return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; attestationCycleId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean; escalationAcknowledged: boolean; acknowledgedByCurrentActor: boolean }> }>;
         })
         .then((payload) => {
           if (!canceled) setPendingReleaseReviews(payload.rows ?? []);
@@ -3043,6 +3048,33 @@ export function PropertyEvaluationWorkspace({
     changeControl: recommendationReleaseChangeControl,
     priorEntries: persistedAuditEntries,
   });
+  const acknowledgeCriticalEscalation = async () => {
+    if (!pendingReleaseReview?.escalationRequired || !pendingReleaseReview.attestationCycleId || pendingReleaseReview.attestationCycleId === "pending-refresh") return;
+    setEscalationAcknowledgeBusy(true);
+    setEscalationAcknowledgeMessage(null);
+    try {
+      const response = await fetch("/api/recommendation-releases/pending", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          releaseId: pendingReleaseReview.releaseId,
+          attestationCycleId: pendingReleaseReview.attestationCycleId,
+          traceId: `release-escalation-ack:${pendingReleaseReview.releaseId}:${Date.now()}`,
+        }),
+      });
+      const payload = await response.json() as { ok?: boolean; error?: string };
+      if (!response.ok || !payload.ok) throw new Error(payload.error || "Escalation acknowledgement failed.");
+      setPendingReleaseReviews((current) => current.map((row) => row.releaseId === pendingReleaseReview.releaseId
+        ? { ...row, escalationAcknowledged: true, acknowledgedByCurrentActor: true }
+        : row));
+      setEscalationAcknowledgeMessage("Your immutable escalation acknowledgement is recorded. This does not count as countersignature or release approval.");
+    } catch (error) {
+      setEscalationAcknowledgeMessage(error instanceof Error ? error.message : "Escalation acknowledgement failed.");
+    } finally {
+      setEscalationAcknowledgeBusy(false);
+    }
+  };
+
   const recordGovernedRecommendationRelease = async () => {
     if (!releaseSubjectKey || releaseRecordBusy) return;
     setReleaseRecordBusy(true);
@@ -3087,6 +3119,7 @@ export function PropertyEvaluationWorkspace({
         setPendingReleaseReviews((current) => [
           {
             releaseId: recommendationReleaseRecord.releaseId,
+            attestationCycleId: "pending-refresh",
             currentActorAlreadyAttested: true,
             canCountersign: false,
             firstAttestedAt: new Date().toISOString(),
@@ -3095,6 +3128,8 @@ export function PropertyEvaluationWorkspace({
             urgencyState: "normal",
             remainingSeconds: 24 * 60 * 60,
             escalationRequired: false,
+            escalationAcknowledged: false,
+            acknowledgedByCurrentActor: false,
           },
           ...current.filter((row) => row.releaseId !== recommendationReleaseRecord.releaseId),
         ]);
@@ -3452,6 +3487,9 @@ export function PropertyEvaluationWorkspace({
           releaseRecordBusy={releaseRecordBusy}
           releaseRecordMessage={releaseRecordMessage}
           pendingReleaseReview={pendingReleaseReview}
+          escalationAcknowledgeBusy={escalationAcknowledgeBusy}
+          escalationAcknowledgeMessage={escalationAcknowledgeMessage}
+          onAcknowledgeEscalation={acknowledgeCriticalEscalation}
           onRecordGovernedRelease={recordGovernedRecommendationRelease}
         />
       )}

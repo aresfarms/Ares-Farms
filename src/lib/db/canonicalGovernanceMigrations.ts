@@ -65,6 +65,7 @@ export const CANONICAL_GOVERNANCE_MIGRATION_FILES = [
   "0038_recommendation_release_authority.sql",
   "0039_recommendation_release_attestations.sql",
   "0040_recommendation_release_attestation_cycles.sql",
+  "0041_recommendation_release_escalation_acknowledgements.sql",
 ] as const;
 
 /** Directory holding the canonical governance migration SQL files. */

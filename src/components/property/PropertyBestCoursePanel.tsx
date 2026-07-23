@@ -91,6 +91,9 @@ export function PropertyBestCoursePanel({
   releaseRecordBusy,
   releaseRecordMessage,
   pendingReleaseReview,
+  escalationAcknowledgeBusy,
+  escalationAcknowledgeMessage,
+  onAcknowledgeEscalation,
   onRecordGovernedRelease,
 }: {
   profileId: PropertyProfileId;
@@ -120,7 +123,10 @@ export function PropertyBestCoursePanel({
   releaseHistoryError: string | null;
   releaseRecordBusy: boolean;
   releaseRecordMessage: string | null;
-  pendingReleaseReview: { releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean } | null;
+  pendingReleaseReview: { releaseId: string; attestationCycleId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean; escalationAcknowledged: boolean; acknowledgedByCurrentActor: boolean } | null;
+  escalationAcknowledgeBusy: boolean;
+  escalationAcknowledgeMessage: string | null;
+  onAcknowledgeEscalation: () => void;
   onRecordGovernedRelease: () => void;
 }) {
   const complex = requiresComplexPipeline(profileId);
@@ -303,6 +309,22 @@ export function PropertyBestCoursePanel({
                     : `Your attestation is recorded. Another authorized reviewer must countersign before ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`}
           </span>
         )}
+        {pendingReleaseReview?.escalationRequired && (
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={onAcknowledgeEscalation}
+              disabled={escalationAcknowledgeBusy || pendingReleaseReview.acknowledgedByCurrentActor}
+              style={{ minHeight: 44, border: "1px solid #9b1c1c", borderRadius: 9, padding: "9px 14px", background: escalationAcknowledgeBusy || pendingReleaseReview.acknowledgedByCurrentActor ? "#f0dddd" : "#ffffff", color: "#7f1d1d", fontWeight: 800, cursor: escalationAcknowledgeBusy || pendingReleaseReview.acknowledgedByCurrentActor ? "not-allowed" : "pointer" }}
+            >
+              {escalationAcknowledgeBusy ? "Acknowledging…" : pendingReleaseReview.acknowledgedByCurrentActor ? "You acknowledged this escalation" : "Acknowledge escalation"}
+            </button>
+            <span style={{ fontSize: 11.5, color: pendingReleaseReview.escalationAcknowledged ? "#0f766e" : "#9b1c1c", fontWeight: 700 }}>
+              {pendingReleaseReview.escalationAcknowledged ? "Critical escalation ownership is recorded." : "No authorized reviewer has acknowledged ownership yet."}
+            </span>
+          </div>
+        )}
+        {escalationAcknowledgeMessage && <span role="status" style={{ fontSize: 11.5, color: "#0f766e", fontWeight: 700 }}>{escalationAcknowledgeMessage}</span>}
         {releaseRecordMessage && <span role="status" style={{ fontSize: 11.5, color: "#0f766e", fontWeight: 700 }}>{releaseRecordMessage}</span>}
         {releaseHistoryError && <span role="alert" style={{ fontSize: 11.5, color: "#9b1c1c", fontWeight: 700 }}>{releaseHistoryError}</span>}
       </section>

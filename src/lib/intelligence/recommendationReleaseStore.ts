@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, ne } from "drizzle-orm";
 import { randomUUID } from "node:crypto";
 
-import { recommendationReleaseAttestations, recommendationReleaseRecords, type RecommendationReleaseAttestationRow, type RecommendationReleaseRecordRow } from "@/db/schema";
+import { recommendationReleaseAttestations, recommendationReleaseEscalationAcknowledgements, recommendationReleaseRecords, type RecommendationReleaseAttestationRow, type RecommendationReleaseRecordRow } from "@/db/schema";
 import { db } from "@/lib/db";
 import type { RecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
@@ -53,6 +53,7 @@ export async function listRecommendationReleaseHistory(input: {
 
 export interface PendingRecommendationReleaseSummary {
   releaseId: string;
+  attestationCycleId: string;
   subjectType: string;
   subjectKey: string;
   firstAttestedAt: Date;
@@ -61,6 +62,8 @@ export interface PendingRecommendationReleaseSummary {
   urgencyState: "normal" | "due-soon" | "critical" | "expired";
   remainingSeconds: number;
   escalationRequired: boolean;
+  escalationAcknowledged: boolean;
+  acknowledgedByCurrentActor: boolean;
   attestationCount: number;
   currentActorAlreadyAttested: boolean;
   canCountersign: boolean;
@@ -83,6 +86,9 @@ export async function listPendingRecommendationReleaseAttestations(input: {
     .limit(Math.min(Math.max(input.limit ?? 300, 1), 750));
   if (!attestations.length) return [];
 
+  const acknowledgements = await db.select().from(recommendationReleaseEscalationAcknowledgements);
+  const acknowledgementKeys = new Set(acknowledgements.map((row) => `${row.releaseId}::${row.attestationCycleId}`));
+  const actorAcknowledgementKeys = new Set(acknowledgements.filter((row) => row.actorId === actorId).map((row) => `${row.releaseId}::${row.attestationCycleId}`));
   const released = await db.select({ releaseId: recommendationReleaseRecords.releaseId }).from(recommendationReleaseRecords);
   const releasedIds = new Set(released.map((row) => row.releaseId));
   const grouped = new Map<string, RecommendationReleaseAttestationRow[]>();
@@ -118,6 +124,7 @@ export async function listPendingRecommendationReleaseAttestations(input: {
       const currentActorAlreadyAttested = rows.some((row) => row.reviewerActorId === actorId);
       return {
         releaseId: first.releaseId,
+        attestationCycleId: first.attestationCycleId,
         subjectType: first.subjectType,
         subjectKey: first.subjectKey,
         firstAttestedAt: first.createdAt,
@@ -126,6 +133,8 @@ export async function listPendingRecommendationReleaseAttestations(input: {
         urgencyState,
         remainingSeconds: Math.max(0, Math.floor(remainingMs / 1000)),
         escalationRequired: urgencyState === "critical",
+        escalationAcknowledged: acknowledgementKeys.has(`${first.releaseId}::${first.attestationCycleId}`),
+        acknowledgedByCurrentActor: actorAcknowledgementKeys.has(`${first.releaseId}::${first.attestationCycleId}`),
         attestationCount: rows.length,
         currentActorAlreadyAttested,
         canCountersign: !expired && !currentActorAlreadyAttested,
@@ -137,6 +146,42 @@ export async function listPendingRecommendationReleaseAttestations(input: {
       const urgencyDelta = rank[a.urgencyState] - rank[b.urgencyState];
       return urgencyDelta || a.expiresAt.getTime() - b.expiresAt.getTime();
     });
+}
+
+export async function acknowledgeRecommendationReleaseEscalation(input: {
+  releaseId: string;
+  attestationCycleId: string;
+  actor: { actorId: string; email: string; name?: string | null; role: string };
+  traceId?: string;
+}): Promise<void> {
+  const releaseId = required(input.releaseId, "releaseId");
+  const attestationCycleId = required(input.attestationCycleId, "attestationCycleId");
+  const rows = await db.select().from(recommendationReleaseAttestations)
+    .where(and(
+      eq(recommendationReleaseAttestations.releaseId, releaseId),
+      eq(recommendationReleaseAttestations.attestationCycleId, attestationCycleId),
+    ))
+    .orderBy(asc(recommendationReleaseAttestations.createdAt));
+  if (rows.length !== 1) throw new Error("Only a pending one-attestation cycle may be acknowledged.");
+  const first = rows[0];
+  const remainingMs = first.expiresAt.getTime() - Date.now();
+  if (remainingMs <= 0) throw new Error("The escalation cycle has expired.");
+  if (remainingMs > 4 * 60 * 60 * 1000) throw new Error("Escalation acknowledgement is available only during the critical four-hour window.");
+  const released = await db.select({ releaseId: recommendationReleaseRecords.releaseId }).from(recommendationReleaseRecords)
+    .where(eq(recommendationReleaseRecords.releaseId, releaseId)).limit(1);
+  if (released[0]) throw new Error("This recommendation release is already complete.");
+  await db.insert(recommendationReleaseEscalationAcknowledgements).values({
+    releaseId,
+    attestationCycleId,
+    subjectType: first.subjectType,
+    subjectKey: first.subjectKey,
+    actorId: required(input.actor.actorId, "actor.actorId"),
+    actorEmail: required(input.actor.email, "actor.email"),
+    actorName: input.actor.name?.trim() || null,
+    actorRole: required(input.actor.role, "actor.role"),
+    acknowledgementStatement: "I acknowledge this critical countersignature escalation, accept responsibility for timely review or explicit non-action, and understand that acknowledgement does not constitute countersignature or release approval.",
+    traceId: input.traceId?.trim() || null,
+  }).onConflictDoNothing({ target: [recommendationReleaseEscalationAcknowledgements.releaseId, recommendationReleaseEscalationAcknowledgements.attestationCycleId, recommendationReleaseEscalationAcknowledgements.actorId] });
 }
 
 export async function persistRecommendationRelease(input: {

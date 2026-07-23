@@ -6,6 +6,7 @@ import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import type { PreliminaryCapitalPlan, PlanningRange } from "@/lib/intelligence/preliminaryCapitalPlan";
 import type { CollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
 import type { MarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
+import type { ScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -61,6 +62,7 @@ export function PropertyBestCoursePanel({
   capitalPlan,
   collateralPlan,
   marketComparablePlan,
+  scenarioRankingPlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -72,8 +74,8 @@ export function PropertyBestCoursePanel({
   capitalPlan: PreliminaryCapitalPlan;
   collateralPlan: CollateralEquityPlan;
   marketComparablePlan: MarketComparablePlan;
+  scenarioRankingPlan: ScenarioRankingPlan;
 }) {
-  const tracks = tracksFor(profileId);
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
   const formatRange = (range: PlanningRange) => {
@@ -98,16 +100,24 @@ export function PropertyBestCoursePanel({
       </div>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
-        {tracks.map((track, index) => (
-          <article key={track.title} style={{ display: "grid", gap: 7, border: "1px solid #e1e7ef", borderRadius: 12, padding: "14px 15px", background: index === 0 ? "#f2fbf8" : "#fafbfd" }}>
+        {scenarioRankingPlan.scenarios.map((scenario, index) => (
+          <article key={scenario.id} style={{ display: "grid", gap: 7, border: "1px solid #e1e7ef", borderRadius: 12, padding: "14px 15px", background: index === 0 ? "#f2fbf8" : "#fafbfd" }}>
             <span style={{ fontSize: 11, fontWeight: 800, color: index === 0 ? "#0f766e" : "#607086", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              {index === 0 ? "First course to test" : `Alternative ${index}`}
+              {index === 0 ? "Rank 1 · leading course" : `Rank ${index + 1}`}
             </span>
-            <strong style={{ fontSize: 16, color: "#162033", lineHeight: 1.3 }}>{track.title}</strong>
-            <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{track.summary}</span>
-            <span style={{ fontSize: 11.5, color: "#7a5a10", fontWeight: 700 }}>Preliminary — ranking requires the full property, market, cost, and financing analysis.</span>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
+              <strong style={{ fontSize: 16, color: "#162033", lineHeight: 1.3 }}>{scenario.title}</strong>
+              <strong style={{ fontSize: 16, color: "#0f766e" }}>{scenario.totalScore}/100</strong>
+            </div>
+            <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{scenario.summary}</span>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{scenario.reasons.join(" · ")}</span>
+            <span style={{ fontSize: 11.5, color: "#7a5a10", fontWeight: 700 }}>{scenario.posture.replace(/-/g, " ")} — {scenario.conditions[0]}</span>
           </article>
         ))}
+      </div>
+      <div style={{ display: "grid", gap: 5, borderLeft: "3px solid #0f766e", paddingLeft: 12 }}>
+        <strong style={{ fontSize: 13, color: "#162033" }}>Current overall posture: {scenarioRankingPlan.overallPosture.replace(/-/g, " ")}</strong>
+        <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{scenarioRankingPlan.rankingRule}</span>
       </div>
 
       <section aria-label="Preliminary capital plan" style={{ display: "grid", gap: 12, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#fbfcfe" }}>

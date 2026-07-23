@@ -18,6 +18,7 @@ import { PropertyBestCoursePanel } from "@/components/property/PropertyBestCours
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
 import { buildMarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
+import { buildScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
@@ -2863,6 +2864,12 @@ export function PropertyEvaluationWorkspace({
     profileId: workspaceProfile.id,
     comparables: similarHomes,
   });
+  const scenarioRankingPlan = buildScenarioRankingPlan({
+    profileId: workspaceProfile.id,
+    marketPlan: marketComparablePlan,
+    capitalPlan: preliminaryCapitalPlan,
+    pathwayCount: topProgramRanks.length,
+  });
 
 
   // ── Result card content (free tier default view, ≤10 numbered bullets) ────
@@ -3177,6 +3184,7 @@ export function PropertyEvaluationWorkspace({
           capitalPlan={preliminaryCapitalPlan}
           collateralPlan={collateralPlan}
           marketComparablePlan={marketComparablePlan}
+          scenarioRankingPlan={scenarioRankingPlan}
         />
       )}
       {!deepView && (

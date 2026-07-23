@@ -21,6 +21,7 @@ import { buildMarketComparablePlan } from "@/lib/intelligence/marketComparablePl
 import { buildScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan";
 import { buildTransactionTimelinePlan } from "@/lib/intelligence/transactionTimelinePlan";
 import { buildFinancialCapacityPlan } from "@/lib/intelligence/financialCapacityPlan";
+import { buildExecutableScenarioRankingPlan } from "@/lib/intelligence/executableScenarioRankingPlan";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
@@ -2878,6 +2879,12 @@ export function PropertyEvaluationWorkspace({
   const financialCapacityPlan = buildFinancialCapacityPlan({
     authorization: "not-requested",
   });
+  const executableScenarioRankingPlan = buildExecutableScenarioRankingPlan({
+    propertyRanking: scenarioRankingPlan,
+    financialCapacity: financialCapacityPlan,
+    timeline: transactionTimelinePlan,
+    collateral: collateralPlan,
+  });
 
 
   // ── Result card content (free tier default view, ≤10 numbered bullets) ────
@@ -3195,6 +3202,7 @@ export function PropertyEvaluationWorkspace({
           scenarioRankingPlan={scenarioRankingPlan}
           transactionTimelinePlan={transactionTimelinePlan}
           financialCapacityPlan={financialCapacityPlan}
+          executableScenarioRankingPlan={executableScenarioRankingPlan}
         />
       )}
       {!deepView && (

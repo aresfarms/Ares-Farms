@@ -9,6 +9,7 @@ import type { MarketComparablePlan } from "@/lib/intelligence/marketComparablePl
 import type { ScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan";
 import type { TransactionTimelinePlan } from "@/lib/intelligence/transactionTimelinePlan";
 import type { FinancialCapacityPlan } from "@/lib/intelligence/financialCapacityPlan";
+import type { ExecutableScenarioRankingPlan } from "@/lib/intelligence/executableScenarioRankingPlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -67,6 +68,7 @@ export function PropertyBestCoursePanel({
   scenarioRankingPlan,
   transactionTimelinePlan,
   financialCapacityPlan,
+  executableScenarioRankingPlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -81,6 +83,7 @@ export function PropertyBestCoursePanel({
   scenarioRankingPlan: ScenarioRankingPlan;
   transactionTimelinePlan: TransactionTimelinePlan;
   financialCapacityPlan: FinancialCapacityPlan;
+  executableScenarioRankingPlan: ExecutableScenarioRankingPlan;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -125,6 +128,24 @@ export function PropertyBestCoursePanel({
         <strong style={{ fontSize: 13, color: "#162033" }}>Current overall posture: {scenarioRankingPlan.overallPosture.replace(/-/g, " ")}</strong>
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{scenarioRankingPlan.rankingRule}</span>
       </div>
+
+      <section aria-label="Personalized executable scenario ranking" style={{ display: "grid", gap: 11, border: "1px solid #cfd8e6", borderRadius: 12, padding: "15px", background: "#f7fbff" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <strong style={{ fontSize: 15, color: "#162033" }}>Property potential versus customer-executable rank</strong>
+          <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{executableScenarioRankingPlan.headline} {executableScenarioRankingPlan.explanation}</span>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          {executableScenarioRankingPlan.scenarios.map((scenario) => (
+            <div key={scenario.id} style={{ display: "grid", gap: 4, border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+              <strong style={{ fontSize: 12.5, color: "#162033" }}>{scenario.title}</strong>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>Property potential: rank {scenario.propertyPotentialRank} · {scenario.propertyPotentialScore}/100</span>
+              <span style={{ fontSize: 11.5, color: scenario.executableRank == null ? "#7a5a10" : "#0f766e", fontWeight: 700 }}>Customer-executable: {scenario.executableRank == null ? "locked pending authorization" : `rank ${scenario.executableRank} · ${scenario.executableScore}/100`}</span>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{scenario.adjustments[0]}</span>
+            </div>
+          ))}
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{executableScenarioRankingPlan.decisionRule}</span>
+      </section>
 
       <section aria-label="Contract and transaction timeline compatibility" style={{ display: "grid", gap: 11, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#f8fafc" }}>
         <div style={{ display: "grid", gap: 4 }}>

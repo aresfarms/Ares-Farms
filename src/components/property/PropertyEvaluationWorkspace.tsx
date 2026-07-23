@@ -27,9 +27,9 @@ import { buildRecommendationEvidenceLedger } from "@/lib/intelligence/recommenda
 import { buildHumanDecisionAssignmentPlan } from "@/lib/intelligence/humanDecisionAssignmentPlan";
 import { buildDecisionResolutionPlan } from "@/lib/intelligence/decisionResolutionPlan";
 import { buildRecommendationFinalityPlan } from "@/lib/intelligence/recommendationFinalityPlan";
-import { buildRecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
+import { buildRecommendationReleaseRecord, type RecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
-import { buildRecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
+import { buildRecommendationReleaseHistory, type RecommendationReleaseAuditEntry, type RecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
@@ -1948,6 +1948,16 @@ export function PropertyEvaluationWorkspace({
   const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
   const [manualReviewError, setManualReviewError] = useState<string | null>(null);
   const [manualPriceLabel, setManualPriceLabel] = useState("");
+  const [persistedReleaseRows, setPersistedReleaseRows] = useState<Array<{
+    releaseId: string;
+    releasePayload: RecommendationReleaseRecord;
+    historyPayload: RecommendationReleaseHistory;
+    createdAt?: string | null;
+  }>>([]);
+  const [releaseHistoryLoading, setReleaseHistoryLoading] = useState(false);
+  const [releaseHistoryError, setReleaseHistoryError] = useState<string | null>(null);
+  const [releaseRecordBusy, setReleaseRecordBusy] = useState(false);
+  const [releaseRecordMessage, setReleaseRecordMessage] = useState<string | null>(null);
   // The report opens with its FULL chart already expanded (founder direction
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
   // visibly open reads as broken). The summary card still leads; the complete
@@ -1972,6 +1982,56 @@ export function PropertyEvaluationWorkspace({
     ...context,
     priceLabel: effectivePriceLabel,
   };
+  const releaseSubjectType = "property-evaluation";
+  const releaseSubjectKey = context.propertyId?.trim()
+    || context.exactAddress?.trim()
+    || [context.title, context.location].filter(Boolean).join(" · ").trim();
+
+  useEffect(() => {
+    if (!releaseSubjectKey) {
+      setPersistedReleaseRows([]);
+      return;
+    }
+    let canceled = false;
+    const controller = new AbortController();
+    setReleaseHistoryLoading(true);
+    setReleaseHistoryError(null);
+    void (async () => {
+      try {
+        const query = new URLSearchParams({
+          subjectType: releaseSubjectType,
+          subjectKey: releaseSubjectKey,
+        });
+        const response = await fetch(`/api/recommendation-releases?${query.toString()}`, {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        const payload = await response.json() as {
+          ok?: boolean;
+          rows?: Array<{
+            releaseId: string;
+            releasePayload: RecommendationReleaseRecord;
+            historyPayload: RecommendationReleaseHistory;
+            createdAt?: string | null;
+          }>;
+          error?: string;
+        };
+        if (!response.ok || !payload.ok) throw new Error(payload.error || "Release history lookup failed.");
+        if (!canceled) setPersistedReleaseRows(payload.rows ?? []);
+      } catch (error) {
+        if (!canceled && error instanceof Error && error.name !== "AbortError") {
+          setReleaseHistoryError(error.message);
+          setPersistedReleaseRows([]);
+        }
+      } finally {
+        if (!canceled) setReleaseHistoryLoading(false);
+      }
+    })();
+    return () => {
+      canceled = true;
+      controller.abort();
+    };
+  }, [releaseSubjectKey]);
 
   useEffect(() => {
     if (!context.propertyId) return;
@@ -2931,13 +2991,63 @@ export function PropertyEvaluationWorkspace({
     resolutions: decisionResolutionPlan,
     finality: recommendationFinalityPlan,
   });
+  const latestPersistedRecommendationRelease = persistedReleaseRows[0]?.releasePayload ?? null;
+  const persistedAuditEntries = persistedReleaseRows
+    .slice()
+    .reverse()
+    .map((row) => row.historyPayload?.entries?.at(-1))
+    .filter((entry): entry is RecommendationReleaseAuditEntry => Boolean(entry));
   const recommendationReleaseChangeControl = buildRecommendationReleaseChangeControl({
     current: recommendationReleaseRecord,
+    previous: latestPersistedRecommendationRelease,
   });
   const recommendationReleaseHistory = buildRecommendationReleaseHistory({
     current: recommendationReleaseRecord,
     changeControl: recommendationReleaseChangeControl,
+    priorEntries: persistedAuditEntries,
   });
+  const recordGovernedRecommendationRelease = async () => {
+    if (!releaseSubjectKey || releaseRecordBusy) return;
+    setReleaseRecordBusy(true);
+    setReleaseRecordMessage(null);
+    setReleaseHistoryError(null);
+    try {
+      const response = await fetch("/api/recommendation-releases", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subjectType: releaseSubjectType,
+          subjectKey: releaseSubjectKey,
+          traceId: `workspace-release-${Date.now()}`,
+          release: recommendationReleaseRecord,
+        }),
+      });
+      const payload = await response.json() as {
+        ok?: boolean;
+        row?: {
+          releaseId: string;
+          releasePayload: RecommendationReleaseRecord;
+          historyPayload: RecommendationReleaseHistory;
+          createdAt?: string | null;
+        };
+        error?: string;
+      };
+      if (!response.ok || !payload.ok || !payload.row) throw new Error(payload.error || "Release persistence failed.");
+      setPersistedReleaseRows((current) => [
+        payload.row!,
+        ...current.filter((row) => row.releaseId !== payload.row!.releaseId),
+      ]);
+      setReleaseRecordMessage(
+        recommendationReleaseRecord.releaseState === "withheld"
+          ? "The governed withheld-release event was recorded without implying approval."
+          : "The governed recommendation release was recorded as an immutable lineage entry."
+      );
+    } catch (error) {
+      setReleaseHistoryError(error instanceof Error ? error.message : "Release persistence failed.");
+    } finally {
+      setReleaseRecordBusy(false);
+    }
+  };
 
 
   // ── Result card content (free tier default view, ≤10 numbered bullets) ────
@@ -3264,6 +3374,12 @@ export function PropertyEvaluationWorkspace({
           recommendationReleaseRecord={recommendationReleaseRecord}
           recommendationReleaseChangeControl={recommendationReleaseChangeControl}
           recommendationReleaseHistory={recommendationReleaseHistory}
+          persistedReleaseCount={persistedReleaseRows.length}
+          releaseHistoryLoading={releaseHistoryLoading}
+          releaseHistoryError={releaseHistoryError}
+          releaseRecordBusy={releaseRecordBusy}
+          releaseRecordMessage={releaseRecordMessage}
+          onRecordGovernedRelease={recordGovernedRecommendationRelease}
         />
       )}
       {!deepView && (

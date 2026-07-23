@@ -85,6 +85,12 @@ export function PropertyBestCoursePanel({
   recommendationReleaseRecord,
   recommendationReleaseChangeControl,
   recommendationReleaseHistory,
+  persistedReleaseCount,
+  releaseHistoryLoading,
+  releaseHistoryError,
+  releaseRecordBusy,
+  releaseRecordMessage,
+  onRecordGovernedRelease,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -108,6 +114,12 @@ export function PropertyBestCoursePanel({
   recommendationReleaseRecord: RecommendationReleaseRecord;
   recommendationReleaseChangeControl: RecommendationReleaseChangeControl;
   recommendationReleaseHistory: RecommendationReleaseHistory;
+  persistedReleaseCount: number;
+  releaseHistoryLoading: boolean;
+  releaseHistoryError: string | null;
+  releaseRecordBusy: boolean;
+  releaseRecordMessage: string | null;
+  onRecordGovernedRelease: () => void;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -242,6 +254,32 @@ export function PropertyBestCoursePanel({
         {recommendationFinalityPlan.blockingReasons.length > 0 && <span style={{ fontSize: 11.5, color: "#9b1c1c", lineHeight: 1.5 }}><strong>Blocking reasons:</strong> {recommendationFinalityPlan.blockingReasons.join(" · ")}</span>}
         {recommendationFinalityPlan.remainingConditions.length > 0 && <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}><strong>Remaining conditions:</strong> {recommendationFinalityPlan.remainingConditions.join(" · ")}</span>}
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{recommendationFinalityPlan.finalityRule}</span>
+      </section>
+
+      <section aria-label="Recommendation release persistence" style={{ display: "grid", gap: 10, border: "1px solid #9fb8ae", borderRadius: 12, padding: "15px", background: "#f7fcfa" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 4, maxWidth: 760 }}>
+            <strong style={{ fontSize: 15, color: "#162033" }}>Governed release storage</strong>
+            <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>
+              {releaseHistoryLoading
+                ? "Loading the recorded recommendation lineage…"
+                : persistedReleaseCount > 0
+                  ? `${persistedReleaseCount} immutable release ${persistedReleaseCount === 1 ? "record" : "records"} loaded for this evaluation.`
+                  : "No prior governed release is recorded for this evaluation."}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onRecordGovernedRelease}
+            disabled={releaseRecordBusy || releaseHistoryLoading}
+            style={{ minHeight: 44, border: "1px solid #0f766e", borderRadius: 9, padding: "9px 14px", background: releaseRecordBusy || releaseHistoryLoading ? "#d9e7e1" : "#0f766e", color: releaseRecordBusy || releaseHistoryLoading ? "#526074" : "#ffffff", fontWeight: 800, cursor: releaseRecordBusy || releaseHistoryLoading ? "not-allowed" : "pointer" }}
+          >
+            {releaseRecordBusy ? "Recording…" : recommendationReleaseRecord.releaseState === "withheld" ? "Record withheld-release event" : "Record governed release"}
+          </button>
+        </div>
+        <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>This action creates or retrieves the deterministic immutable release ID. It never edits or deletes a prior release.</span>
+        {releaseRecordMessage && <span role="status" style={{ fontSize: 11.5, color: "#0f766e", fontWeight: 700 }}>{releaseRecordMessage}</span>}
+        {releaseHistoryError && <span role="alert" style={{ fontSize: 11.5, color: "#9b1c1c", fontWeight: 700 }}>{releaseHistoryError}</span>}
       </section>
 
       <section aria-label="Recommendation release record" style={{ display: "grid", gap: 11, border: "1px solid #9fb8ae", borderRadius: 12, padding: "15px", background: "#f7fcfa" }}>

@@ -98,6 +98,7 @@ export * from "./paymentConnectorAdapters";
 export * from "./paymentConnectorExecutions";
 export * from "./pipeline";
 export * from "./regulatedDecisionNotices";
+export * from "./recommendationReleaseRecords";
 export * from "./reportRecords";
 export * from "./revenueSourceIntelligenceGovernance";
 export * from "./replayVerification";

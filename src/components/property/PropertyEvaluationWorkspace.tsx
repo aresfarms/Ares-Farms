@@ -33,6 +33,7 @@ import { buildRecommendationReleaseHistory, type RecommendationReleaseAuditEntry
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
+import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import {
   allProfiles,
   classifyPropertyProfile,
@@ -2788,6 +2789,10 @@ export function PropertyEvaluationWorkspace({
                     farmMode: workspaceProfile.id === "farm",
                   })
                 : undefined,
+            compensationTransparency: buildRealEstateCompensationTransparency({
+              ...emptyRealEstateCompensationInput(),
+              jurisdiction: analysisContext.location || null,
+            }),
             similarHomes: similarHomes.length
               ? similarHomes.map((home) => ({
                   title: home.title,

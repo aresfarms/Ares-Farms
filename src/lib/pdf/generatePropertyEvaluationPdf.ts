@@ -82,6 +82,14 @@ type PropertyEvaluationPdfInput = {
     equityDisclaimers?: string[];
     disclaimers: string[];
   };
+  /** Consumer-facing transparency for brokerage agreements, commissions, concessions, and added fees. */
+  compensationTransparency?: {
+    posture: "CLEAR" | "REVIEW_NEEDED" | "UNKNOWN";
+    knownFacts: string[];
+    questionsBeforeCommitment: string[];
+    reviewFlags: string[];
+    legalBoundary: string[];
+  };
   /** Alternatives from the tracked government inventory (honest-label rule). */
   similarHomes?: Array<{ title: string; detail: string }>;
 };
@@ -695,6 +703,29 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       for (const line of own.equityDisclaimers ?? []) paragraph(line, { size: 8.5, color: COLORS.muted });
     }
     for (const line of own.disclaimers) paragraph(line, { size: 8.5, color: COLORS.muted });
+  }
+
+  if (input.compensationTransparency) {
+    const comp = input.compensationTransparency;
+    heading("Broker Agreements, Commissions, Concessions & Added Fees");
+    panel({
+      title: comp.posture === "REVIEW_NEEDED" ? "Review before signing or relying" : comp.posture === "CLEAR" ? "Disclosed cost terms" : "What is not yet known",
+      lines: comp.reviewFlags.length ? comp.reviewFlags : ["No transaction-specific brokerage compensation terms have been supplied yet."],
+      fill: ACCENT_SOFT,
+    });
+    if (comp.knownFacts.length) {
+      setFont("bold", 9.5, COLORS.muted);
+      ensure(24);
+      doc.text("WHAT THE CURRENT RECORD SAYS", PAGE.marginX, y, { characterSpacing: 0.8 });
+      y = doc.y + 8;
+      bullets(comp.knownFacts);
+    }
+    setFont("bold", 9.5, COLORS.muted);
+    ensure(24);
+    doc.text("QUESTIONS TO ANSWER UP FRONT", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    checklist(comp.questionsBeforeCommitment);
+    for (const line of comp.legalBoundary) paragraph(line, { size: 8.5, color: COLORS.muted });
   }
 
   if (input.similarHomes?.length) {

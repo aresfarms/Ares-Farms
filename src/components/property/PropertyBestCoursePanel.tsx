@@ -10,6 +10,7 @@ import type { ScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan
 import type { TransactionTimelinePlan } from "@/lib/intelligence/transactionTimelinePlan";
 import type { FinancialCapacityPlan } from "@/lib/intelligence/financialCapacityPlan";
 import type { ExecutableScenarioRankingPlan } from "@/lib/intelligence/executableScenarioRankingPlan";
+import type { DecisionSynthesisPlan } from "@/lib/intelligence/decisionSynthesisPlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -69,6 +70,7 @@ export function PropertyBestCoursePanel({
   transactionTimelinePlan,
   financialCapacityPlan,
   executableScenarioRankingPlan,
+  decisionSynthesisPlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -84,6 +86,7 @@ export function PropertyBestCoursePanel({
   transactionTimelinePlan: TransactionTimelinePlan;
   financialCapacityPlan: FinancialCapacityPlan;
   executableScenarioRankingPlan: ExecutableScenarioRankingPlan;
+  decisionSynthesisPlan: DecisionSynthesisPlan;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -107,6 +110,27 @@ export function PropertyBestCoursePanel({
           {startingLens ? ` The ${startingLens.replace(/-/g, " ")} selection is the starting lens, not the conclusion.` : ""}
         </p>
       </div>
+
+      <section aria-label="Governed decision synthesis" style={{ display: "grid", gap: 10, border: "2px solid #0f766e", borderRadius: 14, padding: "16px", background: "#f2fbf8" }}>
+        <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0f766e" }}>Decision synthesis</span>
+        <strong style={{ fontSize: 20, color: "#162033" }}>{decisionSynthesisPlan.headline}</strong>
+        <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{decisionSynthesisPlan.rationale.join(" ")}</span>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          <div style={{ border: "1px solid #cfd8e6", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Required conditions</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{decisionSynthesisPlan.requiredConditions.join(" · ")}</span>
+          </div>
+          <div style={{ border: "1px solid #cfd8e6", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Hard stops</strong>
+            <span style={{ fontSize: 11.5, color: decisionSynthesisPlan.hardStops.length ? "#8a2d2d" : "#526074", lineHeight: 1.5 }}>{decisionSynthesisPlan.hardStops.length ? decisionSynthesisPlan.hardStops.join(" · ") : "No current hard stop is established from the available evidence."}</span>
+          </div>
+          <div style={{ border: "1px solid #cfd8e6", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Next action</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{decisionSynthesisPlan.nextActions.join(" ")}</span>
+          </div>
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{decisionSynthesisPlan.advisoryBoundary}</span>
+      </section>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
         {scenarioRankingPlan.scenarios.map((scenario, index) => (

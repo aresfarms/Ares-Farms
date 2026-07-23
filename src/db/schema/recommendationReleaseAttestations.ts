@@ -3,6 +3,8 @@ import { jsonb, pgTable, text, timestamp, uniqueIndex, uuid } from "drizzle-orm/
 export const recommendationReleaseAttestations = pgTable("recommendation_release_attestations", {
   id: uuid("id").defaultRandom().primaryKey(),
   releaseId: text("release_id").notNull(),
+  attestationCycleId: text("attestation_cycle_id").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   subjectType: text("subject_type").notNull(),
   subjectKey: text("subject_key").notNull(),
   reviewerActorId: text("reviewer_actor_id").notNull(),
@@ -15,7 +17,7 @@ export const recommendationReleaseAttestations = pgTable("recommendation_release
   traceId: text("trace_id"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, (table) => ({
-  oneAttestationPerReviewer: uniqueIndex("recommendation_release_attestation_reviewer_uniq").on(table.releaseId, table.reviewerActorId),
+  oneAttestationPerReviewer: uniqueIndex("recommendation_release_attestation_reviewer_uniq").on(table.releaseId, table.attestationCycleId, table.reviewerActorId),
 }));
 
 export type RecommendationReleaseAttestationRow = typeof recommendationReleaseAttestations.$inferSelect;

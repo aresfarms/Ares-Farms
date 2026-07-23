@@ -120,7 +120,7 @@ export function PropertyBestCoursePanel({
   releaseHistoryError: string | null;
   releaseRecordBusy: boolean;
   releaseRecordMessage: string | null;
-  pendingReleaseReview: { releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string } | null;
+  pendingReleaseReview: { releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired" } | null;
   onRecordGovernedRelease: () => void;
 }) {
   const complex = requiresComplexPipeline(profileId);
@@ -273,15 +273,17 @@ export function PropertyBestCoursePanel({
           <button
             type="button"
             onClick={onRecordGovernedRelease}
-            disabled={releaseRecordBusy || releaseHistoryLoading || Boolean(pendingReleaseReview?.currentActorAlreadyAttested)}
-            style={{ minHeight: 44, border: "1px solid #0f766e", borderRadius: 9, padding: "9px 14px", background: releaseRecordBusy || releaseHistoryLoading || pendingReleaseReview?.currentActorAlreadyAttested ? "#d9e7e1" : "#0f766e", color: releaseRecordBusy || releaseHistoryLoading || pendingReleaseReview?.currentActorAlreadyAttested ? "#526074" : "#ffffff", fontWeight: 800, cursor: releaseRecordBusy || releaseHistoryLoading || pendingReleaseReview?.currentActorAlreadyAttested ? "not-allowed" : "pointer" }}
+            disabled={releaseRecordBusy || releaseHistoryLoading || Boolean(pendingReleaseReview?.currentActorAlreadyAttested && pendingReleaseReview.freshnessState === "active")}
+            style={{ minHeight: 44, border: "1px solid #0f766e", borderRadius: 9, padding: "9px 14px", background: releaseRecordBusy || releaseHistoryLoading || (pendingReleaseReview?.currentActorAlreadyAttested && pendingReleaseReview.freshnessState === "active") ? "#d9e7e1" : "#0f766e", color: releaseRecordBusy || releaseHistoryLoading || (pendingReleaseReview?.currentActorAlreadyAttested && pendingReleaseReview.freshnessState === "active") ? "#526074" : "#ffffff", fontWeight: 800, cursor: releaseRecordBusy || releaseHistoryLoading || (pendingReleaseReview?.currentActorAlreadyAttested && pendingReleaseReview.freshnessState === "active") ? "not-allowed" : "pointer" }}
           >
             {releaseRecordBusy
               ? "Recording…"
               : pendingReleaseReview?.canCountersign
                 ? "Countersign governed release"
-                : pendingReleaseReview?.currentActorAlreadyAttested
-                  ? "Your attestation is recorded"
+                : pendingReleaseReview?.freshnessState === "expired"
+                  ? "Start fresh attestation cycle"
+                  : pendingReleaseReview?.currentActorAlreadyAttested
+                    ? "Your attestation is recorded"
                   : recommendationReleaseRecord.releaseState === "withheld"
                     ? "Record withheld-release event"
                     : "Record governed release"}
@@ -290,9 +292,11 @@ export function PropertyBestCoursePanel({
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>This action creates or retrieves the deterministic immutable release ID. It never edits or deletes a prior release.</span>
         {pendingReleaseReview && (
           <span role="status" style={{ fontSize: 11.5, color: pendingReleaseReview.canCountersign ? "#0f766e" : "#7a5a10", fontWeight: 700, lineHeight: 1.5 }}>
-            {pendingReleaseReview.canCountersign
-              ? "A different authorized reviewer has already attested. You are eligible to independently countersign this release."
-              : "Your attestation is already recorded. Independence requires another authorized reviewer to countersign."}
+            {pendingReleaseReview.freshnessState === "expired"
+              ? "The prior countersignature window expired. Its attestations remain immutable for audit, but a fresh review cycle is required."
+              : pendingReleaseReview.canCountersign
+                ? `A different authorized reviewer has attested. You may countersign before ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`
+                : `Your attestation is recorded. Another authorized reviewer must countersign before ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`}
           </span>
         )}
         {releaseRecordMessage && <span role="status" style={{ fontSize: 11.5, color: "#0f766e", fontWeight: 700 }}>{releaseRecordMessage}</span>}

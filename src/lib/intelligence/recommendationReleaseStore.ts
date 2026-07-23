@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, ne } from "drizzle-orm";
+import { randomUUID } from "node:crypto";
 
 import { recommendationReleaseAttestations, recommendationReleaseRecords, type RecommendationReleaseAttestationRow, type RecommendationReleaseRecordRow } from "@/db/schema";
 import { db } from "@/lib/db";
@@ -8,6 +9,7 @@ import { buildRecommendationReleaseHistory } from "@/lib/intelligence/recommenda
 
 const GOVERNANCE_VERSION = "master-volumes-runtime-v0.1.0";
 const SOURCE = "recommendation-release-store";
+const ATTESTATION_FRESHNESS_MS = 24 * 60 * 60 * 1000;
 
 function required(value: unknown, label: string): string {
   const text = typeof value === "string" ? value.trim() : "";
@@ -54,6 +56,8 @@ export interface PendingRecommendationReleaseSummary {
   subjectType: string;
   subjectKey: string;
   firstAttestedAt: Date;
+  expiresAt: Date;
+  freshnessState: "active" | "expired";
   attestationCount: number;
   currentActorAlreadyAttested: boolean;
   canCountersign: boolean;
@@ -72,35 +76,45 @@ export async function listPendingRecommendationReleaseAttestations(input: {
   if (input.subjectKey?.trim()) filters.push(eq(recommendationReleaseAttestations.subjectKey, input.subjectKey.trim()));
   const attestations = await db.select().from(recommendationReleaseAttestations)
     .where(filters.length ? and(...filters) : undefined)
-    .orderBy(asc(recommendationReleaseAttestations.createdAt))
-    .limit(Math.min(Math.max(input.limit ?? 200, 1), 500));
+    .orderBy(desc(recommendationReleaseAttestations.createdAt))
+    .limit(Math.min(Math.max(input.limit ?? 300, 1), 750));
   if (!attestations.length) return [];
 
-  const releaseIds = [...new Set(attestations.map((row) => row.releaseId))];
-  const released = await db.select({ releaseId: recommendationReleaseRecords.releaseId })
-    .from(recommendationReleaseRecords);
+  const released = await db.select({ releaseId: recommendationReleaseRecords.releaseId }).from(recommendationReleaseRecords);
   const releasedIds = new Set(released.map((row) => row.releaseId));
   const grouped = new Map<string, RecommendationReleaseAttestationRow[]>();
   for (const row of attestations) {
     if (releasedIds.has(row.releaseId)) continue;
-    const rows = grouped.get(row.releaseId) ?? [];
+    const key = `${row.releaseId}::${row.attestationCycleId}`;
+    const rows = grouped.get(key) ?? [];
     rows.push(row);
-    grouped.set(row.releaseId, rows);
+    grouped.set(key, rows);
   }
 
-  return [...grouped.values()]
-    .filter((rows) => rows.length === 1 && releaseIds.includes(rows[0].releaseId))
+  const latestCycleByRelease = new Map<string, RecommendationReleaseAttestationRow[]>();
+  for (const rows of grouped.values()) {
+    rows.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+    const current = latestCycleByRelease.get(rows[0].releaseId);
+    if (!current || rows[0].createdAt > current[0].createdAt) latestCycleByRelease.set(rows[0].releaseId, rows);
+  }
+
+  const now = Date.now();
+  return [...latestCycleByRelease.values()]
+    .filter((rows) => rows.length === 1)
     .map((rows) => {
       const first = rows[0];
+      const expired = first.expiresAt.getTime() <= now;
       const currentActorAlreadyAttested = rows.some((row) => row.reviewerActorId === actorId);
       return {
         releaseId: first.releaseId,
         subjectType: first.subjectType,
         subjectKey: first.subjectKey,
         firstAttestedAt: first.createdAt,
+        expiresAt: first.expiresAt,
+        freshnessState: expired ? ("expired" as const) : ("active" as const),
         attestationCount: rows.length,
         currentActorAlreadyAttested,
-        canCountersign: !currentActorAlreadyAttested,
+        canCountersign: !expired && !currentActorAlreadyAttested,
         decisionContext: (first.decisionContext ?? {}) as Record<string, unknown>,
       };
     })
@@ -114,9 +128,13 @@ export async function persistRecommendationRelease(input: {
   traceId: string;
   reviewer: { actorId: string; email: string; name?: string | null; role: string; authorityBasis: string };
   decisionContext?: Record<string, unknown>;
-}): Promise<{ row: RecommendationReleaseRecordRow | null; previous: RecommendationReleaseRecord | null; attestations: RecommendationReleaseAttestationRow[]; pendingCountersignature: boolean }> {
+}): Promise<{ row: RecommendationReleaseRecordRow | null; previous: RecommendationReleaseRecord | null; attestations: RecommendationReleaseAttestationRow[]; pendingCountersignature: boolean; attestationExpiresAt: Date | null; staleCycleRestarted: boolean }> {
   const subjectType = required(input.subjectType, "subjectType");
   const subjectKey = required(input.subjectKey, "subjectKey");
+  const existingRelease = await db.select().from(recommendationReleaseRecords)
+    .where(eq(recommendationReleaseRecords.releaseId, input.release.releaseId)).limit(1);
+  if (existingRelease[0]) return { row: existingRelease[0], previous: null, attestations: [], pendingCountersignature: false, attestationExpiresAt: null, staleCycleRestarted: false };
+
   const previousRow = await getLatestRecommendationRelease({ subjectType, subjectKey, excludeReleaseId: input.release.releaseId });
   const previous = previousRow ? releaseFromRow(previousRow) : null;
   const changeControl = buildRecommendationReleaseChangeControl({ current: input.release, previous });
@@ -126,21 +144,35 @@ export async function persistRecommendationRelease(input: {
     ? "I independently reviewed the evidence version, recommendation, conditions, reviewer dispositions, and release authority, and I attest that this release may proceed subject to the recorded boundaries."
     : "I reviewed this withheld-release event and attest that it records a non-release without implying approval or affirmative guidance.";
 
+  const priorAttestations = await db.select().from(recommendationReleaseAttestations)
+    .where(eq(recommendationReleaseAttestations.releaseId, input.release.releaseId))
+    .orderBy(desc(recommendationReleaseAttestations.createdAt));
+  const latest = priorAttestations[0] ?? null;
+  const now = new Date();
+  const latestCycleActive = Boolean(latest && latest.expiresAt.getTime() > now.getTime());
+  const attestationCycleId = latestCycleActive ? latest!.attestationCycleId : `${input.release.releaseId}:${randomUUID()}`;
+  const expiresAt = latestCycleActive ? latest!.expiresAt : new Date(now.getTime() + ATTESTATION_FRESHNESS_MS);
+  const staleCycleRestarted = Boolean(latest && !latestCycleActive);
+
   await db.insert(recommendationReleaseAttestations).values({
-    releaseId: input.release.releaseId, subjectType, subjectKey,
+    releaseId: input.release.releaseId, attestationCycleId, expiresAt, subjectType, subjectKey,
     reviewerActorId: required(input.reviewer.actorId, "reviewer.actorId"),
     reviewerEmail: required(input.reviewer.email, "reviewer.email"),
     reviewerName: input.reviewer.name?.trim() || null,
     reviewerRole: required(input.reviewer.role, "reviewer.role"),
     authorityBasis: required(input.reviewer.authorityBasis, "reviewer.authorityBasis"),
-    attestationStatement, decisionContext: input.decisionContext ?? {}, traceId: input.traceId,
-  }).onConflictDoNothing({ target: [recommendationReleaseAttestations.releaseId, recommendationReleaseAttestations.reviewerActorId] });
+    attestationStatement, decisionContext: { ...(input.decisionContext ?? {}), attestationCycleId, attestationExpiresAt: expiresAt.toISOString() }, traceId: input.traceId,
+  }).onConflictDoNothing({ target: [recommendationReleaseAttestations.releaseId, recommendationReleaseAttestations.attestationCycleId, recommendationReleaseAttestations.reviewerActorId] });
 
   const attestations = await db.select().from(recommendationReleaseAttestations)
-    .where(eq(recommendationReleaseAttestations.releaseId, input.release.releaseId))
+    .where(and(
+      eq(recommendationReleaseAttestations.releaseId, input.release.releaseId),
+      eq(recommendationReleaseAttestations.attestationCycleId, attestationCycleId),
+    ))
     .orderBy(asc(recommendationReleaseAttestations.createdAt));
   const requiredCount = requiresIndependentCountersignature ? 2 : 1;
-  if (attestations.length < requiredCount) return { row: null, previous, attestations, pendingCountersignature: true };
+  if (attestations.length < requiredCount) return { row: null, previous, attestations, pendingCountersignature: true, attestationExpiresAt: expiresAt, staleCycleRestarted };
+  if (expiresAt.getTime() <= Date.now()) throw new Error("The countersignature cycle expired before completion. Start a fresh independent review cycle.");
 
   const finalReviewer = attestations[attestations.length - 1];
   await db.insert(recommendationReleaseRecords).values({
@@ -152,10 +184,10 @@ export async function persistRecommendationRelease(input: {
     historyPayload: history, governanceVersion: GOVERNANCE_VERSION, classification: "CONFIDENTIAL", replayRef: input.traceId,
     traceId: input.traceId, source: SOURCE, reviewerActorId: finalReviewer.reviewerActorId, reviewerEmail: finalReviewer.reviewerEmail,
     reviewerName: finalReviewer.reviewerName, reviewerRole: finalReviewer.reviewerRole, authorityBasis: finalReviewer.authorityBasis,
-    decisionContext: { ...(input.decisionContext ?? {}), attestationCount: attestations.length, independentCountersignatureRequired: requiresIndependentCountersignature },
+    decisionContext: { ...(input.decisionContext ?? {}), attestationCount: attestations.length, independentCountersignatureRequired: requiresIndependentCountersignature, attestationCycleId, attestationExpiresAt: expiresAt.toISOString() },
   }).onConflictDoNothing({ target: recommendationReleaseRecords.releaseId });
 
   const rows = await db.select().from(recommendationReleaseRecords).where(eq(recommendationReleaseRecords.releaseId, input.release.releaseId)).limit(1);
   if (!rows[0]) throw new Error("Recommendation release persistence failed.");
-  return { row: rows[0], previous, attestations, pendingCountersignature: false };
+  return { row: rows[0], previous, attestations, pendingCountersignature: false, attestationExpiresAt: expiresAt, staleCycleRestarted };
 }

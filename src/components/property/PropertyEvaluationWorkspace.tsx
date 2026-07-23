@@ -1963,6 +1963,8 @@ export function PropertyEvaluationWorkspace({
     currentActorAlreadyAttested: boolean;
     canCountersign: boolean;
     firstAttestedAt: string;
+    expiresAt: string;
+    freshnessState: "active" | "expired";
   }>>([]);
   // The report opens with its FULL chart already expanded (founder direction
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
@@ -2049,7 +2051,7 @@ export function PropertyEvaluationWorkspace({
     void fetch(`/api/recommendation-releases/pending?${query.toString()}`, { cache: "no-store" })
       .then(async (response) => {
         if (response.status === 401 || response.status === 403) return { ok: false, rows: [] };
-        return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string }> }>;
+        return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired" }> }>;
       })
       .then((payload) => {
         if (!canceled) setPendingReleaseReviews(payload.rows ?? []);
@@ -3069,6 +3071,8 @@ export function PropertyEvaluationWorkspace({
         };
         pendingCountersignature?: boolean;
         attestationCount?: number;
+        attestationExpiresAt?: string | null;
+        staleCycleRestarted?: boolean;
         error?: string;
       };
       if (!response.ok || !payload.ok) throw new Error(payload.error || "Release persistence failed.");
@@ -3079,10 +3083,14 @@ export function PropertyEvaluationWorkspace({
             currentActorAlreadyAttested: true,
             canCountersign: false,
             firstAttestedAt: new Date().toISOString(),
+            expiresAt: payload.attestationExpiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            freshnessState: "active",
           },
           ...current.filter((row) => row.releaseId !== recommendationReleaseRecord.releaseId),
         ]);
-        setReleaseRecordMessage("Your authorized attestation is recorded. A different authorized reviewer must countersign before this recommendation becomes an immutable release.");
+        setReleaseRecordMessage(payload.staleCycleRestarted
+          ? "The prior countersignature cycle had expired. Your attestation started a fresh 24-hour independent review cycle."
+          : "Your authorized attestation is recorded. A different authorized reviewer must countersign before this recommendation becomes an immutable release.");
         return;
       }
       if (!payload.row) throw new Error("Release persistence completed without a release record.");

@@ -24,6 +24,7 @@ import { buildFinancialCapacityPlan } from "@/lib/intelligence/financialCapacity
 import { buildExecutableScenarioRankingPlan } from "@/lib/intelligence/executableScenarioRankingPlan";
 import { buildDecisionSynthesisPlan } from "@/lib/intelligence/decisionSynthesisPlan";
 import { buildRecommendationEvidenceLedger } from "@/lib/intelligence/recommendationEvidenceLedger";
+import { buildHumanDecisionAssignmentPlan } from "@/lib/intelligence/humanDecisionAssignmentPlan";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
@@ -2905,6 +2906,11 @@ export function PropertyEvaluationWorkspace({
     capital: preliminaryCapitalPlan,
   });
 
+  const humanDecisionAssignmentPlan = buildHumanDecisionAssignmentPlan({
+    decision: decisionSynthesisPlan,
+    ledger: recommendationEvidenceLedger,
+  });
+
 
   // ── Result card content (free tier default view, ≤10 numbered bullets) ────
   const cardGreenFlags = (effectivePlaceIntelligence?.verifiedFacts ?? [])
@@ -3224,6 +3230,7 @@ export function PropertyEvaluationWorkspace({
           executableScenarioRankingPlan={executableScenarioRankingPlan}
           decisionSynthesisPlan={decisionSynthesisPlan}
           recommendationEvidenceLedger={recommendationEvidenceLedger}
+          humanDecisionAssignmentPlan={humanDecisionAssignmentPlan}
         />
       )}
       {!deepView && (

@@ -12,6 +12,7 @@ import type { FinancialCapacityPlan } from "@/lib/intelligence/financialCapacity
 import type { ExecutableScenarioRankingPlan } from "@/lib/intelligence/executableScenarioRankingPlan";
 import type { DecisionSynthesisPlan } from "@/lib/intelligence/decisionSynthesisPlan";
 import type { RecommendationEvidenceLedger } from "@/lib/intelligence/recommendationEvidenceLedger";
+import type { HumanDecisionAssignmentPlan } from "@/lib/intelligence/humanDecisionAssignmentPlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -73,6 +74,7 @@ export function PropertyBestCoursePanel({
   executableScenarioRankingPlan,
   decisionSynthesisPlan,
   recommendationEvidenceLedger,
+  humanDecisionAssignmentPlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -90,6 +92,7 @@ export function PropertyBestCoursePanel({
   executableScenarioRankingPlan: ExecutableScenarioRankingPlan;
   decisionSynthesisPlan: DecisionSynthesisPlan;
   recommendationEvidenceLedger: RecommendationEvidenceLedger;
+  humanDecisionAssignmentPlan: HumanDecisionAssignmentPlan;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -152,6 +155,28 @@ export function PropertyBestCoursePanel({
           })}
         </div>
         <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{recommendationEvidenceLedger.reviewRule}</span>
+      </section>
+
+      <section aria-label="Human decision assignments" style={{ display: "grid", gap: 11, border: "1px solid #d7c58c", borderRadius: 12, padding: "15px", background: "#fffdf6" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <strong style={{ fontSize: 15, color: "#162033" }}>Human decision assignments</strong>
+          <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{humanDecisionAssignmentPlan.headline} Blocking decisions: {humanDecisionAssignmentPlan.blockingCount}. Awaiting named assignment: {humanDecisionAssignmentPlan.unassignedCount}.</span>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
+          {humanDecisionAssignmentPlan.assignments.map((assignment) => (
+            <article key={assignment.id} style={{ display: "grid", gap: 5, border: "1px solid #e6dcc0", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "baseline" }}>
+                <strong style={{ fontSize: 12.5, color: "#162033" }}>{assignment.title}</strong>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: assignment.blocksRecommendation ? "#9b1c1c" : "#0f766e" }}>{assignment.dueState.replace(/-/g, " ")}</span>
+              </div>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.45 }}><strong>Owner:</strong> {assignment.ownerRole}</span>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.45 }}><strong>Authority:</strong> {assignment.authority.replace(/-/g, " ")}</span>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.45 }}><strong>Evidence:</strong> {assignment.evidenceRequired.join(" · ")}</span>
+              <span style={{ fontSize: 11.5, color: assignment.blocksRecommendation ? "#9b1c1c" : "#526074", lineHeight: 1.45 }}><strong>Blocking effect:</strong> {assignment.blockingEffect}</span>
+            </article>
+          ))}
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{humanDecisionAssignmentPlan.assignmentRule}</span>
       </section>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>

@@ -1958,6 +1958,12 @@ export function PropertyEvaluationWorkspace({
   const [releaseHistoryError, setReleaseHistoryError] = useState<string | null>(null);
   const [releaseRecordBusy, setReleaseRecordBusy] = useState(false);
   const [releaseRecordMessage, setReleaseRecordMessage] = useState<string | null>(null);
+  const [pendingReleaseReviews, setPendingReleaseReviews] = useState<Array<{
+    releaseId: string;
+    currentActorAlreadyAttested: boolean;
+    canCountersign: boolean;
+    firstAttestedAt: string;
+  }>>([]);
   // The report opens with its FULL chart already expanded (founder direction
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
   // visibly open reads as broken). The summary card still leads; the complete
@@ -2031,6 +2037,27 @@ export function PropertyEvaluationWorkspace({
       canceled = true;
       controller.abort();
     };
+  }, [releaseSubjectKey]);
+
+  useEffect(() => {
+    if (!releaseSubjectKey) {
+      setPendingReleaseReviews([]);
+      return;
+    }
+    let canceled = false;
+    const query = new URLSearchParams({ subjectType: releaseSubjectType, subjectKey: releaseSubjectKey });
+    void fetch(`/api/recommendation-releases/pending?${query.toString()}`, { cache: "no-store" })
+      .then(async (response) => {
+        if (response.status === 401 || response.status === 403) return { ok: false, rows: [] };
+        return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string }> }>;
+      })
+      .then((payload) => {
+        if (!canceled) setPendingReleaseReviews(payload.rows ?? []);
+      })
+      .catch(() => {
+        if (!canceled) setPendingReleaseReviews([]);
+      });
+    return () => { canceled = true; };
   }, [releaseSubjectKey]);
 
   useEffect(() => {
@@ -2991,6 +3018,7 @@ export function PropertyEvaluationWorkspace({
     resolutions: decisionResolutionPlan,
     finality: recommendationFinalityPlan,
   });
+  const pendingReleaseReview = pendingReleaseReviews.find((row) => row.releaseId === recommendationReleaseRecord.releaseId) ?? null;
   const latestPersistedRecommendationRelease = persistedReleaseRows[0]?.releasePayload ?? null;
   const persistedAuditEntries = persistedReleaseRows
     .slice()
@@ -3045,10 +3073,20 @@ export function PropertyEvaluationWorkspace({
       };
       if (!response.ok || !payload.ok) throw new Error(payload.error || "Release persistence failed.");
       if (payload.pendingCountersignature) {
-        setReleaseRecordMessage("First authorized attestation recorded. A different authorized reviewer must countersign before this recommendation becomes an immutable release.");
+        setPendingReleaseReviews((current) => [
+          {
+            releaseId: recommendationReleaseRecord.releaseId,
+            currentActorAlreadyAttested: true,
+            canCountersign: false,
+            firstAttestedAt: new Date().toISOString(),
+          },
+          ...current.filter((row) => row.releaseId !== recommendationReleaseRecord.releaseId),
+        ]);
+        setReleaseRecordMessage("Your authorized attestation is recorded. A different authorized reviewer must countersign before this recommendation becomes an immutable release.");
         return;
       }
       if (!payload.row) throw new Error("Release persistence completed without a release record.");
+      setPendingReleaseReviews((current) => current.filter((row) => row.releaseId !== recommendationReleaseRecord.releaseId));
       setPersistedReleaseRows((current) => [
         payload.row!,
         ...current.filter((row) => row.releaseId !== payload.row!.releaseId),
@@ -3395,6 +3433,7 @@ export function PropertyEvaluationWorkspace({
           releaseHistoryError={releaseHistoryError}
           releaseRecordBusy={releaseRecordBusy}
           releaseRecordMessage={releaseRecordMessage}
+          pendingReleaseReview={pendingReleaseReview}
           onRecordGovernedRelease={recordGovernedRecommendationRelease}
         />
       )}

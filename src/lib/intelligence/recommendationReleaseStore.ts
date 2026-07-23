@@ -48,6 +48,65 @@ export async function listRecommendationReleaseHistory(input: {
     .limit(Math.min(Math.max(input.limit ?? 50, 1), 200));
 }
 
+
+export interface PendingRecommendationReleaseSummary {
+  releaseId: string;
+  subjectType: string;
+  subjectKey: string;
+  firstAttestedAt: Date;
+  attestationCount: number;
+  currentActorAlreadyAttested: boolean;
+  canCountersign: boolean;
+  decisionContext: Record<string, unknown>;
+}
+
+export async function listPendingRecommendationReleaseAttestations(input: {
+  actorId: string;
+  subjectType?: string;
+  subjectKey?: string;
+  limit?: number;
+}): Promise<PendingRecommendationReleaseSummary[]> {
+  const actorId = required(input.actorId, "actorId");
+  const filters = [];
+  if (input.subjectType?.trim()) filters.push(eq(recommendationReleaseAttestations.subjectType, input.subjectType.trim()));
+  if (input.subjectKey?.trim()) filters.push(eq(recommendationReleaseAttestations.subjectKey, input.subjectKey.trim()));
+  const attestations = await db.select().from(recommendationReleaseAttestations)
+    .where(filters.length ? and(...filters) : undefined)
+    .orderBy(asc(recommendationReleaseAttestations.createdAt))
+    .limit(Math.min(Math.max(input.limit ?? 200, 1), 500));
+  if (!attestations.length) return [];
+
+  const releaseIds = [...new Set(attestations.map((row) => row.releaseId))];
+  const released = await db.select({ releaseId: recommendationReleaseRecords.releaseId })
+    .from(recommendationReleaseRecords);
+  const releasedIds = new Set(released.map((row) => row.releaseId));
+  const grouped = new Map<string, RecommendationReleaseAttestationRow[]>();
+  for (const row of attestations) {
+    if (releasedIds.has(row.releaseId)) continue;
+    const rows = grouped.get(row.releaseId) ?? [];
+    rows.push(row);
+    grouped.set(row.releaseId, rows);
+  }
+
+  return [...grouped.values()]
+    .filter((rows) => rows.length === 1 && releaseIds.includes(rows[0].releaseId))
+    .map((rows) => {
+      const first = rows[0];
+      const currentActorAlreadyAttested = rows.some((row) => row.reviewerActorId === actorId);
+      return {
+        releaseId: first.releaseId,
+        subjectType: first.subjectType,
+        subjectKey: first.subjectKey,
+        firstAttestedAt: first.createdAt,
+        attestationCount: rows.length,
+        currentActorAlreadyAttested,
+        canCountersign: !currentActorAlreadyAttested,
+        decisionContext: (first.decisionContext ?? {}) as Record<string, unknown>,
+      };
+    })
+    .sort((a, b) => a.firstAttestedAt.getTime() - b.firstAttestedAt.getTime());
+}
+
 export async function persistRecommendationRelease(input: {
   subjectType: string;
   subjectKey: string;

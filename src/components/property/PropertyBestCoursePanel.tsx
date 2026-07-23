@@ -90,6 +90,7 @@ export function PropertyBestCoursePanel({
   releaseHistoryError,
   releaseRecordBusy,
   releaseRecordMessage,
+  pendingReleaseReview,
   onRecordGovernedRelease,
 }: {
   profileId: PropertyProfileId;
@@ -119,6 +120,7 @@ export function PropertyBestCoursePanel({
   releaseHistoryError: string | null;
   releaseRecordBusy: boolean;
   releaseRecordMessage: string | null;
+  pendingReleaseReview: { releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string } | null;
   onRecordGovernedRelease: () => void;
 }) {
   const complex = requiresComplexPipeline(profileId);
@@ -271,13 +273,28 @@ export function PropertyBestCoursePanel({
           <button
             type="button"
             onClick={onRecordGovernedRelease}
-            disabled={releaseRecordBusy || releaseHistoryLoading}
-            style={{ minHeight: 44, border: "1px solid #0f766e", borderRadius: 9, padding: "9px 14px", background: releaseRecordBusy || releaseHistoryLoading ? "#d9e7e1" : "#0f766e", color: releaseRecordBusy || releaseHistoryLoading ? "#526074" : "#ffffff", fontWeight: 800, cursor: releaseRecordBusy || releaseHistoryLoading ? "not-allowed" : "pointer" }}
+            disabled={releaseRecordBusy || releaseHistoryLoading || Boolean(pendingReleaseReview?.currentActorAlreadyAttested)}
+            style={{ minHeight: 44, border: "1px solid #0f766e", borderRadius: 9, padding: "9px 14px", background: releaseRecordBusy || releaseHistoryLoading || pendingReleaseReview?.currentActorAlreadyAttested ? "#d9e7e1" : "#0f766e", color: releaseRecordBusy || releaseHistoryLoading || pendingReleaseReview?.currentActorAlreadyAttested ? "#526074" : "#ffffff", fontWeight: 800, cursor: releaseRecordBusy || releaseHistoryLoading || pendingReleaseReview?.currentActorAlreadyAttested ? "not-allowed" : "pointer" }}
           >
-            {releaseRecordBusy ? "Recording…" : recommendationReleaseRecord.releaseState === "withheld" ? "Record withheld-release event" : "Record governed release"}
+            {releaseRecordBusy
+              ? "Recording…"
+              : pendingReleaseReview?.canCountersign
+                ? "Countersign governed release"
+                : pendingReleaseReview?.currentActorAlreadyAttested
+                  ? "Your attestation is recorded"
+                  : recommendationReleaseRecord.releaseState === "withheld"
+                    ? "Record withheld-release event"
+                    : "Record governed release"}
           </button>
         </div>
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>This action creates or retrieves the deterministic immutable release ID. It never edits or deletes a prior release.</span>
+        {pendingReleaseReview && (
+          <span role="status" style={{ fontSize: 11.5, color: pendingReleaseReview.canCountersign ? "#0f766e" : "#7a5a10", fontWeight: 700, lineHeight: 1.5 }}>
+            {pendingReleaseReview.canCountersign
+              ? "A different authorized reviewer has already attested. You are eligible to independently countersign this release."
+              : "Your attestation is already recorded. Independence requires another authorized reviewer to countersign."}
+          </span>
+        )}
         {releaseRecordMessage && <span role="status" style={{ fontSize: 11.5, color: "#0f766e", fontWeight: 700 }}>{releaseRecordMessage}</span>}
         {releaseHistoryError && <span role="alert" style={{ fontSize: 11.5, color: "#9b1c1c", fontWeight: 700 }}>{releaseHistoryError}</span>}
       </section>

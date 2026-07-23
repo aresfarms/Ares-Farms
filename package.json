@@ -439,7 +439,8 @@
     "verify:institutional-lifecycle-cycle-post-reinstatement-monitoring": "tsx src/scripts/verifyInstitutionalLifecycleCyclePostReinstatementMonitoringAuthority.ts",
     "verify:institutional-lifecycle-cycle-monitoring-discharge": "tsx src/scripts/verifyInstitutionalLifecycleCycleMonitoringDischargeAuthority.ts",
     "verify:institutional-lifecycle-cycle-finality": "tsx src/scripts/verifyInstitutionalLifecycleCycleFinalityAuthority.ts",
-    "verify:institutional-lifecycle-cycle-archive-projection": "tsx src/scripts/verifyInstitutionalLifecycleCycleArchiveProjectionAuthority.ts"
+    "verify:institutional-lifecycle-cycle-archive-projection": "tsx src/scripts/verifyInstitutionalLifecycleCycleArchiveProjectionAuthority.ts",
+    "verify:intelligence-workspace": "tsx src/scripts/verifyIntelligenceWorkspaceContract.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

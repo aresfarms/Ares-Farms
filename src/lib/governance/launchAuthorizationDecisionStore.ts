@@ -58,7 +58,7 @@ export function actorMayUseStagingUltimateAuthority(email: string, env: NodeJS.P
 }
 export function recordStagingUltimateAuthorityOverrides(input: { decidedBy: string; evidenceRef: string; ttlMinutes?: number }) {
   if (!actorMayUseStagingUltimateAuthority(input.decidedBy)) throw new Error("Staging ultimate-authority override is not enabled for this identity.");
-  const ttl = Math.min(240, Math.max(5, input.ttlMinutes ?? 60));
+  const ttl = Math.min(1440, Math.max(5, input.ttlMinutes ?? 480));
   const now = new Date();
   const expiresAtUtc = new Date(now.getTime() + ttl * 60_000).toISOString();
   const overrides = launchAuthorizationRequirements.flatMap((requirement) => requirement.authorityRoles.map((authorityRole) => ({

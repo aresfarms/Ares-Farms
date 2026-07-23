@@ -42,6 +42,7 @@ export default function LaunchAuthorizationPage() {
   const [message, setMessage] = useState("");
   const [batchSubmitting, setBatchSubmitting] = useState(false);
   const [testSubmitting, setTestSubmitting] = useState(false);
+  const [testDurationMinutes, setTestDurationMinutes] = useState(480);
 
   const load = () =>
     fetch("/api/governance/launch-authorization-decisions")
@@ -74,10 +75,10 @@ export default function LaunchAuthorizationPage() {
   }
 
   async function simulateAllApprovals() {
-    if (!window.confirm("Enable a 60-minute STAGING TEST OVERRIDE for all launch decisions? These are simulated approvals only and cannot authorize production.")) return;
+    if (!window.confirm(`Enable a ${testDurationMinutes / 60}-hour STAGING TEST OVERRIDE for all launch decisions? These are simulated approvals only and cannot authorize production.`)) return;
     setTestSubmitting(true); setMessage("");
     try {
-      const response = await fetch("/api/governance/launch-authorization-decisions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "STAGING_TEST_OVERRIDE_ALL", ttlMinutes: 60, evidenceRef: "staging-ultimate-authority-end-to-end-test" }) });
+      const response = await fetch("/api/governance/launch-authorization-decisions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "STAGING_TEST_OVERRIDE_ALL", ttlMinutes: testDurationMinutes, evidenceRef: "staging-ultimate-authority-end-to-end-test" }) });
       const json = (await response.json()) as ResponseData & { testOverride?: { recorded: number; expiresAtUtc: string | null } };
       setMessage(json.ok ? `${json.testOverride?.recorded ?? 0} staging test override(s) activated until ${json.testOverride?.expiresAtUtc ?? "expiration"}.` : json.error ?? "Test override could not be activated.");
       if (json.ok) setData(json);
@@ -120,6 +121,24 @@ export default function LaunchAuthorizationPage() {
   const rollup = data.rollup;
   const actorSlots = rollup.slots.filter((item) => item.canDecide);
   const pendingActorSlots = actorSlots.filter((item) => !item.decision);
+  const activeTestExpiry = rollup.slots
+    .map((item) => item.testOverride?.expiresAtUtc)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1) ?? null;
+
+  const testSurfaceByBlocker: Record<string, { href: string; label: string }> = {
+    "P5-B01": { href: "/named-tester-acceptance", label: "Test named tester acceptance" },
+    "P5-B02": { href: "/internal/data-rights", label: "Test data-rights controls" },
+    "P5-B03": { href: "/financing-pathways", label: "Test financing pathways" },
+    "P5-B04": { href: "/source-legal-review", label: "Test source legal review" },
+    "P5-B05": { href: "/controlled-promotion-activation", label: "Test connector activation" },
+    "P5-B06": { href: "/reports", label: "Test reports" },
+    "P5-B07": { href: "/billing", label: "Test billing and treasury" },
+    "P5-B08": { href: "/production-incident-response-readiness", label: "Test incident readiness" },
+    "P5-B09": { href: "/deployment-environment-readiness", label: "Test recovery readiness" },
+    "P5-B10": { href: "/production-activation-ceremony", label: "Test launch ceremony" },
+  };
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-8">
@@ -136,6 +155,7 @@ export default function LaunchAuthorizationPage() {
         <p><b>Real approvals complete:</b> {String(rollup.approvalsComplete)}</p>
         <p><b>Testing approvals complete:</b> {String(rollup.testApprovalsComplete)}</p>
         <p><b>Active test overrides:</b> {rollup.testOverrideCount}</p>
+        {activeTestExpiry && <p><b>Test access expires:</b> {new Date(activeTestExpiry).toLocaleString()}</p>}
         <p><b>Final launch hold released:</b> false</p>
         <p><b>Production authorized:</b> false</p>
       </section>
@@ -168,13 +188,28 @@ export default function LaunchAuthorizationPage() {
             Record my decision
           </button>
           {data.testAuthorityEnabled && (
-            <button
-              className="rounded bg-amber-600 px-4 py-2 font-semibold text-white"
-              disabled={testSubmitting}
-              onClick={simulateAllApprovals}
-            >
-              {testSubmitting ? "Activating test override…" : "Simulate all approvals for 60 minutes"}
-            </button>
+            <>
+              <select
+                className="rounded border border-amber-600 px-3 py-2"
+                value={testDurationMinutes}
+                onChange={(event) => setTestDurationMinutes(Number(event.target.value))}
+                aria-label="Staging test override duration"
+              >
+                <option value={60}>1 hour</option>
+                <option value={240}>4 hours</option>
+                <option value={480}>8 hours</option>
+                <option value={1440}>24 hours</option>
+              </select>
+              <button
+                className="rounded bg-amber-600 px-4 py-2 font-semibold text-white"
+                disabled={testSubmitting}
+                onClick={simulateAllApprovals}
+              >
+                {testSubmitting
+                  ? "Activating test override…"
+                  : `Activate or renew test authority for ${testDurationMinutes / 60} hour${testDurationMinutes === 60 ? "" : "s"}`}
+              </button>
+            </>
           )}
           <button
             className="rounded border border-black px-4 py-2"
@@ -209,6 +244,11 @@ export default function LaunchAuthorizationPage() {
             <p>Assignment posture: {item.assignment?.status ?? "UNRECORDED"}</p>
             {item.assignment?.holderName && <p>Holder: {item.assignment.holderName}</p>}
             {item.assignment?.reason && <p className="text-sm">{item.assignment.reason}</p>}
+            {testSurfaceByBlocker[item.blockerId] && (
+              <a className="mt-2 inline-block font-semibold underline" href={testSurfaceByBlocker[item.blockerId].href}>
+                {testSurfaceByBlocker[item.blockerId].label}
+              </a>
+            )}
           </div>
         ))}
       </section>

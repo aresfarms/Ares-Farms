@@ -1,6 +1,6 @@
-import { and, desc, eq, ne } from "drizzle-orm";
+import { and, asc, desc, eq, ne } from "drizzle-orm";
 
-import { recommendationReleaseRecords, type RecommendationReleaseRecordRow } from "@/db/schema";
+import { recommendationReleaseAttestations, recommendationReleaseRecords, type RecommendationReleaseAttestationRow, type RecommendationReleaseRecordRow } from "@/db/schema";
 import { db } from "@/lib/db";
 import type { RecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
@@ -55,47 +55,48 @@ export async function persistRecommendationRelease(input: {
   traceId: string;
   reviewer: { actorId: string; email: string; name?: string | null; role: string; authorityBasis: string };
   decisionContext?: Record<string, unknown>;
-}): Promise<{ row: RecommendationReleaseRecordRow; previous: RecommendationReleaseRecord | null }> {
-  const previousRow = await getLatestRecommendationRelease({
-    subjectType: input.subjectType,
-    subjectKey: input.subjectKey,
-    excludeReleaseId: input.release.releaseId,
-  });
+}): Promise<{ row: RecommendationReleaseRecordRow | null; previous: RecommendationReleaseRecord | null; attestations: RecommendationReleaseAttestationRow[]; pendingCountersignature: boolean }> {
+  const subjectType = required(input.subjectType, "subjectType");
+  const subjectKey = required(input.subjectKey, "subjectKey");
+  const previousRow = await getLatestRecommendationRelease({ subjectType, subjectKey, excludeReleaseId: input.release.releaseId });
   const previous = previousRow ? releaseFromRow(previousRow) : null;
   const changeControl = buildRecommendationReleaseChangeControl({ current: input.release, previous });
   const history = buildRecommendationReleaseHistory({ current: input.release, changeControl });
+  const requiresIndependentCountersignature = input.release.releaseState !== "withheld" || changeControl.supersessionRequired;
+  const attestationStatement = requiresIndependentCountersignature
+    ? "I independently reviewed the evidence version, recommendation, conditions, reviewer dispositions, and release authority, and I attest that this release may proceed subject to the recorded boundaries."
+    : "I reviewed this withheld-release event and attest that it records a non-release without implying approval or affirmative guidance.";
 
-  await db.insert(recommendationReleaseRecords).values({
-    subjectType: required(input.subjectType, "subjectType"),
-    subjectKey: required(input.subjectKey, "subjectKey"),
-    releaseId: input.release.releaseId,
-    previousReleaseId: previous?.releaseId ?? null,
-    evidenceVersion: input.release.evidenceVersion,
-    releaseState: input.release.releaseState,
-    finality: input.release.finality,
-    approvedRecommendationText: input.release.approvedRecommendationText,
-    reviewerRecordCount: input.release.reviewerResolutions.length,
-    conditionCount: input.release.conditions.length,
-    materialChangeCount: changeControl.materialChangeCount,
-    supersessionRequired: changeControl.supersessionRequired,
-    releasePayload: input.release,
-    changeControlPayload: changeControl,
-    historyPayload: history,
-    governanceVersion: GOVERNANCE_VERSION,
-    classification: "CONFIDENTIAL",
-    replayRef: input.traceId,
-    traceId: input.traceId,
-    source: SOURCE,
+  await db.insert(recommendationReleaseAttestations).values({
+    releaseId: input.release.releaseId, subjectType, subjectKey,
     reviewerActorId: required(input.reviewer.actorId, "reviewer.actorId"),
     reviewerEmail: required(input.reviewer.email, "reviewer.email"),
     reviewerName: input.reviewer.name?.trim() || null,
     reviewerRole: required(input.reviewer.role, "reviewer.role"),
     authorityBasis: required(input.reviewer.authorityBasis, "reviewer.authorityBasis"),
-    decisionContext: input.decisionContext ?? {},
+    attestationStatement, decisionContext: input.decisionContext ?? {}, traceId: input.traceId,
+  }).onConflictDoNothing({ target: [recommendationReleaseAttestations.releaseId, recommendationReleaseAttestations.reviewerActorId] });
+
+  const attestations = await db.select().from(recommendationReleaseAttestations)
+    .where(eq(recommendationReleaseAttestations.releaseId, input.release.releaseId))
+    .orderBy(asc(recommendationReleaseAttestations.createdAt));
+  const requiredCount = requiresIndependentCountersignature ? 2 : 1;
+  if (attestations.length < requiredCount) return { row: null, previous, attestations, pendingCountersignature: true };
+
+  const finalReviewer = attestations[attestations.length - 1];
+  await db.insert(recommendationReleaseRecords).values({
+    subjectType, subjectKey, releaseId: input.release.releaseId, previousReleaseId: previous?.releaseId ?? null,
+    evidenceVersion: input.release.evidenceVersion, releaseState: input.release.releaseState, finality: input.release.finality,
+    approvedRecommendationText: input.release.approvedRecommendationText, reviewerRecordCount: input.release.reviewerResolutions.length,
+    conditionCount: input.release.conditions.length, materialChangeCount: changeControl.materialChangeCount,
+    supersessionRequired: changeControl.supersessionRequired, releasePayload: input.release, changeControlPayload: changeControl,
+    historyPayload: history, governanceVersion: GOVERNANCE_VERSION, classification: "CONFIDENTIAL", replayRef: input.traceId,
+    traceId: input.traceId, source: SOURCE, reviewerActorId: finalReviewer.reviewerActorId, reviewerEmail: finalReviewer.reviewerEmail,
+    reviewerName: finalReviewer.reviewerName, reviewerRole: finalReviewer.reviewerRole, authorityBasis: finalReviewer.authorityBasis,
+    decisionContext: { ...(input.decisionContext ?? {}), attestationCount: attestations.length, independentCountersignatureRequired: requiresIndependentCountersignature },
   }).onConflictDoNothing({ target: recommendationReleaseRecords.releaseId });
 
-  const rows = await db.select().from(recommendationReleaseRecords)
-    .where(eq(recommendationReleaseRecords.releaseId, input.release.releaseId)).limit(1);
+  const rows = await db.select().from(recommendationReleaseRecords).where(eq(recommendationReleaseRecords.releaseId, input.release.releaseId)).limit(1);
   if (!rows[0]) throw new Error("Recommendation release persistence failed.");
-  return { row: rows[0], previous };
+  return { row: rows[0], previous, attestations, pendingCountersignature: false };
 }

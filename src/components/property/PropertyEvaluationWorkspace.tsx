@@ -3039,9 +3039,16 @@ export function PropertyEvaluationWorkspace({
           historyPayload: RecommendationReleaseHistory;
           createdAt?: string | null;
         };
+        pendingCountersignature?: boolean;
+        attestationCount?: number;
         error?: string;
       };
-      if (!response.ok || !payload.ok || !payload.row) throw new Error(payload.error || "Release persistence failed.");
+      if (!response.ok || !payload.ok) throw new Error(payload.error || "Release persistence failed.");
+      if (payload.pendingCountersignature) {
+        setReleaseRecordMessage("First authorized attestation recorded. A different authorized reviewer must countersign before this recommendation becomes an immutable release.");
+        return;
+      }
+      if (!payload.row) throw new Error("Release persistence completed without a release record.");
       setPersistedReleaseRows((current) => [
         payload.row!,
         ...current.filter((row) => row.releaseId !== payload.row!.releaseId),

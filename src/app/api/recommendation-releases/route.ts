@@ -71,7 +71,9 @@ export async function POST(req: NextRequest) {
       row: result.row,
       previousReleaseId: result.previous?.releaseId ?? null,
       reviewer: { actorId: reviewer.actorId, email: reviewer.email, name: reviewer.name, role: reviewer.role, authorityBasis },
-    }, { status: 201 });
+      attestationCount: result.attestations.length,
+      pendingCountersignature: result.pendingCountersignature,
+    }, { status: result.pendingCountersignature ? 202 : 201 });
   } catch (error) {
     return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "Release persistence failed." }, { status: 400 });
   }

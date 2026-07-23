@@ -14,6 +14,7 @@ import type { DecisionSynthesisPlan } from "@/lib/intelligence/decisionSynthesis
 import type { RecommendationEvidenceLedger } from "@/lib/intelligence/recommendationEvidenceLedger";
 import type { HumanDecisionAssignmentPlan } from "@/lib/intelligence/humanDecisionAssignmentPlan";
 import type { DecisionResolutionPlan } from "@/lib/intelligence/decisionResolutionPlan";
+import type { RecommendationFinalityPlan } from "@/lib/intelligence/recommendationFinalityPlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -77,6 +78,7 @@ export function PropertyBestCoursePanel({
   recommendationEvidenceLedger,
   humanDecisionAssignmentPlan,
   decisionResolutionPlan,
+  recommendationFinalityPlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -96,6 +98,7 @@ export function PropertyBestCoursePanel({
   recommendationEvidenceLedger: RecommendationEvidenceLedger;
   humanDecisionAssignmentPlan: HumanDecisionAssignmentPlan;
   decisionResolutionPlan: DecisionResolutionPlan;
+  recommendationFinalityPlan: RecommendationFinalityPlan;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -203,6 +206,33 @@ export function PropertyBestCoursePanel({
           ))}
         </div>
         <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{decisionResolutionPlan.resolutionRule}</span>
+      </section>
+
+      <section aria-label="Recommendation finality gate" style={{ display: "grid", gap: 11, border: "1px solid #c8b57a", borderRadius: 12, padding: "15px", background: "#fffdf5" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <strong style={{ fontSize: 15, color: "#162033" }}>Recommendation finality gate</strong>
+            <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{recommendationFinalityPlan.headline}</span>
+          </div>
+          <strong style={{ fontSize: 13, color: recommendationFinalityPlan.status === "final" ? "#0f766e" : recommendationFinalityPlan.status === "blocked" ? "#9b1c1c" : "#7a5a10", textTransform: "uppercase", letterSpacing: "0.06em" }}>{recommendationFinalityPlan.status.replace(/-/g, " ")}</strong>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
+          {([
+            ["Evidence", recommendationFinalityPlan.evidenceGate],
+            ["Assignments", recommendationFinalityPlan.assignmentGate],
+            ["Authority", recommendationFinalityPlan.authorityGate],
+            ["Conditions", recommendationFinalityPlan.conditionGate],
+            ["Resolutions", recommendationFinalityPlan.resolutionGate],
+          ] as const).map(([label, state]) => (
+            <div key={label} style={{ border: "1px solid #e6dcc0", borderRadius: 9, padding: 10, background: "#ffffff" }}>
+              <strong style={{ display: "block", fontSize: 11.5, color: "#162033" }}>{label}</strong>
+              <span style={{ fontSize: 11.5, color: state === "satisfied" ? "#0f766e" : "#9b1c1c", fontWeight: 800 }}>{state}</span>
+            </div>
+          ))}
+        </div>
+        {recommendationFinalityPlan.blockingReasons.length > 0 && <span style={{ fontSize: 11.5, color: "#9b1c1c", lineHeight: 1.5 }}><strong>Blocking reasons:</strong> {recommendationFinalityPlan.blockingReasons.join(" · ")}</span>}
+        {recommendationFinalityPlan.remainingConditions.length > 0 && <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}><strong>Remaining conditions:</strong> {recommendationFinalityPlan.remainingConditions.join(" · ")}</span>}
+        <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{recommendationFinalityPlan.finalityRule}</span>
       </section>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>

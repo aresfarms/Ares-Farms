@@ -13,6 +13,7 @@ import type { ExecutableScenarioRankingPlan } from "@/lib/intelligence/executabl
 import type { DecisionSynthesisPlan } from "@/lib/intelligence/decisionSynthesisPlan";
 import type { RecommendationEvidenceLedger } from "@/lib/intelligence/recommendationEvidenceLedger";
 import type { HumanDecisionAssignmentPlan } from "@/lib/intelligence/humanDecisionAssignmentPlan";
+import type { DecisionResolutionPlan } from "@/lib/intelligence/decisionResolutionPlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -75,6 +76,7 @@ export function PropertyBestCoursePanel({
   decisionSynthesisPlan,
   recommendationEvidenceLedger,
   humanDecisionAssignmentPlan,
+  decisionResolutionPlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -93,6 +95,7 @@ export function PropertyBestCoursePanel({
   decisionSynthesisPlan: DecisionSynthesisPlan;
   recommendationEvidenceLedger: RecommendationEvidenceLedger;
   humanDecisionAssignmentPlan: HumanDecisionAssignmentPlan;
+  decisionResolutionPlan: DecisionResolutionPlan;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -177,6 +180,29 @@ export function PropertyBestCoursePanel({
           ))}
         </div>
         <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{humanDecisionAssignmentPlan.assignmentRule}</span>
+      </section>
+
+      <section aria-label="Decision resolution workflow" style={{ display: "grid", gap: 11, border: "1px solid #b9c8dc", borderRadius: 12, padding: "15px", background: "#f8fbff" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <strong style={{ fontSize: 15, color: "#162033" }}>Decision resolution workflow</strong>
+          <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{decisionResolutionPlan.headline} Cleared gates: {decisionResolutionPlan.clearedGateCount}. Preserved gates: {decisionResolutionPlan.preservedGateCount}. Finality: {decisionResolutionPlan.finalityStatus.replace(/-/g, " ")}.</span>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {decisionResolutionPlan.records.map((record) => (
+            <article key={record.assignmentId} style={{ display: "grid", gap: 5, border: "1px solid #dbe4ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "baseline" }}>
+                <strong style={{ fontSize: 12.5, color: "#162033" }}>{record.title}</strong>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: record.gateDisposition === "cleared" ? "#0f766e" : "#9b1c1c" }}>{record.gateDisposition}</span>
+              </div>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.45 }}><strong>Reviewer:</strong> {record.reviewerRole}</span>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.45 }}><strong>Authority used:</strong> {record.authorityUsed.replace(/-/g, " ")}</span>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.45 }}><strong>Outcome:</strong> {record.outcome.replace(/-/g, " ")}</span>
+              <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.45 }}><strong>Evidence considered:</strong> {record.evidenceConsidered.length ? record.evidenceConsidered.join(" · ") : "No authorized evidence review has been recorded."}</span>
+              <span style={{ fontSize: 11.5, color: record.gateDisposition === "cleared" ? "#526074" : "#9b1c1c", lineHeight: 1.45 }}><strong>Resolution effect:</strong> {record.resolutionEffect}</span>
+            </article>
+          ))}
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{decisionResolutionPlan.resolutionRule}</span>
       </section>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>

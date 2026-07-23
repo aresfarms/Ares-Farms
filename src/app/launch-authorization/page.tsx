@@ -14,6 +14,7 @@ type Slot = {
   authorityRole: string;
   assignment: Assignment | null;
   decision: { decision: string } | null;
+  canDecide: boolean;
 };
 
 type ResponseData = {
@@ -35,6 +36,7 @@ export default function LaunchAuthorizationPage() {
   const [evidenceRef, setEvidenceRef] = useState("");
   const [condition, setCondition] = useState("");
   const [message, setMessage] = useState("");
+  const [batchSubmitting, setBatchSubmitting] = useState(false);
 
   const load = () =>
     fetch("/api/governance/launch-authorization-decisions")
@@ -66,15 +68,42 @@ export default function LaunchAuthorizationPage() {
     if (json.ok) setData(json);
   }
 
+  async function approveAllAssigned() {
+    if (!window.confirm("Approve every pending launch decision currently assigned to your authenticated identity? This will not approve external, held, or unassigned authority roles.")) return;
+    setBatchSubmitting(true);
+    setMessage("");
+    try {
+      const response = await fetch(
+        "/api/governance/launch-authorization-decisions",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "APPROVE_ALL_ASSIGNED",
+            evidenceRef: evidenceRef.trim() || "launch-authorization-batch-approval",
+          }),
+        }
+      );
+      const json = (await response.json()) as ResponseData & { batch?: { recorded: number } };
+      setMessage(
+        json.ok
+          ? `${json.batch?.recorded ?? 0} assigned pending decision(s) approved.`
+          : json.error ?? "Assigned decisions could not be approved."
+      );
+      if (json.ok) setData(json);
+    } finally {
+      setBatchSubmitting(false);
+    }
+  }
+
   if (!data) return <main className="mx-auto max-w-5xl p-8">Loading…</main>;
   if (!data.ok || !data.rollup) {
     return <main className="mx-auto max-w-5xl p-8">{data.error}</main>;
   }
 
   const rollup = data.rollup;
-  const actorSlots = rollup.slots.filter(
-    (item) => item.assignment?.status === "ASSIGNED"
-  );
+  const actorSlots = rollup.slots.filter((item) => item.canDecide);
+  const pendingActorSlots = actorSlots.filter((item) => !item.decision);
 
   return (
     <main className="mx-auto max-w-5xl space-y-6 p-8">
@@ -116,9 +145,24 @@ export default function LaunchAuthorizationPage() {
         </select>
         <input className="w-full border p-2" value={evidenceRef} onChange={(event) => setEvidenceRef(event.target.value)} placeholder="Evidence reference" />
         <input className="w-full border p-2" value={condition} onChange={(event) => setCondition(event.target.value)} placeholder="Condition, required for conditional approval" />
-        <button className="rounded bg-black px-4 py-2 text-white" disabled={!slot} onClick={submit}>
-          Record my decision
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button className="rounded bg-black px-4 py-2 text-white" disabled={!slot} onClick={submit}>
+            Record my decision
+          </button>
+          <button
+            className="rounded border border-black px-4 py-2"
+            disabled={batchSubmitting || pendingActorSlots.length === 0}
+            onClick={approveAllAssigned}
+          >
+            {batchSubmitting
+              ? "Approving assigned decisions…"
+              : `Approve all assigned to me (${pendingActorSlots.length})`}
+          </button>
+        </div>
+        <p className="text-sm">
+          Batch approval applies only to pending slots assigned to your authenticated identity.
+          External, held, and unassigned roles remain blocked.
+        </p>
         {message && <p>{message}</p>}
       </section>
 

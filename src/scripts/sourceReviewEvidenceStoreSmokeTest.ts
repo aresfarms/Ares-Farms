@@ -38,7 +38,22 @@ try {
   assert(latestSourceReviewEvidence("county-gis", "LEGAL_REVIEW_HOLD")?.evidenceId === legal.evidenceId, "Latest legal evidence must survive reread.");
   assert(latestSourceReviewEvidence("county-gis", "PROMOTION_PACKET_HOLD")?.evidenceId === promotion.evidenceId, "Latest promotion evidence must survive reread.");
 
-  console.log(JSON.stringify({ ok: true, records: 2, activationBlocked: true, productionBlocked: true }, null, 2));
+  
+const readiness = recordSourceReviewEvidence({
+  kind: "PRODUCTION_READINESS_HOLD",
+  sourceId: "source-test-1",
+  actorId: "test-readiness-reviewer",
+  reviewNote: "readiness hold",
+  replayRef: "replay-readiness-1",
+});
+assert(readiness.productionBlocked, "Readiness evidence must remain production blocked.");
+assert(
+  latestSourceReviewEvidence("source-test-1", "PRODUCTION_READINESS_HOLD")?.evidenceId ===
+    readiness.evidenceId,
+  "Latest readiness evidence must persist."
+);
+
+console.log(JSON.stringify({ ok: true, records: 3, activationBlocked: true, productionBlocked: true }, null, 2));
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

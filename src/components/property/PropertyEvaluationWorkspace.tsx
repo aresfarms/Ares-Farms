@@ -3020,6 +3020,15 @@ export function PropertyEvaluationWorkspace({
           subjectKey: releaseSubjectKey,
           traceId: `workspace-release-${Date.now()}`,
           release: recommendationReleaseRecord,
+          decisionContext: {
+            propertyId: context.propertyId ?? null,
+            title: context.title,
+            location: context.location,
+            profileId: workspaceProfile.id,
+            releaseState: recommendationReleaseRecord.releaseState,
+            finality: recommendationReleaseRecord.finality,
+            priorReleaseId: latestPersistedRecommendationRelease?.releaseId ?? null,
+          },
         }),
       });
       const payload = await response.json() as {

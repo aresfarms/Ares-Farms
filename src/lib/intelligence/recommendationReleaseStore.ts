@@ -53,6 +53,8 @@ export async function persistRecommendationRelease(input: {
   subjectKey: string;
   release: RecommendationReleaseRecord;
   traceId: string;
+  reviewer: { actorId: string; email: string; name?: string | null; role: string; authorityBasis: string };
+  decisionContext?: Record<string, unknown>;
 }): Promise<{ row: RecommendationReleaseRecordRow; previous: RecommendationReleaseRecord | null }> {
   const previousRow = await getLatestRecommendationRelease({
     subjectType: input.subjectType,
@@ -84,6 +86,12 @@ export async function persistRecommendationRelease(input: {
     replayRef: input.traceId,
     traceId: input.traceId,
     source: SOURCE,
+    reviewerActorId: required(input.reviewer.actorId, "reviewer.actorId"),
+    reviewerEmail: required(input.reviewer.email, "reviewer.email"),
+    reviewerName: input.reviewer.name?.trim() || null,
+    reviewerRole: required(input.reviewer.role, "reviewer.role"),
+    authorityBasis: required(input.reviewer.authorityBasis, "reviewer.authorityBasis"),
+    decisionContext: input.decisionContext ?? {},
   }).onConflictDoNothing({ target: recommendationReleaseRecords.releaseId });
 
   const rows = await db.select().from(recommendationReleaseRecords)

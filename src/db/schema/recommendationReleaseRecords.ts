@@ -23,6 +23,12 @@ export const recommendationReleaseRecords = pgTable("recommendation_release_reco
   replayRef: text("replay_ref"),
   traceId: text("trace_id"),
   source: text("source").notNull(),
+  reviewerActorId: text("reviewer_actor_id").notNull(),
+  reviewerEmail: text("reviewer_email").notNull(),
+  reviewerName: text("reviewer_name"),
+  reviewerRole: text("reviewer_role").notNull(),
+  authorityBasis: text("authority_basis").notNull(),
+  decisionContext: jsonb("decision_context").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 

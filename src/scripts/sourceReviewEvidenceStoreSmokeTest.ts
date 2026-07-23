@@ -53,7 +53,22 @@ assert(
   "Latest readiness evidence must persist."
 );
 
-console.log(JSON.stringify({ ok: true, records: 3, activationBlocked: true, productionBlocked: true }, null, 2));
+
+const activation = recordSourceReviewEvidence({
+  kind: "CONTROLLED_PROMOTION_HOLD",
+  sourceId: "source-test-1",
+  actorId: "test-activation-reviewer",
+  reviewNote: "activation hold",
+  replayRef: "replay-activation-1",
+});
+assert(activation.productionBlocked, "Activation evidence must remain production blocked.");
+assert(
+  latestSourceReviewEvidence("source-test-1", "CONTROLLED_PROMOTION_HOLD")?.evidenceId ===
+    activation.evidenceId,
+  "Latest activation evidence must persist."
+);
+
+console.log(JSON.stringify({ ok: true, records: 4, activationBlocked: true, productionBlocked: true }, null, 2));
 } finally {
   rmSync(dir, { recursive: true, force: true });
 }

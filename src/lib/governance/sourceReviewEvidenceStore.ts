@@ -8,7 +8,8 @@ import { readRequiredSecret } from "@/lib/security/requestGuards";
 export type SourceReviewEvidenceKind =
   | "LEGAL_REVIEW_HOLD"
   | "PROMOTION_PACKET_HOLD"
-  | "PRODUCTION_READINESS_HOLD";
+  | "PRODUCTION_READINESS_HOLD"
+  | "CONTROLLED_PROMOTION_HOLD";
 
 export type SourceReviewEvidenceRecord = {
   evidenceId: string;

@@ -14,6 +14,7 @@ type Slot = {
   authorityRole: string;
   assignment: Assignment | null;
   decision: { decision: string } | null;
+  testOverride: { expiresAtUtc: string } | null;
   canDecide: boolean;
 };
 
@@ -21,10 +22,13 @@ type ResponseData = {
   ok: boolean;
   actor?: string;
   error?: string;
+  testAuthorityEnabled?: boolean;
   rollup?: {
     completed: number;
     required: number;
     approvalsComplete: boolean;
+    testApprovalsComplete: boolean;
+    testOverrideCount: number;
     slots: Slot[];
   };
 };
@@ -37,6 +41,7 @@ export default function LaunchAuthorizationPage() {
   const [condition, setCondition] = useState("");
   const [message, setMessage] = useState("");
   const [batchSubmitting, setBatchSubmitting] = useState(false);
+  const [testSubmitting, setTestSubmitting] = useState(false);
 
   const load = () =>
     fetch("/api/governance/launch-authorization-decisions")
@@ -66,6 +71,17 @@ export default function LaunchAuthorizationPage() {
     const json = (await response.json()) as ResponseData;
     setMessage(json.ok ? "Your authority decision was recorded." : json.error ?? "Decision could not be recorded.");
     if (json.ok) setData(json);
+  }
+
+  async function simulateAllApprovals() {
+    if (!window.confirm("Enable a 60-minute STAGING TEST OVERRIDE for all launch decisions? These are simulated approvals only and cannot authorize production.")) return;
+    setTestSubmitting(true); setMessage("");
+    try {
+      const response = await fetch("/api/governance/launch-authorization-decisions", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "STAGING_TEST_OVERRIDE_ALL", ttlMinutes: 60, evidenceRef: "staging-ultimate-authority-end-to-end-test" }) });
+      const json = (await response.json()) as ResponseData & { testOverride?: { recorded: number; expiresAtUtc: string | null } };
+      setMessage(json.ok ? `${json.testOverride?.recorded ?? 0} staging test override(s) activated until ${json.testOverride?.expiresAtUtc ?? "expiration"}.` : json.error ?? "Test override could not be activated.");
+      if (json.ok) setData(json);
+    } finally { setTestSubmitting(false); }
   }
 
   async function approveAllAssigned() {
@@ -117,7 +133,9 @@ export default function LaunchAuthorizationPage() {
 
       <section className="rounded border p-4">
         <p><b>Completed:</b> {rollup.completed}/{rollup.required}</p>
-        <p><b>Approvals complete:</b> {String(rollup.approvalsComplete)}</p>
+        <p><b>Real approvals complete:</b> {String(rollup.approvalsComplete)}</p>
+        <p><b>Testing approvals complete:</b> {String(rollup.testApprovalsComplete)}</p>
+        <p><b>Active test overrides:</b> {rollup.testOverrideCount}</p>
         <p><b>Final launch hold released:</b> false</p>
         <p><b>Production authorized:</b> false</p>
       </section>
@@ -149,6 +167,15 @@ export default function LaunchAuthorizationPage() {
           <button className="rounded bg-black px-4 py-2 text-white" disabled={!slot} onClick={submit}>
             Record my decision
           </button>
+          {data.testAuthorityEnabled && (
+            <button
+              className="rounded bg-amber-600 px-4 py-2 font-semibold text-white"
+              disabled={testSubmitting}
+              onClick={simulateAllApprovals}
+            >
+              {testSubmitting ? "Activating test override…" : "Simulate all approvals for 60 minutes"}
+            </button>
+          )}
           <button
             className="rounded border border-black px-4 py-2"
             disabled={batchSubmitting || pendingActorSlots.length === 0}
@@ -163,6 +190,12 @@ export default function LaunchAuthorizationPage() {
           Batch approval applies only to pending slots assigned to your authenticated identity.
           External, held, and unassigned roles remain blocked.
         </p>
+        {data.testAuthorityEnabled && (
+          <p className="rounded border border-amber-500 bg-amber-50 p-3 text-sm font-semibold text-amber-900">
+            Staging test authority is enabled for this account. Test overrides are simulated,
+            expire automatically, and never authorize production.
+          </p>
+        )}
         {message && <p>{message}</p>}
       </section>
 
@@ -171,7 +204,8 @@ export default function LaunchAuthorizationPage() {
         {rollup.slots.map((item) => (
           <div className="rounded border p-3" key={`${item.blockerId}-${item.authorityRole}`}>
             <p><b>{item.blockerId} · {item.authorityRole}</b></p>
-            <p>Decision: {item.decision?.decision ?? "PENDING"}</p>
+            <p>Decision: {item.decision?.decision ?? (item.testOverride ? "TEST_OVERRIDE" : "PENDING")}</p>
+            {item.testOverride && <p className="font-semibold text-amber-700">Staging test override expires {item.testOverride.expiresAtUtc}</p>}
             <p>Assignment posture: {item.assignment?.status ?? "UNRECORDED"}</p>
             {item.assignment?.holderName && <p>Holder: {item.assignment.holderName}</p>}
             {item.assignment?.reason && <p className="text-sm">{item.assignment.reason}</p>}

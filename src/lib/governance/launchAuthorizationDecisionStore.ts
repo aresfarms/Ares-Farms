@@ -11,9 +11,13 @@ export type RecordedLaunchDecision = {
   decidedBy: string; decidedAtUtc: string; conditions: string[]; evidenceRef: string;
   statement: string;
 };
-type Store = { schemaVersion: "p6-launch-authorization-decisions-v1"; decisions: RecordedLaunchDecision[] };
+export type StagingLaunchTestOverride = {
+  blockerId: string; authorityRole: string; overriddenBy: string; overriddenAtUtc: string;
+  expiresAtUtc: string; evidenceRef: string; statement: string;
+};
+type Store = { schemaVersion: "p6-launch-authorization-decisions-v1"; decisions: RecordedLaunchDecision[]; testOverrides?: StagingLaunchTestOverride[] };
 const storePath = () => runtimeStatePath("governance", "launch-authorization-decisions.json");
-const emptyStore = (): Store => ({ schemaVersion: "p6-launch-authorization-decisions-v1", decisions: [] });
+const emptyStore = (): Store => ({ schemaVersion: "p6-launch-authorization-decisions-v1", decisions: [], testOverrides: [] });
 export function readLaunchDecisionStore(): Store { try { return JSON.parse(readFileSync(storePath(), "utf8")) as Store; } catch { return emptyStore(); } }
 function writeStore(store: Store) { mkdirSync(path.dirname(storePath()), { recursive: true }); const temp = `${storePath()}.tmp-${process.pid}`; writeFileSync(temp, JSON.stringify(store, null, 2)); renameSync(temp, storePath()); }
 
@@ -44,6 +48,27 @@ function assignments(): Record<string, string[]> {
   return defaults;
 }
 export function actorMayDecide(email: string, authorityRole: string): boolean { return assignments()[authorityRole]?.includes(email.trim().toLowerCase()) ?? false; }
+const STAGING_PROJECT = "furlong-staging-499102";
+export function actorMayUseStagingUltimateAuthority(email: string, env: NodeJS.ProcessEnv = process.env): boolean {
+  const enabled = env.LAUNCH_TEST_ULTIMATE_AUTHORITY_ENABLED === "true";
+  const project = env.GOOGLE_CLOUD_PROJECT ?? env.GCLOUD_PROJECT ?? "";
+  const allowed = (env.LAUNCH_TEST_ULTIMATE_AUTHORITY_EMAILS ?? "")
+    .split(",").map((value) => value.trim().toLowerCase()).filter(Boolean);
+  return enabled && project === STAGING_PROJECT && allowed.includes(email.trim().toLowerCase());
+}
+export function recordStagingUltimateAuthorityOverrides(input: { decidedBy: string; evidenceRef: string; ttlMinutes?: number }) {
+  if (!actorMayUseStagingUltimateAuthority(input.decidedBy)) throw new Error("Staging ultimate-authority override is not enabled for this identity.");
+  const ttl = Math.min(240, Math.max(5, input.ttlMinutes ?? 60));
+  const now = new Date();
+  const expiresAtUtc = new Date(now.getTime() + ttl * 60_000).toISOString();
+  const overrides = launchAuthorizationRequirements.flatMap((requirement) => requirement.authorityRoles.map((authorityRole) => ({
+    blockerId: requirement.blockerId, authorityRole, overriddenBy: input.decidedBy.trim().toLowerCase(),
+    overriddenAtUtc: now.toISOString(), expiresAtUtc, evidenceRef: input.evidenceRef.trim() || "staging-ultimate-authority-test",
+    statement: "STAGING TEST OVERRIDE ONLY. This is not a genuine authority approval and cannot authorize production launch.",
+  })));
+  const store = readLaunchDecisionStore(); store.testOverrides = overrides; writeStore(store); return overrides;
+}
+
 export function recordLaunchDecision(input: Omit<RecordedLaunchDecision, "decidedAtUtc" | "statement">): RecordedLaunchDecision {
   const requirement = launchAuthorizationRequirements.find((x) => x.blockerId === input.blockerId && (x.authorityRoles as readonly string[]).includes(input.authorityRole));
   if (!requirement) throw new Error("Unknown blocker and authority role combination.");
@@ -63,6 +88,7 @@ export function buildLaunchDecisionRollup() {
       title: requirement.title,
       authorityRole,
       assignment: launchAuthorityAssignmentFor(authorityRole),
+      testOverride: (store.testOverrides ?? []).find((override) => override.blockerId === requirement.blockerId && override.authorityRole === authorityRole && Date.parse(override.expiresAtUtc) > Date.now()) ?? null,
       decision:
         store.decisions.find(
           (decision) =>
@@ -72,8 +98,9 @@ export function buildLaunchDecisionRollup() {
     }))
   );
   const approvalsComplete = slots.every((s) => s.decision && ["APPROVE", "APPROVE_WITH_CONDITIONS"].includes(s.decision.decision));
+  const testApprovalsComplete = slots.every((s) => Boolean(s.testOverride) || Boolean(s.decision && ["APPROVE", "APPROVE_WITH_CONDITIONS"].includes(s.decision.decision)));
   const rejected = slots.some((s) => s.decision?.decision === "REJECT");
-  const body = { schemaVersion: "p6-launch-authorization-rollup-v1", slots, required: slots.length, completed: slots.filter((s) => s.decision).length, approvalsComplete, rejected, finalLaunchHoldReleased: false, productionAuthorized: false, generatedAtUtc: new Date().toISOString() };
+  const body = { schemaVersion: "p6-launch-authorization-rollup-v1", slots, required: slots.length, completed: slots.filter((s) => s.decision).length, approvalsComplete, testApprovalsComplete, testOverrideCount: slots.filter((s) => s.testOverride).length, rejected, finalLaunchHoldReleased: false, productionAuthorized: false, generatedAtUtc: new Date().toISOString() };
   const bytes = JSON.stringify(body); const digest = createHash("sha256").update(bytes).digest("hex"); const secret = readRequiredSecret("REPORT_SIGNING_SECRET");
   return { ...body, digest, signature: secret ? createHmac("sha256", secret).update(bytes).digest("base64url") : null };
 }

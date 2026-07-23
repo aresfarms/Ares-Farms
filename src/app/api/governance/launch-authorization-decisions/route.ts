@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { actorMayDecide, buildLaunchDecisionRollup, recordLaunchDecision } from "@/lib/governance/launchAuthorizationDecisionStore";
+import { actorMayDecide, actorMayUseStagingUltimateAuthority, buildLaunchDecisionRollup, recordLaunchDecision, recordStagingUltimateAuthorityOverrides } from "@/lib/governance/launchAuthorizationDecisionStore";
 
 const email = (req: NextRequest) =>
   req.headers.get("x-ares-authenticated-email")?.trim().toLowerCase() ?? "";
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       { status: 403 }
     );
   }
-  return NextResponse.json({ ok: true, actor, rollup: actorRollup(actor) });
+  return NextResponse.json({ ok: true, actor, testAuthorityEnabled: actorMayUseStagingUltimateAuthority(actor), rollup: actorRollup(actor) });
 }
 
 export async function POST(req: NextRequest) {
@@ -37,7 +37,8 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null) as
     | {
-        action?: "APPROVE_ALL_ASSIGNED";
+        action?: "APPROVE_ALL_ASSIGNED" | "STAGING_TEST_OVERRIDE_ALL";
+        ttlMinutes?: number;
         blockerId?: string;
         authorityRole?: string;
         decision?: "APPROVE" | "APPROVE_WITH_CONDITIONS" | "REJECT";
@@ -45,6 +46,12 @@ export async function POST(req: NextRequest) {
         evidenceRef?: string;
       }
     | null;
+
+  if (body?.action === "STAGING_TEST_OVERRIDE_ALL") {
+    if (!actorMayUseStagingUltimateAuthority(actor)) return NextResponse.json({ ok: false, error: "Staging ultimate-authority mode is not enabled for this identity." }, { status: 403 });
+    const overrides = recordStagingUltimateAuthorityOverrides({ decidedBy: actor, evidenceRef: body.evidenceRef?.trim() || "staging-ultimate-authority-test", ttlMinutes: body.ttlMinutes });
+    return NextResponse.json({ ok: true, actor, testAuthorityEnabled: true, testOverride: { recorded: overrides.length, expiresAtUtc: overrides[0]?.expiresAtUtc ?? null }, rollup: actorRollup(actor) });
+  }
 
   if (body?.action === "APPROVE_ALL_ASSIGNED") {
     const eligible = buildLaunchDecisionRollup().slots.filter(

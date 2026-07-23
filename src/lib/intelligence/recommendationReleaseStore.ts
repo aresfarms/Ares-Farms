@@ -58,6 +58,9 @@ export interface PendingRecommendationReleaseSummary {
   firstAttestedAt: Date;
   expiresAt: Date;
   freshnessState: "active" | "expired";
+  urgencyState: "normal" | "due-soon" | "critical" | "expired";
+  remainingSeconds: number;
+  escalationRequired: boolean;
   attestationCount: number;
   currentActorAlreadyAttested: boolean;
   canCountersign: boolean;
@@ -103,7 +106,15 @@ export async function listPendingRecommendationReleaseAttestations(input: {
     .filter((rows) => rows.length === 1)
     .map((rows) => {
       const first = rows[0];
-      const expired = first.expiresAt.getTime() <= now;
+      const remainingMs = first.expiresAt.getTime() - now;
+      const expired = remainingMs <= 0;
+      const urgencyState: PendingRecommendationReleaseSummary["urgencyState"] = expired
+        ? "expired"
+        : remainingMs <= 4 * 60 * 60 * 1000
+          ? "critical"
+          : remainingMs <= 12 * 60 * 60 * 1000
+            ? "due-soon"
+            : "normal";
       const currentActorAlreadyAttested = rows.some((row) => row.reviewerActorId === actorId);
       return {
         releaseId: first.releaseId,
@@ -112,13 +123,20 @@ export async function listPendingRecommendationReleaseAttestations(input: {
         firstAttestedAt: first.createdAt,
         expiresAt: first.expiresAt,
         freshnessState: expired ? ("expired" as const) : ("active" as const),
+        urgencyState,
+        remainingSeconds: Math.max(0, Math.floor(remainingMs / 1000)),
+        escalationRequired: urgencyState === "critical",
         attestationCount: rows.length,
         currentActorAlreadyAttested,
         canCountersign: !expired && !currentActorAlreadyAttested,
         decisionContext: (first.decisionContext ?? {}) as Record<string, unknown>,
       };
     })
-    .sort((a, b) => a.firstAttestedAt.getTime() - b.firstAttestedAt.getTime());
+    .sort((a, b) => {
+      const rank = { critical: 0, "due-soon": 1, normal: 2, expired: 3 } as const;
+      const urgencyDelta = rank[a.urgencyState] - rank[b.urgencyState];
+      return urgencyDelta || a.expiresAt.getTime() - b.expiresAt.getTime();
+    });
 }
 
 export async function persistRecommendationRelease(input: {

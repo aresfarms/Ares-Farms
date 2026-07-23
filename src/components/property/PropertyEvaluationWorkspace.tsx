@@ -1965,6 +1965,9 @@ export function PropertyEvaluationWorkspace({
     firstAttestedAt: string;
     expiresAt: string;
     freshnessState: "active" | "expired";
+    urgencyState: "normal" | "due-soon" | "critical" | "expired";
+    remainingSeconds: number;
+    escalationRequired: boolean;
   }>>([]);
   // The report opens with its FULL chart already expanded (founder direction
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
@@ -2048,18 +2051,22 @@ export function PropertyEvaluationWorkspace({
     }
     let canceled = false;
     const query = new URLSearchParams({ subjectType: releaseSubjectType, subjectKey: releaseSubjectKey });
-    void fetch(`/api/recommendation-releases/pending?${query.toString()}`, { cache: "no-store" })
-      .then(async (response) => {
-        if (response.status === 401 || response.status === 403) return { ok: false, rows: [] };
-        return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired" }> }>;
-      })
-      .then((payload) => {
-        if (!canceled) setPendingReleaseReviews(payload.rows ?? []);
-      })
-      .catch(() => {
-        if (!canceled) setPendingReleaseReviews([]);
-      });
-    return () => { canceled = true; };
+    const refreshPendingReviews = () => {
+      void fetch(`/api/recommendation-releases/pending?${query.toString()}`, { cache: "no-store" })
+        .then(async (response) => {
+          if (response.status === 401 || response.status === 403) return { ok: false, rows: [] };
+          return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean }> }>;
+        })
+        .then((payload) => {
+          if (!canceled) setPendingReleaseReviews(payload.rows ?? []);
+        })
+        .catch(() => {
+          if (!canceled) setPendingReleaseReviews([]);
+        });
+    };
+    refreshPendingReviews();
+    const refreshTimer = window.setInterval(refreshPendingReviews, 60_000);
+    return () => { canceled = true; window.clearInterval(refreshTimer); };
   }, [releaseSubjectKey]);
 
   useEffect(() => {
@@ -3085,6 +3092,9 @@ export function PropertyEvaluationWorkspace({
             firstAttestedAt: new Date().toISOString(),
             expiresAt: payload.attestationExpiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
             freshnessState: "active",
+            urgencyState: "normal",
+            remainingSeconds: 24 * 60 * 60,
+            escalationRequired: false,
           },
           ...current.filter((row) => row.releaseId !== recommendationReleaseRecord.releaseId),
         ]);

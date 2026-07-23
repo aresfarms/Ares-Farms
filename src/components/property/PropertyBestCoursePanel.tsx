@@ -120,7 +120,7 @@ export function PropertyBestCoursePanel({
   releaseHistoryError: string | null;
   releaseRecordBusy: boolean;
   releaseRecordMessage: string | null;
-  pendingReleaseReview: { releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired" } | null;
+  pendingReleaseReview: { releaseId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean } | null;
   onRecordGovernedRelease: () => void;
 }) {
   const complex = requiresComplexPipeline(profileId);
@@ -291,12 +291,16 @@ export function PropertyBestCoursePanel({
         </div>
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>This action creates or retrieves the deterministic immutable release ID. It never edits or deletes a prior release.</span>
         {pendingReleaseReview && (
-          <span role="status" style={{ fontSize: 11.5, color: pendingReleaseReview.canCountersign ? "#0f766e" : "#7a5a10", fontWeight: 700, lineHeight: 1.5 }}>
+          <span role="status" style={{ fontSize: 11.5, color: pendingReleaseReview.urgencyState === "critical" || pendingReleaseReview.freshnessState === "expired" ? "#9b1c1c" : pendingReleaseReview.canCountersign ? "#0f766e" : "#7a5a10", fontWeight: 700, lineHeight: 1.5 }}>
             {pendingReleaseReview.freshnessState === "expired"
               ? "The prior countersignature window expired. Its attestations remain immutable for audit, but a fresh review cycle is required."
-              : pendingReleaseReview.canCountersign
-                ? `A different authorized reviewer has attested. You may countersign before ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`
-                : `Your attestation is recorded. Another authorized reviewer must countersign before ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`}
+              : pendingReleaseReview.escalationRequired
+                ? `Governance escalation: fewer than ${Math.max(1, Math.ceil(pendingReleaseReview.remainingSeconds / 3600))} hours remain. An eligible independent reviewer should countersign or allow the cycle to expire.`
+                : pendingReleaseReview.urgencyState === "due-soon"
+                  ? `Countersignature is due soon. The current cycle expires ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`
+                  : pendingReleaseReview.canCountersign
+                    ? `A different authorized reviewer has attested. You may countersign before ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`
+                    : `Your attestation is recorded. Another authorized reviewer must countersign before ${new Date(pendingReleaseReview.expiresAt).toLocaleString()}.`}
           </span>
         )}
         {releaseRecordMessage && <span role="status" style={{ fontSize: 11.5, color: "#0f766e", fontWeight: 700 }}>{releaseRecordMessage}</span>}

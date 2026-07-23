@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       subjectType: req.nextUrl.searchParams.get("subjectType") ?? undefined,
       subjectKey: req.nextUrl.searchParams.get("subjectKey") ?? undefined,
     });
-    return NextResponse.json({ ok: true, rows });
+    return NextResponse.json({ ok: true, serverTime: new Date().toISOString(), rows });
   } catch (error) {
     return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "Pending release lookup failed." }, { status: 400 });
   }

@@ -11,6 +11,7 @@ import type { TransactionTimelinePlan } from "@/lib/intelligence/transactionTime
 import type { FinancialCapacityPlan } from "@/lib/intelligence/financialCapacityPlan";
 import type { ExecutableScenarioRankingPlan } from "@/lib/intelligence/executableScenarioRankingPlan";
 import type { DecisionSynthesisPlan } from "@/lib/intelligence/decisionSynthesisPlan";
+import type { RecommendationEvidenceLedger } from "@/lib/intelligence/recommendationEvidenceLedger";
 
 export interface BestCourseTrack {
   title: string;
@@ -71,6 +72,7 @@ export function PropertyBestCoursePanel({
   financialCapacityPlan,
   executableScenarioRankingPlan,
   decisionSynthesisPlan,
+  recommendationEvidenceLedger,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -87,6 +89,7 @@ export function PropertyBestCoursePanel({
   financialCapacityPlan: FinancialCapacityPlan;
   executableScenarioRankingPlan: ExecutableScenarioRankingPlan;
   decisionSynthesisPlan: DecisionSynthesisPlan;
+  recommendationEvidenceLedger: RecommendationEvidenceLedger;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -130,6 +133,25 @@ export function PropertyBestCoursePanel({
           </div>
         </div>
         <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{decisionSynthesisPlan.advisoryBoundary}</span>
+      </section>
+
+      <section aria-label="Recommendation evidence ledger" style={{ display: "grid", gap: 11, border: "1px solid #cfd8e6", borderRadius: 12, padding: "15px", background: "#fbfcfe" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <strong style={{ fontSize: 15, color: "#162033" }}>Why this recommendation exists</strong>
+          <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>Every recommendation is traceable to verified facts, modeled assumptions, unresolved unknowns, and named human decisions.</span>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+          {(["verified-fact", "modeled-assumption", "unresolved-unknown", "human-decision"] as const).map((kind) => {
+            const items = recommendationEvidenceLedger.entries.filter((entry) => entry.kind === kind);
+            return (
+              <div key={kind} style={{ display: "grid", gap: 5, border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+                <strong style={{ fontSize: 12.5, color: "#162033" }}>{kind.replace(/-/g, " ")} · {recommendationEvidenceLedger.counts[kind]}</strong>
+                {items.slice(0, 3).map((entry) => <span key={entry.id} style={{ fontSize: 11.5, color: entry.status === "blocking" ? "#9b1c1c" : entry.status === "pending" ? "#7a5a10" : "#526074", lineHeight: 1.45 }}><strong>{entry.label}:</strong> {entry.detail}</span>)}
+              </div>
+            );
+          })}
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{recommendationEvidenceLedger.reviewRule}</span>
       </section>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>

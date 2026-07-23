@@ -23,6 +23,7 @@ import { buildTransactionTimelinePlan } from "@/lib/intelligence/transactionTime
 import { buildFinancialCapacityPlan } from "@/lib/intelligence/financialCapacityPlan";
 import { buildExecutableScenarioRankingPlan } from "@/lib/intelligence/executableScenarioRankingPlan";
 import { buildDecisionSynthesisPlan } from "@/lib/intelligence/decisionSynthesisPlan";
+import { buildRecommendationEvidenceLedger } from "@/lib/intelligence/recommendationEvidenceLedger";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
@@ -2894,6 +2895,15 @@ export function PropertyEvaluationWorkspace({
     market: marketComparablePlan,
     capital: preliminaryCapitalPlan,
   });
+  const recommendationEvidenceLedger = buildRecommendationEvidenceLedger({
+    decision: decisionSynthesisPlan,
+    verifiedFacts: effectivePlaceIntelligence?.verifiedFacts ?? [],
+    unknowns: effectivePlaceIntelligence?.unknowns ?? [],
+    financialCapacity: financialCapacityPlan,
+    timeline: transactionTimelinePlan,
+    market: marketComparablePlan,
+    capital: preliminaryCapitalPlan,
+  });
 
 
   // ── Result card content (free tier default view, ≤10 numbered bullets) ────
@@ -3213,6 +3223,7 @@ export function PropertyEvaluationWorkspace({
           financialCapacityPlan={financialCapacityPlan}
           executableScenarioRankingPlan={executableScenarioRankingPlan}
           decisionSynthesisPlan={decisionSynthesisPlan}
+          recommendationEvidenceLedger={recommendationEvidenceLedger}
         />
       )}
       {!deepView && (

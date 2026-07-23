@@ -4,11 +4,28 @@ import { relative, resolve } from "node:path";
 import inventoryJson from "../../../config/security/external-secret-inventory.json";
 
 export const governedLocalSecretNames = Object.freeze([
-  "NASS_API_KEY",
-  "REPORT_SIGNING_SECRET",
+  "AIRNOW_API_KEY",
+  "ARCGIS_API_KEY",
+  "BEA_API_KEY",
+  "BLS_API_KEY",
+  "CENSUS_API_KEY",
+  "DATA_GOV_API_KEY",
   "EIA_API_KEY",
+  "EPA_API_KEY",
+  "EPA_AQS_API_KEY",
+  "EPA_AQS_EMAIL",
   "FCC_BROADBAND_API_TOKEN",
+  "FCC_BROADBAND_API_USERNAME",
+  "FRED_API_KEY",
+  "GRANTS_GOV_API_KEY",
+  "HUDUSER_API_TOKEN",
   "MARS_API_KEY",
+  "NASS_API_KEY",
+  "NOAA_CDO_TOKEN",
+  "NREL_API_KEY",
+  "REPORT_SIGNING_SECRET",
+  "SAM_GOV_API_KEY",
+  "SEC_USER_AGENT",
   "SI_API_KEY",
 ] as const);
 

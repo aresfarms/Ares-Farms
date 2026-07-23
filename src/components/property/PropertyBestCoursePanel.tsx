@@ -16,6 +16,7 @@ import type { HumanDecisionAssignmentPlan } from "@/lib/intelligence/humanDecisi
 import type { DecisionResolutionPlan } from "@/lib/intelligence/decisionResolutionPlan";
 import type { RecommendationFinalityPlan } from "@/lib/intelligence/recommendationFinalityPlan";
 import type { RecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
+import type { RecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
 
 export interface BestCourseTrack {
   title: string;
@@ -81,6 +82,7 @@ export function PropertyBestCoursePanel({
   decisionResolutionPlan,
   recommendationFinalityPlan,
   recommendationReleaseRecord,
+  recommendationReleaseChangeControl,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -102,6 +104,7 @@ export function PropertyBestCoursePanel({
   decisionResolutionPlan: DecisionResolutionPlan;
   recommendationFinalityPlan: RecommendationFinalityPlan;
   recommendationReleaseRecord: RecommendationReleaseRecord;
+  recommendationReleaseChangeControl: RecommendationReleaseChangeControl;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -255,6 +258,24 @@ export function PropertyBestCoursePanel({
         {recommendationReleaseRecord.conditions.length > 0 && <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}><strong>Recorded conditions:</strong> {recommendationReleaseRecord.conditions.join(" · ")}</span>}
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{recommendationReleaseRecord.advisoryBoundary}</span>
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{recommendationReleaseRecord.integrityStatement}</span>
+      </section>
+
+      <section aria-label="Recommendation release change control" style={{ display: "grid", gap: 11, border: "1px solid #d5dce8", borderRadius: 12, padding: "15px", background: "#f8fafc" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <strong style={{ fontSize: 15, color: "#162033" }}>Release supersession and change control</strong>
+            <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{recommendationReleaseChangeControl.headline}</span>
+          </div>
+          <strong style={{ fontSize: 12.5, color: recommendationReleaseChangeControl.supersessionRequired ? "#9b1c1c" : recommendationReleaseChangeControl.lineageState === "withheld" ? "#7a5a10" : "#0f766e", textTransform: "uppercase", letterSpacing: "0.06em" }}>{recommendationReleaseChangeControl.lineageState.replace(/-/g, " ")}</strong>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 9, padding: 10, background: "#ffffff" }}><strong style={{ display: "block", fontSize: 11.5, color: "#162033" }}>Current release</strong><span style={{ fontSize: 11.5, color: "#526074" }}>{recommendationReleaseChangeControl.currentReleaseId}</span></div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 9, padding: 10, background: "#ffffff" }}><strong style={{ display: "block", fontSize: 11.5, color: "#162033" }}>Previous release</strong><span style={{ fontSize: 11.5, color: "#526074" }}>{recommendationReleaseChangeControl.previousReleaseId ?? "No prior release supplied"}</span></div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 9, padding: 10, background: "#ffffff" }}><strong style={{ display: "block", fontSize: 11.5, color: "#162033" }}>Material changes</strong><span style={{ fontSize: 11.5, color: recommendationReleaseChangeControl.materialChangeCount > 0 ? "#9b1c1c" : "#0f766e", fontWeight: 800 }}>{recommendationReleaseChangeControl.materialChangeCount}</span></div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 9, padding: 10, background: "#ffffff" }}><strong style={{ display: "block", fontSize: 11.5, color: "#162033" }}>Supersession</strong><span style={{ fontSize: 11.5, color: recommendationReleaseChangeControl.supersessionRequired ? "#9b1c1c" : "#526074" }}>{recommendationReleaseChangeControl.supersessionRequired ? "Required" : "Not currently required"}</span></div>
+        </div>
+        {recommendationReleaseChangeControl.changeReasons.length > 0 && <span style={{ fontSize: 11.5, color: "#9b1c1c", lineHeight: 1.5 }}><strong>Change reasons:</strong> {recommendationReleaseChangeControl.changeReasons.join(" · ")}</span>}
+        <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{recommendationReleaseChangeControl.changeRule}</span>
       </section>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>

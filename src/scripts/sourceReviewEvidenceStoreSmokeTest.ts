@@ -1,0 +1,44 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
+import {
+  latestSourceReviewEvidence,
+  recordSourceReviewEvidence,
+  sourceReviewEvidenceFor,
+} from "@/lib/governance/sourceReviewEvidenceStore";
+
+function assert(value: unknown, message: string): asserts value {
+  if (!value) throw new Error(message);
+}
+
+const dir = mkdtempSync(path.join(tmpdir(), "furlong-source-review-"));
+process.env.FURLONG_RUNTIME_STATE_DIR = dir;
+
+try {
+  const legal = recordSourceReviewEvidence({
+    kind: "LEGAL_REVIEW_HOLD",
+    sourceId: "county-gis",
+    actorId: "smoke-legal-reviewer",
+    reviewNote: "qualified review pending",
+    replayRef: "smoke-legal",
+  });
+  const promotion = recordSourceReviewEvidence({
+    kind: "PROMOTION_PACKET_HOLD",
+    sourceId: "county-gis",
+    actorId: "smoke-promotion-reviewer",
+    reviewNote: "promotion remains blocked",
+    replayRef: "smoke-promotion",
+  });
+
+  assert(legal.activationBlocked, "Legal evidence must remain activation-blocking.");
+  assert(promotion.productionBlocked, "Promotion evidence must remain production-blocking.");
+  assert(sourceReviewEvidenceFor("county-gis").length === 2, "Both records must persist.");
+  assert(sourceReviewEvidenceFor("county-gis", "LEGAL_REVIEW_HOLD").length === 1, "Legal and promotion evidence must remain distinct.");
+  assert(latestSourceReviewEvidence("county-gis", "LEGAL_REVIEW_HOLD")?.evidenceId === legal.evidenceId, "Latest legal evidence must survive reread.");
+  assert(latestSourceReviewEvidence("county-gis", "PROMOTION_PACKET_HOLD")?.evidenceId === promotion.evidenceId, "Latest promotion evidence must survive reread.");
+
+  console.log(JSON.stringify({ ok: true, records: 2, activationBlocked: true, productionBlocked: true }, null, 2));
+} finally {
+  rmSync(dir, { recursive: true, force: true });
+}

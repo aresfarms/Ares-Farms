@@ -9,7 +9,6 @@ export const governedLocalSecretNames = Object.freeze([
   "EIA_API_KEY",
   "FCC_BROADBAND_API_TOKEN",
   "MARS_API_KEY",
-  "REPLIERS_API_KEY",
   "SI_API_KEY",
 ] as const);
 

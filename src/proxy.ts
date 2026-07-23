@@ -272,13 +272,37 @@ function requestBodyExceedsLimit(req: NextRequest): boolean {
   return !Number.isFinite(bytes) || bytes < 0 || bytes > maxBytes;
 }
 
+function trustedMutationOrigins(req: NextRequest): Set<string> {
+  const origins = new Set<string>([req.nextUrl.origin]);
+  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const forwardedProto =
+    req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ?? "https";
+  const host = req.headers.get("host")?.trim();
+
+  for (const candidate of [
+    forwardedHost ? `${forwardedProto}://${forwardedHost}` : null,
+    host ? `${req.nextUrl.protocol}//${host}` : null,
+    process.env.NEXTAUTH_URL,
+    process.env.APP_BASE_URL,
+    process.env.NEXT_PUBLIC_BASE_URL,
+  ]) {
+    if (!candidate) continue;
+    try {
+      origins.add(new URL(candidate).origin);
+    } catch {
+      // Invalid configured origins are ignored; the request remains fail closed.
+    }
+  }
+
+  return origins;
+}
+
 function isCrossSiteMutation(req: NextRequest): boolean {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return false;
-  if (req.headers.get("sec-fetch-site") === "cross-site") return true;
   const origin = req.headers.get("origin");
-  if (!origin) return false;
+  if (!origin) return req.headers.get("sec-fetch-site") === "cross-site";
   try {
-    return new URL(origin).origin !== req.nextUrl.origin;
+    return !trustedMutationOrigins(req).has(new URL(origin).origin);
   } catch {
     return true;
   }

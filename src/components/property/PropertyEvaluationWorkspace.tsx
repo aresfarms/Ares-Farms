@@ -29,6 +29,7 @@ import { buildDecisionResolutionPlan } from "@/lib/intelligence/decisionResoluti
 import { buildRecommendationFinalityPlan } from "@/lib/intelligence/recommendationFinalityPlan";
 import { buildRecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
+import { buildRecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
@@ -2933,6 +2934,10 @@ export function PropertyEvaluationWorkspace({
   const recommendationReleaseChangeControl = buildRecommendationReleaseChangeControl({
     current: recommendationReleaseRecord,
   });
+  const recommendationReleaseHistory = buildRecommendationReleaseHistory({
+    current: recommendationReleaseRecord,
+    changeControl: recommendationReleaseChangeControl,
+  });
 
 
   // ── Result card content (free tier default view, ≤10 numbered bullets) ────
@@ -3258,6 +3263,7 @@ export function PropertyEvaluationWorkspace({
           recommendationFinalityPlan={recommendationFinalityPlan}
           recommendationReleaseRecord={recommendationReleaseRecord}
           recommendationReleaseChangeControl={recommendationReleaseChangeControl}
+          recommendationReleaseHistory={recommendationReleaseHistory}
         />
       )}
       {!deepView && (

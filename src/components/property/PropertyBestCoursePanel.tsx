@@ -17,6 +17,7 @@ import type { DecisionResolutionPlan } from "@/lib/intelligence/decisionResoluti
 import type { RecommendationFinalityPlan } from "@/lib/intelligence/recommendationFinalityPlan";
 import type { RecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
 import type { RecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
+import type { RecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
 
 export interface BestCourseTrack {
   title: string;
@@ -83,6 +84,7 @@ export function PropertyBestCoursePanel({
   recommendationFinalityPlan,
   recommendationReleaseRecord,
   recommendationReleaseChangeControl,
+  recommendationReleaseHistory,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -105,6 +107,7 @@ export function PropertyBestCoursePanel({
   recommendationFinalityPlan: RecommendationFinalityPlan;
   recommendationReleaseRecord: RecommendationReleaseRecord;
   recommendationReleaseChangeControl: RecommendationReleaseChangeControl;
+  recommendationReleaseHistory: RecommendationReleaseHistory;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -276,6 +279,33 @@ export function PropertyBestCoursePanel({
         </div>
         {recommendationReleaseChangeControl.changeReasons.length > 0 && <span style={{ fontSize: 11.5, color: "#9b1c1c", lineHeight: 1.5 }}><strong>Change reasons:</strong> {recommendationReleaseChangeControl.changeReasons.join(" · ")}</span>}
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{recommendationReleaseChangeControl.changeRule}</span>
+      </section>
+
+      <section aria-label="Recommendation release history" style={{ display: "grid", gap: 11, border: "1px solid #cfd8e6", borderRadius: 12, padding: "15px", background: "#fbfcfe" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <strong style={{ fontSize: 15, color: "#162033" }}>Recommendation release history and audit trail</strong>
+            <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{recommendationReleaseHistory.headline}</span>
+          </div>
+          <strong style={{ fontSize: 12.5, color: "#0f766e", textTransform: "uppercase", letterSpacing: "0.06em" }}>Depth {recommendationReleaseHistory.lineageDepth}</strong>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          {recommendationReleaseHistory.entries.map((entry) => (
+            <article key={entry.reconstructionKey} style={{ display: "grid", gap: 5, border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "baseline" }}>
+                <strong style={{ fontSize: 12.5, color: "#162033" }}>Entry {entry.sequence}</strong>
+                <span style={{ fontSize: 11.5, fontWeight: 800, color: entry.action === "superseded" ? "#9b1c1c" : entry.action === "withheld" ? "#7a5a10" : "#0f766e" }}>{entry.action}</span>
+              </div>
+              <span style={{ fontSize: 11.5, color: "#526074" }}><strong>Release:</strong> {entry.releaseId}</span>
+              <span style={{ fontSize: 11.5, color: "#526074" }}><strong>Previous:</strong> {entry.previousReleaseId ?? "None"}</span>
+              <span style={{ fontSize: 11.5, color: "#526074" }}><strong>Evidence:</strong> {entry.evidenceVersion}</span>
+              <span style={{ fontSize: 11.5, color: "#526074" }}><strong>Finality:</strong> {entry.finality.replace(/-/g, " ")} · <strong>Reconstruction:</strong> {entry.reconstructionKey}</span>
+              <span style={{ fontSize: 11.5, color: "#526074" }}><strong>Reviewer records:</strong> {entry.reviewerRecordCount} · <strong>Conditions:</strong> {entry.conditionCount}</span>
+              {entry.changeReasons.length > 0 && <span style={{ fontSize: 11.5, color: "#9b1c1c", lineHeight: 1.45 }}><strong>Reasons:</strong> {entry.changeReasons.join(" · ")}</span>}
+            </article>
+          ))}
+        </div>
+        <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{recommendationReleaseHistory.auditRule}</span>
       </section>
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>

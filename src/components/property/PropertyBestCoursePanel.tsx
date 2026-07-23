@@ -7,6 +7,7 @@ import type { PreliminaryCapitalPlan, PlanningRange } from "@/lib/intelligence/p
 import type { CollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
 import type { MarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
 import type { ScenarioRankingPlan } from "@/lib/intelligence/scenarioRankingPlan";
+import type { TransactionTimelinePlan } from "@/lib/intelligence/transactionTimelinePlan";
 
 export interface BestCourseTrack {
   title: string;
@@ -63,6 +64,7 @@ export function PropertyBestCoursePanel({
   collateralPlan,
   marketComparablePlan,
   scenarioRankingPlan,
+  transactionTimelinePlan,
 }: {
   profileId: PropertyProfileId;
   startingLens?: string | null;
@@ -75,6 +77,7 @@ export function PropertyBestCoursePanel({
   collateralPlan: CollateralEquityPlan;
   marketComparablePlan: MarketComparablePlan;
   scenarioRankingPlan: ScenarioRankingPlan;
+  transactionTimelinePlan: TransactionTimelinePlan;
 }) {
   const complex = requiresComplexPipeline(profileId);
   const phaseI = requiresPhaseI(profileId);
@@ -119,6 +122,28 @@ export function PropertyBestCoursePanel({
         <strong style={{ fontSize: 13, color: "#162033" }}>Current overall posture: {scenarioRankingPlan.overallPosture.replace(/-/g, " ")}</strong>
         <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{scenarioRankingPlan.rankingRule}</span>
       </div>
+
+      <section aria-label="Contract and transaction timeline compatibility" style={{ display: "grid", gap: 11, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#f8fafc" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <strong style={{ fontSize: 15, color: "#162033" }}>Can the financing close inside the transaction window?</strong>
+          <span style={{ fontSize: 12.5, color: "#526074", lineHeight: 1.55 }}>{transactionTimelinePlan.recommendedContractWindow}</span>
+        </div>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Current compatibility</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{transactionTimelinePlan.compatibility === "unknown" ? "Contract deadline and extension rights still need to be entered." : transactionTimelinePlan.compatibility.replace(/-/g, " ")}</span>
+          </div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Critical path</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{transactionTimelinePlan.criticalPath.join(" → ")}</span>
+          </div>
+          <div style={{ border: "1px solid #e1e7ef", borderRadius: 10, padding: 11, background: "#ffffff" }}>
+            <strong style={{ display: "block", fontSize: 12.5, color: "#162033", marginBottom: 4 }}>Delay exposure</strong>
+            <span style={{ fontSize: 11.5, color: "#526074", lineHeight: 1.5 }}>{transactionTimelinePlan.carryingCostCategories.join(" · ")}</span>
+          </div>
+        </div>
+        <span style={{ fontSize: 11.5, color: "#7a5a10", lineHeight: 1.5 }}>{transactionTimelinePlan.decisionRule}</span>
+      </section>
 
       <section aria-label="Preliminary capital plan" style={{ display: "grid", gap: 12, border: "1px solid #d9e2ec", borderRadius: 12, padding: "15px", background: "#fbfcfe" }}>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>

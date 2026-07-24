@@ -70,7 +70,9 @@ function reviewIdFromRow(row: unknown): string | null {
 }
 
 function selectedReviewFromRows(rows: unknown[], selectedId: string | null) {
-  return rows.find((row) => reviewIdFromRow(row) === selectedId) ?? rows[0] ?? null;
+  return (
+    rows.find((row) => reviewIdFromRow(row) === selectedId) ?? rows[0] ?? null
+  );
 }
 
 function adverseActionId(row: unknown): string | null {
@@ -121,6 +123,12 @@ export default function HumanReviewConsolePage() {
   const [actionBusy, setActionBusy] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [lastLoadedAt, setLastLoadedAt] = useState<string | null>(null);
+  const [caseReviewReceipt, setCaseReviewReceipt] = useState<{
+    reviewId: string | null;
+    status: "QUEUED" | "COMPLETED";
+    outcome: string | null;
+    finalActionAllowed: boolean | null;
+  } | null>(null);
 
   const loadAll = useCallback(async () => {
     setRefreshing(true);
@@ -128,16 +136,16 @@ export default function HumanReviewConsolePage() {
 
     const applications = await loadJsonSurface(
       `/api/applications/admin?role=governance&userId=${actorId}&limit=10&includeProperty=true`,
-      ["applications"]
+      ["applications"],
     );
     const scope = scopeFromApplicationRows(applications.rows);
     const reviews =
       scope.applicationId || scope.tenantId || scope.borrowerId
         ? await loadJsonSurface(
             `/api/reviews/admin?role=governance&userId=${actorId}${scopeQuery(
-              scope
+              scope,
             )}&limit=12&includeApplication=true&includeProperty=true&includeAdverseActionReviews=true&includeTransitions=true`,
-            ["reviews"]
+            ["reviews"],
           )
         : emptyLoad;
     const nextReview = selectedReviewFromRows(reviews.rows, selectedReviewId);
@@ -156,8 +164,18 @@ export default function HumanReviewConsolePage() {
       setCaseName(query.get("name")?.trim() || null);
       setCaseGoal(query.get("goal")?.trim() || null);
       setCaseState(query.get("state")?.trim() || null);
-      setCaseCustomerTypes((query.get("customerTypes") ?? "").split(",").map((value) => value.trim()).filter(Boolean));
-      setCaseIntendedUses((query.get("intendedUses") ?? "").split(",").map((value) => value.trim()).filter(Boolean));
+      setCaseCustomerTypes(
+        (query.get("customerTypes") ?? "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+      );
+      setCaseIntendedUses(
+        (query.get("intendedUses") ?? "")
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+      );
     }
     void loadAll();
   }, [loadAll]);
@@ -166,14 +184,37 @@ export default function HumanReviewConsolePage() {
     if (!caseId) return null;
     const params = new URLSearchParams({
       name: caseName || `Furlong Case ${caseId}`,
-      goal: caseGoal || "Evaluate governed pathways, evidence, constraints, and next steps.",
+      goal:
+        caseGoal ||
+        "Evaluate governed pathways, evidence, constraints, and next steps.",
       customerTypes: caseCustomerTypes.join(","),
       intendedUses: caseIntendedUses.join(","),
       origin: "human-review",
     });
     if (caseState) params.set("state", caseState);
+    if (caseReviewReceipt) {
+      if (caseReviewReceipt.reviewId)
+        params.set("reviewId", caseReviewReceipt.reviewId);
+      params.set("reviewStatus", caseReviewReceipt.status);
+      if (caseReviewReceipt.outcome)
+        params.set("reviewOutcome", caseReviewReceipt.outcome);
+      if (caseReviewReceipt.finalActionAllowed !== null) {
+        params.set(
+          "finalActionAllowed",
+          String(caseReviewReceipt.finalActionAllowed),
+        );
+      }
+    }
     return `/intelligence/cases/${encodeURIComponent(caseId)}?${params.toString()}`;
-  }, [caseCustomerTypes, caseGoal, caseId, caseIntendedUses, caseName, caseState]);
+  }, [
+    caseCustomerTypes,
+    caseGoal,
+    caseId,
+    caseIntendedUses,
+    caseName,
+    caseReviewReceipt,
+    caseState,
+  ]);
 
   const selectedReview = useMemo(() => {
     return selectedReviewFromRows(data.reviews.rows, selectedReviewId);
@@ -244,28 +285,52 @@ export default function HumanReviewConsolePage() {
 
       if (!response.ok || json.ok !== true) {
         setActionMessage(
-          stringValue(json.error) ?? "Human review workflow returned review."
+          stringValue(json.error) ?? "Human review workflow returned review.",
         );
       } else {
         const review = isRecord(json.humanReview) ? json.humanReview : {};
-        setSelectedReviewId(stringValue(review.id));
+        const reviewId = stringValue(review.id);
+        setSelectedReviewId(reviewId);
+        if (caseId) {
+          setCaseReviewReceipt({
+            reviewId,
+            status: "QUEUED",
+            outcome: candidateOutcome,
+            finalActionAllowed: null,
+          });
+        }
         setActionMessage(`Human review queued: ${shortId(review.id)}`);
         await loadAll();
       }
     } catch (error) {
       setActionMessage(
-        error instanceof Error ? error.message : "Unknown human review action error."
+        error instanceof Error
+          ? error.message
+          : "Unknown human review action error.",
       );
     } finally {
       setActionBusy(false);
     }
-  }, [candidateOutcome, data.applications.traceId, data.scope, loadAll, reviewPriority]);
+  }, [
+    candidateOutcome,
+    caseId,
+    data.applications.traceId,
+    data.scope,
+    loadAll,
+    reviewPriority,
+  ]);
 
   const runTransitionGate = useCallback(async () => {
-    const review = selectedReview ? primaryRecord(selectedReview, ["humanReview"]) : {};
+    const review = selectedReview
+      ? primaryRecord(selectedReview, ["humanReview"])
+      : {};
     const humanReviewWorkflowId = stringValue(review.id);
 
-    if (!humanReviewWorkflowId || !data.scope.applicationId || !data.scope.tenantId) {
+    if (
+      !humanReviewWorkflowId ||
+      !data.scope.applicationId ||
+      !data.scope.tenantId
+    ) {
       setActionMessage("A selected human-review workflow is required.");
       return;
     }
@@ -312,14 +377,22 @@ export default function HumanReviewConsolePage() {
 
       if (!response.ok || json.ok !== true) {
         setActionMessage(
-          stringValue(json.error) ?? "Review transition returned review."
+          stringValue(json.error) ?? "Review transition returned review.",
         );
       } else {
         const result = isRecord(json.result) ? json.result : {};
+        if (caseId) {
+          setCaseReviewReceipt({
+            reviewId: humanReviewWorkflowId,
+            status: "COMPLETED",
+            outcome: transitionOutcome,
+            finalActionAllowed: result.finalActionAllowed === true,
+          });
+        }
         setActionMessage(
           `Transition gate recorded: ${
             result.finalActionAllowed === true ? "eligible" : "held"
-          }`
+          }`,
         );
         await loadAll();
       }
@@ -327,12 +400,12 @@ export default function HumanReviewConsolePage() {
       setActionMessage(
         error instanceof Error
           ? error.message
-          : "Unknown review transition action error."
+          : "Unknown review transition action error.",
       );
     } finally {
       setActionBusy(false);
     }
-  }, [data.scope, loadAll, selectedReview, transitionOutcome]);
+  }, [caseId, data.scope, loadAll, selectedReview, transitionOutcome]);
 
   const badges = [
     `Claims Gate ${contentClaims.ok ? "Pass" : "Review"}`,
@@ -345,12 +418,30 @@ export default function HumanReviewConsolePage() {
     <main style={moduleShellStyle}>
       <div style={moduleContainerStyle}>
         {caseReturnHref ? (
-          <section data-testid="case-human-review-handoff" style={{ ...panelStyle, padding: 16, borderLeft: "5px solid #7c3aed" }}>
+          <section
+            data-testid="case-human-review-handoff"
+            style={{
+              ...panelStyle,
+              padding: 16,
+              borderLeft: "5px solid #7c3aed",
+            }}
+          >
             <strong>Human review for {caseName || caseId}</strong>
-            <p style={{ margin: "6px 0 10px", color: "#596579", lineHeight: 1.5 }}>
-              This console is opened from the same intelligence case. Only the case reference and structured posture are carried; no Navigator transcript, identity, street address, or listing URL is transferred.
+            <p
+              style={{
+                margin: "6px 0 10px",
+                color: "#596579",
+                lineHeight: 1.5,
+              }}
+            >
+              This console is opened from the same intelligence case. Only the
+              case reference and structured posture are carried; no Navigator
+              transcript, identity, street address, or listing URL is
+              transferred.
             </p>
-            <Link href={caseReturnHref}>Return to the same intelligence case {"->"}</Link>
+            <Link href={caseReturnHref}>
+              Return to the same intelligence case {"->"}
+            </Link>
           </section>
         ) : null}
         <ModuleHeader
@@ -395,7 +486,9 @@ export default function HumanReviewConsolePage() {
             gap: 12,
           }}
         >
-          <article style={{ ...panelStyle, padding: 16, display: "grid", gap: 12 }}>
+          <article
+            style={{ ...panelStyle, padding: 16, display: "grid", gap: 12 }}
+          >
             <h2 style={{ margin: 0, fontSize: 20 }}>Queue Review</h2>
             <div
               style={{
@@ -439,7 +532,9 @@ export default function HumanReviewConsolePage() {
             </ActionButton>
           </article>
 
-          <article style={{ ...panelStyle, padding: 16, display: "grid", gap: 12 }}>
+          <article
+            style={{ ...panelStyle, padding: 16, display: "grid", gap: 12 }}
+          >
             <h2 style={{ margin: 0, fontSize: 20 }}>Transition Gate</h2>
             <FieldLabel label="Review Outcome">
               <select
@@ -448,7 +543,9 @@ export default function HumanReviewConsolePage() {
                 style={inputStyle}
               >
                 <option value="APPROVE">Approve</option>
-                <option value="CONDITIONAL_APPROVAL">Conditional Approval</option>
+                <option value="CONDITIONAL_APPROVAL">
+                  Conditional Approval
+                </option>
                 <option value="RETURN_FOR_REVISION">Return For Revision</option>
                 <option value="DENY">Deny</option>
               </select>
@@ -465,7 +562,12 @@ export default function HumanReviewConsolePage() {
         {actionMessage ? (
           <section
             aria-label="Action result"
-            style={{ ...panelStyle, padding: 14, color: "#334155", fontWeight: 800 }}
+            style={{
+              ...panelStyle,
+              padding: 14,
+              color: "#334155",
+              fontWeight: 800,
+            }}
           >
             {actionMessage}
           </section>
@@ -522,7 +624,9 @@ export default function HumanReviewConsolePage() {
           <div style={{ display: "grid", gap: 12, alignContent: "start" }}>
             <h2 style={{ margin: 0, fontSize: 20 }}>Selected Review</h2>
             {selectedReview ? (
-              <article style={{ ...panelStyle, padding: 16, display: "grid", gap: 14 }}>
+              <article
+                style={{ ...panelStyle, padding: 16, display: "grid", gap: 14 }}
+              >
                 {(() => {
                   const review = primaryRecord(selectedReview, ["humanReview"]);
 
@@ -607,35 +711,41 @@ export default function HumanReviewConsolePage() {
               isRecord(selectedReview) &&
               Array.isArray(selectedReview.transitions) &&
               selectedReview.transitions.length > 0 ? (
-                selectedReview.transitions.slice(0, 6).map((transition, index) => {
-                  const record = isRecord(transition) ? transition : {};
+                selectedReview.transitions
+                  .slice(0, 6)
+                  .map((transition, index) => {
+                    const record = isRecord(transition) ? transition : {};
 
-                  return (
-                    <article
-                      key={`${stringValue(record.id) ?? "transition"}-${index}`}
-                      style={{
-                        ...panelStyle,
-                        padding: 14,
-                        display: "grid",
-                        gap: 8,
-                      }}
-                    >
-                      <strong style={{ overflowWrap: "anywhere" }}>
-                        {shortId(record.id)}
-                      </strong>
-                      <span style={{ color: "#334155", fontSize: 13 }}>
-                        {normalizeStatus(record.transitionStatus)} /{" "}
-                        {normalizeStatus(record.reviewOutcome)}
-                      </span>
-                      <span style={{ color: "#64748b", fontSize: 12 }}>
-                        Final action:{" "}
-                        {record.finalActionAllowed === true ? "Allowed" : "Held"}
-                      </span>
-                    </article>
-                  );
-                })
+                    return (
+                      <article
+                        key={`${stringValue(record.id) ?? "transition"}-${index}`}
+                        style={{
+                          ...panelStyle,
+                          padding: 14,
+                          display: "grid",
+                          gap: 8,
+                        }}
+                      >
+                        <strong style={{ overflowWrap: "anywhere" }}>
+                          {shortId(record.id)}
+                        </strong>
+                        <span style={{ color: "#334155", fontSize: 13 }}>
+                          {normalizeStatus(record.transitionStatus)} /{" "}
+                          {normalizeStatus(record.reviewOutcome)}
+                        </span>
+                        <span style={{ color: "#64748b", fontSize: 12 }}>
+                          Final action:{" "}
+                          {record.finalActionAllowed === true
+                            ? "Allowed"
+                            : "Held"}
+                        </span>
+                      </article>
+                    );
+                  })
               ) : (
-                <EmptyState>No transition records for selected review.</EmptyState>
+                <EmptyState>
+                  No transition records for selected review.
+                </EmptyState>
               )}
             </section>
           </div>
@@ -644,4 +754,3 @@ export default function HumanReviewConsolePage() {
     </main>
   );
 }
-

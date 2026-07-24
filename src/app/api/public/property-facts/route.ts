@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
       placeFacts: imported.placeFacts,
       verifiedPrograms: verifyPropertyPrograms(imported.placeFactsForPrograms),
       placeIntelligence,
+      propertyEvidenceRecords: [],
       verification: {
         status: imported.status,
         normalizedAddress: imported.normalizedAddress,
@@ -140,5 +141,6 @@ export async function POST(req: NextRequest) {
       nmtc,
     },
     verifiedPrograms,
+    propertyEvidenceRecords: [],
   });
 }

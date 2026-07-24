@@ -2,6 +2,53 @@ import type { BriefFactLine, BriefUnknownLine } from "@/lib/property/propertyBri
 import { buildPublicActionRiskImpact, buildWaterInsuranceRiskImpact, type ExtendedPropertyRiskEvidence, type OfficialEvidenceSource, type PublicProjectRiskEvidence, type GovernmentActionRiskEvidence, type WaterRiskEvidence, type InsuranceRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import type { PropertyInfrastructureRiskImpact, ScenarioInfrastructureAdjustment } from "@/lib/intelligence/scenarioRankingPlan";
 
+
+export interface OfficialPropertyEvidenceRecord {
+  recordId: string;
+  domain: "water" | "insurance" | "public-project" | "government-action";
+  status: string;
+  sourceId: string;
+  sourceName: string;
+  authority: string;
+  jurisdiction: string;
+  reference: string;
+  retrievedAt: string;
+  asOf: string;
+  effectiveDate?: string | null;
+  replayRef: string;
+  canonicalPropertyId: string;
+  parcelMatchMethod: "canonical-id" | "parcel-id" | "normalized-address" | "geospatial";
+  parcelMatchConfidence: "exact" | "high" | "review-required";
+  affectedScenarioIds?: string[];
+  notes?: string[];
+  annualCost?: number | null;
+  oneTimeCost?: number | null;
+}
+
+export function ingestStructuredPropertyEvidence(records: OfficialPropertyEvidenceRecord[]): ExtendedPropertyRiskEvidence[] {
+  return records.map((record) => {
+    if (!record.recordId || !record.sourceId || !record.sourceName || !record.authority || !record.jurisdiction || !record.reference || !record.retrievedAt || !record.asOf || !record.replayRef || !record.canonicalPropertyId) {
+      throw new Error("Structured official evidence is missing required provenance or parcel-match fields.");
+    }
+    if (record.parcelMatchConfidence === "review-required") {
+      throw new Error("Structured official evidence requiring parcel review cannot be treated as verified.");
+    }
+    const source: OfficialEvidenceSource = {
+      authority: record.authority,
+      jurisdiction: record.jurisdiction,
+      reference: `${record.sourceName} · ${record.reference} · source ${record.sourceId} · retrieved ${record.retrievedAt} · parcel ${record.canonicalPropertyId} via ${record.parcelMatchMethod}`,
+      asOf: record.asOf,
+      effectiveDate: record.effectiveDate ?? null,
+      replayRef: record.replayRef,
+    };
+    const base = { confidence: "verified" as const, source, affectedScenarioIds: record.affectedScenarioIds ?? [], notes: record.notes ?? [], annualCost: record.annualCost, oneTimeCost: record.oneTimeCost };
+    if (record.domain === "water") return { ...base, kind: "water" as const, status: record.status as WaterRiskEvidence["status"] };
+    if (record.domain === "insurance") return { ...base, kind: "insurance" as const, status: record.status as InsuranceRiskEvidence["status"] };
+    if (record.domain === "public-project") return { ...base, kind: "public-project" as const, status: record.status as PublicProjectRiskEvidence["status"], projectName: record.reference };
+    return { ...base, kind: "government-action" as const, status: record.status as GovernmentActionRiskEvidence["status"], governmentBody: record.authority, officialTitle: record.reference, lastOfficialAction: record.notes?.[0] ?? record.status, geographicScope: record.jurisdiction };
+  });
+}
+
 function sourceFromFact(fact: BriefFactLine): OfficialEvidenceSource | null {
   const asOf = fact.provenance.match(/(?:as of|dated|updated)\s+([0-9]{4}-[0-9]{2}-[0-9]{2})/i)?.[1] ?? null;
   const authority = fact.provenance.split(/[·|—]/)[0]?.trim() || null;

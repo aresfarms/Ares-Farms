@@ -44,9 +44,16 @@ type LedgerAdminQuery = {
   eventHash?: string | null;
   source?: string | null;
   classification?: string | null;
+  traceId?: string | null;
+  moduleId?: string | null;
+  anonymousId?: string | null;
+  from?: Date | null;
+  to?: Date | null;
   limit: number;
   includeCanonicalLedger: boolean;
   includeCanonicalMeta: boolean;
+  includeReplay: boolean;
+  includeObservability: boolean;
 };
 
 function createLedgerAdminTraceId(): string {
@@ -67,6 +74,12 @@ function normalizeBoolean(value: string | null, fallback: boolean): boolean {
   }
 
   return value.toLowerCase() !== "false";
+}
+
+function normalizeDate(value: string | null): Date | null {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function normalizeLimit(value: string | null): number {
@@ -92,14 +105,24 @@ function parseQuery(req: NextRequest): LedgerAdminQuery {
     eventHash: normalizeText(params.get("eventHash")),
     source: normalizeText(params.get("source")),
     classification: normalizeText(params.get("classification")),
+    traceId: normalizeText(params.get("traceId")),
+    moduleId: normalizeText(params.get("moduleId")),
+    anonymousId: normalizeText(params.get("anonymousId")),
+    from: normalizeDate(params.get("from")),
+    to: normalizeDate(params.get("to")),
     limit: normalizeLimit(params.get("limit")),
     includeCanonicalLedger: normalizeBoolean(
       params.get("includeCanonicalLedger"),
-      false
+      false,
     ),
     includeCanonicalMeta: normalizeBoolean(
       params.get("includeCanonicalMeta"),
-      true
+      true,
+    ),
+    includeReplay: normalizeBoolean(params.get("includeReplay"), true),
+    includeObservability: normalizeBoolean(
+      params.get("includeObservability"),
+      true,
     ),
   };
 }
@@ -111,12 +134,17 @@ function privilegedRole(role: string): boolean {
 function hasBoundedLedgerScope(query: LedgerAdminQuery): boolean {
   return Boolean(
     query.eventId ||
-      query.entityId ||
-      query.eventHash ||
-      query.source ||
-      query.eventType ||
-      query.entityType ||
-      query.classification
+    query.entityId ||
+    query.eventHash ||
+    query.source ||
+    query.eventType ||
+    query.entityType ||
+    query.classification ||
+    query.traceId ||
+    query.moduleId ||
+    query.anonymousId ||
+    query.from ||
+    query.to,
   );
 }
 
@@ -124,7 +152,9 @@ function scopeRequired(query: LedgerAdminQuery): boolean {
   return !(privilegedRole(query.role) || hasBoundedLedgerScope(query));
 }
 
-function auditEventResponse(record: AuditLedgerAdminRecords["auditEvents"][number]) {
+function auditEventResponse(
+  record: AuditLedgerAdminRecords["auditEvents"][number],
+) {
   return {
     id: record.id,
     userId: record.userId,
@@ -134,6 +164,9 @@ function auditEventResponse(record: AuditLedgerAdminRecords["auditEvents"][numbe
     decision: record.decision,
     compositeScore: record.compositeScore,
     riskScore: record.riskScore,
+    input: record.input,
+    output: record.output,
+    trace: record.trace,
     payload: record.payload,
     prevHash: record.prevHash,
     eventHash: record.eventHash,
@@ -145,7 +178,7 @@ function auditEventResponse(record: AuditLedgerAdminRecords["auditEvents"][numbe
 }
 
 function canonicalLedgerResponse(
-  record: AuditLedgerAdminRecords["canonicalLedgerRows"][number]
+  record: AuditLedgerAdminRecords["canonicalLedgerRows"][number],
 ) {
   return {
     id: record.id,
@@ -157,6 +190,9 @@ function canonicalLedgerResponse(
     decision: record.decision,
     compositeScore: record.compositeScore,
     riskScore: record.riskScore,
+    input: record.input,
+    output: record.output,
+    trace: record.trace,
     payload: record.payload,
     prevHash: record.prevHash,
     eventHash: record.eventHash,
@@ -167,7 +203,7 @@ function canonicalLedgerResponse(
 }
 
 function canonicalMetaResponse(
-  record: AuditLedgerAdminRecords["canonicalMeta"][number]
+  record: AuditLedgerAdminRecords["canonicalMeta"][number],
 ) {
   return {
     id: record.id,
@@ -277,7 +313,7 @@ export async function GET(req: NextRequest) {
             evidence,
           },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -290,43 +326,43 @@ export async function GET(req: NextRequest) {
           "schema",
           "ledger-admin-read-api-v0.1.0",
           "src/app/api/ledger/admin/route.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "schema",
           "audit-events-v0.1.0",
           "src/db/schema/auditEvents.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "schema",
           "canonical-ledger-v0.1.0",
           "src/db/schema/canonicalLedger.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "schema",
           "canonical-ledger-meta-v0.1.0",
           "src/db/schema/canonicalLedgerMeta.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "governance",
           "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "ledger-admin-read-runtime-v0.1.0",
           "src/lib/ledger/auditLedgerAdminStore.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "governance-evidence-store-v0.1.0",
           "src/lib/governance/evidenceStore.ts",
-          traceId
+          traceId,
         ),
       ],
     });
@@ -339,22 +375,33 @@ export async function GET(req: NextRequest) {
       eventHash: query.eventHash,
       source: query.source,
       classification: query.classification,
+      traceId: query.traceId,
+      moduleId: query.moduleId,
+      anonymousId: query.anonymousId,
+      from: query.from,
+      to: query.to,
       limit: query.limit,
       includeCanonicalLedger: query.includeCanonicalLedger,
       includeCanonicalMeta: query.includeCanonicalMeta,
+      includeReplay: query.includeReplay,
+      includeObservability: query.includeObservability,
     });
 
     const responseRecords = {
       auditEvents: records.auditEvents.map(auditEventResponse),
       canonicalLedgerRows: records.canonicalLedgerRows.map(
-        canonicalLedgerResponse
+        canonicalLedgerResponse,
       ),
       canonicalMeta: records.canonicalMeta.map(canonicalMetaResponse),
+      replayRows: records.replayRows,
+      observabilityRows: records.observabilityRows,
     };
     const totalCount =
       responseRecords.auditEvents.length +
       responseRecords.canonicalLedgerRows.length +
-      responseRecords.canonicalMeta.length;
+      responseRecords.canonicalMeta.length +
+      responseRecords.replayRows.length +
+      responseRecords.observabilityRows.length;
 
     const classifiedOutput = classifyRecord(
       {
@@ -367,6 +414,11 @@ export async function GET(req: NextRequest) {
           eventHash: query.eventHash,
           source: query.source,
           classification: query.classification,
+          traceId: query.traceId,
+          moduleId: query.moduleId,
+          anonymousId: query.anonymousId,
+          from: query.from?.toISOString() ?? null,
+          to: query.to?.toISOString() ?? null,
           includeCanonicalLedger: query.includeCanonicalLedger,
           includeCanonicalMeta: query.includeCanonicalMeta,
         },
@@ -390,7 +442,7 @@ export async function GET(req: NextRequest) {
           "redact-unrelated-borrower-or-operator-data-before-external-disclosure",
         ],
         consentRequirements: ["regulatory-or-audit-authority"],
-      }
+      },
     );
 
     const explanation = createExplanationLineage({
@@ -412,6 +464,8 @@ export async function GET(req: NextRequest) {
         auditEventCount: responseRecords.auditEvents.length,
         canonicalLedgerCount: responseRecords.canonicalLedgerRows.length,
         canonicalMetaCount: responseRecords.canonicalMeta.length,
+        replayCount: responseRecords.replayRows.length,
+        observabilityCount: responseRecords.observabilityRows.length,
       },
     });
 
@@ -431,6 +485,8 @@ export async function GET(req: NextRequest) {
         auditEventCount: responseRecords.auditEvents.length,
         canonicalLedgerCount: responseRecords.canonicalLedgerRows.length,
         canonicalMetaCount: responseRecords.canonicalMeta.length,
+        replayCount: responseRecords.replayRows.length,
+        observabilityCount: responseRecords.observabilityRows.length,
         versionRuntimeOk: versionRuntime.ok,
       },
     });
@@ -447,6 +503,9 @@ export async function GET(req: NextRequest) {
             query.entityId ??
             query.eventHash ??
             query.source ??
+            query.traceId ??
+            query.moduleId ??
+            query.anonymousId ??
             traceId,
           classification: classifiedOutput.classification,
           traceId,
@@ -467,6 +526,9 @@ export async function GET(req: NextRequest) {
           query.entityId ??
           query.eventHash ??
           query.source ??
+          query.traceId ??
+          query.moduleId ??
+          query.anonymousId ??
           traceId,
         verificationStatus: versionRuntime.ok ? "PASS" : "WARN",
         deterministic: true,
@@ -480,6 +542,8 @@ export async function GET(req: NextRequest) {
           auditEventCount: responseRecords.auditEvents.length,
           canonicalLedgerCount: responseRecords.canonicalLedgerRows.length,
           canonicalMetaCount: responseRecords.canonicalMeta.length,
+          replayCount: responseRecords.replayRows.length,
+          observabilityCount: responseRecords.observabilityRows.length,
         },
         metadata: {
           route: "/api/ledger/admin",
@@ -498,9 +562,13 @@ export async function GET(req: NextRequest) {
       auditEventCount: responseRecords.auditEvents.length,
       canonicalLedgerCount: responseRecords.canonicalLedgerRows.length,
       canonicalMetaCount: responseRecords.canonicalMeta.length,
+      replayCount: responseRecords.replayRows.length,
+      observabilityCount: responseRecords.observabilityRows.length,
       auditEvents: responseRecords.auditEvents,
       canonicalLedgerRows: responseRecords.canonicalLedgerRows,
       canonicalMeta: responseRecords.canonicalMeta,
+      replayRows: responseRecords.replayRows,
+      observabilityRows: responseRecords.observabilityRows,
       output: classifiedOutput,
       governance: {
         traceId,
@@ -554,7 +622,7 @@ export async function GET(req: NextRequest) {
           evidence,
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

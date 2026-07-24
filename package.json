@@ -445,7 +445,9 @@
     "smoke:onboarding-intelligence-case-handoff": "tsx src/scripts/onboardingIntelligenceCaseHandoffSmokeTest.ts",
     "smoke:intelligence-case-governed-review": "tsx src/scripts/intelligenceCaseGovernedReviewHandoffSmokeTest.ts",
     "smoke:intelligence-case-human-review": "tsx src/scripts/intelligenceCaseHumanReviewHandoffSmokeTest.ts",
-    "smoke:intelligence-case-review-receipt": "tsx src/scripts/intelligenceCaseReviewReceiptSmokeTest.ts"
+    "smoke:intelligence-case-review-receipt": "tsx src/scripts/intelligenceCaseReviewReceiptSmokeTest.ts",
+    "smoke:durable-unified-audit": "tsx src/scripts/durableUnifiedAuditSmokeTest.ts",
+    "smoke:unified-audit-architecture": "tsx src/scripts/unifiedAuditArchitectureSmokeTest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

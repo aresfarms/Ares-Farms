@@ -28,6 +28,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 
 import { appendLedgerEvent } from "@/lib/audit/appendLedger";
+import { writeAuditEvent } from "@/lib/audit/writeAuditEvent";
 
 const STORE_DIR = path.join(process.cwd(), "data", "borrower-experience");
 const STORE_PATH = path.join(STORE_DIR, "tokens.json");
@@ -52,11 +53,31 @@ export interface TokenRecord {
 
 /** The five data rights, surfaced so the UX can explain them. */
 export const DATA_RIGHTS = [
-  { id: "explain", label: "Explain", note: "See exactly what is stored under your token." },
-  { id: "export", label: "Export", note: "Download everything stored under your token." },
-  { id: "human-review", label: "Human review", note: "Ask a person to review anything under your token." },
-  { id: "hold", label: "Hold", note: "Pause any processing of your token's data." },
-  { id: "delete", label: "Delete", note: "Permanently purge your token's data — truly gone." },
+  {
+    id: "explain",
+    label: "Explain",
+    note: "See exactly what is stored under your token.",
+  },
+  {
+    id: "export",
+    label: "Export",
+    note: "Download everything stored under your token.",
+  },
+  {
+    id: "human-review",
+    label: "Human review",
+    note: "Ask a person to review anything under your token.",
+  },
+  {
+    id: "hold",
+    label: "Hold",
+    note: "Pause any processing of your token's data.",
+  },
+  {
+    id: "delete",
+    label: "Delete",
+    note: "Permanently purge your token's data — truly gone.",
+  },
 ] as const;
 
 function sha(s: string): string {
@@ -76,8 +97,13 @@ function writeAll(rows: TokenRecord[]): void {
   fs.writeFileSync(STORE_PATH, JSON.stringify(rows, null, 2), "utf8");
 }
 
-function log(tokenId: string, decision: string, reason: string): void {
-  // tokenId only — NEVER a person. actorId is the token; there is no human name.
+async function log(
+  tokenId: string,
+  decision: string,
+  reason: string,
+): Promise<void> {
+  // tokenId only — NEVER a person. The local chain is forensic fallback;
+  // the database writer is the durable canonical audit authority.
   appendLedgerEvent({
     actorId: `anon:${tokenId}`,
     actorName: "anonymous-token",
@@ -85,6 +111,24 @@ function log(tokenId: string, decision: string, reason: string): void {
     subject: tokenId,
     decision,
     reason,
+  });
+  await writeAuditEvent({
+    userId: `anon:${tokenId}`,
+    anonymousId: tokenId,
+    moduleId: "borrower-experience",
+    traceId: `anonymous-token:${tokenId}`,
+    eventType: `ANONYMOUS_TOKEN_${decision}`,
+    entityType: "anonymous-token",
+    entityId: tokenId,
+    decision,
+    payload: { anonymousId: tokenId, reason },
+    metadata: {
+      moduleId: "borrower-experience",
+      domain: LEDGER_DOMAIN,
+      zeroPii: true,
+    },
+    classification: "RESTRICTED",
+    source: "borrower-experience.anonymous-token",
   });
 }
 
@@ -104,10 +148,13 @@ function generateToken(): string {
  * Mint a new anonymous token. NO PII required. Returns the PLAINTEXT token ONCE
  * (the caller shows it to the visitor; we never store or recover it).
  */
-export function mintToken(input?: { saved?: StoredSnapshot[]; contact?: string | null }): {
+export async function mintToken(input?: {
+  saved?: StoredSnapshot[];
+  contact?: string | null;
+}): Promise<{
   token: string;
   tokenId: string;
-} {
+}> {
   const token = generateToken();
   const tokenHash = sha(token);
   const tokenId = tokenHash.slice(0, 16);
@@ -122,11 +169,19 @@ export function mintToken(input?: { saved?: StoredSnapshot[]; contact?: string |
   const rows = readAll();
   rows.push(record);
   writeAll(rows);
-  log(tokenId, "MINT", input?.contact ? "minted with optional contact" : "minted with zero PII");
+  await log(
+    tokenId,
+    "MINT",
+    input?.contact ? "minted with optional contact" : "minted with zero PII",
+  );
   return { token, tokenId };
 }
 
-function findByToken(token: string): { rows: TokenRecord[]; idx: number; tokenId: string } {
+function findByToken(token: string): {
+  rows: TokenRecord[];
+  idx: number;
+  tokenId: string;
+} {
   const tokenHash = sha(token);
   const rows = readAll();
   const idx = rows.findIndex((r) => r.tokenHash === tokenHash);
@@ -134,41 +189,48 @@ function findByToken(token: string): { rows: TokenRecord[]; idx: number; tokenId
 }
 
 /** Return-by-token. Null if unknown (lost token = genuinely gone). */
-export function getByToken(token: string): TokenRecord | null {
+export async function getByToken(token: string): Promise<TokenRecord | null> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return null;
-  log(tokenId, "RETURN", "returned by token");
+  await log(tokenId, "RETURN", "returned by token");
   return rows[idx];
 }
 
 /** Persist the visitor's saved set + optional consented contact. */
-export function updateToken(token: string, patch: { saved?: StoredSnapshot[]; contact?: string | null }): TokenRecord | null {
+export async function updateToken(
+  token: string,
+  patch: { saved?: StoredSnapshot[]; contact?: string | null },
+): Promise<TokenRecord | null> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return null;
   if (patch.saved) rows[idx].saved = patch.saved;
-  if (patch.contact !== undefined) rows[idx].contact = patch.contact?.trim() ? patch.contact.trim() : null;
+  if (patch.contact !== undefined)
+    rows[idx].contact = patch.contact?.trim() ? patch.contact.trim() : null;
   writeAll(rows);
-  log(tokenId, "UPDATE", "saved set updated");
+  await log(tokenId, "UPDATE", "saved set updated");
   return rows[idx];
 }
 
 /** Data right: EXPORT — return everything stored under the token. */
-export function exportToken(token: string): TokenRecord | null {
+export async function exportToken(token: string): Promise<TokenRecord | null> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return null;
   rows[idx].rightsLog.push({ ts: new Date().toISOString(), right: "export" });
   writeAll(rows);
-  log(tokenId, "EXPORT", "data-rights export");
+  await log(tokenId, "EXPORT", "data-rights export");
   return rows[idx];
 }
 
 /** Data right: HOLD / HUMAN-REVIEW — recorded request (no processing here). */
-export function requestRight(token: string, right: "hold" | "human-review"): boolean {
+export async function requestRight(
+  token: string,
+  right: "hold" | "human-review",
+): Promise<boolean> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return false;
   rows[idx].rightsLog.push({ ts: new Date().toISOString(), right });
   writeAll(rows);
-  log(tokenId, right.toUpperCase(), `data-rights ${right} requested`);
+  await log(tokenId, right.toUpperCase(), `data-rights ${right} requested`);
   return true;
 }
 
@@ -176,12 +238,12 @@ export function requestRight(token: string, right: "hold" | "human-review"): boo
  * Data right: DELETE — TRUE purge. The record is removed entirely; there is no
  * account or shared table elsewhere holding a copy. Returns true if purged.
  */
-export function deleteToken(token: string): boolean {
+export async function deleteToken(token: string): Promise<boolean> {
   const { rows, idx, tokenId } = findByToken(token);
   if (idx < 0) return false;
   rows.splice(idx, 1);
   writeAll(rows);
-  log(tokenId, "DELETE", "data-rights delete — purged");
+  await log(tokenId, "DELETE", "data-rights delete — purged");
   return true;
 }
 

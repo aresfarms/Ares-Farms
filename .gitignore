@@ -65,3 +65,6 @@ review-exports/
 
 # Runtime operator state + audit ledger (not committed)
 data/
+
+# Restricted generated audit exports (never commit)
+artifacts/audit/

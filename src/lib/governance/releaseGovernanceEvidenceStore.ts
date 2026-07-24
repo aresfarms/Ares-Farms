@@ -100,8 +100,17 @@ export type ReleaseGovernanceEvidenceIntegritySummary = {
   acceptedRecords: number;
   rejectedRecords: number;
   rejectedByReason: Record<ReleaseGovernanceEvidenceRejectionReason, number>;
+  scannedAtUtc: string;
+  cacheHit: boolean;
+  cacheTtlMs: number;
   productionBlocked: true;
 };
+
+const INTEGRITY_CACHE_TTL_MS = 15_000;
+let integrityCache: {
+  summary: Omit<ReleaseGovernanceEvidenceIntegritySummary, "cacheHit">;
+  expiresAt: number;
+} | null = null;
 
 function verificationFailure(record: ReleaseGovernanceEvidenceRecord): ReleaseGovernanceEvidenceRejectionReason | null {
   const payload = unsignedPayload(record);
@@ -170,7 +179,11 @@ function signPayload(payload: Omit<ReleaseGovernanceEvidenceRecord, "digest" | "
   const secret = readRequiredSecret("REPORT_SIGNING_SECRET");
   return { digest, signature: secret ? createHmac("sha256", secret).update(bytes).digest("base64url") : null };
 }
-export function releaseGovernanceEvidenceIntegritySummary(): ReleaseGovernanceEvidenceIntegritySummary {
+export function releaseGovernanceEvidenceIntegritySummary(options?: { forceRefresh?: boolean }): ReleaseGovernanceEvidenceIntegritySummary {
+  const now = Date.now();
+  if (!options?.forceRefresh && integrityCache && integrityCache.expiresAt > now) {
+    return { ...integrityCache.summary, cacheHit: true };
+  }
   const rejectedByReason: Record<ReleaseGovernanceEvidenceRejectionReason, number> = {
     MALFORMED_RECORD: 0,
     DIGEST_MISMATCH: 0,
@@ -206,7 +219,16 @@ export function releaseGovernanceEvidenceIntegritySummary(): ReleaseGovernanceEv
   }
 
   const rejectedRecords = Object.values(rejectedByReason).reduce((sum, count) => sum + count, 0);
-  return { acceptedRecords, rejectedRecords, rejectedByReason, productionBlocked: true };
+  const summary = {
+    acceptedRecords,
+    rejectedRecords,
+    rejectedByReason,
+    scannedAtUtc: new Date(now).toISOString(),
+    cacheTtlMs: INTEGRITY_CACHE_TTL_MS,
+    productionBlocked: true as const,
+  };
+  integrityCache = { summary, expiresAt: now + INTEGRITY_CACHE_TTL_MS };
+  return { ...summary, cacheHit: false };
 }
 
 export function recordReleaseGovernanceEvidence(input: { kind: ReleaseGovernanceEvidenceKind; scope: string; actorId: string; reviewNote?: string | null; replayRef: string }): ReleaseGovernanceEvidenceRecord {
@@ -228,6 +250,7 @@ export function recordReleaseGovernanceEvidence(input: { kind: ReleaseGovernance
   };
   const record = { ...base, ...signPayload(base) };
   writeImmutableRecord(record);
+  integrityCache = null;
   return record;
 }
 export function releaseGovernanceEvidenceFor(scope?: string | null, kind?: ReleaseGovernanceEvidenceKind): ReleaseGovernanceEvidenceRecord[] {

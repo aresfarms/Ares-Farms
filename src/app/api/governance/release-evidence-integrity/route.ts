@@ -32,7 +32,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Governance authority is required.", governance: { traceId, runtimeGuard, access } }, { status: 403 });
   }
 
-  const integrity = releaseGovernanceEvidenceIntegritySummary();
+  const forceRefresh = req.nextUrl.searchParams.get("refresh") === "true";
+  const integrity = releaseGovernanceEvidenceIntegritySummary({ forceRefresh });
   const integrityFindings = Object.entries(integrity.rejectedByReason)
     .filter(([, count]) => count > 0)
     .map(([reason, count]) => ({
@@ -50,6 +51,6 @@ export async function GET(req: NextRequest) {
     integrity,
     productionBlocked: true,
     disclosure: "Counts and coarse rejection reasons only; record contents and identifiers are not exposed.",
-    governance: { traceId, runtimeGuard, access },
+    governance: { traceId, runtimeGuard, access, forceRefresh },
   });
 }

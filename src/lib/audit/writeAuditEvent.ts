@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 
-import { desc, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import { auditEvents } from "@/db/schema";
 import { db } from "@/lib/db";
@@ -38,6 +38,8 @@ export type AuditEventRecord = {
   actorRef: string;
   target: { type: string | null; id: string | null };
   normalizationStatus: "CANONICAL" | "NORMALIZED_LEGACY";
+  chainVersion: "audit-chain-v2";
+  hashEncoding: "canonical-json-v2";
   timestamp: string;
   governance: {
     canonicalWriter: true;
@@ -138,7 +140,6 @@ export async function writeAuditEvent(
   input: AuditEventInput = {},
 ): Promise<AuditEventRecord> {
   const id = randomUUID();
-  const timestamp = new Date();
   const {
     metadata,
     payload,
@@ -176,18 +177,43 @@ export async function writeAuditEvent(
     actorRef,
     target,
     normalizationStatus,
+    chainVersion: "audit-chain-v2",
+    hashEncoding: "canonical-json-v2",
   };
 
   return db.transaction(async (tx) => {
     await tx.execute(
-      sql`select pg_advisory_xact_lock(hashtext('furlong.audit_events.chain.v1'))`,
+      sql`select pg_advisory_xact_lock(hashtext('furlong.audit_events.chain.v2'))`,
     );
-    const [head] = await tx
-      .select({ eventHash: auditEvents.eventHash, hash: auditEvents.hash })
-      .from(auditEvents)
-      .orderBy(desc(auditEvents.createdAt), desc(auditEvents.id))
-      .limit(1);
-    const prevHash = head?.eventHash ?? head?.hash ?? "GENESIS";
+    const headResult = await tx.execute(sql`
+      select head_hash, head_event_id, anchor_manifest_hash
+      from audit_chain_heads
+      where chain_name = 'audit_events_v2'
+      for update
+    `);
+    const headRows =
+      (headResult as unknown as { rows?: Array<Record<string, unknown>> })
+        .rows ?? [];
+    let prevHash = text(headRows[0]?.head_hash);
+    if (!prevHash) {
+      const historical = await tx
+        .select({ eventHash: auditEvents.eventHash, hash: auditEvents.hash })
+        .from(auditEvents);
+      const historicalHashes = historical
+        .map((row) => row.eventHash ?? row.hash)
+        .filter((value): value is string => Boolean(value))
+        .sort();
+      const anchorManifestHash = createHash("sha256")
+        .update(historicalHashes.join("\n"))
+        .digest("hex");
+      prevHash = `MIGRATION:${anchorManifestHash}`;
+      await tx.execute(sql`
+        insert into audit_chain_heads (chain_name, head_event_id, head_hash, chain_version, anchor_manifest_hash)
+        values ('audit_events_v2', null, ${prevHash}, 'audit-chain-v2', ${anchorManifestHash})
+        on conflict (chain_name) do nothing
+      `);
+    }
+    const timestamp = new Date();
     const eventHash = hashAuditEvent({
       prev_hash: prevHash,
       payload: {
@@ -223,6 +249,12 @@ export async function writeAuditEvent(
       createdAt: timestamp,
     });
 
+    await tx.execute(sql`
+      update audit_chain_heads
+      set head_event_id = ${id}, head_hash = ${eventHash}, updated_at = now()
+      where chain_name = 'audit_events_v2'
+    `);
+
     return {
       ok: true,
       mode: "durable-canonical",
@@ -236,6 +268,8 @@ export async function writeAuditEvent(
       actorRef,
       target,
       normalizationStatus,
+      chainVersion: "audit-chain-v2",
+      hashEncoding: "canonical-json-v2",
       timestamp: timestamp.toISOString(),
       governance: {
         canonicalWriter: true,

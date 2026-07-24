@@ -67,6 +67,7 @@ export const CANONICAL_GOVERNANCE_MIGRATION_FILES = [
   "0040_recommendation_release_attestation_cycles.sql",
   "0041_recommendation_release_escalation_acknowledgements.sql",
   "0042_audit_search_and_reconciliation.sql",
+  "0043_audit_chain_head_v2.sql",
 ] as const;
 
 /** Directory holding the canonical governance migration SQL files. */
@@ -100,14 +101,14 @@ export function canonicalTargetSchemaVersion(): string {
  */
 export async function applyCanonicalGovernanceMigrations(
   client: PoolClient,
-  log: (message: string) => void = () => {}
+  log: (message: string) => void = () => {},
 ): Promise<{ appliedFiles: string[]; targetSchemaVersion: string }> {
   const appliedFiles: string[] = [];
 
   for (const fileName of CANONICAL_GOVERNANCE_MIGRATION_FILES) {
     const sql = await readFile(
       canonicalGovernanceMigrationPath(fileName),
-      "utf8"
+      "utf8",
     );
     await client.query(sql);
     appliedFiles.push(fileName);

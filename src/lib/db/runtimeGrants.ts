@@ -39,14 +39,11 @@ export const RUNTIME_GRANT_SCHEMA = "public";
  */
 const SAFE_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
 
-export function assertSafeIdentifier(
-  value: string,
-  label: string
-): string {
+export function assertSafeIdentifier(value: string, label: string): string {
   if (!SAFE_IDENTIFIER.test(value)) {
     throw new Error(
       `Unsafe ${label} "${value}": must match ${SAFE_IDENTIFIER}. ` +
-        `Role/schema/database names are built into DDL and cannot be parameterized.`
+        `Role/schema/database names are built into DDL and cannot be parameterized.`,
     );
   }
   return value;
@@ -74,7 +71,7 @@ export interface RuntimeGrantConfig {
  * required owner when drift occurred.
  */
 export function buildRuntimeGrantStatements(
-  config: RuntimeGrantConfig
+  config: RuntimeGrantConfig,
 ): string[] {
   const db = quoteIdent(config.databaseName, "database name");
   const runtime = quoteIdent(config.runtimeRole, "runtime role");
@@ -92,6 +89,12 @@ export function buildRuntimeGrantStatements(
       `GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO ${runtime};`,
     `ALTER DEFAULT PRIVILEGES FOR ROLE ${migrator} IN SCHEMA ${schema} ` +
       `GRANT USAGE, SELECT ON SEQUENCES TO ${runtime};`,
+    // The ledger is append-only for the serving principal. The chain-head singleton
+    // is the only mutable audit coordination record and is transaction-locked.
+    `REVOKE UPDATE, DELETE, TRUNCATE ON TABLE ${schema}."audit_events" FROM ${runtime};`,
+    `GRANT SELECT, INSERT ON TABLE ${schema}."audit_events" TO ${runtime};`,
+    `REVOKE DELETE, TRUNCATE ON TABLE ${schema}."audit_chain_heads" FROM ${runtime};`,
+    `GRANT SELECT, INSERT, UPDATE ON TABLE ${schema}."audit_chain_heads" TO ${runtime};`,
     // Belt-and-suspenders: some estates still expose CREATE on `public` to
     // PUBLIC, so remove that inherited path first, then revoke directly from
     // the runtime role as well. This makes DDL structurally impossible for the
@@ -123,7 +126,7 @@ export const RUNTIME_OWNED_OBJECTS_QUERY = `
 export async function applyRuntimeGrants(
   client: PoolClient,
   config: RuntimeGrantConfig,
-  log: (message: string) => void = () => {}
+  log: (message: string) => void = () => {},
 ): Promise<string[]> {
   const statements = buildRuntimeGrantStatements(config);
   for (const statement of statements) {

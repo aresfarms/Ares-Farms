@@ -451,7 +451,8 @@
     "audit:package": "tsx src/scripts/buildAuditPackage.ts",
     "smoke:audit-hardening": "tsx src/scripts/auditHardeningArchitectureSmokeTest.ts",
     "test:tprm:preflight": "tsx src/scripts/runInstitutionalTprmAssessment.ts",
-    "test:tprm:database": "tsx src/scripts/institutionalTprmDatabaseSmokeTest.ts"
+    "test:tprm:database": "tsx src/scripts/institutionalTprmDatabaseSmokeTest.ts",
+    "smoke:audit-chain-v2": "tsx src/scripts/auditChainV2ArchitectureSmokeTest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

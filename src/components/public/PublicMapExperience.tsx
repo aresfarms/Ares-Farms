@@ -720,6 +720,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
         sourceId: possibleProp.sourceId,
         description: possibleProp.whyMayFit,
         currentLabel: possibleProp.isCurrent ? "Current government listing" : `${possibleProp.vintageStamp} · historical example`,
+        entryMethod: "map-card",
       })
     : null;
   const cardNavigateHref = possibleAnalyzeHref;

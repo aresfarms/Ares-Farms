@@ -7,7 +7,7 @@ import { buildLocationBriefIntelligence } from "@/lib/property/propertyBriefInte
 import { designatedHubzoneForProperty } from "@/lib/property/propertyHubzones";
 import { nmtcForProperty } from "@/lib/property/propertyNmtc";
 import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones";
-import { findCanonicalPropertyById } from "@/lib/property/propertyData";
+import { findCanonicalPropertyByExactAddress, findCanonicalPropertyById } from "@/lib/property/propertyData";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 
 /**
@@ -62,9 +62,15 @@ export async function POST(req: NextRequest) {
       parsed: imported.parsedAddress,
       propertyType: declaredPropertyType,
     });
+    const canonicalMatch = imported.normalizedAddress
+      ? findCanonicalPropertyByExactAddress(imported.normalizedAddress)
+      : null;
     return NextResponse.json({
       ok: true,
-      propertyId,
+      propertyId: canonicalMatch?.canonical_property_id ?? propertyId,
+      canonicalMatch: canonicalMatch
+        ? { propertyId: canonicalMatch.canonical_property_id, matchedBy: "normalized-exact-address" }
+        : null,
       placeFacts: imported.placeFacts,
       verifiedPrograms: verifyPropertyPrograms(imported.placeFactsForPrograms),
       placeIntelligence,

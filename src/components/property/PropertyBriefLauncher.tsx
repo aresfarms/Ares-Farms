@@ -55,6 +55,7 @@ function buildAnalyzeHref(property: PropertyBrief): string {
     description: property.description,
     categoryLabel: property.categoryLabel,
     currentLabel: property.currentLabel,
+    entryMethod: "property-card",
   });
 }
 

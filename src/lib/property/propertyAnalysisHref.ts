@@ -39,6 +39,8 @@ export type PropertyAnalysisContextInput = {
     | "approved-source-match-established"
     | "approved-source-match-not-yet-established"
     | null;
+  entryMethod?: "manual-address" | "map-card" | "property-card" | "listing-import" | null;
+  startingLens?: string | null;
 };
 
 export function buildPropertyAnalysisHref(property: PropertyAnalysisContextInput): string {
@@ -93,5 +95,7 @@ export function buildPropertyAnalysisHref(property: PropertyAnalysisContextInput
   if (property.listingSourceMatchStatus) {
     params.set("listingSourceMatchStatus", property.listingSourceMatchStatus);
   }
+  if (property.entryMethod) params.set("entryMethod", property.entryMethod);
+  if (property.startingLens) params.set("lens", property.startingLens);
   return `/discover?${params.toString()}`;
 }

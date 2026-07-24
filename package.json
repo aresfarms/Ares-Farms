@@ -345,6 +345,7 @@
     "run:ledger-integrity": "tsx src/scripts/verifyLedgerIntegrity.ts",
     "verify:brief-copy": "tsx src/scripts/verifyBriefCopy.ts",
     "verify:place-brief": "tsx src/scripts/verifyPlaceLevelBrief.ts",
+    "verify:property-entry-parity": "tsx src/scripts/verifyPropertyEntryParity.ts",
     "ingest:nass-cash-rents": "tsx src/scripts/ingestNassCashRents.ts",
     "ingest:nass-county-yields": "tsx src/scripts/ingestNassCountyYields.ts",
     "ingest:nces-private-schools": "tsx src/scripts/ingestNcesPrivateSchools.ts",

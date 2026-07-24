@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import { CHART_TONES, type ChartTone } from "@/lib/property/chartThemes";
+import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 
 /**
  * Place-first discovery card — the correct PRIMARY journey for place/property
@@ -60,6 +61,8 @@ const COVERAGE: { label: string; source: string; confidence: string; disclaimer:
 
 type PlaceFactsResponse = {
   ok: boolean;
+  propertyId?: string | null;
+  canonicalMatch?: { propertyId: string; matchedBy: "normalized-exact-address" } | null;
   error?: string;
   verifiedPrograms?: Array<{
     program_id: string;
@@ -278,13 +281,10 @@ export function PlaceFirstDiscovery({
 
     const parsed = verification.parsedAddress;
     const titleBase = verification.normalizedAddress || fullAddress || located || "Imported property";
-    const title = parsed?.street
-      ? `${parsed.street} analysis`
-      : `${titleBase} analysis`;
+    const title = parsed?.street ? `${parsed.street} analysis` : `${titleBase} analysis`;
     const locationLabel = parsed
       ? [parsed.city, parsed.state].filter(Boolean).join(", ")
       : [city.trim(), stateCode.trim()].filter(Boolean).join(", ") || located || titleBase;
-
     const positiveSignals = [
       liveFacts?.opportunityZone ? `Opportunity Zone tract ${liveFacts.opportunityZone.tractId}` : null,
       liveFacts?.nmtc ? `NMTC tract ${liveFacts.nmtc.tractId}` : null,
@@ -296,25 +296,6 @@ export function PlaceFirstDiscovery({
           : "National Register historic area"
         : null,
     ].filter(Boolean);
-
-    const params = new URLSearchParams();
-    params.set("mode", "possibilities");
-    params.set("entry", "property-brief");
-    params.set("propertyId", "imported:place-facts");
-    params.set("propertyType", "place-led property");
-    params.set("location", locationLabel || "Verified location");
-    params.set("title", title);
-    params.set("priceLabel", "Price not yet verified");
-    params.set("sourceLabel", "Furlong verified address check");
-    params.set("sourceVerificationStatus", "verified-address-only");
-    params.set("currentLabel", "Imported from Furlong place-facts");
-    if (verification.normalizedAddress) params.set("exactAddress", verification.normalizedAddress);
-    if (parsed?.city) params.set("town", parsed.city);
-    if (county.trim()) params.set("county", county.trim());
-    if (parsed?.state || stateCode.trim()) params.set("state", parsed?.state ?? stateCode.trim());
-    if (verifiedPrograms.length > 0) {
-      params.set("pathways", verifiedPrograms.map((program) => program.name).join(", "));
-    }
     const descriptionParts = [
       "Imported from the Furlong place-facts screen.",
       positiveSignals.length > 0
@@ -322,8 +303,30 @@ export function PlaceFirstDiscovery({
         : "No positive place-fact matches were confirmed during the initial verification pass.",
       additionalSourceBottomLine,
     ].filter(Boolean);
-    params.set("description", descriptionParts.join(" "));
-    return `/discover?${params.toString()}`;
+
+    return buildPropertyAnalysisHref({
+      propertyId: result?.propertyId || "imported:place-facts",
+      propertyType: "place-led property",
+      location: locationLabel || "Verified location",
+      title,
+      priceLabel: "Price not yet verified",
+      vintage: "Current address verification",
+      sourceLabel: result?.canonicalMatch
+        ? "Furlong canonical property match"
+        : "Furlong verified address check",
+      pathways: verifiedPrograms.map((program) => program.name),
+      exactAddress: verification.normalizedAddress,
+      town: parsed?.city,
+      county: county.trim() || null,
+      state: parsed?.state || stateCode.trim() || null,
+      description: descriptionParts.join(" "),
+      sourceVerificationStatus: result?.canonicalMatch
+        ? "matched-approved-source-record"
+        : "verified-address-only",
+      matchedSourceRecordId: result?.canonicalMatch?.propertyId ?? null,
+      entryMethod: "manual-address",
+      startingLens: flow,
+    });
   })();
 
   useEffect(() => {

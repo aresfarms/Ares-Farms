@@ -108,6 +108,28 @@ export function findCanonicalPropertyById(propertyId: string): CanonicalProperty
   return null;
 }
 
+function normalizePropertyAddress(value: string | null | undefined): string {
+  return (value ?? "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Resolve manual address intake to the same canonical property used by map cards. */
+export function findCanonicalPropertyByExactAddress(exactAddress: string): CanonicalProperty | null {
+  const target = normalizePropertyAddress(exactAddress);
+  if (!target) return null;
+  for (const source of SOURCES) {
+    const match = recordsOf(source).find((record) =>
+      record.source_records.some((row) => normalizePropertyAddress(row.exactAddress) === target)
+    );
+    if (match) return match;
+  }
+  return null;
+}
+
 export function buildPublicSafeInventoryByState(): Record<string, PublicSafeProperty[]> {
   const byState = new Map<string, PublicSafeProperty[]>();
 

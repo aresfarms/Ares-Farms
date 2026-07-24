@@ -32,7 +32,7 @@ import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/reco
 import { buildRecommendationReleaseHistory, type RecommendationReleaseAuditEntry, type RecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
-import { buildEquityOutlook, buildOwnershipCostModel, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
+import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import {
   allProfiles,
@@ -2991,11 +2991,22 @@ export function PropertyEvaluationWorkspace({
     profileId: workspaceProfile.id,
     comparables: similarHomes,
   });
+  const rankingPrice = listedPrice ?? parsePriceSignal(analysisContext.priceLabel);
+  const rankingTax = ownershipContext && rankingPrice
+    ? buildPostSaleTaxScenario({ price: rankingPrice }, ownershipContext)
+    : null;
   const scenarioRankingPlan = buildScenarioRankingPlan({
     profileId: workspaceProfile.id,
     marketPlan: marketComparablePlan,
     capitalPlan: preliminaryCapitalPlan,
     pathwayCount: topProgramRanks.length,
+    taxImpact: rankingTax && rankingPrice
+      ? {
+          stabilizedAnnual: rankingTax.stabilizedAnnual,
+          adverseAnnual: rankingTax.adverseAnnual,
+          acquisitionPrice: rankingPrice,
+        }
+      : null,
   });
   const transactionTimelinePlan = buildTransactionTimelinePlan({
     profileId: workspaceProfile.id,

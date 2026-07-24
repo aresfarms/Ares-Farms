@@ -13,9 +13,25 @@ export interface RankedPropertyScenario {
   marketViability: number;
   financeability: number;
   lifecycleResilience: number;
+  taxResilience: number;
+  taxAdjustment: number;
   posture: ScenarioPosture;
   reasons: string[];
   conditions: string[];
+}
+
+export interface ScenarioTaxAdjustment {
+  annualAdditionalTax?: number;
+  oneTimeRollbackTax?: number;
+  verified?: boolean;
+  note?: string;
+}
+
+export interface ScenarioTaxImpact {
+  stabilizedAnnual: number;
+  adverseAnnual: number;
+  acquisitionPrice: number;
+  scenarioAdjustments?: Record<string, ScenarioTaxAdjustment>;
 }
 
 export interface ScenarioRankingPlan {
@@ -56,6 +72,7 @@ export function buildScenarioRankingPlan(args: {
   marketPlan: MarketComparablePlan;
   capitalPlan: PreliminaryCapitalPlan;
   pathwayCount: number;
+  taxImpact?: ScenarioTaxImpact | null;
 }): ScenarioRankingPlan {
   const marketBase = args.marketPlan.status === "supported" ? 72 : args.marketPlan.status === "preliminary" ? 58 : 44;
   const financeBase = args.capitalPlan.priceKnown ? 68 : 48;
@@ -63,24 +80,59 @@ export function buildScenarioRankingPlan(args: {
   const alternativePenalty = Math.min(15, args.marketPlan.alternativePropertyCount * 3);
   const phasePenalty = args.capitalPlan.phaseIRequired ? 4 : 0;
 
+  const commonTaxPenalty = (() => {
+    const tax = args.taxImpact;
+    if (!tax || tax.acquisitionPrice <= 0) return 0;
+    const adverseCarryPct = tax.adverseAnnual / tax.acquisitionPrice;
+    const shockPct = tax.stabilizedAnnual > 0
+      ? Math.max(0, (tax.adverseAnnual - tax.stabilizedAnnual) / tax.stabilizedAnnual)
+      : 0;
+    return Math.min(18, Math.round(adverseCarryPct * 300 + shockPct * 8));
+  })();
+
   const scenarios = templates(args.profileId).map(([id, title, summary], index) => {
     const propertyFit = clamp(78 - index * 8);
     const marketViability = clamp(marketBase - index * 3 - alternativePenalty + (index === 2 ? 4 : 0));
     const financeability = clamp(financeBase + pathwayBoost - index * 5 - phasePenalty);
     const lifecycleResilience = clamp(72 - index * 4 + (index === 1 ? 5 : 0));
-    const totalScore = clamp(propertyFit * 0.3 + marketViability * 0.25 + financeability * 0.25 + lifecycleResilience * 0.2);
+    const scenarioTax = args.taxImpact?.scenarioAdjustments?.[id];
+    const annualAdditional = Math.max(0, scenarioTax?.annualAdditionalTax ?? 0);
+    const rollbackAnnualized = Math.max(0, scenarioTax?.oneTimeRollbackTax ?? 0) / 5;
+    const price = Math.max(1, args.taxImpact?.acquisitionPrice ?? 1);
+    const scenarioTaxPenalty = Math.min(30, Math.round(((annualAdditional + rollbackAnnualized) / price) * 500));
+    const taxAdjustment = -(commonTaxPenalty + scenarioTaxPenalty);
+    const taxResilience = clamp(78 + taxAdjustment);
+    const totalScore = clamp(
+      propertyFit * 0.24 +
+      marketViability * 0.21 +
+      financeability * 0.21 +
+      lifecycleResilience * 0.14 +
+      taxResilience * 0.20 -
+      scenarioTaxPenalty * 0.5
+    );
     const posture: ScenarioPosture = totalScore >= 72 ? "proceed-with-conditions" : totalScore >= 58 ? "renegotiate" : "walk-away";
+    const taxReason = scenarioTax
+      ? `${scenarioTax.verified ? "Verified" : "Planning"} use-specific tax effect: $${Math.round(annualAdditional).toLocaleString("en-US")}/yr additional` +
+        `${scenarioTax.oneTimeRollbackTax ? ` plus $${Math.round(scenarioTax.oneTimeRollbackTax).toLocaleString("en-US")} one-time rollback exposure` : ""}` +
+        `${scenarioTax.note ? ` — ${scenarioTax.note}` : ""}`
+      : args.taxImpact
+        ? `Buyer-side tax resilience ${taxResilience}/100 using stabilized $${Math.round(args.taxImpact.stabilizedAnnual).toLocaleString("en-US")}/yr and adverse $${Math.round(args.taxImpact.adverseAnnual).toLocaleString("en-US")}/yr`
+        : "Tax effect unresolved and not yet scored beyond the hard-stop rule.";
     return {
-      id, title, summary, totalScore, propertyFit, marketViability, financeability, lifecycleResilience, posture,
+      id, title, summary, totalScore, propertyFit, marketViability, financeability, lifecycleResilience, taxResilience, taxAdjustment, posture,
       reasons: [
         `Property fit ${propertyFit}/100`,
         `Market viability ${marketViability}/100`,
         `Financeability ${financeability}/100`,
         `Lifecycle resilience ${lifecycleResilience}/100`,
+        taxReason,
       ],
       conditions: [
         args.marketPlan.status === "supported" ? "Comparable and market support is present but still requires source review." : "Market and closed-sale evidence must be strengthened before reliance.",
         args.capitalPlan.phaseIRequired ? "A lender-acceptable Phase I ESA remains part of final financing approval." : "Any triggered environmental requirement must be resolved before final lender approval.",
+        args.taxImpact
+          ? "Official reassessment, exemption, rollback, and change-of-use rules must replace planning tax assumptions before reliance."
+          : "Post-transfer and use-change tax exposure must be established before reliance.",
         "Borrower-specific affordability and collateral analysis remain authorization-gated.",
       ],
     };
@@ -91,12 +143,13 @@ export function buildScenarioRankingPlan(args: {
     status: args.marketPlan.status === "supported" && args.capitalPlan.priceKnown ? "evidence-supported" : "preliminary",
     scenarios,
     overallPosture: lead?.posture ?? "walk-away",
-    rankingRule: "Rank by property fit, market viability, financeability, and lifecycle resilience; no single score can override a hard legal, environmental, physical, or affordability stop.",
+    rankingRule: "Rank by property fit, market viability, financeability, lifecycle resilience, and buyer-side tax resilience. Seller taxes never control the score unless transferability is officially verified; no score overrides a hard legal, environmental, physical, tax, insurance, or affordability stop.",
     walkAwayGates: [
       "The leading course cannot support acquisition, required improvements, working capital, and debt service under conservative assumptions.",
       "Environmental, zoning, access, utility, title, insurance, or physical constraints make the intended use impractical.",
       "A materially better nearby property is available at a comparable or lower total project cost.",
       "The seller timeline is incompatible with the realistic financing pipeline and cannot be extended safely.",
+      "Post-sale reassessment, rollback tax, special assessment, or change-of-use tax makes the use economically impractical.",
     ],
   };
 }

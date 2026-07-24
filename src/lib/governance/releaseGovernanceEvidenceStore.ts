@@ -74,22 +74,42 @@ function unsignedPayload(record: ReleaseGovernanceEvidenceRecord): Omit<ReleaseG
   return payload;
 }
 
-function verifyEvidenceRecord(record: ReleaseGovernanceEvidenceRecord): boolean {
+export type ReleaseGovernanceEvidenceRejectionReason =
+  | "MALFORMED_RECORD"
+  | "DIGEST_MISMATCH"
+  | "SIGNATURE_MISSING"
+  | "SIGNATURE_MISMATCH"
+  | "READ_ERROR";
+
+export type ReleaseGovernanceEvidenceIntegritySummary = {
+  acceptedRecords: number;
+  rejectedRecords: number;
+  rejectedByReason: Record<ReleaseGovernanceEvidenceRejectionReason, number>;
+  productionBlocked: true;
+};
+
+function verificationFailure(record: ReleaseGovernanceEvidenceRecord): ReleaseGovernanceEvidenceRejectionReason | null {
   const payload = unsignedPayload(record);
   const bytes = JSON.stringify(payload);
   const expectedDigest = createHash("sha256").update(bytes).digest("hex");
-  if (record.digest !== expectedDigest) return false;
+  if (record.digest !== expectedDigest) return "DIGEST_MISMATCH";
 
   const secret = readRequiredSecret("REPORT_SIGNING_SECRET");
-  if (!secret) return record.signature === null;
-  if (!record.signature) return false;
+  if (!secret) return record.signature === null ? null : "SIGNATURE_MISMATCH";
+  if (!record.signature) return "SIGNATURE_MISSING";
 
   const expectedSignature = createHmac("sha256", secret)
     .update(bytes)
     .digest("base64url");
   const provided = Buffer.from(record.signature);
   const expected = Buffer.from(expectedSignature);
-  return provided.length === expected.length && timingSafeEqual(provided, expected);
+  return provided.length === expected.length && timingSafeEqual(provided, expected)
+    ? null
+    : "SIGNATURE_MISMATCH";
+}
+
+function verifyEvidenceRecord(record: ReleaseGovernanceEvidenceRecord): boolean {
+  return verificationFailure(record) === null;
 }
 
 function readImmutableRecords(): ReleaseGovernanceEvidenceRecord[] {
@@ -130,6 +150,50 @@ function signPayload(payload: Omit<ReleaseGovernanceEvidenceRecord, "digest" | "
   const secret = readRequiredSecret("REPORT_SIGNING_SECRET");
   return { digest, signature: secret ? createHmac("sha256", secret).update(bytes).digest("base64url") : null };
 }
+export function releaseGovernanceEvidenceIntegritySummary(): ReleaseGovernanceEvidenceIntegritySummary {
+  const rejectedByReason: Record<ReleaseGovernanceEvidenceRejectionReason, number> = {
+    MALFORMED_RECORD: 0,
+    DIGEST_MISMATCH: 0,
+    SIGNATURE_MISSING: 0,
+    SIGNATURE_MISMATCH: 0,
+    READ_ERROR: 0,
+  };
+  let acceptedRecords = 0;
+
+  const inspect = (value: unknown) => {
+    if (!isEvidenceRecord(value)) {
+      rejectedByReason.MALFORMED_RECORD += 1;
+      return;
+    }
+    const failure = verificationFailure(value);
+    if (failure) rejectedByReason[failure] += 1;
+    else acceptedRecords += 1;
+  };
+
+  try {
+    const legacy = readLegacyStore();
+    for (const record of legacy.records) inspect(record);
+  } catch {
+    rejectedByReason.READ_ERROR += 1;
+  }
+
+  try {
+    for (const entry of readdirSync(recordDirectoryPath(), { withFileTypes: true })) {
+      if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
+      try {
+        inspect(JSON.parse(readFileSync(path.join(recordDirectoryPath(), entry.name), "utf8")));
+      } catch {
+        rejectedByReason.READ_ERROR += 1;
+      }
+    }
+  } catch {
+    // Missing record directory is a valid empty state.
+  }
+
+  const rejectedRecords = Object.values(rejectedByReason).reduce((sum, count) => sum + count, 0);
+  return { acceptedRecords, rejectedRecords, rejectedByReason, productionBlocked: true };
+}
+
 export function recordReleaseGovernanceEvidence(input: { kind: ReleaseGovernanceEvidenceKind; scope: string; actorId: string; reviewNote?: string | null; replayRef: string }): ReleaseGovernanceEvidenceRecord {
   const base = {
     evidenceId: `${input.kind.toLowerCase()}-${Date.now()}-${randomUUID()}`,

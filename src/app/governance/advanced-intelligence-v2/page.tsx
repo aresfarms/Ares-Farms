@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   AdvancedIntelligenceV2CrossSourceConflict,
@@ -194,6 +194,9 @@ function ConflictCard(props: {
 }
 
 export default function AdvancedIntelligenceV2Page() {
+  const [caseId, setCaseId] = useState<string | null>(null);
+  const [caseName, setCaseName] = useState<string | null>(null);
+  const [caseGoal, setCaseGoal] = useState<string | null>(null);
   const [reviewerRole, setReviewerRole] = useState(
     "Qualified Governance Reviewer"
   );
@@ -209,9 +212,38 @@ export default function AdvancedIntelligenceV2Page() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const incomingCaseId = query.get("caseId")?.trim() || null;
+    if (!incomingCaseId) return;
+    setCaseId(incomingCaseId);
+    setCaseName(query.get("name")?.trim() || null);
+    setCaseGoal(query.get("goal")?.trim() || null);
+    const customerTypes = query.get("customerTypes")?.trim();
+    const uses = query.get("intendedUses")?.trim();
+    const state = query.get("state")?.trim();
+    if (customerTypes) setDeclaredCustomerTypes(customerTypes);
+    if (uses) setIntendedUses(uses);
+    if (state) setStateValue(state);
+  }, []);
+
+  const caseReturnHref = useMemo(() => {
+    if (!caseId) return null;
+    const params = new URLSearchParams({
+      name: caseName || `Furlong Case ${caseId}`,
+      goal: caseGoal || "Evaluate governed pathways, evidence, constraints, and next steps.",
+      customerTypes: declaredCustomerTypes,
+      intendedUses,
+    });
+    if (stateValue) params.set("state", stateValue);
+    params.set("origin", "governed-review");
+    return `/intelligence/cases/${encodeURIComponent(caseId)}?${params.toString()}`;
+  }, [caseGoal, caseId, caseName, declaredCustomerTypes, intendedUses, stateValue]);
+
   const localInput = useMemo<AdvancedIntelligenceV2Input>(
     () => ({
       reviewerRole,
+      applicationId: caseId,
       borrowerContext: {
         declaredCustomerTypes: declaredCustomerTypes
           .split(",")
@@ -229,9 +261,11 @@ export default function AdvancedIntelligenceV2Page() {
         sovereignFederationAllowed: sovereignAllowed,
         state: stateValue || null,
       },
+      metadata: caseId ? { caseId, source: "INTELLIGENCE_CASE_GOVERNED_REVIEW" } : null,
     }),
     [
       reviewerRole,
+      caseId,
       declaredCustomerTypes,
       intendedUses,
       stateValue,
@@ -273,6 +307,16 @@ export default function AdvancedIntelligenceV2Page() {
   return (
     <div style={shellStyle}>
       <div style={containerStyle}>
+        {caseReturnHref && (
+          <section data-testid="case-review-handoff" style={{ ...panelStyle, padding: 16, borderLeft: "5px solid #0f766e" }}>
+            <strong>Governed review for {caseName || caseId}</strong>
+            <p style={{ ...mutedText, margin: "6px 0 10px" }}>
+              This review is scoped to the same intelligence case. Only the case reference and structured posture are carried; no Navigator transcript, identity, street address, or listing URL is transferred.
+            </p>
+            <Link href={caseReturnHref}>Return to the same intelligence case →</Link>
+          </section>
+        )}
+
         <header style={{ ...panelStyle, padding: 18 }}>
           <div
             style={{

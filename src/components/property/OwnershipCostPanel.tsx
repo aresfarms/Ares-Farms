@@ -246,6 +246,32 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
 
           {/* ── The monthly bill beyond the mortgage ──────────────────── */}
           <div>
+            <div
+              data-testid="post-sale-tax-scenario"
+              style={{
+                display: "grid",
+                gap: 6,
+                padding: "12px 14px",
+                marginBottom: 10,
+                border: `1px solid ${theme.plateBorder}`,
+                borderRadius: 10,
+                background: theme.plate,
+              }}
+            >
+              <strong style={{ fontSize: 13, color: theme.ink }}>
+                Post-purchase property-tax check
+              </strong>
+              <span style={{ fontSize: 12.5, color: theme.ink, lineHeight: 1.55 }}>
+                Stabilized buyer estimate: <strong>{fmt(model.tax.stabilizedAnnual)}/yr</strong>
+                {" · "}Adverse case: <strong>{fmt(model.tax.adverseAnnual)}/yr</strong>
+                {model.tax.sellerCurrentAnnual != null && (
+                  <> · Seller&apos;s current bill: <strong>{fmt(model.tax.sellerCurrentAnnual)}/yr</strong></>
+                )}
+              </span>
+              <span style={{ fontSize: 11.5, color: theme.inkFaint, lineHeight: 1.55 }}>
+                {model.tax.warning} [{model.tax.rule}]
+              </span>
+            </div>
             <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent, marginBottom: 6 }}>
               The rest of the monthly bill — the part people underestimate
             </div>

@@ -100,6 +100,10 @@ export function buildPriceContext(
 export interface OwnershipCostInputs {
   /** Purchase price in dollars — listed price, or the visitor's assumption. */
   price: number;
+  /** Seller's presently recorded annual bill, when known. Never used for qualification unless transfer is verified. */
+  sellerCurrentAnnualTax?: number | null;
+  /** Authoritative confirmation that the current assessment and exemptions survive transfer unchanged. */
+  currentTaxTransfersUnchanged?: boolean;
   /** True when the visitor typed the price (price-on-request listings). */
   priceIsAssumption: boolean;
   /** Home-shaped property (house/residence) vs. land-only. */
@@ -151,7 +155,23 @@ export interface CostRangeLine {
   provenance: string;
 }
 
+export interface PostSaleTaxScenario {
+  status: "transfer-verified" | "post-transfer-unresolved";
+  sellerCurrentAnnual: number | null;
+  buyerFirstYearAnnual: number | null;
+  stabilizedAnnual: number;
+  adverseAnnual: number;
+  qualificationAnnual: number;
+  multiplierVsSeller: number | null;
+  increasePctVsSeller: number | null;
+  rule: "POST-SALE-TAX-001";
+  warning: string;
+  provenance: string;
+}
+
 export interface OwnershipCostModel {
+  /** Buyer-side tax scenarios. Seller bill is excluded unless transferability is verified. */
+  tax: PostSaleTaxScenario;
   /** PMMS survey week the rates came from, YYYY-MM-DD. */
   rateWeekOf: string;
   rate30Pct: number;
@@ -276,6 +296,42 @@ function monthlyPayment(loanAmount: number, annualRatePct: number, years: number
 }
 
 const round10 = (n: number): number => Math.round(n / 10) * 10;
+
+
+export function buildPostSaleTaxScenario(
+  inputs: Pick<OwnershipCostInputs, "price" | "sellerCurrentAnnualTax" | "currentTaxTransfersUnchanged">,
+  context: OwnershipCostContext
+): PostSaleTaxScenario {
+  const seller = inputs.sellerCurrentAnnualTax != null && inputs.sellerCurrentAnnualTax >= 0
+    ? Math.round(inputs.sellerCurrentAnnualTax)
+    : null;
+  const effectiveRate = context.taxContext?.effectiveRatePct ?? 1.1;
+  const stabilized = Math.max(0, Math.round(inputs.price * (effectiveRate / 100)));
+  const transferVerified = inputs.currentTaxTransfersUnchanged === true && seller != null;
+  const qualification = transferVerified ? seller : stabilized;
+  // Until parcel-specific reassessment, exemptions, special assessments, and use-change rules are verified,
+  // carry a visible 50% adverse band rather than quietly presenting the seller bill as durable.
+  const adverse = transferVerified ? seller : Math.round(stabilized * 1.5);
+  const multiplier = seller && seller > 0 ? Number((qualification / seller).toFixed(2)) : null;
+  const increasePct = seller && seller > 0 ? Math.round(((qualification - seller) / seller) * 100) : null;
+  return {
+    status: transferVerified ? "transfer-verified" : "post-transfer-unresolved",
+    sellerCurrentAnnual: seller,
+    buyerFirstYearAnnual: transferVerified ? seller : null,
+    stabilizedAnnual: stabilized,
+    adverseAnnual: adverse,
+    qualificationAnnual: qualification,
+    multiplierVsSeller: multiplier,
+    increasePctVsSeller: increasePct,
+    rule: "POST-SALE-TAX-001",
+    warning: transferVerified
+      ? "Authoritative evidence confirms the current assessment and exemptions transfer unchanged; the current bill may be used until a later reassessment or use change."
+      : "Post-transfer tax exposure is unresolved. Do not rely on the seller's current bill. Qualification uses the stabilized buyer-side estimate, with a separate adverse case.",
+    provenance: context.taxContext
+      ? "Purchase price × Census ACS county effective-rate benchmark; parcel reassessment and exemption rules require official verification."
+      : "Purchase price × 1.1% national planning benchmark; parcel reassessment and exemption rules require official verification.",
+  };
+}
 
 export function buildOwnershipCostModel(
   inputs: OwnershipCostInputs,
@@ -497,28 +553,19 @@ export function buildOwnershipCostModel(
   // ── Recurring non-mortgage monthly costs ────────────────────────────────
   const monthly: CostRangeLine[] = [];
 
-  const taxContext = context.taxContext;
-  if (taxContext) {
-    const annual = price * (taxContext.effectiveRatePct / 100);
-    monthly.push({
-      label: "Property taxes",
-      low: round10((annual * 0.85) / 12),
-      high: round10((annual * 1.15) / 12),
-      note:
-        `This county's owner-occupied median works out to about ${taxContext.effectiveRatePct}% of home value per year ` +
-        `(median bill $${taxContext.medianAnnualTax.toLocaleString("en-US")}). Your parcel's assessment and exemptions decide the actual bill.`,
-      provenance: "Census ACS county medians",
-    });
-  } else {
-    monthly.push({
-      label: "Property taxes",
-      low: round10((price * 0.008) / 12),
-      high: round10((price * 0.014) / 12),
-      note:
-        "National guidance of roughly 0.8–1.4% of value per year — county-level context is not on file for this area yet. The county treasurer can quote the actual bill.",
-      provenance: "National guidance",
-    });
-  }
+  const tax = buildPostSaleTaxScenario(inputs, context);
+  monthly.push({
+    label: "Property taxes — buyer-side planning",
+    low: round10(tax.qualificationAnnual / 12),
+    high: round10(tax.adverseAnnual / 12),
+    note:
+      `${tax.warning} Stabilized estimate: $${tax.stabilizedAnnual.toLocaleString("en-US")}/yr; ` +
+      `adverse case: $${tax.adverseAnnual.toLocaleString("en-US")}/yr.` +
+      (tax.sellerCurrentAnnual != null
+        ? ` Seller currently pays $${tax.sellerCurrentAnnual.toLocaleString("en-US")}/yr; that amount is not assumed transferable.`
+        : " The seller's current bill is not on file."),
+    provenance: tax.provenance,
+  });
 
   monthly.push({
     label: "Homeowner's insurance",
@@ -573,7 +620,7 @@ export function buildOwnershipCostModel(
   // Lenders size the house payment (PITI) against gross income using each
   // program's customary housing ratio. Publishing the bracket lets a visitor
   // see whether their income plausibly funds this WITHOUT disclosing it.
-  const taxLine = monthly.find((line) => line.label === "Property taxes");
+  const taxLine = monthly.find((line) => line.label === "Property taxes — buyer-side planning");
   const insuranceLine = monthly.find((line) => line.label === "Homeowner's insurance");
   const taxesMid = taxLine ? (taxLine.low + taxLine.high) / 2 : 0;
   const insuranceMid = insuranceLine ? (insuranceLine.low + insuranceLine.high) / 2 : 0;
@@ -675,6 +722,7 @@ export function buildOwnershipCostModel(
   };
 
   return {
+    tax,
     rateWeekOf: context.rates.weekOf,
     rate30Pct: rate,
     purchase: {

@@ -269,5 +269,19 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     /* commodity refresh is best-effort; committed snapshot stands */
   }
 
+  // Official parcel-tax and well-permit evidence refresh. The governed writers
+  // persist immutable versions and receipts in the shared runtime-state mount,
+  // so state survives Cloud Run revisions and scheduled job executions.
+  try {
+    const { refreshOfficialEvidenceSources } = await import("./officialEvidenceScheduledRefresh");
+    await refreshOfficialEvidenceSources(now);
+  } catch (error) {
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "official-evidence-refresh", subject: "all", decision: "ALERT",
+      reason: `official evidence refresh failed; last-good durable state retained: ${(error as Error).message}`,
+    });
+  }
+
   return results;
 }

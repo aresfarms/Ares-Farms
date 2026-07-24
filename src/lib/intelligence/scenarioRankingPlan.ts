@@ -15,6 +15,8 @@ export interface RankedPropertyScenario {
   lifecycleResilience: number;
   taxResilience: number;
   taxAdjustment: number;
+  infrastructureResilience: number;
+  infrastructureAdjustment: number;
   posture: ScenarioPosture;
   reasons: string[];
   conditions: string[];
@@ -32,6 +34,26 @@ export interface ScenarioTaxImpact {
   adverseAnnual: number;
   acquisitionPrice: number;
   scenarioAdjustments?: Record<string, ScenarioTaxAdjustment>;
+}
+
+
+export type PropertyRiskStatus = "verified-clear" | "verified-constrained" | "unknown";
+
+export interface ScenarioInfrastructureAdjustment {
+  waterPenalty?: number;
+  insurancePenalty?: number;
+  publicProjectPenalty?: number;
+  governmentActionPenalty?: number;
+  verified?: boolean;
+  notes?: string[];
+}
+
+export interface PropertyInfrastructureRiskImpact {
+  water: PropertyRiskStatus;
+  insurance: PropertyRiskStatus;
+  publicProject: PropertyRiskStatus;
+  governmentAction: PropertyRiskStatus;
+  scenarioAdjustments?: Record<string, ScenarioInfrastructureAdjustment>;
 }
 
 export interface ScenarioRankingPlan {
@@ -73,6 +95,7 @@ export function buildScenarioRankingPlan(args: {
   capitalPlan: PreliminaryCapitalPlan;
   pathwayCount: number;
   taxImpact?: ScenarioTaxImpact | null;
+  infrastructureRisk?: PropertyInfrastructureRiskImpact | null;
 }): ScenarioRankingPlan {
   const marketBase = args.marketPlan.status === "supported" ? 72 : args.marketPlan.status === "preliminary" ? 58 : 44;
   const financeBase = args.capitalPlan.priceKnown ? 68 : 48;
@@ -102,13 +125,23 @@ export function buildScenarioRankingPlan(args: {
     const scenarioTaxPenalty = Math.min(30, Math.round(((annualAdditional + rollbackAnnualized) / price) * 500));
     const taxAdjustment = -(commonTaxPenalty + scenarioTaxPenalty);
     const taxResilience = clamp(78 + taxAdjustment);
+    const infrastructure = args.infrastructureRisk?.scenarioAdjustments?.[id];
+    const statusPenalty = args.infrastructureRisk
+      ? [args.infrastructureRisk.water, args.infrastructureRisk.insurance, args.infrastructureRisk.publicProject, args.infrastructureRisk.governmentAction]
+          .reduce((total, status) => total + (status === "verified-constrained" ? 10 : status === "unknown" ? 3 : 0), 0)
+      : 12;
+    const usePenalty = Math.min(60, Math.max(0, infrastructure?.waterPenalty ?? 0) + Math.max(0, infrastructure?.insurancePenalty ?? 0) + Math.max(0, infrastructure?.publicProjectPenalty ?? 0) + Math.max(0, infrastructure?.governmentActionPenalty ?? 0));
+    const infrastructureAdjustment = -(statusPenalty + usePenalty);
+    const infrastructureResilience = clamp(82 + infrastructureAdjustment);
     const totalScore = clamp(
-      propertyFit * 0.24 +
-      marketViability * 0.21 +
-      financeability * 0.21 +
-      lifecycleResilience * 0.14 +
-      taxResilience * 0.20 -
-      scenarioTaxPenalty * 0.5
+      propertyFit * 0.20 +
+      marketViability * 0.18 +
+      financeability * 0.18 +
+      lifecycleResilience * 0.12 +
+      taxResilience * 0.16 +
+      infrastructureResilience * 0.16 -
+      scenarioTaxPenalty * 0.4 -
+      usePenalty * 0.35
     );
     const posture: ScenarioPosture = totalScore >= 72 ? "proceed-with-conditions" : totalScore >= 58 ? "renegotiate" : "walk-away";
     const taxReason = scenarioTax
@@ -118,14 +151,21 @@ export function buildScenarioRankingPlan(args: {
       : args.taxImpact
         ? `Buyer-side tax resilience ${taxResilience}/100 using stabilized $${Math.round(args.taxImpact.stabilizedAnnual).toLocaleString("en-US")}/yr and adverse $${Math.round(args.taxImpact.adverseAnnual).toLocaleString("en-US")}/yr`
         : "Tax effect unresolved and not yet scored beyond the hard-stop rule.";
+    const infrastructureReason = infrastructure
+      ? `${infrastructure.verified ? "Verified" : "Planning"} use-specific water/insurance/public-project/government-action adjustment ${infrastructureAdjustment}` +
+        `${infrastructure.notes?.length ? ` — ${infrastructure.notes.join("; ")}` : ""}`
+      : args.infrastructureRisk
+        ? `Property-wide infrastructure resilience ${infrastructureResilience}/100 across water, insurance, public-project exposure, and formal government actions`
+        : "Water, insurance, public-project exposure, and formal government actions remain unresolved and are conservatively scored.";
     return {
-      id, title, summary, totalScore, propertyFit, marketViability, financeability, lifecycleResilience, taxResilience, taxAdjustment, posture,
+      id, title, summary, totalScore, propertyFit, marketViability, financeability, lifecycleResilience, taxResilience, taxAdjustment, infrastructureResilience, infrastructureAdjustment, posture,
       reasons: [
         `Property fit ${propertyFit}/100`,
         `Market viability ${marketViability}/100`,
         `Financeability ${financeability}/100`,
         `Lifecycle resilience ${lifecycleResilience}/100`,
         taxReason,
+        infrastructureReason,
       ],
       conditions: [
         args.marketPlan.status === "supported" ? "Comparable and market support is present but still requires source review." : "Market and closed-sale evidence must be strengthened before reliance.",
@@ -133,6 +173,7 @@ export function buildScenarioRankingPlan(args: {
         args.taxImpact
           ? "Official reassessment, exemption, rollback, and change-of-use rules must replace planning tax assumptions before reliance."
           : "Post-transfer and use-change tax exposure must be established before reliance.",
+        "Water capacity and cost, insurance availability and cost, official public-project exposure, and formal government-action status must be resolved before reliance.",
         "Borrower-specific affordability and collateral analysis remain authorization-gated.",
       ],
     };
@@ -143,13 +184,14 @@ export function buildScenarioRankingPlan(args: {
     status: args.marketPlan.status === "supported" && args.capitalPlan.priceKnown ? "evidence-supported" : "preliminary",
     scenarios,
     overallPosture: lead?.posture ?? "walk-away",
-    rankingRule: "Rank by property fit, market viability, financeability, lifecycle resilience, and buyer-side tax resilience. Seller taxes never control the score unless transferability is officially verified; no score overrides a hard legal, environmental, physical, tax, insurance, or affordability stop.",
+    rankingRule: "Rank by property fit, market viability, financeability, lifecycle resilience, buyer-side tax resilience, and infrastructure/regulatory resilience. Seller taxes never control the score unless transferability is officially verified; no score overrides a hard legal, environmental, physical, tax, insurance, or affordability stop.",
     walkAwayGates: [
       "The leading course cannot support acquisition, required improvements, working capital, and debt service under conservative assumptions.",
       "Environmental, zoning, access, utility, title, insurance, or physical constraints make the intended use impractical.",
       "A materially better nearby property is available at a comparable or lower total project cost.",
       "The seller timeline is incompatible with the realistic financing pipeline and cannot be extended safely.",
       "Post-sale reassessment, rollback tax, special assessment, or change-of-use tax makes the use economically impractical.",
+      "Water capacity, insurance availability, a funded or active public-project taking, or a formal enacted/pending government action makes the use impractical.",
     ],
   };
 }

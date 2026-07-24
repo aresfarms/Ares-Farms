@@ -24,16 +24,19 @@ export function writeOfficialEvidenceRefresh<T>(args: {
   records?: T[];
   attemptedAt: string;
   failureReason?: string | null;
+  provenance?: { connectorId: string; parserVersion: string; implementationHash: string; approvalReceiptId: string } | null;
 }): OfficialEvidenceRefreshState<T> {
   const previous = args.previous ?? { sourceId: args.activation.sourceId, snapshots: [], receipts: [], publishedVersion: null };
   const lastGood = [...previous.snapshots].reverse().find((snapshot) => snapshot.receipt.status !== "failed") ?? null;
   const receiptId = randomUUID();
+  const provenance = args.provenance ?? null;
+  const provenanceFields = provenance ? { connectorId: provenance.connectorId, parserVersion: provenance.parserVersion, implementationHash: provenance.implementationHash, approvalReceiptId: provenance.approvalReceiptId } : {};
 
   if (args.failureReason) {
     const receipt: OfficialEvidenceRefreshReceipt = {
       receiptId, sourceId: args.activation.sourceId, attemptedAt: args.attemptedAt, status: "failed",
       recordCount: 0, sourceVersion: lastGood?.sourceVersion ?? "none", previousVersion: lastGood?.sourceVersion ?? null,
-      reason: args.failureReason, replayRef: `replay:${args.activation.sourceId}:${receiptId}`,
+      reason: args.failureReason, replayRef: `replay:${args.activation.sourceId}:${receiptId}`, ...provenanceFields,
     };
     return { ...previous, receipts: [...previous.receipts, receipt] };
   }
@@ -44,7 +47,7 @@ export function writeOfficialEvidenceRefresh<T>(args: {
     const receipt: OfficialEvidenceRefreshReceipt = {
       receiptId, sourceId: args.activation.sourceId, attemptedAt: args.attemptedAt, status: "no-change",
       recordCount: records.length, sourceVersion: lastGood.sourceVersion, previousVersion: lastGood.sourceVersion,
-      reason: "Official source content hash is unchanged.", replayRef: `replay:${args.activation.sourceId}:${receiptId}`,
+      reason: "Official source content hash is unchanged.", replayRef: `replay:${args.activation.sourceId}:${receiptId}`, ...provenanceFields,
     };
     return { ...previous, receipts: [...previous.receipts, receipt] };
   }
@@ -54,7 +57,7 @@ export function writeOfficialEvidenceRefresh<T>(args: {
     receiptId, sourceId: args.activation.sourceId, attemptedAt: args.attemptedAt, status: "refreshed",
     recordCount: records.length, sourceVersion, previousVersion: lastGood?.sourceVersion ?? null,
     reason: lastGood ? "Official source changed; new immutable version created." : "Initial official source version created.",
-    replayRef: `replay:${args.activation.sourceId}:${sourceVersion}`,
+    replayRef: `replay:${args.activation.sourceId}:${sourceVersion}`, ...provenanceFields,
   };
   const snapshot: OfficialEvidenceSnapshot<T> = {
     sourceId: args.activation.sourceId, sourceVersion, retrievedAt: args.attemptedAt, contentHash, records, receipt,

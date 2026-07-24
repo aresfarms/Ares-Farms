@@ -3,16 +3,16 @@ import os from "node:os";
 import path from "node:path";
 function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message); }
 async function main() {
-function assert(condition: unknown, message: string): asserts condition { if (!condition) throw new Error(message); }
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-evidence-refresh-"));
 process.env.FURLONG_RUNTIME_STATE_DIR = dir;
 const { refreshOfficialEvidenceSources } = await import("@/lib/property/officialEvidenceScheduledRefresh");
-const { registerOfficialEvidenceConnector, clearOfficialEvidenceConnectorRegistry } = await import("@/lib/property/officialEvidenceConnectorRegistry");
+const { registerOfficialEvidenceConnector, clearOfficialEvidenceConnectorRegistry, decideOfficialEvidenceConnector } = await import("@/lib/property/officialEvidenceConnectorRegistry");
 const { readOfficialEvidenceRefreshState } = await import("@/lib/property/officialEvidenceRuntimeStore");
 const governance = await import("@/lib/property/officialEvidenceSourceGovernance");
 governance.OFFICIAL_EVIDENCE_SOURCE_ACTIVATION["parcel-tax-authority"].status = "approved";
 clearOfficialEvidenceConnectorRegistry();
-registerOfficialEvidenceConnector({ connectorId: "test-tax-v1", sourceId: "parcel-tax-authority", sourceName: "Test county tax", officialAuthority: "County Treasurer", legalBasis: "Official public tax roll", geographicScope: ["Example County, MD"], parserVersion: "1.0.0", sourceUrl: "https://example.gov/tax", registeredAt: "2026-07-24T21:00:00Z", status: "approved", reviewedBy: "test-reviewer", reviewedAt: "2026-07-24T21:30:00Z" }, async () => [{ parcelId: "p-1", authority: "County Treasurer", jurisdiction: "Example County, MD", reference: "2026 tax card", retrievedAt: "2026-07-24T00:00:00Z", asOf: "2026-07-24", replayRef: "replay:tax:p1", currentAnnualTax: 4200, transferContinuityVerified: false }]);
+registerOfficialEvidenceConnector({ connectorId: "test-tax-v1", sourceId: "parcel-tax-authority", sourceName: "Test county tax", officialAuthority: "County Treasurer", legalBasis: "Official public tax roll", geographicScope: ["Example County, MD"], parserVersion: "1.0.0", sourceUrl: "https://example.gov/tax", registeredAt: "2026-07-24T21:00:00Z", status: "pending" }, async () => [{ parcelId: "p-1", authority: "County Treasurer", jurisdiction: "Example County, MD", reference: "2026 tax card", retrievedAt: "2026-07-24T00:00:00Z", asOf: "2026-07-24", replayRef: "replay:tax:p1", currentAnnualTax: 4200, transferContinuityVerified: false }]);
+decideOfficialEvidenceConnector({ sourceId: "parcel-tax-authority", decision: "APPROVE", reviewerId: "test-reviewer", reviewerName: "Test Reviewer", reason: "Exact connector implementation reviewed.", decidedAt: "2026-07-24T21:30:00Z" });
 const first = await refreshOfficialEvidenceSources(new Date("2026-07-24T22:00:00Z"));
 const stored = readOfficialEvidenceRefreshState<any>("parcel-tax-authority");
 assert(first.find(x => x.sourceId === "parcel-tax-authority")?.status === "refreshed", "Scheduled refresh must publish changed approved evidence.");

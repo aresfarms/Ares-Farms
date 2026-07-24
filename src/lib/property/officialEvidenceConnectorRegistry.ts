@@ -54,5 +54,8 @@ export function decideOfficialEvidenceConnector(input:{sourceId:OfficialEvidence
 export function clearOfficialEvidenceConnectorRegistry(): void { fetchers.clear(); writeDurableConnectorRegistry({registrations:[],receipts:[]}); }
 export function listOfficialEvidenceConnectorRegistrations(): OfficialEvidenceConnectorRegistration[] { return readDurableConnectorRegistry().registrations; }
 export function listOfficialEvidenceConnectorReceipts(): ConnectorReviewReceipt[] { return readDurableConnectorRegistry().receipts; }
+export function approvalReceiptForConnector(registration: OfficialEvidenceConnectorRegistration): ConnectorReviewReceipt | null {
+  return readDurableConnectorRegistry().receipts.filter(r => r.decision === "APPROVE" && r.connectorId === registration.connectorId && r.parserVersion === registration.parserVersion && r.implementationHash === registration.implementationHash).at(-1) ?? null;
+}
 export function getOfficialEvidenceConnectorRegistration(sourceId: OfficialEvidenceSourceId): OfficialEvidenceConnectorRegistration | null { return latestForSource(sourceId); }
 export function resolveApprovedOfficialEvidenceConnector(sourceId: OfficialEvidenceSourceId): RegistryEntry | null { const registration=latestForSource(sourceId); if(!registration||registration.status!=="approved")return null; validate(registration); const fetcher=fetchers.get(registration.connectorId); if(!fetcher||implementationHash(fetcher)!==registration.implementationHash)return null; return {registration,fetcher}; }

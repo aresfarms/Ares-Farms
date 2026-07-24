@@ -12,6 +12,10 @@ export interface OfficialEvidenceRefreshReceipt {
   previousVersion?: string | null;
   reason: string;
   replayRef: string;
+  connectorId?: string | null;
+  parserVersion?: string | null;
+  implementationHash?: string | null;
+  approvalReceiptId?: string | null;
 }
 
 export interface OfficialEvidenceSnapshot<T> {

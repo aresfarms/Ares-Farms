@@ -8,7 +8,8 @@ import { readRequiredSecret } from "@/lib/security/requestGuards";
 export type ReleaseGovernanceEvidenceKind =
   | "RELEASE_CANDIDATE_FREEZE_HOLD"
   | "PRODUCTION_CUTOVER_HOLD"
-  | "PRODUCTION_RELEASE_BOARD_PACKET";
+  | "PRODUCTION_RELEASE_BOARD_PACKET"
+  | "PRODUCTION_FINAL_AUTHORITY_PACKET";
 
 export type ReleaseGovernanceEvidenceRecord = {
   evidenceId: string;

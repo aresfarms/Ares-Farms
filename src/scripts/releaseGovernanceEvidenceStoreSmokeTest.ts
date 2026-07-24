@@ -32,13 +32,21 @@ async function main() {
     reviewNote: "release board remains blocked",
     replayRef: "release-evidence-smoke-board",
   });
-  assert(freeze.productionBlocked && cutover.productionBlocked && board.productionBlocked, "Release evidence must remain production blocked.");
+  const finalAuthority = store.recordReleaseGovernanceEvidence({
+    kind: "PRODUCTION_FINAL_AUTHORITY_PACKET",
+    scope: "platform",
+    actorId: "release-manager-test",
+    reviewNote: "final authority remains blocked",
+    replayRef: "release-evidence-smoke-final-authority",
+  });
+  assert(freeze.productionBlocked && cutover.productionBlocked && board.productionBlocked && finalAuthority.productionBlocked, "Release evidence must remain production blocked.");
   assert(!freeze.deploymentExecuted && !cutover.deploymentExecuted, "Release evidence may not execute deployment.");
   assert(store.latestReleaseGovernanceEvidence("platform", "RELEASE_CANDIDATE_FREEZE_HOLD")?.evidenceId === freeze.evidenceId, "Freeze evidence did not persist.");
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_CUTOVER_HOLD")?.evidenceId === cutover.evidenceId, "Cutover evidence did not persist.");
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_RELEASE_BOARD_PACKET")?.evidenceId === board.evidenceId, "Release board evidence did not persist.");
-  assert(store.releaseGovernanceEvidenceFor("platform").length === 3, "Release evidence stages must remain distinct.");
-  console.log(JSON.stringify({ ok: true, records: 3, productionBlocked: true, deploymentExecuted: false }, null, 2));
+  assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_FINAL_AUTHORITY_PACKET")?.evidenceId === finalAuthority.evidenceId, "Final authority evidence did not persist.");
+  assert(store.releaseGovernanceEvidenceFor("platform").length === 4, "Release evidence stages must remain distinct.");
+  console.log(JSON.stringify({ ok: true, records: 4, productionBlocked: true, deploymentExecuted: false }, null, 2));
   rmSync(dir, { recursive: true, force: true });
 }
 

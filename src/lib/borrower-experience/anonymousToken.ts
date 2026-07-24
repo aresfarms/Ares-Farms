@@ -5,7 +5,7 @@
  * BY DESIGN:
  *   - minting requires ZERO real-identity PII — no email, no name. The visitor
  *     gets a generated token/passphrase they keep. The token is the only handle.
- *   - we store ONLY the token's SHA-256 hash, never the plaintext — so we
+ *   - we store ONLY a peppered HMAC-SHA-256 token verifier, never the plaintext — so we
  *     genuinely cannot recover it, and cannot identify the visitor.
  *   - optional contact (to return / for matching) is OPTIONAL, minimal, and only
  *     stored if the visitor explicitly provides it — never required to mint.
@@ -23,7 +23,7 @@
  * unit holds whatever public property snapshot the visitor chose to keep.
  */
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash, createHmac, randomBytes } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -40,8 +40,9 @@ export type StoredSnapshot = Record<string, unknown>;
 export interface TokenRecord {
   /** Short public handle for logging — derived from the hash, identifies NO person. */
   tokenId: string;
-  /** SHA-256 of the plaintext token. The plaintext is NEVER stored. */
+  /** HMAC-SHA-256 (v2) or legacy SHA-256 (v1). Plaintext is NEVER stored. */
   tokenHash: string;
+  hashVersion?: "v1-sha256" | "v2-hmac-sha256";
   createdAt: string;
   /** The visitor's saved properties (public listing snapshots). */
   saved: StoredSnapshot[];
@@ -80,8 +81,21 @@ export const DATA_RIGHTS = [
   },
 ] as const;
 
-function sha(s: string): string {
-  return createHash("sha256").update(s).digest("hex");
+function legacySha(value: string): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+function tokenPepper(): string {
+  const pepper = process.env.ANONYMOUS_TOKEN_PEPPER?.trim();
+  if (pepper) return pepper;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("ANONYMOUS_TOKEN_PEPPER is required in production.");
+  }
+  return "furlong-local-development-pepper-not-for-production";
+}
+
+function protectedHash(value: string): string {
+  return createHmac("sha256", tokenPepper()).update(value).digest("hex");
 }
 
 function readAll(): TokenRecord[] {
@@ -156,11 +170,12 @@ export async function mintToken(input?: {
   tokenId: string;
 }> {
   const token = generateToken();
-  const tokenHash = sha(token);
+  const tokenHash = protectedHash(token);
   const tokenId = tokenHash.slice(0, 16);
   const record: TokenRecord = {
     tokenId,
     tokenHash,
+    hashVersion: "v2-hmac-sha256",
     createdAt: new Date().toISOString(),
     saved: input?.saved ?? [],
     contact: input?.contact?.trim() ? input.contact.trim() : null, // optional, consented
@@ -182,10 +197,19 @@ function findByToken(token: string): {
   idx: number;
   tokenId: string;
 } {
-  const tokenHash = sha(token);
+  const protectedTokenHash = protectedHash(token);
+  const legacyTokenHash = legacySha(token);
   const rows = readAll();
-  const idx = rows.findIndex((r) => r.tokenHash === tokenHash);
-  return { rows, idx, tokenId: tokenHash.slice(0, 16) };
+  const idx = rows.findIndex((r) =>
+    r.hashVersion === "v2-hmac-sha256"
+      ? r.tokenHash === protectedTokenHash
+      : r.tokenHash === legacyTokenHash,
+  );
+  const resolvedHash =
+    idx >= 0 && rows[idx].hashVersion !== "v2-hmac-sha256"
+      ? legacyTokenHash
+      : protectedTokenHash;
+  return { rows, idx, tokenId: resolvedHash.slice(0, 16) };
 }
 
 /** Return-by-token. Null if unknown (lost token = genuinely gone). */

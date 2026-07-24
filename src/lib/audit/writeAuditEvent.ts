@@ -20,6 +20,8 @@ export type AuditEventInput = {
   traceId?: string | null;
   moduleId?: string | null;
   anonymousId?: string | null;
+  actorRef?: string | null;
+  target?: { type?: string | null; id?: string | null } | null;
   [key: string]: unknown;
 };
 
@@ -33,6 +35,9 @@ export type AuditEventRecord = {
   traceId: string | null;
   moduleId: string | null;
   anonymousId: string | null;
+  actorRef: string;
+  target: { type: string | null; id: string | null };
+  normalizationStatus: "CANONICAL" | "NORMALIZED_LEGACY";
   timestamp: string;
   governance: {
     canonicalWriter: true;
@@ -96,7 +101,37 @@ function extractIdentity(input: AuditEventInput) {
       ? (text(input.userId)?.slice(5) ?? null)
       : null);
 
-  return { metadata, payload, traceId, moduleId, anonymousId };
+  const suppliedActorRef =
+    text(input.actorRef) ?? text(metadata.actorRef) ?? text(payload.actorRef);
+  const actorRef =
+    suppliedActorRef ??
+    (anonymousId
+      ? `anon:${anonymousId}`
+      : text(input.userId)
+        ? `user:${text(input.userId)}`
+        : moduleId
+          ? `module:${moduleId}`
+          : "system:canonical-audit-writer");
+  const suppliedTarget = record(input.target);
+  const target = {
+    type: text(suppliedTarget.type) ?? text(input.entityType),
+    id: text(suppliedTarget.id) ?? text(input.entityId),
+  };
+  const normalizationStatus =
+    input.moduleId && input.traceId && input.actorRef && input.target
+      ? ("CANONICAL" as const)
+      : ("NORMALIZED_LEGACY" as const);
+
+  return {
+    metadata,
+    payload,
+    traceId,
+    moduleId,
+    anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
+  };
 }
 
 export async function writeAuditEvent(
@@ -104,8 +139,16 @@ export async function writeAuditEvent(
 ): Promise<AuditEventRecord> {
   const id = randomUUID();
   const timestamp = new Date();
-  const { metadata, payload, traceId, moduleId, anonymousId } =
-    extractIdentity(input);
+  const {
+    metadata,
+    payload,
+    traceId,
+    moduleId,
+    anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
+  } = extractIdentity(input);
   const classification = text(input.classification) ?? "RESTRICTED";
   const source = text(input.source) ?? moduleId ?? "canonical-audit-writer";
   const suppliedUserId = text(input.userId);
@@ -121,12 +164,18 @@ export async function writeAuditEvent(
     traceId,
     moduleId,
     anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
   };
   const trace = {
     traceId,
     replayRef: text(metadata.replayRef) ?? traceId,
     moduleId,
     anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
   };
 
   return db.transaction(async (tx) => {
@@ -184,6 +233,9 @@ export async function writeAuditEvent(
       traceId,
       moduleId,
       anonymousId,
+      actorRef,
+      target,
+      normalizationStatus,
       timestamp: timestamp.toISOString(),
       governance: {
         canonicalWriter: true,

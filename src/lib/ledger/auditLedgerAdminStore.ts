@@ -20,6 +20,7 @@ export type ListAuditLedgerAdminRecordsInput = {
   traceId?: string | null;
   moduleId?: string | null;
   anonymousId?: string | null;
+  actorRef?: string | null;
   from?: Date | null;
   to?: Date | null;
   limit?: number | null;
@@ -93,6 +94,12 @@ function auditWhere(input: ListAuditLedgerAdminRecordsInput) {
           sql`${auditEvents.payload}->>'moduleId' = ${text(input.moduleId)}`,
         )
       : undefined,
+    text(input.actorRef)
+      ? or(
+          sql`${auditEvents.trace}->>'actorRef' = ${text(input.actorRef)}`,
+          sql`${auditEvents.payload}->>'actorRef' = ${text(input.actorRef)}`,
+        )
+      : undefined,
     text(input.anonymousId)
       ? or(
           eq(auditEvents.entityId, text(input.anonymousId) ?? ""),
@@ -132,6 +139,9 @@ function canonicalWhere(input: ListAuditLedgerAdminRecordsInput) {
       : undefined,
     text(input.moduleId)
       ? sql`${canonicalLedger.trace}->>'moduleId' = ${text(input.moduleId)}`
+      : undefined,
+    text(input.actorRef)
+      ? sql`${canonicalLedger.trace}->>'actorRef' = ${text(input.actorRef)}`
       : undefined,
     text(input.anonymousId)
       ? sql`${canonicalLedger.trace}->>'anonymousId' = ${text(input.anonymousId)}`

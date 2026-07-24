@@ -447,7 +447,11 @@
     "smoke:intelligence-case-human-review": "tsx src/scripts/intelligenceCaseHumanReviewHandoffSmokeTest.ts",
     "smoke:intelligence-case-review-receipt": "tsx src/scripts/intelligenceCaseReviewReceiptSmokeTest.ts",
     "smoke:durable-unified-audit": "tsx src/scripts/durableUnifiedAuditSmokeTest.ts",
-    "smoke:unified-audit-architecture": "tsx src/scripts/unifiedAuditArchitectureSmokeTest.ts"
+    "smoke:unified-audit-architecture": "tsx src/scripts/unifiedAuditArchitectureSmokeTest.ts",
+    "audit:package": "tsx src/scripts/buildAuditPackage.ts",
+    "smoke:audit-hardening": "tsx src/scripts/auditHardeningArchitectureSmokeTest.ts",
+    "test:tprm:preflight": "tsx src/scripts/runInstitutionalTprmAssessment.ts",
+    "test:tprm:database": "tsx src/scripts/institutionalTprmDatabaseSmokeTest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

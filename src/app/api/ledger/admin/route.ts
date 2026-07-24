@@ -47,6 +47,7 @@ type LedgerAdminQuery = {
   traceId?: string | null;
   moduleId?: string | null;
   anonymousId?: string | null;
+  actorRef?: string | null;
   from?: Date | null;
   to?: Date | null;
   limit: number;
@@ -108,6 +109,7 @@ function parseQuery(req: NextRequest): LedgerAdminQuery {
     traceId: normalizeText(params.get("traceId")),
     moduleId: normalizeText(params.get("moduleId")),
     anonymousId: normalizeText(params.get("anonymousId")),
+    actorRef: normalizeText(params.get("actorRef")),
     from: normalizeDate(params.get("from")),
     to: normalizeDate(params.get("to")),
     limit: normalizeLimit(params.get("limit")),
@@ -143,6 +145,7 @@ function hasBoundedLedgerScope(query: LedgerAdminQuery): boolean {
     query.traceId ||
     query.moduleId ||
     query.anonymousId ||
+    query.actorRef ||
     query.from ||
     query.to,
   );

@@ -456,7 +456,8 @@
     "smoke:audit-chain-v2": "tsx src/scripts/auditChainV2ArchitectureSmokeTest.ts",
     "verify:post-sale-tax": "tsx src/scripts/verifyPostSaleTaxRule.ts",
     "verify:tax-aware-top-three": "tsx src/scripts/verifyTaxAwareTopThree.ts",
-    "verify:unified-property-risk": "tsx src/scripts/verifyUnifiedPropertyRiskRanking.ts"
+    "verify:unified-property-risk": "tsx src/scripts/verifyUnifiedPropertyRiskRanking.ts",
+    "verify:water-insurance-evidence": "tsx src/scripts/verifyWaterInsuranceEvidence.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

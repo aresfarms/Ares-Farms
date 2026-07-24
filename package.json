@@ -459,7 +459,8 @@
     "verify:unified-property-risk": "tsx src/scripts/verifyUnifiedPropertyRiskRanking.ts",
     "verify:water-insurance-evidence": "tsx src/scripts/verifyWaterInsuranceEvidence.ts",
     "verify:public-action-evidence": "tsx src/scripts/verifyPublicActionEvidence.ts",
-    "verify:property-evidence-manifest": "tsx src/scripts/verifyPropertyEvidenceManifest.ts"
+    "verify:property-evidence-manifest": "tsx src/scripts/verifyPropertyEvidenceManifest.ts",
+    "verify:property-evidence-panel": "tsx src/scripts/verifyPropertyEvidencePanel.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

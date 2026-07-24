@@ -15,6 +15,7 @@ import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/Cha
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { PropertyResultCard } from "@/components/property/PropertyResultCard";
 import { PropertyBestCoursePanel } from "@/components/property/PropertyBestCoursePanel";
+import { PropertyEvidencePanel } from "@/components/property/PropertyEvidencePanel";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
 import { buildMarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
@@ -34,6 +35,8 @@ import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
+import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
+import type { ExtendedPropertyRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import {
   allProfiles,
   classifyPropertyProfile,
@@ -2995,6 +2998,15 @@ export function PropertyEvaluationWorkspace({
   const rankingTax = ownershipContext && rankingPrice
     ? buildPostSaleTaxScenario({ price: rankingPrice }, ownershipContext)
     : null;
+  const reportRiskEvidence: ExtendedPropertyRiskEvidence[] = [
+    { kind: "water", status: "unresolved", confidence: "unresolved", notes: ["Water source, tested capacity, rights, and lifecycle cost have not yet been verified for this property."] },
+    { kind: "insurance", status: "unknown-pending-quote", confidence: "unresolved", notes: ["A property- and use-specific insurance indication or quote is still required."] },
+    { kind: "public-project", status: "unknown", confidence: "unresolved", notes: ["Current DOT and other public-project records have not yet been resolved for this parcel."] },
+    { kind: "government-action", status: "proposed", confidence: "unresolved", governmentBody: "Unresolved", officialTitle: "Formal government action review", lastOfficialAction: "Not yet searched", geographicScope: analysisContext.location, notes: ["Official pending and implementation-stage government actions have not yet been resolved."] },
+  ];
+  const propertyEvidenceManifest = rankingTax
+    ? buildPropertyEvidenceManifest({ tax: rankingTax, evidence: reportRiskEvidence })
+    : null;
   const scenarioRankingPlan = buildScenarioRankingPlan({
     profileId: workspaceProfile.id,
     marketPlan: marketComparablePlan,
@@ -3483,6 +3495,9 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
+      {!deepView && propertyEvidenceManifest && (
+        <PropertyEvidencePanel manifest={propertyEvidenceManifest} />
+      )}
       {!deepView && (
         <PropertyBestCoursePanel
           profileId={workspaceProfile.id}

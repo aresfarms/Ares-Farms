@@ -175,7 +175,7 @@ const surfaces: SurfaceConfig[] = [
     id: "evidenceIntegrity",
     label: "Release Evidence Integrity",
     group: "audit",
-    path: "/api/governance/release-evidence-integrity",
+    path: `/api/governance/release-evidence-integrity?role=governance&userId=${actorId}`,
     collectionKeys: ["integrityFindings"],
     accent: "#be123c",
     riskLabel: "Rejected or corrupted release evidence",

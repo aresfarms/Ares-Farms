@@ -56,14 +56,30 @@ import { buildSearchGuidance, CANDIDATE_SOURCES_LIVE } from "@/lib/navigator/sea
 
 export const runtime = "nodejs";
 
+interface ExistingIntelligenceCase {
+  caseId: string;
+  displayName?: string | null;
+  goal?: string | null;
+  state?: string | null;
+  customerTypes?: string[];
+  intendedUses?: string[];
+}
+
 interface Body {
   message?: string;
   journey?: JourneyState;
+  intelligenceCase?: ExistingIntelligenceCase | null;
 }
 
-export function intelligenceCaseHandoff(journey: JourneyState, pathwayIds: string[]) {
+export function intelligenceCaseHandoff(
+  journey: JourneyState,
+  pathwayIds: string[],
+  existingCase?: ExistingIntelligenceCase | null
+) {
   const propertyKind = journey.context.propertyKind;
-  const state = journey.context.state?.trim().toUpperCase() || null;
+  const state = existingCase?.state?.trim().toUpperCase()
+    || journey.context.state?.trim().toUpperCase()
+    || null;
   const structuredSeed = JSON.stringify({
     entryMode: journey.entryMode,
     dealType: journey.dealType,
@@ -71,26 +87,32 @@ export function intelligenceCaseHandoff(journey: JourneyState, pathwayIds: strin
     state,
     pathwayIds: [...pathwayIds].sort(),
   });
-  const caseId = `navigator-${createHash("sha256").update(structuredSeed).digest("hex").slice(0, 20)}`;
-  const customerTypes = propertyKind === "farm"
+  const generatedCaseId = `navigator-${createHash("sha256").update(structuredSeed).digest("hex").slice(0, 20)}`;
+  const caseId = existingCase?.caseId.trim() || generatedCaseId;
+  const inferredCustomerTypes = propertyKind === "farm"
     ? ["farmer", "rural small business"]
     : propertyKind === "commercial"
       ? ["small business", "commercial property participant"]
       : propertyKind === "residential"
         ? ["property owner"]
         : ["prospective property participant"];
+  const mergeUnique = (left: string[] = [], right: string[] = []) =>
+    [...new Set([...left, ...right].map((value) => value.trim()).filter(Boolean))];
+  const customerTypes = mergeUnique(existingCase?.customerTypes, inferredCustomerTypes);
+  const intendedUses = mergeUnique(existingCase?.intendedUses, pathwayIds);
   const params = new URLSearchParams({
-    name: "Navigator intelligence case",
-    goal: `Evaluate ${describeDealType(journey.dealType)} pathways, constraints, and next steps.`,
+    name: existingCase?.displayName?.trim() || "Navigator intelligence case",
+    goal: existingCase?.goal?.trim() || `Evaluate ${describeDealType(journey.dealType)} pathways, constraints, and next steps.`,
     customerTypes: customerTypes.join(","),
-    intendedUses: pathwayIds.join(","),
-    origin: "navigator",
+    intendedUses: intendedUses.join(","),
+    origin: existingCase ? "navigator-enrichment" : "navigator",
   });
   if (state) params.set("state", state);
   return {
     caseId,
     href: `/intelligence/cases/${caseId}?${params.toString()}`,
-    source: "NAVIGATOR_STRUCTURED_HANDOFF" as const,
+    source: existingCase ? "NAVIGATOR_CASE_ENRICHMENT" as const : "NAVIGATOR_STRUCTURED_HANDOFF" as const,
+    enrichmentMode: Boolean(existingCase),
     transcriptTransferred: false as const,
     identityTransferred: false as const,
     addressTransferred: false as const,
@@ -372,7 +394,7 @@ export async function POST(req: Request) {
       programsSeam: "A property qualifying for a program is a fact about the property. Whether YOU qualify is a licensed professional's call — property qualifies ≠ you qualify.",
       decision: decisionSummary,
       searchGuidance,
-      intelligenceCase: intelligenceCaseHandoff(journey, pathways.map((pathway) => pathway.id)),
+      intelligenceCase: intelligenceCaseHandoff(journey, pathways.map((pathway) => pathway.id), body.intelligenceCase),
       journey,
     });
   }

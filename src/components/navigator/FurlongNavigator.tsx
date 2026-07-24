@@ -28,10 +28,19 @@ import {
  * instantly. Anonymous means anonymous in the user experience.
  */
 
+type ExistingIntelligenceCase = {
+  caseId: string;
+  displayName?: string | null;
+  goal?: string | null;
+  state?: string | null;
+  customerTypes?: string[];
+  intendedUses?: string[];
+};
+
 type Reply =
   | { kind: "question"; node: string; text: string; turnIntent?: string; journey: JourneyState }
   | { kind: "refusal"; refusal: string; text: string; turnIntent?: string; journey: JourneyState }
-  | { kind: "pathways"; node: string; text: string; turnIntent?: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; intelligenceCase: { caseId: string; href: string; source: "NAVIGATOR_STRUCTURED_HANDOFF"; transcriptTransferred: false; identityTransferred: false; addressTransferred: false }; journey: JourneyState };
+  | { kind: "pathways"; node: string; text: string; turnIntent?: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; intelligenceCase: { caseId: string; href: string; source: "NAVIGATOR_STRUCTURED_HANDOFF" | "NAVIGATOR_CASE_ENRICHMENT"; enrichmentMode: boolean; transcriptTransferred: false; identityTransferred: false; addressTransferred: false }; journey: JourneyState };
 
 const CONF_STYLE: Record<string, { label: string; bg: string; fg: string }> = {
   high: { label: "High confidence", bg: "#e1f5ee", fg: "#0F6E56" },
@@ -60,8 +69,10 @@ export type NavigatorSnapshot = {
 export function FurlongNavigator({
   initialMessage,
   onStateChange,
+  existingCase = null,
 }: {
   initialMessage?: string;
+  existingCase?: ExistingIntelligenceCase | null;
   onStateChange?: (snapshot: NavigatorSnapshot) => void;
 }) {
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -81,7 +92,7 @@ export function FurlongNavigator({
 
   async function post(payload: unknown): Promise<Reply> {
     const res = await fetch("/api/public/navigator/converse", {
-      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
+      method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...(payload as Record<string, unknown>), intelligenceCase: existingCase }),
     });
     if (!res.ok) throw new Error(`navigator ${res.status}`);
     return (await res.json()) as Reply;
@@ -332,12 +343,12 @@ export function FurlongNavigator({
 
           {intelligenceCaseHref && (
             <div data-testid="intelligence-case-handoff" style={{ display: "grid", gap: 8, border: "1.5px solid #0f766e", borderRadius: 12, padding: "16px 18px", background: "#f1fbfa" }}>
-              <strong style={{ fontSize: 15, color: "#0f5f59" }}>Carry this work into one intelligence case</strong>
+              <strong style={{ fontSize: 15, color: "#0f5f59" }}>{existingCase ? "Add these pathways to this intelligence case" : "Carry this work into one intelligence case"}</strong>
               <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>
-                Open a case workspace built from the structured pathway results above. Your transcript, identity, and street address are not transferred.
+                {existingCase ? "Return to the same case with these structured pathway results added. Your transcript, identity, and street address are not transferred." : "Open a case workspace built from the structured pathway results above. Your transcript, identity, and street address are not transferred."}
               </span>
               <Link href={intelligenceCaseHref} style={{ justifySelf: "start", display: "inline-flex", alignItems: "center", minHeight: 42, padding: "0 18px", borderRadius: 999, background: "#0f766e", color: "#fff", textDecoration: "none", fontWeight: 800, fontSize: 13 }}>
-                Open your intelligence case →
+                {existingCase ? "Return to your enriched intelligence case →" : "Open your intelligence case →"}
               </Link>
             </div>
           )}

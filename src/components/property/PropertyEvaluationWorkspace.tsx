@@ -1914,6 +1914,7 @@ export function PropertyEvaluationWorkspace({
   listedPrice = null,
   similarHomes = [],
   startingLens = null,
+  navigatorCaseContext = null,
 }: {
   context: PropertyContext;
   tierPreviewMode: boolean;
@@ -1934,6 +1935,15 @@ export function PropertyEvaluationWorkspace({
   similarHomes?: SimilarHomeLine[];
   /** Compass lane that opened this case. It guides the first view but never limits whole-property analysis. */
   startingLens?: string | null;
+  /** Existing anonymous intelligence case context used only to preserve and enrich the same case. */
+  navigatorCaseContext?: {
+    caseId: string;
+    displayName?: string | null;
+    goal?: string | null;
+    state?: string | null;
+    customerTypes?: string[];
+    intendedUses?: string[];
+  } | null;
 }) {
   const [navigator, setNavigator] = useState<NavigatorSnapshot | null>(null);
   // Visitor's answer to "what is this property?" — an imported address carries
@@ -2347,7 +2357,7 @@ export function PropertyEvaluationWorkspace({
                   This stays in high-level feasibility and public-disposition posture only.
                 </span>
               </div>
-              <FurlongNavigator initialMessage={context.initialMessage} onStateChange={setNavigator} />
+              <FurlongNavigator initialMessage={context.initialMessage} existingCase={navigatorCaseContext} onStateChange={setNavigator} />
             </section>
           </div>
         </section>
@@ -3876,7 +3886,7 @@ export function PropertyEvaluationWorkspace({
               <details style={detailsStyle}>
                 <summary style={summaryStyle}>Open guided follow-up questions and live analysis</summary>
                 <div style={{ paddingTop: 14 }}>
-                  <FurlongNavigator initialMessage={context.initialMessage} onStateChange={setNavigator} />
+                  <FurlongNavigator initialMessage={context.initialMessage} existingCase={navigatorCaseContext} onStateChange={setNavigator} />
                 </div>
               </details>
             ) : (

@@ -202,6 +202,15 @@ function addressFirstAnalysisContext(flow: ReturnType<typeof resolveDiscoveryFlo
 /** Render the journey chosen by the resolver. Exported for the path entrypoints. */
 export function DiscoverSurface({ route, query }: { route: string; query: SP }) {
   const flow = resolveDiscoveryFlow({ route, query });
+  const navigatorCaseId = one(query.caseId);
+  const navigatorCaseContext = navigatorCaseId ? {
+    caseId: navigatorCaseId,
+    displayName: one(query.name),
+    goal: one(query.goal),
+    state: one(query.state),
+    customerTypes: (one(query.customerTypes) ?? "").split(",").map((value) => value.trim()).filter(Boolean),
+    intendedUses: (one(query.intendedUses) ?? "").split(",").map((value) => value.trim()).filter(Boolean),
+  } : null;
   const propertyContext = propertyAnalysisContext(query);
   const addressFirstContext = addressFirstAnalysisContext(flow);
   const defaultPropertyContext = addressFirstAnalysisContext("property-discovery");
@@ -215,6 +224,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
           tierPreviewMode={tierPreviewMode}
           addressFirstFlow={flow}
           startingLens={one(query.lens)}
+          navigatorCaseContext={navigatorCaseContext}
         />
         {/* Manifesto off here: the report carries the elevated Sovereignty
             Guarantee box, so the "why we lay it all out" preface isn't repeated. */}
@@ -296,6 +306,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
             ownershipContext={ownershipContext}
             listedPrice={listedPrice}
             similarHomes={similarHomes}
+            navigatorCaseContext={navigatorCaseContext}
           />
         </>
       ) : (
@@ -304,6 +315,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
           tierPreviewMode={tierPreviewMode}
           addressFirstFlow="property-discovery"
           startingLens={one(query.lens)}
+          navigatorCaseContext={navigatorCaseContext}
         />
       )}
 

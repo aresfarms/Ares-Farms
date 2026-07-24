@@ -462,7 +462,9 @@
     "verify:property-evidence-manifest": "tsx src/scripts/verifyPropertyEvidenceManifest.ts",
     "verify:property-evidence-panel": "tsx src/scripts/verifyPropertyEvidencePanel.ts",
     "verify:property-evidence-ingestion": "tsx src/scripts/verifyPropertyEvidenceIngestion.ts",
-    "verify:structured-official-evidence": "tsx src/scripts/verifyStructuredOfficialEvidence.ts"
+    "verify:structured-official-evidence": "tsx src/scripts/verifyStructuredOfficialEvidence.ts",
+    "verify:official-property-source-adapters": "tsx src/scripts/verifyOfficialPropertySourceAdapters.ts",
+    "verify:cloud-build-release-rule": "tsx src/scripts/verifyCloudBuildReleaseRule.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

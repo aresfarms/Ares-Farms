@@ -36,7 +36,7 @@ import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
-import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence } from "@/lib/property/propertyEvidenceIngestion";
+import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
 import type { ExtendedPropertyRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 import {
@@ -2998,8 +2998,13 @@ export function PropertyEvaluationWorkspace({
     comparables: similarHomes,
   });
   const rankingPrice = listedPrice ?? parsePriceSignal(analysisContext.priceLabel);
+  const officialTaxRecord = structuredTaxRecord(facts?.propertyEvidenceRecords ?? []);
   const rankingTax = ownershipContext && rankingPrice
-    ? buildPostSaleTaxScenario({ price: rankingPrice }, ownershipContext)
+    ? buildPostSaleTaxScenario({
+        price: rankingPrice,
+        sellerCurrentAnnualTax: officialTaxRecord?.currentAnnualTax ?? undefined,
+        currentTaxTransfersUnchanged: officialTaxRecord?.transferContinuityVerified === true,
+      }, ownershipContext)
     : null;
   const structuredRiskEvidence = ingestStructuredPropertyEvidence(facts?.propertyEvidenceRecords ?? []);
   const textRiskEvidence = ingestPropertyEvidence({

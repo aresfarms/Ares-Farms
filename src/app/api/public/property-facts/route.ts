@@ -9,6 +9,7 @@ import { nmtcForProperty } from "@/lib/property/propertyNmtc";
 import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones";
 import { findCanonicalPropertyByExactAddress, findCanonicalPropertyById } from "@/lib/property/propertyData";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
+import { officialPropertyEvidenceRecords } from "@/lib/property/officialPropertySourceAdapters";
 
 /**
  * Property facts API — PUBLIC, verified snapshot reads only.
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
       placeFacts: imported.placeFacts,
       verifiedPrograms: verifyPropertyPrograms(imported.placeFactsForPrograms),
       placeIntelligence,
-      propertyEvidenceRecords: [],
+      propertyEvidenceRecords: canonicalMatch ? officialPropertyEvidenceRecords(canonicalMatch) : [],
       verification: {
         status: imported.status,
         normalizedAddress: imported.normalizedAddress,
@@ -116,6 +117,7 @@ export async function POST(req: NextRequest) {
   });
   const property = findCanonicalPropertyById(propertyId);
   const sourceRecord = property?.source_records[0] ?? null;
+  const propertyEvidenceRecords = property ? officialPropertyEvidenceRecords(property) : [];
 
   return NextResponse.json({
     ok: true,

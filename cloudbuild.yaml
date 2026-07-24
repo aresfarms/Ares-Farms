@@ -47,6 +47,18 @@ steps:
         npm run smoke:consolidated-launch-authorization
         npm run smoke:launch-authorization-decisions
         npm run smoke:production-data-classification
+        npm run verify:cloud-build-release-rule
+        npm run verify:official-property-source-adapters
+        npm run verify:structured-official-evidence
+        npm run verify:property-evidence-ingestion
+        npm run verify:property-evidence-panel
+        npm run verify:property-evidence-manifest
+        npm run verify:public-action-evidence
+        npm run verify:water-insurance-evidence
+        npm run verify:unified-property-risk
+        npm run verify:tax-aware-top-three
+        npm run verify:post-sale-tax
+        npm run verify:property-entry-parity
 
   # Runtime image (default final stage: runner)
   - name: gcr.io/cloud-builders/docker

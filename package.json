@@ -469,7 +469,8 @@
     "verify:official-evidence-refresh-writer": "tsx src/scripts/verifyOfficialEvidenceRefreshWriter.ts",
     "verify:official-evidence-durable-refresh": "tsx src/scripts/verifyOfficialEvidenceDurableRefresh.ts",
     "verify:official-evidence-connector-registry": "tsx src/scripts/verifyOfficialEvidenceConnectorRegistry.ts",
-    "verify:official-evidence-connector-durability": "tsx src/scripts/verifyOfficialEvidenceConnectorDurability.ts"
+    "verify:official-evidence-connector-durability": "tsx src/scripts/verifyOfficialEvidenceConnectorDurability.ts",
+    "verify:official-evidence-connector-change-control": "tsx src/scripts/verifyOfficialEvidenceConnectorChangeControl.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -8,7 +8,7 @@ export interface ConnectorReviewReceipt {
   receiptId: string;
   connectorId: string;
   sourceId: OfficialEvidenceSourceId;
-  decision: "REGISTER" | "APPROVE" | "SUSPEND";
+  decision: "REGISTER" | "CHANGE_REVIEW_REQUIRED" | "APPROVE" | "SUSPEND";
   actorId: string;
   actorName: string;
   decidedAt: string;

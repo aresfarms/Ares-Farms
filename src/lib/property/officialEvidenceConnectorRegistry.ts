@@ -24,11 +24,23 @@ function validate(r: OfficialEvidenceConnectorRegistration): void {
 function latestForSource(sourceId: OfficialEvidenceSourceId): OfficialEvidenceConnectorRegistration | null {
   return readDurableConnectorRegistry().registrations.filter(r=>r.sourceId===sourceId).at(-1) ?? null;
 }
+const materialFingerprint = (r: OfficialEvidenceConnectorRegistration): string => JSON.stringify({
+  connectorId: r.connectorId, sourceId: r.sourceId, sourceName: r.sourceName, officialAuthority: r.officialAuthority,
+  legalBasis: r.legalBasis, geographicScope: [...r.geographicScope].sort(), parserVersion: r.parserVersion, sourceUrl: r.sourceUrl,
+});
+
 export function registerOfficialEvidenceConnector(registration: OfficialEvidenceConnectorRegistration, fetcher: OfficialEvidenceConnectorFetcher): void {
-  validate(registration); fetchers.set(registration.connectorId, fetcher);
-  const state=readDurableConnectorRegistry(); const registrations=state.registrations.filter(r=>!(r.connectorId===registration.connectorId&&r.parserVersion===registration.parserVersion));
-  const receipt: ConnectorReviewReceipt={receiptId:randomUUID(),connectorId:registration.connectorId,sourceId:registration.sourceId,decision:"REGISTER",actorId:"system:connector-registration",actorName:"connector-registration",decidedAt:registration.registeredAt,reason:"Connector version registered for governed review.",parserVersion:registration.parserVersion};
-  writeDurableConnectorRegistry({registrations:[...registrations,structuredClone(registration)],receipts:[...state.receipts,receipt]});
+  validate(registration);
+  const state=readDurableConnectorRegistry();
+  const previous=state.registrations.filter(r=>r.sourceId===registration.sourceId).at(-1) ?? null;
+  const materiallyChanged=!!previous && materialFingerprint(previous)!==materialFingerprint(registration);
+  const next: OfficialEvidenceConnectorRegistration = materiallyChanged
+    ? {...registration,status:"pending",reviewedBy:null,reviewedAt:null,reviewReason:"Material connector change requires fresh review."}
+    : registration;
+  validate(next); fetchers.set(next.connectorId, fetcher);
+  const registrations=state.registrations.filter(r=>!(r.connectorId===next.connectorId&&r.parserVersion===next.parserVersion&&r.registeredAt===next.registeredAt));
+  const receipt: ConnectorReviewReceipt={receiptId:randomUUID(),connectorId:next.connectorId,sourceId:next.sourceId,decision:materiallyChanged?"CHANGE_REVIEW_REQUIRED":"REGISTER",actorId:"system:connector-registration",actorName:"connector-registration",decidedAt:next.registeredAt,reason:materiallyChanged?"Material connector identity, authority, legal basis, scope, parser, or URL changed; approval reset to pending.":"Connector version registered for governed review.",parserVersion:next.parserVersion};
+  writeDurableConnectorRegistry({registrations:[...registrations,structuredClone(next)],receipts:[...state.receipts,receipt]});
 }
 export function decideOfficialEvidenceConnector(input:{sourceId:OfficialEvidenceSourceId;decision:"APPROVE"|"SUSPEND";reviewerId:string;reviewerName:string;reason:string;decidedAt?:string}): OfficialEvidenceConnectorRegistration {
   const current=latestForSource(input.sourceId); if(!current) throw new Error("No connector registration exists for this source.");

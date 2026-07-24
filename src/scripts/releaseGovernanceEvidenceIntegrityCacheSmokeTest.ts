@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -29,6 +29,15 @@ async function main() {
   assert(afterWrite.cacheHit === false, "Evidence write must invalidate the integrity cache.");
   assert(afterWrite.acceptedRecords === 1, "Post-write integrity scan did not see the new record.");
 
+  const cachedAfterWrite = store.releaseGovernanceEvidenceIntegritySummary();
+  assert(cachedAfterWrite.cacheHit === true, "Post-write repeated scan should reuse the cache.");
+
+  const generationPath = path.join(dir, "governance", "release-governance-evidence-generation.json");
+  mkdirSync(path.dirname(generationPath), { recursive: true });
+  writeFileSync(generationPath, JSON.stringify({ generation: "external-instance-change" }));
+  const afterExternalWrite = store.releaseGovernanceEvidenceIntegritySummary();
+  assert(afterExternalWrite.cacheHit === false, "Shared generation change must invalidate another instance cache.");
+
   const forced = store.releaseGovernanceEvidenceIntegritySummary({ forceRefresh: true });
   assert(forced.cacheHit === false, "Forced integrity refresh must bypass the cache.");
   assert(forced.acceptedRecords === 1, "Forced integrity refresh changed accepted count.");
@@ -38,6 +47,7 @@ async function main() {
     cacheTtlMs: forced.cacheTtlMs,
     repeatedReadCacheHit: second.cacheHit,
     writeInvalidatedCache: !afterWrite.cacheHit,
+    sharedGenerationInvalidatedCache: !afterExternalWrite.cacheHit,
     forcedRefreshCacheHit: forced.cacheHit,
   }, null, 2));
   rmSync(dir, { recursive: true, force: true });

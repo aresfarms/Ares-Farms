@@ -43,6 +43,7 @@ export type ReleaseGovernanceEvidenceRecord = {
 type Store = { schemaVersion: "release-governance-evidence-store-v1"; records: ReleaseGovernanceEvidenceRecord[] };
 const legacyStorePath = () => runtimeStatePath("governance", "release-governance-evidence.json");
 const recordDirectoryPath = () => runtimeStatePath("governance", "release-governance-evidence-records");
+const integrityGenerationPath = () => runtimeStatePath("governance", "release-governance-evidence-generation.json");
 const emptyStore = (): Store => ({ schemaVersion: "release-governance-evidence-store-v1", records: [] });
 const scopeShard = (scope: string) => createHash("sha256").update(scope).digest("hex").slice(0, 24);
 const recordShardPath = (scope: string, kind: ReleaseGovernanceEvidenceKind) =>
@@ -110,7 +111,30 @@ const INTEGRITY_CACHE_TTL_MS = 15_000;
 let integrityCache: {
   summary: Omit<ReleaseGovernanceEvidenceIntegritySummary, "cacheHit">;
   expiresAt: number;
+  generation: string | null;
 } | null = null;
+
+
+function readIntegrityGeneration(): string | null {
+  try {
+    const parsed = JSON.parse(readFileSync(integrityGenerationPath(), "utf8")) as { generation?: unknown };
+    return typeof parsed.generation === "string" && parsed.generation.length > 0
+      ? parsed.generation
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+function advanceIntegrityGeneration(): string {
+  const generation = randomUUID();
+  mkdirSync(path.dirname(integrityGenerationPath()), { recursive: true });
+  writeFileSync(
+    integrityGenerationPath(),
+    JSON.stringify({ generation, updatedAtUtc: new Date().toISOString() }),
+  );
+  return generation;
+}
 
 function verificationFailure(record: ReleaseGovernanceEvidenceRecord): ReleaseGovernanceEvidenceRejectionReason | null {
   const payload = unsignedPayload(record);
@@ -181,7 +205,13 @@ function signPayload(payload: Omit<ReleaseGovernanceEvidenceRecord, "digest" | "
 }
 export function releaseGovernanceEvidenceIntegritySummary(options?: { forceRefresh?: boolean }): ReleaseGovernanceEvidenceIntegritySummary {
   const now = Date.now();
-  if (!options?.forceRefresh && integrityCache && integrityCache.expiresAt > now) {
+  const generation = readIntegrityGeneration();
+  if (
+    !options?.forceRefresh
+    && integrityCache
+    && integrityCache.expiresAt > now
+    && integrityCache.generation === generation
+  ) {
     return { ...integrityCache.summary, cacheHit: true };
   }
   const rejectedByReason: Record<ReleaseGovernanceEvidenceRejectionReason, number> = {
@@ -227,7 +257,11 @@ export function releaseGovernanceEvidenceIntegritySummary(options?: { forceRefre
     cacheTtlMs: INTEGRITY_CACHE_TTL_MS,
     productionBlocked: true as const,
   };
-  integrityCache = { summary, expiresAt: now + INTEGRITY_CACHE_TTL_MS };
+  integrityCache = {
+    summary,
+    expiresAt: now + INTEGRITY_CACHE_TTL_MS,
+    generation,
+  };
   return { ...summary, cacheHit: false };
 }
 
@@ -250,7 +284,8 @@ export function recordReleaseGovernanceEvidence(input: { kind: ReleaseGovernance
   };
   const record = { ...base, ...signPayload(base) };
   writeImmutableRecord(record);
-  integrityCache = null;
+  const generation = advanceIntegrityGeneration();
+  integrityCache = integrityCache ? { ...integrityCache, generation: `${generation}-invalidated`, expiresAt: 0 } : null;
   return record;
 }
 export function releaseGovernanceEvidenceFor(scope?: string | null, kind?: ReleaseGovernanceEvidenceKind): ReleaseGovernanceEvidenceRecord[] {

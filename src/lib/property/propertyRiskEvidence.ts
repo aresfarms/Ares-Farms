@@ -217,3 +217,119 @@ export function buildWaterInsuranceRiskImpact(args: {
     scenarioAdjustments: adjustments,
   };
 }
+
+export type PublicProjectExposureStatus =
+  | "no-identified-exposure"
+  | "long-range-conceptual"
+  | "funded-planning"
+  | "preliminary-design"
+  | "right-of-way-anticipated"
+  | "active-acquisition-condemnation"
+  | "existing-partial-taking-easement"
+  | "unknown";
+
+export type GovernmentActionStatus =
+  | "proposed"
+  | "in-committee"
+  | "passed-one-chamber"
+  | "passed-legislature"
+  | "awaiting-signature"
+  | "enacted-not-yet-effective"
+  | "effective-implementation-pending"
+  | "active"
+  | "vetoed"
+  | "failed"
+  | "withdrawn"
+  | "expired";
+
+export interface PublicProjectRiskEvidence extends BaseRiskEvidence {
+  kind: "public-project";
+  status: PublicProjectExposureStatus;
+  projectName?: string | null;
+  projectType?: "road" | "rail" | "airport" | "utility" | "pipeline" | "transmission" | "drainage" | "flood-control" | "other";
+  acquisitionStage?: string | null;
+  accessEffect?: "beneficial" | "neutral" | "restrictive" | "unknown";
+}
+
+export interface GovernmentActionRiskEvidence extends BaseRiskEvidence {
+  kind: "government-action";
+  status: GovernmentActionStatus;
+  governmentBody: string;
+  actionNumber?: string | null;
+  officialTitle: string;
+  lastOfficialAction: string;
+  implementationDate?: string | null;
+  geographicScope: string;
+  financialEffect?: string | null;
+}
+
+export type ExtendedPropertyRiskEvidence = PropertyRiskEvidence | PublicProjectRiskEvidence | GovernmentActionRiskEvidence;
+
+function publicProjectPenalty(status: PublicProjectExposureStatus): number {
+  return ({
+    "no-identified-exposure": 0,
+    "long-range-conceptual": 4,
+    "funded-planning": 10,
+    "preliminary-design": 16,
+    "right-of-way-anticipated": 24,
+    "active-acquisition-condemnation": 35,
+    "existing-partial-taking-easement": 28,
+    unknown: 4,
+  })[status];
+}
+
+function governmentActionPenalty(status: GovernmentActionStatus): number {
+  return ({
+    proposed: 4,
+    "in-committee": 5,
+    "passed-one-chamber": 7,
+    "passed-legislature": 10,
+    "awaiting-signature": 11,
+    "enacted-not-yet-effective": 14,
+    "effective-implementation-pending": 16,
+    active: 18,
+    vetoed: 0,
+    failed: 0,
+    withdrawn: 0,
+    expired: 0,
+  })[status];
+}
+
+export function buildPublicActionRiskImpact(args: {
+  publicProject?: PublicProjectRiskEvidence | null;
+  governmentAction?: GovernmentActionRiskEvidence | null;
+}): PropertyInfrastructureRiskImpact {
+  const adjustments: Record<string, ScenarioInfrastructureAdjustment> = {};
+  const project = args.publicProject ?? undefined;
+  const action = args.governmentAction ?? undefined;
+  for (const item of [project, action].filter(Boolean) as Array<PublicProjectRiskEvidence | GovernmentActionRiskEvidence>) {
+    const errors = validatePropertyRiskEvidence(item as unknown as PropertyRiskEvidence);
+    if (item.kind === "public-project" && item.confidence === "verified" && !item.projectName?.trim()) {
+      errors.push("Verified public-project evidence requires a project name.");
+    }
+    if (item.kind === "government-action") {
+      if (!item.governmentBody?.trim()) errors.push("Government-action evidence requires a government body.");
+      if (!item.officialTitle?.trim()) errors.push("Government-action evidence requires an official title.");
+      if (!item.lastOfficialAction?.trim()) errors.push("Government-action evidence requires the last official action.");
+      if (!item.geographicScope?.trim()) errors.push("Government-action evidence requires geographic scope.");
+    }
+    if (errors.length) throw new Error(errors.join(" "));
+    for (const id of item.affectedScenarioIds ?? []) {
+      const current = adjustments[id] ?? { verified: true, notes: [] };
+      if (item.kind === "public-project") current.publicProjectPenalty = publicProjectPenalty(item.status);
+      else current.governmentActionPenalty = governmentActionPenalty(item.status);
+      current.verified = current.verified !== false && item.confidence === "verified";
+      current.notes = [...(current.notes ?? []), ...(item.notes ?? []), `${item.kind}: ${item.status}`];
+      adjustments[id] = current;
+    }
+  }
+  const projectClear = project?.status === "no-identified-exposure";
+  const actionClear = !action || ["vetoed", "failed", "withdrawn", "expired"].includes(action.status);
+  return {
+    water: "unknown",
+    insurance: "unknown",
+    publicProject: !project || project.confidence === "unresolved" ? "unknown" : projectClear ? "verified-clear" : "verified-constrained",
+    governmentAction: !action || action.confidence === "unresolved" ? "unknown" : actionClear ? "verified-clear" : "verified-constrained",
+    scenarioAdjustments: adjustments,
+  };
+}

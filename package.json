@@ -465,7 +465,8 @@
     "verify:structured-official-evidence": "tsx src/scripts/verifyStructuredOfficialEvidence.ts",
     "verify:official-property-source-adapters": "tsx src/scripts/verifyOfficialPropertySourceAdapters.ts",
     "verify:cloud-build-release-rule": "tsx src/scripts/verifyCloudBuildReleaseRule.ts",
-    "verify:official-evidence-source-governance": "tsx src/scripts/verifyOfficialEvidenceSourceGovernance.ts"
+    "verify:official-evidence-source-governance": "tsx src/scripts/verifyOfficialEvidenceSourceGovernance.ts",
+    "verify:official-evidence-refresh-writer": "tsx src/scripts/verifyOfficialEvidenceRefreshWriter.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

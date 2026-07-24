@@ -25,12 +25,20 @@ async function main() {
     reviewNote: "cutover remains blocked",
     replayRef: "release-evidence-smoke-cutover",
   });
-  assert(freeze.productionBlocked && cutover.productionBlocked, "Release evidence must remain production blocked.");
+  const board = store.recordReleaseGovernanceEvidence({
+    kind: "PRODUCTION_RELEASE_BOARD_PACKET",
+    scope: "platform",
+    actorId: "release-manager-test",
+    reviewNote: "release board remains blocked",
+    replayRef: "release-evidence-smoke-board",
+  });
+  assert(freeze.productionBlocked && cutover.productionBlocked && board.productionBlocked, "Release evidence must remain production blocked.");
   assert(!freeze.deploymentExecuted && !cutover.deploymentExecuted, "Release evidence may not execute deployment.");
   assert(store.latestReleaseGovernanceEvidence("platform", "RELEASE_CANDIDATE_FREEZE_HOLD")?.evidenceId === freeze.evidenceId, "Freeze evidence did not persist.");
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_CUTOVER_HOLD")?.evidenceId === cutover.evidenceId, "Cutover evidence did not persist.");
-  assert(store.releaseGovernanceEvidenceFor("platform").length === 2, "Release evidence stages must remain distinct.");
-  console.log(JSON.stringify({ ok: true, records: 2, productionBlocked: true, deploymentExecuted: false }, null, 2));
+  assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_RELEASE_BOARD_PACKET")?.evidenceId === board.evidenceId, "Release board evidence did not persist.");
+  assert(store.releaseGovernanceEvidenceFor("platform").length === 3, "Release evidence stages must remain distinct.");
+  console.log(JSON.stringify({ ok: true, records: 3, productionBlocked: true, deploymentExecuted: false }, null, 2));
   rmSync(dir, { recursive: true, force: true });
 }
 

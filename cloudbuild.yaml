@@ -51,6 +51,7 @@ steps:
         npm run verify:official-evidence-source-governance
         npm run verify:official-evidence-refresh-writer
         npm run verify:official-evidence-durable-refresh
+        npm run verify:official-evidence-connector-registry
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

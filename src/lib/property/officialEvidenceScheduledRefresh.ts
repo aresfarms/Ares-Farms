@@ -3,15 +3,9 @@ import { writeOfficialEvidenceRefresh } from "./officialEvidenceRefreshWriter";
 import { OFFICIAL_EVIDENCE_SOURCE_ACTIVATION, type OfficialEvidenceSourceId } from "./officialEvidenceSourceGovernance";
 import { readOfficialEvidenceRefreshState, writeOfficialEvidenceRefreshState } from "./officialEvidenceRuntimeStore";
 import type { ParcelTaxAuthorityRecord, WellPermitAuthorityRecord } from "./officialPropertySourceAdapters";
+import { resolveApprovedOfficialEvidenceConnector } from "./officialEvidenceConnectorRegistry";
 
 type EvidenceRows = ParcelTaxAuthorityRecord[] | WellPermitAuthorityRecord[];
-type Fetcher = () => Promise<EvidenceRows>;
-
-const fetchers: Partial<Record<OfficialEvidenceSourceId, Fetcher>> = {};
-
-export function registerOfficialEvidenceFetcher(sourceId: OfficialEvidenceSourceId, fetcher: Fetcher): void {
-  fetchers[sourceId] = fetcher;
-}
 
 export interface OfficialEvidenceScheduledRefreshResult {
   sourceId: OfficialEvidenceSourceId;
@@ -26,11 +20,12 @@ export async function refreshOfficialEvidenceSources(now = new Date()): Promise<
   for (const sourceId of Object.keys(OFFICIAL_EVIDENCE_SOURCE_ACTIVATION) as OfficialEvidenceSourceId[]) {
     const activation = OFFICIAL_EVIDENCE_SOURCE_ACTIVATION[sourceId];
     const previous = readOfficialEvidenceRefreshState<EvidenceRows[number]>(sourceId);
-    const fetcher = fetchers[sourceId];
-    if (!fetcher) {
-      results.push({ sourceId, status: "skipped", recordCount: 0, publishedVersion: previous?.publishedVersion ?? null, reason: "No approved official connector fetcher is registered." });
+    const connector = resolveApprovedOfficialEvidenceConnector(sourceId);
+    if (!connector) {
+      results.push({ sourceId, status: "skipped", recordCount: 0, publishedVersion: previous?.publishedVersion ?? null, reason: "No approved official connector registration is available." });
       continue;
     }
+    const fetcher = connector.fetcher;
     try {
       const rows = await fetcher();
       const next = writeOfficialEvidenceRefresh({ activation, previous, records: rows, attemptedAt: now.toISOString() });
@@ -43,6 +38,6 @@ export async function refreshOfficialEvidenceSources(now = new Date()): Promise<
       results.push({ sourceId, status: "failed", recordCount: 0, publishedVersion: next.publishedVersion, reason: (error as Error).message });
     }
   }
-  for (const result of results) canonicalLandRegisterAuthority.append({ actorId: "system:source-refresh", actorName: "source-refresh-job", domain: "official-evidence-refresh", subject: result.sourceId, decision: result.status.toUpperCase(), reason: result.reason, detail: { recordCount: result.recordCount, publishedVersion: result.publishedVersion } });
+  for (const result of results) canonicalLandRegisterAuthority.append({ actorId: "system:source-refresh", actorName: "source-refresh-job", domain: "official-evidence-refresh", subject: result.sourceId, decision: result.status.toUpperCase(), reason: result.reason, detail: { recordCount: result.recordCount, publishedVersion: result.publishedVersion, connector: resolveApprovedOfficialEvidenceConnector(result.sourceId)?.registration.connectorId ?? null } });
   return results;
 }

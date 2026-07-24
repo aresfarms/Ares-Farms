@@ -99,8 +99,17 @@ async function main() {
   });
   assert(operations.productionBlocked && !operations.deploymentExecuted, "Operations evidence must remain blocked.");
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_OPERATIONS_MONITORING_PACKET")?.evidenceId === operations.evidenceId, "Operations monitoring evidence did not persist.");
-  assert(store.releaseGovernanceEvidenceFor("platform").length === 10, "Release evidence stages must remain distinct.");
-  console.log(JSON.stringify({ ok: true, records: 10, productionBlocked: true, deploymentExecuted: false }, null, 2));
+  const incident = store.recordReleaseGovernanceEvidence({
+    kind: "PRODUCTION_INCIDENT_RESPONSE_READINESS_PACKET",
+    scope: "platform",
+    actorId: "release-manager-test",
+    reviewNote: "incident response remains blocked",
+    replayRef: "release-evidence-smoke-incident",
+  });
+  assert(incident.productionBlocked && !incident.deploymentExecuted, "Incident evidence must remain blocked.");
+  assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_INCIDENT_RESPONSE_READINESS_PACKET")?.evidenceId === incident.evidenceId, "Incident response evidence did not persist.");
+  assert(store.releaseGovernanceEvidenceFor("platform").length === 11, "Release evidence stages must remain distinct.");
+  console.log(JSON.stringify({ ok: true, records: 11, productionBlocked: true, deploymentExecuted: false }, null, 2));
   rmSync(dir, { recursive: true, force: true });
 }
 

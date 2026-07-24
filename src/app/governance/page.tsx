@@ -32,7 +32,8 @@ type SurfaceId =
   | "connectors"
   | "liveAction"
   | "sovereign"
-  | "billing";
+  | "billing"
+  | "evidenceIntegrity";
 
 type SurfaceGroup = "operations" | "audit" | "promotion";
 
@@ -169,6 +170,15 @@ const surfaces: SurfaceConfig[] = [
     collectionKeys: ["billingEvents"],
     accent: "#b45309",
     riskLabel: "Institution-funded activity",
+  },
+  {
+    id: "evidenceIntegrity",
+    label: "Release Evidence Integrity",
+    group: "audit",
+    path: "/api/governance/release-evidence-integrity",
+    collectionKeys: ["integrityFindings"],
+    accent: "#be123c",
+    riskLabel: "Rejected or corrupted release evidence",
   },
   {
     id: "liveAction",

@@ -1,5 +1,6 @@
 import type { CanonicalProperty } from "@/lib/property/propertyTypes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
+import { OFFICIAL_EVIDENCE_SOURCE_ACTIVATION, resolveOfficialEvidenceSource, type OfficialEvidenceSnapshot } from "@/lib/property/officialEvidenceSourceGovernance";
 
 export interface ParcelTaxAuthorityRecord {
   parcelId: string;
@@ -29,16 +30,31 @@ export interface WellPermitAuthorityRecord {
   status: "adequate-private-source" | "adequate-with-conditions" | "capacity-constrained" | "rights-allocation-constrained";
 }
 
-// Last-good governed snapshots. Empty means no official record has been activated;
-// adapters fail closed rather than manufacturing parcel evidence.
-export const PARCEL_TAX_AUTHORITY_RECORDS: ParcelTaxAuthorityRecord[] = [];
-export const WELL_PERMIT_AUTHORITY_RECORDS: WellPermitAuthorityRecord[] = [];
+// Governed version history. Empty means no approved official snapshot exists; adapters fail closed.
+export const PARCEL_TAX_AUTHORITY_SNAPSHOTS: OfficialEvidenceSnapshot<ParcelTaxAuthorityRecord>[] = [];
+export const WELL_PERMIT_AUTHORITY_SNAPSHOTS: OfficialEvidenceSnapshot<WellPermitAuthorityRecord>[] = [];
+
+export function governedParcelTaxRecords(now = new Date()): ParcelTaxAuthorityRecord[] {
+  return resolveOfficialEvidenceSource({
+    activation: OFFICIAL_EVIDENCE_SOURCE_ACTIVATION["parcel-tax-authority"],
+    snapshots: PARCEL_TAX_AUTHORITY_SNAPSHOTS,
+    now,
+  }).records;
+}
+
+export function governedWellPermitRecords(now = new Date()): WellPermitAuthorityRecord[] {
+  return resolveOfficialEvidenceSource({
+    activation: OFFICIAL_EVIDENCE_SOURCE_ACTIVATION["well-permit-authority"],
+    snapshots: WELL_PERMIT_AUTHORITY_SNAPSHOTS,
+    now,
+  }).records;
+}
 
 function parcelIds(property: CanonicalProperty): Set<string> {
   return new Set(property.parcel_refs.map((value) => value.trim()).filter(Boolean));
 }
 
-export function parcelTaxEvidenceRecords(property: CanonicalProperty, records = PARCEL_TAX_AUTHORITY_RECORDS): OfficialPropertyEvidenceRecord[] {
+export function parcelTaxEvidenceRecords(property: CanonicalProperty, records = governedParcelTaxRecords()): OfficialPropertyEvidenceRecord[] {
   const ids = parcelIds(property);
   return records.filter((row) => ids.has(row.parcelId)).map((row) => ({
     recordId: `tax:${row.parcelId}:${row.reference}`,
@@ -67,7 +83,7 @@ export function parcelTaxEvidenceRecords(property: CanonicalProperty, records = 
   }));
 }
 
-export function wellPermitEvidenceRecords(property: CanonicalProperty, records = WELL_PERMIT_AUTHORITY_RECORDS): OfficialPropertyEvidenceRecord[] {
+export function wellPermitEvidenceRecords(property: CanonicalProperty, records = governedWellPermitRecords()): OfficialPropertyEvidenceRecord[] {
   const ids = parcelIds(property);
   return records.filter((row) => ids.has(row.parcelId)).map((row) => ({
     recordId: `well:${row.parcelId}:${row.permitNumber}`,

@@ -2,6 +2,19 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "n
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+
+function firstJsonFile(directory: string): string {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const candidate = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      try { return firstJsonFile(candidate); } catch {}
+    } else if (entry.isFile() && entry.name.endsWith(".json")) {
+      return candidate;
+    }
+  }
+  throw new Error("No evidence record file found.");
+}
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
 }
@@ -20,7 +33,7 @@ async function main() {
   });
   assert(store.releaseGovernanceEvidenceFor("platform").length === 1, "Signed record was not readable.");
   const recordDir = path.join(dir, "governance", "release-governance-evidence-records");
-  const filePath = path.join(recordDir, readdirSync(recordDir)[0]);
+  const filePath = firstJsonFile(recordDir);
   const altered = JSON.parse(readFileSync(filePath, "utf8")) as Record<string, unknown>;
   altered.reviewNote = "tampered evidence";
   writeFileSync(filePath, JSON.stringify(altered, null, 2));

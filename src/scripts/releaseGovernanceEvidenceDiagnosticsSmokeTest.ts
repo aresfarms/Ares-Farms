@@ -2,6 +2,19 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "n
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+
+function firstJsonFile(directory: string): string {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const candidate = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      try { return firstJsonFile(candidate); } catch {}
+    } else if (entry.isFile() && entry.name.endsWith(".json")) {
+      return candidate;
+    }
+  }
+  throw new Error("No evidence record file found.");
+}
+
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
 }
@@ -18,7 +31,7 @@ async function main() {
     replayRef: "diagnostics-smoke",
   });
   const recordsDir = path.join(dir, "governance", "release-governance-evidence-records");
-  const file = path.join(recordsDir, readdirSync(recordsDir)[0]);
+  const file = firstJsonFile(recordsDir);
   const record = JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>;
   record.reviewNote = "tampered";
   writeFileSync(file, JSON.stringify(record, null, 2));

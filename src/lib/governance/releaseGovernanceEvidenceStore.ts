@@ -44,6 +44,21 @@ type Store = { schemaVersion: "release-governance-evidence-store-v1"; records: R
 const legacyStorePath = () => runtimeStatePath("governance", "release-governance-evidence.json");
 const recordDirectoryPath = () => runtimeStatePath("governance", "release-governance-evidence-records");
 const emptyStore = (): Store => ({ schemaVersion: "release-governance-evidence-store-v1", records: [] });
+const scopeShard = (scope: string) => createHash("sha256").update(scope).digest("hex").slice(0, 24);
+const recordShardPath = (scope: string, kind: ReleaseGovernanceEvidenceKind) =>
+  path.join(recordDirectoryPath(), kind.toLowerCase(), scopeShard(scope));
+
+function jsonFilesRecursively(directory: string): string[] {
+  try {
+    return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+      const entryPath = path.join(directory, entry.name);
+      if (entry.isDirectory()) return jsonFilesRecursively(entryPath);
+      return entry.isFile() && entry.name.endsWith(".json") ? [entryPath] : [];
+    });
+  } catch {
+    return [];
+  }
+}
 
 function readLegacyStore(): Store {
   try {
@@ -112,27 +127,31 @@ function verifyEvidenceRecord(record: ReleaseGovernanceEvidenceRecord): boolean 
   return verificationFailure(record) === null;
 }
 
-function readImmutableRecords(): ReleaseGovernanceEvidenceRecord[] {
-  try {
-    return readdirSync(recordDirectoryPath(), { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
-      .flatMap((entry) => {
-        try {
-          const parsed = JSON.parse(
-            readFileSync(path.join(recordDirectoryPath(), entry.name), "utf8")
-          ) as unknown;
-          return isEvidenceRecord(parsed) && verifyEvidenceRecord(parsed) ? [parsed] : [];
-        } catch {
-          return [];
-        }
-      });
-  } catch {
-    return [];
-  }
-}
+function readImmutableRecords(scope?: string | null, kind?: ReleaseGovernanceEvidenceKind): ReleaseGovernanceEvidenceRecord[] {
+  const rootFiles = (() => {
+    try {
+      return readdirSync(recordDirectoryPath(), { withFileTypes: true })
+        .filter((entry) => entry.isFile() && entry.name.endsWith(".json"))
+        .map((entry) => path.join(recordDirectoryPath(), entry.name));
+    } catch {
+      return [];
+    }
+  })();
+  const shardFiles = scope && kind
+    ? jsonFilesRecursively(recordShardPath(scope, kind))
+    : jsonFilesRecursively(recordDirectoryPath()).filter((file) => !rootFiles.includes(file));
 
-function readAllRecords(): ReleaseGovernanceEvidenceRecord[] {
-  const records = [...readLegacyStore().records, ...readImmutableRecords()]
+  return [...rootFiles, ...shardFiles].flatMap((file) => {
+    try {
+      const parsed = JSON.parse(readFileSync(file, "utf8")) as unknown;
+      return isEvidenceRecord(parsed) && verifyEvidenceRecord(parsed) ? [parsed] : [];
+    } catch {
+      return [];
+    }
+  });
+}
+function readAllRecords(scope?: string | null, kind?: ReleaseGovernanceEvidenceKind): ReleaseGovernanceEvidenceRecord[] {
+  const records = [...readLegacyStore().records, ...readImmutableRecords(scope, kind)]
     .filter((record) => isEvidenceRecord(record) && verifyEvidenceRecord(record));
   const unique = new Map<string, ReleaseGovernanceEvidenceRecord>();
   for (const record of records) unique.set(record.evidenceId, record);
@@ -140,8 +159,9 @@ function readAllRecords(): ReleaseGovernanceEvidenceRecord[] {
 }
 
 function writeImmutableRecord(record: ReleaseGovernanceEvidenceRecord): void {
-  mkdirSync(recordDirectoryPath(), { recursive: true });
-  const filePath = path.join(recordDirectoryPath(), `${record.evidenceId}.json`);
+  const shardPath = recordShardPath(record.scope, record.kind);
+  mkdirSync(shardPath, { recursive: true });
+  const filePath = path.join(shardPath, `${record.evidenceId}.json`);
   writeFileSync(filePath, JSON.stringify(record, null, 2), { flag: "wx" });
 }
 function signPayload(payload: Omit<ReleaseGovernanceEvidenceRecord, "digest" | "signature">) {
@@ -177,17 +197,12 @@ export function releaseGovernanceEvidenceIntegritySummary(): ReleaseGovernanceEv
     rejectedByReason.READ_ERROR += 1;
   }
 
-  try {
-    for (const entry of readdirSync(recordDirectoryPath(), { withFileTypes: true })) {
-      if (!entry.isFile() || !entry.name.endsWith(".json")) continue;
-      try {
-        inspect(JSON.parse(readFileSync(path.join(recordDirectoryPath(), entry.name), "utf8")));
-      } catch {
-        rejectedByReason.READ_ERROR += 1;
-      }
+  for (const file of jsonFilesRecursively(recordDirectoryPath())) {
+    try {
+      inspect(JSON.parse(readFileSync(file, "utf8")));
+    } catch {
+      rejectedByReason.READ_ERROR += 1;
     }
-  } catch {
-    // Missing record directory is a valid empty state.
   }
 
   const rejectedRecords = Object.values(rejectedByReason).reduce((sum, count) => sum + count, 0);
@@ -216,7 +231,7 @@ export function recordReleaseGovernanceEvidence(input: { kind: ReleaseGovernance
   return record;
 }
 export function releaseGovernanceEvidenceFor(scope?: string | null, kind?: ReleaseGovernanceEvidenceKind): ReleaseGovernanceEvidenceRecord[] {
-  return readAllRecords()
+  return readAllRecords(scope, kind)
     .filter((record) => (!scope || record.scope === scope) && (!kind || record.kind === kind))
     .sort((a,b) => b.recordedAtUtc.localeCompare(a.recordedAtUtc));
 }

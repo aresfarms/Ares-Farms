@@ -20,9 +20,37 @@ function assert(condition: boolean, message: string): void {
 }
 
 function routeFileExists(route: string): boolean {
-  const routePath = route === "/" ? "src/app/page.tsx" : `src/app${route}/page.tsx`;
+  const appRoot = path.join(repoRoot, "src/app");
+  const targetSegments = route === "/" ? [] : route.split("/").filter(Boolean);
 
-  return fs.existsSync(path.join(repoRoot, routePath));
+  function visit(directory: string, routeSegments: string[]): boolean {
+    const pagePath = path.join(directory, "page.tsx");
+    if (
+      fs.existsSync(pagePath) &&
+      routeSegments.length === targetSegments.length &&
+      routeSegments.every((segment, index) => segment === targetSegments[index])
+    ) {
+      return true;
+    }
+
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      if (
+        !entry.isDirectory() ||
+        entry.name.startsWith("_") ||
+        entry.name === "api"
+      ) {
+        continue;
+      }
+      const nextSegments = /^\(.+\)$/.test(entry.name)
+        ? routeSegments
+        : [...routeSegments, entry.name];
+      if (visit(path.join(directory, entry.name), nextSegments)) return true;
+    }
+
+    return false;
+  }
+
+  return visit(appRoot, []);
 }
 
 function main() {
@@ -33,43 +61,55 @@ function main() {
     assert(!ids.has(manifest.id), `Duplicate manifest id: ${manifest.id}`);
     ids.add(manifest.id);
 
-    assert(manifest.route.startsWith("/"), `${manifest.id} route must be absolute.`);
-    assert(routeFileExists(manifest.route), `${manifest.id} route file is missing.`);
-    assert(manifest.audience.length > 0, `${manifest.id} audience is required.`);
-    assert(manifest.permissions.length > 0, `${manifest.id} permissions are required.`);
+    assert(
+      manifest.route.startsWith("/"),
+      `${manifest.id} route must be absolute.`,
+    );
+    assert(
+      routeFileExists(manifest.route),
+      `${manifest.id} route file is missing.`,
+    );
+    assert(
+      manifest.audience.length > 0,
+      `${manifest.id} audience is required.`,
+    );
+    assert(
+      manifest.permissions.length > 0,
+      `${manifest.id} permissions are required.`,
+    );
     assert(
       manifest.dataDependencies.length > 0,
-      `${manifest.id} dataDependencies are required.`
+      `${manifest.id} dataDependencies are required.`,
     );
     assert(
       manifest.requiredGovernance.length > 0,
-      `${manifest.id} requiredGovernance is required.`
+      `${manifest.id} requiredGovernance is required.`,
     );
     assert(
       manifest.requiredGovernance.includes("CANON-CLASS-001") &&
         manifest.requiredGovernance.includes("TECH-LEDGER-001") &&
         manifest.requiredGovernance.includes("TECH-REPLAY-001"),
-      `${manifest.id} must carry classification, ledger, and replay governance.`
+      `${manifest.id} must carry classification, ledger, and replay governance.`,
     );
     assert(
       typeof manifest.publicSurfaceAllowed === "boolean",
-      `${manifest.id} publicSurfaceAllowed is required.`
+      `${manifest.id} publicSurfaceAllowed is required.`,
     );
     assert(
       typeof manifest.productionBlocked === "boolean",
-      `${manifest.id} productionBlocked is required.`
+      `${manifest.id} productionBlocked is required.`,
     );
     assert(
       manifest.claimsProfile.trim().length > 0,
-      `${manifest.id} claimsProfile is required.`
+      `${manifest.id} claimsProfile is required.`,
     );
     assert(
       typeof manifest.replayRequired === "boolean",
-      `${manifest.id} replayRequired is required.`
+      `${manifest.id} replayRequired is required.`,
     );
     assert(
       moduleFeatureFlagsComplete(manifest.featureFlags),
-      `${manifest.id} feature flags are incomplete.`
+      `${manifest.id} feature flags are incomplete.`,
     );
   }
 
@@ -82,8 +122,8 @@ function main() {
         message: "Module manifest registry smoke test passed.",
       },
       null,
-      2
-    )
+      2,
+    ),
   );
 }
 

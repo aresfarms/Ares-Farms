@@ -2,7 +2,7 @@ import {
   PROGRAM_GRAPH,
   REVENUE_PRODUCTION_RESTRICTIONS,
   REVENUE_SOURCE_REQUIRED_DISCLOSURES,
-} from "@/lib/revenue-intelligence/revenueSourceIntelligenceRuntime";
+} from "@/lib/modules/sourceProgramCatalog";
 
 /**
  * Financing Pathway Engine
@@ -141,7 +141,10 @@ function buildMissingItems(input: FinancingPathwayInput): string[] {
     missingItems.push("acreage");
   }
 
-  if (numericValue(input.requestedAmount) <= 0 && !hasText(input.metadata?.purpose)) {
+  if (
+    numericValue(input.requestedAmount) <= 0 &&
+    !hasText(input.metadata?.purpose)
+  ) {
     missingItems.push("requested amount or financing purpose");
   }
 
@@ -153,7 +156,10 @@ function buildMissingItems(input: FinancingPathwayInput): string[] {
 }
 
 function calculateReadiness(missingItems: string[]): number {
-  const completedItems = Math.max(0, BASE_REQUIRED_ITEMS.length - missingItems.length);
+  const completedItems = Math.max(
+    0,
+    BASE_REQUIRED_ITEMS.length - missingItems.length,
+  );
 
   return Math.round((completedItems / BASE_REQUIRED_ITEMS.length) * 100);
 }
@@ -176,29 +182,34 @@ function goalMatchesProgram(goal: string, eligibleUses: string[]): boolean {
 function candidateFitScore(
   input: FinancingPathwayInput,
   missingItems: string[],
-  program: (typeof PROGRAM_GRAPH)[number]
+  program: (typeof PROGRAM_GRAPH)[number],
 ): number {
   let score = 40;
 
   if (hasText(input.location?.state)) {
     score += program.geography_scope.some((scope) =>
-      ["federal", "state-administered", "state", "county"].includes(scope)
+      ["federal", "state-administered", "state", "county"].includes(scope),
     )
       ? 12
       : 4;
   }
 
   if ((input.farmTypes ?? []).length > 0) {
-    score += program.eligible_customer_types.some((customerType) =>
-      customerType.toLowerCase().includes("farmer") ||
-      customerType.toLowerCase().includes("farm") ||
-      customerType.toLowerCase().includes("operator")
+    score += program.eligible_customer_types.some(
+      (customerType) =>
+        customerType.toLowerCase().includes("farmer") ||
+        customerType.toLowerCase().includes("farm") ||
+        customerType.toLowerCase().includes("operator"),
     )
       ? 14
       : 6;
   }
 
-  if ((input.goals ?? []).some((goal) => goalMatchesProgram(goal, program.eligible_uses))) {
+  if (
+    (input.goals ?? []).some((goal) =>
+      goalMatchesProgram(goal, program.eligible_uses),
+    )
+  ) {
     score += 14;
   }
 
@@ -218,7 +229,7 @@ function candidateFitScore(
 function buildCandidate(
   input: FinancingPathwayInput,
   missingItems: string[],
-  program: (typeof PROGRAM_GRAPH)[number]
+  program: (typeof PROGRAM_GRAPH)[number],
 ): FinancingPathwayCandidate {
   const fitScore = candidateFitScore(input, missingItems, program);
   const reviewReasons = [
@@ -227,11 +238,15 @@ function buildCandidate(
   ];
 
   if (program.stacking_rules.length > 0) {
-    reviewReasons.push("Stacking rules require review before combining pathways.");
+    reviewReasons.push(
+      "Stacking rules require review before combining pathways.",
+    );
   }
 
   if (program.conflict_rules.length > 0) {
-    reviewReasons.push("Conflict rules require review before borrower-facing reliance.");
+    reviewReasons.push(
+      "Conflict rules require review before borrower-facing reliance.",
+    );
   }
 
   return {
@@ -239,7 +254,8 @@ function buildCandidate(
     label: program.program_name,
     sponsorType: program.sponsor_type,
     fitScore,
-    status: missingItems.length === 0 ? "REVIEW_REQUIRED" : "MISSING_INFORMATION",
+    status:
+      missingItems.length === 0 ? "REVIEW_REQUIRED" : "MISSING_INFORMATION",
     fitReasons: reviewReasons,
     missingItems,
     blockedClaims: [
@@ -256,12 +272,12 @@ function buildCandidate(
 }
 
 export function evaluateFinancingPathways(
-  input: FinancingPathwayInput = {}
+  input: FinancingPathwayInput = {},
 ): FinancingPathwayResult {
   const missingItems = buildMissingItems(input);
   const readinessPercent = calculateReadiness(missingItems);
   const pathways = PROGRAM_GRAPH.map((program) =>
-    buildCandidate(input, missingItems, program)
+    buildCandidate(input, missingItems, program),
   ).sort((a, b) => b.fitScore - a.fitScore);
 
   const reviewSignals = [

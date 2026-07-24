@@ -1,6 +1,8 @@
 import type { CanonicalProperty } from "@/lib/property/propertyTypes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 import { OFFICIAL_EVIDENCE_SOURCE_ACTIVATION, resolveOfficialEvidenceSource, type OfficialEvidenceSnapshot } from "@/lib/property/officialEvidenceSourceGovernance";
+import { readOfficialEvidenceRefreshState } from "@/lib/property/officialEvidenceRuntimeStore";
+import { verifiedSnapshotsForRead } from "@/lib/property/officialEvidenceReadVerification";
 
 export interface ParcelTaxAuthorityRecord {
   parcelId: string;
@@ -37,7 +39,7 @@ export const WELL_PERMIT_AUTHORITY_SNAPSHOTS: OfficialEvidenceSnapshot<WellPermi
 export function governedParcelTaxRecords(now = new Date()): ParcelTaxAuthorityRecord[] {
   return resolveOfficialEvidenceSource({
     activation: OFFICIAL_EVIDENCE_SOURCE_ACTIVATION["parcel-tax-authority"],
-    snapshots: PARCEL_TAX_AUTHORITY_SNAPSHOTS,
+    snapshots: verifiedSnapshotsForRead("parcel-tax-authority", readOfficialEvidenceRefreshState<ParcelTaxAuthorityRecord>("parcel-tax-authority")?.snapshots ?? PARCEL_TAX_AUTHORITY_SNAPSHOTS),
     now,
   }).records;
 }
@@ -45,7 +47,7 @@ export function governedParcelTaxRecords(now = new Date()): ParcelTaxAuthorityRe
 export function governedWellPermitRecords(now = new Date()): WellPermitAuthorityRecord[] {
   return resolveOfficialEvidenceSource({
     activation: OFFICIAL_EVIDENCE_SOURCE_ACTIVATION["well-permit-authority"],
-    snapshots: WELL_PERMIT_AUTHORITY_SNAPSHOTS,
+    snapshots: verifiedSnapshotsForRead("well-permit-authority", readOfficialEvidenceRefreshState<WellPermitAuthorityRecord>("well-permit-authority")?.snapshots ?? WELL_PERMIT_AUTHORITY_SNAPSHOTS),
     now,
   }).records;
 }

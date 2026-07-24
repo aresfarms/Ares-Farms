@@ -13,14 +13,25 @@ export default async function IntelligenceCasePage({ params, searchParams }: {
   const query = await searchParams;
   const read = (key: string) => typeof query[key] === "string" ? query[key] as string : null;
   const split = (value: string | null) => value?.split(",").map((item) => item.trim()).filter(Boolean) ?? [];
+  const customerTypes = split(read("customerTypes"));
+  const intendedUses = split(read("intendedUses"));
   const workspace = composeIntelligenceCaseWorkspace({
     caseId,
     displayName: read("name"),
     goal: read("goal"),
     state: read("state"),
-    customerTypes: split(read("customerTypes")),
-    intendedUses: split(read("intendedUses")),
+    customerTypes,
+    intendedUses,
   });
+  const onboardingParams = new URLSearchParams({
+    caseId,
+    name: workspace.subject.displayName,
+    goal: workspace.goal,
+    customerTypes: customerTypes.join(","),
+    intendedUses: intendedUses.join(","),
+  });
+  const state = read("state");
+  if (state) onboardingParams.set("state", state);
 
   return <main style={{ minHeight: "100vh", background: "#f6f8fb", color: "#162033", padding: 24 }}>
     <div style={{ maxWidth: 1180, margin: "0 auto", display: "grid", gap: 18 }}>
@@ -64,6 +75,7 @@ export default async function IntelligenceCasePage({ params, searchParams }: {
       </section>
 
       <footer style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
+        <Link href={`/onboarding?${onboardingParams.toString()}`}>Enrich this case through onboarding</Link>
         <Link href="/navigator">Return to Navigator</Link>
         <Link href="/governance/advanced-intelligence-v2">Open governed intelligence review</Link>
         <Link href="/reviews">Open human review</Link>

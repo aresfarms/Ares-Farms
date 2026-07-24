@@ -36,6 +36,7 @@ import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
+import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, mergeWithDefaultPropertyEvidence } from "@/lib/property/propertyEvidenceIngestion";
 import type { ExtendedPropertyRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import {
   allProfiles,
@@ -2998,15 +2999,20 @@ export function PropertyEvaluationWorkspace({
   const rankingTax = ownershipContext && rankingPrice
     ? buildPostSaleTaxScenario({ price: rankingPrice }, ownershipContext)
     : null;
-  const reportRiskEvidence: ExtendedPropertyRiskEvidence[] = [
-    { kind: "water", status: "unresolved", confidence: "unresolved", notes: ["Water source, tested capacity, rights, and lifecycle cost have not yet been verified for this property."] },
-    { kind: "insurance", status: "unknown-pending-quote", confidence: "unresolved", notes: ["A property- and use-specific insurance indication or quote is still required."] },
-    { kind: "public-project", status: "unknown", confidence: "unresolved", notes: ["Current DOT and other public-project records have not yet been resolved for this parcel."] },
-    { kind: "government-action", status: "proposed", confidence: "unresolved", governmentBody: "Unresolved", officialTitle: "Formal government action review", lastOfficialAction: "Not yet searched", geographicScope: analysisContext.location, notes: ["Official pending and implementation-stage government actions have not yet been resolved."] },
-  ];
+  const ingestedRiskEvidence = ingestPropertyEvidence({
+    facts: effectivePlaceIntelligence?.verifiedFacts ?? [],
+    unknowns: effectivePlaceIntelligence?.unknowns ?? [],
+    profileId: workspaceProfile.id,
+    location: analysisContext.location,
+  });
+  const reportRiskEvidence: ExtendedPropertyRiskEvidence[] = mergeWithDefaultPropertyEvidence({
+    ingested: ingestedRiskEvidence,
+    location: analysisContext.location,
+  });
   const propertyEvidenceManifest = rankingTax
     ? buildPropertyEvidenceManifest({ tax: rankingTax, evidence: reportRiskEvidence })
     : null;
+  const propertyInfrastructureRisk = buildInfrastructureRiskFromEvidence(reportRiskEvidence);
   const scenarioRankingPlan = buildScenarioRankingPlan({
     profileId: workspaceProfile.id,
     marketPlan: marketComparablePlan,
@@ -3019,6 +3025,7 @@ export function PropertyEvaluationWorkspace({
           acquisitionPrice: rankingPrice,
         }
       : null,
+    infrastructureRisk: propertyInfrastructureRisk,
   });
   const transactionTimelinePlan = buildTransactionTimelinePlan({
     profileId: workspaceProfile.id,

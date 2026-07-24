@@ -9,7 +9,8 @@ export type ReleaseGovernanceEvidenceKind =
   | "RELEASE_CANDIDATE_FREEZE_HOLD"
   | "PRODUCTION_CUTOVER_HOLD"
   | "PRODUCTION_RELEASE_BOARD_PACKET"
-  | "PRODUCTION_FINAL_AUTHORITY_PACKET";
+  | "PRODUCTION_FINAL_AUTHORITY_PACKET"
+  | "PRODUCTION_ACTIVATION_CEREMONY_PACKET";
 
 export type ReleaseGovernanceEvidenceRecord = {
   evidenceId: string;

@@ -45,8 +45,17 @@ async function main() {
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_CUTOVER_HOLD")?.evidenceId === cutover.evidenceId, "Cutover evidence did not persist.");
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_RELEASE_BOARD_PACKET")?.evidenceId === board.evidenceId, "Release board evidence did not persist.");
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_FINAL_AUTHORITY_PACKET")?.evidenceId === finalAuthority.evidenceId, "Final authority evidence did not persist.");
-  assert(store.releaseGovernanceEvidenceFor("platform").length === 4, "Release evidence stages must remain distinct.");
-  console.log(JSON.stringify({ ok: true, records: 4, productionBlocked: true, deploymentExecuted: false }, null, 2));
+  const ceremony = store.recordReleaseGovernanceEvidence({
+    kind: "PRODUCTION_ACTIVATION_CEREMONY_PACKET",
+    scope: "platform",
+    actorId: "release-manager-test",
+    reviewNote: "activation ceremony remains blocked",
+    replayRef: "release-evidence-smoke-ceremony",
+  });
+  assert(ceremony.productionBlocked && !ceremony.deploymentExecuted, "Ceremony evidence must remain blocked.");
+  assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_ACTIVATION_CEREMONY_PACKET")?.evidenceId === ceremony.evidenceId, "Ceremony evidence did not persist.");
+  assert(store.releaseGovernanceEvidenceFor("platform").length === 5, "Release evidence stages must remain distinct.");
+  console.log(JSON.stringify({ ok: true, records: 5, productionBlocked: true, deploymentExecuted: false }, null, 2));
   rmSync(dir, { recursive: true, force: true });
 }
 

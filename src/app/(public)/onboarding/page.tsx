@@ -7,6 +7,7 @@ import {
 } from "@/lib/customer-landing/featuredExplorationStories";
 import { PUBLIC_PAGE_META } from "@/lib/public-content/publicCopyRegistry";
 import { Disclosures } from "@/components/public/Disclosures";
+import { onboardingIntelligenceCaseHandoff } from "@/lib/intelligence/onboardingIntelligenceCaseHandoff";
 
 /**
  * /onboarding — Start Exploring (Build 53)
@@ -67,6 +68,9 @@ export default async function OnboardingPage({
   const slugValue        = resolvedParams.explore;
   const selectedSlug     = Array.isArray(slugValue) ? slugValue[0] : slugValue;
   const selectedCategory = EXPLORATION_CATEGORIES.find((c) => c.slug === selectedSlug) ?? null;
+  const intelligenceCase = selectedCategory
+    ? onboardingIntelligenceCaseHandoff(selectedCategory.slug, selectedCategory.label)
+    : null;
 
   return (
     <main>
@@ -101,9 +105,12 @@ export default async function OnboardingPage({
             </span>
             <strong style={{ fontSize: 22, color: "#162033" }}>{selectedCategory.label}</strong>
             <p style={{ margin: 0, fontSize: 16, ...muted }}>{selectedCategory.blurb}</p>
+            <p style={{ margin: 0, fontSize: 13, ...muted }}>
+              Carry this choice into one anonymous intelligence case. No identity, address, transcript, listing URL, or hidden account is transferred.
+            </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 4 }}>
               <Link
-                href={explorationHref(selectedCategory.slug)}
+                href={intelligenceCase?.href ?? explorationHref(selectedCategory.slug)}
                 style={{
                   display:         "inline-flex",
                   minHeight:       48,
@@ -117,7 +124,7 @@ export default async function OnboardingPage({
                   fontSize:        16,
                 }}
               >
-                Explore {selectedCategory.label} →
+                Open your intelligence case →
               </Link>
               <Link
                 href="/onboarding"

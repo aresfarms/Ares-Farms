@@ -441,7 +441,8 @@
     "verify:institutional-lifecycle-cycle-finality": "tsx src/scripts/verifyInstitutionalLifecycleCycleFinalityAuthority.ts",
     "verify:institutional-lifecycle-cycle-archive-projection": "tsx src/scripts/verifyInstitutionalLifecycleCycleArchiveProjectionAuthority.ts",
     "verify:intelligence-workspace": "tsx src/scripts/verifyIntelligenceWorkspaceContract.ts",
-    "verify:real-estate-compensation": "tsx src/scripts/verifyRealEstateCompensationTransparency.ts"
+    "verify:real-estate-compensation": "tsx src/scripts/verifyRealEstateCompensationTransparency.ts",
+    "smoke:onboarding-intelligence-case-handoff": "tsx src/scripts/onboardingIntelligenceCaseHandoffSmokeTest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

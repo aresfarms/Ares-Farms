@@ -43,9 +43,18 @@ export async function GET(req: NextRequest) {
       classification: "CONFIDENTIAL",
       count,
     }));
+  if (integrity.sharedGenerationStatus !== "HEALTHY") {
+    integrityFindings.push({
+      id: `release-evidence-integrity-cache-generation-${integrity.sharedGenerationStatus.toLowerCase()}`,
+      eventType: `CACHE_GENERATION_${integrity.sharedGenerationStatus}`,
+      status: "REJECTED_EVIDENCE",
+      classification: "CONFIDENTIAL",
+      count: 1,
+    });
+  }
 
   return NextResponse.json({
-    ok: integrity.rejectedRecords === 0,
+    ok: integrity.rejectedRecords === 0 && integrity.sharedGenerationStatus === "HEALTHY",
     count: integrity.rejectedRecords,
     integrityFindings,
     integrity,

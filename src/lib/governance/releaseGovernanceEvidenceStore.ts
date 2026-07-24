@@ -104,6 +104,7 @@ export type ReleaseGovernanceEvidenceIntegritySummary = {
   scannedAtUtc: string;
   cacheHit: boolean;
   cacheTtlMs: number;
+  sharedGenerationStatus: "HEALTHY" | "MISSING" | "UNREADABLE";
   productionBlocked: true;
 };
 
@@ -111,18 +112,26 @@ const INTEGRITY_CACHE_TTL_MS = 15_000;
 let integrityCache: {
   summary: Omit<ReleaseGovernanceEvidenceIntegritySummary, "cacheHit">;
   expiresAt: number;
-  generation: string | null;
+  generation: string;
 } | null = null;
 
+type IntegrityGenerationState = {
+  generation: string | null;
+  status: "HEALTHY" | "MISSING" | "UNREADABLE";
+};
 
-function readIntegrityGeneration(): string | null {
+function readIntegrityGeneration(): IntegrityGenerationState {
   try {
-    const parsed = JSON.parse(readFileSync(integrityGenerationPath(), "utf8")) as { generation?: unknown };
+    const raw = readFileSync(integrityGenerationPath(), "utf8");
+    const parsed = JSON.parse(raw) as { generation?: unknown };
     return typeof parsed.generation === "string" && parsed.generation.length > 0
-      ? parsed.generation
-      : null;
-  } catch {
-    return null;
+      ? { generation: parsed.generation, status: "HEALTHY" }
+      : { generation: null, status: "UNREADABLE" };
+  } catch (error) {
+    const code = error && typeof error === "object" && "code" in error ? String(error.code) : null;
+    return code === "ENOENT"
+      ? { generation: null, status: "MISSING" }
+      : { generation: null, status: "UNREADABLE" };
   }
 }
 
@@ -205,12 +214,14 @@ function signPayload(payload: Omit<ReleaseGovernanceEvidenceRecord, "digest" | "
 }
 export function releaseGovernanceEvidenceIntegritySummary(options?: { forceRefresh?: boolean }): ReleaseGovernanceEvidenceIntegritySummary {
   const now = Date.now();
-  const generation = readIntegrityGeneration();
+  const generationState = readIntegrityGeneration();
   if (
     !options?.forceRefresh
+    && generationState.status === "HEALTHY"
+    && generationState.generation
     && integrityCache
     && integrityCache.expiresAt > now
-    && integrityCache.generation === generation
+    && integrityCache.generation === generationState.generation
   ) {
     return { ...integrityCache.summary, cacheHit: true };
   }
@@ -255,12 +266,13 @@ export function releaseGovernanceEvidenceIntegritySummary(options?: { forceRefre
     rejectedByReason,
     scannedAtUtc: new Date(now).toISOString(),
     cacheTtlMs: INTEGRITY_CACHE_TTL_MS,
+    sharedGenerationStatus: generationState.status,
     productionBlocked: true as const,
   };
   integrityCache = {
     summary,
     expiresAt: now + INTEGRITY_CACHE_TTL_MS,
-    generation,
+    generation: generationState.generation ?? "",
   };
   return { ...summary, cacheHit: false };
 }

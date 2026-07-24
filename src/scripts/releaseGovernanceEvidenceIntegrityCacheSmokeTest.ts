@@ -11,6 +11,9 @@ async function main() {
   process.env.FURLONG_RUNTIME_STATE_DIR = dir;
   process.env.REPORT_SIGNING_SECRET = "release-integrity-cache-test-secret";
   const store = await import("@/lib/governance/releaseGovernanceEvidenceStore");
+  const generationPath = path.join(dir, "governance", "release-governance-evidence-generation.json");
+  mkdirSync(path.dirname(generationPath), { recursive: true });
+  writeFileSync(generationPath, JSON.stringify({ generation: "initial-test-generation" }));
 
   const first = store.releaseGovernanceEvidenceIntegritySummary();
   const second = store.releaseGovernanceEvidenceIntegritySummary();
@@ -32,8 +35,6 @@ async function main() {
   const cachedAfterWrite = store.releaseGovernanceEvidenceIntegritySummary();
   assert(cachedAfterWrite.cacheHit === true, "Post-write repeated scan should reuse the cache.");
 
-  const generationPath = path.join(dir, "governance", "release-governance-evidence-generation.json");
-  mkdirSync(path.dirname(generationPath), { recursive: true });
   writeFileSync(generationPath, JSON.stringify({ generation: "external-instance-change" }));
   const afterExternalWrite = store.releaseGovernanceEvidenceIntegritySummary();
   assert(afterExternalWrite.cacheHit === false, "Shared generation change must invalidate another instance cache.");
@@ -42,6 +43,18 @@ async function main() {
   assert(forced.cacheHit === false, "Forced integrity refresh must bypass the cache.");
   assert(forced.acceptedRecords === 1, "Forced integrity refresh changed accepted count.");
 
+  writeFileSync(generationPath, "not-json");
+  const unreadableFirst = store.releaseGovernanceEvidenceIntegritySummary();
+  const unreadableSecond = store.releaseGovernanceEvidenceIntegritySummary();
+  assert(unreadableFirst.sharedGenerationStatus === "UNREADABLE", "Malformed marker must report UNREADABLE.");
+  assert(unreadableSecond.cacheHit === false, "Unreadable shared marker must disable cache reuse.");
+  rmSync(generationPath, { force: true });
+  const missingFirst = store.releaseGovernanceEvidenceIntegritySummary();
+  const missingSecond = store.releaseGovernanceEvidenceIntegritySummary();
+  assert(missingFirst.sharedGenerationStatus === "MISSING", "Missing marker must report MISSING.");
+  assert(missingSecond.cacheHit === false, "Missing shared marker must disable cache reuse.");
+  mkdirSync(path.dirname(generationPath), { recursive: true });
+
   console.log(JSON.stringify({
     ok: true,
     cacheTtlMs: forced.cacheTtlMs,
@@ -49,6 +62,8 @@ async function main() {
     writeInvalidatedCache: !afterWrite.cacheHit,
     sharedGenerationInvalidatedCache: !afterExternalWrite.cacheHit,
     forcedRefreshCacheHit: forced.cacheHit,
+    unreadableMarkerCacheHit: unreadableSecond.cacheHit,
+    missingMarkerCacheHit: missingSecond.cacheHit,
   }, null, 2));
   rmSync(dir, { recursive: true, force: true });
 }

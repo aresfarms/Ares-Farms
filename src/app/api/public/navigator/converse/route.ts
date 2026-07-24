@@ -30,6 +30,8 @@
  * server-side. "Understanding before output. Reality before commitment."
  */
 
+import { createHash } from "node:crypto";
+
 import { NextResponse } from "next/server";
 
 import { classifyRefusal, REFUSAL_LINE } from "@/lib/navigator/propertyPrivacyDoctrine";
@@ -57,6 +59,42 @@ export const runtime = "nodejs";
 interface Body {
   message?: string;
   journey?: JourneyState;
+}
+
+export function intelligenceCaseHandoff(journey: JourneyState, pathwayIds: string[]) {
+  const propertyKind = journey.context.propertyKind;
+  const state = journey.context.state?.trim().toUpperCase() || null;
+  const structuredSeed = JSON.stringify({
+    entryMode: journey.entryMode,
+    dealType: journey.dealType,
+    propertyKind,
+    state,
+    pathwayIds: [...pathwayIds].sort(),
+  });
+  const caseId = `navigator-${createHash("sha256").update(structuredSeed).digest("hex").slice(0, 20)}`;
+  const customerTypes = propertyKind === "farm"
+    ? ["farmer", "rural small business"]
+    : propertyKind === "commercial"
+      ? ["small business", "commercial property participant"]
+      : propertyKind === "residential"
+        ? ["property owner"]
+        : ["prospective property participant"];
+  const params = new URLSearchParams({
+    name: "Navigator intelligence case",
+    goal: `Evaluate ${describeDealType(journey.dealType)} pathways, constraints, and next steps.`,
+    customerTypes: customerTypes.join(","),
+    intendedUses: pathwayIds.join(","),
+    origin: "navigator",
+  });
+  if (state) params.set("state", state);
+  return {
+    caseId,
+    href: `/intelligence/cases/${caseId}?${params.toString()}`,
+    source: "NAVIGATOR_STRUCTURED_HANDOFF" as const,
+    transcriptTransferred: false as const,
+    identityTransferred: false as const,
+    addressTransferred: false as const,
+  };
 }
 
 export async function POST(req: Request) {
@@ -334,6 +372,7 @@ export async function POST(req: Request) {
       programsSeam: "A property qualifying for a program is a fact about the property. Whether YOU qualify is a licensed professional's call — property qualifies ≠ you qualify.",
       decision: decisionSummary,
       searchGuidance,
+      intelligenceCase: intelligenceCaseHandoff(journey, pathways.map((pathway) => pathway.id)),
       journey,
     });
   }

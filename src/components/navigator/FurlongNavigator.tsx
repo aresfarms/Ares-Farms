@@ -31,7 +31,7 @@ import {
 type Reply =
   | { kind: "question"; node: string; text: string; turnIntent?: string; journey: JourneyState }
   | { kind: "refusal"; refusal: string; text: string; turnIntent?: string; journey: JourneyState }
-  | { kind: "pathways"; node: string; text: string; turnIntent?: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; journey: JourneyState };
+  | { kind: "pathways"; node: string; text: string; turnIntent?: string; pathways: PathwayAssessment[]; graphChain: string[]; programsSeam: string; decision: DecisionSummary; searchGuidance: SearchGuidance | null; intelligenceCase: { caseId: string; href: string; source: "NAVIGATOR_STRUCTURED_HANDOFF"; transcriptTransferred: false; identityTransferred: false; addressTransferred: false }; journey: JourneyState };
 
 const CONF_STYLE: Record<string, { label: string; bg: string; fg: string }> = {
   high: { label: "High confidence", bg: "#e1f5ee", fg: "#0F6E56" },
@@ -71,6 +71,7 @@ export function FurlongNavigator({
   const [programsSeam, setProgramsSeam] = useState<string | null>(null);
   const [decision, setDecision] = useState<DecisionSummary | null>(null);
   const [searchGuidance, setSearchGuidance] = useState<SearchGuidance | null>(null);
+  const [intelligenceCaseHref, setIntelligenceCaseHref] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [continuity, setContinuity] = useState(false); // explicit opt-in only
@@ -104,6 +105,7 @@ export function FurlongNavigator({
       setProgramsSeam(r.programsSeam);
       setDecision(r.decision);
       setSearchGuidance(r.searchGuidance);
+      setIntelligenceCaseHref(r.intelligenceCase.href);
     }
     remember(r.journey, next);
   }
@@ -143,7 +145,7 @@ export function FurlongNavigator({
     clearNavigatorSession();
     setContinuity(false); setPendingResume(null);
     setTurns([]); setJourney(null); setPathways(null); setGraphChain([]);
-    setProgramsSeam(null); setDecision(null); setSearchGuidance(null); setInput("");
+    setProgramsSeam(null); setDecision(null); setSearchGuidance(null); setIntelligenceCaseHref(null); setInput("");
     setLoading(true);
     try { handle(await post({}), []); } finally { setLoading(false); }
   }
@@ -325,6 +327,18 @@ export function FurlongNavigator({
                 <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{decision.probability.assessment}</span>
                 <span style={{ fontSize: 11.5, color: "#7a8aa0", lineHeight: 1.5 }}>{decision.probability.advisory}</span>
               </div>
+            </div>
+          )}
+
+          {intelligenceCaseHref && (
+            <div data-testid="intelligence-case-handoff" style={{ display: "grid", gap: 8, border: "1.5px solid #0f766e", borderRadius: 12, padding: "16px 18px", background: "#f1fbfa" }}>
+              <strong style={{ fontSize: 15, color: "#0f5f59" }}>Carry this work into one intelligence case</strong>
+              <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>
+                Open a case workspace built from the structured pathway results above. Your transcript, identity, and street address are not transferred.
+              </span>
+              <Link href={intelligenceCaseHref} style={{ justifySelf: "start", display: "inline-flex", alignItems: "center", minHeight: 42, padding: "0 18px", borderRadius: 999, background: "#0f766e", color: "#fff", textDecoration: "none", fontWeight: 800, fontSize: 13 }}>
+                Open your intelligence case →
+              </Link>
             </div>
           )}
 

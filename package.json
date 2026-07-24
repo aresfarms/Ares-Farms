@@ -443,7 +443,8 @@
     "verify:intelligence-workspace": "tsx src/scripts/verifyIntelligenceWorkspaceContract.ts",
     "verify:real-estate-compensation": "tsx src/scripts/verifyRealEstateCompensationTransparency.ts",
     "smoke:onboarding-intelligence-case-handoff": "tsx src/scripts/onboardingIntelligenceCaseHandoffSmokeTest.ts",
-    "smoke:intelligence-case-governed-review": "tsx src/scripts/intelligenceCaseGovernedReviewHandoffSmokeTest.ts"
+    "smoke:intelligence-case-governed-review": "tsx src/scripts/intelligenceCaseGovernedReviewHandoffSmokeTest.ts",
+    "smoke:intelligence-case-human-review": "tsx src/scripts/intelligenceCaseHumanReviewHandoffSmokeTest.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

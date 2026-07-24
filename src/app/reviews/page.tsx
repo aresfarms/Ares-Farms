@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
@@ -101,6 +102,12 @@ function reviewSummary(row: unknown): string {
 }
 
 export default function HumanReviewConsolePage() {
+  const [caseId, setCaseId] = useState<string | null>(null);
+  const [caseName, setCaseName] = useState<string | null>(null);
+  const [caseGoal, setCaseGoal] = useState<string | null>(null);
+  const [caseState, setCaseState] = useState<string | null>(null);
+  const [caseCustomerTypes, setCaseCustomerTypes] = useState<string[]>([]);
+  const [caseIntendedUses, setCaseIntendedUses] = useState<string[]>([]);
   const [data, setData] = useState<ModuleData>({
     applications: emptyLoad,
     reviews: emptyLoad,
@@ -142,8 +149,31 @@ export default function HumanReviewConsolePage() {
   }, [selectedReviewId]);
 
   useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const incomingCaseId = query.get("caseId")?.trim() || null;
+    if (incomingCaseId) {
+      setCaseId(incomingCaseId);
+      setCaseName(query.get("name")?.trim() || null);
+      setCaseGoal(query.get("goal")?.trim() || null);
+      setCaseState(query.get("state")?.trim() || null);
+      setCaseCustomerTypes((query.get("customerTypes") ?? "").split(",").map((value) => value.trim()).filter(Boolean));
+      setCaseIntendedUses((query.get("intendedUses") ?? "").split(",").map((value) => value.trim()).filter(Boolean));
+    }
     void loadAll();
   }, [loadAll]);
+
+  const caseReturnHref = useMemo(() => {
+    if (!caseId) return null;
+    const params = new URLSearchParams({
+      name: caseName || `Furlong Case ${caseId}`,
+      goal: caseGoal || "Evaluate governed pathways, evidence, constraints, and next steps.",
+      customerTypes: caseCustomerTypes.join(","),
+      intendedUses: caseIntendedUses.join(","),
+      origin: "human-review",
+    });
+    if (caseState) params.set("state", caseState);
+    return `/intelligence/cases/${encodeURIComponent(caseId)}?${params.toString()}`;
+  }, [caseCustomerTypes, caseGoal, caseId, caseIntendedUses, caseName, caseState]);
 
   const selectedReview = useMemo(() => {
     return selectedReviewFromRows(data.reviews.rows, selectedReviewId);
@@ -314,6 +344,15 @@ export default function HumanReviewConsolePage() {
   return (
     <main style={moduleShellStyle}>
       <div style={moduleContainerStyle}>
+        {caseReturnHref ? (
+          <section data-testid="case-human-review-handoff" style={{ ...panelStyle, padding: 16, borderLeft: "5px solid #7c3aed" }}>
+            <strong>Human review for {caseName || caseId}</strong>
+            <p style={{ margin: "6px 0 10px", color: "#596579", lineHeight: 1.5 }}>
+              This console is opened from the same intelligence case. Only the case reference and structured posture are carried; no Navigator transcript, identity, street address, or listing URL is transferred.
+            </p>
+            <Link href={caseReturnHref}>Return to the same intelligence case {"->"}</Link>
+          </section>
+        ) : null}
         <ModuleHeader
           moduleNumber="05"
           title="Human Review"

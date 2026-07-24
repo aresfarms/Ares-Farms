@@ -5,6 +5,11 @@ import {
   evaluateProductionSupportCommunicationsReadinessGate,
 } from "@/lib/governance/productionSupportCommunicationsReadinessGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -181,42 +186,28 @@ async function handleProductionSupportCommunicationsReadiness(
     const result = evaluateProductionSupportCommunicationsReadinessGate({
       supportScope,
     });
+    const scope = supportScope ?? "platform";
     const supportReadiness =
-      req.method === "POST"
-        ? {
-            supportReadinessPacketId: `production-support-communications-readiness-${Date.now()}`,
-            supportScope: supportScope ?? "platform",
-            reviewStatus:
-              "PRODUCTION_SUPPORT_COMMUNICATIONS_READINESS_PACKET_RECORDED",
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_SUPPORT_COMMUNICATIONS_READINESS_PACKET",
+            scope,
+            actorId,
             reviewNote: body.reviewNote ?? null,
-            supportCommunicationsApprovalGranted: false,
-            supportOperationsActivated: false,
-            supportEscalationActivated: false,
-            customerCommunicationsReleased: false,
-            regulatoryCommunicationsReleased: false,
-            publicStatusPageEnabled: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            legalAdviceProvided: false,
-            officialRelianceAllowed: false,
-            incidentResponseActivated: false,
-            incidentBridgeActivated: false,
-            rollbackAuthorized: false,
-            emergencyRollbackExecuted: false,
-            emergencyHoldReleased: false,
-            killSwitchActivated: false,
-            cutoverAuthorityGranted: false,
-            productionCutoverExecuted: false,
-            deploymentExecuted: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            productionBlocked: true,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_SUPPORT_COMMUNICATIONS_READINESS_PACKET"
+          );
+    const supportHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_SUPPORT_COMMUNICATIONS_READINESS_PACKET"
+    );
+    const incidentResponseEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_INCIDENT_RESPONSE_READINESS_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionSupportCommunicationsReadinessReviews.length,
@@ -226,6 +217,8 @@ async function handleProductionSupportCommunicationsReadiness(
         disclosures: result.disclosures,
         supportPosture: result.supportPosture,
         supportReadiness,
+        supportHistory,
+        incidentResponseEvidence,
         productionBlocked: true,
         supportCommunicationsApprovalGranted: false,
         supportOperationsActivated: false,
@@ -355,6 +348,8 @@ async function handleProductionSupportCommunicationsReadiness(
       disclosures: classifiedOutput.disclosures,
       supportPosture: classifiedOutput.supportPosture,
       supportReadiness: classifiedOutput.supportReadiness,
+      supportHistory: classifiedOutput.supportHistory,
+      incidentResponseEvidence: classifiedOutput.incidentResponseEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       supportCommunicationsApprovalGranted:
         classifiedOutput.supportCommunicationsApprovalGranted,

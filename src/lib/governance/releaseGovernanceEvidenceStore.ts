@@ -1,4 +1,4 @@
-import { createHash, createHmac, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -69,6 +69,29 @@ function isEvidenceRecord(value: unknown): value is ReleaseGovernanceEvidenceRec
     && typeof record.digest === "string";
 }
 
+function unsignedPayload(record: ReleaseGovernanceEvidenceRecord): Omit<ReleaseGovernanceEvidenceRecord, "digest" | "signature"> {
+  const { digest: _digest, signature: _signature, ...payload } = record;
+  return payload;
+}
+
+function verifyEvidenceRecord(record: ReleaseGovernanceEvidenceRecord): boolean {
+  const payload = unsignedPayload(record);
+  const bytes = JSON.stringify(payload);
+  const expectedDigest = createHash("sha256").update(bytes).digest("hex");
+  if (record.digest !== expectedDigest) return false;
+
+  const secret = readRequiredSecret("REPORT_SIGNING_SECRET");
+  if (!secret) return record.signature === null;
+  if (!record.signature) return false;
+
+  const expectedSignature = createHmac("sha256", secret)
+    .update(bytes)
+    .digest("base64url");
+  const provided = Buffer.from(record.signature);
+  const expected = Buffer.from(expectedSignature);
+  return provided.length === expected.length && timingSafeEqual(provided, expected);
+}
+
 function readImmutableRecords(): ReleaseGovernanceEvidenceRecord[] {
   try {
     return readdirSync(recordDirectoryPath(), { withFileTypes: true })
@@ -78,7 +101,7 @@ function readImmutableRecords(): ReleaseGovernanceEvidenceRecord[] {
           const parsed = JSON.parse(
             readFileSync(path.join(recordDirectoryPath(), entry.name), "utf8")
           ) as unknown;
-          return isEvidenceRecord(parsed) ? [parsed] : [];
+          return isEvidenceRecord(parsed) && verifyEvidenceRecord(parsed) ? [parsed] : [];
         } catch {
           return [];
         }
@@ -89,7 +112,8 @@ function readImmutableRecords(): ReleaseGovernanceEvidenceRecord[] {
 }
 
 function readAllRecords(): ReleaseGovernanceEvidenceRecord[] {
-  const records = [...readLegacyStore().records, ...readImmutableRecords()];
+  const records = [...readLegacyStore().records, ...readImmutableRecords()]
+    .filter((record) => isEvidenceRecord(record) && verifyEvidenceRecord(record));
   const unique = new Map<string, ReleaseGovernanceEvidenceRecord>();
   for (const record of records) unique.set(record.evidenceId, record);
   return [...unique.values()];

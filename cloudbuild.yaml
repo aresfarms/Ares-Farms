@@ -54,6 +54,7 @@ steps:
         npm run verify:official-evidence-connector-registry
         npm run verify:official-evidence-connector-durability
         npm run verify:official-evidence-connector-change-control
+        npm run verify:official-evidence-connector-implementation-binding
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

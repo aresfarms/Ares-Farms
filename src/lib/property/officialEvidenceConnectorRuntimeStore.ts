@@ -14,6 +14,7 @@ export interface ConnectorReviewReceipt {
   decidedAt: string;
   reason: string;
   parserVersion: string;
+  implementationHash?: string;
 }
 
 export interface DurableConnectorRegistryState {

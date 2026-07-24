@@ -15,6 +15,39 @@ export interface OfficialEvidenceSource {
   replayRef?: string | null;
 }
 
+export type WaterSourceType =
+  | "municipal"
+  | "domestic-well"
+  | "deep-well"
+  | "irrigation-well"
+  | "artesian-well"
+  | "multiple-well-system"
+  | "surface-water-irrigation"
+  | "shared-well"
+  | "other-private-source"
+  | "unknown";
+
+export interface WaterSourceProfile {
+  sourceType: WaterSourceType;
+  wellDepthFeet?: number | null;
+  aquiferName?: string | null;
+  testedYieldGpm?: number | null;
+  sustainableWithdrawalGallonsPerDay?: number | null;
+  irrigatedAcresSupported?: number | null;
+  peakDemandAdequate?: boolean | null;
+  waterQualityTested?: boolean | null;
+  treatmentRequired?: boolean | null;
+  withdrawalPermitRequired?: boolean | null;
+  withdrawalPermitVerified?: boolean | null;
+  waterRightRunsWithLand?: boolean | null;
+  droughtRestrictionExposure?: "none-identified" | "conditional" | "material" | "unknown";
+  sharedSource?: boolean | null;
+  redundantSourceAvailable?: boolean | null;
+  annualEnergyCost?: number | null;
+  annualMaintenanceReserve?: number | null;
+  replacementReserve?: number | null;
+}
+
 export type WaterEvidenceStatus =
   | "adequate-public-service"
   | "adequate-private-source"
@@ -47,6 +80,7 @@ interface BaseRiskEvidence {
 export interface WaterRiskEvidence extends BaseRiskEvidence {
   kind: "water";
   status: WaterEvidenceStatus;
+  sourceProfile?: WaterSourceProfile | null;
 }
 
 export interface InsuranceRiskEvidence extends BaseRiskEvidence {
@@ -67,6 +101,24 @@ export function validatePropertyRiskEvidence(evidence: PropertyRiskEvidence): st
   if ((evidence.annualCost ?? 0) < 0 || (evidence.oneTimeCost ?? 0) < 0) {
     errors.push("Evidence costs cannot be negative.");
   }
+  if (evidence.kind === "water" && evidence.sourceProfile) {
+    const p = evidence.sourceProfile;
+    for (const [label, value] of [
+      ["well depth", p.wellDepthFeet],
+      ["tested yield", p.testedYieldGpm],
+      ["sustainable withdrawal", p.sustainableWithdrawalGallonsPerDay],
+      ["irrigated acres", p.irrigatedAcresSupported],
+      ["annual energy cost", p.annualEnergyCost],
+      ["annual maintenance reserve", p.annualMaintenanceReserve],
+      ["replacement reserve", p.replacementReserve],
+    ] as const) {
+      if ((value ?? 0) < 0) errors.push(`Water ${label} cannot be negative.`);
+    }
+    const wellTypes = ["domestic-well", "deep-well", "irrigation-well", "artesian-well", "multiple-well-system", "shared-well"];
+    if (evidence.confidence === "verified" && wellTypes.includes(p.sourceType) && !p.testedYieldGpm) {
+      errors.push("A verified well source requires tested yield evidence.");
+    }
+  }
   return errors;
 }
 
@@ -83,6 +135,26 @@ function waterPenalty(status: WaterEvidenceStatus): number {
     unavailable: 35,
     unresolved: 4,
   })[status];
+}
+
+function waterBenefit(evidence: WaterRiskEvidence): number {
+  const p = evidence.sourceProfile;
+  if (!p || evidence.confidence !== "verified" || evidence.status !== "adequate-private-source") return 0;
+  const agricultural = (evidence.affectedScenarioIds ?? []).some((id) =>
+    ["operating-agriculture", "specialty-direct-market", "productive-land"].includes(id)
+  );
+  if (!agricultural) return 0;
+  const strongYield = (p.testedYieldGpm ?? 0) >= 20 || (p.sustainableWithdrawalGallonsPerDay ?? 0) >= 20000;
+  const irrigationReady = ["irrigation-well", "deep-well", "artesian-well", "multiple-well-system"].includes(p.sourceType)
+    && p.peakDemandAdequate === true;
+  const rightsSecure = p.withdrawalPermitRequired !== true || p.withdrawalPermitVerified === true;
+  const landRightSecure = p.waterRightRunsWithLand !== false;
+  const droughtAcceptable = !["material", "unknown"].includes(p.droughtRestrictionExposure ?? "unknown");
+  if (!(strongYield && irrigationReady && rightsSecure && landRightSecure && droughtAcceptable)) return 0;
+  let benefit = 8;
+  if (p.redundantSourceAvailable) benefit += 3;
+  if ((p.annualEnergyCost ?? 0) + (p.annualMaintenanceReserve ?? 0) <= 5000) benefit += 2;
+  return Math.min(12, benefit);
 }
 
 function insurancePenalty(status: InsuranceEvidenceStatus): number {
@@ -120,10 +192,19 @@ export function buildWaterInsuranceRiskImpact(args: {
     const penalty = item.kind === "water" ? waterPenalty(item.status) : insurancePenalty(item.status);
     for (const id of scenarioIds) {
       const current = adjustments[id] ?? { verified: true, notes: [] };
-      if (item.kind === "water") current.waterPenalty = penalty;
+      if (item.kind === "water") {
+        current.waterPenalty = penalty;
+        current.waterBenefit = waterBenefit(item);
+      }
       else current.insurancePenalty = penalty;
       current.verified = current.verified !== false && item.confidence === "verified";
       current.notes = [...(current.notes ?? []), ...(item.notes ?? []), `${item.kind}: ${item.status}`];
+      if (item.kind === "water" && item.sourceProfile) {
+        const p = item.sourceProfile;
+        current.notes.push(`water source: ${p.sourceType}`);
+        if (p.testedYieldGpm) current.notes.push(`tested yield: ${p.testedYieldGpm} gpm`);
+        if (p.aquiferName) current.notes.push(`aquifer: ${p.aquiferName}`);
+      }
       adjustments[id] = current;
     }
   }

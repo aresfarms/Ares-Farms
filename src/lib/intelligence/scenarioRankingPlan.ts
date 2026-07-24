@@ -41,6 +41,7 @@ export type PropertyRiskStatus = "verified-clear" | "verified-constrained" | "un
 
 export interface ScenarioInfrastructureAdjustment {
   waterPenalty?: number;
+  waterBenefit?: number;
   insurancePenalty?: number;
   publicProjectPenalty?: number;
   governmentActionPenalty?: number;
@@ -131,7 +132,8 @@ export function buildScenarioRankingPlan(args: {
           .reduce((total, status) => total + (status === "verified-constrained" ? 10 : status === "unknown" ? 3 : 0), 0)
       : 12;
     const usePenalty = Math.min(60, Math.max(0, infrastructure?.waterPenalty ?? 0) + Math.max(0, infrastructure?.insurancePenalty ?? 0) + Math.max(0, infrastructure?.publicProjectPenalty ?? 0) + Math.max(0, infrastructure?.governmentActionPenalty ?? 0));
-    const infrastructureAdjustment = -(statusPenalty + usePenalty);
+    const useBenefit = Math.min(15, Math.max(0, infrastructure?.waterBenefit ?? 0));
+    const infrastructureAdjustment = -(statusPenalty + usePenalty) + useBenefit;
     const infrastructureResilience = clamp(82 + infrastructureAdjustment);
     const totalScore = clamp(
       propertyFit * 0.20 +
@@ -141,7 +143,8 @@ export function buildScenarioRankingPlan(args: {
       taxResilience * 0.16 +
       infrastructureResilience * 0.16 -
       scenarioTaxPenalty * 0.4 -
-      usePenalty * 0.35
+      usePenalty * 0.35 +
+      useBenefit * 0.25
     );
     const posture: ScenarioPosture = totalScore >= 72 ? "proceed-with-conditions" : totalScore >= 58 ? "renegotiate" : "walk-away";
     const taxReason = scenarioTax

@@ -223,7 +223,7 @@ export default function ProductionPortalReadinessPage() {
 
         setActionMessage(
           `Production portal launch hold recorded: ${shortId(
-            launchHold.launchHoldId
+            launchHold.evidenceId
           )}. No production launch, live external action, payment capture, borrower notice send, official report publication, public verification, or official reliance was approved.`
         );
         await loadAll({ clearActionMessage: false });

@@ -72,8 +72,17 @@ async function main() {
   });
   assert(reliance.productionBlocked && !reliance.deploymentExecuted, "Reliance evidence must remain blocked.");
   assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_RELIANCE_VERIFICATION_PACKET")?.evidenceId === reliance.evidenceId, "Reliance evidence did not persist.");
-  assert(store.releaseGovernanceEvidenceFor("platform").length === 7, "Release evidence stages must remain distinct.");
-  console.log(JSON.stringify({ ok: true, records: 7, productionBlocked: true, deploymentExecuted: false }, null, 2));
+  const examination = store.recordReleaseGovernanceEvidence({
+    kind: "PRODUCTION_REGULATORY_EXAMINATION_PACKET",
+    scope: "platform",
+    actorId: "release-manager-test",
+    reviewNote: "regulatory examination remains blocked",
+    replayRef: "release-evidence-smoke-examination",
+  });
+  assert(examination.productionBlocked && !examination.deploymentExecuted, "Examination evidence must remain blocked.");
+  assert(store.latestReleaseGovernanceEvidence("platform", "PRODUCTION_REGULATORY_EXAMINATION_PACKET")?.evidenceId === examination.evidenceId, "Examination evidence did not persist.");
+  assert(store.releaseGovernanceEvidenceFor("platform").length === 8, "Release evidence stages must remain distinct.");
+  console.log(JSON.stringify({ ok: true, records: 8, productionBlocked: true, deploymentExecuted: false }, null, 2));
   rmSync(dir, { recursive: true, force: true });
 }
 

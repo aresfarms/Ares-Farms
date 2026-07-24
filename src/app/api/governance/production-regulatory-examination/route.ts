@@ -5,6 +5,11 @@ import {
   evaluateProductionRegulatoryExaminationGate,
 } from "@/lib/governance/productionRegulatoryExaminationGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -171,34 +176,28 @@ async function handleProductionRegulatoryExamination(
     const result = evaluateProductionRegulatoryExaminationGate({
       examinationScope,
     });
+    const scope = examinationScope ?? "platform";
     const examinationPacket =
-      req.method === "POST"
-        ? {
-            examinationPacketId: `production-regulatory-examination-${Date.now()}`,
-            examinationScope: examinationScope ?? "platform",
-            reviewStatus: "PRODUCTION_REGULATORY_EXAMINATION_PACKET_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            regulatoryExaminationPackageApproved: false,
-            regulatoryExaminationPackageSubmitted: false,
-            regulatorPortalUploadAllowed: false,
-            regulatoryResponseIssued: false,
-            examinationArchiveCertified: false,
-            evidenceRetentionCertified: false,
-            legalHoldReleased: false,
-            externalExaminerDisclosureApproved: false,
-            productionRelianceApprovalGranted: false,
-            publicVerificationApprovalGranted: false,
-            officialRelianceAllowed: false,
-            legalAdviceProvided: false,
-            productionHealthCertified: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            productionBlocked: true,
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_REGULATORY_EXAMINATION_PACKET",
+            scope,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_REGULATORY_EXAMINATION_PACKET"
+          );
+    const examinationHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_REGULATORY_EXAMINATION_PACKET"
+    );
+    const relianceEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_RELIANCE_VERIFICATION_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionRegulatoryExaminationReviews.length,
@@ -208,6 +207,8 @@ async function handleProductionRegulatoryExamination(
         disclosures: result.disclosures,
         examinationPosture: result.examinationPosture,
         examinationPacket,
+        examinationHistory,
+        relianceEvidence,
         productionBlocked: true,
         regulatoryExaminationPackageApproved: false,
         regulatoryExaminationPackageSubmitted: false,
@@ -345,6 +346,8 @@ async function handleProductionRegulatoryExamination(
       disclosures: classifiedOutput.disclosures,
       examinationPosture: classifiedOutput.examinationPosture,
       examinationPacket: classifiedOutput.examinationPacket,
+      examinationHistory: classifiedOutput.examinationHistory,
+      relianceEvidence: classifiedOutput.relianceEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       regulatoryExaminationPackageApproved:
         classifiedOutput.regulatoryExaminationPackageApproved,

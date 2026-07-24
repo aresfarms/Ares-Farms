@@ -209,6 +209,10 @@ async function handleProductionFinalAuthority(
       scope,
       "PRODUCTION_RELEASE_BOARD_PACKET"
     );
+    const supportCommunicationsEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_SUPPORT_COMMUNICATIONS_READINESS_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionFinalAuthorityReviews.length,
@@ -220,6 +224,7 @@ async function handleProductionFinalAuthority(
         authorityPacket,
         authorityHistory,
         releaseBoardEvidence,
+        supportCommunicationsEvidence,
         productionBlocked: true,
         finalAuthorityApprovalGranted: false,
         goLiveApproved: false,
@@ -352,6 +357,8 @@ async function handleProductionFinalAuthority(
       authorityPacket: classifiedOutput.authorityPacket,
       authorityHistory: classifiedOutput.authorityHistory,
       releaseBoardEvidence: classifiedOutput.releaseBoardEvidence,
+      supportCommunicationsEvidence:
+        classifiedOutput.supportCommunicationsEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       finalAuthorityApprovalGranted:
         classifiedOutput.finalAuthorityApprovalGranted,

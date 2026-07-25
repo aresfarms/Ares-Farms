@@ -1,6 +1,7 @@
 import { hashOfficialEvidenceRecords } from "./officialEvidenceRefreshWriter";
 import { readDurableConnectorRegistry } from "./officialEvidenceConnectorRuntimeStore";
 import type { OfficialEvidenceSnapshot, OfficialEvidenceSourceId } from "./officialEvidenceSourceGovernance";
+import { recordOfficialEvidenceQuarantine } from "./officialEvidenceQuarantineStore";
 
 export interface EvidenceReadVerification {
   valid: boolean;
@@ -53,5 +54,15 @@ export function verifiedSnapshotsForRead<T>(
   sourceId: OfficialEvidenceSourceId,
   snapshots: OfficialEvidenceSnapshot<T>[],
 ): OfficialEvidenceSnapshot<T>[] {
-  return snapshots.filter((snapshot) => verifyOfficialEvidenceSnapshotAtRead(sourceId, snapshot).valid);
+  return snapshots.filter((snapshot) => {
+    const verification = verifyOfficialEvidenceSnapshotAtRead(sourceId, snapshot);
+    if (!verification.valid) {
+      recordOfficialEvidenceQuarantine({
+        sourceId, sourceVersion: snapshot.sourceVersion, reasons: verification.reasons,
+        receiptId: snapshot.receipt.receiptId ?? null, connectorId: snapshot.receipt.connectorId ?? null,
+        parserVersion: snapshot.receipt.parserVersion ?? null, implementationHash: snapshot.receipt.implementationHash ?? null,
+      });
+    }
+    return verification.valid;
+  });
 }

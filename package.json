@@ -473,7 +473,8 @@
     "verify:official-evidence-connector-change-control": "tsx src/scripts/verifyOfficialEvidenceConnectorChangeControl.ts",
     "verify:official-evidence-connector-implementation-binding": "tsx src/scripts/verifyOfficialEvidenceConnectorImplementationBinding.ts",
     "verify:official-evidence-refresh-provenance": "tsx src/scripts/verifyOfficialEvidenceRefreshProvenance.ts",
-    "verify:official-evidence-read-provenance": "tsx src/scripts/verifyOfficialEvidenceReadProvenance.ts"
+    "verify:official-evidence-read-provenance": "tsx src/scripts/verifyOfficialEvidenceReadProvenance.ts",
+    "verify:official-evidence-quarantine": "tsx src/scripts/verifyOfficialEvidenceQuarantine.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

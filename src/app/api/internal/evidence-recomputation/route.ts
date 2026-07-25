@@ -20,6 +20,10 @@ import { recordPostResumeExecution } from "@/lib/property/officialEvidencePostRe
 import { pauseEvidenceRecomputationScheduler } from "@/lib/property/officialEvidenceSchedulerPause";
 import { openSteadyStateIncident } from "@/lib/property/officialEvidenceSteadyStateIncident";
 import {
+  assignIncidentSla,
+  evaluateIncidentSlaBreaches,
+} from "@/lib/property/officialEvidenceIncidentSla";
+import {
   missingRequiredSecretDetail,
   readRequiredSecret,
   secureCompare,
@@ -111,6 +115,10 @@ export async function POST(request: Request) {
             at: watchdogReceipt.at,
           })
         : null;
+    const incidentSla = steadyStateIncident
+      ? assignIncidentSla(steadyStateIncident)
+      : null;
+    const incidentSlaBreaches = evaluateIncidentSlaBreaches();
     let completedTranscript = null;
     if (body.canary && canaryTranscript) {
       completedTranscript = completeCanaryExecution({
@@ -142,6 +150,8 @@ export async function POST(request: Request) {
       canaryTranscript: completedTranscript,
       postResumeWatchdog: watchdogReceipt,
       steadyStateIncident,
+      incidentSla,
+      incidentSlaBreaches,
     });
   } catch (error) {
     if (body.canary && canaryTranscript) {

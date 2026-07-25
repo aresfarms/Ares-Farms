@@ -80,6 +80,7 @@ steps:
         npm run verify:official-evidence-canary-transcript
         npm run verify:official-evidence-post-resume-watchdog
         npm run verify:official-evidence-steady-state-incident
+        npm run verify:official-evidence-incident-sla
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

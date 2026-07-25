@@ -63,6 +63,11 @@ import {
   openSteadyStateIncidents,
   type SteadyStateIncidentAction,
 } from "@/lib/property/officialEvidenceSteadyStateIncident";
+import {
+  evaluateIncidentSlaBreaches,
+  incidentSlaStatus,
+  listIncidentSlaReceipts,
+} from "@/lib/property/officialEvidenceIncidentSla";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -281,6 +286,8 @@ export default async function EvidenceRecomputationPage() {
     .slice(-30)
     .reverse();
   const steadyOpenIncidents = openSteadyStateIncidents();
+  evaluateIncidentSlaBreaches();
+  const incidentSlaReceipts = listIncidentSlaReceipts().slice(-30).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -838,6 +845,15 @@ export default async function EvidenceRecomputationPage() {
                 Execution {r.executionId} · failed {r.failedJobIds.length} ·
                 blocked {r.blockedJobIds.length}
               </div>
+              {(() => {
+                const sla = incidentSlaStatus(r.incidentId);
+                return sla ? (
+                  <div>
+                    Severity <b>{sla.severity}</b> · acknowledge by{" "}
+                    {sla.acknowledgeBy} · resolve by {sla.resolveBy}
+                  </div>
+                ) : null;
+              })()}
               <textarea
                 name="reason"
                 required
@@ -855,6 +871,23 @@ export default async function EvidenceRecomputationPage() {
                 </button>
               </div>
             </form>
+          ))
+        )}
+        <h3>SLA receipts</h3>
+        {incidentSlaReceipts.length === 0 ? (
+          <p>No incident SLA receipts.</p>
+        ) : (
+          incidentSlaReceipts.map((r) => (
+            <div
+              key={r.receiptId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{r.action}</b> · {r.severity} · {r.at}
+              <br />
+              Ack by {r.acknowledgeBy} · resolve by {r.resolveBy}
+              <br />
+              {r.reason}
+            </div>
           ))
         )}
         <h3>Incident receipts</h3>

@@ -493,7 +493,8 @@
     "verify:official-evidence-approval-packet": "tsx src/scripts/verifyOfficialEvidenceApprovalPacket.ts",
     "verify:official-evidence-approval-completion": "tsx src/scripts/verifyOfficialEvidenceApprovalCompletion.ts",
     "verify:official-evidence-review-handoff": "tsx src/scripts/verifyOfficialEvidenceReviewHandoff.ts",
-    "verify:official-evidence-final-canary-packet": "tsx src/scripts/verifyOfficialEvidenceFinalCanaryPacket.ts"
+    "verify:official-evidence-final-canary-packet": "tsx src/scripts/verifyOfficialEvidenceFinalCanaryPacket.ts",
+    "verify:official-evidence-canary-transcript": "tsx src/scripts/verifyOfficialEvidenceCanaryExecutionTranscript.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -42,6 +42,10 @@ import {
   listFinalCanaryReleasePackets,
 } from "@/lib/property/officialEvidenceFinalCanaryPacket";
 import {
+  currentPassedCanaryTranscript,
+  listCanaryExecutionTranscripts,
+} from "@/lib/property/officialEvidenceCanaryExecutionTranscript";
+import {
   listSchedulerReleaseReceipts,
   recordSchedulerRelease,
   schedulerCanaryPassed,
@@ -245,6 +249,10 @@ export default async function EvidenceRecomputationPage() {
   const finalCanaryPackets = listFinalCanaryReleasePackets()
     .slice(-20)
     .reverse();
+  const canaryTranscripts = listCanaryExecutionTranscripts()
+    .slice(-20)
+    .reverse();
+  const passedCanaryTranscript = currentPassedCanaryTranscript();
   const handoffChecklist = currentReviewHandoffChecklist();
   const handoffReceipts = listReviewHandoffReceipts().slice(-20).reverse();
   return (
@@ -712,6 +720,33 @@ export default async function EvidenceRecomputationPage() {
               Ceremony {p.ceremonyReceiptId}
               <br />
               {p.reason}
+            </div>
+          ))
+        )}
+      </section>
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
+        <h2>Canary execution transcripts</h2>
+        <p>
+          Current matching passed transcript:{" "}
+          <b>{passedCanaryTranscript ? "READY" : "MISSING"}</b>.
+        </p>
+        {canaryTranscripts.length === 0 ? (
+          <p>No canary execution transcripts.</p>
+        ) : (
+          canaryTranscripts.map((r) => (
+            <div
+              key={r.transcriptId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{r.status}</b> · run {r.canaryRunId} · packet {r.finalPacketId}
+              <br />
+              jobs {String(r.jobCount ?? 0)} · queued{" "}
+              {String(r.queuedCount ?? 0)} · duration{" "}
+              {String(r.durationMs ?? 0)} ms
+              <br />
+              <code>{r.jobResultHash ?? "pending"}</code>
             </div>
           ))
         )}

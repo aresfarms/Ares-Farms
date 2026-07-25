@@ -90,13 +90,18 @@ export function recordSchedulerRelease(input: {
 export function listSchedulerReleaseReceipts(): SchedulerReleaseReceipt[] {
   return read().receipts;
 }
-export function schedulerReleaseAuthorized(): boolean {
+export function currentSchedulerReleaseAuthorization(): SchedulerReleaseReceipt | null {
   const row = [...read().receipts]
     .reverse()
     .find((r) => r.action === "AUTHORIZE" || r.action === "REVOKE");
-  return (
-    row?.action === "AUTHORIZE" && row.activationReady && row.ceremonyFinalized
-  );
+  return row?.action === "AUTHORIZE" &&
+    row.activationReady &&
+    row.ceremonyFinalized
+    ? row
+    : null;
+}
+export function schedulerReleaseAuthorized(): boolean {
+  return currentSchedulerReleaseAuthorization() !== null;
 }
 export function schedulerCanaryPassed(): boolean {
   if (!schedulerReleaseAuthorized()) return false;

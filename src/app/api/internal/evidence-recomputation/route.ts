@@ -12,6 +12,11 @@ import {
   schedulerReleaseAuthorized,
 } from "@/lib/property/officialEvidenceSchedulerRelease";
 import {
+  beginCanaryExecution,
+  completeCanaryExecution,
+  failCanaryExecution,
+} from "@/lib/property/officialEvidenceCanaryExecutionTranscript";
+import {
   missingRequiredSecretDetail,
   readRequiredSecret,
   secureCompare,
@@ -83,28 +88,55 @@ export async function POST(request: Request) {
       { ok: false, error: "Scheduler canary is not authorized." },
       { status: 409 },
     );
-  const queued = enqueueStaleEvidenceArtifacts(body.propertyId);
-  const jobs = await processEvidenceRecomputationQueue(handlers);
-  if (body.canary) {
-    const failed = jobs.filter(
-      (job) => job.status === "failed" || job.status === "blocked",
-    );
-    recordSchedulerRelease({
-      action: failed.length ? "CANARY_FAIL" : "CANARY_PASS",
-      actorId: "system:scheduler-canary",
-      actorName: "scheduler-canary",
-      reason: failed.length
-        ? `Canary failed or blocked for ${failed.length} job(s).`
-        : "Canary completed without failed or blocked recomputation jobs.",
-      canaryRunId: crypto.randomUUID(),
-      jobCount: jobs.length,
+  const canaryTranscript = body.canary ? beginCanaryExecution({}) : null;
+  try {
+    const queued = enqueueStaleEvidenceArtifacts(body.propertyId);
+    const jobs = await processEvidenceRecomputationQueue(handlers);
+    let completedTranscript = null;
+    if (body.canary && canaryTranscript) {
+      completedTranscript = completeCanaryExecution({
+        canaryRunId: canaryTranscript.canaryRunId,
+        queuedCount: queued.length,
+        jobs,
+      });
+      recordSchedulerRelease({
+        action:
+          completedTranscript.status === "PASSED"
+            ? "CANARY_PASS"
+            : "CANARY_FAIL",
+        actorId: "system:scheduler-canary",
+        actorName: "scheduler-canary",
+        reason:
+          completedTranscript.status === "PASSED"
+            ? "Canary completed without failed or blocked recomputation jobs."
+            : `Canary failed or blocked for ${completedTranscript.failedJobIds.length + completedTranscript.blockedJobIds.length} job(s).`,
+        canaryRunId: completedTranscript.canaryRunId,
+        jobCount: jobs.length,
+      });
+    }
+    return NextResponse.json({
+      ok: true,
+      executedAt: new Date().toISOString(),
+      queued: queued.length,
+      jobs,
+      canary: Boolean(body.canary),
+      canaryTranscript: completedTranscript,
     });
+  } catch (error) {
+    if (body.canary && canaryTranscript) {
+      const failed = failCanaryExecution({
+        canaryRunId: canaryTranscript.canaryRunId,
+        reason: error instanceof Error ? error.message : String(error),
+      });
+      recordSchedulerRelease({
+        action: "CANARY_FAIL",
+        actorId: "system:scheduler-canary",
+        actorName: "scheduler-canary",
+        reason: "Canary execution raised an exception.",
+        canaryRunId: failed.canaryRunId,
+        jobCount: 0,
+      });
+    }
+    throw error;
   }
-  return NextResponse.json({
-    ok: true,
-    executedAt: new Date().toISOString(),
-    queued: queued.length,
-    jobs,
-    canary: Boolean(body.canary),
-  });
 }

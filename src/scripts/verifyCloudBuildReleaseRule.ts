@@ -31,6 +31,7 @@ const required = [
   "verify:official-evidence-approval-completion",
   "verify:official-evidence-review-handoff",
   "verify:official-evidence-final-canary-packet",
+  "verify:official-evidence-canary-transcript",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

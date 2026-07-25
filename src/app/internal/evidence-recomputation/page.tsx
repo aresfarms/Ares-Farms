@@ -37,6 +37,11 @@ import {
   type CeremonyAction,
 } from "@/lib/property/officialEvidenceRecomputationCeremony";
 import {
+  createFinalCanaryReleasePacket,
+  currentFinalCanaryReleasePacket,
+  listFinalCanaryReleasePackets,
+} from "@/lib/property/officialEvidenceFinalCanaryPacket";
+import {
   listSchedulerReleaseReceipts,
   recordSchedulerRelease,
   schedulerCanaryPassed,
@@ -154,6 +159,21 @@ async function ceremony(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 
+async function createCanaryPacket(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  createFinalCanaryReleasePacket({
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 async function schedulerRelease(formData: FormData): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
@@ -221,6 +241,10 @@ export default async function EvidenceRecomputationPage() {
   const canaryPassed = schedulerCanaryPassed();
   const resumePermitted = schedulerResumePermitted();
   const approvalCompletion = approvalCompletionStatus();
+  const finalCanaryPacket = currentFinalCanaryReleasePacket();
+  const finalCanaryPackets = listFinalCanaryReleasePackets()
+    .slice(-20)
+    .reverse();
   const handoffChecklist = currentReviewHandoffChecklist();
   const handoffReceipts = listReviewHandoffReceipts().slice(-20).reverse();
   return (
@@ -374,6 +398,21 @@ export default async function EvidenceRecomputationPage() {
         )}
         {mayApprove && (
           <form
+            action={createCanaryPacket}
+            style={{ display: "grid", gap: 8, maxWidth: 700, marginTop: 12 }}
+          >
+            <textarea
+              name="reason"
+              required
+              placeholder="Final canary release packet reason"
+            />
+            <button disabled={!finalized}>
+              Create final canary release packet
+            </button>
+          </form>
+        )}
+        {mayApprove && (
+          <form
             action={schedulerRelease}
             style={{ display: "grid", gap: 8, maxWidth: 700, marginTop: 12 }}
           >
@@ -386,7 +425,7 @@ export default async function EvidenceRecomputationPage() {
               <button
                 name="action"
                 value="AUTHORIZE"
-                disabled={!activation.ready || !finalized}
+                disabled={!activation.ready || !finalized || !finalCanaryPacket}
               >
                 Authorize paused scheduler canary
               </button>
@@ -650,6 +689,29 @@ export default async function EvidenceRecomputationPage() {
               {String(r.readyAtDecision)}
               <br />
               {r.reason}
+            </div>
+          ))
+        )}
+      </section>
+
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
+        <h2>Final canary release packets</h2>
+        {finalCanaryPackets.length === 0 ? (
+          <p>No final canary release packets.</p>
+        ) : (
+          finalCanaryPackets.map((p) => (
+            <div
+              key={p.packetId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{p.ready ? "READY" : "BLOCKED"}</b> · {p.actorName} · {p.at}
+              <br />
+              Approval {p.approvalPacketId} · Handoff {p.handoffReceiptId} ·
+              Ceremony {p.ceremonyReceiptId}
+              <br />
+              {p.reason}
             </div>
           ))
         )}

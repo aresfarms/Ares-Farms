@@ -27,6 +27,9 @@ async function main() {
     await import("@/lib/property/officialEvidenceBatchReplayVerification");
   const approval =
     await import("@/lib/property/officialEvidenceApprovalPacket");
+  const handoff = await import("@/lib/property/officialEvidenceReviewHandoff");
+  const finalPacket =
+    await import("@/lib/property/officialEvidenceFinalCanaryPacket");
   const tax = await import("@/lib/property/ownershipCostModel");
   const ranking = await import("@/lib/intelligence/scenarioRankingPlan");
   const market = await import("@/lib/intelligence/marketComparablePlan");
@@ -215,11 +218,24 @@ async function main() {
       reason: `Approve current ${kind} implementation for scheduler release test.`,
     });
   }
+  handoff.recordReviewHandoff({
+    actorId: "module45-reviewer",
+    actorName: "Module 45 Reviewer",
+    reason: "Ready for final activation ceremony.",
+    at: "2026-07-25T18:34:00Z",
+  });
   ceremony.recordRecomputationActivationCeremony({
     action: "FINALIZE",
     actorId: "module45-reviewer",
     actorName: "Module 45 Reviewer",
     reason: "All exact implementations approved and replay matched.",
+    at: "2026-07-25T18:35:00Z",
+  });
+  finalPacket.createFinalCanaryReleasePacket({
+    actorId: "module45-reviewer",
+    actorName: "Module 45 Reviewer",
+    reason: "Bind the finalized ceremony to the paused canary release.",
+    at: "2026-07-25T18:36:00Z",
   });
   release.recordSchedulerRelease({
     action: "AUTHORIZE",

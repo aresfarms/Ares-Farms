@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { runtimeStatePath } from "./runtimeStatePath";
 import { evidenceRecomputationActivationStatus } from "./officialEvidenceRecomputationActivation";
 import { recomputationActivationFinalized } from "./officialEvidenceRecomputationCeremony";
+import { currentFinalCanaryReleasePacket } from "./officialEvidenceFinalCanaryPacket";
 
 export type SchedulerReleaseAction =
   "AUTHORIZE" | "CANARY_PASS" | "CANARY_FAIL" | "REVOKE";
@@ -55,9 +56,13 @@ export function recordSchedulerRelease(input: {
     );
   const activationReady = evidenceRecomputationActivationStatus().ready;
   const ceremonyFinalized = recomputationActivationFinalized();
-  if (input.action === "AUTHORIZE" && (!activationReady || !ceremonyFinalized))
+  const finalPacket = currentFinalCanaryReleasePacket();
+  if (
+    input.action === "AUTHORIZE" &&
+    (!activationReady || !ceremonyFinalized || !finalPacket)
+  )
     throw new Error(
-      "Scheduler release cannot be authorized until technical readiness and the activation ceremony are finalized.",
+      "Scheduler release cannot be authorized until technical readiness, the activation ceremony, and the current final canary release packet are complete.",
     );
   if (
     (input.action === "CANARY_PASS" || input.action === "CANARY_FAIL") &&

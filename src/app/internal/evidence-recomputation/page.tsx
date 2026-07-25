@@ -19,7 +19,16 @@ import type { DownstreamArtifactKind } from "@/lib/property/officialEvidenceDown
 import { ensureProductionRecomputationBindings } from "@/lib/property/officialEvidenceProductionRecomputationHandlers";
 import { evidenceRecomputationActivationStatus } from "@/lib/property/officialEvidenceRecomputationActivation";
 import { bootstrapLiveEvidenceReplayReview } from "@/lib/property/officialEvidenceLiveBootstrap";
-import { listBatchReplayReceipts, runGovernedBatchReplayVerification } from "@/lib/property/officialEvidenceBatchReplayVerification";
+import {
+  listBatchReplayReceipts,
+  runGovernedBatchReplayVerification,
+} from "@/lib/property/officialEvidenceBatchReplayVerification";
+import {
+  createApprovalPacket,
+  decideApprovalPacketItem,
+  listApprovalPackets,
+  listApprovalPacketDecisions,
+} from "@/lib/property/officialEvidenceApprovalPacket";
 import {
   listRecomputationActivationReceipts,
   recordRecomputationActivationCeremony,
@@ -59,10 +68,48 @@ async function runBatchReplay(formData: FormData): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
   const email = session?.user?.email ?? null;
-  if (!canApproveSourceLegal(email)) throw new Error("Module 45 source/legal authority is required.");
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
   const operator = operatorByEmail(email)!;
   const reason = String(formData.get("reason") ?? "").trim();
-  runGovernedBatchReplayVerification({ actorId: operator.id, actorName: operator.name, reason });
+  runGovernedBatchReplayVerification({
+    actorId: operator.id,
+    actorName: operator.name,
+    reason,
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function createDecisionPacket(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  createApprovalPacket({
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function decidePacketItem(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  decideApprovalPacketItem({
+    packetId: String(formData.get("packetId") ?? ""),
+    kind: String(formData.get("kind")) as DownstreamArtifactKind,
+    decision: String(formData.get("decision")) as "APPROVE" | "SUSPEND",
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
   revalidatePath("/internal/evidence-recomputation");
 }
 
@@ -137,6 +184,10 @@ export default async function EvidenceRecomputationPage() {
   const packets = listEvidenceReplayPackets().slice().reverse();
   const attestations = listReplayAttestations().slice().reverse();
   const batchReplayReceipts = listBatchReplayReceipts().slice(-20).reverse();
+  const approvalPackets = listApprovalPackets().slice(-10).reverse();
+  const approvalPacketDecisions = listApprovalPacketDecisions()
+    .slice(-30)
+    .reverse();
   const receipts = listGovernedRecomputationHandlerReceipts()
     .slice(-30)
     .reverse();
@@ -206,8 +257,15 @@ export default async function EvidenceRecomputationPage() {
           </form>
         )}
         {mayApprove && (
-          <form action={runBatchReplay} style={{ display: "grid", gap: 8, maxWidth: 700, marginTop: 12 }}>
-            <textarea name="reason" required placeholder="Batch replay verification reason" />
+          <form
+            action={runBatchReplay}
+            style={{ display: "grid", gap: 8, maxWidth: 700, marginTop: 12 }}
+          >
+            <textarea
+              name="reason"
+              required
+              placeholder="Batch replay verification reason"
+            />
             <button>Run all four deterministic replays</button>
           </form>
         )}
@@ -328,15 +386,116 @@ export default async function EvidenceRecomputationPage() {
           </div>
         ))}
       </section>
-      <section style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}>
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
         <h2>Batch replay verification receipts</h2>
-        {batchReplayReceipts.length === 0 ? <p>No batch replay verification receipts.</p> : batchReplayReceipts.map((r) => (
-          <div key={r.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
-            <b>{r.allMatched ? "ALL MATCHED" : "REVIEW REQUIRED"}</b> · {r.actorName} · {r.at}<br />
-            {r.reason}<br />
-            {r.results.map((x) => `${x.kind}:${x.matched ? "MATCH" : "FAIL"}`).join(", ")}
-          </div>
-        ))}
+        {batchReplayReceipts.length === 0 ? (
+          <p>No batch replay verification receipts.</p>
+        ) : (
+          batchReplayReceipts.map((r) => (
+            <div
+              key={r.receiptId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{r.allMatched ? "ALL MATCHED" : "REVIEW REQUIRED"}</b> ·{" "}
+              {r.actorName} · {r.at}
+              <br />
+              {r.reason}
+              <br />
+              {r.results
+                .map((x) => `${x.kind}:${x.matched ? "MATCH" : "FAIL"}`)
+                .join(", ")}
+            </div>
+          ))
+        )}
+      </section>
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
+        <h2>Four-decision approval packet</h2>
+        {mayApprove && (
+          <form
+            action={createDecisionPacket}
+            style={{ display: "grid", gap: 8, maxWidth: 700 }}
+          >
+            <textarea
+              name="reason"
+              required
+              placeholder="Reason for preparing the four-decision packet"
+            />
+            <button>Create packet from latest all-matched batch replay</button>
+          </form>
+        )}
+        {approvalPackets.length === 0 ? (
+          <p>No approval packet has been prepared.</p>
+        ) : (
+          approvalPackets.map((packet) => (
+            <div
+              key={packet.packetId}
+              style={{
+                marginTop: 14,
+                paddingTop: 10,
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <b>Packet {packet.packetId}</b> · batch {packet.batchReceiptId}
+              <br />
+              {packet.items.map((item) => (
+                <form
+                  key={item.kind}
+                  action={decidePacketItem}
+                  style={{
+                    display: "grid",
+                    gap: 6,
+                    marginTop: 12,
+                    maxWidth: 760,
+                  }}
+                >
+                  <input
+                    type="hidden"
+                    name="packetId"
+                    value={packet.packetId}
+                  />
+                  <input type="hidden" name="kind" value={item.kind} />
+                  <div>
+                    <b>{item.kind}</b> · <code>{item.implementationHash}</code>
+                    <br />
+                    Attestation {item.attestationId}
+                  </div>
+                  <textarea
+                    name="reason"
+                    required
+                    placeholder={`Separate decision reason for ${item.kind}`}
+                  />
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button name="decision" value="APPROVE">
+                      Approve this implementation
+                    </button>
+                    <button name="decision" value="SUSPEND">
+                      Suspend this implementation
+                    </button>
+                  </div>
+                </form>
+              ))}
+            </div>
+          ))
+        )}
+        <h3>Packet decisions</h3>
+        {approvalPacketDecisions.length === 0 ? (
+          <p>No packet decisions recorded.</p>
+        ) : (
+          approvalPacketDecisions.map((d) => (
+            <div
+              key={d.decisionId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{d.decision}</b> · {d.kind} · {d.actorName} · {d.at}
+              <br />
+              {d.reason}
+            </div>
+          ))
+        )}
       </section>
       <section
         style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}

@@ -73,6 +73,7 @@ steps:
         npm run verify:official-evidence-scheduler-release
         npm run verify:official-evidence-live-bootstrap
         npm run verify:official-evidence-batch-replay
+        npm run verify:official-evidence-approval-packet
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

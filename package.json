@@ -489,7 +489,8 @@
     "verify:official-evidence-scheduler-release": "tsx src/scripts/verifyOfficialEvidenceSchedulerRelease.ts",
     "verify:official-evidence-replay-key-rotation": "tsx src/scripts/verifyOfficialEvidenceReplayKeyRotation.ts",
     "verify:official-evidence-live-bootstrap": "tsx src/scripts/verifyOfficialEvidenceLiveBootstrap.ts",
-    "verify:official-evidence-batch-replay": "tsx src/scripts/verifyOfficialEvidenceBatchReplayVerification.ts"
+    "verify:official-evidence-batch-replay": "tsx src/scripts/verifyOfficialEvidenceBatchReplayVerification.ts",
+    "verify:official-evidence-approval-packet": "tsx src/scripts/verifyOfficialEvidenceApprovalPacket.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

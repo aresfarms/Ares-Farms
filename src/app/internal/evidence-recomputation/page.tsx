@@ -217,6 +217,7 @@ async function decide(formData: FormData): Promise<void> {
   });
   revalidatePath("/internal/evidence-recomputation");
 }
+import { listPostResumeWatchdogReceipts } from "@/lib/property/officialEvidencePostResumeWatchdog";
 export default async function EvidenceRecomputationPage() {
   ensureProductionRecomputationBindings();
   const activation = evidenceRecomputationActivationStatus();
@@ -247,6 +248,9 @@ export default async function EvidenceRecomputationPage() {
   const approvalCompletion = approvalCompletionStatus();
   const finalCanaryPacket = currentFinalCanaryReleasePacket();
   const finalCanaryPackets = listFinalCanaryReleasePackets()
+    .slice(-20)
+    .reverse();
+  const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
   const canaryTranscripts = listCanaryExecutionTranscripts()
@@ -747,6 +751,34 @@ export default async function EvidenceRecomputationPage() {
               {String(r.durationMs ?? 0)} ms
               <br />
               <code>{r.jobResultHash ?? "pending"}</code>
+            </div>
+          ))
+        )}
+      </section>
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
+        <h2>Post-resume watchdog receipts</h2>
+        {watchdogReceipts.length === 0 ? (
+          <p>
+            No recurring executions have entered the guarded post-resume window.
+          </p>
+        ) : (
+          watchdogReceipts.map((r) => (
+            <div
+              key={r.receiptId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{r.action}</b> · {r.at} · execution {r.executionId}
+              <br />
+              Guard window: {String(r.withinGuardWindow)} · jobs {r.jobCount} ·
+              failed {r.failedJobIds.length} · blocked {r.blockedJobIds.length}
+              {r.pauseError ? (
+                <>
+                  <br />
+                  Pause error: {r.pauseError}
+                </>
+              ) : null}
             </div>
           ))
         )}

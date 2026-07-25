@@ -5,6 +5,7 @@ import { runtimeStatePath } from "./runtimeStatePath";
 import { evidenceRecomputationActivationStatus } from "./officialEvidenceRecomputationActivation";
 import { recomputationActivationFinalized } from "./officialEvidenceRecomputationCeremony";
 import { currentFinalCanaryReleasePacket } from "./officialEvidenceFinalCanaryPacket";
+import { postResumeRollbackRequired } from "./officialEvidencePostResumeWatchdog";
 
 export type SchedulerReleaseAction =
   "AUTHORIZE" | "CANARY_PASS" | "CANARY_FAIL" | "REVOKE";

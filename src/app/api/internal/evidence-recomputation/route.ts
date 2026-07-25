@@ -16,6 +16,8 @@ import {
   completeCanaryExecution,
   failCanaryExecution,
 } from "@/lib/property/officialEvidenceCanaryExecutionTranscript";
+import { recordPostResumeExecution } from "@/lib/property/officialEvidencePostResumeWatchdog";
+import { pauseEvidenceRecomputationScheduler } from "@/lib/property/officialEvidenceSchedulerPause";
 import {
   missingRequiredSecretDetail,
   readRequiredSecret,
@@ -92,6 +94,12 @@ export async function POST(request: Request) {
   try {
     const queued = enqueueStaleEvidenceArtifacts(body.propertyId);
     const jobs = await processEvidenceRecomputationQueue(handlers);
+    const watchdogReceipt = body.canary
+      ? null
+      : await recordPostResumeExecution({
+          jobs,
+          pauseScheduler: pauseEvidenceRecomputationScheduler,
+        });
     let completedTranscript = null;
     if (body.canary && canaryTranscript) {
       completedTranscript = completeCanaryExecution({
@@ -121,6 +129,7 @@ export async function POST(request: Request) {
       jobs,
       canary: Boolean(body.canary),
       canaryTranscript: completedTranscript,
+      postResumeWatchdog: watchdogReceipt,
     });
   } catch (error) {
     if (body.canary && canaryTranscript) {

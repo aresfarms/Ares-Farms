@@ -179,6 +179,8 @@ export async function POST(req: NextRequest) {
       propertyId: lineagePropertyId,
       artifactId: `qualification-result:${lineagePropertyId}`,
       generatedAt: intakeResult.generatedAt,
+      replayInput: body,
+      replayOutput: intakeResult,
     });
     const serviceRequestId = serviceRequestReference(traceId);
 

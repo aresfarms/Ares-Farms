@@ -272,6 +272,8 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
       kind: "property-report",
       propertyId: propertyContext.propertyId,
       artifactId: `property-report:${propertyContext.propertyId}`,
+      replayInput: { propertyId: propertyContext.propertyId, sourceId: propertyContext.sourceId, propertyType: propertyContext.propertyType, priceLabel: propertyContext.priceLabel, county: propertyContext.county, town: propertyContext.town, stateCode: propertyContext.stateCode, pathwayList: propertyContext.pathwayList, description: propertyContext.description },
+      replayOutput: briefIntelligence,
     });
   }
 

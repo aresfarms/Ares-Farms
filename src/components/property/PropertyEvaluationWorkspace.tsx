@@ -3052,9 +3052,10 @@ export function PropertyEvaluationWorkspace({
   useEffect(() => {
     const propertyId = analysisContext.propertyId;
     if (!propertyId || propertyId.startsWith("imported:")) return;
-    const captures: Array<{ kind: "top-three" | "tax-scenario"; artifactId: string }> = [
-      { kind: "top-three", artifactId: `top-three:${propertyId}` },
-      ...(rankingTax ? [{ kind: "tax-scenario" as const, artifactId: `tax-scenario:${propertyId}` }] : []),
+    const topThreeInput = { profileId: workspaceProfile.id, marketPlan: marketComparablePlan, capitalPlan: preliminaryCapitalPlan, pathwayCount: topProgramRanks.length, taxImpact: rankingTax && rankingPrice ? { stabilizedAnnual: rankingTax.stabilizedAnnual, adverseAnnual: rankingTax.adverseAnnual, acquisitionPrice: rankingPrice } : null, infrastructureRisk: propertyInfrastructureRisk };
+    const captures = [
+      { kind: "top-three" as const, artifactId: `top-three:${propertyId}`, replayInput: topThreeInput, replayOutput: scenarioRankingPlan },
+      ...(rankingTax ? [{ kind: "tax-scenario" as const, artifactId: `tax-scenario:${propertyId}`, replayInput: { price: rankingPrice, sellerCurrentAnnualTax: officialTaxRecord?.currentAnnualTax ?? null, currentTaxTransfersUnchanged: officialTaxRecord?.transferContinuityVerified === true, ownershipContext }, replayOutput: rankingTax }] : []),
     ];
     for (const capture of captures) {
       void fetch("/api/property/evidence-lineage/capture", {

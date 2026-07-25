@@ -80,6 +80,12 @@ import {
   listExternalNotificationConnectorRegistrations,
   type ExternalConnectorDecision,
 } from "@/lib/property/officialEvidenceExternalNotificationConnector";
+import {
+  decideExternalNotificationActivation,
+  listExternalNotificationActivationReceipts,
+  liveExternalNotificationConnectors,
+  type ExternalNotificationActivationAction,
+} from "@/lib/property/officialEvidenceExternalNotificationActivation";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -281,6 +287,27 @@ async function decideExternalNotificationConnectorAction(
   revalidatePath("/internal/evidence-recomputation");
 }
 
+async function decideExternalNotificationActivationAction(
+  formData: FormData,
+): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  decideExternalNotificationActivation({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    action: String(
+      formData.get("action"),
+    ) as ExternalNotificationActivationAction,
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 async function acknowledgeNotification(formData: FormData): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
@@ -345,6 +372,9 @@ export default async function EvidenceRecomputationPage() {
   const externalConnectorReceipts = listExternalNotificationConnectorReceipts()
     .slice(-30)
     .reverse();
+  const externalActivationReceipts =
+    listExternalNotificationActivationReceipts().slice(-30).reverse();
+  const liveExternalConnectors = liveExternalNotificationConnectors();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1062,6 +1092,60 @@ export default async function EvidenceRecomputationPage() {
             </form>
           ))
         )}
+        <h3>Live activation decisions</h3>
+        {externalConnectorRegistrations.map((registration) => {
+          const isLive = liveExternalConnectors.some(
+            (x) => x.registrationId === registration.registrationId,
+          );
+          return (
+            <form
+              key={`activation-${registration.registrationId}`}
+              action={decideExternalNotificationActivationAction}
+              style={{
+                display: "grid",
+                gap: 8,
+                padding: "10px 0",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <input
+                type="hidden"
+                name="registrationId"
+                value={registration.registrationId}
+              />
+              <b>
+                {registration.channel} · {registration.connectorId} ·{" "}
+                {isLive ? "LIVE" : "NOT LIVE"}
+              </b>
+              <textarea
+                name="reason"
+                required
+                placeholder="Live activation or revocation reason"
+              />
+              <div style={{ display: "flex", gap: 8 }}>
+                <button name="action" value="ACTIVATE" disabled={!mayApprove}>
+                  Activate live delivery
+                </button>
+                <button name="action" value="REVOKE" disabled={!mayApprove}>
+                  Revoke live delivery
+                </button>
+              </div>
+            </form>
+          );
+        })}
+        <h4>Activation receipts</h4>
+        {externalActivationReceipts.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId}{" "}
+            · {receipt.at}
+            <br />
+            Dry run {receipt.dryRunReceiptId} · {receipt.actorName} ·{" "}
+            {receipt.reason}
+          </div>
+        ))}
         <h3>Connector receipts</h3>
         {externalConnectorReceipts.map((receipt) => (
           <div

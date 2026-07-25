@@ -84,6 +84,7 @@ steps:
         npm run verify:official-evidence-incident-notification
         npm run verify:official-evidence-external-notification-connector
         npm run verify:official-evidence-external-notification-dry-run
+        npm run verify:official-evidence-external-notification-activation
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

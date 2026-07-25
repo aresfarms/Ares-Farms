@@ -28,6 +28,7 @@ import {
   decideApprovalPacketItem,
   listApprovalPackets,
   listApprovalPacketDecisions,
+  approvalCompletionStatus,
 } from "@/lib/property/officialEvidenceApprovalPacket";
 import {
   listRecomputationActivationReceipts,
@@ -199,6 +200,7 @@ export default async function EvidenceRecomputationPage() {
   const releaseAuthorized = schedulerReleaseAuthorized();
   const canaryPassed = schedulerCanaryPassed();
   const resumePermitted = schedulerResumePermitted();
+  const approvalCompletion = approvalCompletionStatus();
   return (
     <main
       style={{
@@ -220,8 +222,16 @@ export default async function EvidenceRecomputationPage() {
         </p>
         <p>
           Scheduler activation: <b>{activation.ready ? "READY" : "BLOCKED"}</b>.
-          Ceremony: <b>{finalized ? "FINALIZED" : "OPEN"}</b>. All four handlers
-          must be approved, replay-matched, and runtime-bound.
+          Approval completion:{" "}
+          <b>
+            {approvalCompletion.complete &&
+            approvalCompletion.allApproved &&
+            approvalCompletion.current
+              ? "READY"
+              : "INCOMPLETE"}
+          </b>
+          . Ceremony: <b>{finalized ? "FINALIZED" : "OPEN"}</b>. All four
+          handlers must be approved, replay-matched, and runtime-bound.
         </p>
         <p>
           Scheduler release:{" "}
@@ -246,7 +256,12 @@ export default async function EvidenceRecomputationPage() {
               <button
                 name="action"
                 value="FINALIZE"
-                disabled={!activation.ready}
+                disabled={
+                  !activation.ready ||
+                  !approvalCompletion.complete ||
+                  !approvalCompletion.allApproved ||
+                  !approvalCompletion.current
+                }
               >
                 Finalize activation
               </button>

@@ -168,3 +168,66 @@ export function listApprovalPackets(): ApprovalPacket[] {
 export function listApprovalPacketDecisions(): ApprovalPacketDecision[] {
   return read().decisions;
 }
+
+export interface ApprovalCompletionItem {
+  kind: DownstreamArtifactKind;
+  decided: boolean;
+  approved: boolean;
+  current: boolean;
+  actorName: string | null;
+  decidedAt: string | null;
+  reason: string | null;
+}
+export interface ApprovalCompletionStatus {
+  packetId: string | null;
+  complete: boolean;
+  allApproved: boolean;
+  current: boolean;
+  items: ApprovalCompletionItem[];
+}
+
+export function approvalCompletionStatus(): ApprovalCompletionStatus {
+  const state = read();
+  const packet = state.packets.at(-1) ?? null;
+  if (!packet)
+    return {
+      packetId: null,
+      complete: false,
+      allApproved: false,
+      current: false,
+      items: [],
+    };
+  const items = packet.items.map((item) => {
+    const decision =
+      [...state.decisions]
+        .reverse()
+        .find(
+          (row) => row.packetId === packet.packetId && row.kind === item.kind,
+        ) ?? null;
+    const current = latestGovernedRecomputationHandler(item.kind);
+    const stillCurrent = Boolean(
+      current &&
+      current.handlerId === item.handlerId &&
+      current.implementationHash === item.implementationHash,
+    );
+    return {
+      kind: item.kind,
+      decided: Boolean(decision),
+      approved: decision?.decision === "APPROVE",
+      current: stillCurrent,
+      actorName: decision?.actorName ?? null,
+      decidedAt: decision?.at ?? null,
+      reason: decision?.reason ?? null,
+    };
+  });
+  return {
+    packetId: packet.packetId,
+    complete:
+      items.length === KINDS.length && items.every((item) => item.decided),
+    allApproved:
+      items.length === KINDS.length && items.every((item) => item.approved),
+    current:
+      items.length === KINDS.length && items.every((item) => item.current),
+    items,
+  };
+}

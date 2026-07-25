@@ -29,6 +29,7 @@ const required = [
   "verify:official-evidence-batch-replay",
   "verify:official-evidence-approval-packet",
   "verify:official-evidence-approval-completion",
+  "verify:official-evidence-review-handoff",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

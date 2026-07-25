@@ -43,6 +43,11 @@ import {
   schedulerReleaseAuthorized,
   schedulerResumePermitted,
 } from "@/lib/property/officialEvidenceSchedulerRelease";
+import {
+  currentReviewHandoffChecklist,
+  listReviewHandoffReceipts,
+  recordReviewHandoff,
+} from "@/lib/property/officialEvidenceReviewHandoff";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -107,6 +112,21 @@ async function decidePacketItem(formData: FormData): Promise<void> {
     packetId: String(formData.get("packetId") ?? ""),
     kind: String(formData.get("kind")) as DownstreamArtifactKind,
     decision: String(formData.get("decision")) as "APPROVE" | "SUSPEND",
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function recordHandoff(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  recordReviewHandoff({
     actorId: operator.id,
     actorName: operator.name,
     reason: String(formData.get("reason") ?? "").trim(),
@@ -201,6 +221,8 @@ export default async function EvidenceRecomputationPage() {
   const canaryPassed = schedulerCanaryPassed();
   const resumePermitted = schedulerResumePermitted();
   const approvalCompletion = approvalCompletionStatus();
+  const handoffChecklist = currentReviewHandoffChecklist();
+  const handoffReceipts = listReviewHandoffReceipts().slice(-20).reverse();
   return (
     <main
       style={{
@@ -239,6 +261,72 @@ export default async function EvidenceRecomputationPage() {
           <b>{canaryPassed ? "PASSED" : "NOT PASSED"}</b>. Resume permission:{" "}
           <b>{resumePermitted ? "GRANTED" : "DENIED"}</b>.
         </p>
+        <section
+          style={{
+            padding: 16,
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            marginTop: 12,
+          }}
+        >
+          <h2>Live readiness checklist</h2>
+          <div>
+            Approval packet:{" "}
+            <b>{handoffChecklist.packetsReady ? "READY" : "MISSING"}</b>
+          </div>
+          <div>
+            Four decisions complete:{" "}
+            <b>{handoffChecklist.fourDecisionsComplete ? "YES" : "NO"}</b>
+          </div>
+          <div>
+            All four approved:{" "}
+            <b>{handoffChecklist.allApproved ? "YES" : "NO"}</b>
+          </div>
+          <div>
+            Implementations current:{" "}
+            <b>{handoffChecklist.implementationsCurrent ? "YES" : "NO"}</b>
+          </div>
+          <div>
+            Technical activation:{" "}
+            <b>{handoffChecklist.technicalReady ? "READY" : "BLOCKED"}</b>
+          </div>
+          <div>
+            Final ceremony:{" "}
+            <b>{handoffChecklist.ceremonyFinalized ? "FINALIZED" : "OPEN"}</b>
+          </div>
+          <div>
+            Scheduler:{" "}
+            <b>
+              {handoffChecklist.resumePermitted
+                ? "RESUME PERMITTED"
+                : "PAUSED / BLOCKED"}
+            </b>
+          </div>
+          {mayApprove && (
+            <form
+              action={recordHandoff}
+              style={{ display: "grid", gap: 8, maxWidth: 700, marginTop: 10 }}
+            >
+              <textarea
+                name="reason"
+                required
+                placeholder="Reason for handing the completed review to the final ceremony"
+              />
+              <button
+                disabled={
+                  !handoffChecklist.packetsReady ||
+                  !handoffChecklist.fourDecisionsComplete ||
+                  !handoffChecklist.allApproved ||
+                  !handoffChecklist.implementationsCurrent ||
+                  !handoffChecklist.technicalReady ||
+                  handoffChecklist.ceremonyFinalized
+                }
+              >
+                Record final-ceremony handoff
+              </button>
+            </form>
+          )}
+        </section>
         {mayApprove && (
           <form
             action={ceremony}
@@ -526,6 +614,25 @@ export default async function EvidenceRecomputationPage() {
             {r.reason}
           </div>
         ))}
+      </section>
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
+        <h2>Final-ceremony handoff receipts</h2>
+        {handoffReceipts.length === 0 ? (
+          <p>No handoff receipts recorded.</p>
+        ) : (
+          handoffReceipts.map((r) => (
+            <div
+              key={r.receiptId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>READY FOR FINAL CEREMONY</b> · {r.actorName} · {r.at}
+              <br />
+              {r.reason}
+            </div>
+          ))
+        )}
       </section>
       <section
         style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}

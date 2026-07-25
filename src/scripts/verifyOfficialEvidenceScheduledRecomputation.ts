@@ -5,6 +5,7 @@ function ok(v:unknown,m:string):asserts v{if(!v)throw new Error(m)}
 async function main(){
  process.env.FURLONG_RUNTIME_STATE_DIR=fs.mkdtempSync(path.join(os.tmpdir(),"furlong-scheduled-recompute-"));
  process.env.EVIDENCE_RECOMPUTATION_CRON_SECRET="scheduled-secret";
+ process.env.EVIDENCE_RECOMPUTATION_REQUIRE_FULL_APPROVAL="false";
  process.env.EVIDENCE_REPLAY_SIGNING_SECRET="scheduled-replay-secret";
  const inv=await import("@/lib/property/officialEvidenceDownstreamInvalidation");
  const store=await import("@/lib/property/officialEvidenceRuntimeStore");

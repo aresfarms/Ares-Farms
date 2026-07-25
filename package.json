@@ -483,7 +483,9 @@
     "verify:official-evidence-durable-handler-governance": "tsx src/scripts/verifyOfficialEvidenceDurableHandlerGovernance.ts",
     "verify:official-evidence-signed-replay": "tsx src/scripts/verifyOfficialEvidenceSignedReplayPackets.ts",
     "verify:official-evidence-deterministic-replay": "tsx src/scripts/verifyOfficialEvidenceDeterministicReplay.ts",
-    "verify:official-evidence-production-replay-review": "tsx src/scripts/verifyOfficialEvidenceProductionReplayReview.ts"
+    "verify:official-evidence-production-replay-review": "tsx src/scripts/verifyOfficialEvidenceProductionReplayReview.ts",
+    "verify:official-evidence-production-activation": "tsx src/scripts/verifyOfficialEvidenceProductionActivation.ts",
+    "verify:official-evidence-replay-key-rotation": "tsx src/scripts/verifyOfficialEvidenceReplayKeyRotation.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

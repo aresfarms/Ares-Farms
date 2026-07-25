@@ -18,7 +18,7 @@ const FILE=runtimeStatePath("official-evidence","replay-attestations.json");
 const read=():ReplayAttestation[]=>{try{return JSON.parse(fs.readFileSync(FILE,"utf8")) as ReplayAttestation[]}catch{return []}};
 const write=(rows:ReplayAttestation[])=>{fs.mkdirSync(path.dirname(FILE),{recursive:true});const tmp=`${FILE}.${process.pid}.${Date.now()}.tmp`;fs.writeFileSync(tmp,JSON.stringify(rows,null,2)+"\n");fs.renameSync(tmp,FILE)};
 
-function execute(kind:DownstreamArtifactKind,input:any,capturedAt:string):unknown {
+export function executeReplayBuilder(kind:DownstreamArtifactKind,input:any,capturedAt:string):unknown {
   if(kind==="tax-scenario") return buildPostSaleTaxScenario({price:input.price,sellerCurrentAnnualTax:input.sellerCurrentAnnualTax,currentTaxTransfersUnchanged:input.currentTaxTransfersUnchanged},input.ownershipContext);
   if(kind==="top-three") return buildScenarioRankingPlan(input);
   if(kind==="property-report") return buildPropertyBriefIntelligence(input);
@@ -29,7 +29,7 @@ export function attestDeterministicReplay(input:{artifactId:string;handlerId:str
   const packet=replayPacketForArtifact(input.artifactId); if(!packet) throw new Error("Signed replay packet not found.");
   const verification=verifySignedReplayPacket(packet); const reasons=[...verification.reasons];
   let actualOutputHash="";
-  if(verification.valid){try{actualOutputHash=hashReplayValue(execute(packet.kind,packet.input,packet.capturedAt));if(actualOutputHash!==packet.outputHash)reasons.push("replayed-output-hash-mismatch");}catch(error){reasons.push(`replay-execution-failed:${(error as Error).message}`)}}
+  if(verification.valid){try{actualOutputHash=hashReplayValue(executeReplayBuilder(packet.kind,packet.input,packet.capturedAt));if(actualOutputHash!==packet.outputHash)reasons.push("replayed-output-hash-mismatch");}catch(error){reasons.push(`replay-execution-failed:${(error as Error).message}`)}}
   const row:ReplayAttestation={attestationId:randomUUID(),artifactId:packet.artifactId,kind:packet.kind,packetId:packet.packetId,handlerId:input.handlerId,implementationHash:input.implementationHash,executedAt:input.at??new Date().toISOString(),inputHash:packet.inputHash,expectedOutputHash:packet.outputHash,actualOutputHash,matched:reasons.length===0,reasons};
   write([...read(),row]); return row;
 }

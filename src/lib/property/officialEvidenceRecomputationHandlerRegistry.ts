@@ -1,44 +1,31 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { runtimeStatePath } from "./runtimeStatePath";
 import type { DownstreamArtifactKind, DownstreamArtifactRecord, EvidenceDependency } from "./officialEvidenceDownstreamInvalidation";
 
-export interface RecomputationResult {
-  artifactHash: string;
-  dependencies: EvidenceDependency[];
-  generatedAt: string;
-  productionEvidence: true;
+export interface RecomputationResult { artifactHash:string; dependencies:EvidenceDependency[]; generatedAt:string; productionEvidence:true; }
+export type GovernedRecomputationHandler = (artifact:DownstreamArtifactRecord)=>Promise<RecomputationResult>|RecomputationResult;
+export type HandlerStatus = "pending"|"approved"|"suspended";
+export interface RecomputationHandlerRegistration { handlerId:string; kind:DownstreamArtifactKind; implementationHash:string; sourcePath:string; status:HandlerStatus; registeredAt:string; reviewedBy?:string|null; reviewedAt?:string|null; reviewReason?:string|null; placeholder:false; }
+export interface HandlerReviewReceipt { receiptId:string; handlerId:string; kind:DownstreamArtifactKind; implementationHash:string; decision:"REGISTER"|"CHANGE_REVIEW_REQUIRED"|"APPROVE"|"SUSPEND"; actorId:string; actorName:string; at:string; reason:string; }
+interface DurableState { registrations:RecomputationHandlerRegistration[]; receipts:HandlerReviewReceipt[]; }
+interface RuntimeEntry { registration:RecomputationHandlerRegistration; handler:GovernedRecomputationHandler; }
+const FILE=runtimeStatePath("official-evidence","recomputation-handler-registry.json");
+const entries=new Map<DownstreamArtifactKind,RuntimeEntry>();
+const hash=(handler:GovernedRecomputationHandler)=>createHash("sha256").update(handler.toString()).digest("hex");
+const read=():DurableState=>{try{return JSON.parse(fs.readFileSync(FILE,"utf8")) as DurableState}catch{return {registrations:[],receipts:[]}}};
+const write=(state:DurableState)=>{fs.mkdirSync(path.dirname(FILE),{recursive:true});const tmp=`${FILE}.${process.pid}.${Date.now()}.tmp`;fs.writeFileSync(tmp,JSON.stringify(state,null,2)+"\n");fs.renameSync(tmp,FILE)};
+const latest=(kind:DownstreamArtifactKind)=>read().registrations.filter(r=>r.kind===kind).at(-1)??null;
+const fingerprint=(r:RecomputationHandlerRegistration)=>JSON.stringify({handlerId:r.handlerId,kind:r.kind,implementationHash:r.implementationHash,sourcePath:r.sourcePath});
+function validate(r:RecomputationHandlerRegistration){if(!r.handlerId.trim()||!r.sourcePath.trim()||!r.registeredAt.trim())throw new Error("Recomputation handler identity, source path, and registration time are required.");if(/placeholder|mock|fixture|fake/i.test(r.handlerId+" "+r.sourcePath))throw new Error("Placeholder or fabricated recomputation handlers are prohibited.");if(!/^[a-f0-9]{64}$/.test(r.implementationHash))throw new Error("Handler implementation hash must be SHA-256.");if(r.status==="approved"&&(!r.reviewedBy?.trim()||!r.reviewedAt?.trim()||!r.reviewReason?.trim()))throw new Error("Approved recomputation handlers require a reviewer, timestamp, and reason.");}
+export function registerGovernedRecomputationHandler(input:Omit<RecomputationHandlerRegistration,"implementationHash"|"placeholder"|"registeredAt"> & {registeredAt?:string},handler:GovernedRecomputationHandler):RecomputationHandlerRegistration{
+ const bound:RecomputationHandlerRegistration={...input,registeredAt:input.registeredAt??new Date().toISOString(),implementationHash:hash(handler),placeholder:false};validate(bound);const state=read();const previous=state.registrations.filter(r=>r.kind===input.kind).at(-1)??null;const changed=!!previous&&fingerprint(previous)!==fingerprint(bound);const next=changed?{...bound,status:"pending" as const,reviewedBy:null,reviewedAt:null,reviewReason:"Handler definition or implementation changed; fresh review required."}:bound;validate(next);entries.set(next.kind,{registration:next,handler});const receipt:HandlerReviewReceipt={receiptId:randomUUID(),handlerId:next.handlerId,kind:next.kind,implementationHash:next.implementationHash,decision:changed?"CHANGE_REVIEW_REQUIRED":"REGISTER",actorId:"system:handler-registration",actorName:"handler-registration",at:next.registeredAt,reason:changed?"Material handler definition or executable implementation changed.":"Handler registered for governed review."};write({registrations:[...state.registrations,next],receipts:[...state.receipts,receipt]});return next;
 }
-export type GovernedRecomputationHandler = (artifact: DownstreamArtifactRecord) => Promise<RecomputationResult> | RecomputationResult;
-export interface RecomputationHandlerRegistration {
-  handlerId: string;
-  kind: DownstreamArtifactKind;
-  implementationHash: string;
-  sourcePath: string;
-  status: "pending" | "approved" | "suspended";
-  reviewedBy?: string | null;
-  reviewedAt?: string | null;
-  reviewReason?: string | null;
-  placeholder: false;
+export function decideGovernedRecomputationHandler(input:{kind:DownstreamArtifactKind;decision:"APPROVE"|"SUSPEND";reviewerId:string;reviewerName:string;reason:string;at?:string}):RecomputationHandlerRegistration{
+ if(!input.reason.trim())throw new Error("A handler review reason is required.");const current=latest(input.kind);if(!current)throw new Error("No recomputation handler registration exists for this artifact kind.");const at=input.at??new Date().toISOString();const next={...current,status:input.decision==="APPROVE"?"approved" as const:"suspended" as const,reviewedBy:input.reviewerId,reviewedAt:at,reviewReason:input.reason};validate(next);const state=read();const receipt:HandlerReviewReceipt={receiptId:randomUUID(),handlerId:next.handlerId,kind:next.kind,implementationHash:next.implementationHash,decision:input.decision,actorId:input.reviewerId,actorName:input.reviewerName,at,reason:input.reason};write({registrations:[...state.registrations,next],receipts:[...state.receipts,receipt]});const runtime=entries.get(next.kind);if(runtime)entries.set(next.kind,{registration:next,handler:runtime.handler});return next;
 }
-interface Entry { registration: RecomputationHandlerRegistration; handler: GovernedRecomputationHandler; }
-const entries = new Map<DownstreamArtifactKind, Entry>();
-const hash = (handler: GovernedRecomputationHandler) => createHash("sha256").update(handler.toString()).digest("hex");
-
-export function registerGovernedRecomputationHandler(input: Omit<RecomputationHandlerRegistration, "implementationHash" | "placeholder">, handler: GovernedRecomputationHandler): void {
-  if (!input.handlerId.trim() || !input.sourcePath.trim()) throw new Error("Recomputation handler identity and source path are required.");
-  if (/placeholder|mock|fixture|fake/i.test(input.handlerId + " " + input.sourcePath)) throw new Error("Placeholder or fabricated recomputation handlers are prohibited.");
-  const registration: RecomputationHandlerRegistration = { ...input, implementationHash: hash(handler), placeholder: false };
-  if (registration.status === "approved" && (!registration.reviewedBy?.trim() || !registration.reviewedAt?.trim() || !registration.reviewReason?.trim())) throw new Error("Approved recomputation handlers require a reviewer, timestamp, and reason.");
-  entries.set(input.kind, { registration, handler });
-}
-
-export function approvedRecomputationHandlers(): Partial<Record<DownstreamArtifactKind, GovernedRecomputationHandler>> {
-  const result: Partial<Record<DownstreamArtifactKind, GovernedRecomputationHandler>> = {};
-  for (const [kind, entry] of entries) {
-    if (entry.registration.status !== "approved") continue;
-    if (hash(entry.handler) !== entry.registration.implementationHash) continue;
-    result[kind] = entry.handler;
-  }
-  return result;
-}
-export function clearGovernedRecomputationHandlers(): void { entries.clear(); }
-export function listGovernedRecomputationHandlers(): RecomputationHandlerRegistration[] { return [...entries.values()].map(x => x.registration); }
+export function approvedRecomputationHandlers():Partial<Record<DownstreamArtifactKind,GovernedRecomputationHandler>>{const result:Partial<Record<DownstreamArtifactKind,GovernedRecomputationHandler>>={};for(const kind of ["tax-scenario","top-three","qualification-result","property-report"] as DownstreamArtifactKind[]){const registration=latest(kind);const runtime=entries.get(kind);if(!registration||registration.status!=="approved"||!runtime)continue;if(runtime.registration.implementationHash!==registration.implementationHash||hash(runtime.handler)!==registration.implementationHash)continue;const approval=read().receipts.find(r=>r.decision==="APPROVE"&&r.kind===kind&&r.handlerId===registration.handlerId&&r.implementationHash===registration.implementationHash);if(approval)result[kind]=runtime.handler;}return result;}
+export function clearGovernedRecomputationHandlers():void{entries.clear();write({registrations:[],receipts:[]});}
+export function listGovernedRecomputationHandlers():RecomputationHandlerRegistration[]{return read().registrations;}
+export function listGovernedRecomputationHandlerReceipts():HandlerReviewReceipt[]{return read().receipts;}

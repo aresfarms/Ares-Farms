@@ -63,6 +63,7 @@ steps:
         npm run verify:official-evidence-automatic-dependency-capture
         npm run verify:official-evidence-recomputation-orchestration
         npm run verify:official-evidence-scheduled-recomputation
+        npm run verify:official-evidence-durable-handler-governance
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

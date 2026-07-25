@@ -86,6 +86,7 @@ import {
   liveExternalNotificationConnectors,
   type ExternalNotificationActivationAction,
 } from "@/lib/property/officialEvidenceExternalNotificationActivation";
+import { listExternalNotificationDeliveryReceipts } from "@/lib/property/officialEvidenceExternalNotificationDelivery";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -375,6 +376,9 @@ export default async function EvidenceRecomputationPage() {
   const externalActivationReceipts =
     listExternalNotificationActivationReceipts().slice(-30).reverse();
   const liveExternalConnectors = liveExternalNotificationConnectors();
+  const externalDeliveryReceipts = listExternalNotificationDeliveryReceipts()
+    .slice(-30)
+    .reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1146,6 +1150,25 @@ export default async function EvidenceRecomputationPage() {
             {receipt.reason}
           </div>
         ))}
+        <h3>Live external delivery receipts</h3>
+        {externalDeliveryReceipts.length === 0 ? (
+          <p>No governed live external deliveries have occurred.</p>
+        ) : (
+          externalDeliveryReceipts.map((receipt) => (
+            <div
+              key={receipt.receiptId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{receipt.action}</b> · {receipt.channel} ·{" "}
+              {receipt.connectorId} · {receipt.at}
+              <br />
+              notification {receipt.notificationId} · payload{" "}
+              {receipt.payloadHash.slice(0, 16)}…
+              <br />
+              {receipt.reason}
+            </div>
+          ))
+        )}
         <h3>Connector receipts</h3>
         {externalConnectorReceipts.map((receipt) => (
           <div

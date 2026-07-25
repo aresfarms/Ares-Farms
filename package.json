@@ -478,7 +478,8 @@
     "verify:official-evidence-quarantine-resolution": "tsx src/scripts/verifyOfficialEvidenceQuarantineResolution.ts",
     "verify:official-evidence-downstream-invalidation": "tsx src/scripts/verifyOfficialEvidenceDownstreamInvalidation.ts",
     "verify:official-evidence-automatic-dependency-capture": "tsx src/scripts/verifyOfficialEvidenceAutomaticDependencyCapture.ts",
-    "verify:official-evidence-recomputation-orchestration": "tsx src/scripts/verifyOfficialEvidenceRecomputationOrchestration.ts"
+    "verify:official-evidence-recomputation-orchestration": "tsx src/scripts/verifyOfficialEvidenceRecomputationOrchestration.ts",
+    "verify:official-evidence-scheduled-recomputation": "tsx src/scripts/verifyOfficialEvidenceScheduledRecomputation.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

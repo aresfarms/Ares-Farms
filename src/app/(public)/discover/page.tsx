@@ -4,6 +4,7 @@ import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyEvaluationWorkspace } from "@/components/property/PropertyEvaluationWorkspace";
 import { PropertyPlaceIntelligence } from "@/components/property/PropertyPlaceIntelligence";
 import { buildPropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
+import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
 import type { ChartVariant } from "@/lib/property/chartThemes";
 import { resolveDiscoveryFlow, isPlaceFirstFlow } from "@/lib/discovery/discoveryFlow";
 import { resolveOwnershipCostContext } from "@/lib/property/ownershipCostContext";
@@ -266,6 +267,13 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
         description: propertyContext.description,
       })
     : null;
+  if (briefIntelligence && propertyContext?.propertyId) {
+    captureGeneratedEvidenceArtifact({
+      kind: "property-report",
+      propertyId: propertyContext.propertyId,
+      artifactId: `property-report:${propertyContext.propertyId}`,
+    });
+  }
 
   // Ownership-cost context (founder direction 2026-07-17): the server slices
   // the committed snapshots (PMMS rates, county tax medians, state

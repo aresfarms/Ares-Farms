@@ -3049,6 +3049,21 @@ export function PropertyEvaluationWorkspace({
     timeline: transactionTimelinePlan,
     collateral: collateralPlan,
   });
+  useEffect(() => {
+    const propertyId = analysisContext.propertyId;
+    if (!propertyId || propertyId.startsWith("imported:")) return;
+    const captures: Array<{ kind: "top-three" | "tax-scenario"; artifactId: string }> = [
+      { kind: "top-three", artifactId: `top-three:${propertyId}` },
+      ...(rankingTax ? [{ kind: "tax-scenario" as const, artifactId: `tax-scenario:${propertyId}` }] : []),
+    ];
+    for (const capture of captures) {
+      void fetch("/api/property/evidence-lineage/capture", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...capture, propertyId }),
+      });
+    }
+  }, [analysisContext.propertyId, rankingTax?.stabilizedAnnual, rankingTax?.adverseAnnual, scenarioRankingPlan.status]);
   const decisionSynthesisPlan = buildDecisionSynthesisPlan({
     propertyRanking: scenarioRankingPlan,
     executableRanking: executableScenarioRankingPlan,

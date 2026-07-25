@@ -16,6 +16,7 @@ import {
 } from "@/lib/runtime/versionRuntime";
 import { persistServiceRequest } from "@/lib/serviceRequests/serviceRequestStore";
 import { notifyOnServiceRequest } from "@/lib/notifications/notificationDispatch";
+import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
 
 /**
  * Financing Deal Intake API (customer submits a deal → licensed lender)
@@ -172,6 +173,13 @@ export async function POST(req: NextRequest) {
     });
 
     const intakeResult = evaluateFinancingIntake(body);
+    const lineagePropertyId = body.applicationId?.trim() || body.propertyDescriptor?.trim() || `financing-intake:${traceId}`;
+    captureGeneratedEvidenceArtifact({
+      kind: "qualification-result",
+      propertyId: lineagePropertyId,
+      artifactId: `qualification-result:${lineagePropertyId}`,
+      generatedAt: intakeResult.generatedAt,
+    });
     const serviceRequestId = serviceRequestReference(traceId);
 
     const classifiedOutput = classifyRecord(

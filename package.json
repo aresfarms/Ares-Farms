@@ -497,7 +497,8 @@
     "verify:official-evidence-canary-transcript": "tsx src/scripts/verifyOfficialEvidenceCanaryExecutionTranscript.ts",
     "verify:official-evidence-post-resume-watchdog": "tsx src/scripts/verifyOfficialEvidencePostResumeWatchdog.ts",
     "verify:official-evidence-steady-state-incident": "tsx src/scripts/verifyOfficialEvidenceSteadyStateIncident.ts",
-    "verify:official-evidence-incident-sla": "tsx src/scripts/verifyOfficialEvidenceIncidentSla.ts"
+    "verify:official-evidence-incident-sla": "tsx src/scripts/verifyOfficialEvidenceIncidentSla.ts",
+    "verify:official-evidence-incident-notification": "tsx src/scripts/verifyOfficialEvidenceIncidentNotification.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

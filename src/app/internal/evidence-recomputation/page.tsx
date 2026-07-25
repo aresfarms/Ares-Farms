@@ -68,6 +68,12 @@ import {
   incidentSlaStatus,
   listIncidentSlaReceipts,
 } from "@/lib/property/officialEvidenceIncidentSla";
+import {
+  acknowledgeIncidentNotification,
+  deliverPendingIncidentNotifications,
+  listIncidentNotificationReceipts,
+  pendingIncidentNotifications,
+} from "@/lib/property/officialEvidenceIncidentNotification";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -250,6 +256,22 @@ async function decideSteadyIncident(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 
+async function acknowledgeNotification(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  acknowledgeIncidentNotification({
+    notificationId: String(formData.get("notificationId") ?? ""),
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 export default async function EvidenceRecomputationPage() {
   ensureProductionRecomputationBindings();
   const activation = evidenceRecomputationActivationStatus();
@@ -287,7 +309,12 @@ export default async function EvidenceRecomputationPage() {
     .reverse();
   const steadyOpenIncidents = openSteadyStateIncidents();
   evaluateIncidentSlaBreaches();
+  deliverPendingIncidentNotifications();
   const incidentSlaReceipts = listIncidentSlaReceipts().slice(-30).reverse();
+  const incidentNotificationReceipts = listIncidentNotificationReceipts()
+    .slice(-40)
+    .reverse();
+  const pendingNotifications = pendingIncidentNotifications();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -890,6 +917,57 @@ export default async function EvidenceRecomputationPage() {
             </div>
           ))
         )}
+        <h3>Module 45 incident notifications</h3>
+        {pendingNotifications.length === 0 ? (
+          <p>No unacknowledged incident notifications.</p>
+        ) : (
+          pendingNotifications.map((notification) => (
+            <form
+              key={notification.notificationId}
+              action={acknowledgeNotification}
+              style={{
+                display: "grid",
+                gap: 8,
+                padding: "10px 0",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <input
+                type="hidden"
+                name="notificationId"
+                value={notification.notificationId}
+              />
+              <b>
+                {notification.severity} · {notification.slaAction} ·{" "}
+                {notification.incidentId}
+              </b>
+              <div>
+                Internal Module 45 queue · payload{" "}
+                {notification.payloadHash.slice(0, 16)}…
+              </div>
+              <textarea
+                name="reason"
+                required
+                placeholder="Notification acknowledgment reason"
+              />
+              <button disabled={!mayApprove}>Acknowledge notification</button>
+            </form>
+          ))
+        )}
+        <h4>Notification delivery receipts</h4>
+        {incidentNotificationReceipts.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.severity} · {receipt.slaAction} ·{" "}
+            {receipt.at}
+            <br />
+            {receipt.channel} · {receipt.actorName}
+            <br />
+            {receipt.reason}
+          </div>
+        ))}
         <h3>Incident receipts</h3>
         {steadyIncidentReceipts.map((r) => (
           <div

@@ -35,6 +35,7 @@ const required = [
   "verify:official-evidence-post-resume-watchdog",
   "verify:official-evidence-steady-state-incident",
   "verify:official-evidence-incident-sla",
+  "verify:official-evidence-incident-notification",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

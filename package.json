@@ -499,7 +499,8 @@
     "verify:official-evidence-steady-state-incident": "tsx src/scripts/verifyOfficialEvidenceSteadyStateIncident.ts",
     "verify:official-evidence-incident-sla": "tsx src/scripts/verifyOfficialEvidenceIncidentSla.ts",
     "verify:official-evidence-incident-notification": "tsx src/scripts/verifyOfficialEvidenceIncidentNotification.ts",
-    "verify:official-evidence-external-notification-connector": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationConnector.ts"
+    "verify:official-evidence-external-notification-connector": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationConnector.ts",
+    "verify:official-evidence-external-notification-dry-run": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationDryRun.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

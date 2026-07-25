@@ -37,6 +37,7 @@ const required = [
   "verify:official-evidence-incident-sla",
   "verify:official-evidence-incident-notification",
   "verify:official-evidence-external-notification-connector",
+  "verify:official-evidence-external-notification-dry-run",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

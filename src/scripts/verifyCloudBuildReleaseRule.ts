@@ -25,6 +25,7 @@ const required = [
   "verify:official-evidence-production-activation",
   "verify:official-evidence-activation-ceremony",
   "verify:official-evidence-scheduler-release",
+  "verify:official-evidence-live-bootstrap",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

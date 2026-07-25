@@ -18,6 +18,7 @@ import {
 import type { DownstreamArtifactKind } from "@/lib/property/officialEvidenceDownstreamInvalidation";
 import { ensureProductionRecomputationBindings } from "@/lib/property/officialEvidenceProductionRecomputationHandlers";
 import { evidenceRecomputationActivationStatus } from "@/lib/property/officialEvidenceRecomputationActivation";
+import { bootstrapLiveEvidenceReplayReview } from "@/lib/property/officialEvidenceLiveBootstrap";
 import {
   listRecomputationActivationReceipts,
   recordRecomputationActivationCeremony,

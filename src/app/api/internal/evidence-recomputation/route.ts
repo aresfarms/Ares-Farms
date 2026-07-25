@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { approvedRecomputationHandlers } from "@/lib/property/officialEvidenceRecomputationHandlerRegistry";
 import { ensureProductionRecomputationBindings } from "@/lib/property/officialEvidenceProductionRecomputationHandlers";
 import { evidenceRecomputationActivationStatus } from "@/lib/property/officialEvidenceRecomputationActivation";
+import { recomputationActivationFinalized } from "@/lib/property/officialEvidenceRecomputationCeremony";
 import { enqueueStaleEvidenceArtifacts, processEvidenceRecomputationQueue } from "@/lib/property/officialEvidenceRecomputationOrchestrator";
 import { missingRequiredSecretDetail, readRequiredSecret, secureCompare } from "@/lib/security/requestGuards";
 
@@ -25,7 +26,7 @@ export async function POST(request: Request) {
   }
   if (process.env.EVIDENCE_RECOMPUTATION_REQUIRE_FULL_APPROVAL !== "false") {
     const activation = evidenceRecomputationActivationStatus();
-    if (!activation.ready) return NextResponse.json({ ok:false, error:"Evidence recomputation is not fully approved for activation.", activation }, { status:409 });
+    if (!activation.ready || !recomputationActivationFinalized()) return NextResponse.json({ ok:false, error:"Evidence recomputation is not fully approved and finalized for activation.", activation, finalized:recomputationActivationFinalized() }, { status:409 });
   }
   const body = await request.json().catch(() => ({})) as { propertyId?: string };
   const queued = enqueueStaleEvidenceArtifacts(body.propertyId);

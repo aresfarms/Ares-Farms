@@ -69,6 +69,7 @@ steps:
         npm run verify:official-evidence-deterministic-replay
         npm run verify:official-evidence-production-replay-review
         npm run verify:official-evidence-production-activation
+        npm run verify:official-evidence-activation-ceremony
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

@@ -485,6 +485,7 @@
     "verify:official-evidence-deterministic-replay": "tsx src/scripts/verifyOfficialEvidenceDeterministicReplay.ts",
     "verify:official-evidence-production-replay-review": "tsx src/scripts/verifyOfficialEvidenceProductionReplayReview.ts",
     "verify:official-evidence-production-activation": "tsx src/scripts/verifyOfficialEvidenceProductionActivation.ts",
+    "verify:official-evidence-activation-ceremony": "tsx src/scripts/verifyOfficialEvidenceActivationCeremony.ts",
     "verify:official-evidence-replay-key-rotation": "tsx src/scripts/verifyOfficialEvidenceReplayKeyRotation.ts"
   },
   "dependencies": {

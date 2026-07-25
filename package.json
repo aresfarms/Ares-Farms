@@ -481,7 +481,8 @@
     "verify:official-evidence-recomputation-orchestration": "tsx src/scripts/verifyOfficialEvidenceRecomputationOrchestration.ts",
     "verify:official-evidence-scheduled-recomputation": "tsx src/scripts/verifyOfficialEvidenceScheduledRecomputation.ts",
     "verify:official-evidence-durable-handler-governance": "tsx src/scripts/verifyOfficialEvidenceDurableHandlerGovernance.ts",
-    "verify:official-evidence-signed-replay": "tsx src/scripts/verifyOfficialEvidenceSignedReplayPackets.ts"
+    "verify:official-evidence-signed-replay": "tsx src/scripts/verifyOfficialEvidenceSignedReplayPackets.ts",
+    "verify:official-evidence-deterministic-replay": "tsx src/scripts/verifyOfficialEvidenceDeterministicReplay.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

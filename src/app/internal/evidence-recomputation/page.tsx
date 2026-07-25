@@ -74,6 +74,12 @@ import {
   listIncidentNotificationReceipts,
   pendingIncidentNotifications,
 } from "@/lib/property/officialEvidenceIncidentNotification";
+import {
+  decideExternalNotificationConnector,
+  listExternalNotificationConnectorReceipts,
+  listExternalNotificationConnectorRegistrations,
+  type ExternalConnectorDecision,
+} from "@/lib/property/officialEvidenceExternalNotificationConnector";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -256,6 +262,25 @@ async function decideSteadyIncident(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 
+async function decideExternalNotificationConnectorAction(
+  formData: FormData,
+): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  decideExternalNotificationConnector({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    decision: String(formData.get("decision")) as ExternalConnectorDecision,
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 async function acknowledgeNotification(formData: FormData): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
@@ -315,6 +340,11 @@ export default async function EvidenceRecomputationPage() {
     .slice(-40)
     .reverse();
   const pendingNotifications = pendingIncidentNotifications();
+  const externalConnectorRegistrations =
+    listExternalNotificationConnectorRegistrations().slice().reverse();
+  const externalConnectorReceipts = listExternalNotificationConnectorReceipts()
+    .slice(-30)
+    .reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -977,6 +1007,71 @@ export default async function EvidenceRecomputationPage() {
             <b>{r.action}</b> · {r.actorName} · {r.at}
             <br />
             {r.reason}
+          </div>
+        ))}
+      </section>
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
+        <h2>External notification connector review</h2>
+        <p>
+          External email, SMS, and paging remain disabled unless the current
+          implementation is separately approved.
+        </p>
+        {externalConnectorRegistrations.length === 0 ? (
+          <p>No external notification connectors are registered.</p>
+        ) : (
+          externalConnectorRegistrations.map((registration) => (
+            <form
+              key={registration.registrationId}
+              action={decideExternalNotificationConnectorAction}
+              style={{
+                display: "grid",
+                gap: 8,
+                padding: "10px 0",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <input
+                type="hidden"
+                name="registrationId"
+                value={registration.registrationId}
+              />
+              <b>
+                {registration.channel} · {registration.connectorId}
+              </b>
+              <code>{registration.implementationHash}</code>
+              <div>
+                Credentials: {registration.credentialMode} · delivery:{" "}
+                {registration.deliverySemantics}
+              </div>
+              <div>Replay evidence: {registration.replayEvidenceHash}</div>
+              <textarea
+                name="reason"
+                required
+                placeholder="Connector review reason"
+              />
+              <div style={{ display: "flex", gap: 8 }}>
+                <button name="decision" value="APPROVE" disabled={!mayApprove}>
+                  Approve current implementation
+                </button>
+                <button name="decision" value="SUSPEND" disabled={!mayApprove}>
+                  Suspend
+                </button>
+              </div>
+            </form>
+          ))
+        )}
+        <h3>Connector receipts</h3>
+        {externalConnectorReceipts.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId}{" "}
+            · {receipt.at}
+            <br />
+            {receipt.actorName} · {receipt.reason}
           </div>
         ))}
       </section>

@@ -59,6 +59,7 @@ steps:
         npm run verify:official-evidence-read-provenance
         npm run verify:official-evidence-quarantine
         npm run verify:official-evidence-quarantine-resolution
+        npm run verify:official-evidence-downstream-invalidation
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

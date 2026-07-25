@@ -3,6 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { runtimeStatePath } from "./runtimeStatePath";
 import type { OfficialEvidenceSourceId } from "./officialEvidenceSourceGovernance";
+import { invalidateArtifactsForQuarantine } from "./officialEvidenceDownstreamInvalidation";
 
 export type QuarantineStatus = "open" | "acknowledged" | "remediation-pending" | "released";
 export interface QuarantineEvent { eventId:string; action:"DETECTED"|"ACKNOWLEDGE"|"REMEDIATION"|"REVERIFY_FAILED"|"RELEASE"; actorId:string; actorName:string; at:string; reason:string; verificationReasons?:string[]; }
@@ -19,5 +20,7 @@ export function recordOfficialEvidenceQuarantine(input:Omit<OfficialEvidenceQuar
   const reasons=[...new Set(input.reasons)].sort(); const reasonHash=createHash("sha256").update(JSON.stringify(reasons)).digest("hex"); const records=readOfficialEvidenceQuarantine();
   const existing=records.find(x=>x.sourceId===input.sourceId&&x.sourceVersion===input.sourceVersion&&x.reasonHash===reasonHash); if(existing) return existing;
   const detectedAt=input.detectedAt??new Date().toISOString(); const record:OfficialEvidenceQuarantineRecord={...input,reasons,reasonHash,quarantineId:randomUUID(),detectedAt,status:"open",events:[{eventId:randomUUID(),action:"DETECTED",actorId:"system:evidence-read",actorName:"evidence-read-verifier",at:detectedAt,reason:"Snapshot failed read-time provenance verification.",verificationReasons:reasons}]};
-  write([...records,record]); return record;
+  write([...records,record]);
+  invalidateArtifactsForQuarantine({ sourceId: record.sourceId, sourceVersion: record.sourceVersion, quarantineId: record.quarantineId, reason: `Evidence quarantined: ${record.reasons.join(", ")}`, at: detectedAt });
+  return record;
 }

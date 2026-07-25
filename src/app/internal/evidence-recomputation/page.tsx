@@ -57,6 +57,12 @@ import {
   listReviewHandoffReceipts,
   recordReviewHandoff,
 } from "@/lib/property/officialEvidenceReviewHandoff";
+import {
+  decideSteadyStateIncident,
+  listSteadyStateIncidentReceipts,
+  openSteadyStateIncidents,
+  type SteadyStateIncidentAction,
+} from "@/lib/property/officialEvidenceSteadyStateIncident";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -218,6 +224,27 @@ async function decide(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 import { listPostResumeWatchdogReceipts } from "@/lib/property/officialEvidencePostResumeWatchdog";
+
+async function decideSteadyIncident(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  decideSteadyStateIncident({
+    incidentId: String(formData.get("incidentId") ?? ""),
+    action: String(formData.get("action")) as Exclude<
+      SteadyStateIncidentAction,
+      "OPEN"
+    >,
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 export default async function EvidenceRecomputationPage() {
   ensureProductionRecomputationBindings();
   const activation = evidenceRecomputationActivationStatus();
@@ -250,6 +277,10 @@ export default async function EvidenceRecomputationPage() {
   const finalCanaryPackets = listFinalCanaryReleasePackets()
     .slice(-20)
     .reverse();
+  const steadyIncidentReceipts = listSteadyStateIncidentReceipts()
+    .slice(-30)
+    .reverse();
+  const steadyOpenIncidents = openSteadyStateIncidents();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -782,6 +813,61 @@ export default async function EvidenceRecomputationPage() {
             </div>
           ))
         )}
+      </section>
+      <section
+        style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}
+      >
+        <h2>Steady-state recomputation incidents</h2>
+        {steadyOpenIncidents.length === 0 ? (
+          <p>No open steady-state incidents.</p>
+        ) : (
+          steadyOpenIncidents.map((r) => (
+            <form
+              key={r.incidentId}
+              action={decideSteadyIncident}
+              style={{
+                display: "grid",
+                gap: 8,
+                padding: "10px 0",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <input type="hidden" name="incidentId" value={r.incidentId} />
+              <b>OPEN · {r.incidentId}</b>
+              <div>
+                Execution {r.executionId} · failed {r.failedJobIds.length} ·
+                blocked {r.blockedJobIds.length}
+              </div>
+              <textarea
+                name="reason"
+                required
+                placeholder="Incident decision reason"
+              />
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button name="action" value="ACKNOWLEDGE">
+                  Acknowledge
+                </button>
+                <button name="action" value="ESCALATE">
+                  Escalate
+                </button>
+                <button name="action" value="RESOLVE">
+                  Resolve
+                </button>
+              </div>
+            </form>
+          ))
+        )}
+        <h3>Incident receipts</h3>
+        {steadyIncidentReceipts.map((r) => (
+          <div
+            key={r.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{r.action}</b> · {r.actorName} · {r.at}
+            <br />
+            {r.reason}
+          </div>
+        ))}
       </section>
       <section
         style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}

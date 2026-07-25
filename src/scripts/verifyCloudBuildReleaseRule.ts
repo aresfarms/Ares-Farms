@@ -33,6 +33,7 @@ const required = [
   "verify:official-evidence-final-canary-packet",
   "verify:official-evidence-canary-transcript",
   "verify:official-evidence-post-resume-watchdog",
+  "verify:official-evidence-steady-state-incident",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

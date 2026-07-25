@@ -18,6 +18,7 @@ import {
 } from "@/lib/property/officialEvidenceCanaryExecutionTranscript";
 import { recordPostResumeExecution } from "@/lib/property/officialEvidencePostResumeWatchdog";
 import { pauseEvidenceRecomputationScheduler } from "@/lib/property/officialEvidenceSchedulerPause";
+import { openSteadyStateIncident } from "@/lib/property/officialEvidenceSteadyStateIncident";
 import {
   missingRequiredSecretDetail,
   readRequiredSecret,
@@ -100,6 +101,16 @@ export async function POST(request: Request) {
           jobs,
           pauseScheduler: pauseEvidenceRecomputationScheduler,
         });
+    const steadyStateIncident =
+      watchdogReceipt && !watchdogReceipt.withinGuardWindow
+        ? openSteadyStateIncident({
+            executionId: watchdogReceipt.executionId,
+            finalPacketId: watchdogReceipt.resumeEvidence.finalPacketId,
+            failedJobIds: watchdogReceipt.failedJobIds,
+            blockedJobIds: watchdogReceipt.blockedJobIds,
+            at: watchdogReceipt.at,
+          })
+        : null;
     let completedTranscript = null;
     if (body.canary && canaryTranscript) {
       completedTranscript = completeCanaryExecution({
@@ -130,6 +141,7 @@ export async function POST(request: Request) {
       canary: Boolean(body.canary),
       canaryTranscript: completedTranscript,
       postResumeWatchdog: watchdogReceipt,
+      steadyStateIncident,
     });
   } catch (error) {
     if (body.canary && canaryTranscript) {

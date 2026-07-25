@@ -21,6 +21,12 @@ async function main() {
     await import("@/lib/property/officialEvidenceRecomputationCeremony");
   const release =
     await import("@/lib/property/officialEvidenceSchedulerRelease");
+  const bootstrap =
+    await import("@/lib/property/officialEvidenceLiveBootstrap");
+  const batch =
+    await import("@/lib/property/officialEvidenceBatchReplayVerification");
+  const approval =
+    await import("@/lib/property/officialEvidenceApprovalPacket");
   const tax = await import("@/lib/property/ownershipCostModel");
   const ranking = await import("@/lib/intelligence/scenarioRankingPlan");
   const market = await import("@/lib/intelligence/marketComparablePlan");
@@ -179,6 +185,34 @@ async function main() {
       reviewerId: "module45-reviewer",
       reviewerName: "Module 45 Reviewer",
       reason: "Exact replay proof matched.",
+    });
+  }
+  bootstrap.bootstrapLiveEvidenceReplayReview("2026-07-25T18:31:00Z");
+  batch.runGovernedBatchReplayVerification({
+    actorId: "module45-reviewer",
+    actorName: "Module 45 Reviewer",
+    reason: "Verify current four-builder approval packet.",
+    at: "2026-07-25T18:32:00Z",
+  });
+  const approvalPacket = approval.createApprovalPacket({
+    actorId: "module45-reviewer",
+    actorName: "Module 45 Reviewer",
+    reason: "Prepare four separate release decisions.",
+    at: "2026-07-25T18:33:00Z",
+  });
+  for (const kind of [
+    "tax-scenario",
+    "top-three",
+    "qualification-result",
+    "property-report",
+  ] as const) {
+    approval.decideApprovalPacketItem({
+      packetId: approvalPacket.packetId,
+      kind,
+      decision: "APPROVE",
+      actorId: "module45-reviewer",
+      actorName: "Module 45 Reviewer",
+      reason: `Approve current ${kind} implementation for scheduler release test.`,
     });
   }
   ceremony.recordRecomputationActivationCeremony({

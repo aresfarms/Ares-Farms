@@ -19,6 +19,7 @@ import type { DownstreamArtifactKind } from "@/lib/property/officialEvidenceDown
 import { ensureProductionRecomputationBindings } from "@/lib/property/officialEvidenceProductionRecomputationHandlers";
 import { evidenceRecomputationActivationStatus } from "@/lib/property/officialEvidenceRecomputationActivation";
 import { bootstrapLiveEvidenceReplayReview } from "@/lib/property/officialEvidenceLiveBootstrap";
+import { listBatchReplayReceipts, runGovernedBatchReplayVerification } from "@/lib/property/officialEvidenceBatchReplayVerification";
 import {
   listRecomputationActivationReceipts,
   recordRecomputationActivationCeremony,
@@ -51,6 +52,17 @@ async function runReplay(formData: FormData): Promise<void> {
     handlerId: registration.handlerId,
     implementationHash: registration.implementationHash,
   });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function runBatchReplay(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email)) throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  const reason = String(formData.get("reason") ?? "").trim();
+  runGovernedBatchReplayVerification({ actorId: operator.id, actorName: operator.name, reason });
   revalidatePath("/internal/evidence-recomputation");
 }
 
@@ -124,6 +136,7 @@ export default async function EvidenceRecomputationPage() {
     .filter((r, i, a) => a.findIndex((x) => x.kind === r.kind) === i);
   const packets = listEvidenceReplayPackets().slice().reverse();
   const attestations = listReplayAttestations().slice().reverse();
+  const batchReplayReceipts = listBatchReplayReceipts().slice(-20).reverse();
   const receipts = listGovernedRecomputationHandlerReceipts()
     .slice(-30)
     .reverse();
@@ -190,6 +203,12 @@ export default async function EvidenceRecomputationPage() {
                 Revoke activation
               </button>
             </div>
+          </form>
+        )}
+        {mayApprove && (
+          <form action={runBatchReplay} style={{ display: "grid", gap: 8, maxWidth: 700, marginTop: 12 }}>
+            <textarea name="reason" required placeholder="Batch replay verification reason" />
+            <button>Run all four deterministic replays</button>
           </form>
         )}
         {mayApprove && (
@@ -306,6 +325,16 @@ export default async function EvidenceRecomputationPage() {
                 {a.reasons.join(", ")}
               </>
             ) : null}
+          </div>
+        ))}
+      </section>
+      <section style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}>
+        <h2>Batch replay verification receipts</h2>
+        {batchReplayReceipts.length === 0 ? <p>No batch replay verification receipts.</p> : batchReplayReceipts.map((r) => (
+          <div key={r.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
+            <b>{r.allMatched ? "ALL MATCHED" : "REVIEW REQUIRED"}</b> · {r.actorName} · {r.at}<br />
+            {r.reason}<br />
+            {r.results.map((x) => `${x.kind}:${x.matched ? "MATCH" : "FAIL"}`).join(", ")}
           </div>
         ))}
       </section>

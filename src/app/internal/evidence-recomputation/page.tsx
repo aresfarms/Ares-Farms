@@ -119,6 +119,13 @@ import {
   tombstoneIncidentStatus,
   type TombstoneIncidentAction,
 } from "@/lib/property/officialEvidenceExternalNotificationTombstoneIncident";
+import {
+  closeExternalNotificationCorrectiveAction,
+  correctiveActionStatus,
+  listExternalNotificationCorrectiveActionReceipts,
+  openExternalNotificationCorrectiveAction,
+  verifyExternalNotificationCorrectiveAction,
+} from "@/lib/property/officialEvidenceExternalNotificationCorrectiveAction";
 
 async function decideTombstoneIncident(formData: FormData): Promise<void> {
   "use server";
@@ -130,6 +137,46 @@ async function decideTombstoneIncident(formData: FormData): Promise<void> {
   decideExternalNotificationTombstoneIncident({
     registrationId: String(formData.get("registrationId") ?? ""),
     action: String(formData.get("action")) as Exclude<TombstoneIncidentAction, "CONTAIN">,
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function verifyCorrectiveAction(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  verifyExternalNotificationCorrectiveAction({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    rootCauseRef: String(formData.get("rootCauseRef") ?? "").trim(),
+    credentialAuditRef: String(formData.get("credentialAuditRef") ?? "").trim(),
+    providerAuditRef: String(formData.get("providerAuditRef") ?? "").trim(),
+    routingAuditRef: String(formData.get("routingAuditRef") ?? "").trim(),
+    secretAuditRef: String(formData.get("secretAuditRef") ?? "").trim(),
+    codeChangeRef: String(formData.get("codeChangeRef") ?? "").trim() || null,
+    externalDeliveryBlocked: true,
+    internalQueueAuthoritative: true,
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function closeCorrectiveAction(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  closeExternalNotificationCorrectiveAction({
+    registrationId: String(formData.get("registrationId") ?? ""),
     actorId: operator.id,
     actorName: operator.name,
     reason: String(formData.get("reason") ?? "").trim(),
@@ -505,6 +552,11 @@ export default async function EvidenceRecomputationPage() {
       containExternalNotificationTombstoneFailure({ registrationId: receipt.registrationId });
   const externalTombstoneIncidentReceipts =
     listExternalNotificationTombstoneIncidentReceipts().slice(-40).reverse();
+  for (const receipt of externalTombstoneIncidentReceipts)
+    if (receipt.action === "RESOLVE")
+      openExternalNotificationCorrectiveAction({ registrationId: receipt.registrationId });
+  const externalCorrectiveActionReceipts =
+    listExternalNotificationCorrectiveActionReceipts().slice(-40).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1564,6 +1616,53 @@ export default async function EvidenceRecomputationPage() {
             <br />
             external delivery blocked · internal queue authoritative · offending events {receipt.offendingEventRefs.length}
             {receipt.offendingEventRefs.length ? <><br />{receipt.offendingEventRefs.join(" · ")}</> : null}
+            <br />
+            {receipt.reason}
+          </div>
+        ))}
+        <h3>Post-incident corrective action</h3>
+        <p>
+          A resolved tombstone incident remains open institutionally until root cause and
+          remediation evidence are verified, zero post-resolution recurrence events are
+          proven, and Module 45 records final corrective-action closure.
+        </p>
+        {externalTombstoneIncidentReceipts
+          .filter((receipt) => receipt.action === "RESOLVE")
+          .map((resolution) => {
+            const status = correctiveActionStatus(resolution.registrationId);
+            return (
+              <div key={`capa-${resolution.registrationId}`} style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}>
+                <b>{resolution.connectorId} · {resolution.channel} · CORRECTIVE ACTION {status}</b>
+                {status === "OPEN" ? (
+                  <form action={verifyCorrectiveAction} style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                    <input type="hidden" name="registrationId" value={resolution.registrationId} />
+                    <input name="rootCauseRef" required placeholder="Root-cause evidence reference" />
+                    <input name="credentialAuditRef" required placeholder="Credential audit reference" />
+                    <input name="providerAuditRef" required placeholder="Provider control audit reference" />
+                    <input name="routingAuditRef" required placeholder="Routing audit reference" />
+                    <input name="secretAuditRef" required placeholder="Secret-management audit reference" />
+                    <input name="codeChangeRef" placeholder="Optional corrective code/change reference" />
+                    <textarea name="reason" required placeholder="Why remediation is complete and recurrence risk is controlled" />
+                    <button disabled={!mayApprove}>Verify remediation</button>
+                  </form>
+                ) : null}
+                {status === "VERIFIED" ? (
+                  <form action={closeCorrectiveAction} style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                    <input type="hidden" name="registrationId" value={resolution.registrationId} />
+                    <textarea name="reason" required placeholder="Corrective-action closure reason" />
+                    <button disabled={!mayApprove}>Close corrective action</button>
+                  </form>
+                ) : null}
+              </div>
+            );
+          })}
+        {externalCorrectiveActionReceipts.map((receipt) => (
+          <div key={receipt.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+            <br />
+            recurrence events {receipt.recurrenceEventCount} · external delivery blocked · internal queue authoritative
+            {receipt.rootCauseRef ? <><br />root cause {receipt.rootCauseRef} · credential {receipt.credentialAuditRef} · provider {receipt.providerAuditRef}</> : null}
+            {receipt.routingAuditRef ? <><br />routing {receipt.routingAuditRef} · secret {receipt.secretAuditRef}{receipt.codeChangeRef ? ` · change ${receipt.codeChangeRef}` : ""}</> : null}
             <br />
             {receipt.reason}
           </div>

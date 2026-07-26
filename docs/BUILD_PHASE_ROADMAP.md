@@ -114,7 +114,7 @@ No implementation step may be skipped, reordered, or substituted through develop
 
 The machine-enforced sequence for the current official-evidence notification workstream is:
 
-`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement -> 3X Retirement Closure -> 3Y Tombstone Surveillance -> 3Z Tombstone Incident Containment`
+`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement -> 3X Retirement Closure -> 3Y Tombstone Surveillance -> 3Z Tombstone Incident Containment -> 4A Corrective Action Verification`
 
 **FINAL HARD RULE:** Cloud Build must fail before image construction whenever the roadmap manifest is missing, predecessor order is incomplete, a completed-step artifact is absent, or the mandatory roadmap verifier is removed.
 
@@ -128,3 +128,8 @@ Attributed governance direction: continue the canonical sequence after Step 3W w
 Closed connector registrations remain under permanent resurrection surveillance. Any post-closure approval, activation, dry run, delivery, or reinstatement evidence bound to the retired registration produces `TOMBSTONE_FAIL`. A clean scan produces `TOMBSTONE_PASS`. Replacement registrations remain independent and must not be mistaken for resurrection of the retired registration.
 
 **FINAL HARD RULE:** A closed registration is never considered safely decommissioned without a current tombstone receipt. A detected resurrection event cannot reactivate the connector and must remain visible as immutable failure evidence.
+
+
+### Roadmap Amendment — Step 4A
+
+Step 4A begins the post-incident assurance phase. A resolved 3Z tombstone incident is not institutionally closed until root cause, credential, provider, routing, and secret-control evidence are bound to a corrective-action record; zero post-resolution recurrence events are proven; and attributed Module 45 authority records remediation verification and final closure. Permanent connector retirement remains in force throughout.

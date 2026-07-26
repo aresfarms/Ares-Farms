@@ -45,6 +45,7 @@ const required = [
   "verify:official-evidence-external-notification-reinstatement",
   "verify:official-evidence-external-notification-retirement",
   "verify:official-evidence-external-notification-retirement-closure",
+  "verify:official-evidence-external-notification-retirement-tombstone",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

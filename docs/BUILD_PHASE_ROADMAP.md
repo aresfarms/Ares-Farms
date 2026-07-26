@@ -114,10 +114,17 @@ No implementation step may be skipped, reordered, or substituted through develop
 
 The machine-enforced sequence for the current official-evidence notification workstream is:
 
-`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement -> 3X Retirement Closure`
+`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement -> 3X Retirement Closure -> 3Y Tombstone Surveillance`
 
 **FINAL HARD RULE:** Cloud Build must fail before image construction whenever the roadmap manifest is missing, predecessor order is incomplete, a completed-step artifact is absent, or the mandatory roadmap verifier is removed.
 
 ### Roadmap Amendment RA-2026-07-26-001
 
 Attributed governance direction: continue the canonical sequence after Step 3W without deviation. Step 3X is added as the mandatory retirement-closure control. It does not weaken, reorder, or replace any predecessor. It proves decommission completion after permanent retirement through credential revocation, provider callback disablement, routing alias removal, runtime secret-reference removal, zero open operational references, and continued Module 45 internal-queue authority.
+
+
+### Step 3Y — Retirement Tombstone Surveillance
+
+Closed connector registrations remain under permanent resurrection surveillance. Any post-closure approval, activation, dry run, delivery, or reinstatement evidence bound to the retired registration produces `TOMBSTONE_FAIL`. A clean scan produces `TOMBSTONE_PASS`. Replacement registrations remain independent and must not be mistaken for resurrection of the retired registration.
+
+**FINAL HARD RULE:** A closed registration is never considered safely decommissioned without a current tombstone receipt. A detected resurrection event cannot reactivate the connector and must remain visible as immutable failure evidence.

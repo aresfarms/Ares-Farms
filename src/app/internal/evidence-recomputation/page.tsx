@@ -107,6 +107,11 @@ import {
   listExternalNotificationRetirementClosureReceipts,
   closeExternalNotificationRetirement,
 } from "@/lib/property/officialEvidenceExternalNotificationRetirementClosure";
+import {
+  evaluateExternalNotificationRetirementTombstones,
+  listExternalNotificationRetirementTombstoneReceipts,
+  retirementTombstoneHealthy,
+} from "@/lib/property/officialEvidenceExternalNotificationRetirementTombstone";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -468,6 +473,9 @@ export default async function EvidenceRecomputationPage() {
     listExternalNotificationRetirementReceipts().slice(-30).reverse();
   const externalRetirementClosureReceipts =
     listExternalNotificationRetirementClosureReceipts().slice(-30).reverse();
+  evaluateExternalNotificationRetirementTombstones();
+  const externalRetirementTombstoneReceipts =
+    listExternalNotificationRetirementTombstoneReceipts().slice(-40).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1455,6 +1463,40 @@ export default async function EvidenceRecomputationPage() {
             alias {receipt.routingAliasRemovalRef} · secret {receipt.secretReferenceRemovalRef}
             <br />
             open references {receipt.openOperationalReferences} · internal queue authoritative
+            <br />
+            {receipt.reason}
+          </div>
+        ))}
+        <h3>Retirement tombstone surveillance</h3>
+        <p>
+          Closed registrations remain under permanent surveillance for stale approval,
+          activation, dry-run, delivery, or reinstatement evidence.
+        </p>
+        {externalRetirementClosureReceipts.map((closure) => (
+          <div
+            key={`tombstone-status-${closure.registrationId}`}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>
+              {closure.connectorId} · {closure.channel} · {retirementTombstoneHealthy(closure.registrationId)
+                ? "TOMBSTONE HEALTHY"
+                : "TOMBSTONE REVIEW REQUIRED"}
+            </b>
+            <br />
+            registration {closure.registrationId} · closure {closure.receiptId}
+          </div>
+        ))}
+        {externalRetirementTombstoneReceipts.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+            <br />
+            checked through {receipt.checkedThrough} · prohibited events {receipt.prohibitedEventCount}
+            {receipt.prohibitedEventRefs.length > 0 ? (
+              <><br />{receipt.prohibitedEventRefs.join(" · ")}</>
+            ) : null}
             <br />
             {receipt.reason}
           </div>

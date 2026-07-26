@@ -148,3 +148,8 @@ After institutional closure of the notification lifecycle, the platform must rec
 ## Step 4E — Public Alpha Sign-Off Ceremony Packet
 
 After controlled-promotion readiness reconciliation, the platform prepares a read-only Ceremony Part D packet for founder review. The packet freezes the five Public Alpha §9 decisions, the 2-of-3 founder quorum rule, six machine-verifiable entry conditions, and the two remaining external-evidence conditions: a recorded DR restore test and signed participation terms for every invited participant. It records no founder vote, grants no Alpha entry, permits no external action, and preserves production BLOCKED posture.
+
+
+## Step 4F — Governed Evidence Review Portal and Plain-Language Legal Timeline
+
+After the Public Alpha sign-off packet is prepared, Furlong must provide a password-protected review surface for provisioned auditor, governance, and administrator accounts. The surface composes a standardized Governed Evidence Packet for either the whole platform or one module at a time. Every packet binds module scope, rule-by-rule evidence matching, deterministic replay posture under TECH-REPLAY-001, append-only ledger posture under TECH-LEDGER-001, cryptographic chain verification, unresolved integrity limitations, and a plain-language chronological record. Legacy records outside the SHA-256 chain must be labeled as unchained and may never be represented as cryptographically verified. The packet presents evidence and replay references but does not determine admissibility, legal effect, liability, or the merits of a dispute. Attorneys receive access through a governed auditor-role account; no public or borrower access is permitted.

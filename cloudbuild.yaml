@@ -98,6 +98,7 @@ steps:
         npm run verify:official-evidence-external-notification-institutional-closure
         npm run verify:controlled-promotion-readiness-reconciliation
         npm run verify:public-alpha-signoff-ceremony-packet
+        npm run verify:governed-evidence-review-portal
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

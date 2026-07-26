@@ -514,7 +514,8 @@
     "verify:official-evidence-external-notification-corrective-action-effectiveness": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationCorrectiveActionEffectiveness.ts",
     "verify:official-evidence-external-notification-institutional-closure": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationInstitutionalClosure.ts",
     "verify:controlled-promotion-readiness-reconciliation": "tsx src/scripts/verifyControlledPromotionReadinessReconciliation.ts",
-    "verify:public-alpha-signoff-ceremony-packet": "tsx src/scripts/verifyPublicAlphaSignoffCeremonyPacket.ts"
+    "verify:public-alpha-signoff-ceremony-packet": "tsx src/scripts/verifyPublicAlphaSignoffCeremonyPacket.ts",
+    "verify:governed-evidence-review-portal": "tsx src/scripts/verifyGovernedEvidenceReviewPortal.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

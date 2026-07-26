@@ -503,7 +503,8 @@
     "verify:official-evidence-external-notification-dry-run": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationDryRun.ts",
     "verify:official-evidence-external-notification-activation": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationActivation.ts",
     "verify:official-evidence-external-notification-delivery": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationDelivery.ts",
-    "verify:official-evidence-external-notification-assurance": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationAssurance.ts"
+    "verify:official-evidence-external-notification-assurance": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationAssurance.ts",
+    "verify:official-evidence-external-notification-reinstatement": "tsx src/scripts/verifyOfficialEvidenceExternalNotificationReinstatement.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

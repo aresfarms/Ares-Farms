@@ -91,6 +91,11 @@ import {
   evaluateExternalNotificationAcknowledgments,
   listExternalNotificationAssuranceReceipts,
 } from "@/lib/property/officialEvidenceExternalNotificationAssurance";
+import {
+  connectorInProbation,
+  listExternalNotificationReinstatementReceipts,
+  reinstateExternalNotificationConnector,
+} from "@/lib/property/officialEvidenceExternalNotificationReinstatement";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -313,6 +318,22 @@ async function decideExternalNotificationActivationAction(
   revalidatePath("/internal/evidence-recomputation");
 }
 
+async function reinstateExternalConnector(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  reinstateExternalNotificationConnector({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 async function acknowledgeNotification(formData: FormData): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
@@ -387,6 +408,8 @@ export default async function EvidenceRecomputationPage() {
   const externalAssuranceReceipts = listExternalNotificationAssuranceReceipts()
     .slice(-40)
     .reverse();
+  const externalReinstatementReceipts =
+    listExternalNotificationReinstatementReceipts().slice(-30).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1187,6 +1210,53 @@ export default async function EvidenceRecomputationPage() {
             · {receipt.at}
             <br />
             {receipt.actorName} · {receipt.reason}
+          </div>
+        ))}
+        <h3>Connector reinstatement and probation</h3>
+        {externalConnectorRegistrations.map((registration) => (
+          <form
+            key={`reinstate-${registration.registrationId}`}
+            action={reinstateExternalConnector}
+            style={{
+              display: "grid",
+              gap: 8,
+              padding: "10px 0",
+              borderTop: "1px solid #e2e8f0",
+            }}
+          >
+            <input
+              type="hidden"
+              name="registrationId"
+              value={registration.registrationId}
+            />
+            <b>
+              {registration.connectorId} ·{" "}
+              {connectorInProbation(registration.registrationId)
+                ? "PROBATION"
+                : "NOT IN PROBATION"}
+            </b>
+            <textarea
+              name="reason"
+              required
+              placeholder="Reinstatement reason after fresh dry run"
+            />
+            <button disabled={!mayApprove}>
+              Reinstate into guarded probation
+            </button>
+          </form>
+        ))}
+        {externalReinstatementReceipts.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId}{" "}
+            · {receipt.at}
+            <br />
+            Probation acknowledgments {receipt.probationAcknowledgedDeliveries}/
+            {receipt.probationRequiredDeliveries}
+            <br />
+            {receipt.reason}
           </div>
         ))}
         <h3>External delivery assurance receipts</h3>

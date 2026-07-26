@@ -1419,6 +1419,25 @@
         "src/lib/governance/institutionalAccessSurveillanceCanaryRelease.ts",
         "src/scripts/verifyInstitutionalAccessSurveillanceCanaryRelease.ts"
       ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-PROVISIONING-001": {
+      "title": "Fail-closed paused scheduler provisioning contract for institutional surveillance",
+      "status": "implemented",
+      "requires": [
+        "release_packet_binding",
+        "canonical_scheduler_target",
+        "bounded_retry_policy",
+        "paused_initial_state",
+        "no_plaintext_credentials",
+        "post_create_zero_execution_attestation"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-scheduler-provisioning"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceSchedulerProvisioning.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceSchedulerProvisioning.ts"
+      ]
     }
   }
 }

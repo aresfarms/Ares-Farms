@@ -1,4 +1,4 @@
-export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v18";
+export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v19";
 
 export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3Q_EXTERNAL_NOTIFICATION_CONNECTOR",
@@ -25,6 +25,7 @@ export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "4L_INSTITUTIONAL_ACCESS_SURVEILLANCE_ORCHESTRATION",
   "4M_INSTITUTIONAL_SURVEILLANCE_ACTIVATION_CEREMONY",
   "4N_INSTITUTIONAL_SURVEILLANCE_CANARY_RELEASE",
+  "4O_INSTITUTIONAL_SURVEILLANCE_SCHEDULER_PROVISIONING",
 ] as const);
 
 export type OfficialEvidenceSequenceStep =
@@ -79,6 +80,8 @@ const REQUIRED_ARTIFACT: Record<OfficialEvidenceSequenceStep, string> = {
     "src/lib/governance/institutionalAccessSurveillanceActivationCeremony.ts",
   "4N_INSTITUTIONAL_SURVEILLANCE_CANARY_RELEASE":
     "src/lib/governance/institutionalAccessSurveillanceCanaryRelease.ts",
+  "4O_INSTITUTIONAL_SURVEILLANCE_SCHEDULER_PROVISIONING":
+    "src/lib/governance/institutionalAccessSurveillanceSchedulerProvisioning.ts",
 };
 
 export function roadmapArtifactFor(step: OfficialEvidenceSequenceStep): string {

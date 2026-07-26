@@ -524,7 +524,8 @@
     "verify:institutional-access-runtime-enforcement": "tsx src/scripts/verifyInstitutionalAccessRuntimeEnforcement.ts",
     "verify:institutional-access-surveillance-orchestration": "tsx src/scripts/verifyInstitutionalAccessSurveillanceOrchestration.ts",
     "verify:institutional-access-surveillance-activation-ceremony": "tsx src/scripts/verifyInstitutionalAccessSurveillanceActivationCeremony.ts",
-    "verify:institutional-access-surveillance-canary-release": "tsx src/scripts/verifyInstitutionalAccessSurveillanceCanaryRelease.ts"
+    "verify:institutional-access-surveillance-canary-release": "tsx src/scripts/verifyInstitutionalAccessSurveillanceCanaryRelease.ts",
+    "verify:institutional-access-surveillance-scheduler-provisioning": "tsx src/scripts/verifyInstitutionalAccessSurveillanceSchedulerProvisioning.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

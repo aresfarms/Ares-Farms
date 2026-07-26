@@ -209,3 +209,9 @@ Before continuous institutional-access surveillance may be scheduled, the platfo
 Before a surveillance scheduler may be created, the platform must produce a deterministic dry-run transcript over synthetic or approved isolated grant state. The canary may identify grants that would be clean, review-bound, or revoked, but it must perform zero durable mutations. A separate scheduler-release packet binds the exact 4M activation packet, canary run, plan snapshot, route-authentication readiness, release reason, and two distinct human approvers.
 
 **Hard rule:** A canary failure, duplicate revocation attempt, invalid snapshot, authentication gap, approver collision, or activation-packet mismatch blocks release. Step 4N may permit later scheduler creation, but it never permits scheduler enablement and performs neither action.
+
+## Step 4O — Institutional Surveillance Scheduler Provisioning Contract
+
+Before a Cloud Scheduler job may be created for institutional-access surveillance, the platform must freeze a deterministic provisioning manifest binding the exact release packet, project, region, canonical job name, target route, HTTP method, cadence, timezone, authentication reference, service identity, attempt deadline, retry policy, and initial state. The only permitted initial state is `PAUSED`. A post-create attestation must prove the observed job matches the manifest and has executed zero times.
+
+**Hard rule:** Step 4O does not create a scheduler, configure a secret, or enable execution. Plaintext credentials are prohibited, and any job observed as enabled or previously executed fails attestation.

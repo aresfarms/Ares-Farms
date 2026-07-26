@@ -64,6 +64,7 @@ const required = [
   "verify:institutional-access-surveillance-canary-release",
   "verify:institutional-access-surveillance-scheduler-provisioning",
   "verify:governed-ultimate-proforma",
+  "verify:federal-loan-authority-monitor",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

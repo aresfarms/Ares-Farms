@@ -243,6 +243,10 @@ function validateCalculations(input: UltimateProformaInput): {
   if (!Number.isFinite(generationDate) || !Number.isFinite(reviewedAt)) blockers.push("PROGRAM_AUTHORITY_DATE_INVALID");
   else if (Math.abs(generationDate - reviewedAt) > 90 * 24 * 60 * 60 * 1000) blockers.push("PROGRAM_AUTHORITY_REVIEW_STALE");
   if (input.authority.officialSourceRefs.length === 0) blockers.push("OFFICIAL_PROGRAM_SOURCE_REQUIRED");
+  for (const ref of input.authority.officialSourceRefs) {
+    const boundHash = input.authority.reviewedContentHashes[ref];
+    if (!boundHash || !/^[a-f0-9]{64}$/.test(boundHash)) blockers.push(`PROGRAM_AUTHORITY_HASH_REQUIRED:${ref}`);
+  }
   if (!input.authority.formVersion.trim()) blockers.push("PROGRAM_FORM_VERSION_REQUIRED");
   if (!input.authority.coverageThresholdBasis.trim()) blockers.push("COVERAGE_THRESHOLD_BASIS_REQUIRED");
 

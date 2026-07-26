@@ -223,3 +223,11 @@ The completed Ultimate Pro Forma template may enter the platform only through a 
 The authenticated preparation route is application-scoped and limited to operator, underwriter, governance, and administrator roles. It persists a canonical report record and governance evidence, but the resulting PDF remains an internal preparation artifact requiring human review. Borrower delivery, lender delivery, official-form submission, eligibility determination, approval, commitment, and external reliance remain blocked.
 
 **Hard rule:** Display strings are never trusted as financial proof. A missing evidence item, stale authority snapshot, arithmetic mismatch, prohibited identifier, content-claim overreach, unauthorized role, or cross-application access attempt blocks PDF generation before bytes are returned.
+
+## Step 4Q — Federal Loan Authority Continuous Update Monitor
+
+Furlong must continuously monitor official SBA, Farm Service Agency, USDA Rural Development, eCFR, and Federal Register authorities that govern federal loan programs, forms, handbooks, notices, rates, fees, servicing, eligibility, and program requirements. Discovery may follow only HTTPS links on the approved official-domain allowlist and must remain bounded by agency and relevance. Every fetched document receives an immutable content hash, retrieval metadata, version history, and change receipt.
+
+A changed official source does not silently overwrite portal guidance. The affected authority becomes review-stale immediately, while the last-good snapshot remains available only for audit and comparison. Any pro forma or loan-guidance artifact must bind the exact content hash reviewed by a human; a source change, fetch failure, missing baseline, absent hash binding, or hash mismatch blocks generation or current-requirements claims.
+
+**Hard rule:** “Always current” means continuous detection plus fail-closed reliance, not automatic legal interpretation. Only official sources may be monitored, and changed regulations or program requirements require attributed human review before the portal may rely on the new content.

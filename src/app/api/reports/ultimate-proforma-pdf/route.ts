@@ -11,6 +11,7 @@ import {
   type GovernedUltimateProformaInput,
 } from "@/lib/governance/governedUltimateProforma";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
+import { inspectFederalLoanAuthorityBinding } from "@/lib/governance/federalLoanAuthorityMonitor";
 import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import { canonicalReportAuthority } from "@/lib/platform/authorities/report";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
@@ -116,6 +117,20 @@ export async function POST(request: Request) {
     }
 
     const generatedAt = new Date().toISOString();
+    const authorityBinding = inspectFederalLoanAuthorityBinding({
+      reviewedAt: body.proforma.authority.reviewedAt,
+      officialSourceRefs: body.proforma.authority.officialSourceRefs,
+      reviewedContentHashes: body.proforma.authority.reviewedContentHashes,
+    });
+    if (!authorityBinding.current) {
+      return NextResponse.json({
+        ok: false,
+        error: "Federal loan authority sources changed, failed, or do not match the reviewed content hashes.",
+        traceId,
+        authorityBinding,
+      }, { status: 409 });
+    }
+
     const packet = composeGovernedUltimateProforma({
       proforma: body.proforma,
       evidence: body.evidence,
@@ -203,6 +218,7 @@ export async function POST(request: Request) {
         recordAccess,
         classification: classifiedOutput.classification,
         claimsPolicyVersion: packet.claimsPolicyVersion,
+        federalAuthoritySnapshotSha256: authorityBinding.snapshotSha256,
       },
     });
 

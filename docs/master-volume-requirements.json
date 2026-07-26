@@ -1465,6 +1465,34 @@
         "src/app/api/reports/ultimate-proforma-pdf/route.ts",
         "src/scripts/verifyGovernedUltimateProforma.ts"
       ]
+    },
+    "SRC-FEDERAL-LOAN-AUTHORITY-MONITOR-001": {
+      "title": "Continuous official-source monitoring for SBA, FSA, and USDA loan authority",
+      "status": "implemented",
+      "requires": [
+        "official_domain_allowlist",
+        "bounded_program_and_authority_discovery",
+        "forms_handbooks_notices_rates_and_regulations",
+        "immutable_content_hash_snapshots",
+        "change_receipts",
+        "last_good_retention",
+        "changed_guidance_review_stale",
+        "exact_reviewed_hash_binding",
+        "daily_source_refresh_integration",
+        "proforma_runtime_enforcement"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-monitor",
+        "verify:governed-ultimate-proforma",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityMonitor.ts",
+        "src/scripts/verifyFederalLoanAuthorityMonitor.ts",
+        "src/lib/property/sourceRefresh.ts",
+        "src/app/api/reports/ultimate-proforma-pdf/route.ts"
+      ]
     }
   }
 }

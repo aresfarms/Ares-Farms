@@ -32,6 +32,11 @@ export const syntheticUltimateProformaInput: UltimateProformaInput = {
       "https://www.sba.gov/partners/lenders/7a-loan-program/terms-conditions-eligibility",
       "https://www.sba.gov/document/sba-form-148-unconditional-guarantee",
     ],
+    reviewedContentHashes: {
+      "https://www.sba.gov/document/sba-form-1919-borrower-information-form": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "https://www.sba.gov/partners/lenders/7a-loan-program/terms-conditions-eligibility": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "https://www.sba.gov/document/sba-form-148-unconditional-guarantee": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    },
     programTermsNote: "Program terms are current-source snapshots, not lender approval or an eligibility determination.",
     coverageThresholdBasis: "illustrative lender underwriting assumption; lender-specific confirmation required",
   },

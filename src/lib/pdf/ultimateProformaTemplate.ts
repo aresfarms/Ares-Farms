@@ -42,6 +42,7 @@ export interface UltimateProformaInput {
     reviewedAt: string;
     formVersion: string;
     officialSourceRefs: string[];
+    reviewedContentHashes: Record<string, string>;
     programTermsNote: string;
     coverageThresholdBasis: string;
   };

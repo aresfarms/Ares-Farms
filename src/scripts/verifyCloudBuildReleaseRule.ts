@@ -70,6 +70,7 @@ const required = [
   "verify:federal-loan-authority-change-triage",
   "verify:controlled-public-surface-promotion",
   "verify:production-promotion-readiness",
+  "verify:final-production-promotion-decision",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

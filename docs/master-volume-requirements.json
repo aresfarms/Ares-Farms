@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.6",
+  "frameworkVersion": "master-volume-conformance-v0.4.7",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1602,6 +1602,26 @@
         "src/lib/governance/productionPromotionReadiness.ts",
         "src/scripts/verifyProductionPromotionReadiness.ts",
         "docs/MASTER_VOLUME_BUILD_PROTOCOL.md"
+      ]
+    },
+    "PROMOTION-DECISION-001": {
+      "title": "Final production promotion decision packet",
+      "status": "implemented",
+      "requires": [
+        "exact_image_binding",
+        "allowlist_hash",
+        "distinct_human_approvals",
+        "bounded_activation_window",
+        "rollback_owner"
+      ],
+      "tests": [
+        "verify:final-production-promotion-decision",
+        "verify:official-evidence-roadmap",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/finalProductionPromotionDecisionPacket.ts",
+        "src/scripts/verifyFinalProductionPromotionDecisionPacket.ts"
       ]
     }
   }

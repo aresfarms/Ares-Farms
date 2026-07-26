@@ -646,3 +646,7 @@ Public translation surfaces must expose only deterministic public aliases, publi
 
 ### Step 4V — Production Promotion Readiness and Perimeter Hardening
 Before final production or public-action promotion, the platform must produce a deterministic readiness packet that verifies canonical HTTPS URLs, the approved identity perimeter, secret-manager bindings, required API authentication, bounded rate limiting, credential allowlist posture, and governed administrator-only role provisioning. The packet may declare technical readiness for a human promotion decision, but it never grants launch, payment, notice, official-report, external-action, or official-reliance authority. Named release-board, constitutional, qualified release-manager, and final-activation approvals remain separate attributed human actions. Standing proof: `npm run verify:production-promotion-readiness`.
+
+
+### Step 4W — Final Production Promotion Decision Packet
+A final decision packet must bind the exact immutable production image, the 4V readiness packet, a hash-only credential allowlist, a bounded activation window, an attributed rollback owner, and four distinct signed human approvals: release board, constitutional authority, qualified release manager, and final activation authority. The packet may become ready for a separately executed activation ceremony, but it cannot set environment variables, release holds, activate live actions, or grant official reliance. Standing proof: `npm run verify:final-production-promotion-decision`.

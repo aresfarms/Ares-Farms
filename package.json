@@ -534,7 +534,8 @@
     "verify:federal-loan-authority-refresh-reliability": "tsx src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
     "verify:federal-loan-authority-change-triage": "tsx src/scripts/verifyFederalLoanAuthorityChangeTriage.ts",
     "verify:controlled-public-surface-promotion": "tsx src/scripts/verifyControlledPublicSurfacePromotion.ts",
-    "verify:production-promotion-readiness": "tsx src/scripts/verifyProductionPromotionReadiness.ts"
+    "verify:production-promotion-readiness": "tsx src/scripts/verifyProductionPromotionReadiness.ts",
+    "verify:final-production-promotion-decision": "tsx src/scripts/verifyFinalProductionPromotionDecisionPacket.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

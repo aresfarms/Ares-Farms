@@ -537,7 +537,8 @@
     "verify:production-promotion-readiness": "tsx src/scripts/verifyProductionPromotionReadiness.ts",
     "verify:final-production-promotion-decision": "tsx src/scripts/verifyFinalProductionPromotionDecisionPacket.ts",
     "verify:internal-change-verification": "tsx src/scripts/verifyInternalChangeVerification.ts",
-    "verify:three-founder-release-authority": "tsx src/scripts/verifyThreeFounderReleaseAuthority.ts"
+    "verify:three-founder-release-authority": "tsx src/scripts/verifyThreeFounderReleaseAuthority.ts",
+    "verify:founder-change-review-workspace": "tsx src/scripts/verifyFounderChangeReviewWorkspace.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

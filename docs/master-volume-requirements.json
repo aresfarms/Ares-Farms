@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.9",
+  "frameworkVersion": "master-volume-conformance-v0.5.0",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1664,6 +1664,26 @@
         "src/lib/governance/threeFounderReleaseAuthority.ts",
         "src/lib/governance/finalProductionPromotionDecisionPacket.ts",
         "src/scripts/verifyThreeFounderReleaseAuthority.ts"
+      ]
+    },
+    "OPS-FOUNDER-CHANGE-REVIEW-WORKSPACE-001": {
+      "title": "Founder change review workspace",
+      "status": "implemented",
+      "requires": [
+        "immutable_change_events",
+        "founder_identity_binding",
+        "plain_language_review_surface",
+        "outside_group_approval"
+      ],
+      "tests": [
+        "verify:founder-change-review-workspace",
+        "verify:internal-change-verification",
+        "verify:three-founder-release-authority"
+      ],
+      "evidence": [
+        "src/lib/governance/founderChangeReviewStore.ts",
+        "src/app/api/governance/founder-change-review/route.ts",
+        "src/app/governance/founder-change-review/page.tsx"
       ]
     }
   }

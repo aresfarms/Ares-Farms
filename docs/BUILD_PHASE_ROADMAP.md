@@ -275,3 +275,9 @@ The change owner may implement and attest but may not independently approve the 
 The initial production opening requires all three founders to participate across technical/governance, finance/release-risk, and public/independent-review roles. Routine group-owned changes require the two founders outside the owning group. The change owner may attest to implementation but may not independently approve their own change. Each founder retains unilateral stop and rollback authority within an observed risk event. Domain objections block release until resolved or escalated.
 
 **Hard rule:** The three-founder model replaces artificial four-person distinct-principal requirements, but it never weakens owner exclusion, packet binding, signature integrity, domain review, or separate activation. Initial launch requires unanimous three-founder participation; routine changes require both outside-group approvals. Standing proof: `npm run verify:three-founder-release-authority`.
+
+
+### Step 4Z — Founder Change Review Workspace
+The platform must provide a restricted operational workspace that freezes the plain-language internal change report, binds actions to configured founder identities, stores owner attestations and outside-group reviews as immutable signed events, reconstructs the current report deterministically, and records the three-founder initial-launch authority separately. The workspace may display readiness but never activate a release. Standing proof: `npm run verify:founder-change-review-workspace`.
+
+**Hard rule:** No unauthenticated or unassigned identity may freeze, attest, review, or record launch authority. A material change after freeze requires a new request version; existing signatures cannot be edited or silently reused.

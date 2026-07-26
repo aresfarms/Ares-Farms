@@ -90,6 +90,7 @@ steps:
         npm run verify:official-evidence-external-notification-assurance
         npm run verify:official-evidence-external-notification-reinstatement
         npm run verify:official-evidence-external-notification-retirement
+        npm run verify:official-evidence-external-notification-retirement-closure
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

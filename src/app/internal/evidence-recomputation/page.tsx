@@ -102,6 +102,11 @@ import {
   retireExternalNotificationConnector,
   type ExternalNotificationRetirementClassification,
 } from "@/lib/property/officialEvidenceExternalNotificationRetirement";
+import {
+  externalNotificationRetirementClosed,
+  listExternalNotificationRetirementClosureReceipts,
+  closeExternalNotificationRetirement,
+} from "@/lib/property/officialEvidenceExternalNotificationRetirementClosure";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -361,6 +366,28 @@ async function retireExternalConnector(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 
+async function closeExternalConnectorRetirement(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  closeExternalNotificationRetirement({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    credentialRevocationRef: String(formData.get("credentialRevocationRef") ?? "").trim(),
+    providerCallbackDisableRef: String(formData.get("providerCallbackDisableRef") ?? "").trim(),
+    routingAliasRemovalRef: String(formData.get("routingAliasRemovalRef") ?? "").trim(),
+    secretReferenceRemovalRef: String(formData.get("secretReferenceRemovalRef") ?? "").trim(),
+    internalQueueAuthoritative: formData.get("internalQueueAuthoritative") === "on",
+    openOperationalReferences: Number(formData.get("openOperationalReferences") ?? "0"),
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 async function acknowledgeNotification(formData: FormData): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
@@ -439,6 +466,8 @@ export default async function EvidenceRecomputationPage() {
     listExternalNotificationReinstatementReceipts().slice(-30).reverse();
   const externalRetirementReceipts =
     listExternalNotificationRetirementReceipts().slice(-30).reverse();
+  const externalRetirementClosureReceipts =
+    listExternalNotificationRetirementClosureReceipts().slice(-30).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1359,6 +1388,73 @@ export default async function EvidenceRecomputationPage() {
             <br />
             implementation {receipt.implementationHash.slice(0, 16)}… · revocation{" "}
             {receipt.revocationReceiptId}
+            <br />
+            {receipt.reason}
+          </div>
+        ))}
+
+        <h3>Retirement closure and decommission verification</h3>
+        <p>
+          Closure proves that the retired registration has no remaining credential,
+          callback, routing, secret-reference, or operational path.
+        </p>
+        {externalConnectorRegistrations
+          .filter((registration) =>
+            externalNotificationRegistrationRetired(registration.registrationId),
+          )
+          .map((registration) => (
+            <form
+              key={`retirement-closure-${registration.registrationId}`}
+              action={closeExternalConnectorRetirement}
+              style={{
+                display: "grid",
+                gap: 8,
+                padding: "10px 0",
+                borderTop: "1px solid #e2e8f0",
+              }}
+            >
+              <input type="hidden" name="registrationId" value={registration.registrationId} />
+              <b>
+                {registration.connectorId} · {registration.channel} ·{" "}
+                {externalNotificationRetirementClosed(registration.registrationId)
+                  ? "CLOSED"
+                  : "RETIREMENT OPEN"}
+              </b>
+              <input name="credentialRevocationRef" required placeholder="Credential revocation evidence reference" />
+              <input name="providerCallbackDisableRef" required placeholder="Provider callback disablement reference" />
+              <input name="routingAliasRemovalRef" required placeholder="Routing alias removal reference" />
+              <input name="secretReferenceRemovalRef" required placeholder="Runtime secret-reference removal reference" />
+              <label>
+                Open operational references{" "}
+                <input name="openOperationalReferences" type="number" min="0" defaultValue="0" required />
+              </label>
+              <label>
+                <input name="internalQueueAuthoritative" type="checkbox" required />{" "}
+                Module 45 internal queue remains authoritative
+              </label>
+              <textarea name="reason" required placeholder="Retirement closure reason" />
+              <button
+                disabled={
+                  !mayApprove ||
+                  externalNotificationRetirementClosed(registration.registrationId)
+                }
+              >
+                Close retirement
+              </button>
+            </form>
+          ))}
+        {externalRetirementClosureReceipts.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+            <br />
+            credential {receipt.credentialRevocationRef} · callback {receipt.providerCallbackDisableRef}
+            <br />
+            alias {receipt.routingAliasRemovalRef} · secret {receipt.secretReferenceRemovalRef}
+            <br />
+            open references {receipt.openOperationalReferences} · internal queue authoritative
             <br />
             {receipt.reason}
           </div>

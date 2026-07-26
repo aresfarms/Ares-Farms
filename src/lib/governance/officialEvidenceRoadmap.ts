@@ -1,4 +1,4 @@
-export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v1";
+export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v2";
 
 export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3Q_EXTERNAL_NOTIFICATION_CONNECTOR",
@@ -8,6 +8,7 @@ export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3U_EXTERNAL_NOTIFICATION_ASSURANCE",
   "3V_EXTERNAL_NOTIFICATION_REINSTATEMENT",
   "3W_EXTERNAL_NOTIFICATION_RETIREMENT",
+  "3X_EXTERNAL_NOTIFICATION_RETIREMENT_CLOSURE",
 ] as const);
 
 export type OfficialEvidenceSequenceStep =
@@ -28,6 +29,8 @@ const REQUIRED_ARTIFACT: Record<OfficialEvidenceSequenceStep, string> = {
     "src/lib/property/officialEvidenceExternalNotificationReinstatement.ts",
   "3W_EXTERNAL_NOTIFICATION_RETIREMENT":
     "src/lib/property/officialEvidenceExternalNotificationRetirement.ts",
+  "3X_EXTERNAL_NOTIFICATION_RETIREMENT_CLOSURE":
+    "src/lib/property/officialEvidenceExternalNotificationRetirementClosure.ts",
 };
 
 export function roadmapArtifactFor(step: OfficialEvidenceSequenceStep): string {

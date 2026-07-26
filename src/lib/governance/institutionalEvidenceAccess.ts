@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { chainAppend, verifyLedgerChain } from "@/lib/security/ledgerHashChain";
+import { findCredentialVerificationById } from "@/lib/governance/institutionalCredentialVerification";
 
 export type InstitutionalReviewRole = "auditor" | "government_official" | "attorney";
 export type EvidenceAccessGrant = {
@@ -21,6 +22,7 @@ export type EvidenceAccessGrant = {
   windowEnd: string | null;
   expiresAt: string;
   issuedBy: string;
+  credentialVerificationId: string;
   issuedAt: string;
   revokedAt: string | null;
 };
@@ -54,6 +56,14 @@ function readAccessLedger(): Array<Record<string, unknown>> {
 
 export function issueEvidenceAccessGrant(input: Omit<EvidenceAccessGrant, "grantId" | "issuedAt" | "revokedAt"> & { issuedAt?: string }): EvidenceAccessGrant {
   if (!input.purpose.trim()) throw new Error("A specific evidence-review purpose is required.");
+  if (!input.credentialVerificationId.trim()) throw new Error("An active institutional credential verification is required.");
+  const credential = findCredentialVerificationById(input.credentialVerificationId);
+  if (!credential || credential.status !== "VERIFIED" || Date.parse(credential.expiresAt) < Date.now()) {
+    throw new Error("The institutional credential verification is missing, expired, or not verified.");
+  }
+  if (credential.principalId !== input.principalId || credential.principalEmail.toLowerCase() !== input.principalEmail.toLowerCase() || credential.role !== input.role) {
+    throw new Error("The credential verification is not bound to this principal, email, and role.");
+  }
   if (input.role === "attorney" && !input.tokenId && !input.windowStart && !input.windowEnd) {
     throw new Error("Attorney grants must be token-bound or time-window-bound.");
   }
@@ -82,7 +92,7 @@ export function findEvidenceAccessGrant(grantId: string): EvidenceAccessGrant | 
     tenantId: issued.tenantId ? String(issued.tenantId) : null, moduleIds: Array.isArray(issued.moduleIds) ? issued.moduleIds.map(String) : [],
     subjectIds: Array.isArray(issued.subjectIds) ? issued.subjectIds.map(String) : [], tokenId: issued.tokenId ? String(issued.tokenId) : null,
     windowStart: issued.windowStart ? String(issued.windowStart) : null, windowEnd: issued.windowEnd ? String(issued.windowEnd) : null, expiresAt: String(issued.expiresAt),
-    issuedBy: String(issued.issuedBy), issuedAt: String(issued.issuedAt), revokedAt: revoked ? String(revoked.at ?? "revoked") : null,
+    issuedBy: String(issued.issuedBy), credentialVerificationId: String(issued.credentialVerificationId), issuedAt: String(issued.issuedAt), revokedAt: revoked ? String(revoked.at ?? "revoked") : null,
   };
 }
 

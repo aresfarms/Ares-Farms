@@ -60,7 +60,7 @@ const grant = {
   purpose: "Matter review", matterId: "matter-1", agencyOrFirm: "Example Firm", tenantId: null,
   moduleIds: ["applications"], subjectIds: ["subject-1"], tokenId: null,
   windowStart: "2026-01-01T00:00:00.000Z", windowEnd: "2026-01-02T00:00:00.000Z",
-  expiresAt: "2026-02-01T00:00:00.000Z", issuedBy: "governance-1", issuedAt: "2025-12-31T00:00:00.000Z", revokedAt: null,
+  expiresAt: "2026-02-01T00:00:00.000Z", issuedBy: "governance-1", credentialVerificationId: "verification-1", issuedAt: "2025-12-31T00:00:00.000Z", revokedAt: null,
 };
 const outsideWindow = evaluateInstitutionalEvidenceAccess({
   role: "attorney", actorId: "attorney-1", actorEmail: "law@example.test", grant,
@@ -86,3 +86,27 @@ const filtered = filterEvidenceEventsForAccess({
 });
 assert.equal(filtered.length, 1, "Token-bound attorney filtering must exclude every unrelated record.");
 assert.equal(filtered[0]?.subject, "token-opaque-1");
+
+
+import { verifyInstitutionalCredential } from "@/lib/governance/institutionalCredentialVerification";
+
+assert.throws(() => verifyInstitutionalCredential({
+  principalId: "lawyer-1", principalEmail: "law@example.test", fullLegalName: "Lawyer One", role: "attorney",
+  credentialType: "State Bar", credentialIdentifier: "123456", jurisdictionOrIssuer: "Example State",
+  officialSourceRef: "official://state-bar", officialSourcePayload: "inactive", method: "OFFICIAL_DIRECTORY_MANUAL",
+  standing: "Inactive", verifiedBy: "governance-1", verifiedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2026-02-01T00:00:00.000Z", reason: "test",
+}), /active or eligible/i);
+
+assert.throws(() => verifyInstitutionalCredential({
+  principalId: "official-1", principalEmail: "official@agency.test", fullLegalName: "Official One", role: "government_official",
+  credentialType: "Agency appointment", credentialIdentifier: "EMP-1", jurisdictionOrIssuer: "Example Agency",
+  officialSourceRef: "official://agency", officialSourcePayload: "confirmed", method: "AGENCY_CONFIRMATION",
+  standing: "Confirmed", verifiedBy: "governance-1", verifiedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2026-02-01T00:00:00.000Z", reason: "test",
+}), /agency/i);
+
+assert.throws(() => verifyInstitutionalCredential({
+  principalId: "auditor-1", principalEmail: "audit@example.test", fullLegalName: "Auditor One", role: "auditor",
+  credentialType: "CPA", credentialIdentifier: "CPA-1", jurisdictionOrIssuer: "Example Board",
+  officialSourceRef: "official://board", officialSourcePayload: "active", method: "OFFICIAL_DIRECTORY_MANUAL",
+  standing: "Active", independenceAttested: false, verifiedBy: "governance-1", verifiedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2026-02-01T00:00:00.000Z", reason: "test",
+}), /independence/i);

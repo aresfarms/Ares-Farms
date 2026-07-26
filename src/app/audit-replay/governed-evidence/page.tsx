@@ -16,6 +16,10 @@ import {
   issueEvidenceAccessGrant,
   recordInstitutionalEvidenceAccess,
 } from "@/lib/governance/institutionalEvidenceAccess";
+import {
+  latestValidCredentialVerification,
+  verifyInstitutionalCredential,
+} from "@/lib/governance/institutionalCredentialVerification";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
 import { verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 
@@ -42,6 +46,8 @@ async function createAttorneyTokenGrant(formData: FormData) {
     throw new Error("The anonymous token was not recognized.");
   }
   const issuedAt = new Date();
+  const credential = latestValidCredentialVerification({ principalId: actor.id, principalEmail: actor.email, role: "attorney", at: issuedAt.toISOString() });
+  if (!credential) throw new Error("Active state-bar verification is required before attorney access can be granted.");
   const grant = issueEvidenceAccessGrant({
     role: "attorney",
     principalId: actor.id,
@@ -57,6 +63,7 @@ async function createAttorneyTokenGrant(formData: FormData) {
     windowEnd: null,
     expiresAt: new Date(issuedAt.getTime() + 30 * 60 * 1000).toISOString(),
     issuedBy: actor.id,
+    credentialVerificationId: credential.verificationId,
     issuedAt: issuedAt.toISOString(),
   });
   recordInstitutionalEvidenceAccess({ actorId: actor.id, actorEmail: actor.email, role: actor.role, action: "LOGIN", outcome: "ALLOWED", reason: "Short-lived token-bound attorney grant issued.", grantId: grant.grantId, tokenId });
@@ -76,6 +83,8 @@ async function createScopedInstitutionalGrant(formData: FormData) {
   const windowEnd = String(formData.get("windowEnd") ?? "").trim() || null;
   const moduleId = String(formData.get("moduleId") ?? "").trim();
   const subjectId = String(formData.get("subjectId") ?? "").trim();
+  const credential = latestValidCredentialVerification({ principalId, principalEmail, role });
+  if (!credential) throw new Error("A current credential verification is required for the selected principal and role.");
   const grant = issueEvidenceAccessGrant({
     role,
     principalId,
@@ -91,8 +100,37 @@ async function createScopedInstitutionalGrant(formData: FormData) {
     windowEnd,
     expiresAt,
     issuedBy: actor.id,
+    credentialVerificationId: credential.verificationId,
   });
   redirect(`/audit-replay/governed-evidence?grant=${encodeURIComponent(grant.grantId)}`);
+}
+
+async function recordCredentialVerification(formData: FormData) {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const actor = sessionIdentity(session);
+  if (!(["governance", "admin"] as string[]).includes(actor.role)) throw new Error("Governance or administrator authority is required to verify credentials.");
+  const role = String(formData.get("role") ?? "") as "attorney" | "government_official" | "auditor";
+  verifyInstitutionalCredential({
+    principalId: String(formData.get("principalId") ?? "").trim(),
+    principalEmail: String(formData.get("principalEmail") ?? "").trim().toLowerCase(),
+    fullLegalName: String(formData.get("fullLegalName") ?? "").trim(),
+    role,
+    credentialType: String(formData.get("credentialType") ?? "").trim(),
+    credentialIdentifier: String(formData.get("credentialIdentifier") ?? "").trim(),
+    jurisdictionOrIssuer: String(formData.get("jurisdictionOrIssuer") ?? "").trim(),
+    officialSourceRef: String(formData.get("officialSourceRef") ?? "").trim(),
+    officialSourcePayload: String(formData.get("officialSourcePayload") ?? "").trim(),
+    method: String(formData.get("method") ?? "OFFICIAL_DIRECTORY_MANUAL") as "OFFICIAL_DIRECTORY_AUTOMATED" | "OFFICIAL_DIRECTORY_MANUAL" | "ISSUER_CONFIRMATION" | "AGENCY_CONFIRMATION",
+    standing: String(formData.get("standing") ?? "").trim(),
+    titleOrClassification: String(formData.get("titleOrClassification") ?? "").trim() || null,
+    agencyOrFirm: String(formData.get("agencyOrFirm") ?? "").trim() || null,
+    independenceAttested: role === "auditor" ? formData.get("independenceAttested") === "on" : null,
+    verifiedBy: actor.id,
+    expiresAt: String(formData.get("expiresAt") ?? "").trim(),
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  redirect("/audit-replay/governed-evidence");
 }
 
 export default async function GovernedEvidenceReviewPage({ searchParams }: { searchParams: Promise<{ module?: string; grant?: string; subject?: string; from?: string; to?: string }> }) {
@@ -178,6 +216,23 @@ export default async function GovernedEvidenceReviewPage({ searchParams }: { sea
           <Link href="/audit-replay">Return to audit console</Link>
         </form>
       </section>
+
+      {(["governance", "admin"] as string[]).includes(actor.role) ? (
+        <details style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>
+          <summary><strong>Verify professional or governmental credentials</strong></summary>
+          <form action={recordCredentialVerification} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10, marginTop: 14 }}>
+            <label>Role<select name="role" required><option value="attorney">Attorney</option><option value="government_official">Governmental official</option><option value="auditor">Auditor</option></select></label>
+            <label>Principal ID<input name="principalId" required /></label><label>Principal email<input name="principalEmail" type="email" required /></label><label>Full legal name<input name="fullLegalName" required /></label>
+            <label>Credential type<input name="credentialType" placeholder="State Bar, CPA, CIA, agency appointment" required /></label><label>Credential number<input name="credentialIdentifier" type="password" required /></label>
+            <label>Jurisdiction or issuer<input name="jurisdictionOrIssuer" required /></label><label>Standing/status<input name="standing" placeholder="Active / Eligible / Confirmed" required /></label>
+            <label>Agency or firm<input name="agencyOrFirm" /></label><label>Title/classification<input name="titleOrClassification" /></label>
+            <label>Official source<input name="officialSourceRef" required /></label><label>Verification method<select name="method"><option value="OFFICIAL_DIRECTORY_MANUAL">Official directory — manual</option><option value="OFFICIAL_DIRECTORY_AUTOMATED">Official directory — automated</option><option value="ISSUER_CONFIRMATION">Issuer confirmation</option><option value="AGENCY_CONFIRMATION">Agency confirmation</option></select></label>
+            <label>Source response/evidence<textarea name="officialSourcePayload" required /></label><label>Expires at<input name="expiresAt" type="datetime-local" required /></label>
+            <label>Reason<input name="reason" required /></label><label><input name="independenceAttested" type="checkbox" /> Auditor independence attested for this engagement</label>
+            <button type="submit">Record verified credential</button>
+          </form>
+        </details>
+      ) : null}
 
       {(["governance", "admin"] as string[]).includes(actor.role) ? (
         <details style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>

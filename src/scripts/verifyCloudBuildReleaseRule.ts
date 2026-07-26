@@ -53,6 +53,7 @@ const required = [
   "verify:controlled-promotion-readiness-reconciliation",
   "verify:public-alpha-signoff-ceremony-packet",
   "verify:governed-evidence-review-portal",
+  "verify:institutional-credential-verification",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

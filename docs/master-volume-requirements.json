@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.4",
+  "frameworkVersion": "master-volume-conformance-v0.4.5",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -186,7 +186,7 @@
     },
     "PUBLIC-SURFACE-001": {
       "title": "Public surfaces as governed translation layers",
-      "status": "awaiting_controlled_promotion",
+      "status": "implemented",
       "requires": [
         "public_gateway",
         "dto_filtering",
@@ -196,12 +196,15 @@
       "tests": [
         "smoke:public-surfaces",
         "smoke:claims-public",
-        "smoke:redaction"
+        "smoke:redaction",
+        "verify:controlled-public-surface-promotion"
       ],
       "evidence": [
         "src/app/api/public/surfaces/route.ts",
         "src/lib/dto/public/index.ts",
-        "src/scripts/redactionSmokeTest.ts"
+        "src/scripts/redactionSmokeTest.ts",
+        "src/lib/source-stack/publicSourceIntelligenceApi.ts",
+        "src/scripts/verifyControlledPublicSurfacePromotion.ts"
       ]
     },
     "CROSS-MODULE-001": {
@@ -940,7 +943,7 @@
     },
     "SURFACE-GOV-001": {
       "title": "Public Surface Gateway and public-safe source DTO governance",
-      "status": "awaiting_controlled_promotion",
+      "status": "implemented",
       "requires": [
         "public_gateway",
         "public_source_aliases",
@@ -951,13 +954,16 @@
       "tests": [
         "smoke:public-surfaces",
         "smoke:claims-public",
-        "smoke:redaction"
+        "smoke:redaction",
+        "verify:controlled-public-surface-promotion"
       ],
       "evidence": [
         "src/app/api/public/surfaces/route.ts",
         "src/app/api/public/grants/route.ts",
         "src/lib/dto/publicSourceIntelligence.ts",
-        "src/scripts/publicSurfaceSmokeTest.ts"
+        "src/scripts/publicSurfaceSmokeTest.ts",
+        "src/lib/source-stack/publicSourceIntelligenceApi.ts",
+        "src/scripts/verifyControlledPublicSurfacePromotion.ts"
       ]
     },
     "CONFORMANCE-001": {

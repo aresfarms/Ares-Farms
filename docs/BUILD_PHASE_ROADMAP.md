@@ -247,3 +247,9 @@ The continuous SBA/FSA/USDA authority monitor executes with bounded concurrency,
 
 ### Step 4T — Federal Loan Authority Change Triage and Semantic Diff
 Classify official-source changes using stable lending-authority fingerprints. Cosmetic and non-lending informational changes may be isolated automatically; lending-relevant and legally material changes remain review-bound. Missing prior semantic history fails closed.
+
+
+### Step 4U — Controlled Public Surface Promotion
+Public translation surfaces must expose only deterministic public aliases, public-safe provenance summaries, advisory status, and bounded governance posture. Internal source identifiers, replay references, canonical object identifiers, source-document filenames, runtime module paths, and full observability evidence remain restricted to authorized audit surfaces. Claims governance, classification, redaction, and human-review posture execute before every public response.
+
+**Hard rule:** Promotion of public translation surfaces does not authorize lender reliance, agency reliance, official decisions, payments, notices, submissions, or any other live public action. Standing proof: `npm run verify:controlled-public-surface-promotion`.

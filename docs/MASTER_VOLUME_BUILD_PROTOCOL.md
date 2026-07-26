@@ -636,3 +636,9 @@ Official federal lending authority monitoring must be survivable under partial s
 
 ## Federal Loan Authority Change Triage Amendment
 Official-source HTML churn must not automatically invalidate lending guidance, and raw-content similarity must not automatically clear a material authority change. The monitor must derive a stable lending-authority semantic fingerprint from program clauses, forms, effective dates, amounts, rates, fees, percentages, and requirement language. Cosmetic or non-lending informational changes may be auto-cleared only with an immutable triage receipt. Lending-relevant changes remain review-bound, legally material changes are elevated, and any change lacking a prior semantic baseline fails closed. Standing proof: `npm run verify:federal-loan-authority-change-triage`.
+
+
+### Step 4U — Controlled Public Surface Promotion
+Public translation surfaces must expose only deterministic public aliases, public-safe provenance summaries, advisory status, and bounded governance posture. Internal source identifiers, replay references, canonical object identifiers, source-document filenames, runtime module paths, and full observability evidence remain restricted to authorized audit surfaces. Claims governance, classification, redaction, and human-review posture execute before every public response.
+
+**Hard rule:** Promotion of public translation surfaces does not authorize lender reliance, agency reliance, official decisions, payments, notices, submissions, or any other live public action. Standing proof: `npm run verify:controlled-public-surface-promotion`.

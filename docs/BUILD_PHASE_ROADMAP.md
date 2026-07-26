@@ -195,3 +195,10 @@ The governed evidence portal must invoke the canonical credential, legal-authori
 The platform must continuously evaluate every unrevoked institutional evidence grant against current credential status, current legal or engagement authority, grant expiry, export volume, and denied-request patterns. The surveillance planner must be deterministic and replayable; the durable runner must append a surveillance receipt for every evaluated grant and automatically revoke grants when credentials, authority, or time validity fail. Anomaly-only findings remain review-bound and require independent closure. The protected internal route fails closed unless its dedicated runtime secret is configured.
 
 **Hard rule:** Surveillance that exists only as a library or synthetic verifier is not continuous enforcement. Every unrevoked grant, including a grant that expired between runs, must remain discoverable by the surveillance runner until it is cleanly recorded or revoked. This step does not enable a Cloud Scheduler job and does not resume the paused evidence-recomputation scheduler.
+
+
+## Step 4M — Institutional Surveillance Activation Ceremony
+
+Before continuous institutional-access surveillance may be scheduled, the platform must produce a read-only activation packet binding the canonical route, scheduler identity, approved cadence, route-authentication posture, clean canary evidence, rollback action, alert owner, and two distinct human approvers. The packet must preserve the separate paused state of evidence recomputation and may not create or enable a scheduler itself.
+
+**Hard rule:** A deployed surveillance runner is not authorized for scheduled execution without a current clean canary, configured route authentication, dual-control approval, and a deterministic activation packet. Step 4M performs no scheduler mutation.

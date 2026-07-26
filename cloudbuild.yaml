@@ -106,6 +106,7 @@ steps:
         npm run verify:institutional-access-surveillance
         npm run verify:institutional-access-runtime-enforcement
         npm run verify:institutional-access-surveillance-orchestration
+        npm run verify:institutional-access-surveillance-activation-ceremony
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

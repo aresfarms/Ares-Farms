@@ -1378,6 +1378,29 @@
         "src/app/api/internal/institutional-access-surveillance/route.ts",
         "src/scripts/verifyInstitutionalAccessSurveillanceOrchestration.ts"
       ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-ACTIVATION-001": {
+      "title": "Dual-control activation ceremony for scheduled institutional surveillance",
+      "status": "implemented",
+      "requires": [
+        "dedicated_scheduler_identity",
+        "bounded_cadence",
+        "configured_route_authentication",
+        "clean_canary",
+        "dual_control",
+        "rollback_and_alert_ownership",
+        "no_scheduler_mutation"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-activation-ceremony",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceActivationCeremony.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceActivationCeremony.ts",
+        "docs/BUILD_PHASE_ROADMAP.md"
+      ]
     }
   }
 }

@@ -2556,6 +2556,13 @@ export function PropertyEvaluationWorkspace({
   // The VISITOR'S declaration wins over any machine classification — the
   // owner knows it's a working farm; the classifier can only read type text.
   const importedProperty = context.propertyId?.startsWith("imported:") === true;
+  const genericImportedType = /^(?:place|property|imported|unknown|not specified|place-led property)$/i.test((analysisContext.propertyType ?? "").trim());
+  const automaticTypeEvidenceAvailable = !importedProperty || Boolean(
+    facts?.propertyRecord?.rawPropertyStyle ||
+    facts?.propertyRecord?.acreageText ||
+    (analysisContext.propertyType && !genericImportedType)
+  );
+  const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null;
   const workspaceProfile = profileOverride
     ? profileById(profileOverride)
     : effectivePlaceIntelligence?.profile ??
@@ -3498,7 +3505,7 @@ export function PropertyEvaluationWorkspace({
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {allProfiles().map((profile) => {
-                const active = workspaceProfile.id === profile.id;
+                const active = propertyClassificationAvailable && workspaceProfile.id === profile.id;
                 return (
                   <button
                     key={profile.id}
@@ -3535,7 +3542,7 @@ export function PropertyEvaluationWorkspace({
           title={context.title}
           location={context.location}
           priceLabel={analysisContext.priceLabel}
-          profileLabel={workspaceProfile.label}
+          profileLabel={propertyClassificationAvailable ? workspaceProfile.label : "Classification pending parcel evidence"}
           verdictLine={answerCard.headline}
           greenFlags={cardGreenFlags}
           watchFlags={cardWatchFlags}
@@ -3550,11 +3557,13 @@ export function PropertyEvaluationWorkspace({
           actionsSlot={chartActionsSlot}
         />
       )}
-      {!deepView && importedProperty && !rankingPrice && (
+      {!deepView && importedProperty && (!propertyClassificationAvailable || !rankingPrice) && (
         <section aria-label="Complete property basics" style={{ display: "grid", gap: 7, border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px" }}>
           <strong style={{ color: "#162033", fontSize: 15 }}>Complete the property basics before Furlong recommends a course</strong>
           <span style={{ color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>
-            Furlong has classified the property from the available parcel and listing evidence. Enter the asking price or your intended offer before any financial recommendation is generated. You can correct the property type above only when the source record does not reflect the property’s actual use.
+            {propertyClassificationAvailable
+              ? "Furlong classified the property from the available parcel and listing evidence. Enter the asking price or your intended offer before any financial recommendation is generated. The type control above is only for correcting a source record that does not reflect the property’s actual use."
+              : "Furlong is still resolving the parcel acreage, land-use, and structure record for this address. It will not default the property to residential or generate type-specific analysis until that evidence is available."}
           </span>
         </section>
       )}
@@ -3564,7 +3573,7 @@ export function PropertyEvaluationWorkspace({
       {/* (The imported-only "What is this property?" picker is now the
           front-loaded Property Type Stamp above — shown for every property.) */}
 
-      {!deepView && chartOpen && (
+      {!deepView && chartOpen && propertyClassificationAvailable && (
       <ChartTableBrief
         variant={chartVariant}
         propertyId={context.propertyId ?? context.title}

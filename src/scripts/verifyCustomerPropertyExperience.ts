@@ -12,6 +12,8 @@ const failures: string[] = [];
 
 if (workspace.includes("<PropertyBestCoursePanel")) failures.push("Customer workspace still renders the internal best-course governance panel.");
 if (workspace.includes('import { PropertyBestCoursePanel }')) failures.push("Customer workspace still imports the internal best-course governance panel.");
+if (!workspace.includes("Classification pending parcel evidence")) failures.push("Unmatched imported addresses can still silently default to a property type.");
+if (!workspace.includes("chartOpen && propertyClassificationAvailable")) failures.push("Type-specific chart can render without automatic parcel classification evidence.");
 if (verification.includes("is not activated yet")) failures.push("Customer warnings still expose internal activation state.");
 if (!verification.includes("Some property-specific jurisdiction and hazard checks are still pending verification")) failures.push("Consolidated customer-safe verification note is missing.");
 

@@ -1705,6 +1705,48 @@
         "src/lib/governance/founderChangeReviewStore.ts",
         "src/scripts/verifyFounderPilotTestGate.ts"
       ]
+    },
+    "UX-CUSTOMER-PROPERTY-EXPERIENCE-001": {
+      "title": "Customer property experience reconstruction across all property profiles",
+      "status": "implemented",
+      "requires": [
+        "automatic_property_classification",
+        "parcel_evidence_preservation",
+        "customer_safe_source_status",
+        "unsupported_ranking_suppression",
+        "internal_governance_hidden"
+      ],
+      "tests": [
+        "verify:property-profile-classification",
+        "verify:customer-property-experience",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/property/propertyProfile.ts",
+        "src/components/property/PropertyEvaluationWorkspace.tsx",
+        "src/scripts/verifyCustomerPropertyExperience.ts",
+        "src/scripts/verifyPropertyProfileClassification.ts"
+      ]
+    },
+    "CONFORMANCE-INTEGRATED-PRE-PROMOTION-001": {
+      "title": "Integrated pre-promotion verification for all newly added features",
+      "status": "implemented",
+      "requires": [
+        "cross_feature_regression_suite",
+        "fail_closed_promotion",
+        "customer_experience_regression",
+        "founder_governance_regression",
+        "rollback_preservation"
+      ],
+      "tests": [
+        "verify:integrated-pre-promotion-features",
+        "verify:official-evidence-roadmap",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/scripts/verifyIntegratedPrePromotionFeatureSuite.ts",
+        "cloudbuild.yaml"
+      ]
     }
   }
 }

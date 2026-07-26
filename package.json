@@ -541,7 +541,8 @@
     "verify:founder-change-review-workspace": "tsx src/scripts/verifyFounderChangeReviewWorkspace.ts",
     "verify:founder-pilot-test-gate": "tsx src/scripts/verifyFounderPilotTestGate.ts",
     "verify:customer-property-experience": "tsx src/scripts/verifyCustomerPropertyExperience.ts",
-    "verify:property-profile-classification": "tsx src/scripts/verifyPropertyProfileClassification.ts"
+    "verify:property-profile-classification": "tsx src/scripts/verifyPropertyProfileClassification.ts",
+    "verify:integrated-pre-promotion-features": "tsx src/scripts/verifyIntegratedPrePromotionFeatureSuite.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

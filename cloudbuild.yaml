@@ -115,6 +115,7 @@ steps:
         npm run verify:federal-loan-authority-refresh-reliability
         npm run verify:federal-loan-authority-change-triage
         npm run verify:controlled-public-surface-promotion
+        npm run verify:production-promotion-readiness
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

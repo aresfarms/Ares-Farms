@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.5",
+  "frameworkVersion": "master-volume-conformance-v0.4.6",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1578,6 +1578,30 @@
         "src/lib/governance/federalLoanAuthorityChangeTriage.ts",
         "src/lib/governance/federalLoanAuthorityMonitor.ts",
         "src/scripts/verifyFederalLoanAuthorityChangeTriage.ts"
+      ]
+    },
+    "TECH-PRODUCTION-PROMOTION-READINESS-001": {
+      "title": "Production promotion readiness and perimeter hardening",
+      "status": "implemented",
+      "requires": [
+        "canonical_https_urls",
+        "identity_perimeter",
+        "secret_reference_bindings",
+        "api_auth_enforcement",
+        "rate_limiting",
+        "credential_allowlist",
+        "governed_role_provisioning",
+        "human_promotion_authority_separation"
+      ],
+      "tests": [
+        "verify:production-promotion-readiness",
+        "backend:production-readiness:production",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/productionPromotionReadiness.ts",
+        "src/scripts/verifyProductionPromotionReadiness.ts",
+        "docs/MASTER_VOLUME_BUILD_PROTOCOL.md"
       ]
     }
   }

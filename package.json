@@ -533,7 +533,8 @@
     "verify:federal-loan-authority-reconciliation": "tsx src/scripts/verifyFederalLoanAuthorityReconciliation.ts",
     "verify:federal-loan-authority-refresh-reliability": "tsx src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
     "verify:federal-loan-authority-change-triage": "tsx src/scripts/verifyFederalLoanAuthorityChangeTriage.ts",
-    "verify:controlled-public-surface-promotion": "tsx src/scripts/verifyControlledPublicSurfacePromotion.ts"
+    "verify:controlled-public-surface-promotion": "tsx src/scripts/verifyControlledPublicSurfacePromotion.ts",
+    "verify:production-promotion-readiness": "tsx src/scripts/verifyProductionPromotionReadiness.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

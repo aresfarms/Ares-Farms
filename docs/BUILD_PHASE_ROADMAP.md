@@ -114,7 +114,7 @@ No implementation step may be skipped, reordered, or substituted through develop
 
 The machine-enforced sequence for the current official-evidence notification workstream is:
 
-`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement -> 3X Retirement Closure -> 3Y Tombstone Surveillance`
+`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement -> 3X Retirement Closure -> 3Y Tombstone Surveillance -> 3Z Tombstone Incident Containment`
 
 **FINAL HARD RULE:** Cloud Build must fail before image construction whenever the roadmap manifest is missing, predecessor order is incomplete, a completed-step artifact is absent, or the mandatory roadmap verifier is removed.
 

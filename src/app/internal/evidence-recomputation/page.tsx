@@ -112,6 +112,30 @@ import {
   listExternalNotificationRetirementTombstoneReceipts,
   retirementTombstoneHealthy,
 } from "@/lib/property/officialEvidenceExternalNotificationRetirementTombstone";
+import {
+  containExternalNotificationTombstoneFailure,
+  decideExternalNotificationTombstoneIncident,
+  listExternalNotificationTombstoneIncidentReceipts,
+  tombstoneIncidentStatus,
+  type TombstoneIncidentAction,
+} from "@/lib/property/officialEvidenceExternalNotificationTombstoneIncident";
+
+async function decideTombstoneIncident(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  decideExternalNotificationTombstoneIncident({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    action: String(formData.get("action")) as Exclude<TombstoneIncidentAction, "CONTAIN">,
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -476,6 +500,11 @@ export default async function EvidenceRecomputationPage() {
   evaluateExternalNotificationRetirementTombstones();
   const externalRetirementTombstoneReceipts =
     listExternalNotificationRetirementTombstoneReceipts().slice(-40).reverse();
+  for (const receipt of externalRetirementTombstoneReceipts)
+    if (receipt.action === "TOMBSTONE_FAIL")
+      containExternalNotificationTombstoneFailure({ registrationId: receipt.registrationId });
+  const externalTombstoneIncidentReceipts =
+    listExternalNotificationTombstoneIncidentReceipts().slice(-40).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1497,6 +1526,44 @@ export default async function EvidenceRecomputationPage() {
             {receipt.prohibitedEventRefs.length > 0 ? (
               <><br />{receipt.prohibitedEventRefs.join(" · ")}</>
             ) : null}
+            <br />
+            {receipt.reason}
+          </div>
+        ))}
+        <h3>Tombstone breach containment</h3>
+        <p>
+          Every tombstone failure is automatically contained as SEV-1. Module 45 must
+          acknowledge the incident before it can be resolved; external delivery remains blocked.
+        </p>
+        {externalRetirementTombstoneReceipts
+          .filter((receipt) => receipt.action === "TOMBSTONE_FAIL")
+          .map((failure) => {
+            const status = tombstoneIncidentStatus(failure.registrationId);
+            return (
+              <form
+                key={`tombstone-incident-${failure.registrationId}`}
+                action={decideTombstoneIncident}
+                style={{ display: "grid", gap: 8, padding: "10px 0", borderTop: "1px solid #e2e8f0" }}
+              >
+                <input type="hidden" name="registrationId" value={failure.registrationId} />
+                <b>{failure.connectorId} · {failure.channel} · {status}</b>
+                <select name="action" required defaultValue="">
+                  <option value="" disabled>Select Module 45 disposition</option>
+                  <option value="ACKNOWLEDGE">Acknowledge and investigate</option>
+                  <option value="ESCALATE">Escalate</option>
+                  <option value="RESOLVE">Resolve after acknowledgment</option>
+                </select>
+                <textarea name="reason" required placeholder="Incident disposition reason" />
+                <button disabled={!mayApprove || status === "RESOLVED"}>Record tombstone incident decision</button>
+              </form>
+            );
+          })}
+        {externalTombstoneIncidentReceipts.map((receipt) => (
+          <div key={receipt.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
+            <b>{receipt.action}</b> · {receipt.severity} · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+            <br />
+            external delivery blocked · internal queue authoritative · offending events {receipt.offendingEventRefs.length}
+            {receipt.offendingEventRefs.length ? <><br />{receipt.offendingEventRefs.join(" · ")}</> : null}
             <br />
             {receipt.reason}
           </div>

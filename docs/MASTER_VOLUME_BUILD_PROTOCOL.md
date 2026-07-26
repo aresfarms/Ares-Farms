@@ -607,3 +607,8 @@ Institutional access surveillance must execute as an operational control rather 
 ### Institutional Surveillance Activation Ceremony
 
 Scheduled institutional-access surveillance is a controlled-promotion action. Before scheduler creation or enablement, a deterministic activation packet must bind a dedicated scheduler identity, cadence between five and sixty minutes, canonical protected route, configured authentication, clean canary, rollback action, alert ownership, and two distinct governance/security approvers. Evidence recomputation remains independently paused. The standing proof command is `npm run verify:institutional-access-surveillance-activation-ceremony`.
+
+
+### Institutional Surveillance Canary and Scheduler Release
+
+Institutional-surveillance activation requires a non-mutating dry-run canary before any scheduler may be created. The canary freezes deterministic per-grant surveillance plans, records grants that would remain clean, require review, or be revoked, and proves zero grant, credential, authority, scheduler, or secret mutations. A separate release packet binds the current activation-ceremony hash, exact canary run and snapshot, route-authentication readiness, dual-control approvers, and release reason. Scheduler creation and scheduler enablement remain separate controlled-promotion actions. The standing proof command is `npm run verify:institutional-access-surveillance-canary-release`.

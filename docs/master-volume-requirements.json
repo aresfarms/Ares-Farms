@@ -1401,6 +1401,24 @@
         "src/scripts/verifyInstitutionalAccessSurveillanceActivationCeremony.ts",
         "docs/BUILD_PHASE_ROADMAP.md"
       ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-CANARY-001": {
+      "title": "Non-mutating institutional surveillance canary and scheduler release packet",
+      "status": "implemented",
+      "requires": [
+        "dry_run_canary",
+        "deterministic_plan_snapshot",
+        "zero_canary_mutations",
+        "dual_control_release",
+        "scheduler_enablement_separate"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-canary-release"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceCanaryRelease.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceCanaryRelease.ts"
+      ]
     }
   }
 }

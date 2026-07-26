@@ -523,7 +523,8 @@
     "verify:institutional-access-surveillance": "tsx src/scripts/verifyInstitutionalAccessSurveillance.ts",
     "verify:institutional-access-runtime-enforcement": "tsx src/scripts/verifyInstitutionalAccessRuntimeEnforcement.ts",
     "verify:institutional-access-surveillance-orchestration": "tsx src/scripts/verifyInstitutionalAccessSurveillanceOrchestration.ts",
-    "verify:institutional-access-surveillance-activation-ceremony": "tsx src/scripts/verifyInstitutionalAccessSurveillanceActivationCeremony.ts"
+    "verify:institutional-access-surveillance-activation-ceremony": "tsx src/scripts/verifyInstitutionalAccessSurveillanceActivationCeremony.ts",
+    "verify:institutional-access-surveillance-canary-release": "tsx src/scripts/verifyInstitutionalAccessSurveillanceCanaryRelease.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

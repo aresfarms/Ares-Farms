@@ -202,3 +202,10 @@ The platform must continuously evaluate every unrevoked institutional evidence g
 Before continuous institutional-access surveillance may be scheduled, the platform must produce a read-only activation packet binding the canonical route, scheduler identity, approved cadence, route-authentication posture, clean canary evidence, rollback action, alert owner, and two distinct human approvers. The packet must preserve the separate paused state of evidence recomputation and may not create or enable a scheduler itself.
 
 **Hard rule:** A deployed surveillance runner is not authorized for scheduled execution without a current clean canary, configured route authentication, dual-control approval, and a deterministic activation packet. Step 4M performs no scheduler mutation.
+
+
+## Step 4N — Institutional Surveillance Canary and Scheduler Release Packet
+
+Before a surveillance scheduler may be created, the platform must produce a deterministic dry-run transcript over synthetic or approved isolated grant state. The canary may identify grants that would be clean, review-bound, or revoked, but it must perform zero durable mutations. A separate scheduler-release packet binds the exact 4M activation packet, canary run, plan snapshot, route-authentication readiness, release reason, and two distinct human approvers.
+
+**Hard rule:** A canary failure, duplicate revocation attempt, invalid snapshot, authentication gap, approver collision, or activation-packet mismatch blocks release. Step 4N may permit later scheduler creation, but it never permits scheduler enablement and performs neither action.

@@ -61,6 +61,7 @@ const required = [
   "verify:institutional-access-runtime-enforcement",
   "verify:institutional-access-surveillance-orchestration",
   "verify:institutional-access-surveillance-activation-ceremony",
+  "verify:institutional-access-surveillance-canary-release",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

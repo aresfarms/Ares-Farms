@@ -32,6 +32,7 @@ import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "./stateDroughtGenerated
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "./stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
+import { COUNTY_COLLEGE_BRANCHES, COUNTY_COLLEGE_BRANCHES_PROVENANCE } from "./countyCollegeBranchesCurated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
 import { US_AIRPORTS } from "./usAirportsGenerated";
 import {
@@ -168,6 +169,7 @@ export interface DiligenceCostLine {
 export interface PropertyBriefIntelligence {
   verifiedFacts: BriefFactLine[];
   unknowns: BriefUnknownLine[];
+  ownerAssertions?: BriefFactLine[];
   /**
    * Per-source "how buying this actually works" explainer. stepTitles align
    * 1:1 with paragraphs — the title scans, the paragraph explains on expand.
@@ -747,7 +749,9 @@ function broadbandAreaFact(countyFips: string | null): BriefFactLine | null {
  */
 function collegesFact(countyFips: string | null): BriefFactLine | null {
   if (!countyFips || COUNTY_COLLEGES_PROVENANCE.asOf === null) return null;
-  const list = COUNTY_COLLEGES[countyFips] ?? [];
+  const mainInstitutions = COUNTY_COLLEGES[countyFips] ?? [];
+  const branchCampuses = COUNTY_COLLEGE_BRANCHES[countyFips] ?? [];
+  const list = [...mainInstitutions, ...branchCampuses.filter((branch) => !mainInstitutions.some((item) => item.name === branch.name))];
   if (list.length === 0) {
     return {
       label: "Higher education",
@@ -757,7 +761,7 @@ function collegesFact(countyFips: string | null): BriefFactLine | null {
         "directory — commuting distance to campuses in neighboring counties is a map-app check. " +
         "Some buyers want a college town, others prefer the quiet; either way it is a fact worth " +
         "knowing up front.",
-      provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}`,
+      provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}`,
       tone: "neutral",
     };
   }
@@ -777,7 +781,7 @@ function collegesFact(countyFips: string | null): BriefFactLine | null {
       `${list.length > sample.length ? ` and ${list.length - sample.length} more` : ""}. ` +
       `A campus nearby shapes rentals, dining, and season rhythms — a fact some buyers seek out ` +
       `and others avoid. Directory facts only; Furlong does not rate institutions.`,
-    provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}`,
+    provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}`,
     tone: "neutral",
   };
 }
@@ -1863,6 +1867,7 @@ export async function buildLocationBriefIntelligence(args: {
   placeFacts: LocationBriefPlaceFacts;
   parsed: { street: string; city: string; state: string; zip: string } | null;
   propertyType?: string | null;
+  ownerNotes?: string | null;
   amenityEnv?: NodeJS.ProcessEnv;
 }): Promise<PropertyBriefIntelligence> {
   // Manual portal entry is residential-first; treat as a home unless the
@@ -1875,6 +1880,11 @@ export async function buildLocationBriefIntelligence(args: {
   const town = args.parsed?.city ?? null;
 
   const verifiedFacts: BriefFactLine[] = [];
+  const ownerAssertions: BriefFactLine[] = [];
+  const ownerText = (args.ownerNotes ?? "").trim();
+  if (/waterfront|water front|shoreline/i.test(ownerText)) ownerAssertions.push({ label: "Waterfront", value: "Owner reported — pending parcel and shoreline verification", text: "The customer reports that the property is waterfront. This remains separate from source-verified facts until parcel geometry or recorded legal language corroborates it.", provenance: "Owner assertion recorded in the property intake", tone: "neutral" });
+  if (/deeded pier|pier|riparian/i.test(ownerText)) ownerAssertions.push({ label: "Pier and riparian rights", value: "Owner reported — deed and permit review required", text: "The customer reports a deeded pier or riparian rights. Verify the recorded deed, legal description, and applicable DNREC or U.S. Army Corps permits.", provenance: "Owner assertion recorded in the property intake", tone: "neutral" });
+  if (/two parcels|2 parcels|both parcels/i.test(ownerText)) ownerAssertions.push({ label: "Parcel count", value: "Owner reported — two parcels", text: "The customer reports that two tax parcels make up the property. County parcel records can identify associated parcels; the contract and deed must confirm that both convey.", provenance: "Owner assertion recorded in the property intake", tone: "neutral" });
 
   // County — anchors taxes, floodplain administration, permits.
   const countyFips = geocode?.countyFips ?? null;
@@ -2087,6 +2097,7 @@ export async function buildLocationBriefIntelligence(args: {
 
   return {
     verifiedFacts,
+    ownerAssertions,
     unknowns: withProfileQuestions(
       buildUnknowns({
         propertyId: "",

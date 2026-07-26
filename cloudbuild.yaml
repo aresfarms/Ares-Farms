@@ -124,6 +124,9 @@ steps:
         npm run verify:property-profile-classification
         npm run verify:customer-property-experience
         npm run verify:three-lane-consumer-command-center
+        npm run verify:compass-lane-entry-routing
+        npm run verify:property-data-resolution
+        npm run verify:deed-verification-access
         npm run verify:integrated-pre-promotion-features
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence

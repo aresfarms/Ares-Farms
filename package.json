@@ -543,7 +543,10 @@
     "verify:customer-property-experience": "tsx src/scripts/verifyCustomerPropertyExperience.ts",
     "verify:property-profile-classification": "tsx src/scripts/verifyPropertyProfileClassification.ts",
     "verify:integrated-pre-promotion-features": "tsx src/scripts/verifyIntegratedPrePromotionFeatureSuite.ts",
-    "verify:three-lane-consumer-command-center": "tsx src/scripts/verifyThreeLaneConsumerCommandCenter.ts"
+    "verify:three-lane-consumer-command-center": "tsx src/scripts/verifyThreeLaneConsumerCommandCenter.ts",
+    "verify:compass-lane-entry-routing": "tsx src/scripts/verifyCompassLaneEntryRouting.ts",
+    "verify:deed-verification-access": "tsx src/scripts/verifyDeedVerificationAccess.ts",
+    "verify:property-data-resolution": "tsx src/scripts/verifyPropertyDataResolution.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

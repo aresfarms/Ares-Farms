@@ -43,6 +43,7 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
   const { theme } = props;
   const [assumedPrice, setAssumedPrice] = useState<number | null>(null);
   const [priceInput, setPriceInput] = useState("");
+  const [priceMessage, setPriceMessage] = useState<string | null>(null);
 
   const price = assumedPrice ?? props.listedPrice;
   const priceIsAssumption = assumedPrice !== null;
@@ -66,7 +67,14 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
 
   const applyPriceInput = () => {
     const parsed = Number(priceInput.replace(/[^0-9.]/g, ""));
-    if (Number.isFinite(parsed) && parsed >= 10_000) setAssumedPrice(Math.round(parsed));
+    if (!Number.isFinite(parsed) || parsed < 10_000) {
+      setPriceMessage("Enter a purchase price of at least $10,000.");
+      return;
+    }
+    const rounded = Math.round(parsed);
+    setAssumedPrice(rounded);
+    setPriceInput(rounded.toLocaleString("en-US"));
+    setPriceMessage(`Estimate updated using ${fmt(rounded)}.`);
   };
 
   const cellStyle: React.CSSProperties = {
@@ -91,12 +99,15 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
       {/* Price line / assumption input */}
       <div
         style={{
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-          flexWrap: "wrap",
-          fontSize: 13,
-          color: theme.inkSoft,
+          display: "grid",
+          gap: 12,
+          padding: "18px",
+          border: "2px solid #C9B26A",
+          borderRadius: 14,
+          background: "#FFFFFF",
+          boxShadow: "0 6px 20px rgba(28,43,69,.10)",
+          fontSize: 14,
+          color: "#1C2B45",
         }}
       >
         {price != null ? (
@@ -107,50 +118,51 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
               : " — the listed price. Try a different number any time:"}
           </span>
         ) : (
-          <span>
+          <span style={{ fontWeight: 650, lineHeight: 1.55 }}>
             This listing does not publish a price. Enter the price you would offer and the numbers
-            fill in — the number stays on this page:
+            fill in — the number stays on this page.
           </span>
         )}
-        <span style={{ display: "inline-flex", gap: 6 }}>
+        <form onSubmit={(event) => { event.preventDefault(); applyPriceInput(); }} style={{ display: "flex", gap: 10, alignItems: "stretch", flexWrap: "wrap" }}>
           <input
             inputMode="numeric"
             aria-label="Price to estimate with, dollars"
             placeholder="e.g. 250,000"
             value={priceInput}
-            onChange={(event) => setPriceInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") applyPriceInput();
-            }}
+            onChange={(event) => { setPriceInput(event.target.value); setPriceMessage(null); }}
             style={{
               font: "inherit",
               fontSize: 13,
-              width: 120,
-              padding: "6px 10px",
-              borderRadius: 8,
-              border: `1px solid ${theme.plateBorder}`,
-              background: theme.cellBg,
-              color: theme.ink,
+              width: 190,
+              minHeight: 44,
+              padding: "10px 13px",
+              borderRadius: 9,
+              border: "2px solid #1C2B45",
+              background: "#FFFFFF",
+              color: "#16233C",
+              fontWeight: 750,
+              outlineColor: "#B08A2E",
             }}
           />
           <button
-            type="button"
-            onClick={applyPriceInput}
+            type="submit"
             style={{
               font: "inherit",
-              fontSize: 12.5,
-              fontWeight: 800,
-              padding: "6px 14px",
-              borderRadius: 8,
-              border: `1px solid ${theme.accent}`,
-              background: "transparent",
-              color: theme.accent,
+              fontSize: 13.5,
+              fontWeight: 850,
+              minHeight: 44,
+              padding: "10px 18px",
+              borderRadius: 9,
+              border: "2px solid #1C2B45",
+              background: "#1C2B45",
+              color: "#FFFFFF",
               cursor: "pointer",
             }}
           >
             Estimate
           </button>
-        </span>
+        </form>
+        {priceMessage && <span role="status" aria-live="polite" style={{ color: assumedPrice ? "#2E7D4F" : "#9A3412", fontSize: 12.5, fontWeight: 750 }}>{priceMessage}</span>}
       </div>
 
       {model && price != null && (() => {

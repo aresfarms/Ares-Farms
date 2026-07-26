@@ -14,8 +14,8 @@ const failures: string[] = [];
 
 if (workspace.includes("<PropertyBestCoursePanel")) failures.push("Customer workspace still renders the internal best-course governance panel.");
 if (workspace.includes('import { PropertyBestCoursePanel }')) failures.push("Customer workspace still imports the internal best-course governance panel.");
-if (!workspace.includes("Classification pending parcel evidence")) failures.push("Unmatched imported addresses can still silently default to a property type.");
-if (!workspace.includes("chartOpen && propertyClassificationAvailable")) failures.push("Detailed property brief can render without automatic parcel classification evidence.");
+if (!workspace.includes("const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null")) failures.push("Unmatched imported addresses can still silently default to a property type.");
+if (!workspace.includes("!deepView && propertyClassificationAvailable")) failures.push("Detailed property brief can render without automatic parcel classification evidence.");
 if (!workspace.includes("<PropertyCommandCenter")) failures.push("Customer workspace does not render the shared property command center.");
 if (workspace.includes("<PropertyDecisionBrief")) failures.push("Temporary decision brief still renders instead of the command center.");
 if (workspace.includes("<ChartTableBrief")) failures.push("Customer workspace still renders the chart interface.");

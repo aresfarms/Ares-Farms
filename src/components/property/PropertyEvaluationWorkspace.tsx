@@ -14,7 +14,6 @@ import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyI
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { PropertyCommandCenter } from "@/components/property/PropertyCommandCenter";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
-import { PropertyResultCard } from "@/components/property/PropertyResultCard";
 import { PropertyEvidencePanel } from "@/components/property/PropertyEvidencePanel";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
@@ -1995,7 +1994,6 @@ export function PropertyEvaluationWorkspace({
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
   // visibly open reads as broken). The summary card still leads; the complete
   // chart renders right below it — collapsible, but open by default.
-  const [chartOpen, setChartOpen] = useState(true);
   const [answers, setAnswers] = useState<DraftAnswers>({
     reportTier: "free",
     possibility: "",
@@ -2990,9 +2988,33 @@ export function PropertyEvaluationWorkspace({
           : "On the source listing — changes as bid periods reset",
     },
   ];
-  const topProgramPreview = topProgramRanks.slice(0, 2).map(
+  const verifiedProgramPreview = topProgramRanks.slice(0, 4).map(
     (entry, index) => `${index + 1}. ${entry.program.name}`
   );
+  const preliminaryPropertyPathways = workspaceProfile.id === "residential"
+    ? [
+        "FHA purchase financing",
+        "FHA 203(k) renovation financing",
+        "VA purchase or renovation financing — borrower eligibility required",
+        "Conventional purchase or renovation financing",
+        "Construction-to-permanent financing — if rehabilitation is impractical",
+      ]
+    : workspaceProfile.id === "farm"
+      ? [
+          "USDA FSA farm ownership financing",
+          "USDA Rural Development housing financing — if owner-occupied residential use fits",
+          "Farm Credit or agricultural real-estate financing",
+          "Conventional farm or mixed-use financing",
+        ]
+      : [
+          "Conventional commercial real-estate financing",
+          "SBA 7(a) financing — owner-operated business use required",
+          "SBA 504 financing — eligible fixed-asset use required",
+          "Construction or rehabilitation financing",
+        ];
+  const topProgramPreview = verifiedProgramPreview.length > 0
+    ? verifiedProgramPreview
+    : preliminaryPropertyPathways;
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
     listedPrice: listedPrice ?? parsePriceSignal(analysisContext.priceLabel),
@@ -3237,83 +3259,6 @@ export function PropertyEvaluationWorkspace({
   };
 
 
-  // ── Result card content (free tier default view, ≤10 numbered bullets) ────
-  const cardGreenFlags = (effectivePlaceIntelligence?.verifiedFacts ?? [])
-    .filter((fact) => fact.tone === "positive")
-    .slice(0, 4)
-    .map((fact) => ({ label: fact.label, value: fact.value }));
-  const cardWatchFlags = [
-    ...(effectivePlaceIntelligence?.verifiedFacts ?? [])
-      .filter((fact) => fact.tone === "caution")
-      .map((fact) => ({ label: fact.label, value: fact.value })),
-    ...(effectivePlaceIntelligence?.unknowns ?? []).map((unknown) => ({
-      label: unknown.label,
-      value: `${unknown.pointer} answers it`,
-    })),
-  ].slice(0, 4);
-  const cardModel =
-    ownershipContext && listedPrice != null && profileUsesResidentialLanes(workspaceProfile.id)
-      ? buildOwnershipCostModel(
-          {
-            price: listedPrice,
-            priceIsAssumption: false,
-            isHome: isResidentialHomeContext(analysisContext),
-            farmShaped: workspaceProfile.id === "farm",
-                    farmMode: workspaceProfile.id === "farm",
-          },
-          ownershipContext
-        )
-      : null;
-  const cardNumbersLine = cardModel
-    ? `All-in monthly on ${cardModel.monthlyTotals[0].program}: $${cardModel.monthlyTotals[0].low.toLocaleString("en-US")}–$${cardModel.monthlyTotals[0].high.toLocaleString("en-US")} · typically works from ≈$${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr household income · year 1 all-in $${cardModel.horizon.year1.low.toLocaleString("en-US")}–$${cardModel.horizon.year1.high.toLocaleString("en-US")}, then $${cardModel.horizon.years2to5.low.toLocaleString("en-US")}–$${cardModel.horizon.years2to5.high.toLocaleString("en-US")} across years 2–5. Illustrative guidance at the current Freddie Mac average rate — never a quote or approval.`
-    : /price on request/i.test(analysisContext.priceLabel ?? "")
-      ? "No published price on this listing — open the full chart and enter the price you would offer; the complete cost and income picture fills in on this page only."
-      : null;
-  const cardOverallRead = [
-    report.verdict.explanation,
-    answerCard.fitLine ? `Fits if you want: ${answerCard.fitLine}.` : null,
-    `Pause if you need: ${answerCard.pauseLine}.`,
-  ]
-    .filter(Boolean)
-    .join(" ");
-  // The case, honestly (founder direction 2026-07-17: the report should say
-  // WHY someone might buy or walk — argued from verified facts, never a
-  // verdict; good-buy-or-pass turns on price and condition, which stay
-  // the reader's to establish).
-  const cardPriceContext =
-    ownershipContext && listedPrice != null ? buildPriceContext(listedPrice, ownershipContext) : null;
-  const caseForBits = [
-    ...cardGreenFlags.slice(0, 3).map((flag) => `${flag.label.toLowerCase()} — ${flag.value}`),
-    cardPriceContext && cardPriceContext.ratio <= 1.0
-      ? `priced at about ${Math.round(cardPriceContext.ratio * 100)}% of the county's typical home value`
-      : null,
-    ownershipContext?.taxContext && ownershipContext.taxContext.effectiveRatePct < 1.0
-      ? `county property taxes run light (~${ownershipContext.taxContext.effectiveRatePct}% of value per year)`
-      : null,
-    (analysisContext.sourceId ?? "") === "hud" && workspaceProfile.id === "residential"
-      ? "as a live-in buyer you bid in the HUD owner-occupant window, before any investor is allowed"
-      : null,
-  ].filter((bit): bit is string => Boolean(bit));
-  const caseAgainstBits = [
-    "condition is unknown until an inspection — this is an as-is sale",
-    ...cardWatchFlags
-      .filter((flag) => !/condition/i.test(flag.label))
-      .slice(0, 2)
-      .map((flag) => `${flag.label.toLowerCase()} still needs an answer (${flag.value.replace(/ answers it$/, "")})`),
-    cardModel
-      ? `carrying it comfortably typically takes household income around $${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr`
-      : null,
-    cardPriceContext && cardPriceContext.ratio > 1.15
-      ? `priced above the county's typical home value — the appraisal will test it`
-      : null,
-  ].filter((bit): bit is string => Boolean(bit));
-  const cardCaseFor = caseForBits.length > 0 ? `The case for: ${caseForBits.join("; ")}.` : null;
-  const cardCaseAgainst = `The case against — or still open: ${caseAgainstBits.join("; ")}.`;
-  const cardDecisionLine =
-    "Good buy or pass? That turns on the two things nobody can verify from a distance — the negotiated price and what the inspection finds. This chart arms that decision; it never makes it. If this one doesn't fit, the nearby alternatives on the chart are the honest next look, and any listing from anywhere can be pasted in for the same treatment.";
-  const cardTierLine =
-    "The full chart below is free and complete. Paid tiers add the why — lender-ready packaging, county records pulls, and your personalized file.";
-
   const chartActionsSlot = (
     <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
@@ -3537,27 +3482,6 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
-      {!deepView && (
-        <PropertyResultCard
-          theme={CHART_THEMES[chartVariant]}
-          title={context.title}
-          location={context.location}
-          priceLabel={analysisContext.priceLabel}
-          profileLabel={propertyClassificationAvailable ? workspaceProfile.label : "Classification pending parcel evidence"}
-          verdictLine={answerCard.headline}
-          greenFlags={cardGreenFlags}
-          watchFlags={cardWatchFlags}
-          numbersLine={cardNumbersLine}
-          overallRead={cardOverallRead}
-          caseFor={cardCaseFor}
-          caseAgainst={cardCaseAgainst}
-          decisionLine={cardDecisionLine}
-          tierLine={cardTierLine}
-          chartOpen={chartOpen}
-          onToggleChart={() => setChartOpen((current) => !current)}
-          actionsSlot={chartActionsSlot}
-        />
-      )}
       {!deepView && importedProperty && (!propertyClassificationAvailable || !rankingPrice) && (
         <section aria-label="Complete property basics" style={{ display: "grid", gap: 7, border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px" }}>
           <strong style={{ color: "#162033", fontSize: 15 }}>Complete the property basics before Furlong recommends a course</strong>
@@ -3574,7 +3498,7 @@ export function PropertyEvaluationWorkspace({
       {/* (The imported-only "What is this property?" picker is now the
           front-loaded Property Type Stamp above — shown for every property.) */}
 
-      {!deepView && chartOpen && propertyClassificationAvailable && (
+      {!deepView && propertyClassificationAvailable && (
       <PropertyCommandCenter
         variant={chartVariant}
         propertyId={context.propertyId ?? context.title}
@@ -3590,6 +3514,7 @@ export function PropertyEvaluationWorkspace({
         fitLine={answerCard.fitLine}
         pauseLine={answerCard.pauseLine}
         intelligence={effectivePlaceIntelligence}
+        deedEvidence={facts?.propertyEvidenceRecords ?? []}
         financingLanes={topProgramPreview}
         costsSlot={
           // The finance lens carries no products/terms/rates (counsel gate);

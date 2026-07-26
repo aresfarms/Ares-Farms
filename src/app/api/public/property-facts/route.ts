@@ -67,7 +67,42 @@ export async function POST(req: NextRequest) {
       placeFacts: imported.placeFacts,
       parsed: imported.parsedAddress,
       propertyType: declaredPropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
+      ownerNotes: body.notes ?? null,
     });
+    if (matchedSourceRecord) {
+      const sizeBits = [
+        matchedSourceRecord.squareFeet ? `${matchedSourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : null,
+        matchedSourceRecord.acreageText || null,
+      ].filter((value): value is string => Boolean(value));
+      if (sizeBits.length && !placeIntelligence.verifiedFacts.some((fact) => fact.label === "Size")) {
+        placeIntelligence.verifiedFacts.unshift({
+          label: "Size",
+          value: sizeBits.join(" · "),
+          text: `The matched canonical property record publishes ${sizeBits.join(" and ")}. County parcel geometry remains the authority for official dimensions.`,
+          provenance: "Source: matched canonical property record",
+          tone: "neutral",
+        });
+      }
+    }
+    if (canonicalMatch?.parcel_refs?.length) {
+      placeIntelligence.verifiedFacts.unshift({
+        label: "Associated parcels",
+        value: `${canonicalMatch.parcel_refs.length} parcel${canonicalMatch.parcel_refs.length === 1 ? "" : "s"} identified`,
+        text: `Furlong matched ${canonicalMatch.parcel_refs.length} county parcel reference${canonicalMatch.parcel_refs.length === 1 ? "" : "s"} to this canonical property. The purchase contract and recorded deed still control which parcels convey.`,
+        provenance: "Source: canonical parcel-reference registry",
+        tone: "neutral",
+      });
+    }
+    const evidenceRecords = canonicalMatch ? officialPropertyEvidenceRecords(canonicalMatch) : [];
+    for (const record of evidenceRecords.filter((item) => item.domain === "title")) {
+      placeIntelligence.verifiedFacts.push({
+        label: "Recorded deed",
+        value: `${record.reference}${record.effectiveDate ? ` · ${record.effectiveDate}` : ""}`,
+        text: (record.notes ?? []).filter((note) => !note.startsWith("Restricted deed document reference:")).join(" ") || "A county recorder deed-index record matched this parcel.",
+        provenance: `Source: ${record.sourceName}, ${record.jurisdiction}, retrieved ${record.retrievedAt}`,
+        tone: record.parcelMatchConfidence === "review-required" ? "caution" : "neutral",
+      });
+    }
     return NextResponse.json({
       ok: true,
       propertyId: canonicalMatch?.canonical_property_id ?? propertyId,
@@ -90,7 +125,7 @@ export async function POST(req: NextRequest) {
       placeFacts: imported.placeFacts,
       verifiedPrograms: verifyPropertyPrograms(imported.placeFactsForPrograms),
       placeIntelligence,
-      propertyEvidenceRecords: canonicalMatch ? officialPropertyEvidenceRecords(canonicalMatch) : [],
+      propertyEvidenceRecords: evidenceRecords,
       verification: {
         status: imported.status,
         normalizedAddress: imported.normalizedAddress,

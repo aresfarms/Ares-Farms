@@ -517,7 +517,10 @@
     "verify:public-alpha-signoff-ceremony-packet": "tsx src/scripts/verifyPublicAlphaSignoffCeremonyPacket.ts",
     "verify:governed-evidence-review-portal": "tsx src/scripts/verifyGovernedEvidenceReviewPortal.ts",
     "verify:institutional-credential-verification": "tsx src/scripts/verifyInstitutionalCredentialVerification.ts",
-    "verify:institutional-legal-authority": "tsx src/scripts/verifyInstitutionalLegalAuthority.ts"
+    "verify:institutional-legal-authority": "tsx src/scripts/verifyInstitutionalLegalAuthority.ts",
+    "verify:institutional-abac-disclosure": "tsx src/scripts/verifyInstitutionalAbacDisclosure.ts",
+    "verify:compelled-disclosure-ceremony": "tsx src/scripts/verifyCompelledDisclosureCeremony.ts",
+    "verify:institutional-access-surveillance": "tsx src/scripts/verifyInstitutionalAccessSurveillance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

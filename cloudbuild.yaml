@@ -101,6 +101,9 @@ steps:
         npm run verify:governed-evidence-review-portal
         npm run verify:institutional-credential-verification
         npm run verify:institutional-legal-authority
+        npm run verify:institutional-abac-disclosure
+        npm run verify:compelled-disclosure-ceremony
+        npm run verify:institutional-access-surveillance
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

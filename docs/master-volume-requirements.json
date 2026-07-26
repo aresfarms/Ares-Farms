@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.3.1",
+  "frameworkVersion": "master-volume-conformance-v0.4.0",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1264,6 +1264,81 @@
         "src/lib/governance/contentClaimsPolicy.ts",
         "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
         "docs/BACKEND_COVERAGE_MATRIX.md"
+      ]
+    },
+    "CONST-INSTITUTIONAL-AUTHORITY-001": {
+      "title": "Verified institutional identity, credential, and matter authority",
+      "status": "implemented",
+      "requires": [
+        "ephemeral_official_credential_verification",
+        "opaque_principal_bound_verification_token",
+        "independent_matter_authority",
+        "no_credential_identifier_retention"
+      ],
+      "tests": [
+        "verify:institutional-credential-verification",
+        "verify:institutional-legal-authority"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalCredentialVerification.ts",
+        "src/lib/governance/institutionalLegalAuthorityVerification.ts",
+        "src/lib/governance/institutionalEvidenceAccess.ts"
+      ]
+    },
+    "TECH-ABAC-001": {
+      "title": "Per-request ABAC and field-level minimum-necessary disclosure",
+      "status": "implemented",
+      "requires": [
+        "credential_and_authority_receipts",
+        "matter_subject_module_purpose_window_attributes",
+        "field_filtering_before_payload",
+        "short_lived_capability",
+        "step_up_export"
+      ],
+      "tests": [
+        "verify:institutional-abac-disclosure",
+        "verify:governed-evidence-review-portal"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAbacDisclosure.ts",
+        "src/lib/governance/governedEvidenceReviewPortal.ts"
+      ]
+    },
+    "LEGAL-DISCLOSURE-001": {
+      "title": "Dual-control legal hold and compelled-disclosure ceremony",
+      "status": "implemented",
+      "requires": [
+        "independent_legal_process_verification",
+        "legal_hold_before_disclosure",
+        "dual_control",
+        "selector_bound_release",
+        "notice_restriction_review"
+      ],
+      "tests": [
+        "verify:compelled-disclosure-ceremony",
+        "verify:institutional-legal-authority"
+      ],
+      "evidence": [
+        "src/lib/governance/compelledDisclosureCeremony.ts",
+        "src/lib/governance/institutionalLegalAuthorityVerification.ts"
+      ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-001": {
+      "title": "Continuous institutional access surveillance and independent closure",
+      "status": "implemented",
+      "requires": [
+        "credential_recheck",
+        "authority_recheck",
+        "export_anomaly_detection",
+        "automatic_revocation",
+        "independent_post_access_closure"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillance.ts",
+        "src/lib/governance/institutionalEvidenceAccess.ts"
       ]
     }
   }

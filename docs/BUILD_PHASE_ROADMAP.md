@@ -163,3 +163,21 @@ Before any attorney, governmental official, or auditor grant may activate, the a
 ### Step 4G authority hardening
 
 Professional or official credential verification and legal/matter authority are independent proofs. A valid license, appointment, or audit credential never grants dataset access by itself. Every institutional grant must also bind an independently corroborated authority receipt matching the exact authenticated principal, client or agency subject, matter or examination, jurisdiction, effective period, and role. Uploaded paperwork is evidence to evaluate, not self-authenticating proof. Any name, subject, matter, jurisdiction, date, revocation, or independent-source mismatch causes an immediate append-only denial and prevents packet construction. No auditor, governmental official, or attorney receives unscoped portal access.
+
+## Step 4H — Institutional ABAC and Field-Level Disclosure
+
+RBAC identifies an institutional lane but never grants dataset authority. Every attorney, auditor, and governmental-official request must be reevaluated using authenticated identity, current credential and authority receipts, matter, tenant, subject, module, purpose, action, classification, jurisdiction, consent, legal-hold posture, time window, and step-up authentication. Unauthorized records and fields must be removed before packet, hash, timeline, API response, or export construction. Successful decisions issue only short-lived, scope-bound capability tokens. Sensitive exports require step-up authentication.
+
+**Hard rule:** Role, title, email domain, uploaded paperwork, or token possession alone can never authorize an institutional evidence request.
+
+## Step 4I — Legal Hold and Compelled-Disclosure Dual-Control Ceremony
+
+Court orders, subpoenas, warrants, and agency demands require independently verified authority, a legal hold established before disclosure, a deterministic scope manifest, distinct legal and security approvers, selector-bound record release, a bounded disclosure window, and a governed notice posture. Legal hold never implies disclosure authority. Delayed or prohibited notice requires a scheduled legal review. The system may release only records named by the verified scope manifest; unrelated records remain inaccessible.
+
+**Hard rule:** No single actor may approve both legal validity and security release, and no general vault or portal bypass is permitted.
+
+## Step 4J — Institutional Access Surveillance and Post-Access Closure
+
+Institutional access remains under continuous credential and authority recheck, export-volume monitoring, denied-request monitoring, automatic expiration, and anomaly review. Credential or authority failure revokes access immediately. Material findings require independent post-access closure by an actor other than the original grant issuer. Every access, denial, export, revocation, review, and closure remains append-only and replayable.
+
+**Hard rule:** A previously valid grant does not survive stale credentials, revoked authority, scope drift, abnormal export behavior, or an expired access window.

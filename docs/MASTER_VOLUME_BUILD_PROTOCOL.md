@@ -578,3 +578,17 @@ Blocked until controlled promotion:
 - legal advice,
 - guaranteed revenue claims,
 - sovereign data use beyond consent gates.
+
+## 15. Institutional Evidence Access Constitutional Amendment
+
+The active amendment `docs/MASTER_VOLUME_AMENDMENT_INSTITUTIONAL_ACCESS.md` is a controlling cross-volume doctrine for institutional evidence access.
+
+Hard rules:
+
+- RBAC selects a lane only; ABAC decides every record request.
+- Credential verification, legal/matter authority, and data scope are independent mandatory proofs.
+- No professional credential number or derivative may persist after authoritative verification.
+- Field redaction occurs before payload, packet, hash, timeline, or export construction.
+- Compelled disclosure requires legal hold, verified authority, a deterministic scope manifest, dual control, bounded selector release, governed notice, and post-access review.
+- Institutional access is continuously rechecked and automatically revoked when credential, authority, scope, or timing becomes invalid.
+- The commands listed in the amendment are mandatory Cloud Build gates.

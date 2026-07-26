@@ -67,6 +67,7 @@ const required = [
   "verify:federal-loan-authority-monitor",
   "verify:federal-loan-authority-reconciliation",
   "verify:federal-loan-authority-refresh-reliability",
+  "verify:federal-loan-authority-change-triage",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

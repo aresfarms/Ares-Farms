@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.3",
+  "frameworkVersion": "master-volume-conformance-v0.4.4",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1548,6 +1548,30 @@
         "src/lib/governance/federalLoanAuthorityMonitor.ts",
         "src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
         "src/lib/property/sourceRefresh.ts"
+      ]
+    },
+    "SRC-FEDERAL-LOAN-AUTHORITY-CHANGE-TRIAGE-001": {
+      "title": "Semantic triage of official federal loan authority changes",
+      "status": "implemented",
+      "requires": [
+        "stable_authority_fingerprint",
+        "cosmetic_change_auto_clear_receipt",
+        "informational_change_isolation",
+        "lending_change_review_hold",
+        "legally_material_change_elevation",
+        "missing_prior_semantic_baseline_fail_closed",
+        "exact_semantic_hash_lineage"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-change-triage",
+        "verify:federal-loan-authority-monitor",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityChangeTriage.ts",
+        "src/lib/governance/federalLoanAuthorityMonitor.ts",
+        "src/scripts/verifyFederalLoanAuthorityChangeTriage.ts"
       ]
     }
   }

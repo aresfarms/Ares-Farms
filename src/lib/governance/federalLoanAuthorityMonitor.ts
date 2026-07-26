@@ -3,6 +3,11 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { runtimeStatePath } from "@/lib/property/runtimeStatePath";
+import {
+  buildFederalAuthoritySemanticFingerprint,
+  classifyFederalAuthorityChange,
+  type FederalAuthorityChangeMateriality,
+} from "@/lib/governance/federalLoanAuthorityChangeTriage";
 
 export const FEDERAL_LOAN_AUTHORITY_MONITOR_RULE =
   "FEDERAL-LOAN-AUTHORITY-CONTINUOUS-MONITOR-001" as const;
@@ -43,6 +48,9 @@ export interface FederalLoanAuthorityDocument {
   previousContentHash: string | null;
   status: "CURRENT" | "CHANGED_REVIEW_REQUIRED" | "FETCH_FAILED" | "TIMED_OUT";
   error: string | null;
+  semanticHash?: string;
+  semanticMateriality?: Exclude<FederalAuthorityChangeMateriality, "COSMETIC">;
+  triageReasonCodes?: string[];
 }
 
 export interface FederalLoanAuthorityChangeReceipt {
@@ -55,6 +63,11 @@ export interface FederalLoanAuthorityChangeReceipt {
   nextContentHash: string;
   status: "REVIEW_REQUIRED";
   reason: string;
+  disposition?: "AUTO_CLEARED" | "REVIEW_REQUIRED";
+  materiality?: FederalAuthorityChangeMateriality;
+  previousSemanticHash?: string | null;
+  nextSemanticHash?: string;
+  reasonCodes?: string[];
 }
 
 export interface FederalLoanAuthorityMonitorState {
@@ -401,10 +414,10 @@ export async function refreshFederalLoanAuthorities(input: {
     lastRunAt: completedAt,
     documents,
     changes: [...previous.changes, ...changes],
-    runReceipts: [...previous.runReceipts, { runId, startedAt: now, completedAt, fetched, changed: changes.length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256 }].slice(-365),
+    runReceipts: [...previous.runReceipts, { runId, startedAt: now, completedAt, fetched, changed: changes.filter((change) => change.disposition !== "AUTO_CLEARED").length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256 }].slice(-365),
   };
   if (input.persist !== false) writeState(state);
-  return { rule: FEDERAL_LOAN_AUTHORITY_MONITOR_RULE, runId, fetched, changed: changes.length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256, changes, state };
+  return { rule: FEDERAL_LOAN_AUTHORITY_MONITOR_RULE, runId, fetched, changed: changes.filter((change) => change.disposition !== "AUTO_CLEARED").length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256, changes, state };
 }
 
 export function inspectFederalLoanAuthorityBinding(binding: FederalLoanAuthorityReviewBinding, providedState?: FederalLoanAuthorityMonitorState): {

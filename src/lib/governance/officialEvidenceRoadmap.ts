@@ -1,4 +1,4 @@
-export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v23";
+export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v24";
 
 export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3Q_EXTERNAL_NOTIFICATION_CONNECTOR",
@@ -30,6 +30,7 @@ export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "4Q_FEDERAL_LOAN_AUTHORITY_CONTINUOUS_MONITOR",
   "4R_FEDERAL_LOAN_AUTHORITY_AUTOMATIC_RECONCILIATION",
   "4S_FEDERAL_LOAN_AUTHORITY_REFRESH_RELIABILITY",
+  "4T_FEDERAL_LOAN_AUTHORITY_CHANGE_TRIAGE",
 ] as const);
 
 export type OfficialEvidenceSequenceStep =
@@ -94,6 +95,8 @@ const REQUIRED_ARTIFACT: Record<OfficialEvidenceSequenceStep, string> = {
     "src/lib/governance/federalLoanAuthorityReconciliation.ts",
   "4S_FEDERAL_LOAN_AUTHORITY_REFRESH_RELIABILITY":
     "src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
+  "4T_FEDERAL_LOAN_AUTHORITY_CHANGE_TRIAGE":
+    "src/lib/governance/federalLoanAuthorityChangeTriage.ts",
 };
 
 export function roadmapArtifactFor(step: OfficialEvidenceSequenceStep): string {

@@ -632,3 +632,7 @@ Before an Ultimate Pro Forma is generated, the runtime must read the current fed
 
 ## Federal Loan Authority Refresh Reliability Amendment
 Official federal lending authority monitoring must be survivable under partial source failure. Each request has a bounded deadline; each run has a hard completion deadline; concurrency is bounded; required seeds are attempted before discovered documents; and every failed, timed-out, or deferred source is represented in the replayable run receipt. Successful sources remain publishable, last-good snapshots remain retained, and any timed-out cited authority is blocked from current pro forma reliance. Standing proof: `npm run verify:federal-loan-authority-refresh-reliability`.
+
+
+## Federal Loan Authority Change Triage Amendment
+Official-source HTML churn must not automatically invalidate lending guidance, and raw-content similarity must not automatically clear a material authority change. The monitor must derive a stable lending-authority semantic fingerprint from program clauses, forms, effective dates, amounts, rates, fees, percentages, and requirement language. Cosmetic or non-lending informational changes may be auto-cleared only with an immutable triage receipt. Lending-relevant changes remain review-bound, legally material changes are elevated, and any change lacking a prior semantic baseline fails closed. Standing proof: `npm run verify:federal-loan-authority-change-triage`.

@@ -531,7 +531,8 @@
     "verify:governed-ultimate-proforma": "tsx src/scripts/verifyGovernedUltimateProforma.ts",
     "verify:federal-loan-authority-monitor": "tsx src/scripts/verifyFederalLoanAuthorityMonitor.ts",
     "verify:federal-loan-authority-reconciliation": "tsx src/scripts/verifyFederalLoanAuthorityReconciliation.ts",
-    "verify:federal-loan-authority-refresh-reliability": "tsx src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts"
+    "verify:federal-loan-authority-refresh-reliability": "tsx src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
+    "verify:federal-loan-authority-change-triage": "tsx src/scripts/verifyFederalLoanAuthorityChangeTriage.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

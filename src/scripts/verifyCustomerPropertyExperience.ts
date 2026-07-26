@@ -16,7 +16,8 @@ if (workspace.includes("<PropertyBestCoursePanel")) failures.push("Customer work
 if (workspace.includes('import { PropertyBestCoursePanel }')) failures.push("Customer workspace still imports the internal best-course governance panel.");
 if (!workspace.includes("Classification pending parcel evidence")) failures.push("Unmatched imported addresses can still silently default to a property type.");
 if (!workspace.includes("chartOpen && propertyClassificationAvailable")) failures.push("Detailed property brief can render without automatic parcel classification evidence.");
-if (!workspace.includes("<PropertyDecisionBrief")) failures.push("Customer workspace does not render the decision-oriented property brief.");
+if (!workspace.includes("<PropertyCommandCenter")) failures.push("Customer workspace does not render the shared property command center.");
+if (workspace.includes("<PropertyDecisionBrief")) failures.push("Temporary decision brief still renders instead of the command center.");
 if (workspace.includes("<ChartTableBrief")) failures.push("Customer workspace still renders the chart interface.");
 if (discovery.includes("Not run — governed gate")) failures.push("Discovery still exposes internal governed-gate language.");
 if (verification.includes("is not activated yet")) failures.push("Customer warnings still expose internal activation state.");
@@ -40,5 +41,7 @@ console.log(JSON.stringify({
   unsupportedRankingsHidden: true,
   customerSafeSourceStatus: true,
   chartInterfaceRemoved: true,
-  decisionBriefRendered: true,
+  commandCenterRendered: true,
+  threeConsumerLanes: true,
+  customerReadinessSeparatedFromReleaseGovernance: true,
 }, null, 2));

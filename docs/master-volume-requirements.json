@@ -1747,6 +1747,28 @@
         "src/scripts/verifyIntegratedPrePromotionFeatureSuite.ts",
         "cloudbuild.yaml"
       ]
+    },
+    "UX-THREE-LANE-COMMAND-CENTER-001": {
+      "title": "Three-lane progressive-disclosure consumer command center",
+      "status": "implemented",
+      "requires": [
+        "shared_residential_farm_commercial_shell",
+        "automatic_property_classification",
+        "progressive_disclosure",
+        "grouped_diligence",
+        "customer_readiness_isolation"
+      ],
+      "tests": [
+        "verify:three-lane-consumer-command-center",
+        "verify:customer-property-experience",
+        "verify:integrated-pre-promotion-features",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/components/property/PropertyCommandCenter.tsx",
+        "src/components/property/PropertyEvaluationWorkspace.tsx",
+        "src/scripts/verifyThreeLaneConsumerCommandCenter.ts"
+      ]
     }
   }
 }

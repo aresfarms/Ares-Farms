@@ -12,7 +12,7 @@ import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
-import { PropertyDecisionBrief } from "@/components/property/PropertyDecisionBrief";
+import { PropertyCommandCenter } from "@/components/property/PropertyCommandCenter";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { PropertyResultCard } from "@/components/property/PropertyResultCard";
 import { PropertyEvidencePanel } from "@/components/property/PropertyEvidencePanel";
@@ -3575,7 +3575,7 @@ export function PropertyEvaluationWorkspace({
           front-loaded Property Type Stamp above — shown for every property.) */}
 
       {!deepView && chartOpen && propertyClassificationAvailable && (
-      <PropertyDecisionBrief
+      <PropertyCommandCenter
         variant={chartVariant}
         propertyId={context.propertyId ?? context.title}
         title={context.title}

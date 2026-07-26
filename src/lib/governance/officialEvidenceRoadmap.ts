@@ -1,4 +1,4 @@
-export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v33";
+export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v34";
 
 export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3Q_EXTERNAL_NOTIFICATION_CONNECTOR",
@@ -40,6 +40,7 @@ export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "5A_TWO_FOUNDER_INTERNAL_PILOT_GATE",
   "5B_CUSTOMER_PROPERTY_EXPERIENCE_RECONSTRUCTION",
   "5C_INTEGRATED_PRE_PROMOTION_FEATURE_VERIFICATION",
+  "5D_THREE_LANE_CONSUMER_COMMAND_CENTER",
 ] as const);
 
 export type OfficialEvidenceSequenceStep =
@@ -124,6 +125,8 @@ const REQUIRED_ARTIFACT: Record<OfficialEvidenceSequenceStep, string> = {
     "src/scripts/verifyCustomerPropertyExperience.ts",
   "5C_INTEGRATED_PRE_PROMOTION_FEATURE_VERIFICATION":
     "src/scripts/verifyIntegratedPrePromotionFeatureSuite.ts",
+  "5D_THREE_LANE_CONSUMER_COMMAND_CENTER":
+    "src/scripts/verifyThreeLaneConsumerCommandCenter.ts",
 };
 
 export function roadmapArtifactFor(step: OfficialEvidenceSequenceStep): string {

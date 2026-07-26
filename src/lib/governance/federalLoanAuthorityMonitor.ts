@@ -349,28 +349,52 @@ export async function refreshFederalLoanAuthorities(input: {
         const response = await fetchBounded(seed.url, prior, input.fetchImpl ?? fetch, Math.min(fetchTimeoutMs, remainingMs));
         fetched += 1;
         if (response.status === 304 && prior) {
-          nextByUrl.set(seed.url, { ...prior, fetchedAt: now, status: prior.changedAt ? "CHANGED_REVIEW_REQUIRED" : "CURRENT", error: null });
+          const semantic = buildFederalAuthoritySemanticFingerprint(prior.normalizedText ?? "");
+          nextByUrl.set(seed.url, {
+            ...prior,
+            fetchedAt: now,
+            status: prior.status === "CHANGED_REVIEW_REQUIRED" ? "CHANGED_REVIEW_REQUIRED" : "CURRENT",
+            error: null,
+            semanticHash: semantic.semanticHash,
+            semanticMateriality: semantic.materiality,
+            triageReasonCodes: prior.triageReasonCodes ?? semantic.reasonCodes,
+          });
           return;
         }
         const html = /(?:text\/html|application\/xhtml\+xml)/i.test(response.contentType) ? response.body.toString("utf8") : null;
         const normalized = html ? normalizeHtml(html) : response.body;
+        const normalizedText = html ? cleanMonitorText(html).slice(0, 2_000_000) : null;
+        const semantic = buildFederalAuthoritySemanticFingerprint(normalizedText ?? "");
         const contentHash = sha(normalized);
         const changed = Boolean(prior && prior.contentHash !== contentHash);
+        const triage = changed
+          ? classifyFederalAuthorityChange({ previousText: prior?.normalizedText, nextText: normalizedText })
+          : null;
+        const reviewRequiredChange = Boolean(changed && triage?.disposition === "REVIEW_REQUIRED");
         const doc: FederalLoanAuthorityDocument = {
           documentId: prior?.documentId ?? documentId(seed.url), agency: seed.agency, kind: seed.kind, url: seed.url,
           contentType: response.contentType, contentHash, etag: response.etag, lastModified: response.lastModified,
           title: html ? titleFromHtml(html) : prior?.title ?? null,
-          normalizedText: html ? cleanMonitorText(html).slice(0, 2_000_000) : null,
+          normalizedText,
           fetchedAt: now, firstObservedAt: prior?.firstObservedAt ?? now,
-          changedAt: changed ? now : prior?.changedAt ?? null,
+          changedAt: reviewRequiredChange ? now : prior?.changedAt ?? null,
           previousContentHash: changed ? prior!.contentHash : prior?.previousContentHash ?? null,
-          status: changed || prior?.changedAt ? "CHANGED_REVIEW_REQUIRED" : "CURRENT", error: null,
+          status: reviewRequiredChange || (!changed && prior?.status === "CHANGED_REVIEW_REQUIRED") ? "CHANGED_REVIEW_REQUIRED" : "CURRENT",
+          error: null,
+          semanticHash: semantic.semanticHash,
+          semanticMateriality: semantic.materiality,
+          triageReasonCodes: triage?.reasonCodes ?? semantic.reasonCodes,
         };
         nextByUrl.set(seed.url, doc);
-        if (changed) changes.push({
+        if (changed && triage) changes.push({
           receiptId: randomUUID(), documentId: doc.documentId, agency: doc.agency, url: doc.url,
           detectedAt: now, previousContentHash: prior!.contentHash, nextContentHash: contentHash,
-          status: "REVIEW_REQUIRED", reason: "Official loan authority content changed; dependent guidance is review-stale until rebound to this content hash.",
+          status: "REVIEW_REQUIRED", disposition: triage.disposition, materiality: triage.materiality,
+          previousSemanticHash: triage.previousSemanticHash, nextSemanticHash: triage.nextSemanticHash,
+          reasonCodes: triage.reasonCodes,
+          reason: triage.disposition === "AUTO_CLEARED"
+            ? "Raw official-source content changed without a lending-authority change; the change was isolated and auto-cleared."
+            : "Official lending authority changed or lacks a sufficient prior semantic baseline; dependent guidance remains review-stale.",
         });
         if (seed.discoverLinks && html && discovered < MAX_DISCOVERED_TOTAL) {
           for (const url of discoverLinks(html, seed.url)) {

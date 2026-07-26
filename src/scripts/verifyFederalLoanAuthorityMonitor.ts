@@ -30,7 +30,7 @@ function mockFetch(version: "v1" | "v2" | "fail"): typeof fetch {
     }
     if (url === termsUrl) {
       return new Response(
-        `<html><head><title>7(a) Terms</title></head><body>${version === "v1" ? "75 percent guaranty" : "changed official requirement"}</body></html>`,
+        `<html><head><title>7(a) Terms</title></head><body>${version === "v1" ? "The SBA guaranty is 75 percent." : "The SBA guaranty is 80 percent."}</body></html>`,
         { status: 200, headers: { "content-type": "text/html", etag: version === "v1" ? '"terms-1"' : '"terms-2"' } },
       );
     }

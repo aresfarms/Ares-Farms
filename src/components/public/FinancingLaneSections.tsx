@@ -72,7 +72,7 @@ export function FinancingLaneSections() {
           2026-07-20); the paid-advisory fee block moves to the bottom. */}
       <LoanProgramComparison />
 
-      <section aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
+      <section id="personalized-financing" aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
           Our dedicated licensed lender
         </span>

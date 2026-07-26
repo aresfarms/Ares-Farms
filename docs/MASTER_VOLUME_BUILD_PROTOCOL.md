@@ -597,3 +597,8 @@ Hard rules:
 ## Institutional Access Runtime Enforcement Amendment
 
 Institutional-access doctrine is incomplete until the protected request path consumes it. Every governed evidence packet request must execute the canonical credential, authority, ABAC, field-disclosure, capability, access-ledger, and surveillance-observation controls before packet construction. Governance and administrator identities retain management authority but may not be converted into auditor identities for evidence access. The standing proof command is `npm run verify:institutional-access-runtime-enforcement`.
+
+
+## Institutional Access Surveillance Orchestration Amendment
+
+Institutional access surveillance must execute as an operational control rather than exist only as doctrine or a reusable library. Every unrevoked attorney, auditor, and governmental-official evidence grant must be reevaluated against current credential, authority, scope, expiry, denied-request, and export-volume evidence. Invalid or expired grants are revoked append-only. Anomaly findings remain review-bound and require independent closure. The protected internal route requires `INSTITUTIONAL_ACCESS_SURVEILLANCE_CRON_SECRET` and fails closed when it is absent. The standing proof command is `npm run verify:institutional-access-surveillance-orchestration`. Scheduler activation remains a separate controlled-promotion action.

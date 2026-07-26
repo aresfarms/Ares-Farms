@@ -188,3 +188,10 @@ Institutional access remains under continuous credential and authority recheck, 
 The governed evidence portal must invoke the canonical credential, legal-authority, ABAC, and access-ledger controls on every packet request before any evidence enters a packet object, hash, timeline, response, or export. The request path revalidates the exact credential and authority receipts against the authenticated principal, role, matter, subject, module, and active dates; requires explicit matter, module, and subject scope; filters classified evidence before composition; issues only a five-minute scope-bound capability token; records allowed and denied observations; and prohibits governance or administrator identities from being silently treated as auditors.
 
 **Hard rule:** A control that exists only as a library or build-time verifier is not considered operationally enforced. Removal of the runtime orchestrator, portal integration, or mandatory verifier must fail Cloud Build before image construction.
+
+
+## Step 4L — Institutional Access Surveillance Orchestration
+
+The platform must continuously evaluate every unrevoked institutional evidence grant against current credential status, current legal or engagement authority, grant expiry, export volume, and denied-request patterns. The surveillance planner must be deterministic and replayable; the durable runner must append a surveillance receipt for every evaluated grant and automatically revoke grants when credentials, authority, or time validity fail. Anomaly-only findings remain review-bound and require independent closure. The protected internal route fails closed unless its dedicated runtime secret is configured.
+
+**Hard rule:** Surveillance that exists only as a library or synthetic verifier is not continuous enforcement. Every unrevoked grant, including a grant that expired between runs, must remain discoverable by the surveillance runner until it is cleanly recorded or revoked. This step does not enable a Cloud Scheduler job and does not resume the paused evidence-recomputation scheduler.

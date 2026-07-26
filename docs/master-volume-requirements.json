@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.1",
+  "frameworkVersion": "master-volume-conformance-v0.4.2",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1359,6 +1359,24 @@
         "src/lib/governance/institutionalAccessRuntimeEnforcement.ts",
         "src/app/audit-replay/governed-evidence/page.tsx",
         "src/scripts/verifyInstitutionalAccessRuntimeEnforcement.ts"
+      ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-ORCHESTRATION-001": {
+      "title": "Continuous institutional grant surveillance orchestration",
+      "status": "implemented",
+      "requires": [
+        "scheduled_surveillance_runner",
+        "request_observation_replay",
+        "automatic_grant_revocation",
+        "protected_internal_route"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-orchestration"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceOrchestrator.ts",
+        "src/app/api/internal/institutional-access-surveillance/route.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceOrchestration.ts"
       ]
     }
   }

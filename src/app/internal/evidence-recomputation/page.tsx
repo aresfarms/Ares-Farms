@@ -87,6 +87,10 @@ import {
   type ExternalNotificationActivationAction,
 } from "@/lib/property/officialEvidenceExternalNotificationActivation";
 import { listExternalNotificationDeliveryReceipts } from "@/lib/property/officialEvidenceExternalNotificationDelivery";
+import {
+  evaluateExternalNotificationAcknowledgments,
+  listExternalNotificationAssuranceReceipts,
+} from "@/lib/property/officialEvidenceExternalNotificationAssurance";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -378,6 +382,10 @@ export default async function EvidenceRecomputationPage() {
   const liveExternalConnectors = liveExternalNotificationConnectors();
   const externalDeliveryReceipts = listExternalNotificationDeliveryReceipts()
     .slice(-30)
+    .reverse();
+  evaluateExternalNotificationAcknowledgments();
+  const externalAssuranceReceipts = listExternalNotificationAssuranceReceipts()
+    .slice(-40)
     .reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
@@ -1181,6 +1189,25 @@ export default async function EvidenceRecomputationPage() {
             {receipt.actorName} · {receipt.reason}
           </div>
         ))}
+        <h3>External delivery assurance receipts</h3>
+        {externalAssuranceReceipts.length === 0 ? (
+          <p>No external delivery acknowledgment or timeout receipts.</p>
+        ) : (
+          externalAssuranceReceipts.map((receipt) => (
+            <div
+              key={receipt.receiptId}
+              style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>{receipt.action}</b> · {receipt.channel} ·{" "}
+              {receipt.connectorId} · {receipt.at}
+              <br />
+              Notification {receipt.notificationId} · acknowledge by{" "}
+              {receipt.acknowledgeBy}
+              <br />
+              {receipt.reason}
+            </div>
+          ))
+        )}
       </section>
       <section
         style={{ padding: 20, border: "1px solid #d7deea", borderRadius: 12 }}

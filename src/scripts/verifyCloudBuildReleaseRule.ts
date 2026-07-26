@@ -40,6 +40,7 @@ const required = [
   "verify:official-evidence-external-notification-dry-run",
   "verify:official-evidence-external-notification-activation",
   "verify:official-evidence-external-notification-delivery",
+  "verify:official-evidence-external-notification-assurance",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

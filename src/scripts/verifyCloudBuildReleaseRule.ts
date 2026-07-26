@@ -51,6 +51,7 @@ const required = [
   "verify:official-evidence-external-notification-corrective-action-effectiveness",
   "verify:official-evidence-external-notification-institutional-closure",
   "verify:controlled-promotion-readiness-reconciliation",
+  "verify:public-alpha-signoff-ceremony-packet",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

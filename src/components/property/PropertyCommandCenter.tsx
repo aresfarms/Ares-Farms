@@ -74,8 +74,19 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const evidencePct = evidenceTotal > 0 ? Math.round((facts.length / evidenceTotal) * 100) : 0;
   const lane = laneLabel(props.propertyType);
   const hasPrice = !/not captured|unknown|enter|not provided|—/i.test(props.priceLabel);
+  const propertyProfileEstablished = Boolean(props.propertyType) && facts.length >= 8;
   const recommendationEligible = hasPrice && facts.length >= 4 && unknowns.length <= 5;
-  const posture = recommendationEligible ? "READY FOR REVIEW" : facts.length ? "MORE INFORMATION NEEDED" : "PROPERTY IDENTIFIED";
+  const posture = recommendationEligible
+    ? "READY FOR REVIEW"
+    : propertyProfileEstablished
+      ? "PROPERTY PROFILE ESTABLISHED"
+      : facts.length
+        ? "PROPERTY PROFILE IN PROGRESS"
+        : "PROPERTY IDENTIFIED";
+  const remainingDecisionInputs = [
+    ...(!hasPrice ? ["Purchase or offer price"] : []),
+    ...unknowns.slice(0, 4).map((item) => item.label),
+  ];
 
   const shell = { background: "#FAF8F3", border: "1px solid #E5E0D5", borderRadius: 18, overflow: "hidden" } as const;
   const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
@@ -83,7 +94,7 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
     { id: "summary", label: "Summary" },
     { id: "financing", label: "Financial model" },
     { id: "diligence", label: "Due diligence", badge: `${totalChecks} open` },
-    { id: "readiness", label: "Decision readiness", badge: String(unknowns.length + (hasPrice ? 0 : 1)) },
+    { id: "readiness", label: "Decision readiness", badge: `${unknowns.length + (hasPrice ? 0 : 1)} actions` },
   ];
 
   return (
@@ -107,17 +118,18 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
               <span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane}</span>
               <span style={{ justifySelf: "start", borderRadius: 999, padding: "5px 11px", background: recommendationEligible ? "#EAF4EE" : "#FBF1E0", color: recommendationEligible ? "#2E7D4F" : "#A2661F", fontSize: 12, fontWeight: 800 }}>{posture}</span>
               <p style={{ margin: 0, lineHeight: 1.6, color: "#E6E9EF" }}>{props.headline}</p>
-              <span style={{ fontSize: 11, color: "#9EA8BA" }}>Property intelligence only. A recommendation appears only after the minimum evidence threshold is satisfied.</span>
+              <span style={{ fontSize: 11, color: "#9EA8BA" }}>{propertyProfileEstablished && !recommendationEligible ? "The property profile is established. Deal-specific inputs still control whether Furlong can issue a recommendation." : "Property intelligence only. A recommendation appears only after the minimum evidence threshold is satisfied."}</span>
             </article>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {[
-                ["Evidence completeness", `${evidencePct}%`, `${facts.length} verified · ${unknowns.length} open`],
+                ["Property evidence", propertyProfileEstablished ? "Established" : `${evidencePct}%`, `${facts.length} verified facts · ${unknowns.length} diligence items`],
                 ["Property lane", lane, "Auto-detected from property evidence"],
                 ["Capital needed", hasPrice ? props.priceLabel : "Enter price", hasPrice ? "Current price basis" : "Required for financial modeling"],
                 ["Potential pathways", String(props.financingLanes.length), props.financingLanes.slice(0, 2).join(" · ") || "None confirmed yet"],
               ].map(([label, value, note]) => <div key={label} style={{ ...card, padding: 14 }}><span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{label}</span><strong style={{ display: "block", color: "#1C2B45", fontSize: 17, marginTop: 4 }}>{value}</strong><span style={{ color: "#8A8F9C", fontSize: 11.5 }}>{note}</span></div>)}
             </div>
           </div>
+          {propertyProfileEstablished && !recommendationEligible && <section style={{ ...card, borderColor: "#B9C6D8", background: "#F5F8FC", display: "grid", gap: 8 }}><strong style={{ color: "#1C2B45" }}>What is still needed for a deal recommendation?</strong><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Furlong already has enough information to establish the property profile. These remaining items affect price, financing, insurability, or the final acquisition recommendation:</p><div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>{remainingDecisionInputs.map((item) => <span key={item} style={{ border: "1px solid #CBD5E1", borderRadius: 999, background: "#fff", padding: "5px 9px", color: "#334155", fontSize: 11.5, fontWeight: 700 }}>{item}</span>)}</div></section>}
           <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Something Furlong missed?</strong><span style={{ color: "#5A6172", fontSize: 12 }}>Add a property feature such as “deeded pier,” “two parcels,” or “waterfront.” It will be marked owner-reported until a source or document verifies it.</span><form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "This customer-supplied property feature is kept separate from source-verified facts. Furlong will add the appropriate parcel, deed, permit, or inspection check before relying on it.", provenance: "Owner assertion added in the command center", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", minWidth: 0, border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px", background: "#fff", color: "#1C2B45" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Add feature</button></form></section>
           {ownerAssertions.length > 0 && <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8" }}><strong style={{ color: "#1C2B45" }}>Owner-reported property features</strong><p style={{ margin: "4px 0 10px", color: "#5A6172", fontSize: 12 }}>Useful information kept separate from source-verified facts until supporting records arrive.</p><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 8 }}>{ownerAssertions.map((fact) => <article key={`${fact.label}-${fact.value}`} style={{ border: "1px solid #E8D28A", borderRadius: 10, padding: 11, background: "#fff" }}><strong style={{ display: "block", color: "#1C2B45", fontSize: 13 }}>{fact.label}</strong><span style={{ display: "block", color: "#8F6E1F", fontSize: 12, fontWeight: 750, marginTop: 3 }}>{fact.value}</span><span style={{ display: "block", color: "#6B7280", fontSize: 11, marginTop: 4 }}>{fact.text}</span></article>)}</div></section>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 10 }}>

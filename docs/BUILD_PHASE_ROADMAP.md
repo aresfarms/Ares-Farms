@@ -133,3 +133,8 @@ Closed connector registrations remain under permanent resurrection surveillance.
 ### Roadmap Amendment — Step 4A
 
 Step 4A begins the post-incident assurance phase. A resolved 3Z tombstone incident is not institutionally closed until root cause, credential, provider, routing, and secret-control evidence are bound to a corrective-action record; zero post-resolution recurrence events are proven; and attributed Module 45 authority records remediation verification and final closure. Permanent connector retirement remains in force throughout.
+
+
+### Step 4B — Corrective-Action Effectiveness Monitoring
+
+A closed corrective action must remain under a 72-hour effectiveness window with three clean checkpoints separated by at least 24 hours. Any recurrence evidence fails the window and blocks closure. External delivery remains blocked and the Module 45 internal queue remains authoritative throughout.

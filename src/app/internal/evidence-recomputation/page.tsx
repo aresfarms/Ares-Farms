@@ -126,6 +126,13 @@ import {
   openExternalNotificationCorrectiveAction,
   verifyExternalNotificationCorrectiveAction,
 } from "@/lib/property/officialEvidenceExternalNotificationCorrectiveAction";
+import {
+  closeExternalNotificationCorrectiveActionEffectivenessWindow,
+  correctiveActionEffectivenessStatus,
+  evaluateExternalNotificationCorrectiveActionEffectiveness,
+  listExternalNotificationCorrectiveActionEffectivenessReceipts,
+  openExternalNotificationCorrectiveActionEffectivenessWindow,
+} from "@/lib/property/officialEvidenceExternalNotificationCorrectiveActionEffectiveness";
 
 async function decideTombstoneIncident(formData: FormData): Promise<void> {
   "use server";
@@ -176,6 +183,36 @@ async function closeCorrectiveAction(formData: FormData): Promise<void> {
     throw new Error("Module 45 source/legal authority is required.");
   const operator = operatorByEmail(email)!;
   closeExternalNotificationCorrectiveAction({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function evaluateCorrectiveActionEffectiveness(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  evaluateExternalNotificationCorrectiveActionEffectiveness({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    externalDeliveryBlocked: true,
+    internalQueueAuthoritative: true,
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function closeCorrectiveActionEffectiveness(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  closeExternalNotificationCorrectiveActionEffectivenessWindow({
     registrationId: String(formData.get("registrationId") ?? ""),
     actorId: operator.id,
     actorName: operator.name,
@@ -557,6 +594,13 @@ export default async function EvidenceRecomputationPage() {
       openExternalNotificationCorrectiveAction({ registrationId: receipt.registrationId });
   const externalCorrectiveActionReceipts =
     listExternalNotificationCorrectiveActionReceipts().slice(-40).reverse();
+  for (const receipt of externalCorrectiveActionReceipts)
+    if (receipt.action === "CLOSE_CORRECTIVE_ACTION")
+      openExternalNotificationCorrectiveActionEffectivenessWindow({
+        registrationId: receipt.registrationId,
+      });
+  const externalCorrectiveActionEffectivenessReceipts =
+    listExternalNotificationCorrectiveActionEffectivenessReceipts().slice(-40).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1663,6 +1707,44 @@ export default async function EvidenceRecomputationPage() {
             recurrence events {receipt.recurrenceEventCount} · external delivery blocked · internal queue authoritative
             {receipt.rootCauseRef ? <><br />root cause {receipt.rootCauseRef} · credential {receipt.credentialAuditRef} · provider {receipt.providerAuditRef}</> : null}
             {receipt.routingAuditRef ? <><br />routing {receipt.routingAuditRef} · secret {receipt.secretAuditRef}{receipt.codeChangeRef ? ` · change ${receipt.codeChangeRef}` : ""}</> : null}
+            <br />
+            {receipt.reason}
+          </div>
+        ))}
+        <h3>Corrective-action effectiveness monitoring</h3>
+        <p>
+          Closed corrective actions remain under a 72-hour observation window with three
+          clean checkpoints separated by at least 24 hours. Any recurrence blocks closure.
+        </p>
+        {externalCorrectiveActionReceipts
+          .filter((receipt) => receipt.action === "CLOSE_CORRECTIVE_ACTION")
+          .map((receipt) => {
+            const status = correctiveActionEffectivenessStatus(receipt.registrationId);
+            return (
+              <div key={`effectiveness-${receipt.registrationId}`} style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}>
+                <b>{receipt.connectorId} · {receipt.channel} · EFFECTIVENESS {status}</b>
+                {status !== "CLOSED" && status !== "FAILED" ? (
+                  <form action={evaluateCorrectiveActionEffectiveness} style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                    <input type="hidden" name="registrationId" value={receipt.registrationId} />
+                    <button disabled={!mayApprove}>Run due effectiveness checkpoint</button>
+                  </form>
+                ) : null}
+                {status === "CHECKPOINT_3" ? (
+                  <form action={closeCorrectiveActionEffectiveness} style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                    <input type="hidden" name="registrationId" value={receipt.registrationId} />
+                    <textarea name="reason" required placeholder="Why the 72-hour effectiveness window may close" />
+                    <button disabled={!mayApprove}>Close effectiveness window</button>
+                  </form>
+                ) : null}
+              </div>
+            );
+          })}
+        {externalCorrectiveActionEffectivenessReceipts.map((receipt) => (
+          <div key={receipt.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
+            <b>{receipt.action}</b> · checkpoint {receipt.checkpointNumber}/{receipt.requiredCheckpoints} · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+            <br />
+            observation {receipt.observationWindowHours}h · recurrence events {receipt.recurrenceEventCount} · external delivery blocked · internal queue authoritative
+            {receipt.recurrenceEventRefs.length ? <><br />{receipt.recurrenceEventRefs.join(" · ")}</> : null}
             <br />
             {receipt.reason}
           </div>

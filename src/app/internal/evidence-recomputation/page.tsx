@@ -133,6 +133,11 @@ import {
   listExternalNotificationCorrectiveActionEffectivenessReceipts,
   openExternalNotificationCorrectiveActionEffectivenessWindow,
 } from "@/lib/property/officialEvidenceExternalNotificationCorrectiveActionEffectiveness";
+import {
+  attestExternalNotificationInstitutionalClosure,
+  externalNotificationInstitutionallyClosed,
+  listExternalNotificationInstitutionalClosureAttestations,
+} from "@/lib/property/officialEvidenceExternalNotificationInstitutionalClosure";
 
 async function decideTombstoneIncident(formData: FormData): Promise<void> {
   "use server";
@@ -143,7 +148,10 @@ async function decideTombstoneIncident(formData: FormData): Promise<void> {
   const operator = operatorByEmail(email)!;
   decideExternalNotificationTombstoneIncident({
     registrationId: String(formData.get("registrationId") ?? ""),
-    action: String(formData.get("action")) as Exclude<TombstoneIncidentAction, "CONTAIN">,
+    action: String(formData.get("action")) as Exclude<
+      TombstoneIncidentAction,
+      "CONTAIN"
+    >,
     actorId: operator.id,
     actorName: operator.name,
     reason: String(formData.get("reason") ?? "").trim(),
@@ -191,7 +199,9 @@ async function closeCorrectiveAction(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 
-async function evaluateCorrectiveActionEffectiveness(formData: FormData): Promise<void> {
+async function evaluateCorrectiveActionEffectiveness(
+  formData: FormData,
+): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
   const email = session?.user?.email ?? null;
@@ -205,7 +215,9 @@ async function evaluateCorrectiveActionEffectiveness(formData: FormData): Promis
   revalidatePath("/internal/evidence-recomputation");
 }
 
-async function closeCorrectiveActionEffectiveness(formData: FormData): Promise<void> {
+async function closeCorrectiveActionEffectiveness(
+  formData: FormData,
+): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
   const email = session?.user?.email ?? null;
@@ -214,6 +226,25 @@ async function closeCorrectiveActionEffectiveness(formData: FormData): Promise<v
   const operator = operatorByEmail(email)!;
   closeExternalNotificationCorrectiveActionEffectivenessWindow({
     registrationId: String(formData.get("registrationId") ?? ""),
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
+async function attestInstitutionalClosure(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  attestExternalNotificationInstitutionalClosure({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    attestationScope: String(formData.get("attestationScope") ?? "").trim(),
+    externalDeliveryBlocked: true,
+    internalQueueAuthoritative: true,
     actorId: operator.id,
     actorName: operator.name,
     reason: String(formData.get("reason") ?? "").trim(),
@@ -479,7 +510,9 @@ async function retireExternalConnector(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 
-async function closeExternalConnectorRetirement(formData: FormData): Promise<void> {
+async function closeExternalConnectorRetirement(
+  formData: FormData,
+): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
   const email = session?.user?.email ?? null;
@@ -488,12 +521,23 @@ async function closeExternalConnectorRetirement(formData: FormData): Promise<voi
   const operator = operatorByEmail(email)!;
   closeExternalNotificationRetirement({
     registrationId: String(formData.get("registrationId") ?? ""),
-    credentialRevocationRef: String(formData.get("credentialRevocationRef") ?? "").trim(),
-    providerCallbackDisableRef: String(formData.get("providerCallbackDisableRef") ?? "").trim(),
-    routingAliasRemovalRef: String(formData.get("routingAliasRemovalRef") ?? "").trim(),
-    secretReferenceRemovalRef: String(formData.get("secretReferenceRemovalRef") ?? "").trim(),
-    internalQueueAuthoritative: formData.get("internalQueueAuthoritative") === "on",
-    openOperationalReferences: Number(formData.get("openOperationalReferences") ?? "0"),
+    credentialRevocationRef: String(
+      formData.get("credentialRevocationRef") ?? "",
+    ).trim(),
+    providerCallbackDisableRef: String(
+      formData.get("providerCallbackDisableRef") ?? "",
+    ).trim(),
+    routingAliasRemovalRef: String(
+      formData.get("routingAliasRemovalRef") ?? "",
+    ).trim(),
+    secretReferenceRemovalRef: String(
+      formData.get("secretReferenceRemovalRef") ?? "",
+    ).trim(),
+    internalQueueAuthoritative:
+      formData.get("internalQueueAuthoritative") === "on",
+    openOperationalReferences: Number(
+      formData.get("openOperationalReferences") ?? "0",
+    ),
     actorId: operator.id,
     actorName: operator.name,
     reason: String(formData.get("reason") ?? "").trim(),
@@ -586,12 +630,16 @@ export default async function EvidenceRecomputationPage() {
     listExternalNotificationRetirementTombstoneReceipts().slice(-40).reverse();
   for (const receipt of externalRetirementTombstoneReceipts)
     if (receipt.action === "TOMBSTONE_FAIL")
-      containExternalNotificationTombstoneFailure({ registrationId: receipt.registrationId });
+      containExternalNotificationTombstoneFailure({
+        registrationId: receipt.registrationId,
+      });
   const externalTombstoneIncidentReceipts =
     listExternalNotificationTombstoneIncidentReceipts().slice(-40).reverse();
   for (const receipt of externalTombstoneIncidentReceipts)
     if (receipt.action === "RESOLVE")
-      openExternalNotificationCorrectiveAction({ registrationId: receipt.registrationId });
+      openExternalNotificationCorrectiveAction({
+        registrationId: receipt.registrationId,
+      });
   const externalCorrectiveActionReceipts =
     listExternalNotificationCorrectiveActionReceipts().slice(-40).reverse();
   for (const receipt of externalCorrectiveActionReceipts)
@@ -600,7 +648,13 @@ export default async function EvidenceRecomputationPage() {
         registrationId: receipt.registrationId,
       });
   const externalCorrectiveActionEffectivenessReceipts =
-    listExternalNotificationCorrectiveActionEffectivenessReceipts().slice(-40).reverse();
+    listExternalNotificationCorrectiveActionEffectivenessReceipts()
+      .slice(-40)
+      .reverse();
+  const externalInstitutionalClosureAttestations =
+    listExternalNotificationInstitutionalClosureAttestations()
+      .slice(-30)
+      .reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1452,8 +1506,9 @@ export default async function EvidenceRecomputationPage() {
         ))}
         <h3>Permanent connector retirement</h3>
         <p>
-          Retirement is irreversible for the bound registration and implementation
-          hash. A replacement must begin with a fresh registration.
+          Retirement is irreversible for the bound registration and
+          implementation hash. A replacement must begin with a fresh
+          registration.
         </p>
         {externalConnectorRegistrations.map((registration) => (
           <form
@@ -1473,7 +1528,9 @@ export default async function EvidenceRecomputationPage() {
             />
             <b>
               {registration.connectorId} · {registration.channel} ·{" "}
-              {externalNotificationRegistrationRetired(registration.registrationId)
+              {externalNotificationRegistrationRetired(
+                registration.registrationId,
+              )
                 ? "RETIRED"
                 : "ACTIVE REGISTRATION"}
             </b>
@@ -1487,7 +1544,9 @@ export default async function EvidenceRecomputationPage() {
                 Implementation obsolescence
               </option>
               <option value="POLICY_PROHIBITION">Policy prohibition</option>
-              <option value="OPERATOR_DECOMMISSION">Operator decommission</option>
+              <option value="OPERATOR_DECOMMISSION">
+                Operator decommission
+              </option>
               <option value="SUPERSEDED_IMPLEMENTATION">
                 Superseded implementation
               </option>
@@ -1504,7 +1563,9 @@ export default async function EvidenceRecomputationPage() {
             <button
               disabled={
                 !mayApprove ||
-                externalNotificationRegistrationRetired(registration.registrationId)
+                externalNotificationRegistrationRetired(
+                  registration.registrationId,
+                )
               }
             >
               Permanently retire registration
@@ -1516,11 +1577,11 @@ export default async function EvidenceRecomputationPage() {
             key={receipt.receiptId}
             style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
           >
-            <b>{receipt.action}</b> · {receipt.classification} · {receipt.channel} ·{" "}
-            {receipt.connectorId} · {receipt.at}
+            <b>{receipt.action}</b> · {receipt.classification} ·{" "}
+            {receipt.channel} · {receipt.connectorId} · {receipt.at}
             <br />
-            implementation {receipt.implementationHash.slice(0, 16)}… · revocation{" "}
-            {receipt.revocationReceiptId}
+            implementation {receipt.implementationHash.slice(0, 16)}… ·
+            revocation {receipt.revocationReceiptId}
             <br />
             {receipt.reason}
           </div>
@@ -1528,12 +1589,14 @@ export default async function EvidenceRecomputationPage() {
 
         <h3>Retirement closure and decommission verification</h3>
         <p>
-          Closure proves that the retired registration has no remaining credential,
-          callback, routing, secret-reference, or operational path.
+          Closure proves that the retired registration has no remaining
+          credential, callback, routing, secret-reference, or operational path.
         </p>
         {externalConnectorRegistrations
           .filter((registration) =>
-            externalNotificationRegistrationRetired(registration.registrationId),
+            externalNotificationRegistrationRetired(
+              registration.registrationId,
+            ),
           )
           .map((registration) => (
             <form
@@ -1546,30 +1609,68 @@ export default async function EvidenceRecomputationPage() {
                 borderTop: "1px solid #e2e8f0",
               }}
             >
-              <input type="hidden" name="registrationId" value={registration.registrationId} />
+              <input
+                type="hidden"
+                name="registrationId"
+                value={registration.registrationId}
+              />
               <b>
                 {registration.connectorId} · {registration.channel} ·{" "}
-                {externalNotificationRetirementClosed(registration.registrationId)
+                {externalNotificationRetirementClosed(
+                  registration.registrationId,
+                )
                   ? "CLOSED"
                   : "RETIREMENT OPEN"}
               </b>
-              <input name="credentialRevocationRef" required placeholder="Credential revocation evidence reference" />
-              <input name="providerCallbackDisableRef" required placeholder="Provider callback disablement reference" />
-              <input name="routingAliasRemovalRef" required placeholder="Routing alias removal reference" />
-              <input name="secretReferenceRemovalRef" required placeholder="Runtime secret-reference removal reference" />
+              <input
+                name="credentialRevocationRef"
+                required
+                placeholder="Credential revocation evidence reference"
+              />
+              <input
+                name="providerCallbackDisableRef"
+                required
+                placeholder="Provider callback disablement reference"
+              />
+              <input
+                name="routingAliasRemovalRef"
+                required
+                placeholder="Routing alias removal reference"
+              />
+              <input
+                name="secretReferenceRemovalRef"
+                required
+                placeholder="Runtime secret-reference removal reference"
+              />
               <label>
                 Open operational references{" "}
-                <input name="openOperationalReferences" type="number" min="0" defaultValue="0" required />
+                <input
+                  name="openOperationalReferences"
+                  type="number"
+                  min="0"
+                  defaultValue="0"
+                  required
+                />
               </label>
               <label>
-                <input name="internalQueueAuthoritative" type="checkbox" required />{" "}
+                <input
+                  name="internalQueueAuthoritative"
+                  type="checkbox"
+                  required
+                />{" "}
                 Module 45 internal queue remains authoritative
               </label>
-              <textarea name="reason" required placeholder="Retirement closure reason" />
+              <textarea
+                name="reason"
+                required
+                placeholder="Retirement closure reason"
+              />
               <button
                 disabled={
                   !mayApprove ||
-                  externalNotificationRetirementClosed(registration.registrationId)
+                  externalNotificationRetirementClosed(
+                    registration.registrationId,
+                  )
                 }
               >
                 Close retirement
@@ -1581,21 +1682,25 @@ export default async function EvidenceRecomputationPage() {
             key={receipt.receiptId}
             style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
           >
-            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId}{" "}
+            · {receipt.at}
             <br />
-            credential {receipt.credentialRevocationRef} · callback {receipt.providerCallbackDisableRef}
+            credential {receipt.credentialRevocationRef} · callback{" "}
+            {receipt.providerCallbackDisableRef}
             <br />
-            alias {receipt.routingAliasRemovalRef} · secret {receipt.secretReferenceRemovalRef}
+            alias {receipt.routingAliasRemovalRef} · secret{" "}
+            {receipt.secretReferenceRemovalRef}
             <br />
-            open references {receipt.openOperationalReferences} · internal queue authoritative
+            open references {receipt.openOperationalReferences} · internal queue
+            authoritative
             <br />
             {receipt.reason}
           </div>
         ))}
         <h3>Retirement tombstone surveillance</h3>
         <p>
-          Closed registrations remain under permanent surveillance for stale approval,
-          activation, dry-run, delivery, or reinstatement evidence.
+          Closed registrations remain under permanent surveillance for stale
+          approval, activation, dry-run, delivery, or reinstatement evidence.
         </p>
         {externalRetirementClosureReceipts.map((closure) => (
           <div
@@ -1603,7 +1708,8 @@ export default async function EvidenceRecomputationPage() {
             style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
           >
             <b>
-              {closure.connectorId} · {closure.channel} · {retirementTombstoneHealthy(closure.registrationId)
+              {closure.connectorId} · {closure.channel} ·{" "}
+              {retirementTombstoneHealthy(closure.registrationId)
                 ? "TOMBSTONE HEALTHY"
                 : "TOMBSTONE REVIEW REQUIRED"}
             </b>
@@ -1616,11 +1722,16 @@ export default async function EvidenceRecomputationPage() {
             key={receipt.receiptId}
             style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
           >
-            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId}{" "}
+            · {receipt.at}
             <br />
-            checked through {receipt.checkedThrough} · prohibited events {receipt.prohibitedEventCount}
+            checked through {receipt.checkedThrough} · prohibited events{" "}
+            {receipt.prohibitedEventCount}
             {receipt.prohibitedEventRefs.length > 0 ? (
-              <><br />{receipt.prohibitedEventRefs.join(" · ")}</>
+              <>
+                <br />
+                {receipt.prohibitedEventRefs.join(" · ")}
+              </>
             ) : null}
             <br />
             {receipt.reason}
@@ -1628,8 +1739,9 @@ export default async function EvidenceRecomputationPage() {
         ))}
         <h3>Tombstone breach containment</h3>
         <p>
-          Every tombstone failure is automatically contained as SEV-1. Module 45 must
-          acknowledge the incident before it can be resolved; external delivery remains blocked.
+          Every tombstone failure is automatically contained as SEV-1. Module 45
+          must acknowledge the incident before it can be resolved; external
+          delivery remains blocked.
         </p>
         {externalRetirementTombstoneReceipts
           .filter((receipt) => receipt.action === "TOMBSTONE_FAIL")
@@ -1639,114 +1751,331 @@ export default async function EvidenceRecomputationPage() {
               <form
                 key={`tombstone-incident-${failure.registrationId}`}
                 action={decideTombstoneIncident}
-                style={{ display: "grid", gap: 8, padding: "10px 0", borderTop: "1px solid #e2e8f0" }}
+                style={{
+                  display: "grid",
+                  gap: 8,
+                  padding: "10px 0",
+                  borderTop: "1px solid #e2e8f0",
+                }}
               >
-                <input type="hidden" name="registrationId" value={failure.registrationId} />
-                <b>{failure.connectorId} · {failure.channel} · {status}</b>
+                <input
+                  type="hidden"
+                  name="registrationId"
+                  value={failure.registrationId}
+                />
+                <b>
+                  {failure.connectorId} · {failure.channel} · {status}
+                </b>
                 <select name="action" required defaultValue="">
-                  <option value="" disabled>Select Module 45 disposition</option>
-                  <option value="ACKNOWLEDGE">Acknowledge and investigate</option>
+                  <option value="" disabled>
+                    Select Module 45 disposition
+                  </option>
+                  <option value="ACKNOWLEDGE">
+                    Acknowledge and investigate
+                  </option>
                   <option value="ESCALATE">Escalate</option>
                   <option value="RESOLVE">Resolve after acknowledgment</option>
                 </select>
-                <textarea name="reason" required placeholder="Incident disposition reason" />
-                <button disabled={!mayApprove || status === "RESOLVED"}>Record tombstone incident decision</button>
+                <textarea
+                  name="reason"
+                  required
+                  placeholder="Incident disposition reason"
+                />
+                <button disabled={!mayApprove || status === "RESOLVED"}>
+                  Record tombstone incident decision
+                </button>
               </form>
             );
           })}
         {externalTombstoneIncidentReceipts.map((receipt) => (
-          <div key={receipt.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
-            <b>{receipt.action}</b> · {receipt.severity} · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.severity} · {receipt.channel} ·{" "}
+            {receipt.connectorId} · {receipt.at}
             <br />
-            external delivery blocked · internal queue authoritative · offending events {receipt.offendingEventRefs.length}
-            {receipt.offendingEventRefs.length ? <><br />{receipt.offendingEventRefs.join(" · ")}</> : null}
+            external delivery blocked · internal queue authoritative · offending
+            events {receipt.offendingEventRefs.length}
+            {receipt.offendingEventRefs.length ? (
+              <>
+                <br />
+                {receipt.offendingEventRefs.join(" · ")}
+              </>
+            ) : null}
             <br />
             {receipt.reason}
           </div>
         ))}
         <h3>Post-incident corrective action</h3>
         <p>
-          A resolved tombstone incident remains open institutionally until root cause and
-          remediation evidence are verified, zero post-resolution recurrence events are
-          proven, and Module 45 records final corrective-action closure.
+          A resolved tombstone incident remains open institutionally until root
+          cause and remediation evidence are verified, zero post-resolution
+          recurrence events are proven, and Module 45 records final
+          corrective-action closure.
         </p>
         {externalTombstoneIncidentReceipts
           .filter((receipt) => receipt.action === "RESOLVE")
           .map((resolution) => {
             const status = correctiveActionStatus(resolution.registrationId);
             return (
-              <div key={`capa-${resolution.registrationId}`} style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}>
-                <b>{resolution.connectorId} · {resolution.channel} · CORRECTIVE ACTION {status}</b>
+              <div
+                key={`capa-${resolution.registrationId}`}
+                style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}
+              >
+                <b>
+                  {resolution.connectorId} · {resolution.channel} · CORRECTIVE
+                  ACTION {status}
+                </b>
                 {status === "OPEN" ? (
-                  <form action={verifyCorrectiveAction} style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                    <input type="hidden" name="registrationId" value={resolution.registrationId} />
-                    <input name="rootCauseRef" required placeholder="Root-cause evidence reference" />
-                    <input name="credentialAuditRef" required placeholder="Credential audit reference" />
-                    <input name="providerAuditRef" required placeholder="Provider control audit reference" />
-                    <input name="routingAuditRef" required placeholder="Routing audit reference" />
-                    <input name="secretAuditRef" required placeholder="Secret-management audit reference" />
-                    <input name="codeChangeRef" placeholder="Optional corrective code/change reference" />
-                    <textarea name="reason" required placeholder="Why remediation is complete and recurrence risk is controlled" />
+                  <form
+                    action={verifyCorrectiveAction}
+                    style={{ display: "grid", gap: 8, marginTop: 8 }}
+                  >
+                    <input
+                      type="hidden"
+                      name="registrationId"
+                      value={resolution.registrationId}
+                    />
+                    <input
+                      name="rootCauseRef"
+                      required
+                      placeholder="Root-cause evidence reference"
+                    />
+                    <input
+                      name="credentialAuditRef"
+                      required
+                      placeholder="Credential audit reference"
+                    />
+                    <input
+                      name="providerAuditRef"
+                      required
+                      placeholder="Provider control audit reference"
+                    />
+                    <input
+                      name="routingAuditRef"
+                      required
+                      placeholder="Routing audit reference"
+                    />
+                    <input
+                      name="secretAuditRef"
+                      required
+                      placeholder="Secret-management audit reference"
+                    />
+                    <input
+                      name="codeChangeRef"
+                      placeholder="Optional corrective code/change reference"
+                    />
+                    <textarea
+                      name="reason"
+                      required
+                      placeholder="Why remediation is complete and recurrence risk is controlled"
+                    />
                     <button disabled={!mayApprove}>Verify remediation</button>
                   </form>
                 ) : null}
                 {status === "VERIFIED" ? (
-                  <form action={closeCorrectiveAction} style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                    <input type="hidden" name="registrationId" value={resolution.registrationId} />
-                    <textarea name="reason" required placeholder="Corrective-action closure reason" />
-                    <button disabled={!mayApprove}>Close corrective action</button>
+                  <form
+                    action={closeCorrectiveAction}
+                    style={{ display: "grid", gap: 8, marginTop: 8 }}
+                  >
+                    <input
+                      type="hidden"
+                      name="registrationId"
+                      value={resolution.registrationId}
+                    />
+                    <textarea
+                      name="reason"
+                      required
+                      placeholder="Corrective-action closure reason"
+                    />
+                    <button disabled={!mayApprove}>
+                      Close corrective action
+                    </button>
                   </form>
                 ) : null}
               </div>
             );
           })}
         {externalCorrectiveActionReceipts.map((receipt) => (
-          <div key={receipt.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
-            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId}{" "}
+            · {receipt.at}
             <br />
-            recurrence events {receipt.recurrenceEventCount} · external delivery blocked · internal queue authoritative
-            {receipt.rootCauseRef ? <><br />root cause {receipt.rootCauseRef} · credential {receipt.credentialAuditRef} · provider {receipt.providerAuditRef}</> : null}
-            {receipt.routingAuditRef ? <><br />routing {receipt.routingAuditRef} · secret {receipt.secretAuditRef}{receipt.codeChangeRef ? ` · change ${receipt.codeChangeRef}` : ""}</> : null}
+            recurrence events {receipt.recurrenceEventCount} · external delivery
+            blocked · internal queue authoritative
+            {receipt.rootCauseRef ? (
+              <>
+                <br />
+                root cause {receipt.rootCauseRef} · credential{" "}
+                {receipt.credentialAuditRef} · provider{" "}
+                {receipt.providerAuditRef}
+              </>
+            ) : null}
+            {receipt.routingAuditRef ? (
+              <>
+                <br />
+                routing {receipt.routingAuditRef} · secret{" "}
+                {receipt.secretAuditRef}
+                {receipt.codeChangeRef
+                  ? ` · change ${receipt.codeChangeRef}`
+                  : ""}
+              </>
+            ) : null}
             <br />
             {receipt.reason}
           </div>
         ))}
         <h3>Corrective-action effectiveness monitoring</h3>
         <p>
-          Closed corrective actions remain under a 72-hour observation window with three
-          clean checkpoints separated by at least 24 hours. Any recurrence blocks closure.
+          Closed corrective actions remain under a 72-hour observation window
+          with three clean checkpoints separated by at least 24 hours. Any
+          recurrence blocks closure.
         </p>
         {externalCorrectiveActionReceipts
           .filter((receipt) => receipt.action === "CLOSE_CORRECTIVE_ACTION")
           .map((receipt) => {
-            const status = correctiveActionEffectivenessStatus(receipt.registrationId);
+            const status = correctiveActionEffectivenessStatus(
+              receipt.registrationId,
+            );
             return (
-              <div key={`effectiveness-${receipt.registrationId}`} style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}>
-                <b>{receipt.connectorId} · {receipt.channel} · EFFECTIVENESS {status}</b>
+              <div
+                key={`effectiveness-${receipt.registrationId}`}
+                style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}
+              >
+                <b>
+                  {receipt.connectorId} · {receipt.channel} · EFFECTIVENESS{" "}
+                  {status}
+                </b>
                 {status !== "CLOSED" && status !== "FAILED" ? (
-                  <form action={evaluateCorrectiveActionEffectiveness} style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                    <input type="hidden" name="registrationId" value={receipt.registrationId} />
-                    <button disabled={!mayApprove}>Run due effectiveness checkpoint</button>
+                  <form
+                    action={evaluateCorrectiveActionEffectiveness}
+                    style={{ display: "grid", gap: 8, marginTop: 8 }}
+                  >
+                    <input
+                      type="hidden"
+                      name="registrationId"
+                      value={receipt.registrationId}
+                    />
+                    <button disabled={!mayApprove}>
+                      Run due effectiveness checkpoint
+                    </button>
                   </form>
                 ) : null}
                 {status === "CHECKPOINT_3" ? (
-                  <form action={closeCorrectiveActionEffectiveness} style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                    <input type="hidden" name="registrationId" value={receipt.registrationId} />
-                    <textarea name="reason" required placeholder="Why the 72-hour effectiveness window may close" />
-                    <button disabled={!mayApprove}>Close effectiveness window</button>
+                  <form
+                    action={closeCorrectiveActionEffectiveness}
+                    style={{ display: "grid", gap: 8, marginTop: 8 }}
+                  >
+                    <input
+                      type="hidden"
+                      name="registrationId"
+                      value={receipt.registrationId}
+                    />
+                    <textarea
+                      name="reason"
+                      required
+                      placeholder="Why the 72-hour effectiveness window may close"
+                    />
+                    <button disabled={!mayApprove}>
+                      Close effectiveness window
+                    </button>
                   </form>
                 ) : null}
               </div>
             );
           })}
         {externalCorrectiveActionEffectivenessReceipts.map((receipt) => (
-          <div key={receipt.receiptId} style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}>
-            <b>{receipt.action}</b> · checkpoint {receipt.checkpointNumber}/{receipt.requiredCheckpoints} · {receipt.channel} · {receipt.connectorId} · {receipt.at}
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · checkpoint {receipt.checkpointNumber}/
+            {receipt.requiredCheckpoints} · {receipt.channel} ·{" "}
+            {receipt.connectorId} · {receipt.at}
             <br />
-            observation {receipt.observationWindowHours}h · recurrence events {receipt.recurrenceEventCount} · external delivery blocked · internal queue authoritative
-            {receipt.recurrenceEventRefs.length ? <><br />{receipt.recurrenceEventRefs.join(" · ")}</> : null}
+            observation {receipt.observationWindowHours}h · recurrence events{" "}
+            {receipt.recurrenceEventCount} · external delivery blocked ·
+            internal queue authoritative
+            {receipt.recurrenceEventRefs.length ? (
+              <>
+                <br />
+                {receipt.recurrenceEventRefs.join(" · ")}
+              </>
+            ) : null}
             <br />
             {receipt.reason}
+          </div>
+        ))}
+
+        <h3>Independent institutional closure</h3>
+        <p>
+          A closed effectiveness window still requires an independent Module 45
+          actor to attest the complete incident, remediation, effectiveness, and
+          tombstone evidence snapshot.
+        </p>
+        {externalCorrectiveActionEffectivenessReceipts
+          .filter((receipt) => receipt.action === "CLOSE_EFFECTIVENESS_WINDOW")
+          .map((receipt) => (
+            <div
+              key={`institutional-closure-${receipt.registrationId}`}
+              style={{ padding: "10px 0", borderTop: "1px solid #e2e8f0" }}
+            >
+              <b>
+                {receipt.connectorId} · {receipt.channel} ·{" "}
+                {externalNotificationInstitutionallyClosed(
+                  receipt.registrationId,
+                )
+                  ? "INSTITUTIONALLY CLOSED"
+                  : "INDEPENDENT ATTESTATION REQUIRED"}
+              </b>
+              {!externalNotificationInstitutionallyClosed(
+                receipt.registrationId,
+              ) ? (
+                <form
+                  action={attestInstitutionalClosure}
+                  style={{ display: "grid", gap: 8, marginTop: 8 }}
+                >
+                  <input
+                    type="hidden"
+                    name="registrationId"
+                    value={receipt.registrationId}
+                  />
+                  <input
+                    name="attestationScope"
+                    required
+                    placeholder="Attestation scope and evidence reviewed"
+                  />
+                  <textarea
+                    name="reason"
+                    required
+                    placeholder="Independent institutional closure rationale"
+                  />
+                  <button disabled={!mayApprove}>
+                    Attest institutional closure
+                  </button>
+                </form>
+              ) : null}
+            </div>
+          ))}
+        {externalInstitutionalClosureAttestations.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.channel} · {receipt.connectorId}{" "}
+            · {receipt.at}
+            <br />
+            independent actor {receipt.actorName} · evidence snapshot{" "}
+            {receipt.evidenceSnapshotHash.slice(0, 20)}…
+            <br />
+            effectiveness {receipt.effectivenessClosureReceiptId} · corrective
+            action {receipt.correctiveActionClosureReceiptId}
+            <br />
+            {receipt.attestationScope} · {receipt.reason}
           </div>
         ))}
         <h3>External delivery assurance receipts</h3>

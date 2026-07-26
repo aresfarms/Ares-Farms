@@ -54,39 +54,39 @@ This roadmap governs the practical build order after the backend foundation. It 
 
 These are the next practical product surfaces. They should use the existing governed backend, claims controls, classification, replay, observability, human review, and production-block posture.
 
-| Priority | Workstream | Purpose | Existing Backend Spine | Current Safety Boundary |
-| --- | --- | --- | --- | --- |
-| 1 | Core borrower onboarding | Let borrowers begin, update, and understand their intake path. | `/api/apply`, `/api/onboard`, borrower portal surfaces, applications, documents, data rights | Complete as a review-bound vertical surface; no eligibility, approval, funding, legal, permitting, or regulatory determination. |
-| 2 | Financing pathway engine | Translate borrower context into possible financing pathways and next steps. | rules, recommendations, ranking, revenue/source intelligence, claims runtime | Complete as a review-bound vertical surface; no approval, pre-approval, underwriting decision, guarantee, lender commitment, eligibility determination, or legal/regulatory reliance. |
-| 3 | Readiness assessment | Show what is complete, what is missing, and what human review may need. | module readiness, application records, document metadata, review transitions, public claims | Readiness is operational guidance only; no official certification or public verification. |
-| 4 | Environmental intake | Collect environmental context and route trigger/exemption posture. | environmental compliance runtime, source ingestion, document handoff, human review | Intake and review routing only; no official environmental report, clearance, permit, or provider engagement. |
-| 5 | Opportunity discovery | Show advisory grants, programs, properties, equipment, market context, and revenue opportunities. | public source DTOs, source stack, revenue intelligence, property discovery, scraper activation blocks | Discovery intelligence only; no live scraping, source certainty, guaranteed revenue, program approval, or legal permission claim. |
-| 6 | Public trust pages | Explain what Furlong is, what it is not, and what protections apply. | public surfaces, content claims, disclosure audit, data rights, build evidence archive | Public copy must carry advisory/no-approval/no-guarantee/no-reliance boundaries. |
-| 7 | Basic lender workflow | Give lenders an organized review surface for applications, overlays, evidence, and borrower packets. | lender surfaces, overlays, evidence, partner workflow, claims controls | Coordination only; no underwriting reliance, lender commitment, or official credit decision. |
+| Priority | Workstream               | Purpose                                                                                              | Existing Backend Spine                                                                                | Current Safety Boundary                                                                                                                                                               |
+| -------- | ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1        | Core borrower onboarding | Let borrowers begin, update, and understand their intake path.                                       | `/api/apply`, `/api/onboard`, borrower portal surfaces, applications, documents, data rights          | Complete as a review-bound vertical surface; no eligibility, approval, funding, legal, permitting, or regulatory determination.                                                       |
+| 2        | Financing pathway engine | Translate borrower context into possible financing pathways and next steps.                          | rules, recommendations, ranking, revenue/source intelligence, claims runtime                          | Complete as a review-bound vertical surface; no approval, pre-approval, underwriting decision, guarantee, lender commitment, eligibility determination, or legal/regulatory reliance. |
+| 3        | Readiness assessment     | Show what is complete, what is missing, and what human review may need.                              | module readiness, application records, document metadata, review transitions, public claims           | Readiness is operational guidance only; no official certification or public verification.                                                                                             |
+| 4        | Environmental intake     | Collect environmental context and route trigger/exemption posture.                                   | environmental compliance runtime, source ingestion, document handoff, human review                    | Intake and review routing only; no official environmental report, clearance, permit, or provider engagement.                                                                          |
+| 5        | Opportunity discovery    | Show advisory grants, programs, properties, equipment, market context, and revenue opportunities.    | public source DTOs, source stack, revenue intelligence, property discovery, scraper activation blocks | Discovery intelligence only; no live scraping, source certainty, guaranteed revenue, program approval, or legal permission claim.                                                     |
+| 6        | Public trust pages       | Explain what Furlong is, what it is not, and what protections apply.                                 | public surfaces, content claims, disclosure audit, data rights, build evidence archive                | Public copy must carry advisory/no-approval/no-guarantee/no-reliance boundaries.                                                                                                      |
+| 7        | Basic lender workflow    | Give lenders an organized review surface for applications, overlays, evidence, and borrower packets. | lender surfaces, overlays, evidence, partner workflow, claims controls                                | Coordination only; no underwriting reliance, lender commitment, or official credit decision.                                                                                          |
 
 ## Build Next
 
 These deepen institutional readiness after the borrower/lender practical path is usable.
 
-| Priority | Workstream | Purpose | Required Gate Before Promotion |
-| --- | --- | --- | --- |
-| 8 | Governance evidence engine | Turn evidence, audit, replay, and module state into reusable review packets. | Evidence Pack Generator and human authority mapping remain review-bound. |
-| 9 | Certification engine | Certify internal readiness, source posture, connector posture, and module conformance. | No external certification claims until public verification and reliance gates are approved. |
-| 10 | Registry framework | Formalize registries for modules, sources, public surfaces, controlled promotion, and participant roles. | Registry output remains internal evidence unless separately promoted. |
-| 11 | Connector certification | Expand connector review, certification evidence, rollback, monitoring, and activation checks. | Live external connector execution remains blocked until qualified approval. |
-| 12 | Advanced intelligence modules | Expand source, revenue, market, geospatial, and pathway intelligence. | Outputs remain advisory, replay-safe, conflict-preserving, and human-review-bound. |
+| Priority | Workstream                    | Purpose                                                                                                  | Required Gate Before Promotion                                                              |
+| -------- | ----------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 8        | Governance evidence engine    | Turn evidence, audit, replay, and module state into reusable review packets.                             | Evidence Pack Generator and human authority mapping remain review-bound.                    |
+| 9        | Certification engine          | Certify internal readiness, source posture, connector posture, and module conformance.                   | No external certification claims until public verification and reliance gates are approved. |
+| 10       | Registry framework            | Formalize registries for modules, sources, public surfaces, controlled promotion, and participant roles. | Registry output remains internal evidence unless separately promoted.                       |
+| 11       | Connector certification       | Expand connector review, certification evidence, rollback, monitoring, and activation checks.            | Live external connector execution remains blocked until qualified approval.                 |
+| 12       | Advanced intelligence modules | Expand source, revenue, market, geospatial, and pathway intelligence.                                    | Outputs remain advisory, replay-safe, conflict-preserving, and human-review-bound.          |
 
 ## Build Later
 
 These are ecosystem-scale capabilities and must not be treated as near-term launch prerequisites.
 
-| Workstream | Purpose | Boundary |
-| --- | --- | --- |
-| Full institutional ecosystem | Coordinate USDA, SBA, state, lender, sponsor, and partner workflows at scale. | Requires production authority, participant governance, privacy, security, legal, and operational readiness. |
-| Volume VII automation | Automate doctrine-to-code proof and conformance matrix maintenance. | Must remain subordinate to Master Volume text and human governance authority. |
-| Third-party certification marketplace | Allow qualified third parties to certify or review governed artifacts. | Requires external certification doctrine, contracts, credentialing, auditability, and claims controls. |
-| Federated participant network | Enable governed multi-party participation across institutions. | Requires federation governance, RBAC, connector certification, participant registry, and incident/rollback controls. |
-| External conformance program | Provide external-facing conformance review and evidence exchange. | Requires public verification infrastructure, legal/compliance review, and official reliance boundary approval. |
+| Workstream                            | Purpose                                                                       | Boundary                                                                                                             |
+| ------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Full institutional ecosystem          | Coordinate USDA, SBA, state, lender, sponsor, and partner workflows at scale. | Requires production authority, participant governance, privacy, security, legal, and operational readiness.          |
+| Volume VII automation                 | Automate doctrine-to-code proof and conformance matrix maintenance.           | Must remain subordinate to Master Volume text and human governance authority.                                        |
+| Third-party certification marketplace | Allow qualified third parties to certify or review governed artifacts.        | Requires external certification doctrine, contracts, credentialing, auditability, and claims controls.               |
+| Federated participant network         | Enable governed multi-party participation across institutions.                | Requires federation governance, RBAC, connector certification, participant registry, and incident/rollback controls. |
+| External conformance program          | Provide external-facing conformance review and evidence exchange.             | Requires public verification infrastructure, legal/compliance review, and official reliance boundary approval.       |
 
 ## Immediate Next Sequence
 
@@ -122,19 +122,20 @@ The machine-enforced sequence for the current official-evidence notification wor
 
 Attributed governance direction: continue the canonical sequence after Step 3W without deviation. Step 3X is added as the mandatory retirement-closure control. It does not weaken, reorder, or replace any predecessor. It proves decommission completion after permanent retirement through credential revocation, provider callback disablement, routing alias removal, runtime secret-reference removal, zero open operational references, and continued Module 45 internal-queue authority.
 
-
 ### Step 3Y — Retirement Tombstone Surveillance
 
 Closed connector registrations remain under permanent resurrection surveillance. Any post-closure approval, activation, dry run, delivery, or reinstatement evidence bound to the retired registration produces `TOMBSTONE_FAIL`. A clean scan produces `TOMBSTONE_PASS`. Replacement registrations remain independent and must not be mistaken for resurrection of the retired registration.
 
 **FINAL HARD RULE:** A closed registration is never considered safely decommissioned without a current tombstone receipt. A detected resurrection event cannot reactivate the connector and must remain visible as immutable failure evidence.
 
-
 ### Roadmap Amendment — Step 4A
 
 Step 4A begins the post-incident assurance phase. A resolved 3Z tombstone incident is not institutionally closed until root cause, credential, provider, routing, and secret-control evidence are bound to a corrective-action record; zero post-resolution recurrence events are proven; and attributed Module 45 authority records remediation verification and final closure. Permanent connector retirement remains in force throughout.
 
-
 ### Step 4B — Corrective-Action Effectiveness Monitoring
 
 A closed corrective action must remain under a 72-hour effectiveness window with three clean checkpoints separated by at least 24 hours. Any recurrence evidence fails the window and blocks closure. External delivery remains blocked and the Module 45 internal queue remains authoritative throughout.
+
+## Step 4C — Independent Institutional Closure Attestation
+
+A completed 72-hour effectiveness window does not permit self-attested institutional closure. A second Module 45 actor, distinct from the effectiveness-window closer, must attest the complete incident, corrective-action, effectiveness, and tombstone evidence snapshot. The attestation binds the exact registration and implementation hash, preserves external-delivery blocking and internal-queue authority, and emits an immutable SHA-256 evidence snapshot.

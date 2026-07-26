@@ -49,6 +49,7 @@ const required = [
   "verify:official-evidence-external-notification-tombstone-incident",
   "verify:official-evidence-external-notification-corrective-action",
   "verify:official-evidence-external-notification-corrective-action-effectiveness",
+  "verify:official-evidence-external-notification-institutional-closure",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

@@ -1,4 +1,4 @@
-export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v6";
+export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v7";
 
 export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3Q_EXTERNAL_NOTIFICATION_CONNECTOR",
@@ -13,6 +13,7 @@ export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3Z_EXTERNAL_NOTIFICATION_TOMBSTONE_INCIDENT",
   "4A_EXTERNAL_NOTIFICATION_CORRECTIVE_ACTION",
   "4B_EXTERNAL_NOTIFICATION_CORRECTIVE_ACTION_EFFECTIVENESS",
+  "4C_EXTERNAL_NOTIFICATION_INSTITUTIONAL_CLOSURE",
 ] as const);
 
 export type OfficialEvidenceSequenceStep =
@@ -43,6 +44,8 @@ const REQUIRED_ARTIFACT: Record<OfficialEvidenceSequenceStep, string> = {
     "src/lib/property/officialEvidenceExternalNotificationCorrectiveAction.ts",
   "4B_EXTERNAL_NOTIFICATION_CORRECTIVE_ACTION_EFFECTIVENESS":
     "src/lib/property/officialEvidenceExternalNotificationCorrectiveActionEffectiveness.ts",
+  "4C_EXTERNAL_NOTIFICATION_INSTITUTIONAL_CLOSURE":
+    "src/lib/property/officialEvidenceExternalNotificationInstitutionalClosure.ts",
 };
 
 export function roadmapArtifactFor(step: OfficialEvidenceSequenceStep): string {
@@ -54,7 +57,8 @@ export function assertRoadmapTransition(input: {
   requested: OfficialEvidenceSequenceStep;
 }): void {
   const requestedIndex = OFFICIAL_EVIDENCE_SEQUENCE.indexOf(input.requested);
-  if (requestedIndex < 0) throw new Error("Requested step is not in the canonical roadmap.");
+  if (requestedIndex < 0)
+    throw new Error("Requested step is not in the canonical roadmap.");
   const expected = OFFICIAL_EVIDENCE_SEQUENCE.slice(0, requestedIndex);
   if (
     input.completed.length !== expected.length ||

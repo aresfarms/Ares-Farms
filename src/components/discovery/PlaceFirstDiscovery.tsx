@@ -335,7 +335,7 @@ export function PlaceFirstDiscovery({
 
     // Compact (lane) check: a successful verification goes STRAIGHT to the full
     // analysis report, not the place-facts summary (founder direction 2026-07-20).
-    if (compact && result && analysisHref) {
+    if ((compact || embedded) && result && analysisHref) {
       setJumpCue("Opening your full analysis report…");
       router.push(analysisHref);
       return;
@@ -346,7 +346,7 @@ export function PlaceFirstDiscovery({
       block: "start",
     });
     setJumpCue("Jumped to your location results.");
-  }, [busy, checked, error, result, compact, analysisHref, router]);
+  }, [busy, checked, error, result, compact, embedded, analysisHref, router]);
 
   return (
     <section data-testid="place-first-discovery" data-flow={flow} data-tone={tone} aria-label="Place-first discovery"

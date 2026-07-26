@@ -132,7 +132,7 @@ export function InteractiveCompassRose({
         {/* Center hub — the Furlong emblem. */}
         <div className="cr-hub">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/furlong-emblem.png" alt="Furlong emblem — a guide through uncertain waters" />
+          <img src="/brand/furlong-ship-emblem.png" alt="Furlong ship emblem — Compass to Capital" />
         </div>
 
         {/* Lane spokes — real links, enhanced with hover/focus + active state. */}

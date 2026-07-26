@@ -525,7 +525,10 @@
     "verify:institutional-access-surveillance-orchestration": "tsx src/scripts/verifyInstitutionalAccessSurveillanceOrchestration.ts",
     "verify:institutional-access-surveillance-activation-ceremony": "tsx src/scripts/verifyInstitutionalAccessSurveillanceActivationCeremony.ts",
     "verify:institutional-access-surveillance-canary-release": "tsx src/scripts/verifyInstitutionalAccessSurveillanceCanaryRelease.ts",
-    "verify:institutional-access-surveillance-scheduler-provisioning": "tsx src/scripts/verifyInstitutionalAccessSurveillanceSchedulerProvisioning.ts"
+    "verify:institutional-access-surveillance-scheduler-provisioning": "tsx src/scripts/verifyInstitutionalAccessSurveillanceSchedulerProvisioning.ts",
+    "verify:loan-proforma-pdf": "tsx src/scripts/verifyLoanProformaPdf.ts",
+    "verify:ultimate-proforma": "tsx src/scripts/verifyUltimateProforma.ts",
+    "verify:governed-ultimate-proforma": "tsx src/scripts/verifyGovernedUltimateProforma.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

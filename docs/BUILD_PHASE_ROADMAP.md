@@ -215,3 +215,11 @@ Before a surveillance scheduler may be created, the platform must produce a dete
 Before a Cloud Scheduler job may be created for institutional-access surveillance, the platform must freeze a deterministic provisioning manifest binding the exact release packet, project, region, canonical job name, target route, HTTP method, cadence, timezone, authentication reference, service identity, attempt deadline, retry policy, and initial state. The only permitted initial state is `PAUSED`. A post-create attestation must prove the observed job matches the manifest and has executed zero times.
 
 **Hard rule:** Step 4O does not create a scheduler, configure a secret, or enable execution. Plaintext credentials are prohibited, and any job observed as enabled or previously executed fails attestation.
+
+## Step 4P — Governed Ultimate Pro Forma Preparation
+
+The completed Ultimate Pro Forma template may enter the platform only through a governed preparation runtime. Every material financial figure must be deterministically recomputed; sources, assumptions, borrower attestations, calculations, and official program authority must remain distinguishable in a cryptographically bound evidence manifest. Current official program sources must be reviewed within the permitted freshness window. Full SSNs, TINs, EINs, bank-account numbers, and routing numbers are prohibited from the rendered PDF. Lane-specific content may render only for the selected lane, signatures remain blank, and the current official agency forms and lender instructions remain controlling.
+
+The authenticated preparation route is application-scoped and limited to operator, underwriter, governance, and administrator roles. It persists a canonical report record and governance evidence, but the resulting PDF remains an internal preparation artifact requiring human review. Borrower delivery, lender delivery, official-form submission, eligibility determination, approval, commitment, and external reliance remain blocked.
+
+**Hard rule:** Display strings are never trusted as financial proof. A missing evidence item, stale authority snapshot, arithmetic mismatch, prohibited identifier, content-claim overreach, unauthorized role, or cross-application access attempt blocks PDF generation before bytes are returned.

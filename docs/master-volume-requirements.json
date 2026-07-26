@@ -1438,6 +1438,33 @@
         "src/lib/governance/institutionalAccessSurveillanceSchedulerProvisioning.ts",
         "src/scripts/verifyInstitutionalAccessSurveillanceSchedulerProvisioning.ts"
       ]
+    },
+    "FIN-GOVERNED-ULTIMATE-PROFORMA-001": {
+      "title": "Governed evidence-bound Ultimate Pro Forma preparation",
+      "status": "implemented",
+      "requires": [
+        "deterministic_financial_recomputation",
+        "material_claim_evidence_manifest",
+        "current_official_program_authority",
+        "full_sensitive_identifier_exclusion",
+        "lane_specific_generation_gate",
+        "authenticated_application_scoped_route",
+        "canonical_report_record",
+        "human_review_required",
+        "no_official_or_external_reliance"
+      ],
+      "tests": [
+        "verify:governed-ultimate-proforma",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/governedUltimateProforma.ts",
+        "src/lib/pdf/ultimateProformaTemplate.ts",
+        "src/lib/pdf/generateLoanProformaPdf.ts",
+        "src/app/api/reports/ultimate-proforma-pdf/route.ts",
+        "src/scripts/verifyGovernedUltimateProforma.ts"
+      ]
     }
   }
 }

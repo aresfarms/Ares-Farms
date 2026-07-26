@@ -23,7 +23,18 @@ import {
 const YEARS = ["2024A", "2025A", "2026A", "2027P", "2028P", "2029P", "2030P", "2031P", "2032P", "2033P", "2034P", "2035P", "2036P"];
 const series = (start: number, step: number) => YEARS.map((_, i) => `$${(start + step * i).toLocaleString()}`);
 
-const input: UltimateProformaInput = {
+export const syntheticUltimateProformaInput: UltimateProformaInput = {
+  authority: {
+    reviewedAt: "2026-07-26",
+    formVersion: "SBA Form 1919 effective 2025-03-19; current version confirmation required at generation",
+    officialSourceRefs: [
+      "https://www.sba.gov/document/sba-form-1919-borrower-information-form",
+      "https://www.sba.gov/partners/lenders/7a-loan-program/terms-conditions-eligibility",
+      "https://www.sba.gov/document/sba-form-148-unconditional-guarantee",
+    ],
+    programTermsNote: "Program terms are current-source snapshots, not lender approval or an eligibility determination.",
+    coverageThresholdBasis: "illustrative lender underwriting assumption; lender-specific confirmation required",
+  },
   branding: { logoPath: "/brand/furlong-logo.png" },
   manifest: {
     clientLegalName: "Meadowline Farm, Inc. / Stonebriar Holdings, Inc.",
@@ -36,8 +47,8 @@ const input: UltimateProformaInput = {
   },
   partI: {
     identity: {
-      operatingEntity: "Meadowline Farm, Inc. — VA S-corp, EIN 00-0000001, operations began 2019",
-      holdingEntity: "Stonebriar Holdings, Inc. — VA S-corp, EIN 00-0000002 (real estate)",
+      operatingEntity: "Meadowline Farm, Inc. — VA S-corp, entity identifier retained outside the PDF, operations began 2019",
+      holdingEntity: "Stonebriar Holdings, Inc. — VA S-corp, entity identifier retained outside the PDF (real estate)",
       dbaNotes: "Styled 'Meadowline Farm'; registered names follow IRS/state records",
       taxElectionStatus: "S-elections current for both entities",
       goodStandingCerts: "VA SCC certificates for both entities, issued 2026-07-01",
@@ -55,7 +66,7 @@ const input: UltimateProformaInput = {
       ],
       totalProjectCost: "$3,290,000",
       loanAmount: "$3,290,000",
-      loanCalcBasis: "SBA 7(a): 90% of purchase + payoff; under $5M — 85% guarantee tier",
+      loanCalcBasis: "SBA 7(a): 90% of purchase + payoff; above $150,000 — up to 75% guaranty for most 7(a) programs; confirm current terms",
       injectionProvided: "$330,000",
       injectionSource: "Unencumbered equipment equity — sole-owned; valuation per dealer appraisal 2026-06",
     },
@@ -218,7 +229,7 @@ const input: UltimateProformaInput = {
   partIV: {
     twoCase: {
       revenue: { conservative: "$1,198,700", stabilized: "$1,265,800" },
-      opex: { conservative: "$(820,000)", stabilized: "$(878,000)" },
+      opex: { conservative: "($820,000)", stabilized: "($878,000)" },
       noi: { conservative: "$378,700", stabilized: "$387,800" },
       margins: { conservative: "32%", stabilized: "31%" },
       debtService: "$268,000",
@@ -244,6 +255,8 @@ const input: UltimateProformaInput = {
 };
 
 /* 1 — the gate BLOCKS missing REQUIRED intake. */
+const input = syntheticUltimateProformaInput;
+
 const broken: UltimateProformaInput = JSON.parse(JSON.stringify(input));
 broken.partI.identity.goodStandingCerts = "";
 broken.partII.laneRationale = "";

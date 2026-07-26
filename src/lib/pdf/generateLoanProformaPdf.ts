@@ -120,6 +120,9 @@ const PRINT_SUBSTITUTIONS: Record<string, string> = {
   "/brand/furlong-logo.png": "/brand/furlong-logo-print.jpg",
 };
 function assetPath(p: string): string {
+  if (!p.startsWith("/brand/") || p.includes("..") || !/^\/brand\/[A-Za-z0-9._-]+$/.test(p)) {
+    throw new Error("Loan pro forma logo must be a controlled /brand asset.");
+  }
   const sub = PRINT_SUBSTITUTIONS[p];
   if (sub) {
     const full = path.join(process.cwd(), "public", sub.replace(/^\//, ""));
@@ -129,6 +132,15 @@ function assetPath(p: string): string {
 }
 
 export function generateLoanProformaPdf(input: LoanProformaInput) {
+  for (const section of input.sections) {
+    for (const block of section.tables ?? []) {
+      const totalWidth = block.table.columns.reduce((sum, column) => sum + column.width, 0);
+      if (Math.abs(totalWidth - 1) > 0.02) throw new Error(`Invalid pro forma table width in ${section.title}.`);
+      for (const row of block.table.rows) {
+        if (row.cells.length !== block.table.columns.length) throw new Error(`Invalid pro forma row shape in ${section.title}.`);
+      }
+    }
+  }
   const doc = new PDFDocument({
     size: "LETTER",
     margin: 0,

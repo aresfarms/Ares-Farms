@@ -94,6 +94,7 @@
     "docs/MASTER_VOLUME_AMENDMENT_INSTITUTIONAL_ACCESS.md",
     "src/lib/governance/institutionalAbacDisclosure.ts",
     "src/lib/governance/compelledDisclosureCeremony.ts",
-    "src/lib/governance/institutionalAccessSurveillance.ts"
+    "src/lib/governance/institutionalAccessSurveillance.ts",
+    "src/lib/governance/institutionalAccessRuntimeEnforcement.ts"
   ]
 }

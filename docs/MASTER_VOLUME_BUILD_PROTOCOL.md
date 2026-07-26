@@ -592,3 +592,8 @@ Hard rules:
 - Compelled disclosure requires legal hold, verified authority, a deterministic scope manifest, dual control, bounded selector release, governed notice, and post-access review.
 - Institutional access is continuously rechecked and automatically revoked when credential, authority, scope, or timing becomes invalid.
 - The commands listed in the amendment are mandatory Cloud Build gates.
+
+
+## Institutional Access Runtime Enforcement Amendment
+
+Institutional-access doctrine is incomplete until the protected request path consumes it. Every governed evidence packet request must execute the canonical credential, authority, ABAC, field-disclosure, capability, access-ledger, and surveillance-observation controls before packet construction. Governance and administrator identities retain management authority but may not be converted into auditor identities for evidence access. The standing proof command is `npm run verify:institutional-access-runtime-enforcement`.

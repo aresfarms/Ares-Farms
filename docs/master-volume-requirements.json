@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.0",
+  "frameworkVersion": "master-volume-conformance-v0.4.1",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1339,6 +1339,26 @@
       "evidence": [
         "src/lib/governance/institutionalAccessSurveillance.ts",
         "src/lib/governance/institutionalEvidenceAccess.ts"
+      ]
+    },
+    "TECH-INSTITUTIONAL-RUNTIME-001": {
+      "title": "Institutional access controls enforced on the live packet request path",
+      "status": "implemented",
+      "requires": [
+        "per_request_receipt_revalidation",
+        "abac_before_packet_construction",
+        "scope_bound_capability",
+        "access_observation_logging"
+      ],
+      "tests": [
+        "verify:institutional-access-runtime-enforcement",
+        "verify:governed-evidence-review-portal",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessRuntimeEnforcement.ts",
+        "src/app/audit-replay/governed-evidence/page.tsx",
+        "src/scripts/verifyInstitutionalAccessRuntimeEnforcement.ts"
       ]
     }
   }

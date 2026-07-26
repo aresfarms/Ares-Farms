@@ -6,16 +6,13 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { readLedgerEvents } from "@/lib/audit/appendLedger";
 import { resolveAnonymousTokenIdForGovernedReview } from "@/lib/borrower-experience/anonymousToken";
+import { composeGovernedEvidencePacket } from "@/lib/governance/governedEvidenceReviewPortal";
 import {
-  composeGovernedEvidencePacket,
-  filterEvidenceEventsForAccess,
-} from "@/lib/governance/governedEvidenceReviewPortal";
-import {
-  evaluateInstitutionalEvidenceAccess,
   findEvidenceAccessGrant,
   issueEvidenceAccessGrant,
   recordInstitutionalEvidenceAccess,
 } from "@/lib/governance/institutionalEvidenceAccess";
+import { enforceInstitutionalPacketAccess } from "@/lib/governance/institutionalAccessRuntimeEnforcement";
 import {
   latestValidCredentialVerification,
   verifyInstitutionalCredential,
@@ -63,7 +60,7 @@ async function createAttorneyTokenGrant(formData: FormData) {
     matterId,
     agencyOrFirm: String(formData.get("firm") ?? "").trim() || null,
     tenantId: null,
-    moduleIds: [],
+    moduleIds: ["anonymous-token"],
     subjectIds: [tokenId],
     tokenId,
     windowStart: null,
@@ -91,6 +88,7 @@ async function createScopedInstitutionalGrant(formData: FormData) {
   const windowEnd = String(formData.get("windowEnd") ?? "").trim() || null;
   const moduleId = String(formData.get("moduleId") ?? "").trim();
   const subjectId = String(formData.get("subjectId") ?? "").trim();
+  if (!moduleId || !subjectId) throw new Error("Institutional grants require explicit module and subject scope.");
   const credential = latestValidCredentialVerification({ principalId, principalEmail, role });
   if (!credential) throw new Error("A current credential verification is required for the selected principal and role.");
   const matterId = String(formData.get("matterId") ?? "").trim() || null;
@@ -184,30 +182,34 @@ export default async function GovernedEvidenceReviewPage({ searchParams }: { sea
   const moduleId = query.module?.trim() || null;
   const subjectId = query.subject?.trim() || null;
   const grant = query.grant ? findEvidenceAccessGrant(query.grant) : null;
-  const policyRole = (["governance", "admin"] as string[]).includes(actor.role) ? "auditor" : actor.role;
-  const decision = evaluateInstitutionalEvidenceAccess({
-    role: policyRole,
+  const allEvents = readLedgerEvents();
+  const packetRole = grant?.role ?? actor.role;
+  const runtimeDecision = enforceInstitutionalPacketAccess({
     actorId: actor.id,
     actorEmail: actor.email,
+    actorRole: packetRole,
     grant,
+    candidateEvents: allEvents,
     requestedModuleId: moduleId,
     requestedSubjectId: subjectId,
     requestedWindowStart: query.from ?? null,
     requestedWindowEnd: query.to ?? null,
+    action: "VIEW",
   });
+  const decisionReason = runtimeDecision.reasonCodes.join(", ");
 
   recordInstitutionalEvidenceAccess({
     actorId: actor.id, actorEmail: actor.email, role: actor.role, action: "VIEW_PACKET",
-    outcome: decision.allowed ? "ALLOWED" : "DENIED", reason: decision.reason,
-    grantId: grant?.grantId ?? null, moduleId, subjectId, tokenId: decision.effectiveTokenId,
-    windowStart: decision.effectiveWindowStart, windowEnd: decision.effectiveWindowEnd,
+    outcome: runtimeDecision.allowed ? "ALLOWED" : "DENIED", reason: decisionReason,
+    grantId: grant?.grantId ?? null, moduleId, subjectId, tokenId: grant?.tokenId ?? null,
+    windowStart: query.from ?? grant?.windowStart ?? null, windowEnd: query.to ?? grant?.windowEnd ?? null,
   });
 
-  if (!decision.allowed) {
+  if (!runtimeDecision.allowed) {
     return (
       <main style={{ maxWidth: 900, margin: "0 auto", padding: 32, display: "grid", gap: 18 }}>
         <h1>Governed Evidence Review Portal</h1>
-        <p><strong>Access not granted:</strong> {decision.reason}</p>
+        <p><strong>Access not granted:</strong> {decisionReason}</p>
         {actor.role === "attorney" ? (
           <form action={createAttorneyTokenGrant} style={{ display: "grid", gap: 10, maxWidth: 600 }}>
             <h2>Open a token-bound attorney review</h2>
@@ -222,14 +224,8 @@ export default async function GovernedEvidenceReviewPage({ searchParams }: { sea
   }
 
   const ledgerPath = path.join(process.cwd(), "data", "audit-ledger.ndjson");
-  const authorizedEvents = filterEvidenceEventsForAccess({
-    events: readLedgerEvents(),
-    tokenId: decision.effectiveTokenId,
-    subjectIds: decision.permittedSubjectIds.length > 0 ? decision.permittedSubjectIds : subjectId ? [subjectId] : [],
-    windowStart: decision.effectiveWindowStart,
-    windowEnd: decision.effectiveWindowEnd,
-  });
-  const effectiveModule = moduleId && (decision.permittedModuleIds.length === 0 || decision.permittedModuleIds.includes(moduleId)) ? moduleId : null;
+  const authorizedEvents = [...runtimeDecision.events];
+  const effectiveModule = moduleId && grant?.moduleIds.includes(moduleId) ? moduleId : null;
   const packet = composeGovernedEvidencePacket({
     scope: effectiveModule ? { kind: "MODULE", moduleId: effectiveModule } : { kind: "PLATFORM" },
     modules: moduleManifests,
@@ -307,7 +303,7 @@ export default async function GovernedEvidenceReviewPage({ searchParams }: { sea
       ) : null}
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
-        {[["Packet", packet.packetId], ["Access basis", grant ? `Grant ${grant.grantId}` : actor.role], ["Scope", packet.scope.kind === "PLATFORM" ? "Whole permitted scope" : packet.scope.moduleId], ["Modules", String(packet.moduleCount)], ["Ledger events", String(packet.evidenceEventCount)], ["Integrity", packet.integrityConclusion], ["Packet SHA-256", packet.packetSha256]].map(([label, value]) => <div key={label} style={{ border: "1px solid #d5dbe7", borderRadius: 10, padding: 14, overflowWrap: "anywhere" }}><div style={{ fontSize: 12, fontWeight: 700 }}>{label}</div><div style={{ marginTop: 6 }}>{value}</div></div>)}
+        {[["Packet", packet.packetId], ["Access basis", `Grant ${grant?.grantId ?? "none"}`], ["Capability", runtimeDecision.capabilityToken ?? "none"], ["Capability expires", runtimeDecision.capabilityExpiresAt ?? "none"], ["Withheld fields", String(runtimeDecision.withheldCount)], ["Scope", packet.scope.kind === "PLATFORM" ? "Whole explicitly permitted scope" : packet.scope.moduleId], ["Modules", String(packet.moduleCount)], ["Ledger events", String(packet.evidenceEventCount)], ["Integrity", packet.integrityConclusion], ["Packet SHA-256", packet.packetSha256]].map(([label, value]) => <div key={label} style={{ border: "1px solid #d5dbe7", borderRadius: 10, padding: 14, overflowWrap: "anywhere" }}><div style={{ fontSize: 12, fontWeight: 700 }}>{label}</div><div style={{ marginTop: 6 }}>{value}</div></div>)}
       </section>
 
       <section style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}><h2>Rule-matching logic</h2>{packet.ruleMatches.map((rule) => <article key={rule.ruleId} style={{ borderTop: "1px solid #e4e8ef", paddingTop: 12 }}><strong>{rule.ruleId} · {rule.status}</strong><div>{rule.label}</div><p>{rule.explanation}</p><small>{rule.evidenceRefs.join(" · ")}</small></article>)}</section>

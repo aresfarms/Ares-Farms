@@ -58,6 +58,7 @@ const required = [
   "verify:institutional-abac-disclosure",
   "verify:compelled-disclosure-ceremony",
   "verify:institutional-access-surveillance",
+  "verify:institutional-access-runtime-enforcement",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

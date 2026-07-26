@@ -181,3 +181,10 @@ Court orders, subpoenas, warrants, and agency demands require independently veri
 Institutional access remains under continuous credential and authority recheck, export-volume monitoring, denied-request monitoring, automatic expiration, and anomaly review. Credential or authority failure revokes access immediately. Material findings require independent post-access closure by an actor other than the original grant issuer. Every access, denial, export, revocation, review, and closure remains append-only and replayable.
 
 **Hard rule:** A previously valid grant does not survive stale credentials, revoked authority, scope drift, abnormal export behavior, or an expired access window.
+
+
+## Step 4K — Institutional Access Runtime Enforcement
+
+The governed evidence portal must invoke the canonical credential, legal-authority, ABAC, and access-ledger controls on every packet request before any evidence enters a packet object, hash, timeline, response, or export. The request path revalidates the exact credential and authority receipts against the authenticated principal, role, matter, subject, module, and active dates; requires explicit matter, module, and subject scope; filters classified evidence before composition; issues only a five-minute scope-bound capability token; records allowed and denied observations; and prohibits governance or administrator identities from being silently treated as auditors.
+
+**Hard rule:** A control that exists only as a library or build-time verifier is not considered operationally enforced. Removal of the runtime orchestrator, portal integration, or mandatory verifier must fail Cloud Build before image construction.

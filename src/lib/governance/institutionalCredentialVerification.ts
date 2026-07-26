@@ -30,6 +30,8 @@ export type InstitutionalCredentialVerification = {
   credentialType: string;
   jurisdictionOrIssuer: string;
   verificationToken: string;
+  tokenBoundPrincipalId: string;
+  tokenBoundPrincipalEmail: string;
   officialSourceRef: string;
   officialSourceSnapshotHash: string;
   method: CredentialVerificationMethod;
@@ -117,6 +119,8 @@ export function verifyInstitutionalCredential(input: {
     credentialType: input.credentialType,
     jurisdictionOrIssuer: input.jurisdictionOrIssuer,
     verificationToken: `credv_${randomUUID()}`,
+    tokenBoundPrincipalId: input.principalId,
+    tokenBoundPrincipalEmail: input.principalEmail.toLowerCase(),
     officialSourceRef: input.officialSourceRef,
     officialSourceSnapshotHash: sha(input.officialSourcePayload),
     method: input.method,
@@ -158,6 +162,8 @@ export function latestValidCredentialVerification(input: {
         row.event === "CREDENTIAL_VERIFIED" &&
         row.principalId === input.principalId &&
         String(row.principalEmail).toLowerCase() === input.principalEmail.toLowerCase() &&
+        row.tokenBoundPrincipalId === input.principalId &&
+        String(row.tokenBoundPrincipalEmail).toLowerCase() === input.principalEmail.toLowerCase() &&
         row.role === input.role,
     )
     .reverse()

@@ -29,6 +29,9 @@ assert.ok(!source.includes("credentialIdentifierLast4"), "No license-number suff
 assert.ok(!source.includes("credentialIdentifierHash"), "License-number hashes are prohibited.");
 assert.ok(!source.includes("credentialFingerprint"), "Derived license-number fingerprints are prohibited.");
 assert.ok(source.includes("verificationToken"), "A random opaque verification token must replace the credential number after validation.");
+assert.ok(source.includes("tokenBoundPrincipalId"), "Verification tokens must bind to the exact principal ID.");
+assert.ok(source.includes("tokenBoundPrincipalEmail"), "Verification tokens must bind to the exact principal email.");
+
 
 console.log(JSON.stringify({
   ok: true,
@@ -38,4 +41,5 @@ console.log(JSON.stringify({
   credentialSuffixStored: false,
   postVerificationOpaqueTokenOnly: true,
   matterAuthorityStillRequired: true,
+  tokenBoundToExactPrincipal: true,
 }, null, 2));

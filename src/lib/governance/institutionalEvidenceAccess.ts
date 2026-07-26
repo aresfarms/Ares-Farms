@@ -61,8 +61,8 @@ export function issueEvidenceAccessGrant(input: Omit<EvidenceAccessGrant, "grant
   if (!credential || credential.status !== "VERIFIED" || Date.parse(credential.expiresAt) < Date.now()) {
     throw new Error("The institutional credential verification is missing, expired, or not verified.");
   }
-  if (credential.principalId !== input.principalId || credential.principalEmail.toLowerCase() !== input.principalEmail.toLowerCase() || credential.role !== input.role) {
-    throw new Error("The credential verification is not bound to this principal, email, and role.");
+  if (credential.principalId !== input.principalId || credential.principalEmail.toLowerCase() !== input.principalEmail.toLowerCase() || credential.tokenBoundPrincipalId !== input.principalId || credential.tokenBoundPrincipalEmail.toLowerCase() !== input.principalEmail.toLowerCase() || credential.role !== input.role) {
+    throw new Error("The credential verification token is not bound to this exact principal, email, and role.");
   }
   if (input.role === "attorney" && !input.tokenId && !input.windowStart && !input.windowEnd) {
     throw new Error("Attorney grants must be token-bound or time-window-bound.");

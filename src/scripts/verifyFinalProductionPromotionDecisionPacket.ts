@@ -50,10 +50,9 @@ internalInput.reviewerApprovals = ["STUART", "FRANCIS"].map((principal, index) =
 const internalReport = buildInternalChangeVerificationReport(internalInput);
 
 const roles: PromotionApprovalRole[] = [
-  "RELEASE_BOARD",
-  "CONSTITUTIONAL_AUTHORITY",
-  "QUALIFIED_RELEASE_MANAGER",
-  "FINAL_ACTIVATION_AUTHORITY",
+  "TECHNICAL_CONSTITUTIONAL_ATTESTATION",
+  "FINANCE_RELEASE_RISK_APPROVAL",
+  "PUBLIC_INDEPENDENT_FINAL_REVIEW",
 ];
 const approvals = roles.map((role, index) => ({
   approvalId: `approval-${index + 1}`,
@@ -102,14 +101,14 @@ const collided = buildFinalProductionPromotionDecisionPacket({
   rollbackOwnerPrincipalId: "rollback-owner",
   approvals: approvals.map((approval) => ({ ...approval, principalId: "same-principal" })),
 });
-assert(collided.blockers.includes("approval-principals-must-be-distinct"), "Dual-control collision must block.");
+assert(collided.blockers.includes("initial-launch-requires-three-distinct-founders"), "Three-founder principal collision must block.");
 
 console.log(JSON.stringify({
   ok: true,
   rule: FINAL_PRODUCTION_PROMOTION_DECISION_RULE,
   allowlistStoredAsHashOnly: true,
   exactImageBindingRequired: true,
-  fourDistinctHumanAuthoritiesRequired: true,
+  threeFounderCrossFunctionalAuthorityRequired: true,
   boundedActivationWindowRequired: true,
   activationPerformed: false,
 }, null, 2));

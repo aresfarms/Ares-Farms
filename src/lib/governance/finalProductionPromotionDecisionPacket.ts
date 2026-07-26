@@ -7,10 +7,9 @@ export const FINAL_PRODUCTION_PROMOTION_DECISION_RULE =
   "FINAL-PRODUCTION-PROMOTION-DECISION-PACKET-001" as const;
 
 export type PromotionApprovalRole =
-  | "RELEASE_BOARD"
-  | "CONSTITUTIONAL_AUTHORITY"
-  | "QUALIFIED_RELEASE_MANAGER"
-  | "FINAL_ACTIVATION_AUTHORITY";
+  | "TECHNICAL_CONSTITUTIONAL_ATTESTATION"
+  | "FINANCE_RELEASE_RISK_APPROVAL"
+  | "PUBLIC_INDEPENDENT_FINAL_REVIEW";
 
 export type PromotionApprovalRecord = {
   approvalId: string;
@@ -59,10 +58,9 @@ export type FinalProductionPromotionDecisionPacket = {
 };
 
 const REQUIRED_ROLES: PromotionApprovalRole[] = [
-  "RELEASE_BOARD",
-  "CONSTITUTIONAL_AUTHORITY",
-  "QUALIFIED_RELEASE_MANAGER",
-  "FINAL_ACTIVATION_AUTHORITY",
+  "TECHNICAL_CONSTITUTIONAL_ATTESTATION",
+  "FINANCE_RELEASE_RISK_APPROVAL",
+  "PUBLIC_INDEPENDENT_FINAL_REVIEW",
 ];
 
 function stable(value: unknown): string {
@@ -122,8 +120,8 @@ export function buildFinalProductionPromotionDecisionPacket(
   }
 
   const principals = input.approvals.map((approval) => approval.principalId);
-  if (new Set(principals).size !== principals.length)
-    blockers.push("approval-principals-must-be-distinct");
+  if (new Set(principals).size !== 3 || principals.length != 3)
+    blockers.push("initial-launch-requires-three-distinct-founders");
 
   for (const approval of input.approvals) {
     if (approval.decision !== "APPROVE") blockers.push(`approval-rejected:${approval.role}`);

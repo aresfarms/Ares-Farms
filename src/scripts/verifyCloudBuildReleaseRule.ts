@@ -72,6 +72,7 @@ const required = [
   "verify:production-promotion-readiness",
   "verify:final-production-promotion-decision",
   "verify:internal-change-verification",
+  "verify:three-founder-release-authority",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

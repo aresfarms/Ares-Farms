@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.8",
+  "frameworkVersion": "master-volume-conformance-v0.4.9",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1644,6 +1644,26 @@
       "evidence": [
         "src/lib/governance/internalChangeVerification.ts",
         "src/scripts/verifyInternalChangeVerification.ts"
+      ]
+    },
+    "GOV-THREE-FOUNDER-RELEASE-AUTHORITY-001": {
+      "title": "Three-founder cross-functional release authority",
+      "status": "implemented",
+      "requires": [
+        "three_founder_initial_launch",
+        "owner_exclusion",
+        "cross_functional_approval",
+        "unilateral_stop_authority"
+      ],
+      "tests": [
+        "verify:three-founder-release-authority",
+        "verify:final-production-promotion-decision",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/threeFounderReleaseAuthority.ts",
+        "src/lib/governance/finalProductionPromotionDecisionPacket.ts",
+        "src/scripts/verifyThreeFounderReleaseAuthority.ts"
       ]
     }
   }

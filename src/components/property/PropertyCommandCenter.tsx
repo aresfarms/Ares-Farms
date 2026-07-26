@@ -64,6 +64,8 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const [ownerFeatureInput, setOwnerFeatureInput] = useState("");
   const [vaEligible, setVaEligible] = useState<boolean | null>(null);
   const [coeFileName, setCoeFileName] = useState<string | null>(null);
+  const [coeUploadStatus, setCoeUploadStatus] = useState<string | null>(null);
+  const [coeUploading, setCoeUploading] = useState(false);
   const [localOwnerAssertions, setLocalOwnerAssertions] = useState<Array<{ label: string; value: string; text: string; provenance: string; tone: "neutral" }>>([]);
   const facts = props.intelligence?.verifiedFacts ?? [];
   const marketValueFact = facts.find((fact) => fact.label === "Waterfront market value context");
@@ -93,6 +95,65 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
 
   const shell = { background: "#FAF8F3", border: "1px solid #E5E0D5", borderRadius: 18, overflow: "hidden" } as const;
   const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
+  async function uploadVaCoe(file: File | null) {
+    setCoeFileName(file?.name ?? null);
+    setCoeUploadStatus(null);
+    if (!file) return;
+    if (!(["application/pdf", "image/png", "image/jpeg"].includes(file.type))) {
+      setCoeUploadStatus("Use a PDF, PNG, or JPG file.");
+      return;
+    }
+    setCoeUploading(true);
+    setCoeUploadStatus("Preparing the authorized financing-file upload…");
+    try {
+      const digest = await crypto.subtle.digest("SHA-256", await file.arrayBuffer());
+      const checksum = Array.from(new Uint8Array(digest)).map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      const handoffResponse = await fetch("/api/documents/storage-handoff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicationId: props.propertyId,
+          documentType: "VA_CERTIFICATE_OF_ELIGIBILITY",
+          documentName: "VA Certificate of Eligibility",
+          fileName: file.name,
+          mimeType: file.type,
+          byteSize: file.size,
+          checksum,
+          role: "user",
+          metadata: { sourceSurface: "property-financial-model", restrictedToAuthorizedFile: true },
+        }),
+      });
+      const handoff = await handoffResponse.json() as { ok?: boolean; error?: string; handoff?: { uploadUrl?: string | null; uploadMethod?: string | null; storageUri?: string | null } };
+      if (!handoffResponse.ok || !handoff.handoff) throw new Error(handoff.error || "The authorized upload handoff is not available in this session.");
+      if (!handoff.handoff.uploadUrl) throw new Error("Secure document storage is not configured for this financing file yet.");
+      const uploadResponse = await fetch(handoff.handoff.uploadUrl, { method: handoff.handoff.uploadMethod || "PUT", headers: { "Content-Type": file.type }, body: file });
+      if (!uploadResponse.ok) throw new Error("The secure storage provider did not accept the COE.");
+      const submissionResponse = await fetch("/api/documents/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          applicationId: props.propertyId,
+          documentType: "VA_CERTIFICATE_OF_ELIGIBILITY",
+          documentName: "VA Certificate of Eligibility",
+          fileName: file.name,
+          mimeType: file.type,
+          byteSize: file.size,
+          checksum,
+          storageUri: handoff.handoff.storageUri,
+          role: "user",
+          metadata: { sourceSurface: "property-financial-model", restrictedToAuthorizedFile: true },
+        }),
+      });
+      const submission = await submissionResponse.json() as { ok?: boolean; error?: string };
+      if (!submissionResponse.ok || !submission.ok) throw new Error(submission.error || "The COE was stored but could not be attached to the financing file.");
+      setCoeUploadStatus("COE uploaded to the authorized financing file.");
+    } catch (error) {
+      setCoeUploadStatus(error instanceof Error ? error.message : "The COE upload could not be completed.");
+    } finally {
+      setCoeUploading(false);
+    }
+  }
+
   const tabs: Array<{ id: TabId; label: string; badge?: string }> = [
     { id: "summary", label: "Summary" },
     { id: "financing", label: "Financial model" },
@@ -149,7 +210,7 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
           <header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Financial model</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>Price, ownership costs, capital structure, and pathway matches stay together here. Raw form mappings remain collapsed until the relevant lane and authorization exist.</p></header>
           {props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the financial model.</div>}
           <section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Ranked financing pathways</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 12 }}>Ranked from the property evidence first; borrower eligibility, appraisal, condition, occupancy, and price still control the final fit.</p><div style={{ display: "grid", gap: 9, marginTop: 10 }}>{props.financingLanes.length ? props.financingLanes.map((item, index) => <div key={item} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "11px 13px", background: index === 0 ? "#FBF5E6" : "#fff" }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong><span style={{ display: "block", fontSize: 11.5, color: "#5A6172" }}>{index === 0 ? "Best preliminary property fit from the evidence currently available. This is not borrower qualification." : "Alternative path to examine after price, appraisal, condition, occupancy, and eligibility are confirmed."}</span></div>) : <span style={{ color: "#5A6172" }}>No verified borrower-specific match exists yet. Property-relevant financing families will still appear here when the asset type supports them.</span>}</div></section>
-          <section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD" }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>VA financing check</h3><p style={{ margin: "5px 0 10px", color: "#5A6172", fontSize: 12.5 }}>VA may be a strong path for an eligible owner-occupant, but the property must also satisfy VA appraisal and minimum-property requirements. A substantial rehabilitation or teardown may require a lender that supports VA renovation/construction structures.</p><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button type="button" onClick={() => setVaEligible(true)} style={{ border: 0, borderRadius: 9, padding: "9px 13px", background: vaEligible === true ? "#1C2B45" : "#DCE7F3", color: vaEligible === true ? "#fff" : "#1C2B45", fontWeight: 800, cursor: "pointer" }}>I may be VA eligible</button><button type="button" onClick={() => { setVaEligible(false); setCoeFileName(null); }} style={{ border: "1px solid #C8D8EA", borderRadius: 9, padding: "9px 13px", background: "#fff", color: "#1C2B45", fontWeight: 750, cursor: "pointer" }}>Not using VA</button></div>{vaEligible === true && <div style={{ marginTop: 12, display: "grid", gap: 7 }}><label htmlFor="va-coe-upload" style={{ color: "#1C2B45", fontWeight: 800, fontSize: 12.5 }}>Upload Certificate of Eligibility (COE)</label><input id="va-coe-upload" type="file" accept="application/pdf,image/png,image/jpeg" onChange={(event) => setCoeFileName(event.target.files?.[0]?.name ?? null)} style={{ background: "#fff", border: "1px solid #8EA9C4", borderRadius: 9, padding: 10, color: "#1C2B45" }} /><span style={{ color: coeFileName ? "#2E7D4F" : "#6B7280", fontSize: 11.5 }}>{coeFileName ? `${coeFileName} selected for the authorized financing file.` : "PDF, PNG, or JPG. The document is not shown on the public property summary."}</span></div>}</section>
+          <section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD" }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>VA financing check</h3><p style={{ margin: "5px 0 10px", color: "#5A6172", fontSize: 12.5 }}>VA may be a strong path for an eligible owner-occupant, but the property must also satisfy VA appraisal and minimum-property requirements. A substantial rehabilitation or teardown may require a lender that supports VA renovation/construction structures.</p><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><button type="button" onClick={() => setVaEligible(true)} style={{ border: 0, borderRadius: 9, padding: "9px 13px", background: vaEligible === true ? "#1C2B45" : "#DCE7F3", color: vaEligible === true ? "#fff" : "#1C2B45", fontWeight: 800, cursor: "pointer" }}>I may be VA eligible</button><button type="button" onClick={() => { setVaEligible(false); setCoeFileName(null); setCoeUploadStatus(null); }} style={{ border: "1px solid #C8D8EA", borderRadius: 9, padding: "9px 13px", background: "#fff", color: "#1C2B45", fontWeight: 750, cursor: "pointer" }}>Not using VA</button></div>{vaEligible === true && <div style={{ marginTop: 12, display: "grid", gap: 7 }}><label htmlFor="va-coe-upload" style={{ color: "#1C2B45", fontWeight: 800, fontSize: 12.5 }}>Upload Certificate of Eligibility (COE)</label><input id="va-coe-upload" type="file" accept="application/pdf,image/png,image/jpeg" disabled={coeUploading} onChange={(event) => void uploadVaCoe(event.target.files?.[0] ?? null)} style={{ background: "#fff", border: "1px solid #8EA9C4", borderRadius: 9, padding: 10, color: "#1C2B45" }} /><span role="status" style={{ color: coeUploadStatus?.startsWith("COE uploaded") ? "#2E7D4F" : coeUploadStatus ? "#9A5A16" : "#6B7280", fontSize: 11.5 }}>{coeUploadStatus ?? (coeFileName ? `${coeFileName} selected.` : "PDF, PNG, or JPG. The document is restricted to the authorized financing file and is not shown on the public property summary.")}</span></div>}</section>
           <section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Deed and title verification</h3>{deedEvidence.length ? <div style={{ display: "grid", gap: 9, marginTop: 10 }}>{deedEvidence.map((record) => <article key={record.recordId} style={{ border: "1px solid #D8E2EF", borderRadius: 10, padding: 12, background: "#F8FAFD" }}><strong style={{ display: "block", color: "#1C2B45" }}>Recorded deed located</strong><span style={{ display: "block", color: "#5A6172", fontSize: 12, marginTop: 3 }}>{record.reference} · recorded {record.effectiveDate ?? "date unavailable"}</span><span style={{ display: "block", color: "#6B7280", fontSize: 11, marginTop: 5 }}>{(record.notes ?? []).filter((note) => !note.startsWith("Restricted deed document reference:")).join(" ")}</span></article>)}</div> : <p style={{ margin: "7px 0 0", color: "#5A6172", fontSize: 12.5 }}>The county-recorder verification source has not returned an approved deed record for this parcel yet. Furlong can use address and parcel identifiers without publishing the owner’s identity.</p>}<div style={{ marginTop: 10, border: "1px solid #E8D28A", borderRadius: 10, padding: 11, background: "#FFF9E8", color: "#5A6172", fontSize: 12 }}>The deed image remains restricted. It becomes viewable or printable only inside an authorized financial file or lender workspace, and every access must be ledgered.</div></section>
           <details style={card}><summary style={{ cursor: "pointer", color: "#1C2B45", fontWeight: 800 }}>View supporting form mapping</summary><p style={{ color: "#5A6172", fontSize: 12.5 }}>SBA, FSA, and project-finance field mappings appear only after a relevant lane, price basis, and authorization state exist. Furlong presents them as information it can pre-fill—not as consumer homework.</p></details>
         </>}

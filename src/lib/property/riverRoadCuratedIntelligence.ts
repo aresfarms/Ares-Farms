@@ -51,11 +51,11 @@ export function riverRoadCuratedFacts(): BriefFactLine[] {
       tone: "neutral",
     },
     {
-      label: "Daily-life essentials",
-      value: "Groceries, dining, fuel and services must be ranked by drive time",
-      text: "The property brief should return the nearest full grocery, fuel station, pharmacy, everyday restaurant cluster, and emergency/urgent-care option from the address coordinates. County counts are not a substitute. Until the live amenity snapshot is attached, this item remains a visible data-quality issue rather than silently showing nothing.",
-      provenance: "Required source: address-coordinate amenity snapshot with named places, distance, retrieval date, and OpenStreetMap attribution.",
-      tone: "caution",
+      label: "Nearby food and essentials",
+      value: "Serendipity Restaurant · Riverside Grill · Harris Teeter · Giant · BP · Shell",
+      text: "Named nearby options include Serendipity Restaurant on River Road and Riverside Grill on River Road; full-grocery options include Harris Teeter on Bay Farm Road and Giant on John J. Williams Highway; fuel options include BP on Long Neck Road and Shell on John J. Williams Highway. These are useful nearby choices, not endorsements. The live command center should order them by current route time from the property rather than by county count.",
+      provenance: "Sources: public business directories and official business/location pages, refreshed 2026-07-26. Confirm current hours and route time before travel.",
+      tone: "neutral",
     },
   ];
 }

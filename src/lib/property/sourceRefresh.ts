@@ -278,9 +278,9 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     canonicalLandRegisterAuthority.append({
       actorId: "system:source-refresh", actorName: "source-refresh-job",
       domain: "federal-loan-authority-refresh", subject: "SBA-FSA-USDA",
-      decision: federal.failed > 0 ? "ALERT" : federal.changed > 0 ? "REVIEW_REQUIRED" : "REFRESH",
-      reason: `Federal loan authority monitor fetched ${federal.fetched}, discovered ${federal.discovered}, detected ${federal.changed} changes, and recorded ${federal.failed} failures.`,
-      detail: { runId: federal.runId, snapshotSha256: federal.snapshotSha256 },
+      decision: federal.failed > 0 || federal.timedOut > 0 ? "ALERT" : federal.changed > 0 ? "REVIEW_REQUIRED" : "REFRESH",
+      reason: `Federal loan authority monitor fetched ${federal.fetched}, discovered ${federal.discovered}, detected ${federal.changed} changes, recorded ${federal.failed} failures, and timed out ${federal.timedOut} sources.`,
+      detail: { runId: federal.runId, snapshotSha256: federal.snapshotSha256, attempted: federal.attempted, deferred: federal.deferred, durationMs: federal.durationMs },
     });
   } catch (error) {
     canonicalLandRegisterAuthority.append({

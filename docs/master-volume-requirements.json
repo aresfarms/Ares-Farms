@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.2",
+  "frameworkVersion": "master-volume-conformance-v0.4.3",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1521,6 +1521,33 @@
         "src/scripts/verifyFederalLoanAuthorityReconciliation.ts",
         "src/app/api/reports/ultimate-proforma-pdf/route.ts",
         "src/lib/pdf/ultimateProformaTemplate.ts"
+      ]
+    },
+    "OPS-FEDERAL-LOAN-AUTHORITY-REFRESH-RELIABILITY-001": {
+      "title": "Bounded and survivable federal loan authority refresh execution",
+      "status": "implemented",
+      "requires": [
+        "bounded_concurrency",
+        "per_source_deadline",
+        "whole_run_deadline",
+        "required_seed_priority",
+        "partial_success_receipts",
+        "explicit_timeout_state",
+        "last_good_retention",
+        "deferred_source_accounting",
+        "timeout_blocks_current_reliance",
+        "daily_job_completion"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-refresh-reliability",
+        "verify:federal-loan-authority-monitor",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityMonitor.ts",
+        "src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
+        "src/lib/property/sourceRefresh.ts"
       ]
     }
   }

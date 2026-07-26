@@ -628,3 +628,7 @@ The source-refresh scheduler must monitor official SBA, FSA, USDA Rural Developm
 ### Federal Loan Authority Automatic Reconciliation
 
 Before an Ultimate Pro Forma is generated, the runtime must read the current federal-loan authority monitor state, extract deterministic program facts, update the pro forma authority snapshot and current-program overlay, bind the exact current source hashes, and rerun all financial and evidence gates. Form versions, dates, maximums, guaranty percentages, rates, fees, thresholds, links, and enumerated requirements update automatically. Eligibility, legal, collateral, guaranty, ownership, citizenship, credit-elsewhere, environmental, flood, use-of-proceeds, refinancing, and borrower-contribution changes require review when semantic interpretation is material or uncertain. The standing proof command is `npm run verify:federal-loan-authority-reconciliation`.
+
+
+## Federal Loan Authority Refresh Reliability Amendment
+Official federal lending authority monitoring must be survivable under partial source failure. Each request has a bounded deadline; each run has a hard completion deadline; concurrency is bounded; required seeds are attempted before discovered documents; and every failed, timed-out, or deferred source is represented in the replayable run receipt. Successful sources remain publishable, last-good snapshots remain retained, and any timed-out cited authority is blocked from current pro forma reliance. Standing proof: `npm run verify:federal-loan-authority-refresh-reliability`.

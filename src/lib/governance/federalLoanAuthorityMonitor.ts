@@ -41,7 +41,7 @@ export interface FederalLoanAuthorityDocument {
   firstObservedAt: string;
   changedAt: string | null;
   previousContentHash: string | null;
-  status: "CURRENT" | "CHANGED_REVIEW_REQUIRED" | "FETCH_FAILED";
+  status: "CURRENT" | "CHANGED_REVIEW_REQUIRED" | "FETCH_FAILED" | "TIMED_OUT";
   error: string | null;
 }
 
@@ -69,7 +69,11 @@ export interface FederalLoanAuthorityMonitorState {
     fetched: number;
     changed: number;
     failed: number;
+    timedOut?: number;
     discovered: number;
+    attempted?: number;
+    deferred?: number;
+    durationMs?: number;
     snapshotSha256: string;
   }>;
 }
@@ -81,8 +85,11 @@ export interface FederalLoanAuthorityReviewBinding {
 }
 
 const STATE_FILE = runtimeStatePath("federal-loan-authority", "monitor-state.json");
-const MAX_DISCOVERED_PER_AGENCY = 125;
-const FETCH_TIMEOUT_MS = 25_000;
+const MAX_DISCOVERED_PER_AGENCY = 60;
+const MAX_DISCOVERED_TOTAL = 240;
+const DEFAULT_FETCH_TIMEOUT_MS = 12_000;
+const DEFAULT_RUN_TIMEOUT_MS = 240_000;
+const DEFAULT_CONCURRENCY = 6;
 const MAX_BODY_BYTES = 20 * 1024 * 1024;
 
 export const FEDERAL_LOAN_AUTHORITY_SEEDS: readonly FederalLoanAuthoritySeed[] = Object.freeze([
@@ -224,7 +231,7 @@ function discoverLinks(html: string, base: string): string[] {
   return [...urls].sort();
 }
 
-async function fetchBounded(url: string, previous?: FederalLoanAuthorityDocument, fetchImpl: typeof fetch = fetch): Promise<{
+async function fetchBounded(url: string, previous: FederalLoanAuthorityDocument | undefined, fetchImpl: typeof fetch, timeoutMs: number): Promise<{
   status: number;
   contentType: string;
   body: Buffer;
@@ -232,7 +239,7 @@ async function fetchBounded(url: string, previous?: FederalLoanAuthorityDocument
   lastModified: string | null;
 }> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(new Error(`Official source timed out after ${timeoutMs}ms.`)), timeoutMs);
   try {
     const headers: Record<string, string> = { "user-agent": "FurlongOfficialAuthorityMonitor/1.0 (+governance; official-sources-only)" };
     if (previous?.etag) headers["if-none-match"] = previous.etag;
@@ -264,13 +271,20 @@ export async function refreshFederalLoanAuthorities(input: {
   seeds?: readonly FederalLoanAuthoritySeed[];
   persist?: boolean;
   previousState?: FederalLoanAuthorityMonitorState;
+  fetchTimeoutMs?: number;
+  runTimeoutMs?: number;
+  concurrency?: number;
 } = {}): Promise<{
   rule: typeof FEDERAL_LOAN_AUTHORITY_MONITOR_RULE;
   runId: string;
   fetched: number;
   changed: number;
   failed: number;
+  timedOut: number;
   discovered: number;
+  attempted: number;
+  deferred: number;
+  durationMs: number;
   snapshotSha256: string;
   changes: readonly FederalLoanAuthorityChangeReceipt[];
   state: FederalLoanAuthorityMonitorState;
@@ -284,94 +298,113 @@ export async function refreshFederalLoanAuthorities(input: {
   const discoveredCount = new Map<FederalLoanAgency, number>();
   const nextByUrl = new Map(previous.documents.map((doc) => [doc.url, doc]));
   const changes: FederalLoanAuthorityChangeReceipt[] = [];
+  const runStartedMs = Date.now();
+  const runTimeoutMs = Math.max(1_000, input.runTimeoutMs ?? DEFAULT_RUN_TIMEOUT_MS);
+  const fetchTimeoutMs = Math.max(100, input.fetchTimeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS);
+  const concurrency = Math.min(12, Math.max(1, input.concurrency ?? DEFAULT_CONCURRENCY));
+  const runDeadlineMs = runStartedMs + runTimeoutMs;
+  let cursor = 0;
   let fetched = 0;
   let failed = 0;
+  let timedOut = 0;
   let discovered = 0;
+  let attempted = 0;
 
-  for (let index = 0; index < queue.length; index += 1) {
-    const seed = queue[index];
-    const prior = previousByUrl.get(seed.url);
-    try {
-      const response = await fetchBounded(seed.url, prior, input.fetchImpl ?? fetch);
-      fetched += 1;
-      if (response.status === 304 && prior) {
-        nextByUrl.set(seed.url, { ...prior, fetchedAt: now, status: prior.changedAt ? "CHANGED_REVIEW_REQUIRED" : "CURRENT", error: null });
-        continue;
+  const failureDocument = (seed: FederalLoanAuthoritySeed, prior: FederalLoanAuthorityDocument | undefined, error: unknown, status: "FETCH_FAILED" | "TIMED_OUT"): FederalLoanAuthorityDocument => ({
+    documentId: prior?.documentId ?? documentId(seed.url), agency: seed.agency, kind: seed.kind, url: seed.url,
+    contentType: prior?.contentType ?? "unknown", contentHash: prior?.contentHash ?? "",
+    etag: prior?.etag ?? null, lastModified: prior?.lastModified ?? null, title: prior?.title ?? null,
+    normalizedText: prior?.normalizedText ?? null, fetchedAt: now, firstObservedAt: prior?.firstObservedAt ?? now,
+    changedAt: prior?.changedAt ?? null, previousContentHash: prior?.previousContentHash ?? null,
+    status, error: error instanceof Error ? error.message : String(error),
+  });
+
+  while (cursor < queue.length && Date.now() < runDeadlineMs) {
+    const batch = queue.slice(cursor, cursor + concurrency);
+    cursor += batch.length;
+    const discoveredFromBatch: FederalLoanAuthoritySeed[] = [];
+    await Promise.all(batch.map(async (seed) => {
+      const prior = previousByUrl.get(seed.url);
+      attempted += 1;
+      const remainingMs = runDeadlineMs - Date.now();
+      if (remainingMs <= 0) {
+        timedOut += 1;
+        nextByUrl.set(seed.url, failureDocument(seed, prior, new Error("Authority-monitor run deadline reached before this source could start."), "TIMED_OUT"));
+        return;
       }
-      const html = /(?:text\/html|application\/xhtml\+xml)/i.test(response.contentType)
-        ? response.body.toString("utf8")
-        : null;
-      const normalized = html ? normalizeHtml(html) : response.body;
-      const contentHash = sha(normalized);
-      const changed = Boolean(prior && prior.contentHash !== contentHash);
-      const doc: FederalLoanAuthorityDocument = {
-        documentId: prior?.documentId ?? documentId(seed.url),
-        agency: seed.agency,
-        kind: seed.kind,
-        url: seed.url,
-        contentType: response.contentType,
-        contentHash,
-        etag: response.etag,
-        lastModified: response.lastModified,
-        title: html ? titleFromHtml(html) : prior?.title ?? null,
-        normalizedText: html ? cleanMonitorText(html).slice(0, 2_000_000) : null,
-        fetchedAt: now,
-        firstObservedAt: prior?.firstObservedAt ?? now,
-        changedAt: changed ? now : prior?.changedAt ?? null,
-        previousContentHash: changed ? prior!.contentHash : prior?.previousContentHash ?? null,
-        status: changed || prior?.changedAt ? "CHANGED_REVIEW_REQUIRED" : "CURRENT",
-        error: null,
-      };
-      nextByUrl.set(seed.url, doc);
-      if (changed) {
-        changes.push({
+      try {
+        const response = await fetchBounded(seed.url, prior, input.fetchImpl ?? fetch, Math.min(fetchTimeoutMs, remainingMs));
+        fetched += 1;
+        if (response.status === 304 && prior) {
+          nextByUrl.set(seed.url, { ...prior, fetchedAt: now, status: prior.changedAt ? "CHANGED_REVIEW_REQUIRED" : "CURRENT", error: null });
+          return;
+        }
+        const html = /(?:text\/html|application\/xhtml\+xml)/i.test(response.contentType) ? response.body.toString("utf8") : null;
+        const normalized = html ? normalizeHtml(html) : response.body;
+        const contentHash = sha(normalized);
+        const changed = Boolean(prior && prior.contentHash !== contentHash);
+        const doc: FederalLoanAuthorityDocument = {
+          documentId: prior?.documentId ?? documentId(seed.url), agency: seed.agency, kind: seed.kind, url: seed.url,
+          contentType: response.contentType, contentHash, etag: response.etag, lastModified: response.lastModified,
+          title: html ? titleFromHtml(html) : prior?.title ?? null,
+          normalizedText: html ? cleanMonitorText(html).slice(0, 2_000_000) : null,
+          fetchedAt: now, firstObservedAt: prior?.firstObservedAt ?? now,
+          changedAt: changed ? now : prior?.changedAt ?? null,
+          previousContentHash: changed ? prior!.contentHash : prior?.previousContentHash ?? null,
+          status: changed || prior?.changedAt ? "CHANGED_REVIEW_REQUIRED" : "CURRENT", error: null,
+        };
+        nextByUrl.set(seed.url, doc);
+        if (changed) changes.push({
           receiptId: randomUUID(), documentId: doc.documentId, agency: doc.agency, url: doc.url,
           detectedAt: now, previousContentHash: prior!.contentHash, nextContentHash: contentHash,
           status: "REVIEW_REQUIRED", reason: "Official loan authority content changed; dependent guidance is review-stale until rebound to this content hash.",
         });
-      }
-      if (seed.discoverLinks && html) {
-        for (const url of discoverLinks(html, seed.url)) {
-          if (queued.has(url)) continue;
-          const parsed = new URL(url);
-          const agency = inferAgency(parsed);
-          if (!agency) continue;
-          const count = discoveredCount.get(agency) ?? 0;
-          if (count >= MAX_DISCOVERED_PER_AGENCY) continue;
-          queued.add(url);
-          discoveredCount.set(agency, count + 1);
-          queue.push({ agency, url, kind: inferKind(parsed), discoverLinks: false, required: false });
-          discovered += 1;
+        if (seed.discoverLinks && html && discovered < MAX_DISCOVERED_TOTAL) {
+          for (const url of discoverLinks(html, seed.url)) {
+            if (queued.has(url) || discovered + discoveredFromBatch.length >= MAX_DISCOVERED_TOTAL) continue;
+            const parsed = new URL(url);
+            const agency = inferAgency(parsed);
+            if (!agency) continue;
+            const count = discoveredCount.get(agency) ?? 0;
+            if (count >= MAX_DISCOVERED_PER_AGENCY) continue;
+            queued.add(url);
+            discoveredCount.set(agency, count + 1);
+            discoveredFromBatch.push({ agency, url, kind: inferKind(parsed), discoverLinks: false, required: false });
+          }
         }
+      } catch (error) {
+        const isTimeout = error instanceof Error && (error.name === "AbortError" || /timed out|abort/i.test(error.message));
+        if (isTimeout) timedOut += 1; else failed += 1;
+        nextByUrl.set(seed.url, failureDocument(seed, prior, error, isTimeout ? "TIMED_OUT" : "FETCH_FAILED"));
       }
-    } catch (error) {
-      failed += 1;
-      const priorDoc = prior;
-      nextByUrl.set(seed.url, {
-        documentId: priorDoc?.documentId ?? documentId(seed.url), agency: seed.agency, kind: seed.kind, url: seed.url,
-        contentType: priorDoc?.contentType ?? "unknown", contentHash: priorDoc?.contentHash ?? "",
-        etag: priorDoc?.etag ?? null, lastModified: priorDoc?.lastModified ?? null, title: priorDoc?.title ?? null, normalizedText: priorDoc?.normalizedText ?? null,
-        fetchedAt: now, firstObservedAt: priorDoc?.firstObservedAt ?? now, changedAt: priorDoc?.changedAt ?? null,
-        previousContentHash: priorDoc?.previousContentHash ?? null, status: "FETCH_FAILED", error: (error as Error).message,
-      });
-      if (seed.required && !priorDoc) {
-        // Required first-run failures remain visible and make authority resolution fail closed.
-      }
+    }));
+    if (discoveredFromBatch.length) {
+      queue.push(...discoveredFromBatch);
+      discovered += discoveredFromBatch.length;
     }
   }
+
+  const deferredSeeds = queue.slice(cursor);
+  for (const seed of deferredSeeds) {
+    const prior = previousByUrl.get(seed.url);
+    nextByUrl.set(seed.url, failureDocument(seed, prior, new Error("Authority-monitor whole-run deadline reached; source deferred to the next scheduled run."), "TIMED_OUT"));
+  }
+  timedOut += deferredSeeds.length;
+  const deferred = deferredSeeds.length;
 
   const documents = [...nextByUrl.values()].sort((a, b) => a.url.localeCompare(b.url));
   const snapshotSha256 = sha(stable(documents.map((doc) => ({ url: doc.url, contentHash: doc.contentHash, status: doc.status }))));
   const completedAt = new Date().toISOString();
+  const durationMs = Date.now() - runStartedMs;
   const state: FederalLoanAuthorityMonitorState = {
     schemaVersion: "federal-loan-authority-monitor-v1",
     lastRunAt: completedAt,
     documents,
     changes: [...previous.changes, ...changes],
-    runReceipts: [...previous.runReceipts, { runId, startedAt: now, completedAt, fetched, changed: changes.length, failed, discovered, snapshotSha256 }].slice(-365),
+    runReceipts: [...previous.runReceipts, { runId, startedAt: now, completedAt, fetched, changed: changes.length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256 }].slice(-365),
   };
   if (input.persist !== false) writeState(state);
-  return { rule: FEDERAL_LOAN_AUTHORITY_MONITOR_RULE, runId, fetched, changed: changes.length, failed, discovered, snapshotSha256, changes, state };
+  return { rule: FEDERAL_LOAN_AUTHORITY_MONITOR_RULE, runId, fetched, changed: changes.length, failed, timedOut, discovered, attempted, deferred, durationMs, snapshotSha256, changes, state };
 }
 
 export function inspectFederalLoanAuthorityBinding(binding: FederalLoanAuthorityReviewBinding, providedState?: FederalLoanAuthorityMonitorState): {
@@ -388,6 +421,7 @@ export function inspectFederalLoanAuthorityBinding(binding: FederalLoanAuthority
     const doc = byUrl.get(ref);
     if (!doc) { blockers.push(`AUTHORITY_SOURCE_NOT_MONITORED:${ref}`); continue; }
     if (doc.status === "FETCH_FAILED") blockers.push(`AUTHORITY_SOURCE_FETCH_FAILED:${ref}`);
+    if (doc.status === "TIMED_OUT") blockers.push(`AUTHORITY_SOURCE_TIMED_OUT:${ref}`);
     if (!doc.contentHash) blockers.push(`AUTHORITY_SOURCE_HAS_NO_BASELINE:${ref}`);
     if (doc.changedAt && Date.parse(doc.changedAt) > reviewedAt) blockers.push(`AUTHORITY_CHANGED_AFTER_REVIEW:${ref}`);
     const boundHash = binding.reviewedContentHashes[ref];

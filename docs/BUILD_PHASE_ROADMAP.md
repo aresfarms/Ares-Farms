@@ -239,3 +239,7 @@ The Ultimate Pro Forma must reconcile itself automatically against the latest mo
 Human intervention is required only when a detected change is material to eligibility, legal interpretation, collateral, guaranties, citizenship or ownership, credit-elsewhere analysis, environmental or flood obligations, use of proceeds, refinancing, borrower contribution, or when the changed text is ambiguous, conflicting, binary-only, or cannot be parsed deterministically.
 
 **Hard rule:** The portal must automatically update safe, structured program facts and calculations, but it may never silently infer a legal conclusion from ambiguous regulatory text. Material or uncertain changes fail closed for attributed review.
+
+
+### Step 4S — Federal Loan Authority Refresh Reliability
+The continuous SBA/FSA/USDA authority monitor executes with bounded concurrency, a per-source deadline, and a hard whole-run deadline. Healthy sources publish partial success even when another source is unavailable. Timed-out and deferred sources receive explicit durable states and cannot support current pro forma reliance. The scheduled job must complete without allowing one degraded federal source to exhaust the entire refresh window.

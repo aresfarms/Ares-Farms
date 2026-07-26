@@ -1493,6 +1493,35 @@
         "src/lib/property/sourceRefresh.ts",
         "src/app/api/reports/ultimate-proforma-pdf/route.ts"
       ]
+    },
+    "FIN-FEDERAL-LOAN-AUTHORITY-AUTO-RECONCILIATION-001": {
+      "title": "Automatic pro forma reconciliation against current federal loan authority",
+      "status": "implemented",
+      "requires": [
+        "deterministic_fact_extraction",
+        "automatic_form_version_updates",
+        "automatic_effective_date_updates",
+        "automatic_rate_fee_threshold_updates",
+        "automatic_requirement_label_updates",
+        "exact_current_source_hash_rebinding",
+        "current_authority_overlay_in_pdf",
+        "material_change_review_hold",
+        "conflict_and_unparsed_change_review_hold",
+        "no_silent_legal_interpretation"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-reconciliation",
+        "verify:federal-loan-authority-monitor",
+        "verify:governed-ultimate-proforma",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityReconciliation.ts",
+        "src/scripts/verifyFederalLoanAuthorityReconciliation.ts",
+        "src/app/api/reports/ultimate-proforma-pdf/route.ts",
+        "src/lib/pdf/ultimateProformaTemplate.ts"
+      ]
     }
   }
 }

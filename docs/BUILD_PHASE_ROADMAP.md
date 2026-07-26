@@ -231,3 +231,11 @@ Furlong must continuously monitor official SBA, Farm Service Agency, USDA Rural 
 A changed official source does not silently overwrite portal guidance. The affected authority becomes review-stale immediately, while the last-good snapshot remains available only for audit and comparison. Any pro forma or loan-guidance artifact must bind the exact content hash reviewed by a human; a source change, fetch failure, missing baseline, absent hash binding, or hash mismatch blocks generation or current-requirements claims.
 
 **Hard rule:** “Always current” means continuous detection plus fail-closed reliance, not automatic legal interpretation. Only official sources may be monitored, and changed regulations or program requirements require attributed human review before the portal may rely on the new content.
+
+## Step 4R — Federal Loan Authority Automatic Reconciliation
+
+The Ultimate Pro Forma must reconcile itself automatically against the latest monitored SBA, FSA, USDA Rural Development, eCFR, and Federal Register authority snapshot before every generation. Deterministically extractable changes—such as form versions, effective dates, maximum loan amounts, guaranty percentages, interest-rate terms, fees, ownership thresholds, source links, and enumerated document requirements—are automatically applied and rebound to the exact current source hashes. The current authority overlay is rendered in the PDF with its official-source lineage.
+
+Human intervention is required only when a detected change is material to eligibility, legal interpretation, collateral, guaranties, citizenship or ownership, credit-elsewhere analysis, environmental or flood obligations, use of proceeds, refinancing, borrower contribution, or when the changed text is ambiguous, conflicting, binary-only, or cannot be parsed deterministically.
+
+**Hard rule:** The portal must automatically update safe, structured program facts and calculations, but it may never silently infer a legal conclusion from ambiguous regulatory text. Material or uncertain changes fail closed for attributed review.

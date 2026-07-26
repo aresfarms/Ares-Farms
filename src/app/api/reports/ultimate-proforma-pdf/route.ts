@@ -11,7 +11,14 @@ import {
   type GovernedUltimateProformaInput,
 } from "@/lib/governance/governedUltimateProforma";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
-import { inspectFederalLoanAuthorityBinding } from "@/lib/governance/federalLoanAuthorityMonitor";
+import {
+  inspectFederalLoanAuthorityBinding,
+  readFederalLoanAuthorityMonitorState,
+} from "@/lib/governance/federalLoanAuthorityMonitor";
+import {
+  extractDeterministicProgramFacts,
+  reconcileFederalLoanAuthority,
+} from "@/lib/governance/federalLoanAuthorityReconciliation";
 import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import { canonicalReportAuthority } from "@/lib/platform/authorities/report";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
@@ -117,22 +124,43 @@ export async function POST(request: Request) {
     }
 
     const generatedAt = new Date().toISOString();
-    const authorityBinding = inspectFederalLoanAuthorityBinding({
-      reviewedAt: body.proforma.authority.reviewedAt,
-      officialSourceRefs: body.proforma.authority.officialSourceRefs,
-      reviewedContentHashes: body.proforma.authority.reviewedContentHashes,
+    const monitorState = readFederalLoanAuthorityMonitorState();
+    const extractedFacts = monitorState.documents
+      .filter((document) => body.proforma!.authority.officialSourceRefs.includes(document.url))
+      .flatMap((document) => document.normalizedText
+        ? extractDeterministicProgramFacts({ document, content: document.normalizedText, extractedAt: generatedAt })
+        : []);
+    const reconciliation = reconcileFederalLoanAuthority({
+      proforma: body.proforma,
+      state: monitorState,
+      extractedFacts,
+      now: generatedAt,
     });
+    if (reconciliation.overlay.status === "REVIEW_REQUIRED") {
+      return NextResponse.json({
+        ok: false,
+        error: "A material, ambiguous, or unparsed federal lending requirement requires attributed review before generation.",
+        traceId,
+        reconciliation: reconciliation.overlay,
+      }, { status: 409 });
+    }
+    const reconciledProforma = reconciliation.proforma;
+    const authorityBinding = inspectFederalLoanAuthorityBinding({
+      reviewedAt: reconciledProforma.authority.reviewedAt,
+      officialSourceRefs: reconciledProforma.authority.officialSourceRefs,
+      reviewedContentHashes: reconciledProforma.authority.reviewedContentHashes,
+    }, monitorState);
     if (!authorityBinding.current) {
       return NextResponse.json({
         ok: false,
-        error: "Federal loan authority sources changed, failed, or do not match the reviewed content hashes.",
+        error: "Federal loan authority sources failed or do not match the automatically reconciled content hashes.",
         traceId,
         authorityBinding,
       }, { status: 409 });
     }
 
     const packet = composeGovernedUltimateProforma({
-      proforma: body.proforma,
+      proforma: reconciledProforma,
       evidence: body.evidence,
       humanReviewerId: actorId,
       generatedAt,
@@ -191,13 +219,13 @@ export async function POST(request: Request) {
       borrowerId: body.borrowerId,
       tenantId: body.tenantId ?? tenantId,
       actorId,
-      reportTitle: `Ultimate Pro Forma — ${body.proforma.manifest.clientLegalName}`,
+      reportTitle: `Ultimate Pro Forma — ${reconciledProforma.manifest.clientLegalName}`,
       advisory: "INTERNAL PREPARATION ARTIFACT — HUMAN REVIEW REQUIRED — NOT A LENDER APPROVAL, ELIGIBILITY DETERMINATION, COMMITMENT, OR OFFICIAL SBA/USDA FORM.",
       requestPayload: {
         applicationId: body.applicationId,
         evidenceItemCount: body.evidence.length,
-        lane: body.proforma.manifest.lane,
-        documentId: body.proforma.manifest.documentId,
+        lane: reconciledProforma.manifest.lane,
+        documentId: reconciledProforma.manifest.documentId,
       },
       reportPayload: {
         packetSha256: packet.packetSha256,
@@ -219,6 +247,8 @@ export async function POST(request: Request) {
         classification: classifiedOutput.classification,
         claimsPolicyVersion: packet.claimsPolicyVersion,
         federalAuthoritySnapshotSha256: authorityBinding.snapshotSha256,
+        federalAuthorityReconciliationSha256: reconciliation.overlay.overlaySha256,
+        federalAuthorityAutoAppliedFacts: reconciliation.overlay.autoAppliedFactIds.length,
       },
     });
 
@@ -264,7 +294,7 @@ export async function POST(request: Request) {
       status: 200,
       headers: {
         "content-type": "application/pdf",
-        "content-disposition": `attachment; filename="${safeFilename(body.proforma.manifest.documentId)}"`,
+        "content-disposition": `attachment; filename="${safeFilename(reconciledProforma.manifest.documentId)}"`,
         "cache-control": "private, no-store, max-age=0",
         "x-content-type-options": "nosniff",
         "x-furlong-report-id": traceId,

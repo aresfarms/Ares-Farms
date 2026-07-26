@@ -45,6 +45,13 @@ export interface UltimateProformaInput {
     reviewedContentHashes: Record<string, string>;
     programTermsNote: string;
     coverageThresholdBasis: string;
+    automaticProgramUpdates?: Array<{
+      factId: string;
+      label: string;
+      value: string;
+      sourceUrl: string;
+      sourceContentHash: string;
+    }>;
   };
   branding: { logoPath: string };
   manifest: {
@@ -598,6 +605,25 @@ export function buildUltimateProformaDocument(
     ],
     paragraphs: ["Policy: upside never enters DSCR, collateral, or injection math."],
   });
+
+  if ((input.authority.automaticProgramUpdates ?? []).length > 0) {
+    sections.push({
+      title: "CURRENT PROGRAM AUTHORITY — AUTOMATIC UPDATE OVERLAY",
+      leadIns: [{ text: input.authority.programTermsNote }],
+      tables: [{
+        table: {
+          columns: [
+            { header: "Authority fact", width: 0.24, align: "left" },
+            { header: "Current value / requirement", width: 0.46, align: "left" },
+            { header: "Official source + hash", width: 0.30, align: "left" },
+          ],
+          rows: (input.authority.automaticProgramUpdates ?? []).map((item) => ({
+            cells: [item.label, item.value, `${item.sourceUrl} · ${item.sourceContentHash.slice(0, 16)}…`],
+          })),
+        },
+      }],
+    });
+  }
 
   // ── PART II — Loan Lane Matching ──
   sections.push({

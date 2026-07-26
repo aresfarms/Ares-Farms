@@ -36,6 +36,7 @@ export interface FederalLoanAuthorityDocument {
   etag: string | null;
   lastModified: string | null;
   title: string | null;
+  normalizedText: string | null;
   fetchedAt: string;
   firstObservedAt: string;
   changedAt: string | null;
@@ -153,6 +154,10 @@ function writeState(state: FederalLoanAuthorityMonitorState): void {
   const tmp = `${STATE_FILE}.${process.pid}.${Date.now()}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(state, null, 2) + "\n", "utf8");
   fs.renameSync(tmp, STATE_FILE);
+}
+
+function cleanMonitorText(html: string): string {
+  return html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#160;/gi, " ").replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim();
 }
 
 function normalizeHtml(html: string): string {
@@ -309,6 +314,7 @@ export async function refreshFederalLoanAuthorities(input: {
         etag: response.etag,
         lastModified: response.lastModified,
         title: html ? titleFromHtml(html) : prior?.title ?? null,
+        normalizedText: html ? cleanMonitorText(html).slice(0, 2_000_000) : null,
         fetchedAt: now,
         firstObservedAt: prior?.firstObservedAt ?? now,
         changedAt: changed ? now : prior?.changedAt ?? null,
@@ -344,7 +350,7 @@ export async function refreshFederalLoanAuthorities(input: {
       nextByUrl.set(seed.url, {
         documentId: priorDoc?.documentId ?? documentId(seed.url), agency: seed.agency, kind: seed.kind, url: seed.url,
         contentType: priorDoc?.contentType ?? "unknown", contentHash: priorDoc?.contentHash ?? "",
-        etag: priorDoc?.etag ?? null, lastModified: priorDoc?.lastModified ?? null, title: priorDoc?.title ?? null,
+        etag: priorDoc?.etag ?? null, lastModified: priorDoc?.lastModified ?? null, title: priorDoc?.title ?? null, normalizedText: priorDoc?.normalizedText ?? null,
         fetchedAt: now, firstObservedAt: priorDoc?.firstObservedAt ?? now, changedAt: priorDoc?.changedAt ?? null,
         previousContentHash: priorDoc?.previousContentHash ?? null, status: "FETCH_FAILED", error: (error as Error).message,
       });

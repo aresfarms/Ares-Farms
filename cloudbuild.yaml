@@ -111,6 +111,7 @@ steps:
         npm run verify:institutional-access-surveillance-scheduler-provisioning
         npm run verify:governed-ultimate-proforma
         npm run verify:federal-loan-authority-monitor
+        npm run verify:federal-loan-authority-reconciliation
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

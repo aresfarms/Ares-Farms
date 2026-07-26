@@ -112,7 +112,8 @@ const refreshSource = fs.readFileSync("src/lib/property/sourceRefresh.ts", "utf8
 assert.match(refreshSource, /refreshFederalLoanAuthorities/);
 const routeSource = fs.readFileSync("src/app/api/reports/ultimate-proforma-pdf/route.ts", "utf8");
 assert.match(routeSource, /inspectFederalLoanAuthorityBinding/);
-assert.match(routeSource, /Federal loan authority sources changed/);
+assert.match(routeSource, /reconcileFederalLoanAuthority/);
+assert.match(routeSource, /automatically reconciled content hashes/);
 
 console.log(JSON.stringify({
   ok: true,

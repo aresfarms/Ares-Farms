@@ -1,117 +1,14 @@
 import { execSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 import {
   HUMAN_AUTHORITY_REGISTRY_DOC_REF,
   HUMAN_AUTHORITY_REGISTRY_RUNTIME_VERSION,
   HUMAN_AUTHORITY_REGISTRY_SPEC_VERSION,
-  HumanAuthorityRoleFill,
-  HumanAuthorityRoleId,
   composeHumanAuthorityRegistry,
 } from "@/lib/human-authority/humanAuthorityRegistryRuntime";
-
-/**
- * Vol VII Operational Annex loader.
- *
- * Reads docs/governance/VOL_VII_OPERATIONAL_ANNEX.json and projects
- * the VI-A authority roster into the Module 45 role-fill format. Each
- * authority with `status: "ACTIVE"` and at least one entry in
- * `clearsModule45Roles` contributes a `filledByCount` of 1 per role
- * (Caitlin holds multiple authorities → contributes to multiple
- * roles; quorum is handled at clear-time, not at fill-time).
- *
- * EXTERNAL and UNFILLED_BY_DESIGN authorities also project fills for
- * their declared Module 45 roles — those roles aren't expected to be
- * filled by Furlong, but the binding traces to a non-Furlong holder,
- * which the Module 45 runtime accepts as "active."
- *
- * UNFILLED_BY_DESIGN_FOR_ALPHA entries in `module45RolesNotInAlpha`
- * also contribute a synthetic fill so the alpha_required gate is
- * satisfied. The Annex records the operational state.
- */
-type AnnexAuthority = {
-  status: string;
-  clearsModule45Roles?: string[];
-  holder?: string;
-};
-
-type AnnexShape = {
-  activeFillAuthorities?: AnnexAuthority[];
-  recordOnlyAuthorities?: AnnexAuthority[];
-  heldAuthorities?: AnnexAuthority[];
-  unfilledByDesignAuthorities?: AnnexAuthority[];
-  externalAuthorities?: AnnexAuthority[];
-  module45RolesNotInAlpha?: { roleId: string; category: string; reason?: string }[];
-};
-
-function loadOperationalAnnexFilledRoles(): HumanAuthorityRoleFill[] {
-  const annexPath = path.join(
-    process.cwd(),
-    "docs",
-    "governance",
-    "VOL_VII_OPERATIONAL_ANNEX.json"
-  );
-  if (!existsSync(annexPath)) {
-    return [];
-  }
-  let raw: AnnexShape;
-  try {
-    raw = JSON.parse(readFileSync(annexPath, "utf8")) as AnnexShape;
-  } catch {
-    return [];
-  }
-
-  const fillByRole = new Map<HumanAuthorityRoleId, HumanAuthorityRoleFill>();
-  const note = (
-    roleId: string,
-    holder: string,
-    category: string
-  ) => {
-    const key = roleId as HumanAuthorityRoleId;
-    const existing = fillByRole.get(key);
-    if (existing) {
-      existing.filledByCount += 1;
-      existing.recordedBy = `${existing.recordedBy} + ${holder}`;
-    } else {
-      fillByRole.set(key, {
-        roleId: key,
-        filledByCount: 1,
-        recordedBy: `${holder} (${category})`,
-        recordedAt: "2026-06-04",
-      });
-    }
-  };
-
-  const sections: Array<{ list?: AnnexAuthority[]; category: string }> = [
-    { list: raw.activeFillAuthorities, category: "ACTIVE_FILL" },
-    { list: raw.externalAuthorities, category: "EXTERNAL" },
-  ];
-  for (const { list, category } of sections) {
-    for (const a of list ?? []) {
-      const holder = a.holder ?? "(unnamed)";
-      for (const roleId of a.clearsModule45Roles ?? []) {
-        note(roleId, holder, category);
-      }
-    }
-  }
-
-  // module45RolesNotInAlpha — UNFILLED_BY_DESIGN_FOR_ALPHA (sovereign
-  // not in cohort) or HELD_FOR_ALPHA (CCR-2026-002 etc.). Either way
-  // the Annex declares "no Alpha fill required"; the Module 45 gate
-  // receives a synthetic fill so the alpha_required gate is satisfied
-  // without inventing a holder.
-  for (const r of raw.module45RolesNotInAlpha ?? []) {
-    if (
-      r.category === "UNFILLED_BY_DESIGN_FOR_ALPHA" ||
-      r.category === "HELD_FOR_ALPHA"
-    ) {
-      note(r.roleId, `${r.category}: ${r.reason ?? ""}`, r.category);
-    }
-  }
-
-  return [...fillByRole.values()];
-}
+import { loadOperationalAnnexFilledRoles } from "@/lib/human-authority/operationalAnnexRoleFills";
 
 /**
  * Module 45 — Human Authority Registry CLI

@@ -139,3 +139,7 @@ A closed corrective action must remain under a 72-hour effectiveness window with
 ## Step 4C — Independent Institutional Closure Attestation
 
 A completed 72-hour effectiveness window does not permit self-attested institutional closure. A second Module 45 actor, distinct from the effectiveness-window closer, must attest the complete incident, corrective-action, effectiveness, and tombstone evidence snapshot. The attestation binds the exact registration and implementation hash, preserves external-delivery blocking and internal-queue authority, and emits an immutable SHA-256 evidence snapshot.
+
+## Step 4D — Controlled-Promotion Readiness Reconciliation
+
+After institutional closure of the notification lifecycle, the platform must reconcile current Master Volume conformance, Build Self-Report, Human Authority, Public Alpha, security, controlled-promotion, and external-evidence postures into one immutable readiness packet. Engineering completion, Public Alpha authorization, and production authorization must remain separate conclusions. A packet may report engineering PASS while Public Alpha remains PENDING_SIGNOFF and production remains BLOCKED. The packet never grants production authority; named human governance remains controlling.

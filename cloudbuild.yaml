@@ -96,6 +96,7 @@ steps:
         npm run verify:official-evidence-external-notification-corrective-action
         npm run verify:official-evidence-external-notification-corrective-action-effectiveness
         npm run verify:official-evidence-external-notification-institutional-closure
+        npm run verify:controlled-promotion-readiness-reconciliation
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

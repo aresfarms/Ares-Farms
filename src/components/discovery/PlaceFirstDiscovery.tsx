@@ -257,7 +257,7 @@ export function PlaceFirstDiscovery({
           label: "Historic / NPS",
           outcome: verification.lookupOutcomes.historic,
         },
-      ]
+      ].filter((item) => item.outcome === "matched" || item.outcome === "no-match" || item.outcome === "error")
     : [];
   const checkedSourceCount = sourceOutcomeCards.filter(
     (item) => item.outcome === "matched" || item.outcome === "no-match"
@@ -660,11 +660,7 @@ export function PlaceFirstDiscovery({
                               ? "Checked and matched"
                               : item.outcome === "no-match"
                                 ? "Checked and no positive match"
-                                : item.outcome === "gated"
-                                  ? "Not run — governed gate"
-                                  : item.outcome === "not-run"
-                                    ? "Not run"
-                                    : "Attempted but not completed"}
+                                : "Attempted but not completed"}
                           </span>
                         </div>
                       ))}

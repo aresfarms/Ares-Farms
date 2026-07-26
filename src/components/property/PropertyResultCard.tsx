@@ -5,10 +5,10 @@ import type { ChartTheme } from "@/lib/property/chartThemes";
 /**
  * PropertyResultCard — the free tier's DEFAULT view (founder direction
  * 2026-07-17): no more than ten bullets that answer the questions, grouped as
- * green flags / watch flags, with a short overall read and the full chart one
+ * green flags / watch flags, with a short overall read and the full property brief one
  * click behind it. The tease is DEPTH, not withholding — every bullet keeps
  * its number; what's paid is the why, the documents, the county pulls, the
- * personalized file. The full chart stays complete and free: its completeness
+ * personalized file. The full property brief stays complete and free: its completeness
  * is the trust argument the platform stands on.
  */
 
@@ -149,7 +149,7 @@ export function PropertyResultCard(props: PropertyResultCardProps) {
             cursor: "pointer",
           }}
         >
-          {props.chartOpen ? "Collapse the full chart ▴" : "Open the full chart — every fact, source, and cost ▾"}
+          {props.chartOpen ? "Hide the full property brief ▴" : "Open the full property brief — facts, sources, costs, and open questions ▾"}
         </button>
         <span style={{ fontSize: 11.5, color: theme.inkFaint }}>{props.tierLine}</span>
       </div>

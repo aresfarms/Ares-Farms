@@ -11,7 +11,8 @@ import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery"
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
-import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/ChartTableBrief";
+import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
+import { PropertyDecisionBrief } from "@/components/property/PropertyDecisionBrief";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { PropertyResultCard } from "@/components/property/PropertyResultCard";
 import { PropertyEvidencePanel } from "@/components/property/PropertyEvidencePanel";
@@ -3574,7 +3575,7 @@ export function PropertyEvaluationWorkspace({
           front-loaded Property Type Stamp above — shown for every property.) */}
 
       {!deepView && chartOpen && propertyClassificationAvailable && (
-      <ChartTableBrief
+      <PropertyDecisionBrief
         variant={chartVariant}
         propertyId={context.propertyId ?? context.title}
         title={context.title}
@@ -3636,7 +3637,7 @@ export function PropertyEvaluationWorkspace({
 
       {/* Deeper analysis: a DEDICATED PAGE in the same tab (?view=deep) so the
           in-session draft (sessionStorage, per-tab by privacy design) rides
-          along; browser Back returns to the chart. Not a new window: separate
+          along; browser Back returns to the property brief. Not a new window: separate
           windows would silently drop the visitor's draft answers. */}
       {deepView ? (
         <section style={{ display: "grid", gap: 16 }}>
@@ -3644,7 +3645,7 @@ export function PropertyEvaluationWorkspace({
             href={chartHref}
             style={{ fontSize: 13.5, fontWeight: 700, color: "#0f766e", textDecoration: "underline", textUnderlineOffset: 2, justifySelf: "start" }}
           >
-            ← Back to the property chart
+            ← Back to the property brief
           </a>
         <div style={{ paddingTop: 16 }}>
       <div style={{ display: "grid", gap: 20, gridTemplateColumns: "minmax(0, 1.18fr) minmax(340px, 0.92fr)", alignItems: "start" }}>

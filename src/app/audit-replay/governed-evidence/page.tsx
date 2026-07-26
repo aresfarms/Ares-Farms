@@ -20,6 +20,10 @@ import {
   latestValidCredentialVerification,
   verifyInstitutionalCredential,
 } from "@/lib/governance/institutionalCredentialVerification";
+import {
+  latestValidLegalAuthorityVerification,
+  verifyInstitutionalLegalAuthority,
+} from "@/lib/governance/institutionalLegalAuthorityVerification";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
 import { verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 
@@ -48,12 +52,15 @@ async function createAttorneyTokenGrant(formData: FormData) {
   const issuedAt = new Date();
   const credential = latestValidCredentialVerification({ principalId: actor.id, principalEmail: actor.email, role: "attorney", at: issuedAt.toISOString() });
   if (!credential) throw new Error("Active state-bar verification is required before attorney access can be granted.");
+  const matterId = String(formData.get("matterId") ?? "").trim() || null;
+  const authority = latestValidLegalAuthorityVerification({ principalId: actor.id, principalEmail: actor.email, role: "attorney", subjectId: tokenId, matterId });
+  if (!authority) throw new Error("Independently verified legal authority for this token and matter is required before access can be granted.");
   const grant = issueEvidenceAccessGrant({
     role: "attorney",
     principalId: actor.id,
     principalEmail: actor.email,
     purpose: "Attorney review based on demonstrated possession of an anonymous token.",
-    matterId: String(formData.get("matterId") ?? "").trim() || null,
+    matterId,
     agencyOrFirm: String(formData.get("firm") ?? "").trim() || null,
     tenantId: null,
     moduleIds: [],
@@ -64,6 +71,7 @@ async function createAttorneyTokenGrant(formData: FormData) {
     expiresAt: new Date(issuedAt.getTime() + 30 * 60 * 1000).toISOString(),
     issuedBy: actor.id,
     credentialVerificationId: credential.verificationId,
+    authorityVerificationId: authority.authorityVerificationId,
     issuedAt: issuedAt.toISOString(),
   });
   recordInstitutionalEvidenceAccess({ actorId: actor.id, actorEmail: actor.email, role: actor.role, action: "LOGIN", outcome: "ALLOWED", reason: "Short-lived token-bound attorney grant issued.", grantId: grant.grantId, tokenId });
@@ -85,12 +93,15 @@ async function createScopedInstitutionalGrant(formData: FormData) {
   const subjectId = String(formData.get("subjectId") ?? "").trim();
   const credential = latestValidCredentialVerification({ principalId, principalEmail, role });
   if (!credential) throw new Error("A current credential verification is required for the selected principal and role.");
+  const matterId = String(formData.get("matterId") ?? "").trim() || null;
+  const authority = latestValidLegalAuthorityVerification({ principalId, principalEmail, role, subjectId: subjectId || null, matterId });
+  if (!authority) throw new Error("A current independently verified legal-authority receipt is required for the selected principal, subject, and matter.");
   const grant = issueEvidenceAccessGrant({
     role,
     principalId,
     principalEmail,
     purpose: String(formData.get("purpose") ?? "").trim(),
-    matterId: String(formData.get("matterId") ?? "").trim() || null,
+    matterId,
     agencyOrFirm: String(formData.get("agencyOrFirm") ?? "").trim() || null,
     tenantId: String(formData.get("tenantId") ?? "").trim() || null,
     moduleIds: moduleId ? [moduleId] : [],
@@ -101,8 +112,37 @@ async function createScopedInstitutionalGrant(formData: FormData) {
     expiresAt,
     issuedBy: actor.id,
     credentialVerificationId: credential.verificationId,
+    authorityVerificationId: authority.authorityVerificationId,
   });
   redirect(`/audit-replay/governed-evidence?grant=${encodeURIComponent(grant.grantId)}`);
+}
+
+async function recordLegalAuthorityVerification(formData: FormData) {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const actor = sessionIdentity(session);
+  if (!(["governance", "admin"] as string[]).includes(actor.role)) throw new Error("Governance or administrator authority is required to verify legal authority.");
+  verifyInstitutionalLegalAuthority({
+    principalId: String(formData.get("principalId") ?? "").trim(),
+    principalEmail: String(formData.get("principalEmail") ?? "").trim().toLowerCase(),
+    role: String(formData.get("role") ?? "") as "attorney" | "government_official" | "auditor",
+    clientOrAgencySubjectId: String(formData.get("subjectId") ?? "").trim(),
+    matterId: String(formData.get("matterId") ?? "").trim(),
+    jurisdiction: String(formData.get("jurisdiction") ?? "").trim(),
+    authorityType: String(formData.get("authorityType") ?? "").trim(),
+    effectiveAt: String(formData.get("effectiveAt") ?? "").trim(),
+    expiresAt: String(formData.get("expiresAt") ?? "").trim(),
+    sourceDocumentPayload: String(formData.get("sourceDocumentPayload") ?? "").trim(),
+    independentSourceRef: String(formData.get("independentSourceRef") ?? "").trim(),
+    independentSourcePayload: String(formData.get("independentSourcePayload") ?? "").trim(),
+    namedPrincipalMatched: formData.get("namedPrincipalMatched") === "on",
+    subjectMatched: formData.get("subjectMatched") === "on",
+    matterMatched: formData.get("matterMatched") === "on",
+    jurisdictionMatched: formData.get("jurisdictionMatched") === "on",
+    verifiedBy: actor.id,
+    reason: String(formData.get("reason") ?? "").trim(),
+  });
+  redirect("/audit-replay/governed-evidence");
 }
 
 async function recordCredentialVerification(formData: FormData) {
@@ -216,6 +256,24 @@ export default async function GovernedEvidenceReviewPage({ searchParams }: { sea
           <Link href="/audit-replay">Return to audit console</Link>
         </form>
       </section>
+
+      {(["governance", "admin"] as string[]).includes(actor.role) ? (
+        <details style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>
+          <summary><strong>Verify client, matter, examination, or engagement authority</strong></summary>
+          <form action={recordLegalAuthorityVerification} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10, marginTop: 14 }}>
+            <label>Role<select name="role" required><option value="attorney">Attorney</option><option value="government_official">Governmental official</option><option value="auditor">Auditor</option></select></label>
+            <label>Principal ID<input name="principalId" required /></label><label>Principal email<input name="principalEmail" type="email" required /></label>
+            <label>Client/agency subject ID<input name="subjectId" required /></label><label>Matter/examination ID<input name="matterId" required /></label>
+            <label>Jurisdiction<input name="jurisdiction" required /></label><label>Authority type<input name="authorityType" placeholder="Representation, appointment, subpoena, engagement" required /></label>
+            <label>Effective at<input name="effectiveAt" type="datetime-local" required /></label><label>Expires at<input name="expiresAt" type="datetime-local" required /></label>
+            <label>Submitted authority evidence<textarea name="sourceDocumentPayload" required /></label><label>Independent corroborating source<input name="independentSourceRef" required /></label>
+            <label>Independent source response<textarea name="independentSourcePayload" required /></label><label>Reason<input name="reason" required /></label>
+            <label><input type="checkbox" name="namedPrincipalMatched" required /> Named professional matches</label><label><input type="checkbox" name="subjectMatched" required /> Client/agency subject matches</label>
+            <label><input type="checkbox" name="matterMatched" required /> Matter/examination matches</label><label><input type="checkbox" name="jurisdictionMatched" required /> Jurisdiction matches</label>
+            <button type="submit">Record verified authority</button>
+          </form>
+        </details>
+      ) : null}
 
       {(["governance", "admin"] as string[]).includes(actor.role) ? (
         <details style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>

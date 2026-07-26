@@ -47,8 +47,8 @@ assert.equal(attorneyWithoutScope.allowed, false, "Attorney role alone must neve
 const attorneyToken = evaluateInstitutionalEvidenceAccess({
   role: "attorney", actorId: "attorney-1", actorEmail: "law@example.test", grant: null, suppliedTokenId: "token-opaque-1",
 });
-assert.equal(attorneyToken.allowed, true);
-assert.equal(attorneyToken.effectiveTokenId, "token-opaque-1");
+assert.equal(attorneyToken.allowed, false, "Anonymous-token possession alone must not bypass credential and authority verification.");
+assert.equal(attorneyToken.effectiveTokenId, null);
 
 const governmentWithoutGrant = evaluateInstitutionalEvidenceAccess({
   role: "government_official", actorId: "official-1", actorEmail: "official@agency.test", grant: null,
@@ -60,7 +60,7 @@ const grant = {
   purpose: "Matter review", matterId: "matter-1", agencyOrFirm: "Example Firm", tenantId: null,
   moduleIds: ["applications"], subjectIds: ["subject-1"], tokenId: null,
   windowStart: "2026-01-01T00:00:00.000Z", windowEnd: "2026-01-02T00:00:00.000Z",
-  expiresAt: "2026-02-01T00:00:00.000Z", issuedBy: "governance-1", credentialVerificationId: "verification-1", issuedAt: "2025-12-31T00:00:00.000Z", revokedAt: null,
+  expiresAt: "2026-02-01T00:00:00.000Z", issuedBy: "governance-1", credentialVerificationId: "verification-1", authorityVerificationId: "authority-1", issuedAt: "2025-12-31T00:00:00.000Z", revokedAt: null,
 };
 const outsideWindow = evaluateInstitutionalEvidenceAccess({
   role: "attorney", actorId: "attorney-1", actorEmail: "law@example.test", grant,

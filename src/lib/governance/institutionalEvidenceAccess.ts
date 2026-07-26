@@ -4,6 +4,7 @@ import path from "node:path";
 
 import { chainAppend, verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 import { findCredentialVerificationById } from "@/lib/governance/institutionalCredentialVerification";
+import { findLegalAuthorityVerificationById } from "@/lib/governance/institutionalLegalAuthorityVerification";
 
 export type InstitutionalReviewRole = "auditor" | "government_official" | "attorney";
 export type EvidenceAccessGrant = {
@@ -23,6 +24,7 @@ export type EvidenceAccessGrant = {
   expiresAt: string;
   issuedBy: string;
   credentialVerificationId: string;
+  authorityVerificationId: string;
   issuedAt: string;
   revokedAt: string | null;
 };
@@ -64,6 +66,19 @@ export function issueEvidenceAccessGrant(input: Omit<EvidenceAccessGrant, "grant
   if (credential.principalId !== input.principalId || credential.principalEmail.toLowerCase() !== input.principalEmail.toLowerCase() || credential.tokenBoundPrincipalId !== input.principalId || credential.tokenBoundPrincipalEmail.toLowerCase() !== input.principalEmail.toLowerCase() || credential.role !== input.role) {
     throw new Error("The credential verification token is not bound to this exact principal, email, and role.");
   }
+  const authority = findLegalAuthorityVerificationById(input.authorityVerificationId);
+  if (!authority || authority.status !== "VERIFIED" || authority.revoked || Date.parse(authority.expiresAt) < Date.now()) {
+    throw new Error("A current independently verified legal-authority receipt is required.");
+  }
+  if (authority.principalId !== input.principalId || authority.principalEmail.toLowerCase() !== input.principalEmail.toLowerCase() || authority.role !== input.role) {
+    throw new Error("The legal-authority token is not bound to this exact principal, email, and role.");
+  }
+  if (input.matterId && authority.matterId !== input.matterId) {
+    throw new Error("The legal-authority receipt does not match the requested matter.");
+  }
+  if (input.subjectIds.length > 0 && !input.subjectIds.includes(authority.clientOrAgencySubjectId)) {
+    throw new Error("The legal-authority receipt does not match the requested client or agency subject.");
+  }
   if (input.role === "attorney" && !input.tokenId && !input.windowStart && !input.windowEnd) {
     throw new Error("Attorney grants must be token-bound or time-window-bound.");
   }
@@ -92,7 +107,7 @@ export function findEvidenceAccessGrant(grantId: string): EvidenceAccessGrant | 
     tenantId: issued.tenantId ? String(issued.tenantId) : null, moduleIds: Array.isArray(issued.moduleIds) ? issued.moduleIds.map(String) : [],
     subjectIds: Array.isArray(issued.subjectIds) ? issued.subjectIds.map(String) : [], tokenId: issued.tokenId ? String(issued.tokenId) : null,
     windowStart: issued.windowStart ? String(issued.windowStart) : null, windowEnd: issued.windowEnd ? String(issued.windowEnd) : null, expiresAt: String(issued.expiresAt),
-    issuedBy: String(issued.issuedBy), credentialVerificationId: String(issued.credentialVerificationId), issuedAt: String(issued.issuedAt), revokedAt: revoked ? String(revoked.at ?? "revoked") : null,
+    issuedBy: String(issued.issuedBy), credentialVerificationId: String(issued.credentialVerificationId), authorityVerificationId: String(issued.authorityVerificationId), issuedAt: String(issued.issuedAt), revokedAt: revoked ? String(revoked.at ?? "revoked") : null,
   };
 }
 
@@ -114,16 +129,9 @@ export function evaluateInstitutionalEvidenceAccess(input: {
     return { allowed: false, reason: "This identity is not an institutional evidence-review role.", effectiveTokenId: null, effectiveWindowStart: null, effectiveWindowEnd: null, permittedModuleIds: [], permittedSubjectIds: [] };
   }
 
-  if (role === "auditor" && !input.grant) {
-    return { allowed: true, reason: "Provisioned auditor access; tenant and record-level controls remain applicable.", effectiveTokenId: null, effectiveWindowStart: input.requestedWindowStart ?? null, effectiveWindowEnd: input.requestedWindowEnd ?? null, permittedModuleIds: input.requestedModuleId ? [input.requestedModuleId] : [], permittedSubjectIds: input.requestedSubjectId ? [input.requestedSubjectId] : [] };
-  }
-
   const grant = input.grant;
   if (!grant) {
-    if (role === "attorney" && input.suppliedTokenId) {
-      return { allowed: true, reason: "Attorney access is limited to the supplied anonymous token.", effectiveTokenId: input.suppliedTokenId, effectiveWindowStart: input.requestedWindowStart ?? null, effectiveWindowEnd: input.requestedWindowEnd ?? null, permittedModuleIds: input.requestedModuleId ? [input.requestedModuleId] : [], permittedSubjectIds: [input.suppliedTokenId] };
-    }
-    return { allowed: false, reason: `${role} access requires an active, specifically scoped grant.`, effectiveTokenId: null, effectiveWindowStart: null, effectiveWindowEnd: null, permittedModuleIds: [], permittedSubjectIds: [] };
+    return { allowed: false, reason: `${role} access requires an active, credential-backed and authority-backed scoped grant.`, effectiveTokenId: null, effectiveWindowStart: null, effectiveWindowEnd: null, permittedModuleIds: [], permittedSubjectIds: [] };
   }
   if (grant.role !== role || grant.principalId !== input.actorId || grant.principalEmail.toLowerCase() !== input.actorEmail.toLowerCase()) {
     return { allowed: false, reason: "The access grant is not bound to this authenticated identity and role.", effectiveTokenId: null, effectiveWindowStart: null, effectiveWindowEnd: null, permittedModuleIds: [], permittedSubjectIds: [] };

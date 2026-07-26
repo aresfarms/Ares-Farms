@@ -54,6 +54,7 @@ const required = [
   "verify:public-alpha-signoff-ceremony-packet",
   "verify:governed-evidence-review-portal",
   "verify:institutional-credential-verification",
+  "verify:institutional-legal-authority",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

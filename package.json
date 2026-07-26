@@ -516,7 +516,8 @@
     "verify:controlled-promotion-readiness-reconciliation": "tsx src/scripts/verifyControlledPromotionReadinessReconciliation.ts",
     "verify:public-alpha-signoff-ceremony-packet": "tsx src/scripts/verifyPublicAlphaSignoffCeremonyPacket.ts",
     "verify:governed-evidence-review-portal": "tsx src/scripts/verifyGovernedEvidenceReviewPortal.ts",
-    "verify:institutional-credential-verification": "tsx src/scripts/verifyInstitutionalCredentialVerification.ts"
+    "verify:institutional-credential-verification": "tsx src/scripts/verifyInstitutionalCredentialVerification.ts",
+    "verify:institutional-legal-authority": "tsx src/scripts/verifyInstitutionalLegalAuthority.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

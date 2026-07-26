@@ -6,6 +6,7 @@ import { approvedExternalNotificationConnectors } from "./officialEvidenceExtern
 import { listExternalNotificationDryRuns } from "./officialEvidenceExternalNotificationDryRun";
 import { listExternalNotificationAssuranceReceipts } from "./officialEvidenceExternalNotificationAssurance";
 import { decideExternalNotificationActivation } from "./officialEvidenceExternalNotificationActivation";
+import { externalNotificationRegistrationRetired } from "./officialEvidenceExternalNotificationRetirementState";
 
 export type ReinstatementAction =
   "REINSTATE" | "PROBATION_PASS" | "PROBATION_FAIL";
@@ -55,6 +56,8 @@ export function reinstateExternalNotificationConnector(input: {
   );
   if (!connector)
     throw new Error("Reinstatement requires a currently approved connector.");
+  if (externalNotificationRegistrationRetired(connector.registrationId))
+    throw new Error("Retired connector registrations cannot be reinstated.");
   const suspended = listExternalNotificationAssuranceReceipts().some(
     (x) =>
       x.registrationId === input.registrationId && x.action === "AUTO_SUSPEND",
@@ -114,6 +117,8 @@ export function recordProbationOutcome(input: {
   notificationId: string;
   at?: string;
 }): ReinstatementReceipt {
+  if (externalNotificationRegistrationRetired(input.registrationId))
+    throw new Error("Retired connector registrations cannot continue probation.");
   const rows = read();
   const base = [...rows]
     .reverse()

@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { runtimeStatePath } from "./runtimeStatePath";
 import { approvedExternalNotificationConnectors } from "./officialEvidenceExternalNotificationConnector";
 import { listExternalNotificationDryRuns } from "./officialEvidenceExternalNotificationDryRun";
+import { externalNotificationRegistrationRetired } from "./officialEvidenceExternalNotificationRetirementState";
 
 export type ExternalNotificationActivationAction = "ACTIVATE" | "REVOKE";
 export interface ExternalNotificationActivationReceipt {
@@ -56,6 +57,8 @@ export function decideExternalNotificationActivation(input: {
     throw new Error(
       "Activation requires a currently approved connector implementation.",
     );
+  if (externalNotificationRegistrationRetired(connector.registrationId))
+    throw new Error("Retired connector registrations cannot be activated or revoked again.");
   const dryRun = [...listExternalNotificationDryRuns()]
     .reverse()
     .find(

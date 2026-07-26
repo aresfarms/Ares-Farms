@@ -96,6 +96,12 @@ import {
   listExternalNotificationReinstatementReceipts,
   reinstateExternalNotificationConnector,
 } from "@/lib/property/officialEvidenceExternalNotificationReinstatement";
+import {
+  externalNotificationRegistrationRetired,
+  listExternalNotificationRetirementReceipts,
+  retireExternalNotificationConnector,
+  type ExternalNotificationRetirementClassification,
+} from "@/lib/property/officialEvidenceExternalNotificationRetirement";
 
 async function runReplay(formData: FormData): Promise<void> {
   "use server";
@@ -334,6 +340,27 @@ async function reinstateExternalConnector(formData: FormData): Promise<void> {
   revalidatePath("/internal/evidence-recomputation");
 }
 
+async function retireExternalConnector(formData: FormData): Promise<void> {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const email = session?.user?.email ?? null;
+  if (!canApproveSourceLegal(email))
+    throw new Error("Module 45 source/legal authority is required.");
+  const operator = operatorByEmail(email)!;
+  retireExternalNotificationConnector({
+    registrationId: String(formData.get("registrationId") ?? ""),
+    classification: String(
+      formData.get("classification"),
+    ) as ExternalNotificationRetirementClassification,
+    actorId: operator.id,
+    actorName: operator.name,
+    reason: String(formData.get("reason") ?? "").trim(),
+    replacementRegistrationId:
+      String(formData.get("replacementRegistrationId") ?? "").trim() || null,
+  });
+  revalidatePath("/internal/evidence-recomputation");
+}
+
 async function acknowledgeNotification(formData: FormData): Promise<void> {
   "use server";
   const session = await getServerSession(authOptions);
@@ -410,6 +437,8 @@ export default async function EvidenceRecomputationPage() {
     .reverse();
   const externalReinstatementReceipts =
     listExternalNotificationReinstatementReceipts().slice(-30).reverse();
+  const externalRetirementReceipts =
+    listExternalNotificationRetirementReceipts().slice(-30).reverse();
   const watchdogReceipts = listPostResumeWatchdogReceipts()
     .slice(-20)
     .reverse();
@@ -1255,6 +1284,81 @@ export default async function EvidenceRecomputationPage() {
             <br />
             Probation acknowledgments {receipt.probationAcknowledgedDeliveries}/
             {receipt.probationRequiredDeliveries}
+            <br />
+            {receipt.reason}
+          </div>
+        ))}
+        <h3>Permanent connector retirement</h3>
+        <p>
+          Retirement is irreversible for the bound registration and implementation
+          hash. A replacement must begin with a fresh registration.
+        </p>
+        {externalConnectorRegistrations.map((registration) => (
+          <form
+            key={`retire-${registration.registrationId}`}
+            action={retireExternalConnector}
+            style={{
+              display: "grid",
+              gap: 8,
+              padding: "10px 0",
+              borderTop: "1px solid #e2e8f0",
+            }}
+          >
+            <input
+              type="hidden"
+              name="registrationId"
+              value={registration.registrationId}
+            />
+            <b>
+              {registration.connectorId} · {registration.channel} ·{" "}
+              {externalNotificationRegistrationRetired(registration.registrationId)
+                ? "RETIRED"
+                : "ACTIVE REGISTRATION"}
+            </b>
+            <select name="classification" required defaultValue="">
+              <option value="" disabled>
+                Select retirement classification
+              </option>
+              <option value="SECURITY_RETIREMENT">Security retirement</option>
+              <option value="PROVIDER_TERMINATION">Provider termination</option>
+              <option value="IMPLEMENTATION_OBSOLESCENCE">
+                Implementation obsolescence
+              </option>
+              <option value="POLICY_PROHIBITION">Policy prohibition</option>
+              <option value="OPERATOR_DECOMMISSION">Operator decommission</option>
+              <option value="SUPERSEDED_IMPLEMENTATION">
+                Superseded implementation
+              </option>
+            </select>
+            <input
+              name="replacementRegistrationId"
+              placeholder="Optional replacement registration ID"
+            />
+            <textarea
+              name="reason"
+              required
+              placeholder="Permanent retirement reason"
+            />
+            <button
+              disabled={
+                !mayApprove ||
+                externalNotificationRegistrationRetired(registration.registrationId)
+              }
+            >
+              Permanently retire registration
+            </button>
+          </form>
+        ))}
+        {externalRetirementReceipts.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            style={{ padding: "8px 0", borderTop: "1px solid #e2e8f0" }}
+          >
+            <b>{receipt.action}</b> · {receipt.classification} · {receipt.channel} ·{" "}
+            {receipt.connectorId} · {receipt.at}
+            <br />
+            implementation {receipt.implementationHash.slice(0, 16)}… · revocation{" "}
+            {receipt.revocationReceiptId}
             <br />
             {receipt.reason}
           </div>

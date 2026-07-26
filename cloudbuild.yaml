@@ -48,6 +48,7 @@ steps:
         npm run smoke:launch-authorization-decisions
         npm run smoke:production-data-classification
         npm run verify:cloud-build-release-rule
+        npm run verify:official-evidence-roadmap
         npm run verify:official-evidence-source-governance
         npm run verify:official-evidence-refresh-writer
         npm run verify:official-evidence-durable-refresh
@@ -88,6 +89,7 @@ steps:
         npm run verify:official-evidence-external-notification-delivery
         npm run verify:official-evidence-external-notification-assurance
         npm run verify:official-evidence-external-notification-reinstatement
+        npm run verify:official-evidence-external-notification-retirement
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

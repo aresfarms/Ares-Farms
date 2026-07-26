@@ -2,6 +2,7 @@ import fs from "node:fs";
 const cloud = fs.readFileSync("cloudbuild.yaml", "utf8");
 const required = [
   "verify:cloud-build-release-rule",
+  "verify:official-evidence-roadmap",
   "verify:official-evidence-source-governance",
   "verify:official-evidence-refresh-writer",
   "verify:official-evidence-durable-refresh",
@@ -42,6 +43,7 @@ const required = [
   "verify:official-evidence-external-notification-delivery",
   "verify:official-evidence-external-notification-assurance",
   "verify:official-evidence-external-notification-reinstatement",
+  "verify:official-evidence-external-notification-retirement",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

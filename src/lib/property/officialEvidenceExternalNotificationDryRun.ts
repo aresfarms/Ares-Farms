@@ -3,6 +3,7 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import { runtimeStatePath } from "./runtimeStatePath";
 import { approvedExternalNotificationConnectors } from "./officialEvidenceExternalNotificationConnector";
+import { externalNotificationRegistrationRetired } from "./officialEvidenceExternalNotificationRetirementState";
 
 export interface ExternalNotificationDryRunReceipt {
   receiptId: string;
@@ -69,6 +70,8 @@ export function runExternalNotificationDryRun(input: {
     throw new Error(
       "Dry run requires a currently approved connector implementation.",
     );
+  if (externalNotificationRegistrationRetired(connector.registrationId))
+    throw new Error("Retired connector registrations cannot execute dry runs.");
   const payload = buildMinimalExternalNotificationPayload(input);
   const forbidden = [
     "incidentId",

@@ -107,3 +107,13 @@ These are ecosystem-scale capabilities and must not be treated as near-term laun
 - Public and partner surfaces must preserve required disclosures.
 - Human review is required where decisions, escalation, certification, or promotion are implicated.
 - Live external actions, production launch, public verification, legal/regulatory reliance, payment capture, notices, and official reports remain blocked.
+
+## Roadmap Hard Rule
+
+No implementation step may be skipped, reordered, or substituted through developer discretion, automation, release pressure, or convenience. Every sequence transition must prove that all canonical predecessor steps exist, retain their mandatory verifier, and remain present in Cloud Build. A proposed step outside the recorded sequence is blocked until the roadmap is amended through attributed human governance, replay-preserved rationale, and an updated canonical sequence manifest.
+
+The machine-enforced sequence for the current official-evidence notification workstream is:
+
+`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement`
+
+**FINAL HARD RULE:** Cloud Build must fail before image construction whenever the roadmap manifest is missing, predecessor order is incomplete, a completed-step artifact is absent, or the mandatory roadmap verifier is removed.

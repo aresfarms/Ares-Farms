@@ -1432,12 +1432,15 @@ export function buildPropertyBriefIntelligence(args: {
   description?: string | null;
 }): PropertyBriefIntelligence {
   const id = args.propertyId ?? "";
-  // Canonical profile (axis 1) — classified ONCE here, drives the home-shaped
-  // gating and the per-type question bank. The old bare regex called a
-  // "mobile home park" a home because it contains the word "home".
+  const sourceRecord = id && !id.startsWith("imported:") ? findCanonicalPropertyById(id)?.source_records[0] : null;
+  // Canonical profile (axis 1) — classified from the strongest available asset
+  // evidence: source type/description plus parcel acreage. Acreage is not a
+  // cosmetic display value; it materially distinguishes a residence from a
+  // working agricultural asset.
   const profile = classifyPropertyProfile({
     propertyType: args.propertyType,
     description: args.description ?? null,
+    acreageText: sourceRecord?.acreageText ?? null,
   });
   const isHome = profile.id === "residential";
 
@@ -1447,7 +1450,6 @@ export function buildPropertyBriefIntelligence(args: {
   // it (founder direction 2026-07-17: "exactly how big is this property?").
   // HUD/GSA feeds publish no size fields; the "what conveys" unknown carries
   // the pointer for those.
-  const sourceRecord = id && !id.startsWith("imported:") ? findCanonicalPropertyById(id)?.source_records[0] : null;
   if (sourceRecord) {
     const acreageBit = lotSizeDisplay(
       sourceRecord.acreageText,

@@ -54,23 +54,38 @@ export async function POST(req: NextRequest) {
       rawInput: body.rawInput ?? null,
       notes: body.notes ?? null,
     });
+    const canonicalMatch = imported.normalizedAddress
+      ? findCanonicalPropertyByExactAddress(imported.normalizedAddress)
+      : null;
+    const matchedSourceRecord = canonicalMatch?.source_records[0] ?? null;
     // Same living-here Place Brief a map-selected property gets, resolved from
-    // the geocode: county/FMR/schools by county FIPS, OZ/NMTC/flood/historic
-    // from the live verification, amenities via the gated live lookup.
+    // the geocode and the strongest available asset evidence. An exact address
+    // match carries its canonical property style into classification; a visitor
+    // correction remains secondary and never replaces available parcel facts.
     const placeIntelligence = await buildLocationBriefIntelligence({
       geocode: imported.geocode,
       placeFacts: imported.placeFacts,
       parsed: imported.parsedAddress,
-      propertyType: declaredPropertyType,
+      propertyType: declaredPropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
     });
-    const canonicalMatch = imported.normalizedAddress
-      ? findCanonicalPropertyByExactAddress(imported.normalizedAddress)
-      : null;
     return NextResponse.json({
       ok: true,
       propertyId: canonicalMatch?.canonical_property_id ?? propertyId,
       canonicalMatch: canonicalMatch
         ? { propertyId: canonicalMatch.canonical_property_id, matchedBy: "normalized-exact-address" }
+        : null,
+      propertyRecord: matchedSourceRecord
+        ? {
+            exactAddress: matchedSourceRecord.exactAddress,
+            zip: matchedSourceRecord.zip,
+            rawPropertyStyle: matchedSourceRecord.rawPropertyStyle,
+            bedrooms: matchedSourceRecord.bedrooms,
+            yearBuilt: matchedSourceRecord.yearBuilt,
+            squareFeet: matchedSourceRecord.squareFeet,
+            acreageText: matchedSourceRecord.acreageText,
+            listingId: matchedSourceRecord.listingId,
+            listingStatus: canonicalMatch?.listing_status ?? null,
+          }
         : null,
       placeFacts: imported.placeFacts,
       verifiedPrograms: verifyPropertyPrograms(imported.placeFactsForPrograms),

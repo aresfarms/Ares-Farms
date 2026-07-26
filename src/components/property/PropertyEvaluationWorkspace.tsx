@@ -14,7 +14,6 @@ import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyI
 import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { PropertyResultCard } from "@/components/property/PropertyResultCard";
-import { PropertyBestCoursePanel } from "@/components/property/PropertyBestCoursePanel";
 import { PropertyEvidencePanel } from "@/components/property/PropertyEvidencePanel";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
@@ -2556,12 +2555,14 @@ export function PropertyEvaluationWorkspace({
   // wins; fall back to classifying the context type for older API payloads.
   // The VISITOR'S declaration wins over any machine classification — the
   // owner knows it's a working farm; the classifier can only read type text.
+  const importedProperty = context.propertyId?.startsWith("imported:") === true;
   const workspaceProfile = profileOverride
     ? profileById(profileOverride)
     : effectivePlaceIntelligence?.profile ??
       classifyPropertyProfile({
         propertyType: analysisContext.propertyType,
         description: analysisContext.description ?? null,
+        acreageText: facts?.propertyRecord?.acreageText ?? null,
       });
   const answerCard = buildAnswerCard({
     context: analysisContext,
@@ -3469,7 +3470,7 @@ export function PropertyEvaluationWorkspace({
           an active picker; a typed listing shows it as a confirming stamp you can
           still correct. */}
       {!deepView && (() => {
-        const imported = context.propertyId?.startsWith("imported:");
+        const imported = importedProperty;
         return (
           <section
             aria-label="Property type on file"
@@ -3528,45 +3529,6 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
-      {!deepView && propertyEvidenceManifest && (
-        <PropertyEvidencePanel manifest={propertyEvidenceManifest} />
-      )}
-      {!deepView && (
-        <PropertyBestCoursePanel
-          profileId={workspaceProfile.id}
-          startingLens={startingLens}
-          deepHref={deepHref}
-          environmentalHref={`/portal/borrower/environmental-intake?from=${encodeURIComponent(chartHref)}`}
-          financingHref={`/financing-pathways?from=${encodeURIComponent(chartHref)}`}
-          onDownload={exportDraft}
-          downloadBusy={pdfBusy !== null}
-          capitalPlan={preliminaryCapitalPlan}
-          collateralPlan={collateralPlan}
-          marketComparablePlan={marketComparablePlan}
-          scenarioRankingPlan={scenarioRankingPlan}
-          transactionTimelinePlan={transactionTimelinePlan}
-          financialCapacityPlan={financialCapacityPlan}
-          executableScenarioRankingPlan={executableScenarioRankingPlan}
-          decisionSynthesisPlan={decisionSynthesisPlan}
-          recommendationEvidenceLedger={recommendationEvidenceLedger}
-          humanDecisionAssignmentPlan={humanDecisionAssignmentPlan}
-          decisionResolutionPlan={decisionResolutionPlan}
-          recommendationFinalityPlan={recommendationFinalityPlan}
-          recommendationReleaseRecord={recommendationReleaseRecord}
-          recommendationReleaseChangeControl={recommendationReleaseChangeControl}
-          recommendationReleaseHistory={recommendationReleaseHistory}
-          persistedReleaseCount={persistedReleaseRows.length}
-          releaseHistoryLoading={releaseHistoryLoading}
-          releaseHistoryError={releaseHistoryError}
-          releaseRecordBusy={releaseRecordBusy}
-          releaseRecordMessage={releaseRecordMessage}
-          pendingReleaseReview={pendingReleaseReview}
-          escalationAcknowledgeBusy={escalationAcknowledgeBusy}
-          escalationAcknowledgeMessage={escalationAcknowledgeMessage}
-          onAcknowledgeEscalation={acknowledgeCriticalEscalation}
-          onRecordGovernedRelease={recordGovernedRecommendationRelease}
-        />
-      )}
       {!deepView && (
         <PropertyResultCard
           theme={CHART_THEMES[chartVariant]}
@@ -3587,6 +3549,17 @@ export function PropertyEvaluationWorkspace({
           onToggleChart={() => setChartOpen((current) => !current)}
           actionsSlot={chartActionsSlot}
         />
+      )}
+      {!deepView && importedProperty && !rankingPrice && (
+        <section aria-label="Complete property basics" style={{ display: "grid", gap: 7, border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px" }}>
+          <strong style={{ color: "#162033", fontSize: 15 }}>Complete the property basics before Furlong recommends a course</strong>
+          <span style={{ color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>
+            Furlong has classified the property from the available parcel and listing evidence. Enter the asking price or your intended offer before any financial recommendation is generated. You can correct the property type above only when the source record does not reflect the property’s actual use.
+          </span>
+        </section>
+      )}
+      {!deepView && propertyEvidenceManifest && (
+        <PropertyEvidencePanel manifest={propertyEvidenceManifest} />
       )}
       {/* (The imported-only "What is this property?" picker is now the
           front-loaded Property Type Stamp above — shown for every property.) */}

@@ -400,7 +400,6 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       lookupOutcomes.opportunityZone = "no-match";
     }
   } else {
-    warnings.push("Live Opportunity Zone verification is not activated yet, so this imported property cannot be checked against that source in real time.");
     lookupOutcomes.opportunityZone = "gated";
   }
 
@@ -431,7 +430,6 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       lookupOutcomes.hubzone = "no-match";
     }
   } else {
-    warnings.push("Live HUBZone verification is not activated yet, so this imported property cannot be checked against that source in real time.");
     lookupOutcomes.hubzone = "gated";
   }
 
@@ -465,7 +463,6 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       lookupOutcomes.nmtc = "error";
     }
   } else {
-    warnings.push("Live NMTC verification is not activated yet, so this imported property cannot be checked against the CDFI tract source in real time.");
     lookupOutcomes.nmtc = "gated";
   }
 
@@ -492,7 +489,6 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       lookupOutcomes.flood = "error";
     }
   } else {
-    warnings.push("Live flood verification is not activated yet, so this imported property cannot be checked against FEMA in real time.");
     lookupOutcomes.flood = "gated";
   }
 
@@ -520,8 +516,14 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
       lookupOutcomes.historic = "error";
     }
   } else {
-    warnings.push("Live historic verification is not activated yet, so this imported property cannot be checked against NPS in real time.");
     lookupOutcomes.historic = "gated";
+  }
+
+  const gatedChecks = Object.entries(lookupOutcomes)
+    .filter(([, outcome]) => outcome === "gated")
+    .map(([source]) => source);
+  if (gatedChecks.length > 0) {
+    warnings.push("Some property-specific jurisdiction and hazard checks are still pending verification. Furlong will identify them as open items without treating them as negative findings.");
   }
 
   const anyLiveFact = Boolean(placeFacts.opportunityZone || placeFacts.nmtc || placeFacts.hubzone || placeFacts.flood || placeFacts.historic);

@@ -333,9 +333,10 @@ export function PlaceFirstDiscovery({
     if (!checked || busy) return;
     if (!error && !result) return;
 
-    // Compact (lane) check: a successful verification goes STRAIGHT to the full
-    // analysis report, not the place-facts summary (founder direction 2026-07-20).
-    if ((compact || embedded) && result && analysisHref) {
+    // Every successful property-address check goes straight to the full results
+    // workspace. The verification surface remains only for errors, restricted
+    // inputs, or unverifiable addresses where no responsible analysis exists.
+    if (result && analysisHref) {
       setJumpCue("Opening your full analysis report…");
       router.push(analysisHref);
       return;
@@ -346,7 +347,7 @@ export function PlaceFirstDiscovery({
       block: "start",
     });
     setJumpCue("Jumped to your location results.");
-  }, [busy, checked, error, result, compact, embedded, analysisHref, router]);
+  }, [busy, checked, error, result, analysisHref, router]);
 
   return (
     <section data-testid="place-first-discovery" data-flow={flow} data-tone={tone} aria-label="Place-first discovery"
@@ -503,7 +504,7 @@ export function PlaceFirstDiscovery({
                 boxShadow: busy ? "0 0 0 3px rgba(133,79,11,0.12)" : "0 10px 24px rgba(133,79,11,0.18)",
               }}
             >
-              <span>{busy ? "Checking and jumping to results..." : "Check this location and jump to results →"}</span>
+              <span>{busy ? "Building your results…" : "Check this address and open results →"}</span>
             </button>
             <span
               id="place-facts-jump-cue"
@@ -515,7 +516,7 @@ export function PlaceFirstDiscovery({
               }}
             >
               {busy
-                ? "Furlong is verifying the address now and will move you straight to the answer block."
+                ? "Furlong is verifying the address and opening the full results workspace."
                 : jumpCue ?? ""}
             </span>
           </div>

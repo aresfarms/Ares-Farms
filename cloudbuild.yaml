@@ -120,6 +120,7 @@ steps:
         npm run verify:internal-change-verification
         npm run verify:three-founder-release-authority
         npm run verify:founder-change-review-workspace
+        npm run verify:founder-pilot-test-gate
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

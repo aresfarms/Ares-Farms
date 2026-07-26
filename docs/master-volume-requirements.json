@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.5.0",
+  "frameworkVersion": "master-volume-conformance-v0.5.1",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1684,6 +1684,26 @@
         "src/lib/governance/founderChangeReviewStore.ts",
         "src/app/api/governance/founder-change-review/route.ts",
         "src/app/governance/founder-change-review/page.tsx"
+      ]
+    },
+    "OPS-TWO-FOUNDER-INTERNAL-PILOT-001": {
+      "title": "Two-founder controlled internal pilot gate",
+      "status": "implemented",
+      "requires": [
+        "caitlin_owner_attestation",
+        "stuart_pilot_acceptance",
+        "testing_only_boundary",
+        "francis_deferred_until_final_launch"
+      ],
+      "tests": [
+        "verify:founder-pilot-test-gate",
+        "verify:founder-change-review-workspace",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/founderPilotTestGate.ts",
+        "src/lib/governance/founderChangeReviewStore.ts",
+        "src/scripts/verifyFounderPilotTestGate.ts"
       ]
     }
   }

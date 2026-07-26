@@ -6,10 +6,12 @@ import {
   freezeFounderChangeReport,
   recordFounderLaunchAuthority,
   recordFounderOwnerAttestation,
+  recordFounderPilotTestAcceptance,
   recordFounderReview,
 } from "@/lib/governance/founderChangeReviewStore";
 import type { InternalChangeVerificationInput, OwnerAttestation, ReviewerApproval } from "@/lib/governance/internalChangeVerification";
 import type { FounderAuthorityRecord } from "@/lib/governance/threeFounderReleaseAuthority";
+import type { PilotTesterAcceptance } from "@/lib/governance/founderPilotTestGate";
 
 function authenticated(req: NextRequest) {
   const email = req.headers.get("x-ares-authenticated-email")?.trim().toLowerCase() ?? "";
@@ -28,18 +30,20 @@ export async function POST(req: NextRequest) {
   const { email, principal } = authenticated(req);
   if (!email || !principal) return NextResponse.json({ ok: false, error: "Attributed founder identity required." }, { status: 403 });
   const body = await req.json().catch(() => null) as null | {
-    action?: "FREEZE_REPORT" | "OWNER_ATTEST" | "REVIEW" | "LAUNCH_AUTHORITY";
+    action?: "FREEZE_REPORT" | "OWNER_ATTEST" | "REVIEW" | "LAUNCH_AUTHORITY" | "PILOT_TEST_ACCEPTANCE";
     requestId?: string;
     reportInput?: InternalChangeVerificationInput;
     ownerAttestation?: OwnerAttestation;
     reviewerApproval?: ReviewerApproval;
     founderAuthority?: FounderAuthorityRecord;
+    pilotTesterAcceptance?: PilotTesterAcceptance;
   };
   try {
     if (body?.action === "FREEZE_REPORT" && body.reportInput) freezeFounderChangeReport(principal, body.reportInput);
     else if (body?.action === "OWNER_ATTEST" && body.requestId && body.ownerAttestation) recordFounderOwnerAttestation(principal, body.requestId, body.ownerAttestation);
     else if (body?.action === "REVIEW" && body.requestId && body.reviewerApproval) recordFounderReview(principal, body.requestId, body.reviewerApproval);
     else if (body?.action === "LAUNCH_AUTHORITY" && body.requestId && body.founderAuthority) recordFounderLaunchAuthority(principal, body.requestId, body.founderAuthority);
+    else if (body?.action === "PILOT_TEST_ACCEPTANCE" && body.requestId && body.pilotTesterAcceptance) recordFounderPilotTestAcceptance(principal, body.requestId, body.pilotTesterAcceptance);
     else return NextResponse.json({ ok: false, error: "A valid workspace action and payload are required." }, { status: 400 });
     const requestId = body.requestId ?? body.reportInput?.evidence.requestId ?? "";
     return NextResponse.json({ ok: true, actor: { email, principal }, snapshot: founderChangeReviewSnapshot(requestId) });

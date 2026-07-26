@@ -281,3 +281,9 @@ The initial production opening requires all three founders to participate across
 The platform must provide a restricted operational workspace that freezes the plain-language internal change report, binds actions to configured founder identities, stores owner attestations and outside-group reviews as immutable signed events, reconstructs the current report deterministically, and records the three-founder initial-launch authority separately. The workspace may display readiness but never activate a release. Standing proof: `npm run verify:founder-change-review-workspace`.
 
 **Hard rule:** No unauthenticated or unassigned identity may freeze, attest, review, or record launch authority. A material change after freeze requires a new request version; existing signatures cannot be edited or silently reused.
+
+
+### Step 5A — Two-Founder Controlled Internal Pilot Gate
+Caitlin and Stuart may conduct a testing-only internal pilot before Francis or broader testers are bound. Caitlin remains the implementation owner and attestor; Stuart is the sole initial pilot tester and may record a green light, rejection, or retest requirement against the exact frozen report hash. Francis may remain intentionally unbound during this phase.
+
+**Hard rule:** Pilot readiness authorizes only controlled internal testing. It does not authorize public launch, external actions, payments, notices, official reports, lender or agency reliance, or final production promotion. Francis or another final reviewer remains required before launch. Standing proof: `npm run verify:founder-pilot-test-gate`.

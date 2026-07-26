@@ -74,6 +74,7 @@ const required = [
   "verify:internal-change-verification",
   "verify:three-founder-release-authority",
   "verify:founder-change-review-workspace",
+  "verify:founder-pilot-test-gate",
   "verify:official-property-source-adapters",
   "verify:structured-official-evidence",
   "verify:property-evidence-ingestion",

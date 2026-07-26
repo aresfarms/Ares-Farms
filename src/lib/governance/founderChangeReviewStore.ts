@@ -18,6 +18,11 @@ import {
   type FounderAuthorityRecord,
   type ThreeFounderReleaseDecision,
 } from "@/lib/governance/threeFounderReleaseAuthority";
+import {
+  evaluateFounderPilotTestGate,
+  type FounderPilotTestDecision,
+  type PilotTesterAcceptance,
+} from "@/lib/governance/founderPilotTestGate";
 
 export const FOUNDER_CHANGE_REVIEW_WORKSPACE_RULE =
   "FOUNDER-CHANGE-REVIEW-WORKSPACE-001" as const;
@@ -26,7 +31,8 @@ type WorkspaceAction =
   | "REPORT_FROZEN"
   | "OWNER_ATTESTED"
   | "REVIEW_RECORDED"
-  | "LAUNCH_AUTHORITY_RECORDED";
+  | "LAUNCH_AUTHORITY_RECORDED"
+  | "PILOT_TEST_ACCEPTANCE_RECORDED";
 
 export type FounderChangeReviewRecord = {
   eventId: string;
@@ -38,6 +44,7 @@ export type FounderChangeReviewRecord = {
   ownerAttestation?: OwnerAttestation;
   reviewerApproval?: ReviewerApproval;
   founderAuthority?: FounderAuthorityRecord;
+  pilotTesterAcceptance?: PilotTesterAcceptance;
   payloadSha256: string;
   signature: string | null;
 };
@@ -47,6 +54,7 @@ export type FounderChangeReviewSnapshot = {
   requestId: string;
   report: InternalChangeVerificationReport | null;
   founderReleaseDecision: ThreeFounderReleaseDecision | null;
+  pilotTestDecision: FounderPilotTestDecision;
   events: FounderChangeReviewRecord[];
   immutable: true;
   activationPerformed: false;
@@ -165,6 +173,12 @@ export function founderChangeReviewSnapshot(requestId: string): FounderChangeRev
           authority,
         ], [])
     : [];
+  const pilotAcceptance = report
+    ? [...events].reverse().find(
+        (event) => event.action === "PILOT_TEST_ACCEPTANCE_RECORDED" && event.pilotTesterAcceptance?.reportSha256 === report.reportSha256,
+      )?.pilotTesterAcceptance ?? null
+    : null;
+  const pilotTestDecision = evaluateFounderPilotTestGate({ report, acceptance: pilotAcceptance });
   const founderReleaseDecision = report
     ? evaluateThreeFounderReleaseAuthority({
         initialLaunch: true,
@@ -179,6 +193,7 @@ export function founderChangeReviewSnapshot(requestId: string): FounderChangeRev
     requestId,
     report,
     founderReleaseDecision,
+    pilotTestDecision,
     events,
     immutable: true,
     activationPerformed: false,
@@ -211,4 +226,13 @@ export function recordFounderLaunchAuthority(actorPrincipal: FounderPrincipal, r
   const snapshot = founderChangeReviewSnapshot(requestId);
   if (!snapshot.report || snapshot.report.status !== "APPROVED_FOR_ACTIVATION") throw new Error("Cross-functional report approval is required first.");
   return append({ requestId, action: "LAUNCH_AUTHORITY_RECORDED", actorPrincipal, founderAuthority: authority });
+}
+
+export function recordFounderPilotTestAcceptance(actorPrincipal: FounderPrincipal, requestId: string, acceptance: PilotTesterAcceptance) {
+  if (actorPrincipal !== "STUART" || acceptance.tester !== "STUART")
+    throw new Error("Only Stuart may record the initial pilot testing decision.");
+  const snapshot = founderChangeReviewSnapshot(requestId);
+  if (!snapshot.report) throw new Error("A frozen report is required before pilot testing approval.");
+  if (!snapshot.report.ownerAttestation) throw new Error("The implementation owner must attest before pilot testing approval.");
+  return append({ requestId, action: "PILOT_TEST_ACCEPTANCE_RECORDED", actorPrincipal, pilotTesterAcceptance: acceptance });
 }

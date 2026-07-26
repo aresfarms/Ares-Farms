@@ -66,6 +66,8 @@ const PROVISIONABLE_ROLES = new Set<AccessRole>([
   "operator",
   "underwriter",
   "auditor",
+  "government_official",
+  "attorney",
   "admin",
   "governance",
 ]);
@@ -73,6 +75,8 @@ const ELEVATED_PROVISIONING_ROLES = new Set<AccessRole>([
   "operator",
   "underwriter",
   "auditor",
+  "government_official",
+  "attorney",
   "admin",
   "governance",
 ]);

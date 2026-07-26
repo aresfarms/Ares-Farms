@@ -271,6 +271,15 @@ export async function deleteToken(token: string): Promise<boolean> {
   return true;
 }
 
+
+/** Validate possession of an anonymous token for a governed, read-only review.
+ * Returns only the opaque tokenId; no saved data, contact, or rights log leaves
+ * the borrower-experience authority. The caller must separately audit access. */
+export function resolveAnonymousTokenIdForGovernedReview(token: string): string | null {
+  const { idx, tokenId } = findByToken(token);
+  return idx >= 0 ? tokenId : null;
+}
+
 /** Count of stored tokens — for verification only (no token contents). */
 export function tokenCount(): number {
   return readAll().length;

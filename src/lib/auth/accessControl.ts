@@ -19,6 +19,8 @@ export type AccessRole =
   | "operator"
   | "underwriter"
   | "auditor"
+  | "government_official"
+  | "attorney"
   | "admin"
   | "governance";
 
@@ -43,6 +45,11 @@ const ROLE_ALIASES: Record<string, AccessRole> = {
   operator: "operator",
   underwriter: "underwriter",
   auditor: "auditor",
+  government_official: "government_official",
+  regulator: "government_official",
+  government: "government_official",
+  attorney: "attorney",
+  counsel: "attorney",
   admin: "admin",
   governance: "governance",
 };

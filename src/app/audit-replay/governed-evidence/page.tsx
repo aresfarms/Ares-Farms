@@ -1,118 +1,205 @@
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import path from "node:path";
+import { redirect } from "next/navigation";
 
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { readLedgerEvents } from "@/lib/audit/appendLedger";
-import { composeGovernedEvidencePacket } from "@/lib/governance/governedEvidenceReviewPortal";
+import { resolveAnonymousTokenIdForGovernedReview } from "@/lib/borrower-experience/anonymousToken";
+import {
+  composeGovernedEvidencePacket,
+  filterEvidenceEventsForAccess,
+} from "@/lib/governance/governedEvidenceReviewPortal";
+import {
+  evaluateInstitutionalEvidenceAccess,
+  findEvidenceAccessGrant,
+  issueEvidenceAccessGrant,
+  recordInstitutionalEvidenceAccess,
+} from "@/lib/governance/institutionalEvidenceAccess";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
 import { verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 
-const allowedRoles = new Set(["auditor", "governance", "admin"]);
+const portalRoles = new Set(["auditor", "government_official", "attorney", "governance", "admin"]);
 
-export default async function GovernedEvidenceReviewPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ module?: string }>;
-}) {
+function sessionIdentity(session: unknown) {
+  const user = (session as { user?: { id?: string; email?: string; role?: string } } | null | undefined)?.user;
+  return {
+    id: String(user?.id ?? user?.email ?? "unknown"),
+    email: String(user?.email ?? "unknown"),
+    role: String(user?.role ?? "").toLowerCase(),
+  };
+}
+
+async function createAttorneyTokenGrant(formData: FormData) {
+  "use server";
   const session = await getServerSession(authOptions);
-  const role = String((session?.user as { role?: string } | undefined)?.role ?? "").toLowerCase();
-  if (!session?.user || !allowedRoles.has(role)) {
-    return (
-      <main style={{ maxWidth: 760, margin: "0 auto", padding: 32 }}>
-        <h1>Restricted evidence review</h1>
-        <p>This passworded screen is limited to provisioned auditor, governance, and administrator accounts.</p>
-      </main>
-    );
+  const actor = sessionIdentity(session);
+  if (actor.role !== "attorney") throw new Error("Only an authenticated attorney account may use token-bound review.");
+  const token = String(formData.get("token") ?? "").trim();
+  const tokenId = resolveAnonymousTokenIdForGovernedReview(token);
+  if (!tokenId) {
+    recordInstitutionalEvidenceAccess({ actorId: actor.id, actorEmail: actor.email, role: actor.role, action: "LOGIN", outcome: "DENIED", reason: "Anonymous token validation failed." });
+    throw new Error("The anonymous token was not recognized.");
+  }
+  const issuedAt = new Date();
+  const grant = issueEvidenceAccessGrant({
+    role: "attorney",
+    principalId: actor.id,
+    principalEmail: actor.email,
+    purpose: "Attorney review based on demonstrated possession of an anonymous token.",
+    matterId: String(formData.get("matterId") ?? "").trim() || null,
+    agencyOrFirm: String(formData.get("firm") ?? "").trim() || null,
+    tenantId: null,
+    moduleIds: [],
+    subjectIds: [tokenId],
+    tokenId,
+    windowStart: null,
+    windowEnd: null,
+    expiresAt: new Date(issuedAt.getTime() + 30 * 60 * 1000).toISOString(),
+    issuedBy: actor.id,
+    issuedAt: issuedAt.toISOString(),
+  });
+  recordInstitutionalEvidenceAccess({ actorId: actor.id, actorEmail: actor.email, role: actor.role, action: "LOGIN", outcome: "ALLOWED", reason: "Short-lived token-bound attorney grant issued.", grantId: grant.grantId, tokenId });
+  redirect(`/audit-replay/governed-evidence?grant=${encodeURIComponent(grant.grantId)}`);
+}
+
+async function createScopedInstitutionalGrant(formData: FormData) {
+  "use server";
+  const session = await getServerSession(authOptions);
+  const actor = sessionIdentity(session);
+  if (!(["governance", "admin"] as string[]).includes(actor.role)) throw new Error("Governance or administrator authority is required to issue an institutional grant.");
+  const role = String(formData.get("role") ?? "") as "attorney" | "government_official" | "auditor";
+  const principalId = String(formData.get("principalId") ?? "").trim();
+  const principalEmail = String(formData.get("principalEmail") ?? "").trim().toLowerCase();
+  const expiresAt = String(formData.get("expiresAt") ?? "").trim();
+  const windowStart = String(formData.get("windowStart") ?? "").trim() || null;
+  const windowEnd = String(formData.get("windowEnd") ?? "").trim() || null;
+  const moduleId = String(formData.get("moduleId") ?? "").trim();
+  const subjectId = String(formData.get("subjectId") ?? "").trim();
+  const grant = issueEvidenceAccessGrant({
+    role,
+    principalId,
+    principalEmail,
+    purpose: String(formData.get("purpose") ?? "").trim(),
+    matterId: String(formData.get("matterId") ?? "").trim() || null,
+    agencyOrFirm: String(formData.get("agencyOrFirm") ?? "").trim() || null,
+    tenantId: String(formData.get("tenantId") ?? "").trim() || null,
+    moduleIds: moduleId ? [moduleId] : [],
+    subjectIds: subjectId ? [subjectId] : [],
+    tokenId: null,
+    windowStart,
+    windowEnd,
+    expiresAt,
+    issuedBy: actor.id,
+  });
+  redirect(`/audit-replay/governed-evidence?grant=${encodeURIComponent(grant.grantId)}`);
+}
+
+export default async function GovernedEvidenceReviewPage({ searchParams }: { searchParams: Promise<{ module?: string; grant?: string; subject?: string; from?: string; to?: string }> }) {
+  const session = await getServerSession(authOptions);
+  const actor = sessionIdentity(session);
+  if (!(session as { user?: unknown } | null | undefined)?.user || !portalRoles.has(actor.role)) {
+    return <main style={{ maxWidth: 760, margin: "0 auto", padding: 32 }}><h1>Restricted evidence review</h1><p>This passworded screen is limited to separately provisioned auditor, governmental-official, attorney, governance, and administrator accounts.</p></main>;
   }
 
   const query = await searchParams;
   const moduleId = query.module?.trim() || null;
+  const subjectId = query.subject?.trim() || null;
+  const grant = query.grant ? findEvidenceAccessGrant(query.grant) : null;
+  const policyRole = (["governance", "admin"] as string[]).includes(actor.role) ? "auditor" : actor.role;
+  const decision = evaluateInstitutionalEvidenceAccess({
+    role: policyRole,
+    actorId: actor.id,
+    actorEmail: actor.email,
+    grant,
+    requestedModuleId: moduleId,
+    requestedSubjectId: subjectId,
+    requestedWindowStart: query.from ?? null,
+    requestedWindowEnd: query.to ?? null,
+  });
+
+  recordInstitutionalEvidenceAccess({
+    actorId: actor.id, actorEmail: actor.email, role: actor.role, action: "VIEW_PACKET",
+    outcome: decision.allowed ? "ALLOWED" : "DENIED", reason: decision.reason,
+    grantId: grant?.grantId ?? null, moduleId, subjectId, tokenId: decision.effectiveTokenId,
+    windowStart: decision.effectiveWindowStart, windowEnd: decision.effectiveWindowEnd,
+  });
+
+  if (!decision.allowed) {
+    return (
+      <main style={{ maxWidth: 900, margin: "0 auto", padding: 32, display: "grid", gap: 18 }}>
+        <h1>Governed Evidence Review Portal</h1>
+        <p><strong>Access not granted:</strong> {decision.reason}</p>
+        {actor.role === "attorney" ? (
+          <form action={createAttorneyTokenGrant} style={{ display: "grid", gap: 10, maxWidth: 600 }}>
+            <h2>Open a token-bound attorney review</h2>
+            <label>Anonymous token<input name="token" type="password" required style={{ display: "block", width: "100%", padding: 10 }} /></label>
+            <label>Matter reference<input name="matterId" style={{ display: "block", width: "100%", padding: 10 }} /></label>
+            <label>Firm<input name="firm" style={{ display: "block", width: "100%", padding: 10 }} /></label>
+            <button type="submit">Validate token and open 30-minute review</button>
+          </form>
+        ) : null}
+      </main>
+    );
+  }
+
   const ledgerPath = path.join(process.cwd(), "data", "audit-ledger.ndjson");
-  const packet = composeGovernedEvidencePacket({
-    scope: moduleId ? { kind: "MODULE", moduleId } : { kind: "PLATFORM" },
-    modules: moduleManifests,
+  const authorizedEvents = filterEvidenceEventsForAccess({
     events: readLedgerEvents(),
+    tokenId: decision.effectiveTokenId,
+    subjectIds: decision.permittedSubjectIds.length > 0 ? decision.permittedSubjectIds : subjectId ? [subjectId] : [],
+    windowStart: decision.effectiveWindowStart,
+    windowEnd: decision.effectiveWindowEnd,
+  });
+  const effectiveModule = moduleId && (decision.permittedModuleIds.length === 0 || decision.permittedModuleIds.includes(moduleId)) ? moduleId : null;
+  const packet = composeGovernedEvidencePacket({
+    scope: effectiveModule ? { kind: "MODULE", moduleId: effectiveModule } : { kind: "PLATFORM" },
+    modules: moduleManifests,
+    events: authorizedEvents,
     chainVerification: verifyLedgerChain(ledgerPath),
   });
 
   return (
     <main style={{ maxWidth: 1180, margin: "0 auto", padding: "28px 24px 80px", display: "grid", gap: 18 }}>
       <header style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 20 }}>
-        <p style={{ margin: 0, fontSize: 12, fontWeight: 700 }}>PASSWORD-PROTECTED · AUDITOR / COUNSEL REVIEW</p>
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 700 }}>PASSWORD-PROTECTED · {actor.role.toUpperCase().replaceAll("_", " ")}</p>
         <h1 style={{ margin: "8px 0" }}>Governed Evidence Review Portal</h1>
-        <p style={{ margin: 0, lineHeight: 1.55 }}>
-          Standardized evidence packet with SHA-256 integrity posture, rule matching, replay references, and a plain-language event timeline.
-        </p>
+        <p style={{ margin: 0 }}>Every view, search, verification, export, and denial is recorded in the append-only institutional access ledger.</p>
       </header>
 
       <section style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>
-        <form method="get" style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "end" }}>
-          <label style={{ display: "grid", gap: 5, minWidth: 320 }}>
-            <span style={{ fontWeight: 700 }}>Review scope</span>
-            <select name="module" defaultValue={moduleId ?? ""} style={{ padding: 10 }}>
-              <option value="">Whole platform</option>
-              {moduleManifests.slice().sort((a, b) => a.title.localeCompare(b.title)).map((module) => (
-                <option key={module.id} value={module.id}>{module.title} ({module.id})</option>
-              ))}
-            </select>
-          </label>
-          <button type="submit" style={{ padding: "10px 16px" }}>Build packet</button>
+        <form method="get" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}>
+          {query.grant ? <input type="hidden" name="grant" value={query.grant} /> : null}
+          <label>Module<select name="module" defaultValue={moduleId ?? ""} style={{ display: "block", width: "100%", padding: 10 }}><option value="">Whole permitted scope</option>{moduleManifests.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}</select></label>
+          <label>Subject<input name="subject" defaultValue={subjectId ?? ""} style={{ display: "block", width: "100%", padding: 10 }} /></label>
+          <label>From<input name="from" type="datetime-local" defaultValue={query.from ?? ""} style={{ display: "block", width: "100%", padding: 10 }} /></label>
+          <label>To<input name="to" type="datetime-local" defaultValue={query.to ?? ""} style={{ display: "block", width: "100%", padding: 10 }} /></label>
+          <button type="submit">Build permitted packet</button>
           <Link href="/audit-replay">Return to audit console</Link>
         </form>
       </section>
 
+      {(["governance", "admin"] as string[]).includes(actor.role) ? (
+        <details style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>
+          <summary><strong>Issue a scoped institutional access grant</strong></summary>
+          <form action={createScopedInstitutionalGrant} style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10, marginTop: 14 }}>
+            <label>Role<select name="role" required><option value="attorney">Attorney</option><option value="government_official">Governmental official</option><option value="auditor">Auditor</option></select></label>
+            <label>Principal ID<input name="principalId" required /></label><label>Principal email<input name="principalEmail" type="email" required /></label>
+            <label>Agency or firm<input name="agencyOrFirm" /></label><label>Matter ID<input name="matterId" /></label><label>Purpose<input name="purpose" required /></label>
+            <label>Tenant ID<input name="tenantId" /></label><label>Module ID<input name="moduleId" /></label><label>Subject ID<input name="subjectId" /></label>
+            <label>Window start<input name="windowStart" type="datetime-local" /></label><label>Window end<input name="windowEnd" type="datetime-local" /></label>
+            <label>Expires at<input name="expiresAt" type="datetime-local" required /></label><button type="submit">Issue tracked grant</button>
+          </form>
+        </details>
+      ) : null}
+
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
-        {[
-          ["Packet", packet.packetId],
-          ["Scope", packet.scope.kind === "PLATFORM" ? "Whole platform" : packet.scope.moduleId],
-          ["Modules", String(packet.moduleCount)],
-          ["Ledger events", String(packet.evidenceEventCount)],
-          ["Integrity", packet.integrityConclusion],
-          ["Packet SHA-256", packet.packetSha256],
-        ].map(([label, value]) => (
-          <div key={label} style={{ border: "1px solid #d5dbe7", borderRadius: 10, padding: 14, overflowWrap: "anywhere" }}>
-            <div style={{ fontSize: 12, fontWeight: 700 }}>{label}</div>
-            <div style={{ marginTop: 6 }}>{value}</div>
-          </div>
-        ))}
+        {[["Packet", packet.packetId], ["Access basis", grant ? `Grant ${grant.grantId}` : actor.role], ["Scope", packet.scope.kind === "PLATFORM" ? "Whole permitted scope" : packet.scope.moduleId], ["Modules", String(packet.moduleCount)], ["Ledger events", String(packet.evidenceEventCount)], ["Integrity", packet.integrityConclusion], ["Packet SHA-256", packet.packetSha256]].map(([label, value]) => <div key={label} style={{ border: "1px solid #d5dbe7", borderRadius: 10, padding: 14, overflowWrap: "anywhere" }}><div style={{ fontSize: 12, fontWeight: 700 }}>{label}</div><div style={{ marginTop: 6 }}>{value}</div></div>)}
       </section>
 
-      <section style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>
-        <h2>Rule-matching logic</h2>
-        <div style={{ display: "grid", gap: 10 }}>
-          {packet.ruleMatches.map((rule) => (
-            <article key={rule.ruleId} style={{ borderTop: "1px solid #e4e8ef", paddingTop: 12 }}>
-              <strong>{rule.ruleId} · {rule.status}</strong>
-              <div>{rule.label}</div>
-              <p style={{ marginBottom: 4 }}>{rule.explanation}</p>
-              <small>Evidence: {rule.evidenceRefs.join(" · ")}</small>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}>
-        <h2>Plain-language legal record</h2>
-        {packet.timeline.length === 0 ? <p>No matching ledger events were found for this scope.</p> : (
-          <ol style={{ display: "grid", gap: 12 }}>
-            {packet.timeline.map((event) => (
-              <li key={`${event.occurredAt}-${event.sourceRef}`}>
-                <strong>{event.occurredAt} · {event.action}</strong>
-                <div>{event.whatHappened}</div>
-                <div><em>Why it matters:</em> {event.whyItMatters}</div>
-                <small>{event.sourceRef} · {event.cryptographicCoverage}</small>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
-
-      <section style={{ border: "1px solid #e2b8b8", background: "#fff8f8", borderRadius: 12, padding: 18 }}>
-        <h2>Integrity limitations and legal boundary</h2>
-        {packet.unresolvedIssues.length > 0 ? <ul>{packet.unresolvedIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul> : <p>No unresolved packet-integrity issues were detected.</p>}
-        <p>{packet.legalBoundary}</p>
-      </section>
+      <section style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}><h2>Rule-matching logic</h2>{packet.ruleMatches.map((rule) => <article key={rule.ruleId} style={{ borderTop: "1px solid #e4e8ef", paddingTop: 12 }}><strong>{rule.ruleId} · {rule.status}</strong><div>{rule.label}</div><p>{rule.explanation}</p><small>{rule.evidenceRefs.join(" · ")}</small></article>)}</section>
+      <section style={{ border: "1px solid #d5dbe7", borderRadius: 12, padding: 18 }}><h2>Plain-language legal record</h2>{packet.timeline.length === 0 ? <p>No permitted matching events were found.</p> : <ol>{packet.timeline.map((event) => <li key={`${event.occurredAt}-${event.sourceRef}`} style={{ marginBottom: 14 }}><strong>{event.occurredAt} · {event.action}</strong><div>{event.whatHappened}</div><div><em>Why it matters:</em> {event.whyItMatters}</div><small>{event.sourceRef} · {event.cryptographicCoverage}</small></li>)}</ol>}</section>
+      <section style={{ border: "1px solid #e2b8b8", background: "#fff8f8", borderRadius: 12, padding: 18 }}><h2>Integrity limitations and legal boundary</h2>{packet.unresolvedIssues.length ? <ul>{packet.unresolvedIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul> : <p>No unresolved packet-integrity issues were detected.</p>}<p>{packet.legalBoundary}</p></section>
     </main>
   );
 }

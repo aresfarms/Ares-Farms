@@ -78,6 +78,30 @@ function integrityConclusion(verification: HashChainVerification): GovernedEvide
   return "CRYPTOGRAPHIC_CHAIN_VERIFIED";
 }
 
+
+export function filterEvidenceEventsForAccess(input: {
+  events: LedgerEvent[];
+  tokenId?: string | null;
+  subjectIds?: string[];
+  windowStart?: string | null;
+  windowEnd?: string | null;
+}): LedgerEvent[] {
+  const subjects = new Set((input.subjectIds ?? []).filter(Boolean));
+  if (input.tokenId) subjects.add(input.tokenId);
+  const start = input.windowStart ? Date.parse(input.windowStart) : null;
+  const end = input.windowEnd ? Date.parse(input.windowEnd) : null;
+  return input.events.filter((event) => {
+    const at = Date.parse(event.ts);
+    if (start !== null && (!Number.isFinite(at) || at < start)) return false;
+    if (end !== null && (!Number.isFinite(at) || at > end)) return false;
+    if (subjects.size > 0) {
+      const fields = [event.subject, event.actorId, event.domain, event.decision, event.reason].join(" ").toLowerCase();
+      if (![...subjects].some((subject) => fields.includes(subject.toLowerCase()))) return false;
+    }
+    return true;
+  });
+}
+
 function relevantEvents(input: {
   scope: EvidenceReviewScope;
   events: LedgerEvent[];

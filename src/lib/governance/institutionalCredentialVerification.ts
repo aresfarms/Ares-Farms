@@ -1,4 +1,4 @@
-import { createHash, createHmac, randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -29,7 +29,7 @@ export type InstitutionalCredentialVerification = {
   role: InstitutionalReviewRole;
   credentialType: string;
   jurisdictionOrIssuer: string;
-  credentialFingerprint: string;
+  verificationToken: string;
   officialSourceRef: string;
   officialSourceSnapshotHash: string;
   method: CredentialVerificationMethod;
@@ -52,25 +52,6 @@ const LEDGER = path.join(
 
 function sha(value: string): string {
   return createHash("sha256").update(value).digest("hex");
-}
-
-function credentialFingerprintSecret(): string {
-  const secret = process.env.INSTITUTIONAL_CREDENTIAL_FINGERPRINT_SECRET?.trim();
-  if (secret) return secret;
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("INSTITUTIONAL_CREDENTIAL_FINGERPRINT_SECRET is required in production.");
-  }
-  return "furlong-local-credential-fingerprint-secret-not-for-production";
-}
-
-function credentialFingerprint(input: {
-  role: InstitutionalReviewRole;
-  jurisdictionOrIssuer: string;
-  identifier: string;
-}): string {
-  return createHmac("sha256", credentialFingerprintSecret())
-    .update(`${input.role}:${input.jurisdictionOrIssuer.trim().toLowerCase()}:${input.identifier.trim()}`)
-    .digest("hex");
 }
 
 function rows(): Array<Record<string, unknown>> {
@@ -135,11 +116,7 @@ export function verifyInstitutionalCredential(input: {
     role: input.role,
     credentialType: input.credentialType,
     jurisdictionOrIssuer: input.jurisdictionOrIssuer,
-    credentialFingerprint: credentialFingerprint({
-      role: input.role,
-      jurisdictionOrIssuer: input.jurisdictionOrIssuer,
-      identifier,
-    }),
+    verificationToken: `credv_${randomUUID()}`,
     officialSourceRef: input.officialSourceRef,
     officialSourceSnapshotHash: sha(input.officialSourcePayload),
     method: input.method,

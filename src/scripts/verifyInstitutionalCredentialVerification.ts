@@ -25,10 +25,10 @@ assert.throws(() => verifyInstitutionalCredential({
 }), /independence/i);
 
 const source = fs.readFileSync("src/lib/governance/institutionalCredentialVerification.ts", "utf8");
-assert.ok(source.includes("createHmac"), "Credential identifiers must use keyed HMAC fingerprints.");
 assert.ok(!source.includes("credentialIdentifierLast4"), "No license-number suffix may be retained.");
-assert.ok(!source.includes("credentialIdentifierHash"), "Unkeyed license-number hashes are prohibited.");
-assert.ok(source.includes("INSTITUTIONAL_CREDENTIAL_FINGERPRINT_SECRET"), "Production fingerprint secret must be required.");
+assert.ok(!source.includes("credentialIdentifierHash"), "License-number hashes are prohibited.");
+assert.ok(!source.includes("credentialFingerprint"), "Derived license-number fingerprints are prohibited.");
+assert.ok(source.includes("verificationToken"), "A random opaque verification token must replace the credential number after validation.");
 
 console.log(JSON.stringify({
   ok: true,
@@ -36,6 +36,6 @@ console.log(JSON.stringify({
   roles: ["attorney", "government_official", "auditor"],
   credentialNumberStored: false,
   credentialSuffixStored: false,
-  keyedFingerprintOnly: true,
+  postVerificationOpaqueTokenOnly: true,
   matterAuthorityStillRequired: true,
 }, null, 2));

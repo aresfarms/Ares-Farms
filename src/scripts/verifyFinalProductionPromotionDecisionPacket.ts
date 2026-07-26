@@ -1,4 +1,5 @@
 import { buildProductionPromotionReadinessPacket } from "@/lib/governance/productionPromotionReadiness";
+import { buildInternalChangeVerificationReport, internalChangeReportHash, type InternalChangeVerificationInput } from "@/lib/governance/internalChangeVerification";
 import {
   FINAL_PRODUCTION_PROMOTION_DECISION_RULE,
   buildFinalProductionPromotionDecisionPacket,
@@ -32,6 +33,22 @@ const readiness = buildProductionPromotionReadinessPacket({
   finalActivationApproved: false,
 });
 
+
+const internalInput: InternalChangeVerificationInput = {
+  evidence: {
+    requestId: "launch-change", requestVersion: "v1", requirementText: "Prepare the governed release.", successCriteria: ["all gates pass"],
+    changeOwner: "CAITLIN", domain: "TECHNICAL_GOVERNANCE", commitSha: "d".repeat(40), imageDigest: `sha256:${"e".repeat(64)}`,
+    buildId: "build-launch", buildStatus: "SUCCESS", changedComponents: ["release"], affectedRoutes: [], affectedPermissions: [], databaseChanges: [], configurationChanges: [],
+    tests: [{ name: "release", status: "PASS", evidenceRef: "test:release" }], securityFindings: [], knownLimitations: [], unverifiedClaims: [],
+    rollbackImageDigest: `sha256:${"f".repeat(64)}`, rollbackProcedure: "Restore prior image.", releaseInvariants: ["auth remains enforced"], postReleaseChecks: [{ name: "health", status: "PASS" }],
+  },
+  summary: { whatChanged: "The governed release candidate was prepared.", whyItChanged: "Production readiness.", whoIsAffected: "Authorized users.", whatTestsProved: ["Gates pass"], whatTestsDidNotProve: ["Human approval is still required"], principalRisks: ["Configuration drift"], rollbackExplanation: "Restore prior image." },
+};
+const internalHash = internalChangeReportHash(internalInput);
+internalInput.ownerAttestation = { principal: "CAITLIN", signedAt: "2026-07-27T10:00:00Z", signatureRef: "owner", statement: "implemented", reportSha256: internalHash };
+internalInput.reviewerApprovals = ["STUART", "FRANCIS"].map((principal, index) => ({ principal: principal as "STUART" | "FRANCIS", role: index === 0 ? "REQUESTER_ACCEPTANCE" as const : "INDEPENDENT_REVIEW" as const, decision: "APPROVE" as const, checklistVersion: "technical-v1", checklistAnswers: [{ itemId: "all", answer: "YES" as const }], signedAt: "2026-07-27T11:00:00Z", signatureRef: `review-${principal}`, reportSha256: internalHash }));
+const internalReport = buildInternalChangeVerificationReport(internalInput);
+
 const roles: PromotionApprovalRole[] = [
   "RELEASE_BOARD",
   "CONSTITUTIONAL_AUTHORITY",
@@ -45,11 +62,13 @@ const approvals = roles.map((role, index) => ({
   decision: "APPROVE" as const,
   signedAt: "2026-07-27T12:00:00Z",
   readinessPacketSha256: readiness.packetSha256,
+  internalChangeVerificationReportSha256: internalReport.reportSha256,
   signatureRef: `signature-${index + 1}`,
 }));
 
 const ready = buildFinalProductionPromotionDecisionPacket({
   readinessPacket: readiness,
+  internalChangeVerificationReport: internalReport,
   liveImageDigest: `sha256:${"a".repeat(64)}`,
   credentialAllowlistEmails: ["Release@example.com", "security@example.com"],
   activationWindowStart: "2026-07-27T13:00:00Z",
@@ -63,6 +82,7 @@ assert(!JSON.stringify(ready).includes("Release@example.com"), "Plaintext allowl
 
 const missingApprovals = buildFinalProductionPromotionDecisionPacket({
   readinessPacket: readiness,
+  internalChangeVerificationReport: internalReport,
   liveImageDigest: `sha256:${"a".repeat(64)}`,
   credentialAllowlistEmails: ["release@example.com"],
   activationWindowStart: "2026-07-27T13:00:00Z",
@@ -74,6 +94,7 @@ assert(missingApprovals.status === "BLOCKED", "Missing human approvals must bloc
 
 const collided = buildFinalProductionPromotionDecisionPacket({
   readinessPacket: readiness,
+  internalChangeVerificationReport: internalReport,
   liveImageDigest: `sha256:${"a".repeat(64)}`,
   credentialAllowlistEmails: ["release@example.com"],
   activationWindowStart: "2026-07-27T13:00:00Z",

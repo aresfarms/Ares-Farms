@@ -117,6 +117,7 @@ steps:
         npm run verify:controlled-public-surface-promotion
         npm run verify:production-promotion-readiness
         npm run verify:final-production-promotion-decision
+        npm run verify:internal-change-verification
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

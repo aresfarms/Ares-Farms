@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 
 import type { ProductionPromotionReadinessPacket } from "@/lib/governance/productionPromotionReadiness";
+import type { InternalChangeVerificationReport } from "@/lib/governance/internalChangeVerification";
 
 export const FINAL_PRODUCTION_PROMOTION_DECISION_RULE =
   "FINAL-PRODUCTION-PROMOTION-DECISION-PACKET-001" as const;
@@ -18,11 +19,13 @@ export type PromotionApprovalRecord = {
   decision: "APPROVE" | "REJECT";
   signedAt: string;
   readinessPacketSha256: string;
+  internalChangeVerificationReportSha256: string;
   signatureRef: string;
 };
 
 export type FinalProductionPromotionDecisionInput = {
   readinessPacket: ProductionPromotionReadinessPacket;
+  internalChangeVerificationReport: InternalChangeVerificationReport;
   liveImageDigest: string;
   credentialAllowlistEmails: string[];
   activationWindowStart: string;
@@ -101,6 +104,8 @@ export function buildFinalProductionPromotionDecisionPacket(
 
   if (!input.readinessPacket.technicalPerimeterReady)
     blockers.push("technical-perimeter-not-ready");
+  if (input.internalChangeVerificationReport.status !== "APPROVED_FOR_ACTIVATION" || !input.internalChangeVerificationReport.activationAllowed)
+    blockers.push("internal-change-verification-not-approved");
   if (!/^sha256:[a-f0-9]{64}$/.test(input.liveImageDigest))
     blockers.push("invalid-live-image-digest");
   if (allowlist.length === 0) blockers.push("credential-allowlist-missing");
@@ -136,6 +141,7 @@ export function buildFinalProductionPromotionDecisionPacket(
     finalPromotionAuthorized: false as const,
     liveActionAuthorityGranted: false as const,
     readinessPacketSha256: input.readinessPacket.packetSha256,
+    internalChangeVerificationReportSha256: input.internalChangeVerificationReport.reportSha256,
     liveImageDigest: input.liveImageDigest,
     credentialAllowlistSha256: allowlist.length ? sha(allowlist.join("\n")) : null,
     credentialAllowlistCount: allowlist.length,

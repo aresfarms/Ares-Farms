@@ -650,3 +650,11 @@ Before final production or public-action promotion, the platform must produce a 
 
 ### Step 4W — Final Production Promotion Decision Packet
 A final decision packet must bind the exact immutable production image, the 4V readiness packet, a hash-only credential allowlist, a bounded activation window, an attributed rollback owner, and four distinct signed human approvals: release board, constitutional authority, qualified release manager, and final activation authority. The packet may become ready for a separately executed activation ceremony, but it cannot set environment variables, release holds, activate live actions, or grant official reliance. Standing proof: `npm run verify:final-production-promotion-decision`.
+
+
+### Step 4X — Cross-Functional Internal Change Verification
+Every code, configuration, security, finance, underwriting, or public-communications change must originate from a frozen plain-language request and produce one immutable Internal Change Verification and Plain-Language Assurance Report. The report combines a common machine-evidence backbone with a domain-specific checklist overlay. It records the exact request version, owner, commit, immutable image, build, tests, affected routes, permissions, database and configuration changes, known limitations, unverified claims, rollback image, release invariants, and post-release regression checks.
+
+The change owner may implement and attest but may not independently approve the change. Caitlin-owned technical and governance changes require Stuart and Francis; Stuart-owned finance and underwriting changes require Caitlin and Francis; Francis-owned public and communications changes require Caitlin and Stuart. Any change to the request, evidence, code, configuration, test results, image, or report hash invalidates all prior signatures. A rejection, failed checklist item, failed regression, missing rollback, or external-review requirement keeps activation blocked.
+
+**Hard rule:** No governed change may be activated, promoted, or relied upon without a valid frozen report, owner attestation, both required outside-group approvals, and passing post-release invariants. The report must explain in plain English what changed, what tests proved, what tests did not prove, principal risks, and how to reverse the change. Standing proof: `npm run verify:internal-change-verification`.

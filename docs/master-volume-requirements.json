@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.7",
+  "frameworkVersion": "master-volume-conformance-v0.4.8",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -1622,6 +1622,28 @@
       "evidence": [
         "src/lib/governance/finalProductionPromotionDecisionPacket.ts",
         "src/scripts/verifyFinalProductionPromotionDecisionPacket.ts"
+      ]
+    },
+    "CHANGE-VERIFICATION-001": {
+      "title": "Cross-functional internal change verification and plain-language assurance",
+      "status": "implemented",
+      "requires": [
+        "frozen_plain_language_request",
+        "machine_generated_change_evidence",
+        "domain_specific_checklist_overlay",
+        "owner_attestation",
+        "two_outside_group_approvals",
+        "signature_invalidation_on_change",
+        "post_release_regression_checks"
+      ],
+      "tests": [
+        "verify:internal-change-verification",
+        "verify:official-evidence-roadmap",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/internalChangeVerification.ts",
+        "src/scripts/verifyInternalChangeVerification.ts"
       ]
     }
   }

@@ -51,6 +51,22 @@ const notModifiedFetch = (async () => new Response(null, { status: 304 })) as ty
 const backfill = await refreshFederalLoanAuthorities({ now: "2026-07-26T01:00:00.000Z", fetchImpl: notModifiedFetch, seeds: [{ agency: "SBA", kind: "PROGRAM_TERMS", url: "https://www.sba.gov/funding-programs/loans", discoverLinks: false, required: true }], previousState: priorState, persist: false });
 assert.equal(backfill.state.documents[0]?.semanticHash, buildFederalAuthoritySemanticFingerprint(base).semanticHash);
 
+const retainedOutsideQueue: FederalLoanAuthorityMonitorState = {
+  ...priorState,
+  documents: [
+    ...priorState.documents,
+    { ...priorState.documents[0]!, documentId: "retained", url: "https://www.sba.gov/funding-programs/loans/retained-authority", etag: null, semanticHash: undefined },
+  ],
+};
+const retainedBackfill = await refreshFederalLoanAuthorities({
+  now: "2026-07-26T02:00:00.000Z",
+  fetchImpl: notModifiedFetch,
+  seeds: [{ agency: "SBA", kind: "PROGRAM_TERMS", url: "https://www.sba.gov/funding-programs/loans", discoverLinks: false, required: true }],
+  previousState: retainedOutsideQueue,
+  persist: false,
+});
+assert.equal(retainedBackfill.state.documents.find((doc) => doc.documentId === "retained")?.semanticHash, buildFederalAuthoritySemanticFingerprint(base).semanticHash);
+
 console.log(JSON.stringify({
   ok: true,
   rule: FEDERAL_LOAN_AUTHORITY_CHANGE_TRIAGE_RULE,
@@ -60,6 +76,7 @@ console.log(JSON.stringify({
   legallyMaterialChangesElevated: true,
   missingHistoryFailsClosed: true,
   unchangedSnapshotSemanticBackfill: true,
+  retainedAuthoritySemanticBackfill: true,
 }, null, 2));
 
 }

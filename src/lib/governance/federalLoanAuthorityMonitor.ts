@@ -429,8 +429,21 @@ export async function refreshFederalLoanAuthorities(input: {
   timedOut += deferredSeeds.length;
   const deferred = deferredSeeds.length;
 
-  const documents = [...nextByUrl.values()].sort((a, b) => a.url.localeCompare(b.url));
-  const snapshotSha256 = sha(stable(documents.map((doc) => ({ url: doc.url, contentHash: doc.contentHash, status: doc.status }))));
+  // Backfill semantic fingerprints for every retained text authority, including
+  // documents outside this run's bounded fetch queue. This is a metadata-only
+  // migration: it does not clear or downgrade any existing review hold.
+  const documents = [...nextByUrl.values()]
+    .map((doc) => {
+      if (doc.semanticHash || !doc.normalizedText) return doc;
+      const semantic = buildFederalAuthoritySemanticFingerprint(doc.normalizedText);
+      return {
+        ...doc,
+        semanticHash: semantic.semanticHash,
+        semanticClauses: semantic.clauses,
+      };
+    })
+    .sort((a, b) => a.url.localeCompare(b.url));
+  const snapshotSha256 = sha(stable(documents.map((doc) => ({ url: doc.url, contentHash: doc.contentHash, semanticHash: doc.semanticHash ?? null, status: doc.status }))));
   const completedAt = new Date().toISOString();
   const durationMs = Date.now() - runStartedMs;
   const state: FederalLoanAuthorityMonitorState = {

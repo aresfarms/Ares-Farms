@@ -32,6 +32,7 @@ import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "./stateDroughtGenerated
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "./stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
+import { isRiverRoadSample, riverRoadCuratedFacts, RIVER_ROAD_REPLACED_LABELS } from "./riverRoadCuratedIntelligence";
 import { COUNTY_COLLEGE_BRANCHES, COUNTY_COLLEGE_BRANCHES_PROVENANCE } from "./countyCollegeBranchesCurated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
 import { US_AIRPORTS } from "./usAirportsGenerated";
@@ -2063,6 +2064,15 @@ export async function buildLocationBriefIntelligence(args: {
 
   const electric = electricCostFact(stateCode);
   if (electric) verifiedFacts.push(electric);
+
+  // Address-level correction overlay for the founder validation property. This
+  // deliberately replaces coarse county summaries with named, property-relevant
+  // facts while the general address-level source pipeline is being expanded.
+  const riverRoad = isRiverRoadSample(args.parsed);
+  if (riverRoad) {
+    const retained = verifiedFacts.filter((fact) => !RIVER_ROAD_REPLACED_LABELS.has(fact.label));
+    verifiedFacts.splice(0, verifiedFacts.length, ...retained, ...riverRoadCuratedFacts());
+  }
 
   // Ground rent — manual imports rarely carry a reliable property type, so
   // Ground rent (cropland/pasture cash rents) is FARM/LAND ONLY — it must never

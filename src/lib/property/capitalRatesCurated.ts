@@ -51,7 +51,7 @@ export function buildCapitalRates(): CapitalRatesView {
     {
       program: "SBA 504",
       basis: "A fixed rate set at each monthly debenture sale — it locks when your loan funds.",
-      current: deb != null ? `${deb}%` : undefined,
+      current: deb != null ? `25-year standard ${deb}% · July 2026 sale` : undefined,
     },
     { program: "USDA Business & Industry (B&I)", basis: "Lender-negotiated, backed by a USDA guarantee." },
     { program: "USDA / FSA program", basis: "Published program rate.", current: `FSA Farm Ownership ${FSA_RATES.ownershipDirect}%` },

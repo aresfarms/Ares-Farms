@@ -3031,10 +3031,12 @@ export function PropertyEvaluationWorkspace({
           "Conventional farm or mixed-use financing",
         ]
       : [
-          "Conventional commercial real-estate financing",
-          "SBA 7(a) financing — owner-operated business use required",
-          "SBA 504 financing — eligible fixed-asset use required",
-          "Construction or rehabilitation financing",
+          "Conventional bank or credit-union commercial real-estate financing",
+          "SBA 504 financing — owner-occupied fixed assets and eligible improvements",
+          "SBA 7(a) financing — real estate, business acquisition, working capital, and equipment when eligible",
+          "USDA Business & Industry financing — rural eligible business-purpose projects",
+          "Commercial bridge or value-add financing — acquisition plus renovation or lease-up",
+          "Equipment financing or seller financing — when machinery, fixtures, or the operating business conveys",
         ];
   const topProgramPreview = verifiedProgramPreview.length > 0
     ? verifiedProgramPreview

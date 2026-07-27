@@ -10,6 +10,13 @@ export type PropertyCommandCenterProps = ChartTableBriefProps & {
   propertyRecord?: {
     exactAddress: string | null;
     rawPropertyStyle: string | null;
+    propertyType?: string | null;
+    price?: number | null;
+    county?: string | null;
+    town?: string | null;
+    state?: string | null;
+    parcelRefs?: string[];
+    recordBasis?: "matched-approved-source-record" | "verified-address-only";
     bedrooms: number | null;
     yearBuilt: number | null;
     squareFeet: number | null;
@@ -106,13 +113,20 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const recordFacts = useMemo(() => {
     const record = props.propertyRecord;
     if (!record) return [];
-    const source = "Source: matched property/listing record";
+    const source = record.recordBasis === "verified-address-only"
+      ? "Source: verified address intake; parcel-level fields require an approved jurisdiction record"
+      : "Source: matched property/listing record";
+    const place = [record.town, record.county, record.state].filter(Boolean).join(", ");
     return [
+      record.exactAddress ? { label: "Verified address", value: record.exactAddress, text: "The entered property address resolved successfully through the public address-verification path.", provenance: source, tone: "neutral" as const } : null,
+      place ? { label: "Property location", value: place, text: "Town, county, and state carried into the property record from the verified intake context.", provenance: source, tone: "neutral" as const } : null,
+      props.priceLabel ? { label: "Price status", value: props.priceLabel, text: "Current price or off-market posture carried into this property analysis.", provenance: props.sourceLabel ? `Source: ${props.sourceLabel}` : source, tone: "neutral" as const } : null,
+      record.parcelRefs?.length ? { label: "Associated parcels", value: `${record.parcelRefs.length} parcel${record.parcelRefs.length === 1 ? "" : "s"} identified`, text: "Parcel references returned by the approved property source.", provenance: source, tone: "neutral" as const } : null,
       record.acreageText ? { label: "Land area", value: record.acreageText, text: `The matched record reports ${record.acreageText} of land.`, provenance: source, tone: "neutral" as const } : null,
       record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.squareFeet != null ? { label: "Building square feet", value: `${record.squareFeet.toLocaleString("en-US")} sq ft`, text: "Building area reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.yearBuilt != null ? { label: "Year built", value: String(record.yearBuilt), text: "Construction year reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
-      record.rawPropertyStyle ? { label: "Property type", value: record.rawPropertyStyle, text: "Property style reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      (record.rawPropertyStyle || record.propertyType) ? { label: "Property type", value: record.rawPropertyStyle || record.propertyType || "Property", text: record.recordBasis === "verified-address-only" ? "Property classification follows the selected discovery lane until a parcel or listing source supplies a more specific official style." : "Property style reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.listingStatus ? { label: "Listing status", value: record.listingStatus, text: "Current status carried by the matched listing record.", provenance: source, tone: "neutral" as const } : null,
       record.listingId ? { label: "Source record", value: record.listingId, text: "Identifier for the matched property/listing record.", provenance: source, tone: "neutral" as const } : null,
     ].filter((fact): fact is NonNullable<typeof fact> => fact !== null);

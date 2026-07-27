@@ -335,7 +335,7 @@ export function PlaceFirstDiscovery({
 
     return buildPropertyAnalysisHref({
       propertyId: commercialAddressRecord?.propertyId || result?.canonicalMatch?.propertyId || result?.propertyId || "imported:place-facts",
-      propertyType: commercialAddressRecord?.propertyType || result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || "place-led property",
+      propertyType: commercialAddressRecord?.propertyType || result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || (/farm|agric/i.test(flow) ? "farm" : /commercial|business/i.test(flow) ? "commercial property" : "place-led property"),
       location: locationLabel || "Verified location",
       title,
       priceLabel: commercialAddressRecord?.priceLabel || (result?.propertyRecord?.price != null

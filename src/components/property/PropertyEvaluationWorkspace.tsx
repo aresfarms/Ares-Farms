@@ -115,6 +115,13 @@ type PropertyFactsResponse = {
     exactAddress: string | null;
     zip: string | null;
     rawPropertyStyle: string | null;
+    propertyType?: string | null;
+    price?: number | null;
+    county?: string | null;
+    town?: string | null;
+    state?: string | null;
+    parcelRefs?: string[];
+    recordBasis?: "matched-approved-source-record" | "verified-address-only";
     bedrooms: number | null;
     yearBuilt: number | null;
     squareFeet: number | null;
@@ -2120,6 +2127,9 @@ export function PropertyEvaluationWorkspace({
             exactAddress: context.exactAddress,
             location: context.location,
             stateCode: context.stateCode,
+            town: context.town,
+            county: context.county,
+            startingLens,
             // The visitor's "what is this property?" declaration — the server
             // rebuilds the whole Place Brief in that shape (farm lanes for a
             // farm, never home-mortgage copy on a working farm).
@@ -2142,7 +2152,7 @@ export function PropertyEvaluationWorkspace({
       clearTimeout(timeout);
       controller.abort();
     };
-  }, [context.propertyId, profileOverride]);
+  }, [context.propertyId, context.exactAddress, context.location, context.stateCode, context.town, context.county, profileOverride, startingLens]);
 
   async function submitSpecialBuildingReview() {
     setManualReviewBusy(true);

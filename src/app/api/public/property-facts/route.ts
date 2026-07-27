@@ -47,6 +47,9 @@ export async function POST(req: NextRequest) {
     /** Visitor's "what is this property?" declaration (imported addresses
         carry no type; the owner knows — founder-caught 2026-07-18). */
     declaredPropertyType?: string | null;
+    startingLens?: string | null;
+    town?: string | null;
+    county?: string | null;
   }>(req, {
     maxBytes: 24 * 1024,
   });
@@ -62,6 +65,9 @@ export async function POST(req: NextRequest) {
     body.declaredPropertyType && DECLARABLE.has(String(body.declaredPropertyType))
       ? String(body.declaredPropertyType)
       : null;
+  const lanePropertyType = declaredPropertyType ??
+    (/farm|agric/i.test(String(body.startingLens ?? "")) ? "farm" :
+      /commercial|business/i.test(String(body.startingLens ?? "")) ? "commercial" : null);
 
   if (propertyId?.startsWith("imported:") || (!propertyId && (body.exactAddress || body.location))) {
     const imported = await verifyImportedPropertyAddress({
@@ -84,7 +90,7 @@ export async function POST(req: NextRequest) {
       geocode: imported.geocode,
       placeFacts: imported.placeFacts,
       parsed: imported.parsedAddress,
-      propertyType: declaredPropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
+      propertyType: lanePropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
       ownerNotes: body.notes ?? null,
     });
     if (matchedSourceRecord) {
@@ -145,8 +151,29 @@ export async function POST(req: NextRequest) {
             acreageText: derivedAcreageText(matchedSourceRecord),
             listingId: matchedSourceRecord.listingId,
             listingStatus: canonicalMatch?.listing_status ?? null,
+            recordBasis: "matched-approved-source-record",
           }
-        : null,
+        : imported.normalizedAddress
+          ? {
+              exactAddress: imported.normalizedAddress,
+              zip: imported.parsedAddress?.zip || null,
+              rawPropertyStyle: lanePropertyType === "farm" ? "Farm / agricultural property" : lanePropertyType === "commercial" ? "Commercial property" : "Verified property address",
+              propertyType: lanePropertyType,
+              price: null,
+              county: body.county ?? null,
+              town: body.town ?? imported.parsedAddress?.city ?? null,
+              state: imported.parsedAddress?.state ?? body.stateCode ?? null,
+              description: "Address verified through the public property-facts intake. Parcel-level attributes appear when an approved jurisdiction record is available.",
+              parcelRefs: [],
+              bedrooms: null,
+              yearBuilt: null,
+              squareFeet: null,
+              acreageText: null,
+              listingId: null,
+              listingStatus: "Address verified · no governed listing match",
+              recordBasis: "verified-address-only",
+            }
+          : null,
       placeFacts: imported.placeFacts,
       verifiedPrograms: verifyPropertyPrograms(imported.placeFactsForPrograms),
       placeIntelligence,

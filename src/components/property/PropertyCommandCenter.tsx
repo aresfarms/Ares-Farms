@@ -6,7 +6,7 @@ import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 
 export type PropertyCommandCenterProps = ChartTableBriefProps & { deedEvidence?: OfficialPropertyEvidenceRecord[] };
-type TabId = "summary" | "report" | "financing" | "diligence" | "readiness";
+type TabId = "summary" | "financing" | "diligence";
 
 type DiligenceGroup = { id: string; title: string; items: Array<{ label: string; how: string; source: string }> };
 
@@ -112,10 +112,8 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
   const tabs: Array<{ id: TabId; label: string; badge?: string }> = [
     { id: "summary", label: "Summary" },
-    { id: "report", label: "Decision readiness", badge: `${unknowns.length + (hasPrice ? 0 : 1)} actions` },
     { id: "financing", label: "Financial model" },
     { id: "diligence", label: "Due diligence", badge: `${totalChecks} open` },
-    { id: "readiness", label: "Pro forma" },
   ];
 
   return (
@@ -157,74 +155,9 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
             {(showAllFacts ? facts : facts.slice(0, 8)).map((fact) => <article key={`${fact.label}-${fact.value}`} style={card}><span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{fact.label}</span><strong style={{ display: "block", color: "#1C2B45", marginTop: 4, lineHeight: 1.4 }}>{fact.value}</strong><details><summary style={{ marginTop: 7, cursor: "pointer", color: "#8F6E1F", fontSize: 11.5 }}>Source and explanation</summary><p style={{ fontSize: 12, color: "#5A6172", lineHeight: 1.55 }}>{fact.text}</p><p style={{ fontSize: 10.5, color: "#8A8F9C" }}>{fact.provenance}</p></details></article>)}
           </div>
           {facts.length > 8 && <button type="button" onClick={() => setShowAllFacts((value) => !value)} style={{ justifySelf: "start", border: "1px solid #B08A2E", borderRadius: 10, background: showAllFacts ? "#fff" : "#B08A2E", color: showAllFacts ? "#8F6E1F" : "#fff", padding: "10px 15px", fontWeight: 800, cursor: "pointer" }}>{showAllFacts ? "Show fewer verified facts" : `View ${facts.length - 8} additional verified facts`}</button>}
+          {props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}><strong style={{ color: "#1C2B45" }}>Save or export this property analysis</strong><p style={{ margin: 0, color: "#6B7280", fontSize: 12 }}>Keep the useful actions with the analysis itself—no separate readiness ceremony or placeholder pro forma.</p>{props.actionsSlot}</section>}
         </>}
 
-
-        {tab === "readiness" && <>
-          <header style={{ ...card, background: "linear-gradient(145deg,#20304E,#16233C)", border: 0, color: "#fff" }}>
-            <span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase" }}>Property acquisition pro forma</span>
-            <h2 style={{ margin: "6px 0 3px", color: "#fff", fontFamily: "Georgia,serif" }}>{props.title}</h2>
-            <p style={{ margin: 0, color: "#D7DCE6", fontSize: 13 }}>{props.location} · {lane}</p>
-          </header>
-
-          <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 7 }}>
-            <strong style={{ color: "#1C2B45", fontSize: 17 }}>Pro forma conclusion</strong>
-            <p style={{ margin: 0, color: "#4B5563", lineHeight: 1.6 }}>{props.headline}</p>
-            <span style={{ color: "#6B7280", fontSize: 12 }}>This is a property-level acquisition model. Borrower qualification, final loan terms, appraisal, insurance quotes, and contractor bids remain separate inputs.</span>
-          </section>
-
-          <section style={card}>
-            <h3 style={{ margin: 0, color: "#1C2B45" }}>Core acquisition assumptions</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 8, marginTop: 10 }}>
-              {[
-                ["Purchase / offer basis", hasPrice ? props.priceLabel : marketValueFact?.value ?? "Not entered", hasPrice ? "Current deal assumption" : "Market context only — enter an offer price"],
-                ["Land and parcel basis", landFact?.value ?? "Not resolved", landFact ? "Verified property record" : "Acreage and parcel configuration still required"],
-                ["Current annual taxes", taxFact?.value ?? "Not resolved", taxFact ? "Public tax record" : "County tax record still required"],
-                ["Condition / capital scope", conditionFact?.value ?? "Not scoped", conditionFact ? "Current condition posture" : "Inspection and repair budget still required"],
-                ["Insurance / hazard posture", floodFact?.value ?? "Quote not obtained", floodFact ? "Known hazard context" : "Property-specific insurance quote required"],
-                ["Primary financing lane", props.financingLanes[0] ?? "Cash / conventional comparison", "Property-level path, not borrower approval"],
-              ].map(([label, value, note]) => <article key={label} style={{ border: "1px solid #D8E2EF", borderRadius: 10, padding: 12, background: "#F8FAFD" }}><span style={{ fontSize: 10, color: "#64748B", fontWeight: 800, textTransform: "uppercase" }}>{label}</span><strong style={{ display: "block", color: "#1C2B45", marginTop: 4, lineHeight: 1.4 }}>{value}</strong><span style={{ display: "block", color: "#6B7280", fontSize: 11, marginTop: 4 }}>{note}</span></article>)}
-            </div>
-          </section>
-
-          <section style={card}>
-            <h3 style={{ margin: 0, color: "#1C2B45" }}>Ownership and carrying-cost model</h3>
-            <p style={{ margin: "5px 0 10px", color: "#5A6172", fontSize: 12.5 }}>Taxes, insurance, financing, reserves, and property-specific operating costs belong in the pro forma—not in a separate summary card.</p>
-            {props.costsSlot ?? <div style={{ border: "1px solid #E8D9B5", borderRadius: 10, background: "#FFFCF5", padding: 12, color: "#7A5A16", fontSize: 12.5 }}>Enter or confirm the acquisition price before Furlong can calculate monthly and annual ownership costs.</div>}
-          </section>
-
-          <section style={card}>
-            <h3 style={{ margin: 0, color: "#1C2B45" }}>Scenario frame</h3>
-            <div style={{ overflowX: "auto", marginTop: 10 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 680, fontSize: 12 }}>
-                <thead><tr>{["Scenario", "Acquisition basis", "Capital work", "Insurance / hazard", "Decision use"].map((head) => <th key={head} style={{ textAlign: "left", padding: "9px 10px", borderBottom: "2px solid #CBD5E1", color: "#334155" }}>{head}</th>)}</tr></thead>
-                <tbody>
-                  <tr><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB", fontWeight: 800 }}>As-is / base</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>{hasPrice ? props.priceLabel : "Offer price required"}</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>{conditionFact?.value ?? "Scope required"}</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>{floodFact?.value ?? "Quote required"}</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>Current evidence case</td></tr>
-                  <tr><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB", fontWeight: 800 }}>Stabilized</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>Acquisition plus verified improvements</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>Contractor budget and contingency</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>Bound post-work coverage</td><td style={{ padding: 10, borderBottom: "1px solid #E5E7EB" }}>Long-term ownership case</td></tr>
-                  <tr><td style={{ padding: 10, fontWeight: 800 }}>Downside</td><td style={{ padding: 10 }}>Price plus overruns / delay</td><td style={{ padding: 10 }}>Major hidden-condition reserve</td><td style={{ padding: 10 }}>Highest credible premium / deductible</td><td style={{ padding: 10 }}>Walk-away and renegotiation threshold</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section style={card}>
-            <h3 style={{ margin: 0, color: "#1C2B45" }}>Financing structure under review</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 8, marginTop: 10 }}>
-              {(props.financingLanes.length ? props.financingLanes : ["Cash / conventional comparison"]).slice(0, 4).map((item, index) => { const note = financingProgramNote(item, lane); return <article key={`proforma:${item}`} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: 12, background: index === 0 ? "#FBF5E6" : "#fff" }}><strong style={{ display: "block", color: "#1C2B45" }}>{item}</strong><span style={{ display: "block", color: "#8F6E1F", fontSize: 11.5, fontWeight: 800, marginTop: 4 }}>{note.fit}</span><span style={{ display: "block", color: "#5A6172", fontSize: 11.5, lineHeight: 1.45, marginTop: 4 }}>{note.why}</span><span style={{ display: "block", color: "#6B7280", fontSize: 10.8, marginTop: 5 }}><b>Still controls:</b> {note.watch}</span></article>; })}
-            </div>
-          </section>
-
-          <section style={card}>
-            <h3 style={{ margin: 0, color: "#1C2B45" }}>Conditions that change the numbers</h3>
-            <p style={{ margin: "5px 0 10px", color: "#5A6172", fontSize: 12.5 }}>These are not generic checklist items; each can change acquisition price, required capital, insurance, financing eligibility, or the walk-away decision.</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>{unknowns.length ? unknowns.slice(0, 10).map((item) => <span key={`condition:${item.label}`} style={{ border: "1px solid #E8D9B5", borderRadius: 999, background: "#FFFCF5", padding: "6px 10px", color: "#7A5A16", fontSize: 11.5, fontWeight: 700 }}>{item.label}</span>) : <span style={{ color: "#2E7D4F", fontWeight: 800 }}>No unresolved material conditions currently listed.</span>}</div>
-          </section>
-
-          <section style={{ ...card, background: recommendationEligible ? "#EAF4EE" : "#FBF5E6", borderColor: recommendationEligible ? "#B9D8C4" : "#E8D9B5" }}>
-            <strong style={{ color: "#1C2B45" }}>Decision posture: {recommendationEligible ? "ready for human review" : "preliminary — key inputs remain"}</strong>
-            <p style={{ margin: "6px 0 0", color: "#5A6172", fontSize: 12.5 }}>{recommendationEligible ? "The property-level model has enough evidence and a price basis to move into named review. Final terms still depend on borrower, appraisal, insurance, title, and contractor evidence." : `The model is not final because ${remainingDecisionInputs.join(", ") || "material assumptions remain unresolved"}.`}</p>
-          </section>
-        </>}
 
         {tab === "financing" && <>
           <header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Financial model</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>Price, ownership costs, capital structure, and pathway matches stay together here. Raw form mappings remain collapsed until the relevant lane and authorization exist.</p></header>
@@ -241,12 +174,6 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
           {groups.length ? groups.map((group) => <section key={group.id} style={{ ...card, padding: 0, overflow: "hidden" }}><button type="button" onClick={() => setOpenGroups((value) => ({ ...value, [group.id]: !value[group.id] }))} style={{ width: "100%", border: 0, background: "transparent", padding: "15px 17px", display: "flex", justifyContent: "space-between", cursor: "pointer", color: "#1C2B45", fontWeight: 800 }}><span>{group.title}</span><span>{group.items.length} open {openGroups[group.id] ? "▴" : "▾"}</span></button>{openGroups[group.id] && <div style={{ padding: "0 16px 16px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 8 }}>{group.items.map((item) => <article key={`${group.id}:${item.label}`} style={{ border: "1px solid #E8D9B5", borderRadius: 10, padding: 11, background: "#FFFCF5" }}><strong style={{ display: "block", color: "#1C2B45", fontSize: 13 }}>{item.label}</strong><span style={{ display: "block", color: "#5A6172", fontSize: 11.5, lineHeight: 1.45, marginTop: 3 }}>{item.how}</span><span style={{ display: "block", color: "#8A6A20", fontSize: 10.5, marginTop: 4 }}>Verification source: {item.source}</span></article>)}</div>}</section>) : <div style={card}>No unresolved property checks are currently listed.</div>}
         </>}
 
-        {tab === "report" && <>
-          <header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Decision readiness</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>This is the customer file’s readiness—not Furlong’s internal release governance.</p></header>
-          {[{ title: "Property identity and intended use", done: Boolean(props.propertyType), note: `${lane} lane selected from the available evidence.` }, { title: "Purchase assumptions", done: hasPrice, note: hasPrice ? props.priceLabel : "Enter or confirm the purchase price." }, { title: "Material property evidence", done: facts.length >= 4, note: `${facts.length} property-specific facts verified.` }, { title: "Major diligence questions", done: unknowns.length <= 5, note: `${unknowns.length} unresolved items remain.` }].map((item) => <article key={item.title} style={{ ...card, display: "flex", gap: 12, alignItems: "flex-start" }}><span style={{ width: 28, height: 28, borderRadius: "50%", display: "grid", placeItems: "center", flex: "none", background: item.done ? "#EAF4EE" : "#FBF1E0", color: item.done ? "#2E7D4F" : "#A2661F", fontWeight: 900 }}>{item.done ? "✓" : "!"}</span><div><strong style={{ color: "#1C2B45" }}>{item.title}</strong><p style={{ margin: "3px 0 0", color: "#5A6172", fontSize: 12.5 }}>{item.note}</p></div></article>)}
-          <section style={{ ...card, background: recommendationEligible ? "#EAF4EE" : "#FBF5E6", display: "grid", gap: 7 }}><strong style={{ color: "#1C2B45" }}>{recommendationEligible ? "Supported review threshold satisfied" : "Preliminary property conclusion available"}</strong><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>{recommendationEligible ? "The current report can move into named human review for final recommendation posture." : "Furlong has generated the customer property report using the available evidence. Remaining items are conditions and confidence limits—not a reason to withhold the answer. Furlong will not manufacture a score; it will provide an evidence-linked conclusion with the unresolved conditions shown."}</p><button type="button" onClick={() => setTab("readiness")} style={{ justifySelf: "start", border: 0, borderRadius: 9, padding: "9px 13px", background: "#1C2B45", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Open pro forma</button></section>
-          <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}><strong style={{ color: "#1C2B45" }}>Save or export this property file</strong><p style={{ margin: 0, color: "#6B7280", fontSize: 12 }}>These actions belong to decision readiness because they preserve or export the completed property file. The acquisition model itself remains available on the Pro forma tab.</p>{props.actionsSlot}</section>
-        </>}
       </div>
     </section>
   );

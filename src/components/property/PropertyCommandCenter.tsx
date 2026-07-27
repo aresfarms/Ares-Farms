@@ -6,7 +6,7 @@ import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 
 export type PropertyCommandCenterProps = ChartTableBriefProps & { deedEvidence?: OfficialPropertyEvidenceRecord[] };
-type TabId = "summary" | "financing" | "diligence";
+type TabId = "summary" | "property" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
 
 type DiligenceGroup = { id: string; title: string; items: Array<{ label: string; how: string; source: string }> };
 
@@ -88,111 +88,79 @@ function suppressResolvedUnknowns(
 export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const theme = CHART_THEMES[props.variant ?? "buyer"];
   const [tab, setTab] = useState<TabId>("summary");
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ risk: true });
-  const [showAllFacts, setShowAllFacts] = useState(false);
   const [ownerFeatureInput, setOwnerFeatureInput] = useState("");
   const [localOwnerAssertions, setLocalOwnerAssertions] = useState<Array<{ label: string; value: string; text: string; provenance: string; tone: "neutral" }>>([]);
-  const rawFacts = props.intelligence?.verifiedFacts ?? [];
-  const facts = [...rawFacts].sort((a, b) => {
-    const priority = (label: string) => /land area|land, lots|parcel and conveyance|tax-parcel profile|acreage|size/i.test(label) ? 0 : 1;
-    return priority(a.label) - priority(b.label);
-  });
-  const marketValueFact = facts.find((fact) => fact.label === "Waterfront market value context");
-  const landFact = facts.find((fact) => /land area|land, lots|parcel and conveyance|size/i.test(fact.label));
-  const taxFact = facts.find((fact) => /annual property taxes/i.test(fact.label));
-  const conditionFact = facts.find((fact) => /condition|repair posture/i.test(fact.label));
-  const floodFact = facts.find((fact) => /flood and insurance|flood zone/i.test(fact.label));
-  const deedEvidence = (props.deedEvidence ?? []).filter((record) => record.domain === "title");
-  const ownerAssertions = [...(props.intelligence?.ownerAssertions ?? []), ...localOwnerAssertions];
+  const facts = props.intelligence?.verifiedFacts ?? [];
   const rawUnknowns = props.intelligence?.unknowns ?? [];
   const unknowns = useMemo(() => suppressResolvedUnknowns(facts, rawUnknowns), [facts, rawUnknowns]);
-  const groups = useMemo(() => groupUnknowns(unknowns), [unknowns]);
-  const totalChecks = unknowns.length;
-  const evidenceTotal = facts.length + unknowns.length;
-  const evidencePct = evidenceTotal > 0 ? Math.round((facts.length / evidenceTotal) * 100) : 0;
   const lane = laneLabel(props.propertyType);
   const hasPrice = !/not captured|unknown|enter|not provided|—/i.test(props.priceLabel);
-  const propertyProfileEstablished = Boolean(props.propertyType) && facts.length >= 8;
-  const recommendationEligible = hasPrice && facts.length >= 4 && unknowns.length <= 5;
-  const posture = recommendationEligible
-    ? "READY FOR REVIEW"
-    : propertyProfileEstablished
-      ? "PROPERTY PROFILE ESTABLISHED"
-      : facts.length
-        ? "PROPERTY PROFILE IN PROGRESS"
-        : "PROPERTY IDENTIFIED";
-  const remainingDecisionInputs = [
-    ...(!hasPrice ? ["Purchase or offer price"] : []),
-    ...unknowns.slice(0, 4).map((item) => item.label),
+  const ownerAssertions = [...(props.intelligence?.ownerAssertions ?? []), ...localOwnerAssertions];
+  const deedEvidence = (props.deedEvidence ?? []).filter((record) => record.domain === "title");
+
+  const categoryForFact = (label: string): Exclude<TabId, "summary" | "report" | "finance"> => {
+    const value = label.toLowerCase();
+    if (/school|education|college|university|district|parochial/.test(value)) return "education";
+    if (/electric|utility|water|sewer|septic|well|broadband|internet|gas|fuel|wastewater/.test(value)) return "utilities";
+    if (/environment|flood|wetland|hazard|historic|contamin|storm|climate|soil|waterfront exposure/.test(value)) return "environmental";
+    if (/acre|parcel|lot|bed|bath|price|tax|assessment|property type|year built|square feet|size|deed|title/.test(value)) return "property";
+    return "misc";
+  };
+  const categoryForUnknown = (item: NonNullable<ChartTableBriefProps["intelligence"]>["unknowns"][number]): Exclude<TabId, "summary" | "report" | "finance"> => {
+    const value = `${item.label} ${item.pointer} ${item.howToFind}`.toLowerCase();
+    if (/school|education|college|university|district/.test(value)) return "education";
+    if (/electric|utility|water|sewer|septic|well|broadband|internet|gas|fuel|wastewater/.test(value)) return "utilities";
+    if (/environment|flood|wetland|hazard|historic|contamin|storm|climate|soil/.test(value)) return "environmental";
+    if (/acre|parcel|lot|bed|bath|price|tax|assessment|property type|year built|square feet|size|deed|title|zoning/.test(value)) return "property";
+    return "misc";
+  };
+
+  const factsByTab = useMemo(() => {
+    const out: Record<string, typeof facts> = { property: [], utilities: [], environmental: [], education: [], misc: [] };
+    for (const fact of facts) out[categoryForFact(fact.label)].push(fact);
+    return out;
+  }, [facts]);
+  const unknownsByTab = useMemo(() => {
+    const out: Record<string, typeof unknowns> = { property: [], utilities: [], environmental: [], education: [], misc: [] };
+    for (const item of unknowns) out[categoryForUnknown(item)].push(item);
+    return out;
+  }, [unknowns]);
+
+  const tabs: Array<{ id: TabId; label: string }> = [
+    { id: "summary", label: "Summary" },
+    { id: "property", label: "Property" },
+    { id: "utilities", label: "Utilities" },
+    { id: "finance", label: "Finance" },
+    { id: "environmental", label: "Environmental" },
+    { id: "education", label: "Education" },
+    { id: "misc", label: "Misc. / Other" },
+    { id: "report", label: "Report" },
   ];
 
   const shell = { background: "#FAF8F3", border: "1px solid #E5E0D5", borderRadius: 18, overflow: "hidden" } as const;
   const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
-  const tabs: Array<{ id: TabId; label: string; badge?: string }> = [
-    { id: "summary", label: "Summary" },
-    { id: "financing", label: "Financial model" },
-    { id: "diligence", label: "Due diligence", badge: `${totalChecks} open` },
-  ];
+  const renderFact = (fact: (typeof facts)[number]) => <article key={`${fact.label}-${fact.value}`} style={card}><span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{fact.label}</span><strong style={{ display: "block", color: "#1C2B45", marginTop: 4, lineHeight: 1.4 }}>{fact.value}</strong><details><summary style={{ marginTop: 7, cursor: "pointer", color: "#8F6E1F", fontSize: 11.5 }}>Source and explanation</summary><p style={{ fontSize: 12, color: "#5A6172", lineHeight: 1.55 }}>{fact.text}</p><p style={{ fontSize: 10.5, color: "#8A8F9C" }}>{fact.provenance}</p></details></article>;
+  const renderUnknown = (item: (typeof unknowns)[number]) => <article key={item.label} style={{ ...card, background: "#FFFCF5", borderColor: "#E8D9B5" }}><strong style={{ display: "block", color: "#1C2B45", fontSize: 13 }}>{item.label}</strong><span style={{ display: "block", color: "#5A6172", fontSize: 11.5, lineHeight: 1.45, marginTop: 4 }}>{item.howToFind}</span><span style={{ display: "block", color: "#8A6A20", fontSize: 10.5, marginTop: 5 }}>Verification source: {item.pointer}</span></article>;
+  const renderCategory = (id: "property" | "utilities" | "environmental" | "education" | "misc", title: string, intro: string) => <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>{title}</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{intro}</p></header>{factsByTab[id].length > 0 && <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>{factsByTab[id].map(renderFact)}</div>}{unknownsByTab[id].length > 0 && <section style={{ display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Still to confirm</strong><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9 }}>{unknownsByTab[id].map(renderUnknown)}</div></section>}{factsByTab[id].length === 0 && unknownsByTab[id].length === 0 && <div style={card}>No information is currently available in this section.</div>}</>;
 
-  return (
-    <section aria-label="Property command center" data-testid="property-command-center" data-consumer-lane={lane} style={shell}>
-      <nav aria-label="Property workspace sections" style={{ position: "sticky", top: 0, zIndex: 4, background: "rgba(250,248,243,.96)", borderBottom: "1px solid #E5E0D5", padding: "10px 12px", display: "flex", gap: 8, overflowX: "auto", alignItems: "center" }}>
-        <img src="/brand/furlong-emblem.png" alt="Furlong emblem" width={38} height={38} style={{ width: 38, height: 38, objectFit: "contain", flex: "none", marginRight: 4 }} />
-        {tabs.map((item) => (
-          <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 13px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>
-            {item.label}{item.badge ? <span style={{ marginLeft: 7, background: "#B08A2E", color: "#fff", borderRadius: 999, padding: "1px 7px", fontSize: 10.5 }}>{item.badge}</span> : null}
-          </button>
-        ))}
-      </nav>
-
-      <div style={{ padding: 20, display: "grid", gap: 16 }}>
-        {tab === "summary" && <>
-          <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.15fr) minmax(260px,.85fr)", gap: 14 }}>
-            <article style={{ ...card, background: "linear-gradient(155deg,#20304E,#16233C)", color: "#fff", border: 0, display: "grid", gap: 10, position: "relative", overflow: "hidden" }}>
-              <img src="/brand/furlong-emblem.png" alt="" aria-hidden="true" width={92} height={92} style={{ position: "absolute", right: 14, top: 12, width: 92, height: 92, objectFit: "contain", opacity: .2 }} />
-              <span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase", position: "relative" }}>The answer, first</span>
-              <h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: 24 }}>{props.title}</h2>
-              <span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane}</span>
-              <span style={{ justifySelf: "start", borderRadius: 999, padding: "5px 11px", background: recommendationEligible ? "#EAF4EE" : "#FBF1E0", color: recommendationEligible ? "#2E7D4F" : "#A2661F", fontSize: 12, fontWeight: 800 }}>{posture}</span>
-              <p style={{ margin: 0, lineHeight: 1.6, color: "#E6E9EF" }}>{props.headline}</p>
-              <span style={{ fontSize: 11, color: "#9EA8BA" }}>{propertyProfileEstablished && !recommendationEligible ? "The property profile is established. Deal-specific inputs still control whether Furlong can issue a recommendation." : "Property intelligence only. A recommendation appears only after the minimum evidence threshold is satisfied."}</span>
-            </article>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {[
-                ["Property evidence", propertyProfileEstablished ? "Established" : `${evidencePct}%`, `${facts.length} verified facts · ${unknowns.length} diligence items`],
-                ["Property lane", lane, "Auto-detected from property evidence"],
-                ["Market / price basis", hasPrice ? props.priceLabel : marketValueFact?.value ?? "Enter offer price", hasPrice ? "User-entered deal basis" : marketValueFact ? "Preliminary market context — not asking price" : "Required for financial modeling"],
-                ["Potential pathways", String(props.financingLanes.length), props.financingLanes.slice(0, 2).join(" · ") || "None confirmed yet"],
-              ].map(([label, value, note]) => <div key={label} style={{ ...card, padding: 14 }}><span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{label}</span><strong style={{ display: "block", color: "#1C2B45", fontSize: 17, marginTop: 4 }}>{value}</strong><span style={{ color: "#8A8F9C", fontSize: 11.5 }}>{note}</span></div>)}
-            </div>
-          </div>
-          {propertyProfileEstablished && !recommendationEligible && <section style={{ ...card, borderColor: "#B9C6D8", background: "#F5F8FC", display: "grid", gap: 8 }}><strong style={{ color: "#1C2B45" }}>What is still needed for a deal recommendation?</strong><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Furlong already has enough information to establish the property profile. These remaining items affect price, financing, insurability, or the final acquisition recommendation:</p><div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>{remainingDecisionInputs.map((item) => <span key={item} style={{ border: "1px solid #CBD5E1", borderRadius: 999, background: "#fff", padding: "5px 9px", color: "#334155", fontSize: 11.5, fontWeight: 700 }}>{item}</span>)}</div></section>}
-          <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Something Furlong missed?</strong><span style={{ color: "#5A6172", fontSize: 12 }}>Add a property feature such as “deeded pier,” “two parcels,” or “waterfront.” It will be marked owner-reported until a source or document verifies it.</span><form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "This customer-supplied property feature is kept separate from source-verified facts. Furlong will add the appropriate parcel, deed, permit, or inspection check before relying on it.", provenance: "Owner assertion added in the command center", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", minWidth: 0, border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px", background: "#fff", color: "#1C2B45" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Add feature</button></form></section>
-          {ownerAssertions.length > 0 && <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8" }}><strong style={{ color: "#1C2B45" }}>Owner-reported property features</strong><p style={{ margin: "4px 0 10px", color: "#5A6172", fontSize: 12 }}>Useful information kept separate from source-verified facts until supporting records arrive.</p><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 8 }}>{ownerAssertions.map((fact) => <article key={`${fact.label}-${fact.value}`} style={{ border: "1px solid #E8D28A", borderRadius: 10, padding: 11, background: "#fff" }}><strong style={{ display: "block", color: "#1C2B45", fontSize: 13 }}>{fact.label}</strong><span style={{ display: "block", color: "#8F6E1F", fontSize: 12, fontWeight: 750, marginTop: 3 }}>{fact.value}</span><span style={{ display: "block", color: "#6B7280", fontSize: 11, marginTop: 4 }}>{fact.text}</span></article>)}</div></section>}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 10 }}>
-            {(showAllFacts ? facts : facts.slice(0, 8)).map((fact) => <article key={`${fact.label}-${fact.value}`} style={card}><span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{fact.label}</span><strong style={{ display: "block", color: "#1C2B45", marginTop: 4, lineHeight: 1.4 }}>{fact.value}</strong><details><summary style={{ marginTop: 7, cursor: "pointer", color: "#8F6E1F", fontSize: 11.5 }}>Source and explanation</summary><p style={{ fontSize: 12, color: "#5A6172", lineHeight: 1.55 }}>{fact.text}</p><p style={{ fontSize: 10.5, color: "#8A8F9C" }}>{fact.provenance}</p></details></article>)}
-          </div>
-          {facts.length > 8 && <button type="button" onClick={() => setShowAllFacts((value) => !value)} style={{ justifySelf: "start", border: "1px solid #B08A2E", borderRadius: 10, background: showAllFacts ? "#fff" : "#B08A2E", color: showAllFacts ? "#8F6E1F" : "#fff", padding: "10px 15px", fontWeight: 800, cursor: "pointer" }}>{showAllFacts ? "Show fewer verified facts" : `View ${facts.length - 8} additional verified facts`}</button>}
-          {props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}><strong style={{ color: "#1C2B45" }}>Save or export this property analysis</strong><p style={{ margin: 0, color: "#6B7280", fontSize: 12 }}>Keep the analysis, PDF, print, and save actions together so you can use or revisit this property review.</p>{props.actionsSlot}</section>}
-        </>}
-
-
-        {tab === "financing" && <>
-          <header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Financial model</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>Price, ownership costs, capital structure, and pathway matches stay together here. Raw form mappings remain collapsed until the relevant lane and authorization exist.</p></header>
-          {props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the financial model.</div>}
-          <section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Property financing programs</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 12 }}>These programs are shown from the property evidence as a standard part of the report. They are not borrower qualification or a credit decision.</p><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{props.financingLanes.length ? props.financingLanes.map((item, index) => { const note = financingProgramNote(item, lane); return <article key={item} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: index === 0 ? "#FBF5E6" : "#fff", display: "grid", gap: 6 }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5, lineHeight: 1.45 }}>{note.why}</span><span style={{ color: "#6B7280", fontSize: 10.8, lineHeight: 1.4 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span style={{ color: "#5A6172" }}>No property-relevant program has been produced yet. The property type and intended use should still produce the applicable financing families before any personalized review begins.</span>}</div></section>
-          <section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 9 }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Choose personalized pro forma review</h3><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>The property-side financing analysis above is already complete at the non-personalized level. Continue only when you choose to have your finances vetted and request a finalized pro forma from Stuart’s licensed Financial module.</p><a href="/explore#personalized-financing" style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none" }}>Continue to personalized Financial module</a><span style={{ color: "#6B7280", fontSize: 11.5 }}>VA eligibility questions, COE upload, personal and financial documents, consent, anonymization, and licensed review begin there—not on the property report.</span></section>
-          <section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Deed and title verification</h3>{deedEvidence.length ? <div style={{ display: "grid", gap: 9, marginTop: 10 }}>{deedEvidence.map((record) => <article key={record.recordId} style={{ border: "1px solid #D8E2EF", borderRadius: 10, padding: 12, background: "#F8FAFD" }}><strong style={{ display: "block", color: "#1C2B45" }}>Recorded deed located</strong><span style={{ display: "block", color: "#5A6172", fontSize: 12, marginTop: 3 }}>{record.reference} · recorded {record.effectiveDate ?? "date unavailable"}</span><span style={{ display: "block", color: "#6B7280", fontSize: 11, marginTop: 5 }}>{(record.notes ?? []).filter((note) => !note.startsWith("Restricted deed document reference:")).join(" ")}</span></article>)}</div> : <p style={{ margin: "7px 0 0", color: "#5A6172", fontSize: 12.5 }}>The county-recorder verification source has not returned an approved deed record for this parcel yet. Furlong can use address and parcel identifiers without publishing the owner’s identity.</p>}<div style={{ marginTop: 10, border: "1px solid #E8D28A", borderRadius: 10, padding: 11, background: "#FFF9E8", color: "#5A6172", fontSize: 12 }}>The deed image remains restricted. It becomes viewable or printable only inside an authorized financial file or lender workspace, and every access must be ledgered.</div></section>
-          <details style={card}><summary style={{ cursor: "pointer", color: "#1C2B45", fontWeight: 800 }}>View supporting form mapping</summary><p style={{ color: "#5A6172", fontSize: 12.5 }}>SBA, FSA, and project-finance field mappings appear only after a relevant lane, price basis, and authorization state exist. Furlong presents them as information it can pre-fill—not as consumer homework.</p></details>
-        </>}
-
-        {tab === "diligence" && <>
-          <header style={card}><div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline", flexWrap: "wrap" }}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>{facts.length} verified · {totalChecks} open</h3><span style={{ color: "#8F6E1F", fontWeight: 700, fontSize: 12 }}>Generated for the {lane.toLowerCase()} lane</span></div><div style={{ height: 8, background: "#EFE5CC", borderRadius: 999, marginTop: 12, overflow: "hidden" }}><span style={{ display: "block", width: `${evidencePct}%`, height: "100%", background: "#B08A2E" }} /></div><p style={{ margin: "8px 0 0", color: "#5A6172", fontSize: 12.5 }}>Verified evidence counts automatically. Open items remain open until a source, document, or professional review resolves them.</p></header>
-          {facts.length > 0 && <details style={card}><summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Resolved evidence ({facts.length})</summary><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 8, marginTop: 12 }}>{facts.map((fact) => <article key={`${fact.label}-${fact.value}`} style={{ border: "1px solid #CFE4D6", background: "#F3FAF5", borderRadius: 10, padding: 11 }}><strong style={{ display: "block", color: "#1C2B45", fontSize: 13 }}>{fact.label}</strong><span style={{ display: "block", color: "#2E7D4F", fontSize: 12, fontWeight: 750, marginTop: 3 }}>{fact.value}</span><span style={{ display: "block", color: "#6B7280", fontSize: 10.5, marginTop: 4 }}>{fact.provenance}</span></article>)}</div></details>}
-          {groups.length ? groups.map((group) => <section key={group.id} style={{ ...card, padding: 0, overflow: "hidden" }}><button type="button" onClick={() => setOpenGroups((value) => ({ ...value, [group.id]: !value[group.id] }))} style={{ width: "100%", border: 0, background: "transparent", padding: "15px 17px", display: "flex", justifyContent: "space-between", cursor: "pointer", color: "#1C2B45", fontWeight: 800 }}><span>{group.title}</span><span>{group.items.length} open {openGroups[group.id] ? "▴" : "▾"}</span></button>{openGroups[group.id] && <div style={{ padding: "0 16px 16px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 8 }}>{group.items.map((item) => <article key={`${group.id}:${item.label}`} style={{ border: "1px solid #E8D9B5", borderRadius: 10, padding: 11, background: "#FFFCF5" }}><strong style={{ display: "block", color: "#1C2B45", fontSize: 13 }}>{item.label}</strong><span style={{ display: "block", color: "#5A6172", fontSize: 11.5, lineHeight: 1.45, marginTop: 3 }}>{item.how}</span><span style={{ display: "block", color: "#8A6A20", fontSize: 10.5, marginTop: 4 }}>Verification source: {item.source}</span></article>)}</div>}</section>) : <div style={card}>No unresolved property checks are currently listed.</div>}
-        </>}
-
-      </div>
-    </section>
-  );
+  return <section aria-label="Property command center" data-testid="property-command-center" data-consumer-lane={lane} style={shell}>
+    <nav aria-label="Property workspace sections" style={{ position: "sticky", top: 0, zIndex: 4, background: "rgba(250,248,243,.97)", borderBottom: "1px solid #E5E0D5", padding: "10px 12px", display: "flex", gap: 7, overflowX: "auto", alignItems: "center" }}>
+      <img src="/brand/furlong-emblem.png" alt="Furlong emblem" width={38} height={38} style={{ width: 38, height: 38, objectFit: "contain", flex: "none", marginRight: 4 }} />
+      {tabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 12px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>{item.label}</button>)}
+    </nav>
+    <div style={{ padding: 20, display: "grid", gap: 16 }}>
+      {tab === "summary" && <>
+        <article style={{ ...card, background: "linear-gradient(155deg,#20304E,#16233C)", color: "#fff", border: 0, display: "grid", gap: 9 }}><span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase" }}>Property summary</span><h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: 24 }}>{props.title}</h2><span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane}</span><p style={{ margin: 0, lineHeight: 1.6, color: "#E6E9EF" }}>{props.headline}</p></article>
+        <section style={{ ...card, display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Everything at a glance</strong><p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 13 }}>{hasPrice ? `Price basis: ${props.priceLabel}. ` : "Price is not yet confirmed. "}{factsByTab.property.length} property fact{factsByTab.property.length === 1 ? "" : "s"}, {factsByTab.utilities.length} utility fact{factsByTab.utilities.length === 1 ? "" : "s"}, {factsByTab.environmental.length} environmental fact{factsByTab.environmental.length === 1 ? "" : "s"}, {factsByTab.education.length} education fact{factsByTab.education.length === 1 ? "" : "s"}, and {factsByTab.misc.length} other fact{factsByTab.misc.length === 1 ? "" : "s"} are organized in the tabs above. {unknowns.length ? `${unknowns.length} item${unknowns.length === 1 ? " remains" : "s remain"} to verify.` : "No unresolved diligence items are currently listed."}</p></section>
+        <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Something Furlong missed?</strong><form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "Customer-supplied property feature pending source verification.", provenance: "Owner assertion added in the property workspace", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800 }}>Add feature</button></form>{ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7 }}>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}</section>
+      </>}
+      {tab === "property" && renderCategory("property", "Property", "Lot size, parcel identity, bedrooms and bathrooms, price, taxes, deed, and core physical identity live here.")}
+      {tab === "utilities" && renderCategory("utilities", "Utilities", "Electricity, water, sewer, septic, well, gas, broadband, and recurring infrastructure costs live here.")}
+      {tab === "environmental" && renderCategory("environmental", "Environmental", "Flood, wetlands, hazards, contamination, historic constraints, soils, climate, and environmental diligence live here.")}
+      {tab === "education" && renderCategory("education", "Education", "Assigned-school evidence, nearby public and private options, higher education, and state choice rules live here.")}
+      {tab === "misc" && renderCategory("misc", "Miscellaneous and other", "Location, amenities, transportation, market context, operations, and facts that do not belong in the other dedicated sections live here.")}
+      {tab === "finance" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Finance</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>Current rate and term comparisons, ownership costs, cash to close, and property-relevant financing pathways live here.</p></header>{props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the financial model.</div>}<section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Property financing programs</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{props.financingLanes.length ? props.financingLanes.map((item, index) => { const note = financingProgramNote(item, lane); return <article key={item} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: index === 0 ? "#FBF5E6" : "#fff", display: "grid", gap: 6 }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5 }}>{note.why}</span><span style={{ color: "#6B7280", fontSize: 10.8 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span>No property-relevant program has been produced yet.</span>}</div></section></>}
+      {tab === "report" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Report and pro forma</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>View, download, print, save, and continue to the personalized pro forma from one place.</p></header>{props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}>{props.actionsSlot}</section>}<section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 9 }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Personalized pro forma</h3><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Continue when you want borrower-specific qualification, document review, and a finalized pro forma from the licensed Financial module.</p><a href="/explore#personalized-financing" style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none" }}>Continue to personalized Financial module</a></section>{deedEvidence.length > 0 && <details style={card}><summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Restricted deed evidence</summary><p style={{ color: "#5A6172", fontSize: 12 }}>Recorded deed evidence is available inside an authorized financial or lender workspace.</p></details>}</>}
+    </div>
+  </section>;
 }

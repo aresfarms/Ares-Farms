@@ -14,9 +14,13 @@ if (workspace.includes("<ChartTableBrief")) failures.push("Legacy chart interfac
 if (commandCenter.includes("BLOCKED") || commandCenter.includes("WITHHELD") || commandCenter.includes("governed gate")) failures.push("Internal governance language leaked into the consumer command center.");
 if (commandCenter.includes('label: "Decision readiness"')) failures.push("Ceremonial customer decision-readiness tab returned.");
 if (commandCenter.includes('label: "Pro forma"') || commandCenter.includes('label: "Pro forma report"')) failures.push("Placeholder pro forma tab returned before a working model exists.");
-if (!commandCenter.includes("Save or export this property analysis")) failures.push("Useful save/export actions are not retained on the customer summary.");
-if (!commandCenter.includes("View supporting form mapping")) failures.push("Progressive disclosure for form mapping is missing.");
-if (!commandCenter.includes("Site & environmental risk") || !commandCenter.includes("Property, title & taxes") || !commandCenter.includes("Infrastructure & physical systems")) failures.push("Grouped due-diligence architecture is incomplete.");
+for (const tab of ["Summary", "Property", "Utilities", "Finance", "Environmental", "Education", "Misc. / Other", "Report"]) {
+  if (!commandCenter.includes(`label: "${tab}"`)) failures.push(`Missing requested property workspace tab: ${tab}.`);
+}
+if (!commandCenter.includes("Report and pro forma")) failures.push("Report tab does not own the pro forma and export workflow.");
+if (!commandCenter.includes("props.actionsSlot")) failures.push("Report tab does not retain the working save/export actions.");
+if (commandCenter.includes("View supporting form mapping")) failures.push("Legacy supporting-form box returned as duplicated customer content.");
+if (!commandCenter.includes("categoryForFact") || !commandCenter.includes("factsByTab")) failures.push("Single-assignment fact routing is missing.");
 
 if (failures.length) {
   console.error(JSON.stringify({ ok: false, rule: "THREE-LANE-CONSUMER-COMMAND-CENTER-001", failures }, null, 2));
@@ -27,10 +31,10 @@ console.log(JSON.stringify({
   rule: "THREE-LANE-CONSUMER-COMMAND-CENTER-001",
   sharedVisualShell: true,
   lanes: ["residential", "farm-agricultural", "commercial-business"],
-  progressiveDisclosure: true,
+  singleAssignmentTabs: true,
   automaticClassificationPreserved: true,
   unsupportedScoresBlocked: true,
   internalGovernanceHidden: true,
-  groupedDiligence: true,
+  reportOwnsExports: true,
   responsiveTabbedWorkspace: true
 }, null, 2));

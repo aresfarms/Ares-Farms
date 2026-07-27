@@ -103,12 +103,27 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const [ownerFeatureInput, setOwnerFeatureInput] = useState("");
   const [localOwnerAssertions, setLocalOwnerAssertions] = useState<Array<{ label: string; value: string; text: string; provenance: string; tone: "neutral" }>>([]);
   const rawFacts = props.intelligence?.verifiedFacts ?? [];
+  const recordFacts = useMemo(() => {
+    const record = props.propertyRecord;
+    if (!record) return [];
+    const source = "Source: matched property/listing record";
+    return [
+      record.acreageText ? { label: "Land area", value: record.acreageText, text: `The matched record reports ${record.acreageText} of land.`, provenance: source, tone: "neutral" as const } : null,
+      record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.squareFeet != null ? { label: "Building square feet", value: `${record.squareFeet.toLocaleString("en-US")} sq ft`, text: "Building area reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.yearBuilt != null ? { label: "Year built", value: String(record.yearBuilt), text: "Construction year reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.rawPropertyStyle ? { label: "Property type", value: record.rawPropertyStyle, text: "Property style reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.listingStatus ? { label: "Listing status", value: record.listingStatus, text: "Current status carried by the matched listing record.", provenance: source, tone: "neutral" as const } : null,
+      record.listingId ? { label: "Source record", value: record.listingId, text: "Identifier for the matched property/listing record.", provenance: source, tone: "neutral" as const } : null,
+    ].filter((fact): fact is NonNullable<typeof fact> => fact !== null);
+  }, [props.propertyRecord]);
   // Lane-level market boards belong on the lane landing page, not inside a
   // parcel record. The property workspace contains parcel-specific evidence only.
-  const facts = useMemo(
-    () => rawFacts.filter((fact) => !/commodity prices|national commodity|corn .*soybeans|livestock prices|regional cash bid/i.test(`${fact.label} ${fact.value}`)),
-    [rawFacts]
-  );
+  const facts = useMemo(() => {
+    const filtered = rawFacts.filter((fact) => !/commodity prices|national commodity|corn .*soybeans|livestock prices|regional cash bid/i.test(`${fact.label} ${fact.value}`));
+    const labels = new Set(filtered.map((fact) => fact.label.toLowerCase()));
+    return [...recordFacts.filter((fact) => !labels.has(fact.label.toLowerCase())), ...filtered];
+  }, [rawFacts, recordFacts]);
   const rawUnknowns = props.intelligence?.unknowns ?? [];
   // Unknown-record templates are retained in the intelligence model for an
   // authorized diligence workflow, but are not rendered as customer property facts.

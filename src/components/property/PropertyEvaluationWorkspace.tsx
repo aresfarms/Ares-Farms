@@ -3555,6 +3555,7 @@ export function PropertyEvaluationWorkspace({
         fitLine={answerCard.fitLine}
         pauseLine={answerCard.pauseLine}
         intelligence={effectivePlaceIntelligence}
+        propertyRecord={facts?.propertyRecord ?? null}
         deedEvidence={facts?.propertyEvidenceRecords ?? []}
         financingLanes={topProgramPreview}
         costsSlot={

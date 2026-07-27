@@ -3022,6 +3022,8 @@ export function PropertyEvaluationWorkspace({
         "VA purchase or renovation financing — borrower eligibility required",
         "Conventional purchase or renovation financing",
         "Construction-to-permanent financing — if rehabilitation is impractical",
+        "Seller financing — seller carries a negotiated note",
+        "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
       ]
     : workspaceProfile.id === "farm"
       ? [
@@ -3029,6 +3031,8 @@ export function PropertyEvaluationWorkspace({
           "USDA Rural Development housing financing — if owner-occupied residential use fits",
           "Farm Credit or agricultural real-estate financing",
           "Conventional farm or mixed-use financing",
+          "Seller financing — seller carries a negotiated note on land, improvements, or included assets",
+          "Private agricultural or asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
         ]
       : [
           "Conventional bank or credit-union commercial real-estate financing",
@@ -3036,7 +3040,9 @@ export function PropertyEvaluationWorkspace({
           "SBA 7(a) financing — real estate, business acquisition, working capital, and equipment when eligible",
           "USDA Business & Industry financing — rural eligible business-purpose projects",
           "Commercial bridge or value-add financing — acquisition plus renovation or lease-up",
-          "Equipment financing or seller financing — when machinery, fixtures, or the operating business conveys",
+          "Seller financing — seller carries a negotiated note on real estate, business value, or included assets",
+          "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
+          "Equipment financing — when machinery, fixtures, or other eligible fixed assets convey",
         ];
   const topProgramPreview = verifiedProgramPreview.length > 0
     ? verifiedProgramPreview

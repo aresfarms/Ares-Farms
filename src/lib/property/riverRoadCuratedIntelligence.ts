@@ -31,7 +31,7 @@ export function riverRoadCuratedFacts(): BriefFactLine[] {
     },
     {
       label: "Private and parochial options",
-      value: "Named school directory available",
+      value: "Delmarva Christian High School · Epworth Christian School · Greenwood Mennonite School · Milford Christian School",
       text: "Sussex County options include Delmarva Christian High School (Georgetown), Delmarva Christian Milton Campus (Milton), Epworth Christian School (Laurel), Greenwood Mennonite School (Greenwood), Milford Christian School (Milford), Child Craft Company (Seaford), Peaceful Child School (Milton), St. Johns Preschool/Kindergarten (Seaford), and The Cross Christian Academy (Seaford). Directory listing is not a rating or accreditation determination.",
       provenance: "Source: NCES Private School Universe Survey 2023–24 and school campus directories; refreshed 2026-07-26.",
       tone: "neutral",

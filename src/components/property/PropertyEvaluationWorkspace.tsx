@@ -2585,9 +2585,16 @@ export function PropertyEvaluationWorkspace({
     (analysisContext.propertyType && !genericImportedType)
   );
   const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null;
+  const explicitImportedProfile = importedProperty && analysisContext.propertyType && !genericImportedType
+    ? classifyPropertyProfile({
+        propertyType: analysisContext.propertyType,
+        description: analysisContext.description ?? null,
+        acreageText: facts?.propertyRecord?.acreageText ?? null,
+      })
+    : null;
   const workspaceProfile = profileOverride
     ? profileById(profileOverride)
-    : effectivePlaceIntelligence?.profile ??
+    : explicitImportedProfile ?? effectivePlaceIntelligence?.profile ??
       classifyPropertyProfile({
         propertyType: analysisContext.propertyType,
         description: analysisContext.description ?? null,
@@ -3044,9 +3051,9 @@ export function PropertyEvaluationWorkspace({
           "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
           "Equipment financing — when machinery, fixtures, or other eligible fixed assets convey",
         ];
-  const topProgramPreview = verifiedProgramPreview.length > 0
-    ? verifiedProgramPreview
-    : preliminaryPropertyPathways;
+  // Property-type compatibility controls this public list. Borrower-ranked
+  // results may refine order later, but must never replace the correct lane.
+  const topProgramPreview = preliminaryPropertyPathways;
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
     listedPrice: listedPrice ?? parsePriceSignal(analysisContext.priceLabel),

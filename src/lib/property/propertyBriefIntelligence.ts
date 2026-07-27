@@ -775,7 +775,9 @@ function collegesFact(countyFips: string | null): BriefFactLine | null {
   ].filter(Boolean);
   return {
     label: "Higher education",
-    value: `${valueBits.join(" · ")} in the county`,
+    value: list.length <= 3
+      ? list.map((c) => c.name).join(" · ")
+      : `${sample.map((c) => c.name).join(" · ")} · ${list.length - sample.length} more`,
     text:
       `${list.length} degree-granting institution${list.length === 1 ? "" : "s"} in this county on the ` +
       `federal directory: ${sample.map((c) => `${c.name} (${c.level}, ${c.city})`).join("; ")}` +
@@ -827,16 +829,16 @@ function electricCostFact(stateCode: string | null): BriefFactLine | null {
   if (!stateCode || STATE_ELECTRICITY_PROVENANCE.asOf === null) return null;
   const state = STATE_ELECTRICITY[stateCode.trim().toUpperCase()];
   if (!state) return null;
-  const bill = state.resAvgMonthlyBill;
+  const rate = state.resPriceCentsKwh;
+  const costAt = (kwh: number) => Math.round((rate * kwh) / 100);
   return {
     label: "Electric cost context",
-    value: `~${state.resPriceCentsKwh.toFixed(1)}¢/kWh${bill ? ` · avg bill ~$${bill.toLocaleString("en-US")}/mo` : ""} (state avg)`,
+    value: `~${rate.toFixed(1)}¢/kWh · 750 kWh ~$${costAt(750)} · 1,250 kWh ~$${costAt(1250)} · 2,000 kWh ~$${costAt(2000)}`,
     text:
-      `EIA's ${STATE_ELECTRICITY_PROVENANCE.year} state averages: residential power runs about ` +
-      `${state.resPriceCentsKwh.toFixed(1)}¢/kWh${bill ? `, a typical residential bill about $${bill.toLocaleString("en-US")}/month` : ""}` +
-      `${state.comPriceCentsKwh ? `; commercial about ${state.comPriceCentsKwh.toFixed(1)}¢/kWh` : ""}. ` +
-      `State averages — the serving utility's published rate sheet and your usage decide the ` +
-      `actual bill.`,
+      `EIA's ${STATE_ELECTRICITY_PROVENANCE.year} statewide residential energy price is about ${rate.toFixed(1)}¢/kWh. ` +
+      `At that energy-only rate, 750 kWh is about $${costAt(750)}, 1,250 kWh about $${costAt(1250)}, and 2,000 kWh about $${costAt(2000)} before fixed customer charges, taxes, riders, demand charges, or time-of-use adjustments. ` +
+      `Those are usage examples—not a promise that a particular apartment, three-bedroom house, older home, or commercial building will have an average bill. The serving utility, building size and age, HVAC and water-heating fuel, insulation, occupancy, and seasonal usage determine the actual cost.` +
+      `${state.comPriceCentsKwh ? ` The statewide commercial energy-price average is about ${state.comPriceCentsKwh.toFixed(1)}¢/kWh, but commercial bills also depend heavily on demand and tariff class.` : ""}`,
     provenance: `Source: ${STATE_ELECTRICITY_PROVENANCE.source}, ${STATE_ELECTRICITY_PROVENANCE.year}, snapshot ${STATE_ELECTRICITY_PROVENANCE.asOf}`,
     tone: "neutral",
   };
@@ -872,11 +874,10 @@ function hazardRiskFact(countyFips: string | null): BriefFactLine | null {
   const riders = [...new Set(elevated.map((h) => h.rider))];
   const rated = hazards.filter((h) => h.rating !== null);
   return {
-    label: "Natural hazard profile",
-    value: `Overall ${risk.overall} — ${valueBits}`,
+    label: "County hazard context — not parcel risk",
+    value: `FEMA county-relative screen: ${risk.overall} overall · elevated: ${valueBits}`,
     text:
-      `FEMA's National Risk Index rates this county ${risk.overall} overall relative to all U.S. ` +
-      `counties. By hazard: ${rated.map((h) => `${h.name.toLowerCase()} ${h.rating}`).join(", ")}. ` +
+      `This is FEMA National Risk Index context for the entire county, not a parcel flood-zone result and not a prediction that this building will experience each listed hazard. FEMA rates the county ${risk.overall} overall relative to all U.S. counties. By hazard: ${rated.map((h) => `${h.name.toLowerCase()} ${h.rating}`).join(", ")}. ` +
       (riders.length > 0
         ? `Worth asking a licensed insurance agent about ${riders.join("; ")}. `
         : "") +

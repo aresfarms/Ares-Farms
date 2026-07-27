@@ -112,10 +112,10 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
   const tabs: Array<{ id: TabId; label: string; badge?: string }> = [
     { id: "summary", label: "Summary" },
-    { id: "report", label: "Pro forma report" },
+    { id: "report", label: "Decision readiness", badge: `${unknowns.length + (hasPrice ? 0 : 1)} actions` },
     { id: "financing", label: "Financial model" },
     { id: "diligence", label: "Due diligence", badge: `${totalChecks} open` },
-    { id: "readiness", label: "Decision readiness", badge: `${unknowns.length + (hasPrice ? 0 : 1)} actions` },
+    { id: "readiness", label: "Pro forma" },
   ];
 
   return (
@@ -160,7 +160,7 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
         </>}
 
 
-        {tab === "report" && <>
+        {tab === "readiness" && <>
           <header style={{ ...card, background: "linear-gradient(145deg,#20304E,#16233C)", border: 0, color: "#fff" }}>
             <span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".14em", textTransform: "uppercase" }}>Property acquisition pro forma</span>
             <h2 style={{ margin: "6px 0 3px", color: "#fff", fontFamily: "Georgia,serif" }}>{props.title}</h2>
@@ -241,11 +241,11 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
           {groups.length ? groups.map((group) => <section key={group.id} style={{ ...card, padding: 0, overflow: "hidden" }}><button type="button" onClick={() => setOpenGroups((value) => ({ ...value, [group.id]: !value[group.id] }))} style={{ width: "100%", border: 0, background: "transparent", padding: "15px 17px", display: "flex", justifyContent: "space-between", cursor: "pointer", color: "#1C2B45", fontWeight: 800 }}><span>{group.title}</span><span>{group.items.length} open {openGroups[group.id] ? "▴" : "▾"}</span></button>{openGroups[group.id] && <div style={{ padding: "0 16px 16px", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 8 }}>{group.items.map((item) => <article key={`${group.id}:${item.label}`} style={{ border: "1px solid #E8D9B5", borderRadius: 10, padding: 11, background: "#FFFCF5" }}><strong style={{ display: "block", color: "#1C2B45", fontSize: 13 }}>{item.label}</strong><span style={{ display: "block", color: "#5A6172", fontSize: 11.5, lineHeight: 1.45, marginTop: 3 }}>{item.how}</span><span style={{ display: "block", color: "#8A6A20", fontSize: 10.5, marginTop: 4 }}>Verification source: {item.source}</span></article>)}</div>}</section>) : <div style={card}>No unresolved property checks are currently listed.</div>}
         </>}
 
-        {tab === "readiness" && <>
+        {tab === "report" && <>
           <header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Decision readiness</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>This is the customer file’s readiness—not Furlong’s internal release governance.</p></header>
           {[{ title: "Property identity and intended use", done: Boolean(props.propertyType), note: `${lane} lane selected from the available evidence.` }, { title: "Purchase assumptions", done: hasPrice, note: hasPrice ? props.priceLabel : "Enter or confirm the purchase price." }, { title: "Material property evidence", done: facts.length >= 4, note: `${facts.length} property-specific facts verified.` }, { title: "Major diligence questions", done: unknowns.length <= 5, note: `${unknowns.length} unresolved items remain.` }].map((item) => <article key={item.title} style={{ ...card, display: "flex", gap: 12, alignItems: "flex-start" }}><span style={{ width: 28, height: 28, borderRadius: "50%", display: "grid", placeItems: "center", flex: "none", background: item.done ? "#EAF4EE" : "#FBF1E0", color: item.done ? "#2E7D4F" : "#A2661F", fontWeight: 900 }}>{item.done ? "✓" : "!"}</span><div><strong style={{ color: "#1C2B45" }}>{item.title}</strong><p style={{ margin: "3px 0 0", color: "#5A6172", fontSize: 12.5 }}>{item.note}</p></div></article>)}
-          <section style={{ ...card, background: recommendationEligible ? "#EAF4EE" : "#FBF5E6", display: "grid", gap: 7 }}><strong style={{ color: "#1C2B45" }}>{recommendationEligible ? "Supported review threshold satisfied" : "Preliminary property conclusion available"}</strong><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>{recommendationEligible ? "The current report can move into named human review for final recommendation posture." : "Furlong has generated the customer property report using the available evidence. Remaining items are conditions and confidence limits—not a reason to withhold the answer. Furlong will not manufacture a score; it will provide an evidence-linked conclusion with the unresolved conditions shown."}</p><button type="button" onClick={() => setTab("report")} style={{ justifySelf: "start", border: 0, borderRadius: 9, padding: "9px 13px", background: "#1C2B45", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Open pro forma report</button></section>
-          <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}><strong style={{ color: "#1C2B45" }}>Save or export this property file</strong><p style={{ margin: 0, color: "#6B7280", fontSize: 12 }}>These actions belong to decision readiness because they preserve or export the completed property file. The pro forma itself remains available on the Pro forma report tab.</p>{props.actionsSlot}</section>
+          <section style={{ ...card, background: recommendationEligible ? "#EAF4EE" : "#FBF5E6", display: "grid", gap: 7 }}><strong style={{ color: "#1C2B45" }}>{recommendationEligible ? "Supported review threshold satisfied" : "Preliminary property conclusion available"}</strong><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>{recommendationEligible ? "The current report can move into named human review for final recommendation posture." : "Furlong has generated the customer property report using the available evidence. Remaining items are conditions and confidence limits—not a reason to withhold the answer. Furlong will not manufacture a score; it will provide an evidence-linked conclusion with the unresolved conditions shown."}</p><button type="button" onClick={() => setTab("readiness")} style={{ justifySelf: "start", border: 0, borderRadius: 9, padding: "9px 13px", background: "#1C2B45", color: "#fff", fontWeight: 800, cursor: "pointer" }}>Open pro forma</button></section>
+          <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}><strong style={{ color: "#1C2B45" }}>Save or export this property file</strong><p style={{ margin: 0, color: "#6B7280", fontSize: 12 }}>These actions belong to decision readiness because they preserve or export the completed property file. The acquisition model itself remains available on the Pro forma tab.</p>{props.actionsSlot}</section>
         </>}
       </div>
     </section>

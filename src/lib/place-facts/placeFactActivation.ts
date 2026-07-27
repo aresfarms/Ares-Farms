@@ -149,15 +149,18 @@ export const HUBZONE_PLACE_FACT_ACTIVATION: PlaceFactActivationRecord = {
 };
 
 /**
- * FEMA flood place-fact source — same governance posture: the frozen snapshot
- * may render as a public government fact, while the live request-time lookup
- * stays behind Module 22/23 approval.
+ * FEMA flood place-fact source — APPROVED for live request-time verification.
+ *
+ * The approval is committed here because Cloud Run revisions do not receive the
+ * git-ignored runtime overlay under data/. Keeping the recorded decision only in
+ * that ephemeral/local file caused production to fall back to PENDING and skip
+ * FEMA for newly searched addresses after every deployment.
  */
 export const FEMA_FLOOD_PLACE_FACT_ACTIVATION: PlaceFactActivationRecord = {
   sourceId: "fema-flood",
   sourceName: "FEMA National Flood Hazard Layer",
   module23: {
-    status: "PENDING_HUMAN_APPROVAL",
+    status: "APPROVED",
     facts: [
       "Source authority: FEMA National Flood Hazard Layer (NFHL), public ArcGIS service.",
       "Output is an informational place-fact about the mapped flood-zone posture of the location, not a benefit, approval, or eligibility determination.",
@@ -167,16 +170,16 @@ export const FEMA_FLOOD_PLACE_FACT_ACTIVATION: PlaceFactActivationRecord = {
     license: "Public domain (U.S. Government work) — FEMA NFHL",
     attributionRequired:
       'Display "Source: FEMA National Flood Hazard Layer" with the flood-zone fact and as-of date on every place-fact.',
-    reviewedBy: null,
-    reviewedAt: null,
+    reviewedBy: "op-caitlin",
+    reviewedAt: "2026-07-15T12:00:00.000Z",
   },
   module22: {
-    status: "PENDING_HUMAN_APPROVAL",
+    status: "APPROVED",
     capabilityGated:
-      "Request-time live fetch to the FEMA NFHL flood zone layer. Gated until a human approves live activation.",
-    liveFetchAllowed: false,
-    reviewedBy: null,
-    reviewedAt: null,
+      "Request-time live fetch to the FEMA NFHL flood zone layer. Approved for production property verification.",
+    liveFetchAllowed: true,
+    reviewedBy: "op-caitlin",
+    reviewedAt: "2026-07-15T12:00:00.000Z",
   },
   snapshotRenderAllowed: true,
 };

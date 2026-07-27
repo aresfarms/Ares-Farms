@@ -597,12 +597,12 @@ export function buildOwnershipCostModel(
   }
 
   monthly.push({
-    label: "Water, sewer / septic",
-    low: 30,
-    high: 90,
+    label: "Water and wastewater ownership reserve",
+    low: 75,
+    high: 225,
     note:
-      "On municipal service, expect a monthly bill. On well and septic there is no bill — but budget for septic pumping every 3–5 years (about $300–$600) and eventual well-pump replacement.",
-    provenance: "National guidance",
+      "Use this until the parcel's actual utility setup and local rate schedule are verified. Municipal water and sewer create recurring usage, base, and sometimes capital charges. A private well and septic system removes the monthly utility invoice, not the cost: electricity for the pump, water testing or treatment, septic pumping and inspection, pressure-tank and pump service, and eventual drain-field or system replacement all require a monthly reserve.",
+    provenance: "National planning allowance; replace with serving-utility tariffs, parcel utility records, and local contractor history",
   });
 
   const maintenanceNote = inputs.farmShaped

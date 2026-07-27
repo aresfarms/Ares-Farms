@@ -2121,23 +2121,28 @@ export async function buildLocationBriefIntelligence(args: {
   return {
     verifiedFacts,
     ownerAssertions,
-    unknowns: withProfileQuestions(
-      buildUnknowns({
-        propertyId: "",
-        county: resolvedCounty?.name ?? null,
-        resolvedCounty,
-        priceLabel: null,
-        floodResolved,
-        isHome,
-        rentalContextAvailable: Boolean(fmr),
-        amenitiesAvailable: Boolean(amenities),
-        schoolsAvailable: Boolean(schools && schools.length > 0),
-        groundRentNeeded: locFarmShaped && !groundRent,
-        privateSchoolsAvailable: Boolean(privateSchools),
-        electricAvailable: Boolean(electric),
-      }),
-      locProfile
-    ),
+    unknowns: (() => {
+      const built = withProfileQuestions(
+        buildUnknowns({
+          propertyId: "",
+          county: resolvedCounty?.name ?? null,
+          resolvedCounty,
+          priceLabel: null,
+          floodResolved,
+          isHome,
+          rentalContextAvailable: Boolean(fmr),
+          amenitiesAvailable: Boolean(amenities),
+          schoolsAvailable: Boolean(schools && schools.length > 0),
+          groundRentNeeded: locFarmShaped && !groundRent,
+          privateSchoolsAvailable: Boolean(privateSchools),
+          electricAvailable: Boolean(electric),
+        }),
+        locProfile
+      );
+      return riverRoad
+        ? built.filter((unknown) => !RIVER_ROAD_REPLACED_LABELS.has(unknown.label))
+        : built;
+    })(),
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),
     farmEnterpriseAnswers: locFarmShaped

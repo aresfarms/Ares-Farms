@@ -51,6 +51,27 @@ export function riverRoadCuratedFacts(): BriefFactLine[] {
       tone: "caution",
     },
     {
+      label: "Annual property taxes",
+      value: "$1,287 for 2025 · assessed value $301,250",
+      text: "Current public-record feeds report 2025 property taxes of $1,287 and a 2025 assessed value of $301,250 for parcel 234-34.12-56.00. The assessment changed materially from the prior cycle, so the county tax portal should remain the final pre-closing refresh source rather than treating taxes as unknown.",
+      provenance: "Sources: Sussex County-derived public property records reported by Redfin and Zillow; refreshed 2026-07-27. County portal remains controlling for the current bill and any later reassessment.",
+      tone: "neutral",
+    },
+    {
+      label: "Access and recorded easement posture",
+      value: "River Road frontage identified · recorded easements still require deed review",
+      text: "The parcel is addressed directly on River Road and current property-record feeds do not identify a shared-road or HOA-maintained access obligation. That resolves the generic shared-driveway warning. Any utility, drainage, access, or riparian easement recorded against Lots 23 and 24 still belongs in the deed and title review.",
+      provenance: "Sources: Sussex County parcel/address mapping and public property-record feeds; refreshed 2026-07-27. Recorded easements remain document-level title evidence.",
+      tone: "neutral",
+    },
+    {
+      label: "HOA and covenant posture",
+      value: "No HOA dues identified in current public-record feeds",
+      text: "Current public property feeds identify no HOA dues for this address. Furlong should report that result rather than asking the customer to start from zero, while still requiring the deed and title commitment to confirm whether any recorded subdivision or waterfront covenants apply.",
+      provenance: "Sources: Redfin and Trulia public property records; refreshed 2026-07-27. Recorded covenants remain subject to deed/title confirmation.",
+      tone: "neutral",
+    },
+    {
       label: "Known condition and repair posture",
       value: "Major rehabilitation or teardown analysis warranted",
       text: "The existing residence has been described as a possible teardown, with asbestos exterior shingles reported. That is enough to model the property as a major-repair or replacement scenario now. An inspection, asbestos survey, contractor scope, demolition estimate, and as-completed appraisal refine cost and financing; they do not make the current condition posture unknown.",
@@ -87,4 +108,7 @@ export const RIVER_ROAD_REPLACED_LABELS = new Set([
   "Higher education",
   "Airports & flight paths",
   "Natural hazard profile",
+  "Shared access and easements",
+  "Annual property taxes",
+  "HOA or covenants",
 ]);

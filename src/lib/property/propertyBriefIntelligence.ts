@@ -563,7 +563,7 @@ function buildChips(args: {
  * never ratings (same founder rule as public schools). Count is the county
  * total; examples are the largest by enrollment.
  */
-function publicSchoolsFact(schools: CountySchool[] | undefined, town: string | null): BriefFactLine | null {
+function publicSchoolsFact(schools: CountySchool[] | undefined, town: string | null, stateCode: string | null): BriefFactLine | null {
   if (!schools?.length) return null;
   const townName = town?.trim() || null;
   const townLower = townName?.toLowerCase() ?? "";
@@ -571,14 +571,28 @@ function publicSchoolsFact(schools: CountySchool[] | undefined, town: string | n
   const displayed = (inTown.length > 0 ? inTown : schools).slice(0, 4);
   const charterCount = schools.filter((school) => school.charter).length;
   const scope = inTown.length > 0 && townName ? `Public schools listed in ${townName}` : "Public-school examples in the county";
+  const normalizedState = stateCode?.trim().toUpperCase() ?? "";
+  const choiceContext =
+    normalizedState === "DE"
+      ? "School choice: Delaware has a statewide public-school Choice program. Families may apply outside their assigned attendance area, district, or feeder pattern, but acceptance depends on capacity, application timing, and the receiving school's rules."
+      : normalizedState === "MD"
+        ? "School choice: Maryland does not have a general statewide open-enrollment program. County boards set attendance areas; local transfer policies, charter lotteries, and limited statutory exceptions may provide alternatives."
+        : "School choice: statewide and local transfer rules vary. Confirm open-enrollment, charter, magnet, and transfer options with the state education agency and local district.";
+  const choiceSource =
+    normalizedState === "DE"
+      ? "Delaware Department of Education School Choice and 14 Del. C. ch. 4"
+      : normalizedState === "MD"
+        ? "Maryland Education Article §§ 4-109, 7-101, and 9-102"
+        : "State education agency and local district policy";
   return {
     label: "Schools",
     value: displayed.map((school) => school.name).join(" · "),
     text:
       `${scope}: ${displayed.map((school) => `${school.name} (${school.city}${school.enrollment != null ? `, ${school.enrollment} students` : ""})`).join("; ")}. ` +
       `The county directory contains ${schools.length} public school${schools.length === 1 ? "" : "s"}${charterCount > 0 ? `, including ${charterCount} charter` : ""}. ` +
-      `These are directory locations, not a claim that this address is assigned to a particular school. Confirm attendance boundaries with the school district; the state report card is the official quality source.`,
-    provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
+      `These are directory locations, not a claim that this address is assigned to a particular school. Confirm attendance boundaries with the school district; the state report card is the official quality source. ` +
+      choiceContext,
+    provenance: `Sources: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}; ${choiceSource}, reviewed 2026-07-27`,
     tone: "neutral",
   };
 }
@@ -1608,7 +1622,7 @@ export function buildPropertyBriefIntelligence(args: {
   const schoolsFips =
     resolvedCounty?.fips ?? (id ? PROPERTY_OZ_FACTS[id]?.tractId?.slice(0, 5) ?? null : null);
   const schools = schoolsFips ? COUNTY_SCHOOLS[schoolsFips] : undefined;
-  const schoolsFact = isHome ? publicSchoolsFact(schools, args.town ?? null) : null;
+  const schoolsFact = isHome ? publicSchoolsFact(schools, args.town ?? null, args.stateCode ?? null) : null;
   if (schoolsFact) verifiedFacts.push(schoolsFact);
 
   const privateSchools = isHome ? privateSchoolsFact(schoolsFips) : null;
@@ -2002,7 +2016,7 @@ export async function buildLocationBriefIntelligence(args: {
 
   // Schools — county-keyed directory facts, list only, never ratings.
   const schools = countyFips ? COUNTY_SCHOOLS[countyFips] : undefined;
-  const schoolsFact = isHome ? publicSchoolsFact(schools, town) : null;
+  const schoolsFact = isHome ? publicSchoolsFact(schools, town, stateCode) : null;
   if (schoolsFact) verifiedFacts.push(schoolsFact);
 
   const privateSchools = isHome ? privateSchoolsFact(countyFips) : null;

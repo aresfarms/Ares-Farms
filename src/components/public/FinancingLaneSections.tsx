@@ -1,9 +1,8 @@
 import Link from "next/link";
 
 import { FinancingIntakePanel } from "@/components/public/FinancingIntakePanel";
-import { FinancingFeeChart } from "@/components/public/FinancingFeeChart";
+import { FinancingFeeChart, FinancingFreeOverview } from "@/components/public/FinancingFeeChart";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
-import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { accentForLane } from "@/lib/property/laneThemes";
 import { activePartners } from "@/lib/modules/licensedModuleRegistry";
 
@@ -69,11 +68,8 @@ const FINANCING_BRIEFS: FinBrief[] = [
 export function FinancingLaneSections() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      {/* The customer promise belongs first: applications and lender review are free,
-          and eligible 100%-financing structures may exist. Paid advisory remains
-          clearly separated from lender/application activity in the same fee chart. */}
-      <FinancingFeeChart />
-      <HundredPercentFinancingCallout />
+      {/* Free application promise first, then current rates and program pricing. */}
+      <FinancingFreeOverview />
       <LoanProgramComparison />
 
       <section id="personalized-financing" aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
@@ -110,6 +106,9 @@ export function FinancingLaneSections() {
       </section>
 
       <FinancingIntakePanel />
+
+      {/* Optional paid advisory belongs near the bottom, after rates and intake. */}
+      <FinancingFeeChart />
 
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
         <Link href="/explore?lane=environmental-compliance" style={{ ...card, textDecoration: "none" }}>

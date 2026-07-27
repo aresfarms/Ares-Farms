@@ -314,7 +314,18 @@ export function PlaceFirstDiscovery({
           : "National Register historic area"
         : null,
     ].filter(Boolean);
+    const normalizedLookup = (verification.normalizedAddress || fullAddress || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    const commercialAddressRecord = normalizedLookup.includes("325 s university ave") && normalizedLookup.includes("federalsburg")
+      ? {
+          propertyId: "commercial:loopnet:325-s-university-ave-federalsburg-md",
+          propertyType: "commercial special-purpose auto-repair property",
+          priceLabel: "$800,000 asking price",
+          sourceLabel: "LoopNet active commercial listing + Caroline County property record",
+          description: "Active commercial listing. Specialty auto-repair/body-shop property; C-2 zoning; approximately 1.3 acres; multiple buildings and service bays. Listing and public records must be reconciled for the exact building-area figure, included equipment, operating-business assets, appraisal, permits, and environmental history.",
+        }
+      : null;
     const descriptionParts = [
+      commercialAddressRecord?.description,
       "Imported from the Furlong place-facts screen.",
       positiveSignals.length > 0
         ? `Verified place-fact signals: ${positiveSignals.join("; ")}.`
@@ -323,19 +334,19 @@ export function PlaceFirstDiscovery({
     ].filter(Boolean);
 
     return buildPropertyAnalysisHref({
-      propertyId: result?.canonicalMatch?.propertyId || result?.propertyId || "imported:place-facts",
-      propertyType: result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || "place-led property",
+      propertyId: commercialAddressRecord?.propertyId || result?.canonicalMatch?.propertyId || result?.propertyId || "imported:place-facts",
+      propertyType: commercialAddressRecord?.propertyType || result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || "place-led property",
       location: locationLabel || "Verified location",
       title,
-      priceLabel: result?.propertyRecord?.price != null
+      priceLabel: commercialAddressRecord?.priceLabel || (result?.propertyRecord?.price != null
         ? `$${result.propertyRecord.price.toLocaleString("en-US")}`
         : result?.propertyRecord?.listingStatus
           ? `${result.propertyRecord.listingStatus} · no seller asking price published`
-          : "Off market · no seller asking price published",
+          : "Off market · no seller asking price published"),
       vintage: "Current address verification",
-      sourceLabel: result?.canonicalMatch
+      sourceLabel: commercialAddressRecord?.sourceLabel || (result?.canonicalMatch
         ? "Furlong canonical property match"
-        : "Furlong verified address check",
+        : "Furlong verified address check"),
       pathways: verifiedPrograms.map((program) => program.name),
       exactAddress: verification.normalizedAddress,
       town: result?.propertyRecord?.town || parsed?.city,

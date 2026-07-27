@@ -12,9 +12,9 @@ for (const lane of ["Residential", "Farm & agricultural", "Commercial & business
 if (!workspace.includes("<PropertyCommandCenter")) failures.push("Property workspace does not render the shared command center.");
 if (workspace.includes("<ChartTableBrief")) failures.push("Legacy chart interface returned to the customer workspace.");
 if (commandCenter.includes("BLOCKED") || commandCenter.includes("WITHHELD") || commandCenter.includes("governed gate")) failures.push("Internal governance language leaked into the consumer command center.");
-if (!commandCenter.includes("Decision readiness")) failures.push("Customer decision-readiness tab is missing.");
-if (!commandCenter.includes("This is the customer file’s readiness—not Furlong’s internal release governance.")) failures.push("Customer readiness is not explicitly separated from release governance.");
-if (!commandCenter.includes("Furlong will not manufacture a score")) failures.push("Unsupported-score fail-closed disclosure is missing.");
+if (commandCenter.includes('label: "Decision readiness"')) failures.push("Ceremonial customer decision-readiness tab returned.");
+if (commandCenter.includes('label: "Pro forma"') || commandCenter.includes('label: "Pro forma report"')) failures.push("Placeholder pro forma tab returned before a working model exists.");
+if (!commandCenter.includes("Save or export this property analysis")) failures.push("Useful save/export actions are not retained on the customer summary.");
 if (!commandCenter.includes("View supporting form mapping")) failures.push("Progressive disclosure for form mapping is missing.");
 if (!commandCenter.includes("Site & environmental risk") || !commandCenter.includes("Property, title & taxes") || !commandCenter.includes("Infrastructure & physical systems")) failures.push("Grouped due-diligence architecture is incomplete.");
 

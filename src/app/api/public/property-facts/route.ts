@@ -11,6 +11,24 @@ import { findCanonicalPropertyByExactAddress, findCanonicalPropertyById } from "
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { officialPropertyEvidenceRecords } from "@/lib/property/officialPropertySourceAdapters";
 
+
+function derivedAcreageText(record: { acreageText?: string | null; description?: string | null } | null): string | null {
+  if (!record) return null;
+  if (record.acreageText?.trim()) return record.acreageText.trim();
+  const text = record.description ?? "";
+  const acre = text.match(/(?:^|\b)([0-9]+(?:\.[0-9]+)?)\s*(?:\+\/-\s*)?(?:acres?|ac\.?)(?:\b|$)/i);
+  if (acre) return `${acre[1]} acres`;
+  const lotSqFt = text.match(/(?:lot|land|parcel)[^0-9]{0,20}([0-9][0-9,]*)\s*(?:sq\.?\s*ft\.?|square feet)/i);
+  if (lotSqFt) {
+    const sqFt = Number(lotSqFt[1].replace(/,/g, ""));
+    if (Number.isFinite(sqFt) && sqFt > 0) {
+      const acres = sqFt / 43560;
+      return `${acres.toFixed(acres < 1 ? 3 : 2)} acres · ${sqFt.toLocaleString("en-US")} sq ft lot`;
+    }
+  }
+  return null;
+}
+
 /**
  * Property facts API — PUBLIC, verified snapshot reads only.
  *
@@ -72,7 +90,7 @@ export async function POST(req: NextRequest) {
     if (matchedSourceRecord) {
       const sizeBits = [
         matchedSourceRecord.squareFeet ? `${matchedSourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : null,
-        matchedSourceRecord.acreageText || null,
+        derivedAcreageText(matchedSourceRecord),
       ].filter((value): value is string => Boolean(value));
       if (sizeBits.length && !placeIntelligence.verifiedFacts.some((fact) => fact.label === "Size")) {
         placeIntelligence.verifiedFacts.unshift({
@@ -124,7 +142,7 @@ export async function POST(req: NextRequest) {
             bedrooms: matchedSourceRecord.bedrooms,
             yearBuilt: matchedSourceRecord.yearBuilt,
             squareFeet: matchedSourceRecord.squareFeet,
-            acreageText: matchedSourceRecord.acreageText,
+            acreageText: derivedAcreageText(matchedSourceRecord),
             listingId: matchedSourceRecord.listingId,
             listingStatus: canonicalMatch?.listing_status ?? null,
           }
@@ -187,7 +205,7 @@ export async function POST(req: NextRequest) {
           bedrooms: sourceRecord.bedrooms,
           yearBuilt: sourceRecord.yearBuilt,
           squareFeet: sourceRecord.squareFeet,
-          acreageText: sourceRecord.acreageText,
+          acreageText: derivedAcreageText(sourceRecord),
           listingId: sourceRecord.listingId,
           listingStatus: property?.listing_status ?? null,
         }

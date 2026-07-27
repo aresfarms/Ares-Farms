@@ -1167,6 +1167,21 @@ function buildUnknowns(args: {
       ? `https://www.google.com/search?q=${encodeURIComponent(`${countyLabel} ${terms}`)}`
       : undefined;
 
+  // Mineral-rights diligence is geography-triggered, not universal boilerplate.
+  // Show it where severed mineral estates or extraction rights are materially
+  // common, plus the Appalachian counties where the issue is locally relevant.
+  const mineralRightsRelevant = (() => {
+    const state = args.resolvedCounty?.state?.toUpperCase() ?? "";
+    const county = args.resolvedCounty?.name?.toLowerCase() ?? "";
+    const statewide = new Set(["PA", "WV", "KY", "OH", "TX", "OK", "CO", "WY", "NM", "ND", "MT", "AK"]);
+    if (statewide.has(state)) return true;
+    if (state === "MD") return county === "allegany" || county === "garrett";
+    if (state === "VA") {
+      return new Set(["buchanan", "dickenson", "wise", "russell", "tazewell", "lee", "scott", "washington", "smyth", "bland"]).has(county);
+    }
+    return false;
+  })();
+
   if (!countyKnown) {
     unknowns.push({
       label: "County",
@@ -1267,21 +1282,19 @@ function buildUnknowns(args: {
       "maintain lines. The title search lists every recorded easement; read what each one actually " +
       "allows.",
   });
-  // Mineral & subsurface rights (founder direction 2026-07-17): severed
-  // estates — you can own the surface and not what's under it.
-  unknowns.push({
-    label: "Mineral and subsurface rights",
-    pointer: "Title search + county deed records",
-    url: officialSearch("county deed records mineral rights severed estate search"),
-    howToFind:
-      "Owning the surface does not automatically mean owning the oil, gas, coal, metals, or stone " +
-      "beneath it. In much of the country — especially energy and mining regions — the mineral " +
-      "estate was legally 'severed' from the surface by a prior owner and may belong to someone " +
-      "else entirely, who can hold the right to access and extract. A full title search and the " +
-      "county deed records show whether minerals convey with this sale, are reserved, or were long " +
-      "ago separated; if minerals matter to you, make conveying them an explicit term of the " +
-      "contract rather than an assumption.",
-  });
+  // Mineral & subsurface rights appear only where geography makes severed
+  // estates or extraction rights a material diligence issue.
+  if (mineralRightsRelevant) {
+    unknowns.push({
+      label: "Mineral and subsurface rights",
+      pointer: "Title search + county deed records",
+      url: officialSearch("county deed records mineral rights severed estate search"),
+      howToFind:
+        "This property is in a region where severed mineral estates or extraction rights can be " +
+        "material. The title search and county deed records show whether minerals convey, are " +
+        "reserved, or were previously separated from the surface estate.",
+    });
+  }
   // Crime: official statistics only — Furlong links sources and never
   // characterizes an area (fair-housing doctrine).
   unknowns.push({
@@ -2119,7 +2132,7 @@ export async function buildLocationBriefIntelligence(args: {
         rentalContextAvailable: Boolean(fmr),
         amenitiesAvailable: Boolean(amenities),
         schoolsAvailable: Boolean(schools && schools.length > 0),
-        groundRentNeeded: !groundRent,
+        groundRentNeeded: locFarmShaped && !groundRent,
         privateSchoolsAvailable: Boolean(privateSchools),
         electricAvailable: Boolean(electric),
       }),

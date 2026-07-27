@@ -63,6 +63,24 @@ type PlaceFactsResponse = {
   ok: boolean;
   propertyId?: string | null;
   canonicalMatch?: { propertyId: string; matchedBy: "normalized-exact-address" } | null;
+  propertyRecord?: {
+    exactAddress: string | null;
+    zip: string | null;
+    rawPropertyStyle: string;
+    propertyType: string;
+    price: number | null;
+    county: string;
+    town: string;
+    state: string;
+    description: string | null;
+    parcelRefs: string[];
+    bedrooms: number | null;
+    yearBuilt: number | null;
+    squareFeet: number | null;
+    acreageText: string | null;
+    listingId: string;
+    listingStatus: string | null;
+  } | null;
   error?: string;
   verifiedPrograms?: Array<{
     program_id: string;
@@ -305,21 +323,25 @@ export function PlaceFirstDiscovery({
     ].filter(Boolean);
 
     return buildPropertyAnalysisHref({
-      propertyId: result?.propertyId || "imported:place-facts",
-      propertyType: "place-led property",
+      propertyId: result?.canonicalMatch?.propertyId || result?.propertyId || "imported:place-facts",
+      propertyType: result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || "place-led property",
       location: locationLabel || "Verified location",
       title,
-      priceLabel: "Price not yet verified",
+      priceLabel: result?.propertyRecord?.price != null
+        ? `$${result.propertyRecord.price.toLocaleString("en-US")}`
+        : result?.propertyRecord?.listingStatus
+          ? `${result.propertyRecord.listingStatus} · no seller asking price published`
+          : "Off market · no seller asking price published",
       vintage: "Current address verification",
       sourceLabel: result?.canonicalMatch
         ? "Furlong canonical property match"
         : "Furlong verified address check",
       pathways: verifiedPrograms.map((program) => program.name),
       exactAddress: verification.normalizedAddress,
-      town: parsed?.city,
-      county: county.trim() || null,
-      state: parsed?.state || stateCode.trim() || null,
-      description: descriptionParts.join(" "),
+      town: result?.propertyRecord?.town || parsed?.city,
+      county: result?.propertyRecord?.county || county.trim() || null,
+      state: result?.propertyRecord?.state || parsed?.state || stateCode.trim() || null,
+      description: [result?.propertyRecord?.description, ...descriptionParts].filter(Boolean).join(" "),
       sourceVerificationStatus: result?.canonicalMatch
         ? "matched-approved-source-record"
         : "verified-address-only",

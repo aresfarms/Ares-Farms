@@ -11,6 +11,7 @@ import {
   type OwnershipCostContext,
 } from "@/lib/property/ownershipCostModel";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
+import { buildResidentialRates } from "@/lib/property/residentialRatesCurated";
 
 /**
  * OwnershipCostPanel — "what it costs to buy, and then what it costs to KEEP"
@@ -25,6 +26,12 @@ import type { PropertyProfileId } from "@/lib/property/propertyProfile";
  */
 
 const fmt = (n: number): string => `$${n.toLocaleString("en-US")}`;
+const monthlyPayment = (principal: number, annualRate: number, years: number): number => {
+  const months = years * 12;
+  const rate = annualRate / 100 / 12;
+  if (rate === 0) return Math.round(principal / months);
+  return Math.round(principal * rate * Math.pow(1 + rate, months) / (Math.pow(1 + rate, months) - 1));
+};
 
 export interface OwnershipCostPanelProps {
   theme: ChartTheme;
@@ -47,6 +54,7 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
 
   const price = assumedPrice ?? props.listedPrice;
   const priceIsAssumption = assumedPrice !== null;
+  const residentialRates = useMemo(() => buildResidentialRates(), []);
 
   const model = useMemo(
     () =>
@@ -186,6 +194,35 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
           </div>
         ) : null;
       })()}
+
+      {model && price != null && props.isHome && (
+        <div style={{ padding: "16px 18px", border: `1px solid ${theme.plateBorder}`, borderRadius: 12, background: theme.plate }}>
+          <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent, marginBottom: 6 }}>
+            Current rate and term comparison
+          </div>
+          {(() => {
+            const loan = Math.round(price * 0.8);
+            const rate30 = residentialRates.rate30;
+            const rate15 = residentialRates.rate15 ?? rate30;
+            const rows = [
+              { term: "30-year fixed benchmark", rate: rate30, payment: monthlyPayment(loan, rate30, 30), note: "Current Freddie Mac national benchmark." },
+              { term: "15-year fixed benchmark", rate: rate15, payment: monthlyPayment(loan, rate15, 15), note: "Current Freddie Mac national benchmark." },
+              { term: "40-year payment illustration", rate: rate30, payment: monthlyPayment(loan, rate30, 40), note: "Payment comparison only. A 40-year purchase loan is not a standard universally available product; lender and program availability must be confirmed." },
+              { term: "ARM initial-rate sensitivity", rate: Math.max(0.01, rate30 - 0.5), payment: monthlyPayment(loan, Math.max(0.01, rate30 - 0.5), 30), note: "Illustrates an initial rate 0.50 percentage point below the current 30-year benchmark—not a live ARM quote. The payment can rise after adjustment." },
+            ];
+            return <>
+              <p style={{ margin: "0 0 10px", fontSize: 12.5, lineHeight: 1.55, color: theme.inkSoft }}>
+                Calculated on an illustrative 80% loan of <strong>{fmt(loan)}</strong> for this {fmt(price)} property. Principal and interest only; taxes, insurance, mortgage insurance, fees, and program-specific charges are added elsewhere in this model.
+              </p>
+              <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", background: theme.cellBg }}><thead><tr><th style={headStyle}>Term / structure</th><th style={headStyle}>Rate used</th><th style={headStyle}>Monthly P&amp;I</th><th style={headStyle}>What it means</th></tr></thead><tbody>{rows.map((row) => <tr key={row.term}><td style={cellStyle}><strong>{row.term}</strong></td><td style={cellStyle}>{row.rate.toFixed(2)}%</td><td style={cellStyle}>{fmt(row.payment)}/mo</td><td style={cellStyle}>{row.note}</td></tr>)}</tbody></table></div>
+              <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 8 }}>
+                {[0.5, 1, 2].map((pointPct) => <div key={pointPct} style={{ border: `1px solid ${theme.cellBorder}`, borderRadius: 9, padding: 10, background: theme.cellBg }}><strong style={{ display: "block", color: theme.ink }}>{pointPct} point{pointPct === 1 ? "" : "s"} = {pointPct}%</strong><span style={{ fontSize: 12, color: theme.inkSoft }}>{fmt(Math.round(loan * pointPct / 100))} on this illustrative loan</span></div>)}
+              </div>
+              <p style={{ margin: "10px 0 0", fontSize: 11.5, lineHeight: 1.5, color: theme.inkFaint }}>{residentialRates.provenanceNote} Snapshot week: {residentialRates.weekOf ?? "date unavailable"}. Points may buy a lower rate, cover lender compensation, or reflect pricing adjustments; the lender must disclose the actual rate, APR, dollar cost, and break-even period.</p>
+            </>;
+          })()}
+        </div>
+      )}
 
       {model && (
         <>

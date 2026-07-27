@@ -92,7 +92,11 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
   const [showAllFacts, setShowAllFacts] = useState(false);
   const [ownerFeatureInput, setOwnerFeatureInput] = useState("");
   const [localOwnerAssertions, setLocalOwnerAssertions] = useState<Array<{ label: string; value: string; text: string; provenance: string; tone: "neutral" }>>([]);
-  const facts = props.intelligence?.verifiedFacts ?? [];
+  const rawFacts = props.intelligence?.verifiedFacts ?? [];
+  const facts = [...rawFacts].sort((a, b) => {
+    const priority = (label: string) => /land area|land, lots|parcel and conveyance|tax-parcel profile|acreage|size/i.test(label) ? 0 : 1;
+    return priority(a.label) - priority(b.label);
+  });
   const marketValueFact = facts.find((fact) => fact.label === "Waterfront market value context");
   const landFact = facts.find((fact) => /land area|land, lots|parcel and conveyance|size/i.test(fact.label));
   const taxFact = facts.find((fact) => /annual property taxes/i.test(fact.label));

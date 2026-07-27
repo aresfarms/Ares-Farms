@@ -3306,12 +3306,14 @@ export function PropertyEvaluationWorkspace({
             See the current price on the official listing ↗
           </Link>
         )}
-        {/* Streamlined to three distinct actions (founder direction
-            2026-07-17): one PDF button (view/download/print were three routes
-            to the same watermarked PDF), the zero-PII device draft, and the
-            governed Furlong account path. */}
-        <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-          {pdfBusy !== null ? "Preparing PDF..." : "Download the PDF"}
+        <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+          {pdfBusy === "view" ? "Preparing PDF..." : "View PDF"}
+        </button>
+        <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+          {pdfBusy === "export" ? "Preparing PDF..." : "Download PDF"}
+        </button>
+        <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+          {pdfBusy === "print" ? "Preparing print view..." : "Print report"}
         </button>
         <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
           Save draft on this device

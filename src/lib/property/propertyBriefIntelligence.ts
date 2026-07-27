@@ -75,7 +75,7 @@ import {
   PROPERTY_AMENITY_FACTS,
   PROPERTY_AMENITIES_PROVENANCE,
 } from "./propertyAmenitiesGenerated";
-import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
+import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE, type CountySchool } from "./countySchoolsGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
 import { COUNTY_YIELDS } from "./countyYieldsGenerated";
 import {
@@ -563,6 +563,26 @@ function buildChips(args: {
  * never ratings (same founder rule as public schools). Count is the county
  * total; examples are the largest by enrollment.
  */
+function publicSchoolsFact(schools: CountySchool[] | undefined, town: string | null): BriefFactLine | null {
+  if (!schools?.length) return null;
+  const townName = town?.trim() || null;
+  const townLower = townName?.toLowerCase() ?? "";
+  const inTown = townLower ? schools.filter((school) => school.city.toLowerCase() === townLower) : [];
+  const displayed = (inTown.length > 0 ? inTown : schools).slice(0, 4);
+  const charterCount = schools.filter((school) => school.charter).length;
+  const scope = inTown.length > 0 && townName ? `Public schools listed in ${townName}` : "Public-school examples in the county";
+  return {
+    label: "Schools",
+    value: displayed.map((school) => school.name).join(" · "),
+    text:
+      `${scope}: ${displayed.map((school) => `${school.name} (${school.city}${school.enrollment != null ? `, ${school.enrollment} students` : ""})`).join("; ")}. ` +
+      `The county directory contains ${schools.length} public school${schools.length === 1 ? "" : "s"}${charterCount > 0 ? `, including ${charterCount} charter` : ""}. ` +
+      `These are directory locations, not a claim that this address is assigned to a particular school. Confirm attendance boundaries with the school district; the state report card is the official quality source.`,
+    provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
+    tone: "neutral",
+  };
+}
+
 function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
   if (!countyFips) return null;
   const entry = COUNTY_PRIVATE_SCHOOLS[countyFips];
@@ -1588,29 +1608,8 @@ export function buildPropertyBriefIntelligence(args: {
   const schoolsFips =
     resolvedCounty?.fips ?? (id ? PROPERTY_OZ_FACTS[id]?.tractId?.slice(0, 5) ?? null : null);
   const schools = schoolsFips ? COUNTY_SCHOOLS[schoolsFips] : undefined;
-  if (schools && schools.length > 0 && isHome) {
-    const townLower = (args.town ?? "").trim().toLowerCase();
-    const inTown = townLower
-      ? schools.filter((s) => s.city.toLowerCase() === townLower)
-      : [];
-    const sample = (inTown.length > 0 ? inTown : schools).slice(0, 4);
-    const charterCount = schools.filter((s) => s.charter).length;
-    verifiedFacts.push({
-      label: "Schools",
-      value: `${schools.length} in the county${inTown.length > 0 ? ` · ${inTown.length} in ${args.town}` : ""}`,
-      text:
-        `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
-        `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
-        `${inTown.length > 0 ? `, including ${inTown.length} in ${args.town}` : ""}. ` +
-        `Examples: ${sample
-          .map((s) => `${s.name} (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})`)
-          .join("; ")}. ` +
-        `Directory facts from federal data — Furlong does not rate schools; the state report card ` +
-        `is the official quality source.`,
-      provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
-      tone: "neutral",
-    });
-  }
+  const schoolsFact = isHome ? publicSchoolsFact(schools, args.town ?? null) : null;
+  if (schoolsFact) verifiedFacts.push(schoolsFact);
 
   const privateSchools = isHome ? privateSchoolsFact(schoolsFips) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
@@ -2003,27 +2002,8 @@ export async function buildLocationBriefIntelligence(args: {
 
   // Schools — county-keyed directory facts, list only, never ratings.
   const schools = countyFips ? COUNTY_SCHOOLS[countyFips] : undefined;
-  if (schools && schools.length > 0 && isHome) {
-    const townLower = (town ?? "").trim().toLowerCase();
-    const inTown = townLower ? schools.filter((s) => s.city.toLowerCase() === townLower) : [];
-    const sample = (inTown.length > 0 ? inTown : schools).slice(0, 4);
-    const charterCount = schools.filter((s) => s.charter).length;
-    verifiedFacts.push({
-      label: "Schools",
-      value: `${schools.length} in the county${inTown.length > 0 && town ? ` · ${inTown.length} in ${town}` : ""}`,
-      text:
-        `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
-        `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
-        `${inTown.length > 0 && town ? `, including ${inTown.length} in ${town}` : ""}. ` +
-        `Examples: ${sample
-          .map((s) => `${s.name} (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})`)
-          .join("; ")}. ` +
-        `Directory facts from federal data — Furlong does not rate schools; the state report card ` +
-        `is the official quality source.`,
-      provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
-      tone: "neutral",
-    });
-  }
+  const schoolsFact = isHome ? publicSchoolsFact(schools, town) : null;
+  if (schoolsFact) verifiedFacts.push(schoolsFact);
 
   const privateSchools = isHome ? privateSchoolsFact(countyFips) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);

@@ -546,7 +546,8 @@
     "verify:three-lane-consumer-command-center": "tsx src/scripts/verifyThreeLaneConsumerCommandCenter.ts",
     "verify:compass-lane-entry-routing": "tsx src/scripts/verifyCompassLaneEntryRouting.ts",
     "verify:deed-verification-access": "tsx src/scripts/verifyDeedVerificationAccess.ts",
-    "verify:property-data-resolution": "tsx src/scripts/verifyPropertyDataResolution.ts"
+    "verify:property-data-resolution": "tsx src/scripts/verifyPropertyDataResolution.ts",
+    "verify:property-report-copy-integrity": "tsx src/scripts/verifyPropertyReportCopyIntegrity.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -2547,9 +2547,32 @@ export function PropertyEvaluationWorkspace({
   // typed addresses get it back from the property-facts API (geocode-derived).
   // For imported ids the API brief is authoritative — a property-keyed server
   // brief can only be empty/negative for an address with no canonical record.
-  const effectivePlaceIntelligence = context.propertyId?.startsWith("imported:")
+  const basePlaceIntelligence = context.propertyId?.startsWith("imported:")
     ? facts?.placeIntelligence ?? placeIntelligence ?? null
     : placeIntelligence ?? facts?.placeIntelligence ?? null;
+  // Acreage is a foundational property fact for every lane, not merely a farm
+  // classifier input. The property-facts API already carries acreageText; promote
+  // it into the customer-visible evidence whenever the source brief omitted it.
+  const effectivePlaceIntelligence = (() => {
+    if (!basePlaceIntelligence || !facts?.propertyRecord?.acreageText) return basePlaceIntelligence;
+    const alreadyVisible = basePlaceIntelligence.verifiedFacts.some((fact) =>
+      /size|acreage|land area|parcel and conveyance profile/i.test(fact.label)
+    );
+    if (alreadyVisible) return basePlaceIntelligence;
+    return {
+      ...basePlaceIntelligence,
+      verifiedFacts: [
+        {
+          label: "Land area",
+          value: facts.propertyRecord.acreageText,
+          text: `The matched property record reports ${facts.propertyRecord.acreageText} of land. Acreage affects value, usable layout, setbacks, operating capacity, and the financial model regardless of whether the property is residential, agricultural, or commercial.`,
+          provenance: "Source: matched canonical property record; county parcel geometry and recorded plat remain controlling",
+          tone: "neutral" as const,
+        },
+        ...basePlaceIntelligence.verifiedFacts,
+      ],
+    };
+  })();
   // Canonical property profile (axis 1) — the brief's server classification
   // wins; fall back to classifying the context type for older API payloads.
   // The VISITOR'S declaration wins over any machine classification — the

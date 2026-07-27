@@ -44,10 +44,10 @@ export function riverRoadCuratedFacts(): BriefFactLine[] {
       tone: "caution",
     },
     {
-      label: "Parcel and conveyance profile",
-      value: "Two lots / tax parcels · waterfront · pier rights require deed confirmation",
-      text: "Public property records describe the property as Lots 23 and 24 and identify the waterfront setting. The customer reports a deeded pier. The acquisition analysis should therefore treat both parcels as part of the expected conveyance and require the contract, deed, legal description, and applicable pier/riparian permits to confirm that both lots and the claimed pier rights transfer.",
-      provenance: "Sources: public property-record descriptions and customer-reported deeded-pier feature; refreshed 2026-07-26. Pier and riparian rights remain pending deed and permit verification.",
+      label: "Land, lots, and tax-parcel profile",
+      value: "0.4091 acres / 17,820 sq ft · Lots 23 & 24 · one tax parcel · Riverdale Park",
+      text: "The public property record describes 17,820 square feet (0.4091 acres) in the Riverdale Park subdivision. Its legal description is Lots 23 and 24, while both lots are carried under one assessor parcel number, 234-34.12-56.00, for assessment and tax-record purposes. The site is waterfront. The customer reports a deeded pier; the deed, legal description, recorded plat, and applicable pier or riparian permits still control whether both lots and the claimed pier rights convey.",
+      provenance: "Sources: Sussex County-derived public property records, legal description LOTS 23 24 RIVERDALE PK W/IMP, APN 234-34.12-56.00; refreshed 2026-07-27. Deed, plat, and pier/riparian rights remain document-level verification.",
       tone: "caution",
     },
     {

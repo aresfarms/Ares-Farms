@@ -44,6 +44,27 @@ export function riverRoadCuratedFacts(): BriefFactLine[] {
       tone: "caution",
     },
     {
+      label: "Parcel and conveyance profile",
+      value: "Two lots / tax parcels · waterfront · pier rights require deed confirmation",
+      text: "Public property records describe the property as Lots 23 and 24 and identify the waterfront setting. The customer reports a deeded pier. The acquisition analysis should therefore treat both parcels as part of the expected conveyance and require the contract, deed, legal description, and applicable pier/riparian permits to confirm that both lots and the claimed pier rights transfer.",
+      provenance: "Sources: public property-record descriptions and customer-reported deeded-pier feature; refreshed 2026-07-26. Pier and riparian rights remain pending deed and permit verification.",
+      tone: "caution",
+    },
+    {
+      label: "Known condition and repair posture",
+      value: "Major rehabilitation or teardown analysis warranted",
+      text: "The existing residence has been described as a possible teardown, with asbestos exterior shingles reported. That is enough to model the property as a major-repair or replacement scenario now. An inspection, asbestos survey, contractor scope, demolition estimate, and as-completed appraisal refine cost and financing; they do not make the current condition posture unknown.",
+      provenance: "Source: customer-provided property condition information, recorded 2026-07-26; professional inspection and hazardous-material verification remain required before reliance.",
+      tone: "caution",
+    },
+    {
+      label: "Nearby public works screening",
+      value: "Regional US 113 projects identified · no direct River Road parcel impact confirmed",
+      text: "DelDOT identifies active or planned Millsboro-area US 113 corridor work, including the US 113 at SR 20 grade-separated intersection and widening from Dagboro Road to Hardscrabble Road. The current screening did not identify a project specifically taking or rebuilding this River Road parcel. Furlong should show the regional projects and the absence of a confirmed direct parcel impact, then refresh the check before contract or closing.",
+      provenance: "Sources: Delaware Department of Transportation US 113 North/South Study and Corridor Capacity Preservation Program, checked 2026-07-27; parcel-specific impact not confirmed.",
+      tone: "neutral",
+    },
+    {
       label: "Airports",
       value: "Delaware Coastal Airport ~9 mi · Salisbury Regional ~24 mi",
       text: "Delaware Coastal Airport in Georgetown is the closest public-use general aviation airport. Salisbury–Ocean City–Wicomico Regional (SBY) is the closest scheduled-service airport. BWI is generally closer by road than Philadelphia International from this part of Sussex County; both should be shown as major-airport alternatives with current drive times rather than a fixed straight-line claim.",

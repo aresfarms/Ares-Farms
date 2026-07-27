@@ -59,8 +59,10 @@ function suppressResolvedUnknowns(
   const factText = facts.map((fact) => `${fact.label} ${fact.value} ${fact.text}`.toLowerCase()).join(" ");
   return unknowns.filter((item) => {
     const label = item.label.toLowerCase();
-    if (/flood zone/.test(label) && /flood zone/.test(factText)) return false;
-    if (/size|lot|what conveys|parcel/.test(label) && /size|acre|parcel count|recorded deed/.test(factText)) return false;
+    if (/flood zone/.test(label) && /flood zone|flood and insurance posture|waterfront exposure/.test(factText)) return false;
+    if (/condition|repair scope/.test(label) && /known condition and repair posture|major rehabilitation|teardown/.test(factText)) return false;
+    if (/size|lot|what conveys|parcel/.test(label) && /size|acre|parcel count|parcel and conveyance profile|two lots|recorded deed/.test(factText)) return false;
+    if (/planned construction|public works/.test(label) && /nearby public works screening|regional us 113 projects/.test(factText)) return false;
     if (/higher education|college/.test(label) && /higher education/.test(factText)) return false;
     if (/broadband/.test(label) && /broadband/.test(factText)) return false;
     if (/county/.test(label) && /county/.test(factText)) return false;

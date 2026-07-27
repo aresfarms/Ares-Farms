@@ -2764,6 +2764,7 @@ export function PropertyEvaluationWorkspace({
             branding: report.branding,
             tier: report.tier,
             context: {
+              propertyId: context.propertyId ?? null,
               title: analysisContext.title,
               location: analysisContext.location,
               exactAddress: analysisContext.exactAddress,

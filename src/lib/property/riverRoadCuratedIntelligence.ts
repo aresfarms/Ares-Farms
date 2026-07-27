@@ -38,9 +38,9 @@ export function riverRoadCuratedFacts(): BriefFactLine[] {
     },
     {
       label: "Flood and insurance posture",
-      value: "Waterfront exposure — budget flood insurance pending FEMA determination",
-      text: "This is a waterfront/bay-influenced property and public climate-risk data flags extreme long-horizon flood exposure. The page must not dilute that with a countywide 'moderate' label. Until the parcel-level FEMA zone and lender determination are returned, the financial model should budget flood insurance as expected and treat elevation, foundation, storm-surge exposure, and insurability as first-order diligence.",
-      provenance: "Sources: public property record (waterfront/bay influence), First Street flood-risk display, and pending FEMA parcel determination; refreshed 2026-07-26.",
+      value: "FEMA Zone AE · Special Flood Hazard Area",
+      text: "The live FEMA National Flood Hazard Layer lookup places this property in Zone AE, inside a Special Flood Hazard Area. The financial model should therefore budget flood insurance as expected for financed acquisition and treat elevation, foundation, storm-surge exposure, and property-specific insurability as first-order diligence. The lender determination and insurance quote remain closing-verification items; the FEMA zone itself is resolved.",
+      provenance: "Source: FEMA National Flood Hazard Layer live address lookup, verified 2026-07-27; lender flood determination and property-specific insurance pricing remain pending.",
       tone: "caution",
     },
     {

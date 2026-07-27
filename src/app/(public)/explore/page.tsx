@@ -237,6 +237,16 @@ export default async function ExplorePage({
             <FarmCommodityTicker />
           </div>
         )}
+        {isFarmLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
+            <header style={{ display: "grid", gap: 6, textAlign: "center" }}>
+              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
+              <h1 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.08 }}>Start with what the ground can support</h1>
+              <p style={{ margin: "0 auto", maxWidth: 760, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Choose the farm question or action that brought you here. Property exploration and the address checker follow below.</p>
+            </header>
+            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} />
+          </div>
+        )}
         <div
           className="land-top-row"
           style={{
@@ -280,16 +290,6 @@ export default async function ExplorePage({
             )}
           </div>
         </div>
-        {isFarmLane && (
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
-            <header style={{ display: "grid", gap: 6, textAlign: "center" }}>
-              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
-              <h1 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.08 }}>Start with what the ground can support</h1>
-              <p style={{ margin: "0 auto", maxWidth: 760, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Choose the farm question or action that brought you here after reviewing this week&apos;s market and exploring the map or a specific address.</p>
-            </header>
-            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} />
-          </div>
-        )}
         {/* The commercial sections (founder direction 2026-07-18): the kinds of
             commercial property, the questions owners ask + the ones they don't. */}
         {isCommercialLane && (

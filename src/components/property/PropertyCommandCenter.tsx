@@ -5,7 +5,19 @@ import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief
 import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 
-export type PropertyCommandCenterProps = ChartTableBriefProps & { deedEvidence?: OfficialPropertyEvidenceRecord[] };
+export type PropertyCommandCenterProps = ChartTableBriefProps & {
+  deedEvidence?: OfficialPropertyEvidenceRecord[];
+  propertyRecord?: {
+    exactAddress: string | null;
+    rawPropertyStyle: string | null;
+    bedrooms: number | null;
+    yearBuilt: number | null;
+    squareFeet: number | null;
+    acreageText: string | null;
+    listingId: string | null;
+    listingStatus: string | null;
+  } | null;
+};
 type TabId = "summary" | "property" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
 
 type DiligenceGroup = { id: string; title: string; items: Array<{ label: string; how: string; source: string }> };

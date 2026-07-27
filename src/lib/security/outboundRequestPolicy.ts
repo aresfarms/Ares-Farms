@@ -7,6 +7,7 @@ const STATIC_ALLOWED_HOSTS = new Set([
   "services.arcgis.com",
   "services6.arcgis.com",
   "opendata.arcgis.com",
+  "mdgeodata.md.gov",
   "www.treasury.gov",
   "realestatesales.gov",
 ]);

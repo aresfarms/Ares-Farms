@@ -16,7 +16,20 @@ export type PropertyCommandCenterProps = ChartTableBriefProps & {
     town?: string | null;
     state?: string | null;
     parcelRefs?: string[];
-    recordBasis?: "matched-approved-source-record" | "verified-address-only";
+    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "verified-address-only";
+    parcelSourceName?: string | null;
+    parcelSourceAsOf?: string | null;
+    parcelSourceUrl?: string | null;
+    landUse?: string | null;
+    zoning?: string | null;
+    deedReference?: string | null;
+    legalDescription?: string | null;
+    assessedLandValue?: number | null;
+    assessedImprovementValue?: number | null;
+    assessedTotalValue?: number | null;
+    publicWater?: boolean | null;
+    publicSewer?: boolean | null;
+    waterfront?: boolean | null;
     bedrooms: number | null;
     yearBuilt: number | null;
     squareFeet: number | null;
@@ -115,18 +128,26 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
     if (!record) return [];
     const source = record.recordBasis === "verified-address-only"
       ? "Source: verified address intake; parcel-level fields require an approved jurisdiction record"
-      : "Source: matched property/listing record";
+      : record.recordBasis === "matched-jurisdiction-parcel-record"
+        ? `Source: ${record.parcelSourceName ?? "official jurisdiction parcel record"}${record.parcelSourceAsOf ? ` · data ${record.parcelSourceAsOf}` : ""}`
+        : "Source: matched property/listing record";
     const place = [record.town, record.county, record.state].filter(Boolean).join(", ");
     return [
       record.exactAddress ? { label: "Verified address", value: record.exactAddress, text: "The entered property address resolved successfully through the public address-verification path.", provenance: source, tone: "neutral" as const } : null,
       place ? { label: "Property location", value: place, text: "Town, county, and state carried into the property record from the verified intake context.", provenance: source, tone: "neutral" as const } : null,
-      props.priceLabel ? { label: "Price status", value: props.priceLabel, text: "Current price or off-market posture carried into this property analysis.", provenance: props.sourceLabel ? `Source: ${props.sourceLabel}` : source, tone: "neutral" as const } : null,
-      record.parcelRefs?.length ? { label: "Associated parcels", value: `${record.parcelRefs.length} parcel${record.parcelRefs.length === 1 ? "" : "s"} identified`, text: "Parcel references returned by the approved property source.", provenance: source, tone: "neutral" as const } : null,
+      record.recordBasis !== "verified-address-only" && props.priceLabel && !/no governed listing match/i.test(props.priceLabel) ? { label: "Price status", value: props.priceLabel, text: "Current price or off-market posture carried into this property analysis.", provenance: props.sourceLabel ? `Source: ${props.sourceLabel}` : source, tone: "neutral" as const } : null,
+      record.parcelRefs?.length ? { label: "Parcel identity", value: record.parcelRefs.join(" · "), text: "Official account, map, grid, parcel, or lot references returned by the jurisdiction parcel source.", provenance: source, tone: "neutral" as const } : null,
       record.acreageText ? { label: "Land area", value: record.acreageText, text: `The matched record reports ${record.acreageText} of land.`, provenance: source, tone: "neutral" as const } : null,
+      record.landUse ? { label: "Land use", value: record.landUse, text: "Land-use description published by the official parcel source.", provenance: source, tone: "neutral" as const } : null,
+      record.zoning ? { label: "Zoning", value: record.zoning, text: "Zoning code carried by the official parcel source; local zoning records remain controlling.", provenance: source, tone: "neutral" as const } : null,
+      record.deedReference ? { label: "Recorded deed reference", value: record.deedReference, text: record.legalDescription || "Deed book and page reference published with the parcel record.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedLandValue != null ? { label: "Appraised land value", value: `$${record.assessedLandValue.toLocaleString("en-US")}`, text: "Land component of the official appraised value; this is not a seller asking price.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedImprovementValue != null ? { label: "Appraised improvement value", value: `$${record.assessedImprovementValue.toLocaleString("en-US")}`, text: "Improvement component of the official appraised value.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedTotalValue != null ? { label: "Appraised total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: "Total appraised value published by the jurisdiction parcel source; it is not a market-price opinion.", provenance: source, tone: "neutral" as const } : null,
       record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.squareFeet != null ? { label: "Building square feet", value: `${record.squareFeet.toLocaleString("en-US")} sq ft`, text: "Building area reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.yearBuilt != null ? { label: "Year built", value: String(record.yearBuilt), text: "Construction year reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
-      (record.rawPropertyStyle || record.propertyType) ? { label: "Property type", value: record.rawPropertyStyle || record.propertyType || "Property", text: record.recordBasis === "verified-address-only" ? "Property classification follows the selected discovery lane until a parcel or listing source supplies a more specific official style." : "Property style reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      (record.rawPropertyStyle || record.propertyType) ? { label: "Property type", value: record.rawPropertyStyle || record.propertyType || "Property", text: record.recordBasis === "verified-address-only" ? "Property classification follows the selected discovery lane until a parcel or listing source supplies a more specific official style." : "Property style or land use reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.listingStatus ? { label: "Listing status", value: record.listingStatus, text: "Current status carried by the matched listing record.", provenance: source, tone: "neutral" as const } : null,
       record.listingId ? { label: "Source record", value: record.listingId, text: "Identifier for the matched property/listing record.", provenance: source, tone: "neutral" as const } : null,
     ].filter((fact): fact is NonNullable<typeof fact> => fact !== null);

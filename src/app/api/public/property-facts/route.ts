@@ -10,6 +10,7 @@ import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones
 import { findCanonicalPropertyByExactAddress, findCanonicalPropertyById } from "@/lib/property/propertyData";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { officialPropertyEvidenceRecords } from "@/lib/property/officialPropertySourceAdapters";
+import { resolveJurisdictionParcel } from "@/lib/property/jurisdictionParcelResolver";
 
 
 function derivedAcreageText(record: { acreageText?: string | null; description?: string | null } | null): string | null {
@@ -82,6 +83,14 @@ export async function POST(req: NextRequest) {
       ? findCanonicalPropertyByExactAddress(imported.normalizedAddress)
       : null;
     const matchedSourceRecord = canonicalMatch?.source_records[0] ?? null;
+    const jurisdictionParcel = imported.parsedAddress
+      ? await resolveJurisdictionParcel({
+          street: imported.parsedAddress.street,
+          city: imported.parsedAddress.city,
+          state: imported.parsedAddress.state,
+          zip: imported.parsedAddress.zip || null,
+        }).catch(() => null)
+      : null;
     // Same living-here Place Brief a map-selected property gets, resolved from
     // the geocode and the strongest available asset evidence. An exact address
     // match carries its canonical property style into classification; a visitor
@@ -93,17 +102,17 @@ export async function POST(req: NextRequest) {
       propertyType: lanePropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
       ownerNotes: body.notes ?? null,
     });
-    if (matchedSourceRecord) {
+    if (matchedSourceRecord || jurisdictionParcel) {
       const sizeBits = [
-        matchedSourceRecord.squareFeet ? `${matchedSourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : null,
-        derivedAcreageText(matchedSourceRecord),
+        matchedSourceRecord?.squareFeet ? `${matchedSourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : jurisdictionParcel?.squareFeet ? `${jurisdictionParcel.squareFeet.toLocaleString("en-US")} sq ft` : null,
+        derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null,
       ].filter((value): value is string => Boolean(value));
       if (sizeBits.length && !placeIntelligence.verifiedFacts.some((fact) => fact.label === "Size")) {
         placeIntelligence.verifiedFacts.unshift({
           label: "Size",
           value: sizeBits.join(" · "),
           text: `The matched canonical property record publishes ${sizeBits.join(" and ")}. County parcel geometry remains the authority for official dimensions.`,
-          provenance: "Source: matched canonical property record",
+          provenance: matchedSourceRecord ? "Source: matched canonical property record" : `Source: ${jurisdictionParcel?.sourceName ?? "official jurisdiction parcel source"}`,
           tone: "neutral",
         });
       }
@@ -133,25 +142,38 @@ export async function POST(req: NextRequest) {
       canonicalMatch: canonicalMatch
         ? { propertyId: canonicalMatch.canonical_property_id, matchedBy: "normalized-exact-address" }
         : null,
-      propertyRecord: matchedSourceRecord
+      propertyRecord: matchedSourceRecord || jurisdictionParcel
         ? {
-            exactAddress: matchedSourceRecord.exactAddress,
-            zip: matchedSourceRecord.zip,
-            rawPropertyStyle: matchedSourceRecord.rawPropertyStyle,
-            propertyType: matchedSourceRecord.propertyType,
-            price: matchedSourceRecord.price,
-            county: matchedSourceRecord.county,
-            town: matchedSourceRecord.town,
-            state: matchedSourceRecord.state,
-            description: matchedSourceRecord.description,
-            parcelRefs: canonicalMatch?.parcel_refs ?? [],
-            bedrooms: matchedSourceRecord.bedrooms,
-            yearBuilt: matchedSourceRecord.yearBuilt,
-            squareFeet: matchedSourceRecord.squareFeet,
-            acreageText: derivedAcreageText(matchedSourceRecord),
-            listingId: matchedSourceRecord.listingId,
-            listingStatus: canonicalMatch?.listing_status ?? null,
-            recordBasis: "matched-approved-source-record",
+            exactAddress: matchedSourceRecord?.exactAddress ?? imported.normalizedAddress,
+            zip: matchedSourceRecord?.zip ?? imported.parsedAddress?.zip ?? null,
+            rawPropertyStyle: matchedSourceRecord?.rawPropertyStyle ?? jurisdictionParcel?.landUse ?? (lanePropertyType === "farm" ? "Farm / agricultural property" : lanePropertyType),
+            propertyType: matchedSourceRecord?.propertyType ?? lanePropertyType,
+            price: matchedSourceRecord?.price ?? null,
+            county: matchedSourceRecord?.county ?? body.county ?? null,
+            town: matchedSourceRecord?.town ?? body.town ?? imported.parsedAddress?.city ?? null,
+            state: matchedSourceRecord?.state ?? imported.parsedAddress?.state ?? body.stateCode ?? null,
+            description: matchedSourceRecord?.description ?? jurisdictionParcel?.legalDescription ?? null,
+            parcelRefs: canonicalMatch?.parcel_refs?.length ? canonicalMatch.parcel_refs : jurisdictionParcel?.parcelRefs ?? [],
+            bedrooms: matchedSourceRecord?.bedrooms ?? null,
+            yearBuilt: matchedSourceRecord?.yearBuilt ?? jurisdictionParcel?.yearBuilt ?? null,
+            squareFeet: matchedSourceRecord?.squareFeet ?? jurisdictionParcel?.squareFeet ?? null,
+            acreageText: derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null,
+            listingId: matchedSourceRecord?.listingId ?? jurisdictionParcel?.accountId ?? null,
+            listingStatus: canonicalMatch?.listing_status ?? (jurisdictionParcel ? "Official parcel record matched" : null),
+            recordBasis: matchedSourceRecord ? "matched-approved-source-record" : "matched-jurisdiction-parcel-record",
+            parcelSourceName: jurisdictionParcel?.sourceName ?? null,
+            parcelSourceAsOf: jurisdictionParcel?.sourceAsOf ?? null,
+            parcelSourceUrl: jurisdictionParcel?.sourceUrl ?? null,
+            landUse: jurisdictionParcel?.landUse ?? null,
+            zoning: jurisdictionParcel?.zoning ?? null,
+            deedReference: jurisdictionParcel?.deedReference ?? null,
+            legalDescription: jurisdictionParcel?.legalDescription ?? null,
+            assessedLandValue: jurisdictionParcel?.assessedLandValue ?? null,
+            assessedImprovementValue: jurisdictionParcel?.assessedImprovementValue ?? null,
+            assessedTotalValue: jurisdictionParcel?.assessedTotalValue ?? null,
+            publicWater: jurisdictionParcel?.publicWater ?? null,
+            publicSewer: jurisdictionParcel?.publicSewer ?? null,
+            waterfront: jurisdictionParcel?.waterfront ?? null,
           }
         : imported.normalizedAddress
           ? {
@@ -172,6 +194,7 @@ export async function POST(req: NextRequest) {
               listingId: null,
               listingStatus: "Address verified · no governed listing match",
               recordBasis: "verified-address-only",
+              parcelSourceName: null, parcelSourceAsOf: null, parcelSourceUrl: null, landUse: null, zoning: null, deedReference: null, legalDescription: null, assessedLandValue: null, assessedImprovementValue: null, assessedTotalValue: null, publicWater: null, publicSewer: null, waterfront: null,
             }
           : null,
       placeFacts: imported.placeFacts,

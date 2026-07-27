@@ -273,6 +273,17 @@ export function FarmLaneMenu({ hrefFor, reportHref }: { hrefFor: (key: string) =
     <div style={{ display: "grid", gap: 16 }}>
       <section aria-label="Farms module topics" style={{ display: "grid", gap: 12 }}>
         <span style={sectionKicker}>The Farms module — pick a topic</span>
+        <nav aria-label="Farm topic shortcuts" style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
+          {[
+            { label: "Crops", key: "questions" },
+            { label: "Equipment", key: "equipment" },
+            { label: "Hauling", key: "hauling" },
+          ].map((item) => (
+            <Link key={item.label} href={hrefFor(item.key)} style={{ border: `1px solid ${FARM.accent}`, borderRadius: 999, padding: "9px 15px", background: "#fff", color: FARM.accent, fontWeight: 850, textDecoration: "none", fontSize: 13 }}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12, alignItems: "stretch" }}>
           {FARM_SECTIONS.map((s) => (
             <Link key={s.key} href={hrefFor(s.key)} style={menuCard}>

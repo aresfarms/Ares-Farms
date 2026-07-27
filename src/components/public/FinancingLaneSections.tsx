@@ -3,6 +3,7 @@ import Link from "next/link";
 import { FinancingIntakePanel } from "@/components/public/FinancingIntakePanel";
 import { FinancingFeeChart } from "@/components/public/FinancingFeeChart";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
+import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { accentForLane } from "@/lib/property/laneThemes";
 import { activePartners } from "@/lib/modules/licensedModuleRegistry";
 
@@ -68,8 +69,11 @@ const FINANCING_BRIEFS: FinBrief[] = [
 export function FinancingLaneSections() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      {/* Program comparison + today's rates leads the page (founder direction
-          2026-07-20); the paid-advisory fee block moves to the bottom. */}
+      {/* The customer promise belongs first: applications and lender review are free,
+          and eligible 100%-financing structures may exist. Paid advisory remains
+          clearly separated from lender/application activity in the same fee chart. */}
+      <FinancingFeeChart />
+      <HundredPercentFinancingCallout />
       <LoanProgramComparison />
 
       <section id="personalized-financing" aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
@@ -122,9 +126,6 @@ export function FinancingLaneSections() {
         </Link>
       </section>
 
-      {/* Paid advisory services (free applications + the only paid one-on-one time)
-          at the BOTTOM (founder direction 2026-07-20). */}
-      <FinancingFeeChart />
     </div>
   );
 }

@@ -237,58 +237,49 @@ export default async function ExplorePage({
             <FarmCommodityTicker />
           </div>
         )}
-        {isFarmLane && (
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
-            <header style={{ display: "grid", gap: 6, textAlign: "center" }}>
-              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
-              <h1 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.08 }}>Start with what the ground can support</h1>
-              <p style={{ margin: "0 auto", maxWidth: 760, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Choose the farm question or action that brought you here. Property exploration and the address checker follow below.</p>
-            </header>
-            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} />
-          </div>
-        )}
-        <div
-          className="land-top-row"
+        <section
+          aria-label={`${selected.label} map and address search`}
+          className="land-map-row"
           style={{
             maxWidth: 1280,
             margin: "0 auto",
             padding: "24px 20px 0",
             display: "grid",
-            gap: 24,
-            gridTemplateColumns: "minmax(0, 1.35fr) minmax(0, 1fr)",
-            alignItems: "start",
+            gap: 14,
           }}
         >
-          <div className="fl-map-section" style={{ display: "grid", gap: 12, alignContent: "start" }}>
-            <PublicMapExperience
-              liveSources={getRuntimeLiveSources()}
-              mapInventoryByState={laneInventory}
-              weekSeed={landWeekSeed}
-            />
-            {/* Compact address-check tucked directly under the map, at the map's
-                width, filling the space below it (founder direction 2026-07-20). */}
-            <div style={{ display: "grid", gap: 8 }}>
-              <div style={{ display: "grid", gap: 3 }}>
-                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>
-                  Have an address in mind?
-                </span>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>
-                  Check a specific location&apos;s verified place-facts right here — or keep browsing the map above.
-                </p>
-              </div>
-              <PlaceFirstDiscovery flow="place-facts" compact />
+          <header style={{ display: "grid", gap: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Explore the map</span>
+            <h2 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(22px,3vw,32px)", lineHeight: 1.15 }}>America&apos;s Journey and property opportunities</h2>
+          </header>
+          <PublicMapExperience
+            liveSources={getRuntimeLiveSources()}
+            mapInventoryByState={laneInventory}
+            weekSeed={landWeekSeed}
+          />
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ display: "grid", gap: 3 }}>
+              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>Have an address in mind?</span>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>Check a specific location&apos;s verified place-facts here — or keep browsing the map above.</p>
             </div>
+            <PlaceFirstDiscovery flow="place-facts" compact />
           </div>
-          {/* Right column beside the map. Farms/Land: the Real Listings fill the
-              dead space under the browse box. Residential: the mortgage-rate
-              tiles sit under the "Homes to live in" box (founder direction
-              2026-07-18). Other lanes keep the full-width shelf below. */}
-          <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
-            <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
-            {isFarmLane && (
-              <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={shelfSeed} limit={6} layout="column" accent={laneAccent} />
-            )}
+        </section>
+        {isFarmLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
+            <header style={{ display: "grid", gap: 6, textAlign: "center" }}>
+              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
+              <h1 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.08 }}>Start with what the ground can support</h1>
+              <p style={{ margin: "0 auto", maxWidth: 760, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Choose the farm question or action that brought you here after reviewing the market and map above.</p>
+            </header>
+            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} />
           </div>
+        )}
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 16 }}>
+          <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
+          {isFarmLane && (
+            <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={shelfSeed} limit={6} accent={laneAccent} />
+          )}
         </div>
         {/* The commercial sections (founder direction 2026-07-18): the kinds of
             commercial property, the questions owners ask + the ones they don't. */}
@@ -328,9 +319,8 @@ export default async function ExplorePage({
             column instead of forcing an 8px page overflow (their min-content is
             wider than a phone); overflow-x:clip guards against any residual. */}
         <style>{`
-          .land-top-row { overflow-x: clip; }
-          .land-top-row > * { min-width: 0; }
-          @media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }
+          .land-map-row { overflow-x: clip; }
+          .land-map-row > * { min-width: 0; }
         `}</style>
       </>
     );

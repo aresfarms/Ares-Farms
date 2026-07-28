@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import type { ChartTheme } from "@/lib/property/chartThemes";
+import { AgriculturalOpportunityOptimizerPanel } from "@/components/property/AgriculturalOpportunityOptimizerPanel";
 import { financingProgramsFor } from "@/lib/property/financingProgramsCurated";
 import {
   buildEquityOutlook,
@@ -11,6 +12,7 @@ import {
   type OwnershipCostContext,
 } from "@/lib/property/ownershipCostModel";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
+import { buildResidentialRates } from "@/lib/property/residentialRatesCurated";
 
 /**
  * OwnershipCostPanel — "what it costs to buy, and then what it costs to KEEP"
@@ -25,6 +27,12 @@ import type { PropertyProfileId } from "@/lib/property/propertyProfile";
  */
 
 const fmt = (n: number): string => `$${n.toLocaleString("en-US")}`;
+const monthlyPayment = (principal: number, annualRate: number, years: number): number => {
+  const months = years * 12;
+  const rate = annualRate / 100 / 12;
+  if (rate === 0) return Math.round(principal / months);
+  return Math.round(principal * rate * Math.pow(1 + rate, months) / (Math.pow(1 + rate, months) - 1));
+};
 
 export interface OwnershipCostPanelProps {
   theme: ChartTheme;
@@ -35,6 +43,8 @@ export interface OwnershipCostPanelProps {
   farmShaped: boolean;
   /** Working-farm/ranch — use FSA/USDA farm-loan lanes, not consumer mortgages. */
   farmMode?: boolean;
+  /** Parcel or offering acreage available to the farm operating model. */
+  farmAcreage?: number | null;
   /** Classified profile — drives the "programs you may also qualify for" block. */
   profileId?: PropertyProfileId;
 }
@@ -43,9 +53,11 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
   const { theme } = props;
   const [assumedPrice, setAssumedPrice] = useState<number | null>(null);
   const [priceInput, setPriceInput] = useState("");
+  const [priceMessage, setPriceMessage] = useState<string | null>(null);
 
   const price = assumedPrice ?? props.listedPrice;
   const priceIsAssumption = assumedPrice !== null;
+  const residentialRates = useMemo(() => buildResidentialRates(), []);
 
   const model = useMemo(
     () =>
@@ -66,7 +78,14 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
 
   const applyPriceInput = () => {
     const parsed = Number(priceInput.replace(/[^0-9.]/g, ""));
-    if (Number.isFinite(parsed) && parsed >= 10_000) setAssumedPrice(Math.round(parsed));
+    if (!Number.isFinite(parsed) || parsed < 10_000) {
+      setPriceMessage("Enter a purchase price of at least $10,000.");
+      return;
+    }
+    const rounded = Math.round(parsed);
+    setAssumedPrice(rounded);
+    setPriceInput(rounded.toLocaleString("en-US"));
+    setPriceMessage(`Estimate updated using ${fmt(rounded)}.`);
   };
 
   const cellStyle: React.CSSProperties = {
@@ -91,12 +110,15 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
       {/* Price line / assumption input */}
       <div
         style={{
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-          flexWrap: "wrap",
-          fontSize: 13,
-          color: theme.inkSoft,
+          display: "grid",
+          gap: 12,
+          padding: "18px",
+          border: "2px solid #C9B26A",
+          borderRadius: 14,
+          background: "#FFFFFF",
+          boxShadow: "0 6px 20px rgba(28,43,69,.10)",
+          fontSize: 14,
+          color: "#1C2B45",
         }}
       >
         {price != null ? (
@@ -107,51 +129,61 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
               : " — the listed price. Try a different number any time:"}
           </span>
         ) : (
-          <span>
+          <span style={{ fontWeight: 650, lineHeight: 1.55 }}>
             This listing does not publish a price. Enter the price you would offer and the numbers
-            fill in — the number stays on this page:
+            fill in — the number stays on this page.
           </span>
         )}
-        <span style={{ display: "inline-flex", gap: 6 }}>
+        <form onSubmit={(event) => { event.preventDefault(); applyPriceInput(); }} style={{ display: "flex", gap: 10, alignItems: "stretch", flexWrap: "wrap" }}>
           <input
             inputMode="numeric"
             aria-label="Price to estimate with, dollars"
             placeholder="e.g. 250,000"
             value={priceInput}
-            onChange={(event) => setPriceInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") applyPriceInput();
-            }}
+            onChange={(event) => { setPriceInput(event.target.value); setPriceMessage(null); }}
             style={{
               font: "inherit",
               fontSize: 13,
-              width: 120,
-              padding: "6px 10px",
-              borderRadius: 8,
-              border: `1px solid ${theme.plateBorder}`,
-              background: theme.cellBg,
-              color: theme.ink,
+              width: 190,
+              minHeight: 44,
+              padding: "10px 13px",
+              borderRadius: 9,
+              border: "2px solid #1C2B45",
+              background: "#FFFFFF",
+              color: "#16233C",
+              fontWeight: 750,
+              outlineColor: "#B08A2E",
             }}
           />
           <button
-            type="button"
-            onClick={applyPriceInput}
+            type="submit"
             style={{
               font: "inherit",
-              fontSize: 12.5,
-              fontWeight: 800,
-              padding: "6px 14px",
-              borderRadius: 8,
-              border: `1px solid ${theme.accent}`,
-              background: "transparent",
-              color: theme.accent,
+              fontSize: 13.5,
+              fontWeight: 850,
+              minHeight: 44,
+              padding: "10px 18px",
+              borderRadius: 9,
+              border: "2px solid #1C2B45",
+              background: "#1C2B45",
+              color: "#FFFFFF",
               cursor: "pointer",
             }}
           >
             Estimate
           </button>
-        </span>
+        </form>
+        {priceMessage && <span role="status" aria-live="polite" style={{ color: assumedPrice ? "#2E7D4F" : "#9A3412", fontSize: 12.5, fontWeight: 750 }}>{priceMessage}</span>}
       </div>
+
+      {props.farmMode && price != null && props.farmAcreage != null && props.farmAcreage > 0 && (
+        <AgriculturalOpportunityOptimizerPanel
+          acreage={props.farmAcreage}
+          price={price}
+          rate={props.context.fsa?.ownershipDirectPct ?? props.context.rates.rate30}
+          theme={theme}
+        />
+      )}
 
       {model && price != null && (() => {
         const priceContext = buildPriceContext(price, props.context);
@@ -174,6 +206,35 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
           </div>
         ) : null;
       })()}
+
+      {model && price != null && props.isHome && (
+        <div style={{ padding: "16px 18px", border: `1px solid ${theme.plateBorder}`, borderRadius: 12, background: theme.plate }}>
+          <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: theme.accent, marginBottom: 6 }}>
+            Current rate and term comparison
+          </div>
+          {(() => {
+            const loan = Math.round(price * 0.8);
+            const rate30 = residentialRates.rate30;
+            const rate15 = residentialRates.rate15 ?? rate30;
+            const rows = [
+              { term: "30-year fixed benchmark", rate: rate30, payment: monthlyPayment(loan, rate30, 30), note: "Current Freddie Mac national benchmark." },
+              { term: "15-year fixed benchmark", rate: rate15, payment: monthlyPayment(loan, rate15, 15), note: "Current Freddie Mac national benchmark." },
+              { term: "40-year payment illustration", rate: rate30, payment: monthlyPayment(loan, rate30, 40), note: "Payment comparison only. A 40-year purchase loan is not a standard universally available product; lender and program availability must be confirmed." },
+              { term: "ARM initial-rate sensitivity", rate: Math.max(0.01, rate30 - 0.5), payment: monthlyPayment(loan, Math.max(0.01, rate30 - 0.5), 30), note: "Illustrates an initial rate 0.50 percentage point below the current 30-year benchmark—not a live ARM quote. The payment can rise after adjustment." },
+            ];
+            return <>
+              <p style={{ margin: "0 0 10px", fontSize: 12.5, lineHeight: 1.55, color: theme.inkSoft }}>
+                Calculated on an illustrative 80% loan of <strong>{fmt(loan)}</strong> for this {fmt(price)} property. Principal and interest only; taxes, insurance, mortgage insurance, fees, and program-specific charges are added elsewhere in this model.
+              </p>
+              <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse", background: theme.cellBg }}><thead><tr><th style={headStyle}>Term / structure</th><th style={headStyle}>Rate used</th><th style={headStyle}>Monthly P&amp;I</th><th style={headStyle}>What it means</th></tr></thead><tbody>{rows.map((row) => <tr key={row.term}><td style={cellStyle}><strong>{row.term}</strong></td><td style={cellStyle}>{row.rate.toFixed(2)}%</td><td style={cellStyle}>{fmt(row.payment)}/mo</td><td style={cellStyle}>{row.note}</td></tr>)}</tbody></table></div>
+              <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 8 }}>
+                {[0.5, 1, 2].map((pointPct) => <div key={pointPct} style={{ border: `1px solid ${theme.cellBorder}`, borderRadius: 9, padding: 10, background: theme.cellBg }}><strong style={{ display: "block", color: theme.ink }}>{pointPct} point{pointPct === 1 ? "" : "s"} = {pointPct}%</strong><span style={{ fontSize: 12, color: theme.inkSoft }}>{fmt(Math.round(loan * pointPct / 100))} on this illustrative loan</span></div>)}
+              </div>
+              <p style={{ margin: "10px 0 0", fontSize: 11.5, lineHeight: 1.5, color: theme.inkFaint }}>{residentialRates.provenanceNote} Snapshot week: {residentialRates.weekOf ?? "date unavailable"}. Points may buy a lower rate, cover lender compensation, or reflect pricing adjustments; the lender must disclose the actual rate, APR, dollar cost, and break-even period.</p>
+            </>;
+          })()}
+        </div>
+      )}
 
       {model && (
         <>

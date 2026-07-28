@@ -18,6 +18,26 @@ export interface ParcelTaxAuthorityRecord {
   transferContinuityVerified: boolean;
 }
 
+
+export interface CountyRecorderDeedRecord {
+  parcelId: string;
+  normalizedAddress?: string | null;
+  authority: string;
+  jurisdiction: string;
+  instrumentNumber: string;
+  bookPage?: string | null;
+  recordingDate: string;
+  legalDescriptionHash?: string | null;
+  parcelCount?: number | null;
+  allAssociatedParcelsConveyed?: boolean | null;
+  waterfrontLanguage?: boolean | null;
+  pierOrRiparianLanguage?: boolean | null;
+  retrievedAt: string;
+  asOf: string;
+  replayRef: string;
+  documentRef?: string | null;
+}
+
 export interface WellPermitAuthorityRecord {
   parcelId: string;
   authority: string;
@@ -35,11 +55,21 @@ export interface WellPermitAuthorityRecord {
 // Governed version history. Empty means no approved official snapshot exists; adapters fail closed.
 export const PARCEL_TAX_AUTHORITY_SNAPSHOTS: OfficialEvidenceSnapshot<ParcelTaxAuthorityRecord>[] = [];
 export const WELL_PERMIT_AUTHORITY_SNAPSHOTS: OfficialEvidenceSnapshot<WellPermitAuthorityRecord>[] = [];
+export const COUNTY_RECORDER_DEED_SNAPSHOTS: OfficialEvidenceSnapshot<CountyRecorderDeedRecord>[] = [];
 
 export function governedParcelTaxRecords(now = new Date()): ParcelTaxAuthorityRecord[] {
   return resolveOfficialEvidenceSource({
     activation: OFFICIAL_EVIDENCE_SOURCE_ACTIVATION["parcel-tax-authority"],
     snapshots: verifiedSnapshotsForRead("parcel-tax-authority", readOfficialEvidenceRefreshState<ParcelTaxAuthorityRecord>("parcel-tax-authority")?.snapshots ?? PARCEL_TAX_AUTHORITY_SNAPSHOTS),
+    now,
+  }).records;
+}
+
+
+export function governedCountyRecorderDeedRecords(now = new Date()): CountyRecorderDeedRecord[] {
+  return resolveOfficialEvidenceSource({
+    activation: OFFICIAL_EVIDENCE_SOURCE_ACTIVATION["county-recorder-deed"],
+    snapshots: verifiedSnapshotsForRead("county-recorder-deed", readOfficialEvidenceRefreshState<CountyRecorderDeedRecord>("county-recorder-deed")?.snapshots ?? COUNTY_RECORDER_DEED_SNAPSHOTS),
     now,
   }).records;
 }
@@ -107,6 +137,36 @@ export function wellPermitEvidenceRecords(property: CanonicalProperty, records =
   }));
 }
 
+
+export function countyRecorderDeedEvidenceRecords(property: CanonicalProperty, records = governedCountyRecorderDeedRecords()): OfficialPropertyEvidenceRecord[] {
+  const ids = parcelIds(property);
+  return records.filter((row) => ids.has(row.parcelId)).map((row) => ({
+    recordId: `deed:${row.parcelId}:${row.instrumentNumber}`,
+    domain: "title",
+    status: row.allAssociatedParcelsConveyed === false ? "parcel-mismatch-review-required" : "recorded-deed-located",
+    sourceId: "county-recorder-deed",
+    sourceName: "County recorder deed index",
+    authority: row.authority,
+    jurisdiction: row.jurisdiction,
+    reference: row.bookPage ? `Instrument ${row.instrumentNumber} · ${row.bookPage}` : `Instrument ${row.instrumentNumber}`,
+    retrievedAt: row.retrievedAt,
+    asOf: row.asOf,
+    effectiveDate: row.recordingDate,
+    replayRef: row.replayRef,
+    canonicalPropertyId: property.canonical_property_id,
+    parcelMatchMethod: "parcel-id",
+    parcelMatchConfidence: row.allAssociatedParcelsConveyed === false ? "review-required" : "exact",
+    notes: [
+      `Recording date: ${row.recordingDate}.`,
+      row.parcelCount ? `Recorded instrument references ${row.parcelCount} parcel${row.parcelCount === 1 ? "" : "s"}.` : "Parcel count not published in the recorder index.",
+      row.allAssociatedParcelsConveyed === true ? "All associated parcel references matched the recorded instrument." : row.allAssociatedParcelsConveyed === false ? "The recorded instrument does not yet reconcile to every associated parcel." : "Associated-parcel conveyance still requires reconciliation.",
+      row.waterfrontLanguage ? "Recorded legal description contains waterfront or shoreline language." : "No waterfront conclusion drawn from the recorder index alone.",
+      row.pierOrRiparianLanguage ? "Recorded instrument contains pier, riparian-rights, or related access language requiring title review." : "No pier or riparian-rights language was detected in the indexed record.",
+      ...(row.documentRef ? [`Restricted deed document reference: ${row.documentRef}`] : []),
+    ],
+  }));
+}
+
 export function officialPropertyEvidenceRecords(property: CanonicalProperty): OfficialPropertyEvidenceRecord[] {
-  return [...parcelTaxEvidenceRecords(property), ...wellPermitEvidenceRecords(property)];
+  return [...parcelTaxEvidenceRecords(property), ...countyRecorderDeedEvidenceRecords(property), ...wellPermitEvidenceRecords(property)];
 }

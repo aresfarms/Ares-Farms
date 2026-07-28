@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.4.1",
+  "frameworkVersion": "master-volume-conformance-v0.5.1",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -186,7 +186,7 @@
     },
     "PUBLIC-SURFACE-001": {
       "title": "Public surfaces as governed translation layers",
-      "status": "awaiting_controlled_promotion",
+      "status": "implemented",
       "requires": [
         "public_gateway",
         "dto_filtering",
@@ -196,12 +196,15 @@
       "tests": [
         "smoke:public-surfaces",
         "smoke:claims-public",
-        "smoke:redaction"
+        "smoke:redaction",
+        "verify:controlled-public-surface-promotion"
       ],
       "evidence": [
         "src/app/api/public/surfaces/route.ts",
         "src/lib/dto/public/index.ts",
-        "src/scripts/redactionSmokeTest.ts"
+        "src/scripts/redactionSmokeTest.ts",
+        "src/lib/source-stack/publicSourceIntelligenceApi.ts",
+        "src/scripts/verifyControlledPublicSurfacePromotion.ts"
       ]
     },
     "CROSS-MODULE-001": {
@@ -940,7 +943,7 @@
     },
     "SURFACE-GOV-001": {
       "title": "Public Surface Gateway and public-safe source DTO governance",
-      "status": "awaiting_controlled_promotion",
+      "status": "implemented",
       "requires": [
         "public_gateway",
         "public_source_aliases",
@@ -951,13 +954,16 @@
       "tests": [
         "smoke:public-surfaces",
         "smoke:claims-public",
-        "smoke:redaction"
+        "smoke:redaction",
+        "verify:controlled-public-surface-promotion"
       ],
       "evidence": [
         "src/app/api/public/surfaces/route.ts",
         "src/app/api/public/grants/route.ts",
         "src/lib/dto/publicSourceIntelligence.ts",
-        "src/scripts/publicSurfaceSmokeTest.ts"
+        "src/scripts/publicSurfaceSmokeTest.ts",
+        "src/lib/source-stack/publicSourceIntelligenceApi.ts",
+        "src/scripts/verifyControlledPublicSurfacePromotion.ts"
       ]
     },
     "CONFORMANCE-001": {
@@ -1359,6 +1365,409 @@
         "src/lib/governance/institutionalAccessRuntimeEnforcement.ts",
         "src/app/audit-replay/governed-evidence/page.tsx",
         "src/scripts/verifyInstitutionalAccessRuntimeEnforcement.ts"
+      ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-ORCHESTRATION-001": {
+      "title": "Continuous institutional grant surveillance orchestration",
+      "status": "implemented",
+      "requires": [
+        "scheduled_surveillance_runner",
+        "request_observation_replay",
+        "automatic_grant_revocation",
+        "protected_internal_route"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-orchestration"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceOrchestrator.ts",
+        "src/app/api/internal/institutional-access-surveillance/route.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceOrchestration.ts"
+      ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-ACTIVATION-001": {
+      "title": "Dual-control activation ceremony for scheduled institutional surveillance",
+      "status": "implemented",
+      "requires": [
+        "dedicated_scheduler_identity",
+        "bounded_cadence",
+        "configured_route_authentication",
+        "clean_canary",
+        "dual_control",
+        "rollback_and_alert_ownership",
+        "no_scheduler_mutation"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-activation-ceremony",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceActivationCeremony.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceActivationCeremony.ts",
+        "docs/BUILD_PHASE_ROADMAP.md"
+      ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-CANARY-001": {
+      "title": "Non-mutating institutional surveillance canary and scheduler release packet",
+      "status": "implemented",
+      "requires": [
+        "dry_run_canary",
+        "deterministic_plan_snapshot",
+        "zero_canary_mutations",
+        "dual_control_release",
+        "scheduler_enablement_separate"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-canary-release"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceCanaryRelease.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceCanaryRelease.ts"
+      ]
+    },
+    "OPS-INSTITUTIONAL-SURVEILLANCE-PROVISIONING-001": {
+      "title": "Fail-closed paused scheduler provisioning contract for institutional surveillance",
+      "status": "implemented",
+      "requires": [
+        "release_packet_binding",
+        "canonical_scheduler_target",
+        "bounded_retry_policy",
+        "paused_initial_state",
+        "no_plaintext_credentials",
+        "post_create_zero_execution_attestation"
+      ],
+      "tests": [
+        "verify:institutional-access-surveillance-scheduler-provisioning"
+      ],
+      "evidence": [
+        "src/lib/governance/institutionalAccessSurveillanceSchedulerProvisioning.ts",
+        "src/scripts/verifyInstitutionalAccessSurveillanceSchedulerProvisioning.ts"
+      ]
+    },
+    "FIN-GOVERNED-ULTIMATE-PROFORMA-001": {
+      "title": "Governed evidence-bound Ultimate Pro Forma preparation",
+      "status": "implemented",
+      "requires": [
+        "deterministic_financial_recomputation",
+        "material_claim_evidence_manifest",
+        "current_official_program_authority",
+        "full_sensitive_identifier_exclusion",
+        "lane_specific_generation_gate",
+        "authenticated_application_scoped_route",
+        "canonical_report_record",
+        "human_review_required",
+        "no_official_or_external_reliance"
+      ],
+      "tests": [
+        "verify:governed-ultimate-proforma",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/governedUltimateProforma.ts",
+        "src/lib/pdf/ultimateProformaTemplate.ts",
+        "src/lib/pdf/generateLoanProformaPdf.ts",
+        "src/app/api/reports/ultimate-proforma-pdf/route.ts",
+        "src/scripts/verifyGovernedUltimateProforma.ts"
+      ]
+    },
+    "SRC-FEDERAL-LOAN-AUTHORITY-MONITOR-001": {
+      "title": "Continuous official-source monitoring for SBA, FSA, and USDA loan authority",
+      "status": "implemented",
+      "requires": [
+        "official_domain_allowlist",
+        "bounded_program_and_authority_discovery",
+        "forms_handbooks_notices_rates_and_regulations",
+        "immutable_content_hash_snapshots",
+        "change_receipts",
+        "last_good_retention",
+        "changed_guidance_review_stale",
+        "exact_reviewed_hash_binding",
+        "daily_source_refresh_integration",
+        "proforma_runtime_enforcement"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-monitor",
+        "verify:governed-ultimate-proforma",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityMonitor.ts",
+        "src/scripts/verifyFederalLoanAuthorityMonitor.ts",
+        "src/lib/property/sourceRefresh.ts",
+        "src/app/api/reports/ultimate-proforma-pdf/route.ts"
+      ]
+    },
+    "FIN-FEDERAL-LOAN-AUTHORITY-AUTO-RECONCILIATION-001": {
+      "title": "Automatic pro forma reconciliation against current federal loan authority",
+      "status": "implemented",
+      "requires": [
+        "deterministic_fact_extraction",
+        "automatic_form_version_updates",
+        "automatic_effective_date_updates",
+        "automatic_rate_fee_threshold_updates",
+        "automatic_requirement_label_updates",
+        "exact_current_source_hash_rebinding",
+        "current_authority_overlay_in_pdf",
+        "material_change_review_hold",
+        "conflict_and_unparsed_change_review_hold",
+        "no_silent_legal_interpretation"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-reconciliation",
+        "verify:federal-loan-authority-monitor",
+        "verify:governed-ultimate-proforma",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityReconciliation.ts",
+        "src/scripts/verifyFederalLoanAuthorityReconciliation.ts",
+        "src/app/api/reports/ultimate-proforma-pdf/route.ts",
+        "src/lib/pdf/ultimateProformaTemplate.ts"
+      ]
+    },
+    "OPS-FEDERAL-LOAN-AUTHORITY-REFRESH-RELIABILITY-001": {
+      "title": "Bounded and survivable federal loan authority refresh execution",
+      "status": "implemented",
+      "requires": [
+        "bounded_concurrency",
+        "per_source_deadline",
+        "whole_run_deadline",
+        "required_seed_priority",
+        "partial_success_receipts",
+        "explicit_timeout_state",
+        "last_good_retention",
+        "deferred_source_accounting",
+        "timeout_blocks_current_reliance",
+        "daily_job_completion"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-refresh-reliability",
+        "verify:federal-loan-authority-monitor",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityMonitor.ts",
+        "src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
+        "src/lib/property/sourceRefresh.ts"
+      ]
+    },
+    "SRC-FEDERAL-LOAN-AUTHORITY-CHANGE-TRIAGE-001": {
+      "title": "Semantic triage of official federal loan authority changes",
+      "status": "implemented",
+      "requires": [
+        "stable_authority_fingerprint",
+        "cosmetic_change_auto_clear_receipt",
+        "informational_change_isolation",
+        "lending_change_review_hold",
+        "legally_material_change_elevation",
+        "missing_prior_semantic_baseline_fail_closed",
+        "exact_semantic_hash_lineage"
+      ],
+      "tests": [
+        "verify:federal-loan-authority-change-triage",
+        "verify:federal-loan-authority-monitor",
+        "verify:official-evidence-roadmap",
+        "verify:cloud-build-release-rule"
+      ],
+      "evidence": [
+        "src/lib/governance/federalLoanAuthorityChangeTriage.ts",
+        "src/lib/governance/federalLoanAuthorityMonitor.ts",
+        "src/scripts/verifyFederalLoanAuthorityChangeTriage.ts"
+      ]
+    },
+    "TECH-PRODUCTION-PROMOTION-READINESS-001": {
+      "title": "Production promotion readiness and perimeter hardening",
+      "status": "implemented",
+      "requires": [
+        "canonical_https_urls",
+        "identity_perimeter",
+        "secret_reference_bindings",
+        "api_auth_enforcement",
+        "rate_limiting",
+        "credential_allowlist",
+        "governed_role_provisioning",
+        "human_promotion_authority_separation"
+      ],
+      "tests": [
+        "verify:production-promotion-readiness",
+        "backend:production-readiness:production",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/productionPromotionReadiness.ts",
+        "src/scripts/verifyProductionPromotionReadiness.ts",
+        "docs/MASTER_VOLUME_BUILD_PROTOCOL.md"
+      ]
+    },
+    "PROMOTION-DECISION-001": {
+      "title": "Final production promotion decision packet",
+      "status": "implemented",
+      "requires": [
+        "exact_image_binding",
+        "allowlist_hash",
+        "distinct_human_approvals",
+        "bounded_activation_window",
+        "rollback_owner"
+      ],
+      "tests": [
+        "verify:final-production-promotion-decision",
+        "verify:official-evidence-roadmap",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/finalProductionPromotionDecisionPacket.ts",
+        "src/scripts/verifyFinalProductionPromotionDecisionPacket.ts"
+      ]
+    },
+    "CHANGE-VERIFICATION-001": {
+      "title": "Cross-functional internal change verification and plain-language assurance",
+      "status": "implemented",
+      "requires": [
+        "frozen_plain_language_request",
+        "machine_generated_change_evidence",
+        "domain_specific_checklist_overlay",
+        "owner_attestation",
+        "two_outside_group_approvals",
+        "signature_invalidation_on_change",
+        "post_release_regression_checks"
+      ],
+      "tests": [
+        "verify:internal-change-verification",
+        "verify:official-evidence-roadmap",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/internalChangeVerification.ts",
+        "src/scripts/verifyInternalChangeVerification.ts"
+      ]
+    },
+    "GOV-THREE-FOUNDER-RELEASE-AUTHORITY-001": {
+      "title": "Three-founder cross-functional release authority",
+      "status": "implemented",
+      "requires": [
+        "three_founder_initial_launch",
+        "owner_exclusion",
+        "cross_functional_approval",
+        "unilateral_stop_authority"
+      ],
+      "tests": [
+        "verify:three-founder-release-authority",
+        "verify:final-production-promotion-decision",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/threeFounderReleaseAuthority.ts",
+        "src/lib/governance/finalProductionPromotionDecisionPacket.ts",
+        "src/scripts/verifyThreeFounderReleaseAuthority.ts"
+      ]
+    },
+    "OPS-FOUNDER-CHANGE-REVIEW-WORKSPACE-001": {
+      "title": "Founder change review workspace",
+      "status": "implemented",
+      "requires": [
+        "immutable_change_events",
+        "founder_identity_binding",
+        "plain_language_review_surface",
+        "outside_group_approval"
+      ],
+      "tests": [
+        "verify:founder-change-review-workspace",
+        "verify:internal-change-verification",
+        "verify:three-founder-release-authority"
+      ],
+      "evidence": [
+        "src/lib/governance/founderChangeReviewStore.ts",
+        "src/app/api/governance/founder-change-review/route.ts",
+        "src/app/governance/founder-change-review/page.tsx"
+      ]
+    },
+    "OPS-TWO-FOUNDER-INTERNAL-PILOT-001": {
+      "title": "Two-founder controlled internal pilot gate",
+      "status": "implemented",
+      "requires": [
+        "caitlin_owner_attestation",
+        "stuart_pilot_acceptance",
+        "testing_only_boundary",
+        "francis_deferred_until_final_launch"
+      ],
+      "tests": [
+        "verify:founder-pilot-test-gate",
+        "verify:founder-change-review-workspace",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/governance/founderPilotTestGate.ts",
+        "src/lib/governance/founderChangeReviewStore.ts",
+        "src/scripts/verifyFounderPilotTestGate.ts"
+      ]
+    },
+    "UX-CUSTOMER-PROPERTY-EXPERIENCE-001": {
+      "title": "Customer property experience reconstruction across all property profiles",
+      "status": "implemented",
+      "requires": [
+        "automatic_property_classification",
+        "parcel_evidence_preservation",
+        "customer_safe_source_status",
+        "unsupported_ranking_suppression",
+        "internal_governance_hidden"
+      ],
+      "tests": [
+        "verify:property-profile-classification",
+        "verify:customer-property-experience",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/lib/property/propertyProfile.ts",
+        "src/components/property/PropertyEvaluationWorkspace.tsx",
+        "src/scripts/verifyCustomerPropertyExperience.ts",
+        "src/scripts/verifyPropertyProfileClassification.ts"
+      ]
+    },
+    "CONFORMANCE-INTEGRATED-PRE-PROMOTION-001": {
+      "title": "Integrated pre-promotion verification for all newly added features",
+      "status": "implemented",
+      "requires": [
+        "cross_feature_regression_suite",
+        "fail_closed_promotion",
+        "customer_experience_regression",
+        "founder_governance_regression",
+        "rollback_preservation"
+      ],
+      "tests": [
+        "verify:integrated-pre-promotion-features",
+        "verify:official-evidence-roadmap",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/scripts/verifyIntegratedPrePromotionFeatureSuite.ts",
+        "cloudbuild.yaml"
+      ]
+    },
+    "UX-THREE-LANE-COMMAND-CENTER-001": {
+      "title": "Three-lane progressive-disclosure consumer command center",
+      "status": "implemented",
+      "requires": [
+        "shared_residential_farm_commercial_shell",
+        "automatic_property_classification",
+        "progressive_disclosure",
+        "grouped_diligence",
+        "customer_readiness_isolation"
+      ],
+      "tests": [
+        "verify:three-lane-consumer-command-center",
+        "verify:customer-property-experience",
+        "verify:integrated-pre-promotion-features",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "src/components/property/PropertyCommandCenter.tsx",
+        "src/components/property/PropertyEvaluationWorkspace.tsx",
+        "src/scripts/verifyThreeLaneConsumerCommandCenter.ts"
       ]
     }
   }

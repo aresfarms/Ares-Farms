@@ -11,11 +11,9 @@ import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery"
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
-import { ChartTableBrief, type SimilarHomeLine } from "@/components/property/ChartTableBrief";
+import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
+import { PropertyCommandCenter } from "@/components/property/PropertyCommandCenter";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
-import { PropertyResultCard } from "@/components/property/PropertyResultCard";
-import { PropertyBestCoursePanel } from "@/components/property/PropertyBestCoursePanel";
-import { PropertyEvidencePanel } from "@/components/property/PropertyEvidencePanel";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
 import { buildMarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
@@ -32,11 +30,12 @@ import { buildRecommendationReleaseRecord, type RecommendationReleaseRecord } fr
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
 import { buildRecommendationReleaseHistory, type RecommendationReleaseAuditEntry, type RecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
+import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
-import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
+import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
 import type { ExtendedPropertyRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 import {
@@ -116,7 +115,38 @@ type PropertyFactsResponse = {
     exactAddress: string | null;
     zip: string | null;
     rawPropertyStyle: string | null;
+    propertyType?: string | null;
+    price?: number | null;
+    county?: string | null;
+    town?: string | null;
+    state?: string | null;
+    parcelRefs?: string[];
+    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
+    parcelSourceName?: string | null;
+    parcelSourceAsOf?: string | null;
+    parcelSourceUrl?: string | null;
+    landUse?: string | null;
+    zoning?: string | null;
+    deedReference?: string | null;
+    legalDescription?: string | null;
+    assessedLandValue?: number | null;
+    assessedImprovementValue?: number | null;
+    assessedTotalValue?: number | null;
+    publicWater?: boolean | null;
+    publicSewer?: boolean | null;
+    waterfront?: boolean | null;
+    resolvedParcelCount?: number;
+    offeredParcelCount?: number | null;
+    offeredAcreage?: number | null;
+    listingSourceName?: string | null;
+    listingSourceAsOf?: string | null;
+    listingSourceUrl?: string | null;
+    listingAgent?: string | null;
+    listingBrokerage?: string | null;
+    listingPhone?: string | null;
+    listingEmail?: string | null;
     bedrooms: number | null;
+    bathrooms?: number | null;
     yearBuilt: number | null;
     squareFeet: number | null;
     acreageText: string | null;
@@ -664,9 +694,9 @@ function deriveAssetClassFromContext(context: PropertyContext): AssetClass {
 }
 
 function isResidentialHomeContext(context: PropertyContext): boolean {
-  return /(home|house|residential|single family|condo|duplex)/i.test(
-    [context.propertyType, context.categoryLabel ?? "", context.description ?? "", context.title].join(" ")
-  );
+  const text = [context.propertyType, context.categoryLabel ?? "", context.description ?? "", context.title].join(" ");
+  if (/(farm|ranch|agric|crop|pasture|livestock|orchard|vineyard|poultry|dairy|tillable|irrigat|acre)/i.test(text)) return false;
+  return /(home|house|residential|single family|condo|duplex)/i.test(text);
 }
 
 function buildBudgetExpectations(context: PropertyContext): BudgetExpectations {
@@ -1958,6 +1988,7 @@ export function PropertyEvaluationWorkspace({
   const [profileOverride, setProfileOverride] = useState<PropertyProfileId | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
+  const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "print" | "view" | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
@@ -1995,7 +2026,6 @@ export function PropertyEvaluationWorkspace({
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
   // visibly open reads as broken). The summary card still leads; the complete
   // chart renders right below it — collapsible, but open by default.
-  const [chartOpen, setChartOpen] = useState(true);
   const [answers, setAnswers] = useState<DraftAnswers>({
     reportTier: "free",
     possibility: "",
@@ -2122,6 +2152,9 @@ export function PropertyEvaluationWorkspace({
             exactAddress: context.exactAddress,
             location: context.location,
             stateCode: context.stateCode,
+            town: context.town,
+            county: context.county,
+            startingLens,
             // The visitor's "what is this property?" declaration — the server
             // rebuilds the whole Place Brief in that shape (farm lanes for a
             // farm, never home-mortgage copy on a working farm).
@@ -2144,7 +2177,7 @@ export function PropertyEvaluationWorkspace({
       clearTimeout(timeout);
       controller.abort();
     };
-  }, [context.propertyId, profileOverride]);
+  }, [context.propertyId, context.exactAddress, context.location, context.stateCode, context.town, context.county, profileOverride, startingLens]);
 
   async function submitSpecialBuildingReview() {
     setManualReviewBusy(true);
@@ -2549,19 +2582,58 @@ export function PropertyEvaluationWorkspace({
   // typed addresses get it back from the property-facts API (geocode-derived).
   // For imported ids the API brief is authoritative — a property-keyed server
   // brief can only be empty/negative for an address with no canonical record.
-  const effectivePlaceIntelligence = context.propertyId?.startsWith("imported:")
+  const basePlaceIntelligence = context.propertyId?.startsWith("imported:")
     ? facts?.placeIntelligence ?? placeIntelligence ?? null
     : placeIntelligence ?? facts?.placeIntelligence ?? null;
+  // Acreage is a foundational property fact for every lane, not merely a farm
+  // classifier input. The property-facts API already carries acreageText; promote
+  // it into the customer-visible evidence whenever the source brief omitted it.
+  const effectivePlaceIntelligence = (() => {
+    if (!basePlaceIntelligence || !facts?.propertyRecord?.acreageText) return basePlaceIntelligence;
+    const alreadyVisible = basePlaceIntelligence.verifiedFacts.some((fact) =>
+      /size|acreage|land area|parcel and conveyance profile/i.test(fact.label)
+    );
+    if (alreadyVisible) return basePlaceIntelligence;
+    return {
+      ...basePlaceIntelligence,
+      verifiedFacts: [
+        {
+          label: "Land area",
+          value: facts.propertyRecord.acreageText,
+          text: `The matched property record reports ${facts.propertyRecord.acreageText} of land. Acreage affects value, usable layout, setbacks, operating capacity, and the financial model regardless of whether the property is residential, agricultural, or commercial.`,
+          provenance: "Source: matched canonical property record; county parcel geometry and recorded plat remain controlling",
+          tone: "neutral" as const,
+        },
+        ...basePlaceIntelligence.verifiedFacts,
+      ],
+    };
+  })();
   // Canonical property profile (axis 1) — the brief's server classification
   // wins; fall back to classifying the context type for older API payloads.
   // The VISITOR'S declaration wins over any machine classification — the
   // owner knows it's a working farm; the classifier can only read type text.
+  const importedProperty = context.propertyId?.startsWith("imported:") === true;
+  const genericImportedType = /^(?:place|property|imported|unknown|not specified|place-led property)$/i.test((analysisContext.propertyType ?? "").trim());
+  const automaticTypeEvidenceAvailable = !importedProperty || Boolean(
+    facts?.propertyRecord?.rawPropertyStyle ||
+    facts?.propertyRecord?.acreageText ||
+    (analysisContext.propertyType && !genericImportedType)
+  );
+  const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null;
+  const explicitImportedProfile = importedProperty && analysisContext.propertyType && !genericImportedType
+    ? classifyPropertyProfile({
+        propertyType: analysisContext.propertyType,
+        description: analysisContext.description ?? null,
+        acreageText: facts?.propertyRecord?.acreageText ?? null,
+      })
+    : null;
   const workspaceProfile = profileOverride
     ? profileById(profileOverride)
-    : effectivePlaceIntelligence?.profile ??
+    : explicitImportedProfile ?? effectivePlaceIntelligence?.profile ??
       classifyPropertyProfile({
         propertyType: analysisContext.propertyType,
         description: analysisContext.description ?? null,
+        acreageText: facts?.propertyRecord?.acreageText ?? null,
       });
   const answerCard = buildAnswerCard({
     context: analysisContext,
@@ -2757,6 +2829,7 @@ export function PropertyEvaluationWorkspace({
             branding: report.branding,
             tier: report.tier,
             context: {
+              propertyId: context.propertyId ?? null,
               title: analysisContext.title,
               location: analysisContext.location,
               exactAddress: analysisContext.exactAddress,
@@ -2786,25 +2859,58 @@ export function PropertyEvaluationWorkspace({
             buyingProcess: report.buyingProcess,
             honestUnknowns: report.honestUnknowns,
             financingProse: report.financingProse,
-            placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? []).map((fact) => ({
-              label: fact.label,
-              value: fact.value,
-              source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
-            })),
+            placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? [])
+              .filter((fact) => workspaceProfile.id !== "farm" || !/school|education|college|university|broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
+              .map((fact) => ({
+                label: fact.label,
+                value: fact.value,
+                source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
+              })),
             diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
             ownershipCosts:
-              listedPrice != null &&
+              effectiveListedPrice != null &&
               ownershipContext &&
               chartVariant !== "finance" &&
-              profileUsesResidentialLanes(workspaceProfile.id)
+              profileUsesResidentialLanes(workspaceProfile.id) &&
+              workspaceProfile.id !== "farm"
                 ? formatOwnershipCostsForPdf({
-                    listedPrice,
+                    listedPrice: effectiveListedPrice,
                     ownershipContext,
                     isHome: isResidentialHomeContext(analysisContext),
-                    farmShaped: workspaceProfile.id === "farm",
-                    farmMode: workspaceProfile.id === "farm",
+                    farmShaped: false,
+                    farmMode: false,
                   })
                 : undefined,
+            agriculturalProForma: (() => {
+              if (workspaceProfile.id !== "farm" || effectiveListedPrice == null || !ownershipContext) return undefined;
+              const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
+              if (!acreage) return undefined;
+              const rate = ownershipContext.fsa?.ownershipDirectPct ?? ownershipContext.rates.rate30;
+              const annualDebtService = effectiveListedPrice * 0.8 * (rate / 100) / (1 - Math.pow(1 + rate / 100, -40));
+              const model = optimizeAgriculturalOpportunities({ acres: acreage, purchasePrice: effectiveListedPrice, debtService: annualDebtService, waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
+              const dollars = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
+              return {
+                scopeLine: `${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres screened at ${dollars(effectiveListedPrice)} across agricultural, livestock, specialty-crop, controlled-environment, renewable-energy, storage, leasing, and diversified-use candidates. Rankings are assumptions until site and operator evidence is attached.`,
+                acreageRows: model.ranked.slice(0, 8).map((item, index) => ({ label: `${index + 1}. ${item.label}`, value: `${item.fit.toFixed(0)}/100 fit · ${item.usedAcres.toFixed(1)} acres modeled · ${item.eligible ? dollars(item.noi) + " annual NOI" : "blocked pending feasibility evidence"}` })),
+                operatingRows: model.diversified.length ? model.diversified.map((item) => ({ label: `${Math.round(item.portfolioShare * 100)}% ${item.label}`, value: `${dollars(item.noi * item.portfolioShare)} weighted annual NOI` })) : [{ label: "Diversified portfolio", value: "No feasible portfolio until constraints are resolved" }],
+                debtRows: [
+                  { label: "Illustrative annual debt service", value: dollars(annualDebtService) },
+                  { label: "Highest-ranked diversified NOI", value: dollars(model.portfolioNoi) },
+                  { label: "Diversified DSCR", value: `${model.portfolioDscr?.toFixed(2) ?? "—"}x against a 1.25x screening threshold` },
+                  { label: "Energy-use treatment", value: "Solar, agrivoltaics, and battery storage receive no credited revenue until zoning and grid/interconnection evidence is present." },
+                ],
+                assumptions: [model.warning, "Opportunity economics are editable screening assumptions, not appraisals, bids, contracts, or eligibility findings.", "The selected best use can be singular or diversified; the optimizer does not privilege commodity crops."],
+                readiness: [
+                  "NRCS soils, capability classes, drainage, wetlands, and productive-acre delineation",
+                  "FSA acreage/base history, APH, conservation obligations, and crop-insurance records",
+                  "Water supply, irrigation capacity, nutrient-management and waste-handling constraints",
+                  "Labor, operator skill, equipment, buildings, working capital, and market/offtake capacity",
+                  "Zoning and permits for livestock, poultry, greenhouse, agritourism, solar, agrivoltaics, or battery storage",
+                  "Utility territory, substation distance, hosting capacity, interconnection queue, and offtake terms",
+                  "Enterprise-specific budgets, contracts, price scenarios, and downside sensitivities",
+                ],
+              };
+            })(),
             compensationTransparency: buildRealEstateCompensationTransparency({
               ...emptyRealEstateCompensationInput(),
               jurisdiction: analysisContext.location || null,
@@ -2981,12 +3087,44 @@ export function PropertyEvaluationWorkspace({
           : "On the source listing — changes as bid periods reset",
     },
   ];
-  const topProgramPreview = topProgramRanks.slice(0, 2).map(
+  const verifiedProgramPreview = topProgramRanks.slice(0, 4).map(
     (entry, index) => `${index + 1}. ${entry.program.name}`
   );
+  const preliminaryPropertyPathways = workspaceProfile.id === "residential"
+    ? [
+        "FHA purchase financing",
+        "FHA 203(k) renovation financing",
+        "VA purchase or renovation financing — borrower eligibility required",
+        "Conventional purchase or renovation financing",
+        "Construction-to-permanent financing — if rehabilitation is impractical",
+        "Seller financing — seller carries a negotiated note",
+        "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
+      ]
+    : workspaceProfile.id === "farm"
+      ? [
+          "USDA FSA farm ownership financing",
+          "USDA Rural Development housing financing — if owner-occupied residential use fits",
+          "Farm Credit or agricultural real-estate financing",
+          "Conventional farm or mixed-use financing",
+          "Seller financing — seller carries a negotiated note on land, improvements, or included assets",
+          "Private agricultural or asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
+        ]
+      : [
+          "Conventional bank or credit-union commercial real-estate financing",
+          "SBA 504 financing — owner-occupied fixed assets and eligible improvements",
+          "SBA 7(a) financing — real estate, business acquisition, working capital, and equipment when eligible",
+          "USDA Business & Industry financing — rural eligible business-purpose projects",
+          "Commercial bridge or value-add financing — acquisition plus renovation or lease-up",
+          "Seller financing — seller carries a negotiated note on real estate, business value, or included assets",
+          "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
+          "Equipment financing — when machinery, fixtures, or other eligible fixed assets convey",
+        ];
+  // Property-type compatibility controls this public list. Borrower-ranked
+  // results may refine order later, but must never replace the correct lane.
+  const topProgramPreview = preliminaryPropertyPathways;
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
-    listedPrice: listedPrice ?? parsePriceSignal(analysisContext.priceLabel),
+    listedPrice: effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel),
     requestedAmount: parsePriceSignal(answers.requestedAmount),
     pathwayNames: topProgramRanks.map((entry) => entry.program.name),
   });
@@ -2997,7 +3135,7 @@ export function PropertyEvaluationWorkspace({
     profileId: workspaceProfile.id,
     comparables: similarHomes,
   });
-  const rankingPrice = listedPrice ?? parsePriceSignal(analysisContext.priceLabel);
+  const rankingPrice = effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel);
   const officialTaxRecord = structuredTaxRecord(facts?.propertyEvidenceRecords ?? []);
   const rankingTax = ownershipContext && rankingPrice
     ? buildPostSaleTaxScenario({
@@ -3022,6 +3160,7 @@ export function PropertyEvaluationWorkspace({
   const propertyEvidenceManifest = rankingTax
     ? buildPropertyEvidenceManifest({ tax: rankingTax, evidence: reportRiskEvidence })
     : null;
+  void propertyEvidenceManifest;
   const propertyInfrastructureRisk = buildInfrastructureRiskFromEvidence(reportRiskEvidence);
   const scenarioRankingPlan = buildScenarioRankingPlan({
     profileId: workspaceProfile.id,
@@ -3228,83 +3367,6 @@ export function PropertyEvaluationWorkspace({
   };
 
 
-  // ── Result card content (free tier default view, ≤10 numbered bullets) ────
-  const cardGreenFlags = (effectivePlaceIntelligence?.verifiedFacts ?? [])
-    .filter((fact) => fact.tone === "positive")
-    .slice(0, 4)
-    .map((fact) => ({ label: fact.label, value: fact.value }));
-  const cardWatchFlags = [
-    ...(effectivePlaceIntelligence?.verifiedFacts ?? [])
-      .filter((fact) => fact.tone === "caution")
-      .map((fact) => ({ label: fact.label, value: fact.value })),
-    ...(effectivePlaceIntelligence?.unknowns ?? []).map((unknown) => ({
-      label: unknown.label,
-      value: `${unknown.pointer} answers it`,
-    })),
-  ].slice(0, 4);
-  const cardModel =
-    ownershipContext && listedPrice != null && profileUsesResidentialLanes(workspaceProfile.id)
-      ? buildOwnershipCostModel(
-          {
-            price: listedPrice,
-            priceIsAssumption: false,
-            isHome: isResidentialHomeContext(analysisContext),
-            farmShaped: workspaceProfile.id === "farm",
-                    farmMode: workspaceProfile.id === "farm",
-          },
-          ownershipContext
-        )
-      : null;
-  const cardNumbersLine = cardModel
-    ? `All-in monthly on ${cardModel.monthlyTotals[0].program}: $${cardModel.monthlyTotals[0].low.toLocaleString("en-US")}–$${cardModel.monthlyTotals[0].high.toLocaleString("en-US")} · typically works from ≈$${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr household income · year 1 all-in $${cardModel.horizon.year1.low.toLocaleString("en-US")}–$${cardModel.horizon.year1.high.toLocaleString("en-US")}, then $${cardModel.horizon.years2to5.low.toLocaleString("en-US")}–$${cardModel.horizon.years2to5.high.toLocaleString("en-US")} across years 2–5. Illustrative guidance at the current Freddie Mac average rate — never a quote or approval.`
-    : /price on request/i.test(analysisContext.priceLabel ?? "")
-      ? "No published price on this listing — open the full chart and enter the price you would offer; the complete cost and income picture fills in on this page only."
-      : null;
-  const cardOverallRead = [
-    report.verdict.explanation,
-    answerCard.fitLine ? `Fits if you want: ${answerCard.fitLine}.` : null,
-    `Pause if you need: ${answerCard.pauseLine}.`,
-  ]
-    .filter(Boolean)
-    .join(" ");
-  // The case, honestly (founder direction 2026-07-17: the report should say
-  // WHY someone might buy or walk — argued from verified facts, never a
-  // verdict; good-buy-or-pass turns on price and condition, which stay
-  // the reader's to establish).
-  const cardPriceContext =
-    ownershipContext && listedPrice != null ? buildPriceContext(listedPrice, ownershipContext) : null;
-  const caseForBits = [
-    ...cardGreenFlags.slice(0, 3).map((flag) => `${flag.label.toLowerCase()} — ${flag.value}`),
-    cardPriceContext && cardPriceContext.ratio <= 1.0
-      ? `priced at about ${Math.round(cardPriceContext.ratio * 100)}% of the county's typical home value`
-      : null,
-    ownershipContext?.taxContext && ownershipContext.taxContext.effectiveRatePct < 1.0
-      ? `county property taxes run light (~${ownershipContext.taxContext.effectiveRatePct}% of value per year)`
-      : null,
-    (analysisContext.sourceId ?? "") === "hud" && workspaceProfile.id === "residential"
-      ? "as a live-in buyer you bid in the HUD owner-occupant window, before any investor is allowed"
-      : null,
-  ].filter((bit): bit is string => Boolean(bit));
-  const caseAgainstBits = [
-    "condition is unknown until an inspection — this is an as-is sale",
-    ...cardWatchFlags
-      .filter((flag) => !/condition/i.test(flag.label))
-      .slice(0, 2)
-      .map((flag) => `${flag.label.toLowerCase()} still needs an answer (${flag.value.replace(/ answers it$/, "")})`),
-    cardModel
-      ? `carrying it comfortably typically takes household income around $${cardModel.purchase.scenarios[0].incomeGuidance.comfortableAnnual.toLocaleString("en-US")}/yr`
-      : null,
-    cardPriceContext && cardPriceContext.ratio > 1.15
-      ? `priced above the county's typical home value — the appraisal will test it`
-      : null,
-  ].filter((bit): bit is string => Boolean(bit));
-  const cardCaseFor = caseForBits.length > 0 ? `The case for: ${caseForBits.join("; ")}.` : null;
-  const cardCaseAgainst = `The case against — or still open: ${caseAgainstBits.join("; ")}.`;
-  const cardDecisionLine =
-    "Good buy or pass? That turns on the two things nobody can verify from a distance — the negotiated price and what the inspection finds. This chart arms that decision; it never makes it. If this one doesn't fit, the nearby alternatives on the chart are the honest next look, and any listing from anywhere can be pasted in for the same treatment.";
-  const cardTierLine =
-    "The full chart below is free and complete. Paid tiers add the why — lender-ready packaging, county records pulls, and your personalized file.";
-
   const chartActionsSlot = (
     <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
@@ -3313,12 +3375,14 @@ export function PropertyEvaluationWorkspace({
             See the current price on the official listing ↗
           </Link>
         )}
-        {/* Streamlined to three distinct actions (founder direction
-            2026-07-17): one PDF button (view/download/print were three routes
-            to the same watermarked PDF), the zero-PII device draft, and the
-            governed Furlong account path. */}
-        <button type="button" onClick={exportDraft} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-          {pdfBusy !== null ? "Preparing PDF..." : "Download the PDF"}
+        <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+          {pdfBusy === "view" ? "Preparing PDF..." : "View PDF"}
+        </button>
+        <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+          {pdfBusy === "export" ? "Preparing PDF..." : "Download PDF"}
+        </button>
+        <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+          {pdfBusy === "print" ? "Preparing print view..." : "Print report"}
         </button>
         <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
           Save draft on this device
@@ -3469,7 +3533,7 @@ export function PropertyEvaluationWorkspace({
           an active picker; a typed listing shows it as a confirming stamp you can
           still correct. */}
       {!deepView && (() => {
-        const imported = context.propertyId?.startsWith("imported:");
+        const imported = importedProperty;
         return (
           <section
             aria-label="Property type on file"
@@ -3497,7 +3561,7 @@ export function PropertyEvaluationWorkspace({
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {allProfiles().map((profile) => {
-                const active = workspaceProfile.id === profile.id;
+                const active = propertyClassificationAvailable && workspaceProfile.id === profile.id;
                 return (
                   <button
                     key={profile.id}
@@ -3528,71 +3592,21 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
-      {!deepView && propertyEvidenceManifest && (
-        <PropertyEvidencePanel manifest={propertyEvidenceManifest} />
-      )}
-      {!deepView && (
-        <PropertyBestCoursePanel
-          profileId={workspaceProfile.id}
-          startingLens={startingLens}
-          deepHref={deepHref}
-          environmentalHref={`/portal/borrower/environmental-intake?from=${encodeURIComponent(chartHref)}`}
-          financingHref={`/financing-pathways?from=${encodeURIComponent(chartHref)}`}
-          onDownload={exportDraft}
-          downloadBusy={pdfBusy !== null}
-          capitalPlan={preliminaryCapitalPlan}
-          collateralPlan={collateralPlan}
-          marketComparablePlan={marketComparablePlan}
-          scenarioRankingPlan={scenarioRankingPlan}
-          transactionTimelinePlan={transactionTimelinePlan}
-          financialCapacityPlan={financialCapacityPlan}
-          executableScenarioRankingPlan={executableScenarioRankingPlan}
-          decisionSynthesisPlan={decisionSynthesisPlan}
-          recommendationEvidenceLedger={recommendationEvidenceLedger}
-          humanDecisionAssignmentPlan={humanDecisionAssignmentPlan}
-          decisionResolutionPlan={decisionResolutionPlan}
-          recommendationFinalityPlan={recommendationFinalityPlan}
-          recommendationReleaseRecord={recommendationReleaseRecord}
-          recommendationReleaseChangeControl={recommendationReleaseChangeControl}
-          recommendationReleaseHistory={recommendationReleaseHistory}
-          persistedReleaseCount={persistedReleaseRows.length}
-          releaseHistoryLoading={releaseHistoryLoading}
-          releaseHistoryError={releaseHistoryError}
-          releaseRecordBusy={releaseRecordBusy}
-          releaseRecordMessage={releaseRecordMessage}
-          pendingReleaseReview={pendingReleaseReview}
-          escalationAcknowledgeBusy={escalationAcknowledgeBusy}
-          escalationAcknowledgeMessage={escalationAcknowledgeMessage}
-          onAcknowledgeEscalation={acknowledgeCriticalEscalation}
-          onRecordGovernedRelease={recordGovernedRecommendationRelease}
-        />
-      )}
-      {!deepView && workspaceProfile.id !== "farm" && (
-        <PropertyResultCard
-          theme={CHART_THEMES[chartVariant]}
-          title={context.title}
-          location={context.location}
-          priceLabel={analysisContext.priceLabel}
-          profileLabel={workspaceProfile.label}
-          verdictLine={answerCard.headline}
-          greenFlags={cardGreenFlags}
-          watchFlags={cardWatchFlags}
-          numbersLine={cardNumbersLine}
-          overallRead={cardOverallRead}
-          caseFor={cardCaseFor}
-          caseAgainst={cardCaseAgainst}
-          decisionLine={cardDecisionLine}
-          tierLine={cardTierLine}
-          chartOpen={chartOpen}
-          onToggleChart={() => setChartOpen((current) => !current)}
-          actionsSlot={chartActionsSlot}
-        />
+      {!deepView && importedProperty && (!propertyClassificationAvailable || !rankingPrice) && (
+        <section aria-label="Complete property basics" style={{ display: "grid", gap: 7, border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px" }}>
+          <strong style={{ color: "#162033", fontSize: 15 }}>Complete the property basics before Furlong recommends a course</strong>
+          <span style={{ color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>
+            {propertyClassificationAvailable
+              ? "Furlong classified the property from the available parcel and listing evidence. Enter the asking price or your intended offer before any financial recommendation is generated. The type control above is only for correcting a source record that does not reflect the property’s actual use."
+              : "Furlong is still resolving the parcel acreage, land-use, and structure record for this address. It will not default the property to residential or generate type-specific analysis until that evidence is available."}
+          </span>
+        </section>
       )}
       {/* (The imported-only "What is this property?" picker is now the
           front-loaded Property Type Stamp above — shown for every property.) */}
 
-      {!deepView && workspaceProfile.id !== "farm" && chartOpen && (
-      <ChartTableBrief
+      {!deepView && propertyClassificationAvailable && (
+      <PropertyCommandCenter
         variant={chartVariant}
         propertyId={context.propertyId ?? context.title}
         title={context.title}
@@ -3607,6 +3621,15 @@ export function PropertyEvaluationWorkspace({
         fitLine={answerCard.fitLine}
         pauseLine={answerCard.pauseLine}
         intelligence={effectivePlaceIntelligence}
+        propertyRecord={facts?.propertyRecord ?? null}
+        financingRateContext={ownershipContext ? {
+          fsaOwnershipDirectPct: ownershipContext.fsa?.ownershipDirectPct ?? null,
+          fsaDownPaymentPct: ownershipContext.fsa?.downPaymentPct ?? null,
+          fsaEffective: ownershipContext.fsa?.effective ?? null,
+          mortgage30Pct: ownershipContext.rates.rate30 ?? null,
+          mortgageWeekOf: ownershipContext.rates.weekOf ?? null,
+        } : null}
+        deedEvidence={facts?.propertyEvidenceRecords ?? []}
         financingLanes={topProgramPreview}
         costsSlot={
           // The finance lens carries no products/terms/rates (counsel gate);
@@ -3619,10 +3642,11 @@ export function PropertyEvaluationWorkspace({
             <OwnershipCostPanel
               theme={CHART_THEMES[chartVariant]}
               context={ownershipContext}
-              listedPrice={listedPrice}
+              listedPrice={effectiveListedPrice}
               isHome={isResidentialHomeContext(analysisContext)}
-              farmShaped={false}
-              farmMode={false}
+              farmShaped={workspaceProfile.id === "farm"}
+              farmMode={workspaceProfile.id === "farm"}
+              farmAcreage={facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null)}
               profileId={workspaceProfile.id}
             />
           ) : null
@@ -3654,7 +3678,7 @@ export function PropertyEvaluationWorkspace({
 
       {/* Deeper analysis: a DEDICATED PAGE in the same tab (?view=deep) so the
           in-session draft (sessionStorage, per-tab by privacy design) rides
-          along; browser Back returns to the chart. Not a new window: separate
+          along; browser Back returns to the property brief. Not a new window: separate
           windows would silently drop the visitor's draft answers. */}
       {deepView ? (
         <section style={{ display: "grid", gap: 16 }}>
@@ -3662,7 +3686,7 @@ export function PropertyEvaluationWorkspace({
             href={chartHref}
             style={{ fontSize: 13.5, fontWeight: 700, color: "#0f766e", textDecoration: "underline", textUnderlineOffset: 2, justifySelf: "start" }}
           >
-            ← Back to the property chart
+            ← Back to the property brief
           </a>
         <div style={{ paddingTop: 16 }}>
       <div style={{ display: "grid", gap: 20, gridTemplateColumns: "minmax(0, 1.18fr) minmax(340px, 0.92fr)", alignItems: "start" }}>

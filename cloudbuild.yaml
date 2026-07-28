@@ -105,6 +105,29 @@ steps:
         npm run verify:compelled-disclosure-ceremony
         npm run verify:institutional-access-surveillance
         npm run verify:institutional-access-runtime-enforcement
+        npm run verify:institutional-access-surveillance-orchestration
+        npm run verify:institutional-access-surveillance-activation-ceremony
+        npm run verify:institutional-access-surveillance-canary-release
+        npm run verify:institutional-access-surveillance-scheduler-provisioning
+        npm run verify:governed-ultimate-proforma
+        npm run verify:federal-loan-authority-monitor
+        npm run verify:federal-loan-authority-reconciliation
+        npm run verify:federal-loan-authority-refresh-reliability
+        npm run verify:federal-loan-authority-change-triage
+        npm run verify:controlled-public-surface-promotion
+        npm run verify:production-promotion-readiness
+        npm run verify:final-production-promotion-decision
+        npm run verify:internal-change-verification
+        npm run verify:three-founder-release-authority
+        npm run verify:founder-change-review-workspace
+        npm run verify:founder-pilot-test-gate
+        npm run verify:property-profile-classification
+        npm run verify:customer-property-experience
+        npm run verify:three-lane-consumer-command-center
+        npm run verify:compass-lane-entry-routing
+        npm run verify:property-data-resolution
+        npm run verify:deed-verification-access
+        npm run verify:integrated-pre-promotion-features
         npm run verify:official-property-source-adapters
         npm run verify:structured-official-evidence
         npm run verify:property-evidence-ingestion

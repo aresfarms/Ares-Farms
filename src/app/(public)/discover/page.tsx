@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { Disclosures } from "@/components/public/Disclosures";
+import { DiscoveryEngine } from "@/components/discovery/DiscoveryEngine";
+import { guidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import { PropertyEvaluationWorkspace } from "@/components/property/PropertyEvaluationWorkspace";
 import { PropertyPlaceIntelligence } from "@/components/property/PropertyPlaceIntelligence";
 import { buildPropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
@@ -216,6 +218,27 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
   const addressFirstContext = addressFirstAnalysisContext(flow);
   const defaultPropertyContext = addressFirstAnalysisContext("property-discovery");
   const tierPreviewMode = process.env.FURLONG_TIER_PREVIEW_MODE !== "off";
+
+  // The Possibility Discovery interview (Tier-2 surfacing, 2026-07-28): the
+  // conversational persona journey + the 10-part Possibility Map had no
+  // renderer — DiscoveryEngine existed, its converse API existed, and nothing
+  // mounted it. It now renders on the EXPLICIT ask (?mode=possibilities);
+  // plain /discover keeps the address-first door unchanged.
+  const wantsPossibilities = /possibilit|persona/i.test(one(query.mode) ?? "");
+  if (wantsPossibilities && !propertyContext) {
+    return (
+      <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
+        <DiscoveryEngine feed={guidedIntakeFeed()} />
+        <p style={{ margin: 0, fontSize: 13, color: "#4d596d" }}>
+          Already have a property or address in mind?{" "}
+          <a href="/discover" style={{ color: "#0f766e", fontWeight: 700 }}>
+            Start from the address instead →
+          </a>
+        </p>
+        <Disclosures showManifesto={false} />
+      </main>
+    );
+  }
 
   if (isPlaceFirstFlow(flow)) {
     return (

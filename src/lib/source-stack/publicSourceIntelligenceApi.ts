@@ -13,7 +13,7 @@ import {
   createRuntimeVersionRef,
   evaluateVersionRuntime,
 } from "@/lib/runtime/versionRuntime";
-import { SOURCE_STACK_SOURCES, SOURCE_STACK_VERSION } from "@/lib/platform/authorities/source";
+import { SOURCE_STACK_VERSION } from "@/lib/platform/authorities/source";
 
 /**
  * Public Source Intelligence API Helper
@@ -48,8 +48,7 @@ export async function handlePublicSourceIntelligenceRoute(
       replayRef: traceId,
       metadata: {
         route,
-        sourceDocuments: [...SOURCE_STACK_SOURCES],
-        query: Object.fromEntries(req.nextUrl.searchParams.entries()),
+        queryParameterCount: req.nextUrl.searchParams.size,
         publicDtoOnly: true,
         classificationFiltering: true,
         claimsGovernance: true,
@@ -207,10 +206,17 @@ export async function handlePublicSourceIntelligenceRoute(
       data: classifiedPayload,
       governance: {
         traceId,
-        runtimeGuard,
-        versionRuntime,
-        claimsEvaluation,
-        observability,
+        classification: "PUBLIC",
+        advisoryOnly: true,
+        humanReviewRequired: true,
+        productionRelianceAllowed: false,
+        controls: {
+          runtimeGuardPassed: runtimeGuard.allowed,
+          versionRuntimePassed: versionRuntime.ok,
+          claimsPassed: claimsEvaluation.ok,
+          redactionPassed: redacted,
+          auditRecorded: Boolean(observability),
+        },
       },
     });
   } catch (error) {

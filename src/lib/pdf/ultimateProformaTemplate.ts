@@ -38,6 +38,21 @@ export const LANE_LABELS: Record<LoanLane, string> = {
 /* ── Input model (Parts I–IV; Part V is computed) ─────────────────────────── */
 
 export interface UltimateProformaInput {
+  authority: {
+    reviewedAt: string;
+    formVersion: string;
+    officialSourceRefs: string[];
+    reviewedContentHashes: Record<string, string>;
+    programTermsNote: string;
+    coverageThresholdBasis: string;
+    automaticProgramUpdates?: Array<{
+      factId: string;
+      label: string;
+      value: string;
+      sourceUrl: string;
+      sourceContentHash: string;
+    }>;
+  };
   branding: { logoPath: string };
   manifest: {
     clientLegalName: string;
@@ -266,12 +281,12 @@ const PART_II_MATRIX: ProformaTable = {
     { header: "Lane C — Infrastructure / Project", width: 0.28, align: "left" },
   ],
   rows: [
-    { cells: ["Typical size", "≤ $5,000,000 (85% guarantee < $5M tiers per program rules)", "FSA direct/guaranteed program limits (below large-project scale)", "Large-scale; multi-tranche (senior + subordinate/WIFIA-style)"] },
+    { cells: ["Typical size", "Up to $5,000,000 for most 7(a) loans; guaranty percentage varies by loan amount and program and must be confirmed from current SBA authority", "FSA direct/guaranteed program limits (below large-project scale)", "Large-scale; multi-tranche (senior + subordinate/WIFIA-style)"] },
     { cells: ["Borrower / use fit", "Operating small business; RE purchase, construction, equipment, refi, working capital; EPC/OC structures", "Family farm operations; ag RE, operating loans, farm ownership", "Public or project entities; infrastructure with long-dated revenue"] },
     { cells: ["Collateral character", "Commercial/ag RE + business assets; specialized collateral acceptable", "Farm RE, crops, livestock, equipment (FSA-2037 schedules)", "Project revenues / system net revenue pledges"] },
     { cells: ["Key eligibility test", "Credit-elsewhere: conventional financing unavailable on reasonable terms", "Program eligibility + size limits; county office filing", "LOI + investment-grade path; coverage & liquidity metrics"] },
-    { cells: ["Coverage convention", "Standalone + global DSCR vs 1.25x floor", "Feasibility per farm business plan (FSA-2037 series)", "Senior DSCR & Total DSCR by tranche; FFO/interest; days cash"] },
-    { cells: ["Governing intake", "SBA Form 1919 (per co-applicant)", "FSA-2037 (+ companion FSA plan forms)", "LOI pro forma (3-yr historical + 10-yr projection)"] },
+    { cells: ["Coverage convention", "Standalone + global DSCR against the lender-specific threshold recorded in Part IV", "Feasibility per farm business plan (FSA-2037 series)", "Senior DSCR & Total DSCR by tranche; FFO/interest; days cash"] },
+    { cells: ["Governing intake", "Current SBA Form 1919 (version and effective date bound in the authority snapshot)", "FSA-2037 (+ companion FSA plan forms)", "LOI pro forma (3-yr historical + 10-yr projection)"] },
   ],
 };
 
@@ -292,14 +307,10 @@ const MODULE_A_QUESTIONS: Array<{ n: number; q: string }> = [
 ];
 
 const MODULE_A_CERTIFICATIONS: string[] = [
-  "Program eligibility (13 CFR 120.10 / 120.100 / 120.110 / 121.301; 31 CFR 285.13); ≥51% U.S. citizen/LPR ownership & control; size standard (13 CFR 121.201).",
-  "Truth & accuracy under 18 U.S.C. 1001/3571, 15 U.S.C. 645, 18 U.S.C. 1014.",
-  "Build America, Buy America (BABAA) for any infrastructure use of proceeds — U.S.-produced iron, steel, manufactured products, construction materials + contractor certifications.",
-  "OSHA; Lead-Based Paint (residential construction/rehab); hazard insurance; civil rights (13 CFR 112/113/117); ECOA; SBA Form 722 poster.",
-  "Taxes current (income, payroll, real estate, sales); no 50%+ owner >60 days delinquent on child support.",
-  "Refinanced debt used exclusively for the business (documentation required).",
-  "Debarment/suspension (2 CFR 180); environmental compliance & indemnification; EPA Violating Facilities (loans ≥ $100k); Flood Disaster Protection Act (determinations + insurance).",
-  "Ongoing covenants: no distributions / ownership changes / asset dispositions outside ordinary course without lender consent; books & records access; annual financial reporting.",
+  "The applicant must review and execute the current SBA Form 1919 and lender-required certifications at signing; this Furlong preparation report does not replace the official form.",
+  "No certification, eligibility conclusion, legal representation, or program approval is pre-made by Furlong.",
+  "Current program terms, eligibility rules, fees, guaranty percentages, collateral requirements, and environmental or flood obligations must be confirmed by the participating lender against current official SBA authority.",
+  "Any applicant answer requiring explanation remains subject to lender and SBA review and must be supported by the source documents identified in the evidence manifest.",
 ];
 
 const GATE_ITEMS: Array<{ id: string; item: string }> = [
@@ -595,6 +606,25 @@ export function buildUltimateProformaDocument(
     paragraphs: ["Policy: upside never enters DSCR, collateral, or injection math."],
   });
 
+  if ((input.authority.automaticProgramUpdates ?? []).length > 0) {
+    sections.push({
+      title: "CURRENT PROGRAM AUTHORITY — AUTOMATIC UPDATE OVERLAY",
+      leadIns: [{ text: input.authority.programTermsNote }],
+      tables: [{
+        table: {
+          columns: [
+            { header: "Authority fact", width: 0.24, align: "left" },
+            { header: "Current value / requirement", width: 0.46, align: "left" },
+            { header: "Official source + hash", width: 0.30, align: "left" },
+          ],
+          rows: (input.authority.automaticProgramUpdates ?? []).map((item) => ({
+            cells: [item.label, item.value, `${item.sourceUrl} · ${item.sourceContentHash.slice(0, 16)}…`],
+          })),
+        },
+      }],
+    });
+  }
+
   // ── PART II — Loan Lane Matching ──
   sections.push({
     title: "PART II — LOAN LANE MATCHING",
@@ -622,10 +652,10 @@ export function buildUltimateProformaDocument(
   if (m.lane === "A" && input.moduleA) {
     const mod = input.moduleA;
     sections.push({
-      title: "PART III · MODULE A — SBA 7(a) (governing form: SBA Form 1919, 02/2025)",
+      title: `PART III · MODULE A — SBA 7(a) (official form authority: ${input.authority.formVersion})`,
       leadIns: [
         {
-          text: "Structural rules: one Form 1919 per co-applicant (EPC and OC each), signed by an authorized representative; loan-purpose amounts across all 1919s must sum to the total loan request; every ≥20% owner listed and guaranteeing; EPC/OC written lease with rent ≤ debt service + expenses.",
+          text: `Preparation rules: applicant and ownership information must reconcile across the package; the current official Form 1919 and lender instructions control. Owners of 20% or more are flagged for lender guaranty review. This report is not the official form and makes no eligibility or approval determination. Authority reviewed ${input.authority.reviewedAt}.`,
         },
       ],
       tables: [
@@ -771,8 +801,8 @@ export function buildUltimateProformaDocument(
             { cells: ["Operating expenses", tc.opex.conservative, tc.opex.stabilized, "—"] },
             { cells: [`Net Operating Income (margin)`, `${tc.noi.conservative} (${tc.margins.conservative})`, `${tc.noi.stabilized} (${tc.margins.stabilized})`, "—"] },
             { cells: ["Annual debt service", tc.debtService, tc.debtService, "—"] },
-            { cells: ["DSCR — standalone", tc.dscrStandalone.conservative, tc.dscrStandalone.stabilized, `${tc.dscrFloor} (lane convention)`], emphasis: true },
-            { cells: ["DSCR — global / total", tc.dscrGlobal.conservative, tc.dscrGlobal.stabilized, tc.dscrFloor] },
+            { cells: ["DSCR — standalone", tc.dscrStandalone.conservative, tc.dscrStandalone.stabilized, `${tc.dscrFloor} (${input.authority.coverageThresholdBasis})`], emphasis: true },
+            { cells: ["DSCR — global / total", tc.dscrGlobal.conservative, tc.dscrGlobal.stabilized, `${tc.dscrFloor} (${input.authority.coverageThresholdBasis})`] },
             { cells: [`Stress case: ${tc.stressDescription}`, tc.dscrStress, "—", tc.dscrFloor] },
           ],
         },
@@ -862,7 +892,7 @@ export function buildUltimateProformaDocument(
         "Certification: The undersigned certifies that the information in this report is true, accurate, and complete as of the date stated, submitted in connection with a commercial loan application. Asset values are stated at conservative documented amounts; contingent assets are disclosed but excluded from stated totals. Financing decisions belong to licensed lenders — Furlong prepares and formats the borrower's own documented information and never approves, guarantees, or determines eligibility.",
       signerName: m.guarantorNames,
       finePrint:
-        "Generated by the Furlong engine from the borrower's own intake under the Ultimate Pro Forma Master Template v2.1. Supporting documents available on request.",
+        "Generated by the Furlong engine from the borrower's own intake under the Ultimate Pro Forma Master Template v2.1. Supporting documents and evidence lineage remain controlled by Furlong and are available only through authorized review.",
     },
   };
 }

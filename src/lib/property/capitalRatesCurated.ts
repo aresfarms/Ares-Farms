@@ -51,11 +51,21 @@ export function buildCapitalRates(): CapitalRatesView {
     {
       program: "SBA 504",
       basis: "A fixed rate set at each monthly debenture sale — it locks when your loan funds.",
-      current: deb != null ? `${deb}%` : undefined,
+      current: deb != null ? `25-year standard ${deb}% · July 2026 sale` : undefined,
     },
     { program: "USDA Business & Industry (B&I)", basis: "Lender-negotiated, backed by a USDA guarantee." },
     { program: "USDA / FSA program", basis: "Published program rate.", current: `FSA Farm Ownership ${FSA_RATES.ownershipDirect}%` },
-    { program: "Conventional", basis: conventionalBasis },
+    {
+      program: "Conventional",
+      basis: conventionalBasis,
+      current:
+        treasury5yr != null || sofr != null
+          ? [
+              treasury5yr != null ? `5-year Treasury ${treasury5yr}%` : null,
+              sofr != null ? `SOFR ${sofr}%` : null,
+            ].filter(Boolean).join(" · ") + " + lender spread"
+          : undefined,
+    },
   ];
 
   // Prefer the freshest stamp we actually have (live overlay > committed).

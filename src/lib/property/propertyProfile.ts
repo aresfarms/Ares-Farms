@@ -23,7 +23,7 @@
  * New profile logic belongs HERE — not in scattered regexes.
  */
 
-export const PROPERTY_PROFILE_VERSION = "property-profile-v1.0.0";
+export const PROPERTY_PROFILE_VERSION = "property-profile-v1.1.0";
 
 export type PropertyProfileId =
   | "residential"
@@ -97,6 +97,9 @@ export function classifyPropertyProfile(args: {
     " "
   );
   const text = `${args.propertyType ?? ""} ${cleanedDesc}`.toLowerCase();
+  const acreageMatch = (args.acreageText ?? "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
+  const acres = acreageMatch ? Number(acreageMatch[1]) : null;
+  const hasStructureEvidence = /house|home|residen|dwelling|bedroom|bathroom|sq ft|square feet|building|barn|stable|warehouse|hotel|motel|retail|office/.test(text);
 
   const id: PropertyProfileId =
     /mobile home park|manufactured housing (community|park)|mhp|trailer park|rv park/.test(text)
@@ -105,11 +108,13 @@ export function classifyPropertyProfile(args: {
         ? "hospitality"
         : /commercial|retail|industrial|warehouse|restaurant|mixed[- ]use|office (?:building|space|unit|suite)|(?:self[- ]|storage )storage|business (?:park|center)/.test(text)
           ? "commercial"
-          : /\bfarm\b|ranch|agric|crop|pasture|orchard|vineyard|homestead|dairy/.test(text)
+          : /\bfarm\b|ranch|agric|crop|pasture|orchard|vineyard|homestead|dairy|equestrian|poultry|livestock/.test(text)
             ? "farm"
-            : /\bland\b|\blot\b|vacant|acreage|parcel only|unimproved/.test(text)
-              ? "land"
-              : "residential";
+            : acres != null && acres >= 20 && !/vacant|unimproved|parcel only|timberland|recreational land/.test(text)
+              ? "farm"
+              : /\bland\b|\blot\b|vacant|acreage|parcel only|unimproved|timberland/.test(text) && !hasStructureEvidence
+                ? "land"
+                : "residential";
 
   return { id, label: PROFILE_LABELS[id] };
 }

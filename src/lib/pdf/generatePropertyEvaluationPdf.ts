@@ -82,6 +82,14 @@ type PropertyEvaluationPdfInput = {
     equityDisclaimers?: string[];
     disclaimers: string[];
   };
+  agriculturalProForma?: {
+    scopeLine: string;
+    acreageRows: Array<{ label: string; value: string }>;
+    operatingRows: Array<{ label: string; value: string }>;
+    debtRows: Array<{ label: string; value: string }>;
+    assumptions: string[];
+    readiness: string[];
+  };
   /** Consumer-facing transparency for brokerage agreements, commissions, concessions, and added fees. */
   compensationTransparency?: {
     posture: "CLEAR" | "REVIEW_NEEDED" | "UNKNOWN";
@@ -662,6 +670,30 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   // direction 2026-07-20: stop the flip-back-and-forth). They now travel INSIDE
   // the Uncharted Ledger chapter, as the "Provisions & Allocations" budget that
   // sits directly with the blindspots those dollars answer.
+
+  // ── AGRICULTURAL OPERATING PRO FORMA ──────────────────────────────────────
+  if (input.agriculturalProForma) {
+    const farm = input.agriculturalProForma;
+    heading("Agricultural Best-Use Pro Forma — Singular and Diversified Opportunity Screen");
+    paragraph(farm.scopeLine);
+    setFont("bold", 9.5, COLORS.muted);
+    doc.text("RANKED PROPERTY-USE CANDIDATES", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    factsTable(farm.acreageRows);
+    setFont("bold", 9.5, COLORS.muted);
+    ensure(24);
+    doc.text("DIVERSIFIED PORTFOLIO SCREEN", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    factsTable(farm.operatingRows);
+    setFont("bold", 9.5, COLORS.muted);
+    ensure(24);
+    doc.text("DEBT SERVICE AND COVERAGE", PAGE.marginX, y, { characterSpacing: 0.8 });
+    y = doc.y + 8;
+    factsTable(farm.debtRows);
+    panel({ title: "Assumption and source status", lines: farm.assumptions, fill: ACCENT_SOFT });
+    heading("FSA / Farm Credit Application Readiness");
+    checklist(farm.readiness);
+  }
 
   // ── OWNERSHIP COSTS — buy it, then keep it (founder direction 2026-07-17) ──
 

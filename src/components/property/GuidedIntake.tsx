@@ -111,6 +111,15 @@ export function GuidedIntake({ feed }: { feed: GuidedIntakeFeed }) {
           inventory filter below stays as the browse path. */}
       <InterestFirstDiscovery embedded />
 
+      {/* No place in mind either? The conversational possibilities interview
+          (surfaced 2026-07-28 — it previously had no door at all). */}
+      <a
+        href="/discover?mode=possibilities"
+        style={{ fontSize: 12.5, fontWeight: 700, color: "#0f766e", textDecoration: "underline", textUnderlineOffset: 2, justifySelf: "start" }}
+      >
+        No place in mind yet? Take the guided possibilities interview →
+      </a>
+
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <span style={{ flex: 1, height: 1, background: "#e4e9f0" }} />
         <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: "#4d596d" }}>

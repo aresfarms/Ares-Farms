@@ -4,7 +4,7 @@ import { readOfficialEvidenceRefreshState } from "./officialEvidenceRuntimeStore
 import type { OfficialEvidenceSourceId } from "./officialEvidenceSourceGovernance";
 import { preserveSignedReplayPacket } from "./officialEvidenceReplayPacketStore";
 
-const SOURCE_IDS: OfficialEvidenceSourceId[] = ["parcel-tax-authority", "well-permit-authority"];
+const SOURCE_IDS: OfficialEvidenceSourceId[] = ["parcel-tax-authority", "well-permit-authority", "county-recorder-deed"];
 
 export function currentOfficialEvidenceDependencies(): EvidenceDependency[] {
   return SOURCE_IDS.flatMap((sourceId) => {

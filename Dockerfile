@@ -108,6 +108,10 @@ RUN groupadd --system --gid 1001 nodejs \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+# Next/Turbopack rewrites PDFKit's module directory to /ROOT in the compiled
+# server chunk. Preserve PDFKit's built-in AFM/ICC assets at that traced path
+# as well as under /app/node_modules, or report rendering fails at runtime.
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/pdfkit/js/data /ROOT/node_modules/pdfkit/js/data
 
 USER nextjs
 EXPOSE 8080

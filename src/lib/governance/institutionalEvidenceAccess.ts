@@ -48,7 +48,7 @@ function parseDate(value: string | null): number | null {
 }
 
 
-function readAccessLedger(): Array<Record<string, unknown>> {
+export function readInstitutionalAccessLedger(): Array<Record<string, unknown>> {
   try {
     return fs.readFileSync(ACCESS_LEDGER, "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line) as Record<string, unknown>);
   } catch {
@@ -97,7 +97,7 @@ export function revokeEvidenceAccessGrant(input: { grantId: string; revokedBy: s
 }
 
 export function findEvidenceAccessGrant(grantId: string): EvidenceAccessGrant | null {
-  const rows = readAccessLedger();
+  const rows = readInstitutionalAccessLedger();
   const issued = rows.find((row) => row.event === "GRANT_ISSUED" && row.grantId === grantId) as (Record<string, unknown> | undefined);
   if (!issued) return null;
   const revoked = rows.slice().reverse().find((row) => row.event === "GRANT_REVOKED" && row.grantId === grantId);
@@ -190,6 +190,36 @@ export function recordInstitutionalEvidenceAccess(input: {
     windowStart: input.windowStart ?? null,
     windowEnd: input.windowEnd ?? null,
   });
+}
+
+
+export type InstitutionalAccessObservation = {
+  actorId: string;
+  grantId: string;
+  action: "VIEW" | "SEARCH" | "VERIFY_HASH" | "EXPORT" | "DENIED";
+  at: string;
+  recordCount: number;
+  moduleId: string | null;
+  subjectId: string | null;
+};
+
+export function unrevokedEvidenceAccessGrants(): EvidenceAccessGrant[] {
+  const rows = readInstitutionalAccessLedger();
+  const ids = [...new Set(rows.filter((r) => r.event === "GRANT_ISSUED").map((r) => String(r.grantId)))];
+  return ids.map(findEvidenceAccessGrant).filter((g): g is EvidenceAccessGrant => Boolean(g && !g.revokedAt));
+}
+
+export function institutionalAccessObservationsForGrant(grantId: string, since: string, until: string): InstitutionalAccessObservation[] {
+  return readInstitutionalAccessLedger().filter((r) => r.grantId === grantId && r.eventId && Date.parse(String(r.at)) >= Date.parse(since) && Date.parse(String(r.at)) <= Date.parse(until)).map((r) => ({
+    actorId: String(r.actorId ?? "unknown"), grantId,
+    action: r.outcome === "DENIED" ? "DENIED" : String(r.action) === "EXPORT" ? "EXPORT" : String(r.action) === "SEARCH" ? "SEARCH" : String(r.action) === "VERIFY_HASH" ? "VERIFY_HASH" : "VIEW",
+    at: String(r.at), recordCount: Number(r.recordCount ?? 1),
+    moduleId: r.moduleId ? String(r.moduleId) : null, subjectId: r.subjectId ? String(r.subjectId) : null,
+  }));
+}
+
+export function recordInstitutionalSurveillanceRun(input: { plan: unknown; at: string; actorId: string }) {
+  return chainAppend(ACCESS_LEDGER, { schemaVersion: "institutional-evidence-access-v1", event: "SURVEILLANCE_RUN", ...input });
 }
 
 export function institutionalEvidenceAccessLedgerVerification() {

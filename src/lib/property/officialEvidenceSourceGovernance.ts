@@ -1,4 +1,4 @@
-export type OfficialEvidenceSourceId = "parcel-tax-authority" | "well-permit-authority";
+export type OfficialEvidenceSourceId = "parcel-tax-authority" | "well-permit-authority" | "county-recorder-deed";
 export type SourceActivationStatus = "pending" | "approved" | "suspended";
 export type RefreshReceiptStatus = "refreshed" | "no-change" | "failed";
 
@@ -107,4 +107,5 @@ export function resolveOfficialEvidenceSource<T>(args: {
 export const OFFICIAL_EVIDENCE_SOURCE_ACTIVATION: Record<OfficialEvidenceSourceId, OfficialEvidenceSourceActivation> = {
   "parcel-tax-authority": { sourceId: "parcel-tax-authority", status: "pending", staleAfterDays: 45 },
   "well-permit-authority": { sourceId: "well-permit-authority", status: "pending", staleAfterDays: 365 },
+  "county-recorder-deed": { sourceId: "county-recorder-deed", status: "pending", staleAfterDays: 30 },
 };

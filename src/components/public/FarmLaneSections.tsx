@@ -24,6 +24,9 @@ import { LoanProgramComparison } from "@/components/public/LoanProgramComparison
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
 import { FarmFinancialHealthCheck } from "@/components/public/FarmFinancialHealthCheck";
+import { FarmBestUseFinanceWorkspace } from "@/components/public/FarmBestUseFinanceWorkspace";
+import { NavigatorEntryCta } from "@/components/public/NavigatorEntryCta";
+import { HOMEPAGE_PRIMARY_ACTIONS } from "@/lib/public-content/publicCopyRegistry";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 
 // This whole module wears the FARM lane's color identity (green — growth,
@@ -267,43 +270,47 @@ const menuCard = {
   gap: 8,
 } as const;
 
-/** The lane home: a grid of topic buttons + a report button + module cross-links. */
-export function FarmLaneMenu({ hrefFor, reportHref }: { hrefFor: (key: string) => string; reportHref: string }) {
+/** Persistent farms workspace navigation. The agricultural landing page keeps
+ * market context and parcel tools visible while these tabs change the working section. */
+export function FarmLaneMenu({ hrefFor, reportHref, activeSection }: { hrefFor: (key: string) => string; reportHref: string; activeSection?: string | null }) {
+  const tabs = [
+    { key: "", label: "Overview" },
+    { key: "questions", label: "Best use & enterprises" },
+    { key: "land-earnings", label: "Land income" },
+    { key: "financial-health", label: "Financial health" },
+    { key: "equipment", label: "Equipment" },
+    { key: "hauling", label: "Hauling" },
+    { key: "loan-comparison", label: "Financing" },
+    { key: "newsletters", label: "News & audio" },
+  ];
   return (
-    <div style={{ display: "grid", gap: 16 }}>
-      <section aria-label="Farms module topics" style={{ display: "grid", gap: 12 }}>
-        <span style={sectionKicker}>The Farms module — pick a topic</span>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12, alignItems: "stretch" }}>
-          {FARM_SECTIONS.map((s) => (
-            <Link key={s.key} href={hrefFor(s.key)} style={menuCard}>
-              <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>{s.title}</strong>
-              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{s.blurb}</span>
-              <span style={{ fontSize: 12.5, fontWeight: 800, color: FARM.accent }}>Open →</span>
+    <div style={{ display: "grid", gap: 14 }}>
+      <nav aria-label="Agricultural workspace tabs" style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4 }}>
+        {tabs.map((tab) => {
+          const active = (activeSection ?? "") === tab.key;
+          return (
+            <Link key={tab.label} href={tab.key ? hrefFor(tab.key) : "/explore?lane=farms-agriculture"} style={{ whiteSpace: "nowrap", border: `1px solid ${active ? FARM.accent : "#cbd5e1"}`, borderRadius: 999, padding: "9px 14px", background: active ? FARM.accent : "#fff", color: active ? "#fff" : "#263246", fontWeight: 800, textDecoration: "none", fontSize: 12.5 }}>
+              {tab.label}
+            </Link>
+          );
+        })}
+        <Link href={reportHref} style={{ whiteSpace: "nowrap", border: "1px solid #9a5b00", borderRadius: 999, padding: "9px 14px", background: "#9a5b00", color: "#ffffff", fontWeight: 850, textDecoration: "none", fontSize: 12.5 }}>
+          {HOMEPAGE_PRIMARY_ACTIONS.primaryLabel} →
+        </Link>
+      </nav>
+      {!activeSection && (
+        <section aria-label="Agricultural workspace overview" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 10 }}>
+          {FARM_SECTIONS.slice(0, 6).map((section) => (
+            <Link key={section.key} href={hrefFor(section.key)} style={{ ...menuCard, minHeight: 88 }}>
+              <strong style={{ fontSize: 14.5, color: "#101a2b" }}>{section.title}</strong>
+              <span style={{ fontSize: 12, color: "#4d596d", lineHeight: 1.45 }}>{section.blurb}</span>
             </Link>
           ))}
-          {/* The analysis report — opens the written property analysis in a new tab. */}
-          <a href={reportHref} target="_blank" rel="noopener noreferrer" style={{ ...menuCard, borderTop: "3px solid #b8862f", background: "#fdfaf2" }}>
-            <strong style={{ fontSize: 15.5, color: "#101a2b", lineHeight: 1.25 }}>Run a property analysis report ↗</strong>
-            <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>Enter an address and open the full written analysis in a new tab.</span>
-            <span style={{ fontSize: 12.5, fontWeight: 800, color: "#b8862f" }}>Open in new tab ↗</span>
-          </a>
-        </div>
-      </section>
-
-      {/* Cross-links to the sibling modules */}
-      <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-        <Link href="/explore?lane=environmental-compliance" style={{ ...card, textDecoration: "none" }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#0f6e56" }}>Environmental module →</span>
-          <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.5 }}>
-            Water, soil, wetlands, and the site questions that change what ground can do.
-          </span>
-        </Link>
-        <Link href="/explore?lane=financing-capital" style={{ ...card, textDecoration: "none" }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#534AB7" }}>Financing &amp; Capital module →</span>
-          <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.5 }}>
-            FSA, Farm Credit, and the lanes beyond them — the capital side of every plan on this page.
-          </span>
-        </Link>
+        </section>
+      )}
+      <section aria-label="Related agricultural modules" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <Link href="/explore?lane=environmental-compliance" style={{ fontSize: 12.5, fontWeight: 750, color: "#0f6e56", textDecoration: "none" }}>Soil, water & environmental constraints →</Link>
+        <Link href="/explore?lane=financing-capital" style={{ fontSize: 12.5, fontWeight: 750, color: "#534AB7", textDecoration: "none" }}>Financing & capital workspace →</Link>
       </section>
     </div>
   );
@@ -375,9 +382,11 @@ export function FarmLaneSection({ sectionKey }: { sectionKey: string }) {
       // Merged program comparison + today's rates (founder direction 2026-07-20),
       // with the 100%-financing callout underneath.
       return (
-        <div style={{ display: "grid", gap: 24 }}>
+        <div style={{ display: "grid", gap: 28 }}>
+          <NavigatorEntryCta lens="farms-agriculture" support="Use the same Navigator entry point as the main Compass. Start with the farm, parcel, listing, or financing question and keep the agricultural lens throughout the analysis." />
           <LoanProgramComparison />
           <HundredPercentFinancingCallout />
+          <FarmBestUseFinanceWorkspace />
         </div>
       );
     default:

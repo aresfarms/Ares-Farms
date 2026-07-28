@@ -597,3 +597,82 @@ Hard rules:
 ## Institutional Access Runtime Enforcement Amendment
 
 Institutional-access doctrine is incomplete until the protected request path consumes it. Every governed evidence packet request must execute the canonical credential, authority, ABAC, field-disclosure, capability, access-ledger, and surveillance-observation controls before packet construction. Governance and administrator identities retain management authority but may not be converted into auditor identities for evidence access. The standing proof command is `npm run verify:institutional-access-runtime-enforcement`.
+
+
+## Institutional Access Surveillance Orchestration Amendment
+
+Institutional access surveillance must execute as an operational control rather than exist only as doctrine or a reusable library. Every unrevoked attorney, auditor, and governmental-official evidence grant must be reevaluated against current credential, authority, scope, expiry, denied-request, and export-volume evidence. Invalid or expired grants are revoked append-only. Anomaly findings remain review-bound and require independent closure. The protected internal route requires `INSTITUTIONAL_ACCESS_SURVEILLANCE_CRON_SECRET` and fails closed when it is absent. The standing proof command is `npm run verify:institutional-access-surveillance-orchestration`. Scheduler activation remains a separate controlled-promotion action.
+
+
+### Institutional Surveillance Activation Ceremony
+
+Scheduled institutional-access surveillance is a controlled-promotion action. Before scheduler creation or enablement, a deterministic activation packet must bind a dedicated scheduler identity, cadence between five and sixty minutes, canonical protected route, configured authentication, clean canary, rollback action, alert ownership, and two distinct governance/security approvers. Evidence recomputation remains independently paused. The standing proof command is `npm run verify:institutional-access-surveillance-activation-ceremony`.
+
+
+### Institutional Surveillance Canary and Scheduler Release
+
+Institutional-surveillance activation requires a non-mutating dry-run canary before any scheduler may be created. The canary freezes deterministic per-grant surveillance plans, records grants that would remain clean, require review, or be revoked, and proves zero grant, credential, authority, scheduler, or secret mutations. A separate release packet binds the current activation-ceremony hash, exact canary run and snapshot, route-authentication readiness, dual-control approvers, and release reason. Scheduler creation and scheduler enablement remain separate controlled-promotion actions. The standing proof command is `npm run verify:institutional-access-surveillance-canary-release`.
+
+### Institutional Surveillance Scheduler Provisioning
+
+A scheduler release packet does not authorize an operator to improvise infrastructure settings. Before any institutional-surveillance scheduler may be created, a deterministic provisioning manifest must bind the exact project, region, canonical job name, HTTPS target, POST method, bounded cadence, timezone, authentication reference, dedicated scheduler identity, attempt deadline, retry/backoff policy, and initial `PAUSED` state. Plaintext credentials are prohibited. A post-create attestation must prove the observed job matches the manifest, remains paused, and has executed zero times. Scheduler enablement remains a later controlled-promotion action. The standing proof command is `npm run verify:institutional-access-surveillance-scheduler-provisioning`.
+
+### Governed Ultimate Pro Forma Preparation
+
+The Ultimate Pro Forma is a governed internal preparation artifact, not an official lender or agency form and not a financing decision. Its runtime must recompute sources and uses, collateral totals and coverage, personal financial statement totals, revenue subtotals, NOI, margins, DSCR, working capital, and year-model shape before rendering. Every material claim must bind to a typed evidence item, and the lane-authority item must use a current official source snapshot. Full sensitive identifiers are prohibited from the PDF. The route must authenticate the actor, enforce application-level access, restrict preparation to operator/underwriter/governance/admin roles, persist the canonical report record and governance evidence, disable caching, and mark external delivery and official use as blocked. The standing proof command is `npm run verify:governed-ultimate-proforma`.
+
+### Federal Loan Authority Continuous Monitoring
+
+The source-refresh scheduler must monitor official SBA, FSA, USDA Rural Development, eCFR, and Federal Register loan authorities, including program catalogs, requirements, forms, handbooks, notices, rates, fees, servicing guidance, and regulations. Monitoring is official-domain-only, bounded, cryptographically versioned, and last-good preserving. A detected change emits a review-required receipt and immediately makes dependent loan guidance review-stale. Pro forma preparation must bind exact reviewed content hashes and fail when a source changed after review, failed to refresh, lacks a baseline, or no longer matches the bound hash. The standing proof command is `npm run verify:federal-loan-authority-monitor`.
+
+### Federal Loan Authority Automatic Reconciliation
+
+Before an Ultimate Pro Forma is generated, the runtime must read the current federal-loan authority monitor state, extract deterministic program facts, update the pro forma authority snapshot and current-program overlay, bind the exact current source hashes, and rerun all financial and evidence gates. Form versions, dates, maximums, guaranty percentages, rates, fees, thresholds, links, and enumerated requirements update automatically. Eligibility, legal, collateral, guaranty, ownership, citizenship, credit-elsewhere, environmental, flood, use-of-proceeds, refinancing, and borrower-contribution changes require review when semantic interpretation is material or uncertain. The standing proof command is `npm run verify:federal-loan-authority-reconciliation`.
+
+
+## Federal Loan Authority Refresh Reliability Amendment
+Official federal lending authority monitoring must be survivable under partial source failure. Each request has a bounded deadline; each run has a hard completion deadline; concurrency is bounded; required seeds are attempted before discovered documents; and every failed, timed-out, or deferred source is represented in the replayable run receipt. Successful sources remain publishable, last-good snapshots remain retained, and any timed-out cited authority is blocked from current pro forma reliance. Standing proof: `npm run verify:federal-loan-authority-refresh-reliability`.
+
+
+## Federal Loan Authority Change Triage Amendment
+Official-source HTML churn must not automatically invalidate lending guidance, and raw-content similarity must not automatically clear a material authority change. The monitor must derive a stable lending-authority semantic fingerprint from program clauses, forms, effective dates, amounts, rates, fees, percentages, and requirement language. Cosmetic or non-lending informational changes may be auto-cleared only with an immutable triage receipt. Lending-relevant changes remain review-bound, legally material changes are elevated, and any change lacking a prior semantic baseline fails closed. Standing proof: `npm run verify:federal-loan-authority-change-triage`.
+
+
+### Step 4U — Controlled Public Surface Promotion
+Public translation surfaces must expose only deterministic public aliases, public-safe provenance summaries, advisory status, and bounded governance posture. Internal source identifiers, replay references, canonical object identifiers, source-document filenames, runtime module paths, and full observability evidence remain restricted to authorized audit surfaces. Claims governance, classification, redaction, and human-review posture execute before every public response.
+
+**Hard rule:** Promotion of public translation surfaces does not authorize lender reliance, agency reliance, official decisions, payments, notices, submissions, or any other live public action. Standing proof: `npm run verify:controlled-public-surface-promotion`.
+
+
+### Step 4V — Production Promotion Readiness and Perimeter Hardening
+Before final production or public-action promotion, the platform must produce a deterministic readiness packet that verifies canonical HTTPS URLs, the approved identity perimeter, secret-manager bindings, required API authentication, bounded rate limiting, credential allowlist posture, and governed administrator-only role provisioning. The packet may declare technical readiness for a human promotion decision, but it never grants launch, payment, notice, official-report, external-action, or official-reliance authority. Named release-board, constitutional, qualified release-manager, and final-activation approvals remain separate attributed human actions. Standing proof: `npm run verify:production-promotion-readiness`.
+
+
+### Step 4W — Final Production Promotion Decision Packet
+A final decision packet must bind the exact immutable production image, the 4V readiness packet, a hash-only credential allowlist, a bounded activation window, an attributed rollback owner, and four distinct signed human approvals: release board, constitutional authority, qualified release manager, and final activation authority. The packet may become ready for a separately executed activation ceremony, but it cannot set environment variables, release holds, activate live actions, or grant official reliance. Standing proof: `npm run verify:final-production-promotion-decision`.
+
+
+### Step 4X — Cross-Functional Internal Change Verification
+Every code, configuration, security, finance, underwriting, or public-communications change must originate from a frozen plain-language request and produce one immutable Internal Change Verification and Plain-Language Assurance Report. The report combines a common machine-evidence backbone with a domain-specific checklist overlay. It records the exact request version, owner, commit, immutable image, build, tests, affected routes, permissions, database and configuration changes, known limitations, unverified claims, rollback image, release invariants, and post-release regression checks.
+
+The change owner may implement and attest but may not independently approve the change. Caitlin-owned technical and governance changes require Stuart and Francis; Stuart-owned finance and underwriting changes require Caitlin and Francis; Francis-owned public and communications changes require Caitlin and Stuart. Any change to the request, evidence, code, configuration, test results, image, or report hash invalidates all prior signatures. A rejection, failed checklist item, failed regression, missing rollback, or external-review requirement keeps activation blocked.
+
+**Hard rule:** No governed change may be activated, promoted, or relied upon without a valid frozen report, owner attestation, both required outside-group approvals, and passing post-release invariants. The report must explain in plain English what changed, what tests proved, what tests did not prove, principal risks, and how to reverse the change. Standing proof: `npm run verify:internal-change-verification`.
+
+
+### Step 4Y — Three-Founder Cross-Functional Release Authority Addendum
+The initial production opening requires all three founders to participate across technical/governance, finance/release-risk, and public/independent-review roles. Routine group-owned changes require the two founders outside the owning group. The change owner may attest to implementation but may not independently approve their own change. Each founder retains unilateral stop and rollback authority within an observed risk event. Domain objections block release until resolved or escalated.
+
+**Hard rule:** The three-founder model replaces artificial four-person distinct-principal requirements, but it never weakens owner exclusion, packet binding, signature integrity, domain review, or separate activation. Initial launch requires unanimous three-founder participation; routine changes require both outside-group approvals. Standing proof: `npm run verify:three-founder-release-authority`.
+
+
+### Step 4Z — Founder Change Review Workspace
+The platform must provide a restricted operational workspace that freezes the plain-language internal change report, binds actions to configured founder identities, stores owner attestations and outside-group reviews as immutable signed events, reconstructs the current report deterministically, and records the three-founder initial-launch authority separately. The workspace may display readiness but never activate a release. Standing proof: `npm run verify:founder-change-review-workspace`.
+
+**Hard rule:** No unauthenticated or unassigned identity may freeze, attest, review, or record launch authority. A material change after freeze requires a new request version; existing signatures cannot be edited or silently reused.
+
+
+### Step 5A — Two-Founder Controlled Internal Pilot Gate
+Caitlin and Stuart may conduct a testing-only internal pilot before Francis or broader testers are bound. Caitlin remains the implementation owner and attestor; Stuart is the sole initial pilot tester and may record a green light, rejection, or retest requirement against the exact frozen report hash. Francis may remain intentionally unbound during this phase.
+
+**Hard rule:** Pilot readiness authorizes only controlled internal testing. It does not authorize public launch, external actions, payments, notices, official reports, lender or agency reliance, or final production promotion. Francis or another final reviewer remains required before launch. Standing proof: `npm run verify:founder-pilot-test-gate`.

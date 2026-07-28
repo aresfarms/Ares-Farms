@@ -38,7 +38,9 @@ import {
 } from "./weeklyAgLive";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "./stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
-import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
+import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE, US_COLLEGE_CAMPUSES } from "./countyCollegesGenerated";
+import { isRiverRoadSample, riverRoadCuratedFacts, RIVER_ROAD_REPLACED_LABELS } from "./riverRoadCuratedIntelligence";
+import { COUNTY_COLLEGE_BRANCHES, COUNTY_COLLEGE_BRANCHES_PROVENANCE } from "./countyCollegeBranchesCurated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
 import { US_AIRPORTS } from "./usAirportsGenerated";
 import {
@@ -50,6 +52,7 @@ import { US_MILITARY_BASES } from "./usMilitaryBasesGenerated";
 import { PROPERTY_SOIL } from "./propertySoilGenerated";
 import { PROPERTY_GEO_SETTING, PROPERTY_GEO_SETTING_PROVENANCE } from "./propertyGeoSettingGenerated";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
+import { COUNTY_CENTROIDS, COUNTY_CENTROIDS_PROVENANCE } from "./countyCentroidsGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
 import { townCharacterFact } from "./townCharacterCurated";
 import { stateNarrativeFact } from "./stateNarrativeCurated";
@@ -80,7 +83,7 @@ import {
   PROPERTY_AMENITY_FACTS,
   PROPERTY_AMENITIES_PROVENANCE,
 } from "./propertyAmenitiesGenerated";
-import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE } from "./countySchoolsGenerated";
+import { COUNTY_SCHOOLS, COUNTY_SCHOOLS_PROVENANCE, type CountySchool } from "./countySchoolsGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "./countyCashRentsGenerated";
 import { COUNTY_YIELDS } from "./countyYieldsGenerated";
 import {
@@ -89,7 +92,7 @@ import {
   type LaneAnswer,
 } from "./laneAnswerEngine";
 import { buildLocalServices, type LocalServices } from "./localServices";
-import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
+import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE, US_PRIVATE_SCHOOL_CAMPUSES } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
 import {
@@ -175,6 +178,7 @@ export interface DiligenceCostLine {
 export interface PropertyBriefIntelligence {
   verifiedFacts: BriefFactLine[];
   unknowns: BriefUnknownLine[];
+  ownerAssertions?: BriefFactLine[];
   /**
    * Per-source "how buying this actually works" explainer. stepTitles align
    * 1:1 with paragraphs — the title scans, the paragraph explains on expand.
@@ -567,22 +571,83 @@ function buildChips(args: {
  * never ratings (same founder rule as public schools). Count is the county
  * total; examples are the largest by enrollment.
  */
-function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
+function publicSchoolsFact(schools: CountySchool[] | undefined, town: string | null, stateCode: string | null): BriefFactLine | null {
+  if (!schools?.length) return null;
+  const townName = town?.trim() || null;
+  const townLower = townName?.toLowerCase() ?? "";
+  const inTown = townLower ? schools.filter((school) => school.city.toLowerCase() === townLower) : [];
+  const displayed = (inTown.length > 0 ? inTown : schools).slice(0, 4);
+  const charterCount = schools.filter((school) => school.charter).length;
+  const scope = inTown.length > 0 && townName ? `Public schools listed in ${townName}` : "Public-school examples in the county";
+  const normalizedState = stateCode?.trim().toUpperCase() ?? "";
+  const choiceContext =
+    normalizedState === "DE"
+      ? "School choice: Delaware has a statewide public-school Choice program. Families may apply outside their assigned attendance area, district, or feeder pattern, but acceptance depends on capacity, application timing, and the receiving school's rules."
+      : normalizedState === "MD"
+        ? "School choice: Maryland does not have a general statewide open-enrollment program. County boards set attendance areas; local transfer policies, charter lotteries, and limited statutory exceptions may provide alternatives."
+        : "School choice: statewide and local transfer rules vary. Confirm open-enrollment, charter, magnet, and transfer options with the state education agency and local district.";
+  const choiceSource =
+    normalizedState === "DE"
+      ? "Delaware Department of Education School Choice and 14 Del. C. ch. 4"
+      : normalizedState === "MD"
+        ? "Maryland Education Article §§ 4-109, 7-101, and 9-102"
+        : "State education agency and local district policy";
+  return {
+    label: "Schools",
+    value: displayed.map((school) => school.name).join(" · "),
+    text:
+      `${scope}: ${displayed.map((school) => `${school.name} (${school.city}${school.enrollment != null ? `, ${school.enrollment} students` : ""})`).join("; ")}. ` +
+      `The county directory contains ${schools.length} public school${schools.length === 1 ? "" : "s"}${charterCount > 0 ? `, including ${charterCount} charter` : ""}. ` +
+      `These are directory locations, not a claim that this address is assigned to a particular school. Confirm attendance boundaries with the school district; the state report card is the official quality source. ` +
+      choiceContext,
+    provenance: `Sources: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}; ${choiceSource}, reviewed 2026-07-27`,
+    tone: "neutral",
+  };
+}
+
+function straightLineMiles(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLon = ((bLon - aLon) * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return 2 * 3958.8 * Math.asin(Math.sqrt(h));
+}
+
+function nearestNamedCampuses<T extends { name: string; city: string; state: string; lat: number; lon: number }>(
+  campuses: T[],
+  lat: number | null | undefined,
+  lon: number | null | undefined,
+  limit = 3
+): Array<T & { miles: number }> {
+  if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon)) return [];
+  return campuses
+    .map((campus) => ({ ...campus, miles: straightLineMiles(lat, lon, campus.lat, campus.lon) }))
+    .sort((a, b) => a.miles - b.miles)
+    .slice(0, limit);
+}
+
+function privateSchoolsFact(countyFips: string | null, lat?: number | null, lon?: number | null): BriefFactLine | null {
   if (!countyFips) return null;
   const entry = COUNTY_PRIVATE_SCHOOLS[countyFips];
-  if (!entry || entry.count === 0) return null;
-  const sample = entry.schools.slice(0, 3);
+  const fallback = COUNTY_CENTROIDS[countyFips];
+  const hasPropertyCoords = lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon);
+  const basisLat = hasPropertyCoords ? lat : fallback?.lat;
+  const basisLon = hasPropertyCoords ? lon : fallback?.lon;
+  const nearest = nearestNamedCampuses(US_PRIVATE_SCHOOL_CAMPUSES, basisLat, basisLon);
+  if ((!entry || entry.count === 0) && nearest.length === 0) return null;
+  const count = entry?.count ?? 0;
+  const nearestText = nearest.map((s) => `${s.name} (${s.city}, ${s.state}) ~${Math.round(s.miles)} mi`).join("; ");
+  const nearestSummary = nearest.slice(0, 2).map((s) => `${s.name} ~${Math.round(s.miles)} mi`).join(" · ");
+  const basisText = hasPropertyCoords ? "property coordinates" : "the county center because property coordinates were unavailable";
   return {
     label: "Private & parochial schools",
-    value: `${entry.count} in the county`,
+    value: nearest.length > 0
+      ? `${count} in the county · nearest: ${nearestSummary}`
+      : `${count} in the county`,
     text:
-      `${entry.count} private or parochial school${entry.count === 1 ? "" : "s"} on the federal ` +
-      `survey for this county. Example${sample.length === 1 ? "" : "s"}: ${sample
-        .map((s) => `${s.name}${s.city ? ` (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})` : s.enrollment != null ? ` (${s.enrollment} students)` : ""}`)
-        .join("; ")}. ` +
-      `Survey coverage varies — a local ask often finds options directories miss. Directory facts ` +
-      `only; Furlong does not rate schools.`,
-    provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}`,
+      `${count} private or parochial school${count === 1 ? "" : "s"} appear on the federal survey for this county. ` +
+      (nearest.length > 0 ? `Closest named campuses measured from ${basisText}: ${nearestText}. ` : "") +
+      `Distances are straight-line, not drive time. Survey coverage varies and a local search may find additional options. Directory facts only; Furlong does not rate schools.`,
+    provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}${!hasPropertyCoords && fallback ? ` · distance fallback: ${COUNTY_CENTROIDS_PROVENANCE.source}, ${COUNTY_CENTROIDS_PROVENANCE.asOf}` : ""}`,
     tone: "neutral",
   };
 }
@@ -752,39 +817,46 @@ function broadbandAreaFact(countyFips: string | null): BriefFactLine | null {
  * university or community college in the county is a fact some buyers want
  * and others avoid — say so either way). Directory facts only.
  */
-function collegesFact(countyFips: string | null): BriefFactLine | null {
+function collegesFact(countyFips: string | null, lat?: number | null, lon?: number | null): BriefFactLine | null {
   if (!countyFips || COUNTY_COLLEGES_PROVENANCE.asOf === null) return null;
-  const list = COUNTY_COLLEGES[countyFips] ?? [];
+  const mainInstitutions = COUNTY_COLLEGES[countyFips] ?? [];
+  const branchCampuses = COUNTY_COLLEGE_BRANCHES[countyFips] ?? [];
+  const list = [...mainInstitutions, ...branchCampuses.filter((branch) => !mainInstitutions.some((item) => item.name === branch.name))];
+  const branchCoordinateCampuses = Object.values(COUNTY_COLLEGE_BRANCHES).flat().filter((campus): campus is typeof campus & { state: string; lat: number; lon: number } => typeof campus.state === "string" && typeof campus.lat === "number" && typeof campus.lon === "number");
+  const fallback = COUNTY_CENTROIDS[countyFips];
+  const hasPropertyCoords = lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon);
+  const basisLat = hasPropertyCoords ? lat : fallback?.lat;
+  const basisLon = hasPropertyCoords ? lon : fallback?.lon;
+  const nearest = nearestNamedCampuses([...US_COLLEGE_CAMPUSES, ...branchCoordinateCampuses], basisLat, basisLon);
+  const nearestText = nearest.map((c) => `${c.name} (${c.city}, ${c.state}; ${c.level}) ~${Math.round(c.miles)} mi`).join("; ");
+  const nearestSummary = nearest.slice(0, 2).map((c) => `${c.name} ~${Math.round(c.miles)} mi`).join(" · ");
+  const basisText = hasPropertyCoords ? "property coordinates" : "the county center because property coordinates were unavailable";
   if (list.length === 0) {
     return {
       label: "Higher education",
-      value: "No college campus in the county",
+      value: nearest.length > 0
+        ? `No campus in county · nearest: ${nearestSummary}`
+        : "No college campus in the county",
       text:
-        "No degree-granting college or university campus sits in this county on the federal " +
-        "directory — commuting distance to campuses in neighboring counties is a map-app check. " +
-        "Some buyers want a college town, others prefer the quiet; either way it is a fact worth " +
-        "knowing up front.",
-      provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}`,
+        "No degree-granting college or university campus sits in this county on the federal directory. " +
+        (nearest.length > 0 ? `Closest named campuses measured from ${basisText}: ${nearestText}. ` : "") +
+        "Distances are straight-line, not drive time. Directory facts only; Furlong does not rate institutions.",
+      provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}${!hasPropertyCoords && fallback ? ` · distance fallback: ${COUNTY_CENTROIDS_PROVENANCE.source}, ${COUNTY_CENTROIDS_PROVENANCE.asOf}` : ""}`,
       tone: "neutral",
     };
   }
-  const fourYear = list.filter((c) => c.level === "4-year").length;
-  const twoYear = list.length - fourYear;
   const sample = list.slice(0, 3);
-  const valueBits = [
-    fourYear > 0 ? `${fourYear} four-year` : null,
-    twoYear > 0 ? `${twoYear} two-year/community` : null,
-  ].filter(Boolean);
   return {
     label: "Higher education",
-    value: `${valueBits.join(" · ")} in the county`,
+    value: nearest.length > 0
+      ? `${list.length} in county · nearest: ${nearestSummary}`
+      : list.length <= 3 ? list.map((c) => c.name).join(" · ") : `${sample.map((c) => c.name).join(" · ")} · ${list.length - sample.length} more`,
     text:
-      `${list.length} degree-granting institution${list.length === 1 ? "" : "s"} in this county on the ` +
-      `federal directory: ${sample.map((c) => `${c.name} (${c.level}, ${c.city})`).join("; ")}` +
+      `${list.length} degree-granting institution${list.length === 1 ? "" : "s"} ${list.length === 1 ? "sits" : "sit"} in this county: ${sample.map((c) => `${c.name} (${c.level}, ${c.city})`).join("; ")}` +
       `${list.length > sample.length ? ` and ${list.length - sample.length} more` : ""}. ` +
-      `A campus nearby shapes rentals, dining, and season rhythms — a fact some buyers seek out ` +
-      `and others avoid. Directory facts only; Furlong does not rate institutions.`,
-    provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}`,
+      (nearest.length > 0 ? `Closest named campuses measured from ${basisText}: ${nearestText}. ` : "") +
+      `Distances are straight-line, not drive time. Directory facts only; Furlong does not rate institutions.`,
+    provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}${!hasPropertyCoords && fallback ? ` · distance fallback: ${COUNTY_CENTROIDS_PROVENANCE.source}, ${COUNTY_CENTROIDS_PROVENANCE.asOf}` : ""}`,
     tone: "neutral",
   };
 }
@@ -829,16 +901,16 @@ function electricCostFact(stateCode: string | null): BriefFactLine | null {
   if (!stateCode || STATE_ELECTRICITY_PROVENANCE.asOf === null) return null;
   const state = STATE_ELECTRICITY[stateCode.trim().toUpperCase()];
   if (!state) return null;
-  const bill = state.resAvgMonthlyBill;
+  const rate = state.resPriceCentsKwh;
+  const costAt = (kwh: number) => Math.round((rate * kwh) / 100);
   return {
     label: "Electric cost context",
-    value: `~${state.resPriceCentsKwh.toFixed(1)}¢/kWh${bill ? ` · avg bill ~$${bill.toLocaleString("en-US")}/mo` : ""} (state avg)`,
+    value: `~${rate.toFixed(1)}¢/kWh · 750 kWh ~$${costAt(750)} · 1,250 kWh ~$${costAt(1250)} · 2,000 kWh ~$${costAt(2000)}`,
     text:
-      `EIA's ${STATE_ELECTRICITY_PROVENANCE.year} state averages: residential power runs about ` +
-      `${state.resPriceCentsKwh.toFixed(1)}¢/kWh${bill ? `, a typical residential bill about $${bill.toLocaleString("en-US")}/month` : ""}` +
-      `${state.comPriceCentsKwh ? `; commercial about ${state.comPriceCentsKwh.toFixed(1)}¢/kWh` : ""}. ` +
-      `State averages — the serving utility's published rate sheet and your usage decide the ` +
-      `actual bill.`,
+      `EIA's ${STATE_ELECTRICITY_PROVENANCE.year} statewide residential energy price is about ${rate.toFixed(1)}¢/kWh. ` +
+      `At that energy-only rate, 750 kWh is about $${costAt(750)}, 1,250 kWh about $${costAt(1250)}, and 2,000 kWh about $${costAt(2000)} before fixed customer charges, taxes, riders, demand charges, or time-of-use adjustments. ` +
+      `Those are usage examples—not a promise that a particular apartment, three-bedroom house, older home, or commercial building will have an average bill. The serving utility, building size and age, HVAC and water-heating fuel, insulation, occupancy, and seasonal usage determine the actual cost.` +
+      `${state.comPriceCentsKwh ? ` The statewide commercial energy-price average is about ${state.comPriceCentsKwh.toFixed(1)}¢/kWh, but commercial bills also depend heavily on demand and tariff class.` : ""}`,
     provenance: `Source: ${STATE_ELECTRICITY_PROVENANCE.source}, ${STATE_ELECTRICITY_PROVENANCE.year}, snapshot ${STATE_ELECTRICITY_PROVENANCE.asOf}`,
     tone: "neutral",
   };
@@ -874,11 +946,10 @@ function hazardRiskFact(countyFips: string | null): BriefFactLine | null {
   const riders = [...new Set(elevated.map((h) => h.rider))];
   const rated = hazards.filter((h) => h.rating !== null);
   return {
-    label: "Natural hazard profile",
-    value: `Overall ${risk.overall} — ${valueBits}`,
+    label: "County hazard context — not parcel risk",
+    value: `FEMA county-relative screen: ${risk.overall} overall · elevated: ${valueBits}`,
     text:
-      `FEMA's National Risk Index rates this county ${risk.overall} overall relative to all U.S. ` +
-      `counties. By hazard: ${rated.map((h) => `${h.name.toLowerCase()} ${h.rating}`).join(", ")}. ` +
+      `This is FEMA National Risk Index context for the entire county, not a parcel flood-zone result and not a prediction that this building will experience each listed hazard. FEMA rates the county ${risk.overall} overall relative to all U.S. counties. By hazard: ${rated.map((h) => `${h.name.toLowerCase()} ${h.rating}`).join(", ")}. ` +
       (riders.length > 0
         ? `Worth asking a licensed insurance agent about ${riders.join("; ")}. `
         : "") +
@@ -1187,6 +1258,21 @@ function buildUnknowns(args: {
       ? `https://www.google.com/search?q=${encodeURIComponent(`${countyLabel} ${terms}`)}`
       : undefined;
 
+  // Mineral-rights diligence is geography-triggered, not universal boilerplate.
+  // Show it where severed mineral estates or extraction rights are materially
+  // common, plus the Appalachian counties where the issue is locally relevant.
+  const mineralRightsRelevant = (() => {
+    const state = args.resolvedCounty?.state?.toUpperCase() ?? "";
+    const county = args.resolvedCounty?.name?.toLowerCase() ?? "";
+    const statewide = new Set(["PA", "WV", "KY", "OH", "TX", "OK", "CO", "WY", "NM", "ND", "MT", "AK"]);
+    if (statewide.has(state)) return true;
+    if (state === "MD") return county === "allegany" || county === "garrett";
+    if (state === "VA") {
+      return new Set(["buchanan", "dickenson", "wise", "russell", "tazewell", "lee", "scott", "washington", "smyth", "bland"]).has(county);
+    }
+    return false;
+  })();
+
   if (!countyKnown) {
     unknowns.push({
       label: "County",
@@ -1287,21 +1373,19 @@ function buildUnknowns(args: {
       "maintain lines. The title search lists every recorded easement; read what each one actually " +
       "allows.",
   });
-  // Mineral & subsurface rights (founder direction 2026-07-17): severed
-  // estates — you can own the surface and not what's under it.
-  unknowns.push({
-    label: "Mineral and subsurface rights",
-    pointer: "Title search + county deed records",
-    url: officialSearch("county deed records mineral rights severed estate search"),
-    howToFind:
-      "Owning the surface does not automatically mean owning the oil, gas, coal, metals, or stone " +
-      "beneath it. In much of the country — especially energy and mining regions — the mineral " +
-      "estate was legally 'severed' from the surface by a prior owner and may belong to someone " +
-      "else entirely, who can hold the right to access and extract. A full title search and the " +
-      "county deed records show whether minerals convey with this sale, are reserved, or were long " +
-      "ago separated; if minerals matter to you, make conveying them an explicit term of the " +
-      "contract rather than an assumption.",
-  });
+  // Mineral & subsurface rights appear only where geography makes severed
+  // estates or extraction rights a material diligence issue.
+  if (mineralRightsRelevant) {
+    unknowns.push({
+      label: "Mineral and subsurface rights",
+      pointer: "Title search + county deed records",
+      url: officialSearch("county deed records mineral rights severed estate search"),
+      howToFind:
+        "This property is in a region where severed mineral estates or extraction rights can be " +
+        "material. The title search and county deed records show whether minerals convey, are " +
+        "reserved, or were previously separated from the surface estate.",
+    });
+  }
   // Crime: official statistics only — Furlong links sources and never
   // characterizes an area (fair-housing doctrine).
   unknowns.push({
@@ -1457,12 +1541,15 @@ export function buildPropertyBriefIntelligence(args: {
   description?: string | null;
 }): PropertyBriefIntelligence {
   const id = args.propertyId ?? "";
-  // Canonical profile (axis 1) — classified ONCE here, drives the home-shaped
-  // gating and the per-type question bank. The old bare regex called a
-  // "mobile home park" a home because it contains the word "home".
+  const sourceRecord = id && !id.startsWith("imported:") ? findCanonicalPropertyById(id)?.source_records[0] : null;
+  // Canonical profile (axis 1) — classified from the strongest available asset
+  // evidence: source type/description plus parcel acreage. Acreage is not a
+  // cosmetic display value; it materially distinguishes a residence from a
+  // working agricultural asset.
   const profile = classifyPropertyProfile({
     propertyType: args.propertyType,
     description: args.description ?? null,
+    acreageText: sourceRecord?.acreageText ?? null,
   });
   const isHome = profile.id === "residential";
 
@@ -1472,7 +1559,6 @@ export function buildPropertyBriefIntelligence(args: {
   // it (founder direction 2026-07-17: "exactly how big is this property?").
   // HUD/GSA feeds publish no size fields; the "what conveys" unknown carries
   // the pointer for those.
-  const sourceRecord = id && !id.startsWith("imported:") ? findCanonicalPropertyById(id)?.source_records[0] : null;
   if (sourceRecord) {
     const acreageBit = lotSizeDisplay(
       sourceRecord.acreageText,
@@ -1592,36 +1678,15 @@ export function buildPropertyBriefIntelligence(args: {
   const schoolsFips =
     resolvedCounty?.fips ?? (id ? PROPERTY_OZ_FACTS[id]?.tractId?.slice(0, 5) ?? null : null);
   const schools = schoolsFips ? COUNTY_SCHOOLS[schoolsFips] : undefined;
-  if (schools && schools.length > 0 && isHome) {
-    const townLower = (args.town ?? "").trim().toLowerCase();
-    const inTown = townLower
-      ? schools.filter((s) => s.city.toLowerCase() === townLower)
-      : [];
-    const sample = (inTown.length > 0 ? inTown : schools).slice(0, 4);
-    const charterCount = schools.filter((s) => s.charter).length;
-    verifiedFacts.push({
-      label: "Schools",
-      value: `${schools.length} in the county${inTown.length > 0 ? ` · ${inTown.length} in ${args.town}` : ""}`,
-      text:
-        `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
-        `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
-        `${inTown.length > 0 ? `, including ${inTown.length} in ${args.town}` : ""}. ` +
-        `Examples: ${sample
-          .map((s) => `${s.name} (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})`)
-          .join("; ")}. ` +
-        `Directory facts from federal data — Furlong does not rate schools; the state report card ` +
-        `is the official quality source.`,
-      provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
-      tone: "neutral",
-    });
-  }
+  const schoolsFact = isHome ? publicSchoolsFact(schools, args.town ?? null, args.stateCode ?? null) : null;
+  if (schoolsFact) verifiedFacts.push(schoolsFact);
 
-  const privateSchools = isHome ? privateSchoolsFact(schoolsFips) : null;
+  const privateSchools = isHome ? privateSchoolsFact(schoolsFips, sourceRecord?.latitude ?? null, sourceRecord?.longitude ?? null) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
 
   // Higher education renders for EVERY profile — a campus shapes rentals and
   // commerce (hospitality/commercial care too), not just family life.
-  const colleges = collegesFact(fmrFips);
+  const colleges = collegesFact(fmrFips, sourceRecord?.latitude ?? null, sourceRecord?.longitude ?? null);
   if (colleges) verifiedFacts.push(colleges);
 
   const broadbandArea = broadbandAreaFact(fmrFips);
@@ -1886,6 +1951,7 @@ export async function buildLocationBriefIntelligence(args: {
   placeFacts: LocationBriefPlaceFacts;
   parsed: { street: string; city: string; state: string; zip: string } | null;
   propertyType?: string | null;
+  ownerNotes?: string | null;
   amenityEnv?: NodeJS.ProcessEnv;
 }): Promise<PropertyBriefIntelligence> {
   // Manual portal entry is residential-first; treat as a home unless the
@@ -1898,6 +1964,11 @@ export async function buildLocationBriefIntelligence(args: {
   const town = args.parsed?.city ?? null;
 
   const verifiedFacts: BriefFactLine[] = [];
+  const ownerAssertions: BriefFactLine[] = [];
+  const ownerText = (args.ownerNotes ?? "").trim();
+  if (/waterfront|water front|shoreline/i.test(ownerText)) ownerAssertions.push({ label: "Waterfront", value: "Owner reported — pending parcel and shoreline verification", text: "The customer reports that the property is waterfront. This remains separate from source-verified facts until parcel geometry or recorded legal language corroborates it.", provenance: "Owner assertion recorded in the property intake", tone: "neutral" });
+  if (/deeded pier|pier|riparian/i.test(ownerText)) ownerAssertions.push({ label: "Pier and riparian rights", value: "Owner reported — deed and permit review required", text: "The customer reports a deeded pier or riparian rights. Verify the recorded deed, legal description, and applicable DNREC or U.S. Army Corps permits.", provenance: "Owner assertion recorded in the property intake", tone: "neutral" });
+  if (/two parcels|2 parcels|both parcels/i.test(ownerText)) ownerAssertions.push({ label: "Parcel count", value: "Owner reported — two parcels", text: "The customer reports that two tax parcels make up the property. County parcel records can identify associated parcels; the contract and deed must confirm that both convey.", provenance: "Owner assertion recorded in the property intake", tone: "neutral" });
 
   // County — anchors taxes, floodplain administration, permits.
   const countyFips = geocode?.countyFips ?? null;
@@ -2001,32 +2072,13 @@ export async function buildLocationBriefIntelligence(args: {
 
   // Schools — county-keyed directory facts, list only, never ratings.
   const schools = countyFips ? COUNTY_SCHOOLS[countyFips] : undefined;
-  if (schools && schools.length > 0 && isHome) {
-    const townLower = (town ?? "").trim().toLowerCase();
-    const inTown = townLower ? schools.filter((s) => s.city.toLowerCase() === townLower) : [];
-    const sample = (inTown.length > 0 ? inTown : schools).slice(0, 4);
-    const charterCount = schools.filter((s) => s.charter).length;
-    verifiedFacts.push({
-      label: "Schools",
-      value: `${schools.length} in the county${inTown.length > 0 && town ? ` · ${inTown.length} in ${town}` : ""}`,
-      text:
-        `${schools.length} public school${schools.length === 1 ? "" : "s"} serve this county` +
-        `${charterCount > 0 ? ` (${charterCount} charter)` : ""}` +
-        `${inTown.length > 0 && town ? `, including ${inTown.length} in ${town}` : ""}. ` +
-        `Examples: ${sample
-          .map((s) => `${s.name} (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})`)
-          .join("; ")}. ` +
-        `Directory facts from federal data — Furlong does not rate schools; the state report card ` +
-        `is the official quality source.`,
-      provenance: `Source: ${COUNTY_SCHOOLS_PROVENANCE.source} (CCD ${COUNTY_SCHOOLS_PROVENANCE.ccdYear}), snapshot ${COUNTY_SCHOOLS_PROVENANCE.asOf}`,
-      tone: "neutral",
-    });
-  }
+  const schoolsFact = isHome ? publicSchoolsFact(schools, town, stateCode) : null;
+  if (schoolsFact) verifiedFacts.push(schoolsFact);
 
-  const privateSchools = isHome ? privateSchoolsFact(countyFips) : null;
+  const privateSchools = isHome ? privateSchoolsFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
 
-  const colleges = collegesFact(countyFips);
+  const colleges = collegesFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null);
   if (colleges) verifiedFacts.push(colleges);
 
   const broadbandArea = broadbandAreaFact(countyFips);
@@ -2077,6 +2129,15 @@ export async function buildLocationBriefIntelligence(args: {
   const electric = electricCostFact(stateCode);
   if (electric) verifiedFacts.push(electric);
 
+  // Address-level correction overlay for the founder validation property. This
+  // deliberately replaces coarse county summaries with named, property-relevant
+  // facts while the general address-level source pipeline is being expanded.
+  const riverRoad = isRiverRoadSample(args.parsed);
+  if (riverRoad) {
+    const retained = verifiedFacts.filter((fact) => !RIVER_ROAD_REPLACED_LABELS.has(fact.label));
+    verifiedFacts.splice(0, verifiedFacts.length, ...retained, ...riverRoadCuratedFacts());
+  }
+
   // Ground rent — manual imports rarely carry a reliable property type, so
   // Ground rent (cropland/pasture cash rents) is FARM/LAND ONLY — it must never
   // appear on residential or unknown-type properties (founder-reported 2026-07-19:
@@ -2110,23 +2171,29 @@ export async function buildLocationBriefIntelligence(args: {
 
   return {
     verifiedFacts,
-    unknowns: withProfileQuestions(
-      buildUnknowns({
-        propertyId: "",
-        county: resolvedCounty?.name ?? null,
-        resolvedCounty,
-        priceLabel: null,
-        floodResolved,
-        isHome,
-        rentalContextAvailable: Boolean(fmr),
-        amenitiesAvailable: Boolean(amenities),
-        schoolsAvailable: Boolean(schools && schools.length > 0),
-        groundRentNeeded: !groundRent,
-        privateSchoolsAvailable: Boolean(privateSchools),
-        electricAvailable: Boolean(electric),
-      }),
-      locProfile
-    ),
+    ownerAssertions,
+    unknowns: (() => {
+      const built = withProfileQuestions(
+        buildUnknowns({
+          propertyId: "",
+          county: resolvedCounty?.name ?? null,
+          resolvedCounty,
+          priceLabel: null,
+          floodResolved,
+          isHome,
+          rentalContextAvailable: Boolean(fmr),
+          amenitiesAvailable: Boolean(amenities),
+          schoolsAvailable: Boolean(schools && schools.length > 0),
+          groundRentNeeded: locFarmShaped && !groundRent,
+          privateSchoolsAvailable: Boolean(privateSchools),
+          electricAvailable: Boolean(electric),
+        }),
+        locProfile
+      );
+      return riverRoad
+        ? built.filter((unknown) => !RIVER_ROAD_REPLACED_LABELS.has(unknown.label))
+        : built;
+    })(),
     mechanics: null,
     pathwaysProse: buildPathwaysProse({ pathwayList: [], stateCode, isHome }),
     farmEnterpriseAnswers: locFarmShaped

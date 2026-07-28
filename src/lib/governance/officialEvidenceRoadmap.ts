@@ -1,4 +1,4 @@
-export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v15";
+export const OFFICIAL_EVIDENCE_ROADMAP_VERSION = "official-evidence-roadmap-v34";
 
 export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "3Q_EXTERNAL_NOTIFICATION_CONNECTOR",
@@ -22,6 +22,25 @@ export const OFFICIAL_EVIDENCE_SEQUENCE = Object.freeze([
   "4I_COMPELLED_DISCLOSURE_DUAL_CONTROL",
   "4J_INSTITUTIONAL_ACCESS_SURVEILLANCE",
   "4K_INSTITUTIONAL_ACCESS_RUNTIME_ENFORCEMENT",
+  "4L_INSTITUTIONAL_ACCESS_SURVEILLANCE_ORCHESTRATION",
+  "4M_INSTITUTIONAL_SURVEILLANCE_ACTIVATION_CEREMONY",
+  "4N_INSTITUTIONAL_SURVEILLANCE_CANARY_RELEASE",
+  "4O_INSTITUTIONAL_SURVEILLANCE_SCHEDULER_PROVISIONING",
+  "4P_GOVERNED_ULTIMATE_PROFORMA",
+  "4Q_FEDERAL_LOAN_AUTHORITY_CONTINUOUS_MONITOR",
+  "4R_FEDERAL_LOAN_AUTHORITY_AUTOMATIC_RECONCILIATION",
+  "4S_FEDERAL_LOAN_AUTHORITY_REFRESH_RELIABILITY",
+  "4T_FEDERAL_LOAN_AUTHORITY_CHANGE_TRIAGE",
+  "4U_CONTROLLED_PUBLIC_SURFACE_PROMOTION",
+  "4V_PRODUCTION_PROMOTION_READINESS",
+  "4W_FINAL_PRODUCTION_PROMOTION_DECISION_PACKET",
+  "4X_CROSS_FUNCTIONAL_INTERNAL_CHANGE_VERIFICATION",
+  "4Y_THREE_FOUNDER_RELEASE_AUTHORITY",
+  "4Z_FOUNDER_CHANGE_REVIEW_WORKSPACE",
+  "5A_TWO_FOUNDER_INTERNAL_PILOT_GATE",
+  "5B_CUSTOMER_PROPERTY_EXPERIENCE_RECONSTRUCTION",
+  "5C_INTEGRATED_PRE_PROMOTION_FEATURE_VERIFICATION",
+  "5D_THREE_LANE_CONSUMER_COMMAND_CENTER",
 ] as const);
 
 export type OfficialEvidenceSequenceStep =
@@ -70,6 +89,44 @@ const REQUIRED_ARTIFACT: Record<OfficialEvidenceSequenceStep, string> = {
     "src/lib/governance/institutionalAccessSurveillance.ts",
   "4K_INSTITUTIONAL_ACCESS_RUNTIME_ENFORCEMENT":
     "src/lib/governance/institutionalAccessRuntimeEnforcement.ts",
+  "4L_INSTITUTIONAL_ACCESS_SURVEILLANCE_ORCHESTRATION":
+    "src/lib/governance/institutionalAccessSurveillanceOrchestrator.ts",
+  "4M_INSTITUTIONAL_SURVEILLANCE_ACTIVATION_CEREMONY":
+    "src/lib/governance/institutionalAccessSurveillanceActivationCeremony.ts",
+  "4N_INSTITUTIONAL_SURVEILLANCE_CANARY_RELEASE":
+    "src/lib/governance/institutionalAccessSurveillanceCanaryRelease.ts",
+  "4O_INSTITUTIONAL_SURVEILLANCE_SCHEDULER_PROVISIONING":
+    "src/lib/governance/institutionalAccessSurveillanceSchedulerProvisioning.ts",
+  "4P_GOVERNED_ULTIMATE_PROFORMA":
+    "src/lib/governance/governedUltimateProforma.ts",
+  "4Q_FEDERAL_LOAN_AUTHORITY_CONTINUOUS_MONITOR":
+    "src/lib/governance/federalLoanAuthorityMonitor.ts",
+  "4R_FEDERAL_LOAN_AUTHORITY_AUTOMATIC_RECONCILIATION":
+    "src/lib/governance/federalLoanAuthorityReconciliation.ts",
+  "4S_FEDERAL_LOAN_AUTHORITY_REFRESH_RELIABILITY":
+    "src/scripts/verifyFederalLoanAuthorityRefreshReliability.ts",
+  "4T_FEDERAL_LOAN_AUTHORITY_CHANGE_TRIAGE":
+    "src/lib/governance/federalLoanAuthorityChangeTriage.ts",
+  "4U_CONTROLLED_PUBLIC_SURFACE_PROMOTION":
+    "src/scripts/verifyControlledPublicSurfacePromotion.ts",
+  "4V_PRODUCTION_PROMOTION_READINESS":
+    "src/lib/governance/productionPromotionReadiness.ts",
+  "4W_FINAL_PRODUCTION_PROMOTION_DECISION_PACKET":
+    "src/lib/governance/finalProductionPromotionDecisionPacket.ts",
+  "4X_CROSS_FUNCTIONAL_INTERNAL_CHANGE_VERIFICATION":
+    "src/lib/governance/internalChangeVerification.ts",
+  "4Y_THREE_FOUNDER_RELEASE_AUTHORITY":
+    "src/lib/governance/threeFounderReleaseAuthority.ts",
+  "4Z_FOUNDER_CHANGE_REVIEW_WORKSPACE":
+    "src/lib/governance/founderChangeReviewStore.ts",
+  "5A_TWO_FOUNDER_INTERNAL_PILOT_GATE":
+    "src/lib/governance/founderPilotTestGate.ts",
+  "5B_CUSTOMER_PROPERTY_EXPERIENCE_RECONSTRUCTION":
+    "src/scripts/verifyCustomerPropertyExperience.ts",
+  "5C_INTEGRATED_PRE_PROMOTION_FEATURE_VERIFICATION":
+    "src/scripts/verifyIntegratedPrePromotionFeatureSuite.ts",
+  "5D_THREE_LANE_CONSUMER_COMMAND_CENTER":
+    "src/scripts/verifyThreeLaneConsumerCommandCenter.ts",
 };
 
 export function roadmapArtifactFor(step: OfficialEvidenceSequenceStep): string {

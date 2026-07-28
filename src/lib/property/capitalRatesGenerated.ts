@@ -11,7 +11,7 @@
  */
 
 export const CAPITAL_RATES_PROVENANCE = {
-  asOf: "2026-07-16" as string | null,
+  asOf: "2026-07-22" as string | null,
   source: "FRED (DPRIME) for prime; NADCO/DCFC monthly debenture for 504",
 } as const;
 
@@ -24,5 +24,5 @@ export interface CapitalRatesSnapshot {
 
 export const CAPITAL_RATES: CapitalRatesSnapshot = {
   prime: 6.75,
-  sba504Debenture: null,
+  sba504Debenture: 6.176,
 };

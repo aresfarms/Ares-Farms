@@ -10,6 +10,6 @@ assert(panel.includes('data-testid="property-evidence-panel"'), "Evidence panel 
 for (const label of ["Verified", "Supported", "Inferred", "Unknown", "Stale", "Confirmation required"]) assert(panel.includes(label), `Missing visible status ${label}`);
 assert(panel.includes("block final reliance"), "Panel must visibly state reliance blockers.");
 assert(workspace.includes("buildPropertyEvidenceManifest"), "Workspace must build the canonical manifest.");
-assert(workspace.includes("<PropertyEvidencePanel manifest={propertyEvidenceManifest}"), "Workspace must render the canonical manifest.");
+assert(!workspace.includes("<PropertyEvidencePanel manifest={propertyEvidenceManifest}"), "Customer workspace must not render the internal evidence manifest.");
 assert(ingestion.includes('kind: "water"') && ingestion.includes('kind: "insurance"') && ingestion.includes('kind: "public-project"') && ingestion.includes('kind: "government-action"'), "All evidence domains must be represented when unresolved.");
-console.log(JSON.stringify({ ok: true, rule: "TESTER-EVIDENCE-PANEL-001", visibleStatuses: ["verified", "supported", "inferred", "unknown", "stale", "confirmation-required"], blocksReliance: true }, null, 2));
+console.log(JSON.stringify({ ok: true, rule: "TESTER-EVIDENCE-PANEL-001", internalManifestPreserved: true, customerPanelHidden: true }, null, 2));

@@ -15,6 +15,7 @@ import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
+import { NavigatorEntryCta, navigatorHref } from "@/components/public/NavigatorEntryCta";
 import { InteractiveCompassRose } from "@/components/public/InteractiveCompassRose";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
@@ -27,7 +28,6 @@ import { accentForLane } from "@/lib/property/laneThemes";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
-import { buildStateDroughtProvenance } from "@/lib/property/weeklyAgLive";
 import { canonicalProviderAuthority } from "@/lib/platform/authorities/provider";
 import { isoWeekSeed, dayRotationSeed } from "@/lib/public-content/weekSeed";
 
@@ -112,7 +112,7 @@ type LaneNode = {
 // without scrolling on desktop.
 const LANES: LaneNode[] = [
   { slug: "property-land",            label: "Residential",                     icon: "map-pin", tint: "#FAEEDA", color: "#854F0B", top: 13, left: 50 }, // N
-  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 24, left: 78, href: "/explore?lane=farms-agriculture" }, // NE
+  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 24, left: 78 }, // NE
   { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
   { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
   { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S
@@ -198,106 +198,72 @@ export default async function ExplorePage({
     // property lanes render on white → the onLight variant.
     const laneAccent = accentForLane(selected.slug, "light");
 
-    // Tabbed Farms module (founder direction 2026-07-20): ?section=<key> opens a
-    // single focused page instead of the long scroll. The report button opens the
-    // written analysis flow in a new tab.
+    // Agricultural workspace tabs stay integrated into the main farm page.
     const section = one(resolved.section);
-    const farmReportHref = "/discover?flow=place-facts";
-    if (isFarmLane && section && FARM_SECTIONS.some((s) => s.key === section)) {
-      return (
-        <main>
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 48px", display: "grid", gap: 20 }}>
-            <Link href="/explore?lane=farms-agriculture" style={{ fontSize: 13, fontWeight: 700, color: laneAccent, textDecoration: "none", width: "fit-content" }}>
-              ← Back to the Farms module
-            </Link>
-            {section === "newsletters"
-              ? audience && <CurrentNewsletters audiences={[audience]} />
-              : <FarmLaneSection sectionKey={section} />}
-            <CommunityCta />
-          </div>
-        </main>
-      );
-    }
+    const farmReportHref = navigatorHref("farms-agriculture");
 
     return (
       <>
-        {/* Farms lane leads with the commodity ticker (founder direction
-            2026-07-18: the module answers what agricultural people actually
-            want to know — prices first). */}
+        {isResidentialLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "22px 20px 0", display: "grid", gap: 12 }}>
+            <ResidentialRateTiles />
+            <HundredPercentFinancingCallout />
+          </div>
+        )}
+        {isCommercialLane && (
+          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "22px 20px 0" }}>
+            <CapitalRatesBlock accent={laneAccent} />
+          </div>
+        )}
         {isFarmLane && (
-          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "20px 20px 0" }}>
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "22px 20px 0" }}>
             <FarmCommodityTicker />
           </div>
         )}
-        <div
-          className="land-top-row"
+        <section
+          aria-label={`${selected.label} map and address search`}
+          className="land-map-row"
           style={{
             maxWidth: 1280,
             margin: "0 auto",
             padding: "24px 20px 0",
             display: "grid",
-            gap: 24,
-            gridTemplateColumns: isFarmLane ? "1fr" : "minmax(0, 1.35fr) minmax(0, 1fr)",
-            alignItems: "start",
+            gap: 14,
           }}
         >
-          <div className="fl-map-section" style={{ display: "grid", gap: 12, alignContent: "start" }}>
-            <PublicMapExperience
-              liveSources={getRuntimeLiveSources()}
-              mapInventoryByState={laneInventory}
-              weekSeed={landWeekSeed}
-            />
-            {/* Compact address-check tucked directly under the map, at the map's
-                width, filling the space below it (founder direction 2026-07-20). */}
-            <div style={{ display: "grid", gap: 8 }}>
-              <div style={{ display: "grid", gap: 3 }}>
-                <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>
-                  Have an address in mind?
-                </span>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>
-                  Check a specific location&apos;s verified place-facts right here — or keep browsing the map above.
-                </p>
-              </div>
+          <header style={{ display: "grid", gap: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Explore the map</span>
+            <h2 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(22px,3vw,32px)", lineHeight: 1.15 }}>America&apos;s Journey and property opportunities</h2>
+          </header>
+          <PublicMapExperience
+            liveSources={getRuntimeLiveSources()}
+            mapInventoryByState={laneInventory}
+            weekSeed={landWeekSeed}
+          />
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ display: "grid", gap: 3 }}>
+              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>Have a farm or parcel in mind?</span>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>Use the same Furlong Navigator entry point as the Compass and financing workspace. Your farm lens carries into the property-first analysis automatically.</p>
+            </div>
+            {isFarmLane ? (
+              <NavigatorEntryCta lens="farms-agriculture" support="Start with the property, listing, or question. Navigator keeps the farming lens while testing every plausible use, market, cost, environmental, and financing pathway." />
+            ) : (
               <PlaceFirstDiscovery flow="place-facts" compact />
-            </div>
+            )}
           </div>
-          {/* Right column beside the map. Farms/Land: the Real Listings fill the
-              dead space under the browse box. Residential: the mortgage-rate
-              tiles sit under the "Homes to live in" box (founder direction
-              2026-07-18). Other lanes keep the full-width shelf below. */}
-          {!isFarmLane && (
-            <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
-              <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
-              {isResidentialLane && <ResidentialRateTiles />}
-              {isResidentialLane && <HundredPercentFinancingCallout />}
-              {isCommercialLane && <CapitalRatesBlock accent={laneAccent} />}
-            </div>
+        </section>
+
+        <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 16 }}>
+          <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
+          {isFarmLane && (
+            <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={shelfSeed} limit={6} accent={laneAccent} />
           )}
         </div>
-        {/* The farmer sections as cards (founder direction 2026-07-18):
-            enterprise economics, land-money options, equipment, cross-links. */}
-        {/* Farms now uses the unified property-analysis journey. The market
-            header, map, and address choice remain here; after a property is
-            selected, the new Property Evaluation Workspace owns everything
-            else. Do not reintroduce the legacy farm cards on this surface. */}
         {/* The commercial sections (founder direction 2026-07-18): the kinds of
             commercial property, the questions owners ask + the ones they don't. */}
         {isCommercialLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
             <CommercialLaneSections />
-          </div>
-        )}
-        {/* Farm lane: the topic menu — the ONLY navigation to the seven farm
-            sections (questions, land earnings, self-check, equipment, hauling,
-            loan comparison, newsletters). Restored 2026-07-28: the unified-flow
-            restructure left FarmLaneMenu imported but unrendered, orphaning all
-            seven section pages behind undiscoverable URLs. */}
-        {isFarmLane && (
-          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "18px 20px 0" }}>
-            <FarmLaneMenu
-              hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`}
-              reportHref="/discover?flow=place-facts"
-            />
           </div>
         )}
         {/* Non-farm lanes keep the full-width listings shelf below the map. */}
@@ -313,19 +279,34 @@ export default async function ExplorePage({
             <ResidentialLoanTable />
           </div>
         )}
-        {!isFarmLane && (
-          <PropertyHub
-            state={one(resolved.state)}
-            type={one(resolved.type)}
-            category={one(resolved.category)}
-            lane={selected.slug}
-          />
+        <PropertyHub
+          state={one(resolved.state)}
+          type={one(resolved.type)}
+          category={one(resolved.category)}
+          lane={selected.slug}
+        />
+        {isFarmLane && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 20px 0", display: "grid", gap: 16 }}>
+            <header style={{ display: "grid", gap: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
+              <h2 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.08 }}>Find the best use of the ground</h2>
+              <p style={{ margin: 0, maxWidth: 880, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Compare agricultural enterprises, diversified portfolios, land-income options, operating costs, financing, equipment, and site constraints in one workspace.</p>
+            </header>
+            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} activeSection={section} />
+          </div>
+        )}
+        {isFarmLane && section && FARM_SECTIONS.some((item) => item.key === section) && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
+            {section === "newsletters"
+              ? audience && <CurrentNewsletters audiences={[audience]} />
+              : <FarmLaneSection sectionKey={section} />}
+          </div>
         )}
         {/* Newsletters & podcasts, then the gold Community cue, at the BOTTOM
             of every lane (founder direction 2026-07-18). */}
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0", display: "grid", gap: 16 }}>
           {audience && !isFarmLane && <CurrentNewsletters audiences={[audience]} />}
-          {!isFarmLane && <CommunityCta />}
+          <CommunityCta />
         </div>
         {/* The map is width-responsive now (960×580 aspect held at any width),
             so it keeps its side column at normal widths; only narrow screens stack.
@@ -333,9 +314,8 @@ export default async function ExplorePage({
             column instead of forcing an 8px page overflow (their min-content is
             wider than a phone); overflow-x:clip guards against any residual. */}
         <style>{`
-          .land-top-row { overflow-x: clip; }
-          .land-top-row > * { min-width: 0; }
-          @media (max-width: 900px) { .land-top-row { grid-template-columns: 1fr !important; } }
+          .land-map-row { overflow-x: clip; }
+          .land-map-row > * { min-width: 0; }
         `}</style>
       </>
     );

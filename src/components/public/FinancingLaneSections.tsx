@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { FinancingIntakePanel } from "@/components/public/FinancingIntakePanel";
-import { FinancingFeeChart } from "@/components/public/FinancingFeeChart";
+import { FinancingFeeChart, FinancingFreeOverview } from "@/components/public/FinancingFeeChart";
+import { NavigatorEntryCta } from "@/components/public/NavigatorEntryCta";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
 import { accentForLane } from "@/lib/property/laneThemes";
 import { activePartners } from "@/lib/modules/licensedModuleRegistry";
@@ -68,11 +69,12 @@ const FINANCING_BRIEFS: FinBrief[] = [
 export function FinancingLaneSections() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      {/* Program comparison + today's rates leads the page (founder direction
-          2026-07-20); the paid-advisory fee block moves to the bottom. */}
+      <NavigatorEntryCta lens="financing-capital" support="Use the same Furlong Navigator entry point as the main Compass. Start with a property, business, project, or financing question and carry that context into the capital workspace." />
+      {/* Free application promise first, then current rates and program pricing. */}
+      <FinancingFreeOverview />
       <LoanProgramComparison />
 
-      <section aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
+      <section id="personalized-financing" aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
           Our dedicated licensed lender
         </span>
@@ -107,6 +109,9 @@ export function FinancingLaneSections() {
 
       <FinancingIntakePanel />
 
+      {/* Optional paid advisory belongs near the bottom, after rates and intake. */}
+      <FinancingFeeChart />
+
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
         <Link href="/explore?lane=environmental-compliance" style={{ ...card, textDecoration: "none" }}>
           <span style={{ fontSize: 15, fontWeight: 700, color: "#127a4f" }}>Environmental &amp; Compliance →</span>
@@ -131,9 +136,6 @@ export function FinancingLaneSections() {
         </Link>
       </section>
 
-      {/* Paid advisory services (free applications + the only paid one-on-one time)
-          at the BOTTOM (founder direction 2026-07-20). */}
-      <FinancingFeeChart />
     </div>
   );
 }

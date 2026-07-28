@@ -292,6 +292,27 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     /* weekly-ag refresh is best-effort; committed snapshot stands */
   }
 
+  // Federal loan authority monitor: official SBA, FSA, USDA Rural Development,
+  // eCFR, and Federal Register sources. Content changes are detected and marked
+  // review-stale; the monitor never silently converts changed text into advice.
+  try {
+    const { refreshFederalLoanAuthorities } = await import("@/lib/governance/federalLoanAuthorityMonitor");
+    const federal = await refreshFederalLoanAuthorities({ now: now.toISOString() });
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "federal-loan-authority-refresh", subject: "SBA-FSA-USDA",
+      decision: federal.failed > 0 || federal.timedOut > 0 ? "ALERT" : federal.changed > 0 ? "REVIEW_REQUIRED" : "REFRESH",
+      reason: `Federal loan authority monitor fetched ${federal.fetched}, discovered ${federal.discovered}, detected ${federal.changed} changes, recorded ${federal.failed} failures, and timed out ${federal.timedOut} sources.`,
+      detail: { runId: federal.runId, snapshotSha256: federal.snapshotSha256, attempted: federal.attempted, deferred: federal.deferred, durationMs: federal.durationMs },
+    });
+  } catch (error) {
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "federal-loan-authority-refresh", subject: "SBA-FSA-USDA", decision: "ALERT",
+      reason: `Federal loan authority refresh failed; dependent guidance remains review-bound: ${(error as Error).message}`,
+    });
+  }
+
   // Official parcel-tax and well-permit evidence refresh. The governed writers
   // persist immutable versions and receipts in the shared runtime-state mount,
   // so state survives Cloud Run revisions and scheduled job executions.

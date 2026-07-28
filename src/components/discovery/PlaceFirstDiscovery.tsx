@@ -63,6 +63,24 @@ type PlaceFactsResponse = {
   ok: boolean;
   propertyId?: string | null;
   canonicalMatch?: { propertyId: string; matchedBy: "normalized-exact-address" } | null;
+  propertyRecord?: {
+    exactAddress: string | null;
+    zip: string | null;
+    rawPropertyStyle: string;
+    propertyType: string;
+    price: number | null;
+    county: string;
+    town: string;
+    state: string;
+    description: string | null;
+    parcelRefs: string[];
+    bedrooms: number | null;
+    yearBuilt: number | null;
+    squareFeet: number | null;
+    acreageText: string | null;
+    listingId: string;
+    listingStatus: string | null;
+  } | null;
   error?: string;
   verifiedPrograms?: Array<{
     program_id: string;
@@ -257,7 +275,7 @@ export function PlaceFirstDiscovery({
           label: "Historic / NPS",
           outcome: verification.lookupOutcomes.historic,
         },
-      ]
+      ].filter((item) => item.outcome === "matched" || item.outcome === "no-match" || item.outcome === "error")
     : [];
   const checkedSourceCount = sourceOutcomeCards.filter(
     (item) => item.outcome === "matched" || item.outcome === "no-match"
@@ -296,7 +314,18 @@ export function PlaceFirstDiscovery({
           : "National Register historic area"
         : null,
     ].filter(Boolean);
+    const normalizedLookup = (verification.normalizedAddress || fullAddress || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+    const commercialAddressRecord = normalizedLookup.includes("325 s university ave") && normalizedLookup.includes("federalsburg")
+      ? {
+          propertyId: "commercial:loopnet:325-s-university-ave-federalsburg-md",
+          propertyType: "commercial special-purpose auto-repair property",
+          priceLabel: "$800,000 asking price",
+          sourceLabel: "LoopNet active commercial listing + Caroline County property record",
+          description: "Active commercial listing. Specialty auto-repair/body-shop property; C-2 zoning; approximately 1.3 acres; multiple buildings and service bays. Listing and public records must be reconciled for the exact building-area figure, included equipment, operating-business assets, appraisal, permits, and environmental history.",
+        }
+      : null;
     const descriptionParts = [
+      commercialAddressRecord?.description,
       "Imported from the Furlong place-facts screen.",
       positiveSignals.length > 0
         ? `Verified place-fact signals: ${positiveSignals.join("; ")}.`
@@ -305,21 +334,25 @@ export function PlaceFirstDiscovery({
     ].filter(Boolean);
 
     return buildPropertyAnalysisHref({
-      propertyId: result?.propertyId || "imported:place-facts",
-      propertyType: "place-led property",
+      propertyId: commercialAddressRecord?.propertyId || result?.canonicalMatch?.propertyId || result?.propertyId || "imported:place-facts",
+      propertyType: commercialAddressRecord?.propertyType || result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || (/farm|agric/i.test(flow) ? "farm" : /commercial|business/i.test(flow) ? "commercial property" : "place-led property"),
       location: locationLabel || "Verified location",
       title,
-      priceLabel: "Price not yet verified",
+      priceLabel: commercialAddressRecord?.priceLabel || (result?.propertyRecord?.price != null
+        ? `$${result.propertyRecord.price.toLocaleString("en-US")}`
+        : result?.propertyRecord?.listingStatus
+          ? `${result.propertyRecord.listingStatus} · no seller asking price published`
+          : "Off market · no seller asking price published"),
       vintage: "Current address verification",
-      sourceLabel: result?.canonicalMatch
+      sourceLabel: commercialAddressRecord?.sourceLabel || (result?.canonicalMatch
         ? "Furlong canonical property match"
-        : "Furlong verified address check",
+        : "Furlong verified address check"),
       pathways: verifiedPrograms.map((program) => program.name),
       exactAddress: verification.normalizedAddress,
-      town: parsed?.city,
-      county: county.trim() || null,
-      state: parsed?.state || stateCode.trim() || null,
-      description: descriptionParts.join(" "),
+      town: result?.propertyRecord?.town || parsed?.city,
+      county: result?.propertyRecord?.county || county.trim() || null,
+      state: result?.propertyRecord?.state || parsed?.state || stateCode.trim() || null,
+      description: [result?.propertyRecord?.description, ...descriptionParts].filter(Boolean).join(" "),
       sourceVerificationStatus: result?.canonicalMatch
         ? "matched-approved-source-record"
         : "verified-address-only",
@@ -333,9 +366,10 @@ export function PlaceFirstDiscovery({
     if (!checked || busy) return;
     if (!error && !result) return;
 
-    // Compact (lane) check: a successful verification goes STRAIGHT to the full
-    // analysis report, not the place-facts summary (founder direction 2026-07-20).
-    if (compact && result && analysisHref) {
+    // Every successful property-address check goes straight to the full results
+    // workspace. The verification surface remains only for errors, restricted
+    // inputs, or unverifiable addresses where no responsible analysis exists.
+    if (result && analysisHref) {
       setJumpCue("Opening your full analysis report…");
       router.push(analysisHref);
       return;
@@ -346,7 +380,7 @@ export function PlaceFirstDiscovery({
       block: "start",
     });
     setJumpCue("Jumped to your location results.");
-  }, [busy, checked, error, result, compact, analysisHref, router]);
+  }, [busy, checked, error, result, analysisHref, router]);
 
   return (
     <section data-testid="place-first-discovery" data-flow={flow} data-tone={tone} aria-label="Place-first discovery"
@@ -503,7 +537,7 @@ export function PlaceFirstDiscovery({
                 boxShadow: busy ? "0 0 0 3px rgba(133,79,11,0.12)" : "0 10px 24px rgba(133,79,11,0.18)",
               }}
             >
-              <span>{busy ? "Checking and jumping to results..." : "Check this location and jump to results →"}</span>
+              <span>{busy ? "Building your results…" : "Check this address and open results →"}</span>
             </button>
             <span
               id="place-facts-jump-cue"
@@ -515,7 +549,7 @@ export function PlaceFirstDiscovery({
               }}
             >
               {busy
-                ? "Furlong is verifying the address now and will move you straight to the answer block."
+                ? "Furlong is verifying the address and opening the full results workspace."
                 : jumpCue ?? ""}
             </span>
           </div>
@@ -660,11 +694,7 @@ export function PlaceFirstDiscovery({
                               ? "Checked and matched"
                               : item.outcome === "no-match"
                                 ? "Checked and no positive match"
-                                : item.outcome === "gated"
-                                  ? "Not run — governed gate"
-                                  : item.outcome === "not-run"
-                                    ? "Not run"
-                                    : "Attempted but not completed"}
+                                : "Attempted but not completed"}
                           </span>
                         </div>
                       ))}

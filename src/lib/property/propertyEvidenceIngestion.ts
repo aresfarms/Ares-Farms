@@ -5,7 +5,7 @@ import type { PropertyInfrastructureRiskImpact, ScenarioInfrastructureAdjustment
 
 export interface OfficialPropertyEvidenceRecord {
   recordId: string;
-  domain: "tax" | "water" | "insurance" | "public-project" | "government-action";
+  domain: "tax" | "title" | "water" | "insurance" | "public-project" | "government-action";
   status: string;
   sourceId: string;
   sourceName: string;
@@ -32,7 +32,7 @@ export function structuredTaxRecord(records: OfficialPropertyEvidenceRecord[]): 
 }
 
 export function ingestStructuredPropertyEvidence(records: OfficialPropertyEvidenceRecord[]): ExtendedPropertyRiskEvidence[] {
-  return records.filter((record) => record.domain !== "tax").map((record) => {
+  return records.filter((record) => record.domain !== "tax" && record.domain !== "title").map((record) => {
     if (!record.recordId || !record.sourceId || !record.sourceName || !record.authority || !record.jurisdiction || !record.reference || !record.retrievedAt || !record.asOf || !record.replayRef || !record.canonicalPropertyId) {
       throw new Error("Structured official evidence is missing required provenance or parcel-match fields.");
     }

@@ -51,8 +51,18 @@ const OBJECTIVES: { label: string; slug: string }[] = [
   { label: "Read the ground", slug: "environmental-compliance" },
 ];
 
+const PROPERTY_DISCOVERY_LANES = new Set([
+  "property-land",
+  "farms-agriculture",
+  "small-business-growth",
+]);
+
 function laneHref(l: CompassLane): string {
-  return l.href ?? `/navigator?flow=property-discovery&lens=${encodeURIComponent(l.slug)}`;
+  if (l.href) return l.href;
+  if (PROPERTY_DISCOVERY_LANES.has(l.slug)) {
+    return `/navigator?flow=property-discovery&lens=${encodeURIComponent(l.slug)}`;
+  }
+  return `/explore?lane=${encodeURIComponent(l.slug)}`;
 }
 
 /** Bearing (deg, clockwise from north) from the hub to a lane node. */
@@ -122,7 +132,7 @@ export function InteractiveCompassRose({
         {/* Center hub — the Furlong emblem. */}
         <div className="cr-hub">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/furlong-emblem.png" alt="Furlong emblem — a guide through uncertain waters" />
+          <img src="/brand/furlong-ship-emblem-v2.png" alt="Furlong ship emblem — Compass to Capital" />
         </div>
 
         {/* Lane spokes — real links, enhanced with hover/focus + active state. */}

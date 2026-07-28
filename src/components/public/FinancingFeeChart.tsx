@@ -5,6 +5,7 @@ import {
   FINANCING_OFFERINGS,
   FINANCING_TRUST,
 } from "@/lib/financing/financingFeeSchedule";
+import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { accentForLane } from "@/lib/property/laneThemes";
 
 /**
@@ -29,9 +30,9 @@ const cellBase = {
   verticalAlign: "top" as const,
 };
 
-export function FinancingFeeChart() {
+export function FinancingFreeOverview() {
   return (
-    <section aria-label="Financing fees" style={{ display: "grid", gap: 12 }}>
+    <section aria-label="Free lending applications and possible no-money-down financing" style={{ display: "grid", gap: 12 }}>
       <div
         style={{
           background: "#e7f6ee",
@@ -68,6 +69,14 @@ export function FinancingFeeChart() {
         </div>
       </div>
 
+      <HundredPercentFinancingCallout />
+    </section>
+  );
+}
+
+export function FinancingFeeChart() {
+  return (
+    <section aria-label="Financing fees" style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 4 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
           The only paid services — one-on-one with the licensed lender

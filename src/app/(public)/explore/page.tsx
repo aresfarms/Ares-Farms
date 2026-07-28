@@ -27,7 +27,7 @@ import { accentForLane } from "@/lib/property/laneThemes";
 import { buildPublicSafeInventoryByState } from "@/lib/property/propertyData";
 import type { PropertyProfileId } from "@/lib/property/propertyProfile";
 import { getRuntimeLiveSources } from "@/lib/property/sourceActivationStore";
-import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
+import { buildStateDroughtProvenance } from "@/lib/property/weeklyAgLive";
 import { canonicalProviderAuthority } from "@/lib/platform/authorities/provider";
 import { isoWeekSeed, dayRotationSeed } from "@/lib/public-content/weekSeed";
 
@@ -285,6 +285,19 @@ export default async function ExplorePage({
         {isCommercialLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
             <CommercialLaneSections />
+          </div>
+        )}
+        {/* Farm lane: the topic menu — the ONLY navigation to the seven farm
+            sections (questions, land earnings, self-check, equipment, hauling,
+            loan comparison, newsletters). Restored 2026-07-28: the unified-flow
+            restructure left FarmLaneMenu imported but unrendered, orphaning all
+            seven section pages behind undiscoverable URLs. */}
+        {isFarmLane && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "18px 20px 0" }}>
+            <FarmLaneMenu
+              hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`}
+              reportHref="/discover?flow=place-facts"
+            />
           </div>
         )}
         {/* Non-farm lanes keep the full-width listings shelf below the map. */}

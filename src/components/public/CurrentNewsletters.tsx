@@ -10,10 +10,10 @@ import Link from "next/link";
 import { buildCompassDispatch } from "@/lib/newsletter/newsletterDispatch";
 import type { NewsletterAudience } from "@/lib/newsletter/newsletterEditions";
 import { CURRENT_NEWSLETTERS } from "@/lib/newsletter/newsletterRegistry";
-import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
+import { buildStateDroughtProvenance } from "@/lib/property/weeklyAgLive";
 
 export function CurrentNewsletters({ audiences, accent = "#0f766e" }: { audiences?: NewsletterAudience[]; accent?: string }) {
-  const asOf = STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-18";
+  const asOf = buildStateDroughtProvenance().mapDate ?? "2026-07-18";
   const listings = CURRENT_NEWSLETTERS.filter(
     (n) => !audiences || audiences.includes(n.audience)
   );

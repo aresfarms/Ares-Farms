@@ -269,6 +269,29 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     /* commodity refresh is best-effort; committed snapshot stands */
   }
 
+  // Weekly ag refresh (Tier-1 activation 2026-07-28): drought severity (USDM,
+  // keyless) + corn/soybean crop conditions (NASS, same key as above) into the
+  // weekly-ag overlay, so the "local truth" leads — this week's drought map and
+  // crop ratings — track their weekly sources instead of aging in a snapshot.
+  // Best-effort: a thin pull never overwrites the served picture.
+  try {
+    const { refreshWeeklyAg } = await import("./weeklyAgRefresh");
+    const w = await refreshWeeklyAg();
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh",
+      actorName: "source-refresh-job",
+      domain: DOMAIN,
+      subject: "weekly-ag",
+      decision: w.status === "FAILED" ? "ALERT" : "REFRESH",
+      reason:
+        w.status === "FAILED"
+          ? `weekly-ag refresh failed (drought ${w.droughtStates} states) — committed snapshot kept live`
+          : `weekly-ag ${w.status.toLowerCase()} (drought ${w.droughtStates} states, crop conditions ${w.cropStates} states)`,
+    });
+  } catch {
+    /* weekly-ag refresh is best-effort; committed snapshot stands */
+  }
+
   // Official parcel-tax and well-permit evidence refresh. The governed writers
   // persist immutable versions and receipts in the shared runtime-state mount,
   // so state survives Cloud Run revisions and scheduled job executions.

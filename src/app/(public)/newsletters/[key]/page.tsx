@@ -6,7 +6,7 @@ import { CompassDispatchHero } from "@/components/public/CompassDispatchHero";
 import { NewsletterDownloadButton } from "@/components/public/NewsletterDownloadButton";
 import { buildCompassDispatch } from "@/lib/newsletter/newsletterDispatch";
 import { newsletterByKey } from "@/lib/newsletter/newsletterRegistry";
-import { STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
+import { buildStateDroughtProvenance } from "@/lib/property/weeklyAgLive";
 
 /**
  * /newsletters/[key] — one newsletter, as a branded, downloadable document
@@ -35,7 +35,7 @@ export default async function NewsletterPage({ params }: { params: Promise<{ key
   const listing = newsletterByKey(key);
   if (!listing || listing.kind !== "newsletter") notFound();
 
-  const asOf = STATE_DROUGHT_PROVENANCE.mapDate ?? "2026-07-18";
+  const asOf = buildStateDroughtProvenance().mapDate ?? "2026-07-18";
   const dispatch = buildCompassDispatch(listing.audience, listing.regionKey, asOf);
   if (!dispatch) notFound();
 

@@ -27,8 +27,15 @@ import { PROPERTY_HUBZONE_PROVENANCE } from "./propertyHubzonesGenerated";
 import { nmtcForProperty } from "./propertyNmtc";
 import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "./commodityPricesGenerated";
 import { COUNTY_BROADBAND, COUNTY_BROADBAND_PROVENANCE } from "./countyBroadbandGenerated";
-import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "./stateCropConditionsGenerated";
-import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "./stateDroughtGenerated";
+// Weekly-cadence ag facts read through the live overlay (Tier-1 activation
+// 2026-07-28): the daily job refreshes drought + crop conditions; these
+// builders serve the overlay when fresh, the committed snapshot otherwise.
+import {
+  buildStateCropConditions,
+  buildCropConditionsProvenance,
+  buildStateDrought,
+  buildStateDroughtProvenance,
+} from "./weeklyAgLive";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "./stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
@@ -894,8 +901,9 @@ function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
   if (!st) return [];
   const facts: BriefFactLine[] = [];
 
-  const drought = STATE_DROUGHT[st];
-  if (drought && STATE_DROUGHT_PROVENANCE.mapDate && drought.severePlus >= 5) {
+  const droughtProvenance = buildStateDroughtProvenance();
+  const drought = buildStateDrought()[st];
+  if (drought && droughtProvenance.mapDate && drought.severePlus >= 5) {
     facts.push({
       label: "Drought status",
       value: `${drought.severePlus}% of the state in severe drought or worse`,
@@ -908,8 +916,9 @@ function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
     });
   }
 
-  const crop = STATE_CROP_CONDITIONS[st];
-  if (crop && STATE_CROP_CONDITIONS_PROVENANCE.asOf && (crop.corn || crop.soybeans)) {
+  const cropProvenance = buildCropConditionsProvenance();
+  const crop = buildStateCropConditions()[st];
+  if (crop && cropProvenance.asOf && (crop.corn || crop.soybeans)) {
     const bits = [
       crop.corn ? `corn ${crop.corn.goodExcellent}% good-or-excellent (${crop.corn.poorVeryPoor}% poor-or-worse)` : null,
       crop.soybeans ? `soybeans ${crop.soybeans.goodExcellent}% good-or-excellent` : null,
@@ -919,9 +928,9 @@ function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
       label: "Crop conditions",
       value: crop.corn ? `Corn ${crop.corn.goodExcellent}% good-or-excellent statewide` : bits[0] ?? "",
       text:
-        `USDA's week-${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek} Crop Progress rates this state's ${bits.join(", ")}. ` +
+        `USDA's week-${cropProvenance.latestWeek} Crop Progress rates this state's ${bits.join(", ")}. ` +
         `A statewide condition read — this parcel's ground can run better or worse, but it frames the season.`,
-      provenance: `Source: USDA NASS Crop Progress ${STATE_CROP_CONDITIONS_PROVENANCE.year}, week ${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek}`,
+      provenance: `Source: USDA NASS Crop Progress ${cropProvenance.year}, week ${cropProvenance.latestWeek}`,
       tone: cornPvp >= 25 || (crop.corn && crop.corn.goodExcellent <= 35) ? "caution" : "neutral",
     });
   }

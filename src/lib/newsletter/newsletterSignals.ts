@@ -21,8 +21,8 @@ import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "@/lib/property/co
 import { INPUT_COSTS, INPUT_COSTS_PROVENANCE } from "@/lib/property/inputCostsGenerated";
 import { COUNTY_CASH_RENTS, COUNTY_CASH_RENTS_PROVENANCE } from "@/lib/property/countyCashRentsGenerated";
 import { MORTGAGE_RATES } from "@/lib/property/mortgageRatesGenerated";
-import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "@/lib/property/stateCropConditionsGenerated";
-import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
+import { buildStateCropConditions, buildCropConditionsProvenance } from "@/lib/property/weeklyAgLive";
+import { buildStateDrought, buildStateDroughtProvenance } from "@/lib/property/weeklyAgLive";
 import { STATE_ELECTRICITY } from "@/lib/property/stateElectricityGenerated";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "@/lib/property/stateGrainBidsGenerated";
@@ -66,7 +66,7 @@ function stateName(code: string): string {
 function hardestDrought(states: string[]): { code: string; severePlus: number; extremePlus: number; mapDate: string } | null {
   let worst: { code: string; severePlus: number; extremePlus: number; mapDate: string } | null = null;
   for (const code of states) {
-    const d = STATE_DROUGHT[code];
+    const d = buildStateDrought()[code];
     if (!d) continue;
     if (!worst || d.severePlus > worst.severePlus) {
       worst = { code, severePlus: d.severePlus, extremePlus: d.extremePlus, mapDate: d.mapDate };
@@ -78,12 +78,12 @@ function hardestDrought(states: string[]): { code: string; severePlus: number; e
 // ── Signal builders ─────────────────────────────────────────────────────────
 
 export function droughtSignal(states: string[]): NewsletterSignal | null {
-  if (STATE_DROUGHT_PROVENANCE.mapDate === null) return null;
+  if (buildStateDroughtProvenance().mapDate === null) return null;
   const worst = hardestDrought(states);
   if (!worst || worst.severePlus < 5) return null;
   const others = states
-    .filter((c) => c !== worst.code && STATE_DROUGHT[c])
-    .map((c) => `${stateName(c)} ${STATE_DROUGHT[c].severePlus}%`)
+    .filter((c) => c !== worst.code && buildStateDrought()[c])
+    .map((c) => `${stateName(c)} ${buildStateDrought()[c].severePlus}%`)
     .join(", ");
   return {
     headline: `${stateName(worst.code)} is ${worst.severePlus}% in severe drought or worse`,
@@ -99,26 +99,26 @@ export function droughtSignal(states: string[]): NewsletterSignal | null {
 }
 
 export function cropConditionSignal(states: string[]): NewsletterSignal | null {
-  if (STATE_CROP_CONDITIONS_PROVENANCE.asOf === null) return null;
+  if (buildCropConditionsProvenance().asOf === null) return null;
   // Lead with the hardest-hit corn crop in the region.
   let worst: { code: string; ge: number; pvp: number } | null = null;
   for (const code of states) {
-    const c = STATE_CROP_CONDITIONS[code]?.corn;
+    const c = buildStateCropConditions()[code]?.corn;
     if (!c) continue;
     if (!worst || c.poorVeryPoor > worst.pvp) worst = { code, ge: c.goodExcellent, pvp: c.poorVeryPoor };
   }
   if (!worst) return null;
-  const soy = STATE_CROP_CONDITIONS[worst.code]?.soybeans;
+  const soy = buildStateCropConditions()[worst.code]?.soybeans;
   return {
     headline: `${stateName(worst.code)} corn: only ${worst.ge}% good-or-excellent, ${worst.pvp}% poor-or-worse`,
     takeaway: "A failing crop, in the government's own survey.",
     body:
-      `USDA's week-${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek} Crop Progress rates ${stateName(worst.code)} corn ` +
+      `USDA's week-${buildCropConditionsProvenance().latestWeek} Crop Progress rates ${stateName(worst.code)} corn ` +
       `${worst.ge}% good-or-excellent and ${worst.pvp}% poor-or-very-poor` +
       (soy ? `; soybeans ${soy.goodExcellent}% good-or-excellent, ${soy.poorVeryPoor}% poor-or-worse` : "") +
       `. A rating this low this late in the season is what a failing crop looks like in the official numbers — ` +
       `not opinion, the government's own survey.`,
-    source: `USDA NASS Crop Progress ${STATE_CROP_CONDITIONS_PROVENANCE.year}, week ${STATE_CROP_CONDITIONS_PROVENANCE.latestWeek}`,
+    source: `USDA NASS Crop Progress ${buildCropConditionsProvenance().year}, week ${buildCropConditionsProvenance().latestWeek}`,
     tone: worst.pvp >= 25 || worst.ge <= 35 ? "alarm" : "watch",
   };
 }

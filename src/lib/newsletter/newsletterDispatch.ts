@@ -18,8 +18,8 @@
 import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "@/lib/property/commodityPricesGenerated";
 import { INPUT_COSTS, INPUT_COSTS_PROVENANCE } from "@/lib/property/inputCostsGenerated";
 import { MORTGAGE_RATES } from "@/lib/property/mortgageRatesGenerated";
-import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "@/lib/property/stateCropConditionsGenerated";
-import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "@/lib/property/stateDroughtGenerated";
+import { buildStateCropConditions, buildCropConditionsProvenance } from "@/lib/property/weeklyAgLive";
+import { buildStateDrought, buildStateDroughtProvenance } from "@/lib/property/weeklyAgLive";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "@/lib/property/stateGrainBidsGenerated";
 
@@ -104,10 +104,10 @@ function regionShortName(label: string): string {
 // ── Structured fact accessors (same selection logic as the signal pool) ──────
 
 function droughtFact(states: string[]): { name: string; severePlus: number } | null {
-  if (STATE_DROUGHT_PROVENANCE.mapDate === null) return null;
+  if (buildStateDroughtProvenance().mapDate === null) return null;
   let worst: { code: string; severePlus: number } | null = null;
   for (const c of states) {
-    const d = STATE_DROUGHT[c];
+    const d = buildStateDrought()[c];
     if (!d) continue;
     if (!worst || d.severePlus > worst.severePlus) worst = { code: c, severePlus: d.severePlus };
   }
@@ -115,10 +115,10 @@ function droughtFact(states: string[]): { name: string; severePlus: number } | n
 }
 
 function cornFact(states: string[]): { name: string; ge: number; pvp: number } | null {
-  if (STATE_CROP_CONDITIONS_PROVENANCE.asOf === null) return null;
+  if (buildCropConditionsProvenance().asOf === null) return null;
   let worst: { code: string; ge: number; pvp: number } | null = null;
   for (const c of states) {
-    const x = STATE_CROP_CONDITIONS[c]?.corn;
+    const x = buildStateCropConditions()[c]?.corn;
     if (!x) continue;
     if (!worst || x.poorVeryPoor > worst.pvp) worst = { code: c, ge: x.goodExcellent, pvp: x.poorVeryPoor };
   }

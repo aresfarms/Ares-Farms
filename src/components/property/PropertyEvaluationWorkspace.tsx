@@ -121,7 +121,7 @@ type PropertyFactsResponse = {
     town?: string | null;
     state?: string | null;
     parcelRefs?: string[];
-    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "verified-address-only";
+    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
     parcelSourceName?: string | null;
     parcelSourceAsOf?: string | null;
     parcelSourceUrl?: string | null;
@@ -135,7 +135,18 @@ type PropertyFactsResponse = {
     publicWater?: boolean | null;
     publicSewer?: boolean | null;
     waterfront?: boolean | null;
+    resolvedParcelCount?: number;
+    offeredParcelCount?: number | null;
+    offeredAcreage?: number | null;
+    listingSourceName?: string | null;
+    listingSourceAsOf?: string | null;
+    listingSourceUrl?: string | null;
+    listingAgent?: string | null;
+    listingBrokerage?: string | null;
+    listingPhone?: string | null;
+    listingEmail?: string | null;
     bedrooms: number | null;
+    bathrooms?: number | null;
     yearBuilt: number | null;
     squareFeet: number | null;
     acreageText: string | null;
@@ -1977,6 +1988,7 @@ export function PropertyEvaluationWorkspace({
   const [profileOverride, setProfileOverride] = useState<PropertyProfileId | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
+  const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "print" | "view" | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
@@ -2854,12 +2866,12 @@ export function PropertyEvaluationWorkspace({
             })),
             diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
             ownershipCosts:
-              listedPrice != null &&
+              effectiveListedPrice != null &&
               ownershipContext &&
               chartVariant !== "finance" &&
               profileUsesResidentialLanes(workspaceProfile.id)
                 ? formatOwnershipCostsForPdf({
-                    listedPrice,
+                    listedPrice: effectiveListedPrice,
                     ownershipContext,
                     isHome: isResidentialHomeContext(analysisContext),
                     farmShaped: workspaceProfile.id === "farm",
@@ -3079,7 +3091,7 @@ export function PropertyEvaluationWorkspace({
   const topProgramPreview = preliminaryPropertyPathways;
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
-    listedPrice: listedPrice ?? parsePriceSignal(analysisContext.priceLabel),
+    listedPrice: effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel),
     requestedAmount: parsePriceSignal(answers.requestedAmount),
     pathwayNames: topProgramRanks.map((entry) => entry.program.name),
   });
@@ -3090,7 +3102,7 @@ export function PropertyEvaluationWorkspace({
     profileId: workspaceProfile.id,
     comparables: similarHomes,
   });
-  const rankingPrice = listedPrice ?? parsePriceSignal(analysisContext.priceLabel);
+  const rankingPrice = effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel);
   const officialTaxRecord = structuredTaxRecord(facts?.propertyEvidenceRecords ?? []);
   const rankingTax = ownershipContext && rankingPrice
     ? buildPostSaleTaxScenario({
@@ -3599,7 +3611,7 @@ export function PropertyEvaluationWorkspace({
             <OwnershipCostPanel
               theme={CHART_THEMES[chartVariant]}
               context={ownershipContext}
-              listedPrice={listedPrice}
+              listedPrice={effectiveListedPrice}
               isHome={isResidentialHomeContext(analysisContext)}
               farmShaped={workspaceProfile.id === "farm"}
               farmMode={workspaceProfile.id === "farm"}

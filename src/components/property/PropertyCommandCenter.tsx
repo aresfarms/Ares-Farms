@@ -23,7 +23,7 @@ export type PropertyCommandCenterProps = ChartTableBriefProps & {
     town?: string | null;
     state?: string | null;
     parcelRefs?: string[];
-    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "verified-address-only";
+    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
     parcelSourceName?: string | null;
     parcelSourceAsOf?: string | null;
     parcelSourceUrl?: string | null;
@@ -37,7 +37,18 @@ export type PropertyCommandCenterProps = ChartTableBriefProps & {
     publicWater?: boolean | null;
     publicSewer?: boolean | null;
     waterfront?: boolean | null;
+    resolvedParcelCount?: number;
+    offeredParcelCount?: number | null;
+    offeredAcreage?: number | null;
+    listingSourceName?: string | null;
+    listingSourceAsOf?: string | null;
+    listingSourceUrl?: string | null;
+    listingAgent?: string | null;
+    listingBrokerage?: string | null;
+    listingPhone?: string | null;
+    listingEmail?: string | null;
     bedrooms: number | null;
+    bathrooms?: number | null;
     yearBuilt: number | null;
     squareFeet: number | null;
     acreageText: string | null;
@@ -165,8 +176,11 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
     return [
       record.exactAddress ? { label: "Verified address", value: record.exactAddress, text: "The entered property address resolved successfully through the public address-verification path.", provenance: source, tone: "neutral" as const } : null,
       place ? { label: "Property location", value: place, text: "Town, county, and state carried into the property record from the verified intake context.", provenance: source, tone: "neutral" as const } : null,
-      record.recordBasis !== "verified-address-only" && props.priceLabel && !/no governed listing match/i.test(props.priceLabel) ? { label: "Price status", value: props.priceLabel, text: "Current price or off-market posture carried into this property analysis.", provenance: props.sourceLabel ? `Source: ${props.sourceLabel}` : source, tone: "neutral" as const } : null,
-      record.parcelRefs?.length ? { label: "Parcel identity", value: record.parcelRefs.join(" · "), text: "Official account, map, grid, parcel, or lot references returned by the jurisdiction parcel source.", provenance: source, tone: "neutral" as const } : null,
+      record.price != null ? { label: "Asking price", value: `$${record.price.toLocaleString("en-US")}`, text: "Current seller asking price carried by the matched governed listing snapshot.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}${record.listingSourceAsOf ? ` · ${record.listingSourceAsOf}` : ""}` : source, tone: "neutral" as const } : null,
+      record.listingStatus ? { label: "Sale status", value: record.listingStatus, text: "Current public sale posture carried by the matched listing source.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
+      record.listingId ? { label: "MLS / listing ID", value: record.listingId, text: "Public listing identifier for the active offering.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
+      record.offeredParcelCount ? { label: "Sale package", value: `${record.offeredParcelCount} parcels · ${record.offeredAcreage?.toLocaleString("en-US") ?? "acreage pending"} acres offered`, text: record.resolvedParcelCount === record.offeredParcelCount ? "Every parcel in the listing package has been reconciled to an official jurisdiction parcel record." : `The listing offers ${record.offeredParcelCount} parcels. ${record.resolvedParcelCount ?? 0} parcel identities are currently resolved from the official jurisdiction source; the remaining listing parcel identity still requires reconciliation.`, provenance: record.listingSourceName ? `Source: ${record.listingSourceName}; parcel identities: ${record.parcelSourceName ?? "jurisdiction source"}` : source, tone: record.resolvedParcelCount === record.offeredParcelCount ? "neutral" as const : "caution" as const } : null,
+      record.parcelRefs?.length ? { label: "Resolved parcel identities", value: record.parcelRefs.join(" · "), text: "Official account, map, grid, parcel, or lot references returned by the jurisdiction parcel source.", provenance: source, tone: "neutral" as const } : null,
       record.acreageText ? { label: "Land area", value: record.acreageText, text: `The matched record reports ${record.acreageText} of land.`, provenance: source, tone: "neutral" as const } : null,
       record.landUse ? { label: "Land use", value: record.landUse, text: "Land-use description published by the official parcel source.", provenance: source, tone: "neutral" as const } : null,
       record.zoning ? { label: "Zoning", value: record.zoning, text: "Zoning code carried by the official parcel source; local zoning records remain controlling.", provenance: source, tone: "neutral" as const } : null,
@@ -175,11 +189,11 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
       record.assessedImprovementValue != null ? { label: "Appraised improvement value", value: `$${record.assessedImprovementValue.toLocaleString("en-US")}`, text: "Improvement component of the official appraised value.", provenance: source, tone: "neutral" as const } : null,
       record.assessedTotalValue != null ? { label: "Appraised total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: "Total appraised value published by the jurisdiction parcel source; it is not a market-price opinion.", provenance: source, tone: "neutral" as const } : null,
       record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.bathrooms != null ? { label: "Bathrooms", value: String(record.bathrooms), text: "Bathroom count reported by the matched listing record.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
       record.squareFeet != null ? { label: "Building square feet", value: `${record.squareFeet.toLocaleString("en-US")} sq ft`, text: "Building area reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.yearBuilt != null ? { label: "Year built", value: String(record.yearBuilt), text: "Construction year reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       (record.rawPropertyStyle || record.propertyType) ? { label: "Property type", value: record.rawPropertyStyle || record.propertyType || "Property", text: record.recordBasis === "verified-address-only" ? "Property classification follows the selected discovery lane until a parcel or listing source supplies a more specific official style." : "Property style or land use reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
-      record.listingStatus ? { label: "Listing status", value: record.listingStatus, text: "Current status carried by the matched listing record.", provenance: source, tone: "neutral" as const } : null,
-      record.listingId ? { label: "Source record", value: record.listingId, text: "Identifier for the matched property/listing record.", provenance: source, tone: "neutral" as const } : null,
+      record.listingAgent ? { label: "Listing contact", value: [record.listingAgent, record.listingBrokerage].filter(Boolean).join(" · "), text: [record.listingPhone, record.listingEmail].filter(Boolean).join(" · ") || "Contact details are available from the matched listing source.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
     ].filter((fact): fact is NonNullable<typeof fact> => fact !== null);
   }, [props.propertyRecord]);
   // Lane-level market boards belong on the lane landing page, not inside a

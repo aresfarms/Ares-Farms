@@ -45,12 +45,13 @@ export async function fetchSolarPotential(
     tilt: "20",
     azimuth: "180",
     losses: "14.08",
-    timeframe: "annual",
   });
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), PVWATTS_TIMEOUT_MS);
   try {
-    const res = await fetch(`https://developer.nrel.gov/api/pvwatts/v8.json?${params.toString()}`, {
+    // developer.nrel.gov was retired 2026-05-29; the lab's APIs now live at
+    // developer.nlr.gov (National Laboratory of the Rockies). Same api.data.gov keys.
+    const res = await fetch(`https://developer.nlr.gov/api/pvwatts/v8.json?${params.toString()}`, {
       signal: controller.signal,
       // Solar resource is climatological — a week-long cache is honest.
       next: { revalidate: 604_800 },

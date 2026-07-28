@@ -120,6 +120,15 @@ export function FinancingLaneSections() {
             FSA, Farm Credit, and the farm economics these financing choices ride on.
           </span>
         </Link>
+        {/* Surfaced 2026-07-28: the ranked pathway engine was live but reachable
+            only from a workspace deep-link — a working tool with no door. */}
+        <Link href="/financing-pathways" style={{ ...card, textDecoration: "none" }}>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#534AB7" }}>Rank your financing pathways →</span>
+          <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.5 }}>
+            Answer a few questions about the project and see which federal lanes fit best, with the
+            reasons and what each still needs — guidance, never an approval.
+          </span>
+        </Link>
       </section>
 
       {/* Paid advisory services (free applications + the only paid one-on-one time)

@@ -65,6 +65,61 @@ function BriefCard({ brief }: { brief: GrantBrief }) {
   );
 }
 
+/**
+ * Live federal grant opportunities (Tier-2 activation 2026-07-28) — the
+ * official Grants.gov register, rendered as facts-with-source + link-out.
+ * Async server component; a failed fetch renders a plain link-out line, never
+ * a fabricated list.
+ */
+async function LiveGrantOpportunities() {
+  const { fetchGrantOpportunities } = await import("@/lib/grants/grantsGovSearch");
+  const result = await fetchGrantOpportunities(8);
+  const fmt = (d: string | null) => (d ? d.split("T")[0] : null);
+  return (
+    <section aria-label="Open federal grant opportunities" style={{ display: "grid", gap: 12 }}>
+      <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: RASPBERRY }}>
+        Open right now — live from Grants.gov
+      </span>
+      {result.opportunities.length > 0 ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {result.opportunities.map((o) => (
+            <a
+              key={o.id}
+              href={o.detailUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...card, textDecoration: "none", display: "grid", gap: 4 }}
+            >
+              <span style={{ fontSize: 13.5, fontWeight: 700, color: "#101a2b", lineHeight: 1.35 }}>{o.title} ↗</span>
+              <span style={{ fontSize: 12, color: "#4d596d" }}>
+                {o.agency}
+                {o.number ? ` · ${o.number}` : ""}
+                {fmt(o.closeDate) ? ` · closes ${fmt(o.closeDate)}` : " · no close date posted"}
+              </span>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p style={{ margin: 0, fontSize: 13, color: "#4d596d", lineHeight: 1.6 }}>
+          The live register didn&apos;t answer just now — search it directly on{" "}
+          <a href="https://www.grants.gov/search-grants" target="_blank" rel="noopener noreferrer" style={{ color: RASPBERRY, fontWeight: 700 }}>
+            grants.gov ↗
+          </a>
+          .
+        </p>
+      )}
+      <span style={{ fontSize: 11, color: "#708997", lineHeight: 1.5 }}>
+        Source: {result.source} · searched: {result.searchedKeywords.join(", ")} · Listings and deadlines
+        belong to the posting agency — always confirm on the linked page. Whether a program fits{" "}
+        <em>you</em> is the agency&apos;s determination, never ours.{" "}
+        <a href="https://www.grants.gov/search-grants" target="_blank" rel="noopener noreferrer" style={{ color: RASPBERRY, fontWeight: 700 }}>
+          Search all of Grants.gov ↗
+        </a>
+      </span>
+    </section>
+  );
+}
+
 export function GrantsLaneSections() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
@@ -86,6 +141,8 @@ export function GrantsLaneSections() {
         </div>
         <span style={{ fontSize: 11.5, color: "#708997", lineHeight: 1.5 }}>{GRANTS_NOTE}</span>
       </section>
+
+      <LiveGrantOpportunities />
 
       <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
         <Link href="/explore?lane=financing-capital" style={{ ...card, textDecoration: "none" }}>

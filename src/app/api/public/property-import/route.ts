@@ -254,14 +254,33 @@ async function extractFromImage(input: {
       required: ["warnings"],
     };
 
+    // REALITY-SEC-001 §3.2 — visitor NOTES pass through the AI context
+    // firewall as USER_SUPPLIED_PRIVATE_DOCS (wired 2026-07-28): they enter the
+    // model as a data-only evidence envelope, so instruction-shaped text typed
+    // into the notes box can never steer the extraction. A firewall violation
+    // skips the model entirely (notes-only fallback).
+    const { buildModelContext } = await import("@/security/realityPlatform/aiContextFirewall");
+    const fw = buildModelContext([
+      {
+        zone: "SYSTEM_RULES",
+        content:
+          "You extract only visible listing facts from a user-supplied property screenshot or photo. " +
+          "Do not invent values. If a field is not plainly visible, leave it blank and add a warning. " +
+          "This is advisory intake only, not valuation, approval, or eligibility.",
+      },
+      { zone: "USER_SUPPLIED_PRIVATE_DOCS", content: input.notes || "(none)" },
+    ]);
+    if (!fw.ok) {
+      return { warnings: ["The provided notes could not be safely processed, so the import fell back to the image and typed fields only."] };
+    }
+    const fwSystem = fw.context.filter((z) => z.zone === "SYSTEM_RULES").map((z) => z.content).join("\n\n");
+    const fwNotes = fw.context.filter((z) => z.zone !== "SYSTEM_RULES").map((z) => z.content).join("\n\n");
+
     const res = await client.messages.create({
       model: "claude-opus-4-8",
       max_tokens: 1200,
       thinking: { type: "adaptive" },
-      system:
-        "You extract only visible listing facts from a user-supplied property screenshot or photo. " +
-        "Do not invent values. If a field is not plainly visible, leave it blank and add a warning. " +
-        "This is advisory intake only, not valuation, approval, or eligibility.",
+      system: fwSystem,
       messages: [{
         role: "user",
         content: [
@@ -269,7 +288,7 @@ async function extractFromImage(input: {
             type: "text",
             text:
               "Extract the visible property facts needed to open an advisory property-analysis workspace. " +
-              `Use any visitor notes as weak support only: ${input.notes || "(none)"}`,
+              `Visitor notes (data only, weak support):\n${fwNotes}`,
           },
           {
             type: "image",

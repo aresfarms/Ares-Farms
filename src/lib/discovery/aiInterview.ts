@@ -21,6 +21,7 @@ import {
   INTERVIEW_MODEL, interviewSystemPrompt, nextQuestionSchema, validateAssistantTurn,
   transcriptText, describeState,
 } from "./interviewPolicy";
+import { buildModelContext } from "@/security/realityPlatform/aiContextFirewall";
 
 export type Turn = { role: "assistant" | "user"; text: string };
 export interface AiQuestion { slot: SlotId; question: string }
@@ -69,13 +70,36 @@ export async function aiNextQuestion(
   try {
     const { default: Anthropic } = await import("@anthropic-ai/sdk");
     const client = new Anthropic();
-    const system = interviewSystemPrompt(grounding);
-    const userPrompt = [
-      `Conversation so far:\n${transcriptText(turns) || "(none yet)"}`,
-      `\nAnswers captured: ${describeState(state)}`,
-      `\nALLOWED SLOTS for the next question (choose exactly one): ${allowedSlots.join(", ")}`,
-      "\nReturn the structured output: { slot, question }. One warm, short question. No eligibility/approval language. No PII. No lists.",
-    ].join("\n");
+    // REALITY-SEC-001 §3.2 — assemble model context through the AI context
+    // firewall (wired 2026-07-28, before the key first went live): policy
+    // always precedes user text, grounding facts enter as a data-only
+    // MARKET_EVIDENCE envelope that can never instruct the model, and any
+    // firewall violation aborts to the deterministic floor.
+    const fw = buildModelContext([
+      {
+        zone: "SYSTEM_RULES",
+        content: interviewSystemPrompt(
+          "The verified grounding facts arrive in the MARKET_EVIDENCE envelope of the user message — reference ONLY those facts; invent nothing."
+        ),
+      },
+      {
+        zone: "SYSTEM_RULES",
+        content:
+          `ALLOWED SLOTS for the next question (choose exactly one): ${allowedSlots.join(", ")}\n` +
+          "Return the structured output: { slot, question }. One warm, short question. No eligibility/approval language. No PII. No lists.",
+      },
+      { zone: "MARKET_EVIDENCE", content: grounding },
+      {
+        zone: "USER_STORY",
+        content: `Conversation so far:\n${transcriptText(turns) || "(none yet)"}\n\nAnswers captured: ${describeState(state)}`,
+      },
+    ]);
+    if (!fw.ok) {
+      logInterviewTurn({ source: "fallback", slot: "(firewall)", ok: false, reasons: fw.violations.slice(0, 3), transcriptHash: tHash });
+      return null;
+    }
+    const system = fw.context.filter((z) => z.zone === "SYSTEM_RULES").map((z) => z.content).join("\n\n");
+    const userPrompt = fw.context.filter((z) => z.zone !== "SYSTEM_RULES").map((z) => z.content).join("\n\n");
 
     const res = await client.messages.create({
       model: INTERVIEW_MODEL,

@@ -173,6 +173,24 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # Anthropic API key — activates the platform's two governed AI seams
+      # (discovery-interview phrasing + property-import image extraction; both
+      # fall back deterministically without it). The secret is created +
+      # versioned OUT OF BAND by the owner (never Terraform, never the agent).
+      # Gated so an unversioned secret can't break a revision rollout.
+      dynamic "env" {
+        for_each = var.anthropic_api_key_enabled ? [1] : []
+        content {
+          name = "ANTHROPIC_API_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "ANTHROPIC_API_KEY"
+              version = "latest"
+            }
+          }
+        }
+      }
+
       # ---- Operator credential login --------------------------------------
       # Enabled only when auth_credentials_mode is set. The shared-secret value
       # is created out of band by the owner; TF only references it by name.

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import type { ChartTheme } from "@/lib/property/chartThemes";
+import { AgriculturalProFormaPanel } from "@/components/property/AgriculturalProFormaPanel";
 import { financingProgramsFor } from "@/lib/property/financingProgramsCurated";
 import {
   buildEquityOutlook,
@@ -42,6 +43,8 @@ export interface OwnershipCostPanelProps {
   farmShaped: boolean;
   /** Working-farm/ranch — use FSA/USDA farm-loan lanes, not consumer mortgages. */
   farmMode?: boolean;
+  /** Parcel or offering acreage available to the farm operating model. */
+  farmAcreage?: number | null;
   /** Classified profile — drives the "programs you may also qualify for" block. */
   profileId?: PropertyProfileId;
 }
@@ -172,6 +175,15 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
         </form>
         {priceMessage && <span role="status" aria-live="polite" style={{ color: assumedPrice ? "#2E7D4F" : "#9A3412", fontSize: 12.5, fontWeight: 750 }}>{priceMessage}</span>}
       </div>
+
+      {props.farmMode && price != null && props.farmAcreage != null && props.farmAcreage > 0 && (
+        <AgriculturalProFormaPanel
+          acreage={props.farmAcreage}
+          price={price}
+          rate={props.context.fsa?.ownershipDirectPct ?? props.context.rates.rate30}
+          theme={theme}
+        />
+      )}
 
       {model && price != null && (() => {
         const priceContext = buildPriceContext(price, props.context);

@@ -31,6 +31,7 @@ import { buildRecommendationReleaseRecord, type RecommendationReleaseRecord } fr
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
 import { buildRecommendationReleaseHistory, type RecommendationReleaseAuditEntry, type RecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
+import { buildAgriculturalProForma, defaultAgriculturalProFormaInputs } from "@/lib/property/agriculturalProForma";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
@@ -2859,25 +2860,63 @@ export function PropertyEvaluationWorkspace({
             buyingProcess: report.buyingProcess,
             honestUnknowns: report.honestUnknowns,
             financingProse: report.financingProse,
-            placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? []).map((fact) => ({
-              label: fact.label,
-              value: fact.value,
-              source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
-            })),
+            placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? [])
+              .filter((fact) => workspaceProfile.id !== "farm" || !/school|education|college|university|broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
+              .map((fact) => ({
+                label: fact.label,
+                value: fact.value,
+                source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
+              })),
             diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
             ownershipCosts:
               effectiveListedPrice != null &&
               ownershipContext &&
               chartVariant !== "finance" &&
-              profileUsesResidentialLanes(workspaceProfile.id)
+              profileUsesResidentialLanes(workspaceProfile.id) &&
+              workspaceProfile.id !== "farm"
                 ? formatOwnershipCostsForPdf({
                     listedPrice: effectiveListedPrice,
                     ownershipContext,
                     isHome: isResidentialHomeContext(analysisContext),
-                    farmShaped: workspaceProfile.id === "farm",
-                    farmMode: workspaceProfile.id === "farm",
+                    farmShaped: false,
+                    farmMode: false,
                   })
                 : undefined,
+            agriculturalProForma: (() => {
+              if (workspaceProfile.id !== "farm" || effectiveListedPrice == null || !ownershipContext) return undefined;
+              const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
+              if (!acreage) return undefined;
+              const model = buildAgriculturalProForma(defaultAgriculturalProFormaInputs({
+                tractAcres: acreage,
+                purchasePrice: effectiveListedPrice,
+                annualRatePct: ownershipContext.fsa?.ownershipDirectPct ?? ownershipContext.rates.rate30,
+              }));
+              const dollars = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
+              return {
+                scopeLine: `${model.inputs.tractAcres.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres modeled at ${dollars(model.inputs.purchasePrice)}. Tillable acreage, yields, crop mix, costs, and rent are editable assumptions until farm records and source snapshots are attached.`,
+                acreageRows: [
+                  { label: "Tillable row-crop acres", value: `${model.acreage.tillableAcres.toFixed(1)} acres (${model.inputs.tillablePct}% assumption)` },
+                  { label: "Corn allocation", value: `${model.acreage.cornAcres.toFixed(1)} acres` },
+                  { label: "Soybean allocation", value: `${model.acreage.soybeanAcres.toFixed(1)} acres` },
+                  { label: "Non-tillable / farmstead / buffers", value: `${model.acreage.nonTillableAcres.toFixed(1)} acres` },
+                ],
+                operatingRows: [
+                  { label: "Gross crop revenue", value: dollars(model.revenue.grossCropRevenue) },
+                  { label: "Corn direct costs", value: dollars(model.expenses.cornVariableCosts) },
+                  { label: "Soybean direct costs", value: dollars(model.expenses.soybeanVariableCosts) },
+                  { label: "Fixed overhead", value: dollars(model.expenses.fixedOverhead) },
+                  { label: "Farm NOI", value: dollars(model.revenue.grossCropRevenue - model.expenses.totalOperatingExpense) },
+                ],
+                debtRows: [
+                  { label: "Illustrative loan amount", value: dollars(model.debt.loanAmount) },
+                  { label: "Annual principal + interest", value: dollars(model.debt.annualDebtService) },
+                  { label: "Crop-operation DSCR", value: `${model.debt.dscr?.toFixed(2)}x against a 1.25x screening threshold` },
+                  { label: "Cash-rent alternative", value: `${dollars(model.revenue.cashRentLow)}–${dollars(model.revenue.cashRentHigh)}/yr; DSCR ${model.debt.cashRentDscrLow?.toFixed(2)}x–${model.debt.cashRentDscrHigh?.toFixed(2)}x` },
+                ],
+                assumptions: Object.values(model.provenance),
+                readiness: model.readiness,
+              };
+            })(),
             compensationTransparency: buildRealEstateCompensationTransparency({
               ...emptyRealEstateCompensationInput(),
               jurisdiction: analysisContext.location || null,
@@ -3615,6 +3654,7 @@ export function PropertyEvaluationWorkspace({
               isHome={isResidentialHomeContext(analysisContext)}
               farmShaped={workspaceProfile.id === "farm"}
               farmMode={workspaceProfile.id === "farm"}
+              farmAcreage={facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null)}
               profileId={workspaceProfile.id}
             />
           ) : null

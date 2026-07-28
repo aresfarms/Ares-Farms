@@ -198,29 +198,22 @@ export default async function ExplorePage({
     // property lanes render on white → the onLight variant.
     const laneAccent = accentForLane(selected.slug, "light");
 
-    // Tabbed Farms module (founder direction 2026-07-20): ?section=<key> opens a
-    // single focused page instead of the long scroll. The report button opens the
-    // written analysis flow in a new tab.
+    // Agricultural workspace tabs stay integrated into the main farm page.
     const section = one(resolved.section);
     const farmReportHref = "/discover?flow=place-facts";
-    if (isFarmLane && section && FARM_SECTIONS.some((s) => s.key === section)) {
-      return (
-        <main>
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 48px", display: "grid", gap: 20 }}>
-            <Link href="/explore?lane=farms-agriculture" style={{ fontSize: 13, fontWeight: 700, color: laneAccent, textDecoration: "none", width: "fit-content" }}>
-              ← Back to the Farms module
-            </Link>
-            {section === "newsletters"
-              ? audience && <CurrentNewsletters audiences={[audience]} />
-              : <FarmLaneSection sectionKey={section} />}
-            <CommunityCta />
-          </div>
-        </main>
-      );
-    }
 
     return (
       <>
+        {isFarmLane && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 20px 0", display: "grid", gap: 16 }}>
+            <header style={{ display: "grid", gap: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
+              <h1 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(30px,4vw,48px)", lineHeight: 1.05 }}>Find the best use of the ground</h1>
+              <p style={{ margin: 0, maxWidth: 880, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Compare agricultural enterprises, diversified portfolios, land-income options, operating costs, financing, equipment, and site constraints in one workspace.</p>
+            </header>
+            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} activeSection={section} />
+          </div>
+        )}
         {isResidentialLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "22px 20px 0", display: "grid", gap: 12 }}>
             <ResidentialRateTiles />
@@ -235,6 +228,13 @@ export default async function ExplorePage({
         {isFarmLane && (
           <div style={{ maxWidth: 1280, margin: "0 auto", padding: "22px 20px 0" }}>
             <FarmCommodityTicker />
+          </div>
+        )}
+        {isFarmLane && section && FARM_SECTIONS.some((item) => item.key === section) && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
+            {section === "newsletters"
+              ? audience && <CurrentNewsletters audiences={[audience]} />
+              : <FarmLaneSection sectionKey={section} />}
           </div>
         )}
         <section
@@ -265,16 +265,7 @@ export default async function ExplorePage({
             <PlaceFirstDiscovery flow="place-facts" compact />
           </div>
         </section>
-        {isFarmLane && (
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
-            <header style={{ display: "grid", gap: 6, textAlign: "center" }}>
-              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
-              <h1 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.08 }}>Start with what the ground can support</h1>
-              <p style={{ margin: "0 auto", maxWidth: 760, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Choose the farm question or action that brought you here after reviewing the market and map above.</p>
-            </header>
-            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} />
-          </div>
-        )}
+
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 16 }}>
           <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
           {isFarmLane && (

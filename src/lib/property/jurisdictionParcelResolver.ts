@@ -24,7 +24,7 @@ export type JurisdictionParcelRecord = {
   resolvedParcelCount: number;
 };
 
-type AddressInput = { street: string; city: string; state: string; zip?: string | null };
+type AddressInput = { street: string; city: string; state: string; zip?: string | null; parcelId?: string | null; lat?: string | number | null; lon?: string | number | null };
 
 function clean(value: unknown): string | null {
   const text = String(value ?? "").trim();
@@ -91,7 +91,52 @@ async function resolveMaryland(input: AddressInput): Promise<JurisdictionParcelR
   };
 }
 
+
+async function querySussex(layer: 0 | 1, params: Record<string, string>): Promise<Array<Record<string, unknown>>> {
+  const query = new URLSearchParams({ f: "json", returnGeometry: "false", ...params });
+  const endpoint = `https://map.sussexcountyde.gov/trdserver/rest/services/Geographic_Information_Office/Parcels_PIN_With_Assessment_Unit/FeatureServer/${layer}/query?${query.toString()}`;
+  const response = await governedFetch(endpoint, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(12_000) });
+  if (!response.ok) return [];
+  const body = await response.json() as { features?: Array<{ attributes?: Record<string, unknown> }> };
+  return (body.features ?? []).map((item) => item.attributes ?? {});
+}
+
+async function resolveDelawareSussex(input: AddressInput): Promise<JurisdictionParcelRecord | null> {
+  let pin = clean(input.parcelId);
+  let parcelRows: Array<Record<string, unknown>> = [];
+  if (pin) {
+    parcelRows = await querySussex(0, { where: `Name='${escapeSql(pin)}'`, outFields: "OBJECTID,Name,Acreage,SqFeet,Shape__Area,Legal_1,Legal_2,Legal_3" });
+  } else if (input.lat != null && input.lon != null) {
+    const lat = Number(input.lat); const lon = Number(input.lon);
+    if (Number.isFinite(lat) && Number.isFinite(lon)) {
+      parcelRows = await querySussex(0, { geometry: `${lon},${lat}`, geometryType: "esriGeometryPoint", inSR: "4326", spatialRel: "esriSpatialRelIntersects", distance: "15", units: "esriSRUnit_Meter", outFields: "OBJECTID,Name,Acreage,SqFeet,Shape__Area,Legal_1,Legal_2,Legal_3", resultRecordCount: "5" });
+      pin = clean(parcelRows[0]?.Name);
+    }
+  }
+  if (!pin) return null;
+  if (!parcelRows.length) parcelRows = await querySussex(0, { where: `Name='${escapeSql(pin)}'`, outFields: "OBJECTID,Name,Acreage,SqFeet,Shape__Area,Legal_1,Legal_2,Legal_3" });
+  const parcel = parcelRows.find((row) => clean(row.Name) === pin) ?? parcelRows[0];
+  if (!parcel) return null;
+  const ownerRows = await querySussex(1, { where: `PIN='${escapeSql(pin)}'`, outFields: "BOOK,PAGE,DESCRIPTION,DESCRIPTION2,DESCRIPTION3,LUC,APRBLDG,APRLAND,PIN,MAP,PARCEL" });
+  const owner = ownerRows[0] ?? {};
+  const shapeAreaSqM = number(parcel.Shape__Area);
+  const acres = number(parcel.Acreage) ?? (shapeAreaSqM ? shapeAreaSqM / 4046.8564224 : null);
+  const legal = [owner.DESCRIPTION, owner.DESCRIPTION2, owner.DESCRIPTION3, parcel.Legal_1, parcel.Legal_2, parcel.Legal_3].map(clean).filter(Boolean).join(" · ") || null;
+  const book = clean(owner.BOOK); const page = clean(owner.PAGE);
+  const land = number(owner.APRLAND); const improvement = number(owner.APRBLDG);
+  return {
+    sourceName: "Sussex County Delaware Parcel and Assessment Service", sourceAsOf: new Date().toISOString().slice(0, 10), sourceUrl: "https://map.sussexcountyde.gov/",
+    accountId: pin, parcelRefs: [pin], acreageText: acres ? `${acres.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres in official parcel geometry` : null,
+    landUse: clean(owner.LUC) ? `Sussex County land-use code ${clean(owner.LUC)}` : null, zoning: null,
+    deedReference: book || page ? `Book ${book ?? "—"} · Page ${page ?? "—"}` : null, legalDescription: legal,
+    yearBuilt: null, squareFeet: number(parcel.SqFeet), buildingStyle: null, buildingType: null,
+    assessedLandValue: land, assessedImprovementValue: improvement, assessedTotalValue: land || improvement ? (land ?? 0) + (improvement ?? 0) : null,
+    publicWater: null, publicSewer: null, waterfront: null, resolvedParcelCount: 1,
+  };
+}
+
 export async function resolveJurisdictionParcel(input: AddressInput): Promise<JurisdictionParcelRecord | null> {
   if (input.state.toUpperCase() === "MD") return resolveMaryland(input);
+  if (input.state.toUpperCase() === "DE") return resolveDelawareSussex(input);
   return null;
 }

@@ -8,6 +8,9 @@ export type GovernedListingSnapshot = {
   sourceUrl: string | null;
   offeredParcelCount: number | null;
   offeredAcreage: number | null;
+  parcelId?: string | null;
+  propertyType?: string | null;
+  squareFeet?: number | null;
   bedrooms: number | null;
   bathrooms: number | null;
   yearBuilt: number | null;
@@ -23,6 +26,28 @@ function key(value: string): string {
 }
 
 const SNAPSHOTS: GovernedListingSnapshot[] = [
+  {
+    normalizedAddress: "18885 sand hill rd georgetown de 19947",
+    status: "Active",
+    askingPrice: 669_000,
+    listingId: "DESU2102862",
+    sourceName: "Bright MLS broker-reciprocity listing",
+    sourceAsOf: "2026-06-19",
+    sourceUrl: "https://www.redfin.com/DE/Georgetown/18885-Sand-Hill-Rd-19947/home/179443926",
+    offeredParcelCount: 1,
+    offeredAcreage: 13.07,
+    parcelId: "135-10.00-56.00",
+    propertyType: "Residential acreage estate",
+    squareFeet: 2411,
+    bedrooms: 4,
+    bathrooms: 3.5,
+    yearBuilt: 2000,
+    listingAgent: "Matt Brittingham",
+    listingBrokerage: "Patterson-Schwartz-Rehoboth",
+    listingPhone: "302-703-6987",
+    listingEmail: "jgiles@psre.com",
+    description: "Active Sussex County residential acreage listing with a four-bedroom residence, private road, garage, pool, and outbuilding. Listing acreage and official parcel geometry require reconciliation before reliance.",
+  },
   {
     normalizedAddress: "10870 river rd denton md 21629",
     status: "Active",

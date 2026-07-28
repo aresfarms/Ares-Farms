@@ -91,6 +91,9 @@ export async function POST(req: NextRequest) {
           city: imported.parsedAddress.city,
           state: imported.parsedAddress.state,
           zip: imported.parsedAddress.zip || null,
+          parcelId: listingSnapshot?.parcelId ?? null,
+          lat: imported.geocode?.lat ?? null,
+          lon: imported.geocode?.lon ?? null,
         }).catch(() => null)
       : null;
     // Same living-here Place Brief a map-selected property gets, resolved from
@@ -148,8 +151,8 @@ export async function POST(req: NextRequest) {
         ? {
             exactAddress: matchedSourceRecord?.exactAddress ?? imported.normalizedAddress,
             zip: matchedSourceRecord?.zip ?? imported.parsedAddress?.zip ?? null,
-            rawPropertyStyle: matchedSourceRecord?.rawPropertyStyle ?? jurisdictionParcel?.landUse ?? (listingSnapshot ? "Farm / agricultural property" : (lanePropertyType === "farm" ? "Farm / agricultural property" : lanePropertyType)),
-            propertyType: matchedSourceRecord?.propertyType ?? lanePropertyType,
+            rawPropertyStyle: matchedSourceRecord?.rawPropertyStyle ?? listingSnapshot?.propertyType ?? jurisdictionParcel?.landUse ?? (lanePropertyType === "farm" ? "Farm / agricultural property" : lanePropertyType),
+            propertyType: matchedSourceRecord?.propertyType ?? listingSnapshot?.propertyType ?? lanePropertyType,
             price: matchedSourceRecord?.price ?? listingSnapshot?.askingPrice ?? null,
             county: matchedSourceRecord?.county ?? body.county ?? null,
             town: matchedSourceRecord?.town ?? body.town ?? imported.parsedAddress?.city ?? null,
@@ -159,7 +162,7 @@ export async function POST(req: NextRequest) {
             bedrooms: matchedSourceRecord?.bedrooms ?? listingSnapshot?.bedrooms ?? null,
             bathrooms: listingSnapshot?.bathrooms ?? null,
             yearBuilt: matchedSourceRecord?.yearBuilt ?? listingSnapshot?.yearBuilt ?? jurisdictionParcel?.yearBuilt ?? null,
-            squareFeet: matchedSourceRecord?.squareFeet ?? jurisdictionParcel?.squareFeet ?? null,
+            squareFeet: matchedSourceRecord?.squareFeet ?? listingSnapshot?.squareFeet ?? jurisdictionParcel?.squareFeet ?? null,
             acreageText: listingSnapshot?.offeredAcreage ? `${listingSnapshot.offeredAcreage.toLocaleString("en-US")} acres offered across ${listingSnapshot.offeredParcelCount ?? "multiple"} parcels` : derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null,
             listingId: matchedSourceRecord?.listingId ?? listingSnapshot?.listingId ?? jurisdictionParcel?.accountId ?? null,
             listingStatus: canonicalMatch?.listing_status ?? listingSnapshot?.status ?? (jurisdictionParcel ? "Official parcel record matched" : null),

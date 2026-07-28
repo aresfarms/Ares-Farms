@@ -14,7 +14,6 @@ import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyI
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { PropertyCommandCenter } from "@/components/property/PropertyCommandCenter";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
-import { PropertyEvidencePanel } from "@/components/property/PropertyEvidencePanel";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
 import { buildMarketComparablePlan } from "@/lib/intelligence/marketComparablePlan";
@@ -35,7 +34,6 @@ import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOp
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
-import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
 import type { ExtendedPropertyRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
@@ -3158,9 +3156,6 @@ export function PropertyEvaluationWorkspace({
     ingested: ingestedRiskEvidence,
     location: analysisContext.location,
   });
-  const propertyEvidenceManifest = rankingTax
-    ? buildPropertyEvidenceManifest({ tax: rankingTax, evidence: reportRiskEvidence })
-    : null;
   const propertyInfrastructureRisk = buildInfrastructureRiskFromEvidence(reportRiskEvidence);
   const scenarioRankingPlan = buildScenarioRankingPlan({
     profileId: workspaceProfile.id,
@@ -3601,9 +3596,6 @@ export function PropertyEvaluationWorkspace({
               : "Furlong is still resolving the parcel acreage, land-use, and structure record for this address. It will not default the property to residential or generate type-specific analysis until that evidence is available."}
           </span>
         </section>
-      )}
-      {!deepView && propertyEvidenceManifest && (
-        <PropertyEvidencePanel manifest={propertyEvidenceManifest} />
       )}
       {/* (The imported-only "What is this property?" picker is now the
           front-loaded Property Type Stamp above — shown for every property.) */}

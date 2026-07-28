@@ -1,19 +1,83 @@
 "use client";
-import {useMemo,useState} from "react";
-import type {ChartTheme} from "@/lib/property/chartThemes";
-import {optimizeAgriculturalOpportunities} from "@/lib/property/agriculturalOpportunityOptimizer";
-const money=(n:number)=>`$${Math.round(n).toLocaleString("en-US")}`;
-export function AgriculturalOpportunityOptimizerPanel(p:{acreage:number;price:number;rate:number;theme:ChartTheme}){
- const debt=p.price*.8*(p.rate/100)/(1-Math.pow(1+p.rate/100,-40));
- const [x,setX]=useState({waterScore:70,laborCapacity:55,capitalCapacity:55,marketAccess:60,gridEvidence:false,solarZoningEvidence:false});
- const m=useMemo(()=>optimizeAgriculturalOpportunities({acres:p.acreage,purchasePrice:p.price,debtService:debt,...x}),[p.acreage,p.price,debt,x]);
- const slider=(k:keyof typeof x,label:string)=>typeof x[k]==="number"?<label style={{fontSize:11.5,display:"grid",gap:3}}>{label}: {String(x[k])}<input type="range" min="0" max="100" value={x[k] as number} onChange={e=>setX(v=>({...v,[k]:Number(e.target.value)}))}/></label>:null;
- return <section style={{display:"grid",gap:14,padding:16,border:`2px solid ${p.theme.accent}`,borderRadius:12,background:p.theme.plate}}>
-  <div><strong style={{fontSize:17,color:p.theme.ink}}>Best-use agricultural opportunity optimizer</strong><p style={{margin:"4px 0 0",fontSize:12,color:p.theme.inkSoft}}>Compares singular and diversified enterprises. It does not assume commodity crops are the answer.</p></div>
-  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:10}}>{slider("waterScore","Water/irrigation capacity")}{slider("laborCapacity","Labor/management capacity")}{slider("capitalCapacity","Capital capacity")}{slider("marketAccess","Market/offtake access")}</div>
-  <div style={{display:"flex",gap:16,flexWrap:"wrap",fontSize:12}}><label><input type="checkbox" checked={x.gridEvidence} onChange={e=>setX(v=>({...v,gridEvidence:e.target.checked}))}/> Grid/interconnection evidence exists</label><label><input type="checkbox" checked={x.solarZoningEvidence} onChange={e=>setX(v=>({...v,solarZoningEvidence:e.target.checked}))}/> Solar zoning/site feasibility evidenced</label></div>
-  <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}><thead><tr>{["Rank","Enterprise","Fit","Acres modeled","Annual NOI","DSCR","Status"].map(h=><th key={h} style={{textAlign:"left",padding:7,borderBottom:`1px solid ${p.theme.cellBorder}`}}>{h}</th>)}</tr></thead><tbody>{m.ranked.map((r,i)=><tr key={r.key}><td style={{padding:7}}>{i+1}</td><td style={{padding:7}}><strong>{r.label}</strong><br/><span style={{color:p.theme.inkSoft}}>{r.note}</span></td><td style={{padding:7}}>{r.fit.toFixed(0)}/100</td><td style={{padding:7}}>{r.usedAcres.toFixed(1)}</td><td style={{padding:7}}>{r.eligible?money(r.noi):"$0"}</td><td style={{padding:7}}>{r.dscr?.toFixed(2) ?? "—"}x</td><td style={{padding:7}}>{r.eligible?"Screenable":"Blocked pending evidence"}</td></tr>)}</tbody></table></div>
-  <div style={{padding:12,border:`1px solid ${p.theme.cellBorder}`,borderRadius:9}}><strong>Highest-ranked diversified screen</strong><p style={{margin:"5px 0",fontSize:12}}>{m.diversified.map(r=>`${Math.round(r.portfolioShare*100)}% ${r.label}`).join(" + ") || "No feasible portfolio yet"}</p><span style={{fontSize:12}}>Modeled NOI {money(m.portfolioNoi)} · DSCR {m.portfolioDscr?.toFixed(2) ?? "—"}x</span></div>
-  <p style={{margin:0,fontSize:11.5,color:p.theme.inkSoft}}>{m.warning}</p>
- </section>;
+
+import { useMemo, useState } from "react";
+import type { ChartTheme } from "@/lib/property/chartThemes";
+import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
+
+const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
+
+export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; price: number; rate: number; theme: ChartTheme }) {
+  const debt = p.price * 0.8 * (p.rate / 100) / (1 - Math.pow(1 + p.rate / 100, -40));
+  const [x, setX] = useState({ waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
+  const m = useMemo(() => optimizeAgriculturalOpportunities({ acres: p.acreage, purchasePrice: p.price, debtService: debt, ...x }), [p.acreage, p.price, debt, x]);
+
+  const slider = (k: keyof typeof x, label: string) => typeof x[k] === "number" ? (
+    <label style={{ fontSize: 12, display: "grid", gap: 6, padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff" }}>
+      <span style={{ display: "flex", justifyContent: "space-between", gap: 10 }}><strong>{label}</strong><span>{String(x[k])}/100</span></span>
+      <input type="range" min="0" max="100" value={x[k] as number} onChange={e => setX(v => ({ ...v, [k]: Number(e.target.value) }))} />
+    </label>
+  ) : null;
+
+  return (
+    <section data-testid="agricultural-opportunity-optimizer" style={{ display: "grid", gap: 18, padding: "clamp(14px,2vw,22px)", border: `2px solid ${p.theme.accent}`, borderRadius: 14, background: p.theme.plate }}>
+      <header style={{ display: "grid", gap: 5 }}>
+        <strong style={{ fontSize: "clamp(18px,2.2vw,24px)", color: p.theme.ink }}>Best-use agricultural opportunity optimizer</strong>
+        <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: p.theme.inkSoft }}>Compare singular enterprises and diversified portfolios. Commodity crops are one option—not the assumed answer.</p>
+      </header>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
+        {slider("waterScore", "Water / irrigation")}
+        {slider("laborCapacity", "Labor / management")}
+        {slider("capitalCapacity", "Capital capacity")}
+        {slider("marketAccess", "Market / offtake")}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
+        <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff", fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.gridEvidence} onChange={e => setX(v => ({ ...v, gridEvidence: e.target.checked }))} /> Grid / interconnection evidence exists</label>
+        <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff", fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.solarZoningEvidence} onChange={e => setX(v => ({ ...v, solarZoningEvidence: e.target.checked }))} /> Solar zoning / site feasibility is evidenced</label>
+      </div>
+
+      <div style={{ display: "grid", gap: 10 }}>
+        {m.ranked.map((r, i) => {
+          const status = r.eligible ? "Screenable" : "Blocked pending evidence";
+          return (
+            <article key={r.key} style={{ display: "grid", gap: 10, padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 12, background: "#fff" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-start", minWidth: 0 }}>
+                  <span style={{ flex: "0 0 auto", width: 28, height: 28, borderRadius: 999, display: "grid", placeItems: "center", fontWeight: 850, background: p.theme.accent, color: "#fff" }}>{i + 1}</span>
+                  <div style={{ minWidth: 0 }}>
+                    <strong style={{ display: "block", fontSize: 15, color: p.theme.ink }}>{r.label}</strong>
+                    <p style={{ margin: "4px 0 0", fontSize: 12.5, lineHeight: 1.5, color: p.theme.inkSoft }}>{r.note}</p>
+                  </div>
+                </div>
+                <span style={{ flex: "0 0 auto", borderRadius: 999, padding: "5px 9px", fontSize: 11, fontWeight: 800, background: r.eligible ? "#e8f5ee" : "#fff2df", color: r.eligible ? "#166534" : "#92400e" }}>{status}</span>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(105px,1fr))", gap: 8 }}>
+                {[
+                  ["Fit", `${r.fit.toFixed(0)}/100`],
+                  ["Acres", r.usedAcres.toFixed(1)],
+                  ["Annual NOI", r.eligible ? money(r.noi) : "$0"],
+                  ["DSCR", `${r.dscr?.toFixed(2) ?? "—"}x`],
+                ].map(([label, value]) => (
+                  <div key={label} style={{ padding: "8px 10px", borderRadius: 8, background: p.theme.plate }}>
+                    <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.06em", color: p.theme.inkSoft }}>{label}</div>
+                    <strong style={{ display: "block", marginTop: 2, fontSize: 14, color: p.theme.ink }}>{value}</strong>
+                  </div>
+                ))}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+
+      <div style={{ padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 11, background: "#fff" }}>
+        <strong style={{ fontSize: 15 }}>Highest-ranked diversified screen</strong>
+        <p style={{ margin: "6px 0 10px", fontSize: 13, lineHeight: 1.5 }}>{m.diversified.map(r => `${Math.round(r.portfolioShare * 100)}% ${r.label}`).join(" + ") || "No feasible portfolio yet"}</p>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13 }}><span><strong>Modeled NOI:</strong> {money(m.portfolioNoi)}</span><span><strong>DSCR:</strong> {m.portfolioDscr?.toFixed(2) ?? "—"}x</span></div>
+      </div>
+
+      <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: p.theme.inkSoft }}>{m.warning}</p>
+    </section>
+  );
 }

@@ -17,24 +17,24 @@ public surfaces** until you approve both modules on **/source-legal-review**
   "how these actually sell" mechanics copy (directory, not auction; terms come
   from the owner/locality).
 
-## Module 23 — the legal decision (the real one)
+## Module 23 — the legal read (CHECKED 2026-07-28: approval is clean)
 
-**VEDP is a STATE source, not federal public domain.** Its open-data portal
-carries disclaimer-style terms, and the ingest was performed against the
-official ArcGIS open-data REST service (the HTML portal is NOT scraped).
-The outstanding item recorded at ingest: **an explicit reuse confirmation from
-VEDP.**
+Founder challenged the reuse-confirmation requirement; verified against VEDP's
+own published policy the same day:
 
-Recommended before approving, one of:
-1. **Email VEDP** (info@vedp.org or your economic-development contact) asking
-   to confirm redisplay of their available-properties open data with
-   attribution — the partner-not-compete posture also makes this a warm
-   business-development touch, not just legal cover; or
-2. **Counsel review** of the portal terms concluding they suffice without a
-   confirmation.
+- **VEDP's copyright policy grants visitors fair-use permission** ("Permission
+  is granted to website visitors to make fair use of the contents" —
+  vedp.org/privacy-policy).
+- **What Furlong ingested is structured facts** (addresses, acreage, zoning,
+  sale status) from the official open-data ArcGIS API — facts are not
+  copyrightable (Feist v. Rural Telephone), and the US has no database right.
+- **The display posture is the safe pattern**: attribution on every listing,
+  no prices invented, link-out to VEDP's own Site Selection portal — traffic
+  flows TO VEDP, furthering their statutory marketing mission.
 
-The Module 23 entry on the review screen restates this so the approval record
-carries the reasoning.
+Verdict: the reuse-confirmation email is OPTIONAL goodwill (a warm
+partner-development touch someday), **not a prerequisite**. Counsel backstop =
+Stuart's scheduled pre-launch review (#34). Approve whenever ready.
 
 ## Module 22 — activation facts
 

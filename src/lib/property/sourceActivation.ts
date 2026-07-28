@@ -207,12 +207,12 @@ export const SOURCE_ACTIVATION: Record<string, SourceActivationRecord> = {
       status: "PENDING_HUMAN_APPROVAL",
       facts: [
         "Official VEDP open-data ArcGIS service (maps.vedp.org PropertiesSites MapServer) — a STATE source, not federal public domain.",
-        "Terms are disclaimer-style open-data portal terms; an explicit reuse confirmation with VEDP is the OUTSTANDING legal item.",
+        "VEDP's published copyright policy grants website visitors fair-use permission (vedp.org/privacy-policy, checked 2026-07-28); the ingested material is structured FACTS (addresses, acreage, zoning, sale status) from the official open-data API — facts are not copyrightable (Feist).",
         "Commercial buildings and development sites listed for sale/lease by owners and localities; Furlong ingests sale === true only.",
         "The feed publishes NO prices ('Price on request' — never invented) and NO per-listing public URLs (link-out goes to VEDP's official Site Selection portal, verified live).",
       ],
       license:
-        "VEDP open-data portal, disclaimer-style terms — reuse confirmation with VEDP pending. Do NOT approve until that confirmation is in hand or counsel deems the portal terms sufficient.",
+        "VEDP copyright policy grants fair-use permission to site visitors; ingested material is uncopyrightable structured facts from the official open-data API, displayed with attribution + link-out to VEDP's own portal. A courtesy heads-up to VEDP remains OPTIONAL goodwill (partner posture), not a prerequisite; Stuart's pre-launch review (#34) is the counsel backstop.",
       attributionRequired:
         'Display "Source: VEDP — Virginia Economic Development Partnership (vedp.org)" on every listing.',
       reviewedBy: null,

@@ -35,6 +35,7 @@ import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
+import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
 import type { ExtendedPropertyRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 import {
@@ -3156,6 +3157,10 @@ export function PropertyEvaluationWorkspace({
     ingested: ingestedRiskEvidence,
     location: analysisContext.location,
   });
+  const propertyEvidenceManifest = rankingTax
+    ? buildPropertyEvidenceManifest({ tax: rankingTax, evidence: reportRiskEvidence })
+    : null;
+  void propertyEvidenceManifest;
   const propertyInfrastructureRisk = buildInfrastructureRiskFromEvidence(reportRiskEvidence);
   const scenarioRankingPlan = buildScenarioRankingPlan({
     profileId: workspaceProfile.id,

@@ -191,6 +191,22 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # ---- api.data.gov key (NREL PVWatts solar estimate) -----------------
+      # Same out-of-band pattern as ANTHROPIC_API_KEY: owner-created secret,
+      # gated so an unversioned secret can't break a revision rollout.
+      dynamic "env" {
+        for_each = var.data_gov_api_key_enabled ? [1] : []
+        content {
+          name = "DATA_GOV_API_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "DATA_GOV_API_KEY"
+              version = "latest"
+            }
+          }
+        }
+      }
+
       # ---- Operator credential login --------------------------------------
       # Enabled only when auth_credentials_mode is set. The shared-secret value
       # is created out of band by the owner; TF only references it by name.

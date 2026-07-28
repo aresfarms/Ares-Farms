@@ -100,6 +100,11 @@ type PropertyEvaluationPdfInput = {
   };
   /** Alternatives from the tracked government inventory (honest-label rule). */
   similarHomes?: Array<{ title: string; detail: string }>;
+  /** Lane burning-questions answered FOR THIS property (Tier 3, 2026-07-28):
+      same content the web report shows, so the signed PDF carries the answers
+      too. Title is lane-worded by the workspace; lines pre-formatted
+      "Question — answer (Confirm: …)". */
+  laneAnswers?: { title: string; lines: string[] } | null;
 };
 
 /**
@@ -661,6 +666,14 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       })
       .filter((row) => !/^(asset|location|asking posture|immediate deal type|asset type|source)$/i.test(row.label)),
   ]);
+
+  // ── LANE QUESTIONS, ANSWERED ───────────────────────────────────────────────
+  // Directly after the snapshot — the founder's direct-to-answers principle
+  // applies to the printed ledger too.
+  if (input.laneAnswers && input.laneAnswers.lines.length > 0) {
+    heading(input.laneAnswers.title);
+    bullets(input.laneAnswers.lines);
+  }
 
   // ── COST POSTURE ───────────────────────────────────────────────────────────
 

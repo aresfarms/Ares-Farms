@@ -2868,6 +2868,21 @@ export function PropertyEvaluationWorkspace({
             buyingProcess: report.buyingProcess,
             honestUnknowns: report.honestUnknowns,
             financingProse: report.financingProse,
+            // Lane burning-questions answered for THIS property — the signed
+            // PDF carries the same answers the web report shows (Tier 3).
+            laneAnswers: (() => {
+              const fmt = (answers: { question: string; answer: string; confirm: string | null }[]) =>
+                answers.map((a) => `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`);
+              const farm = (effectivePlaceIntelligence?.farmEnterpriseAnswers ?? []).map(
+                (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`
+              );
+              if (farm.length > 0) return { title: "Your Farm Questions — Answered for This Property", lines: farm };
+              const residential = fmt(effectivePlaceIntelligence?.residentialAnswers ?? []);
+              if (residential.length > 0) return { title: "Your Questions — Answered for This Home", lines: residential };
+              const commercial = fmt(effectivePlaceIntelligence?.commercialAnswers ?? []);
+              if (commercial.length > 0) return { title: "Your Questions — Answered for This Property", lines: commercial };
+              return null;
+            })(),
             placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? [])
               .filter((fact) => workspaceProfile.id !== "farm" || !/school|education|college|university|broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
               .map((fact) => ({

@@ -94,6 +94,7 @@ import {
 import { buildLocalServices, type LocalServices } from "./localServices";
 import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE, US_PRIVATE_SCHOOL_CAMPUSES } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
+import { fetchSolarPotential } from "./solarPotentialLive";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
 import {
   AMENITY_RADIUS_MILES,
@@ -2067,6 +2068,27 @@ export async function buildLocationBriefIntelligence(args: {
           `Source: OpenStreetMap via Overpass API (live lookup), © OpenStreetMap contributors (ODbL)`
         )
       );
+    }
+  }
+
+  // Solar resource — NREL PVWatts v8 modeled estimate for a fixed 10 kW
+  // reference array (Tier 3, DATA_GOV key). Gated on the key being mounted;
+  // absent key or failed call → the fact simply does not render.
+  if (geocode?.lat != null && geocode?.lon != null) {
+    const solar = await fetchSolarPotential(geocode.lat, geocode.lon);
+    if (solar) {
+      verifiedFacts.push({
+        label: "Solar resource (climate)",
+        value: `~${solar.acAnnualKwh.toLocaleString("en-US")} kWh/yr per ${solar.capacityKw} kW array`,
+        text:
+          `NREL's PVWatts model estimates a fixed ${solar.capacityKw} kW ground-mounted, south-facing array here ` +
+          `would produce roughly ${solar.acAnnualKwh.toLocaleString("en-US")} kWh per year` +
+          `${solar.solradAnnual ? ` (solar resource ${solar.solradAnnual} kWh/m²/day)` : ""}. This is a modeled ` +
+          `climate estimate for comparing places — actual production depends on siting, shading, equipment, ` +
+          `interconnection, and permits, and this is not a recommendation to build.`,
+        provenance: `Source: NREL PVWatts v8 (developer.nrel.gov), modeled estimate retrieved ${solar.retrievedAt}`,
+        tone: "neutral",
+      });
     }
   }
 

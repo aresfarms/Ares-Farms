@@ -133,3 +133,13 @@ resource "google_secret_manager_secret_iam_member" "runtime_anthropic_api_key" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
+
+# DATA_GOV_API_KEY is created + versioned out of band by the owner (not TF).
+# Grant the runtime SA read access only when the data.gov lookups are enabled.
+resource "google_secret_manager_secret_iam_member" "runtime_data_gov_api_key" {
+  count     = var.data_gov_api_key_enabled ? 1 : 0
+  project   = var.project_id
+  secret_id = "DATA_GOV_API_KEY"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}

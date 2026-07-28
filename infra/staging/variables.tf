@@ -419,3 +419,9 @@ variable "anthropic_api_key_enabled" {
   type        = bool
   default     = false
 }
+
+variable "data_gov_api_key_enabled" {
+  description = "When true, the core service reads DATA_GOV_API_KEY (an out-of-band Secret Manager secret) to activate api.data.gov-keyed live lookups (NREL PVWatts solar estimate). Requires the secret to hold at least one enabled version. Default false = the solar fact simply does not render."
+  type        = bool
+  default     = false
+}

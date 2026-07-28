@@ -674,15 +674,15 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   // ── AGRICULTURAL OPERATING PRO FORMA ──────────────────────────────────────
   if (input.agriculturalProForma) {
     const farm = input.agriculturalProForma;
-    heading("Agricultural Operating Pro Forma — Revenue, OpEx, and Debt Coverage");
+    heading("Agricultural Best-Use Pro Forma — Singular and Diversified Opportunity Screen");
     paragraph(farm.scopeLine);
     setFont("bold", 9.5, COLORS.muted);
-    doc.text("TRACT AND CROP ALLOCATION", PAGE.marginX, y, { characterSpacing: 0.8 });
+    doc.text("RANKED PROPERTY-USE CANDIDATES", PAGE.marginX, y, { characterSpacing: 0.8 });
     y = doc.y + 8;
     factsTable(farm.acreageRows);
     setFont("bold", 9.5, COLORS.muted);
     ensure(24);
-    doc.text("OPERATING INCOME STATEMENT", PAGE.marginX, y, { characterSpacing: 0.8 });
+    doc.text("DIVERSIFIED PORTFOLIO SCREEN", PAGE.marginX, y, { characterSpacing: 0.8 });
     y = doc.y + 8;
     factsTable(farm.operatingRows);
     setFont("bold", 9.5, COLORS.muted);

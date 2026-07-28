@@ -31,7 +31,7 @@ import { buildRecommendationReleaseRecord, type RecommendationReleaseRecord } fr
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
 import { buildRecommendationReleaseHistory, type RecommendationReleaseAuditEntry, type RecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
-import { buildAgriculturalProForma, defaultAgriculturalProFormaInputs } from "@/lib/property/agriculturalProForma";
+import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
@@ -695,9 +695,9 @@ function deriveAssetClassFromContext(context: PropertyContext): AssetClass {
 }
 
 function isResidentialHomeContext(context: PropertyContext): boolean {
-  return /(home|house|residential|single family|condo|duplex)/i.test(
-    [context.propertyType, context.categoryLabel ?? "", context.description ?? "", context.title].join(" ")
-  );
+  const text = [context.propertyType, context.categoryLabel ?? "", context.description ?? "", context.title].join(" ");
+  if (/(farm|ranch|agric|crop|pasture|livestock|orchard|vineyard|poultry|dairy|tillable|irrigat|acre)/i.test(text)) return false;
+  return /(home|house|residential|single family|condo|duplex)/i.test(text);
 }
 
 function buildBudgetExpectations(context: PropertyContext): BudgetExpectations {
@@ -2886,35 +2886,30 @@ export function PropertyEvaluationWorkspace({
               if (workspaceProfile.id !== "farm" || effectiveListedPrice == null || !ownershipContext) return undefined;
               const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
               if (!acreage) return undefined;
-              const model = buildAgriculturalProForma(defaultAgriculturalProFormaInputs({
-                tractAcres: acreage,
-                purchasePrice: effectiveListedPrice,
-                annualRatePct: ownershipContext.fsa?.ownershipDirectPct ?? ownershipContext.rates.rate30,
-              }));
+              const rate = ownershipContext.fsa?.ownershipDirectPct ?? ownershipContext.rates.rate30;
+              const annualDebtService = effectiveListedPrice * 0.8 * (rate / 100) / (1 - Math.pow(1 + rate / 100, -40));
+              const model = optimizeAgriculturalOpportunities({ acres: acreage, purchasePrice: effectiveListedPrice, debtService: annualDebtService, waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
               const dollars = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
               return {
-                scopeLine: `${model.inputs.tractAcres.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres modeled at ${dollars(model.inputs.purchasePrice)}. Tillable acreage, yields, crop mix, costs, and rent are editable assumptions until farm records and source snapshots are attached.`,
-                acreageRows: [
-                  { label: "Tillable row-crop acres", value: `${model.acreage.tillableAcres.toFixed(1)} acres (${model.inputs.tillablePct}% assumption)` },
-                  { label: "Corn allocation", value: `${model.acreage.cornAcres.toFixed(1)} acres` },
-                  { label: "Soybean allocation", value: `${model.acreage.soybeanAcres.toFixed(1)} acres` },
-                  { label: "Non-tillable / farmstead / buffers", value: `${model.acreage.nonTillableAcres.toFixed(1)} acres` },
-                ],
-                operatingRows: [
-                  { label: "Gross crop revenue", value: dollars(model.revenue.grossCropRevenue) },
-                  { label: "Corn direct costs", value: dollars(model.expenses.cornVariableCosts) },
-                  { label: "Soybean direct costs", value: dollars(model.expenses.soybeanVariableCosts) },
-                  { label: "Fixed overhead", value: dollars(model.expenses.fixedOverhead) },
-                  { label: "Farm NOI", value: dollars(model.revenue.grossCropRevenue - model.expenses.totalOperatingExpense) },
-                ],
+                scopeLine: `${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres screened at ${dollars(effectiveListedPrice)} across agricultural, livestock, specialty-crop, controlled-environment, renewable-energy, storage, leasing, and diversified-use candidates. Rankings are assumptions until site and operator evidence is attached.`,
+                acreageRows: model.ranked.slice(0, 8).map((item, index) => ({ label: `${index + 1}. ${item.label}`, value: `${item.fit.toFixed(0)}/100 fit · ${item.usedAcres.toFixed(1)} acres modeled · ${item.eligible ? dollars(item.noi) + " annual NOI" : "blocked pending feasibility evidence"}` })),
+                operatingRows: model.diversified.length ? model.diversified.map((item) => ({ label: `${Math.round(item.portfolioShare * 100)}% ${item.label}`, value: `${dollars(item.noi * item.portfolioShare)} weighted annual NOI` })) : [{ label: "Diversified portfolio", value: "No feasible portfolio until constraints are resolved" }],
                 debtRows: [
-                  { label: "Illustrative loan amount", value: dollars(model.debt.loanAmount) },
-                  { label: "Annual principal + interest", value: dollars(model.debt.annualDebtService) },
-                  { label: "Crop-operation DSCR", value: `${model.debt.dscr?.toFixed(2)}x against a 1.25x screening threshold` },
-                  { label: "Cash-rent alternative", value: `${dollars(model.revenue.cashRentLow)}–${dollars(model.revenue.cashRentHigh)}/yr; DSCR ${model.debt.cashRentDscrLow?.toFixed(2)}x–${model.debt.cashRentDscrHigh?.toFixed(2)}x` },
+                  { label: "Illustrative annual debt service", value: dollars(annualDebtService) },
+                  { label: "Highest-ranked diversified NOI", value: dollars(model.portfolioNoi) },
+                  { label: "Diversified DSCR", value: `${model.portfolioDscr?.toFixed(2) ?? "—"}x against a 1.25x screening threshold` },
+                  { label: "Energy-use treatment", value: "Solar, agrivoltaics, and battery storage receive no credited revenue until zoning and grid/interconnection evidence is present." },
                 ],
-                assumptions: Object.values(model.provenance),
-                readiness: model.readiness,
+                assumptions: [model.warning, "Opportunity economics are editable screening assumptions, not appraisals, bids, contracts, or eligibility findings.", "The selected best use can be singular or diversified; the optimizer does not privilege commodity crops."],
+                readiness: [
+                  "NRCS soils, capability classes, drainage, wetlands, and productive-acre delineation",
+                  "FSA acreage/base history, APH, conservation obligations, and crop-insurance records",
+                  "Water supply, irrigation capacity, nutrient-management and waste-handling constraints",
+                  "Labor, operator skill, equipment, buildings, working capital, and market/offtake capacity",
+                  "Zoning and permits for livestock, poultry, greenhouse, agritourism, solar, agrivoltaics, or battery storage",
+                  "Utility territory, substation distance, hosting capacity, interconnection queue, and offtake terms",
+                  "Enterprise-specific budgets, contracts, price scenarios, and downside sensitivities",
+                ],
               };
             })(),
             compensationTransparency: buildRealEstateCompensationTransparency({

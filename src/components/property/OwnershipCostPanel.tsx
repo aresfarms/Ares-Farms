@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 import type { ChartTheme } from "@/lib/property/chartThemes";
-import { AgriculturalProFormaPanel } from "@/components/property/AgriculturalProFormaPanel";
+import { AgriculturalOpportunityOptimizerPanel } from "@/components/property/AgriculturalOpportunityOptimizerPanel";
 import { financingProgramsFor } from "@/lib/property/financingProgramsCurated";
 import {
   buildEquityOutlook,
@@ -177,7 +177,7 @@ export function OwnershipCostPanel(props: OwnershipCostPanelProps) {
       </div>
 
       {props.farmMode && price != null && props.farmAcreage != null && props.farmAcreage > 0 && (
-        <AgriculturalProFormaPanel
+        <AgriculturalOpportunityOptimizerPanel
           acreage={props.farmAcreage}
           price={price}
           rate={props.context.fsa?.ownershipDirectPct ?? props.context.rates.rate30}

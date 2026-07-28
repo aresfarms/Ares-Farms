@@ -132,6 +132,7 @@ export function PlaceFirstDiscovery({
   embedded = false,
   tone = "light",
   compact = false,
+  startingLens,
 }: {
   flow: DiscoveryFlow;
   embedded?: boolean;
@@ -139,7 +140,13 @@ export function PlaceFirstDiscovery({
   /** Slim variant for the /explore compass front door: framed card, chips-only
       coverage with a link to the full check, no bottom routing footer. */
   compact?: boolean;
+  /** Lens carried into the analysis (e.g. "farms-agriculture" on the farm
+      lane) so the report opens type-correct without a round-trip through the
+      Navigator — added after the farm CTA → /navigator → farm-lane redirect
+      loop (founder-caught 2026-07-28). Defaults to the flow itself. */
+  startingLens?: string;
 }) {
+  const lensSignal = startingLens ?? flow;
   const head = HEAD[flow] ?? HEAD["place-facts"];
   const t = CHART_TONES[tone];
   const router = useRouter();
@@ -336,7 +343,7 @@ export function PlaceFirstDiscovery({
 
     return buildPropertyAnalysisHref({
       propertyId: commercialAddressRecord?.propertyId || result?.canonicalMatch?.propertyId || result?.propertyId || "imported:place-facts",
-      propertyType: commercialAddressRecord?.propertyType || result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || (/farm|agric/i.test(flow) ? "farm" : /commercial|business/i.test(flow) ? "commercial property" : "place-led property"),
+      propertyType: commercialAddressRecord?.propertyType || result?.propertyRecord?.propertyType || result?.propertyRecord?.rawPropertyStyle || (/farm|agric/i.test(lensSignal) ? "farm" : /commercial|business/i.test(lensSignal) ? "commercial property" : "place-led property"),
       location: locationLabel || "Verified location",
       title,
       priceLabel: commercialAddressRecord?.priceLabel || (result?.propertyRecord?.price != null
@@ -359,7 +366,7 @@ export function PlaceFirstDiscovery({
         : "verified-address-only",
       matchedSourceRecordId: result?.canonicalMatch?.propertyId ?? null,
       entryMethod: "manual-address",
-      startingLens: flow,
+      startingLens: lensSignal,
     });
   })();
 

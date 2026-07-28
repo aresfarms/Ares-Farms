@@ -25,7 +25,7 @@ import { HundredPercentFinancingCallout } from "@/components/public/HundredPerce
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
 import { FarmFinancialHealthCheck } from "@/components/public/FarmFinancialHealthCheck";
 import { FarmBestUseFinanceWorkspace } from "@/components/public/FarmBestUseFinanceWorkspace";
-import { NavigatorEntryCta } from "@/components/public/NavigatorEntryCta";
+import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { HOMEPAGE_PRIMARY_ACTIONS } from "@/lib/public-content/publicCopyRegistry";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 
@@ -383,7 +383,10 @@ export function FarmLaneSection({ sectionKey }: { sectionKey: string }) {
       // with the 100%-financing callout underneath.
       return (
         <div style={{ display: "grid", gap: 28 }}>
-          <NavigatorEntryCta lens="farms-agriculture" support="Use the same Navigator entry point as the main Compass. Start with the farm, parcel, listing, or financing question and keep the agricultural lens throughout the analysis." />
+          {/* Direct farm address check — never NavigatorEntryCta with the
+              farms-agriculture lens: /navigator redirects that combination
+              back to this lane (refresh loop, founder-caught 2026-07-28). */}
+          <PlaceFirstDiscovery flow="place-facts" compact startingLens="farms-agriculture" />
           <LoanProgramComparison />
           <HundredPercentFinancingCallout />
           <FarmBestUseFinanceWorkspace />

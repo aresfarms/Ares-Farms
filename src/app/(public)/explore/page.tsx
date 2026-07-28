@@ -15,7 +15,6 @@ import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
-import { NavigatorEntryCta, navigatorHref } from "@/components/public/NavigatorEntryCta";
 import { InteractiveCompassRose } from "@/components/public/InteractiveCompassRose";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
@@ -200,7 +199,9 @@ export default async function ExplorePage({
 
     // Agricultural workspace tabs stay integrated into the main farm page.
     const section = one(resolved.section);
-    const farmReportHref = navigatorHref("farms-agriculture");
+    // Address-first farm analysis on /discover. NEVER navigatorHref("farms-agriculture"):
+    // /navigator redirects that lens back to this lane (refresh loop, 2026-07-28).
+    const farmReportHref = "/discover?flow=property-discovery&lens=farms-agriculture";
 
     return (
       <>
@@ -245,11 +246,11 @@ export default async function ExplorePage({
               <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>Have a farm or parcel in mind?</span>
               <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>Use the same Furlong Navigator entry point as the Compass and financing workspace. Your farm lens carries into the property-first analysis automatically.</p>
             </div>
-            {isFarmLane ? (
-              <NavigatorEntryCta lens="farms-agriculture" support="Start with the property, listing, or question. Navigator keeps the farming lens while testing every plausible use, market, cost, environmental, and financing pathway." />
-            ) : (
-              <PlaceFirstDiscovery flow="place-facts" compact />
-            )}
+            {/* The farm lane gets the SAME direct address check as every other
+                lane, carrying the farm lens. It must never link to
+                /navigator?lens=farms-agriculture — that redirects straight back
+                to this lane (founder-caught refresh loop, 2026-07-28). */}
+            <PlaceFirstDiscovery flow="place-facts" compact startingLens={isFarmLane ? "farms-agriculture" : undefined} />
           </div>
         </section>
 

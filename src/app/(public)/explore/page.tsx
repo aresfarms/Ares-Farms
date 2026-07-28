@@ -237,7 +237,7 @@ export default async function ExplorePage({
             padding: "24px 20px 0",
             display: "grid",
             gap: 24,
-            gridTemplateColumns: "minmax(0, 1.35fr) minmax(0, 1fr)",
+            gridTemplateColumns: isFarmLane ? "1fr" : "minmax(0, 1.35fr) minmax(0, 1fr)",
             alignItems: "start",
           }}
         >
@@ -265,26 +265,21 @@ export default async function ExplorePage({
               dead space under the browse box. Residential: the mortgage-rate
               tiles sit under the "Homes to live in" box (founder direction
               2026-07-18). Other lanes keep the full-width shelf below. */}
-          <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
-            <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
-            {isFarmLane && (
-              <PropertyShowcaseRail inventoryByState={laneInventory} weekSeed={shelfSeed} limit={6} layout="column" accent={laneAccent} />
-            )}
-            {isResidentialLane && <ResidentialRateTiles />}
-            {isResidentialLane && <HundredPercentFinancingCallout />}
-            {isCommercialLane && <CapitalRatesBlock accent={laneAccent} />}
-          </div>
+          {!isFarmLane && (
+            <div style={{ display: "grid", gap: 16, alignContent: "start" }}>
+              <PropertyGroupsFrontDoor groups={laneGroups} compact accent={laneAccent} />
+              {isResidentialLane && <ResidentialRateTiles />}
+              {isResidentialLane && <HundredPercentFinancingCallout />}
+              {isCommercialLane && <CapitalRatesBlock accent={laneAccent} />}
+            </div>
+          )}
         </div>
         {/* The farmer sections as cards (founder direction 2026-07-18):
             enterprise economics, land-money options, equipment, cross-links. */}
-        {isFarmLane && (
-          <div style={{ maxWidth: 1180, margin: "0 auto", padding: "18px 20px 0" }}>
-            <FarmLaneMenu
-              hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`}
-              reportHref={farmReportHref}
-            />
-          </div>
-        )}
+        {/* Farms now uses the unified property-analysis journey. The market
+            header, map, and address choice remain here; after a property is
+            selected, the new Property Evaluation Workspace owns everything
+            else. Do not reintroduce the legacy farm cards on this surface. */}
         {/* The commercial sections (founder direction 2026-07-18): the kinds of
             commercial property, the questions owners ask + the ones they don't. */}
         {isCommercialLane && (
@@ -305,17 +300,19 @@ export default async function ExplorePage({
             <ResidentialLoanTable />
           </div>
         )}
-        <PropertyHub
-          state={one(resolved.state)}
-          type={one(resolved.type)}
-          category={one(resolved.category)}
-          lane={selected.slug}
-        />
+        {!isFarmLane && (
+          <PropertyHub
+            state={one(resolved.state)}
+            type={one(resolved.type)}
+            category={one(resolved.category)}
+            lane={selected.slug}
+          />
+        )}
         {/* Newsletters & podcasts, then the gold Community cue, at the BOTTOM
             of every lane (founder direction 2026-07-18). */}
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0", display: "grid", gap: 16 }}>
           {audience && !isFarmLane && <CurrentNewsletters audiences={[audience]} />}
-          <CommunityCta />
+          {!isFarmLane && <CommunityCta />}
         </div>
         {/* The map is width-responsive now (960×580 aspect held at any width),
             so it keeps its side column at normal widths; only narrow screens stack.

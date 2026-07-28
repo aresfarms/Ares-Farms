@@ -1,0 +1,234 @@
+"use client";
+
+/**
+ * GovernedLaneChassis — the SINGLE-SOURCE compliance substrate under all three
+ * consumer lane workspaces (founder-approved decomposition, 2026-07-28).
+ *
+ * The chassis owns everything that is legally sensitive or provenance-bearing
+ * and must never fork per lane:
+ *   - sticky tab navigation shell + single-assignment fact routing,
+ *   - the fact card with "Source and explanation" provenance on every figure,
+ *   - record-fact promotion from the matched parcel/listing record,
+ *   - resolved-unknown suppression (suppressResolvedUnknowns),
+ *   - the owner-correction loop ("Something Furlong missed?"),
+ *   - the Report tab (save/export actions + personalized pro forma hand-off),
+ *   - customer-safe language only — no internal governance state.
+ *
+ * Everything a lane OWNS arrives through its LaneDefinition: tab list and
+ * intros, initial tab, financing ranking + program notes + rate labels, and
+ * the best-first-path rationale. Farm, commercial, and residential evolve
+ * independently in their own files; the substrate stays here, once.
+ */
+
+import { useMemo, useState, type ReactNode } from "react";
+import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief";
+import { CHART_THEMES } from "@/lib/property/chartThemes";
+import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
+
+export type TabId = "summary" | "property" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
+export type CategoryTabId = Exclude<TabId, "summary" | "report" | "finance">;
+
+export type FinancingRateContext = {
+  fsaOwnershipDirectPct: number | null;
+  fsaDownPaymentPct: number | null;
+  fsaEffective: string | null;
+  mortgage30Pct: number | null;
+  mortgageWeekOf: string | null;
+} | null;
+
+export type LaneTab = { id: TabId; label: string; intro: string };
+
+export type LaneFinancingNote = { fit: string; why: string; watch: string };
+
+export type LaneDefinition = {
+  /** Canonical lane id — matches the property-profile grouping, not a regex. */
+  id: "residential" | "farm" | "commercial";
+  /** Customer-facing lane name used in the summary line + data attribute. */
+  consumerLaneLabel: "Residential" | "Farm & agricultural" | "Commercial & business";
+  /** Tab the lane opens on. */
+  initialTab: TabId;
+  /** The lane's own tabs — labels and category intros are lane-owned copy. */
+  tabs: LaneTab[];
+  /** Lower sorts first in the Finance tab ranking. */
+  financingPriority: (programName: string) => number;
+  /** Current-rate/quote label for a program, lane-flavored. */
+  financingRateLabel: (programName: string, rates: FinancingRateContext) => string;
+  /** Fit / why / what-still-controls copy for a program, lane-flavored. */
+  financingProgramNote: (programName: string) => LaneFinancingNote;
+  /** Why the top-ranked program leads, in this lane's own words. */
+  bestFirstPathNote: (programName: string) => string;
+  /** Optional lane refinement of fact routing; return null to use the default. */
+  categorizeFact?: (label: string) => CategoryTabId | null;
+};
+
+export type LaneWorkspaceProps = ChartTableBriefProps & {
+  deedEvidence?: OfficialPropertyEvidenceRecord[];
+  financingRateContext?: FinancingRateContext;
+  propertyRecord?: {
+    exactAddress: string | null;
+    rawPropertyStyle: string | null;
+    propertyType?: string | null;
+    price?: number | null;
+    county?: string | null;
+    town?: string | null;
+    state?: string | null;
+    parcelRefs?: string[];
+    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
+    parcelSourceName?: string | null;
+    parcelSourceAsOf?: string | null;
+    parcelSourceUrl?: string | null;
+    landUse?: string | null;
+    zoning?: string | null;
+    deedReference?: string | null;
+    legalDescription?: string | null;
+    assessedLandValue?: number | null;
+    assessedImprovementValue?: number | null;
+    assessedTotalValue?: number | null;
+    publicWater?: boolean | null;
+    publicSewer?: boolean | null;
+    waterfront?: boolean | null;
+    resolvedParcelCount?: number;
+    offeredParcelCount?: number | null;
+    offeredAcreage?: number | null;
+    listingSourceName?: string | null;
+    listingSourceAsOf?: string | null;
+    listingSourceUrl?: string | null;
+    listingAgent?: string | null;
+    listingBrokerage?: string | null;
+    listingPhone?: string | null;
+    listingEmail?: string | null;
+    bedrooms: number | null;
+    bathrooms?: number | null;
+    yearBuilt: number | null;
+    squareFeet: number | null;
+    acreageText: string | null;
+    listingId: string | null;
+    listingStatus: string | null;
+  } | null;
+};
+
+type ChassisProps = LaneWorkspaceProps & { lane: LaneDefinition };
+
+function suppressResolvedUnknowns(
+  facts: NonNullable<ChartTableBriefProps["intelligence"]>["verifiedFacts"],
+  unknowns: NonNullable<ChartTableBriefProps["intelligence"]>["unknowns"]
+) {
+  const factText = facts.map((fact) => `${fact.label} ${fact.value} ${fact.text}`.toLowerCase()).join(" ");
+  return unknowns.filter((item) => {
+    const label = item.label.toLowerCase();
+    if (/flood zone/.test(label) && /flood zone|flood and insurance posture|waterfront exposure/.test(factText)) return false;
+    if (/condition|repair scope/.test(label) && /known condition and repair posture|major rehabilitation|teardown/.test(factText)) return false;
+    if (/size|lot|what conveys|parcel/.test(label) && /size|acre|parcel count|parcel and conveyance profile|two lots|recorded deed/.test(factText)) return false;
+    if (/planned construction|public works/.test(label) && /nearby public works screening|regional us 113 projects/.test(factText)) return false;
+    if (/higher education|college/.test(label) && /higher education/.test(factText)) return false;
+    if (/broadband/.test(label) && /broadband/.test(factText)) return false;
+    if (/county/.test(label) && /county/.test(factText)) return false;
+    if (/historic/.test(label) && /historic status/.test(factText)) return false;
+    return true;
+  });
+}
+
+/** Default single-assignment fact routing; lanes may refine via categorizeFact. */
+function defaultCategoryForFact(label: string): CategoryTabId {
+  const value = label.toLowerCase();
+  if (/school|education|college|university|district|parochial/.test(value)) return "education";
+  if (/electric|utility|water|sewer|septic|well|broadband|internet|gas|fuel|wastewater/.test(value)) return "utilities";
+  if (/environment|flood|wetland|hazard|historic|contamin|storm|climate|soil|waterfront exposure/.test(value)) return "environmental";
+  if (/acre|parcel|lot|bed|bath|price|tax|assessment|property type|year built|square feet|size|deed|title/.test(value)) return "property";
+  return "misc";
+}
+
+export function GovernedLaneChassis(props: ChassisProps) {
+  const lane = props.lane;
+  const theme = CHART_THEMES[props.variant ?? "buyer"];
+  void theme;
+  const [tab, setTab] = useState<TabId>(lane.initialTab);
+  const [ownerFeatureInput, setOwnerFeatureInput] = useState("");
+  const [localOwnerAssertions, setLocalOwnerAssertions] = useState<Array<{ label: string; value: string; text: string; provenance: string; tone: "neutral" }>>([]);
+  const rawFacts = props.intelligence?.verifiedFacts ?? [];
+  const recordFacts = useMemo(() => {
+    const record = props.propertyRecord;
+    if (!record) return [];
+    const source = record.recordBasis === "verified-address-only"
+      ? "Source: verified address intake; parcel-level fields require an approved jurisdiction record"
+      : record.recordBasis === "matched-jurisdiction-parcel-record"
+        ? `Source: ${record.parcelSourceName ?? "official jurisdiction parcel record"}${record.parcelSourceAsOf ? ` · data ${record.parcelSourceAsOf}` : ""}`
+        : "Source: matched property/listing record";
+    const place = [record.town, record.county, record.state].filter(Boolean).join(", ");
+    return [
+      record.exactAddress ? { label: "Verified address", value: record.exactAddress, text: "The entered property address resolved successfully through the public address-verification path.", provenance: source, tone: "neutral" as const } : null,
+      place ? { label: "Property location", value: place, text: "Town, county, and state carried into the property record from the verified intake context.", provenance: source, tone: "neutral" as const } : null,
+      record.price != null ? { label: "Asking price", value: `$${record.price.toLocaleString("en-US")}`, text: "Current seller asking price carried by the matched governed listing snapshot.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}${record.listingSourceAsOf ? ` · ${record.listingSourceAsOf}` : ""}` : source, tone: "neutral" as const } : null,
+      record.listingStatus ? { label: "Sale status", value: record.listingStatus, text: "Current public sale posture carried by the matched listing source.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
+      record.listingId ? { label: "MLS / listing ID", value: record.listingId, text: "Public listing identifier for the active offering.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
+      record.offeredParcelCount ? { label: "Sale package", value: `${record.offeredParcelCount} parcels · ${record.offeredAcreage?.toLocaleString("en-US") ?? "acreage pending"} acres offered`, text: record.resolvedParcelCount === record.offeredParcelCount ? "Every parcel in the listing package has been reconciled to an official jurisdiction parcel record." : `The listing offers ${record.offeredParcelCount} parcels. ${record.resolvedParcelCount ?? 0} parcel identities are currently resolved from the official jurisdiction source; the remaining listing parcel identity still requires reconciliation.`, provenance: record.listingSourceName ? `Source: ${record.listingSourceName}; parcel identities: ${record.parcelSourceName ?? "jurisdiction source"}` : source, tone: record.resolvedParcelCount === record.offeredParcelCount ? "neutral" as const : "caution" as const } : null,
+      record.parcelRefs?.length ? { label: "Resolved parcel identities", value: record.parcelRefs.join(" · "), text: "Official account, map, grid, parcel, or lot references returned by the jurisdiction parcel source.", provenance: source, tone: "neutral" as const } : null,
+      record.acreageText ? { label: "Land area", value: record.acreageText, text: `The matched record reports ${record.acreageText} of land.`, provenance: source, tone: "neutral" as const } : null,
+      record.landUse ? { label: "Land use", value: record.landUse, text: "Land-use description published by the official parcel source.", provenance: source, tone: "neutral" as const } : null,
+      record.zoning ? { label: "Zoning", value: record.zoning, text: "Zoning code carried by the official parcel source; local zoning records remain controlling.", provenance: source, tone: "neutral" as const } : null,
+      record.deedReference ? { label: "Recorded deed reference", value: record.deedReference, text: record.legalDescription || "Deed book and page reference published with the parcel record.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedLandValue != null ? { label: "Appraised land value", value: `$${record.assessedLandValue.toLocaleString("en-US")}`, text: "Land component of the official appraised value; this is not a seller asking price.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedImprovementValue != null ? { label: "Appraised improvement value", value: `$${record.assessedImprovementValue.toLocaleString("en-US")}`, text: "Improvement component of the official appraised value.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedTotalValue != null ? { label: "Appraised total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: "Total appraised value published by the jurisdiction parcel source; it is not a market-price opinion.", provenance: source, tone: "neutral" as const } : null,
+      record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.bathrooms != null ? { label: "Bathrooms", value: String(record.bathrooms), text: "Bathroom count reported by the matched listing record.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
+      record.squareFeet != null ? { label: "Building square feet", value: `${record.squareFeet.toLocaleString("en-US")} sq ft`, text: "Building area reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.yearBuilt != null ? { label: "Year built", value: String(record.yearBuilt), text: "Construction year reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      (record.rawPropertyStyle || record.propertyType) ? { label: "Property type", value: record.rawPropertyStyle || record.propertyType || "Property", text: record.recordBasis === "verified-address-only" ? "Property classification follows the selected discovery lane until a parcel or listing source supplies a more specific official style." : "Property style or land use reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
+      record.listingAgent ? { label: "Listing contact", value: [record.listingAgent, record.listingBrokerage].filter(Boolean).join(" · "), text: [record.listingPhone, record.listingEmail].filter(Boolean).join(" · ") || "Contact details are available from the matched listing source.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
+    ].filter((fact): fact is NonNullable<typeof fact> => fact !== null);
+  }, [props.propertyRecord]);
+  // Lane-level market boards belong on the lane landing page, not inside a
+  // parcel record. The property workspace contains parcel-specific evidence only.
+  const facts = useMemo(() => {
+    const filtered = rawFacts.filter((fact) => !/commodity prices|national commodity|corn .*soybeans|livestock prices|regional cash bid/i.test(`${fact.label} ${fact.value}`));
+    const labels = new Set(filtered.map((fact) => fact.label.toLowerCase()));
+    return [...recordFacts.filter((fact) => !labels.has(fact.label.toLowerCase())), ...filtered];
+  }, [rawFacts, recordFacts]);
+  const rawUnknowns = props.intelligence?.unknowns ?? [];
+  // Unknown-record templates are retained in the intelligence model for an
+  // authorized diligence workflow, but are not rendered as customer property facts.
+  const unknowns = useMemo(() => suppressResolvedUnknowns(facts, rawUnknowns), [facts, rawUnknowns]);
+  void unknowns;
+  const hasPrice = !/not captured|unknown|enter|not provided|—/i.test(props.priceLabel);
+  const ownerAssertions = [...(props.intelligence?.ownerAssertions ?? []), ...localOwnerAssertions];
+  const deedEvidence = (props.deedEvidence ?? []).filter((record) => record.domain === "title");
+
+  const categoryForFact = (label: string): CategoryTabId =>
+    lane.categorizeFact?.(label) ?? defaultCategoryForFact(label);
+
+  const factsByTab = useMemo(() => {
+    const out: Record<string, typeof facts> = { property: [], utilities: [], environmental: [], education: [], misc: [] };
+    for (const fact of facts) out[categoryForFact(fact.label)].push(fact);
+    return out;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facts, lane]);
+
+  const introFor = (id: TabId): string => lane.tabs.find((item) => item.id === id)?.intro ?? "";
+
+  const shell = { background: "#FAF8F3", border: "1px solid #E5E0D5", borderRadius: 18, overflow: "hidden" } as const;
+  const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
+  const renderFact = (fact: (typeof facts)[number]) => <article key={`${fact.label}-${fact.value}`} style={card}><span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{fact.label}</span><strong style={{ display: "block", color: "#1C2B45", marginTop: 4, lineHeight: 1.4 }}>{fact.value}</strong><details><summary style={{ marginTop: 7, cursor: "pointer", color: "#8F6E1F", fontSize: 11.5 }}>Source and explanation</summary><p style={{ fontSize: 12, color: "#5A6172", lineHeight: 1.55 }}>{fact.text}</p><p style={{ fontSize: 10.5, color: "#8A8F9C" }}>{fact.provenance}</p></details></article>;
+  const renderCategory = (id: CategoryTabId, title: string): ReactNode => <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>{title}</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor(id)}</p></header>{factsByTab[id].length > 0 ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>{factsByTab[id].map(renderFact)}</div> : <div style={card}>No verified information is currently available in this section.</div>}</>;
+
+  return <section aria-label="Property command center" data-testid="property-command-center" data-consumer-lane={lane.consumerLaneLabel} style={shell}>
+    <nav aria-label="Property workspace sections" style={{ position: "sticky", top: 0, zIndex: 4, background: "rgba(250,248,243,.97)", borderBottom: "1px solid #E5E0D5", padding: "10px 12px", display: "flex", gap: 7, overflowX: "auto", alignItems: "center" }}>
+      <img src="/brand/furlong-emblem.png" alt="Furlong emblem" width={38} height={38} style={{ width: 38, height: 38, objectFit: "contain", flex: "none", marginRight: 4 }} />
+      {lane.tabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 12px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>{item.label}</button>)}
+    </nav>
+    <div style={{ padding: 20, display: "grid", gap: 16 }}>
+      {tab === "summary" && <>
+        <article style={{ ...card, background: "linear-gradient(155deg,#20304E,#16233C)", color: "#fff", border: 0, display: "grid", gap: 9 }}><span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase" }}>Property summary</span><h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: 24 }}>{props.title}</h2><span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane.consumerLaneLabel}</span><p style={{ margin: 0, lineHeight: 1.6, color: "#E6E9EF" }}>{props.headline}</p></article>
+        <section style={{ ...card, display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Everything at a glance</strong><p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 13 }}>{hasPrice ? `Price basis: ${props.priceLabel}. ` : "Price is not yet confirmed. "}{factsByTab.property.length} property fact{factsByTab.property.length === 1 ? "" : "s"}, {factsByTab.utilities.length} utility fact{factsByTab.utilities.length === 1 ? "" : "s"}, {factsByTab.environmental.length} environmental fact{factsByTab.environmental.length === 1 ? "" : "s"}, {factsByTab.education.length} education fact{factsByTab.education.length === 1 ? "" : "s"}, and {factsByTab.misc.length} other fact{factsByTab.misc.length === 1 ? "" : "s"} are organized in the tabs above.</p></section>
+        <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Something Furlong missed?</strong><form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "Customer-supplied property feature pending source verification.", provenance: "Owner assertion added in the property workspace", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800 }}>Add feature</button></form>{ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7 }}><strong style={{ color: "#1C2B45", fontSize: 12 }}>Owner-reported property features</strong>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}</section>
+      </>}
+      {tab === "property" && renderCategory("property", "Property")}
+      {tab === "utilities" && renderCategory("utilities", "Utilities")}
+      {tab === "environmental" && renderCategory("environmental", "Environmental")}
+      {tab === "education" && renderCategory("education", "Education")}
+      {tab === "misc" && renderCategory("misc", "Miscellaneous and other")}
+      {tab === "finance" && (() => { const ranked = [...props.financingLanes].sort((a, b) => lane.financingPriority(a) - lane.financingPriority(b)); const first = ranked[0] ?? null; return <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Finance</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("finance")}</p></header>{first && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFF9E8", display: "grid", gap: 7 }}><span style={{ fontSize: 10, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase", color: "#8F6E1F" }}>Best first path to test</span><strong style={{ color: "#1C2B45", fontSize: 17 }}>{first}</strong><span style={{ color: "#8F6E1F", fontWeight: 800 }}>{lane.financingRateLabel(first, props.financingRateContext ?? null)}</span><span style={{ color: "#5A6172", fontSize: 12 }}>{lane.bestFirstPathNote(first)} This is a screening priority—not an eligibility or approval decision.</span>{props.financingRateContext?.fsaEffective && lane.id === "farm" && <span style={{ color: "#6B7280", fontSize: 10.8 }}>FSA rate effective {props.financingRateContext.fsaEffective}.</span>}</section>}{props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the payment and cash-to-close model.</div>}<section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Property financing programs</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{ranked.length ? ranked.map((item, index) => { const note = lane.financingProgramNote(item); return <article key={item} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: index === 0 ? "#FBF5E6" : "#fff", display: "grid", gap: 6 }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{lane.financingRateLabel(item, props.financingRateContext ?? null)}</span><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5 }}>{note.why}</span><span style={{ color: "#6B7280", fontSize: 10.8 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span>No property-relevant program has been produced yet.</span>}</div></section></>; })()}
+      {tab === "report" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Report and pro forma</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("report")}</p></header>{props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}>{props.actionsSlot}</section>}<section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 9 }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Personalized pro forma</h3><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Continue when you want borrower-specific qualification, document review, and a finalized pro forma from the licensed Financial module.</p><a href="/explore#personalized-financing" style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none" }}>Continue to personalized Financial module</a></section>{deedEvidence.length > 0 && <details style={card}><summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Restricted deed evidence</summary><p style={{ color: "#5A6172", fontSize: 12 }}>Recorded deed evidence is available inside an authorized financial or lender workspace.</p></details>}</>}
+    </div>
+  </section>;
+}

@@ -5,7 +5,10 @@ const ROOT = process.cwd();
 const FILES = [
   "src/lib/property/propertyBriefIntelligence.ts",
   "src/lib/property/riverRoadCuratedIntelligence.ts",
-  "src/components/property/PropertyCommandCenter.tsx",
+  "src/components/property/lanes/GovernedLaneChassis.tsx",
+  "src/components/property/lanes/FarmLaneWorkspace.tsx",
+  "src/components/property/lanes/CommercialLaneWorkspace.tsx",
+  "src/components/property/lanes/ResidentialLaneWorkspace.tsx",
   "src/components/property/PropertyEvaluationWorkspace.tsx",
   "src/components/discovery/PlaceFirstDiscovery.tsx",
 ];

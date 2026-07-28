@@ -12,7 +12,9 @@ import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
-import { PropertyCommandCenter } from "@/components/property/PropertyCommandCenter";
+import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
+import { CommercialLaneWorkspace } from "@/components/property/lanes/CommercialLaneWorkspace";
+import { ResidentialLaneWorkspace } from "@/components/property/lanes/ResidentialLaneWorkspace";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
 import { buildPreliminaryCapitalPlan } from "@/lib/intelligence/preliminaryCapitalPlan";
 import { buildCollateralEquityPlan } from "@/lib/intelligence/collateralEquityPlan";
@@ -3605,8 +3607,21 @@ export function PropertyEvaluationWorkspace({
       {/* (The imported-only "What is this property?" picker is now the
           front-loaded Property Type Stamp above — shown for every property.) */}
 
-      {!deepView && propertyClassificationAvailable && (
-      <PropertyCommandCenter
+      {/* Lane selection is canonical-profile-driven (propertyProfile.ts), not a
+          regex: farm + land → FarmLaneWorkspace; residential → ResidentialLaneWorkspace;
+          commercial, hospitality, mobile-home-park → CommercialLaneWorkspace.
+          Each lane owns its tabs/questions/panels; GovernedLaneChassis keeps the
+          compliance substrate single-source. The type-correction picker above
+          remounts the lane while all entered state stays in this parent. */}
+      {!deepView && propertyClassificationAvailable && (() => {
+        const LaneWorkspace =
+          workspaceProfile.id === "farm" || workspaceProfile.id === "land"
+            ? FarmLaneWorkspace
+            : workspaceProfile.id === "residential"
+              ? ResidentialLaneWorkspace
+              : CommercialLaneWorkspace;
+        return (
+      <LaneWorkspace
         variant={chartVariant}
         propertyId={context.propertyId ?? context.title}
         title={context.title}
@@ -3654,7 +3669,8 @@ export function PropertyEvaluationWorkspace({
         similarHomes={similarHomes}
         actionsSlot={chartActionsSlot}
       />
-      )}
+        );
+      })()}
       {/* Imported-address verification status stays visible below the chart. */}
       <div style={{ display: "grid", gap: 16 }}>
 	        {context.propertyId?.startsWith("imported:") && (

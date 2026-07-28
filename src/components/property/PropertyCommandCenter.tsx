@@ -7,6 +7,13 @@ import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvid
 
 export type PropertyCommandCenterProps = ChartTableBriefProps & {
   deedEvidence?: OfficialPropertyEvidenceRecord[];
+  financingRateContext?: {
+    fsaOwnershipDirectPct: number | null;
+    fsaDownPaymentPct: number | null;
+    fsaEffective: string | null;
+    mortgage30Pct: number | null;
+    mortgageWeekOf: string | null;
+  } | null;
   propertyRecord?: {
     exactAddress: string | null;
     rawPropertyStyle: string | null;
@@ -71,6 +78,29 @@ function groupUnknowns(items: NonNullable<ChartTableBriefProps["intelligence"]>[
 }
 
 
+
+function financingRateLabel(name: string, rates: PropertyCommandCenterProps["financingRateContext"]): string {
+  const value = name.toLowerCase();
+  if (/fsa.*farm ownership|farm ownership.*fsa/.test(value)) return rates?.fsaOwnershipDirectPct != null ? `${rates.fsaOwnershipDirectPct.toFixed(3).replace(/\.?0+$/, "")}% published FSA direct rate` : "Current FSA rate unavailable";
+  if (/rural development housing/.test(value)) return rates?.mortgage30Pct != null ? `${rates.mortgage30Pct.toFixed(2)}% national 30-year benchmark — not a USDA-RD quote` : "USDA-RD lender quote required";
+  if (/farm credit|conventional farm|mixed-use/.test(value)) return "Participating-lender quote required";
+  if (/seller financing/.test(value)) return "Rate negotiated with seller";
+  if (/hard money|private agricultural|asset-based bridge/.test(value)) return "Private-lender quote required";
+  return "Program-specific quote required";
+}
+
+function financingPriority(name: string, lane: string): number {
+  const value = name.toLowerCase();
+  if (/farm|agricultural/.test(lane.toLowerCase())) {
+    if (/fsa.*farm ownership|farm ownership.*fsa/.test(value)) return 0;
+    if (/farm credit/.test(value)) return 1;
+    if (/conventional farm|mixed-use/.test(value)) return 2;
+    if (/seller financing/.test(value)) return 3;
+    if (/rural development housing/.test(value)) return 4;
+    if (/hard money|private agricultural|asset-based bridge/.test(value)) return 5;
+  }
+  return 10;
+}
 
 function financingProgramNote(name: string, lane: string) {
   const value = name.toLowerCase();
@@ -228,7 +258,7 @@ export function PropertyCommandCenter(props: PropertyCommandCenterProps) {
       {tab === "environmental" && renderCategory("environmental", "Environmental", "Flood, wetlands, hazards, contamination, historic constraints, soils, climate, and environmental diligence live here.")}
       {tab === "education" && renderCategory("education", "Education", "Assigned-school evidence, nearby public and private options, higher education, and state choice rules live here.")}
       {tab === "misc" && renderCategory("misc", "Miscellaneous and other", "Location, amenities, transportation, market context, operations, and facts that do not belong in the other dedicated sections live here.")}
-      {tab === "finance" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Finance</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>Current rate and term comparisons, ownership costs, cash to close, and property-relevant financing pathways live here.</p></header>{props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the financial model.</div>}<section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Property financing programs</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{props.financingLanes.length ? props.financingLanes.map((item, index) => { const note = financingProgramNote(item, lane); return <article key={item} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: index === 0 ? "#FBF5E6" : "#fff", display: "grid", gap: 6 }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5 }}>{note.why}</span><span style={{ color: "#6B7280", fontSize: 10.8 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span>No property-relevant program has been produced yet.</span>}</div></section></>}
+      {tab === "finance" && (() => { const ranked = [...props.financingLanes].sort((a, b) => financingPriority(a, lane) - financingPriority(b, lane)); const first = ranked[0] ?? null; return <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Finance</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>Current rate and term comparisons, ownership costs, cash to close, and property-relevant financing pathways live here.</p></header>{first && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFF9E8", display: "grid", gap: 7 }}><span style={{ fontSize: 10, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase", color: "#8F6E1F" }}>Best first path to test</span><strong style={{ color: "#1C2B45", fontSize: 17 }}>{first}</strong><span style={{ color: "#8F6E1F", fontWeight: 800 }}>{financingRateLabel(first, props.financingRateContext ?? null)}</span><span style={{ color: "#5A6172", fontSize: 12 }}>Ranked first for a farm acquisition because it is purpose-built for eligible farm ownership. This is a screening priority—not an eligibility or approval decision.</span>{props.financingRateContext?.fsaEffective && <span style={{ color: "#6B7280", fontSize: 10.8 }}>FSA rate effective {props.financingRateContext.fsaEffective}.</span>}</section>}{props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the payment and cash-to-close model.</div>}<section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Property financing programs</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{ranked.length ? ranked.map((item, index) => { const note = financingProgramNote(item, lane); return <article key={item} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: index === 0 ? "#FBF5E6" : "#fff", display: "grid", gap: 6 }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{financingRateLabel(item, props.financingRateContext ?? null)}</span><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5 }}>{note.why}</span><span style={{ color: "#6B7280", fontSize: 10.8 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span>No property-relevant program has been produced yet.</span>}</div></section></>; })()}
       {tab === "report" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Report and pro forma</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>View, download, print, save, and continue to the personalized pro forma from one place.</p></header>{props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}>{props.actionsSlot}</section>}<section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 9 }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Personalized pro forma</h3><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Continue when you want borrower-specific qualification, document review, and a finalized pro forma from the licensed Financial module.</p><a href="/explore#personalized-financing" style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none" }}>Continue to personalized Financial module</a></section>{deedEvidence.length > 0 && <details style={card}><summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Restricted deed evidence</summary><p style={{ color: "#5A6172", fontSize: 12 }}>Recorded deed evidence is available inside an authorized financial or lender workspace.</p></details>}</>}
     </div>
   </section>;

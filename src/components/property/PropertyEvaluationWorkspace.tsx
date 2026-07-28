@@ -3579,6 +3579,13 @@ export function PropertyEvaluationWorkspace({
         pauseLine={answerCard.pauseLine}
         intelligence={effectivePlaceIntelligence}
         propertyRecord={facts?.propertyRecord ?? null}
+        financingRateContext={ownershipContext ? {
+          fsaOwnershipDirectPct: ownershipContext.fsa?.ownershipDirectPct ?? null,
+          fsaDownPaymentPct: ownershipContext.fsa?.downPaymentPct ?? null,
+          fsaEffective: ownershipContext.fsa?.effective ?? null,
+          mortgage30Pct: ownershipContext.rates.rate30 ?? null,
+          mortgageWeekOf: ownershipContext.rates.weekOf ?? null,
+        } : null}
         deedEvidence={facts?.propertyEvidenceRecords ?? []}
         financingLanes={topProgramPreview}
         costsSlot={

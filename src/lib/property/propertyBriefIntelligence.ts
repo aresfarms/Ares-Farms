@@ -45,6 +45,7 @@ import { US_MILITARY_BASES } from "./usMilitaryBasesGenerated";
 import { PROPERTY_SOIL } from "./propertySoilGenerated";
 import { PROPERTY_GEO_SETTING, PROPERTY_GEO_SETTING_PROVENANCE } from "./propertyGeoSettingGenerated";
 import { COUNTY_NAMES, COUNTY_NAMES_PROVENANCE } from "./countyNamesGenerated";
+import { COUNTY_CENTROIDS, COUNTY_CENTROIDS_PROVENANCE } from "./countyCentroidsGenerated";
 import { findCanonicalPropertyById } from "./propertyData";
 import { townCharacterFact } from "./townCharacterCurated";
 import { stateNarrativeFact } from "./stateNarrativeCurated";
@@ -620,20 +621,26 @@ function nearestNamedCampuses<T extends { name: string; city: string; state: str
 function privateSchoolsFact(countyFips: string | null, lat?: number | null, lon?: number | null): BriefFactLine | null {
   if (!countyFips) return null;
   const entry = COUNTY_PRIVATE_SCHOOLS[countyFips];
-  const nearest = nearestNamedCampuses(US_PRIVATE_SCHOOL_CAMPUSES, lat, lon);
+  const fallback = COUNTY_CENTROIDS[countyFips];
+  const hasPropertyCoords = lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon);
+  const basisLat = hasPropertyCoords ? lat : fallback?.lat;
+  const basisLon = hasPropertyCoords ? lon : fallback?.lon;
+  const nearest = nearestNamedCampuses(US_PRIVATE_SCHOOL_CAMPUSES, basisLat, basisLon);
   if ((!entry || entry.count === 0) && nearest.length === 0) return null;
   const count = entry?.count ?? 0;
   const nearestText = nearest.map((s) => `${s.name} (${s.city}, ${s.state}) ~${Math.round(s.miles)} mi`).join("; ");
+  const nearestSummary = nearest.slice(0, 2).map((s) => `${s.name} ~${Math.round(s.miles)} mi`).join(" · ");
+  const basisText = hasPropertyCoords ? "property coordinates" : "the county center because property coordinates were unavailable";
   return {
     label: "Private & parochial schools",
     value: nearest.length > 0
-      ? `${count} in the county · closest ${nearest[0].name} ~${Math.round(nearest[0].miles)} mi`
+      ? `${count} in the county · nearest: ${nearestSummary}`
       : `${count} in the county`,
     text:
       `${count} private or parochial school${count === 1 ? "" : "s"} appear on the federal survey for this county. ` +
-      (nearest.length > 0 ? `Closest named campuses from the property coordinates: ${nearestText}. ` : "") +
+      (nearest.length > 0 ? `Closest named campuses measured from ${basisText}: ${nearestText}. ` : "") +
       `Distances are straight-line, not drive time. Survey coverage varies and a local search may find additional options. Directory facts only; Furlong does not rate schools.`,
-    provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}`,
+    provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}${!hasPropertyCoords && fallback ? ` · distance fallback: ${COUNTY_CENTROIDS_PROVENANCE.source}, ${COUNTY_CENTROIDS_PROVENANCE.asOf}` : ""}`,
     tone: "neutral",
   };
 }
@@ -809,19 +816,25 @@ function collegesFact(countyFips: string | null, lat?: number | null, lon?: numb
   const branchCampuses = COUNTY_COLLEGE_BRANCHES[countyFips] ?? [];
   const list = [...mainInstitutions, ...branchCampuses.filter((branch) => !mainInstitutions.some((item) => item.name === branch.name))];
   const branchCoordinateCampuses = Object.values(COUNTY_COLLEGE_BRANCHES).flat().filter((campus): campus is typeof campus & { state: string; lat: number; lon: number } => typeof campus.state === "string" && typeof campus.lat === "number" && typeof campus.lon === "number");
-  const nearest = nearestNamedCampuses([...US_COLLEGE_CAMPUSES, ...branchCoordinateCampuses], lat, lon);
+  const fallback = COUNTY_CENTROIDS[countyFips];
+  const hasPropertyCoords = lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon);
+  const basisLat = hasPropertyCoords ? lat : fallback?.lat;
+  const basisLon = hasPropertyCoords ? lon : fallback?.lon;
+  const nearest = nearestNamedCampuses([...US_COLLEGE_CAMPUSES, ...branchCoordinateCampuses], basisLat, basisLon);
   const nearestText = nearest.map((c) => `${c.name} (${c.city}, ${c.state}; ${c.level}) ~${Math.round(c.miles)} mi`).join("; ");
+  const nearestSummary = nearest.slice(0, 2).map((c) => `${c.name} ~${Math.round(c.miles)} mi`).join(" · ");
+  const basisText = hasPropertyCoords ? "property coordinates" : "the county center because property coordinates were unavailable";
   if (list.length === 0) {
     return {
       label: "Higher education",
       value: nearest.length > 0
-        ? `No campus in county · closest ${nearest[0].name} ~${Math.round(nearest[0].miles)} mi`
+        ? `No campus in county · nearest: ${nearestSummary}`
         : "No college campus in the county",
       text:
         "No degree-granting college or university campus sits in this county on the federal directory. " +
-        (nearest.length > 0 ? `Closest named campuses from the property coordinates: ${nearestText}. ` : "") +
+        (nearest.length > 0 ? `Closest named campuses measured from ${basisText}: ${nearestText}. ` : "") +
         "Distances are straight-line, not drive time. Directory facts only; Furlong does not rate institutions.",
-      provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}`,
+      provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}${!hasPropertyCoords && fallback ? ` · distance fallback: ${COUNTY_CENTROIDS_PROVENANCE.source}, ${COUNTY_CENTROIDS_PROVENANCE.asOf}` : ""}`,
       tone: "neutral",
     };
   }
@@ -829,14 +842,14 @@ function collegesFact(countyFips: string | null, lat?: number | null, lon?: numb
   return {
     label: "Higher education",
     value: nearest.length > 0
-      ? `${list.length} in county · closest ${nearest[0].name} ~${Math.round(nearest[0].miles)} mi`
+      ? `${list.length} in county · nearest: ${nearestSummary}`
       : list.length <= 3 ? list.map((c) => c.name).join(" · ") : `${sample.map((c) => c.name).join(" · ")} · ${list.length - sample.length} more`,
     text:
       `${list.length} degree-granting institution${list.length === 1 ? "" : "s"} ${list.length === 1 ? "sits" : "sit"} in this county: ${sample.map((c) => `${c.name} (${c.level}, ${c.city})`).join("; ")}` +
       `${list.length > sample.length ? ` and ${list.length - sample.length} more` : ""}. ` +
-      (nearest.length > 0 ? `Closest named campuses from the property coordinates: ${nearestText}. ` : "") +
+      (nearest.length > 0 ? `Closest named campuses measured from ${basisText}: ${nearestText}. ` : "") +
       `Distances are straight-line, not drive time. Directory facts only; Furlong does not rate institutions.`,
-    provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}`,
+    provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}${!hasPropertyCoords && fallback ? ` · distance fallback: ${COUNTY_CENTROIDS_PROVENANCE.source}, ${COUNTY_CENTROIDS_PROVENANCE.asOf}` : ""}`,
     tone: "neutral",
   };
 }

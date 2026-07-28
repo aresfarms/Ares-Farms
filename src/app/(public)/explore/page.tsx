@@ -204,16 +204,6 @@ export default async function ExplorePage({
 
     return (
       <>
-        {isFarmLane && (
-          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 20px 0", display: "grid", gap: 16 }}>
-            <header style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
-              <h1 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(30px,4vw,48px)", lineHeight: 1.05 }}>Find the best use of the ground</h1>
-              <p style={{ margin: 0, maxWidth: 880, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Compare agricultural enterprises, diversified portfolios, land-income options, operating costs, financing, equipment, and site constraints in one workspace.</p>
-            </header>
-            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} activeSection={section} />
-          </div>
-        )}
         {isResidentialLane && (
           <div style={{ maxWidth: 1180, margin: "0 auto", padding: "22px 20px 0", display: "grid", gap: 12 }}>
             <ResidentialRateTiles />
@@ -228,13 +218,6 @@ export default async function ExplorePage({
         {isFarmLane && (
           <div style={{ maxWidth: 1280, margin: "0 auto", padding: "22px 20px 0" }}>
             <FarmCommodityTicker />
-          </div>
-        )}
-        {isFarmLane && section && FARM_SECTIONS.some((item) => item.key === section) && (
-          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
-            {section === "newsletters"
-              ? audience && <CurrentNewsletters audiences={[audience]} />
-              : <FarmLaneSection sectionKey={section} />}
           </div>
         )}
         <section
@@ -298,6 +281,23 @@ export default async function ExplorePage({
           category={one(resolved.category)}
           lane={selected.slug}
         />
+        {isFarmLane && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "28px 20px 0", display: "grid", gap: 16 }}>
+            <header style={{ display: "grid", gap: 6 }}>
+              <span style={{ fontSize: 12, fontWeight: 850, letterSpacing: "0.1em", textTransform: "uppercase", color: laneAccent }}>Farms, Agriculture &amp; Land</span>
+              <h2 style={{ margin: 0, color: "#101a2b", fontSize: "clamp(28px,4vw,44px)", lineHeight: 1.08 }}>Find the best use of the ground</h2>
+              <p style={{ margin: 0, maxWidth: 880, color: "#4d596d", fontSize: 15, lineHeight: 1.6 }}>Compare agricultural enterprises, diversified portfolios, land-income options, operating costs, financing, equipment, and site constraints in one workspace.</p>
+            </header>
+            <FarmLaneMenu hrefFor={(key) => `/explore?lane=farms-agriculture&section=${key}`} reportHref={farmReportHref} activeSection={section} />
+          </div>
+        )}
+        {isFarmLane && section && FARM_SECTIONS.some((item) => item.key === section) && (
+          <div style={{ maxWidth: 1280, margin: "0 auto", padding: "18px 20px 0", display: "grid", gap: 18 }}>
+            {section === "newsletters"
+              ? audience && <CurrentNewsletters audiences={[audience]} />
+              : <FarmLaneSection sectionKey={section} />}
+          </div>
+        )}
         {/* Newsletters & podcasts, then the gold Community cue, at the BOTTOM
             of every lane (founder direction 2026-07-18). */}
         <div style={{ maxWidth: 1180, margin: "0 auto", padding: "24px 20px 0", display: "grid", gap: 16 }}>

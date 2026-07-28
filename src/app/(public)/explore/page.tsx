@@ -112,7 +112,7 @@ type LaneNode = {
 // without scrolling on desktop.
 const LANES: LaneNode[] = [
   { slug: "property-land",            label: "Residential",                     icon: "map-pin", tint: "#FAEEDA", color: "#854F0B", top: 13, left: 50 }, // N
-  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 24, left: 78 }, // NE
+  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 24, left: 78, href: "/explore?lane=farms-agriculture" }, // NE
   { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
   { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
   { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S

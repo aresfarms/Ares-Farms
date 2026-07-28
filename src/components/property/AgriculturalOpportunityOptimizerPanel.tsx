@@ -8,7 +8,7 @@ const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 
 export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; price: number; rate: number; theme: ChartTheme }) {
   const debt = p.price * 0.8 * (p.rate / 100) / (1 - Math.pow(1 + p.rate / 100, -40));
-  const [x, setX] = useState({ waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false, hayYieldTonsPerAcre: 5, hayBaleWeightLb: 55, haySummerPrice: 20, hayWinterPrice: 35, hayWinterShare: 35, hayVariableCostPerAcre: 1400, hayHandlingCostPerBale: 2, hayShrinkPct: 8 });
+  const [x, setX] = useState({ waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false, hayYieldTonsPerAcre: 5, hayBaleWeightLb: 55, haySummerPrice: 20, hayWinterPrice: 35, hayWinterShare: 35, hayVariableCostPerAcre: 1400, hayHandlingCostPerBale: 2, hayShrinkPct: 8, irrigationInstallCost: 450000, irrigationAnnualPowerCost: 30000, irrigationAnnualMaintenanceCost: 10000, soilSuitability: 50, weatherSuitability: 50, localMarketDepth: 60, competitionPressure: 40 });
   const m = useMemo(() => optimizeAgriculturalOpportunities({ acres: p.acreage, purchasePrice: p.price, debtService: debt, ...x }), [p.acreage, p.price, debt, x]);
 
   const slider = (k: keyof typeof x, label: string) => typeof x[k] === "number" ? (
@@ -59,6 +59,28 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
         </div>
       </details>
 
+
+      <details style={{ border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: "#fff", padding: 12 }}>
+        <summary style={{ cursor: "pointer", fontWeight: 800, color: p.theme.ink }}>Real-world feasibility assumptions</summary>
+        <p style={{ margin: "7px 0 10px", fontSize: 12, lineHeight: 1.5, color: p.theme.inkSoft }}>These assumptions reduce rankings when soils, weather, labor, competition, market depth, or irrigation economics make an enterprise look better on paper than it is in practice.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 9 }}>
+          {[
+            ["soilSuitability", "Soil suitability, 0-100", 1],
+            ["weatherSuitability", "Weather fit, 0-100", 1],
+            ["localMarketDepth", "Local market depth, 0-100", 1],
+            ["competitionPressure", "Competition pressure, 0-100", 1],
+            ["irrigationInstallCost", "Irrigation install $", 10000],
+            ["irrigationAnnualPowerCost", "Annual pumping power $", 1000],
+            ["irrigationAnnualMaintenanceCost", "Annual irrigation maintenance $", 1000],
+          ].map(([key, label, step]) => (
+            <label key={String(key)} style={{ display: "grid", gap: 4, fontSize: 11.5, color: p.theme.inkSoft }}>
+              {String(label)}
+              <input type="number" min="0" step={Number(step)} value={x[key as keyof typeof x] as number} onChange={e => setX(v => ({ ...v, [key]: Number(e.target.value) }))} style={{ width: "100%", padding: "7px 8px", border: `1px solid ${p.theme.cellBorder}`, borderRadius: 7, fontSize: 13 }} />
+            </label>
+          ))}
+        </div>
+      </details>
+
       <div style={{ display: "grid", gap: 10 }}>
         {m.ranked.map((r, i) => {
           const status = r.eligible ? "Screenable" : "Blocked pending evidence";
@@ -80,6 +102,7 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
                   ["Fit", `${r.fit.toFixed(0)}/100`],
                   ["Acres", r.usedAcres.toFixed(1)],
                   ["Annual NOI", r.eligible ? money(r.noi) : "$0"],
+                  ["Risk-adjusted NOI", r.eligible ? money(r.riskAdjustedNoi) : "$0"],
                   ["DSCR", `${r.dscr?.toFixed(2) ?? "—"}x`],
                 ].map(([label, value]) => (
                   <div key={label} style={{ padding: "8px 10px", borderRadius: 8, background: p.theme.plate }}>
@@ -91,6 +114,20 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
             </article>
           );
         })}
+      </div>
+
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 10 }}>
+        {[
+          { label: "Most profitable on paper", item: m.mostProfitable },
+          { label: "Most feasible to operate", item: m.mostFeasible },
+          { label: "Best risk-adjusted use", item: m.bestRiskAdjusted },
+        ].map(({ label, item }) => (
+          <div key={label} style={{ padding: 12, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: "#fff" }}>
+            <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.06em", color: p.theme.inkSoft }}>{label}</div>
+            <strong style={{ display: "block", marginTop: 4, fontSize: 14, color: p.theme.ink }}>{item?.label ?? "No feasible result"}</strong>
+          </div>
+        ))}
       </div>
 
       <div style={{ padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 11, background: "#fff" }}>

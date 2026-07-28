@@ -1131,6 +1131,22 @@ function mechanicsForSource(
             `Invitation for Bids before committing${isHome ? "" : " — especially for former federal facilities"}.`,
         ],
       };
+    case "vedp":
+      return {
+        heading: "How VEDP-listed properties actually sell",
+        stepTitles: [
+          "An economic-development inventory, not an auction",
+          "Price and terms come from the owner — VEDP is the directory",
+        ],
+        paragraphs: [
+          `This property appears in the Virginia Economic Development Partnership's available-properties ` +
+            `inventory — commercial buildings and development sites listed by their owners and localities ` +
+            `to attract projects to Virginia. It is a directory of availability, not an auction platform.`,
+          `The feed publishes no asking price — pricing, terms, and current availability come from the ` +
+            `listing owner or the locality's economic-development office, reachable through VEDP's Site ` +
+            `Selection portal. Confirm availability first; economic-development inventories can lag a sale.`,
+        ],
+      };
     default:
       return null;
   }

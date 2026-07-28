@@ -28,6 +28,8 @@ import { TREASURY_INGEST_PROVENANCE, TREASURY_PROPERTIES } from "./treasuryGener
 import { GSA_RE_INGEST_PROVENANCE, GSA_RE_PROPERTIES } from "./gsaRealEstateGenerated";
 import { readLiveRecords } from "./liveOverlay";
 import { USDA_INGEST_PROVENANCE, USDA_RESALE_PROPERTIES } from "./usdaResaleGenerated";
+import { VEDP_CANONICAL } from "./vedpCanonical";
+import { VEDP_INGEST_PROVENANCE } from "./vedpPropertiesGenerated";
 
 // Server data layer reads RUNTIME activation (operator overlay over the static
 // defaults), so an approval on the Source Review screen takes effect immediately.
@@ -38,6 +40,9 @@ const SOURCES: Array<{ id: PropertySourceId; records: CanonicalProperty[]; fetch
   { id: "usda", records: USDA_RESALE_PROPERTIES, fetchedAt: USDA_INGEST_PROVENANCE.fetchedAt },
   { id: "treasury", records: TREASURY_PROPERTIES, fetchedAt: TREASURY_INGEST_PROVENANCE.fetchedAt },
   { id: "gsa-realestate", records: GSA_RE_PROPERTIES, fetchedAt: GSA_RE_INGEST_PROVENANCE.fetchedAt },
+  // VEDP (wired 2026-07-28) — DARK until Module 22/23 founder approval on
+  // /source-legal-review; isSourceLive gates every read below.
+  { id: "vedp", records: VEDP_CANONICAL, fetchedAt: VEDP_INGEST_PROVENANCE.fetchedAt },
 ];
 
 /**
@@ -98,6 +103,7 @@ const PUBLIC_SAFE_SOURCE_PRIORITY: Record<PropertySourceId, number> = {
   treasury: 1,
   "gsa-realestate": 2,
   usda: 3,
+  vedp: 4,
 };
 
 export function findCanonicalPropertyById(propertyId: string): CanonicalProperty | null {

@@ -23,7 +23,7 @@ export interface SavedProperty {
   priceLabel: string;
   exactAddress: string | null;
   zip: string | null;
-  sourceId: "usda" | "hud" | "treasury" | "gsa-realestate";
+  sourceId: "usda" | "hud" | "treasury" | "gsa-realestate" | "vedp";
   sourceCitation: string;
   isCurrent: boolean;
   vintageStamp: string;

@@ -195,6 +195,39 @@ export const SOURCE_ACTIVATION: Record<string, SourceActivationRecord> = {
     },
     sourceLive: false,
   },
+
+  // VEDP — Virginia Economic Development Partnership available properties &
+  // sites (state economic-development inventory; 1,712 for-sale records).
+  // Wired 2026-07-28; ships PENDING — display requires BOTH approvals below.
+  vedp: {
+    sourceId: "vedp",
+    sourceName: "VEDP — Virginia Economic Development Partnership (available properties & sites)",
+    module23: {
+      module: "Module 23 — Source Legal & Licensing Review",
+      status: "PENDING_HUMAN_APPROVAL",
+      facts: [
+        "Official VEDP open-data ArcGIS service (maps.vedp.org PropertiesSites MapServer) — a STATE source, not federal public domain.",
+        "Terms are disclaimer-style open-data portal terms; an explicit reuse confirmation with VEDP is the OUTSTANDING legal item.",
+        "Commercial buildings and development sites listed for sale/lease by owners and localities; Furlong ingests sale === true only.",
+        "The feed publishes NO prices ('Price on request' — never invented) and NO per-listing public URLs (link-out goes to VEDP's official Site Selection portal, verified live).",
+      ],
+      license:
+        "VEDP open-data portal, disclaimer-style terms — reuse confirmation with VEDP pending. Do NOT approve until that confirmation is in hand or counsel deems the portal terms sufficient.",
+      attributionRequired:
+        'Display "Source: VEDP — Virginia Economic Development Partnership (vedp.org)" on every listing.',
+      reviewedBy: null,
+      reviewedAt: null,
+    },
+    module22: {
+      module: "Module 22 — Live Scraper Activation",
+      status: "PENDING_HUMAN_APPROVAL",
+      ingestMethod: "Official VEDP ArcGIS open-data REST service (JSON query; the live HTML portal is NOT scraped)",
+      liveFetchAllowed: false,
+      reviewedBy: null,
+      reviewedAt: null,
+    },
+    sourceLive: false,
+  },
 };
 
 /** True only when a source has BOTH modules APPROVED and sourceLive set. */

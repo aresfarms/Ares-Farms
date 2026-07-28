@@ -15,6 +15,7 @@ import { ResidentialLoanTable, ResidentialRateTiles } from "@/components/public/
 import { Disclosures } from "@/components/public/Disclosures";
 import { PropertyHub } from "@/components/property/PropertyHub";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
+import { NavigatorEntryCta, navigatorHref } from "@/components/public/NavigatorEntryCta";
 import { InteractiveCompassRose } from "@/components/public/InteractiveCompassRose";
 import { PropertyGroupsFrontDoor } from "@/components/public/PropertyGroupsFrontDoor";
 import { PropertyShowcaseRail } from "@/components/public/PropertyShowcaseRail";
@@ -200,7 +201,7 @@ export default async function ExplorePage({
 
     // Agricultural workspace tabs stay integrated into the main farm page.
     const section = one(resolved.section);
-    const farmReportHref = "/discover?flow=place-facts";
+    const farmReportHref = navigatorHref("farms-agriculture");
 
     return (
       <>
@@ -242,10 +243,14 @@ export default async function ExplorePage({
           />
           <div style={{ display: "grid", gap: 8 }}>
             <div style={{ display: "grid", gap: 3 }}>
-              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>Have an address in mind?</span>
-              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>Check a specific location&apos;s verified place-facts here — or keep browsing the map above.</p>
+              <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: laneAccent }}>Have a farm or parcel in mind?</span>
+              <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: "#4d596d" }}>Use the same Furlong Navigator entry point as the Compass and financing workspace. Your farm lens carries into the property-first analysis automatically.</p>
             </div>
-            <PlaceFirstDiscovery flow="place-facts" compact />
+            {isFarmLane ? (
+              <NavigatorEntryCta lens="farms-agriculture" support="Start with the property, listing, or question. Navigator keeps the farming lens while testing every plausible use, market, cost, environmental, and financing pathway." />
+            ) : (
+              <PlaceFirstDiscovery flow="place-facts" compact />
+            )}
           </div>
         </section>
 

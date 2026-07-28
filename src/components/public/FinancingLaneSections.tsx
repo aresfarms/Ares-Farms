@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { FinancingIntakePanel } from "@/components/public/FinancingIntakePanel";
 import { FinancingFeeChart, FinancingFreeOverview } from "@/components/public/FinancingFeeChart";
+import { NavigatorEntryCta } from "@/components/public/NavigatorEntryCta";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
 import { accentForLane } from "@/lib/property/laneThemes";
 import { activePartners } from "@/lib/modules/licensedModuleRegistry";
@@ -68,6 +69,7 @@ const FINANCING_BRIEFS: FinBrief[] = [
 export function FinancingLaneSections() {
   return (
     <div style={{ display: "grid", gap: 20 }}>
+      <NavigatorEntryCta lens="financing-capital" support="Use the same Furlong Navigator entry point as the main Compass. Start with a property, business, project, or financing question and carry that context into the capital workspace." />
       {/* Free application promise first, then current rates and program pricing. */}
       <FinancingFreeOverview />
       <LoanProgramComparison />

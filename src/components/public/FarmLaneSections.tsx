@@ -25,6 +25,8 @@ import { HundredPercentFinancingCallout } from "@/components/public/HundredPerce
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
 import { FarmFinancialHealthCheck } from "@/components/public/FarmFinancialHealthCheck";
 import { FarmBestUseFinanceWorkspace } from "@/components/public/FarmBestUseFinanceWorkspace";
+import { NavigatorEntryCta } from "@/components/public/NavigatorEntryCta";
+import { HOMEPAGE_PRIMARY_ACTIONS } from "@/lib/public-content/publicCopyRegistry";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 
 // This whole module wears the FARM lane's color identity (green — growth,
@@ -292,9 +294,9 @@ export function FarmLaneMenu({ hrefFor, reportHref, activeSection }: { hrefFor: 
             </Link>
           );
         })}
-        <a href={reportHref} target="_blank" rel="noopener noreferrer" style={{ whiteSpace: "nowrap", border: "1px solid #b8862f", borderRadius: 999, padding: "9px 14px", background: "#fdfaf2", color: "#7a5617", fontWeight: 800, textDecoration: "none", fontSize: 12.5 }}>
-          Analyze a property ↗
-        </a>
+        <Link href={reportHref} style={{ whiteSpace: "nowrap", border: "1px solid #9a5b00", borderRadius: 999, padding: "9px 14px", background: "#9a5b00", color: "#ffffff", fontWeight: 850, textDecoration: "none", fontSize: 12.5 }}>
+          {HOMEPAGE_PRIMARY_ACTIONS.primaryLabel} →
+        </Link>
       </nav>
       {!activeSection && (
         <section aria-label="Agricultural workspace overview" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 10 }}>
@@ -381,6 +383,7 @@ export function FarmLaneSection({ sectionKey }: { sectionKey: string }) {
       // with the 100%-financing callout underneath.
       return (
         <div style={{ display: "grid", gap: 28 }}>
+          <NavigatorEntryCta lens="farms-agriculture" support="Use the same Navigator entry point as the main Compass. Start with the farm, parcel, listing, or financing question and keep the agricultural lens throughout the analysis." />
           <LoanProgramComparison />
           <HundredPercentFinancingCallout />
           <FarmBestUseFinanceWorkspace />

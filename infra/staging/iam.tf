@@ -143,3 +143,13 @@ resource "google_secret_manager_secret_iam_member" "runtime_data_gov_api_key" {
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
+
+# NOAA_CDO_TOKEN is created + versioned out of band by the owner (not TF).
+# Grant the runtime SA read access only when the climate lookup is enabled.
+resource "google_secret_manager_secret_iam_member" "runtime_noaa_cdo_token" {
+  count     = var.noaa_cdo_token_enabled ? 1 : 0
+  project   = var.project_id
+  secret_id = "NOAA_CDO_TOKEN"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}

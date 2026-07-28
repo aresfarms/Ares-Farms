@@ -435,3 +435,9 @@ variable "data_gov_api_key_enabled" {
   type        = bool
   default     = false
 }
+
+variable "noaa_cdo_token_enabled" {
+  description = "When true, the core service reads NOAA_CDO_TOKEN (an out-of-band Secret Manager secret) to activate the NOAA NCEI climate-normals lookup. Requires the secret to hold at least one enabled version. Default false = the climate fact simply does not render."
+  type        = bool
+  default     = false
+}

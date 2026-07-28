@@ -95,6 +95,8 @@ import { buildLocalServices, type LocalServices } from "./localServices";
 import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE, US_PRIVATE_SCHOOL_CAMPUSES } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
 import { fetchSolarPotential } from "./solarPotentialLive";
+import { fetchSoilProfile } from "./soilsLive";
+import { fetchClimateNormals } from "./climateNormalsLive";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
 import {
   AMENITY_RADIUS_MILES,
@@ -2071,11 +2073,74 @@ export async function buildLocationBriefIntelligence(args: {
     }
   }
 
+  // Soil / climate / solar live lookups run CONCURRENTLY — each is fail-safe
+  // and independently gated, and the workspace prefetch means this whole
+  // block usually completes before the visitor reaches the report.
+  const [soilResult, climateResult, solarResult] =
+    geocode?.lat != null && geocode?.lon != null
+      ? await Promise.all([
+          fetchSoilProfile(geocode.lat, geocode.lon),
+          fetchClimateNormals(geocode.lat, geocode.lon),
+          fetchSolarPotential(geocode.lat, geocode.lon),
+        ])
+      : [null, null, null];
+
+  // Soil survey — USDA NRCS Soil Data Access point query (keyless; founder
+  // request 2026-07-28). Dominant map-unit component, farmland class,
+  // drainage, and slope; the county soil survey remains the authority.
+  {
+    const soil = soilResult;
+    if (soil) {
+      const detailBits = [
+        soil.dominantComponent && soil.componentPct != null
+          ? `dominant component ${soil.dominantComponent} (~${soil.componentPct}%)`
+          : soil.dominantComponent,
+        soil.drainageClass ? soil.drainageClass.toLowerCase() : null,
+        soil.slopePct != null ? `~${soil.slopePct}% representative slope` : null,
+      ].filter(Boolean);
+      verifiedFacts.push({
+        label: "Soil survey (soils)",
+        value: soil.farmlandClass ? `${soil.mapUnitName} · ${soil.farmlandClass}` : soil.mapUnitName,
+        text:
+          `The USDA soil survey maps this point as ${soil.mapUnitName}` +
+          `${detailBits.length ? ` — ${detailBits.join(", ")}` : ""}. ` +
+          `${soil.farmlandClass ? `NRCS classifies it as "${soil.farmlandClass}". ` : ""}` +
+          `Soil behavior varies within a map unit — an on-site soil evaluation still governs septic, ` +
+          `drainage, and cropping decisions.`,
+        provenance: `Source: USDA NRCS Soil Data Access (SSURGO), retrieved ${soil.retrievedAt} · websoilsurvey.nrcs.usda.gov`,
+        tone: "neutral",
+      });
+    }
+  }
+
+  // Climate normals — NOAA NCEI 30-year annual normals from the nearest
+  // normals station (NOAA_CDO_TOKEN-gated; founder request 2026-07-28).
+  {
+    const climate = climateResult;
+    if (climate) {
+      const bits = [
+        climate.avgTempF != null ? `${climate.avgTempF.toFixed(1)}°F annual average` : null,
+        climate.precipInches != null ? `${climate.precipInches.toFixed(1)}" precipitation/yr` : null,
+        climate.snowInches != null ? `${climate.snowInches.toFixed(1)}" snowfall/yr` : null,
+      ].filter((bit): bit is string => Boolean(bit));
+      verifiedFacts.push({
+        label: "Climate normals",
+        value: bits.join(" · "),
+        text:
+          `Official 30-year climate normals at the nearest NOAA station (${climate.stationName}): ` +
+          `${bits.join(", ")}. Normals describe the place's long-run climate — they are climatology, ` +
+          `not a forecast, and conditions at the parcel can differ from the station.`,
+        provenance: `Source: NOAA NCEI Climate Data Online, annual normals, station ${climate.stationName}, retrieved ${climate.retrievedAt}`,
+        tone: "neutral",
+      });
+    }
+  }
+
   // Solar resource — NREL PVWatts v8 modeled estimate for a fixed 10 kW
   // reference array (Tier 3, DATA_GOV key). Gated on the key being mounted;
   // absent key or failed call → the fact simply does not render.
-  if (geocode?.lat != null && geocode?.lon != null) {
-    const solar = await fetchSolarPotential(geocode.lat, geocode.lon);
+  {
+    const solar = solarResult;
     if (solar) {
       verifiedFacts.push({
         label: "Solar resource (climate)",

@@ -218,6 +218,20 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # ---- NOAA CDO token (climate normals) -------------------------------
+      dynamic "env" {
+        for_each = var.noaa_cdo_token_enabled ? [1] : []
+        content {
+          name = "NOAA_CDO_TOKEN"
+          value_source {
+            secret_key_ref {
+              secret  = "NOAA_CDO_TOKEN"
+              version = "latest"
+            }
+          }
+        }
+      }
+
       # ---- Operator credential login --------------------------------------
       # Enabled only when auth_credentials_mode is set. The shared-secret value
       # is created out of band by the owner; TF only references it by name.

@@ -191,6 +191,17 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # ---- Tier preview flag (launch hygiene) -----------------------------
+      # Unset in staging (paid tiers preview for testing). Set "off" at
+      # launch freeze — docs/LAUNCH_HYGIENE_CHECKLIST.md step L2.
+      dynamic "env" {
+        for_each = var.tier_preview_mode == "" ? [] : [var.tier_preview_mode]
+        content {
+          name  = "FURLONG_TIER_PREVIEW_MODE"
+          value = env.value
+        }
+      }
+
       # ---- api.data.gov key (NREL PVWatts solar estimate) -----------------
       # Same out-of-band pattern as ANTHROPIC_API_KEY: owner-created secret,
       # gated so an unversioned secret can't break a revision rollout.

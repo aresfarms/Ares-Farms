@@ -420,6 +420,16 @@ variable "anthropic_api_key_enabled" {
   default     = false
 }
 
+variable "tier_preview_mode" {
+  description = "FURLONG_TIER_PREVIEW_MODE for the core service. Empty (default) leaves the env unset — the app previews paid tiers, correct for staging/testing. Set to \"off\" at LAUNCH FREEZE so paid tiers stop previewing (see docs/LAUNCH_HYGIENE_CHECKLIST.md)."
+  type        = string
+  default     = ""
+  validation {
+    condition     = contains(["", "off"], var.tier_preview_mode)
+    error_message = "tier_preview_mode must be \"\" (previews on) or \"off\"."
+  }
+}
+
 variable "data_gov_api_key_enabled" {
   description = "When true, the core service reads DATA_GOV_API_KEY (an out-of-band Secret Manager secret) to activate api.data.gov-keyed live lookups (NREL PVWatts solar estimate). Requires the secret to hold at least one enabled version. Default false = the solar fact simply does not render."
   type        = bool

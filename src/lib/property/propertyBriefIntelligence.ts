@@ -97,6 +97,8 @@ import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazar
 import { fetchSolarPotential } from "./solarPotentialLive";
 import { fetchSoilProfile } from "./soilsLive";
 import { fetchClimateNormals } from "./climateNormalsLive";
+import { fetchWetlands } from "./wetlandsLive";
+import { fetchEpaFacilityScreen } from "./epaFacilitiesLive";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
 import {
   AMENITY_RADIUS_MILES,
@@ -2073,17 +2075,71 @@ export async function buildLocationBriefIntelligence(args: {
     }
   }
 
-  // Soil / climate / solar live lookups run CONCURRENTLY — each is fail-safe
-  // and independently gated, and the workspace prefetch means this whole
-  // block usually completes before the visitor reaches the report.
-  const [soilResult, climateResult, solarResult] =
+  // Soil / climate / solar / wetlands / EPA live lookups run CONCURRENTLY —
+  // each is fail-safe and independently gated, and the workspace prefetch
+  // means this block usually completes before the visitor reaches the report.
+  const [soilResult, climateResult, solarResult, wetlandsResult, epaResult] =
     geocode?.lat != null && geocode?.lon != null
       ? await Promise.all([
           fetchSoilProfile(geocode.lat, geocode.lon),
           fetchClimateNormals(geocode.lat, geocode.lon),
           fetchSolarPotential(geocode.lat, geocode.lon),
+          fetchWetlands(geocode.lat, geocode.lon),
+          fetchEpaFacilityScreen(geocode.lat, geocode.lon),
         ])
-      : [null, null, null];
+      : [null, null, null, null, null];
+
+  // Wetlands — USFWS National Wetlands Inventory point query (keyless).
+  // Mapped wetland → caution; no mapped wetland → honest positive with the
+  // NWI-coverage caveat; failed query → nothing rendered.
+  if (wetlandsResult) {
+    if (wetlandsResult.mapped) {
+      verifiedFacts.push({
+        label: "Wetlands (NWI)",
+        value: `${wetlandsResult.wetlandType}${wetlandsResult.nwiCode ? ` · ${wetlandsResult.nwiCode}` : ""}`,
+        text:
+          `The National Wetlands Inventory maps this point inside a ${wetlandsResult.wetlandType.toLowerCase()} polygon` +
+          `${wetlandsResult.acres != null ? ` of about ${wetlandsResult.acres.toLocaleString("en-US")} acres` : ""}` +
+          `${wetlandsResult.nwiCode ? ` (NWI code ${wetlandsResult.nwiCode})` : ""}. Mapped wetlands can constrain ` +
+          `building, clearing, and drainage, and can trigger federal or state permitting — a formal wetland ` +
+          `delineation by a qualified professional governs, not the map.`,
+        provenance: `Source: USFWS National Wetlands Inventory, retrieved ${wetlandsResult.retrievedAt} · fws.gov/program/national-wetlands-inventory`,
+        tone: "caution",
+      });
+    } else {
+      verifiedFacts.push({
+        label: "Wetlands (NWI)",
+        value: "No mapped wetland at this point",
+        text:
+          `The National Wetlands Inventory shows no mapped wetland polygon at this point. NWI mapping is not ` +
+          `exhaustive — small or forested wetlands can be unmapped, and a formal delineation still governs where ` +
+          `site work or federal permits are involved.`,
+        provenance: `Source: USFWS National Wetlands Inventory, retrieved ${wetlandsResult.retrievedAt} · fws.gov/program/national-wetlands-inventory`,
+        tone: "positive",
+      });
+    }
+  }
+
+  // EPA facility screen — Facility Registry Service proximity counts
+  // (keyless). Facts about the surrounding area, never a determination about
+  // this property; registrations are program records, not violations.
+  if (epaResult) {
+    const superfundLine = epaResult.superfundCount > 0
+      ? `${epaResult.superfundCount} Superfund (SEMS) site${epaResult.superfundCount === 1 ? "" : "s"} within ${epaResult.superfundRadiusMiles} mi`
+      : `No Superfund (SEMS) sites within ${epaResult.superfundRadiusMiles} mi`;
+    verifiedFacts.push({
+      label: "Contamination screen (EPA facilities)",
+      value: `${superfundLine} · ${epaResult.facilityCount} EPA-registered facilit${epaResult.facilityCount === 1 ? "y" : "ies"} within ${epaResult.facilityRadiusMiles} mi`,
+      text:
+        `${epaResult.superfundCount > 0 && epaResult.superfundNearestName ? `The nearest Superfund-program record is "${epaResult.superfundNearestName}". ` : ""}` +
+        `${epaResult.facilityCount > 0 ? `EPA's Facility Registry lists ${epaResult.facilityCount} registered facilit${epaResult.facilityCount === 1 ? "y" : "ies"} within ${epaResult.facilityRadiusMiles} mile${epaResult.sampleFacilityNames.length ? ` (e.g., ${epaResult.sampleFacilityNames.join("; ")})` : ""}. ` : `EPA's Facility Registry lists no registered facilities within ${epaResult.facilityRadiusMiles} mile. `}` +
+        `These are facts about the surrounding area — an EPA registration is a permit or program record for that ` +
+        `facility, not a violation and not a finding about this property. A Phase I environmental site assessment ` +
+        `is the professional instrument for contamination diligence.`,
+      provenance: `Source: U.S. EPA Facility Registry Service, retrieved ${epaResult.retrievedAt} · frs-public.epa.gov`,
+      tone: epaResult.superfundCount > 0 ? "caution" : "neutral",
+    });
+  }
 
   // Soil survey — USDA NRCS Soil Data Access point query (keyless; founder
   // request 2026-07-28). Dominant map-unit component, farmland class,

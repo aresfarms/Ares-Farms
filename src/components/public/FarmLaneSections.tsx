@@ -24,6 +24,7 @@ import { LoanProgramComparison } from "@/components/public/LoanProgramComparison
 import { HundredPercentFinancingCallout } from "@/components/public/HundredPercentFinancingCallout";
 import { FarmEquipmentExplorer } from "@/components/public/FarmEquipmentExplorer";
 import { FarmFinancialHealthCheck } from "@/components/public/FarmFinancialHealthCheck";
+import { FarmBestUseFinanceWorkspace } from "@/components/public/FarmBestUseFinanceWorkspace";
 import { LANE_THEMES } from "@/lib/property/laneThemes";
 
 // This whole module wears the FARM lane's color identity (green — growth,
@@ -379,9 +380,10 @@ export function FarmLaneSection({ sectionKey }: { sectionKey: string }) {
       // Merged program comparison + today's rates (founder direction 2026-07-20),
       // with the 100%-financing callout underneath.
       return (
-        <div style={{ display: "grid", gap: 24 }}>
+        <div style={{ display: "grid", gap: 28 }}>
           <LoanProgramComparison />
           <HundredPercentFinancingCallout />
+          <FarmBestUseFinanceWorkspace />
         </div>
       );
     default:

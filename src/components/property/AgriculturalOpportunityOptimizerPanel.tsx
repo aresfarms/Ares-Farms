@@ -12,7 +12,7 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
   const m = useMemo(() => optimizeAgriculturalOpportunities({ acres: p.acreage, purchasePrice: p.price, debtService: debt, ...x }), [p.acreage, p.price, debt, x]);
 
   const slider = (k: keyof typeof x, label: string) => typeof x[k] === "number" ? (
-    <label style={{ fontSize: 12, display: "grid", gap: 6, padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff" }}>
+    <label style={{ fontSize: 12, display: "grid", gap: 6, padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: p.theme.cellBg }}>
       <span style={{ display: "flex", justifyContent: "space-between", gap: 10 }}><strong>{label}</strong><span>{String(x[k])}/100</span></span>
       <input type="range" min="0" max="100" value={x[k] as number} onChange={e => setX(v => ({ ...v, [k]: Number(e.target.value) }))} />
     </label>
@@ -33,11 +33,11 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>
-        <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff", fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.gridEvidence} onChange={e => setX(v => ({ ...v, gridEvidence: e.target.checked }))} /> Grid / interconnection evidence exists</label>
-        <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff", fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.solarZoningEvidence} onChange={e => setX(v => ({ ...v, solarZoningEvidence: e.target.checked }))} /> Solar zoning / site feasibility is evidenced</label>
+        <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: p.theme.cellBg, fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.gridEvidence} onChange={e => setX(v => ({ ...v, gridEvidence: e.target.checked }))} /> Grid / interconnection evidence exists</label>
+        <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: p.theme.cellBg, fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.solarZoningEvidence} onChange={e => setX(v => ({ ...v, solarZoningEvidence: e.target.checked }))} /> Solar zoning / site feasibility is evidenced</label>
       </div>
 
-      <details style={{ border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: "#fff", padding: 12 }}>
+      <details style={{ border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: p.theme.cellBg, padding: 12 }}>
         <summary style={{ cursor: "pointer", fontWeight: 800, color: p.theme.ink }}>Premium small-square alfalfa assumptions</summary>
         <p style={{ margin: "7px 0 10px", fontSize: 12, lineHeight: 1.5, color: p.theme.inkSoft }}>Editable operator assumptions. Revenue is calculated by the bale—not by a generic bulk-hay tonnage rate.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 9 }}>
@@ -60,7 +60,7 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
       </details>
 
 
-      <details style={{ border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: "#fff", padding: 12 }}>
+      <details style={{ border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: p.theme.cellBg, padding: 12 }}>
         <summary style={{ cursor: "pointer", fontWeight: 800, color: p.theme.ink }}>Real-world feasibility assumptions</summary>
         <p style={{ margin: "7px 0 10px", fontSize: 12, lineHeight: 1.5, color: p.theme.inkSoft }}>These assumptions reduce rankings when soils, weather, labor, competition, market depth, or irrigation economics make an enterprise look better on paper than it is in practice.</p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 9 }}>
@@ -85,7 +85,7 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
         {m.ranked.map((r, i) => {
           const status = r.eligible ? "Screenable" : "Blocked pending evidence";
           return (
-            <article key={r.key} style={{ display: "grid", gap: 10, padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 12, background: "#fff" }}>
+            <article key={r.key} style={{ display: "grid", gap: 10, padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 12, background: p.theme.cellBg }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
                 <div style={{ display: "flex", gap: 10, alignItems: "flex-start", minWidth: 0 }}>
                   <span style={{ flex: "0 0 auto", width: 28, height: 28, borderRadius: 999, display: "grid", placeItems: "center", fontWeight: 850, background: p.theme.accent, color: "#fff" }}>{i + 1}</span>
@@ -123,14 +123,14 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
           { label: "Most feasible to operate", item: m.mostFeasible },
           { label: "Best risk-adjusted use", item: m.bestRiskAdjusted },
         ].map(({ label, item }) => (
-          <div key={label} style={{ padding: 12, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: "#fff" }}>
+          <div key={label} style={{ padding: 12, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: p.theme.cellBg }}>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.06em", color: p.theme.inkSoft }}>{label}</div>
             <strong style={{ display: "block", marginTop: 4, fontSize: 14, color: p.theme.ink }}>{item?.label ?? "No feasible result"}</strong>
           </div>
         ))}
       </div>
 
-      <div style={{ padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 11, background: "#fff" }}>
+      <div style={{ padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 11, background: p.theme.cellBg }}>
         <strong style={{ fontSize: 15 }}>Highest-ranked diversified screen</strong>
         <p style={{ margin: "6px 0 10px", fontSize: 13, lineHeight: 1.5 }}>{m.diversified.map(r => `${Math.round(r.portfolioShare * 100)}% ${r.label}`).join(" + ") || "No feasible portfolio yet"}</p>
         <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13 }}><span><strong>Modeled NOI:</strong> {money(m.portfolioNoi)}</span><span><strong>DSCR:</strong> {m.portfolioDscr?.toFixed(2) ?? "—"}x</span></div>

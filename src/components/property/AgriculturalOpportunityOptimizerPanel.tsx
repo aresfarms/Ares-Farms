@@ -8,7 +8,7 @@ const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 
 export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; price: number; rate: number; theme: ChartTheme }) {
   const debt = p.price * 0.8 * (p.rate / 100) / (1 - Math.pow(1 + p.rate / 100, -40));
-  const [x, setX] = useState({ waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
+  const [x, setX] = useState({ waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false, hayYieldTonsPerAcre: 5, hayBaleWeightLb: 55, haySummerPrice: 20, hayWinterPrice: 35, hayWinterShare: 35, hayVariableCostPerAcre: 1400, hayHandlingCostPerBale: 2, hayShrinkPct: 8 });
   const m = useMemo(() => optimizeAgriculturalOpportunities({ acres: p.acreage, purchasePrice: p.price, debtService: debt, ...x }), [p.acreage, p.price, debt, x]);
 
   const slider = (k: keyof typeof x, label: string) => typeof x[k] === "number" ? (
@@ -36,6 +36,28 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
         <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff", fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.gridEvidence} onChange={e => setX(v => ({ ...v, gridEvidence: e.target.checked }))} /> Grid / interconnection evidence exists</label>
         <label style={{ padding: 10, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 9, background: "#fff", fontSize: 12.5, lineHeight: 1.4 }}><input type="checkbox" checked={x.solarZoningEvidence} onChange={e => setX(v => ({ ...v, solarZoningEvidence: e.target.checked }))} /> Solar zoning / site feasibility is evidenced</label>
       </div>
+
+      <details style={{ border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: "#fff", padding: 12 }}>
+        <summary style={{ cursor: "pointer", fontWeight: 800, color: p.theme.ink }}>Premium small-square alfalfa assumptions</summary>
+        <p style={{ margin: "7px 0 10px", fontSize: 12, lineHeight: 1.5, color: p.theme.inkSoft }}>Editable operator assumptions. Revenue is calculated by the bale—not by a generic bulk-hay tonnage rate.</p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 9 }}>
+          {[
+            ["hayYieldTonsPerAcre", "Yield, tons/acre", 0.1],
+            ["hayBaleWeightLb", "Bale weight, lb", 1],
+            ["haySummerPrice", "Summer $/bale", 1],
+            ["hayWinterPrice", "Winter $/bale", 1],
+            ["hayWinterShare", "Sold in winter, %", 1],
+            ["hayVariableCostPerAcre", "Field cost $/acre", 25],
+            ["hayHandlingCostPerBale", "Handling $/bale", 0.25],
+            ["hayShrinkPct", "Shrink / loss, %", 1],
+          ].map(([key, label, step]) => (
+            <label key={String(key)} style={{ display: "grid", gap: 4, fontSize: 11.5, color: p.theme.inkSoft }}>
+              {String(label)}
+              <input type="number" min="0" step={Number(step)} value={x[key as keyof typeof x] as number} onChange={e => setX(v => ({ ...v, [key]: Number(e.target.value) }))} style={{ width: "100%", padding: "7px 8px", border: `1px solid ${p.theme.cellBorder}`, borderRadius: 7, fontSize: 13 }} />
+            </label>
+          ))}
+        </div>
+      </details>
 
       <div style={{ display: "grid", gap: 10 }}>
         {m.ranked.map((r, i) => {

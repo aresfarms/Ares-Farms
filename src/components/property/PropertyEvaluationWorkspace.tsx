@@ -3567,7 +3567,7 @@ export function PropertyEvaluationWorkspace({
           onRecordGovernedRelease={recordGovernedRecommendationRelease}
         />
       )}
-      {!deepView && (
+      {!deepView && workspaceProfile.id !== "farm" && (
         <PropertyResultCard
           theme={CHART_THEMES[chartVariant]}
           title={context.title}
@@ -3591,7 +3591,7 @@ export function PropertyEvaluationWorkspace({
       {/* (The imported-only "What is this property?" picker is now the
           front-loaded Property Type Stamp above — shown for every property.) */}
 
-      {!deepView && chartOpen && (
+      {!deepView && workspaceProfile.id !== "farm" && chartOpen && (
       <ChartTableBrief
         variant={chartVariant}
         propertyId={context.propertyId ?? context.title}
@@ -3621,8 +3621,8 @@ export function PropertyEvaluationWorkspace({
               context={ownershipContext}
               listedPrice={listedPrice}
               isHome={isResidentialHomeContext(analysisContext)}
-              farmShaped={workspaceProfile.id === "farm"}
-              farmMode={workspaceProfile.id === "farm"}
+              farmShaped={false}
+              farmMode={false}
               profileId={workspaceProfile.id}
             />
           ) : null

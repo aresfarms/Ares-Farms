@@ -3,7 +3,7 @@ import type { CountyCollege } from "./countyCollegesGenerated";
 /** Branch campuses omitted by institution-main-address IPEDS county joins. */
 export const COUNTY_COLLEGE_BRANCHES: Record<string, CountyCollege[]> = {
   "10005": [
-    { name: "Delaware Technical Community College — Owens Campus", city: "Georgetown", level: "community college" },
+    { name: "Delaware Technical Community College — Owens Campus", city: "Georgetown", state: "DE", level: "community college", lat: 38.697667, lon: -75.408352 },
   ],
 };
 

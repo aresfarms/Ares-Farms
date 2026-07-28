@@ -43,12 +43,14 @@ async function main(): Promise<void> {
   const rows = parseCsv(csv);
   const header = rows[0].map((cell) => cell.trim().toUpperCase());
   const col = (name: string) => header.indexOf(name);
-  const [nameC, cityC, sectorC, countyC] = [col("INSTNM"), col("CITY"), col("SECTOR"), col("COUNTYCD")];
-  if ([nameC, cityC, sectorC, countyC].some((i) => i < 0)) {
+  const [nameC, cityC, stateC, sectorC, countyC, latC, lonC] = [col("INSTNM"), col("CITY"), col("STABBR"), col("SECTOR"), col("COUNTYCD"), col("LATITUDE"), col("LONGITUD")];
+  if ([nameC, cityC, stateC, sectorC, countyC, latC, lonC].some((i) => i < 0)) {
     throw new Error(`IPEDS HD header changed — snapshot NOT overwritten.`);
   }
 
-  const byCounty = new Map<string, Array<{ name: string; city: string; level: string }>>();
+  type Campus = { name: string; city: string; state: string; level: string; lat: number; lon: number };
+  const byCounty = new Map<string, Campus[]>();
+  const campuses: Campus[] = [];
   let kept = 0;
   for (const row of rows.slice(1)) {
     const sector = Number(row[sectorC]);
@@ -57,8 +59,13 @@ async function main(): Promise<void> {
     if (!/^\d{5}$/.test(fips) || fips === "00000") continue;
     const level =
       sector <= 3 ? "4-year" : sector === 4 ? "community college" : "2-year";
+    const lat = Number(row[latC]);
+    const lon = Number(row[lonC]);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    const campus = { name: (row[nameC] ?? "").trim(), city: (row[cityC] ?? "").trim(), state: (row[stateC] ?? "").trim(), level, lat, lon };
     const list = byCounty.get(fips) ?? [];
-    list.push({ name: (row[nameC] ?? "").trim(), city: (row[cityC] ?? "").trim(), level });
+    list.push(campus);
+    campuses.push(campus);
     byCounty.set(fips, list);
     kept += 1;
   }
@@ -67,6 +74,7 @@ async function main(): Promise<void> {
   const entries = [...byCounty.entries()]
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([fips, list]) => `  ${JSON.stringify(fips)}: ${JSON.stringify(list.slice(0, 10))},`);
+  const campusEntries = campuses.map((campus) => `  ${JSON.stringify(campus)},`);
 
   const asOf = new Date().toISOString().slice(0, 10);
   fs.writeFileSync(
@@ -90,14 +98,28 @@ export const COUNTY_COLLEGES_PROVENANCE = {
 export interface CountyCollege {
   name: string;
   city: string;
+  state?: string;
   /** "4-year" | "community college" | "2-year" */
   level: string;
+  lat?: number;
+  lon?: number;
+}
+
+export interface CollegeCampus extends CountyCollege {
+  state: string;
+  lat: number;
+  lon: number;
 }
 
 /** Keyed by 5-digit county FIPS; capped at 10 per county. */
 export const COUNTY_COLLEGES: Record<string, CountyCollege[]> = {
 ${entries.join("\n")}
 };
+
+/** All degree-granting campuses with coordinates, for nearest-campus distance facts. */
+export const US_COLLEGE_CAMPUSES: CollegeCampus[] = [
+${campusEntries.join("\n")}
+];
 `,
     "utf8"
   );

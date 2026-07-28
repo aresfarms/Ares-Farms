@@ -50,7 +50,10 @@ function titleCase(value: string): string {
 interface PrivateSchool {
   name: string;
   city: string;
+  state: string;
   enrollment: number | null;
+  lat: number;
+  lon: number;
 }
 
 function main(): void {
@@ -68,15 +71,20 @@ function main(): void {
   const col = (name: string) => header.indexOf(name);
   const cName = col("PINST");
   const cCity = col("PL_CIT");
+  const cMailCity = col("PCITY");
   const cStateAnsi = col("PSTANSI");
   const cCounty3 = col("PCNTY");
   const cStudents = col("NUMSTUDS");
-  if (cName === -1 || cStateAnsi === -1 || cCounty3 === -1) {
+  const cState = col("PSTABB");
+  const cLat = col("LATITUDE22");
+  const cLon = col("LONGITUDE22");
+  if (cName === -1 || cStateAnsi === -1 || cCounty3 === -1 || cState === -1 || cLat === -1 || cLon === -1) {
     console.error(`  Unexpected header — needed PINST/PSTANSI/PCNTY; got ${header.length} columns.`);
     process.exit(1);
   }
 
   const byCounty = new Map<string, { count: number; schools: PrivateSchool[] }>();
+  const campuses: PrivateSchool[] = [];
   let skipped = 0;
   for (let i = 1; i < lines.length; i += 1) {
     const row = parseCsvLine(lines[i]);
@@ -87,13 +95,21 @@ function main(): void {
     const name = titleCase((row[cName] ?? "").trim());
     if (!name) { skipped += 1; continue; }
     const enrollment = Number(row[cStudents] ?? "");
+    const lat = Number(row[cLat] ?? "");
+    const lon = Number(row[cLon] ?? "");
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) { skipped += 1; continue; }
     const entry = byCounty.get(fips) ?? { count: 0, schools: [] };
     entry.count += 1;
-    entry.schools.push({
+    const school = {
       name,
-      city: titleCase((row[cCity] ?? "").trim()),
+      city: titleCase(((row[cCity] ?? "").trim() || (row[cMailCity] ?? "").trim())),
+      state: (row[cState] ?? "").trim().toUpperCase(),
       enrollment: Number.isFinite(enrollment) && enrollment > 0 ? enrollment : null,
-    });
+      lat,
+      lon,
+    };
+    entry.schools.push(school);
+    campuses.push(school);
     byCounty.set(fips, entry);
   }
 
@@ -108,6 +124,7 @@ function main(): void {
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([fips, entry]) => `  ${JSON.stringify(fips)}: ${JSON.stringify(entry)},`)
     .join("\n");
+  const campusEntries = campuses.map((school) => `  ${JSON.stringify(school)},`).join("\n");
 
   fs.writeFileSync(
     OUT,
@@ -131,12 +148,20 @@ export const COUNTY_PRIVATE_SCHOOLS_PROVENANCE = {
 export interface CountyPrivateSchool {
   name: string;
   city: string;
+  state: string;
   enrollment: number | null;
+  lat: number;
+  lon: number;
 }
 
 export const COUNTY_PRIVATE_SCHOOLS: Record<string, { count: number; schools: CountyPrivateSchool[] }> = {
 ${entries}
 };
+
+/** All surveyed private/parochial campuses with coordinates, for nearest-campus distance facts. */
+export const US_PRIVATE_SCHOOL_CAMPUSES: CountyPrivateSchool[] = [
+${campusEntries}
+];
 `,
     "utf8"
   );

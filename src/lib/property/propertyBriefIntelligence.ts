@@ -31,7 +31,7 @@ import { STATE_CROP_CONDITIONS, STATE_CROP_CONDITIONS_PROVENANCE } from "./state
 import { STATE_DROUGHT, STATE_DROUGHT_PROVENANCE } from "./stateDroughtGenerated";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "./stateFarmlandGenerated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
-import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE } from "./countyCollegesGenerated";
+import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE, US_COLLEGE_CAMPUSES } from "./countyCollegesGenerated";
 import { isRiverRoadSample, riverRoadCuratedFacts, RIVER_ROAD_REPLACED_LABELS } from "./riverRoadCuratedIntelligence";
 import { COUNTY_COLLEGE_BRANCHES, COUNTY_COLLEGE_BRANCHES_PROVENANCE } from "./countyCollegeBranchesCurated";
 import { PROPERTY_AIRPORTS, PROPERTY_AIRPORTS_PROVENANCE, type PropertyAirportFact } from "./propertyAirportsGenerated";
@@ -84,7 +84,7 @@ import {
   type LaneAnswer,
 } from "./laneAnswerEngine";
 import { buildLocalServices, type LocalServices } from "./localServices";
-import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE } from "./countyPrivateSchoolsGenerated";
+import { COUNTY_PRIVATE_SCHOOLS, COUNTY_PRIVATE_SCHOOLS_PROVENANCE, US_PRIVATE_SCHOOL_CAMPUSES } from "./countyPrivateSchoolsGenerated";
 import { COUNTY_HAZARD_RISK, COUNTY_HAZARD_RISK_PROVENANCE } from "./countyHazardRiskGenerated";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
 import {
@@ -597,21 +597,42 @@ function publicSchoolsFact(schools: CountySchool[] | undefined, town: string | n
   };
 }
 
-function privateSchoolsFact(countyFips: string | null): BriefFactLine | null {
+function straightLineMiles(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLon = ((bLon - aLon) * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return 2 * 3958.8 * Math.asin(Math.sqrt(h));
+}
+
+function nearestNamedCampuses<T extends { name: string; city: string; state: string; lat: number; lon: number }>(
+  campuses: T[],
+  lat: number | null | undefined,
+  lon: number | null | undefined,
+  limit = 3
+): Array<T & { miles: number }> {
+  if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon)) return [];
+  return campuses
+    .map((campus) => ({ ...campus, miles: straightLineMiles(lat, lon, campus.lat, campus.lon) }))
+    .sort((a, b) => a.miles - b.miles)
+    .slice(0, limit);
+}
+
+function privateSchoolsFact(countyFips: string | null, lat?: number | null, lon?: number | null): BriefFactLine | null {
   if (!countyFips) return null;
   const entry = COUNTY_PRIVATE_SCHOOLS[countyFips];
-  if (!entry || entry.count === 0) return null;
-  const sample = entry.schools.slice(0, 3);
+  const nearest = nearestNamedCampuses(US_PRIVATE_SCHOOL_CAMPUSES, lat, lon);
+  if ((!entry || entry.count === 0) && nearest.length === 0) return null;
+  const count = entry?.count ?? 0;
+  const nearestText = nearest.map((s) => `${s.name} (${s.city}, ${s.state}) ~${Math.round(s.miles)} mi`).join("; ");
   return {
     label: "Private & parochial schools",
-    value: `${entry.count} in the county`,
+    value: nearest.length > 0
+      ? `${count} in the county · closest ${nearest[0].name} ~${Math.round(nearest[0].miles)} mi`
+      : `${count} in the county`,
     text:
-      `${entry.count} private or parochial school${entry.count === 1 ? "" : "s"} on the federal ` +
-      `survey for this county. Example${sample.length === 1 ? "" : "s"}: ${sample
-        .map((s) => `${s.name}${s.city ? ` (${s.city}${s.enrollment != null ? `, ${s.enrollment} students` : ""})` : s.enrollment != null ? ` (${s.enrollment} students)` : ""}`)
-        .join("; ")}. ` +
-      `Survey coverage varies — a local ask often finds options directories miss. Directory facts ` +
-      `only; Furlong does not rate schools.`,
+      `${count} private or parochial school${count === 1 ? "" : "s"} appear on the federal survey for this county. ` +
+      (nearest.length > 0 ? `Closest named campuses from the property coordinates: ${nearestText}. ` : "") +
+      `Distances are straight-line, not drive time. Survey coverage varies and a local search may find additional options. Directory facts only; Furlong does not rate schools.`,
     provenance: `Source: ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.source} (${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.pssYear}), snapshot ${COUNTY_PRIVATE_SCHOOLS_PROVENANCE.asOf}`,
     tone: "neutral",
   };
@@ -782,42 +803,39 @@ function broadbandAreaFact(countyFips: string | null): BriefFactLine | null {
  * university or community college in the county is a fact some buyers want
  * and others avoid — say so either way). Directory facts only.
  */
-function collegesFact(countyFips: string | null): BriefFactLine | null {
+function collegesFact(countyFips: string | null, lat?: number | null, lon?: number | null): BriefFactLine | null {
   if (!countyFips || COUNTY_COLLEGES_PROVENANCE.asOf === null) return null;
   const mainInstitutions = COUNTY_COLLEGES[countyFips] ?? [];
   const branchCampuses = COUNTY_COLLEGE_BRANCHES[countyFips] ?? [];
   const list = [...mainInstitutions, ...branchCampuses.filter((branch) => !mainInstitutions.some((item) => item.name === branch.name))];
+  const branchCoordinateCampuses = Object.values(COUNTY_COLLEGE_BRANCHES).flat().filter((campus): campus is typeof campus & { state: string; lat: number; lon: number } => typeof campus.state === "string" && typeof campus.lat === "number" && typeof campus.lon === "number");
+  const nearest = nearestNamedCampuses([...US_COLLEGE_CAMPUSES, ...branchCoordinateCampuses], lat, lon);
+  const nearestText = nearest.map((c) => `${c.name} (${c.city}, ${c.state}; ${c.level}) ~${Math.round(c.miles)} mi`).join("; ");
   if (list.length === 0) {
     return {
       label: "Higher education",
-      value: "No college campus in the county",
+      value: nearest.length > 0
+        ? `No campus in county · closest ${nearest[0].name} ~${Math.round(nearest[0].miles)} mi`
+        : "No college campus in the county",
       text:
-        "No degree-granting college or university campus sits in this county on the federal " +
-        "directory — commuting distance to campuses in neighboring counties is a map-app check. " +
-        "Some buyers want a college town, others prefer the quiet; either way it is a fact worth " +
-        "knowing up front.",
+        "No degree-granting college or university campus sits in this county on the federal directory. " +
+        (nearest.length > 0 ? `Closest named campuses from the property coordinates: ${nearestText}. ` : "") +
+        "Distances are straight-line, not drive time. Directory facts only; Furlong does not rate institutions.",
       provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}`,
       tone: "neutral",
     };
   }
-  const fourYear = list.filter((c) => c.level === "4-year").length;
-  const twoYear = list.length - fourYear;
   const sample = list.slice(0, 3);
-  const valueBits = [
-    fourYear > 0 ? `${fourYear} four-year` : null,
-    twoYear > 0 ? `${twoYear} two-year/community` : null,
-  ].filter(Boolean);
   return {
     label: "Higher education",
-    value: list.length <= 3
-      ? list.map((c) => c.name).join(" · ")
-      : `${sample.map((c) => c.name).join(" · ")} · ${list.length - sample.length} more`,
+    value: nearest.length > 0
+      ? `${list.length} in county · closest ${nearest[0].name} ~${Math.round(nearest[0].miles)} mi`
+      : list.length <= 3 ? list.map((c) => c.name).join(" · ") : `${sample.map((c) => c.name).join(" · ")} · ${list.length - sample.length} more`,
     text:
-      `${list.length} degree-granting institution${list.length === 1 ? "" : "s"} in this county on the ` +
-      `federal directory: ${sample.map((c) => `${c.name} (${c.level}, ${c.city})`).join("; ")}` +
+      `${list.length} degree-granting institution${list.length === 1 ? "" : "s"} ${list.length === 1 ? "sits" : "sit"} in this county: ${sample.map((c) => `${c.name} (${c.level}, ${c.city})`).join("; ")}` +
       `${list.length > sample.length ? ` and ${list.length - sample.length} more` : ""}. ` +
-      `A campus nearby shapes rentals, dining, and season rhythms — a fact some buyers seek out ` +
-      `and others avoid. Directory facts only; Furlong does not rate institutions.`,
+      (nearest.length > 0 ? `Closest named campuses from the property coordinates: ${nearestText}. ` : "") +
+      `Distances are straight-line, not drive time. Directory facts only; Furlong does not rate institutions.`,
     provenance: `Source: ${COUNTY_COLLEGES_PROVENANCE.source}, snapshot ${COUNTY_COLLEGES_PROVENANCE.asOf}${branchCampuses.length ? ` · corrected with ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.source}, ${COUNTY_COLLEGE_BRANCHES_PROVENANCE.asOf}` : ""}`,
     tone: "neutral",
   };
@@ -1625,12 +1643,12 @@ export function buildPropertyBriefIntelligence(args: {
   const schoolsFact = isHome ? publicSchoolsFact(schools, args.town ?? null, args.stateCode ?? null) : null;
   if (schoolsFact) verifiedFacts.push(schoolsFact);
 
-  const privateSchools = isHome ? privateSchoolsFact(schoolsFips) : null;
+  const privateSchools = isHome ? privateSchoolsFact(schoolsFips, sourceRecord?.latitude ?? null, sourceRecord?.longitude ?? null) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
 
   // Higher education renders for EVERY profile — a campus shapes rentals and
   // commerce (hospitality/commercial care too), not just family life.
-  const colleges = collegesFact(fmrFips);
+  const colleges = collegesFact(fmrFips, sourceRecord?.latitude ?? null, sourceRecord?.longitude ?? null);
   if (colleges) verifiedFacts.push(colleges);
 
   const broadbandArea = broadbandAreaFact(fmrFips);
@@ -2019,10 +2037,10 @@ export async function buildLocationBriefIntelligence(args: {
   const schoolsFact = isHome ? publicSchoolsFact(schools, town, stateCode) : null;
   if (schoolsFact) verifiedFacts.push(schoolsFact);
 
-  const privateSchools = isHome ? privateSchoolsFact(countyFips) : null;
+  const privateSchools = isHome ? privateSchoolsFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null) : null;
   if (privateSchools) verifiedFacts.push(privateSchools);
 
-  const colleges = collegesFact(countyFips);
+  const colleges = collegesFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null);
   if (colleges) verifiedFacts.push(colleges);
 
   const broadbandArea = broadbandAreaFact(countyFips);

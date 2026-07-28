@@ -60,6 +60,7 @@ import {
   loadPropertyEvaluationDraft,
   savePropertyEvaluationDraft,
 } from "@/lib/property/propertyEvaluationDraft";
+import { consumePropertyFactsPrefetch } from "@/lib/property/propertyFactsPrefetch";
 import { assessBorrowerReadiness } from "@/lib/readiness/readinessAssessment";
 import {
   buildReportBranding,
@@ -2143,27 +2144,33 @@ export function PropertyEvaluationWorkspace({
     // is slow/unreachable (founder-caught 2026-07-18).
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30_000);
+    const requestBody = {
+      propertyId: context.propertyId,
+      exactAddress: context.exactAddress,
+      location: context.location,
+      stateCode: context.stateCode,
+      town: context.town,
+      county: context.county,
+      startingLens: startingLens ?? null,
+      // The visitor's "what is this property?" declaration — the server
+      // rebuilds the whole Place Brief in that shape (farm lanes for a
+      // farm, never home-mortgage copy on a working farm).
+      declaredPropertyType: profileOverride,
+    };
     void (async () => {
       try {
-        const res = await fetch("/api/public/property-facts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          signal: controller.signal,
-          body: JSON.stringify({
-            propertyId: context.propertyId,
-            exactAddress: context.exactAddress,
-            location: context.location,
-            stateCode: context.stateCode,
-            town: context.town,
-            county: context.county,
-            startingLens,
-            // The visitor's "what is this property?" declaration — the server
-            // rebuilds the whole Place Brief in that shape (farm lanes for a
-            // farm, never home-mortgage copy on a working farm).
-            declaredPropertyType: profileOverride,
-          }),
-        });
-        const data = (await res.json()) as PropertyFactsResponse;
+        // The address-check surface fires this same request the moment the
+        // address verifies (Tier 3b prefetch), so the answers are usually
+        // already on their way — or here — when the workspace mounts.
+        const prefetched = consumePropertyFactsPrefetch(requestBody);
+        const data = prefetched
+          ? ((await prefetched) as PropertyFactsResponse)
+          : ((await (await fetch("/api/public/property-facts", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              signal: controller.signal,
+              body: JSON.stringify(requestBody),
+            })).json()) as PropertyFactsResponse);
         if (!canceled) setFacts(data);
       } catch {
         // Aborted or failed — leave facts null; the workspace renders from the

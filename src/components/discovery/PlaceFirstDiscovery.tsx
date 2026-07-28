@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import { CHART_TONES, type ChartTone } from "@/lib/property/chartThemes";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
+import { startPropertyFactsPrefetch } from "@/lib/property/propertyFactsPrefetch";
 
 /**
  * Place-first discovery card — the correct PRIMARY journey for place/property
@@ -370,6 +371,24 @@ export function PlaceFirstDiscovery({
     // workspace. The verification surface remains only for errors, restricted
     // inputs, or unverifiable addresses where no responsible analysis exists.
     if (result && analysisHref) {
+      // Warm-start the workspace: fire the exact property-facts request the
+      // report will make, keyed off the href's own params so the bodies match.
+      // Best-effort only — the workspace has its own fetch as fallback.
+      try {
+        const query = new URLSearchParams(analysisHref.split("?")[1] ?? "");
+        startPropertyFactsPrefetch({
+          propertyId: query.get("propertyId"),
+          exactAddress: query.get("exactAddress"),
+          location: query.get("location"),
+          stateCode: query.get("state"),
+          town: query.get("town"),
+          county: query.get("county"),
+          startingLens: query.get("lens"),
+          declaredPropertyType: null,
+        });
+      } catch {
+        // Prefetch is an optimization; never block navigation on it.
+      }
       setJumpCue("Opening your full analysis report…");
       router.push(analysisHref);
       return;

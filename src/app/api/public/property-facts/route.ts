@@ -14,6 +14,37 @@ import { resolveJurisdictionParcel } from "@/lib/property/jurisdictionParcelReso
 import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnapshot";
 
 
+/**
+ * Short-TTL in-process response cache for the imported-address flow (Tier 3b).
+ * The address-check surface prefetches this route the moment an address
+ * verifies; the workspace request that follows seconds later — including
+ * across a full document navigation — lands on the warm entry instead of
+ * re-running geocoding, parcel resolution, and place intelligence.
+ * Deterministic inputs → identical payload inside the TTL, so replay safety
+ * is unchanged; snapshot-backed sources make a 2-minute window honest.
+ */
+const FACTS_CACHE_TTL_MS = 2 * 60_000;
+const FACTS_CACHE_MAX_ENTRIES = 50;
+const factsCache = new Map<string, { at: number; payload: unknown }>();
+
+function factsCacheGet(key: string): unknown | null {
+  const entry = factsCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.at >= FACTS_CACHE_TTL_MS) {
+    factsCache.delete(key);
+    return null;
+  }
+  return entry.payload;
+}
+
+function factsCacheSet(key: string, payload: unknown): void {
+  factsCache.set(key, { at: Date.now(), payload });
+  if (factsCache.size > FACTS_CACHE_MAX_ENTRIES) {
+    const oldest = factsCache.keys().next().value;
+    if (oldest !== undefined) factsCache.delete(oldest);
+  }
+}
+
 function derivedAcreageText(record: { acreageText?: string | null; description?: string | null } | null): string | null {
   if (!record) return null;
   if (record.acreageText?.trim()) return record.acreageText.trim();
@@ -72,6 +103,13 @@ export async function POST(req: NextRequest) {
       /commercial|business/i.test(String(body.startingLens ?? "")) ? "commercial" : null);
 
   if (propertyId?.startsWith("imported:") || (!propertyId && (body.exactAddress || body.location))) {
+    const factsCacheKey = JSON.stringify([
+      propertyId, body.exactAddress ?? null, body.location ?? null, body.stateCode ?? null,
+      body.town ?? null, body.county ?? null, body.rawInput ?? null, body.notes ?? null,
+      body.startingLens ?? null, declaredPropertyType,
+    ]);
+    const cached = factsCacheGet(factsCacheKey);
+    if (cached) return NextResponse.json(cached);
     const imported = await verifyImportedPropertyAddress({
       propertyId: propertyId ?? "imported:place-facts",
       exactAddress: body.exactAddress ?? null,
@@ -141,7 +179,7 @@ export async function POST(req: NextRequest) {
         tone: record.parcelMatchConfidence === "review-required" ? "caution" : "neutral",
       });
     }
-    return NextResponse.json({
+    const payload = {
       ok: true,
       propertyId: canonicalMatch?.canonical_property_id ?? propertyId,
       canonicalMatch: canonicalMatch
@@ -227,7 +265,9 @@ export async function POST(req: NextRequest) {
         liveChecks: imported.liveChecks,
         lookupOutcomes: imported.lookupOutcomes,
       },
-    });
+    };
+    factsCacheSet(factsCacheKey, payload);
+    return NextResponse.json(payload);
   }
 
   if (!propertyId) {

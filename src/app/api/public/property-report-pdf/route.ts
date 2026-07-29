@@ -25,7 +25,8 @@ function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
 
 export async function POST(req: NextRequest) {
   const parsed = await readJsonBodyWithLimit<Partial<PropertyReportRequest>>(req, {
-    maxBytes: 256 * 1024,
+    // 512 KB headroom — the report payload grew with lane answers + live facts (2026-07-29).
+    maxBytes: 512 * 1024,
   });
   if (!parsed.ok) {
     return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });

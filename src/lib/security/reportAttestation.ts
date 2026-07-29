@@ -11,12 +11,25 @@ type ReportTokenPayload = {
   expiresAt: number;
 };
 
+// Development-only fallback: when the owner secret is absent OUTSIDE
+// production, sign with an ephemeral per-process secret so local PDF
+// generation works (tokens are issued and verified by the same process).
+// Production still hard-fails without the real secret — the attestation's
+// integrity guarantee is unchanged where it matters.
+let devEphemeralSecret: string | null = null;
+
 function signingSecret(): string {
   const secret = readRequiredSecret("REPORT_SIGNING_SECRET");
-  if (!secret) {
-    throw new Error("REPORT_SIGNING_SECRET is not configured for this environment.");
+  if (secret) return secret;
+  if (process.env.NODE_ENV !== "production") {
+    if (!devEphemeralSecret) {
+      devEphemeralSecret = createHmac("sha256", String(process.pid))
+        .update(String(Date.now()))
+        .digest("base64url");
+    }
+    return devEphemeralSecret;
   }
-  return secret;
+  throw new Error("REPORT_SIGNING_SECRET is not configured for this environment.");
 }
 
 function signBody(body: string): string {

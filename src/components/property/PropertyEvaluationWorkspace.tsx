@@ -2000,7 +2000,7 @@ export function PropertyEvaluationWorkspace({
   const [factsLoading, setFactsLoading] = useState(false);
   const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
   const [savedAt, setSavedAt] = useState<string | null>(null);
-  const [pdfBusy, setPdfBusy] = useState<"export" | "print" | "view" | null>(null);
+  const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [manualReviewBusy, setManualReviewBusy] = useState(false);
   const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
@@ -2830,6 +2830,17 @@ export function PropertyEvaluationWorkspace({
     setSavedAt(updatedAt);
   }
 
+  // AUTOSAVE (founder direction 2026-07-29): the on-device draft saves itself
+  // a moment after any answer changes — the "Save draft" button is gone and
+  // nothing the visitor typed is ever lost. Device-only, zero PII, same
+  // storage as before.
+  useEffect(() => {
+    if (!context.propertyId) return;
+    const timer = window.setTimeout(saveDraft, 1_200);
+    return () => window.clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [answers, context.propertyId]);
+
   async function requestReportPdf() {
     if (!selectedTierUnlocked) {
       setPdfError(`${report.tier.label} is not unlocked on this screen yet.`);
@@ -2978,7 +2989,10 @@ export function PropertyEvaluationWorkspace({
         | { ok?: boolean; token?: string; error?: string }
         | null;
       if (!tokenRes.ok || !tokenBody?.ok || !tokenBody.token) {
-        throw new Error(tokenBody?.error || "The report attestation service returned an unexpected error.");
+        throw new Error(
+          tokenBody?.error ||
+            `The report attestation service returned HTTP ${tokenRes.status}${tokenRes.statusText ? ` (${tokenRes.statusText})` : ""} — try again in a moment; if it persists, this exact message is what to report.`
+        );
       }
 
       const res = await fetch("/api/public/property-report-pdf", {
@@ -3059,42 +3073,6 @@ export function PropertyEvaluationWorkspace({
     })();
   }
 
-  function printDraft() {
-    void (async () => {
-      setPdfBusy("print");
-      const printWindow = window.open("", "_blank");
-      if (printWindow) {
-        printWindow.document.write("<title>Preparing FURLONG report</title><body style=\"font-family: Georgia, serif; padding: 24px; color: #162033;\">Preparing your watermarked report…</body>");
-        printWindow.document.close();
-      }
-      try {
-        const payload = await requestReportPdf();
-        if (!payload) {
-          printWindow?.close();
-          return;
-        }
-        const { blob } = payload;
-        const url = window.URL.createObjectURL(blob);
-        if (printWindow) {
-          printWindow.location.href = url;
-          window.setTimeout(() => {
-            try {
-              printWindow.focus();
-              printWindow.print();
-            } catch {
-              // If the browser's PDF viewer controls the print timing, opening the
-              // generated file is still a usable fallback for the customer.
-            }
-          }, 900);
-        } else {
-          window.open(url, "_blank");
-        }
-        window.setTimeout(() => window.URL.revokeObjectURL(url), 30_000);
-      } finally {
-        setPdfBusy(null);
-      }
-    })();
-  }
 
   const propertyRecord = facts?.propertyRecord ?? null;
   // Label/value rows, not sentences — the panel scans (redesign round 2).
@@ -3403,6 +3381,11 @@ export function PropertyEvaluationWorkspace({
 
   const chartActionsSlot = (
     <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
+      {/* THREE actions only (founder direction 2026-07-29: five buttons doing
+          the same thing → view/print, download, opt-in permanent record).
+          Print merged into View — the PDF viewer's own print button covers it.
+          The on-device draft save is now AUTOMATIC (no button; see the
+          autosave effect), so nothing the visitor typed is ever lost. */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
         {context.listingUrl && (
           <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
@@ -3410,31 +3393,25 @@ export function PropertyEvaluationWorkspace({
           </Link>
         )}
         <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
-          {pdfBusy === "view" ? "Preparing PDF..." : "View PDF"}
+          {pdfBusy === "view" ? "Preparing PDF..." : "View & print PDF"}
         </button>
         <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
           {pdfBusy === "export" ? "Preparing PDF..." : "Download PDF"}
-        </button>
-        <button type="button" onClick={printDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
-          {pdfBusy === "print" ? "Preparing print view..." : "Print report"}
-        </button>
-        <button type="button" onClick={saveDraft} style={actionButtonSecondary}>
-          Save draft on this device
         </button>
         {/* The PLATFORM save is the existing governed borrower pathway —
             onboarding collects identity under the established consent and
             data-rights framework; no parallel PII store is created here
             (public-alpha posture: piiPermitted stays a founder/counsel
-            flag). Device save stays the zero-PII default. */}
+            flag). The automatic device draft stays the zero-PII default. */}
         <Link
           href={`/onboarding?from=${encodeURIComponent(chartHref)}`}
           style={{ ...actionButtonSecondary, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
         >
-          Save with Furlong →
+          Keep a permanent record with Furlong →
         </Link>
         {savedAt && (
           <span style={{ fontSize: 12, color: "#7a8aa0" }}>
-            Saved {new Date(savedAt).toLocaleString()}
+            Draft saved automatically on this device · {new Date(savedAt).toLocaleString()}
           </span>
         )}
       </div>

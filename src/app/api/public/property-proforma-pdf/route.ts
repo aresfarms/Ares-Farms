@@ -7,6 +7,8 @@ import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { solveDscrCoverage, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
 import { commercialAlternativeUses } from "@/lib/property/commercialAlternativeUses";
+import { buildResidentialProformaDocument, type ResidentialProformaArgs } from "@/lib/pdf/residentialProformaDocument";
+import type { LoanProformaInput } from "@/lib/pdf/generateLoanProformaPdf";
 
 /**
  * DRAFT pro forma PDF — PUBLIC, property-side screening only (founder
@@ -36,6 +38,7 @@ export async function POST(req: NextRequest) {
       assessedTotalValue?: unknown;
       soil?: unknown;
       building?: unknown;
+      residential?: unknown;
     }
   >(req, {
     maxBytes: 128 * 1024,
@@ -49,6 +52,7 @@ export async function POST(req: NextRequest) {
   if (!title) {
     return NextResponse.json({ ok: false, error: "propertyTitle is required." }, { status: 400 });
   }
+  const isResidentialDoc = (body.lane as string) === "R";
   const lane = body.lane === "A" || body.lane === "B" || body.lane === "C" ? body.lane : "B";
   const num = (value: unknown): number | null =>
     typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
@@ -76,6 +80,29 @@ export async function POST(req: NextRequest) {
         .filter((p) => p.title)
     : [];
 
+  // ── Residential Pro Forma Report (lane "R") — the numbers-only edition
+  // built from the page's own ownership-cost model (founder 2026-07-29:
+  // two documents on every lane).
+  let document: LoanProformaInput;
+  let gateOpenItems = 0;
+  if (isResidentialDoc) {
+    const resRaw = body.residential as Record<string, unknown> | null | undefined;
+    const ownershipCosts = resRaw && typeof resRaw === "object" && resRaw.ownershipCosts && typeof resRaw.ownershipCosts === "object"
+      ? (resRaw.ownershipCosts as ResidentialProformaArgs["ownershipCosts"])
+      : null;
+    const financingLanes = resRaw && Array.isArray(resRaw.financingLanes)
+      ? (resRaw.financingLanes as unknown[]).slice(0, 8).map((v) => String(v).slice(0, 120)).filter(Boolean)
+      : [];
+    document = buildResidentialProformaDocument({
+      propertyTitle: title,
+      exactAddress: typeof body.exactAddress === "string" ? body.exactAddress.slice(0, 200) : null,
+      location: typeof resRaw?.location === "string" ? (resRaw.location as string).slice(0, 160) : null,
+      generationDate: new Date().toISOString().slice(0, 10),
+      priceLabel: typeof resRaw?.priceLabel === "string" ? (resRaw.priceLabel as string).slice(0, 160) : "Price not yet confirmed",
+      ownershipCosts,
+      financingLanes,
+    });
+  } else {
   // ── Screening value derivation (founder direction 2026-07-29: "we HAVE the
   // numbers"). Many parcels publish no asking price; the pro forma still runs
   // on the best value we verifiably hold, with the basis printed on the page:
@@ -154,7 +181,8 @@ export async function POST(req: NextRequest) {
   });
 
   const failures = evaluateGenerationGate(input);
-  const document = buildUltimateProformaDocument(input, { allowDraft: true });
+  document = buildUltimateProformaDocument(input, { allowDraft: true });
+  gateOpenItems = failures.length;
 
   // ── IV.3 — Coverage solution (founder direction 2026-07-29): solve for the
   // soil-sustainable enterprise mix that clears the 1.25x floor, or say
@@ -252,6 +280,8 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  }
+
   // ── Property exhibits (founder direction 2026-07-29: ONE document) ────────
   // The verified Land Ledger evidence rides behind the pro forma as exhibits,
   // the way a real loan package carries its supporting documentation.
@@ -301,9 +331,9 @@ export async function POST(req: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="furlong-draft-proforma.pdf"`,
+      "Content-Disposition": `attachment; filename="${isResidentialDoc ? "furlong-buyer-proforma" : "furlong-draft-proforma"}.pdf"`,
       "X-Furlong-Draft": "true",
-      "X-Furlong-Gate-Open-Items": String(failures.length),
+      "X-Furlong-Gate-Open-Items": String(gateOpenItems),
       "Cache-Control": "no-store",
     },
   });

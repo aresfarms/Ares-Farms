@@ -2004,6 +2004,10 @@ export function PropertyEvaluationWorkspace({
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
   const [proformaError, setProformaError] = useState<string | null>(null);
+  // Two documents on every lane (founder 2026-07-29): the Pro Forma Report
+  // (numbers-only, experienced buyers) and the First-Time Buyer Report (the
+  // full-guidance Land Ledger). The toggle picks which one View/Download build.
+  const [reportDocKind, setReportDocKind] = useState<"proforma" | "first-time">("proforma");
   // Other saved properties this session — offered as optional additions to
   // the DRAFT pro forma (founder 2026-07-29: multi-property when they have
   // them, single-property document otherwise). Loaded post-mount so server
@@ -2622,7 +2626,7 @@ export function PropertyEvaluationWorkspace({
   const effectivePlaceIntelligence = (() => {
     if (!basePlaceIntelligence || !facts?.propertyRecord?.acreageText) return basePlaceIntelligence;
     const alreadyVisible = basePlaceIntelligence.verifiedFacts.some((fact) =>
-      /size|acreage|land area|parcel and conveyance profile/i.test(fact.label)
+      /size|acreage|land area|land, lots|tax-parcel profile|parcel and conveyance profile/i.test(fact.label)
     );
     if (alreadyVisible) return basePlaceIntelligence;
     return {
@@ -2861,10 +2865,11 @@ export function PropertyEvaluationWorkspace({
       setPdfError(`${report.tier.label} is not unlocked on this screen yet.`);
       return null;
     }
-    // ONE document (founder direction 2026-07-29): farm and commercial print
-    // the DRAFT SBA/USDA pro forma with the Land Ledger evidence as exhibits.
-    // Residential keeps the Land Ledger report — no pro forma applies.
-    if (workspaceProfile.id !== "residential") {
+    // Two documents, every lane (founder 2026-07-29): the toggle decides.
+    // "proforma" → the numbers-only Pro Forma Report (SBA/USDA structure for
+    // farm/commercial; the ownership-cost buyer pro forma for residential).
+    // "first-time" → the full-guidance First-Time Buyer Report (Land Ledger).
+    if (reportDocKind === "proforma") {
       return requestProformaPdf();
     }
     setPdfError(null);
@@ -3449,6 +3454,26 @@ export function PropertyEvaluationWorkspace({
       const laneAnswerLines = isFarmLaneDoc
         ? (effectivePlaceIntelligence?.farmEnterpriseAnswers ?? []).map((a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`)
         : answerFmt(effectivePlaceIntelligence?.commercialAnswers ?? []);
+      // Residential gets the ownership-cost buyer pro forma (lane "R");
+      // farm → USDA/FSA (B); commercial → SBA (A).
+      const residentialPayload =
+        workspaceProfile.id === "residential"
+          ? {
+              location: analysisContext.location ?? null,
+              priceLabel: analysisContext.priceLabel,
+              ownershipCosts:
+                effectiveListedPrice != null && ownershipContext
+                  ? formatOwnershipCostsForPdf({
+                      listedPrice: effectiveListedPrice,
+                      ownershipContext,
+                      isHome: isResidentialHomeContext(analysisContext),
+                      farmShaped: false,
+                      farmMode: false,
+                    }) ?? null
+                  : null,
+              financingLanes: topProgramPreview,
+            }
+          : undefined;
       const res = await fetch("/api/public/property-proforma-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3457,7 +3482,8 @@ export function PropertyEvaluationWorkspace({
           exactAddress: context.exactAddress,
           county: context.county,
           state: context.stateCode,
-          lane: isFarmLaneDoc ? "B" : "A",
+          lane: workspaceProfile.id === "residential" ? "R" : isFarmLaneDoc ? "B" : "A",
+          residential: residentialPayload,
           acquisitionPrice: effectiveListedPrice,
           // No published/entered price → the server derives a stated screening
           // value (assessed value, else USDA state average × acreage) so the
@@ -3501,6 +3527,35 @@ export function PropertyEvaluationWorkspace({
           Print merged into View — the PDF viewer's own print button covers it.
           The on-device draft save is now AUTOMATIC (no button; see the
           autosave effect), so nothing the visitor typed is ever lost. */}
+      {/* Document picker (founder 2026-07-29): the Pro Forma Report is the
+          numbers-only edition for experienced buyers; the First-Time Buyer
+          Report carries the full guidance. Every lane offers both. */}
+      <div role="radiogroup" aria-label="Choose your document" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+        {([
+          { kind: "proforma" as const, label: "Pro Forma Report", note: "numbers-only, for experienced buyers" },
+          { kind: "first-time" as const, label: "First-Time Buyer Report", note: "full guidance, every concept explained" },
+        ]).map((doc) => (
+          <button
+            key={doc.kind}
+            type="button"
+            role="radio"
+            aria-checked={reportDocKind === doc.kind}
+            onClick={() => setReportDocKind(doc.kind)}
+            style={{
+              borderRadius: 999,
+              padding: "8px 14px",
+              fontSize: 12.5,
+              fontWeight: 750,
+              cursor: "pointer",
+              border: reportDocKind === doc.kind ? "1px solid #1C2B45" : "1px solid #cdd9ec",
+              background: reportDocKind === doc.kind ? "#1C2B45" : "#ffffff",
+              color: reportDocKind === doc.kind ? "#ffffff" : "#3b475a",
+            }}
+          >
+            {doc.label} <span style={{ fontWeight: 500, opacity: 0.85 }}>· {doc.note}</span>
+          </button>
+        ))}
+      </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
         {context.listingUrl && (
           <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
@@ -3805,23 +3860,26 @@ export function PropertyEvaluationWorkspace({
         }
         similarHomes={similarHomes}
         actionsSlot={chartActionsSlot}
+        factsPending={factsLoading}
         agricultureSlot={
           workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
             <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />
           ) : undefined
         }
         proformaSlot={
-          workspaceProfile.id !== "residential" ? (
+          (
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Your PDF is the DRAFT SBA/USDA pro forma</h3>
+              <h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Two documents, your choice</h3>
               <p style={{ margin: 0, color: "#5A6172", fontSize: 12.5, lineHeight: 1.6 }}>
-                View &amp; print and Download above produce ONE document: the lender-package pro forma —
-                Sources &amp; Uses, collateral schedule, revenue segments, debt-service assumptions, two-case
-                DSCR, and the ten-year model — with this property&apos;s verified Land Ledger evidence attached
-                as exhibits. It carries a DRAFT banner and the generation-gate checklist of everything
-                underwriting still requires. {rankingPrice == null ? "No price entered yet — the finance math runs on a stated screening value (the parcel's assessed value, else the USDA state farmland average), with that basis printed on every figure. Enter your intended offer above to run your own number instead." : ""}
+                The <strong>Pro Forma Report</strong> is the numbers-only edition for experienced buyers
+                {workspaceProfile.id === "residential"
+                  ? " — purchase and cash-to-close scenarios, the monthly carrying model, the ten-year cost and equity outlook, and the financing lanes to test."
+                  : " — the lender-package structure (Sources & Uses through the ten-year model and the generation-gate checklist) with the verified Land Ledger evidence attached as exhibits."}{" "}
+                The <strong>First-Time Buyer Report</strong> is the full-guidance edition: every concept,
+                cost, and question explained. Pick above; View &amp; print and Download build whichever is
+                selected. {rankingPrice == null ? (workspaceProfile.id === "residential" ? "Enter the asking price or your intended offer above to populate the finance math." : "No price entered yet — the finance math runs on a stated screening value (the parcel's assessed value, else the USDA state farmland average), with that basis printed on every figure. Enter your intended offer above to run your own number instead.") : ""}
               </p>
-              {otherSavedProperties.length > 0 && (
+              {workspaceProfile.id !== "residential" && otherSavedProperties.length > 0 && (
                 <div style={{ display: "grid", gap: 5, border: "1px solid #E5D9BC", borderRadius: 10, background: "#FFFDF7", padding: "10px 12px" }}>
                   <strong style={{ color: "#1C2B45", fontSize: 12.5 }}>
                     Acquiring more than one? Include other saved properties in the pro forma (optional):
@@ -3850,7 +3908,7 @@ export function PropertyEvaluationWorkspace({
               )}
               {proformaError && <span style={{ fontSize: 12, color: "#a12626" }}>{proformaError}</span>}
             </div>
-          ) : undefined
+          )
         }
       />
         );

@@ -2094,39 +2094,39 @@ export async function buildLocationBriefIntelligence(args: {
     });
   }
 
-  // Daily-life amenities — GATED live Overpass lookup (OFF by default). When the
-  // gate is closed or the query fails, amenities become an honest unknown.
-  let amenities: AmenityFacts | null = null;
-  if (
+  // Amenities / soil / climate / solar / wetlands / EPA live lookups run
+  // CONCURRENTLY — each is fail-safe and independently gated. Amenities
+  // (Overpass, up to 8s) used to run serially BEFORE this block, adding its
+  // full duration to every residential report (founder-reported slowness
+  // 2026-07-29); it now rides the same Promise.all.
+  const amenitiesGateOpen =
     geocode?.lat != null &&
     geocode?.lon != null &&
-    amenityLiveLookupEnabled(args.amenityEnv ?? process.env)
-  ) {
-    amenities = await queryAmenitiesLive(geocode.lat, geocode.lon);
-    if (amenities) {
-      verifiedFacts.push(
-        amenityFactLine(
-          amenities,
-          AMENITY_RADIUS_MILES,
-          `Source: OpenStreetMap via Overpass API (live lookup), © OpenStreetMap contributors (ODbL)`
-        )
-      );
-    }
-  }
-
-  // Soil / climate / solar / wetlands / EPA live lookups run CONCURRENTLY —
-  // each is fail-safe and independently gated, and the workspace prefetch
-  // means this block usually completes before the visitor reaches the report.
-  const [soilResult, climateResult, solarResult, wetlandsResult, epaResult] =
+    amenityLiveLookupEnabled(args.amenityEnv ?? process.env);
+  const [amenitiesResult, soilResult, climateResult, solarResult, wetlandsResult, epaResult] =
     geocode?.lat != null && geocode?.lon != null
       ? await Promise.all([
+          amenitiesGateOpen ? queryAmenitiesLive(geocode.lat, geocode.lon) : Promise.resolve(null),
           fetchSoilProfile(geocode.lat, geocode.lon),
           fetchClimateNormals(geocode.lat, geocode.lon),
           fetchSolarPotential(geocode.lat, geocode.lon),
           fetchWetlands(geocode.lat, geocode.lon),
           fetchEpaFacilityScreen(geocode.lat, geocode.lon),
         ])
-      : [null, null, null, null, null];
+      : [null, null, null, null, null, null];
+
+  // Daily-life amenities — GATED live Overpass lookup (OFF by default). When
+  // the gate is closed or the query fails, amenities become an honest unknown.
+  const amenities: AmenityFacts | null = amenitiesResult;
+  if (amenities) {
+    verifiedFacts.push(
+      amenityFactLine(
+        amenities,
+        AMENITY_RADIUS_MILES,
+        `Source: OpenStreetMap via Overpass API (live lookup), © OpenStreetMap contributors (ODbL)`
+      )
+    );
+  }
 
   // Wetlands — USFWS National Wetlands Inventory point query (keyless).
   // Mapped wetland → caution; no mapped wetland → honest positive with the

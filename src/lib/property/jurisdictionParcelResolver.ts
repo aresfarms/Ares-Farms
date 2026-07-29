@@ -126,7 +126,10 @@ async function resolveDelawareSussex(input: AddressInput): Promise<JurisdictionP
   const land = number(owner.APRLAND); const improvement = number(owner.APRBLDG);
   return {
     sourceName: "Sussex County Delaware Parcel and Assessment Service", sourceAsOf: new Date().toISOString().slice(0, 10), sourceUrl: "https://map.sussexcountyde.gov/",
-    accountId: pin, parcelRefs: [pin], acreageText: acres ? `${acres.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres in official parcel geometry` : null,
+    // "mapped parcel geometry (GIS)" — GIS polygon areas routinely differ a few
+    // percent from the recorded plat; the deed/plat governs (founder-caught
+    // 0.38 vs 0.4091 mismatch, 2026-07-29).
+    accountId: pin, parcelRefs: [pin], acreageText: acres ? `≈${acres.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres by mapped parcel geometry (GIS) — the recorded plat governs` : null,
     landUse: clean(owner.LUC) ? `Sussex County land-use code ${clean(owner.LUC)}` : null, zoning: null,
     deedReference: book || page ? `Book ${book ?? "—"} · Page ${page ?? "—"}` : null, legalDescription: legal,
     yearBuilt: null, squareFeet: number(parcel.SqFeet), buildingStyle: null, buildingType: null,

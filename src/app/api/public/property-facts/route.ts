@@ -23,7 +23,10 @@ import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnaps
  * Deterministic inputs → identical payload inside the TTL, so replay safety
  * is unchanged; snapshot-backed sources make a 2-minute window honest.
  */
-const FACTS_CACHE_TTL_MS = 2 * 60_000;
+// 10 minutes: place facts are snapshot/dated anyway, and a visitor's
+// back-and-forth (tabs, type correction, PDF) should never re-pay the
+// full federal round-trip (founder-reported slowness 2026-07-29).
+const FACTS_CACHE_TTL_MS = 10 * 60_000;
 const FACTS_CACHE_MAX_ENTRIES = 50;
 const factsCache = new Map<string, { at: number; payload: unknown }>();
 
@@ -123,8 +126,11 @@ export async function POST(req: NextRequest) {
       : null;
     const matchedSourceRecord = canonicalMatch?.source_records[0] ?? null;
     const listingSnapshot = findGovernedListingSnapshot(imported.normalizedAddress);
-    const jurisdictionParcel = imported.parsedAddress
-      ? await resolveJurisdictionParcel({
+    // The county parcel resolver and the Place Brief are independent — run
+    // them CONCURRENTLY (founder-reported slowness 2026-07-29: the parcel
+    // service was serially blocking the whole intelligence build).
+    const jurisdictionParcelPromise = imported.parsedAddress
+      ? resolveJurisdictionParcel({
           street: imported.parsedAddress.street,
           city: imported.parsedAddress.city,
           state: imported.parsedAddress.state,
@@ -133,24 +139,31 @@ export async function POST(req: NextRequest) {
           lat: imported.geocode?.lat ?? null,
           lon: imported.geocode?.lon ?? null,
         }).catch(() => null)
-      : null;
+      : Promise.resolve(null);
     // Same living-here Place Brief a map-selected property gets, resolved from
     // the geocode and the strongest available asset evidence. An exact address
     // match carries its canonical property style into classification; a visitor
     // correction remains secondary and never replaces available parcel facts.
-    const placeIntelligence = await buildLocationBriefIntelligence({
-      geocode: imported.geocode,
-      placeFacts: imported.placeFacts,
-      parsed: imported.parsedAddress,
-      propertyType: lanePropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
-      ownerNotes: body.notes ?? null,
-    });
+    const [jurisdictionParcel, placeIntelligence] = await Promise.all([
+      jurisdictionParcelPromise,
+      buildLocationBriefIntelligence({
+        geocode: imported.geocode,
+        placeFacts: imported.placeFacts,
+        parsed: imported.parsedAddress,
+        propertyType: lanePropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
+        ownerNotes: body.notes ?? null,
+      }),
+    ]);
     if (matchedSourceRecord || jurisdictionParcel || listingSnapshot) {
       const sizeBits = [
         matchedSourceRecord?.squareFeet ? `${matchedSourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : jurisdictionParcel?.squareFeet ? `${jurisdictionParcel.squareFeet.toLocaleString("en-US")} sq ft` : null,
         listingSnapshot?.offeredAcreage ? `${listingSnapshot.offeredAcreage.toLocaleString("en-US")} acres offered` : derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null,
       ].filter((value): value is string => Boolean(value));
-      if (sizeBits.length && !placeIntelligence.verifiedFacts.some((fact) => fact.label === "Size")) {
+      // A deed/plat-based land fact (e.g. a curated "Land, lots, and
+      // tax-parcel profile" carrying the RECORDED area) outranks the GIS
+      // geometry figure — never render both (founder-caught 0.38 vs 0.4091
+      // conflict, 2026-07-29: the recorded plat governs).
+      if (sizeBits.length && !placeIntelligence.verifiedFacts.some((fact) => /\bsize\b|land area|acreage|land, lots|tax-parcel profile|parcel and conveyance/i.test(fact.label))) {
         placeIntelligence.verifiedFacts.unshift({
           label: "Size",
           value: sizeBits.join(" · "),

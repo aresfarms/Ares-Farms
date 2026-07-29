@@ -46,16 +46,20 @@ export const FINANCING_FEE_LINES: FinFeeLine[] = [
     guild: "Included / credited",
   },
   {
-    service: "Engagement retainer",
-    detail: "A flat fee to evaluate tax returns, assess debt-to-income, and map a long-term borrowing strategy.",
+    // "Financial Tune-Up" (founder 2026-07-29): plain-language rename —
+    // "Engagement retainer" read as jargon even to the founder.
+    service: "Financial Tune-Up",
+    detail: "A flat-fee financial check-up: we evaluate your tax returns, assess debt-to-income, and map a long-term borrowing strategy.",
     emphasis: "Credited back to you in full if a loan closes.",
     fee: "$500 – $2,500",
     feeConfirmed: true,
     guild: "Free — every tier",
   },
   {
-    service: "Flat advisory fee",
-    detail: "Shopping the market, negotiating with multiple wholesale lenders, and reviewing tailored loan offers on your behalf.",
+    // "Advisory fee" (founder 2026-07-29): a "flat" fee cannot carry a range —
+    // the range stays, the contradiction goes.
+    service: "Advisory fee",
+    detail: "Shopping the market, negotiating with multiple wholesale lenders, and reviewing tailored loan offers on your behalf. Quoted up front for your situation before any work begins.",
     fee: "$500 – $2,000",
     feeConfirmed: true,
     guild: "Included / credited",

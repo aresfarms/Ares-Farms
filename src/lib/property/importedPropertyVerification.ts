@@ -382,6 +382,16 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
     historic: "not-run",
   };
 
+  // PARALLEL live checks (founder-reported slowness 2026-07-29): OZ, HUBZone,
+  // and the geocode are independent — run together; NMTC/flood/historic need
+  // only the geocode — run together after it. Same outcomes, same honesty,
+  // roughly half the cold wall-clock. Mutations of the shared facts/warnings
+  // objects are safe: JS is single-threaded and each block owns its keys.
+  const geocodePromise: Promise<CensusGeocodeResult | null> = freeformGeocode
+    ? Promise.resolve(freeformGeocode)
+    : geocodeToCensusTract(parsed.street, parsed.city, parsed.state, parsed.zip).catch(() => null);
+
+  const ozTask = (async () => {
   if (ozActivated) {
     const oz = await lookupOpportunityZone(parsed.street, parsed.city, parsed.state, parsed.zip);
     if (!oz.error && oz.designated && oz.tractId) {
@@ -402,7 +412,8 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   } else {
     lookupOutcomes.opportunityZone = "gated";
   }
-
+  })();
+  const hubzoneTask = (async () => {
   if (hubzoneActivated) {
     const hubzone = await lookupHubzone(parsed.street, parsed.city, parsed.state, parsed.zip);
     if (!hubzone.error && hubzone.designated && hubzone.hubzoneType && hubzone.geoid) {
@@ -432,15 +443,10 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   } else {
     lookupOutcomes.hubzone = "gated";
   }
+  })();
 
-  // Always geocode a parsed address (not just when a live place-fact gate is
-  // open): the manual-address Place Brief needs the tract GEOID + county FIPS
-  // to resolve tenure, food access, county mechanics, and live amenities even
-  // when every OZ/NMTC/flood/historic gate is off (staging default).
-  const geocode =
-    freeformGeocode ??
-    (await geocodeToCensusTract(parsed.street, parsed.city, parsed.state, parsed.zip).catch(() => null));
-
+  const geocode = await geocodePromise;
+  const nmtcTask = (async () => {
   if (nmtcActivated) {
     if (geocode?.geoid) {
       const nmtc = await lookupNmtcQualifiedTract(geocode.geoid).catch(() => undefined);
@@ -465,7 +471,8 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   } else {
     lookupOutcomes.nmtc = "gated";
   }
-
+  })();
+  const floodTask = (async () => {
   if (floodActivated) {
     if (geocode?.lat && geocode?.lon) {
       const flood = await queryFloodZone(Number(geocode.lon), Number(geocode.lat)).catch(() => undefined);
@@ -491,7 +498,8 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   } else {
     lookupOutcomes.flood = "gated";
   }
-
+  })();
+  const historicTask = (async () => {
   if (historicActivated) {
     if (geocode?.lat && geocode?.lon) {
       const historic = await queryNationalRegister(Number(geocode.lon), Number(geocode.lat)).catch(() => undefined);
@@ -518,6 +526,8 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   } else {
     lookupOutcomes.historic = "gated";
   }
+  })();
+  await Promise.all([ozTask, hubzoneTask, nmtcTask, floodTask, historicTask]);
 
   const gatedChecks = Object.entries(lookupOutcomes)
     .filter(([, outcome]) => outcome === "gated")

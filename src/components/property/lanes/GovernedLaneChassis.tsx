@@ -112,6 +112,9 @@ export type LaneWorkspaceProps = ChartTableBriefProps & {
       commercial lanes). Rendered inside the Report tab above the licensed
       Financial-module hand-off. */
   proformaSlot?: ReactNode;
+  /** True while the property-facts request is in flight — the Summary tab
+      says the record is still arriving instead of showing zero counts. */
+  factsPending?: boolean;
 };
 
 type ChassisProps = LaneWorkspaceProps & { lane: LaneDefinition };
@@ -174,9 +177,9 @@ export function GovernedLaneChassis(props: ChassisProps) {
       record.landUse ? { label: "Land use", value: record.landUse, text: "Land-use description published by the official parcel source.", provenance: source, tone: "neutral" as const } : null,
       record.zoning ? { label: "Zoning", value: record.zoning, text: "Zoning code carried by the official parcel source; local zoning records remain controlling.", provenance: source, tone: "neutral" as const } : null,
       record.deedReference ? { label: "Recorded deed reference", value: record.deedReference, text: record.legalDescription || "Deed book and page reference published with the parcel record.", provenance: source, tone: "neutral" as const } : null,
-      record.assessedLandValue != null ? { label: "Appraised land value", value: `$${record.assessedLandValue.toLocaleString("en-US")}`, text: "Land component of the official appraised value; this is not a seller asking price.", provenance: source, tone: "neutral" as const } : null,
-      record.assessedImprovementValue != null ? { label: "Appraised improvement value", value: `$${record.assessedImprovementValue.toLocaleString("en-US")}`, text: "Improvement component of the official appraised value.", provenance: source, tone: "neutral" as const } : null,
-      record.assessedTotalValue != null ? { label: "Appraised total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: "Total appraised value published by the jurisdiction parcel source; it is not a market-price opinion.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedLandValue != null ? { label: "County-assessed land value", value: `$${record.assessedLandValue.toLocaleString("en-US")}`, text: "The land component of the county's estimated value for taxation. It is not a market appraisal and not a seller asking price — a lender's appraiser or the market may conclude differently.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedImprovementValue != null ? { label: "County-assessed improvement value", value: `$${record.assessedImprovementValue.toLocaleString("en-US")}`, text: "The building/improvement component of the county's estimated value for taxation — not a market appraisal.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedTotalValue != null ? { label: "County-assessed total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: "The county's total estimated value for taxation, published by the jurisdiction parcel source. It is the taxing authority's estimate — not a market-price opinion, and not what a professional appraiser would necessarily conclude.", provenance: source, tone: "neutral" as const } : null,
       record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.bathrooms != null ? { label: "Bathrooms", value: String(record.bathrooms), text: "Bathroom count reported by the matched listing record.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
       record.squareFeet != null ? { label: "Building square feet", value: `${record.squareFeet.toLocaleString("en-US")} sq ft`, text: "Building area reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
@@ -190,7 +193,15 @@ export function GovernedLaneChassis(props: ChassisProps) {
   const facts = useMemo(() => {
     const filtered = rawFacts.filter((fact) => !/commodity prices|national commodity|corn .*soybeans|livestock prices|regional cash bid/i.test(`${fact.label} ${fact.value}`));
     const labels = new Set(filtered.map((fact) => fact.label.toLowerCase()));
-    return [...recordFacts.filter((fact) => !labels.has(fact.label.toLowerCase())), ...filtered];
+    // Size-family dedupe: a deed/plat-based land fact from the intelligence
+    // (e.g. "Land, lots, and tax-parcel profile") outranks the record's
+    // GIS-geometry "Land area" — never show both (recorded plat governs).
+    const SIZE_FAMILY = /\bsize\b|land area|acreage|land, lots|tax-parcel profile|parcel and conveyance/i;
+    const intelligenceHasSize = filtered.some((fact) => SIZE_FAMILY.test(fact.label));
+    return [
+      ...recordFacts.filter((fact) => !labels.has(fact.label.toLowerCase()) && !(intelligenceHasSize && SIZE_FAMILY.test(fact.label))),
+      ...filtered,
+    ];
   }, [rawFacts, recordFacts]);
   const rawUnknowns = props.intelligence?.unknowns ?? [];
   // Unknown-record templates are retained in the intelligence model for an
@@ -224,11 +235,49 @@ export function GovernedLaneChassis(props: ChassisProps) {
       {lane.tabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 12px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>{item.label}</button>)}
     </nav>
     <div style={{ padding: 20, display: "grid", gap: 16 }}>
-      {tab === "summary" && <>
+      {tab === "summary" && (() => {
+        // A REAL summary (founder direction 2026-07-29: "why don't we have an
+        // actual summary of the property here?") — the most decision-relevant
+        // verified facts, in priority order, not a count line.
+        const SUMMARY_PRIORITY = [/^size$/i, /^land area$/i, /asking price/i, /appraised total/i, /^property type$/i, /^county$/i, /flood zone/i, /soil survey/i, /^zoning$/i, /^land use$/i, /^sale status$/i, /wetlands/i, /^schools$/i, /broadband/i, /climate normals/i];
+        const summaryFacts: typeof facts = [];
+        for (const pattern of SUMMARY_PRIORITY) {
+          const hit = facts.find((fact) => pattern.test(fact.label) && !summaryFacts.includes(fact));
+          if (hit) summaryFacts.push(hit);
+          if (summaryFacts.length >= 8) break;
+        }
+        const totalFacts = facts.length;
+        return <>
         <article style={{ ...card, background: "linear-gradient(155deg,#20304E,#16233C)", color: "#fff", border: 0, display: "grid", gap: 9 }}><span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase" }}>Property summary</span><h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: 24 }}>{props.title}</h2><span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane.consumerLaneLabel}</span><p style={{ margin: 0, lineHeight: 1.6, color: "#E6E9EF" }}>{props.headline}</p></article>
-        <section style={{ ...card, display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Everything at a glance</strong><p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 13 }}>{hasPrice ? `Price basis: ${props.priceLabel}. ` : "Price is not yet confirmed. "}{factsByTab.property.length} property fact{factsByTab.property.length === 1 ? "" : "s"}, {factsByTab.utilities.length} utility fact{factsByTab.utilities.length === 1 ? "" : "s"}, {factsByTab.environmental.length} environmental fact{factsByTab.environmental.length === 1 ? "" : "s"}, {factsByTab.education.length} education fact{factsByTab.education.length === 1 ? "" : "s"}, and {factsByTab.misc.length} other fact{factsByTab.misc.length === 1 ? "" : "s"} are organized in the tabs above.</p></section>
+        {summaryFacts.length > 0 ? (
+          <section style={{ ...card, display: "grid", gap: 10 }}>
+            <strong style={{ color: "#1C2B45" }}>The property, in brief</strong>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "8px 18px" }}>
+              {summaryFacts.map((fact) => (
+                <div key={fact.label} style={{ display: "grid", gap: 2, borderLeft: "3px solid #E5E0D5", paddingLeft: 10 }}>
+                  <span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{fact.label}</span>
+                  <span style={{ color: "#1C2B45", fontSize: 13.5, fontWeight: 650, lineHeight: 1.45 }}>{fact.value}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 12.5 }}>
+              {hasPrice ? `Price basis: ${props.priceLabel}. ` : "Price is not yet confirmed. "}
+              {totalFacts} verified fact{totalFacts === 1 ? "" : "s"} in all — {factsByTab.property.length} property, {factsByTab.utilities.length} utility, {factsByTab.environmental.length} environmental, {factsByTab.education.length} education, {factsByTab.misc.length} other — each with its source and date in the tabs above.
+            </p>
+          </section>
+        ) : (
+          <section style={{ ...card, display: "grid", gap: 9 }}>
+            <strong style={{ color: "#1C2B45" }}>The property, in brief</strong>
+            <p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 13 }}>
+              {props.factsPending
+                ? "Public records for this property are still arriving — flood, parcel, soil, and program facts land here as each source answers. The summary fills in momentarily."
+                : "No verified public records resolved for this entry yet. Facts appear here the moment a source answers; each carries its origin and date."}
+            </p>
+          </section>
+        )}
         <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Something Furlong missed?</strong><form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "Customer-supplied property feature pending source verification.", provenance: "Owner assertion added in the property workspace", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800 }}>Add feature</button></form>{ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7 }}><strong style={{ color: "#1C2B45", fontSize: 12 }}>Owner-reported property features</strong>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}</section>
-      </>}
+      </>;
+      })()}
       {tab === "property" && renderCategory("property", "Property")}
       {tab === "agriculture" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Agriculture</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("agriculture")}</p></header>{props.agricultureSlot ?? <div style={card}>The growing analysis for this ground is still assembling — soil, county yields, and market signals arrive with the property facts.</div>}</>}
       {tab === "utilities" && renderCategory("utilities", "Utilities")}
@@ -236,7 +285,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
       {tab === "education" && renderCategory("education", "Education")}
       {tab === "misc" && renderCategory("misc", "Miscellaneous and other")}
       {tab === "finance" && (() => { const ranked = [...props.financingLanes].sort((a, b) => lane.financingPriority(a) - lane.financingPriority(b)); const first = ranked[0] ?? null; return <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Finance</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("finance")}</p></header>{first && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFF9E8", display: "grid", gap: 7 }}><span style={{ fontSize: 10, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase", color: "#8F6E1F" }}>Best first path to test</span><strong style={{ color: "#1C2B45", fontSize: 17 }}>{first}</strong><span style={{ color: "#8F6E1F", fontWeight: 800 }}>{lane.financingRateLabel(first, props.financingRateContext ?? null)}</span><span style={{ color: "#5A6172", fontSize: 12 }}>{lane.bestFirstPathNote(first)} This is a screening priority—not an eligibility or approval decision.</span>{props.financingRateContext?.fsaEffective && lane.id === "farm" && <span style={{ color: "#6B7280", fontSize: 10.8 }}>FSA rate effective {props.financingRateContext.fsaEffective}.</span>}</section>}{props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the payment and cash-to-close model.</div>}<section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Property financing programs</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{ranked.length ? ranked.map((item, index) => { const note = lane.financingProgramNote(item); return <article key={item} style={{ border: `1px solid ${index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: index === 0 ? "#FBF5E6" : "#fff", display: "grid", gap: 6 }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{lane.financingRateLabel(item, props.financingRateContext ?? null)}</span><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5 }}>{note.why}</span><span style={{ color: "#6B7280", fontSize: 10.8 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span>No property-relevant program has been produced yet.</span>}</div></section></>; })()}
-      {tab === "report" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Report and pro forma</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("report")}</p></header>{props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}>{props.actionsSlot}</section>}{props.proformaSlot && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFFDF5", display: "grid", gap: 9 }}>{props.proformaSlot}</section>}<section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 9 }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Personalized pro forma</h3><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Continue when you want borrower-specific qualification, document review, and a finalized pro forma from the licensed Financial module.</p><a href="/explore#personalized-financing" style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none" }}>Continue to personalized Financial module</a></section>{deedEvidence.length > 0 && <details style={card}><summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Restricted deed evidence</summary><p style={{ color: "#5A6172", fontSize: 12 }}>Recorded deed evidence is available inside an authorized financial or lender workspace.</p></details>}</>}
+      {tab === "report" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Report and pro forma</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("report")}</p></header>{props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}>{props.actionsSlot}</section>}{props.proformaSlot && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFFDF5", display: "grid", gap: 9 }}>{props.proformaSlot}</section>}<section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 9 }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Personalized pro forma</h3><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Continue when you want borrower-specific qualification, document review, and a finalized pro forma from the licensed Financial module.</p><a href="/explore?lane=financing-capital#personalized-financing" style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none" }}>Continue to personalized Financial module</a></section>{deedEvidence.length > 0 && <details style={card}><summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Restricted deed evidence</summary><p style={{ color: "#5A6172", fontSize: 12 }}>Recorded deed evidence is available inside an authorized financial or lender workspace.</p></details>}</>}
     </div>
   </section>;
 }

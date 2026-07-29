@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPropertyPrograms } from "@/lib/capital-graph/programVerification";
 import { sfhaForProperty, historicForProperty } from "@/lib/property/propertyFloodHistoric";
 import { verifyImportedPropertyAddress } from "@/lib/property/importedPropertyVerification";
-import { buildLocationBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
+import { buildLocationBriefIntelligence, startEnvironmentalLookups } from "@/lib/property/propertyBriefIntelligence";
 import { designatedHubzoneForProperty } from "@/lib/property/propertyHubzones";
 import { nmtcForProperty } from "@/lib/property/propertyNmtc";
 import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones";
@@ -26,7 +26,10 @@ import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnaps
 // 10 minutes: place facts are snapshot/dated anyway, and a visitor's
 // back-and-forth (tabs, type correction, PDF) should never re-pay the
 // full federal round-trip (founder-reported slowness 2026-07-29).
-const FACTS_CACHE_TTL_MS = 10 * 60_000;
+// One hour: every fact here is public data that changes on quarterly-to-annual
+// cadences — a longer window just spares repeat visitors the cold rebuild
+// (founder-reported lag 2026-07-29; was 10 minutes).
+const FACTS_CACHE_TTL_MS = 60 * 60_000;
 const FACTS_CACHE_MAX_ENTRIES = 50;
 const factsCache = new Map<string, { at: number; payload: unknown }>();
 
@@ -113,6 +116,11 @@ export async function POST(req: NextRequest) {
     ]);
     const cached = factsCacheGet(factsCacheKey);
     if (cached) return NextResponse.json(cached);
+    // The environmental bundle (soils/climate/solar/wetlands/EPA/amenities)
+    // needs only the coordinate — start it the moment the geocode resolves so
+    // it runs CONCURRENTLY with the federal checks instead of after them
+    // (founder-reported lag 2026-07-29: the two ~12s phases were serial).
+    let envPrefetch: ReturnType<typeof startEnvironmentalLookups> | null = null;
     const imported = await verifyImportedPropertyAddress({
       propertyId: propertyId ?? "imported:place-facts",
       exactAddress: body.exactAddress ?? null,
@@ -120,6 +128,13 @@ export async function POST(req: NextRequest) {
       stateCode: body.stateCode ?? null,
       rawInput: body.rawInput ?? null,
       notes: body.notes ?? null,
+      onGeocode: (g) => {
+        const lat = g?.lat ? Number(g.lat) : NaN;
+        const lon = g?.lon ? Number(g.lon) : NaN;
+        if (Number.isFinite(lat) && Number.isFinite(lon)) {
+          envPrefetch = startEnvironmentalLookups(lat, lon);
+        }
+      },
     });
     const canonicalMatch = imported.normalizedAddress
       ? findCanonicalPropertyByExactAddress(imported.normalizedAddress)
@@ -152,6 +167,7 @@ export async function POST(req: NextRequest) {
         parsed: imported.parsedAddress,
         propertyType: lanePropertyType ?? matchedSourceRecord?.rawPropertyStyle ?? null,
         ownerNotes: body.notes ?? null,
+        envPrefetch,
       }),
     ]);
     if (matchedSourceRecord || jurisdictionParcel || listingSnapshot) {

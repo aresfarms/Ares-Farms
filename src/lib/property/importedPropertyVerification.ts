@@ -44,6 +44,12 @@ export type ImportedVerificationRequest = {
   stateCode?: string | null;
   rawInput?: string | null;
   notes?: string | null;
+  /**
+   * Fires the moment the geocode resolves (before the geocode-dependent
+   * federal checks finish) so the caller can overlap coordinate-only work.
+   * Pure observer — exceptions are swallowed, verification is unaffected.
+   */
+  onGeocode?: (geocode: CensusGeocodeResult | null) => void;
 };
 
 export type ImportedVerificationResult = {
@@ -446,6 +452,15 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   })();
 
   const geocode = await geocodePromise;
+  // Early-geocode observer (perf, founder-reported lag 2026-07-29): lets the
+  // caller start coordinate-only lookups (soils/climate/wetlands/EPA) while
+  // the remaining federal checks below are still in flight. Observer only —
+  // it can never alter or break verification.
+  try {
+    input.onGeocode?.(geocode);
+  } catch {
+    /* observer errors are the caller's problem, never verification's */
+  }
   const nmtcTask = (async () => {
   if (nmtcActivated) {
     if (geocode?.geoid) {

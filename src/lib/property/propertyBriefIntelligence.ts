@@ -1990,6 +1990,27 @@ function floodFactFromLive(floodZone: string, asOf: string): BriefFactLine {
   };
 }
 
+/**
+ * Kick off ALL live environmental lookups for a coordinate — amenities
+ * (gated), soils, climate, solar, wetlands, EPA — as one concurrent bundle.
+ * Exported so the facts route can start this the moment the geocode resolves,
+ * OVERLAPPING the federal place-fact checks instead of running after them
+ * (founder-reported lag 2026-07-29: two serial ~12s phases ≈ 24s cold; the
+ * env bundle only ever needed the coordinate). Every lookup is fail-safe —
+ * the bundle never rejects.
+ */
+export function startEnvironmentalLookups(lat: number, lon: number, amenityEnv?: NodeJS.ProcessEnv) {
+  const amenitiesGateOpen = amenityLiveLookupEnabled(amenityEnv ?? process.env);
+  return Promise.all([
+    amenitiesGateOpen ? queryAmenitiesLive(lat, lon) : Promise.resolve(null),
+    fetchSoilProfile(lat, lon),
+    fetchClimateNormals(lat, lon),
+    fetchSolarPotential(lat, lon),
+    fetchWetlands(lat, lon),
+    fetchEpaFacilityScreen(lat, lon),
+  ]);
+}
+
 export async function buildLocationBriefIntelligence(args: {
   geocode: LocationBriefGeocode | null;
   placeFacts: LocationBriefPlaceFacts;
@@ -1997,6 +2018,8 @@ export async function buildLocationBriefIntelligence(args: {
   propertyType?: string | null;
   ownerNotes?: string | null;
   amenityEnv?: NodeJS.ProcessEnv;
+  /** Already-started env bundle for this address's coordinate (see startEnvironmentalLookups). */
+  envPrefetch?: ReturnType<typeof startEnvironmentalLookups> | null;
 }): Promise<PropertyBriefIntelligence> {
   // Manual portal entry is residential-first; treat as a home unless the
   // canonical classifier says the supplied type is something else.
@@ -2099,20 +2122,10 @@ export async function buildLocationBriefIntelligence(args: {
   // (Overpass, up to 8s) used to run serially BEFORE this block, adding its
   // full duration to every residential report (founder-reported slowness
   // 2026-07-29); it now rides the same Promise.all.
-  const amenitiesGateOpen =
-    geocode?.lat != null &&
-    geocode?.lon != null &&
-    amenityLiveLookupEnabled(args.amenityEnv ?? process.env);
   const [amenitiesResult, soilResult, climateResult, solarResult, wetlandsResult, epaResult] =
     geocode?.lat != null && geocode?.lon != null
-      ? await Promise.all([
-          amenitiesGateOpen ? queryAmenitiesLive(geocode.lat, geocode.lon) : Promise.resolve(null),
-          fetchSoilProfile(geocode.lat, geocode.lon),
-          fetchClimateNormals(geocode.lat, geocode.lon),
-          fetchSolarPotential(geocode.lat, geocode.lon),
-          fetchWetlands(geocode.lat, geocode.lon),
-          fetchEpaFacilityScreen(geocode.lat, geocode.lon),
-        ])
+      ? await (args.envPrefetch ??
+          startEnvironmentalLookups(geocode.lat, geocode.lon, args.amenityEnv))
       : [null, null, null, null, null, null];
 
   // Daily-life amenities — GATED live Overpass lookup (OFF by default). When

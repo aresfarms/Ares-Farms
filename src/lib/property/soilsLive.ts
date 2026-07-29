@@ -34,9 +34,14 @@ export async function fetchSoilProfile(lat: number, lon: number): Promise<SoilPr
   // WKT is built from Number-validated coordinates only — never raw strings.
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const wkt = `point(${lon.toFixed(5)} ${lat.toFixed(5)})`;
+  // niccdcd (nonirrigated capability class, dominant condition) lives in the
+  // MUAGGATT map-unit aggregate table, NOT component — querying c.niccdcd was
+  // an invalid-column error on every request (found 2026-07-29 by probing SDA
+  // directly; the fail-safe null had been silently hiding it).
   const query =
-    "SELECT TOP 1 mu.muname, mu.farmlndcl, c.compname, c.comppct_r, c.drainagecl, c.slope_r, c.niccdcd " +
+    "SELECT TOP 1 mu.muname, mu.farmlndcl, c.compname, c.comppct_r, c.drainagecl, c.slope_r, mag.niccdcd " +
     "FROM mapunit mu JOIN component c ON c.mukey = mu.mukey " +
+    "LEFT JOIN muaggatt mag ON mag.mukey = mu.mukey " +
     `WHERE mu.mukey IN (SELECT * FROM SDA_Get_Mukey_from_intersection_with_WktWgs84('${wkt}')) ` +
     "ORDER BY c.comppct_r DESC";
   const controller = new AbortController();

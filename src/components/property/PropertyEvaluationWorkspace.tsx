@@ -3466,6 +3466,13 @@ export function PropertyEvaluationWorkspace({
           // Parcel soil facts gate what the coverage solver may recommend
           // (founder 2026-07-29: soil type and topography must be respected).
           soil: effectivePlaceIntelligence?.soilProfile ?? null,
+          // Building facts feed the commercial alternative-use screen.
+          building: {
+            zoning: facts?.propertyRecord?.zoning ?? null,
+            landUse: facts?.propertyRecord?.landUse ?? null,
+            squareFeet: facts?.propertyRecord?.squareFeet ?? null,
+            town: context.town ?? null,
+          },
           acreage,
           fsaRatePct,
           revenueUnits,

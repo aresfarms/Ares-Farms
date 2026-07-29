@@ -6,6 +6,7 @@ import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { solveDscrCoverage, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
+import { commercialAlternativeUses } from "@/lib/property/commercialAlternativeUses";
 
 /**
  * DRAFT pro forma PDF — PUBLIC, property-side screening only (founder
@@ -34,6 +35,7 @@ export async function POST(req: NextRequest) {
       laneAnswerLines?: unknown;
       assessedTotalValue?: unknown;
       soil?: unknown;
+      building?: unknown;
     }
   >(req, {
     maxBytes: 128 * 1024,
@@ -200,8 +202,53 @@ export async function POST(req: NextRequest) {
             rows: mixRows,
           },
         },
+        ...(solution.planRequirements.length > 0
+          ? [
+              {
+                intro: "PLAN REQUIREMENTS & MARKET CHANNELS — equipment capital, irrigation necessity, and where the goods sell (on-farm, local, and internet channels included).",
+                introBold: true,
+                table: {
+                  columns: [
+                    { header: "Item", width: 0.34, align: "left" as const },
+                    { header: "Detail", width: 0.66, align: "left" as const },
+                  ],
+                  rows: solution.planRequirements.map((req) => ({ cells: [req.item, req.detail] })),
+                },
+              },
+            ]
+          : []),
       ],
       paragraphs: solution.notes,
+    });
+  }
+
+  // ── Alternative-use screen for commercial (lane A) — a building is often
+  // marketed for its last use, not its highest (founder 2026-07-29).
+  if (lane === "A") {
+    const buildingRaw = body.building as Record<string, unknown> | null | undefined;
+    const screen = commercialAlternativeUses({
+      zoning: typeof buildingRaw?.zoning === "string" ? buildingRaw.zoning.slice(0, 120) : null,
+      landUse: typeof buildingRaw?.landUse === "string" ? buildingRaw.landUse.slice(0, 120) : null,
+      squareFeet: num(buildingRaw?.squareFeet),
+      town: typeof buildingRaw?.town === "string" ? buildingRaw.town.slice(0, 80) : null,
+    });
+    const gateIdxA = document.sections.findIndex((s) => s.title.startsWith("PART V"));
+    document.sections.splice(gateIdxA >= 0 ? gateIdxA : document.sections.length, 0, {
+      title: "ALTERNATIVE-USE SCREEN — MARKETED PURPOSE VS HIGHEST USE",
+      leadIns: [{ text: "Uses this building's verified record does not rule out — some may value higher than the purpose it is marketed for.", bold: true }],
+      tables: [
+        {
+          table: {
+            columns: [
+              { header: "Alternative use", width: 0.24, align: "left" },
+              { header: "Why it can out-earn the marketed purpose", width: 0.4, align: "left" },
+              { header: "What governs", width: 0.36, align: "left" },
+            ],
+            rows: screen.uses.map((use) => ({ cells: [use.use, use.why, use.watch] })),
+          },
+        },
+      ],
+      paragraphs: [screen.note],
     });
   }
 

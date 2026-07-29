@@ -132,8 +132,28 @@ export interface CoverageSolution {
   outsideIncomeNeeded: number | null;
   /** Screening price at which the best modeled income clears 1.25x. */
   maxSupportablePrice: number | null;
+  /** What executing the recommended plan actually takes (founder 2026-07-29):
+      equipment/establishment capital, irrigation necessity + costs, and where
+      the goods sell — on-farm, local, and internet channels included. */
+  planRequirements: Array<{ item: string; detail: string }>;
   notes: string[];
 }
+
+/** Where each enterprise's goods actually sell — on-farm, local, and internet
+    channels included (founder direction 2026-07-29). */
+const MARKET_CHANNELS: Record<string, string> = {
+  "row-crops": "Grain elevator / buyer cash bids (regional), forward contracts; on-farm storage widens the selling window.",
+  "cash-rent": "Local operator lease market — county rental evidence and a written lease govern.",
+  "hay-pasture": "On-farm pickup, regional delivery to horse and livestock owners, winter demand premium; online hay directories reach beyond the county.",
+  "alfalfa-small-square": "Premium small-square channels: horse owners (on-farm and delivered), feed stores, online hay listings — winter pricing carries the model; storage capacity is the gatekeeper.",
+  "livestock": "Auction barns, direct freezer-beef/lamb sold on-farm and by internet reservation — local butcher/processing capacity governs throughput.",
+  "poultry": "Integrator contract (fee-based) — the contract IS the market; independent flocks need on-farm, farmers-market, or internet channels plus processing access.",
+  "specialty-crops": "On-farm stand, farmers markets, CSA subscriptions, restaurants/grocers, and internet pre-orders or direct-ship where the product allows — channel depth decides the margin.",
+  "greenhouse": "Wholesale to grocers and florists, direct retail, and internet-ordered local delivery — offtake commitments before capital.",
+  "solar-lease": "Utility/community-solar offtake — the lease and interconnection agreement are the market.",
+  "agrivoltaics": "Energy rent under contract plus the compatible agricultural product's own channels.",
+  "battery-storage": "Grid-services contract — entirely site- and utility-specific.",
+};
 
 export function solveDscrCoverage(args: {
   acres: number;
@@ -211,6 +231,57 @@ export function solveDscrCoverage(args: {
   const paymentFactor = args.ltv * (r > 0 ? r / (1 - Math.pow(1 + r, -args.amortYears)) : 1 / args.amortYears);
   const maxSupportablePrice = bestNoi > 0 && paymentFactor > 0 ? Math.round(bestNoi / DSCR_FLOOR / paymentFactor) : null;
 
+  // ── Plan requirements (founder 2026-07-29): equipment capital, irrigation
+  // necessity + cost, and market channels for whatever plan the verdict
+  // points at — the clearing plan, or the closest one when nothing clears.
+  const fmt = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
+  const mixClearsFloor = (bestMix?.dscr ?? 0) >= DSCR_FLOOR;
+  const planEntries: Array<{ key: string; label: string; startup: number; irrigationCapex: number; irrigationAnnual: number }> =
+    mixClearsFloor && mixParts.length
+      ? mixParts.map((entry) => ({
+          key: entry.r.key,
+          label: entry.r.label,
+          startup: entry.r.startup,
+          irrigationCapex: entry.r.irrigationCapex,
+          irrigationAnnual: entry.r.irrigationAnnual,
+        }))
+      : bestSingleRaw
+        ? [{ key: bestSingleRaw.key, label: bestSingleRaw.label, startup: bestSingleRaw.startup, irrigationCapex: bestSingleRaw.irrigationCapex, irrigationAnnual: bestSingleRaw.irrigationAnnual }]
+        : [];
+  const droughtyGround = /excessively drained/i.test(args.soil?.drainageClass ?? "");
+  const planRequirements: CoverageSolution["planRequirements"] = [];
+  for (const entry of planEntries) {
+    const equipmentCapital = Math.max(0, entry.startup - entry.irrigationCapex);
+    planRequirements.push({
+      item: `${entry.label} — equipment & establishment capital`,
+      detail: `${fmt(equipmentCapital)} (screening estimate: machinery, fencing, plantings, establishment — beyond the acquisition; belongs in Sources & Uses once the plan is chosen)`,
+    });
+    if (entry.irrigationCapex > 0) {
+      planRequirements.push({
+        item: `${entry.label} — irrigation REQUIRED`,
+        detail: `${fmt(entry.irrigationCapex)} development (well/pivot/lines, screening estimate) + ${fmt(entry.irrigationAnnual)}/yr power & maintenance — already netted from this enterprise's modeled NOI; water-source and permit verification is step one`,
+      });
+    } else {
+      planRequirements.push({
+        item: `${entry.label} — irrigation`,
+        detail: droughtyGround
+          ? "Not modeled as required, but this ground is droughty — supplemental irrigation is advisable and its cost is NOT in the model"
+          : "Not required in the model for this enterprise on this ground",
+      });
+    }
+    planRequirements.push({
+      item: `${entry.label} — where it sells`,
+      detail: MARKET_CHANNELS[entry.key] ?? "Channel evidence to be gathered — buyer commitments before committing acreage.",
+    });
+  }
+  if (planEntries.length > 0) {
+    planRequirements.push({
+      item: "Competition & market share (assumptions)",
+      detail:
+        "Screened at local market depth 60/100 and competition pressure 40/100 (defaults). Real evidence — buyer counts, standing hay/produce customers, saturation at nearby markets — moves every ranking; gather it before committing.",
+    });
+  }
+
   const exclusionNotes = [...soilAdj.excluded.entries()].map(
     ([, reason]) => `EXCLUDED by soil/topography: ${reason}.`
   );
@@ -236,6 +307,7 @@ export function solveDscrCoverage(args: {
     gapAnnual,
     outsideIncomeNeeded: gapAnnual,
     maxSupportablePrice,
+    planRequirements,
     notes,
   };
 }

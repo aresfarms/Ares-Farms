@@ -16,3 +16,4 @@ crash.log
 
 # NOTE: .terraform.lock.hcl SHOULD be committed (reproducible provider versions).
 !.terraform.lock.hcl
+tfplan

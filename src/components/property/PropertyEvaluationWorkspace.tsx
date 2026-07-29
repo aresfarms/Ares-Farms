@@ -15,6 +15,7 @@ import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
 import { FarmAgricultureTab } from "@/components/property/lanes/FarmAgricultureTab";
 import { ReportRecordToken } from "@/components/property/ReportRecordToken";
+import { getSaved, SAVED_EVENT, type SavedProperty } from "@/lib/property/savedProperty";
 import { CommercialLaneWorkspace } from "@/components/property/lanes/CommercialLaneWorkspace";
 import { ResidentialLaneWorkspace } from "@/components/property/lanes/ResidentialLaneWorkspace";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
@@ -2004,6 +2005,18 @@ export function PropertyEvaluationWorkspace({
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
   const [proformaBusy, setProformaBusy] = useState(false);
   const [proformaError, setProformaError] = useState<string | null>(null);
+  // Other saved properties this session — offered as optional additions to
+  // the DRAFT pro forma (founder 2026-07-29: multi-property when they have
+  // them, single-property document otherwise). Loaded post-mount so server
+  // and first client render agree.
+  const [otherSavedProperties, setOtherSavedProperties] = useState<SavedProperty[]>([]);
+  const [proformaIncludedIds, setProformaIncludedIds] = useState<string[]>([]);
+  useEffect(() => {
+    const sync = () => setOtherSavedProperties(getSaved().filter((p) => p.id !== context.propertyId));
+    sync();
+    window.addEventListener(SAVED_EVENT, sync);
+    return () => window.removeEventListener(SAVED_EVENT, sync);
+  }, [context.propertyId]);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [manualReviewBusy, setManualReviewBusy] = useState(false);
   const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
@@ -3406,6 +3419,16 @@ export function PropertyEvaluationWorkspace({
             methodology: "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
           }));
         }
+        const additionalProperties = otherSavedProperties
+          .filter((p) => proformaIncludedIds.includes(p.id))
+          .map((p) => {
+            const parsedPrice = Number((p.priceLabel.match(/\$([0-9][0-9,]*)/) ?? [])[1]?.replace(/,/g, ""));
+            return {
+              title: p.exactAddress ?? [p.town, p.state].filter(Boolean).join(", ") ?? p.id,
+              location: [p.county, p.state].filter(Boolean).join(", ") || null,
+              price: Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : null,
+            };
+          });
         const res = await fetch("/api/public/property-proforma-pdf", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -3419,6 +3442,7 @@ export function PropertyEvaluationWorkspace({
             acreage,
             fsaRatePct,
             revenueUnits,
+            additionalProperties,
           }),
         });
         if (!res.ok) {
@@ -3767,6 +3791,33 @@ export function PropertyEvaluationWorkspace({
                 checklist of everything underwriting still requires (entity documents, guarantor PFS, balance
                 sheet, registers). {rankingPrice == null ? "Enter the asking price or your intended offer above to populate the finance math." : ""}
               </p>
+              {otherSavedProperties.length > 0 && (
+                <div style={{ display: "grid", gap: 5, border: "1px solid #E5D9BC", borderRadius: 10, background: "#FFFDF7", padding: "10px 12px" }}>
+                  <strong style={{ color: "#1C2B45", fontSize: 12.5 }}>
+                    Acquiring more than one? Include other saved properties in this pro forma (optional):
+                  </strong>
+                  {otherSavedProperties.map((p) => (
+                    <label key={p.id} style={{ display: "flex", gap: 7, alignItems: "baseline", fontSize: 12.5, color: "#3d4655", cursor: "pointer" }}>
+                      <input
+                        type="checkbox"
+                        checked={proformaIncludedIds.includes(p.id)}
+                        onChange={(event) =>
+                          setProformaIncludedIds((current) =>
+                            event.target.checked ? [...current, p.id] : current.filter((id) => id !== p.id)
+                          )
+                        }
+                      />
+                      <span>
+                        {p.exactAddress ?? [p.town, p.state].filter(Boolean).join(", ") ?? p.id} · {p.propertyType} · {p.priceLabel}
+                      </span>
+                    </label>
+                  ))}
+                  <span style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.5 }}>
+                    Each included property becomes its own acquisition and collateral line with combined loan
+                    sizing. Income stays modeled for this property only until each is run through its own report.
+                  </span>
+                </div>
+              )}
               <button
                 type="button"
                 data-testid="draft-proforma"
@@ -3774,7 +3825,7 @@ export function PropertyEvaluationWorkspace({
                 disabled={proformaBusy}
                 style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", border: "1px solid #8F6E1F", background: "#8F6E1F", color: "#fff", fontWeight: 800, cursor: "pointer" }}
               >
-                {proformaBusy ? "Building DRAFT pro forma..." : "Download DRAFT pro forma (PDF)"}
+                {proformaBusy ? "Building DRAFT pro forma..." : `Download DRAFT pro forma (PDF)${proformaIncludedIds.length > 0 ? ` — ${1 + proformaIncludedIds.length} properties` : ""}`}
               </button>
               {proformaError && <span style={{ fontSize: 12, color: "#a12626" }}>{proformaError}</span>}
             </div>

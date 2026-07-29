@@ -23,6 +23,13 @@ export interface DraftProformaRevenueUnit {
   methodology: string;
 }
 
+export interface DraftProformaAdditionalProperty {
+  title: string;
+  location: string | null;
+  /** Parsed asking price when the saved record carries one. */
+  price: number | null;
+}
+
 export interface DraftProformaPropertyArgs {
   propertyTitle: string;
   exactAddress: string | null;
@@ -35,6 +42,11 @@ export interface DraftProformaPropertyArgs {
   /** Published FSA direct farm-ownership rate, percent (screening basis). */
   fsaRatePct: number | null;
   revenueUnits: DraftProformaRevenueUnit[];
+  /** OPTIONAL multi-property acquisition (founder direction 2026-07-29):
+      when the visitor includes other saved properties, each becomes its own
+      Sources & Uses acquisition row and collateral line, and combined totals
+      drive the loan sizing. One property → the document reflects only it. */
+  additionalProperties?: DraftProformaAdditionalProperty[];
 }
 
 const TO_SUPPLY = "TO BE SUPPLIED AT UNDERWRITING";
@@ -74,14 +86,30 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
   const where = [args.county, args.state].filter(Boolean).join(", ");
   const authority = LANE_AUTHORITY[args.lane];
 
+  // ── Multi-property acquisition (optional) ─────────────────────────────────
+  // One property → everything below reflects only it. With additional
+  // properties, each priced one contributes to the combined acquisition;
+  // unpriced ones appear as rows whose figures await appraisal/offer.
+  const additional = args.additionalProperties ?? [];
+  const pricedAdditional = additional.filter((p): p is DraftProformaAdditionalProperty & { price: number } => p.price != null && p.price > 0);
+  const combinedPrice =
+    price != null || pricedAdditional.length > 0
+      ? (price ?? 0) + pricedAdditional.reduce((sum, p) => sum + p.price, 0)
+      : null;
+  const propertyCount = 1 + additional.length;
+  const unmodeledIncomeNote =
+    additional.length > 0
+      ? ` Income is modeled for the primary property only — run each included property through its own Furlong report to model its income; until then combined coverage is understated.`
+      : "";
+
   // ── Screening finance math (every assumption stated in the document) ──────
   const LTV = 0.8;
   const AMORT_YEARS = args.lane === "B" ? 40 : 25;
-  const loanAmount = price != null ? price * LTV : null;
-  const closingEstimate = price != null ? price * 0.03 : null;
-  const workingCapitalReserve = price != null ? price * 0.1 : null;
-  const totalProject = price != null ? price + (closingEstimate ?? 0) + (workingCapitalReserve ?? 0) : null;
-  const injection = price != null && totalProject != null && loanAmount != null ? totalProject - loanAmount : null;
+  const loanAmount = combinedPrice != null ? combinedPrice * LTV : null;
+  const closingEstimate = combinedPrice != null ? combinedPrice * 0.03 : null;
+  const workingCapitalReserve = combinedPrice != null ? combinedPrice * 0.1 : null;
+  const totalProject = combinedPrice != null ? combinedPrice + (closingEstimate ?? 0) + (workingCapitalReserve ?? 0) : null;
+  const injection = combinedPrice != null && totalProject != null && loanAmount != null ? totalProject - loanAmount : null;
   const rate = args.fsaRatePct;
   const annualDebtService = loanAmount != null && rate != null ? levelDebtService(loanAmount, rate, AMORT_YEARS) : null;
 
@@ -127,29 +155,46 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         primaryContact: TO_SUPPLY,
       },
       sourcesAndUses: {
-        rows: price != null
-          ? [
-              { use: `Acquisition — ${args.propertyTitle}${where ? ` (${where})` : ""}`, amount: dollars(price), notes: "Asking price / intended offer as entered; appraisal governs" },
-              { use: "Closing, title & diligence (screening estimate)", amount: dollars(closingEstimate!), notes: "≈3% of acquisition — itemized at underwriting" },
-              { use: "Working capital reserve (screening estimate)", amount: dollars(workingCapitalReserve!), notes: "≈10% of acquisition — set from the operating budget" },
-            ]
-          : [],
+        rows: [
+          ...(price != null
+            ? [{ use: `Acquisition — ${args.propertyTitle}${where ? ` (${where})` : ""}`, amount: dollars(price), notes: "Asking price / intended offer as entered; appraisal governs" }]
+            : []),
+          ...additional.map((p) => ({
+            use: `Acquisition — ${p.title}${p.location ? ` (${p.location})` : ""}`,
+            amount: p.price != null ? dollars(p.price) : "Price TBD",
+            notes: p.price != null ? "Saved-record asking price; appraisal governs" : "Included property — price set at offer/appraisal",
+          })),
+          ...(combinedPrice != null
+            ? [
+                { use: "Closing, title & diligence (screening estimate)", amount: dollars(closingEstimate!), notes: `≈3% of combined acquisition${propertyCount > 1 ? ` (${propertyCount} properties)` : ""} — itemized at underwriting` },
+                { use: "Working capital reserve (screening estimate)", amount: dollars(workingCapitalReserve!), notes: "≈10% of combined acquisition — set from the operating budget" },
+              ]
+            : []),
+        ],
         totalProjectCost: totalProject != null ? dollars(totalProject) : "Requires acquisition price",
         loanAmount: loanAmount != null ? dollars(loanAmount) : "Requires acquisition price",
-        loanCalcBasis: price != null
-          ? `Screening basis: ${Math.round(LTV * 100)}% of acquisition price; final loan amount set by program rules, appraisal, and lender underwriting`
+        loanCalcBasis: combinedPrice != null
+          ? `Screening basis: ${Math.round(LTV * 100)}% of combined acquisition price${propertyCount > 1 ? ` across ${propertyCount} properties` : ""}; final loan amount set by program rules, appraisal, and lender underwriting`
           : "",
         injectionProvided: injection != null ? dollars(injection) : TO_SUPPLY,
         injectionSource: TO_SUPPLY,
       },
       collateral: {
         discountPct: "25%",
-        rows: price != null
-          ? [{ asset: `Subject real estate — ${args.propertyTitle}`, stated: dollars(price), discounted: dollars(price * 0.75), lien: "1st REM (anticipated)" }]
-          : [],
-        statedTotal: price != null ? dollars(price) : "Requires acquisition price",
-        discountedTotal: price != null ? dollars(price * 0.75) : "Requires acquisition price",
-        coveragePct: price != null && loanAmount != null ? `${Math.round(((price * 0.75) / loanAmount) * 100)}%` : "",
+        rows: [
+          ...(price != null
+            ? [{ asset: `Subject real estate — ${args.propertyTitle}`, stated: dollars(price), discounted: dollars(price * 0.75), lien: "1st REM (anticipated)" }]
+            : []),
+          ...additional.map((p) => ({
+            asset: `Included real estate — ${p.title}${p.location ? ` (${p.location})` : ""}`,
+            stated: p.price != null ? dollars(p.price) : "Appraisal required",
+            discounted: p.price != null ? dollars(p.price * 0.75) : "—",
+            lien: "1st REM (anticipated)",
+          })),
+        ],
+        statedTotal: combinedPrice != null ? dollars(combinedPrice) : "Requires acquisition price",
+        discountedTotal: combinedPrice != null ? dollars(combinedPrice * 0.75) : "Requires acquisition price",
+        coveragePct: combinedPrice != null && loanAmount != null ? `${Math.round(((combinedPrice * 0.75) / loanAmount) * 100)}%` : "",
         guaranteesAndExclusions: "Personal guarantees per program rules; additional collateral identified at underwriting.",
       },
       guarantorPfs: {
@@ -213,7 +258,7 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
           ? `USDA/FSA farm-ownership is the screening lane for an agricultural acquisition${where ? ` in ${where}` : ""}: purpose-built for farm real estate, ${AMORT_YEARS}-year terms, and the published direct rate used in the debt-service model. Final lane selection is made with the lender against the borrower's full file.`
           : `SBA 7(a) is the screening lane for an owner-operated business acquisition${where ? ` in ${where}` : ""}. Final lane selection is made with the lender against the borrower's full file.`,
       eligibilityNarrative:
-        "Property-side screening only: the figures in Parts I and IV come from the property's verified record, county economics, and modeled enterprise income. Borrower eligibility, credit, injection capacity, and program qualification are determined exclusively at underwriting — this DRAFT makes no eligibility finding.",
+        `Property-side screening only: the figures in Parts I and IV come from the ${propertyCount > 1 ? `${propertyCount} included properties'` : "property's"} verified record${propertyCount > 1 ? "s" : ""}, county economics, and modeled enterprise income.${unmodeledIncomeNote} Borrower eligibility, credit, injection capacity, and program qualification are determined exclusively at underwriting — this DRAFT makes no eligibility finding.`,
     },
     ...(args.lane === "B"
       ? { moduleB: { countyOffice: args.county ? `${args.county}${/county/i.test(args.county) ? "" : " County"} USDA Service Center` : "County USDA Service Center (identified from the parcel county)" } }
@@ -228,7 +273,7 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         dscrStandalone: { conservative: dscr(consNoi), stabilized: dscr(stabNoi) },
         dscrGlobal: { conservative: "Requires borrower's full obligations", stabilized: "Requires borrower's full obligations" },
         dscrFloor: "1.25x screening threshold",
-        stressDescription: "Conservative-case net operating income stressed a further -25%",
+        stressDescription: `Conservative-case net operating income stressed a further -25%.${unmodeledIncomeNote}`,
         dscrStress: dscr(stressNoi),
       },
       debtServiceAssumptions: {

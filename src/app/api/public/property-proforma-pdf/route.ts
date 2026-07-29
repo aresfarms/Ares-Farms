@@ -54,6 +54,17 @@ export async function POST(req: NextRequest) {
         .filter((unit) => unit.unitName)
     : [];
 
+  const additionalProperties = Array.isArray(body.additionalProperties)
+    ? body.additionalProperties
+        .slice(0, 6)
+        .map((p) => ({
+          title: String(p?.title ?? "").slice(0, 160).trim(),
+          location: typeof p?.location === "string" ? p.location.slice(0, 120) : null,
+          price: num(p?.price),
+        }))
+        .filter((p) => p.title)
+    : [];
+
   const input = buildDraftProformaInput({
     propertyTitle: title,
     exactAddress: typeof body.exactAddress === "string" ? body.exactAddress.slice(0, 200) : null,
@@ -65,6 +76,7 @@ export async function POST(req: NextRequest) {
     acreage: num(body.acreage),
     fsaRatePct: num(body.fsaRatePct),
     revenueUnits,
+    additionalProperties,
   });
 
   const failures = evaluateGenerationGate(input);

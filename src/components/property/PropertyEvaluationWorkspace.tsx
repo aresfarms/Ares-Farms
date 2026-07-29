@@ -2002,6 +2002,8 @@ export function PropertyEvaluationWorkspace({
   const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
+  const [proformaBusy, setProformaBusy] = useState(false);
+  const [proformaError, setProformaError] = useState<string | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [manualReviewBusy, setManualReviewBusy] = useState(false);
   const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
@@ -3380,6 +3382,64 @@ export function PropertyEvaluationWorkspace({
   };
 
 
+  // DRAFT SBA/USDA pro forma (founder direction 2026-07-29): the real lender
+  // package structure, built from property-side data; borrower-side gate
+  // items intentionally stay open so the document is watermarked DRAFT with
+  // the underwriting checklist. Zero PII leaves the page.
+  function downloadDraftProforma() {
+    void (async () => {
+      setProformaBusy(true);
+      setProformaError(null);
+      try {
+        const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
+        const fsaRatePct = ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? null;
+        const isFarmLaneDoc = workspaceProfile.id === "farm" || workspaceProfile.id === "land";
+        let revenueUnits: Array<{ unitName: string; unitDescription: string; conservativeAnnualNoi: number; stabilizedAnnualNoi: number; methodology: string }> = [];
+        if (isFarmLaneDoc && effectiveListedPrice != null && acreage && fsaRatePct != null) {
+          const annualDebtService = effectiveListedPrice * 0.8 * (fsaRatePct / 100) / (1 - Math.pow(1 + fsaRatePct / 100, -40));
+          const model = optimizeAgriculturalOpportunities({ acres: acreage, purchasePrice: effectiveListedPrice, debtService: annualDebtService, waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
+          revenueUnits = model.diversified.slice(0, 6).map((item) => ({
+            unitName: item.label,
+            unitDescription: `${Math.round(item.portfolioShare * 100)}% of the diversified screening portfolio on ~${acreage.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
+            conservativeAnnualNoi: Math.round(item.noi * item.portfolioShare * 0.75),
+            stabilizedAnnualNoi: Math.round(item.noi * item.portfolioShare),
+            methodology: "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
+          }));
+        }
+        const res = await fetch("/api/public/property-proforma-pdf", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            propertyTitle: analysisContext.title,
+            exactAddress: context.exactAddress,
+            county: context.county,
+            state: context.stateCode,
+            lane: isFarmLaneDoc ? "B" : "A",
+            acquisitionPrice: effectiveListedPrice,
+            acreage,
+            fsaRatePct,
+            revenueUnits,
+          }),
+        });
+        if (!res.ok) {
+          const failureText = await res.text();
+          throw new Error(failureText.slice(0, 200) || `The pro forma service returned HTTP ${res.status}.`);
+        }
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = url;
+        anchor.download = "furlong-draft-proforma.pdf";
+        anchor.click();
+        window.setTimeout(() => window.URL.revokeObjectURL(url), 30_000);
+      } catch (error) {
+        setProformaError(error instanceof Error ? error.message : "The pro forma service is unavailable right now.");
+      } finally {
+        setProformaBusy(false);
+      }
+    })();
+  }
+
   const chartActionsSlot = (
     <div style={{ display: "grid", gap: 8, justifyItems: "start" }}>
       {/* THREE actions only (founder direction 2026-07-29: five buttons doing
@@ -3694,6 +3754,30 @@ export function PropertyEvaluationWorkspace({
         agricultureSlot={
           workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
             <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />
+          ) : undefined
+        }
+        proformaSlot={
+          workspaceProfile.id !== "residential" ? (
+            <div style={{ display: "grid", gap: 8 }}>
+              <h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>DRAFT pro forma — SBA/USDA structure</h3>
+              <p style={{ margin: 0, color: "#5A6172", fontSize: 12.5, lineHeight: 1.6 }}>
+                The real lender-package document: Sources &amp; Uses, collateral schedule, revenue segments,
+                debt-service assumptions, two-case DSCR, and the ten-year model — built from this property&apos;s
+                verified record and screening assumptions. It carries a DRAFT banner and the generation-gate
+                checklist of everything underwriting still requires (entity documents, guarantor PFS, balance
+                sheet, registers). {rankingPrice == null ? "Enter the asking price or your intended offer above to populate the finance math." : ""}
+              </p>
+              <button
+                type="button"
+                data-testid="draft-proforma"
+                onClick={downloadDraftProforma}
+                disabled={proformaBusy}
+                style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", border: "1px solid #8F6E1F", background: "#8F6E1F", color: "#fff", fontWeight: 800, cursor: "pointer" }}
+              >
+                {proformaBusy ? "Building DRAFT pro forma..." : "Download DRAFT pro forma (PDF)"}
+              </button>
+              {proformaError && <span style={{ fontSize: 12, color: "#a12626" }}>{proformaError}</span>}
+            </div>
           ) : undefined
         }
       />

@@ -49,6 +49,7 @@ const RESIDENTIAL_LANE: LaneDefinition = {
     { id: "utilities", label: "Utilities", intro: "Electricity, water, sewer, septic, well, gas, broadband, and recurring infrastructure costs live here." },
     { id: "finance", label: "Finance", intro: "Current rate and term comparisons, ownership costs, cash to close, and home-relevant financing pathways — conventional, FHA, VA, USDA-RD — live here." },
     { id: "environmental", label: "Environmental", intro: "Flood, wetlands, hazards, contamination, historic constraints, soils, climate, and environmental diligence live here." },
+    { id: "agriculture", label: "Yard & Garden", intro: "What grows well in this yard — garden plants matched to the parcel's actual soil, plus native plants for the region that support pollinators and need less water and care." },
     { id: "education", label: "Education", intro: "Assigned-school evidence, nearby public and private options, higher education, and state choice rules live here." },
     { id: "misc", label: "Misc. / Other", intro: "Location, amenities, transportation, market context, and facts that do not belong in the other dedicated sections live here." },
     { id: "report", label: "Report", intro: "View, download, print, save, and continue to the personalized pro forma from one place." },

@@ -14,6 +14,7 @@ import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyI
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
 import { FarmAgricultureTab } from "@/components/property/lanes/FarmAgricultureTab";
+import { ResidentialGardenTab } from "@/components/property/lanes/ResidentialGardenTab";
 import { ReportRecordToken } from "@/components/property/ReportRecordToken";
 import { getSaved, SAVED_EVENT, type SavedProperty } from "@/lib/property/savedProperty";
 import { CommercialLaneWorkspace } from "@/components/property/lanes/CommercialLaneWorkspace";
@@ -3875,6 +3876,14 @@ export function PropertyEvaluationWorkspace({
         agricultureSlot={
           workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
             <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />
+          ) : workspaceProfile.id === "residential" ? (
+            // Residential repurposes the slot as Yard & Garden (founder
+            // 2026-07-29): soil-matched garden picks + region natives.
+            // Commercial keeps no agriculture tab at all.
+            <ResidentialGardenTab
+              state={analysisContext.stateCode ?? facts?.verification?.parsedAddress?.state ?? null}
+              soil={effectivePlaceIntelligence?.soilProfile ?? null}
+            />
           ) : undefined
         }
         proformaSlot={

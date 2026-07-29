@@ -279,7 +279,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
       </>;
       })()}
       {tab === "property" && renderCategory("property", "Property")}
-      {tab === "agriculture" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Agriculture</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("agriculture")}</p></header>{props.agricultureSlot ?? <div style={card}>The growing analysis for this ground is still assembling — soil, county yields, and market signals arrive with the property facts.</div>}</>}
+      {tab === "agriculture" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>{lane.tabs.find((item) => item.id === "agriculture")?.label ?? "Agriculture"}</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("agriculture")}</p></header>{props.agricultureSlot ?? <div style={card}>The growing analysis for this ground is still assembling — soil, county yields, and market signals arrive with the property facts.</div>}</>}
       {tab === "utilities" && renderCategory("utilities", "Utilities")}
       {tab === "environmental" && renderCategory("environmental", "Environmental")}
       {tab === "education" && renderCategory("education", "Education")}

@@ -35,6 +35,7 @@ import {
   buildStateDroughtProvenance,
 } from "./weeklyAgLive";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "./stateFarmlandGenerated";
+import { STATE_EXTENSION, STATE_EXTENSION_PROVENANCE } from "./stateExtensionCurated";
 import { STATE_GRAIN_BIDS, STATE_GRAIN_BIDS_PROVENANCE } from "./stateGrainBidsGenerated";
 import { COUNTY_COLLEGES, COUNTY_COLLEGES_PROVENANCE, US_COLLEGE_CAMPUSES } from "./countyCollegesGenerated";
 import { isRiverRoadSample, riverRoadCuratedFacts, RIVER_ROAD_REPLACED_LABELS } from "./riverRoadCuratedIntelligence";
@@ -970,6 +971,30 @@ function hazardRiskFact(countyFips: string | null): BriefFactLine | null {
  * authoritative, dated, sourced data that leads The Furlong Compass.
  * Facts, never predictions or characterizations.
  */
+/**
+ * Land-grant cooperative-extension fact (founder request 2026-07-29): the
+ * Education tab's "extension programs" promise, answered for the state.
+ * Farm-shaped reports only — the intro copy promises it on the farm lane.
+ */
+function extensionProgramsFact(stateCode: string | null, county: string | null): BriefFactLine | null {
+  const st = stateCode?.toUpperCase() ?? null;
+  const ext = st ? STATE_EXTENSION[st] : undefined;
+  if (!ext) return null;
+  const countyName = county && county !== "Unknown" ? county : null;
+  return {
+    label: "Extension programs (agricultural education)",
+    value: `${ext.extensionName} — ${ext.institution}`,
+    text:
+      `Every county in this state is served by ${ext.extensionName}, the land-grant cooperative-extension ` +
+      `system run by ${ext.institution}. County extension offices provide agronomy and horticulture help, ` +
+      `soil-test intake, pesticide applicator certification, farm business education, and 4-H — usually free ` +
+      `or near-free, and the right first call before committing acreage to a new enterprise. ` +
+      `${countyName ? `Search "${ext.extensionName} ${countyName}" to reach the local office.` : `Search "${ext.extensionName}" plus your county name to reach the local office.`}`,
+    provenance: `Source: ${STATE_EXTENSION_PROVENANCE.source}, reviewed ${STATE_EXTENSION_PROVENANCE.asOf} · nifa.usda.gov`,
+    tone: "positive",
+  };
+}
+
 function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
   const st = stateCode?.toUpperCase() ?? null;
   if (!st) return [];
@@ -1684,6 +1709,11 @@ export function buildPropertyBriefIntelligence(args: {
   const colleges = collegesFact(fmrFips, sourceRecord?.latitude ?? null, sourceRecord?.longitude ?? null);
   if (colleges) verifiedFacts.push(colleges);
 
+  if (isFarmShaped(args.propertyType)) {
+    const extensionFact = extensionProgramsFact(args.stateCode ?? null, resolvedCounty?.name ?? null);
+    if (extensionFact) verifiedFacts.push(extensionFact);
+  }
+
   const broadbandArea = broadbandAreaFact(fmrFips);
   if (broadbandArea) verifiedFacts.push(broadbandArea);
 
@@ -2216,6 +2246,11 @@ export async function buildLocationBriefIntelligence(args: {
 
   const colleges = collegesFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null);
   if (colleges) verifiedFacts.push(colleges);
+
+  if (isFarmShaped(args.propertyType ?? null)) {
+    const extensionFact = extensionProgramsFact(stateCode, resolvedCounty?.name ?? null);
+    if (extensionFact) verifiedFacts.push(extensionFact);
+  }
 
   const broadbandArea = broadbandAreaFact(countyFips);
   if (broadbandArea) verifiedFacts.push(broadbandArea);

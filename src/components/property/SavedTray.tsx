@@ -80,6 +80,16 @@ export function SavedTray() {
               <li key={p.id} style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between", borderTop: "1px solid #d7eee5", paddingTop: 8 }}>
                 <span style={{ fontSize: 14, color: "#162033" }}>
                   <strong>{loc(p)}</strong> · {p.propertyType} · {p.priceLabel}
+                  {/* Report records restored by token reopen the full analysis
+                      (founder 2026-07-29: "their report will populate"). */}
+                  {p.resumeHref && (
+                    <>
+                      {" "}
+                      <a href={p.resumeHref} style={{ color: "#0f766e", fontWeight: 700 }}>
+                        Reopen this report →
+                      </a>
+                    </>
+                  )}
                 </span>
                 <button type="button" onClick={() => removeSaved(p.id)} style={{ ...btn(false), fontSize: 12, padding: "3px 10px" }}>
                   Remove

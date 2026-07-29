@@ -14,6 +14,7 @@ import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyI
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
 import { FarmAgricultureTab } from "@/components/property/lanes/FarmAgricultureTab";
+import { ReportRecordToken } from "@/components/property/ReportRecordToken";
 import { CommercialLaneWorkspace } from "@/components/property/lanes/CommercialLaneWorkspace";
 import { ResidentialLaneWorkspace } from "@/components/property/lanes/ResidentialLaneWorkspace";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
@@ -3398,17 +3399,30 @@ export function PropertyEvaluationWorkspace({
         <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
           {pdfBusy === "export" ? "Preparing PDF..." : "Download PDF"}
         </button>
-        {/* The PLATFORM save is the existing governed borrower pathway —
-            onboarding collects identity under the established consent and
-            data-rights framework; no parallel PII store is created here
-            (public-alpha posture: piiPermitted stays a founder/counsel
-            flag). The automatic device draft stays the zero-PII default. */}
-        <Link
-          href={`/onboarding?from=${encodeURIComponent(chartHref)}`}
-          style={{ ...actionButtonSecondary, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
-        >
-          Keep a permanent record with Furlong →
-        </Link>
+        {/* ANONYMIZED permanent record (founder direction 2026-07-29): the
+            visitor mints an anonymous token — no account, no identity, no
+            onboarding. Entering the token next time repopulates their saved
+            records, including this report (resumeHref). The automatic device
+            draft stays the zero-PII default. */}
+        <ReportRecordToken
+          record={{
+            id: context.propertyId ?? analysisContext.title,
+            town: context.town ?? "",
+            county: context.county ?? "",
+            state: context.stateCode ?? "",
+            propertyType: analysisContext.propertyType,
+            priceLabel: analysisContext.priceLabel,
+            exactAddress: context.exactAddress,
+            zip: null,
+            sourceId: "furlong-report",
+            sourceCitation: "Furlong report record",
+            isCurrent: true,
+            vintageStamp: report.branding.generatedDate,
+            listingUrl: context.listingUrl ?? "",
+            pathways: [],
+            resumeHref: chartHref,
+          }}
+        />
         {savedAt && (
           <span style={{ fontSize: 12, color: "#7a8aa0" }}>
             Draft saved automatically on this device · {new Date(savedAt).toLocaleString()}

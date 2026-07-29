@@ -2180,8 +2180,19 @@ export function PropertyEvaluationWorkspace({
       startingLens: startingLens ?? null,
       // The visitor's "what is this property?" declaration — the server
       // rebuilds the whole Place Brief in that shape (farm lanes for a
-      // farm, never home-mortgage copy on a working farm).
-      declaredPropertyType: profileOverride,
+      // farm, never home-mortgage copy on a working farm). A saved-file
+      // reopen carries no lens, only its stored profile id — forward that
+      // as the declaration ONLY on an exact allowlist match, so vague
+      // imported types ("place-led property") never override parcel
+      // evidence (founder-caught 2026-07-29: reopening "Dagsboro farm
+      // test" left the Agriculture tab on its placeholder).
+      declaredPropertyType:
+        profileOverride ??
+        (["residential", "farm", "commercial", "hospitality", "mobile-home-park", "land"].includes(
+          (context.propertyType ?? "").trim().toLowerCase()
+        )
+          ? (context.propertyType ?? "").trim().toLowerCase()
+          : null),
     };
     void (async () => {
       try {

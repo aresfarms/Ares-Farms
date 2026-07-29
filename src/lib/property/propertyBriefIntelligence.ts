@@ -31,8 +31,6 @@ import { COUNTY_BROADBAND, COUNTY_BROADBAND_PROVENANCE } from "./countyBroadband
 // 2026-07-28): the daily job refreshes drought + crop conditions; these
 // builders serve the overlay when fresh, the committed snapshot otherwise.
 import {
-  buildStateCropConditions,
-  buildCropConditionsProvenance,
   buildStateDrought,
   buildStateDroughtProvenance,
 } from "./weeklyAgLive";
@@ -992,24 +990,13 @@ function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
     });
   }
 
-  const cropProvenance = buildCropConditionsProvenance();
-  const crop = buildStateCropConditions()[st];
-  if (crop && cropProvenance.asOf && (crop.corn || crop.soybeans)) {
-    const bits = [
-      crop.corn ? `corn ${crop.corn.goodExcellent}% good-or-excellent (${crop.corn.poorVeryPoor}% poor-or-worse)` : null,
-      crop.soybeans ? `soybeans ${crop.soybeans.goodExcellent}% good-or-excellent` : null,
-    ].filter(Boolean);
-    const cornPvp = crop.corn?.poorVeryPoor ?? 0;
-    facts.push({
-      label: "Crop conditions",
-      value: crop.corn ? `Corn ${crop.corn.goodExcellent}% good-or-excellent statewide` : bits[0] ?? "",
-      text:
-        `USDA's week-${cropProvenance.latestWeek} Crop Progress rates this state's ${bits.join(", ")}. ` +
-        `A statewide condition read — this parcel's ground can run better or worse, but it frames the season.`,
-      provenance: `Source: USDA NASS Crop Progress ${cropProvenance.year}, week ${cropProvenance.latestWeek}`,
-      tone: cornPvp >= 25 || (crop.corn && crop.corn.goodExcellent <= 35) ? "caution" : "neutral",
-    });
-  }
+  // Crop conditions REMOVED from the property report (founder direction
+  // 2026-07-29): the fact led with corn only, which misrepresents the season
+  // for any other operation. Founder rule for ever bringing it back: it must
+  // cover ALL the commodity crops NASS reports for the state (corn, soybeans,
+  // wheat, cotton, etc.), not a corn headline. The weekly-ag overlay still
+  // powers the newsletter's full crop-conditions board, where every reported
+  // crop renders together.
 
   const farmland = STATE_FARMLAND[st];
   if (farmland && STATE_FARMLAND_PROVENANCE.asOf) {

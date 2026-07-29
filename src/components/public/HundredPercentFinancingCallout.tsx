@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { accentForLane } from "@/lib/property/laneThemes";
-import { navigatorHref } from "@/components/public/NavigatorEntryCta";
 
 /**
  * HundredPercentFinancingCallout — a cross-lane cue that 100% (no-money-down)
@@ -19,10 +18,10 @@ const PURPLE = accentForLane("financing-capital", "light"); // #534AB7
 export function HundredPercentFinancingCallout() {
   return (
     <Link
-      // Straight to the Navigator INTAKE (founder-caught 2026-07-29: the old
-      // target was the financing lane page itself — clicking from that page
-      // navigated to the same URL and appeared dead).
-      href={navigatorHref("financing-capital")}
+      // Straight to the LENDER INTAKE FORM (founder 2026-07-29: not the
+      // address form, not the lane page — the "Submit your financing deal"
+      // panel itself).
+      href="/explore?lane=financing-capital#lender-intake"
       style={{
         display: "flex",
         gap: 14,

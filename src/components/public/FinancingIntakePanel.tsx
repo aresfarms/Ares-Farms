@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   FINANCING_PROGRAMS,
@@ -64,6 +64,19 @@ type SubmitState =
   | { phase: "error"; message: string };
 
 export function FinancingIntakePanel() {
+  // #lender-intake deep links (0% DOWN callout, report hand-off): the browser's
+  // native hash scroll fires before below-fold content loads, so re-anchor
+  // after mount (founder-caught 2026-07-29).
+  useEffect(() => {
+    if (window.location.hash !== "#lender-intake") return;
+    const land = () =>
+      document.getElementById("lender-intake")?.scrollIntoView({ block: "start" });
+    land();
+    // Content above the panel (rates, program tables) can finish rendering
+    // after mount and push the anchor down — re-assert once layout settles.
+    const settle = window.setTimeout(land, 700);
+    return () => window.clearTimeout(settle);
+  }, []);
   const [purpose, setPurpose] = useState<FinancingPurpose | "">("");
   const [programInterest, setProgramInterest] = useState<
     FinancingProgramInterest | ""

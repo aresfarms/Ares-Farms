@@ -107,7 +107,11 @@ export function FinancingLaneSections() {
         </div>
       </section>
 
-      <FinancingIntakePanel />
+      {/* Stable anchor for every "take me to the lender intake" entry point
+          (0% DOWN callout, report-tab hand-off) — founder 2026-07-29. */}
+      <div id="lender-intake">
+        <FinancingIntakePanel />
+      </div>
 
       {/* Optional paid advisory belongs near the bottom, after rates and intake. */}
       <FinancingFeeChart />

@@ -2003,7 +2003,6 @@ export function PropertyEvaluationWorkspace({
   const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
-  const [proformaBusy, setProformaBusy] = useState(false);
   const [proformaError, setProformaError] = useState<string | null>(null);
   // Other saved properties this session — offered as optional additions to
   // the DRAFT pro forma (founder 2026-07-29: multi-property when they have
@@ -2862,6 +2861,12 @@ export function PropertyEvaluationWorkspace({
       setPdfError(`${report.tier.label} is not unlocked on this screen yet.`);
       return null;
     }
+    // ONE document (founder direction 2026-07-29): farm and commercial print
+    // the DRAFT SBA/USDA pro forma with the Land Ledger evidence as exhibits.
+    // Residential keeps the Land Ledger report — no pro forma applies.
+    if (workspaceProfile.id !== "residential") {
+      return requestProformaPdf();
+    }
     setPdfError(null);
     const fileStem = `${context.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "property-evaluation"}-${report.tier.id}`;
     try {
@@ -2932,8 +2937,8 @@ export function PropertyEvaluationWorkspace({
               effectiveListedPrice != null &&
               ownershipContext &&
               chartVariant !== "finance" &&
-              profileUsesResidentialLanes(workspaceProfile.id) &&
-              workspaceProfile.id !== "farm"
+              // Residential-only path (farm/commercial return the pro forma above).
+              profileUsesResidentialLanes(workspaceProfile.id)
                 ? formatOwnershipCostsForPdf({
                     listedPrice: effectiveListedPrice,
                     ownershipContext,
@@ -2943,7 +2948,8 @@ export function PropertyEvaluationWorkspace({
                   })
                 : undefined,
             agriculturalProForma: (() => {
-              if (workspaceProfile.id !== "farm" || effectiveListedPrice == null || !ownershipContext) return undefined;
+              // Residential-only path — the farm pro forma section never applies here.
+              if ((workspaceProfile.id as string) !== "farm" || effectiveListedPrice == null || !ownershipContext) return undefined;
               const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
               if (!acreage) return undefined;
               const rate = ownershipContext.fsa?.ownershipDirectPct ?? ownershipContext.rates.rate30;
@@ -3396,72 +3402,82 @@ export function PropertyEvaluationWorkspace({
 
 
   // DRAFT SBA/USDA pro forma (founder direction 2026-07-29): the real lender
-  // package structure, built from property-side data; borrower-side gate
-  // items intentionally stay open so the document is watermarked DRAFT with
-  // the underwriting checklist. Zero PII leaves the page.
-  function downloadDraftProforma() {
-    void (async () => {
-      setProformaBusy(true);
-      setProformaError(null);
-      try {
-        const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
-        const fsaRatePct = ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? null;
-        const isFarmLaneDoc = workspaceProfile.id === "farm" || workspaceProfile.id === "land";
-        let revenueUnits: Array<{ unitName: string; unitDescription: string; conservativeAnnualNoi: number; stabilizedAnnualNoi: number; methodology: string }> = [];
-        if (isFarmLaneDoc && effectiveListedPrice != null && acreage && fsaRatePct != null) {
-          const annualDebtService = effectiveListedPrice * 0.8 * (fsaRatePct / 100) / (1 - Math.pow(1 + fsaRatePct / 100, -40));
-          const model = optimizeAgriculturalOpportunities({ acres: acreage, purchasePrice: effectiveListedPrice, debtService: annualDebtService, waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
-          revenueUnits = model.diversified.slice(0, 6).map((item) => ({
-            unitName: item.label,
-            unitDescription: `${Math.round(item.portfolioShare * 100)}% of the diversified screening portfolio on ~${acreage.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
-            conservativeAnnualNoi: Math.round(item.noi * item.portfolioShare * 0.75),
-            stabilizedAnnualNoi: Math.round(item.noi * item.portfolioShare),
-            methodology: "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
-          }));
-        }
-        const additionalProperties = otherSavedProperties
-          .filter((p) => proformaIncludedIds.includes(p.id))
-          .map((p) => {
-            const parsedPrice = Number((p.priceLabel.match(/\$([0-9][0-9,]*)/) ?? [])[1]?.replace(/,/g, ""));
-            return {
-              title: p.exactAddress ?? [p.town, p.state].filter(Boolean).join(", ") ?? p.id,
-              location: [p.county, p.state].filter(Boolean).join(", ") || null,
-              price: Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : null,
-            };
-          });
-        const res = await fetch("/api/public/property-proforma-pdf", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            propertyTitle: analysisContext.title,
-            exactAddress: context.exactAddress,
-            county: context.county,
-            state: context.stateCode,
-            lane: isFarmLaneDoc ? "B" : "A",
-            acquisitionPrice: effectiveListedPrice,
-            acreage,
-            fsaRatePct,
-            revenueUnits,
-            additionalProperties,
-          }),
-        });
-        if (!res.ok) {
-          const failureText = await res.text();
-          throw new Error(failureText.slice(0, 200) || `The pro forma service returned HTTP ${res.status}.`);
-        }
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const anchor = document.createElement("a");
-        anchor.href = url;
-        anchor.download = "furlong-draft-proforma.pdf";
-        anchor.click();
-        window.setTimeout(() => window.URL.revokeObjectURL(url), 30_000);
-      } catch (error) {
-        setProformaError(error instanceof Error ? error.message : "The pro forma service is unavailable right now.");
-      } finally {
-        setProformaBusy(false);
+  // package structure with the property's Land Ledger evidence attached as
+  // exhibits — ONE document. Farm and commercial View/Download produce this;
+  // residential keeps the Land Ledger report. Borrower-side gate items
+  // intentionally stay open so the document is watermarked DRAFT with the
+  // underwriting checklist. Zero PII leaves the page.
+  async function requestProformaPdf(): Promise<{ blob: Blob; fileStem: string } | null> {
+    setPdfError(null);
+    setProformaError(null);
+    try {
+      const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
+      const fsaRatePct = ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? null;
+      const isFarmLaneDoc = workspaceProfile.id === "farm" || workspaceProfile.id === "land";
+      let revenueUnits: Array<{ unitName: string; unitDescription: string; conservativeAnnualNoi: number; stabilizedAnnualNoi: number; methodology: string }> = [];
+      if (isFarmLaneDoc && effectiveListedPrice != null && acreage && fsaRatePct != null) {
+        const annualDebtService = effectiveListedPrice * 0.8 * (fsaRatePct / 100) / (1 - Math.pow(1 + fsaRatePct / 100, -40));
+        const model = optimizeAgriculturalOpportunities({ acres: acreage, purchasePrice: effectiveListedPrice, debtService: annualDebtService, waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
+        revenueUnits = model.diversified.slice(0, 6).map((item) => ({
+          unitName: item.label,
+          unitDescription: `${Math.round(item.portfolioShare * 100)}% of the diversified screening portfolio on ~${acreage.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
+          conservativeAnnualNoi: Math.round(item.noi * item.portfolioShare * 0.75),
+          stabilizedAnnualNoi: Math.round(item.noi * item.portfolioShare),
+          methodology: "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
+        }));
       }
-    })();
+      const additionalProperties = otherSavedProperties
+        .filter((p) => proformaIncludedIds.includes(p.id))
+        .map((p) => {
+          const parsedPrice = Number((p.priceLabel.match(/\$([0-9][0-9,]*)/) ?? [])[1]?.replace(/,/g, ""));
+          return {
+            title: p.exactAddress ?? [p.town, p.state].filter(Boolean).join(", ") ?? p.id,
+            location: [p.county, p.state].filter(Boolean).join(", ") || null,
+            price: Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : null,
+          };
+        });
+      // Land Ledger evidence rides as Exhibit A; lane answers as Exhibit B.
+      const propertyEvidence = (effectivePlaceIntelligence?.verifiedFacts ?? [])
+        .filter((fact) => workspaceProfile.id !== "farm" || !/broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
+        .map((fact) => ({
+          label: fact.label,
+          value: fact.value,
+          source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
+        }));
+      const answerFmt = (answers: { question: string; answer: string; confirm: string | null }[]) =>
+        answers.map((a) => `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`);
+      const laneAnswerLines = isFarmLaneDoc
+        ? (effectivePlaceIntelligence?.farmEnterpriseAnswers ?? []).map((a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`)
+        : answerFmt(effectivePlaceIntelligence?.commercialAnswers ?? []);
+      const res = await fetch("/api/public/property-proforma-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          propertyTitle: analysisContext.title,
+          exactAddress: context.exactAddress,
+          county: context.county,
+          state: context.stateCode,
+          lane: isFarmLaneDoc ? "B" : "A",
+          acquisitionPrice: effectiveListedPrice,
+          acreage,
+          fsaRatePct,
+          revenueUnits,
+          additionalProperties,
+          propertyEvidence,
+          laneAnswerLines,
+        }),
+      });
+      if (!res.ok) {
+        const failureText = await res.text();
+        throw new Error(failureText.slice(0, 200) || `The pro forma service returned HTTP ${res.status}.`);
+      }
+      return { blob: await res.blob(), fileStem: "furlong-draft-proforma" };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "The pro forma service is unavailable right now.";
+      setPdfError(message);
+      setProformaError(message);
+      return null;
+    }
   }
 
   const chartActionsSlot = (
@@ -3783,18 +3799,18 @@ export function PropertyEvaluationWorkspace({
         proformaSlot={
           workspaceProfile.id !== "residential" ? (
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>DRAFT pro forma — SBA/USDA structure</h3>
+              <h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Your PDF is the DRAFT SBA/USDA pro forma</h3>
               <p style={{ margin: 0, color: "#5A6172", fontSize: 12.5, lineHeight: 1.6 }}>
-                The real lender-package document: Sources &amp; Uses, collateral schedule, revenue segments,
-                debt-service assumptions, two-case DSCR, and the ten-year model — built from this property&apos;s
-                verified record and screening assumptions. It carries a DRAFT banner and the generation-gate
-                checklist of everything underwriting still requires (entity documents, guarantor PFS, balance
-                sheet, registers). {rankingPrice == null ? "Enter the asking price or your intended offer above to populate the finance math." : ""}
+                View &amp; print and Download above produce ONE document: the lender-package pro forma —
+                Sources &amp; Uses, collateral schedule, revenue segments, debt-service assumptions, two-case
+                DSCR, and the ten-year model — with this property&apos;s verified Land Ledger evidence attached
+                as exhibits. It carries a DRAFT banner and the generation-gate checklist of everything
+                underwriting still requires. {rankingPrice == null ? "Enter the asking price or your intended offer above to populate the finance math." : ""}
               </p>
               {otherSavedProperties.length > 0 && (
                 <div style={{ display: "grid", gap: 5, border: "1px solid #E5D9BC", borderRadius: 10, background: "#FFFDF7", padding: "10px 12px" }}>
                   <strong style={{ color: "#1C2B45", fontSize: 12.5 }}>
-                    Acquiring more than one? Include other saved properties in this pro forma (optional):
+                    Acquiring more than one? Include other saved properties in the pro forma (optional):
                   </strong>
                   {otherSavedProperties.map((p) => (
                     <label key={p.id} style={{ display: "flex", gap: 7, alignItems: "baseline", fontSize: 12.5, color: "#3d4655", cursor: "pointer" }}>
@@ -3818,15 +3834,6 @@ export function PropertyEvaluationWorkspace({
                   </span>
                 </div>
               )}
-              <button
-                type="button"
-                data-testid="draft-proforma"
-                onClick={downloadDraftProforma}
-                disabled={proformaBusy}
-                style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", border: "1px solid #8F6E1F", background: "#8F6E1F", color: "#fff", fontWeight: 800, cursor: "pointer" }}
-              >
-                {proformaBusy ? "Building DRAFT pro forma..." : `Download DRAFT pro forma (PDF)${proformaIncludedIds.length > 0 ? ` — ${1 + proformaIncludedIds.length} properties` : ""}`}
-              </button>
               {proformaError && <span style={{ fontSize: 12, color: "#a12626" }}>{proformaError}</span>}
             </div>
           ) : undefined

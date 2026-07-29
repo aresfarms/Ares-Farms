@@ -26,8 +26,10 @@ function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
 }
 
 export async function POST(req: NextRequest) {
-  const parsed = await readJsonBodyWithLimit<Partial<DraftProformaPropertyArgs>>(req, {
-    maxBytes: 64 * 1024,
+  const parsed = await readJsonBodyWithLimit<
+    Partial<DraftProformaPropertyArgs> & { propertyEvidence?: unknown; laneAnswerLines?: unknown }
+  >(req, {
+    maxBytes: 128 * 1024,
   });
   if (!parsed.ok) {
     return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
@@ -81,6 +83,49 @@ export async function POST(req: NextRequest) {
 
   const failures = evaluateGenerationGate(input);
   const document = buildUltimateProformaDocument(input, { allowDraft: true });
+
+  // ── Property exhibits (founder direction 2026-07-29: ONE document) ────────
+  // The verified Land Ledger evidence rides behind the pro forma as exhibits,
+  // the way a real loan package carries its supporting documentation.
+  const evidence = Array.isArray(body.propertyEvidence)
+    ? (body.propertyEvidence as Array<Record<string, unknown>>)
+        .slice(0, 48)
+        .map((fact) => ({
+          label: String(fact?.label ?? "").slice(0, 80),
+          value: String(fact?.value ?? "").slice(0, 220),
+          source: String(fact?.source ?? "").slice(0, 160),
+        }))
+        .filter((fact) => fact.label && fact.value)
+    : [];
+  if (evidence.length > 0) {
+    document.sections.push({
+      title: "EXHIBIT A — VERIFIED PROPERTY EVIDENCE",
+      leadIns: [{ text: "Sourced, dated government facts for the subject property (Furlong Land Ledger).", bold: false }],
+      tables: [
+        {
+          table: {
+            columns: [
+              { header: "Fact", width: 0.24, align: "left" },
+              { header: "Value", width: 0.44, align: "left" },
+              { header: "Source", width: 0.32, align: "left" },
+            ],
+            rows: evidence.map((fact) => ({ cells: [fact.label, fact.value, fact.source] })),
+          },
+        },
+      ],
+    });
+  }
+  const answerLines = Array.isArray(body.laneAnswerLines)
+    ? (body.laneAnswerLines as unknown[]).slice(0, 24).map((line) => String(line).slice(0, 600)).filter(Boolean)
+    : [];
+  if (answerLines.length > 0) {
+    document.sections.push({
+      title: "EXHIBIT B — PROPERTY QUESTIONS, ANSWERED",
+      leadIns: [{ text: "Lane-specific questions answered for the subject property from the verified record.", bold: false }],
+      paragraphs: answerLines.map((line) => `— ${line}`),
+    });
+  }
+
   const pdf = generateLoanProformaPdf(document);
   const buffer = await streamToBuffer(pdf as unknown as NodeJS.ReadableStream);
 

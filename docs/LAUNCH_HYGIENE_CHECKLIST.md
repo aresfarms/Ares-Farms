@@ -62,4 +62,6 @@ if it is ever activated, import it into terraform first.
   expires ~2026-08-27 (rotation reminder scheduled 2026-08-24).
 - Stuart's compliance review of financing surfaces (#34).
 - Payments / Guild billing stays OFF until Stuart tests the model (#35).
-- VEDP founder approval on /source-legal-review (#42) — no email needed.
+- VEDP stays DARK for launch (founder decision 2026-07-29 — legal comfort not
+  reached). Not a launch step; revisit only if counsel clears it in Stuart's
+  review (#34).

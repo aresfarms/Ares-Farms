@@ -3459,6 +3459,10 @@ export function PropertyEvaluationWorkspace({
           state: context.stateCode,
           lane: isFarmLaneDoc ? "B" : "A",
           acquisitionPrice: effectiveListedPrice,
+          // No published/entered price → the server derives a stated screening
+          // value (assessed value, else USDA state average × acreage) so the
+          // document carries real numbers with their basis printed.
+          assessedTotalValue: facts?.propertyRecord?.assessedTotalValue ?? null,
           acreage,
           fsaRatePct,
           revenueUnits,
@@ -3805,7 +3809,7 @@ export function PropertyEvaluationWorkspace({
                 Sources &amp; Uses, collateral schedule, revenue segments, debt-service assumptions, two-case
                 DSCR, and the ten-year model — with this property&apos;s verified Land Ledger evidence attached
                 as exhibits. It carries a DRAFT banner and the generation-gate checklist of everything
-                underwriting still requires. {rankingPrice == null ? "Enter the asking price or your intended offer above to populate the finance math." : ""}
+                underwriting still requires. {rankingPrice == null ? "No price entered yet — the finance math runs on a stated screening value (the parcel's assessed value, else the USDA state farmland average), with that basis printed on every figure. Enter your intended offer above to run your own number instead." : ""}
               </p>
               {otherSavedProperties.length > 0 && (
                 <div style={{ display: "grid", gap: 5, border: "1px solid #E5D9BC", borderRadius: 10, background: "#FFFDF7", padding: "10px 12px" }}>

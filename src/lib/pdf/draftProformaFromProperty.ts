@@ -41,6 +41,9 @@ export interface DraftProformaPropertyArgs {
   acreage: number | null;
   /** Published FSA direct farm-ownership rate, percent (screening basis). */
   fsaRatePct: number | null;
+  /** Where acquisitionPrice came from — printed with every figure it drives
+      (entered offer > listing price > assessed value > state-average screen). */
+  valuationNote: string | null;
   revenueUnits: DraftProformaRevenueUnit[];
   /** OPTIONAL multi-property acquisition (founder direction 2026-07-29):
       when the visitor includes other saved properties, each becomes its own
@@ -157,7 +160,7 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
       sourcesAndUses: {
         rows: [
           ...(price != null
-            ? [{ use: `Acquisition — ${args.propertyTitle}${where ? ` (${where})` : ""}`, amount: dollars(price), notes: "Asking price / intended offer as entered; appraisal governs" }]
+            ? [{ use: `Acquisition — ${args.propertyTitle}${where ? ` (${where})` : ""}`, amount: dollars(price), notes: args.valuationNote ?? "Asking price / intended offer as entered; appraisal governs" }]
             : []),
           ...additional.map((p) => ({
             use: `Acquisition — ${p.title}${p.location ? ` (${p.location})` : ""}`,
@@ -174,7 +177,7 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         totalProjectCost: totalProject != null ? dollars(totalProject) : "Requires acquisition price",
         loanAmount: loanAmount != null ? dollars(loanAmount) : "Requires acquisition price",
         loanCalcBasis: combinedPrice != null
-          ? `Screening basis: ${Math.round(LTV * 100)}% of combined acquisition price${propertyCount > 1 ? ` across ${propertyCount} properties` : ""}; final loan amount set by program rules, appraisal, and lender underwriting`
+          ? `Screening basis: ${Math.round(LTV * 100)}% of combined acquisition price${propertyCount > 1 ? ` across ${propertyCount} properties` : ""}${args.valuationNote ? ` (${args.valuationNote})` : ""}; final loan amount set by program rules, appraisal, and lender underwriting`
           : "",
         injectionProvided: injection != null ? dollars(injection) : TO_SUPPLY,
         injectionSource: TO_SUPPLY,

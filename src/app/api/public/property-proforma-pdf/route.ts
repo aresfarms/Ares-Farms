@@ -4,6 +4,8 @@ import { buildDraftProformaInput, type DraftProformaPropertyArgs } from "@/lib/p
 import { buildUltimateProformaDocument, evaluateGenerationGate } from "@/lib/pdf/ultimateProformaTemplate";
 import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
+import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
+import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
 
 /**
  * DRAFT pro forma PDF — PUBLIC, property-side screening only (founder
@@ -27,7 +29,11 @@ function streamToBuffer(stream: NodeJS.ReadableStream): Promise<Buffer> {
 
 export async function POST(req: NextRequest) {
   const parsed = await readJsonBodyWithLimit<
-    Partial<DraftProformaPropertyArgs> & { propertyEvidence?: unknown; laneAnswerLines?: unknown }
+    Partial<DraftProformaPropertyArgs> & {
+      propertyEvidence?: unknown;
+      laneAnswerLines?: unknown;
+      assessedTotalValue?: unknown;
+    }
   >(req, {
     maxBytes: 128 * 1024,
   });
@@ -67,17 +73,66 @@ export async function POST(req: NextRequest) {
         .filter((p) => p.title)
     : [];
 
+  // ── Screening value derivation (founder direction 2026-07-29: "we HAVE the
+  // numbers"). Many parcels publish no asking price; the pro forma still runs
+  // on the best value we verifiably hold, with the basis printed on the page:
+  //   entered/listing price → official assessed total value → USDA state
+  //   farmland average × acreage. No basis available → the figures honestly
+  //   say what they require.
+  const stateCode = typeof body.state === "string" ? body.state.slice(0, 40) : null;
+  const acreage = num(body.acreage);
+  const fsaRatePct = num(body.fsaRatePct);
+  const enteredPrice = num(body.acquisitionPrice);
+  const assessedTotal = num(body.assessedTotalValue);
+  const stateFarmland = stateCode ? STATE_FARMLAND[stateCode.toUpperCase()] : undefined;
+  let screeningPrice: number | null = enteredPrice;
+  let valuationNote: string | null = enteredPrice != null ? "Asking price / intended offer as entered; appraisal governs" : null;
+  if (screeningPrice == null && assessedTotal != null) {
+    screeningPrice = assessedTotal;
+    valuationNote = "SCREENING VALUE — official assessed total value from the jurisdiction parcel record; asking price and appraisal govern";
+  }
+  if (screeningPrice == null && acreage != null && acreage > 0 && stateFarmland) {
+    screeningPrice = Math.round(acreage * stateFarmland.dollarsPerAcre);
+    valuationNote = `SCREENING VALUE — ${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres × USDA ${stateFarmland.year ?? STATE_FARMLAND_PROVENANCE.asOf} state farm real-estate average ($${stateFarmland.dollarsPerAcre.toLocaleString("en-US")}/acre); asking price and appraisal govern`;
+  }
+
+  // Revenue: prefer client-modeled units; when absent, run the same screening
+  // optimizer server-side off the derived value (lane B, acreage known).
+  let effectiveRevenueUnits = revenueUnits;
+  if (effectiveRevenueUnits.length === 0 && lane === "B" && acreage != null && acreage > 0 && screeningPrice != null && fsaRatePct != null) {
+    const debtService = (screeningPrice * 0.8 * (fsaRatePct / 100)) / (1 - Math.pow(1 + fsaRatePct / 100, -40));
+    const model = optimizeAgriculturalOpportunities({
+      acres: acreage,
+      purchasePrice: screeningPrice,
+      debtService,
+      waterScore: 70,
+      laborCapacity: 55,
+      capitalCapacity: 55,
+      marketAccess: 60,
+      gridEvidence: false,
+      solarZoningEvidence: false,
+    });
+    effectiveRevenueUnits = model.diversified.slice(0, 6).map((item) => ({
+      unitName: item.label,
+      unitDescription: `${Math.round(item.portfolioShare * 100)}% of the diversified screening portfolio on ~${acreage.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
+      conservativeAnnualNoi: Math.round(item.noi * item.portfolioShare * 0.75),
+      stabilizedAnnualNoi: Math.round(item.noi * item.portfolioShare),
+      methodology: "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
+    }));
+  }
+
   const input = buildDraftProformaInput({
     propertyTitle: title,
     exactAddress: typeof body.exactAddress === "string" ? body.exactAddress.slice(0, 200) : null,
     county: typeof body.county === "string" ? body.county.slice(0, 80) : null,
-    state: typeof body.state === "string" ? body.state.slice(0, 40) : null,
+    state: stateCode,
     lane,
     generationDate: new Date().toISOString().slice(0, 10),
-    acquisitionPrice: num(body.acquisitionPrice),
-    acreage: num(body.acreage),
-    fsaRatePct: num(body.fsaRatePct),
-    revenueUnits,
+    acquisitionPrice: screeningPrice,
+    acreage,
+    fsaRatePct,
+    valuationNote,
+    revenueUnits: effectiveRevenueUnits,
     additionalProperties,
   });
 

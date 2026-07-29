@@ -359,7 +359,9 @@ variable "notify_pe_email" {
 variable "notify_lender_email" {
   description = "Recipient for new financing deals (the licensed lender)."
   type        = string
-  default     = "stuart@aresfarmsinc.com"
+  # Stuart's real workspace address (founder-confirmed 2026-07-29) — the
+  # prior stuart@ placeholder was never a live mailbox.
+  default     = "sfraas@aresfarmsinc.com"
 }
 
 variable "email_from" {

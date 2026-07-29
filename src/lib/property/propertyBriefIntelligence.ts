@@ -1670,10 +1670,13 @@ export function buildPropertyBriefIntelligence(args: {
   const schoolsFips =
     resolvedCounty?.fips ?? (id ? PROPERTY_OZ_FACTS[id]?.tractId?.slice(0, 5) ?? null : null);
   const schools = schoolsFips ? COUNTY_SCHOOLS[schoolsFips] : undefined;
-  const schoolsFact = isHome ? publicSchoolsFact(schools, args.town ?? null, args.stateCode ?? null) : null;
+  // School facts render for EVERY profile (founder 2026-07-29: the Education
+  // tab promises assigned-school evidence on every lane — farm and commercial
+  // buyers are families too; the old isHome gate left the tab empty).
+  const schoolsFact = publicSchoolsFact(schools, args.town ?? null, args.stateCode ?? null);
   if (schoolsFact) verifiedFacts.push(schoolsFact);
 
-  const privateSchools = isHome ? privateSchoolsFact(schoolsFips, sourceRecord?.latitude ?? null, sourceRecord?.longitude ?? null) : null;
+  const privateSchools = privateSchoolsFact(schoolsFips, sourceRecord?.latitude ?? null, sourceRecord?.longitude ?? null);
   if (privateSchools) verifiedFacts.push(privateSchools);
 
   // Higher education renders for EVERY profile — a campus shapes rentals and
@@ -2200,12 +2203,15 @@ export async function buildLocationBriefIntelligence(args: {
     }
   }
 
-  // Schools — county-keyed directory facts, list only, never ratings.
+  // Schools — county-keyed directory facts, list only, never ratings. Render
+  // for EVERY profile (founder 2026-07-29: the Education tab promises
+  // assigned-school evidence on every lane; the old isHome gate left the farm
+  // and commercial tabs empty).
   const schools = countyFips ? COUNTY_SCHOOLS[countyFips] : undefined;
-  const schoolsFact = isHome ? publicSchoolsFact(schools, town, stateCode) : null;
+  const schoolsFact = publicSchoolsFact(schools, town, stateCode);
   if (schoolsFact) verifiedFacts.push(schoolsFact);
 
-  const privateSchools = isHome ? privateSchoolsFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null) : null;
+  const privateSchools = privateSchoolsFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null);
   if (privateSchools) verifiedFacts.push(privateSchools);
 
   const colleges = collegesFact(countyFips, geocode?.lat ?? null, geocode?.lon ?? null);

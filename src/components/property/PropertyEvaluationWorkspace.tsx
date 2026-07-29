@@ -2891,7 +2891,10 @@ export function PropertyEvaluationWorkspace({
               return null;
             })(),
             placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? [])
-              .filter((fact) => workspaceProfile.id !== "farm" || !/school|education|college|university|broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
+              // Education facts stay in the farm report too (founder 2026-07-29:
+              // the Education tab promises them on every lane); the farm PDF
+              // still drops the residential-flavored context lines below.
+              .filter((fact) => workspaceProfile.id !== "farm" || !/broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
               .map((fact) => ({
                 label: fact.label,
                 value: fact.value,

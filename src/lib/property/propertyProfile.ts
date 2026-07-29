@@ -96,7 +96,14 @@ export function classifyPropertyProfile(args: {
     /\bfarm[\s.-]*(?:number|núm\.?|num\.?|no\.?|n[°º]?\.?|inf\.?|#)?[\s.-]*[\d,]+/gi,
     " "
   );
-  const text = `${args.propertyType ?? ""} ${cleanedDesc}`.toLowerCase();
+  // County assessment feeds label parcels with jurisdictional phrases like
+  // "Sussex County land-use code 101" — the words "land-use" are a coding
+  // scheme, not a property description, and must never classify a dwelling
+  // as raw land (founder-caught 2026-07-29: the reopened Millsboro house
+  // typed as "land", silently switching which pro forma it produced).
+  const text = `${args.propertyType ?? ""} ${cleanedDesc}`
+    .replace(/\bland[- ]use\s+(?:code|classification|category)s?\b[\s:]*[\d.-]*/gi, " ")
+    .toLowerCase();
   const acreageMatch = (args.acreageText ?? "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
   const acres = acreageMatch ? Number(acreageMatch[1]) : null;
   const hasStructureEvidence = /house|home|residen|dwelling|bedroom|bathroom|sq ft|square feet|building|barn|stable|warehouse|hotel|motel|retail|office/.test(text);

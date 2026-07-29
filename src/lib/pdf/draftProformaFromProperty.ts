@@ -213,13 +213,16 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         netWorth: VIA_FINANCIAL_MODULE,
         totalAnnualIncome: VIA_FINANCIAL_MODULE,
       },
+      // The opening balance sheet is borrower financial data too — it is
+      // collected through the personal Financial module alongside the PFS
+      // (founder 2026-07-29), not left to a generic underwriting hand-off.
       balanceSheet: {
-        current: { assets: TO_SUPPLY, liabilities: TO_SUPPLY },
-        intermediate: { assets: TO_SUPPLY, liabilities: TO_SUPPLY },
-        longTerm: { assets: TO_SUPPLY, liabilities: TO_SUPPLY },
-        totalFarmAssets: TO_SUPPLY,
-        totalAssetsCombined: TO_SUPPLY,
-        totalFarmLiabilities: TO_SUPPLY,
+        current: { assets: VIA_FINANCIAL_MODULE, liabilities: VIA_FINANCIAL_MODULE },
+        intermediate: { assets: VIA_FINANCIAL_MODULE, liabilities: VIA_FINANCIAL_MODULE },
+        longTerm: { assets: VIA_FINANCIAL_MODULE, liabilities: VIA_FINANCIAL_MODULE },
+        totalFarmAssets: VIA_FINANCIAL_MODULE,
+        totalAssetsCombined: VIA_FINANCIAL_MODULE,
+        totalFarmLiabilities: VIA_FINANCIAL_MODULE,
         totalEquity: "", // U6 stays red on purpose — DRAFT
       },
       assetRegisters: {

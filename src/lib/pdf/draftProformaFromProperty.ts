@@ -53,6 +53,9 @@ export interface DraftProformaPropertyArgs {
 }
 
 const TO_SUPPLY = "TO BE SUPPLIED AT UNDERWRITING";
+// Personal financial statement fields route through Furlong's licensed
+// Financial module, not a generic underwriting hand-off (founder 2026-07-29).
+const VIA_FINANCIAL_MODULE = "INCLUDED WITH THE PERSONAL FINANCIAL MODULE";
 
 const dollars = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
 
@@ -203,12 +206,12 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
       guarantorPfs: {
         asOfDate: "", // U5 stays red on purpose — DRAFT
         docBasis: "",
-        assets: [{ label: "Guarantor assets", value: TO_SUPPLY }],
-        liabilitiesAndIncome: [{ label: "Guarantor liabilities & income", value: TO_SUPPLY }],
-        totalAssets: TO_SUPPLY,
-        totalLiabilities: TO_SUPPLY,
-        netWorth: TO_SUPPLY,
-        totalAnnualIncome: TO_SUPPLY,
+        assets: [{ label: "Guarantor assets", value: VIA_FINANCIAL_MODULE }],
+        liabilitiesAndIncome: [{ label: "Guarantor liabilities & income", value: VIA_FINANCIAL_MODULE }],
+        totalAssets: VIA_FINANCIAL_MODULE,
+        totalLiabilities: VIA_FINANCIAL_MODULE,
+        netWorth: VIA_FINANCIAL_MODULE,
+        totalAnnualIncome: VIA_FINANCIAL_MODULE,
       },
       balanceSheet: {
         current: { assets: TO_SUPPLY, liabilities: TO_SUPPLY },

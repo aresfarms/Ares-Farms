@@ -45,6 +45,7 @@ const FARM_LANE: LaneDefinition = {
   tabs: [
     { id: "summary", label: "Summary", intro: "The whole tract at a glance." },
     { id: "property", label: "Property", intro: "Acreage, parcel identity, land use, price, taxes, deed, structures, and the core physical identity of the tract live here." },
+    { id: "agriculture", label: "Agriculture", intro: "What this ground grows best — ranked crop and enterprise options (row crops, orchard, hay, flowers, vines, and more) from the actual soil, county yields, and market signals, plus whether one anchor crop or a diversified mix fits this parcel." },
     { id: "utilities", label: "Utilities", intro: "Electricity, water, wells, septic, irrigation access, gas, broadband, and recurring infrastructure costs live here." },
     { id: "finance", label: "Finance", intro: "Current rate and term comparisons, ownership costs, cash to close, and farm-relevant financing pathways — FSA, Farm Credit, conventional agricultural — live here." },
     { id: "environmental", label: "Environmental", intro: "Flood, wetlands, soils, drought posture, hazards, contamination, historic constraints, climate, and environmental diligence live here." },

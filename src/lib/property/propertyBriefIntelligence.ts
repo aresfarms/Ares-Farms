@@ -2364,6 +2364,11 @@ export async function buildLocationBriefIntelligence(args: {
           stateFarmlandPerAcre:
             (stateCode ? STATE_FARMLAND[stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
           nearestMetroMiles: null,
+          // LIVE SSURGO point query (2026-07-28): the ranking reads the actual
+          // dominant soil under this address, not a snapshot.
+          primeFarmland: soilResult?.farmlandClass ?? null,
+          capabilityClass: soilResult?.capabilityClass ?? null,
+          drainageClass: soilResult?.drainageClass ?? null,
           cornYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.corn ?? null : null,
           soybeanYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.soybeans ?? null : null,
           wheatYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.wheat ?? null : null,

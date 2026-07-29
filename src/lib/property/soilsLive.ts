@@ -22,6 +22,8 @@ export interface SoilProfile {
   drainageClass: string | null;
   /** Representative slope, percent. */
   slopePct: number | null;
+  /** Non-irrigated land-capability class 1–8 (1–4 arable; 5–8 pasture/limited). */
+  capabilityClass: number | null;
   retrievedAt: string;
 }
 
@@ -33,7 +35,7 @@ export async function fetchSoilProfile(lat: number, lon: number): Promise<SoilPr
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const wkt = `point(${lon.toFixed(5)} ${lat.toFixed(5)})`;
   const query =
-    "SELECT TOP 1 mu.muname, mu.farmlndcl, c.compname, c.comppct_r, c.drainagecl, c.slope_r " +
+    "SELECT TOP 1 mu.muname, mu.farmlndcl, c.compname, c.comppct_r, c.drainagecl, c.slope_r, c.niccdcd " +
     "FROM mapunit mu JOIN component c ON c.mukey = mu.mukey " +
     `WHERE mu.mukey IN (SELECT * FROM SDA_Get_Mukey_from_intersection_with_WktWgs84('${wkt}')) ` +
     "ORDER BY c.comppct_r DESC";
@@ -71,6 +73,7 @@ export async function fetchSoilProfile(lat: number, lon: number): Promise<SoilPr
       componentPct: num(col("comppct_r")),
       drainageClass: col("drainagecl") || null,
       slopePct: num(col("slope_r")),
+      capabilityClass: num(col("niccdcd")),
       retrievedAt: new Date().toISOString().slice(0, 10),
     };
   } catch {

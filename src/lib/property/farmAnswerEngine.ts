@@ -30,6 +30,9 @@ export interface FarmPropertyFacts {
   primeFarmland?: string | null; // e.g. "All areas are prime farmland" | "Not prime farmland"
   /** Non-irrigated land-capability class 1–8 (1–4 = arable cropland; 5–8 = pasture/limited). */
   capabilityClass?: number | null;
+  /** NRCS drainage class, e.g. "Well drained" | "Poorly drained" — steers
+      orchard/vineyard (need drainage) vs hay/pasture (tolerate wet ground). */
+  drainageClass?: string | null;
   /** USDA plant-hardiness zone, e.g. "7b". */
   hardinessZone?: string | null;
   /** County-average crop yields, bu/acre (USDA NASS Survey), when resolved — a
@@ -52,6 +55,13 @@ export interface BestUseOption {
 export interface FarmBestUse {
   headline: string;
   options: BestUseOption[];
+  /** Single-enterprise vs diversified recommendation for THIS parcel
+      (founder request 2026-07-28: "grow only one crop or diversify?"). */
+  portfolioAdvice: {
+    verdict: "single-anchor" | "diversify";
+    title: string;
+    reasons: string[];
+  };
 }
 
 export interface FarmPropertyAnswer {
@@ -66,9 +76,12 @@ const CONFIRM_ZONING =
   "We cannot see this parcel's zoning, water rights, or soil map — confirm ag use is permitted (county zoning), that you have adequate water, and pull the NRCS Web Soil Survey before committing.";
 
 function acreLabel(county: string | null, state: string | null): string {
-  const where = [county && county !== "Unknown" ? `${county} County` : null, state]
-    .filter(Boolean)
-    .join(", ");
+  // County names from the FIPS table already end in "County"/"Parish" etc. —
+  // only append when the name is bare (fixes "Sussex County County").
+  const countyLabel = county && county !== "Unknown"
+    ? (/\b(county|parish|borough|census area|municipality|city)\b/i.test(county) ? county : `${county} County`)
+    : null;
+  const where = [countyLabel, state].filter(Boolean).join(", ");
   return where ? ` in ${where}` : "";
 }
 
@@ -320,7 +333,34 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
     },
   ];
 
-  const sorted = raw
+  // Drainage steering (NRCS drainage class, live SSURGO): tree and vine crops
+  // need drained ground; hay/pasture tolerates wet ground; wet commodity ground
+  // carries tiling cost. Applied programmatically so every option stays honest
+  // about WHY its rank moved.
+  const drainage = (f.drainageClass ?? "").trim();
+  const wetGround = /poorly drained/i.test(drainage);
+  const drained = /^(well|excessively|somewhat excessively) drained/i.test(drainage);
+  const drainageAdjusted = raw.map((o) => {
+    let score = o.score;
+    let why = o.why;
+    if (wetGround) {
+      if (/^(Orchard|Vineyard|Christmas)/.test(o.name)) {
+        score -= 18;
+        why = `${why}; NRCS maps the dominant soil here as ${drainage.toLowerCase()} — tree and vine crops need drained ground, raised beds, or tile before they pay`;
+      } else if (/^Pasture/.test(o.name)) {
+        score += 10;
+        why = `${why}; ${drainage.toLowerCase()} ground carries forage and pasture better than deep-rooted plantings`;
+      } else if (/^Commodity/.test(o.name)) {
+        score -= 6;
+      }
+    } else if (drained && /^(Orchard|Vineyard)/.test(o.name)) {
+      score += 8;
+      why = `${why}; the ${drainage.toLowerCase()} dominant soil is the drainage profile tree and vine crops want`;
+    }
+    return { ...o, score, why };
+  });
+
+  const sorted = drainageAdjusted
     .map((o) => ({ ...o, score: Math.max(0, Math.min(100, o.score)) }))
     .sort((x, y) => y.score - x.score);
 
@@ -354,5 +394,44 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
     ? `For ${parcel}${place}, the numbers lean toward ${top.name.replace(/\s*\(.*\)/, "").toLowerCase()} over commodity row crops — ${top.why}.${soilNote}${yieldNote} Read the ranked options below as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`
     : `For ${parcel}${place}, the ranked options below weigh real per-acre economics for this ground.${soilNote}${yieldNote} Read each as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`;
 
-  return { headline, options };
+  // Single anchor crop vs diversified portfolio (founder request 2026-07-28).
+  // Deterministic read of the same signals that built the ranking — advisory
+  // screening only, never an agronomic prescription.
+  const second = sorted[1] ?? null;
+  const topThreeClustered =
+    sorted.length >= 3 && sorted[0].score - sorted[2].score <= 12;
+  const commodityDominates =
+    top.name === commodity.name &&
+    large &&
+    goodSoil &&
+    (strongYield || goodCropland) &&
+    (second == null || top.score - second.score >= 12);
+  const portfolioAdvice: FarmBestUse["portfolioAdvice"] = commodityDominates
+    ? {
+        verdict: "single-anchor",
+        title: "Run one anchor crop system here — a commodity rotation, not a monoculture",
+        reasons: [
+          `The parcel has the scale${isPrime ? ", prime soil" : ""}${strongYield ? ", and county yields" : ""} for a commodity base, and no alternative scores close to it.`,
+          "One anchor SYSTEM still means a rotation (corn/soy/wheat) — rotating within the system protects soil, spreads workload, and is not the same as planting a single crop forever.",
+          "Add a small secondary enterprise only where it does not compete for labor at planting and harvest.",
+        ],
+      }
+    : {
+        verdict: "diversify",
+        title: "Diversify — two or three complementary enterprises fit this ground better than one",
+        reasons: [
+          small
+            ? `At ${acresKnown ? `~${a!.toLocaleString("en-US")} acres` : "this size"}, a single commodity crop cannot carry the overhead — smaller parcels pay through higher-value mixes (produce, flowers, hay, agritourism).`
+            : topThreeClustered
+              ? "No single use clearly dominates — the top options score within a few points of each other, which is exactly when spreading across two or three of them beats betting on one."
+              : "The leading option is strong but not dominant — pairing it with a complementary second enterprise spreads weather and price risk across seasons.",
+          ...(wetGround
+            ? ["Drainage varies across ground like this — keep the wet portions in hay or pasture while the drained portion carries the higher-value planting."]
+            : []),
+          "Diversification also staggers cash flow through the year instead of concentrating it in one harvest window.",
+          "Before committing acreage, confirm zoning, water, and an actual buyer for each enterprise — the extension office and NRCS field staff are the free first calls.",
+        ],
+      };
+
+  return { headline, options, portfolioAdvice };
 }

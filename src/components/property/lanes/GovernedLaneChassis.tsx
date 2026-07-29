@@ -25,7 +25,7 @@ import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief
 import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
 
-export type TabId = "summary" | "property" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
+export type TabId = "summary" | "property" | "agriculture" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
 export type CategoryTabId = Exclude<TabId, "summary" | "report" | "finance">;
 
 export type FinancingRateContext = {
@@ -105,6 +105,9 @@ export type LaneWorkspaceProps = ChartTableBriefProps & {
     listingId: string | null;
     listingStatus: string | null;
   } | null;
+  /** Lane-owned content for a lane-specific tab (the farm lane's Agriculture
+      tab). Renders only when the lane's tab list includes that tab. */
+  agricultureSlot?: ReactNode;
 };
 
 type ChassisProps = LaneWorkspaceProps & { lane: LaneDefinition };
@@ -223,6 +226,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
         <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Something Furlong missed?</strong><form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "Customer-supplied property feature pending source verification.", provenance: "Owner assertion added in the property workspace", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800 }}>Add feature</button></form>{ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7 }}><strong style={{ color: "#1C2B45", fontSize: 12 }}>Owner-reported property features</strong>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}</section>
       </>}
       {tab === "property" && renderCategory("property", "Property")}
+      {tab === "agriculture" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Agriculture</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("agriculture")}</p></header>{props.agricultureSlot ?? <div style={card}>The growing analysis for this ground is still assembling — soil, county yields, and market signals arrive with the property facts.</div>}</>}
       {tab === "utilities" && renderCategory("utilities", "Utilities")}
       {tab === "environmental" && renderCategory("environmental", "Environmental")}
       {tab === "education" && renderCategory("education", "Education")}

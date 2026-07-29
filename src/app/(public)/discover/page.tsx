@@ -340,6 +340,11 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
             listedPrice={listedPrice}
             similarHomes={similarHomes}
             navigatorCaseContext={navigatorCaseContext}
+            // The visitor's lane lens must reach the facts request — without it
+            // an address-check arrival from the farm lane typed as whatever the
+            // parcel's land-use code happened to say (found 2026-07-29: the
+            // Agriculture tab stayed empty because startingLens arrived null).
+            startingLens={one(query.lens)}
           />
         </>
       ) : (

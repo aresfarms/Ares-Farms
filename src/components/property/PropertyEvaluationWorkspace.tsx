@@ -13,6 +13,7 @@ import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
+import { FarmAgricultureTab } from "@/components/property/lanes/FarmAgricultureTab";
 import { CommercialLaneWorkspace } from "@/components/property/lanes/CommercialLaneWorkspace";
 import { ResidentialLaneWorkspace } from "@/components/property/lanes/ResidentialLaneWorkspace";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
@@ -1669,7 +1670,13 @@ function buildReportModel(args: {
   // Highest-and-best-use ranking for a farm/land parcel.
   const bestUse = args.placeIntelligence?.farmBestUse ?? null;
   const bestUseLines = bestUse
-    ? bestUse.options.map((o) => `[${o.tier.toUpperCase()}] ${o.name} — ${o.grossPerAcre} — ${o.why}`)
+    ? [
+        ...bestUse.options.map((o) => `[${o.tier.toUpperCase()}] ${o.name} — ${o.grossPerAcre} — ${o.why}`),
+        // One-crop-vs-diversify verdict travels with the ranking in BOTH
+        // export paths (founder request 2026-07-28).
+        `[${bestUse.portfolioAdvice.verdict === "diversify" ? "DIVERSIFY" : "ONE ANCHOR SYSTEM"}] ${bestUse.portfolioAdvice.title}`,
+        ...bestUse.portfolioAdvice.reasons.map((reason) => `• ${reason}`),
+      ]
     : [];
   // Residential / commercial burning-questions answered FOR THIS PROPERTY
   // (null on the other profiles). Each renders as "Question — answer (Confirm: …)".
@@ -3690,6 +3697,11 @@ export function PropertyEvaluationWorkspace({
         }
         similarHomes={similarHomes}
         actionsSlot={chartActionsSlot}
+        agricultureSlot={
+          workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
+            <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />
+          ) : undefined
+        }
       />
         );
       })()}

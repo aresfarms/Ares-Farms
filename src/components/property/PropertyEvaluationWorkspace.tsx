@@ -9,6 +9,7 @@ import {
 } from "@/components/navigator/FurlongNavigator";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
+import { ReportTokenReturn } from "@/components/property/ReportTokenReturn";
 import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
@@ -1056,6 +1057,7 @@ function buildResidentialLenderSections(args: {
   ownershipContext: OwnershipCostContext;
   isHome: boolean;
   financingLanes: string[];
+  valuationNote?: string | null;
 }): LenderProformaSection[] | null {
   const model = buildOwnershipCostModel(
     { price: args.listedPrice, priceIsAssumption: false, isHome: args.isHome, farmShaped: false, farmMode: false },
@@ -1092,6 +1094,7 @@ function buildResidentialLenderSections(args: {
       mortgageWeekOf: args.ownershipContext.rates.weekOf ?? null,
     },
     disclaimers: model.disclaimers,
+    valuationNote: args.valuationNote ?? null,
   });
 }
 
@@ -2054,6 +2057,18 @@ export function PropertyEvaluationWorkspace({
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
   const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
+  // Residential screening basis (founder 2026-07-29: the pro forma must
+  // carry real numbers "period" — same stated-basis chain the farm and
+  // commercial lanes already use): entered/listed price, else the county-
+  // assessed total value, with the basis printed on every figure.
+  const residentialAssessedTotal = facts?.propertyRecord?.assessedTotalValue ?? null;
+  const residentialBasisPrice = effectiveListedPrice ?? residentialAssessedTotal;
+  const residentialBasisNote =
+    effectiveListedPrice != null
+      ? null
+      : residentialAssessedTotal != null
+        ? `No asking price is published for this parcel, so every figure runs on the county-assessed total value of $${residentialAssessedTotal.toLocaleString("en-US")} as a stated screening basis — the county's taxation value, not a market appraisal. Enter your intended offer on the report page to run your own number; the negotiated price and an appraisal govern.`
+        : null;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
   const [proformaError, setProformaError] = useState<string | null>(null);
@@ -2345,6 +2360,9 @@ export function PropertyEvaluationWorkspace({
               )}
             </div>
             <SavedDraftsRail />
+            {/* Permanent-record re-entry (founder-caught 2026-07-29: tokens
+                were mintable from the report but had no entry point here). */}
+            <ReportTokenReturn />
             <PlaceFirstDiscovery flow={addressFirstFlow} embedded />
             {/* ONE front door (founder feedback 2026-07-16): the address form
                 above is how a property comes in; paste/upload is the same task,
@@ -3021,13 +3039,14 @@ export function PropertyEvaluationWorkspace({
             // need the numbers "for a lender if they don't choose ours").
             lenderProforma:
               workspaceProfile.id === "residential" &&
-              effectiveListedPrice != null &&
+              residentialBasisPrice != null &&
               ownershipContext
                 ? buildResidentialLenderSections({
-                    listedPrice: effectiveListedPrice,
+                    listedPrice: residentialBasisPrice,
                     ownershipContext,
                     isHome: isResidentialHomeContext(analysisContext),
                     financingLanes: topProgramPreview,
+                    valuationNote: residentialBasisNote,
                   }) ?? undefined
                 : undefined,
             agriculturalProForma: (() => {
@@ -3551,16 +3570,22 @@ export function PropertyEvaluationWorkspace({
                   : null,
               financingLanes: topProgramPreview,
               // The REAL pro forma body — Sources & Uses through Cash to
-              // Close, modeled numbers only (founder 2026-07-29).
+              // Close, modeled numbers only (founder 2026-07-29). Runs on
+              // the entered/listed price, else the county-assessed total
+              // as a stated screening basis — never an empty stub.
               lenderSections:
-                effectiveListedPrice != null && ownershipContext
+                residentialBasisPrice != null && ownershipContext
                   ? buildResidentialLenderSections({
-                      listedPrice: effectiveListedPrice,
+                      listedPrice: residentialBasisPrice,
                       ownershipContext,
                       isHome: isResidentialHomeContext(analysisContext),
                       financingLanes: topProgramPreview,
+                      valuationNote: residentialBasisNote,
                     })
                   : null,
+              rates: ownershipContext
+                ? { mortgage30Pct: ownershipContext.rates.rate30 ?? null, mortgageWeekOf: ownershipContext.rates.weekOf ?? null }
+                : null,
             }
           : undefined;
       const res = await fetch("/api/public/property-proforma-pdf", {

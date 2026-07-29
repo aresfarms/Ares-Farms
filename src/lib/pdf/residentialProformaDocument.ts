@@ -12,6 +12,7 @@
  * actual terms.
  */
 
+import { estimateLanePricing, type LaneRateContext } from "@/lib/financing/laneRateEstimates";
 import type { LoanProformaInput, ProformaSection } from "@/lib/pdf/generateLoanProformaPdf";
 import type { LenderProformaSection } from "@/lib/property/residentialLenderProforma";
 
@@ -40,6 +41,9 @@ export interface ResidentialProformaArgs {
    * the legacy summary sections below remain only as the no-price fallback.
    */
   lenderSections?: LenderProformaSection[] | null;
+  /** Published-benchmark context so even the no-basis fallback prices the
+      financing lanes (founder 2026-07-29: no bare "Lender quote required"). */
+  rates?: LaneRateContext | null;
 }
 
 /** Neutral lender-proforma section → institutional two-column table section. */
@@ -178,7 +182,7 @@ export function buildResidentialProformaDocument(args: ResidentialProformaArgs):
               { header: "Pricing", width: 0.36, align: "left" },
             ],
             rows: args.financingLanes.slice(0, 8).map((laneName, index) => ({
-              cells: [String(index + 1), laneName, "Lender quote required"],
+              cells: [String(index + 1), laneName, estimateLanePricing(laneName, args.rates ?? null, null).pricing],
             })),
           },
         },

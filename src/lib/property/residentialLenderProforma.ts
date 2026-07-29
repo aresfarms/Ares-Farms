@@ -62,6 +62,9 @@ export interface ResidentialLenderProformaArgs {
   financingLanes: string[];
   rates: LaneRateContext | null;
   disclaimers: string[];
+  /** Printed basis when the price is a stated screening value (e.g. the
+      county-assessed total) rather than an asking price or entered offer. */
+  valuationNote?: string | null;
 }
 
 /** Neutral pro forma section — both PDF renderers consume this shape. */
@@ -85,7 +88,7 @@ export function buildResidentialLenderProforma(
     const loanAmount = args.price - anchor.downPayment;
     sections.push({
       title: "I. SOURCES & USES OF FUNDS",
-      intro: `Modeled on the ${anchor.program} scenario at the stated price. Every scenario in Section II re-runs this structure.`,
+      intro: `${args.valuationNote ? `${args.valuationNote} ` : ""}Modeled on the ${anchor.program} scenario at the stated ${args.valuationNote ? "screening basis" : "price"}. Every scenario in Section II re-runs this structure.`,
       rows: [
         { label: "USES — Purchase price", value: dollars(args.price) },
         { label: "USES — Closing costs (modeled midpoint of the published 2–5% band)", value: `${dollars(closingMid)}  (band ${dollars(args.closingLow)}–${dollars(args.closingHigh)})` },

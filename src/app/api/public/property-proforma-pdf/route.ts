@@ -127,6 +127,13 @@ export async function POST(req: NextRequest) {
       ownershipCosts,
       financingLanes,
       lenderSections: lenderSections?.length ? lenderSections : null,
+      rates: (() => {
+        const r = resRaw?.rates as Record<string, unknown> | null | undefined;
+        if (!r || typeof r !== "object") return null;
+        const pct = typeof r.mortgage30Pct === "number" && Number.isFinite(r.mortgage30Pct) ? r.mortgage30Pct : null;
+        const week = typeof r.mortgageWeekOf === "string" ? r.mortgageWeekOf.slice(0, 20) : null;
+        return pct != null ? { mortgage30Pct: pct, mortgageWeekOf: week } : null;
+      })(),
     });
   } else {
   // ── Screening value derivation (founder direction 2026-07-29: "we HAVE the

@@ -50,3 +50,13 @@ review).
 3. Approve Module 23 (paste your reasoning — e.g. the reuse-confirmation email
    date), approve Module 22, set the source live.
 4. Effect is immediate (runtime activation overlay) — no deploy needed.
+
+## FOUNDER DECISION — 2026-07-29: STAYS OFF
+
+Caitlin's call: leave VEDP dark. Reason: unresolved comfort on whether the
+listings can legally be redisplayed, notwithstanding the fair-use read above.
+Do NOT activate, do NOT re-pitch activation. The wiring stays as-is (PENDING,
+zero public surfaces) so that IF counsel (Stuart pre-launch review, #34)
+clears it later, activation remains a single founder click on
+/source-legal-review — no rebuild needed. Until then this source is treated
+as OFF for launch planning.

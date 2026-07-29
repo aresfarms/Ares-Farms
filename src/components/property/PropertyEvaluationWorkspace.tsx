@@ -39,6 +39,7 @@ import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
+import { buildResidentialLenderProforma, type LenderProformaSection } from "@/lib/property/residentialLenderProforma";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
 import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
@@ -1043,6 +1044,57 @@ function rankPropertyPathways(args: {
  * LISTED prices only — the signed artifact stays deterministic; a price the
  * visitor typed stays on the page it was typed on.
  */
+/**
+ * The REAL residential pro forma sections (founder 2026-07-29: "They should
+ * receive a real pro forma for the property period") — raw numbers from the
+ * ownership-cost model handed to the shared lender-proforma builder. Feeds
+ * BOTH editions: the Pro Forma Report body and the First-Time Buyer Report's
+ * lender-ready appendix.
+ */
+function buildResidentialLenderSections(args: {
+  listedPrice: number;
+  ownershipContext: OwnershipCostContext;
+  isHome: boolean;
+  financingLanes: string[];
+}): LenderProformaSection[] | null {
+  const model = buildOwnershipCostModel(
+    { price: args.listedPrice, priceIsAssumption: false, isHome: args.isHome, farmShaped: false, farmMode: false },
+    args.ownershipContext
+  );
+  if (!model) return null;
+  const outlook = buildEquityOutlook(args.listedPrice, args.ownershipContext);
+  return buildResidentialLenderProforma({
+    price: args.listedPrice,
+    scenarios: model.purchase.scenarios.map((s) => ({
+      program: s.program,
+      downPayment: s.downPayment,
+      downPaymentPct: s.downPaymentPct,
+      monthlyPrincipalInterest: s.monthlyPrincipalInterest,
+      monthlyMortgageInsurance: s.monthlyMortgageInsurance,
+      incomeComfortableAnnual: s.incomeGuidance.comfortableAnnual,
+      incomeStretchAnnual: s.incomeGuidance.stretchAnnual,
+    })),
+    closingLow: model.purchase.closingLow,
+    closingHigh: model.purchase.closingHigh,
+    monthly: model.monthly.map((line) => ({ label: line.label, low: line.low, high: line.high, note: line.note })),
+    monthlyTotals: model.monthlyTotals.map((t) => ({ program: t.program, low: t.low, high: t.high })),
+    equityRows: (outlook?.rows ?? []).map((row) => ({
+      year: row.year,
+      loanBalance: row.loanBalance,
+      flatValue: row.flat.value,
+      flatEquity: row.flat.equity,
+      steadyValue: row.steady.value,
+      steadyEquity: row.steady.equity,
+    })),
+    financingLanes: args.financingLanes,
+    rates: {
+      mortgage30Pct: args.ownershipContext.rates.rate30 ?? null,
+      mortgageWeekOf: args.ownershipContext.rates.weekOf ?? null,
+    },
+    disclaimers: model.disclaimers,
+  });
+}
+
 function formatOwnershipCostsForPdf(args: {
   listedPrice: number;
   ownershipContext: OwnershipCostContext;
@@ -2964,6 +3016,20 @@ export function PropertyEvaluationWorkspace({
                     farmMode: false,
                   })
                 : undefined,
+            // The SAME real pro forma rides in the First-Time Buyer Report as
+            // a lender-ready appendix (founder 2026-07-29: first-time buyers
+            // need the numbers "for a lender if they don't choose ours").
+            lenderProforma:
+              workspaceProfile.id === "residential" &&
+              effectiveListedPrice != null &&
+              ownershipContext
+                ? buildResidentialLenderSections({
+                    listedPrice: effectiveListedPrice,
+                    ownershipContext,
+                    isHome: isResidentialHomeContext(analysisContext),
+                    financingLanes: topProgramPreview,
+                  }) ?? undefined
+                : undefined,
             agriculturalProForma: (() => {
               // Residential-only path — the farm pro forma section never applies here.
               if ((workspaceProfile.id as string) !== "farm" || effectiveListedPrice == null || !ownershipContext) return undefined;
@@ -3484,6 +3550,17 @@ export function PropertyEvaluationWorkspace({
                     }) ?? null
                   : null,
               financingLanes: topProgramPreview,
+              // The REAL pro forma body — Sources & Uses through Cash to
+              // Close, modeled numbers only (founder 2026-07-29).
+              lenderSections:
+                effectiveListedPrice != null && ownershipContext
+                  ? buildResidentialLenderSections({
+                      listedPrice: effectiveListedPrice,
+                      ownershipContext,
+                      isHome: isResidentialHomeContext(analysisContext),
+                      financingLanes: topProgramPreview,
+                    })
+                  : null,
             }
           : undefined;
       const res = await fetch("/api/public/property-proforma-pdf", {

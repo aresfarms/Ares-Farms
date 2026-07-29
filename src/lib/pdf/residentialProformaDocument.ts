@@ -13,6 +13,7 @@
  */
 
 import type { LoanProformaInput, ProformaSection } from "@/lib/pdf/generateLoanProformaPdf";
+import type { LenderProformaSection } from "@/lib/property/residentialLenderProforma";
 
 export interface ResidentialProformaArgs {
   propertyTitle: string;
@@ -33,6 +34,34 @@ export interface ResidentialProformaArgs {
     disclaimers: string[];
   } | null;
   financingLanes: string[];
+  /**
+   * The REAL pro forma body (founder 2026-07-29: Sources & Uses through
+   * qualifying income and cash to close). When present it IS the document;
+   * the legacy summary sections below remain only as the no-price fallback.
+   */
+  lenderSections?: LenderProformaSection[] | null;
+}
+
+/** Neutral lender-proforma section → institutional two-column table section. */
+function toProformaSection(section: LenderProformaSection): ProformaSection {
+  return {
+    title: section.title,
+    leadIns: section.intro ? [{ text: section.intro, bold: false }] : undefined,
+    tables: section.rows?.length
+      ? [
+          {
+            table: {
+              columns: [
+                { header: "Item", width: 0.42, align: "left" },
+                { header: "Detail", width: 0.58, align: "left" },
+              ],
+              rows: section.rows.map((row) => ({ cells: [row.label, row.value], emphasis: row.emphasis })),
+            },
+          },
+        ]
+      : undefined,
+    paragraphs: section.paragraphs,
+  };
 }
 
 export function buildResidentialProformaDocument(args: ResidentialProformaArgs): LoanProformaInput {
@@ -60,7 +89,11 @@ export function buildResidentialProformaDocument(args: ResidentialProformaArgs):
     ],
   });
 
-  if (costs) {
+  if (args.lenderSections?.length) {
+    // The REAL pro forma: Sources & Uses of Funds through Cash to Close,
+    // every figure a modeled number (founder 2026-07-29).
+    for (const section of args.lenderSections) sections.push(toProformaSection(section));
+  } else if (costs) {
     sections.push({
       title: "SECTION 1 — PURCHASE & CASH TO CLOSE",
       leadIns: [
@@ -133,7 +166,7 @@ export function buildResidentialProformaDocument(args: ResidentialProformaArgs):
     });
   }
 
-  if (args.financingLanes.length) {
+  if (args.financingLanes.length && !args.lenderSections?.length) {
     sections.push({
       title: "SECTION 4 — FINANCING LANES TO TEST",
       tables: [
@@ -156,13 +189,16 @@ export function buildResidentialProformaDocument(args: ResidentialProformaArgs):
     });
   }
 
-  sections.push({
-    title: "ADVISORY BOUNDARY",
-    paragraphs: [
-      ...(costs?.disclaimers ?? []),
-      "This document is an advisory screening pro forma prepared without collecting any personal information. It is not a Loan Estimate under TRID, not a rate quote, not a commitment to lend, and not an eligibility or approval finding. Property taxes, insurance, and rates change; the figures are ranges built from published sources with their dates. A licensed lender and your own diligence govern every number before reliance.",
-    ],
-  });
+  if (!args.lenderSections?.length) {
+    // The real pro forma carries its own ADVISORY BOUNDARY section.
+    sections.push({
+      title: "ADVISORY BOUNDARY",
+      paragraphs: [
+        ...(costs?.disclaimers ?? []),
+        "This document is an advisory screening pro forma prepared without collecting any personal information. It is not a Loan Estimate under TRID, not a rate quote, not a commitment to lend, and not an eligibility or approval finding. Property taxes, insurance, and rates change; the figures are ranges built from published sources with their dates. A licensed lender and your own diligence govern every number before reliance.",
+      ],
+    });
+  }
 
   return {
     branding: { logoPath: "/brand/furlong-logo.png", footerIdentity: "Furlong — Residential Buyer Pro Forma (advisory screening)" },

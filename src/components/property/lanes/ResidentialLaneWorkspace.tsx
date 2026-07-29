@@ -9,6 +9,7 @@
  * substrate is shared, through GovernedLaneChassis.
  */
 
+import { estimateLanePricing } from "@/lib/financing/laneRateEstimates";
 import {
   GovernedLaneChassis,
   type FinancingRateContext,
@@ -16,14 +17,15 @@ import {
   type LaneWorkspaceProps,
 } from "@/components/property/lanes/GovernedLaneChassis";
 
+// Illustrative benchmark-anchored pricing per lane (founder 2026-07-29:
+// "We can't give them an estimated cost here instead?" — no more bare
+// "Lender quote required" rows). Shared estimator with both PDF editions.
 function rateLabel(name: string, rates: FinancingRateContext): string {
-  const value = name.toLowerCase();
-  if (/conventional/.test(value)) return rates?.mortgage30Pct != null ? `${rates.mortgage30Pct.toFixed(2)}% national 30-year benchmark${rates.mortgageWeekOf ? ` · week of ${rates.mortgageWeekOf}` : ""}` : "Lender quote required";
-  if (/rural development housing|usda/.test(value)) return rates?.mortgage30Pct != null ? `${rates.mortgage30Pct.toFixed(2)}% national 30-year benchmark — not a USDA-RD quote` : "USDA-RD lender quote required";
-  if (/fha|203\(k\)|\bva\b/.test(value)) return "Program lender quote required";
-  if (/seller financing/.test(value)) return "Rate negotiated with seller";
-  if (/hard money|asset-based bridge|private bridge/.test(value)) return "Private-lender quote required";
-  return "Program-specific quote required";
+  return estimateLanePricing(
+    name,
+    rates ? { mortgage30Pct: rates.mortgage30Pct, mortgageWeekOf: rates.mortgageWeekOf } : null,
+    null
+  ).pricing;
 }
 
 function programNote(name: string) {

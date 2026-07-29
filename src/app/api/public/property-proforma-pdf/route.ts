@@ -93,6 +93,31 @@ export async function POST(req: NextRequest) {
     const financingLanes = resRaw && Array.isArray(resRaw.financingLanes)
       ? (resRaw.financingLanes as unknown[]).slice(0, 8).map((v) => String(v).slice(0, 120)).filter(Boolean)
       : [];
+    // The REAL pro forma body (Sources & Uses → Cash to Close), built by the
+    // shared residentialLenderProforma module client-side from the ownership
+    // model's raw numbers. Sanitized to plain strings with hard caps.
+    const lenderSections = resRaw && Array.isArray(resRaw.lenderSections)
+      ? (resRaw.lenderSections as unknown[]).slice(0, 12).flatMap((s) => {
+          if (!s || typeof s !== "object") return [];
+          const sec = s as Record<string, unknown>;
+          if (typeof sec.title !== "string") return [];
+          return [{
+            title: sec.title.slice(0, 120),
+            intro: typeof sec.intro === "string" ? sec.intro.slice(0, 600) : undefined,
+            rows: Array.isArray(sec.rows)
+              ? (sec.rows as unknown[]).slice(0, 24).flatMap((r) => {
+                  if (!r || typeof r !== "object") return [];
+                  const row = r as Record<string, unknown>;
+                  if (typeof row.label !== "string" || typeof row.value !== "string") return [];
+                  return [{ label: row.label.slice(0, 200), value: row.value.slice(0, 400), emphasis: row.emphasis === true }];
+                })
+              : undefined,
+            paragraphs: Array.isArray(sec.paragraphs)
+              ? (sec.paragraphs as unknown[]).slice(0, 6).map((p) => String(p).slice(0, 900))
+              : undefined,
+          }];
+        })
+      : null;
     document = buildResidentialProformaDocument({
       propertyTitle: title,
       exactAddress: typeof body.exactAddress === "string" ? body.exactAddress.slice(0, 200) : null,
@@ -101,6 +126,7 @@ export async function POST(req: NextRequest) {
       priceLabel: typeof resRaw?.priceLabel === "string" ? (resRaw.priceLabel as string).slice(0, 160) : "Price not yet confirmed",
       ownershipCosts,
       financingLanes,
+      lenderSections: lenderSections?.length ? lenderSections : null,
     });
   } else {
   // ── Screening value derivation (founder direction 2026-07-29: "we HAVE the

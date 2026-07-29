@@ -90,6 +90,15 @@ type PropertyEvaluationPdfInput = {
     assumptions: string[];
     readiness: string[];
   };
+  /** The REAL residential pro forma appendix (founder 2026-07-29): Sources &
+      Uses through Cash to Close — the same modeled sections as the Pro Forma
+      Report, so a first-time buyer can hand THIS document to any lender. */
+  lenderProforma?: Array<{
+    title: string;
+    intro?: string;
+    rows?: Array<{ label: string; value: string; emphasis?: boolean }>;
+    paragraphs?: string[];
+  }>;
   /** Consumer-facing transparency for brokerage agreements, commissions, concessions, and added fees. */
   compensationTransparency?: {
     posture: "CLEAR" | "REVIEW_NEEDED" | "UNKNOWN";
@@ -748,6 +757,22 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       for (const line of own.equityDisclaimers ?? []) paragraph(line, { size: 8.5, color: COLORS.muted });
     }
     for (const line of own.disclaimers) paragraph(line, { size: 8.5, color: COLORS.muted });
+  }
+
+  // ── LENDER-READY PRO FORMA (founder 2026-07-29): the same real pro forma
+  // as the numbers-only edition, carried here so a first-time buyer can take
+  // THIS document to any lender — ours or their own. ──
+  if (input.lenderProforma?.length) {
+    heading("Lender-Ready Pro Forma — Take These Numbers to Any Lender");
+    for (const section of input.lenderProforma) {
+      setFont("bold", 9.5, COLORS.muted);
+      ensure(24);
+      doc.text(section.title.toUpperCase(), PAGE.marginX, y, { characterSpacing: 0.8 });
+      y = doc.y + 8;
+      if (section.intro) paragraph(section.intro, { size: 9.5 });
+      if (section.rows?.length) factsTable(section.rows.map((row) => ({ label: row.label, value: row.value })));
+      for (const line of section.paragraphs ?? []) paragraph(line, { size: 8.5, color: COLORS.muted });
+    }
   }
 
   if (input.compensationTransparency) {

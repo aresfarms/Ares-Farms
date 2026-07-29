@@ -6,6 +6,7 @@ import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
+import { solveDscrCoverage, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
 
 /**
  * DRAFT pro forma PDF — PUBLIC, property-side screening only (founder
@@ -138,6 +139,66 @@ export async function POST(req: NextRequest) {
 
   const failures = evaluateGenerationGate(input);
   const document = buildUltimateProformaDocument(input, { allowDraft: true });
+
+  // ── IV.3 — Coverage solution (founder direction 2026-07-29): solve for the
+  // enterprise mix that clears the 1.25x floor, or say plainly that none can.
+  if (lane === "B" && acreage != null && acreage > 0 && screeningPrice != null && fsaRatePct != null) {
+    const dollars = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
+    const AMORT = 40;
+    const LTV = 0.8;
+    const annualDs = (screeningPrice * LTV * (fsaRatePct / 100)) / (1 - Math.pow(1 + fsaRatePct / 100, -AMORT));
+    const solution = solveDscrCoverage({
+      acres: acreage,
+      screeningPrice,
+      annualDebtService: annualDs,
+      ratePct: fsaRatePct,
+      amortYears: AMORT,
+      ltv: LTV,
+    });
+    const mixClears = (solution.bestMix?.dscr ?? 0) >= DSCR_FLOOR;
+    const verdictLine =
+      solution.verdict === "clears"
+        ? mixClears
+          ? `CLEARS THE FLOOR — the diversified mix below services the debt at ${(solution.bestMix?.dscr ?? 0).toFixed(2)}x. On this screen, agriculture alone can carry the purchase at the screening price.`
+          : `CLEARS THE FLOOR — a single modeled enterprise, ${solution.bestSingle?.label ?? "the best enterprise"}, services the debt at ${(solution.bestSingle?.dscr ?? 0).toFixed(2)}x. The diversified screen alone does not (${(solution.bestMix?.dscr ?? 0).toFixed(2)}x) — clearing the floor on this screen means committing to that enterprise, with the concentration risk and capital requirements that carries. Agriculture can carry this purchase, but only on that plan.`
+        : solution.verdict === "close"
+          ? `COVERS THE PAYMENT, MISSES THE FLOOR — the best modeled option covers the debt (≥1.0x) but falls ${dollars(solution.gapAnnual ?? 0)}/yr short of the ${DSCR_FLOOR}x lender floor. Documented off-farm income of ${dollars(solution.outsideIncomeNeeded ?? 0)}/yr (counted in GLOBAL coverage), an acquisition price near ${solution.maxSupportablePrice != null ? dollars(solution.maxSupportablePrice) : "a lower level"}, or stronger operator records close the gap.`
+          : `NO MODELED COMBINATION CLEARS THE FLOOR — on this screen, no mix of crops, livestock, hay, flowers, or orchard services this debt at the screening price. Agriculture alone will not carry this purchase: plan on documented outside income of ${dollars(solution.outsideIncomeNeeded ?? 0)}/yr (counted in GLOBAL coverage), or an acquisition price near ${solution.maxSupportablePrice != null ? dollars(solution.maxSupportablePrice) : "a substantially lower level"} where the best mix clears ${DSCR_FLOOR}x.`;
+    const mixRows = [
+      ...(solution.bestMix
+        ? solution.bestMix.parts.map((part) => ({
+            cells: [`Mix — ${part.label}`, `${part.sharePct}%`, dollars(part.annualNoi), ""],
+          }))
+        : []),
+      ...(solution.bestMix
+        ? [{ cells: ["BEST MODELED MIX — TOTAL", "100%", dollars(solution.bestMix.annualNoi), `${solution.bestMix.dscr.toFixed(2)}x`], emphasis: true }]
+        : []),
+      ...(solution.bestSingle
+        ? [{ cells: [`Best single enterprise — ${solution.bestSingle.label}`, "—", dollars(solution.bestSingle.annualNoi), `${solution.bestSingle.dscr.toFixed(2)}x`] }]
+        : []),
+      { cells: ["Annual debt service (screening)", "—", dollars(solution.annualDebtService), "1.00x basis"] },
+      { cells: [`Income required for the ${DSCR_FLOOR}x floor`, "—", dollars(solution.requiredNoi), `${DSCR_FLOOR}x`], emphasis: true },
+    ];
+    const gateIdx = document.sections.findIndex((s) => s.title.startsWith("PART V"));
+    document.sections.splice(gateIdx >= 0 ? gateIdx : document.sections.length, 0, {
+      title: `IV.3 — COVERAGE SOLUTION · WHAT CLEARS THE ${DSCR_FLOOR}x FLOOR`,
+      leadIns: [{ text: verdictLine, bold: true }],
+      tables: [
+        {
+          table: {
+            columns: [
+              { header: "Enterprise / measure", width: 0.44, align: "left" },
+              { header: "Share", width: 0.12, align: "right" },
+              { header: "Annual NOI", width: 0.22, align: "right" },
+              { header: "DSCR", width: 0.22, align: "right" },
+            ],
+            rows: mixRows,
+          },
+        },
+      ],
+      paragraphs: solution.notes,
+    });
+  }
 
   // ── Property exhibits (founder direction 2026-07-29: ONE document) ────────
   // The verified Land Ledger evidence rides behind the pro forma as exhibits,

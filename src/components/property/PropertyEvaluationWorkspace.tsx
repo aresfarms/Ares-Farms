@@ -3463,6 +3463,9 @@ export function PropertyEvaluationWorkspace({
           // value (assessed value, else USDA state average × acreage) so the
           // document carries real numbers with their basis printed.
           assessedTotalValue: facts?.propertyRecord?.assessedTotalValue ?? null,
+          // Parcel soil facts gate what the coverage solver may recommend
+          // (founder 2026-07-29: soil type and topography must be respected).
+          soil: effectivePlaceIntelligence?.soilProfile ?? null,
           acreage,
           fsaRatePct,
           revenueUnits,

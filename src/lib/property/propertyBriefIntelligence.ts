@@ -212,6 +212,16 @@ export interface PropertyBriefIntelligence {
       construction diligence — authoritative links, never fabricated providers or
       embedded crime data. Applies to every property. */
   localServices: LocalServices | null;
+  /** Structured SSURGO soil facts for the parcel (live point query) — the
+      agronomic constraints (drainage, slope, capability) that gate what this
+      ground can sustainably grow (founder direction 2026-07-29). */
+  soilProfile: {
+    mapUnitName: string | null;
+    farmlandClass: string | null;
+    drainageClass: string | null;
+    slopePct: number | null;
+    capabilityClass: number | null;
+  } | null;
   /** County derived from the property's census tract when the record lacked one. */
   resolvedCounty: ResolvedCounty | null;
   /** Up to four verified-fact chips for the Answer card (flood, grocery, schools, rent). */
@@ -1880,6 +1890,15 @@ export function buildPropertyBriefIntelligence(args: {
       broadbandPctServed: fmrFips ? COUNTY_BROADBAND[fmrFips]?.pctServed ?? null : null,
       broadbandPctWired: fmrFips ? COUNTY_BROADBAND[fmrFips]?.pctWired ?? null : null,
     }),
+    soilProfile: id && PROPERTY_SOIL[id]
+      ? {
+          mapUnitName: null,
+          farmlandClass: PROPERTY_SOIL[id]?.primeFarmland ?? null,
+          drainageClass: null,
+          slopePct: null,
+          capabilityClass: PROPERTY_SOIL[id]?.capabilityClass ?? null,
+        }
+      : null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,
@@ -2452,6 +2471,16 @@ export async function buildLocationBriefIntelligence(args: {
       broadbandPctServed: countyFips ? COUNTY_BROADBAND[countyFips]?.pctServed ?? null : null,
       broadbandPctWired: countyFips ? COUNTY_BROADBAND[countyFips]?.pctWired ?? null : null,
     }),
+    // Live SSURGO point query — the agronomic gate for the coverage solver.
+    soilProfile: soilResult
+      ? {
+          mapUnitName: soilResult.mapUnitName,
+          farmlandClass: soilResult.farmlandClass,
+          drainageClass: soilResult.drainageClass,
+          slopePct: soilResult.slopePct,
+          capabilityClass: soilResult.capabilityClass,
+        }
+      : null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,

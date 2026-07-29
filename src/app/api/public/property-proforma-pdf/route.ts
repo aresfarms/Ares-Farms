@@ -5,7 +5,6 @@ import { buildUltimateProformaDocument, evaluateGenerationGate } from "@/lib/pdf
 import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
-import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
 import { solveDscrCoverage, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
 
 /**
@@ -34,6 +33,7 @@ export async function POST(req: NextRequest) {
       propertyEvidence?: unknown;
       laneAnswerLines?: unknown;
       assessedTotalValue?: unknown;
+      soil?: unknown;
     }
   >(req, {
     maxBytes: 128 * 1024,
@@ -97,28 +97,42 @@ export async function POST(req: NextRequest) {
     valuationNote = `SCREENING VALUE — ${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres × USDA ${stateFarmland.year ?? STATE_FARMLAND_PROVENANCE.asOf} state farm real-estate average ($${stateFarmland.dollarsPerAcre.toLocaleString("en-US")}/acre); asking price and appraisal govern`;
   }
 
-  // Revenue: prefer client-modeled units; when absent, run the same screening
-  // optimizer server-side off the derived value (lane B, acreage known).
-  let effectiveRevenueUnits = revenueUnits;
-  if (effectiveRevenueUnits.length === 0 && lane === "B" && acreage != null && acreage > 0 && screeningPrice != null && fsaRatePct != null) {
+  // Soil/topography constraints (founder direction 2026-07-29): the parcel's
+  // SSURGO facts gate what this ground can sustainably grow.
+  const soilRaw = body.soil as Record<string, unknown> | null | undefined;
+  const soil = soilRaw && typeof soilRaw === "object"
+    ? {
+        mapUnitName: typeof soilRaw.mapUnitName === "string" ? soilRaw.mapUnitName.slice(0, 160) : null,
+        farmlandClass: typeof soilRaw.farmlandClass === "string" ? soilRaw.farmlandClass.slice(0, 120) : null,
+        drainageClass: typeof soilRaw.drainageClass === "string" ? soilRaw.drainageClass.slice(0, 80) : null,
+        slopePct: num(soilRaw.slopePct),
+        capabilityClass: num(soilRaw.capabilityClass),
+      }
+    : null;
+
+  // Coverage solve (soil-constrained) — also the source of the modeled
+  // revenue units, so Part I and IV.3 tell the same soil-aware story.
+  let coverageSolution: ReturnType<typeof solveDscrCoverage> | null = null;
+  if (lane === "B" && acreage != null && acreage > 0 && screeningPrice != null && fsaRatePct != null) {
     const debtService = (screeningPrice * 0.8 * (fsaRatePct / 100)) / (1 - Math.pow(1 + fsaRatePct / 100, -40));
-    const model = optimizeAgriculturalOpportunities({
+    coverageSolution = solveDscrCoverage({
       acres: acreage,
-      purchasePrice: screeningPrice,
-      debtService,
-      waterScore: 70,
-      laborCapacity: 55,
-      capitalCapacity: 55,
-      marketAccess: 60,
-      gridEvidence: false,
-      solarZoningEvidence: false,
+      screeningPrice,
+      annualDebtService: debtService,
+      ratePct: fsaRatePct,
+      amortYears: 40,
+      ltv: 0.8,
+      soil,
     });
-    effectiveRevenueUnits = model.diversified.slice(0, 6).map((item) => ({
-      unitName: item.label,
-      unitDescription: `${Math.round(item.portfolioShare * 100)}% of the diversified screening portfolio on ~${acreage.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
-      conservativeAnnualNoi: Math.round(item.noi * item.portfolioShare * 0.75),
-      stabilizedAnnualNoi: Math.round(item.noi * item.portfolioShare),
-      methodology: "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
+  }
+  let effectiveRevenueUnits = revenueUnits;
+  if (effectiveRevenueUnits.length === 0 && coverageSolution?.bestMix) {
+    effectiveRevenueUnits = coverageSolution.bestMix.parts.slice(0, 6).map((part) => ({
+      unitName: part.label,
+      unitDescription: `${part.sharePct}% of the soil-constrained diversified screening portfolio on ~${acreage!.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
+      conservativeAnnualNoi: Math.round(part.annualNoi * 0.75),
+      stabilizedAnnualNoi: part.annualNoi,
+      methodology: "Soil-constrained screening optimizer over county economics — editable assumptions, not appraisals, bids, or contracts.",
     }));
   }
 
@@ -141,20 +155,11 @@ export async function POST(req: NextRequest) {
   const document = buildUltimateProformaDocument(input, { allowDraft: true });
 
   // ── IV.3 — Coverage solution (founder direction 2026-07-29): solve for the
-  // enterprise mix that clears the 1.25x floor, or say plainly that none can.
-  if (lane === "B" && acreage != null && acreage > 0 && screeningPrice != null && fsaRatePct != null) {
+  // soil-sustainable enterprise mix that clears the 1.25x floor, or say
+  // plainly that none can.
+  if (coverageSolution) {
     const dollars = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
-    const AMORT = 40;
-    const LTV = 0.8;
-    const annualDs = (screeningPrice * LTV * (fsaRatePct / 100)) / (1 - Math.pow(1 + fsaRatePct / 100, -AMORT));
-    const solution = solveDscrCoverage({
-      acres: acreage,
-      screeningPrice,
-      annualDebtService: annualDs,
-      ratePct: fsaRatePct,
-      amortYears: AMORT,
-      ltv: LTV,
-    });
+    const solution = coverageSolution;
     const mixClears = (solution.bestMix?.dscr ?? 0) >= DSCR_FLOOR;
     const verdictLine =
       solution.verdict === "clears"

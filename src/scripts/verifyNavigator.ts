@@ -264,9 +264,9 @@ ok(!/cta-explore-map|href="#americas-possibilities"|id="americas-possibilities"/
 ok(!/cta-start-journey|cta-possibilities-map|home-discovery-cta/.test(home), "old CTA labels/testids removed");
 
 const heroCopy = fs.readFileSync("src/lib/public-content/publicCopyRegistry.ts", "utf8");
-ok(/Bring the property\. We bring the analysis\./.test(heroCopy), "canonical property-analysis headline is locked");
-ok(/Start with a property, a place, or just a question\./.test(heroCopy),
-  "supporting copy permits property, place, or question entry");
+ok(/Type in an address\. See if it's worth buying — and exactly how to pay for it\./.test(heroCopy), "canonical address-first headline is locked (hero v3, founder 2026-07-29)");
+ok(/Start with an address — or just a question —/.test(heroCopy),
+  "supporting copy permits address or question entry");
 ok(/Explore anonymously\. No account required\. No hidden handoff\./.test(heroCopy),
   "anonymous first-touch trust line is locked");
 ok(/primaryLabel:\s*"Start with Furlong Navigator"/.test(heroCopy),
@@ -437,7 +437,7 @@ async function main() {
     ok((homeHtml.match(/data-testid="cta-navigator"/g) ?? []).length === 1 &&
        (homeHtml.match(/data-testid="cta-explore-map"/g) ?? []).length === 0,
       "SSR: hero renders one governed Navigator CTA");
-    ok(/Bring the property\. We bring the analysis\./.test(homeHtml), "SSR: canonical headline renders");
+    ok(/Type in an address\. See if it&#x27;s worth buying — and exactly how to pay for it\./.test(homeHtml) || /Type in an address\. See if it's worth buying — and exactly how to pay for it\./.test(homeHtml), "SSR: canonical headline renders");
     const navHtml = await fetch(`${BASE}/navigator`).then((r) => r.text());
     ok(navHtml.includes('data-testid="place-first-discovery"'), "SSR: /navigator renders place-first Navigator");
     ok(!/under-map-explore-cta/.test(homeHtml), "SSR: no CTA after the tour controls");

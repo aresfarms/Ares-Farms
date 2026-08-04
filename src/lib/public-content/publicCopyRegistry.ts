@@ -51,24 +51,42 @@
  *     longer canonical list ("land, capital, business, and community") stays on
  *     the /about mission line. Do not reintroduce "commercial pathways".
  */
+/**
+ * Hero v3 (founder direction 2026-07-29, from Stuart's positioning review):
+ * the customer's own sentence — "you type in an address and it tells you if
+ * it's worth buying and how to finance it, whoever you are" — stated as an
+ * action + outcome, not a catalog of capabilities. Supersedes "Bring the
+ * property. We bring the analysis." (retired: described Furlong's activity,
+ * not the visitor's outcome; the four-item tagline list covered three
+ * audiences at once and read as comprehensive rather than specific).
+ * Advisory posture preserved: the visitor SEES and decides; nothing promises
+ * value, approval, or eligibility.
+ */
 export const HOMEPAGE_HERO = {
   brandName: "Furlong",
-  headline:  "Bring the property. We bring the analysis.",
+  headline:  "Type in an address. See if it's worth buying — and exactly how to pay for it.",
   tagline:
-    "What the land can earn, what a building's really worth, the deal-killers to dodge, the financing that fits — see it free before you commit to anything.",
+    "A house, a farm, a commercial building, bare land — Furlong shows you what's really there, what it actually costs to own, the deal-killers hiding in the details, and the financing built for exactly that kind of property. Free, before you commit to anything.",
   subhead:
-    "Start with a property, a place, or just a question. Furlong shows you what's possible, where the " +
-    "boundaries are, and your next move — before you talk to anyone or share a thing.",
+    "Not sure the property is even right for what you want? That's the exact question this answers. " +
+    "Start with an address — or just a question — and see the whole picture and your next move before you talk to anyone or share a thing.",
   trustTag:  "Explore anonymously. No account required. No hidden handoff.",
 } as const;
 
+/**
+ * CTA v2 (founder direction 2026-07-29): buttons say the ACTION in the
+ * customer's words, not brand-internal nouns — a first-time visitor doesn't
+ * know what a "Navigator" or "Compass" is yet (Stuart's "What is this?"
+ * reaction lived on these buttons). The Compass keeps its name in the
+ * support line, where it's introduced rather than assumed.
+ */
 export const HOMEPAGE_PRIMARY_ACTIONS = {
-  primaryLabel: "Start with Furlong Navigator",
+  primaryLabel: "Check an address — free",
   primarySupport:
-    "Tell us what you're trying to figure out and we'll help surface pathways, options, and constraints.",
-  secondaryLabel: "Open the Compass",
+    "Any U.S. address — a home, a farm, a business property, or bare land. The facts come first; no account, no sales call.",
+  secondaryLabel: "Browse every pathway",
   secondarySupport:
-    "Move through the Furlong Compass — your pathways across land, farms, business, financing, and grants.",
+    "Not address-first? Move through the Furlong Compass — farms, homes, business, financing, and grants on one map.",
 } as const;
 
 export const HOMEPAGE_CAPABILITIES = {
@@ -105,8 +123,10 @@ export const HOMEPAGE_CAPABILITIES = {
 
 export const HOMEPAGE_MODULES = {
   heading: "Where do you want to go?",
+  // Hero v3 alignment (2026-07-29): the modules echo the address-first
+  // promise instead of re-stating the retired "we bring the analysis" line.
   intro:
-    "Bring the property or the question — we bring the analysis. Explore any lane free; bring in a licensed professional only when you're ready.",
+    "Whatever the property is — a house, a farm, a commercial building, bare land — there's a lane built for its questions. Explore any of them free; bring in a licensed professional only when you're ready.",
   cards: [
     {
       title: "Farms, Agriculture & Land",

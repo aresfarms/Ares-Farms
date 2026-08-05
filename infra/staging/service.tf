@@ -121,6 +121,29 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # Evidence-replay signing secrets (+ rotation variant) — created and
+      # versioned OUT OF BAND by the owner (same pattern as SENDGRID_API_KEY).
+      # Signs governed evidence-lineage replay packets; the customer financing
+      # intake 500s without them (staging test 2026-08-05).
+      env {
+        name = "EVIDENCE_REPLAY_SIGNING_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "EVIDENCE_REPLAY_SIGNING_SECRET"
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name = "EVIDENCE_REPLAY_SIGNING_SECRET_V1"
+        value_source {
+          secret_key_ref {
+            secret  = "EVIDENCE_REPLAY_SIGNING_SECRET_V1"
+            version = "latest"
+          }
+        }
+      }
+
       # Non-secret revision forcer: incrementing var.secret_revision_epoch
       # after a rotation mints a new revision so `latest` is re-resolved.
       env {

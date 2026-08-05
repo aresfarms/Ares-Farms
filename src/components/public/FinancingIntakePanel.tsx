@@ -299,19 +299,14 @@ export function FinancingIntakePanel() {
           <label style={label} htmlFor="fin-program">Program you have in mind (optional)</label>
           <select id="fin-program" style={field} value={programInterest} onChange={(e) => setProgramInterest(e.target.value as FinancingProgramInterest | "")}>
             <option value="">Select…</option>
-            {FINANCING_PROGRAMS.map((p) => (
+            {/* FSA is not offered here (founder 2026-08-05): the in-network
+                lender doesn't originate FSA paper, so it isn't a selectable
+                destination. FSA education + the FSA-lender hand-off stay in
+                the pathways guide and pro forma — inform, never steer. */}
+            {FINANCING_PROGRAMS.filter((p) => p.code !== "fsa").map((p) => (
               <option key={p.code} value={p.code}>{p.label}</option>
             ))}
           </select>
-          {programInterest === "fsa" && (
-            <p style={{ margin: "6px 0 0", fontSize: 12, lineHeight: 1.55, color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A", borderRadius: 8, padding: "8px 10px" }}>
-              Honest heads-up: our in-network licensed lender sources commercial and business
-              debt — FSA farm loans aren&apos;t in network, so this submission is recorded but
-              won&apos;t be reviewed by a lender here. FSA-guaranteed lenders, Farm Credit
-              associations, and ag banks make these loans; your Furlong pro forma is built to
-              take to any of them.
-            </p>
-          )}
         </div>
       </div>
 

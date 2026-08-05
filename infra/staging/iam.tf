@@ -82,6 +82,23 @@ resource "google_secret_manager_secret_iam_member" "runtime_nextauth_secret" {
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+# EVIDENCE_REPLAY_SIGNING_SECRET (+ rotation variant _V1) — created + versioned
+# out of band by the owner. Required by the evidence-lineage replay signer,
+# which the customer financing intake calls on every submission.
+resource "google_secret_manager_secret_iam_member" "runtime_evidence_replay_signing" {
+  project   = var.project_id
+  secret_id = "EVIDENCE_REPLAY_SIGNING_SECRET"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "runtime_evidence_replay_signing_v1" {
+  project   = var.project_id
+  secret_id = "EVIDENCE_REPLAY_SIGNING_SECRET_V1"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
 resource "google_secret_manager_secret_iam_member" "runtime_report_signing" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.app["REPORT_SIGNING_SECRET"].secret_id

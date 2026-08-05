@@ -49,6 +49,7 @@ export interface DealSummary {
   contactName: string | null;
   contactEmail: string | null;
   contactPhone: string | null;
+  mailingAddress: string | null;
   propertyDescriptor: string | null;
   locationState: string | null;
   locationCounty: string | null;
@@ -58,6 +59,19 @@ export interface DealSummary {
   deskState: DealDeskState;
   applicationId: string;
   documentCount: number;
+}
+
+function mailingAddressFrom(metadata: unknown): string | null {
+  const raw = metadata as {
+    contactAddress?: string | null;
+    mailingAddress?: { street?: string | null; city?: string | null; state?: string | null; postalCode?: string | null } | null;
+  } | null;
+  const m = raw?.mailingAddress;
+  const parts = m
+    ? [m.street, m.city, m.state, m.postalCode].filter((p): p is string => Boolean(p && p.trim()))
+    : [];
+  if (parts.length > 0) return parts.join(", ");
+  return raw?.contactAddress?.trim() || null;
 }
 
 function deskStateFrom(metadata: unknown): DealDeskState {
@@ -103,6 +117,7 @@ export async function listLenderDeals(limit = 50): Promise<DealSummary[]> {
       contactName: row.contactName,
       contactEmail: row.contactEmail,
       contactPhone: row.contactPhone,
+      mailingAddress: mailingAddressFrom(row.metadata),
       propertyDescriptor: row.propertyDescriptor,
       locationState: row.locationState,
       locationCounty: row.locationCounty,

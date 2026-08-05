@@ -85,6 +85,9 @@ export function FinancingIntakePanel() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactAddress, setContactAddress] = useState("");
+  const [contactCity, setContactCity] = useState("");
+  const [contactState, setContactState] = useState("");
+  const [contactPostalCode, setContactPostalCode] = useState("");
   const [propertyDescriptor, setPropertyDescriptor] = useState("");
   const [state, setState] = useState("");
   const [county, setCounty] = useState("");
@@ -103,6 +106,9 @@ export function FinancingIntakePanel() {
       contactEmail,
       contactPhone,
       contactAddress,
+      contactCity,
+      contactState,
+      contactPostalCode,
       propertyDescriptor,
       location: { state, county },
       estimatedProjectCost: estimatedProjectCost
@@ -120,6 +126,9 @@ export function FinancingIntakePanel() {
       contactEmail,
       contactPhone,
       contactAddress,
+      contactCity,
+      contactState,
+      contactPostalCode,
       propertyDescriptor,
       state,
       county,
@@ -323,7 +332,22 @@ export function FinancingIntakePanel() {
 
       <div>
         <label style={label} htmlFor="fin-address">Your mailing address (optional — the lender collects it later)</label>
-        <input id="fin-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} />
+        <input id="fin-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} placeholder="Street address" />
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 10 }}>
+        <div>
+          <label style={label} htmlFor="fin-city">City</label>
+          <input id="fin-city" style={field} value={contactCity} onChange={(e) => setContactCity(e.target.value)} />
+        </div>
+        <div>
+          <label style={label} htmlFor="fin-mailing-state">State</label>
+          <input id="fin-mailing-state" style={field} value={contactState} onChange={(e) => setContactState(e.target.value)} />
+        </div>
+        <div>
+          <label style={label} htmlFor="fin-zip">ZIP code</label>
+          <input id="fin-zip" style={field} value={contactPostalCode} onChange={(e) => setContactPostalCode(e.target.value)} inputMode="numeric" />
+        </div>
       </div>
 
       <div>
@@ -333,11 +357,11 @@ export function FinancingIntakePanel() {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
         <div>
-          <label style={label} htmlFor="fin-state">State</label>
+          <label style={label} htmlFor="fin-state">State the property is in</label>
           <input id="fin-state" style={field} value={state} onChange={(e) => setState(e.target.value)} />
         </div>
         <div>
-          <label style={label} htmlFor="fin-county">County (optional)</label>
+          <label style={label} htmlFor="fin-county">Property county (optional)</label>
           <input id="fin-county" style={field} value={county} onChange={(e) => setCounty(e.target.value)} />
         </div>
         <div>

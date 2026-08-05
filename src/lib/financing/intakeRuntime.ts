@@ -78,6 +78,9 @@ export interface FinancingIntakeInput {
   contactEmail?: string | null;
   contactPhone?: string | null;
   contactAddress?: string | null;
+  contactCity?: string | null;
+  contactState?: string | null;
+  contactPostalCode?: string | null;
   propertyDescriptor?: string | null;
   location?: {
     state?: string | null;

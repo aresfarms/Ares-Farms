@@ -43,7 +43,7 @@ export const OPERATORS: Operator[] = [
   },
   {
     id: "op-stuart",
-    email: "stuart@aresfarmsinc.com",
+    email: "sfraas@aresfarmsinc.com",
     name: "Stuart",
     role: "operator",
     capabilities: ["view:internal", "approve:source-legal"],

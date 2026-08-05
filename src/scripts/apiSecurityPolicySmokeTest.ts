@@ -56,6 +56,19 @@ function main() {
     "Protected application route should not be public."
   );
   assert(
+    apiSecurityPublicReason("/api/financing/intake") === "public-surface-gateway",
+    "Customer financing intake must stay public — customers never have a session (staging regression 2026-08-05)."
+  );
+  assert(
+    apiSecurityPublicReason("/api/service-requests/status") ===
+      "public-surface-gateway",
+    "Customer status lookup must stay public — it is minimum-disclosure (ref + email) by design."
+  );
+  assert(
+    apiSecurityPublicReason("/api/lender/deal-desk") === null,
+    "The lender deal desk must NEVER be public — session-derived authority only."
+  );
+  assert(
     apiAuthEnforcementRequired({
       API_AUTH_ENFORCEMENT: "required",
     }),

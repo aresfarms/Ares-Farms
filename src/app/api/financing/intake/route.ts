@@ -360,6 +360,12 @@ export async function POST(req: NextRequest) {
         route: "/api/financing/intake",
         purpose: intakeResult.purpose?.code ?? null,
         contactAddress: body.contactAddress ?? null,
+        mailingAddress: {
+          street: body.contactAddress ?? null,
+          city: body.contactCity ?? null,
+          state: body.contactState ?? null,
+          postalCode: body.contactPostalCode ?? null,
+        },
         timeline: body.timeline ?? null,
         readinessPercent: intakeResult.readiness.readinessPercent,
       },

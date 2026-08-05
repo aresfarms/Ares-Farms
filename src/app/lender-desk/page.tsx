@@ -29,8 +29,9 @@ import {
  * reminder + timeline runbooks; Vol V observability on every action.
  */
 
-const ROLE = "lender";
-const ACTOR = "lender-desk-console";
+// Identity is session-derived server-side (proxy-verified headers + the
+// operator registry) — the console claims NOTHING. Client-claimed role/actor
+// params conflict with the session at the API perimeter (staging 2026-08-05).
 
 interface Timeline {
   docsDueAt: string | null;
@@ -47,6 +48,7 @@ interface Deal {
   contactName: string | null;
   contactEmail: string | null;
   contactPhone: string | null;
+  mailingAddress: string | null;
   propertyDescriptor: string | null;
   locationState: string | null;
   locationCounty: string | null;
@@ -137,9 +139,7 @@ export default function LenderDeskPage() {
     setLoading(true);
     setLoadError(null);
     try {
-      const res = await fetch(
-        `/api/lender/deal-desk?view=deals&role=${ROLE}&actorId=${ACTOR}`
-      );
+      const res = await fetch(`/api/lender/deal-desk?view=deals`);
       const json = await res.json();
       if (!res.ok || json.ok !== true) {
         setLoadError(typeof json.error === "string" ? json.error : "Load failed.");
@@ -170,7 +170,7 @@ export default function LenderDeskPage() {
     void fetch("/api/lender/deal-desk", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "remind-all", role: ROLE, actorId: ACTOR }),
+      body: JSON.stringify({ action: "remind-all" }),
     })
       .then((r) => r.json())
       .then((json) => {
@@ -187,7 +187,7 @@ export default function LenderDeskPage() {
     const res = await fetch(
       `/api/lender/deal-desk?view=documents&applicationId=${encodeURIComponent(
         deal.applicationId
-      )}&role=${ROLE}&actorId=${ACTOR}`
+      )}`
     );
     const json = await res.json();
     if (res.ok && json.ok === true) {
@@ -220,8 +220,6 @@ export default function LenderDeskPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "update",
-            role: ROLE,
-            actorId: ACTOR,
             serviceRequestId: deal.serviceRequestId,
             status: draft.status,
             customerNote: draft.customerNote,
@@ -268,8 +266,6 @@ export default function LenderDeskPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "remind",
-            role: ROLE,
-            actorId: ACTOR,
             serviceRequestId: deal.serviceRequestId,
             force,
           }),
@@ -393,7 +389,9 @@ export default function LenderDeskPage() {
                       .join(" · ")}
                   </span>
                   <span style={{ color: "#596579", fontSize: 13 }}>
-                    {[deal.contactEmail, deal.contactPhone].filter(Boolean).join(" · ")}
+                    {[deal.contactEmail, deal.contactPhone, deal.mailingAddress]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </span>
                 </div>
                 <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
@@ -469,7 +467,7 @@ export default function LenderDeskPage() {
                                     <a
                                       href={`/api/lender/deal-desk?view=download&documentId=${encodeURIComponent(
                                         doc.id
-                                      )}&role=${ROLE}&actorId=${ACTOR}`}
+                                      )}`}
                                       style={{ color: "#1f4f7a", fontWeight: 700 }}
                                     >
                                       Download

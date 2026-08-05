@@ -3,6 +3,8 @@ import { eq } from "drizzle-orm";
 
 import { applicationDocuments } from "@/db/schema";
 import { evaluateAccess, type AccessRole } from "@/lib/auth/accessControl";
+import { operatorByEmail } from "@/lib/auth/operatorRegistry";
+import { apiAuthEnforcementRequired } from "@/lib/security/apiSecurityPolicy";
 import { db } from "@/lib/db";
 import {
   fetchObjectStream,
@@ -61,24 +63,44 @@ function portalBaseUrl(req: NextRequest): string {
 }
 
 /**
- * Actor identity: the security proxy verifies the session and injects
- * x-ares-authenticated-* headers; those WIN over anything the client claims.
- * Claimed values are only a fallback for sessions that carry no role/actor
- * (the proxy has already rejected any claim that conflicts with the session).
+ * Actor identity — session-derived, never client-claimed (staging test
+ * 2026-08-05 proved query-claimed roles conflict with the session at the
+ * API perimeter). Authority resolves in strict order:
+ *   1. The operator registry (Module 45 accountable-authority list) looked up
+ *      by the proxy-verified session EMAIL — the founder maps to admin, the
+ *      finance-licensed operator to lender, other operators to operator.
+ *   2. The proxy-verified session role header, if it's already privileged.
+ *   3. Dev-only fallback when API auth enforcement is off (local testing;
+ *      the perimeter is open there anyway and staging/production set
+ *      API_AUTH_ENFORCEMENT=required).
+ * Anything else resolves to "user" and is denied by evaluateAccess.
  */
-function resolveIdentity(
-  req: NextRequest,
-  claimedRole: string,
-  claimedActorId: string | null
-): { role: string; actorId: string | null } {
-  const sessionRole = req.headers.get("x-ares-authenticated-role");
+function resolveIdentity(req: NextRequest): { role: string; actorId: string | null } {
+  const email = req.headers.get("x-ares-authenticated-email")?.trim() || null;
   const sessionActor =
-    req.headers.get("x-ares-authenticated-user-id") ??
-    req.headers.get("x-ares-authenticated-email");
-  return {
-    role: sessionRole?.trim() || claimedRole,
-    actorId: sessionActor?.trim() || claimedActorId,
-  };
+    req.headers.get("x-ares-authenticated-user-id")?.trim() || email;
+
+  const operator = operatorByEmail(email);
+  if (operator) {
+    const role =
+      operator.role === "founder-operator"
+        ? "admin"
+        : operator.license?.toLowerCase().includes("finance")
+          ? "lender"
+          : "operator";
+    return { role, actorId: email ?? operator.id };
+  }
+
+  const sessionRole = req.headers.get("x-ares-authenticated-role")?.trim();
+  if (sessionRole && ALLOWED_ROLES.includes(sessionRole as AccessRole)) {
+    return { role: sessionRole, actorId: sessionActor };
+  }
+
+  if (!apiAuthEnforcementRequired()) {
+    return { role: "lender", actorId: sessionActor ?? "dev-lender-console" };
+  }
+
+  return { role: "user", actorId: sessionActor };
 }
 
 function authorize(args: {
@@ -135,11 +157,7 @@ function denied(traceId: string, actorId: string | null, operation: string) {
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
   const view = params.get("view") ?? "deals";
-  const { role, actorId } = resolveIdentity(
-    req,
-    params.get("role") ?? "user",
-    params.get("actorId")
-  );
+  const { role, actorId } = resolveIdentity(req);
   const traceId = traceIdFor(`read-${view}`);
   const operation = `lender-desk.read-${view}`;
 
@@ -324,11 +342,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid JSON body." }, { status: 400 });
   }
   const action = typeof body.action === "string" ? body.action : "";
-  const { role, actorId } = resolveIdentity(
-    req,
-    typeof body.role === "string" ? body.role : "user",
-    typeof body.actorId === "string" ? body.actorId : null
-  );
+  const { role, actorId } = resolveIdentity(req);
   const traceId = traceIdFor(action || "post");
   const operation = `lender-desk.${action || "unknown"}`;
 

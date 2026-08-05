@@ -231,7 +231,11 @@ export function evaluateCredentialAuthPolicy(input: {
   }
 
   const allowlist = parseEmailAllowlist(env.AUTH_CREDENTIAL_EMAIL_ALLOWLIST);
-  const sharedSecret = env.AUTH_CREDENTIAL_SHARED_SECRET;
+  // Trim BOTH sides of the comparison: the typed password is normalized
+  // (trimmed), so an invisible trailing newline in the stored secret version
+  // (the classic `echo | gcloud secrets versions add` artifact) would make
+  // sign-in impossible forever (founder staging test 2026-08-05).
+  const sharedSecret = env.AUTH_CREDENTIAL_SHARED_SECRET?.trim();
 
   if (!allowlist.has(email)) {
     return {

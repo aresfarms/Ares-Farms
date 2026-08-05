@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import {
@@ -41,6 +41,8 @@ import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOp
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildResidentialLenderProforma, type LenderProformaSection } from "@/lib/property/residentialLenderProforma";
+import { evaluateProgramFit, type ProgramFitContext } from "@/lib/property/financingProgramFit";
+import { solveDscrCoverage } from "@/lib/property/dscrCoverageSolver";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
 import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
@@ -3231,6 +3233,7 @@ export function PropertyEvaluationWorkspace({
         "FHA purchase financing",
         "FHA 203(k) renovation financing",
         "VA purchase or renovation financing — borrower eligibility required",
+        "USDA Rural Development purchase financing — 0% down in eligible rural areas",
         "Conventional purchase or renovation financing",
         "Construction-to-permanent financing — if rehabilitation is impractical",
         "Seller financing — seller carries a negotiated note",
@@ -3238,7 +3241,12 @@ export function PropertyEvaluationWorkspace({
       ]
     : workspaceProfile.id === "farm"
       ? [
-          "USDA FSA farm ownership financing",
+          // FSA split (founder 2026-08-05): direct and guaranteed are
+          // different programs with different limits, rates, and lenders —
+          // presenting one undifferentiated "FSA" entry was steering by
+          // omission toward the direct program.
+          "FSA direct farm ownership financing — USDA lends directly",
+          "FSA guaranteed farm ownership financing — bank loan with a USDA guarantee",
           "USDA Rural Development housing financing — if owner-occupied residential use fits",
           "Farm Credit or agricultural real-estate financing",
           "Conventional farm or mixed-use financing",
@@ -3258,6 +3266,66 @@ export function PropertyEvaluationWorkspace({
   // Property-type compatibility controls this public list. Borrower-ranked
   // results may refine order later, but must never replace the correct lane.
   const topProgramPreview = preliminaryPropertyPathways;
+  // ── Property-first program fit (founder premise 2026-08-05): rank the
+  // financing programs by THIS property's own paper — eligibility gates from
+  // the live USDA rural layer + statutory loan limits, and the standalone
+  // DSCR test from the parcel's modeled income at each program's rate/term.
+  const financingProgramFit = useMemo(() => {
+    const laneId: ProgramFitContext["laneId"] =
+      workspaceProfile.id === "farm" || workspaceProfile.id === "land"
+        ? "farm"
+        : workspaceProfile.id === "residential"
+          ? "residential"
+          : "commercial";
+    const screeningPrice =
+      effectiveListedPrice ?? facts?.propertyRecord?.assessedTotalValue ?? null;
+    const soil = effectivePlaceIntelligence?.soilProfile ?? null;
+    let noiAnnual: number | null = null;
+    let noiBasis: string | null = null;
+    if (laneId === "farm" && screeningPrice != null) {
+      // Parcel-resolver acreage reads "≈41 acres by mapped parcel geometry" —
+      // extract the number, never parseFloat a prefixed string.
+      const acresMatch = (facts?.propertyRecord?.acreageText ?? "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
+      const acres =
+        facts?.propertyRecord?.offeredAcreage ??
+        (acresMatch ? Number(acresMatch[1]) : null);
+      const ratePct =
+        ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? null;
+      if (acres != null && acres > 0 && ratePct != null) {
+        const r = ratePct / 100;
+        const ads = (screeningPrice * r) / (1 - Math.pow(1 + r, -40));
+        const solution = solveDscrCoverage({
+          acres,
+          screeningPrice,
+          annualDebtService: ads,
+          ratePct,
+          amortYears: 40,
+          ltv: 1.0,
+          soil,
+        });
+        noiAnnual = solution.bestMix?.annualNoi ?? solution.bestSingle?.annualNoi ?? null;
+        noiBasis = "best modeled enterprise mix for this parcel's soil and county (screening, not a projection)";
+      }
+    }
+    const ctx: ProgramFitContext = {
+      laneId,
+      screeningPrice,
+      noiAnnual,
+      noiBasis,
+      rates: {
+        mortgage30Pct: ownershipContext?.rates.rate30 ?? null,
+        fsaOwnershipDirectPct: ownershipContext?.fsa?.ownershipDirectPct ?? null,
+      },
+      usdaRural: effectivePlaceIntelligence?.usdaRural ?? null,
+    };
+    const map: Record<string, { score: number; line: string; excluded?: string }> = {};
+    for (const name of topProgramPreview) {
+      const fit = evaluateProgramFit(name, ctx);
+      if (fit) map[name] = fit;
+    }
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspaceProfile.id, effectiveListedPrice, facts, effectivePlaceIntelligence, ownershipContext, topProgramPreview.join("|")]);
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
     listedPrice: effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel),
@@ -3975,6 +4043,7 @@ export function PropertyEvaluationWorkspace({
         similarHomes={similarHomes}
         actionsSlot={chartActionsSlot}
         factsPending={factsLoading}
+        financingFit={financingProgramFit}
         agricultureSlot={
           workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
             <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />

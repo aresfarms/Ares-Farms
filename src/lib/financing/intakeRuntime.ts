@@ -95,7 +95,12 @@ export interface FinancingIntakeResult {
   generatedAt: string;
   purpose: FinancingPurposeOption | null;
   programInterest: FinancingProgramOption | null;
-  routedTo: "licensed-lending-spoke";
+  routedTo: "licensed-lending-spoke" | "recorded-no-network-lender";
+  /** Honest routing note shown to the customer when no in-network lender
+      handles this deal type (founder 2026-08-05: the licensed lender does
+      commercial/business debt — FSA farm loans and residential mortgages
+      are out-of-network and must never pretend otherwise). */
+  networkNote: string | null;
   readiness: {
     readinessPercent: number;
     missingItems: string[];
@@ -172,12 +177,20 @@ export function evaluateFinancingIntake(
     ((totalChecks - missingItems.length) / totalChecks) * 100
   );
 
+  // FSA farm loans are out-of-network: the in-network licensed lender
+  // sources commercial/business debt and does not originate FSA or
+  // residential paper (founder 2026-08-05). The deal is still recorded —
+  // demand is a real signal — but never routed as a live lead.
+  const outOfNetwork = input.programInterest === "fsa";
   return {
     runtimeVersion: FINANCING_INTAKE_RUNTIME_VERSION,
     generatedAt: new Date().toISOString(),
     purpose,
     programInterest: program,
-    routedTo: "licensed-lending-spoke",
+    routedTo: outOfNetwork ? "recorded-no-network-lender" : "licensed-lending-spoke",
+    networkNote: outOfNetwork
+      ? "Heads up: our in-network licensed lender sources commercial and business debt — FSA farm loans aren't in network. Your submission is recorded, but it will not be reviewed by a lender here. FSA-guaranteed lenders, Farm Credit associations, and ag banks make these loans — your Furlong pro forma is built to take to any of them."
+      : null,
     readiness: {
       readinessPercent: Math.max(0, Math.min(100, readinessPercent)),
       missingItems,

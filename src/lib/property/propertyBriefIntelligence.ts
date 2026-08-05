@@ -98,6 +98,7 @@ import { fetchSoilProfile } from "./soilsLive";
 import { fetchClimateNormals } from "./climateNormalsLive";
 import { fetchWetlands } from "./wetlandsLive";
 import { fetchEpaFacilityScreen } from "./epaFacilitiesLive";
+import { fetchUsdaRuralEligibility, type UsdaRuralEligibility } from "./usdaRuralLive";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
 import {
   AMENITY_RADIUS_MILES,
@@ -222,6 +223,9 @@ export interface PropertyBriefIntelligence {
     slopePct: number | null;
     capabilityClass: number | null;
   } | null;
+  /** LIVE USDA RD area eligibility (B&I business gate + RD housing gate) —
+      the geographic hinge for the rural financing programs (2026-08-05). */
+  usdaRural: UsdaRuralEligibility | null;
   /** County derived from the property's census tract when the record lacked one. */
   resolvedCounty: ResolvedCounty | null;
   /** Up to four verified-fact chips for the Answer card (flood, grocery, schools, rent). */
@@ -1899,6 +1903,8 @@ export function buildPropertyBriefIntelligence(args: {
           capabilityClass: PROPERTY_SOIL[id]?.capabilityClass ?? null,
         }
       : null,
+    // No live coordinate query on the snapshot path — honest unknown.
+    usdaRural: null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,
@@ -2008,6 +2014,9 @@ export function startEnvironmentalLookups(lat: number, lon: number, amenityEnv?:
     fetchSolarPotential(lat, lon),
     fetchWetlands(lat, lon),
     fetchEpaFacilityScreen(lat, lon),
+    // USDA RD area eligibility — the B&I/RD geographic gate (founder wedge
+    // decision 2026-08-05); rides the same coordinate-only bundle.
+    fetchUsdaRuralEligibility(lat, lon),
   ]);
 }
 
@@ -2122,11 +2131,11 @@ export async function buildLocationBriefIntelligence(args: {
   // (Overpass, up to 8s) used to run serially BEFORE this block, adding its
   // full duration to every residential report (founder-reported slowness
   // 2026-07-29); it now rides the same Promise.all.
-  const [amenitiesResult, soilResult, climateResult, solarResult, wetlandsResult, epaResult] =
+  const [amenitiesResult, soilResult, climateResult, solarResult, wetlandsResult, epaResult, usdaRuralResult] =
     geocode?.lat != null && geocode?.lon != null
       ? await (args.envPrefetch ??
           startEnvironmentalLookups(geocode.lat, geocode.lon, args.amenityEnv))
-      : [null, null, null, null, null, null];
+      : [null, null, null, null, null, null, null];
 
   // Daily-life amenities — GATED live Overpass lookup (OFF by default). When
   // the gate is closed or the query fails, amenities become an honest unknown.
@@ -2191,6 +2200,32 @@ export async function buildLocationBriefIntelligence(args: {
       provenance: `Source: U.S. EPA Facility Registry Service, retrieved ${epaResult.retrievedAt} · frs-public.epa.gov`,
       tone: epaResult.superfundCount > 0 ? "caution" : "neutral",
     });
+  }
+
+  // USDA RD area eligibility — LIVE point query against USDA's own
+  // eligibility service (founder wedge decision 2026-08-05). The geographic
+  // gate for B&I/OneRD business financing and RD housing programs.
+  if (usdaRuralResult) {
+    const bits: string[] = [];
+    if (usdaRuralResult.businessEligible != null) {
+      bits.push(`Business programs (B&I): ${usdaRuralResult.businessEligible ? "eligible rural area" : "NOT an eligible rural area"}`);
+    }
+    if (usdaRuralResult.housingEligible != null) {
+      bits.push(`RD housing (502): ${usdaRuralResult.housingEligible ? "eligible rural area" : "NOT an eligible rural area"}`);
+    }
+    if (bits.length) {
+      verifiedFacts.push({
+        label: "USDA rural eligibility",
+        value: bits.join(" · "),
+        text:
+          `USDA Rural Development's own eligibility layers place this point ` +
+          `${usdaRuralResult.businessEligible ? "inside" : "outside"} the eligible rural area for business programs (B&I / OneRD)` +
+          `${usdaRuralResult.housingEligible != null ? ` and ${usdaRuralResult.housingEligible ? "inside" : "outside"} the eligible area for RD housing programs` : ""}. ` +
+          `This is the area designation only — program eligibility for a person or project is a separate, licensed determination.`,
+        provenance: `Source: USDA Rural Development eligibility service (live point query), retrieved ${usdaRuralResult.retrievedAt} · eligibility.sc.egov.usda.gov`,
+        tone: usdaRuralResult.businessEligible || usdaRuralResult.housingEligible ? "positive" : "neutral",
+      });
+    }
   }
 
   // Soil survey — USDA NRCS Soil Data Access point query (keyless; founder
@@ -2494,6 +2529,7 @@ export async function buildLocationBriefIntelligence(args: {
           capabilityClass: soilResult.capabilityClass,
         }
       : null,
+    usdaRural: usdaRuralResult ?? null,
     resolvedCounty,
     chips: buildChips({
       verifiedFacts,

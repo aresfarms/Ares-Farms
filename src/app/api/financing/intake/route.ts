@@ -231,7 +231,9 @@ export async function POST(req: NextRequest) {
       audience: "borrower",
       claimType: "recommendation",
       summary:
-        "Customer financing deal recorded and routed to the licensed lender. No qualification, pre-approval, pricing, or credit decision is made; the lender decides.",
+        intakeResult.routedTo === "licensed-lending-spoke"
+          ? "Customer financing deal recorded and routed to the licensed lender. No qualification, pre-approval, pricing, or credit decision is made; the lender decides."
+          : "Customer financing deal recorded WITHOUT lender routing — the requested program (FSA/farm) is outside the in-network lender's practice; the customer was told honestly and pointed to the lenders who make these loans.",
       ruleVersion: FINANCING_INTAKE_RUNTIME_VERSION,
       overlayRefs: [],
       confidenceScore: Math.min(
@@ -361,13 +363,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Alert the licensed lender that a deal is waiting (min-disclosure, never blocks).
-    await notifyOnServiceRequest({
-      requestType: "financing_deal_intake",
-      serviceRequestId,
-      routedTo: intakeResult.routedTo,
-      traceId,
-    });
+    // Alert the licensed lender that a deal is waiting (min-disclosure, never
+    // blocks). OUT-OF-NETWORK deals (FSA/farm paper the lender does not
+    // originate — founder 2026-08-05) are recorded for demand signal but
+    // never sent to the lender's inbox: no false leads, no inundation.
+    if (intakeResult.routedTo === "licensed-lending-spoke") {
+      await notifyOnServiceRequest({
+        requestType: "financing_deal_intake",
+        serviceRequestId,
+        routedTo: intakeResult.routedTo,
+        traceId,
+      });
+    }
 
     return NextResponse.json({
       ok: true,

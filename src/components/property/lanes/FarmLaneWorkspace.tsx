@@ -18,7 +18,8 @@ import {
 
 function rateLabel(name: string, rates: FinancingRateContext): string {
   const value = name.toLowerCase();
-  if (/fsa.*farm ownership|farm ownership.*fsa/.test(value)) return rates?.fsaOwnershipDirectPct != null ? `${rates.fsaOwnershipDirectPct.toFixed(3).replace(/\.?0+$/, "")}% published FSA direct rate` : "Current FSA rate unavailable";
+  if (/fsa direct/.test(value)) return rates?.fsaOwnershipDirectPct != null ? `${rates.fsaOwnershipDirectPct.toFixed(3).replace(/\.?0+$/, "")}% published FSA direct rate` : "Current FSA direct rate unavailable";
+  if (/fsa guaranteed/.test(value)) return rates?.mortgage30Pct != null ? `Participating-lender rate — illustratively ≈${(rates.mortgage30Pct + 0.75).toFixed(2)}% (benchmark +0.75); USDA guarantees up to 95%` : "Participating-lender quote — USDA guarantees up to 95%";
   if (/rural development housing/.test(value)) return rates?.mortgage30Pct != null ? `${rates.mortgage30Pct.toFixed(2)}% national 30-year benchmark — not a USDA-RD quote` : "USDA-RD lender quote required";
   if (/farm credit|conventional farm|mixed-use/.test(value)) return "Participating-lender quote required";
   if (/seller financing/.test(value)) return "Rate negotiated with seller";
@@ -32,6 +33,8 @@ function programNote(name: string) {
   if (value.includes("seller financing") || value.includes("seller-financed")) return { fit: "Seller-carried financing", why: "The seller may carry part or all of the purchase price through a negotiated note, sometimes alongside bank, SBA, Farm Credit, or buyer equity.", watch: "Price, down payment, interest rate, amortization, balloon date, lien priority, collateral, default remedies, due-on-sale terms, and independent legal and tax review must be documented before reliance." };
   if (value.includes("hard money") || value.includes("private asset-based") || value.includes("private bridge") || value.includes("private agricultural")) return { fit: "Private asset-based bridge financing (often called hard money)", why: "A short-term lender may underwrite primarily to collateral value and exit strategy when speed, condition, occupancy, or conventional seasoning prevents ordinary financing.", watch: "These loans are commonly higher-cost and shorter-term, with points, fees, conservative loan-to-value limits, extension charges, personal guarantees, and a required refinance or sale exit. They should be compared on total dollars and downside risk—not headline rate alone." };
   if (value.includes("construction") || value.includes("renovation")) return { fit: "Agricultural improvement or construction financing", why: "Farm and agricultural lenders may combine land acquisition with eligible building, drainage, fencing, equipment, or rehabilitation costs when the operating plan supports repayment.", watch: "Plans, budget, appraisal, farm cash flow, permits, contractor controls, and program-specific eligible-use rules still govern." };
+  if (value.includes("fsa direct")) return { fit: "USDA lends directly — no bank in the transaction", why: "The lowest-rate farm-ownership path, targeted at beginning and underserved farmers, with statutory loan limits and government processing timelines.", watch: "Loan limits (≈$600K, indexed), eligibility targeting, farm experience requirements, appraisal, and FSA processing timelines still control." };
+  if (value.includes("fsa guaranteed")) return { fit: "Bank-made farm loan with a USDA guarantee behind it", why: "The commercial farm-ownership path most non-beginning farmers actually use: a private lender underwrites and closes at bank speed, with USDA guaranteeing up to 95% — higher limits than the direct program.", watch: "Participating-lender availability, the guaranteed loan limit (≈$2.25M, indexed annually), farm repayment ability, appraisal, and collateral still control." };
   if (value.includes("usda") || value.includes("fsa")) return { fit: "Agricultural or rural-property financing", why: "Potentially relevant when the farm, land, or owner-occupied rural use matches the specific USDA or FSA program.", watch: "The exact program, geography, farm or household eligibility, repayment ability, appraisal, occupancy, and use-of-proceeds rules still control." };
   if (value.includes("farm credit")) return { fit: "Cooperative agricultural lender path", why: "Farm Credit associations underwrite agricultural land and operations as their core business, often with patronage structures.", watch: "Membership eligibility, farm income, appraisal, collateral quality, and association-specific underwriting still control." };
   if (value.includes("sba")) return { fit: "Business-purpose pathway", why: "Potential fit only when the property supports an eligible operating business rather than passive ownership.", watch: "Business use, borrower/entity eligibility, injection, repayment ability, and collateral rules are reviewed in the Financial module." };
@@ -55,8 +58,9 @@ const FARM_LANE: LaneDefinition = {
   ],
   financingPriority: (name) => {
     const value = name.toLowerCase();
-    if (/fsa.*farm ownership|farm ownership.*fsa/.test(value)) return 0;
-    if (/farm credit/.test(value)) return 1;
+    if (/fsa direct/.test(value)) return 0;
+    if (/fsa guaranteed/.test(value)) return 1;
+    if (/farm credit/.test(value)) return 2;
     if (/conventional farm|mixed-use/.test(value)) return 2;
     if (/seller financing/.test(value)) return 3;
     if (/rural development housing/.test(value)) return 4;

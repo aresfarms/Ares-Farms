@@ -260,6 +260,15 @@ export function FinancingIntakePanel() {
               <option key={p.code} value={p.code}>{p.label}</option>
             ))}
           </select>
+          {programInterest === "fsa" && (
+            <p style={{ margin: "6px 0 0", fontSize: 12, lineHeight: 1.55, color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A", borderRadius: 8, padding: "8px 10px" }}>
+              Honest heads-up: our in-network licensed lender sources commercial and business
+              debt — FSA farm loans aren&apos;t in network, so this submission is recorded but
+              won&apos;t be reviewed by a lender here. FSA-guaranteed lenders, Farm Credit
+              associations, and ag banks make these loans; your Furlong pro forma is built to
+              take to any of them.
+            </p>
+          )}
         </div>
       </div>
 

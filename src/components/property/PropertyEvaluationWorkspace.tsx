@@ -41,7 +41,9 @@ import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOp
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
 import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
 import { buildResidentialLenderProforma, type LenderProformaSection } from "@/lib/property/residentialLenderProforma";
-import { evaluateProgramFit, type ProgramFitContext } from "@/lib/property/financingProgramFit";
+import { buildLenderTestScorecard, evaluateProgramFit, type ProgramFitContext } from "@/lib/property/financingProgramFit";
+import { modelCommercialUses } from "@/lib/property/commercialUseModel";
+import { FinanceAnalysisPanel } from "@/components/property/lanes/FinanceAnalysisPanel";
 import { solveDscrCoverage } from "@/lib/property/dscrCoverageSolver";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
@@ -3282,6 +3284,23 @@ export function PropertyEvaluationWorkspace({
     const soil = effectivePlaceIntelligence?.soilProfile ?? null;
     let noiAnnual: number | null = null;
     let noiBasis: string | null = null;
+    // Commercial: model income per candidate use (founder 2026-08-05 — the
+    // commercial twin of the farm optimizer); best use's NOI feeds the
+    // per-program DSCR lines.
+    const useScreen = laneId === "commercial"
+      ? modelCommercialUses({
+          zoning: facts?.propertyRecord?.zoning ?? null,
+          landUse: facts?.propertyRecord?.landUse ?? null,
+          squareFeet: facts?.propertyRecord?.squareFeet ?? null,
+          town: analysisContext.location ?? null,
+          screeningPrice,
+          benchRatePct: ownershipContext?.rates.rate30 ?? null,
+        })
+      : null;
+    if (useScreen?.bestUse?.noiMid != null) {
+      noiAnnual = useScreen.bestUse.noiMid;
+      noiBasis = `best modeled use — ${useScreen.bestUse.use} (screening bands, not an appraisal)`;
+    }
     if (laneId === "farm" && screeningPrice != null) {
       // Parcel-resolver acreage reads "≈41 acres by mapped parcel geometry" —
       // extract the number, never parseFloat a prefixed string.
@@ -3323,7 +3342,32 @@ export function PropertyEvaluationWorkspace({
       const fit = evaluateProgramFit(name, ctx);
       if (fit) map[name] = fit;
     }
-    return map;
+    // Best DSCR across everything modeled, for the lender-test scorecard.
+    const bestDscr = laneId === "commercial"
+      ? useScreen?.bestUse?.dscr ?? null
+      : Object.values(map).reduce<number | null>((best, f) => {
+          const m = f.line.match(/DSCR (\d+\.\d+)/);
+          const v = m ? Number(m[1]) : null;
+          return v != null && (best == null || v > best) ? v : best;
+        }, null);
+    const bestDscrLabel = laneId === "commercial" ? useScreen?.bestUse?.use ?? null : noiBasis;
+    const scorecard = buildLenderTestScorecard({
+      ctx,
+      bestDscr,
+      bestDscrLabel,
+      superfundWithin3mi: (() => {
+        const epa = (effectivePlaceIntelligence?.verifiedFacts ?? []).find((f) => /contamination screen/i.test(f.label));
+        if (!epa) return null;
+        const m = epa.value.match(/(\d+|No) Superfund/i);
+        return m ? (m[1].toLowerCase() === "no" ? 0 : Number(m[1])) : null;
+      })(),
+      floodZone: (() => {
+        const flood = (effectivePlaceIntelligence?.verifiedFacts ?? []).find((f) => /flood zone/i.test(f.label));
+        const m = flood?.value.match(/Zone ([A-Z0-9]+)/i);
+        return m ? m[1] : null;
+      })(),
+    });
+    return { map, useScreen, scorecard };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspaceProfile.id, effectiveListedPrice, facts, effectivePlaceIntelligence, ownershipContext, topProgramPreview.join("|")]);
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
@@ -3667,6 +3711,8 @@ export function PropertyEvaluationWorkspace({
           lane: workspaceProfile.id === "residential" ? "R" : isFarmLaneDoc ? "B" : "A",
           residential: residentialPayload,
           acquisitionPrice: effectiveListedPrice,
+          benchRatePct: ownershipContext?.rates.rate30 ?? null,
+          usdaRural: effectivePlaceIntelligence?.usdaRural ?? null,
           // No published/entered price → the server derives a stated screening
           // value (assessed value, else USDA state average × acreage) so the
           // document carries real numbers with their basis printed.
@@ -4043,7 +4089,13 @@ export function PropertyEvaluationWorkspace({
         similarHomes={similarHomes}
         actionsSlot={chartActionsSlot}
         factsPending={factsLoading}
-        financingFit={financingProgramFit}
+        financingFit={financingProgramFit.map}
+        financeAnalysisSlot={
+          <FinanceAnalysisPanel
+            useScreen={financingProgramFit.useScreen}
+            scorecard={financingProgramFit.scorecard}
+          />
+        }
         agricultureSlot={
           workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
             <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />

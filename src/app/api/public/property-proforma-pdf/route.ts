@@ -7,6 +7,8 @@ import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { solveDscrCoverage, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
 import { commercialAlternativeUses } from "@/lib/property/commercialAlternativeUses";
+import { modelCommercialUses } from "@/lib/property/commercialUseModel";
+import { buildLenderTestScorecard } from "@/lib/property/financingProgramFit";
 import { buildResidentialProformaDocument, type ResidentialProformaArgs } from "@/lib/pdf/residentialProformaDocument";
 import type { LoanProformaInput } from "@/lib/pdf/generateLoanProformaPdf";
 
@@ -35,6 +37,8 @@ export async function POST(req: NextRequest) {
     Partial<DraftProformaPropertyArgs> & {
       propertyEvidence?: unknown;
       laneAnswerLines?: unknown;
+      benchRatePct?: unknown;
+      usdaRural?: unknown;
       assessedTotalValue?: unknown;
       soil?: unknown;
       building?: unknown;
@@ -287,30 +291,104 @@ export async function POST(req: NextRequest) {
   // marketed for its last use, not its highest (founder 2026-07-29).
   if (lane === "A") {
     const buildingRaw = body.building as Record<string, unknown> | null | undefined;
-    const screen = commercialAlternativeUses({
+    const benchRatePct = num(body.benchRatePct);
+    const usdaRuralRaw = body.usdaRural as Record<string, unknown> | null | undefined;
+    const usdaRural = usdaRuralRaw && typeof usdaRuralRaw === "object"
+      ? {
+          businessEligible: typeof usdaRuralRaw.businessEligible === "boolean" ? usdaRuralRaw.businessEligible : null,
+          housingEligible: typeof usdaRuralRaw.housingEligible === "boolean" ? usdaRuralRaw.housingEligible : null,
+        }
+      : null;
+    // The NUMBERED best-use screen (founder 2026-08-05): modeled NOI + DSCR
+    // per candidate use at lender-shaped reference terms — the commercial
+    // twin of the farm coverage solution.
+    const useScreen = modelCommercialUses({
       zoning: typeof buildingRaw?.zoning === "string" ? buildingRaw.zoning.slice(0, 120) : null,
       landUse: typeof buildingRaw?.landUse === "string" ? buildingRaw.landUse.slice(0, 120) : null,
       squareFeet: num(buildingRaw?.squareFeet),
       town: typeof buildingRaw?.town === "string" ? buildingRaw.town.slice(0, 80) : null,
+      screeningPrice,
+      benchRatePct,
     });
+    const scorecard = buildLenderTestScorecard({
+      ctx: {
+        laneId: "commercial",
+        screeningPrice,
+        noiAnnual: useScreen.bestUse?.noiMid ?? null,
+        noiBasis: useScreen.bestUse ? `best modeled use — ${useScreen.bestUse.use}` : null,
+        rates: { mortgage30Pct: benchRatePct, fsaOwnershipDirectPct: null },
+        usdaRural,
+      },
+      bestDscr: useScreen.bestUse?.dscr ?? null,
+      bestDscrLabel: useScreen.bestUse?.use ?? null,
+      superfundWithin3mi: (() => {
+        const epa = (Array.isArray(body.propertyEvidence) ? (body.propertyEvidence as Array<Record<string, unknown>>) : [])
+          .find((f) => typeof f?.label === "string" && /contamination screen/i.test(f.label as string));
+        const m = typeof epa?.value === "string" ? (epa.value as string).match(/(\d+|No) Superfund/i) : null;
+        return m ? (m[1].toLowerCase() === "no" ? 0 : Number(m[1])) : null;
+      })(),
+      floodZone: (() => {
+        const flood = (Array.isArray(body.propertyEvidence) ? (body.propertyEvidence as Array<Record<string, unknown>>) : [])
+          .find((f) => typeof f?.label === "string" && /flood zone/i.test(f.label as string));
+        const m = typeof flood?.value === "string" ? (flood.value as string).match(/Zone ([A-Z0-9]+)/i) : null;
+        return m ? m[1] : null;
+      })(),
+    });
+    const fmtNoi = (v: number | null) => (v != null ? `$${Math.round(v).toLocaleString("en-US")}` : "needs sq ft");
     const gateIdxA = document.sections.findIndex((s) => s.title.startsWith("PART V"));
-    document.sections.splice(gateIdxA >= 0 ? gateIdxA : document.sections.length, 0, {
-      title: "ALTERNATIVE-USE SCREEN — MARKETED PURPOSE VS HIGHEST USE",
-      leadIns: [{ text: "Uses this building's verified record does not rule out — some may value higher than the purpose it is marketed for.", bold: true }],
+    const insertAt = gateIdxA >= 0 ? gateIdxA : document.sections.length;
+    document.sections.splice(insertAt, 0, {
+      title: "BEST-USE INCOME & COVERAGE SCREEN",
+      leadIns: [
+        {
+          text: useScreen.bestUse
+            ? `Best modeled use: ${useScreen.bestUse.use} — ≈${fmtNoi(useScreen.bestUse.noiMid)}/yr modeled NOI, DSCR ${useScreen.bestUse.dscr?.toFixed(2)} against the 1.25x floor at ${useScreen.referenceTerms}${useScreen.bestUse.clearsFloor ? " — the property clears on its own paper." : " — under the floor at the stated screening value."}`
+            : useScreen.note,
+          bold: true,
+        },
+      ],
       tables: [
         {
           table: {
             columns: [
-              { header: "Alternative use", width: 0.24, align: "left" },
-              { header: "Why it can out-earn the marketed purpose", width: 0.4, align: "left" },
-              { header: "What governs", width: 0.36, align: "left" },
+              { header: "Use", width: 0.26, align: "left" },
+              { header: "Net $/sf/yr", width: 0.14, align: "left" },
+              { header: "Modeled NOI (yr)", width: 0.24, align: "left" },
+              { header: "DSCR", width: 0.12, align: "left" },
+              { header: "1.25x floor", width: 0.24, align: "left" },
             ],
-            rows: screen.uses.map((use) => ({ cells: [use.use, use.why, use.watch] })),
+            rows: useScreen.uses.map((u) => ({
+              cells: [
+                u.use,
+                `$${u.netPerSqftLow}\u2013$${u.netPerSqftHigh}`,
+                u.noiMid != null ? `${fmtNoi(u.noiLow)}\u2013${fmtNoi(u.noiHigh)}` : "needs sq ft",
+                u.dscr != null ? u.dscr.toFixed(2) : "\u2014",
+                u.clearsFloor == null ? "\u2014" : u.clearsFloor ? "CLEARS" : "SHORT",
+              ],
+              emphasis: u.use === useScreen.bestUse?.use,
+            })),
           },
         },
       ],
-      paragraphs: [screen.note],
+      paragraphs: [useScreen.note],
     });
+    document.sections.splice(insertAt + 1, 0, {
+      title: "LENDER-TEST SCORECARD \u2014 PROPERTY-SIDE ONLY",
+      leadIns: [{ text: "Which of a lender's property-side checklist items this parcel passes on paper. Not an approval, an approval probability, or an eligibility determination \u2014 borrower qualification is the licensed lender's decision.", bold: false }],
+      tables: [
+        {
+          table: {
+            columns: [
+              { header: "Test", width: 0.28, align: "left" },
+              { header: "Status", width: 0.12, align: "left" },
+              { header: "Finding", width: 0.6, align: "left" },
+            ],
+            rows: scorecard.map((t) => ({ cells: [t.test, t.status.toUpperCase(), t.detail], emphasis: t.status === "fail" })),
+          },
+        },
+      ],
+    });
+    void commercialAlternativeUses;
   }
 
   }

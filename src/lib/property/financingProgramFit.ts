@@ -83,6 +83,80 @@ function coverage(
 const NEEDS_INPUTS =
   "Property-standalone test needs a price and a modeled income figure — enter the asking price or your intended offer to run it.";
 
+export interface LenderTest {
+  test: string;
+  status: "pass" | "fail" | "unknown";
+  detail: string;
+}
+
+/**
+ * The property-side lender-test scorecard (founder ask 2026-08-05 was
+ * "probability of a lender approving" — which the platform must never state:
+ * approval is a licensed credit decision about a PERSON. What a lender's own
+ * checklist tests about the PROPERTY is statable, and this is that list).
+ */
+export function buildLenderTestScorecard(args: {
+  ctx: ProgramFitContext;
+  /** Best modeled DSCR across uses/programs (farm mix or commercial best use). */
+  bestDscr: number | null;
+  bestDscrLabel: string | null;
+  superfundWithin3mi: number | null;
+  floodZone: string | null;
+}): LenderTest[] {
+  const tests: LenderTest[] = [];
+  const { ctx } = args;
+
+  tests.push(
+    ctx.screeningPrice != null
+      ? { test: "Stated value basis", status: "pass", detail: `Screening value ${dollars(ctx.screeningPrice)} on record — the loan math has a basis (appraisal governs).` }
+      : { test: "Stated value basis", status: "unknown", detail: "No price or assessed value on record — enter an intended offer to run the loan math." }
+  );
+
+  if (args.bestDscr != null) {
+    tests.push(
+      args.bestDscr >= 1.25
+        ? { test: "Debt-service coverage (1.25x floor)", status: "pass", detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — the property covers the loan on its own paper.` }
+        : { test: "Debt-service coverage (1.25x floor)", status: "fail", detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — under the floor; outside income or a lower price closes the gap.` }
+    );
+  } else {
+    tests.push({ test: "Debt-service coverage (1.25x floor)", status: "unknown", detail: "Coverage needs a price and an income model (square footage for commercial, acreage for farm)." });
+  }
+
+  if (ctx.laneId !== "residential") {
+    const rural = ctx.laneId === "commercial" ? ctx.usdaRural?.businessEligible : ctx.usdaRural?.businessEligible;
+    tests.push(
+      rural === true
+        ? { test: "USDA rural-area gate (B&I/OneRD)", status: "pass", detail: "Verified inside the eligible rural area against USDA's own live layer." }
+        : rural === false
+          ? { test: "USDA rural-area gate (B&I/OneRD)", status: "fail", detail: "Not in a USDA-eligible rural area — the USDA business programs are off the menu; SBA and conventional remain." }
+          : { test: "USDA rural-area gate (B&I/OneRD)", status: "unknown", detail: "Live rural check unavailable — verify at eligibility.sc.egov.usda.gov." }
+    );
+  }
+
+  if (args.superfundWithin3mi != null) {
+    tests.push(
+      args.superfundWithin3mi === 0
+        ? { test: "Environmental screen (Superfund)", status: "pass", detail: "No Superfund (SEMS) sites within 3 miles — the first environmental question a lender asks starts clean." }
+        : { test: "Environmental screen (Superfund)", status: "fail", detail: `${args.superfundWithin3mi} Superfund (SEMS) site(s) within 3 miles — expect the lender's environmental diligence to look hard here.` }
+    );
+  } else {
+    tests.push({ test: "Environmental screen (Superfund)", status: "unknown", detail: "EPA screen not resolved for this address yet." });
+  }
+
+  if (args.floodZone) {
+    const hazard = /^[AV]/.test(args.floodZone.trim().toUpperCase());
+    tests.push(
+      hazard
+        ? { test: "Flood posture", status: "fail", detail: `FEMA zone ${args.floodZone} — inside a Special Flood Hazard Area; flood insurance is a lender requirement and a real carrying cost.` }
+        : { test: "Flood posture", status: "pass", detail: `FEMA zone ${args.floodZone} — outside the mapped hazard area.` }
+    );
+  } else {
+    tests.push({ test: "Flood posture", status: "unknown", detail: "Flood zone not resolved for this address yet." });
+  }
+
+  return tests;
+}
+
 export function evaluateProgramFit(programName: string, ctx: ProgramFitContext): ProgramFit | null {
   const name = programName.toLowerCase();
   const bench = ctx.rates?.mortgage30Pct ?? null;
@@ -136,21 +210,32 @@ export function evaluateProgramFit(programName: string, ctx: ProgramFitContext):
   if (ctx.laneId === "commercial") {
     if (/usda business|business & industry|business and industry/.test(name)) {
       if (ctx.usdaRural?.businessEligible === true) {
-        return {
-          score: 3,
-          line: "Address verified inside the USDA-eligible rural area for business programs (live USDA layer) — the B&I geographic gate passes; eligible business purpose and lender participation still control.",
-        };
+        const c = coverage(ctx, bench != null ? bench + 0.75 : null, "illustrative B&I bank rate ≈ benchmark +0.75", 25, 0.8);
+        const ruralLine = "Address verified inside the USDA-eligible rural area for business programs (live USDA layer) — the B&I geographic gate passes; eligible business purpose and lender participation still control.";
+        return c
+          ? { score: c.score + 1, line: `${ruralLine} ${c.line}` }
+          : { score: 3, line: ruralLine };
       }
       if (ctx.usdaRural?.businessEligible === false) {
         return { score: -1, line: "", excluded: "This address is NOT in a USDA-eligible rural area (verified live against USDA's own layer) — B&I/OneRD business programs are unavailable here." };
       }
       return { score: 0.5, line: "USDA rural-area check unavailable right now — the B&I geographic gate is unverified; check eligibility.sc.egov.usda.gov." };
     }
+    if (/sba 504/.test(name)) {
+      const c = coverage(ctx, bench != null ? bench + 0.4 : null, "illustrative 504 blended rate ≈ benchmark +0.4", 25, 0.9);
+      return c
+        ? { ...c, line: `${c.line} Owner-occupancy by an eligible operating business is the program's own gate.` }
+        : { score: 2, line: "Fit turns on owner-occupancy: SBA 504 requires an eligible operating business occupying the property." };
+    }
     if (/sba/.test(name)) {
-      return { score: 2, line: "Fit turns on owner-occupancy: SBA financing requires an eligible operating business occupying the property — a property-plus-business question, not a property-alone one." };
+      const c = coverage(ctx, bench != null ? bench + 1.0 : null, "illustrative 7(a) rate ≈ benchmark +1.0", 25, 0.85);
+      return c
+        ? { ...c, line: `${c.line} Owner-occupancy by an eligible operating business is the program's own gate.` }
+        : { score: 2, line: "Fit turns on owner-occupancy: SBA financing requires an eligible operating business occupying the property — a property-plus-business question, not a property-alone one." };
     }
     if (/conventional/.test(name)) {
-      return { score: 1.5, line: "Conventional CRE underwrites the property's own income first: the coverage test needs a rent roll or operating NOI — bring either and the standalone math runs." };
+      const c = coverage(ctx, bench != null ? bench + 1.0 : null, "illustrative bank CRE rate ≈ benchmark +1.0", 20, 0.75);
+      return c ?? { score: 1.5, line: "Conventional CRE underwrites the property's own income first: the coverage test needs a rent roll or operating NOI — bring either and the standalone math runs." };
     }
     return null;
   }

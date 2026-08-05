@@ -77,7 +77,15 @@ resource "google_storage_bucket" "documents" {
   }
 
   cors {
-    origin          = compact([var.nextauth_url, "http://localhost:3000"])
+    # Cloud Run serves the same service on TWO url formats — the legacy
+    # revision-hash form (nextauth_url) and the deterministic project-number
+    # form. Browsers upload from whichever the tester is on; allow both
+    # (founder staging test 2026-08-05: "Failed to fetch" = CORS-blocked PUT).
+    origin = distinct(compact([
+      var.nextauth_url,
+      "https://furlong-core-${data.google_project.staging.number}.${var.region}.run.app",
+      "http://localhost:3000",
+    ]))
     method          = ["PUT", "OPTIONS"]
     response_header = ["Content-Type"]
     max_age_seconds = 3600

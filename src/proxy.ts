@@ -404,7 +404,10 @@ function pageResponseWithCsp(req: NextRequest): NextResponse {
         "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
-        "connect-src 'self'",
+        // storage.googleapis.com: the sovereign vault's browser→GCS direct
+        // upload (resumable session PUT). The ONLY external connect allowed —
+        // CSP blocked it as "Failed to fetch" (founder staging test 2026-08-05).
+        "connect-src 'self' https://storage.googleapis.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'",
@@ -415,7 +418,7 @@ function pageResponseWithCsp(req: NextRequest): NextResponse {
         `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
-        "connect-src 'self'",
+        "connect-src 'self' https://storage.googleapis.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'",

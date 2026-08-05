@@ -182,7 +182,7 @@ export function EnvironmentalOrderPanel() {
   }
 
   return (
-    <section aria-label="Order a site assessment" style={panel}>
+    <section id="environmental-order" aria-label="Order a site assessment" style={panel}>
       <div style={{ display: "grid", gap: 4 }}>
         <span
           style={{

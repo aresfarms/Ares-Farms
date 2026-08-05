@@ -16,18 +16,33 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-const DOC_SLOTS: Array<{ type: string; label: string; hint: string }> = [
+const DOC_SLOTS: Array<{
+  type: string;
+  label: string;
+  hint: string;
+  actionHref?: string;
+  actionLabel?: string;
+}> = [
   { type: "bank-statements", label: "Bank statements", hint: "Most recent 3 months, all operating accounts" },
   { type: "tax-returns", label: "Tax returns", hint: "Last 2–3 years, personal and business" },
   { type: "personal-financial-statement", label: "Personal financial statement", hint: "Assets, liabilities, net worth — SBA Form 413 or your own" },
   { type: "debt-schedule", label: "Business debt schedule", hint: "Every existing loan: balance, payment, rate, maturity" },
   { type: "entity-documents", label: "Entity documents", hint: "Operating agreement / bylaws, EIN letter, good standing" },
-  { type: "environmental-reports", label: "Environmental reports", hint: "Phase I ESA or any environmental screening you already hold — every USDA/SBA commercial deal requires environmental diligence before closing" },
+  {
+    type: "environmental-reports",
+    label: "Environmental reports",
+    hint: "Phase I ESA or any environmental screening you already hold — every USDA/SBA commercial deal requires environmental diligence before closing",
+    // Borrower-procured model: the borrower chooses any qualified environmental
+    // professional; Furlong Environmental is the platform's licensed in-house
+    // option, offered — never required.
+    actionHref: "/explore?lane=environmental-compliance#environmental-order",
+    actionLabel: "Don't have one yet? Order your Phase I from Furlong Environmental →",
+  },
   { type: "purchase-agreement", label: "Purchase agreement", hint: "The signed contract, if the deal has one yet" },
   { type: "other-supporting", label: "Anything else", hint: "Whatever your lender asked for that isn't above" },
 ];
 
-type UploadState = { status: "idle" | "uploading" | "done" | "error"; note?: string };
+type UploadState = { status: "idle" | "uploading" | "done" | "pending" | "error"; note?: string };
 
 function SecureUploadInner() {
   const params = useSearchParams();
@@ -77,12 +92,17 @@ function SecureUploadInner() {
       if (!confirmRes.ok || !confirm.ok) throw new Error(confirm.error ?? "The upload could not be confirmed.");
       setStates((s) => ({
         ...s,
-        [documentType]: {
-          status: "done",
-          note: uploaded
-            ? `${file.name} — received into secure custody; your lender will be able to review it.`
-            : `${file.name} — recorded; secure storage activation is pending in this environment, so re-send once the portal confirms live storage.`,
-        },
+        [documentType]: uploaded
+          ? {
+              status: "done",
+              note: `${file.name} — received into secure custody; your lender will be able to review it.`,
+            }
+          : {
+              // Honest degradation must not LOOK like success (founder test
+              // 2026-08-05: a green check next to "recorded" read as stored).
+              status: "pending",
+              note: `${file.name} — details recorded, but the FILE WAS NOT STORED: secure storage is not active in this environment. Re-send it once the portal confirms live storage.`,
+            },
       }));
     } catch (error) {
       setStates((s) => ({ ...s, [documentType]: { status: "error", note: error instanceof Error ? error.message : "Upload failed." } }));
@@ -121,6 +141,11 @@ function SecureUploadInner() {
             <section key={slot.type} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#fff", padding: "14px 16px", display: "grid", gap: 6 }}>
               <strong style={{ color: "#1C2B45", fontSize: 14 }}>{slot.label}</strong>
               <span style={{ color: "#5A6172", fontSize: 12.5 }}>{slot.hint}</span>
+              {slot.actionHref && (
+                <a href={slot.actionHref} style={{ color: "#0F6E56", fontSize: 12.5, fontWeight: 750, textDecoration: "none" }}>
+                  {slot.actionLabel}
+                </a>
+              )}
               <input
                 type="file"
                 aria-label={`Upload ${slot.label}`}
@@ -130,6 +155,7 @@ function SecureUploadInner() {
               />
               {st.status === "uploading" && <span style={{ color: "#5A6172", fontSize: 12.5 }}>Encrypting and transferring…</span>}
               {st.status === "done" && <span style={{ color: "#1C4532", fontSize: 12.5, fontWeight: 700 }}>✓ {st.note}</span>}
+              {st.status === "pending" && <span role="alert" style={{ color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A", borderRadius: 8, padding: "6px 9px", fontSize: 12.5, fontWeight: 700 }}>⚠ {st.note}</span>}
               {st.status === "error" && <span role="alert" style={{ color: "#a12626", fontSize: 12.5 }}>{st.note}</span>}
             </section>
           );

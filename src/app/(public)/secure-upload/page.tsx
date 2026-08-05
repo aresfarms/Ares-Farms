@@ -1,0 +1,153 @@
+"use client";
+
+/**
+ * Sovereign Secure Upload — the borrower's encrypted document channel
+ * (founder direction 2026-08-05: financials and PII never travel by email).
+ *
+ * Flow: the page exchanges its signed link token for the deal reference and
+ * checklist, then for each file: begin (governed handoff + direct-to-storage
+ * session) → browser PUTs bytes straight to the IAM-private bucket over TLS
+ * → confirm (custody record for the licensed lender). File bytes never pass
+ * through the application servers. When the storage provider is not
+ * configured (local dev), the page says so honestly and records metadata
+ * custody only — never a fake success.
+ */
+
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
+const DOC_SLOTS: Array<{ type: string; label: string; hint: string }> = [
+  { type: "bank-statements", label: "Bank statements", hint: "Most recent 3 months, all operating accounts" },
+  { type: "tax-returns", label: "Tax returns", hint: "Last 2–3 years, personal and business" },
+  { type: "personal-financial-statement", label: "Personal financial statement", hint: "Assets, liabilities, net worth — SBA Form 413 or your own" },
+  { type: "debt-schedule", label: "Business debt schedule", hint: "Every existing loan: balance, payment, rate, maturity" },
+  { type: "entity-documents", label: "Entity documents", hint: "Operating agreement / bylaws, EIN letter, good standing" },
+  { type: "purchase-agreement", label: "Purchase agreement", hint: "The signed contract, if the deal has one yet" },
+  { type: "other-supporting", label: "Anything else", hint: "Whatever your lender asked for that isn't above" },
+];
+
+type UploadState = { status: "idle" | "uploading" | "done" | "error"; note?: string };
+
+function SecureUploadInner() {
+  const params = useSearchParams();
+  const token = params.get("token") ?? "";
+  const [dealRef, setDealRef] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [providerConfigured, setProviderConfigured] = useState<boolean | null>(null);
+  const [linkError, setLinkError] = useState<string | null>(null);
+  const [states, setStates] = useState<Record<string, UploadState>>({});
+
+  useEffect(() => {
+    if (!token) { setLinkError("This page needs a secure link — open it from the link you were sent."); return; }
+    void (async () => {
+      const res = await fetch("/api/public/secure-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "exchange", token }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) { setLinkError(data.error ?? "This link could not be verified."); return; }
+      setDealRef(data.dealRef); setExpiresAt(data.expiresAt); setProviderConfigured(data.providerConfigured);
+    })();
+  }, [token]);
+
+  async function handleFile(documentType: string, file: File) {
+    setStates((s) => ({ ...s, [documentType]: { status: "uploading" } }));
+    try {
+      const beginRes = await fetch("/api/public/secure-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "begin", token, fileName: file.name, mimeType: file.type || null, byteSize: file.size, documentType }),
+      });
+      const begin = await beginRes.json();
+      if (!beginRes.ok || !begin.ok) throw new Error(begin.error ?? "Could not start the upload.");
+      let uploaded = false;
+      if (begin.uploadUrl) {
+        const put = await fetch(begin.uploadUrl, { method: "PUT", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file });
+        if (!put.ok) throw new Error("The secure storage transfer failed — try again.");
+        uploaded = true;
+      }
+      const confirmRes = await fetch("/api/public/secure-upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "confirm", token, fileName: file.name, mimeType: file.type || null, byteSize: file.size, documentType, storageUri: begin.storageUri, uploaded }),
+      });
+      const confirm = await confirmRes.json();
+      if (!confirmRes.ok || !confirm.ok) throw new Error(confirm.error ?? "The upload could not be confirmed.");
+      setStates((s) => ({
+        ...s,
+        [documentType]: {
+          status: "done",
+          note: uploaded
+            ? `${file.name} — received into secure custody; your lender will be able to review it.`
+            : `${file.name} — recorded; secure storage activation is pending in this environment, so re-send once the portal confirms live storage.`,
+        },
+      }));
+    } catch (error) {
+      setStates((s) => ({ ...s, [documentType]: { status: "error", note: error instanceof Error ? error.message : "Upload failed." } }));
+    }
+  }
+
+  if (linkError) {
+    return (
+      <main style={{ maxWidth: 720, margin: "0 auto", padding: "48px 20px" }}>
+        <h1 style={{ color: "#1C2B45", fontFamily: "Georgia,serif" }}>Secure document upload</h1>
+        <p style={{ color: "#a12626", fontSize: 14, lineHeight: 1.6 }}>{linkError}</p>
+      </main>
+    );
+  }
+
+  return (
+    <main style={{ maxWidth: 760, margin: "0 auto", padding: "40px 20px", display: "grid", gap: 16 }}>
+      <h1 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Secure document upload</h1>
+      <p style={{ margin: 0, color: "#3b475a", fontSize: 14, lineHeight: 1.65 }}>
+        {dealRef ? <>For deal <strong>{dealRef}</strong>. </> : "Verifying your link… "}
+        Files travel encrypted, directly into access-controlled storage that only your licensed
+        lender&apos;s review process can reach — nothing is sent by email, and this page never sees
+        or stores your account numbers itself. This link is single-purpose and expires
+        {expiresAt ? ` on ${new Date(expiresAt).toLocaleDateString()}` : " after a few days"}.
+      </p>
+      {providerConfigured === false && (
+        <p style={{ margin: 0, color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A", borderRadius: 10, padding: "10px 12px", fontSize: 13, lineHeight: 1.55 }}>
+          Heads-up: secure storage is not yet activated in this environment. Your file details will be
+          recorded for your lender, but hold the documents themselves until the portal confirms live storage.
+        </p>
+      )}
+      <div style={{ display: "grid", gap: 10 }}>
+        {DOC_SLOTS.map((slot) => {
+          const st = states[slot.type] ?? { status: "idle" as const };
+          return (
+            <section key={slot.type} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#fff", padding: "14px 16px", display: "grid", gap: 6 }}>
+              <strong style={{ color: "#1C2B45", fontSize: 14 }}>{slot.label}</strong>
+              <span style={{ color: "#5A6172", fontSize: 12.5 }}>{slot.hint}</span>
+              <input
+                type="file"
+                aria-label={`Upload ${slot.label}`}
+                disabled={st.status === "uploading" || !dealRef}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(slot.type, f); e.target.value = ""; }}
+                style={{ fontSize: 13 }}
+              />
+              {st.status === "uploading" && <span style={{ color: "#5A6172", fontSize: 12.5 }}>Encrypting and transferring…</span>}
+              {st.status === "done" && <span style={{ color: "#1C4532", fontSize: 12.5, fontWeight: 700 }}>✓ {st.note}</span>}
+              {st.status === "error" && <span role="alert" style={{ color: "#a12626", fontSize: 12.5 }}>{st.note}</span>}
+            </section>
+          );
+        })}
+      </div>
+      <p style={{ margin: 0, color: "#6B7280", fontSize: 11.5, lineHeight: 1.6 }}>
+        Chain of custody: every file is classified CONFIDENTIAL on receipt, access-logged, retained
+        per policy, and reviewable only through the licensed lender&apos;s governed workspace.
+        Uploading here is your consent to that handling for this financing request; nothing here is
+        a credit decision, and you may request deletion of documents for a withdrawn request at any time.
+      </p>
+    </main>
+  );
+}
+
+export default function SecureUploadPage() {
+  return (
+    <Suspense fallback={<main style={{ padding: 48 }}>Loading…</main>}>
+      <SecureUploadInner />
+    </Suspense>
+  );
+}

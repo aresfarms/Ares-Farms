@@ -324,6 +324,13 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # Sovereign document storage (2026-08-05): the borrower upload channel's
+      # IAM-private bucket. Present only when the bucket exists.
+      env {
+        name  = "DOCUMENT_STORAGE_BUCKET"
+        value = var.core_image == "" ? "" : "${var.project_id}-borrower-documents"
+      }
+
       # ---- Health (spec P2.3: three distinct concepts) ----------------------
       # Startup probe: Node process initialized (NO DB).
       startup_probe {

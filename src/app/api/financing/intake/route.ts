@@ -16,6 +16,8 @@ import {
 } from "@/lib/runtime/versionRuntime";
 import { persistServiceRequest } from "@/lib/serviceRequests/serviceRequestStore";
 import { notifyOnServiceRequest } from "@/lib/notifications/notificationDispatch";
+import { persistApplicationState } from "@/lib/applications/applicationStore";
+import { mintUploadLinkToken } from "@/lib/documents/uploadLinkToken";
 import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
 
 /**
@@ -376,9 +378,35 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Sovereign upload link (founder 2026-08-05): in-network deals get an
+    // encrypted, expiring document-upload link so financials/PII never
+    // travel by email. The deal's application record anchors custody.
+    let secureUploadPath: string | null = null;
+    if (intakeResult.routedTo === "licensed-lending-spoke") {
+      try {
+        const app = await persistApplicationState({
+          traceId,
+          source: "financing-intake",
+          applicationId: `finintake-${serviceRequestId}`,
+          status: "INTAKE_RECEIVED",
+          metadata: { serviceRequestId, channel: "financing-intake" },
+        });
+        const link = mintUploadLinkToken({
+          applicationId: app.application.id,
+          dealRef: serviceRequestId,
+        });
+        secureUploadPath = `/secure-upload?token=${encodeURIComponent(link.token)}`;
+      } catch {
+        // The intake must never fail because the upload link could not be
+        // minted; the lender can issue a fresh link from the operator queue.
+        secureUploadPath = null;
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       serviceRequestId,
+      secureUploadPath,
       status: serviceRequest.status,
       intakeResult,
       event: classifiedOutput.event,

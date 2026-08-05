@@ -60,7 +60,7 @@ const field = {
 type SubmitState =
   | { phase: "idle" }
   | { phase: "submitting" }
-  | { phase: "done"; serviceRequestId: string; nextSteps: string[] }
+  | { phase: "done"; serviceRequestId: string; nextSteps: string[]; secureUploadPath: string | null }
   | { phase: "error"; message: string };
 
 export function FinancingIntakePanel() {
@@ -154,6 +154,7 @@ export function FinancingIntakePanel() {
         phase: "done",
         serviceRequestId: data.serviceRequestId,
         nextSteps: data.intakeResult?.nextSteps ?? [],
+        secureUploadPath: typeof data.secureUploadPath === "string" ? data.secureUploadPath : null,
       });
     } catch (err) {
       const message =
@@ -189,6 +190,22 @@ export function FinancingIntakePanel() {
           Your deal is recorded and routed to the licensed lender. Here&apos;s
           what happens next:
         </p>
+        {submit.secureUploadPath && (
+          <a
+            href={submit.secureUploadPath}
+            style={{ justifySelf: "start", borderRadius: 9, padding: "11px 16px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none", fontSize: 13.5 }}
+          >
+            🔒 Securely upload your documents →
+          </a>
+        )}
+        {submit.secureUploadPath && (
+          <p style={{ margin: 0, fontSize: 11.5, color: "#6B7280", lineHeight: 1.55 }}>
+            Financial statements and identification never travel by email here: the button opens
+            your deal&apos;s encrypted upload channel — single-purpose, expiring, and readable only
+            through the licensed lender&apos;s governed review. Bookmark it or return to this page;
+            the link stays valid for 72 hours.
+          </p>
+        )}
         <ol style={{ margin: 0, paddingLeft: 18, color: "#3b475a", fontSize: 13, lineHeight: 1.6 }}>
           {submit.nextSteps.map((s) => (
             <li key={s}>{s}</li>

@@ -59,3 +59,18 @@ resource "google_storage_bucket_iam_member" "runtime_documents" {
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.core_runtime.email}"
 }
+
+# Data Access audit logs for Cloud Storage (SCIF posture, founder 2026-08-05):
+# every object read and write in this project's buckets is logged immutably —
+# an intrusion cannot touch a document without leaving a fingerprint.
+resource "google_project_iam_audit_config" "storage_data_access" {
+  project = var.project_id
+  service = "storage.googleapis.com"
+
+  audit_log_config {
+    log_type = "DATA_READ"
+  }
+  audit_log_config {
+    log_type = "DATA_WRITE"
+  }
+}

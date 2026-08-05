@@ -36,6 +36,7 @@ const ALLOWED_DOCUMENT_TYPES = new Set([
   "personal-financial-statement",
   "debt-schedule",
   "entity-documents",
+  "environmental-reports",
   "purchase-agreement",
   "other-supporting",
 ]);

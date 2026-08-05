@@ -22,6 +22,7 @@ const DOC_SLOTS: Array<{ type: string; label: string; hint: string }> = [
   { type: "personal-financial-statement", label: "Personal financial statement", hint: "Assets, liabilities, net worth — SBA Form 413 or your own" },
   { type: "debt-schedule", label: "Business debt schedule", hint: "Every existing loan: balance, payment, rate, maturity" },
   { type: "entity-documents", label: "Entity documents", hint: "Operating agreement / bylaws, EIN letter, good standing" },
+  { type: "environmental-reports", label: "Environmental reports", hint: "Phase I ESA or any environmental screening you already hold — every USDA/SBA commercial deal requires environmental diligence before closing" },
   { type: "purchase-agreement", label: "Purchase agreement", hint: "The signed contract, if the deal has one yet" },
   { type: "other-supporting", label: "Anything else", hint: "Whatever your lender asked for that isn't above" },
 ];

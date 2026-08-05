@@ -32,6 +32,30 @@ export type ServiceRequestType =
   | "environmental_report_order"
   | "financing_deal_intake";
 
+/**
+ * Canonical financing-deal lifecycle (founder direction 2026-08-05: the
+ * portal must track deals to completion OR failure — both outcomes are
+ * first-class). Operators set these via the queue; the customer status
+ * portal shows the customer-safe label. Free-form statuses remain accepted
+ * for non-financing request types.
+ */
+export const FINANCING_DEAL_STATUSES: ReadonlyArray<{ status: string; customerLabel: string }> = [
+  { status: "SUBMITTED_PENDING_REVIEW", customerLabel: "Received — awaiting the lender's first review" },
+  { status: "IN_LENDER_REVIEW", customerLabel: "In review with the licensed lender" },
+  { status: "DOCUMENTS_REQUESTED", customerLabel: "The lender needs documents — use your secure upload link" },
+  { status: "UNDERWRITING_IN_PROGRESS", customerLabel: "In underwriting" },
+  { status: "APPROVED_PROCEEDING_TO_CLOSE", customerLabel: "Approved — proceeding toward closing" },
+  { status: "CLOSED_FUNDED", customerLabel: "Closed and funded" },
+  { status: "DECLINED_BY_LENDER", customerLabel: "The lender was unable to proceed with this request" },
+  { status: "WITHDRAWN_BY_CUSTOMER", customerLabel: "Withdrawn at your request" },
+  { status: "CLOSED_NOT_COMPLETED", customerLabel: "Closed without completing — see your lender's note" },
+];
+
+export function customerStatusLabel(status: string | null | undefined): string | null {
+  if (!status) return null;
+  return FINANCING_DEAL_STATUSES.find((s) => s.status === status)?.customerLabel ?? status;
+}
+
 export type PersistServiceRequestInput = {
   traceId: string;
   serviceRequestId: string;

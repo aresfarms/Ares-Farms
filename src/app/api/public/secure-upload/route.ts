@@ -42,7 +42,33 @@ const ALLOWED_DOCUMENT_TYPES = new Set([
 ]);
 const MAX_FILE_BYTES = 50 * 1024 * 1024; // 50MB per file — lender-package scale
 
+// In-process rate limiting (SCIF posture 2026-08-05): a public token-gated
+// route still gets brute-force and abuse pressure — cap per-IP request rates
+// so credential-stuffing a link token is uneconomical. 60 requests/minute
+// covers a legitimate multi-file upload session with headroom.
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX_REQUESTS = 60;
+const rateBuckets = new Map<string, { windowStart: number; count: number }>();
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const bucket = rateBuckets.get(ip);
+  if (!bucket || now - bucket.windowStart >= RATE_WINDOW_MS) {
+    rateBuckets.set(ip, { windowStart: now, count: 1 });
+    if (rateBuckets.size > 5_000) rateBuckets.clear(); // memory bound
+    return false;
+  }
+  bucket.count += 1;
+  return bucket.count > RATE_MAX_REQUESTS;
+}
+
 export async function POST(req: NextRequest) {
+  const clientIp = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+  if (rateLimited(clientIp)) {
+    return NextResponse.json(
+      { ok: false, error: "Too many requests — wait a minute and try again." },
+      { status: 429 }
+    );
+  }
   const parsed = await readJsonBodyWithLimit<{
     action?: unknown;
     token?: unknown;

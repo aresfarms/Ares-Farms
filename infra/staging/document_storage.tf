@@ -14,10 +14,44 @@
 # - CORS allows the browser PUT from the service origin only.
 # =============================================================================
 
-resource "google_storage_bucket" "documents" {
+# CMEK (founder 2026-08-05: sovereign standard, pennies cost): the vault's
+# objects are encrypted under OUR key. Key access is itself audit-logged and
+# revocable; destroying the key crypto-shreds the vault — the kill switch.
+resource "google_kms_key_ring" "vault" {
   count    = var.core_image == "" ? 0 : 1
-  name     = "${var.project_id}-borrower-documents"
+  name     = "furlong-vault"
   location = var.region
+  project  = var.project_id
+  depends_on = [google_project_service.required]
+}
+
+resource "google_kms_crypto_key" "borrower_documents" {
+  count           = var.core_image == "" ? 0 : 1
+  name            = "borrower-documents"
+  key_ring        = google_kms_key_ring.vault[0].id
+  rotation_period = "7776000s" # 90 days — sovereign hygiene without ceremony
+
+  lifecycle {
+    prevent_destroy = true # destroying the key destroys ALL vault data — founder ceremony only
+  }
+}
+
+data "google_storage_project_service_account" "gcs" {
+  project = var.project_id
+}
+
+resource "google_kms_crypto_key_iam_member" "gcs_uses_vault_key" {
+  count         = var.core_image == "" ? 0 : 1
+  crypto_key_id = google_kms_crypto_key.borrower_documents[0].id
+  role          = "roles/cloudkms.cryptoKeyEncrypterDecrypter"
+  member        = "serviceAccount:${data.google_storage_project_service_account.gcs.email_address}"
+}
+
+resource "google_storage_bucket" "documents" {
+  count      = var.core_image == "" ? 0 : 1
+  name       = "${var.project_id}-borrower-documents"
+  depends_on = [google_kms_crypto_key_iam_member.gcs_uses_vault_key]
+  location   = var.region
   project  = var.project_id
 
   uniform_bucket_level_access = true
@@ -25,6 +59,10 @@ resource "google_storage_bucket" "documents" {
 
   versioning {
     enabled = true
+  }
+
+  encryption {
+    default_kms_key_name = google_kms_crypto_key.borrower_documents[0].id
   }
 
   lifecycle_rule {

@@ -29,15 +29,32 @@ type LaneNode = {
 
 // Residential removed from the rose (founder 2026-08-05: focused portal —
 // residential is parked, not marketed). Seven points; Farms takes North.
-const LANES: LaneNode[] = [
-  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 13, left: 50 }, // N
-  { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 24, left: 78 }, // NE
-  { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 50, left: 88 }, // E
-  { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 76, left: 78 }, // SE
-  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", top: 87, left: 50, href: "/guild" }, // S — the gold membership entity
-  { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556", top: 76, left: 22 }, // SW
-  { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5", top: 50, left: 12 }, // W
+// Positions are COMPUTED evenly around the ring (founder 2026-08-05: the
+// 7 lanes on the old 8-slot compass grid left a hole at NW and read wonky).
+const LANE_ORDER: Omit<LaneNode, "top" | "left">[] = [
+  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11" },
+  { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5" },
+  { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56" },
+  { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7" },
+  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", href: "/guild" },
+  { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556" },
+  { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5" },
 ];
+
+/** Evenly space n points clockwise from North on the ring the old 8-point
+ *  rose used (vertical radius 37, horizontal radius 38 around center 50,50). */
+export function evenRosePositions<T>(nodes: (T & { top?: number; left?: number })[]): (T & { top: number; left: number })[] {
+  return nodes.map((node, i) => {
+    const angle = (i * 2 * Math.PI) / nodes.length;
+    return {
+      ...node,
+      top: Math.round((50 - 37 * Math.cos(angle)) * 10) / 10,
+      left: Math.round((50 + 38 * Math.sin(angle)) * 10) / 10,
+    };
+  });
+}
+
+const LANES: LaneNode[] = evenRosePositions(LANE_ORDER);
 
 export function CompassRose({
   showHeading = true,

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { EXPLORATION_CATEGORIES } from "@/lib/customer-landing/featuredExplorationStories";
 import { CommunityCta } from "@/components/public/CommunityCta";
+import { evenRosePositions } from "@/components/public/CompassRose";
 import { CurrentNewsletters } from "@/components/public/CurrentNewsletters";
 import { CapitalRatesBlock } from "@/components/public/CapitalRatesBlock";
 import { CommercialLaneSections } from "@/components/public/CommercialLaneSections";
@@ -106,19 +107,18 @@ type LaneNode = {
   href?: string;     // override the /explore?lane= link (e.g. The Guild → /guild)
 };
 
-// Positions pulled inward from the square's edges (verticals 13–87, diagonals
-// 24/76) so the chips + labels never clip the band top/bottom and all eight fit
-// without scrolling on desktop.
-// Residential removed (founder 2026-08-05: focused portal). Seven points.
-const LANES: LaneNode[] = [
-  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 13, left: 50 }, // N
-  { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 24, left: 78 }, // NE
-  { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 50, left: 88 }, // E
-  { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 76, left: 78 }, // SE
-  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", top: 87, left: 50, href: "/guild" }, // S — the gold membership entity
-  { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556", top: 76, left: 22 }, // SW
-  { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5", top: 50, left: 12 }, // W
-];
+// Residential removed (founder 2026-08-05: focused portal). Seven points,
+// spaced EVENLY around the ring via evenRosePositions (shared with the
+// front-page rose) — the old hardcoded 8-slot grid left a hole at NW.
+const LANES: LaneNode[] = evenRosePositions([
+  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11" },
+  { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5" },
+  { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56" },
+  { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7" },
+  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", href: "/guild" },
+  { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556" },
+  { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5" },
+]);
 
 type IconName = "map-pin" | "plant" | "store" | "leaf" | "coin" | "mail" | "gift" | "compass" | "doc" | "community";
 

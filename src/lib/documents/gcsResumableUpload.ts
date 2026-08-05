@@ -40,6 +40,50 @@ async function serviceAccountToken(): Promise<string | null> {
   }
 }
 
+const STORAGE_URI_PREFIX = "governed://document-storage/";
+
+/** Map a stored governed storageUri back to its GCS object key. */
+export function objectKeyFromStorageUri(storageUri: string | null | undefined): string | null {
+  if (!storageUri || !storageUri.startsWith(STORAGE_URI_PREFIX)) return null;
+  const key = storageUri.slice(STORAGE_URI_PREFIX.length);
+  return key.trim() ? key : null;
+}
+
+/**
+ * Governed single-object read for the licensed lender's desk. Bytes stream
+ * THROUGH the runtime deliberately (never a shareable signed URL): every read
+ * passes the route's access control + audit trail, and this is the seam where
+ * per-deal envelope decryption slots in later without redesign. Returns null
+ * when the provider is not configured (dev) — callers degrade honestly.
+ */
+export async function fetchObjectStream(objectKey: string): Promise<{
+  stream: ReadableStream<Uint8Array>;
+  contentType: string;
+  contentLength: string | null;
+} | null> {
+  const bucket = documentStorageBucket();
+  if (!bucket) return null;
+  const token = await serviceAccountToken();
+  if (!token) return null;
+  try {
+    const url =
+      `https://storage.googleapis.com/storage/v1/b/${encodeURIComponent(bucket)}/o/` +
+      `${encodeURIComponent(objectKey)}?alt=media`;
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!res.ok || !res.body) return null;
+    return {
+      stream: res.body,
+      contentType: res.headers.get("content-type") ?? "application/octet-stream",
+      contentLength: res.headers.get("content-length"),
+    };
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Initiate a resumable upload session for one governed object. Returns the
  * browser-usable session URI, or null when the provider is not configured

@@ -150,6 +150,13 @@ resource "google_cloud_run_v2_service" "core" {
         value = var.notify_lender_email
       }
       dynamic "env" {
+        for_each = var.lender_booking_url == "" ? [] : [var.lender_booking_url]
+        content {
+          name  = "LENDER_BOOKING_URL"
+          value = env.value
+        }
+      }
+      dynamic "env" {
         for_each = var.email_from == "" ? [] : [var.email_from]
         content {
           name  = "EMAIL_FROM"

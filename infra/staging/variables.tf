@@ -364,6 +364,12 @@ variable "notify_lender_email" {
   default     = "finance@compasstocapital.com"
 }
 
+variable "lender_booking_url" {
+  description = "The licensed lender's appointment-scheduling page (e.g. Google Workspace booking link). Surfaced on the customer status page, intake success, and reminder emails so customers schedule calls instead of cold-calling. Empty = booking links stay hidden."
+  type        = string
+  default     = ""
+}
+
 variable "email_from" {
   description = "Verified sender address for outbound notifications. Empty = notifications stay off (recorded, not sent)."
   type        = string

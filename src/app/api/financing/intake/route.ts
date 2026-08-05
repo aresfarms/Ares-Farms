@@ -407,6 +407,13 @@ export async function POST(req: NextRequest) {
       ok: true,
       serviceRequestId,
       secureUploadPath,
+      // Scheduling beats phone tag (founder 2026-08-05): in-network deals
+      // surface the lender's booking page so the first call lands on his
+      // calendar. Hidden until LENDER_BOOKING_URL is configured.
+      bookingUrl:
+        intakeResult.routedTo === "licensed-lending-spoke"
+          ? process.env.LENDER_BOOKING_URL?.trim() || null
+          : null,
       status: serviceRequest.status,
       intakeResult,
       event: classifiedOutput.event,

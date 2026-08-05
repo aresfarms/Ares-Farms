@@ -138,7 +138,20 @@ export type ServiceRequestStatusView = {
   requestType?: ServiceRequestType;
   routedTo?: string;
   status?: string;
+  statusLabel?: string | null;
   submittedAt?: string | null;
+  /** Customer-visible note the licensed professional wrote for THIS request. */
+  lenderNote?: string | null;
+  /** Customer-safe closing timeline (lender-maintained; moves with real
+   *  lender/USDA/SBA backlogs — the backlog note explains why). */
+  timeline?: {
+    docsDueAt: string | null;
+    underwritingEtaAt: string | null;
+    closingTargetAt: string | null;
+    lenderBacklogNote: string | null;
+  } | null;
+  /** Scheduling link so the customer books a call instead of cold-calling. */
+  bookingUrl?: string | null;
 };
 
 /**
@@ -166,13 +179,46 @@ export async function getServiceRequestStatus(
     return { found: false };
   }
 
+  // Deal-desk state (lender-authored) — surface ONLY the customer-safe
+  // subset: the note written FOR the customer and the timeline. Never
+  // reminders metadata, actor ids, or anything the lender didn't intend
+  // the customer to read.
+  const dealDesk = (row.metadata as {
+    dealDesk?: {
+      customerNote?: string | null;
+      timeline?: {
+        docsDueAt?: string | null;
+        underwritingEtaAt?: string | null;
+        closingTargetAt?: string | null;
+        lenderBacklogNote?: string | null;
+      };
+    };
+  } | null)?.dealDesk;
+  const t = dealDesk?.timeline;
+  const hasTimeline = Boolean(
+    t && (t.docsDueAt || t.underwritingEtaAt || t.closingTargetAt || t.lenderBacklogNote)
+  );
+  const isFinancing = row.requestType === "financing_deal_intake";
+  const bookingUrl = process.env.LENDER_BOOKING_URL?.trim() || null;
+
   return {
     found: true,
     serviceRequestId: row.serviceRequestId,
     requestType: row.requestType as ServiceRequestType,
     routedTo: row.routedTo,
     status: row.status,
+    statusLabel: isFinancing ? customerStatusLabel(row.status) : null,
     submittedAt: row.occurredAt ? row.occurredAt.toISOString() : null,
+    lenderNote: dealDesk?.customerNote ?? null,
+    timeline: hasTimeline
+      ? {
+          docsDueAt: t?.docsDueAt ?? null,
+          underwritingEtaAt: t?.underwritingEtaAt ?? null,
+          closingTargetAt: t?.closingTargetAt ?? null,
+          lenderBacklogNote: t?.lenderBacklogNote ?? null,
+        }
+      : null,
+    bookingUrl: isFinancing ? bookingUrl : null,
   };
 }
 

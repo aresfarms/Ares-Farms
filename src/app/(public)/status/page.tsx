@@ -16,8 +16,24 @@ type StatusView = {
   requestType?: "environmental_report_order" | "financing_deal_intake";
   routedTo?: string;
   status?: string;
+  statusLabel?: string | null;
   submittedAt?: string | null;
+  lenderNote?: string | null;
+  timeline?: {
+    docsDueAt: string | null;
+    underwritingEtaAt: string | null;
+    closingTargetAt: string | null;
+    lenderBacklogNote: string | null;
+  } | null;
+  bookingUrl?: string | null;
 };
+
+function shortDate(iso: string | null): string | null {
+  if (!iso) return null;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" });
+}
 
 const INK = "#101a2b";
 const MUTED = "#4d596d";
@@ -130,16 +146,86 @@ export default function StatusPortalPage() {
 
         {result && (
           result.found ? (
-            <section style={{ border: "1px solid #cfe0d5", borderRadius: 14, background: "#fff", padding: 18, display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#127a4f" }}>
-                {result.serviceRequestId}
-              </span>
-              <strong style={{ fontSize: 18, color: INK }}>{friendlyStatus(result).headline}</strong>
-              <p style={{ margin: 0, fontSize: 13.5, color: MUTED, lineHeight: 1.6 }}>{friendlyStatus(result).detail}</p>
-              {result.submittedAt && (
-                <span style={{ fontSize: 11.5, color: "#8090a0" }}>
-                  Submitted {result.submittedAt.replace("T", " ").slice(0, 16)} UTC
+            <section style={{ border: "1px solid #cfe0d5", borderRadius: 14, background: "#fff", padding: 18, display: "grid", gap: 10 }}>
+              <div style={{ display: "grid", gap: 6 }}>
+                <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#127a4f" }}>
+                  {result.serviceRequestId}
                 </span>
+                <strong style={{ fontSize: 18, color: INK }}>
+                  {result.statusLabel ?? friendlyStatus(result).headline}
+                </strong>
+                {!result.statusLabel && (
+                  <p style={{ margin: 0, fontSize: 13.5, color: MUTED, lineHeight: 1.6 }}>{friendlyStatus(result).detail}</p>
+                )}
+                {result.submittedAt && (
+                  <span style={{ fontSize: 11.5, color: "#8090a0" }}>
+                    Submitted {result.submittedAt.replace("T", " ").slice(0, 16)} UTC
+                  </span>
+                )}
+              </div>
+
+              {result.lenderNote && (
+                <div style={{ borderTop: "1px solid #e6ecf3", paddingTop: 10, display: "grid", gap: 4 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#3b475a" }}>
+                    From your lender
+                  </span>
+                  <p style={{ margin: 0, fontSize: 13.5, color: INK, lineHeight: 1.6 }}>{result.lenderNote}</p>
+                </div>
+              )}
+
+              {result.timeline && (
+                <div style={{ borderTop: "1px solid #e6ecf3", paddingTop: 10, display: "grid", gap: 6 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#3b475a" }}>
+                    Where this is headed
+                  </span>
+                  {[
+                    { label: "Documents due", value: shortDate(result.timeline.docsDueAt) },
+                    { label: "Underwriting expected", value: shortDate(result.timeline.underwritingEtaAt) },
+                    { label: "Closing target", value: shortDate(result.timeline.closingTargetAt) },
+                  ]
+                    .filter((row) => row.value)
+                    .map((row) => (
+                      <div key={row.label} style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5 }}>
+                        <span style={{ color: MUTED }}>{row.label}</span>
+                        <strong style={{ color: INK }}>{row.value}</strong>
+                      </div>
+                    ))}
+                  {result.timeline.lenderBacklogNote && (
+                    <p style={{ margin: 0, fontSize: 12.5, color: MUTED, lineHeight: 1.55 }}>
+                      {result.timeline.lenderBacklogNote}
+                    </p>
+                  )}
+                  <span style={{ fontSize: 11.5, color: "#8090a0", lineHeight: 1.5 }}>
+                    Dates are your lender&apos;s working estimates and move with real lender and
+                    agency processing backlogs — never a promise of any outcome.
+                  </span>
+                </div>
+              )}
+
+              {result.bookingUrl && (
+                <div style={{ borderTop: "1px solid #e6ecf3", paddingTop: 10, display: "grid", gap: 6 }}>
+                  <a
+                    href={result.bookingUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      justifySelf: "start",
+                      border: "none",
+                      borderRadius: 10,
+                      padding: "9px 16px",
+                      fontSize: 13.5,
+                      fontWeight: 700,
+                      color: "#fff",
+                      background: "#1c5aa0",
+                      textDecoration: "none",
+                    }}
+                  >
+                    Schedule a call with your lender
+                  </a>
+                  <span style={{ fontSize: 11.5, color: "#8090a0" }}>
+                    Booking a time gets you a focused call — faster than phone tag.
+                  </span>
+                </div>
               )}
             </section>
           ) : (

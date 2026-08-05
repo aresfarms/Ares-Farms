@@ -60,7 +60,7 @@ const field = {
 type SubmitState =
   | { phase: "idle" }
   | { phase: "submitting" }
-  | { phase: "done"; serviceRequestId: string; nextSteps: string[]; secureUploadPath: string | null }
+  | { phase: "done"; serviceRequestId: string; nextSteps: string[]; secureUploadPath: string | null; bookingUrl: string | null }
   | { phase: "error"; message: string };
 
 export function FinancingIntakePanel() {
@@ -155,6 +155,7 @@ export function FinancingIntakePanel() {
         serviceRequestId: data.serviceRequestId,
         nextSteps: data.intakeResult?.nextSteps ?? [],
         secureUploadPath: typeof data.secureUploadPath === "string" ? data.secureUploadPath : null,
+        bookingUrl: typeof data.bookingUrl === "string" ? data.bookingUrl : null,
       });
     } catch (err) {
       const message =
@@ -204,6 +205,22 @@ export function FinancingIntakePanel() {
             your deal&apos;s encrypted upload channel — single-purpose, expiring, and readable only
             through the licensed lender&apos;s governed review. Bookmark it or return to this page;
             the link stays valid for 72 hours.
+          </p>
+        )}
+        {submit.bookingUrl && (
+          <a
+            href={submit.bookingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ justifySelf: "start", borderRadius: 9, padding: "11px 16px", background: "#1c5aa0", color: "#fff", fontWeight: 800, textDecoration: "none", fontSize: 13.5 }}
+          >
+            📅 Schedule your call with the lender →
+          </a>
+        )}
+        {submit.bookingUrl && (
+          <p style={{ margin: 0, fontSize: 11.5, color: "#6B7280", lineHeight: 1.55 }}>
+            Booking a time gets you a focused conversation about your deal — pick a slot that
+            works instead of playing phone tag.
           </p>
         )}
         <ol style={{ margin: 0, paddingLeft: 18, color: "#3b475a", fontSize: 13, lineHeight: 1.6 }}>

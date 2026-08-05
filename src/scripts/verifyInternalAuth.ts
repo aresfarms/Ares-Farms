@@ -64,6 +64,7 @@ const INTERNAL_PAGES = [
   "/production-final-authority",
   "/dashboard",
   "/lender/dashboard",
+  "/lender-desk",
   "/sponsor/dashboard",
   "/portal/borrower",
 ];
@@ -86,6 +87,7 @@ const INTERNAL_APIS = [
   "/api/ledger",
   "/api/audit",
   "/api/entitlements",
+  "/api/lender/deal-desk",
 ];
 
 // Public pages must still render (must NOT be redirected to sign-in).

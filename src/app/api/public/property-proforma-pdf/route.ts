@@ -289,6 +289,62 @@ export async function POST(req: NextRequest) {
 
   // ── Alternative-use screen for commercial (lane A) — a building is often
   // marketed for its last use, not its highest (founder 2026-07-29).
+  // ── Farm (lane B): lender-test scorecard + the BOLD FSA hand-off
+  // (founder 2026-08-05: if FSA fits best, say so IN BOLD and point at the
+  // lenders who actually make those loans — the in-network lender does not).
+  if (lane === "B") {
+    const usdaRuralRawB = body.usdaRural as Record<string, unknown> | null | undefined;
+    const usdaRuralB = usdaRuralRawB && typeof usdaRuralRawB === "object"
+      ? {
+          businessEligible: typeof usdaRuralRawB.businessEligible === "boolean" ? usdaRuralRawB.businessEligible : null,
+          housingEligible: typeof usdaRuralRawB.housingEligible === "boolean" ? usdaRuralRawB.housingEligible : null,
+        }
+      : null;
+    const evidenceB = Array.isArray(body.propertyEvidence) ? (body.propertyEvidence as Array<Record<string, unknown>>) : [];
+    const scorecardB = buildLenderTestScorecard({
+      ctx: {
+        laneId: "farm",
+        screeningPrice,
+        noiAnnual: coverageSolution?.bestMix?.annualNoi ?? coverageSolution?.bestSingle?.annualNoi ?? null,
+        noiBasis: "best modeled enterprise mix",
+        rates: { mortgage30Pct: num(body.benchRatePct), fsaOwnershipDirectPct: num(body.fsaRatePct) },
+        usdaRural: usdaRuralB,
+      },
+      bestDscr: coverageSolution ? Math.max(coverageSolution.bestMix?.dscr ?? 0, coverageSolution.bestSingle?.dscr ?? 0) || null : null,
+      bestDscrLabel: coverageSolution?.bestMix ? "best enterprise mix" : coverageSolution?.bestSingle?.label ?? null,
+      superfundWithin3mi: (() => {
+        const epa = evidenceB.find((f) => typeof f?.label === "string" && /contamination screen/i.test(f.label as string));
+        const m = typeof epa?.value === "string" ? (epa.value as string).match(/(\d+|No) Superfund/i) : null;
+        return m ? (m[1].toLowerCase() === "no" ? 0 : Number(m[1])) : null;
+      })(),
+      floodZone: (() => {
+        const flood = evidenceB.find((f) => typeof f?.label === "string" && /flood zone/i.test(f.label as string));
+        const m = typeof flood?.value === "string" ? (flood.value as string).match(/Zone ([A-Z0-9]+)/i) : null;
+        return m ? m[1] : null;
+      })(),
+    });
+    const gateIdxB = document.sections.findIndex((sec) => sec.title.startsWith("PART V"));
+    document.sections.splice(gateIdxB >= 0 ? gateIdxB : document.sections.length, 0, {
+      title: "LENDER-TEST SCORECARD \u2014 PROPERTY-SIDE ONLY",
+      leadIns: [
+        { text: "Which of a lender's property-side checklist items this parcel passes on paper. Not an approval, an approval probability, or an eligibility determination \u2014 borrower qualification is the licensed lender's decision.", bold: false },
+        { text: "IMPORTANT \u2014 IF FSA PROGRAMS FIT THIS PROPERTY BEST: Furlong's in-network licensed lender sources commercial and business debt and does NOT originate FSA farm loans. FSA-GUARANTEED lenders (local ag banks and Farm Credit associations) and FSA direct loans make these \u2014 find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take THIS pro forma with you; it is built for exactly that conversation.", bold: true },
+      ],
+      tables: [
+        {
+          table: {
+            columns: [
+              { header: "Test", width: 0.28, align: "left" },
+              { header: "Status", width: 0.12, align: "left" },
+              { header: "Finding", width: 0.6, align: "left" },
+            ],
+            rows: scorecardB.map((t) => ({ cells: [t.test, t.status.toUpperCase(), t.detail], emphasis: t.status === "fail" })),
+          },
+        },
+      ],
+    });
+  }
+
   if (lane === "A") {
     const buildingRaw = body.building as Record<string, unknown> | null | undefined;
     const benchRatePct = num(body.benchRatePct);

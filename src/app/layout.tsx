@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     template: "%s | Furlong",
   },
   description:
-    "Type in an address. See if it's worth buying — and exactly how to pay for it. Homes, farms, storefronts, bare land: facts, true ownership costs, and the financing that fits. Free, no account.",
+    "Type in an address. See if it's worth buying — and exactly how to pay for it. Farms, commercial buildings, rural business property, bare land: facts, true ownership costs, and the USDA and SBA financing that fits. Free, no account.",
 };
 
 // NONCE-CSP REQUIREMENT (GCP readiness 2026-06-12): per-request CSP nonces are

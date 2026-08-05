@@ -66,7 +66,7 @@ export const HOMEPAGE_HERO = {
   brandName: "Furlong",
   headline:  "Type in an address. See if it's worth buying — and exactly how to pay for it.",
   tagline:
-    "A house, a farm, a commercial building, bare land — Furlong shows you what's really there, what it actually costs to own, the deal-killers hiding in the details, and the financing built for exactly that kind of property. Free, before you commit to anything.",
+    "A farm, a commercial building, a rural business property, bare land — Furlong shows you what's really there, what it actually costs to own, the deal-killers hiding in the details, and the financing built for exactly that kind of property. Free, before you commit to anything.",
   subhead:
     "Not sure the property is even right for what you want? That's the exact question this answers. " +
     "Start with an address — or just a question — and see the whole picture and your next move before you talk to anyone or share a thing.",
@@ -126,7 +126,7 @@ export const HOMEPAGE_MODULES = {
   // Hero v3 alignment (2026-07-29): the modules echo the address-first
   // promise instead of re-stating the retired "we bring the analysis" line.
   intro:
-    "Whatever the property is — a house, a farm, a commercial building, bare land — there's a lane built for its questions. Explore any of them free; bring in a licensed professional only when you're ready.",
+    "Whatever the property is — a farm, a commercial building, a rural business, bare land — there's a lane built for its questions. Explore any of them free; bring in a licensed professional only when you're ready.",
   cards: [
     {
       title: "Farms, Agriculture & Land",

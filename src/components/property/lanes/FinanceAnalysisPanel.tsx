@@ -19,7 +19,7 @@ const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14
 
 const STATUS_STYLE: Record<LenderTest["status"], { label: string; bg: string; ink: string }> = {
   pass: { label: "PASS", bg: "#E7F0E9", ink: "#1C4532" },
-  fail: { label: "WATCH", bg: "#FDECEC", ink: "#8F1F1F" },
+  fail: { label: "FAIL", bg: "#FDECEC", ink: "#8F1F1F" },
   unknown: { label: "UNKNOWN", bg: "#F3F4F6", ink: "#6B7280" },
 };
 

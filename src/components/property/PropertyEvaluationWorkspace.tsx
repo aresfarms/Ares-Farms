@@ -3041,6 +3041,31 @@ export function PropertyEvaluationWorkspace({
             // The SAME real pro forma rides in the First-Time Buyer Report as
             // a lender-ready appendix (founder 2026-07-29: first-time buyers
             // need the numbers "for a lender if they don't choose ours").
+            // Lane-aware federal program guide (founder 2026-08-05): the
+            // First-Time report teaches USDA RD / B&I / SBA / FSA for this
+            // lane and skips residential-mortgage content entirely.
+            programGuide: (() => {
+              const isFarm = workspaceProfile.id === "farm" || workspaceProfile.id === "land";
+              const isCommercial = !isFarm && workspaceProfile.id !== "residential";
+              if (!isFarm && !isCommercial) return undefined;
+              const shared = [
+                { name: "USDA B&I (OneRD guarantee)", body: "Rural BUSINESS financing: a private lender makes the loan and USDA guarantees it. Requires a USDA-eligible rural area (checked live on this report) and an eligible business purpose; agricultural production alone does not qualify, but value-added, processing, and agritourism operations can." },
+                { name: "SBA 7(a)", body: "The general-purpose small-business loan through participating lenders: real estate, acquisition, working capital, equipment. Requires an eligible operating business — owner-occupancy for real estate." },
+                { name: "SBA 504", body: "Fixed-asset financing (real estate, heavy equipment) through a bank + a Certified Development Company at below-market blended rates. Owner-occupied businesses only." },
+              ];
+              const farmOnly = [
+                { name: "FSA Direct Farm Ownership", body: "USDA lends directly — lowest rate, ~$600K limit (indexed), targeted at beginning and underserved farmers; government processing timelines." },
+                { name: "FSA Guaranteed Farm Ownership", body: "The commercial farm path most established farmers use: a local ag bank or Farm Credit association makes the loan at bank speed and USDA guarantees up to 95% — limits near $2.25M (indexed)." },
+                { name: "Farm Credit System", body: "The nationwide cooperative ag lender network — farm real estate and operating credit as their core business, with patronage refunds to member-borrowers." },
+              ];
+              return {
+                heading: "The Federal Programs That Fund Properties Like This",
+                items: isFarm ? [...farmOnly, ...shared] : shared,
+                fsaNote: isFarm
+                  ? "Furlong's in-network licensed lender sources commercial and business debt and does NOT originate FSA farm loans. FSA-guaranteed lenders (local ag banks and Farm Credit associations) and FSA direct loans make these — find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take this report and its pro forma with you; they are built for exactly that conversation."
+                  : undefined,
+              };
+            })(),
             lenderProforma:
               workspaceProfile.id === "residential" &&
               residentialBasisPrice != null &&

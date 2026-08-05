@@ -99,6 +99,14 @@ type PropertyEvaluationPdfInput = {
     rows?: Array<{ label: string; value: string; emphasis?: boolean }>;
     paragraphs?: string[];
   }>;
+  /** Lane-aware federal-program guide (founder 2026-08-05): the First-Time
+      report teaches the USDA/SBA/FSA programs for THIS lane; the bold FSA
+      hand-off appears when FSA programs may fit best. */
+  programGuide?: {
+    heading: string;
+    items: Array<{ name: string; body: string }>;
+    fsaNote?: string;
+  };
   /** Consumer-facing transparency for brokerage agreements, commissions, concessions, and added fees. */
   compensationTransparency?: {
     posture: "CLEAR" | "REVIEW_NEEDED" | "UNKNOWN";
@@ -772,6 +780,14 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       if (section.intro) paragraph(section.intro, { size: 9.5 });
       if (section.rows?.length) factsTable(section.rows.map((row) => ({ label: row.label, value: row.value })));
       for (const line of section.paragraphs ?? []) paragraph(line, { size: 8.5, color: COLORS.muted });
+    }
+  }
+
+  if (input.programGuide) {
+    heading(input.programGuide.heading);
+    factsTable(input.programGuide.items.map((item) => ({ label: item.name, value: item.body })));
+    if (input.programGuide.fsaNote) {
+      panel({ title: "IMPORTANT \u2014 IF FSA PROGRAMS FIT THIS PROPERTY BEST", lines: [input.programGuide.fsaNote], fill: ACCENT_SOFT });
     }
   }
 

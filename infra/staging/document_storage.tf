@@ -84,6 +84,7 @@ resource "google_storage_bucket" "documents" {
     origin = distinct(compact([
       var.nextauth_url,
       "https://furlong-core-${data.google_project.staging.number}.${var.region}.run.app",
+      try(google_cloud_run_v2_service.core[0].uri, ""),
       "http://localhost:3000",
     ]))
     method          = ["PUT", "OPTIONS"]

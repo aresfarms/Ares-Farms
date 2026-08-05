@@ -359,9 +359,9 @@ variable "notify_pe_email" {
 variable "notify_lender_email" {
   description = "Recipient for new financing deals (the licensed lender)."
   type        = string
-  # Stuart's real workspace address (founder-confirmed 2026-07-29) — the
-  # prior stuart@ placeholder was never a live mailbox.
-  default     = "sfraas@aresfarmsinc.com"
+  # The Financial module's brand address (founder 2026-08-05):
+  # finance@compasstocapital.com — Stuart's lane on his own domain.
+  default     = "finance@compasstocapital.com"
 }
 
 variable "email_from" {

@@ -109,15 +109,15 @@ type LaneNode = {
 // Positions pulled inward from the square's edges (verticals 13–87, diagonals
 // 24/76) so the chips + labels never clip the band top/bottom and all eight fit
 // without scrolling on desktop.
+// Residential removed (founder 2026-08-05: focused portal). Seven points.
 const LANES: LaneNode[] = [
-  { slug: "property-land",            label: "Residential",                     icon: "map-pin", tint: "#FAEEDA", color: "#854F0B", top: 13, left: 50 }, // N
-  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 24, left: 78 }, // NE
-  { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 50, left: 88 }, // E
-  { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 76, left: 78 }, // SE
-  { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 87, left: 50 }, // S
-  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", top: 76, left: 22, href: "/guild" }, // SW — the gold membership entity
-  { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556", top: 50, left: 12 }, // W
-  { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5", top: 24, left: 22 }, // NW
+  { slug: "farms-agriculture",        label: "Farms, Agriculture & Land",       icon: "plant",   tint: "#EAF3DE", color: "#3B6D11", top: 13, left: 50 }, // N
+  { slug: "small-business-growth",    label: "Commercial Properties",           icon: "store",   tint: "#E6F1FB", color: "#185FA5", top: 24, left: 78 }, // NE
+  { slug: "environmental-compliance", label: "Environmental",                   icon: "leaf",    tint: "#E1F5EE", color: "#0F6E56", top: 50, left: 88 }, // E
+  { slug: "financing-capital",        label: "Financing & Capital",             icon: "coin",    tint: "#EEEDFE", color: "#534AB7", top: 76, left: 78 }, // SE
+  { slug: "guild",                    label: "The Guild",                       icon: "community", tint: "#faf3e6", color: "#b8862f", top: 87, left: 50, href: "/guild" }, // S — the gold membership entity
+  { slug: "programs-incentives",      label: "Grants & State and Federal Programs", icon: "gift", tint: "#FBEAF0", color: "#993556", top: 76, left: 22 }, // SW
+  { slug: "not-sure",                 label: "Taxes, Accounting & Regulations", icon: "doc",     tint: "#E6F1FB", color: "#185FA5", top: 50, left: 12 }, // W
 ];
 
 type IconName = "map-pin" | "plant" | "store" | "leaf" | "coin" | "mail" | "gift" | "compass" | "doc" | "community";

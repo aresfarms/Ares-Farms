@@ -44,7 +44,6 @@ function LaneIcon({ name }: { name: string }) {
 
 // "Point me toward…" — plain-language objectives mapped to lanes. Guidance only.
 const OBJECTIVES: { label: string; slug: string }[] = [
-  { label: "Buy a home", slug: "property-land" },
   { label: "Work the land", slug: "farms-agriculture" },
   { label: "Open a business", slug: "small-business-growth" },
   { label: "Fund a deal", slug: "financing-capital" },

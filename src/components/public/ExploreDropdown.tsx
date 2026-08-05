@@ -15,7 +15,6 @@
  */
 
 const EXPLORE_OPTIONS = [
-  { slug: "property-land",             label: "Residential" },
   { slug: "farms-agriculture",         label: "Farms, Agriculture & Land" },
   { slug: "small-business-growth",     label: "Commercial Properties" },
   { slug: "environmental-compliance",  label: "Environmental & Compliance" },

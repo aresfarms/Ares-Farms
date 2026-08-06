@@ -8,6 +8,7 @@ on:
   pull_request:
     branches:
       - main
+      - feature/p2-cloud-run-private
 
 # Master Volume Governance:
 # - Vol III: keeps every push and pull request under deterministic,

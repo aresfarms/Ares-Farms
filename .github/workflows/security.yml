@@ -2,7 +2,7 @@ name: security
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, feature/p2-cloud-run-private]
   push:
     branches: ["**"]
 

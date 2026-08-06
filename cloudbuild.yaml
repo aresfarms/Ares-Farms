@@ -158,9 +158,19 @@ steps:
       - -t=${_REPO}/furlong-db-migrate:p2
       - .
 
+  # Vault malware scanner (ClamAV, IAM-private; definitions baked at build —
+  # each image build refreshes them)
+  - name: gcr.io/cloud-builders/docker
+    id: build-scanner
+    args:
+      - build
+      - -t=${_REPO}/furlong-scanner:p2
+      - scanner
+
 images:
   - ${_REPO}/furlong-core:p2
   - ${_REPO}/furlong-db-migrate:p2
+  - ${_REPO}/furlong-scanner:p2
 
 # The default compute service account is intentionally DISABLED (security
 # hardening — it is over-privileged), and Cloud Build defaults to it. The

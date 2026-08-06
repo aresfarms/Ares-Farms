@@ -9,6 +9,7 @@ import {
   objectKeyFromStorageUri,
 } from "@/lib/documents/gcsResumableUpload";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
+import { scanAllowsStreaming } from "@/lib/documents/malwareScan";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 
 /**
@@ -90,6 +91,19 @@ export async function GET(req: NextRequest) {
     metadata: { route: "/api/public/document-download", documentId: doc.id, dealRef: claims.dealRef },
   });
 
+  const scanGate = scanAllowsStreaming(doc.metadata);
+  if (!scanGate.allowed) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          scanGate.status === "infected"
+            ? "This file is unavailable — it did not pass the vault's safety scan."
+            : "This file is still being safety-scanned — try again in a minute.",
+      },
+      { status: 423 }
+    );
+  }
   const objectKey = objectKeyFromStorageUri(doc.storageUri);
   if (!objectKey) {
     return NextResponse.json(

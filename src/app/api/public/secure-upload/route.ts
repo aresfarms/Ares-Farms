@@ -8,6 +8,7 @@ import {
   initResumableUpload,
 } from "@/lib/documents/gcsResumableUpload";
 import { verifyUploadLinkToken } from "@/lib/documents/uploadLinkToken";
+import { scanVaultDocumentSoon } from "@/lib/documents/malwareScan";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 
@@ -191,6 +192,7 @@ export async function POST(req: NextRequest) {
       module: "api.public.secure-upload",
       metadata: { applicationId: claims.applicationId, documentId: persisted.document.id, documentType, uploaded },
     });
+    if (uploaded) scanVaultDocumentSoon(persisted.document.id);
     return NextResponse.json({
       ok: true,
       documentId: persisted.document.id,

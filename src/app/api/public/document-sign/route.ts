@@ -17,6 +17,7 @@ import {
   signatureMode,
 } from "@/lib/documents/signatureVault";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
+import { scanAllowsStreaming } from "@/lib/documents/malwareScan";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
 import { LENDER_EMAIL_SIGNATURE, renderLenderEmailHtml } from "@/lib/notifications/lenderSignature";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
@@ -103,6 +104,13 @@ export async function POST(req: NextRequest) {
   if (!doc) {
     return NextResponse.json({ ok: false, error: "This document is not available for signing." }, { status: 404 });
   }
+  const signScanGate = scanAllowsStreaming(doc.metadata);
+  if (!signScanGate.allowed) {
+    return NextResponse.json(
+      { ok: false, error: "This document has not passed the vault's safety scan and cannot be signed yet." },
+      { status: 423 }
+    );
+  }
   const metadata = (doc.metadata ?? {}) as Record<string, unknown>;
   if (metadata.signatureStatus === "signed") {
     return NextResponse.json({ ok: true, alreadySigned: true });
@@ -159,7 +167,7 @@ export async function POST(req: NextRequest) {
     mimeType: "application/pdf",
     byteSize: certPdf.length,
     storageUri: certStored ? handoff.handoff.storageUri : null,
-    metadata: { dealRef: claims.dealRef, signatureEvent: event, bytesInGovernedStorage: certStored },
+    metadata: { dealRef: claims.dealRef, signatureEvent: event, bytesInGovernedStorage: certStored, scanStatus: "clean", scanTrusted: "runtime-authored" },
   });
 
   // Mark the source document signed.

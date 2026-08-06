@@ -200,6 +200,18 @@ resource "google_cloud_run_v2_service" "core" {
           value = env.value
         }
       }
+      # Vault malware quarantine (scanner is a private in-project service).
+      dynamic "env" {
+        for_each = var.scanner_image == "" ? [] : [1]
+        content {
+          name  = "SCANNER_URL"
+          value = google_cloud_run_v2_service.scanner[0].uri
+        }
+      }
+      env {
+        name  = "QUARANTINE_MODE"
+        value = var.quarantine_mode
+      }
 
       # SendGrid API key — the secret is created + versioned OUT OF BAND by the
       # owner (never Terraform, never the agent). Wired only when EMAIL_FROM is

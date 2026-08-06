@@ -154,6 +154,10 @@ export async function listDealDocuments(applicationId: string) {
       signatureRequested: m.signatureRequested === true,
       signed: m.signatureStatus === "signed",
       signedByTypedName: typeof m.signedByTypedName === "string" ? m.signedByTypedName : null,
+      scanStatus:
+        m.scanStatus === "clean" || m.scanStatus === "infected" || m.scanStatus === "unavailable"
+          ? (m.scanStatus as string)
+          : "pending",
     };
   });
 }

@@ -79,6 +79,7 @@ interface DealDocument {
   signatureRequested: boolean;
   signed: boolean;
   signedByTypedName: string | null;
+  scanStatus: "pending" | "clean" | "infected" | "unavailable";
 }
 
 interface StatusOption {
@@ -602,7 +603,11 @@ export default function LenderDeskPage() {
                                   {doc.receivedAt ? formatDateTime(doc.receivedAt) : "—"}
                                 </td>
                                 <td style={{ padding: "6px 10px" }}>
-                                  {doc.signed ? (
+                                  {doc.scanStatus === "infected" ? (
+                                    <span style={{ color: "#b42318", fontWeight: 800 }}>⛔ QUARANTINED</span>
+                                  ) : doc.scanStatus === "pending" || doc.scanStatus === "unavailable" ? (
+                                    <span style={{ color: "#8F6E1F", fontWeight: 700 }}>Scanning…</span>
+                                  ) : doc.signed ? (
                                     <span style={{ color: "#166534", fontWeight: 800 }}>
                                       SIGNED{doc.signedByTypedName ? ` — ${doc.signedByTypedName}` : ""}
                                     </span>

@@ -29,6 +29,7 @@ import {
   initResumableUpload,
 } from "@/lib/documents/gcsResumableUpload";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
+import { scanAllowsStreaming, scanVaultDocumentSoon, sweepPendingScans } from "@/lib/documents/malwareScan";
 import { LENDER_EMAIL_SIGNATURE, renderLenderEmailHtml } from "@/lib/notifications/lenderSignature";
 import { serviceRequests } from "@/db/schema";
 
@@ -207,6 +208,7 @@ export async function GET(req: NextRequest) {
           { status: 400 }
         );
       }
+      void sweepPendingScans(applicationId); // opportunistic re-scan of pendings
       const documents = await listDealDocuments(applicationId);
       createObservabilityEvent({
         eventType: "LENDER_DEAL_DESK_DOCUMENTS_READ",
@@ -240,6 +242,21 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(
           { ok: false, error: "Document not found.", governance: { traceId } },
           { status: 404 }
+        );
+      }
+      const scanGate = scanAllowsStreaming(doc.metadata);
+      if (!scanGate.allowed) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error:
+              scanGate.status === "infected"
+                ? "This file is QUARANTINED by the malware scanner and cannot be opened."
+                : "This file has not passed the malware scan yet — try again shortly.",
+            scanStatus: scanGate.status,
+            governance: { traceId },
+          },
+          { status: 423 }
         );
       }
       const objectKey = objectKeyFromStorageUri(doc.storageUri);
@@ -648,6 +665,7 @@ export async function POST(req: NextRequest) {
         observability,
         metadata: { route: "/api/lender/deal-desk", operation, serviceRequestId, documentId: persisted.document.id },
       });
+      if (uploaded) scanVaultDocumentSoon(persisted.document.id);
       return NextResponse.json({
         ok: true,
         documentId: persisted.document.id,

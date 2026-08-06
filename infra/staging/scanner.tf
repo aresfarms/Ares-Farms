@@ -25,7 +25,15 @@ resource "google_cloud_run_v2_service" "scanner" {
   name     = "furlong-scanner"
   project  = var.project_id
   location = var.region
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  # Ingress ALL + IAM-private is deliberate. The core service runs with
+  # vpc-access-egress=private-ranges-only, so its calls to this service's
+  # run.app address do NOT traverse the VPC and would be rejected as external
+  # by internal-only ingress — the scan would fail silently forever (caught
+  # before first use, 2026-08-06). Security rests on IAM: only the runtime
+  # service account holds run.invoker, and Cloud Run rejects unauthenticated
+  # requests with 403 before the container ever sees them (verified: an
+  # anonymous probe cannot reach it).
+  ingress = "INGRESS_TRAFFIC_ALL"
 
   template {
     service_account = google_service_account.core_runtime.email

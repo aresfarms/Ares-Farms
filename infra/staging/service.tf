@@ -90,6 +90,10 @@ resource "google_cloud_run_v2_service" "core" {
           memory = var.core_memory
         }
         cpu_idle = true
+        # Cold start is CPU-starved with cpu_idle: the first request has to
+        # load the route tree before /health/live can answer. Boost startup
+        # (deploy failure 2026-08-06: 10 consecutive 3s probe timeouts).
+        startup_cpu_boost = true
       }
 
       # ---- Secrets by REFERENCE (no plaintext env, no baked secrets) --------
@@ -394,10 +398,10 @@ resource "google_cloud_run_v2_service" "core" {
           path = "/health/live"
           port = 8080
         }
-        initial_delay_seconds = 3
-        period_seconds        = 5
-        timeout_seconds       = 3
-        failure_threshold     = 10
+        initial_delay_seconds = 5
+        period_seconds        = 10
+        timeout_seconds       = 10
+        failure_threshold     = 24 # ~4 min: the app grew past the old 53s budget
       }
 
       # Liveness: process answers HTTP (NO DB) — DB blips must not recycle

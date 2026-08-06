@@ -601,7 +601,7 @@ export async function POST(req: NextRequest) {
               `Your licensed lender added a document to your financing request ${serviceRequestId}.\n\n` +
               `View and download it securely on your status page (enter your reference number and email):\n` +
               `${portalBaseUrl(req)}/status\n\n` +
-              (booking ? `Questions? Schedule a call:\n${booking}\n\n` : "") +
+              (booking ? `Schedule a call with your lender:\n${booking}\n\n` : "") +
               `This message intentionally contains no document contents — everything sensitive stays inside the portal.`,
           });
           customerNotified = result.sent;

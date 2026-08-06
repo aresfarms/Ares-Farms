@@ -234,7 +234,7 @@ export async function sendDocumentReminder(args: {
       dueLine +
       (desk.customerNote ? `Note from your lender: ${desk.customerNote}\n\n` : "") +
       `Upload them securely here (encrypted, never by email):\n${uploadUrl}\n\n` +
-      (booking ? `Questions? Schedule a call at a time that works:\n${booking}\n\n` : "") +
+      (booking ? `Schedule a call with your lender:\n${booking}\n\n` : "") +
       `Check your request status any time:\n${args.portalBaseUrl}/status\n\n` +
       `This link is single-purpose and expires in 72 hours; a fresh one arrives with each reminder. ` +
       `This message contains no account details by design — everything sensitive stays inside the portal.`,

@@ -223,7 +223,7 @@ export function FinancingIntakePanel() {
             rel="noopener noreferrer"
             style={{ justifySelf: "start", borderRadius: 9, padding: "11px 16px", background: "#1c5aa0", color: "#fff", fontWeight: 800, textDecoration: "none", fontSize: 13.5 }}
           >
-            📅 Schedule your call with the lender →
+            📅 Schedule a call with your lender →
           </a>
         )}
         {submit.bookingUrl && (

@@ -364,7 +364,7 @@ export default async function ExplorePage({
               {selected.label}
             </h1>
             <p style={{ margin: 0, fontSize: 16, color: "#4d596d", lineHeight: 1.6, maxWidth: 640 }}>
-              The capital side of every property decision — learn the programs and see today&apos;s rates free, then bring your deal to a licensed lender when you&apos;re ready.
+              The capital side of every property decision — learn the programs and see today&apos;s rates free, then bring your deal to our commercial debt broker when you&apos;re ready.
             </p>
           </header>
           <FinancingLaneSections />

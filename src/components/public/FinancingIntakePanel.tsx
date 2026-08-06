@@ -197,8 +197,7 @@ export function FinancingIntakePanel() {
           Your reference is {submit.serviceRequestId}
         </strong>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-          Your deal is recorded and routed to the licensed commercial debt
-          broker. Here&apos;s what happens next:
+          Your deal is recorded and routed to the commercial debt broker. Here&apos;s what happens next:
         </p>
         {submit.secureUploadPath && (
           <a
@@ -212,7 +211,7 @@ export function FinancingIntakePanel() {
           <p style={{ margin: 0, fontSize: 11.5, color: "#6B7280", lineHeight: 1.55 }}>
             Financial statements and identification never travel by email here: the button opens
             your deal&apos;s encrypted upload channel — single-purpose, expiring, and readable only
-            through your licensed broker&apos;s governed review. Bookmark it or return to this page;
+            through your broker&apos;s governed review. Bookmark it or return to this page;
             the link stays valid for 72 hours.
           </p>
         )}
@@ -261,11 +260,11 @@ export function FinancingIntakePanel() {
             color: PURPLE,
           }}
         >
-          Bring your deal — a licensed broker reviews it
+          Bring your deal — a commercial debt broker reviews it
         </span>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
           Tell us what you&apos;re trying to finance. We record it and route it to
-          the licensed commercial debt broker, who reviews the fit and follows
+          the commercial debt broker, who reviews the fit and follows
           up. We don&apos;t lend, qualify, or price — your broker arranges your
           loan with the lenders who do.
         </p>
@@ -377,7 +376,7 @@ export function FinancingIntakePanel() {
       </label>
       <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
         <input type="checkbox" checked={consentAck} onChange={(e) => setConsentAck(e.target.checked)} style={{ marginTop: 2 }} />
-        <span>I consent to routing my request to the licensed commercial debt broker, and understand this is not a qualification, pre-approval, rate lock, or lender commitment.</span>
+        <span>I consent to routing my request to the commercial debt broker, and understand this is not a qualification, pre-approval, rate lock, or lender commitment.</span>
       </label>
 
       {!ready && (

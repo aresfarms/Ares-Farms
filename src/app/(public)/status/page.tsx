@@ -47,7 +47,7 @@ function friendlyStatus(s: StatusView): { headline: string; detail: string } {
   const who =
     s.requestType === "environmental_report_order"
       ? "the licensed PE"
-      : "your licensed broker";
+      : "your broker";
   const status = (s.status ?? "").toUpperCase();
   if (status.includes("PENDING") || status.includes("SUBMITTED")) {
     return {

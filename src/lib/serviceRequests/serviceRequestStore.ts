@@ -41,7 +41,7 @@ export type ServiceRequestType =
  */
 export const FINANCING_DEAL_STATUSES: ReadonlyArray<{ status: string; customerLabel: string }> = [
   { status: "SUBMITTED_PENDING_REVIEW", customerLabel: "Received — awaiting your broker's first review" },
-  { status: "IN_LENDER_REVIEW", customerLabel: "In review with your licensed broker" },
+  { status: "IN_LENDER_REVIEW", customerLabel: "In review with your broker" },
   { status: "DOCUMENTS_REQUESTED", customerLabel: "Your broker needs documents — use your secure upload link" },
   { status: "UNDERWRITING_IN_PROGRESS", customerLabel: "In underwriting" },
   { status: "APPROVED_PROCEEDING_TO_CLOSE", customerLabel: "Approved — proceeding toward closing" },

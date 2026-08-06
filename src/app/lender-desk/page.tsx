@@ -390,7 +390,7 @@ export default function LenderDeskPage() {
           title="Lender Deal Desk"
           subtitle="Every financing deal, its documents, the closing timeline, and the customer communication loop — in one governed console."
           badges={[
-            "Licensed Broker Only",
+            "Broker Access Only",
             emailReady ? "Reminders Live" : "Reminders Pending Email Config",
             bookingUrl ? "Booking Link Active" : "Booking Link Not Set",
           ]}

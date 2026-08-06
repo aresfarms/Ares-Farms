@@ -328,7 +328,7 @@ export async function POST(req: NextRequest) {
       title: "LENDER-TEST SCORECARD \u2014 PROPERTY-SIDE ONLY",
       leadIns: [
         { text: "Which of a lender's property-side checklist items this parcel passes on paper. Not an approval, an approval probability, or an eligibility determination \u2014 borrower qualification is the licensed lender's decision.", bold: false },
-        { text: "IMPORTANT \u2014 IF FSA PROGRAMS FIT THIS PROPERTY BEST: Furlong's in-network licensed lender sources commercial and business debt and does NOT originate FSA farm loans. FSA-GUARANTEED lenders (local ag banks and Farm Credit associations) and FSA direct loans make these \u2014 find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take THIS pro forma with you; it is built for exactly that conversation.", bold: true },
+        { text: "IMPORTANT \u2014 IF FSA PROGRAMS FIT THIS PROPERTY BEST: Furlong's in-network commercial debt broker sources commercial and business debt and does NOT originate FSA farm loans. FSA-GUARANTEED lenders (local ag banks and Farm Credit associations) and FSA direct loans make these \u2014 find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take THIS pro forma with you; it is built for exactly that conversation.", bold: true },
       ],
       tables: [
         {

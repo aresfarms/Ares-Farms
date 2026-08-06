@@ -3062,7 +3062,7 @@ export function PropertyEvaluationWorkspace({
                 heading: "The Federal Programs That Fund Properties Like This",
                 items: isFarm ? [...farmOnly, ...shared] : shared,
                 fsaNote: isFarm
-                  ? "Furlong's in-network licensed lender sources commercial and business debt and does NOT originate FSA farm loans. FSA-guaranteed lenders (local ag banks and Farm Credit associations) and FSA direct loans make these — find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take this report and its pro forma with you; they are built for exactly that conversation."
+                  ? "Furlong's in-network commercial debt broker sources commercial and business debt and does NOT originate FSA farm loans. FSA-guaranteed lenders (local ag banks and Farm Credit associations) and FSA direct loans make these — find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take this report and its pro forma with you; they are built for exactly that conversation."
                   : undefined,
               };
             })(),

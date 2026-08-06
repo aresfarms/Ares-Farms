@@ -234,7 +234,7 @@ export async function POST(req: NextRequest) {
       claimType: "recommendation",
       summary:
         intakeResult.routedTo === "licensed-lending-spoke"
-          ? "Customer financing deal recorded and routed to the licensed lender. No qualification, pre-approval, pricing, or credit decision is made; the lender decides."
+          ? "Customer financing deal recorded and routed to the commercial debt broker. No qualification, pre-approval, pricing, or credit decision is made; the funding lender decides."
           : "Customer financing deal recorded WITHOUT lender routing — the requested program (FSA/farm) is outside the in-network lender's practice; the customer was told honestly and pointed to the lenders who make these loans.",
       ruleVersion: FINANCING_INTAKE_RUNTIME_VERSION,
       overlayRefs: [],

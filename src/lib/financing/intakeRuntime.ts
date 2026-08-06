@@ -145,7 +145,7 @@ function buildMissingItems(input: FinancingIntakeInput): string[] {
   if (!input.feeDisclosureAcknowledged)
     missing.push("Acknowledge the fee posture");
   if (!input.consentAcknowledged)
-    missing.push("Consent to route your request to the licensed lender");
+    missing.push("Consent to route your request to the commercial debt broker");
   return missing;
 }
 

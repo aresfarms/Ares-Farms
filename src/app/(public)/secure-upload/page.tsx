@@ -128,7 +128,7 @@ function SecureUploadInner() {
       <h1 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Secure document upload</h1>
       <p style={{ margin: 0, color: "#3b475a", fontSize: 14, lineHeight: 1.65 }}>
         {dealRef ? <>For deal <strong>{dealRef}</strong>. </> : "Verifying your link… "}
-        Files travel encrypted, directly into access-controlled storage that only your licensed
+        Files travel encrypted, directly into access-controlled storage that only your
         broker&apos;s review process can reach — nothing is sent by email, and this page never sees
         or stores your account numbers itself. This link is single-purpose and expires
         {expiresAt ? ` on ${new Date(expiresAt).toLocaleDateString()}` : " after a few days"}.
@@ -168,7 +168,7 @@ function SecureUploadInner() {
       </div>
       <p style={{ margin: 0, color: "#6B7280", fontSize: 11.5, lineHeight: 1.6 }}>
         Chain of custody: every file is classified CONFIDENTIAL on receipt, access-logged, retained
-        per policy, and reviewable only through your licensed broker&apos;s governed workspace.
+        per policy, and reviewable only through your broker&apos;s governed workspace.
         Uploading here is your consent to that handling for this financing request; nothing here is
         a credit decision, and you may request deletion of documents for a withdrawn request at any time.
       </p>

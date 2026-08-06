@@ -50,7 +50,7 @@ interface FinBrief {
 const FINANCING_BRIEFS: FinBrief[] = [
   {
     title: "How this works",
-    body: "You bring the deal; we route it to a licensed lender who reviews the fit and follows up. Furlong is the analysis and coordination layer — it does not lend, qualify, price, or approve, and it takes no fee tied to your transaction.",
+    body: "You bring the deal; we route it to a commercial debt broker who reviews the fit and follows up. Furlong is the analysis and coordination layer — it does not lend, qualify, price, or approve, and it takes no fee tied to your transaction.",
   },
   {
     title: "SBA, USDA, or conventional — the quick map",
@@ -62,7 +62,7 @@ const FINANCING_BRIEFS: FinBrief[] = [
   },
   {
     title: "A program fitting ≠ you qualifying",
-    body: "Seeing a program that fits your project is a starting point, not an approval. Qualification, rate, and terms are the licensed lender's call, disclosed to you in writing — never assumed here.",
+    body: "Seeing a program that fits your project is a starting point, not an approval. Qualification, rate, and terms are the funding lender's call, disclosed to you in writing — never assumed here.",
   },
 ];
 
@@ -76,12 +76,12 @@ export function FinancingLaneSections() {
 
       <section id="personalized-financing" aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
-          Our dedicated licensed lender
+          Our dedicated commercial debt broker
         </span>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6, maxWidth: 720 }}>
           The capital side of every property decision. Learn how the programs
           map to your project, see today&apos;s public rates, then send your deal
-          to a licensed lender who can actually do the work.
+          to a commercial debt broker who can actually do the work.
         </p>
         <div style={cardGrid}>
           {FINANCING_BRIEFS.map((b) => (

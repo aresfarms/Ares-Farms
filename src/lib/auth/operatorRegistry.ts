@@ -47,7 +47,7 @@ export const OPERATORS: Operator[] = [
     name: "Stuart",
     role: "operator",
     capabilities: ["view:internal", "approve:source-legal"],
-    license: "Finance / commercial loan broker (licensed)",
+    license: "Finance / commercial debt broker (license status pending confirmation)",
   },
   {
     id: "op-frances",

@@ -110,11 +110,18 @@ export async function GET(req: NextRequest) {
   // types must never render inline from our origin (script execution).
   const inlineSafe = new Set(["application/pdf", "image/png", "image/jpeg", "image/gif", "image/webp"]);
   const disposition = inlineSafe.has(object.contentType) ? "inline" : "attachment";
+  // Extensionless uploads (founder test: raw bytes opened as text) get one derived from the real type.
+  const EXT_BY_TYPE: Record<string, string> = {
+    "application/pdf": ".pdf", "image/png": ".png", "image/jpeg": ".jpg",
+    "image/gif": ".gif", "image/webp": ".webp", "text/plain": ".txt",
+  };
+  const ext = /\.[A-Za-z0-9]{2,5}$/.test(fileName) ? "" : (EXT_BY_TYPE[object.contentType] ?? "");
+
   return new NextResponse(object.stream, {
     headers: {
       "Content-Type": object.contentType,
       ...(object.contentLength ? { "Content-Length": object.contentLength } : {}),
-      "Content-Disposition": `${disposition}; filename="${fileName}"`,
+      "Content-Disposition": `${disposition}; filename="${fileName}${ext}"`,
       "X-Content-Type-Options": "nosniff",
       "Cache-Control": "no-store",
       "X-Trace-Id": traceId,

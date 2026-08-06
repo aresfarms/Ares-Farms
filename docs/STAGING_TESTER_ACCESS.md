@@ -18,7 +18,7 @@ someone NOT on the list is harmless (they hit the sign-in wall) but pointless.
 Defined in `infra/staging/terraform.tfvars` → `iap_tester_principals`:
 
 - `user:chudson@aresfarmsinc.com` (Caitlin)
-- `user:stuart@aresfarmsinc.com` (Stuart)
+- `user:sfraas@aresfarmsinc.com` (Stuart)
 
 (Plus the `furlong-verify` service account, which the deploy gate uses to prove
 health through IAP — leave it alone.)
@@ -41,7 +41,7 @@ health through IAP — leave it alone.)
    ```hcl
    iap_tester_principals = [
      "user:chudson@aresfarmsinc.com",
-     "user:stuart@aresfarmsinc.com",
+     "user:sfraas@aresfarmsinc.com",
      "user:newtester@example.com",
    ]
    ```

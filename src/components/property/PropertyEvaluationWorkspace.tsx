@@ -2741,13 +2741,28 @@ export function PropertyEvaluationWorkspace({
     (analysisContext.propertyType && !genericImportedType)
   );
   const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null;
-  const explicitImportedProfile = importedProperty && analysisContext.propertyType && !genericImportedType
+  // The county assessment record's land-use / building style IS a property-type
+  // signal — it was fetched but never classified (founder-caught 2026-08-06:
+  // "why can't we automatically tell what type of property this is?"). Use it
+  // for typed addresses; ignore the generic placeholders the facts route emits
+  // when no real record matched.
+  const countyStyleRaw = (facts?.propertyRecord?.rawPropertyStyle ?? "").trim();
+  const countyStyleIsGeneric = /^(?:verified property address|place|property|imported|unknown|not specified|place-led property)$/i.test(countyStyleRaw);
+  const countyDerivedStyle = countyStyleRaw && !countyStyleIsGeneric ? countyStyleRaw : null;
+  const explicitImportedProfile = importedProperty && (
+    (analysisContext.propertyType && !genericImportedType) || countyDerivedStyle
+  )
     ? classifyPropertyProfile({
-        propertyType: analysisContext.propertyType,
+        propertyType:
+          (analysisContext.propertyType && !genericImportedType ? analysisContext.propertyType : null) ??
+          countyDerivedStyle,
         description: analysisContext.description ?? null,
         acreageText: facts?.propertyRecord?.acreageText ?? null,
       })
     : null;
+  // True only when NOTHING in the record implies a type — the one case where
+  // the customer genuinely has to pick.
+  const typeIsGuessworkOnly = importedProperty && !explicitImportedProfile && !facts?.propertyRecord?.acreageText;
   const workspaceProfile = profileOverride
     ? profileById(profileOverride)
     : explicitImportedProfile ?? effectivePlaceIntelligence?.profile ??
@@ -3999,8 +4014,10 @@ export function PropertyEvaluationWorkspace({
                 Property type
               </span>
               <span style={{ fontSize: 12.5, color: "#4d596d" }}>
-                {imported ? (
-                  <>An address alone can&apos;t tell us — pick the type. The financing lanes, costs, and questions all follow your answer.</>
+                {imported && typeIsGuessworkOnly ? (
+                  <>No public record for this address names its type yet — pick it. The financing lanes, costs, and questions all follow your answer.</>
+                ) : imported && countyDerivedStyle ? (
+                  <>Read as a <strong style={{ color: "#101a2b" }}>{workspaceProfile.label}</strong> from the county record (&ldquo;{countyDerivedStyle}&rdquo;). The lanes, costs, and questions follow this — not right? Set the true type.</>
                 ) : (
                   <>Read as a <strong style={{ color: "#101a2b" }}>{workspaceProfile.label}</strong>. The lanes, costs, and questions below all follow this — not right? Set the true type.</>
                 )}

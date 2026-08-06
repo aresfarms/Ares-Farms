@@ -9,8 +9,11 @@
 
 FROM debian:bookworm-slim
 
+# ca-certificates FIRST — freshclam fetches definitions over TLS and fails
+# with "Problem with the SSL CA cert" on the slim base without it.
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends clamav clamav-daemon python3 \
+  && apt-get install -y --no-install-recommends ca-certificates clamav clamav-daemon python3 \
+  && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 # Bake definitions at build time (freshclam needs the db dir writable).

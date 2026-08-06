@@ -23,7 +23,7 @@ export type LaunchAuthorityAssignment = Readonly<{
 
 const identityByHolderId: Readonly<Record<string, readonly string[]>> = {
   "caitlin-hudson": ["chudson@aresfarmsinc.com"],
-  "stuart-fraass": ["stuart@aresfarmsinc.com"],
+  "stuart-fraass": ["sfraas@aresfarmsinc.com"],
 };
 
 const activeByRole = new Map(

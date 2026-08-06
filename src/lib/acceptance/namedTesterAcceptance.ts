@@ -8,7 +8,7 @@ export const TARGET_IMAGE_DIGEST = process.env.P6_NAMED_TESTER_TARGET_IMAGE_DIGE
 export const TARGET_APPLICATION_ID = process.env.P6_NAMED_TESTER_TARGET_APPLICATION_ID ?? "staging-p4-furlong-core-00107-6z7-application";
 export const TESTERS = {
   "chudson@aresfarmsinc.com": "Caitlin Hudson",
-  "stuart@aresfarmsinc.com": "Stuart Fraass",
+  "sfraas@aresfarmsinc.com": "Stuart Fraass",
 } as const;
 export type TesterEmail = keyof typeof TESTERS;
 export type Verdict = "PASS" | "PASS_WITH_FINDINGS" | "FAIL";

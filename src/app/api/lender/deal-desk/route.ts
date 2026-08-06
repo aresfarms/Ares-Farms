@@ -29,6 +29,7 @@ import {
   initResumableUpload,
 } from "@/lib/documents/gcsResumableUpload";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
+import { LENDER_EMAIL_SIGNATURE } from "@/lib/notifications/lenderSignature";
 import { serviceRequests } from "@/db/schema";
 
 /**
@@ -602,7 +603,8 @@ export async function POST(req: NextRequest) {
               `View and download it securely on your status page (enter your reference number and email):\n` +
               `${portalBaseUrl(req)}/status\n\n` +
               (booking ? `Schedule a call with your lender:\n${booking}\n\n` : "") +
-              `This message intentionally contains no document contents — everything sensitive stays inside the portal.`,
+              `This message intentionally contains no document contents — everything sensitive stays inside the portal.\n\n` +
+              LENDER_EMAIL_SIGNATURE,
           });
           customerNotified = result.sent;
         }

@@ -4,6 +4,7 @@ import { applicationDocuments, serviceRequests } from "@/db/schema";
 import { db } from "@/lib/db";
 import { mintUploadLinkToken } from "@/lib/documents/uploadLinkToken";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
+import { LENDER_EMAIL_SIGNATURE } from "@/lib/notifications/lenderSignature";
 
 /**
  * Lender Deal Desk store (founder direction 2026-08-05): the licensed
@@ -237,7 +238,8 @@ export async function sendDocumentReminder(args: {
       (booking ? `Schedule a call with your lender:\n${booking}\n\n` : "") +
       `Check your request status any time:\n${args.portalBaseUrl}/status\n\n` +
       `This link is single-purpose and expires in 72 hours; a fresh one arrives with each reminder. ` +
-      `This message contains no account details by design — everything sensitive stays inside the portal.`,
+      `This message contains no account details by design — everything sensitive stays inside the portal.\n\n` +
+      LENDER_EMAIL_SIGNATURE,
   });
   if (result.sent) {
     const nextDesk = { ...desk, reminders: [...desk.reminders, new Date().toISOString()] };

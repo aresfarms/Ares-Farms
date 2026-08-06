@@ -219,3 +219,130 @@ Virginia, and Nebraska. **Skip** Iowa and Kansas until they publish something.
 
 Delaware may be approved for coverage, but note it cannot classify anything on
 its own.
+
+---
+
+# PART II — National sources (fills the gaps where states are amber or absent)
+
+State-by-state activation is slow and leaves holes (Iowa and Kansas have
+nothing; Virginia, Pennsylvania, West Virginia and Nebraska are on hold). Two
+FREE federal sources cover the whole country and were verified live.
+
+## RECOMMENDED — FEMA / ORNL **USA Structures** ⭐ the only free source that goes address → occupancy
+
+- **Coverage:** 135,321,228 building footprints, US + territories (buildings
+  over 450 sq ft).
+- **Fields:** `occ_cls` (Residential / Commercial / Industrial / **Agriculture**
+  / Government / Education / Assembly), `prim_occ` (Single Family Dwelling,
+  Manufactured Home, Retail Trade, **Agriculture**…), plus `prop_addr`,
+  `prop_city`, `prop_st`, `prop_zip`. **96.9% of records carry a street
+  address.**
+- **Endpoint (verified, per-point query works):**
+  `https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/USA_Structures_View/FeatureServer/0/query`
+- **Honesty requirements — non-negotiable if we use this:**
+  - It is **modeled, not observed** — built by conflating 57 HIFLD layers,
+    commercial parcel data, Census block housing percentages and a machine
+    classifier. Published validation is **residential-vs-nonresidential only**
+    (~92–95%). **No accuracy was ever published for the Agriculture or
+    Commercial subclasses.** Imagery vintage on sampled records: 2019–2020.
+  - **Observed failure:** at an Iowa farmstead the service returned two
+    buildings, **both** labeled Residential / Single Family Dwelling — one is
+    near-certainly an outbuilding. It also does not handle multi-address
+    structures (townhouses, strip malls).
+- **COUNSEL ITEM:** FEMA distributes openly and the method paper is CC BY 4.0,
+  but the classification was built partly from **licensed LightBox parcel
+  data**. Confirm the distributed product's terms before redistributing the
+  attributes downstream — do not rely on the paper's CC BY alone.
+
+## RECOMMENDED — USDA **Cropland Data Layer** — cleanest license in this document
+
+- **License:** NASS states verbatim that CDL is *"considered public domain and
+  free to redistribute."* Commercial use fine. Nothing else reviewed here is
+  this clean.
+- **Resolution:** 10 m from 2024 forward (30 m before); CONUS annual since 2008.
+- **Endpoint (verified live) — note it requires Albers EPSG:5070 metres, NOT
+  lat/lon (lat/lon returns HTTP 500):**
+  `https://nassgeodata.gmu.edu/axis2/services/CDLService/GetCDLValue?year=2024&x=…&y=…`
+  → `{value: 1, category: "Corn"}`. GMU-hosted, best-effort, **no SLA**.
+- **What it can and cannot say:** crop classes (Corn, Soybeans) are strong
+  evidence of active farming. But `176 Grass/Pasture` and `181 Pasture/Hay`
+  cannot distinguish a grazing operation from an unmanaged field or a mowed
+  verge, and a rural house with a big lawn lands in `121 Developed/Open Space`
+  — the same class as parks and golf courses. **Never a
+  commercial-vs-residential signal.** Overall crop accuracy 75–82%.
+
+## OpenStreetMap — legally workable, factually thin; do NOT lead with it
+
+- **The ODbL rule that matters:** a report shown to a customer is a **Produced
+  Work** — share-alike does **not** attach to it, attribution only. **But**
+  ODbL §4.4 says a Derivative Database is "Publicly Used" *if a Produced Work
+  created from it is Publicly Used* — so a **cached national table** of
+  OSM-derived property types would itself have to be ODbL-licensed and, under
+  §4.6, **offered for free download**. Share-alike never reaches our report; it
+  reaches the pipeline table behind it.
+- **Two clean routes if we ever use it:** keep any OSM-derived layer as a
+  **separate (Collective) database**, never merged into proprietary tables; or
+  stay inside the OSMF **geocoding guideline**, which treats individual
+  per-address lookups as insubstantial extracts that may sit alongside
+  proprietary data — **provided they are not systematically accumulated into a
+  database.** Live, uncached, per-address only.
+- **Why it's weak here anyway:** **79.37% of OSM buildings are untagged
+  `building=yes`**, and US rural land-use polygons are sparse and
+  inconsistently tagged. High-precision positives, near-worthless negatives —
+  exactly backwards for rural work.
+- **Operational limit:** the public Overpass instance guidance is under 10,000
+  queries/day and it is explicitly **not an SLA**. Never back a customer-facing
+  feature with `overpass-api.de`.
+
+## Ruled out — with reasons (so these are not re-proposed later)
+
+| Source | Why not |
+|---|---|
+| **USGS National Structures** | Emergency-response facilities only — no residence/barn/farm code at all. Rhode Island's layer is 71% cemeteries. |
+| **Census MAF/TIGER** | MAF is Title 13 confidential forever. TIGER's farm landmark code exists but is unpopulated — **verified: Iowa has 0, Kansas 0, Virginia 0**. No residential class at all. |
+| **FEMA NFIP claims** | Has occupancy codes but **no agricultural code**, and lat/lon is deliberately truncated to ~11 km — cannot be joined to an address. |
+| **USACE NSI** | Self-described *"pseudo inventory… not an exact representation of reality"*; live query returned **two conflicting records at identical coordinates**; reported 17 agricultural buildings where USA Structures reported 4. |
+| **USDA FSA Common Land Unit** | **Statutorily withdrawn** — §1619 of the 2008 Farm Bill bars USDA from releasing geospatial data about agricultural land or operations. Circulating "CLU shapefiles" are the pre-2008 release, ~18 years stale. **Any vendor selling "current CLU" is a legal red flag.** |
+| **Microsoft Building Footprints** | Geometry + optional height only — **no use/type/occupancy field anywhere**. Cannot distinguish a barn from a house. (Note: the US repo is ODbL; the global repo is CDLA-Permissive — a commonly confused pair.) |
+| **EPA FRS** | Only regulated facilities. Catches a large CAFO, misses a 200-acre row-crop farm. Positive-only signal, never a negative. |
+
+## Paid upgrade path, if accuracy ever becomes revenue-critical
+
+- **Regrid (Loveland)** — the only standardized nationwide answer: normalizes
+  messy county codes into **LBCS** fields covering residential / commercial /
+  industrial / **agricultural**. Published 2023 rates: **county $300–$800**,
+  state $8k–$20k, national $50k–$135k, API $0.10–$0.28/record; 30-day free
+  sandbox. EULA **explicitly permits displaying derived conclusions** to end
+  users, **prohibits** resale/bulk redistribution and public display of
+  assessment data, **requires per-page attribution**, and bars uploading data
+  to third-party LLMs without permission.
+- **ATTOM** — free trial key and a start-up plan exist; costs nothing to
+  evaluate. (Estated is now ATTOM; the old cheap tier is gone.)
+- **RentCast** — most permissive license of the paid set, but its
+  `propertyType` has **no Agricultural or Commercial value** — a farm returns
+  "Land" or "Single Family." Structurally cannot answer our question.
+- **CoreLogic/Cotality, LightBox, Precisely, Datafiniti, Melissa** — enterprise
+  quote-only; not realistic at this scale.
+
+---
+
+# CONSOLIDATED RECOMMENDATION
+
+**Free, and it covers the whole country:**
+1. **FEMA USA Structures** as the primary per-address signal (the only free
+   source that goes address → occupancy class).
+2. **USDA CDL** as an independent cross-check over the parcel footprint — it
+   answers a genuinely different question ("is this land actively cropped")
+   rather than echoing source 1, and its license is public domain.
+3. **The six green states** (NC, NJ, OH, IN, WI, MN) as the highest-confidence
+   layer where available — an actual assessor's classification beats any model.
+
+**The design rule that keeps this honest:** treat **agreement between sources
+as high confidence** and **disagreement as "we're not sure — please confirm."**
+Given the observed Iowa farmstead misclassification, disagreement will be most
+common on exactly the rural properties that matter most here. The picker must
+survive as the honest fallback — it just stops being the default.
+
+**Two items for counsel:** the LightBox-derived attribution inside FEMA USA
+Structures, and a standing rule that any vendor selling "current USDA CLU" data
+is a legal red flag.

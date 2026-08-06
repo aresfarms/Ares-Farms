@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { applicationDocuments } from "@/db/schema";
 import { evaluateAccess, type AccessRole } from "@/lib/auth/accessControl";
 import { operatorByEmail } from "@/lib/auth/operatorRegistry";
+import { professionalRole } from "@/lib/auth/professionalRegistry";
 import { apiAuthEnforcementRequired } from "@/lib/security/apiSecurityPolicy";
 import { db } from "@/lib/db";
 import {
@@ -101,6 +102,11 @@ function resolveIdentity(req: NextRequest): { role: string; actorId: string | nu
           : "operator";
     return { role, actorId: email ?? operator.id };
   }
+
+  // Outside counterparties (Module 45 named grants) — a registry lookup on
+  // the session-verified email, never a client claim.
+  const granted = professionalRole(email);
+  if (granted) return { role: granted, actorId: email ?? sessionActor };
 
   const sessionRole = req.headers.get("x-ares-authenticated-role")?.trim();
   if (sessionRole && ALLOWED_ROLES.includes(sessionRole as AccessRole)) {

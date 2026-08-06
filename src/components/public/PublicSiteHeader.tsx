@@ -66,6 +66,12 @@ export function PublicSiteHeader() {
           <Link href="/about" className="ps-nav-link">
             Our Story
           </Link>
+          {/* Professional Access sits AFTER Our Story (founder 2026-08-06):
+              the credentialed counterparty door — lender, attorney, auditor,
+              sponsor. Public page; the roles themselves are registry-granted. */}
+          <Link href="/professional-access" className="ps-nav-link">
+            Professional Access
+          </Link>
         </div>
       </nav>
     </header>

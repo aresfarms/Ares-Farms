@@ -313,6 +313,28 @@ green while five of these were live. Gates prove what they were told to check.
   zone (we are the drafting party and own the template); third-party PDFs get a
   non-obscuring margin band plus an appended signature page. `pdf-lib` added.
 
+## C-16. Risk-based credential rotation requires an execution workflow
+
+- **Founder direction:** 30 days for exceptionally privileged or recently
+  exposed credentials; 60 days for external API/payment/AI credentials and
+  database passwords; 90 days for lower-risk machine secrets with material
+  rotation cost; immediately for suspected disclosure.
+- **Controlling volumes:** Vol III `TECH-VAULT-001` and `TECH-SEC-001`; Vol IV
+  incident and rollback runbooks.
+- **Finding:** Secret Manager schedules publish Pub/Sub notifications but do
+  not replace provider credentials. A reminder was therefore necessary but
+  insufficient.
+- **Resolution:** `config/security/secret-rotation-policy.json` is the
+  machine-readable authority. `secretRotationWorkflow.ts` implements
+  activation, provider/database adapter gates, Secret Manager versioning,
+  consumer canaries and rollouts, overlap retirement, rollback, evidence, and
+  failure alerting. Provider and database operations fail closed when their
+  approved adapters are absent; the source event remains unacknowledged.
+- **Live posture:** reminder schedules now match the 30/60/90 tiers. Automated
+  execution is not represented as active until the dedicated worker identity,
+  provider adapters, and safe dual-key/session behavior are deployed and
+  certified.
+
 ## G-1. VOLUME-LEVEL GAP — broker-to-funding-lender submission is unscoped
 
 - **Finding:** the deal desk exposes only customer-facing actions (update,

@@ -37,6 +37,7 @@ steps:
       - |
         npm ci
         npm run verify:cloud-upload-context
+        npm run verify:secret-rotation-workflow
         npm run verify:canonical-domain
         npm run smoke:canonical-domain-fail-closed
         npm run smoke:production-source-legal

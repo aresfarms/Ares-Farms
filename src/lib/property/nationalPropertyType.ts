@@ -48,11 +48,30 @@ const TIMEOUT_MS = 5_000;
 // never delay a customer — a state assessor answer stands on its own.
 const STRUCTURE_TIMEOUT_MS = 2_500;
 
-/** State assessor services approved under Module 23 (2026-08-06). */
-const STATE_SERVICES: Record<
-  string,
-  { url: string; useFields: string[]; label: string }
-> = {
+/**
+ * Jurisdiction registry — DATA, not logic (founder direction 2026-08-06:
+ * "we need to operate anywhere in the US… Europe as the next iteration").
+ *
+ * Adding a jurisdiction must never require new code: every entry is the same
+ * four fields, and `profileFromUseText` already handles the code vocabularies
+ * generically. That keeps the marginal cost of a new state — or, later, a
+ * national European cadastre — at one registry line plus a Module 23 review.
+ *
+ * KEYED BY JURISDICTION CODE, not "state": US entries use the two-letter
+ * state; international entries will use the ISO country code (Europe's
+ * INSPIRE directive obliges member states to publish parcel/land-use spatial
+ * data, and most run ONE national cadastre — which is materially easier than
+ * the US county patchwork, not harder).
+ *
+ * Approved under Module 23 on 2026-08-06: NC, NJ, OH, IN, WI, MN.
+ */
+export interface JurisdictionSource {
+  url: string;
+  useFields: string[];
+  label: string;
+}
+
+const STATE_SERVICES: Record<string, JurisdictionSource> = {
   NC: {
     url: "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1",
     useFields: ["parusedesc", "parusecode"],
@@ -186,6 +205,33 @@ async function structureSignal(
 }
 
 /**
+ * Unmet-coverage signal (founder 2026-08-06: "we have zero idea what those
+ * three states would be"). Rather than guessing which jurisdictions to add,
+ * record every one we were ASKED about and could not answer. Coverage
+ * priority then follows real demand instead of intuition.
+ *
+ * Aggregate counts only — a jurisdiction code, never an address or a person.
+ */
+const unmetCoverage = new Map<string, number>();
+
+export function recordUnmetCoverage(jurisdiction: string | null): void {
+  const key = (jurisdiction ?? "unknown").trim().toUpperCase() || "unknown";
+  unmetCoverage.set(key, (unmetCoverage.get(key) ?? 0) + 1);
+}
+
+/** Demand-ranked list of jurisdictions worth reviewing next. */
+export function unmetCoverageDemand(): Array<{ jurisdiction: string; asks: number }> {
+  return [...unmetCoverage.entries()]
+    .map(([jurisdiction, asks]) => ({ jurisdiction, asks }))
+    .sort((a, b) => b.asks - a.asks);
+}
+
+/** Jurisdictions currently wired (for operator surfaces + coverage honesty). */
+export function coveredJurisdictions(): string[] {
+  return Object.keys(STATE_SERVICES).sort();
+}
+
+/**
  * Classify a property's type from public records.
  *
  * Returns null when nothing public says anything — the caller then asks the
@@ -225,5 +271,8 @@ export async function classifyPropertyTypeFromPublicRecords(args: {
     };
   }
 
+  // Nothing public answered — record the jurisdiction so coverage priority
+  // follows real demand, then let the caller ask the customer honestly.
+  recordUnmetCoverage(state);
   return null;
 }

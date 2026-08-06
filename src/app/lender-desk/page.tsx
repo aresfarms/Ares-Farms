@@ -628,9 +628,11 @@ export default function LenderDeskPage() {
                                       href={`/api/lender/deal-desk?view=download&documentId=${encodeURIComponent(
                                         doc.id
                                       )}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
                                       style={{ color: "#1f4f7a", fontWeight: 700 }}
                                     >
-                                      Download
+                                      Open
                                     </a>
                                   ) : (
                                     <span style={{ color: "#9a3412" }}>No stored bytes</span>

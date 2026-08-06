@@ -238,9 +238,11 @@ export default function StatusPortalPage() {
                         )}
                         <a
                           href={doc.downloadPath}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           style={{ fontWeight: 750, color: "#1c5aa0", textDecoration: "none", alignSelf: "center" }}
                         >
-                          Download ↓
+                          Open ↗
                         </a>
                       </span>
                     </div>

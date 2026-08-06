@@ -105,11 +105,17 @@ export async function GET(req: NextRequest) {
     );
   }
   const fileName = (doc.fileName ?? `document-${doc.id}`).replace(/[^\w.\- ]+/g, "_");
+  // Readable types open IN the browser (founder 2026-08-06: "open a window so
+  // you can read the document"); everything else downloads. HTML/unknown
+  // types must never render inline from our origin (script execution).
+  const inlineSafe = new Set(["application/pdf", "image/png", "image/jpeg", "image/gif", "image/webp"]);
+  const disposition = inlineSafe.has(object.contentType) ? "inline" : "attachment";
   return new NextResponse(object.stream, {
     headers: {
       "Content-Type": object.contentType,
       ...(object.contentLength ? { "Content-Length": object.contentLength } : {}),
-      "Content-Disposition": `attachment; filename="${fileName}"`,
+      "Content-Disposition": `${disposition}; filename="${fileName}"`,
+      "X-Content-Type-Options": "nosniff",
       "Cache-Control": "no-store",
       "X-Trace-Id": traceId,
     },

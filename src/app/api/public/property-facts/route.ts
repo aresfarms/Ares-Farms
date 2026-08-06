@@ -335,7 +335,6 @@ export async function POST(req: NextRequest) {
   });
   const property = findCanonicalPropertyById(propertyId);
   const sourceRecord = property?.source_records[0] ?? null;
-  const propertyEvidenceRecords = property ? officialPropertyEvidenceRecords(property) : [];
 
   return NextResponse.json({
     ok: true,

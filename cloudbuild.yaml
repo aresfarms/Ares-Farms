@@ -5,7 +5,7 @@
 # Artifact Registry. Run from the repo root (the owner machine has no local
 # Docker; Cloud Build is the P2.1 build path):
 #
-#   gcloud builds submit --config cloudbuild.yaml --project furlong-staging-499102 .
+#   npm run build:cloud:staging
 #
 # The upload tarball honors .gcloudignore (gcloud does NOT read .dockerignore),
 # so `.env*` and the prebuilt `.next` NEVER leave the laptop; inside Cloud
@@ -29,13 +29,14 @@ steps:
   # Deployment-blocking canonical authority gates. These run in Cloud Build
   # before either image is built or published, so Artifact Registry can never
   # receive an image that bypasses a registered domain authority boundary.
-  - name: node:20-bookworm
+  - name: node:24.15.0-bookworm
     id: verify-canonical-authorities
     entrypoint: bash
     args:
       - -ceu
       - |
         npm ci
+        npm run verify:cloud-upload-context
         npm run verify:canonical-domain
         npm run smoke:canonical-domain-fail-closed
         npm run smoke:production-source-legal

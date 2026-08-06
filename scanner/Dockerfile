@@ -17,16 +17,19 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 # Bake definitions at build time (freshclam needs the db dir writable).
-RUN mkdir -p /var/lib/clamav && chown -R clamav:clamav /var/lib/clamav \
+RUN mkdir -p /var/lib/clamav /run/clamav /srv \
+  && chown -R clamav:clamav /var/lib/clamav /run/clamav /srv \
   && freshclam --foreground --stdout || freshclam --foreground --stdout
 
 # clamd config: stream-only scanning over a local TCP socket.
-RUN printf 'TCPSocket 3310\nTCPAddr 127.0.0.1\nMaxFileSize 60M\nMaxScanSize 60M\nStreamMaxLength 60M\nForeground yes\nLogSyslog no\n' > /etc/clamav/clamd.conf
+RUN printf 'User clamav\nTCPSocket 3310\nTCPAddr 127.0.0.1\nMaxFileSize 60M\nMaxScanSize 60M\nStreamMaxLength 60M\nForeground yes\nLogSyslog no\n' > /etc/clamav/clamd.conf
 
-COPY server.py /srv/server.py
+COPY --chown=clamav:clamav server.py /srv/server.py
 
 ENV PORT=8080
 EXPOSE 8080
+
+USER clamav
 
 # Start clamd in the background, then the HTTP shim (which waits for clamd).
 CMD ["/bin/sh", "-c", "clamd & python3 /srv/server.py"]

@@ -42,6 +42,7 @@ locals {
     "cloudkms.googleapis.com",             # Cloud KMS (CMEK for the sovereign document vault)
     "servicenetworking.googleapis.com",    # Private Services Access peering
     "cloudbuild.googleapis.com",           # P2.1 image build (owner has no local Docker)
+    "billingbudgets.googleapis.com",       # Existing monthly billing alert inspection/maintenance
   ]
 }
 

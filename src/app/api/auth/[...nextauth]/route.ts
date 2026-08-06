@@ -1,4 +1,5 @@
 import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import {
@@ -357,7 +358,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
   };
 }
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   secret: resolveNextAuthSecret(),
   providers: [
     CredentialsProvider({
@@ -381,24 +382,37 @@ export const authOptions = {
     strategy: "jwt" as const,
   },
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.tenantId = user.tenantId;
-        token.role = user.role;
-        token.governanceVersion = user.governanceVersion;
-        token.classification = user.classification;
+        const furlongUser = user as typeof user & {
+          tenantId?: unknown;
+          role?: unknown;
+          governanceVersion?: unknown;
+          classification?: unknown;
+        };
+        token.id = furlongUser.id;
+        token.tenantId = furlongUser.tenantId;
+        token.role = furlongUser.role;
+        token.governanceVersion = furlongUser.governanceVersion;
+        token.classification = furlongUser.classification;
       }
 
       return token;
     },
-    async session({ session, token }: any) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
-        session.user.tenantId = token.tenantId;
-        session.user.role = token.role;
-        session.user.governanceVersion = token.governanceVersion;
-        session.user.classification = token.classification;
+        const furlongSessionUser = session.user as typeof session.user & {
+          id?: unknown;
+          tenantId?: unknown;
+          role?: unknown;
+          governanceVersion?: unknown;
+          classification?: unknown;
+        };
+        furlongSessionUser.id = token.id;
+        furlongSessionUser.tenantId = token.tenantId;
+        furlongSessionUser.role = token.role;
+        furlongSessionUser.governanceVersion = token.governanceVersion;
+        furlongSessionUser.classification = token.classification;
       }
 
       return session;

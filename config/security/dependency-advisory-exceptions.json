@@ -1,17 +1,5 @@
 {
   "schemaVersion": 1,
-  "reviewBy": "2026-08-21",
-  "exceptions": [
-    {
-      "source": 1123528,
-      "ghsa": "GHSA-4x5r-pxfx-6jf8",
-      "package": "@babel/core",
-      "severity": "low",
-      "scope": "DEVELOPMENT_ONLY",
-      "title": "@babel/core: Arbitrary File Read via sourceMappingURL Comment",
-      "dependencyPath": "eslint-config-next -> eslint-plugin-react-hooks -> @babel/core",
-      "reason": "The patched Babel 8 release is incompatible with the current Next ESLint chain, whose eslint-plugin-react-hooks dependency requires Babel 7. Production dependencies contain no advisory.",
-      "remediation": "Re-evaluate when eslint-plugin-react-hooks removes or updates its Babel 7 dependency; do not process untrusted source maps in lint/build tooling meanwhile."
-    }
-  ]
+  "reviewBy": "2026-08-06",
+  "exceptions": []
 }

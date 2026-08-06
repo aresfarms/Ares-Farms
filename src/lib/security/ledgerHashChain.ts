@@ -174,7 +174,7 @@ export function forensicRolloverLedger(
     const manifestTempPath = `${manifestPath}.tmp`;
 
     for (const candidate of [archivePath, manifestPath, manifestTempPath]) {
-      if (fs.existsSync(candidate)) {
+      if (fs.existsSync(/* turbopackIgnore: true */ candidate)) {
         throw new Error(`Forensic rollover target already exists: ${path.basename(candidate)}`);
       }
     }

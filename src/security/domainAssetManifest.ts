@@ -175,7 +175,7 @@ export const CLOUD_DEPLOYMENT = {
 } as const;
 
 /** The package gate — set by the build, never production-ready. */
-export const DOMAIN_ASSET_GOVERNANCE: "ALPHA_PENDING" = "ALPHA_PENDING";
+export const DOMAIN_ASSET_GOVERNANCE = "ALPHA_PENDING" as const;
 
 /** Human attestation that founder domain review occurred. Set ONLY by a human. */
 export const DOMAIN_FOUNDER_REVIEW_COMPLETE = false;

@@ -68,6 +68,7 @@ export interface SignatureEvent {
   documentSha256: string | null;
   signerTypedName: string;
   signerIp: string;
+  signerUserAgent: string;
   signedAtIso: string;
   consentVersion: string;
   mode: "test" | "live";
@@ -109,6 +110,7 @@ export function buildSignatureCertificatePdf(event: SignatureEvent): Promise<Buf
     row("Signed by (typed legal name)", event.signerTypedName);
     row("Signed at (UTC)", event.signedAtIso);
     row("Signer network address", event.signerIp);
+    row("Signer browser & device", event.signerUserAgent);
     row("Consent language version", event.consentVersion);
 
     doc.moveDown(0.6);

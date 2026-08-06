@@ -109,6 +109,7 @@ export async function POST(req: NextRequest) {
   }
 
   const signerIp = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+  const signerUserAgent = (req.headers.get("user-agent") ?? "unknown").slice(0, 300);
   const signedAtIso = new Date().toISOString();
   const documentSha256 = await sha256OfVaultObject(doc.storageUri);
   const mode = signatureMode();
@@ -119,6 +120,7 @@ export async function POST(req: NextRequest) {
     documentSha256,
     signerTypedName: typedName,
     signerIp,
+    signerUserAgent,
     signedAtIso,
     consentVersion: ESIGN_CONSENT_VERSION,
     mode,

@@ -40,15 +40,15 @@ export type ServiceRequestType =
  * for non-financing request types.
  */
 export const FINANCING_DEAL_STATUSES: ReadonlyArray<{ status: string; customerLabel: string }> = [
-  { status: "SUBMITTED_PENDING_REVIEW", customerLabel: "Received — awaiting the lender's first review" },
-  { status: "IN_LENDER_REVIEW", customerLabel: "In review with the licensed lender" },
-  { status: "DOCUMENTS_REQUESTED", customerLabel: "The lender needs documents — use your secure upload link" },
+  { status: "SUBMITTED_PENDING_REVIEW", customerLabel: "Received — awaiting your broker's first review" },
+  { status: "IN_LENDER_REVIEW", customerLabel: "In review with your licensed broker" },
+  { status: "DOCUMENTS_REQUESTED", customerLabel: "Your broker needs documents — use your secure upload link" },
   { status: "UNDERWRITING_IN_PROGRESS", customerLabel: "In underwriting" },
   { status: "APPROVED_PROCEEDING_TO_CLOSE", customerLabel: "Approved — proceeding toward closing" },
   { status: "CLOSED_FUNDED", customerLabel: "Closed and funded" },
   { status: "DECLINED_BY_LENDER", customerLabel: "The lender was unable to proceed with this request" },
   { status: "WITHDRAWN_BY_CUSTOMER", customerLabel: "Withdrawn at your request" },
-  { status: "CLOSED_NOT_COMPLETED", customerLabel: "Closed without completing — see your lender's note" },
+  { status: "CLOSED_NOT_COMPLETED", customerLabel: "Closed without completing — see your broker's note" },
 ];
 
 export function customerStatusLabel(status: string | null | undefined): string | null {

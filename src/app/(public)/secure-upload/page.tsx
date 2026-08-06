@@ -44,7 +44,7 @@ const DOC_SLOTS: Array<{
     hint: "Farm records, subsidy history, or FSA loan documents — download them yourself from your farmers.gov account or request them from your county FSA office. We will NEVER ask for your federal login.",
   },
   { type: "purchase-agreement", label: "Purchase agreement", hint: "The signed contract, if the deal has one yet" },
-  { type: "other-supporting", label: "Anything else", hint: "Whatever your lender asked for that isn't above" },
+  { type: "other-supporting", label: "Anything else", hint: "Whatever your broker asked for that isn't above" },
 ];
 
 type UploadState = { status: "idle" | "uploading" | "done" | "pending" | "error"; note?: string };
@@ -100,7 +100,7 @@ function SecureUploadInner() {
         [documentType]: uploaded
           ? {
               status: "done",
-              note: `${file.name} — received into secure custody; your lender will be able to review it.`,
+              note: `${file.name} — received into secure custody; your broker will be able to review it.`,
             }
           : {
               // Honest degradation must not LOOK like success (founder test
@@ -129,14 +129,14 @@ function SecureUploadInner() {
       <p style={{ margin: 0, color: "#3b475a", fontSize: 14, lineHeight: 1.65 }}>
         {dealRef ? <>For deal <strong>{dealRef}</strong>. </> : "Verifying your link… "}
         Files travel encrypted, directly into access-controlled storage that only your licensed
-        lender&apos;s review process can reach — nothing is sent by email, and this page never sees
+        broker&apos;s review process can reach — nothing is sent by email, and this page never sees
         or stores your account numbers itself. This link is single-purpose and expires
         {expiresAt ? ` on ${new Date(expiresAt).toLocaleDateString()}` : " after a few days"}.
       </p>
       {providerConfigured === false && (
         <p style={{ margin: 0, color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A", borderRadius: 10, padding: "10px 12px", fontSize: 13, lineHeight: 1.55 }}>
           Heads-up: secure storage is not yet activated in this environment. Your file details will be
-          recorded for your lender, but hold the documents themselves until the portal confirms live storage.
+          recorded for your broker, but hold the documents themselves until the portal confirms live storage.
         </p>
       )}
       <div style={{ display: "grid", gap: 10 }}>
@@ -168,7 +168,7 @@ function SecureUploadInner() {
       </div>
       <p style={{ margin: 0, color: "#6B7280", fontSize: 11.5, lineHeight: 1.6 }}>
         Chain of custody: every file is classified CONFIDENTIAL on receipt, access-logged, retained
-        per policy, and reviewable only through the licensed lender&apos;s governed workspace.
+        per policy, and reviewable only through your licensed broker&apos;s governed workspace.
         Uploading here is your consent to that handling for this financing request; nothing here is
         a credit decision, and you may request deletion of documents for a withdrawn request at any time.
       </p>

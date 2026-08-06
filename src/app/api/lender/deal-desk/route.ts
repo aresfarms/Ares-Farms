@@ -596,13 +596,13 @@ export async function POST(req: NextRequest) {
         if (contactEmail) {
           const booking = process.env.LENDER_BOOKING_URL?.trim();
           const docBodyText =
-            `Your licensed lender added a document to your financing request ${serviceRequestId}.\n\n` +
+            `Your licensed commercial debt broker added a document to your financing request ${serviceRequestId}.\n\n` +
             `View and download it securely on your status page (enter your reference number and email):\n` +
             `${portalBaseUrl(req)}/status\n\n` +
-            (booking ? `Schedule a call with your lender:\n${booking}` : "");
+            (booking ? `Schedule a call with your broker:\n${booking}` : "");
           const result = await sendEmail({
             to: contactEmail,
-            subject: `Your lender sent you a document — financing request ${serviceRequestId}`,
+            subject: `Your broker sent you a document — financing request ${serviceRequestId}`,
             text: `${docBodyText}\n\nThis message intentionally contains no document contents — everything sensitive stays inside the portal.\n\n${LENDER_EMAIL_SIGNATURE}`,
             html: renderLenderEmailHtml(docBodyText),
             inlineBrandLogo: true,

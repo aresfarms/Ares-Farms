@@ -197,8 +197,8 @@ export function FinancingIntakePanel() {
           Your reference is {submit.serviceRequestId}
         </strong>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-          Your deal is recorded and routed to the licensed lender. Here&apos;s
-          what happens next:
+          Your deal is recorded and routed to the licensed commercial debt
+          broker. Here&apos;s what happens next:
         </p>
         {submit.secureUploadPath && (
           <a
@@ -212,7 +212,7 @@ export function FinancingIntakePanel() {
           <p style={{ margin: 0, fontSize: 11.5, color: "#6B7280", lineHeight: 1.55 }}>
             Financial statements and identification never travel by email here: the button opens
             your deal&apos;s encrypted upload channel — single-purpose, expiring, and readable only
-            through the licensed lender&apos;s governed review. Bookmark it or return to this page;
+            through your licensed broker&apos;s governed review. Bookmark it or return to this page;
             the link stays valid for 72 hours.
           </p>
         )}
@@ -223,7 +223,7 @@ export function FinancingIntakePanel() {
             rel="noopener noreferrer"
             style={{ justifySelf: "start", borderRadius: 9, padding: "11px 16px", background: "#1c5aa0", color: "#fff", fontWeight: 800, textDecoration: "none", fontSize: 13.5 }}
           >
-            📅 Schedule a call with your lender →
+            📅 Schedule a call with your broker →
           </a>
         )}
         {submit.bookingUrl && (
@@ -239,7 +239,7 @@ export function FinancingIntakePanel() {
         </ol>
         <span style={{ fontSize: 11.5, color: "#708997" }}>
           A program fitting your project is not the same as you qualifying — the
-          licensed lender makes that call, and nothing is committed until you and
+          funding lender makes that call, and nothing is committed until you and
           the lender agree.
         </span>
         <a href="/status" style={{ fontSize: 12.5, fontWeight: 700, color: PURPLE, textDecoration: "none" }}>
@@ -261,12 +261,13 @@ export function FinancingIntakePanel() {
             color: PURPLE,
           }}
         >
-          Bring your deal — a licensed lender reviews it
+          Bring your deal — a licensed broker reviews it
         </span>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
           Tell us what you&apos;re trying to finance. We record it and route it to
-          the licensed lender, who reviews the fit and follows up. We don&apos;t
-          lend, qualify, or price — the lender does.
+          the licensed commercial debt broker, who reviews the fit and follows
+          up. We don&apos;t lend, qualify, or price — your broker arranges your
+          loan with the lenders who do.
         </p>
       </div>
 
@@ -326,7 +327,7 @@ export function FinancingIntakePanel() {
       </div>
 
       <div>
-        <label style={label} htmlFor="fin-address">Your mailing address (optional — the lender collects it later)</label>
+        <label style={label} htmlFor="fin-address">Your mailing address (optional — your broker collects it later)</label>
         <input id="fin-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} placeholder="Street address" />
       </div>
 
@@ -376,7 +377,7 @@ export function FinancingIntakePanel() {
       </label>
       <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
         <input type="checkbox" checked={consentAck} onChange={(e) => setConsentAck(e.target.checked)} style={{ marginTop: 2 }} />
-        <span>I consent to routing my request to the licensed lender, and understand this is not a qualification, pre-approval, rate lock, or lender commitment.</span>
+        <span>I consent to routing my request to the licensed commercial debt broker, and understand this is not a qualification, pre-approval, rate lock, or lender commitment.</span>
       </label>
 
       {!ready && (

@@ -225,14 +225,14 @@ export async function sendDocumentReminder(args: {
   const uploadUrl = `${args.portalBaseUrl}/secure-upload?token=${encodeURIComponent(link.token)}`;
   const booking = bookingUrl();
   const dueLine = desk.timeline.docsDueAt
-    ? `Your lender has asked for these by ${new Date(desk.timeline.docsDueAt).toLocaleDateString()}.\n\n`
+    ? `Your broker has asked for these by ${new Date(desk.timeline.docsDueAt).toLocaleDateString()}.\n\n`
     : "";
   const bodyText =
-    `Your licensed lender is waiting on documents for financing request ${row.serviceRequestId}.\n\n` +
+    `Your licensed commercial debt broker is waiting on documents for financing request ${row.serviceRequestId}.\n\n` +
     dueLine +
-    (desk.customerNote ? `Note from your lender: ${desk.customerNote}\n\n` : "") +
+    (desk.customerNote ? `Note from your broker: ${desk.customerNote}\n\n` : "") +
     `Upload them securely here (encrypted, never by email):\n${uploadUrl}\n\n` +
-    (booking ? `Schedule a call with your lender:\n${booking}\n\n` : "") +
+    (booking ? `Schedule a call with your broker:\n${booking}\n\n` : "") +
     `Check your request status any time:\n${args.portalBaseUrl}/status\n\n` +
     `This link is single-purpose and expires in 72 hours; a fresh one arrives with each reminder.`;
   const result = await sendEmail({

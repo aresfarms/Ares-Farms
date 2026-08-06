@@ -7,7 +7,7 @@
  */
 export const LENDER_EMAIL_SIGNATURE =
   `--\n` +
-  `Stuart Fraass | Principal\n` +
+  `Stuart Fraass | Principal — Domestic Commercial Debt Broker\n` +
   `Furlong Inc.\n` +
   `Direct: 212.203.6603 | finance@compasstocapital.com\n` +
   `www.furlongpathways.com | linkedin.com/in/stuart-fraass-8959755\n` +
@@ -53,7 +53,7 @@ export function renderLenderEmailHtml(bodyText: string): string {
     `<table role="presentation" cellpadding="0" cellspacing="0"><tr>` +
     `<td style="vertical-align:middle;padding-right:16px;"><img src="cid:brand-logo" width="64" height="64" alt="Furlong — Compass to Capital" style="display:block;border-radius:50%;"/></td>` +
     `<td style="vertical-align:middle;font-family:Georgia,'Times New Roman',serif;">` +
-    `<div style="font-size:15px;font-weight:700;color:${NAVY};">Stuart Fraass <span style="font-weight:400;color:${INK_SOFT};">| Principal</span></div>` +
+    `<div style="font-size:15px;font-weight:700;color:${NAVY};">Stuart Fraass <span style="font-weight:400;color:${INK_SOFT};">| Principal — Domestic Commercial Debt Broker</span></div>` +
     `<div style="font-size:13px;color:${INK_SOFT};margin-top:2px;">Furlong Inc.</div>` +
     `<div style="font-size:12.5px;color:${INK_SOFT};margin-top:6px;">Direct: 212.203.6603 &nbsp;·&nbsp; <a href="mailto:finance@compasstocapital.com" style="color:${GOLD};text-decoration:none;">finance@compasstocapital.com</a></div>` +
     `<div style="font-size:12.5px;margin-top:2px;"><a href="https://www.furlongpathways.com" style="color:${GOLD};text-decoration:none;">furlongpathways.com</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/stuart-fraass-8959755/" style="color:${GOLD};text-decoration:none;">LinkedIn</a></div>` +

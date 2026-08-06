@@ -120,15 +120,25 @@ async function delegatedGmailToken(delegatedUser: string): Promise<string | null
   }
 }
 
+/** RFC 2047 encoded-word: headers have no charset mechanism of their own, so
+ *  any non-ASCII subject (em-dashes!) must be wrapped or it renders as
+ *  mojibake (founder test 2026-08-06: "Ã¢Â€Â"" in the subject line). */
+function headerValue(value: string): string {
+  return /[^\x20-\x7E]/.test(value)
+    ? `=?UTF-8?B?${Buffer.from(value, "utf8").toString("base64")}?=`
+    : value;
+}
+
 function rfc822(message: EmailMessage, from: string): string {
   const raw =
     `From: ${from}\r\n` +
     `To: ${message.to}\r\n` +
-    `Subject: ${message.subject}\r\n` +
+    `Subject: ${headerValue(message.subject)}\r\n` +
     `MIME-Version: 1.0\r\n` +
     `Content-Type: text/plain; charset="UTF-8"\r\n` +
+    `Content-Transfer-Encoding: base64\r\n` +
     `\r\n` +
-    message.text;
+    Buffer.from(message.text, "utf8").toString("base64");
   return Buffer.from(raw).toString("base64url");
 }
 

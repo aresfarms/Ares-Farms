@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "authority": ["Vol II", "Vol III", "Vol III-B", "Vol V", "TECH-SEC-001"],
+  "googleCloudIdentityPosture": {
+    "cloudRunAndJobs": "ATTACHED_SERVICE_ACCOUNT",
+    "githubToGoogleCloud": "WORKLOAD_IDENTITY_FEDERATION",
+    "downloadedServiceAccountKeysAllowed": false
+  },
+  "authenticationClasses": [
+    {
+      "class": "PUBLIC",
+      "description": "Public endpoint; no credential is sent.",
+      "connectors": [
+        "FRED public graph CSV",
+        "USDA FSA published rates",
+        "U.S. Drought Monitor",
+        "USFWS National Wetlands Inventory",
+        "USDA NRCS Soil Data Access",
+        "public state and county GIS or property-record endpoints"
+      ],
+      "secretNames": []
+    },
+    {
+      "class": "PROVIDER_API_KEY",
+      "description": "The government or data provider requires its own API key or token. Cloud Run retrieves only the named credential from Secret Manager at runtime.",
+      "connectors": [
+        "EPA AirNow", "ArcGIS", "BEA", "BLS", "Census", "API.data.gov", "EIA",
+        "EPA", "EPA AQS", "FCC Broadband", "FRED API", "Grants.gov", "HUD USER",
+        "USDA AMS", "USDA NASS", "NOAA CDO", "NREL", "SAM.gov", "Smithsonian Open Access"
+      ],
+      "secretNames": [
+        "AIRNOW_API_KEY", "ARCGIS_API_KEY", "BEA_API_KEY", "BLS_API_KEY",
+        "CENSUS_API_KEY", "DATA_GOV_API_KEY", "EIA_API_KEY", "EPA_API_KEY",
+        "EPA_AQS_API_KEY", "FCC_BROADBAND_API_TOKEN", "FRED_API_KEY",
+        "GRANTS_GOV_API_KEY", "HUDUSER_API_TOKEN", "MARS_API_KEY", "NASS_API_KEY",
+        "NOAA_CDO_TOKEN", "NREL_API_KEY", "SAM_GOV_API_KEY", "SI_API_KEY"
+      ]
+    },
+    {
+      "class": "PROVIDER_IDENTITY_HEADER",
+      "description": "The provider requires an identifying username, email, or user-agent header. These values are provider-specific and are not Google service-account credentials.",
+      "connectors": ["EPA AQS", "FCC Broadband", "SEC EDGAR"],
+      "secretNames": ["EPA_AQS_EMAIL", "FCC_BROADBAND_API_USERNAME", "SEC_USER_AGENT"]
+    },
+    {
+      "class": "INTERNAL_SIGNING_SECRET",
+      "description": "Furlong-owned cryptographic material used for attestation, not external-provider authentication.",
+      "connectors": ["Furlong report attestation"],
+      "secretNames": ["REPORT_SIGNING_SECRET"]
+    },
+    {
+      "class": "PROVIDER_OAUTH_OIDC_MTLS_OR_LEGACY",
+      "description": "Reserved exception class for a state or agency that mandates OAuth/OIDC, a client certificate, IP allowlisting, or a legacy login. Each exception requires provider documentation, least privilege, and an approved rotation/revocation runbook.",
+      "connectors": [],
+      "secretNames": []
+    }
+  ]
+}

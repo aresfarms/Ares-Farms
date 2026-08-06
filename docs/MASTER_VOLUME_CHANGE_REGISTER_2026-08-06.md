@@ -212,3 +212,123 @@ platform will and will not do regardless of what is built next.
 - **The tell that it is working:** a bank asks whether it can run the
   property-fit engine on deals that never came through the portal. Build so
   that the answer can be yes.
+
+---
+
+# Part IV — Afternoon session, founder live testing (2026-08-06, 14:54–17:45)
+
+Every item below was found by the founder testing the deployed staging build,
+not by a gate. That is itself the finding worth recording: the gates were all
+green while five of these were live. Gates prove what they were told to check.
+
+## C-9. Authority was accepted from the caller, not derived (CRITICAL)
+
+- **Controlling volumes:** Vol II (authority granted, never asserted),
+  Vol III-B (GOV-RUNTIME-001), Vol V (replay-safe derivation).
+- **Defect:** twenty admin API routes read privilege from the query string —
+  `role: params.get("role") ?? "user"`, with `role === "admin" || "governance"`
+  granting access. A URL parameter is a claim, not a credential.
+- **Resolution:** `src/lib/auth/sessionAuthority.ts` derives role from the
+  proxy-verified session email against the operator and professional
+  registries. All 20 routes converted; zero claimed-role reads remain.
+- **Doctrine to carry forward:** a route may accept a statement of what lane a
+  caller *wants*. It may never accept a statement of what the caller *is*.
+
+## C-10. Counterparty lanes opened onto internal operator consoles (CRITICAL)
+
+- **Controlling volumes:** Vol I (activation boundaries), Vol II (minimum
+  disclosure), Vol IV (operator surfaces are operator-only).
+- **Defect:** the attorney, auditor and sponsor lanes on `/professional-access`
+  targeted `/governance`, `/audit-replay` and `/sponsor` — all
+  INTERNAL_CHROME_PREFIXES routes rendering the 43-module operator navigation
+  (deployment gates, release board packets, billing controls). Only
+  `/lender-desk` was purpose-built and correctly excluded from internal chrome.
+- **What actually prevented disclosure:** the C-9 perimeter 403. Had C-9 been
+  "fixed" first in isolation, the console would have populated with live
+  internal data for an outside attorney. Two defects, and the second one was
+  the only thing containing the first.
+- **Resolution:** all three lanes render a stated absence, not a sign-in link.
+- **Doctrine to carry forward:** a counterparty lane must NEVER target a route
+  in INTERNAL_CHROME_PREFIXES. A lane reopens only when a scope-limited
+  surface exists for it — never by re-pointing at an internal console.
+
+## C-11. A fetch timestamp was published as the data's vintage
+
+- **Controlling volumes:** Vol II (no fabricated certainty), Vol V (provenance).
+- **Defect:** the Sussex County resolver stamped `new Date()` as `sourceAsOf`.
+  The brief then printed "data 2026-08-06" beside a $629,000 assessment on a
+  property under contract at $2,500,000 — presenting a figure of unknown
+  vintage as current-as-of-today.
+- **Resolution:** null means null, and the brief prints "this source publishes
+  no data date — the figures may be years old."
+- **Doctrine to carry forward:** a missing provenance date must be STATED. It
+  may never be omitted, and it may never be substituted with the retrieval time.
+
+## C-12. Lot area was consumed as building area
+
+- **Defect:** Sussex `SqFeet` (a Tax Parcels field beside Acreage and
+  Shape__Area — i.e. lot area) populated `squareFeet`, which the commercial
+  income model consumes as leasable building area. Had it populated, NOI would
+  have been modelled on dirt.
+- **Resolution:** nulled; retained separately as `lotSquareFeet`.
+- **Doctrine:** any field feeding a financial model must be verified for
+  MEANING at the source, not matched by name.
+
+## C-13. The platform published no opinion of value (founder-directed reversal)
+
+- **Controlling volumes:** Vol II, Vol V.
+- **History, recorded because the reversal matters:** the first fix stated the
+  absence honestly ("Furlong publishes no valuation"). The founder rejected it
+  — publishing a value IS the purpose of that surface. Correct call; a stated
+  absence was the right interim containment and the wrong destination.
+- **Resolution:** `src/lib/property/marketValueIndication.ts` — assessment
+  reconciliation against each jurisdiction's PUBLISHED basis (ratio of market
+  value + valuation date), walked forward on the FHFA index, shown as a ±20%
+  screening band. Registry is data; an unregistered jurisdiction returns
+  "cannot be produced" rather than a guessed ratio.
+- **Verified basis:** Sussex County, DE assesses at 100% of fair market value
+  as of 1 July 2023 (court-ordered Tyler reassessment, replacing 50% of 1974
+  values) — sussexcountyde.gov/reassessment.
+- **Doctrine:** where a real market price is known and diverges materially from
+  the model, the DIVERGENCE is the headline output and the market price wins.
+
+## C-14. Market status was never stated
+
+- **Defect:** "Official parcel record matched" was displayed under the label
+  "Sale status." A visitor could read a full brief on a property that sold last
+  week and never learn the platform had no idea.
+- **Resolution:** market status always renders; absence of a listing feed is
+  stated as such.
+
+## C-15. Signed documents do not exist (OPEN — highest priority)
+
+- **Controlling volumes:** Vol II (ESIGN/UETA retention), Vol V (evidence).
+- **Defect:** `api/public/document-sign` writes a signature CERTIFICATE and
+  flips the original's status to SIGNED. It never produces the executed
+  instrument. Both the broker and the customer can open only the blank form
+  plus a separate certificate. No lender or closing attorney accepts that as
+  an executed document.
+- **Resolution (in progress):** generate a signed counterpart in ONE PDF —
+  Furlong-drafted instruments get a real signature block at a defined stamp
+  zone (we are the drafting party and own the template); third-party PDFs get a
+  non-obscuring margin band plus an appended signature page. `pdf-lib` added.
+
+## G-1. VOLUME-LEVEL GAP — broker-to-funding-lender submission is unscoped
+
+- **Finding:** the deal desk exposes only customer-facing actions (update,
+  remind, remind-all, request-signature, upload-begin, upload-confirm). There
+  is no path for the broker to package a file and send it to a funding lender.
+- **Searched:** all 41 Master Volume PDFs. ZERO hits in Volume II, III, IV or V,
+  and zero in the Lender & Capital Complete Edition.
+- **Status:** this is NOT a missed implementation. The requirement does not
+  exist in the Master Volume Series. It is the broker's core activity, and it
+  needs a Volume amendment authored by the founder before it is built.
+
+## Standing note on this register's own limits
+
+This register is maintained in-repo. The authoritative Master Volume PDFs in
+`~/Documents/Master Build Volume Documents 05-2026/` are an INPUT to the build
+and are not modified here — their newest file dates to 15 June 2026. Items
+carrying doctrine changes (C-9, C-10, C-11, C-13) and the unscoped requirement
+(G-1) require founder authorship into the Volumes themselves to become
+governing. Until then they govern the code but not the constitution.

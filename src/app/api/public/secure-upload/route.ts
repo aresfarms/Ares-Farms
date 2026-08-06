@@ -37,6 +37,7 @@ const ALLOWED_DOCUMENT_TYPES = new Set([
   "debt-schedule",
   "entity-documents",
   "environmental-reports",
+  "usda-fsa-records",
   "purchase-agreement",
   "other-supporting",
 ]);

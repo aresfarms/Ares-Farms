@@ -38,6 +38,11 @@ const DOC_SLOTS: Array<{
     actionHref: "/explore?lane=environmental-compliance#environmental-order",
     actionLabel: "Don't have one yet? Order your Phase I from Furlong Environmental →",
   },
+  {
+    type: "usda-fsa-records",
+    label: "USDA / FSA records (farm deals)",
+    hint: "Farm records, subsidy history, or FSA loan documents — download them yourself from your farmers.gov account or request them from your county FSA office. We will NEVER ask for your federal login.",
+  },
   { type: "purchase-agreement", label: "Purchase agreement", hint: "The signed contract, if the deal has one yet" },
   { type: "other-supporting", label: "Anything else", hint: "Whatever your lender asked for that isn't above" },
 ];

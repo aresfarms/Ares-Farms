@@ -180,6 +180,13 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
       dynamic "env" {
+        for_each = var.lender_calendar_embed_src == "" ? [] : [var.lender_calendar_embed_src]
+        content {
+          name  = "LENDER_CALENDAR_EMBED_SRC"
+          value = env.value
+        }
+      }
+      dynamic "env" {
         for_each = var.email_from == "" ? [] : [var.email_from]
         content {
           name  = "EMAIL_FROM"

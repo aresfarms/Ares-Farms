@@ -370,6 +370,12 @@ variable "lender_booking_url" {
   default     = ""
 }
 
+variable "lender_calendar_embed_src" {
+  description = "Google Calendar id embedded as the agenda panel on the lender desk (renders only for Google sessions with access to that calendar). Empty = panel hidden."
+  type        = string
+  default     = "sfraas@aresfarmsinc.com"
+}
+
 variable "email_from" {
   description = "Verified sender address for outbound notifications. Empty = notifications stay off (recorded, not sent)."
   type        = string

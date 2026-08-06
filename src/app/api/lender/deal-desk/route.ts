@@ -21,6 +21,15 @@ import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { FINANCING_DEAL_STATUSES } from "@/lib/serviceRequests/serviceRequestStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
+import { createDocumentStorageHandoff } from "@/lib/documents/storageHandoffStore";
+import { persistDocumentSubmission } from "@/lib/documents/documentStore";
+import {
+  DOCUMENT_STORAGE_PROVIDER,
+  documentStorageBucket,
+  initResumableUpload,
+} from "@/lib/documents/gcsResumableUpload";
+import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
+import { serviceRequests } from "@/db/schema";
 
 /**
  * Lender Deal Desk API — the licensed lender's governed working surface
@@ -183,6 +192,7 @@ export async function GET(req: NextRequest) {
         deals,
         statuses: FINANCING_DEAL_STATUSES,
         bookingUrl: process.env.LENDER_BOOKING_URL?.trim() || null,
+        calendarEmbedSrc: process.env.LENDER_CALENDAR_EMBED_SRC?.trim() || null,
         emailConfigured: Boolean(process.env.EMAIL_FROM && process.env.SENDGRID_API_KEY),
         governance: { traceId },
       });
@@ -332,7 +342,15 @@ type PostBody = {
   customerNote?: unknown;
   timeline?: unknown;
   force?: unknown;
+  fileName?: unknown;
+  mimeType?: unknown;
+  byteSize?: unknown;
+  storageUri?: unknown;
+  uploaded?: unknown;
 };
+
+const LENDER_PROVIDED_DOCUMENT_TYPE = "lender-provided";
+const MAX_LENDER_FILE_BYTES = 50 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
   let body: PostBody;
@@ -460,6 +478,167 @@ export async function POST(req: NextRequest) {
         metadata: { serviceRequestId, ...result },
       });
       return NextResponse.json({ ok: true, ...result, governance: { traceId } });
+    }
+
+    // Lender → customer documents (founder direction 2026-08-05): approval
+    // letters, term sheets, disclosures go through the SAME encrypted vault
+    // as borrower documents — never email attachments. Same browser→GCS
+    // direct-byte pattern; records tagged lender-provided so the customer
+    // status page can offer them (and ONLY them) for download.
+    if (action === "upload-begin") {
+      const serviceRequestId =
+        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
+      const fileName = typeof body.fileName === "string" ? body.fileName.slice(0, 200).trim() : "";
+      const mimeType = typeof body.mimeType === "string" ? body.mimeType.slice(0, 120) : null;
+      const byteSize =
+        typeof body.byteSize === "number" && Number.isFinite(body.byteSize)
+          ? Math.floor(body.byteSize)
+          : null;
+      if (!serviceRequestId || !fileName) {
+        return NextResponse.json(
+          { ok: false, error: "serviceRequestId and fileName are required.", governance: { traceId } },
+          { status: 400 }
+        );
+      }
+      if (byteSize != null && byteSize > MAX_LENDER_FILE_BYTES) {
+        return NextResponse.json(
+          { ok: false, error: "Files are limited to 50MB each.", governance: { traceId } },
+          { status: 400 }
+        );
+      }
+      const applicationId = `finintake-${serviceRequestId}`;
+      const created = await createDocumentStorageHandoff({
+        applicationId,
+        documentType: LENDER_PROVIDED_DOCUMENT_TYPE,
+        documentName: `${serviceRequestId} — from your lender`,
+        fileName,
+        mimeType,
+        byteSize,
+        storageProvider: documentStorageBucket() ? DOCUMENT_STORAGE_PROVIDER : null,
+        storageBucket: documentStorageBucket(),
+        traceId,
+        source: "lender-deal-desk",
+        metadata: { dealRef: serviceRequestId, channel: "lender-deal-desk", providedBy: actorId },
+      });
+      const uploadUrl = await initResumableUpload({
+        objectKey: created.handoff.objectKey,
+        mimeType,
+        originForCors: req.headers.get("origin"),
+      });
+      createObservabilityEvent({
+        eventType: "LENDER_DOC_UPLOAD_BEGIN",
+        domain: "runtime",
+        severity: "INFO",
+        message: "The lender began sending a document to the customer through the vault.",
+        traceId,
+        replayRef: traceId,
+        actorId,
+        module: MODULE,
+        metadata: { serviceRequestId, providerConfigured: Boolean(uploadUrl) },
+      });
+      return NextResponse.json({
+        ok: true,
+        uploadUrl,
+        storageUri: created.handoff.storageUri,
+        providerConfigured: Boolean(uploadUrl),
+        governance: { traceId },
+      });
+    }
+
+    if (action === "upload-confirm") {
+      const serviceRequestId =
+        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
+      const fileName = typeof body.fileName === "string" ? body.fileName.slice(0, 200).trim() : "";
+      const mimeType = typeof body.mimeType === "string" ? body.mimeType.slice(0, 120) : null;
+      const byteSize =
+        typeof body.byteSize === "number" && Number.isFinite(body.byteSize)
+          ? Math.floor(body.byteSize)
+          : null;
+      const storageUri = typeof body.storageUri === "string" ? body.storageUri.slice(0, 500) : null;
+      const uploaded = body.uploaded === true;
+      if (!serviceRequestId || !fileName) {
+        return NextResponse.json(
+          { ok: false, error: "serviceRequestId and fileName are required.", governance: { traceId } },
+          { status: 400 }
+        );
+      }
+      const applicationId = `finintake-${serviceRequestId}`;
+      const persisted = await persistDocumentSubmission({
+        traceId,
+        source: "lender-deal-desk",
+        applicationId,
+        documentType: LENDER_PROVIDED_DOCUMENT_TYPE,
+        documentName: `${serviceRequestId} — from your lender`,
+        fileName,
+        mimeType,
+        byteSize,
+        storageUri: uploaded ? storageUri : null,
+        metadata: {
+          dealRef: serviceRequestId,
+          channel: "lender-deal-desk",
+          providedBy: actorId,
+          bytesInGovernedStorage: uploaded,
+        },
+      });
+
+      // Minimum-disclosure notification: the customer learns a document is
+      // waiting and where to get it — never the document itself, never its
+      // name, never financial content.
+      let customerNotified = false;
+      if (uploaded && emailConfigured()) {
+        const dealRows = await db
+          .select()
+          .from(serviceRequests)
+          .where(eq(serviceRequests.serviceRequestId, serviceRequestId))
+          .limit(1);
+        const contactEmail = dealRows[0]?.contactEmail;
+        if (contactEmail) {
+          const booking = process.env.LENDER_BOOKING_URL?.trim();
+          const result = await sendEmail({
+            to: contactEmail,
+            subject: `Your lender sent you a document — financing request ${serviceRequestId}`,
+            text:
+              `Your licensed lender added a document to your financing request ${serviceRequestId}.\n\n` +
+              `View and download it securely on your status page (enter your reference number and email):\n` +
+              `${portalBaseUrl(req)}/status\n\n` +
+              (booking ? `Questions? Schedule a call:\n${booking}\n\n` : "") +
+              `This message intentionally contains no document contents — everything sensitive stays inside the portal.`,
+          });
+          customerNotified = result.sent;
+        }
+      }
+
+      const observability = createObservabilityEvent({
+        eventType: "LENDER_DOC_SENT_TO_CUSTOMER",
+        domain: "security",
+        severity: "INFO",
+        message: uploaded
+          ? "The lender placed a document in the vault for the customer."
+          : "The lender recorded a document for the customer (storage provider pending).",
+        traceId,
+        replayRef: traceId,
+        actorId,
+        module: MODULE,
+        metadata: {
+          serviceRequestId,
+          documentId: persisted.document.id,
+          uploaded,
+          customerNotified,
+        },
+      });
+      await persistGovernanceEvidence({
+        traceId,
+        replayRef: traceId,
+        observability,
+        metadata: { route: "/api/lender/deal-desk", operation, serviceRequestId, documentId: persisted.document.id },
+      });
+      return NextResponse.json({
+        ok: true,
+        documentId: persisted.document.id,
+        uploaded,
+        customerNotified,
+        governance: { traceId },
+      });
     }
 
     if (action === "remind-all") {

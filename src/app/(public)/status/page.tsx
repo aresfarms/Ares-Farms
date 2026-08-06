@@ -26,6 +26,11 @@ type StatusView = {
     lenderBacklogNote: string | null;
   } | null;
   bookingUrl?: string | null;
+  lenderDocuments?: Array<{
+    fileName: string | null;
+    receivedAt: string | null;
+    downloadPath: string;
+  }>;
 };
 
 function shortDate(iso: string | null): string | null {
@@ -198,6 +203,34 @@ export default function StatusPortalPage() {
                   <span style={{ fontSize: 11.5, color: "#8090a0", lineHeight: 1.5 }}>
                     Dates are your lender&apos;s working estimates and move with real lender and
                     agency processing backlogs — never a promise of any outcome.
+                  </span>
+                </div>
+              )}
+
+              {result.lenderDocuments && result.lenderDocuments.length > 0 && (
+                <div style={{ borderTop: "1px solid #e6ecf3", paddingTop: 10, display: "grid", gap: 6 }}>
+                  <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#3b475a" }}>
+                    Documents from your lender
+                  </span>
+                  {result.lenderDocuments.map((doc) => (
+                    <div key={doc.downloadPath} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, fontSize: 13.5 }}>
+                      <span style={{ color: INK, overflowWrap: "anywhere" }}>
+                        {doc.fileName ?? "Document"}
+                        {shortDate(doc.receivedAt) && (
+                          <span style={{ color: "#8090a0", fontSize: 11.5 }}> · {shortDate(doc.receivedAt)}</span>
+                        )}
+                      </span>
+                      <a
+                        href={doc.downloadPath}
+                        style={{ flexShrink: 0, fontWeight: 750, color: "#1c5aa0", textDecoration: "none" }}
+                      >
+                        Download ↓
+                      </a>
+                    </div>
+                  ))}
+                  <span style={{ fontSize: 11.5, color: "#8090a0", lineHeight: 1.5 }}>
+                    Download links are private to this lookup and expire after 2 hours — run the
+                    status check again any time for fresh ones.
                   </span>
                 </div>
               )}

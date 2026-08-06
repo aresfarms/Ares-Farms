@@ -408,6 +408,9 @@ function pageResponseWithCsp(req: NextRequest): NextResponse {
         // upload (resumable session PUT). The ONLY external connect allowed —
         // CSP blocked it as "Failed to fetch" (founder staging test 2026-08-05).
         "connect-src 'self' https://storage.googleapis.com",
+        // calendar.google.com: the lender desk's agenda embed (renders only
+        // for Google sessions that already have calendar access).
+        "frame-src https://calendar.google.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'",
@@ -419,6 +422,7 @@ function pageResponseWithCsp(req: NextRequest): NextResponse {
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "connect-src 'self' https://storage.googleapis.com",
+        "frame-src https://calendar.google.com",
         "frame-ancestors 'none'",
         "base-uri 'self'",
         "form-action 'self'",

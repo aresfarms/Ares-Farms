@@ -125,6 +125,7 @@ export default function LenderDeskPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [statuses, setStatuses] = useState<StatusOption[]>([]);
   const [bookingUrl, setBookingUrl] = useState<string | null>(null);
+  const [calendarSrc, setCalendarSrc] = useState<string | null>(null);
   const [emailReady, setEmailReady] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -147,6 +148,7 @@ export default function LenderDeskPage() {
         setDeals(json.deals as Deal[]);
         setStatuses(json.statuses as StatusOption[]);
         setBookingUrl((json.bookingUrl as string | null) ?? null);
+        setCalendarSrc((json.calendarEmbedSrc as string | null) ?? null);
         setEmailReady(json.emailConfigured === true);
         setDrafts((prev) => {
           const next = { ...prev };
@@ -294,6 +296,69 @@ export default function LenderDeskPage() {
     setDrafts((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
   }, []);
 
+  // Lender → customer document (approval letter, term sheet, disclosure):
+  // begin → browser PUT to the vault → confirm (+ customer notification).
+  const sendDocumentToCustomer = useCallback(
+    async (deal: Deal, file: File) => {
+      setBusy(deal.serviceRequestId);
+      setMessage(deal.serviceRequestId, "");
+      try {
+        const beginRes = await fetch("/api/lender/deal-desk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "upload-begin",
+            serviceRequestId: deal.serviceRequestId,
+            fileName: file.name,
+            mimeType: file.type || null,
+            byteSize: file.size,
+          }),
+        });
+        const begin = await beginRes.json();
+        if (!beginRes.ok || begin.ok !== true) throw new Error(begin.error ?? "Could not start the transfer.");
+        let uploaded = false;
+        if (begin.uploadUrl) {
+          const put = await fetch(begin.uploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": file.type || "application/octet-stream" },
+            body: file,
+          });
+          if (!put.ok) throw new Error("The secure storage transfer failed — try again.");
+          uploaded = true;
+        }
+        const confirmRes = await fetch("/api/lender/deal-desk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "upload-confirm",
+            serviceRequestId: deal.serviceRequestId,
+            fileName: file.name,
+            mimeType: file.type || null,
+            byteSize: file.size,
+            storageUri: begin.storageUri,
+            uploaded,
+          }),
+        });
+        const confirm = await confirmRes.json();
+        if (!confirmRes.ok || confirm.ok !== true) throw new Error(confirm.error ?? "The transfer could not be confirmed.");
+        setMessage(
+          deal.serviceRequestId,
+          uploaded
+            ? confirm.customerNotified
+              ? `${file.name} is in the vault for the customer — they were emailed to check their status page.`
+              : `${file.name} is in the vault for the customer — it appears on their status page (notification email not sent: email not configured).`
+            : `${file.name} was recorded but NOT stored — secure storage is not active in this environment.`
+        );
+        await loadDocuments(deal);
+      } catch (error) {
+        setMessage(deal.serviceRequestId, error instanceof Error ? error.message : "Transfer failed.");
+      } finally {
+        setBusy(null);
+      }
+    },
+    [loadDocuments, setMessage]
+  );
+
   const active = deals.filter((d) => !FAILURE_STATUSES.has(d.status) && d.status !== "CLOSED_FUNDED");
   const awaitingDocs = deals.filter((d) => d.status === "DOCUMENTS_REQUESTED");
   const closedFunded = deals.filter((d) => d.status === "CLOSED_FUNDED");
@@ -323,6 +388,23 @@ export default function LenderDeskPage() {
             { label: "Did Not Complete", value: failed.length, color: "#7c3aed" },
           ]}
         />
+
+        {calendarSrc && (
+          <section style={{ ...panelStyle, padding: 14, display: "grid", gap: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+              <strong style={{ fontSize: 14 }}>Today&apos;s calls & schedule</strong>
+              <span style={{ color: "#64748b", fontSize: 12 }}>
+                Your Google Calendar — visible only to accounts that already have access to it.
+                Customers book through your booking link, never by cold-calling.
+              </span>
+            </div>
+            <iframe
+              title="Lender calendar agenda"
+              src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(calendarSrc)}&mode=AGENDA&showTitle=0&showPrint=0&showTabs=0&showCalendars=0`}
+              style={{ border: 0, width: "100%", height: 340, borderRadius: 8 }}
+            />
+          </section>
+        )}
 
         {sweepResult ? (
           <div
@@ -486,6 +568,25 @@ export default function LenderDeskPage() {
                       Every download is a single file streamed through the governed runtime and
                       recorded in the audit trail. There is no bulk export.
                     </span>
+                    <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 10, display: "grid", gap: 6 }}>
+                      <strong style={{ fontSize: 13.5 }}>Send a document to the customer</strong>
+                      <span style={{ color: "#64748b", fontSize: 12 }}>
+                        Approval letters, term sheets, disclosures — it goes into the encrypted
+                        vault, appears on their status page for secure download, and they get a
+                        notification email. Never send documents by email.
+                      </span>
+                      <input
+                        type="file"
+                        aria-label={`Send a document to the customer for ${deal.serviceRequestId}`}
+                        disabled={busy === deal.serviceRequestId}
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) void sendDocumentToCustomer(deal, f);
+                          e.target.value = "";
+                        }}
+                        style={{ fontSize: 13 }}
+                      />
+                    </div>
                   </section>
 
                   <section style={{ display: "grid", gap: 10 }}>

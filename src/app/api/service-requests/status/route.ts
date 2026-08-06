@@ -4,6 +4,7 @@ import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import { getServiceRequestStatus } from "@/lib/serviceRequests/serviceRequestStore";
+import { mintCustomerDownloadToken } from "@/lib/documents/customerDownloadToken";
 
 /**
  * Service Request Status API (customer status portal)
@@ -76,6 +77,24 @@ export async function POST(req: NextRequest) {
       body.email ?? ""
     );
 
+    // Lender-provided documents: the successful ref+email lookup IS the
+    // customer's authentication, so mint short-lived single-document
+    // download tokens here (2h; the customer re-runs the lookup for fresh
+    // ones). Tokens can only reach lender-provided documents on this deal.
+    const lenderDocuments =
+      status.found && status.serviceRequestId && status.lenderDocuments?.length
+        ? status.lenderDocuments.map((doc) => ({
+            fileName: doc.fileName,
+            receivedAt: doc.receivedAt,
+            downloadPath: `/api/public/document-download?token=${encodeURIComponent(
+              mintCustomerDownloadToken({
+                documentId: doc.id,
+                dealRef: status.serviceRequestId as string,
+              }).token
+            )}`,
+          }))
+        : undefined;
+
     const observability = createObservabilityEvent({
       eventType: "SERVICE_REQUEST_STATUS_LOOKUP",
       domain: "operations",
@@ -98,7 +117,10 @@ export async function POST(req: NextRequest) {
       metadata: { route: "/api/service-requests/status", found: status.found },
     });
 
-    return NextResponse.json({ ok: true, status });
+    return NextResponse.json({
+      ok: true,
+      status: { ...status, lenderDocuments },
+    });
   } catch {
     return NextResponse.json(
       { ok: false, error: "Status lookup failed. Please try again." },

@@ -1,6 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 
-import { serviceRequests, type ServiceRequestRow } from "@/db/schema";
+import { applicationDocuments, serviceRequests, type ServiceRequestRow } from "@/db/schema";
 import { db } from "@/lib/db";
 
 /**
@@ -152,6 +152,11 @@ export type ServiceRequestStatusView = {
   } | null;
   /** Scheduling link so the customer books a call instead of cold-calling. */
   bookingUrl?: string | null;
+  /** Documents the LENDER addressed to the customer (approval letters, term
+   *  sheets). Only lender-provided documents ever appear — never the
+   *  customer's own uploads, never other deals'. Download tokens are minted
+   *  by the API layer, not here. */
+  lenderDocuments?: Array<{ id: string; fileName: string | null; receivedAt: string | null }>;
 };
 
 /**
@@ -201,6 +206,27 @@ export async function getServiceRequestStatus(
   const isFinancing = row.requestType === "financing_deal_intake";
   const bookingUrl = process.env.LENDER_BOOKING_URL?.trim() || null;
 
+  let lenderDocuments: ServiceRequestStatusView["lenderDocuments"];
+  if (isFinancing) {
+    const docs = await db
+      .select({
+        id: applicationDocuments.id,
+        fileName: applicationDocuments.fileName,
+        documentType: applicationDocuments.documentType,
+        storageUri: applicationDocuments.storageUri,
+        receivedAt: applicationDocuments.receivedAt,
+      })
+      .from(applicationDocuments)
+      .where(eq(applicationDocuments.applicationId, `finintake-${row.serviceRequestId}`));
+    lenderDocuments = docs
+      .filter((d) => d.documentType === "lender-provided" && d.storageUri)
+      .map((d) => ({
+        id: d.id,
+        fileName: d.fileName,
+        receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
+      }));
+  }
+
   return {
     found: true,
     serviceRequestId: row.serviceRequestId,
@@ -219,6 +245,7 @@ export async function getServiceRequestStatus(
         }
       : null,
     bookingUrl: isFinancing ? bookingUrl : null,
+    lenderDocuments,
   };
 }
 

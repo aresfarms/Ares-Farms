@@ -4,19 +4,29 @@
  * attorney login here, auditor here, lender here").
  *
  * SECURITY POSTURE — read before changing anything here:
- * Each lane below is a DESTINATION, not a claim. Clicking "I'm an auditor"
- * grants nothing: every one of these links lands on the SAME governed
- * sign-in, and the actual role is resolved server-side from the verified
- * session email against the professional registry (Module 45 accountable
- * authority). This is deliberate — the API perimeter rejects caller-claimed
- * roles outright (staging finding 2026-08-05), and a page that let a visitor
- * pick their own privilege would be exactly the vulnerability the perimeter
- * exists to prevent. Unrecognized accounts land on a "no access yet" page,
- * never on a console.
+ * Each lane is a DESTINATION, not a claim. Clicking "I'm an auditor" grants
+ * nothing: every link lands on the SAME governed sign-in, and authority is
+ * resolved server-side. A page that let a visitor pick their own privilege
+ * would be exactly the caller-claimed-role hole the API perimeter rejects.
+ *
+ * HOW AUTHORITY IS ACTUALLY ESTABLISHED (founder correction 2026-08-06 —
+ * the earlier version of this page under-described it). Two governed paths,
+ * both already built:
+ *   1. CREDENTIAL VERIFICATION (institutionalCredentialVerification.ts):
+ *      the professional's licence/commission is verified against the OFFICIAL
+ *      issuing directory — bar, agency, or issuer confirmation — and the
+ *      resulting verification TOKEN is bound to that principal, carries the
+ *      official source snapshot hash, a standing, and an EXPIRY. Access is
+ *      the token, not the job title.
+ *   2. COMPELLED DISCLOSURE (compelledDisclosureCeremony.ts): an attorney or
+ *      agency arriving WITHOUT a standing credential presents legal process —
+ *      court order, subpoena, warrant, or agency demand. The ceremony records
+ *      it, fixes the NOTICE POSTURE (required / delayed / prohibited /
+ *      pending legal review), and opens ONLY the selectors that process
+ *      actually names. Nothing else in the vault becomes reachable.
  *
  * Each lane states plainly what that role can and cannot see — minimum
- * disclosure is the promise, so it belongs in front of the login, not buried
- * in a policy.
+ * disclosure is the promise, so it belongs in front of the login.
  *
  * Master Volume Governance: Vol I (accountable authority — named humans, not
  * self-declared roles); Vol II (controlled disclosure per role); Vol V
@@ -69,11 +79,12 @@ const LANES: Lane[] = [
   {
     role: "attorney",
     title: "Attorney / Counsel",
-    who: "Counsel engaged on a matter, or reviewing the platform's governed language.",
+    who: "Counsel with a verified bar credential, or presenting legal process on a matter.",
     sees: [
-      "The specific matter or document set you are engaged on",
+      "The specific matter or document set your credential or legal process covers",
       "Consent, disclosure and signature language with its version history",
       "The evidence trail for anything you are asked to opine on",
+      "Without a standing credential: exactly the records your court order, subpoena or warrant names — nothing beyond them",
     ],
     neverSees: [
       "Borrower financial documents outside your engagement",
@@ -86,7 +97,7 @@ const LANES: Lane[] = [
   {
     role: "auditor",
     title: "Auditor / Examiner",
-    who: "An auditor, examiner, or regulator reviewing how the platform behaved.",
+    who: "An auditor, examiner, or regulator whose commission we verify with the issuing agency.",
     sees: [
       "The audit ledger and replay records — what happened, when, and by whom",
       "Governance evidence, classification and version lineage",
@@ -163,10 +174,12 @@ export default function ProfessionalAccessPage() {
             lineHeight: 1.6,
           }}
         >
-          <strong style={{ color: INK }}>Access is by named account.</strong> Choosing a
-          lane here does not grant it. Every lane signs in the same way, and your access is
-          determined by the account you sign in with — not by the button you press. If your
-          account has not been granted a role yet, you will be told so plainly.
+          <strong style={{ color: INK }}>Access is verified, not asserted.</strong> Choosing
+          a lane here does not grant it. Standing access requires a credential we verify
+          against the official issuing directory — your bar, commission, or agency — recorded
+          with its source, standing and expiry. Without one, an attorney or agency may still
+          proceed by presenting legal process (court order, subpoena, warrant, or agency
+          demand): that opens only the specific records the process names, and nothing else.
         </div>
 
         {LANES.map((lane) => (

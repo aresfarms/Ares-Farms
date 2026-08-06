@@ -134,3 +134,81 @@ controlling volume(s), what changed, and where the implementation lives.
   catalog (names + public rule citations) was split into its own module so
   rendered surfaces cite programs without importing the deferred, gated
   financing node.
+
+---
+
+# PART III — Standing doctrines for the Master Volumes (founder-affirmed 2026-08-06)
+
+These are not feature notes. They are **standing positions** the founder
+directed be carried into the controlling volumes, because they govern what the
+platform will and will not do regardless of what is built next.
+
+## D-1. AI is back-office leverage, never a front-office promise
+
+- **Controlling volumes:** Vol I (facilitation, never determination), Vol II
+  (CONST-FAIR-001/002 — no qualification or adverse-action language), Vol V
+  (source authority — facts come from governed sources).
+- **Permitted:** extracting structure from messy documents (appraisal
+  comparables, statement line items), normalizing county land-use codes,
+  drafting first-pass work product a licensed human then corrects and signs.
+- **Forbidden, no exceptions:** any AI output that states or implies
+  qualification, eligibility, approval, pricing, or a credit decision; any AI
+  that GENERATES a property fact rather than summarizing one a governed source
+  produced. *An AI that says "you qualify" is making a credit decision; an AI
+  that hallucinates a flood zone is a liability.*
+- **No chatbot.** Founder position, stated plainly: the platform will not ship
+  a conversational assistant. This is a deliberate stance, not an omission.
+- **Sole outward exception:** the possibilities / discovery walk-through, which
+  may guide a person through exploring a purchase — bounded to phrasing
+  questions and summarizing governed facts. Founder's testing verdict: "not
+  clunky or intrusive, but not very useful" — approved to IMPROVE, on the
+  condition it stays inside those bounds.
+
+## D-2. The evidence trail is the product, not a byproduct
+
+- **Controlling volumes:** Vol II (regulated custody), Vol III-B (replay),
+  Vol V (evidence preservation).
+- **Position:** audit ledgers, document fingerprints, scan verdicts, access
+  records and signature certificates are not internal plumbing — they are the
+  defensible asset. When a bank asks *"how do you know these documents weren't
+  altered?"*, the answer is a hash chain, and that answer is the differentiator.
+- **First expression:** the per-deal **Chain of Custody report** — issued to
+  both the borrower and the funding institution, stating which documents
+  entered the vault, when, from whom, their scan verdicts, their SHA-256
+  fingerprints, every recorded access, and every signature. It asserts custody
+  only: explicitly NOT authenticity, accuracy, qualification, or any credit
+  conclusion.
+
+## D-3. Provenance is the 3–5 year market position
+
+- **Controlling volumes:** Vol II (Section 1071 firewall + regulated data),
+  Vol V (classification, verification).
+- **Position:** two forces converge — Section 1071 phasing in demands clean,
+  structured, auditable origination data; and generative tooling makes
+  synthetic borrowers, altered statements, and forged identity artifacts
+  cheap. The platform that can PROVE provenance — of a document, an identity,
+  a signature — holds the trust position.
+- **Roadmap consequence:** the signer-identity ladder (verification, not mere
+  email possession) and document-authenticity checking are not optional
+  polish; they are the position itself. Both remain counsel-gated and
+  test-mode until reviewed.
+
+## D-4. The long game is infrastructure, not one broker's front end
+
+- **Controlling volumes:** Vol I (constitutional separation of platform from
+  licensed party), Vol III (module separability), Vol V (portable evidence).
+- **Position, restated as original intent:** community banks are consolidating
+  and losing in-house capacity to underwrite complex rural and specialty
+  deals. The end state is Furlong as the **screening and evidence
+  infrastructure other lenders run on**, not a single broker's portal.
+- **Two engineering obligations that follow, and must be enforced in review:**
+  1. **Keep the engine free of Furlong-specific assumptions.** The
+     property-fit and program-screening logic must never depend on the
+     network broker, Furlong's own routing, or any one lender's preferences.
+     Module separability gates already exist to prove this and must stay green.
+  2. **Keep the evidence trail exportable.** A licensing institution must be
+     able to take its own deals' custody records with it, in a portable form,
+     without Furlong as an intermediary.
+- **The tell that it is working:** a bank asks whether it can run the
+  property-fit engine on deals that never came through the portal. Build so
+  that the answer can be yes.

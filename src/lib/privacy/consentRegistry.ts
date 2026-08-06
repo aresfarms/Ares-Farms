@@ -35,6 +35,7 @@ export type ConsentId =
   | "esign-signature"
   | "identity-verification"
   | "financial-data-handling"
+  | "document-attestation"
   | "marketing-optional";
 
 export interface ConsentDefinition {
@@ -153,6 +154,27 @@ export const CONSENTS: Record<ConsentId, ConsentDefinition> = {
       "still get a loan arranged. Captured at the moment of the first financial upload so it is " +
       "specific and contemporaneous, and paired with the identity check because these documents are " +
       "the ones an impostor actually wants.",
+  },
+  "document-attestation": {
+    id: "document-attestation",
+    version: "attestation-v1-draft",
+    capturedAt: "EVERY document upload, per file",
+    lawfulBasis: "contract",
+    required: true,
+    text:
+      "I confirm this file is a true, complete and unaltered copy of the record it claims to be, " +
+      "that I am authorised to provide it, and that I understand my broker and any lender will rely " +
+      "on it. I understand that knowingly providing a falsified or altered financial record in " +
+      "support of a loan application may be a criminal offence.",
+    basisNote:
+      "NOT a consent — an ATTESTATION, and the distinction matters. Consent authorises processing " +
+      "and is asked ONCE (repeating it identically breeds click-fatigue and weakens the record: the " +
+      "EDPB warns about exactly this, and eight identical ticks in four minutes reads as ritual, not " +
+      "agreement). An attestation is a fresh statement about a DIFFERENT file each time, so it has no " +
+      "fatigue problem, and it does what consent cannot: it creates the borrower's own exposure for a " +
+      "falsified record. That is the real deterrent against doctored statements, it mirrors the " +
+      "certifications SBA/USDA lenders already require, and it puts 'the borrower affirmed this file " +
+      "was genuine at this moment' into the chain-of-custody record.",
   },
   "marketing-optional": {
     id: "marketing-optional",

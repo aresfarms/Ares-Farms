@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { createDocumentStorageHandoff } from "@/lib/documents/storageHandoffStore";
@@ -81,6 +83,7 @@ export async function POST(req: NextRequest) {
     handoffToken?: unknown;
     storageUri?: unknown;
     uploaded?: unknown;
+    attestationText?: unknown;
   }>(req, { maxBytes: 16 * 1024 });
   if (!parsed.ok) {
     return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
@@ -177,7 +180,21 @@ export async function POST(req: NextRequest) {
       mimeType,
       byteSize,
       storageUri: uploaded ? storageUri : null,
-      metadata: { dealRef: claims.dealRef, channel: "sovereign-upload-link", bytesInGovernedStorage: uploaded },
+      metadata: {
+        dealRef: claims.dealRef,
+        channel: "sovereign-upload-link",
+        bytesInGovernedStorage: uploaded,
+        // Per-file ATTESTATION (founder direction 2026-08-06): the borrower's
+        // own statement that THIS file is genuine. Recorded with the exact
+        // text and its hash so the custody report can quote what was affirmed.
+        attestation: typeof body.attestationText === "string" && body.attestationText.trim()
+          ? {
+              text: body.attestationText.slice(0, 1000),
+              sha256: createHash("sha256").update(body.attestationText.slice(0, 1000), "utf8").digest("hex"),
+              affirmedAt: new Date().toISOString(),
+            }
+          : null,
+      },
     });
     await createObservabilityEvent({
       eventType: "SOVEREIGN_UPLOAD_CONFIRMED",

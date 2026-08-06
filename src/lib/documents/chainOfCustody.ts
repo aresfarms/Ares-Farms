@@ -60,6 +60,8 @@ export interface CustodyDocument {
   signed: boolean;
   signedBy: string | null;
   origin: "borrower" | "broker" | "portal";
+  attestedAt: string | null;
+  attestationText: string | null;
 }
 
 export interface CustodyEvent {
@@ -129,6 +131,8 @@ export async function buildChainOfCustody(dealRef: string): Promise<ChainOfCusto
       signed: m.signatureStatus === "signed",
       signedBy: typeof m.signedByTypedName === "string" ? m.signedByTypedName : null,
       origin: originOf(d.source, d.documentType),
+      attestedAt: (m.attestation as { affirmedAt?: string } | null)?.affirmedAt ?? null,
+      attestationText: (m.attestation as { text?: string } | null)?.text ?? null,
     };
   });
 
@@ -228,6 +232,10 @@ export function renderChainOfCustodyPdf(report: ChainOfCustodyReport): Promise<B
       }
       if (d.signed) {
         doc.font("Times-Roman").fontSize(10).fillColor(NAVY).text(`Signed electronically by ${d.signedBy ?? "the customer"}`);
+      }
+      if (d.attestedAt && d.attestationText) {
+        doc.font("Times-Italic").fontSize(9).fillColor(NAVY)
+          .text(`Affirmed by the sender ${fmt(d.attestedAt)}: "${d.attestationText}"`, { lineGap: 1 });
       }
       doc.moveDown(0.5);
     }

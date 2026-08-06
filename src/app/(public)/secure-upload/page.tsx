@@ -49,6 +49,14 @@ const DOC_SLOTS: Array<{
 
 type UploadState = { status: "idle" | "uploading" | "done" | "pending" | "error"; note?: string };
 
+/** Per-file attestation (founder direction 2026-08-06). Deliberately an
+ *  ATTESTATION about THIS file, not a repeated consent — a fresh statement
+ *  each time carries evidentiary weight where an identical repeated tick
+ *  does not, and it creates real exposure for a falsified record. */
+const ATTESTATION_TEXT =
+  "I confirm this file is a true, complete and unaltered copy of the record it claims to be, that " +
+  "I am authorised to provide it, and that my broker and any lender will rely on it.";
+
 function SecureUploadInner() {
   const params = useSearchParams();
   const token = params.get("token") ?? "";
@@ -57,6 +65,7 @@ function SecureUploadInner() {
   const [providerConfigured, setProviderConfigured] = useState<boolean | null>(null);
   const [linkError, setLinkError] = useState<string | null>(null);
   const [states, setStates] = useState<Record<string, UploadState>>({});
+  const [attested, setAttested] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!token) { setLinkError("This page needs a secure link — open it from the link you were sent."); return; }
@@ -91,7 +100,7 @@ function SecureUploadInner() {
       const confirmRes = await fetch("/api/public/secure-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "confirm", token, fileName: file.name, mimeType: file.type || null, byteSize: file.size, documentType, storageUri: begin.storageUri, uploaded }),
+        body: JSON.stringify({ action: "confirm", token, fileName: file.name, mimeType: file.type || null, byteSize: file.size, documentType, storageUri: begin.storageUri, uploaded, attestationText: ATTESTATION_TEXT }),
       });
       const confirm = await confirmRes.json();
       if (!confirmRes.ok || !confirm.ok) throw new Error(confirm.error ?? "The upload could not be confirmed.");
@@ -151,10 +160,19 @@ function SecureUploadInner() {
                   {slot.actionLabel}
                 </a>
               )}
+              <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12.5, color: "#3b475a", lineHeight: 1.55, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 11px" }}>
+                <input
+                  type="checkbox"
+                  checked={attested[slot.type] === true}
+                  onChange={(e) => setAttested((a) => ({ ...a, [slot.type]: e.target.checked }))}
+                  style={{ marginTop: 2 }}
+                />
+                <span>{ATTESTATION_TEXT}</span>
+              </label>
               <input
                 type="file"
                 aria-label={`Upload ${slot.label}`}
-                disabled={st.status === "uploading" || !dealRef}
+                disabled={st.status === "uploading" || !dealRef || attested[slot.type] !== true}
                 onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(slot.type, f); e.target.value = ""; }}
                 style={{ fontSize: 13 }}
               />

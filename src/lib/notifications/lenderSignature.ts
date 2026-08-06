@@ -12,3 +12,55 @@ export const LENDER_EMAIL_SIGNATURE =
   `Direct: 212.203.6603 | finance@compasstocapital.com\n` +
   `www.furlongpathways.com | linkedin.com/in/stuart-fraass-8959755\n` +
   `Financing challenging commercial real estate nationwide.`;
+
+const NAVY = "#1C2B45";
+const GOLD = "#b8862f";
+const INK_SOFT = "#4d596d";
+
+function escapeHtml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function linkify(escaped: string): string {
+  return escaped.replace(
+    /(https?:\/\/[^\s<]+)/g,
+    (url) => `<a href="${url}" style="color:${GOLD};font-weight:600;text-decoration:none;">${url}</a>`
+  );
+}
+
+/**
+ * Wrap a plain-text lender email body in the branded HTML frame — restrained
+ * navy-and-bronze, serif headline, hairline gold rule, signature card with
+ * the Compass to Capital seal inline (cid:brand-logo; renders logo-less if
+ * the asset is absent). Table layout + inline styles: email clients, not
+ * browsers. The text/plain version always travels alongside.
+ */
+export function renderLenderEmailHtml(bodyText: string): string {
+  const paragraphs = bodyText
+    .split(/\n\n+/)
+    .map((p) => `<p style="margin:0 0 14px;font-size:14.5px;line-height:1.65;color:${NAVY};">${linkify(escapeHtml(p.trim())).replace(/\n/g, "<br/>")}</p>`)
+    .join("");
+  return (
+    `<div style="background:#f4f2ec;padding:28px 16px;">` +
+    `<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:560px;margin:0 auto;background:#ffffff;border:1px solid #e3ddd0;border-radius:10px;">` +
+    `<tr><td style="padding:26px 30px 6px;font-family:Georgia,'Times New Roman',serif;">` +
+    `<div style="font-size:12px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:${GOLD};">Compass to Capital</div>` +
+    `<div style="height:1px;background:${GOLD};opacity:0.45;margin:12px 0 18px;"></div>` +
+    `</td></tr>` +
+    `<tr><td style="padding:0 30px;font-family:Georgia,'Times New Roman',serif;">${paragraphs}</td></tr>` +
+    `<tr><td style="padding:10px 30px 26px;">` +
+    `<div style="height:1px;background:#e3ddd0;margin:8px 0 18px;"></div>` +
+    `<table role="presentation" cellpadding="0" cellspacing="0"><tr>` +
+    `<td style="vertical-align:middle;padding-right:16px;"><img src="cid:brand-logo" width="64" height="64" alt="Furlong — Compass to Capital" style="display:block;border-radius:50%;"/></td>` +
+    `<td style="vertical-align:middle;font-family:Georgia,'Times New Roman',serif;">` +
+    `<div style="font-size:15px;font-weight:700;color:${NAVY};">Stuart Fraass <span style="font-weight:400;color:${INK_SOFT};">| Principal</span></div>` +
+    `<div style="font-size:13px;color:${INK_SOFT};margin-top:2px;">Furlong Inc.</div>` +
+    `<div style="font-size:12.5px;color:${INK_SOFT};margin-top:6px;">Direct: 212.203.6603 &nbsp;·&nbsp; <a href="mailto:finance@compasstocapital.com" style="color:${GOLD};text-decoration:none;">finance@compasstocapital.com</a></div>` +
+    `<div style="font-size:12.5px;margin-top:2px;"><a href="https://www.furlongpathways.com" style="color:${GOLD};text-decoration:none;">furlongpathways.com</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/stuart-fraass-8959755/" style="color:${GOLD};text-decoration:none;">LinkedIn</a></div>` +
+    `<div style="font-size:12px;font-style:italic;color:${INK_SOFT};margin-top:8px;">Financing challenging commercial real estate nationwide.</div>` +
+    `</td></tr></table>` +
+    `</td></tr></table>` +
+    `<div style="max-width:560px;margin:10px auto 0;font-family:Georgia,serif;font-size:11px;color:#8a8577;text-align:center;">This message contains no account details by design — everything sensitive stays inside the portal.</div>` +
+    `</div>`
+  );
+}

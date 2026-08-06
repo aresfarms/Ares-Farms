@@ -34,6 +34,12 @@ export interface EmailMessage {
   to: string;
   subject: string;
   text: string;
+  /** Optional rich version; when present the message sends as
+   *  multipart/alternative (text fallback always included). */
+  html?: string;
+  /** Embed the brand logo as an inline CID attachment (cid:brand-logo) —
+   *  only honored when html is present and the asset exists. */
+  inlineBrandLogo?: boolean;
 }
 
 const METADATA_BASE = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default";
@@ -129,17 +135,73 @@ function headerValue(value: string): string {
     : value;
 }
 
+/** Brand logo for inline embedding (cid:brand-logo). Loaded lazily from the
+ *  bundled public assets; absent file = emails simply go logo-less. The
+ *  image RIDES INSIDE the email (staging is IAP-locked, so a hosted image
+ *  URL would be invisible to customers). */
+let cachedLogo: { base64: string } | null | undefined;
+function brandLogo(): { base64: string } | null {
+  if (cachedLogo !== undefined) return cachedLogo;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs = require("node:fs") as typeof import("node:fs");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const path = require("node:path") as typeof import("node:path");
+    const file = path.join(process.cwd(), "public", "brand", "compasstocapital-email-logo.jpg");
+    cachedLogo = fs.existsSync(file)
+      ? { base64: fs.readFileSync(file).toString("base64") }
+      : null;
+  } catch {
+    cachedLogo = null;
+  }
+  return cachedLogo;
+}
+
+function b64(value: string): string {
+  return Buffer.from(value, "utf8").toString("base64");
+}
+
 function rfc822(message: EmailMessage, from: string): string {
-  const raw =
+  const headers =
     `From: ${from}\r\n` +
     `To: ${message.to}\r\n` +
     `Subject: ${headerValue(message.subject)}\r\n` +
-    `MIME-Version: 1.0\r\n` +
-    `Content-Type: text/plain; charset="UTF-8"\r\n` +
-    `Content-Transfer-Encoding: base64\r\n` +
-    `\r\n` +
-    Buffer.from(message.text, "utf8").toString("base64");
-  return Buffer.from(raw).toString("base64url");
+    `MIME-Version: 1.0\r\n`;
+
+  let body: string;
+  if (message.html) {
+    const altBoundary = "furlong-alt-8c2f1a";
+    const relBoundary = "furlong-rel-3d9e7b";
+    const logo = message.inlineBrandLogo ? brandLogo() : null;
+    const alternative =
+      `--${altBoundary}\r\n` +
+      `Content-Type: text/plain; charset="UTF-8"\r\nContent-Transfer-Encoding: base64\r\n\r\n` +
+      `${b64(message.text)}\r\n` +
+      `--${altBoundary}\r\n` +
+      `Content-Type: text/html; charset="UTF-8"\r\nContent-Transfer-Encoding: base64\r\n\r\n` +
+      `${b64(message.html)}\r\n` +
+      `--${altBoundary}--\r\n`;
+    if (logo) {
+      body =
+        `Content-Type: multipart/related; boundary="${relBoundary}"\r\n\r\n` +
+        `--${relBoundary}\r\n` +
+        `Content-Type: multipart/alternative; boundary="${altBoundary}"\r\n\r\n` +
+        alternative +
+        `--${relBoundary}\r\n` +
+        `Content-Type: image/jpeg\r\nContent-Transfer-Encoding: base64\r\n` +
+        `Content-ID: <brand-logo>\r\nContent-Disposition: inline; filename="logo.jpg"\r\n\r\n` +
+        `${logo.base64}\r\n` +
+        `--${relBoundary}--`;
+    } else {
+      body = `Content-Type: multipart/alternative; boundary="${altBoundary}"\r\n\r\n` + alternative;
+    }
+  } else {
+    body =
+      `Content-Type: text/plain; charset="UTF-8"\r\nContent-Transfer-Encoding: base64\r\n\r\n` +
+      b64(message.text);
+  }
+
+  return Buffer.from(headers + body).toString("base64url");
 }
 
 async function sendViaGmail(message: EmailMessage): Promise<EmailSendResult> {

@@ -4,7 +4,7 @@ import { applicationDocuments, serviceRequests } from "@/db/schema";
 import { db } from "@/lib/db";
 import { mintUploadLinkToken } from "@/lib/documents/uploadLinkToken";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
-import { LENDER_EMAIL_SIGNATURE } from "@/lib/notifications/lenderSignature";
+import { LENDER_EMAIL_SIGNATURE, renderLenderEmailHtml } from "@/lib/notifications/lenderSignature";
 
 /**
  * Lender Deal Desk store (founder direction 2026-08-05): the licensed
@@ -227,19 +227,20 @@ export async function sendDocumentReminder(args: {
   const dueLine = desk.timeline.docsDueAt
     ? `Your lender has asked for these by ${new Date(desk.timeline.docsDueAt).toLocaleDateString()}.\n\n`
     : "";
+  const bodyText =
+    `Your licensed lender is waiting on documents for financing request ${row.serviceRequestId}.\n\n` +
+    dueLine +
+    (desk.customerNote ? `Note from your lender: ${desk.customerNote}\n\n` : "") +
+    `Upload them securely here (encrypted, never by email):\n${uploadUrl}\n\n` +
+    (booking ? `Schedule a call with your lender:\n${booking}\n\n` : "") +
+    `Check your request status any time:\n${args.portalBaseUrl}/status\n\n` +
+    `This link is single-purpose and expires in 72 hours; a fresh one arrives with each reminder.`;
   const result = await sendEmail({
     to: row.contactEmail,
     subject: `Documents needed for your financing request ${row.serviceRequestId}`,
-    text:
-      `Your licensed lender is waiting on documents for financing request ${row.serviceRequestId}.\n\n` +
-      dueLine +
-      (desk.customerNote ? `Note from your lender: ${desk.customerNote}\n\n` : "") +
-      `Upload them securely here (encrypted, never by email):\n${uploadUrl}\n\n` +
-      (booking ? `Schedule a call with your lender:\n${booking}\n\n` : "") +
-      `Check your request status any time:\n${args.portalBaseUrl}/status\n\n` +
-      `This link is single-purpose and expires in 72 hours; a fresh one arrives with each reminder. ` +
-      `This message contains no account details by design — everything sensitive stays inside the portal.\n\n` +
-      LENDER_EMAIL_SIGNATURE,
+    text: `${bodyText}\n\nThis message contains no account details by design — everything sensitive stays inside the portal.\n\n${LENDER_EMAIL_SIGNATURE}`,
+    html: renderLenderEmailHtml(bodyText),
+    inlineBrandLogo: true,
   });
   if (result.sent) {
     const nextDesk = { ...desk, reminders: [...desk.reminders, new Date().toISOString()] };

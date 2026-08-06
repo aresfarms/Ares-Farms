@@ -125,3 +125,5 @@ jobs:
         run: npm run verify:security-conformance
       - name: Security hardening test suite
         run: npm run verify:security-governance -- --ci
+      - name: Risk-based secret rotation workflow
+        run: npm run verify:secret-rotation-workflow

@@ -44,6 +44,19 @@ npm run with:staging-secrets -- --plan --secret=EIA_API_KEY -- npm run ingest:ei
 
 ## Rotation evidence
 
+The controlling schedule is risk-based:
+
+- 30 days for exceptionally privileged or recently exposed credentials;
+- 60 days for external API/payment/AI credentials and database passwords;
+- 90 days for lower-risk machine secrets with material rotation cost; and
+- immediately for any suspected disclosure.
+
+`config/security/secret-rotation-policy.json` is the machine-readable authority.
+Run `npm run secrets:rotation:plan` before changing live schedules and
+`npm run secrets:rotation:apply` only from an authenticated operator session.
+`npm run verify:secret-rotation-workflow` proves fail-closed adapters, rollback,
+overlap retirement, and immediate suspected-disclosure handling.
+
 For provider-issued API credentials:
 
 1. Create a replacement credential at the provider.

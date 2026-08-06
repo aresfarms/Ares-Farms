@@ -20,6 +20,14 @@ type AuditReport = Readonly<{
   }>;
 }>;
 
+type DependencyException = Readonly<{
+  source: number;
+  ghsa: string;
+  package: string;
+  severity: string;
+  title: string;
+}>;
+
 function audit(args: string[]): AuditReport {
   const result = spawnSync("npm", ["audit", "--json", ...args], {
     cwd: process.cwd(),
@@ -51,7 +59,7 @@ const actual = Object.values(full.vulnerabilities).flatMap((vulnerability) =>
       title: via.title,
     }))
 );
-const expected = exceptionJson.exceptions;
+const expected: readonly DependencyException[] = exceptionJson.exceptions;
 const expectedSources = new Set(expected.map((entry) => entry.source));
 const actualSources = new Set(actual.map((entry) => entry.source));
 const mismatches: string[] = [];
@@ -81,7 +89,10 @@ if (actualSources.size !== expectedSources.size || full.metadata.vulnerabilities
 }
 
 const reviewDeadline = new Date(`${exceptionJson.reviewBy}T23:59:59.999Z`);
-if (!Number.isFinite(reviewDeadline.getTime()) || Date.now() > reviewDeadline.getTime()) {
+if (
+  expected.length > 0 &&
+  (!Number.isFinite(reviewDeadline.getTime()) || Date.now() > reviewDeadline.getTime())
+) {
   mismatches.push(`Dependency advisory exception review expired on ${exceptionJson.reviewBy}`);
 }
 

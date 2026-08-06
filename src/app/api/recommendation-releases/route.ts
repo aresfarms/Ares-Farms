@@ -8,7 +8,16 @@ export const runtime = "nodejs";
 
 const RELEASE_ROLES = new Set(["admin", "governance", "underwriter"]);
 
-function sessionIdentity(session: any) {
+type ReleaseSession = {
+  user?: {
+    id?: unknown;
+    email?: unknown;
+    name?: unknown;
+    role?: unknown;
+  };
+};
+
+function sessionIdentity(session: ReleaseSession) {
   const actorId = String(session?.user?.id ?? "").trim();
   const email = String(session?.user?.email ?? "").trim().toLowerCase();
   const name = String(session?.user?.name ?? "").trim() || null;

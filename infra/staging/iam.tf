@@ -34,6 +34,15 @@ resource "google_service_account" "db_migrator" {
   depends_on = [google_project_service.required]
 }
 
+resource "google_service_account" "scanner_runtime" {
+  project      = var.project_id
+  account_id   = "furlong-scanner-runtime"
+  display_name = "Furlong malware scanner runtime (Cloud Run service)"
+  description  = "Isolated runtime SA for furlong-scanner. No Secret Manager, database, or storage access."
+
+  depends_on = [google_project_service.required]
+}
+
 # ---- Secret access: runtime SA -> DATABASE_URL + NEXTAUTH_SECRET ------------
 
 resource "google_secret_manager_secret_iam_member" "runtime_database_url" {

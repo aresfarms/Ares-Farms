@@ -12,5 +12,28 @@ resource "google_artifact_registry_repository" "docker" {
   description   = "Furlong staging container images (furlong-core)."
   labels        = var.labels
 
+  # Observe cleanup matches before permitting deletion. This is intentionally
+  # left in dry-run mode until the retained versions have been audited.
+  cleanup_policy_dry_run = true
+
+  cleanup_policies {
+    id     = "delete-untagged-after-30-days"
+    action = "DELETE"
+
+    condition {
+      tag_state  = "UNTAGGED"
+      older_than = "2592000s"
+    }
+  }
+
+  cleanup_policies {
+    id     = "keep-latest-ten"
+    action = "KEEP"
+
+    most_recent_versions {
+      keep_count = 10
+    }
+  }
+
   depends_on = [google_project_service.required]
 }

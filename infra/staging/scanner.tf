@@ -36,7 +36,10 @@ resource "google_cloud_run_v2_service" "scanner" {
   ingress = "INGRESS_TRAFFIC_ALL"
 
   template {
-    service_account = google_service_account.core_runtime.email
+    # The scanner accepts bytes and returns a verdict. It needs no database,
+    # Secret Manager, or object-storage authority, so it uses a dedicated
+    # identity with no resource roles instead of inheriting core privileges.
+    service_account = google_service_account.scanner_runtime.email
 
     scaling {
       min_instance_count = 0

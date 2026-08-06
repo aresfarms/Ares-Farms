@@ -2,12 +2,16 @@
   "name": "ares-farms",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "24.15.0"
+  },
   "scripts": {
     "dev": "NEXT_DISABLE_TURBOPACK=1 next dev",
     "dev:clean": "rm -rf .next node_modules/.cache node_modules/.turbo && NEXT_DISABLE_TURBOPACK=1 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:critical": "eslint src/app/api src/lib/security src/security src/proxy.ts --max-warnings=0",
     "test:apply": "bash scripts/test-apply.sh",
     "test:health": "bash scripts/test-health.sh",
     "verify:schema": "tsx src/scripts/verifySchemaSingularity.ts",
@@ -164,6 +168,8 @@
     "smoke:public-alpha-customer-journey": "tsx src/scripts/publicAlphaCustomerJourneySmokeTest.ts",
     "smoke:exploration-registry": "tsx src/scripts/explorationRegistrySmokeTest.ts",
     "verify:no-personal-docs": "tsx src/scripts/verifyNoPersonalDocs.ts",
+    "verify:cloud-upload-context": "tsx src/scripts/verifyCloudBuildUploadContext.ts",
+    "build:cloud:staging": "npm run verify:cloud-upload-context && gcloud builds submit --config cloudbuild.yaml --project furlong-staging-499102 .",
     "smoke:no-personal-docs": "tsx src/scripts/verifyNoPersonalDocsSmokeTest.ts",
     "verify:customer-journey-audit": "tsx src/scripts/publicAlphaCustomerJourneyCli.ts",
     "ingest:map-assets": "tsx src/scripts/ingestMapAssets.ts",
@@ -556,7 +562,7 @@
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "framer-motion": "^12.40.0",
-    "next": "^16.2.11",
+    "next": "^16.3.0",
     "next-auth": "^4.24.15",
     "pdf-lib": "^1.17.1",
     "pdfkit": "^0.18.0",
@@ -570,6 +576,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.3",
+    "@cyclonedx/cyclonedx-npm": "^6.0.0",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -578,8 +585,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.10",
-    "eslint": "^9",
-    "eslint-config-next": "^16.2.11",
+    "eslint": "9.39.3",
+    "eslint-config-next": "^16.3.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "tsx": "^4.22.2",
@@ -589,11 +596,11 @@
     "@esbuild-kit/core-utils": {
       "esbuild": "0.25.0"
     },
-    "brace-expansion@<1.1.16": "1.1.16",
-    "brace-expansion@>=3.0.0 <5.0.7": "5.0.7",
-    "js-yaml": "4.3.0",
+    "brace-expansion@<1.1.18": "1.1.18",
+    "brace-expansion@>=3.0.0 <5.0.9": "5.0.9",
+    "js-yaml": "4.3.1",
     "next": {
-      "postcss": "8.5.14",
+      "postcss": "8.5.26",
       "sharp": "0.35.0"
     },
     "tsx": {

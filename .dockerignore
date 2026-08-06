@@ -21,6 +21,22 @@
 # --- Secrets: NEVER enter the build context ---------------------------------
 .env
 .env.*
+*.pem
+*.key
+*.p12
+*.pfx
+Recovery Key.pdf
+*recovery[ _-]key*
+Credit_Summary_*.pdf
+*_Caitlin_Hudson.pdf
+*_Stuart_Fraass.pdf
+*_Frances_Fraass.pdf
+*_ssn*
+*social_security*
+*passport*
+*drivers_license*
+*tax_return*
+*bank_statement*
 
 # --- Build artifacts: rebuilt fresh inside the image ------------------------
 .next
@@ -54,3 +70,9 @@ npm-debug.log*
 # --- Infra (not needed in the app image) ------------------------------------
 infra
 artifacts
+data
+review-exports
+journey-photos
+work
+scratch
+tmp

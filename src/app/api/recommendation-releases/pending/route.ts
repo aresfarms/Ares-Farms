@@ -7,13 +7,21 @@ export const runtime = "nodejs";
 
 const RELEASE_ROLES = new Set(["admin", "governance", "underwriter"]);
 
+type ReleaseSessionUser = {
+  id?: unknown;
+  email?: unknown;
+  name?: unknown;
+  role?: unknown;
+};
+
 export async function GET(req: NextRequest) {
   const auth = await requireAuth();
   if (!auth.ok || !auth.session?.user) {
     return NextResponse.json({ ok: false, error: "Authentication is required to view pending release attestations." }, { status: 401 });
   }
-  const actorId = String((auth.session.user as any).id ?? "").trim();
-  const role = String((auth.session.user as any).role ?? "user").trim().toLowerCase();
+  const user = auth.session.user as ReleaseSessionUser;
+  const actorId = String(user.id ?? "").trim();
+  const role = String(user.role ?? "user").trim().toLowerCase();
   if (!actorId || !RELEASE_ROLES.has(role)) {
     return NextResponse.json({ ok: false, error: "Your account is not assigned recommendation-release review authority." }, { status: 403 });
   }
@@ -32,7 +40,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = await requireAuth();
   if (!auth.ok || !auth.session?.user) return NextResponse.json({ ok: false, error: "Authentication is required." }, { status: 401 });
-  const user = auth.session.user as any;
+  const user = auth.session.user as ReleaseSessionUser;
   const actorId = String(user.id ?? "").trim();
   const email = String(user.email ?? "").trim();
   const role = String(user.role ?? "user").trim().toLowerCase();

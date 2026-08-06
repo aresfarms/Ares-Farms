@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import { composeIntelligenceCaseWorkspace } from "@/lib/intelligence/intelligenceCaseWorkspaceRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 
 export async function GET(req: NextRequest, context: { params: Promise<{ caseId: string }> }) {
   const { caseId } = await context.params;
-  const role = req.nextUrl.searchParams.get("role") ?? "borrower";
+  // Session-derived, never claimed (founder-caught 2026-08-06).
+  const role = effectiveRole(req);
   const actorId = req.nextUrl.searchParams.get("userId");
   const traceId = `intelligence-case-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   const runtimeGuard = runRuntimeGuard({

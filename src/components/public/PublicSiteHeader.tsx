@@ -72,6 +72,15 @@ export function PublicSiteHeader() {
           <Link href="/professional-access" className="ps-nav-link">
             Professional Access
           </Link>
+          {/* Check Status must live in the PERMANENT navigation (founder-caught
+              2026-08-06). It previously appeared only on the post-submission
+              confirmation screen, so a customer who closed that tab — or lost
+              the confirmation email — had no route back to their own request at
+              all. A customer with money in motion needs this reachable from
+              every page, not from one screen they saw once. */}
+          <Link href="/status" className="ps-nav-link">
+            Check Status
+          </Link>
         </div>
       </nav>
     </header>

@@ -232,7 +232,14 @@ export async function POST(req: NextRequest) {
             squareFeet: matchedSourceRecord?.squareFeet ?? listingSnapshot?.squareFeet ?? jurisdictionParcel?.squareFeet ?? null,
             acreageText: listingSnapshot?.offeredAcreage ? `${listingSnapshot.offeredAcreage.toLocaleString("en-US")} acres offered across ${listingSnapshot.offeredParcelCount ?? "multiple"} parcels` : derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null,
             listingId: matchedSourceRecord?.listingId ?? listingSnapshot?.listingId ?? jurisdictionParcel?.accountId ?? null,
-            listingStatus: canonicalMatch?.listing_status ?? listingSnapshot?.status ?? (jurisdictionParcel ? "Official parcel record matched" : null),
+            // MARKET STATUS ONLY. Matching a parcel record says nothing about
+            // whether the property is for sale, under contract, or sold — it
+            // used to fill this field with "Official parcel record matched",
+            // which read as a sale status and told the visitor nothing
+            // (founder-caught 2026-08-06 on a property already under contract
+            // at $2.5M). Null here means "no listing feed covers this address",
+            // and the brief must say exactly that.
+            listingStatus: canonicalMatch?.listing_status ?? listingSnapshot?.status ?? null,
             recordBasis: matchedSourceRecord ? "matched-approved-source-record" : listingSnapshot ? "matched-governed-listing-and-parcel-record" : "matched-jurisdiction-parcel-record",
             parcelSourceName: jurisdictionParcel?.sourceName ?? null,
             parcelSourceAsOf: jurisdictionParcel?.sourceAsOf ?? null,

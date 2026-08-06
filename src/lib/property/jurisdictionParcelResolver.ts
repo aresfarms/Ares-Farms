@@ -12,7 +12,17 @@ export type JurisdictionParcelRecord = {
   deedReference: string | null;
   legalDescription: string | null;
   yearBuilt: number | null;
+  /** BUILDING area only. Never populate this from a parcel/lot area field —
+   *  the commercial income model reads it as leasable building area, so a lot
+   *  area here silently models NOI on dirt (founder-caught 2026-08-06). */
   squareFeet: number | null;
+  /** Parcel/lot area, kept separate precisely so it can never be mistaken
+   *  for building area. */
+  lotSquareFeet: number | null;
+  /** The vintage the SOURCE itself publishes for its assessment values. Null
+   *  means the source publishes none — which must be SAID, never replaced
+   *  with the date we happened to fetch it. */
+  assessmentAsOf: string | null;
   buildingStyle: string | null;
   buildingType: string | null;
   assessedLandValue: number | null;
@@ -82,10 +92,13 @@ async function resolveMaryland(input: AddressInput): Promise<JurisdictionParcelR
   const totalAcres = rows.reduce((sum, attrs) => sum + (number(attrs.ACRES) ?? (String(attrs.LUOM ?? "").toUpperCase() === "A" ? number(attrs.LANDAREA) ?? 0 : 0)), 0);
   const sum = (field: string) => { const value = rows.reduce((total, attrs) => total + (number(attrs[field]) ?? 0), 0); return value || null; };
   return {
-    sourceName: "Maryland SDAT / MD iMAP Property Data", sourceAsOf: clean(primary.SDATDATE), sourceUrl: clean(primary.SDATWEBADR),
+    // Maryland DOES publish its own assessment date (SDATDATE) — so this one
+    // is a real vintage, not a fetch timestamp.
+    sourceName: "Maryland SDAT / MD iMAP Property Data", sourceAsOf: clean(primary.SDATDATE), assessmentAsOf: clean(primary.SDATDATE), sourceUrl: clean(primary.SDATWEBADR),
     accountId: clean(primary.ACCTID)!, parcelRefs: refs, acreageText: totalAcres ? `${totalAcres.toLocaleString("en-US", { maximumFractionDigits: 3 })} acres across ${rows.length} resolved parcel${rows.length === 1 ? "" : "s"}` : null,
     landUse: [...new Set(rows.map((attrs) => clean(attrs.DESCLU)).filter(Boolean))].join(" / ") || null, zoning: [...new Set(rows.map((attrs) => clean(attrs.ZONING)).filter(Boolean))].join(" / ") || null,
-    deedReference: deed, legalDescription: legal, yearBuilt: number(primary.YEARBLT), squareFeet: number(primary.SQFTSTRC), buildingStyle: clean(primary.DESCSTYL), buildingType: clean(primary.DESCBLDG),
+    // SQFTSTRC is structure area — genuine BUILDING square footage.
+    deedReference: deed, legalDescription: legal, yearBuilt: number(primary.YEARBLT), squareFeet: number(primary.SQFTSTRC), lotSquareFeet: null, buildingStyle: clean(primary.DESCSTYL), buildingType: clean(primary.DESCBLDG),
     assessedLandValue: sum("NFMLNDVL"), assessedImprovementValue: sum("NFMIMPVL"), assessedTotalValue: sum("NFMTTLVL"),
     publicWater: flag(primary.PFUW), publicSewer: flag(primary.PFUS), waterfront: flag(primary.PFLW), resolvedParcelCount: rows.length,
   };
@@ -125,14 +138,25 @@ async function resolveDelawareSussex(input: AddressInput): Promise<JurisdictionP
   const book = clean(owner.BOOK); const page = clean(owner.PAGE);
   const land = number(owner.APRLAND); const improvement = number(owner.APRBLDG);
   return {
-    sourceName: "Sussex County Delaware Parcel and Assessment Service", sourceAsOf: new Date().toISOString().slice(0, 10), sourceUrl: "https://map.sussexcountyde.gov/",
+    // SOURCE VINTAGE IS NOT KNOWN. This service publishes no assessment date,
+    // no base year, and no sale history (field audit 2026-08-06). Stamping
+    // today's date here — which this line used to do — told the customer a
+    // possibly decades-old base-year assessment was current as of today, and
+    // that is what made a $629,000 tax figure read as a value opinion against
+    // a $2,500,000 contract. Null means "the source does not say", and the
+    // brief must print exactly that.
+    sourceName: "Sussex County Delaware Parcel and Assessment Service", sourceAsOf: null, assessmentAsOf: null, sourceUrl: "https://map.sussexcountyde.gov/",
     // "mapped parcel geometry (GIS)" — GIS polygon areas routinely differ a few
     // percent from the recorded plat; the deed/plat governs (founder-caught
     // 0.38 vs 0.4091 mismatch, 2026-07-29).
     accountId: pin, parcelRefs: [pin], acreageText: acres ? `≈${acres.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres by mapped parcel geometry (GIS) — the recorded plat governs` : null,
     landUse: clean(owner.LUC) ? `Sussex County land-use code ${clean(owner.LUC)}` : null, zoning: null,
     deedReference: book || page ? `Book ${book ?? "—"} · Page ${page ?? "—"}` : null, legalDescription: legal,
-    yearBuilt: null, squareFeet: number(parcel.SqFeet), buildingStyle: null, buildingType: null,
+    // SqFeet sits in the "Tax Parcels" layer beside Acreage and Shape__Area —
+    // it is LOT area, not building area (field audit 2026-08-06). It used to
+    // be returned as squareFeet, which the commercial income model consumes as
+    // leasable building area. This service carries no building area at all.
+    yearBuilt: null, squareFeet: null, lotSquareFeet: number(parcel.SqFeet), buildingStyle: null, buildingType: null,
     assessedLandValue: land, assessedImprovementValue: improvement, assessedTotalValue: land || improvement ? (land ?? 0) + (improvement ?? 0) : null,
     publicWater: null, publicSewer: null, waterfront: null, resolvedParcelCount: 1,
   };

@@ -88,7 +88,11 @@ function scopeQuery(
 
   const query = params.toString();
 
-  return query ? `&${query}` : "";
+  // Returns a COMPLETE leading query segment. It used to return "&..." on the
+  // assumption that a `?role=governance&userId=` prefix always preceded it —
+  // that prefix was a client-claimed authority header and has been removed
+  // (2026-08-06), so this must now own the "?" itself.
+  return query ? `?${query}&` : "?";
 }
 
 const surfaces: SurfaceConfig[] = [
@@ -96,7 +100,7 @@ const surfaces: SurfaceConfig[] = [
     id: "applications",
     label: "Applications",
     group: "operations",
-    path: `/api/applications/admin?role=governance&userId=${actorId}&limit=8&includeProperty=true`,
+    path: `/api/applications/admin?limit=8&includeProperty=true`,
     collectionKeys: ["applications"],
     accent: "#2563eb",
     riskLabel: "Intake and review posture",
@@ -106,9 +110,9 @@ const surfaces: SurfaceConfig[] = [
     label: "Operator Queue",
     group: "operations",
     path: (scope) =>
-      `/api/queues/admin?role=governance&userId=${actorId}${scopeQuery(
+      `/api/queues/admin${scopeQuery(
         scope
-      )}&status=OPEN&limit=8&includeApplication=true&includeProperty=true`,
+      )}status=OPEN&limit=8&includeApplication=true&includeProperty=true`,
     collectionKeys: ["queueItems"],
     accent: "#0f766e",
     riskLabel: "Open work requiring action",
@@ -118,9 +122,9 @@ const surfaces: SurfaceConfig[] = [
     label: "Human Review",
     group: "operations",
     path: (scope) =>
-      `/api/reviews/admin?role=governance&userId=${actorId}${scopeQuery(
+      `/api/reviews/admin${scopeQuery(
         scope
-      )}&limit=8&includeApplication=true&includeProperty=true&includeAdverseActionReviews=true&includeTransitions=true`,
+      )}limit=8&includeApplication=true&includeProperty=true&includeAdverseActionReviews=true&includeTransitions=true`,
     collectionKeys: ["reviews"],
     accent: "#7c3aed",
     riskLabel: "Review and transition controls",
@@ -130,9 +134,9 @@ const surfaces: SurfaceConfig[] = [
     label: "Reports",
     group: "operations",
     path: (scope) =>
-      `/api/reports/admin?role=governance&userId=${actorId}${scopeQuery(
+      `/api/reports/admin${scopeQuery(
         scope
-      )}&limit=8&includeApplication=true&includeProperty=true`,
+      )}limit=8&includeApplication=true&includeProperty=true`,
     collectionKeys: ["reportRecords"],
     accent: "#0891b2",
     riskLabel: "Advisory-only report records",
@@ -141,7 +145,7 @@ const surfaces: SurfaceConfig[] = [
     id: "ledger",
     label: "Audit Ledger",
     group: "audit",
-    path: `/api/ledger/admin?role=governance&userId=${actorId}&eventType=APPLICATION_SUBMITTED&includeCanonicalLedger=true&includeCanonicalMeta=true&limit=8`,
+    path: `/api/ledger/admin?eventType=APPLICATION_SUBMITTED&includeCanonicalLedger=true&includeCanonicalMeta=true&limit=8`,
     collectionKeys: ["auditEvents", "canonicalLedger", "canonicalMeta"],
     accent: "#4338ca",
     riskLabel: "Evidence and replay inspection",
@@ -151,9 +155,9 @@ const surfaces: SurfaceConfig[] = [
     label: "Connectors",
     group: "audit",
     path: (scope) =>
-      `/api/connectors/admin?role=governance&userId=${actorId}${scopeQuery(
+      `/api/connectors/admin${scopeQuery(
         scope
-      )}&limit=8&includeSource=true&includeAdapters=true&includeExecutions=true&includeApplication=true&includeProperty=true`,
+      )}limit=8&includeSource=true&includeAdapters=true&includeExecutions=true&includeApplication=true&includeProperty=true`,
     collectionKeys: ["connectorRecords"],
     accent: "#4d7c0f",
     riskLabel: "Source authority and adapters",
@@ -163,10 +167,10 @@ const surfaces: SurfaceConfig[] = [
     label: "Billing Controls",
     group: "audit",
     path: (scope) =>
-      `/api/billing/admin?role=governance&userId=${actorId}${scopeQuery(
+      `/api/billing/admin${scopeQuery(
         scope,
         ["tenantId"]
-      )}&limit=8&includeEntitlement=true`,
+      )}limit=8&includeEntitlement=true`,
     collectionKeys: ["billingEvents"],
     accent: "#b45309",
     riskLabel: "Institution-funded activity",
@@ -175,7 +179,7 @@ const surfaces: SurfaceConfig[] = [
     id: "evidenceIntegrity",
     label: "Release Evidence Integrity",
     group: "audit",
-    path: `/api/governance/release-evidence-integrity?role=governance&userId=${actorId}`,
+    path: `/api/governance/release-evidence-integrity`,
     collectionKeys: ["integrityFindings"],
     accent: "#be123c",
     riskLabel: "Rejected or corrupted release evidence",
@@ -185,9 +189,9 @@ const surfaces: SurfaceConfig[] = [
     label: "Live Action",
     group: "promotion",
     path: (scope) =>
-      `/api/governance/live-action-readiness/admin?role=governance&userId=${actorId}${scopeQuery(
+      `/api/governance/live-action-readiness/admin${scopeQuery(
         scope
-      )}&limit=8&includeApplication=true&includeProperty=true`,
+      )}limit=8&includeApplication=true&includeProperty=true`,
     collectionKeys: ["readinessRecords"],
     accent: "#be123c",
     riskLabel: "Promotion readiness only",
@@ -197,9 +201,9 @@ const surfaces: SurfaceConfig[] = [
     label: "Sovereign Gateway",
     group: "promotion",
     path: (scope) =>
-      `/api/governance/sovereign-consent-gateway/admin?role=governance&userId=${actorId}${scopeQuery(
+      `/api/governance/sovereign-consent-gateway/admin${scopeQuery(
         scope
-      )}&limit=8&includeApplication=true&includeProperty=true`,
+      )}limit=8&includeApplication=true&includeProperty=true`,
     collectionKeys: ["gatewayRecords"],
     accent: "#854d0e",
     riskLabel: "Level 5 controls by default",

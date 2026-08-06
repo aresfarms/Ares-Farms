@@ -55,6 +55,21 @@ type Lane = {
   neverSees: string[];
   destination: string;
   accent: string;
+  /**
+   * FOUNDER-CAUGHT 2026-08-06. The attorney and auditor lanes pointed at
+   * /governance and /audit-replay — both INTERNAL operator consoles carrying
+   * the full 43-module platform nav (deployment gates, release board packets,
+   * billing controls, connector certification). An outside counterparty must
+   * never reach those. The API perimeter's "caller-claimed authority" 403 was
+   * the only thing preventing it, and that 403 is itself a bug queued for fix,
+   * so the door cannot be left standing on an accident.
+   *
+   * A lane marked "building" renders as a stated absence, not a link. It goes
+   * back to "live" only when a purpose-built, scope-limited surface exists for
+   * that counterparty — never by re-pointing it at an internal console.
+   */
+  status: "live" | "building";
+  buildingNote?: string;
 };
 
 const LANES: Lane[] = [
@@ -75,6 +90,7 @@ const LANES: Lane[] = [
     ],
     destination: "/lender-desk",
     accent: "#534AB7",
+    status: "live",
   },
   {
     role: "attorney",
@@ -93,6 +109,13 @@ const LANES: Lane[] = [
     ],
     destination: "/governance",
     accent: "#185FA5",
+    status: "building",
+    buildingNote:
+      "The counsel surface described above is being built. It does not exist yet, and this lane " +
+      "previously opened an internal operator console instead — which is not what is described " +
+      "here and not something outside counsel should ever see. Rather than send you somewhere " +
+      "wrong, the door is closed until the matter-scoped surface is real. To reach a matter now, " +
+      "contact the file's broker directly, or serve legal process through the route below.",
   },
   {
     role: "auditor",
@@ -110,6 +133,14 @@ const LANES: Lane[] = [
     ],
     destination: "/audit-replay",
     accent: "#0F6E56",
+    status: "building",
+    buildingNote:
+      "The examination surface described above is being built. This lane previously opened an " +
+      "internal replay console that states on its own face that external verification claims are " +
+      "not made from it — it offers an examiner nothing to request, nothing to sample, and nothing " +
+      "to independently verify. An examiner needs to make a scoped request, receive a manifest of " +
+      "responsive records, check hashes without having to trust our screen, and take a signed " +
+      "export away. None of that exists yet, so the door stays closed rather than wasting your time.",
   },
   {
     role: "sponsor",
@@ -125,6 +156,11 @@ const LANES: Lane[] = [
     ],
     destination: "/sponsor",
     accent: "#993556",
+    status: "building",
+    buildingNote:
+      "The partner surface described above is being built. Like the counsel and examiner lanes, " +
+      "this one pointed at an internal operator console rather than a partner-scoped view of your " +
+      "own participation. It stays closed until the scoped surface exists.",
   },
 ];
 
@@ -212,21 +248,45 @@ export default function ProfessionalAccessPage() {
               </div>
             </div>
 
-            <Link
-              href={lane.destination}
-              style={{
-                justifySelf: "start",
-                borderRadius: 10,
-                padding: "10px 18px",
-                fontSize: 14,
-                fontWeight: 800,
-                color: "#fff",
-                background: lane.accent,
-                textDecoration: "none",
-              }}
-            >
-              Sign in as {lane.title.split(" /")[0].toLowerCase()} →
-            </Link>
+            {lane.status === "live" ? (
+              <Link
+                href={lane.destination}
+                style={{
+                  justifySelf: "start",
+                  borderRadius: 10,
+                  padding: "10px 18px",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  color: "#fff",
+                  background: lane.accent,
+                  textDecoration: "none",
+                }}
+              >
+                Sign in as {lane.title.split(" /")[0].toLowerCase()} →
+              </Link>
+            ) : (
+              /* A door that would open onto the wrong room is worse than no
+                 door. State the absence plainly — a professional can act on
+                 "not built yet, here is who to call"; they cannot act on a
+                 sign-in button that lands them somewhere they should not be. */
+              <div
+                role="note"
+                style={{
+                  justifySelf: "stretch",
+                  borderRadius: 10,
+                  padding: "12px 14px",
+                  border: "1px solid #D7B85A",
+                  background: "#FFF9E8",
+                  display: "grid",
+                  gap: 5,
+                }}
+              >
+                <strong style={{ fontSize: 13, color: "#8F6E1F" }}>
+                  Not open yet — this lane is being built
+                </strong>
+                <span style={{ fontSize: 12.5, color: INK, lineHeight: 1.6 }}>{lane.buildingNote}</span>
+              </div>
+            )}
           </section>
         ))}
 

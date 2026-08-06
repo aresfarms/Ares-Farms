@@ -24,6 +24,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief";
 import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
+import { indicateMarketValue } from "@/lib/property/marketValueIndication";
 
 export type TabId = "summary" | "property" | "agriculture" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
 export type CategoryTabId = Exclude<TabId, "summary" | "report" | "finance">;
@@ -171,14 +172,32 @@ export function GovernedLaneChassis(props: ChassisProps) {
     const source = record.recordBasis === "verified-address-only"
       ? "Source: verified address intake; parcel-level fields require an approved jurisdiction record"
       : record.recordBasis === "matched-jurisdiction-parcel-record"
-        ? `Source: ${record.parcelSourceName ?? "official jurisdiction parcel record"}${record.parcelSourceAsOf ? ` · data ${record.parcelSourceAsOf}` : ""}`
+        // A missing vintage must be STATED, never silently dropped — and it
+        // must never be replaced with the date we fetched the record. Sussex
+        // County publishes no assessment date at all; printing today's date
+        // there made a base-year tax figure look like today's market value
+        // (founder-caught 2026-08-06, $629k assessment vs $2.5M contract).
+        ? `Source: ${record.parcelSourceName ?? "official jurisdiction parcel record"} · ${record.parcelSourceAsOf ? `source-published data date ${record.parcelSourceAsOf}` : "this source publishes no data date — the figures may be years old"}`
         : "Source: matched property/listing record";
     const place = [record.town, record.county, record.state].filter(Boolean).join(", ");
+    const valuation = indicateMarketValue({
+      assessedTotalValue: record.assessedTotalValue,
+      stateCode: record.state,
+      county: record.county,
+      knownPriceUsd: record.price,
+      knownPriceLabel: record.listingStatus ? `${record.listingStatus} at` : "Asking price",
+    });
     return [
       record.exactAddress ? { label: "Verified address", value: record.exactAddress, text: "The entered property address resolved successfully through the public address-verification path.", provenance: source, tone: "neutral" as const } : null,
       place ? { label: "Property location", value: place, text: "Town, county, and state carried into the property record from the verified intake context.", provenance: source, tone: "neutral" as const } : null,
       record.price != null ? { label: "Asking price", value: `$${record.price.toLocaleString("en-US")}`, text: "Current seller asking price carried by the matched governed listing snapshot.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}${record.listingSourceAsOf ? ` · ${record.listingSourceAsOf}` : ""}` : source, tone: "neutral" as const } : null,
-      record.listingStatus ? { label: "Sale status", value: record.listingStatus, text: "Current public sale posture carried by the matched listing source.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
+      // Market status is ALWAYS shown — because its absence is itself the
+      // most decision-relevant fact a visitor can have. A brief that simply
+      // omits it lets someone read a full report on a property that sold
+      // last week (founder-caught 2026-08-06).
+      record.listingStatus
+        ? { label: "Market status", value: record.listingStatus, text: "Current public sale posture carried by the matched listing source.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const }
+        : { label: "Market status", value: "Not known — no listing feed covers this address", text: "Furlong does not carry a multiple-listing feed, so this brief cannot tell you whether the property is for sale, under contract, or already sold. A property can be under contract at a price far above or below every figure on this page. Confirm current status with the listing broker, the seller, or the county recorder before relying on anything here.", provenance: "Absence of a governed listing source — stated rather than omitted", tone: "caution" as const },
       record.listingId ? { label: "MLS / listing ID", value: record.listingId, text: "Public listing identifier for the active offering.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
       record.offeredParcelCount ? { label: "Sale package", value: `${record.offeredParcelCount} parcels · ${record.offeredAcreage?.toLocaleString("en-US") ?? "acreage pending"} acres offered`, text: record.resolvedParcelCount === record.offeredParcelCount ? "Every parcel in the listing package has been reconciled to an official jurisdiction parcel record." : `The listing offers ${record.offeredParcelCount} parcels. ${record.resolvedParcelCount ?? 0} parcel identities are currently resolved from the official jurisdiction source; the remaining listing parcel identity still requires reconciliation.`, provenance: record.listingSourceName ? `Source: ${record.listingSourceName}; parcel identities: ${record.parcelSourceName ?? "jurisdiction source"}` : source, tone: record.resolvedParcelCount === record.offeredParcelCount ? "neutral" as const : "caution" as const } : null,
       record.parcelRefs?.length ? { label: "Resolved parcel identities", value: record.parcelRefs.join(" · "), text: "Official account, map, grid, parcel, or lot references returned by the jurisdiction parcel source.", provenance: source, tone: "neutral" as const } : null,
@@ -188,7 +207,20 @@ export function GovernedLaneChassis(props: ChassisProps) {
       record.deedReference ? { label: "Recorded deed reference", value: record.deedReference, text: record.legalDescription || "Deed book and page reference published with the parcel record.", provenance: source, tone: "neutral" as const } : null,
       record.assessedLandValue != null ? { label: "County-assessed land value", value: `$${record.assessedLandValue.toLocaleString("en-US")}`, text: "The land component of the county's estimated value for taxation. It is not a market appraisal and not a seller asking price — a lender's appraiser or the market may conclude differently.", provenance: source, tone: "neutral" as const } : null,
       record.assessedImprovementValue != null ? { label: "County-assessed improvement value", value: `$${record.assessedImprovementValue.toLocaleString("en-US")}`, text: "The building/improvement component of the county's estimated value for taxation — not a market appraisal.", provenance: source, tone: "neutral" as const } : null,
-      record.assessedTotalValue != null ? { label: "County-assessed total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: "The county's total estimated value for taxation, published by the jurisdiction parcel source. It is the taxing authority's estimate — not a market-price opinion, and not what a professional appraiser would necessarily conclude.", provenance: source, tone: "neutral" as const } : null,
+      record.assessedTotalValue != null ? { label: "County-assessed total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: `The county's total estimated value FOR TAXATION${record.parcelSourceAsOf ? ` as published by the source on ${record.parcelSourceAsOf}` : ", of a vintage this source does not publish"}. Read it as a tax figure and nothing else. Assessed values routinely sit far below — occasionally far above — what a property actually trades for, because many jurisdictions assess against a frozen base year and none of them re-assess when a property goes under contract. It is not an appraisal, not a market-price opinion, and not Furlong's view of what this property is worth.`, provenance: source, tone: "caution" as const } : null,
+      // FURLONG'S OWN INDICATED VALUE (founder direction 2026-08-06: "it must
+      // publish that data, that is the entire point of that part of the
+      // platform"). The assessed value must never stand as the only dollar
+      // figure on the page — left alone it becomes, by default, the number a
+      // reader takes away as what the property is worth.
+      valuation.status === "indicated"
+        ? { label: "Indicated market value (Furlong)", value: `$${valuation.lowUsd!.toLocaleString("en-US")} – $${valuation.highUsd!.toLocaleString("en-US")}`, text: `Midpoint $${valuation.midUsd!.toLocaleString("en-US")}. ${valuation.method} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.map((s) => `Source: ${s}`).join(" · "), tone: "neutral" as const }
+        : { label: "Indicated market value (Furlong)", value: "Cannot be produced for this address", text: `${valuation.method} ${valuation.cautions.join(" ")}`, provenance: "Stated limitation — Furlong does not publish a value it cannot source", tone: "caution" as const },
+      // The divergence line is the single most decision-relevant output when a
+      // real price exists: a buyer paying a real number outranks any model.
+      valuation.divergence
+        ? { label: "Market price vs. indicated value", value: `${valuation.divergence.knownPriceLabel} $${valuation.divergence.knownPriceUsd.toLocaleString("en-US")} · ${valuation.divergence.multipleOfMid}× the indication`, text: valuation.divergence.verdict, provenance: "Furlong reconciliation of the known market price against the indicated value", tone: "caution" as const }
+        : null,
       record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.bathrooms != null ? { label: "Bathrooms", value: String(record.bathrooms), text: "Bathroom count reported by the matched listing record.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,
       record.squareFeet != null ? { label: "Building square feet", value: `${record.squareFeet.toLocaleString("en-US")} sq ft`, text: "Building area reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,

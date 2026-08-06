@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import {
@@ -97,7 +99,7 @@ function parseQuery(req: NextRequest): LedgerAdminQuery {
   const params = req.nextUrl.searchParams;
 
   return {
-    role: params.get("role") ?? "user",
+    role: effectiveRole(req),
     userId: normalizeText(params.get("userId")),
     eventId: normalizeText(params.get("eventId")),
     eventType: normalizeText(params.get("eventType")),

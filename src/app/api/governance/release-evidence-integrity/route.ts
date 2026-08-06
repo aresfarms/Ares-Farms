@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 
@@ -7,7 +9,8 @@ import { releaseGovernanceEvidenceIntegritySummary } from "@/lib/governance/rele
 
 export async function GET(req: NextRequest) {
   const traceId = `release-evidence-integrity-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  const role = req.nextUrl.searchParams.get("role") ?? "user";
+  // Session-derived, never claimed (founder-caught 2026-08-06).
+  const role = effectiveRole(req);
   const actorId = req.nextUrl.searchParams.get("userId");
   const runtimeGuard = runRuntimeGuard({
     operation: "release-evidence-integrity.read",

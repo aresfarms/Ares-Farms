@@ -97,9 +97,19 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 
+# The pinned Node base was published with libgnutls30 deb12u6. Debian's deb12u7
+# fixes the current critical/high GnuTLS advisory set. Pin the exact patched
+# package version so the security update remains reproducible.
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y libgnutls30=3.7.9-2+deb12u7 \
+ && rm -rf /var/lib/apt/lists/*
+
 # Fixed, non-root system account (stable UID/GID for reproducibility).
 RUN groupadd --system --gid 1001 nodejs \
- && useradd  --system --uid 1001 --gid nodejs nextjs
+ && useradd  --system --uid 1001 --gid nodejs nextjs \
+ && rm -rf /usr/local/lib/node_modules/npm \
+           /usr/local/bin/npm \
+           /usr/local/bin/npx
 
 # Copy ONLY the standalone runtime, owned by the non-root user.
 #   * .next/standalone -> /app  (includes the traced server.js + node_modules)

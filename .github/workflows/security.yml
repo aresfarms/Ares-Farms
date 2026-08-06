@@ -127,3 +127,5 @@ jobs:
         run: npm run verify:security-governance -- --ci
       - name: Risk-based secret rotation workflow
         run: npm run verify:secret-rotation-workflow
+      - name: External connector authentication inventory
+        run: npm run verify:external-connector-auth

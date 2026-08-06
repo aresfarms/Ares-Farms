@@ -2203,11 +2203,18 @@ export function PropertyEvaluationWorkspace({
       return;
     }
     let canceled = false;
+    let pollingAuthorized = true;
+    let refreshTimer: number | null = null;
     const query = new URLSearchParams({ subjectType: releaseSubjectType, subjectKey: releaseSubjectKey });
     const refreshPendingReviews = () => {
+      if (!pollingAuthorized) return;
       void fetch(`/api/recommendation-releases/pending?${query.toString()}`, { cache: "no-store" })
         .then(async (response) => {
-          if (response.status === 401 || response.status === 403) return { ok: false, rows: [] };
+          if (response.status === 401 || response.status === 403) {
+            pollingAuthorized = false;
+            if (refreshTimer !== null) window.clearInterval(refreshTimer);
+            return { ok: false, rows: [] };
+          }
           return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; attestationCycleId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean; escalationAcknowledged: boolean; acknowledgedByCurrentActor: boolean }> }>;
         })
         .then((payload) => {
@@ -2218,8 +2225,11 @@ export function PropertyEvaluationWorkspace({
         });
     };
     refreshPendingReviews();
-    const refreshTimer = window.setInterval(refreshPendingReviews, 60_000);
-    return () => { canceled = true; window.clearInterval(refreshTimer); };
+    if (pollingAuthorized) refreshTimer = window.setInterval(refreshPendingReviews, 60_000);
+    return () => {
+      canceled = true;
+      if (refreshTimer !== null) window.clearInterval(refreshTimer);
+    };
   }, [releaseSubjectKey]);
 
   useEffect(() => {

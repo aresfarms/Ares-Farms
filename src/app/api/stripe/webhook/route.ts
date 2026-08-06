@@ -59,7 +59,10 @@ function webhookSecret(): string | null {
 }
 
 function stripeWebhookVerifier(): Stripe {
-  return new Stripe(process.env.STRIPE_SECRET_KEY?.trim() || "sk_test_placeholder");
+  // Webhook signature verification uses STRIPE_WEBHOOK_SECRET, not an API
+  // credential. A non-credential sentinel keeps the dormant connector
+  // constructible without putting Stripe-key-shaped content in source.
+  return new Stripe(process.env.STRIPE_SECRET_KEY?.trim() || "not-configured");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

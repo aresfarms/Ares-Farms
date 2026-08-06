@@ -24,6 +24,10 @@
 
 substitutions:
   _REPO: us-central1-docker.pkg.dev/furlong-staging-499102/furlong
+  # GitHub's keyless workflow supplies these values. Local owner submissions
+  # retain explicit sentinel values so provenance is never silently invented.
+  _GIT_COMMIT: unknown-local-submission
+  _GIT_REF: unknown-local-submission
 
 steps:
   # Deployment-blocking canonical authority gates. These run in Cloud Build
@@ -38,6 +42,7 @@ steps:
         npm ci
         npm run verify:cloud-upload-context
         npm run verify:secret-rotation-workflow
+        npm run verify:external-connector-auth
         npm run verify:canonical-domain
         npm run smoke:canonical-domain-fail-closed
         npm run smoke:production-source-legal
@@ -148,6 +153,8 @@ steps:
     args:
       - build
       - --target=runner
+      - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
       - -t=${_REPO}/furlong-core:p2
       - .
 
@@ -157,6 +164,8 @@ steps:
     args:
       - build
       - --target=migrator
+      - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
       - -t=${_REPO}/furlong-db-migrate:p2
       - .
 
@@ -166,6 +175,8 @@ steps:
     id: build-scanner
     args:
       - build
+      - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
       - -t=${_REPO}/furlong-scanner:p2
       - scanner
 

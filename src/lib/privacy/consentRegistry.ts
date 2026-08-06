@@ -34,6 +34,7 @@ export type ConsentId =
   | "electronic-communications"
   | "esign-signature"
   | "identity-verification"
+  | "financial-data-handling"
   | "marketing-optional";
 
 export interface ConsentDefinition {
@@ -134,6 +135,24 @@ export const CONSENTS: Record<ConsentId, ConsentDefinition> = {
       "would itself be a misstatement. If a biometric (face) comparison is used, that is special-" +
       "category data requiring EXPLICIT separate consent, and US biometric statutes (notably Illinois " +
       "BIPA, with its private right of action) require a written policy and a release BEFORE capture.",
+  },
+  "financial-data-handling": {
+    id: "financial-data-handling",
+    version: "financial-data-v1-draft",
+    capturedAt: "Before the first financial document is uploaded",
+    lawfulBasis: "contract",
+    required: true,
+    text:
+      "I am sending financial records — which may include tax returns, bank statements and a " +
+      "personal financial statement — so my broker can work my financing request. I understand " +
+      "they are stored encrypted, that every time anyone opens one it is recorded, that they are " +
+      "never sent by email, and that they are shared only with the broker working this request " +
+      "and any lender I agree to send them to.",
+    basisNote:
+      "Necessary to perform the requested service, not 'consent' — a person cannot refuse this and " +
+      "still get a loan arranged. Captured at the moment of the first financial upload so it is " +
+      "specific and contemporaneous, and paired with the identity check because these documents are " +
+      "the ones an impostor actually wants.",
   },
   "marketing-optional": {
     id: "marketing-optional",

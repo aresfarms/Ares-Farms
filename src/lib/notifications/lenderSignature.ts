@@ -48,17 +48,24 @@ export function renderLenderEmailHtml(bodyText: string): string {
     `<div style="height:1px;background:${GOLD};opacity:0.45;margin:12px 0 18px;"></div>` +
     `</td></tr>` +
     `<tr><td style="padding:0 30px;font-family:Georgia,'Times New Roman',serif;">${paragraphs}</td></tr>` +
-    `<tr><td style="padding:10px 30px 26px;">` +
-    `<div style="height:1px;background:#e3ddd0;margin:8px 0 18px;"></div>` +
+    `<tr><td style="padding:14px 30px 30px;">` +
+    // Engraved thick-thin rule — the stationery cue.
+    `<div style="height:2px;background:${GOLD};opacity:0.55;"></div>` +
+    `<div style="height:1px;background:${GOLD};opacity:0.35;margin-top:2px;margin-bottom:22px;"></div>` +
     `<table role="presentation" cellpadding="0" cellspacing="0"><tr>` +
-    `<td style="vertical-align:middle;padding-right:16px;"><img src="cid:brand-logo" width="64" height="64" alt="Furlong — Compass to Capital" style="display:block;border-radius:50%;"/></td>` +
-    `<td style="vertical-align:middle;font-family:Georgia,'Times New Roman',serif;">` +
-    `<div style="font-size:15px;font-weight:700;color:${NAVY};">Stuart Fraass <span style="font-weight:400;color:${INK_SOFT};">| Principal — Domestic Commercial Debt Broker</span></div>` +
-    `<div style="font-size:13px;color:${INK_SOFT};margin-top:2px;">Furlong Inc.</div>` +
-    `<div style="font-size:12.5px;color:${INK_SOFT};margin-top:6px;">Direct: 212.203.6603 &nbsp;·&nbsp; <a href="mailto:finance@compasstocapital.com" style="color:${GOLD};text-decoration:none;">finance@compasstocapital.com</a></div>` +
-    `<div style="font-size:12.5px;margin-top:2px;"><a href="https://www.furlongpathways.com" style="color:${GOLD};text-decoration:none;">furlongpathways.com</a> &nbsp;·&nbsp; <a href="https://www.linkedin.com/in/stuart-fraass-8959755/" style="color:${GOLD};text-decoration:none;">LinkedIn</a></div>` +
-    `<div style="font-size:12px;font-style:italic;color:${INK_SOFT};margin-top:8px;">Financing challenging commercial real estate nationwide.</div>` +
+    `<td style="vertical-align:middle;padding-right:22px;"><img src="cid:brand-logo" width="76" height="76" alt="Furlong — Compass to Capital" style="display:block;border-radius:50%;"/></td>` +
+    `<td style="vertical-align:middle;border-left:1px solid #e3ddd0;padding-left:22px;font-family:Georgia,'Times New Roman',serif;">` +
+    `<div style="font-size:17px;letter-spacing:0.02em;color:${NAVY};">Stuart Fraass</div>` +
+    `<div style="font-size:10.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${GOLD};margin-top:4px;">Principal &nbsp;·&nbsp; Domestic Commercial Debt Broker</div>` +
+    `<div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${INK_SOFT};margin-top:10px;">Furlong Inc.</div>` +
+    `<div style="font-size:12.5px;color:${INK_SOFT};margin-top:10px;">212.203.6603` +
+    `<span style="color:${GOLD};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>` +
+    `<a href="mailto:finance@compasstocapital.com" style="color:${NAVY};text-decoration:none;">finance@compasstocapital.com</a></div>` +
+    `<div style="font-size:12.5px;margin-top:3px;"><a href="https://www.furlongpathways.com" style="color:${NAVY};text-decoration:none;">furlongpathways.com</a>` +
+    `<span style="color:${GOLD};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>` +
+    `<a href="https://www.linkedin.com/in/stuart-fraass-8959755/" style="color:${NAVY};text-decoration:none;">LinkedIn</a></div>` +
     `</td></tr></table>` +
+    `<div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;font-style:italic;color:${GOLD};margin-top:18px;">Financing challenging commercial real estate nationwide.</div>` +
     `</td></tr></table>` +
     `<div style="max-width:560px;margin:10px auto 0;font-family:Georgia,serif;font-size:11px;color:#8a8577;text-align:center;">This message contains no account details by design — everything sensitive stays inside the portal.</div>` +
     `</div>`

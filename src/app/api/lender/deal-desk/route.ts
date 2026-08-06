@@ -609,7 +609,7 @@ export async function POST(req: NextRequest) {
         if (contactEmail) {
           const booking = process.env.LENDER_BOOKING_URL?.trim();
           const docBodyText =
-            `Your commercial debt broker added a document to your financing request ${serviceRequestId}.\n\n` +
+            `Your commercial debt broker added a document to your financing request:\n${serviceRequestId}\n\n` +
             `View and download it securely on your status page (enter your reference number and email):\n` +
             `${portalBaseUrl(req)}/status\n\n` +
             (booking ? `Schedule a call with your broker:\n${booking}` : "");
@@ -701,7 +701,7 @@ export async function POST(req: NextRequest) {
         const contactEmail = dealRows[0]?.contactEmail;
         if (contactEmail) {
           const bodyText =
-            `Your broker has asked for your electronic signature on a document for financing request ${serviceRequestId}.\n\n` +
+            `Your broker has asked for your electronic signature on a document for financing request:\n${serviceRequestId}\n\n` +
             `Review and sign it securely from your status page (enter your reference number and email):\n` +
             `${portalBaseUrl(req)}/status`;
           const result = await sendEmail({

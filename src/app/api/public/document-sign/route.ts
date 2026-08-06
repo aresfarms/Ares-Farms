@@ -208,7 +208,7 @@ export async function POST(req: NextRequest) {
     const base = process.env.APP_BASE_URL ?? process.env.NEXTAUTH_URL ?? req.nextUrl.origin;
     if (contactEmail) {
       const bodyText =
-        `Your electronic signature on a document for financing request ${claims.dealRef} is recorded.\n\n` +
+        `Your electronic signature is recorded for financing request:\n${claims.dealRef}\n\n` +
         `Your signature certificate is available on your status page (enter your reference number and email):\n${base}/status` +
         (mode === "test" ? `\n\nNote: the portal's signing feature is in TEST MODE — this ceremony is a rehearsal, not yet a legally operative signature.` : "");
       await sendEmail({

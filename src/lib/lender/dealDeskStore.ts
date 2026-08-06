@@ -234,7 +234,7 @@ export async function sendDocumentReminder(args: {
     ? `Your broker has asked for these by ${new Date(desk.timeline.docsDueAt).toLocaleDateString()}.\n\n`
     : "";
   const bodyText =
-    `Your commercial debt broker is waiting on documents for financing request ${row.serviceRequestId}.\n\n` +
+    `Your commercial debt broker is waiting on documents for financing request:\n${row.serviceRequestId}\n\n` +
     dueLine +
     (desk.customerNote ? `Note from your broker: ${desk.customerNote}\n\n` : "") +
     `Upload them securely here (encrypted, never by email):\n${uploadUrl}\n\n` +

@@ -176,8 +176,11 @@ export async function getServiceRequestStatus(
   serviceRequestId: string,
   email: string
 ): Promise<ServiceRequestStatusView> {
-  const ref = serviceRequestId.trim();
-  const mail = email.trim().toLowerCase();
+  // Forgive copy-paste debris (founder 2026-08-06: people copy the reference
+  // WITH the sentence's trailing period and the lookup breaks): strip any
+  // leading/trailing characters that can't be part of a reference or email.
+  const ref = serviceRequestId.trim().replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "").toUpperCase();
+  const mail = email.trim().replace(/[.,;:]+$/g, "").toLowerCase();
   if (!ref || !mail) return { found: false };
 
   const rows = await db

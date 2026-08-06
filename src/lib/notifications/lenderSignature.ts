@@ -4,13 +4,11 @@
  * notices). Plain text by design — the portal's emails are text/plain and
  * minimum-disclosure; branding yes, images/attachments never.
  *
- * LinkedIn line intentionally omitted until the profile URL is supplied
- * (a bare "LinkedIn" is a dead word in plain text).
  */
 export const LENDER_EMAIL_SIGNATURE =
   `--\n` +
   `Stuart Fraass | Principal\n` +
   `Furlong Inc.\n` +
   `Direct: 212.203.6603 | finance@compasstocapital.com\n` +
-  `www.furlongpathways.com\n` +
+  `www.furlongpathways.com | linkedin.com/in/stuart-fraass-8959755\n` +
   `Financing challenging commercial real estate nationwide.`;

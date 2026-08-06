@@ -82,6 +82,15 @@ resource "google_secret_manager_secret_iam_member" "runtime_nextauth_secret" {
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+# Keyless Gmail domain-wide delegation: the runtime SA signs JWTs AS ITSELF
+# via the IAM Credentials API (no downloaded key files ever). Pairs with the
+# owner's one-time Admin-console domain-wide-delegation entry.
+resource "google_service_account_iam_member" "core_runtime_self_token_creator" {
+  service_account_id = google_service_account.core_runtime.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
 # EVIDENCE_REPLAY_SIGNING_SECRET (+ rotation variant _V1) — created + versioned
 # out of band by the owner. Required by the evidence-lineage replay signer,
 # which the customer financing intake calls on every submission.

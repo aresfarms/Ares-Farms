@@ -193,6 +193,13 @@ resource "google_cloud_run_v2_service" "core" {
           value = env.value
         }
       }
+      dynamic "env" {
+        for_each = var.gmail_delegated_user == "" ? [] : [var.gmail_delegated_user]
+        content {
+          name  = "GMAIL_DELEGATED_USER"
+          value = env.value
+        }
+      }
 
       # SendGrid API key — the secret is created + versioned OUT OF BAND by the
       # owner (never Terraform, never the agent). Wired only when EMAIL_FROM is

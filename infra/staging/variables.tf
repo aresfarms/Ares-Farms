@@ -370,6 +370,12 @@ variable "lender_booking_url" {
   default     = ""
 }
 
+variable "gmail_delegated_user" {
+  description = "Workspace mailbox the portal sends email AS via Gmail API domain-wide delegation (free Workspace-native sending; replaces paid SendGrid). Empty = Gmail provider off."
+  type        = string
+  default     = ""
+}
+
 variable "lender_calendar_embed_src" {
   description = "Google Calendar id embedded as the agenda panel on the lender desk (renders only for Google sessions with access to that calendar). Empty = panel hidden."
   type        = string

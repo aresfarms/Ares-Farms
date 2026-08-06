@@ -393,7 +393,7 @@ export default function LenderDeskPage() {
           <section style={{ ...panelStyle, padding: 14, display: "grid", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
               <strong style={{ fontSize: 14 }}>Today&apos;s calls & schedule</strong>
-              <span style={{ color: "#64748b", fontSize: 12 }}>
+              <span style={{ color: "#1f2937", fontSize: 13.5, lineHeight: 1.5 }}>
                 Your Google Calendar — visible only to accounts that already have access to it.
                 Customers book through your booking link, never by cold-calling.
               </span>

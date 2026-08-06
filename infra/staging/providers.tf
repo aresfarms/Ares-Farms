@@ -37,6 +37,8 @@ locals {
     "compute.googleapis.com",              # VPC, subnet, addresses
     "storage.googleapis.com",              # Shared runtime state bucket
     "vpcaccess.googleapis.com",            # VPC access (connector fallback if needed)
+    "gmail.googleapis.com",                # Workspace-native portal email (free; replaces paid SendGrid)
+    "iamcredentials.googleapis.com",       # Keyless signJwt for Gmail domain-wide delegation
     "cloudkms.googleapis.com",             # Cloud KMS (CMEK for the sovereign document vault)
     "servicenetworking.googleapis.com",    # Private Services Access peering
     "cloudbuild.googleapis.com",           # P2.1 image build (owner has no local Docker)

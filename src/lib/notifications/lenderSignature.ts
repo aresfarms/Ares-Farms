@@ -52,20 +52,23 @@ export function renderLenderEmailHtml(bodyText: string): string {
     // Engraved thick-thin rule — the stationery cue.
     `<div style="height:2px;background:${GOLD};opacity:0.55;"></div>` +
     `<div style="height:1px;background:${GOLD};opacity:0.35;margin-top:2px;margin-bottom:22px;"></div>` +
-    `<table role="presentation" cellpadding="0" cellspacing="0"><tr>` +
-    `<td style="vertical-align:middle;padding-right:22px;"><img src="cid:brand-logo" width="76" height="76" alt="Furlong — Compass to Capital" style="display:block;border-radius:50%;"/></td>` +
-    `<td style="vertical-align:middle;border-left:1px solid #e3ddd0;padding-left:22px;font-family:Georgia,'Times New Roman',serif;">` +
-    `<div style="font-size:17px;letter-spacing:0.02em;color:${NAVY};">Stuart Fraass</div>` +
-    `<div style="font-size:10.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:${GOLD};margin-top:4px;">Principal &nbsp;·&nbsp; Domestic Commercial Debt Broker</div>` +
-    `<div style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:${INK_SOFT};margin-top:10px;">Furlong Inc.</div>` +
-    `<div style="font-size:12.5px;color:${INK_SOFT};margin-top:10px;">212.203.6603` +
+    // Old-money type: Didone stack for the name (Didot on Mac, Bodoni MT on
+    // Windows Office, Garamond/Times beyond), Copperplate engraving for the
+    // firm, serif caps — never sans — for the title.
+    `<table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr>` +
+    `<td style="vertical-align:middle;width:86px;padding-right:20px;"><img src="cid:brand-logo" width="80" height="80" alt="Furlong — Compass to Capital" style="display:block;border-radius:50%;"/></td>` +
+    `<td style="vertical-align:middle;border-left:1px solid #e3ddd0;padding-left:20px;">` +
+    `<div style="font-family:Didot,'Bodoni MT',Cochin,Garamond,'Times New Roman',serif;font-size:21px;letter-spacing:0.03em;color:#0F1D3A;">Stuart Fraass</div>` +
+    `<div style="font-family:Didot,'Bodoni MT',Garamond,'Times New Roman',serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${GOLD};margin-top:5px;white-space:nowrap;">Principal&nbsp;·&nbsp;Domestic&nbsp;Commercial&nbsp;Debt&nbsp;Broker</div>` +
+    `<div style="font-family:Copperplate,'Copperplate Gothic Light',Georgia,serif;font-size:12px;letter-spacing:0.1em;color:${INK_SOFT};margin-top:9px;">Furlong Inc.</div>` +
+    `<div style="font-family:Garamond,'Book Antiqua',Palatino,Georgia,serif;font-size:13px;color:${INK_SOFT};margin-top:9px;">212.203.6603` +
     `<span style="color:${GOLD};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>` +
-    `<a href="mailto:finance@compasstocapital.com" style="color:${NAVY};text-decoration:none;">finance@compasstocapital.com</a></div>` +
-    `<div style="font-size:12.5px;margin-top:3px;"><a href="https://www.furlongpathways.com" style="color:${NAVY};text-decoration:none;">furlongpathways.com</a>` +
+    `<a href="mailto:finance@compasstocapital.com" style="color:#0F1D3A;text-decoration:none;">finance@compasstocapital.com</a></div>` +
+    `<div style="font-family:Garamond,'Book Antiqua',Palatino,Georgia,serif;font-size:13px;margin-top:2px;"><a href="https://www.furlongpathways.com" style="color:#0F1D3A;text-decoration:none;">furlongpathways.com</a>` +
     `<span style="color:${GOLD};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>` +
-    `<a href="https://www.linkedin.com/in/stuart-fraass-8959755/" style="color:${NAVY};text-decoration:none;">LinkedIn</a></div>` +
+    `<a href="https://www.linkedin.com/in/stuart-fraass-8959755/" style="color:#0F1D3A;text-decoration:none;">LinkedIn</a></div>` +
     `</td></tr></table>` +
-    `<div style="font-family:Georgia,'Times New Roman',serif;font-size:13px;font-style:italic;color:${GOLD};margin-top:18px;">Financing challenging commercial real estate nationwide.</div>` +
+    `<div style="font-family:Didot,'Bodoni MT',Garamond,'Times New Roman',serif;font-size:13.5px;font-style:italic;letter-spacing:0.02em;color:${GOLD};margin-top:18px;">Financing challenging commercial real estate nationwide.</div>` +
     `</td></tr></table>` +
     `<div style="max-width:560px;margin:10px auto 0;font-family:Georgia,serif;font-size:11px;color:#8a8577;text-align:center;">This message contains no account details by design — everything sensitive stays inside the portal.</div>` +
     `</div>`

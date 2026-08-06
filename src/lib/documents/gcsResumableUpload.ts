@@ -85,6 +85,37 @@ export async function fetchObjectStream(objectKey: string): Promise<{
 }
 
 /**
+ * Server-side write of a small governed object (signature certificates —
+ * the ONE case where the runtime itself authors vault bytes; borrower and
+ * lender file bytes still never pass through the app). Returns false when
+ * the provider is not configured (dev) — callers degrade honestly.
+ */
+export async function uploadObjectBytes(args: {
+  objectKey: string;
+  bytes: Buffer;
+  contentType: string;
+}): Promise<boolean> {
+  const bucket = documentStorageBucket();
+  if (!bucket) return false;
+  const token = await serviceAccountToken();
+  if (!token) return false;
+  try {
+    const url =
+      `https://storage.googleapis.com/upload/storage/v1/b/${encodeURIComponent(bucket)}/o` +
+      `?uploadType=media&name=${encodeURIComponent(args.objectKey)}`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": args.contentType },
+      body: new Uint8Array(args.bytes),
+      signal: AbortSignal.timeout(30_000),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Initiate a resumable upload session for one governed object. Returns the
  * browser-usable session URI, or null when the provider is not configured
  * in this environment (dev) — callers must degrade honestly.

@@ -339,6 +339,7 @@ type PostBody = {
   role?: unknown;
   actorId?: unknown;
   serviceRequestId?: unknown;
+  documentId?: unknown;
   status?: unknown;
   customerNote?: unknown;
   timeline?: unknown;
@@ -642,6 +643,83 @@ export async function POST(req: NextRequest) {
         customerNotified,
         governance: { traceId },
       });
+    }
+
+    // Signature vault (founder-approved 2026-08-06): the broker asks the
+    // customer to sign a document he placed in the vault. The ceremony
+    // itself is token-gated off the customer's status lookup.
+    if (action === "request-signature") {
+      const serviceRequestId =
+        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
+      const documentId = typeof body.documentId === "string" ? body.documentId.trim() : "";
+      if (!serviceRequestId || !documentId) {
+        return NextResponse.json(
+          { ok: false, error: "serviceRequestId and documentId are required.", governance: { traceId } },
+          { status: 400 }
+        );
+      }
+      const rows = await db
+        .select()
+        .from(applicationDocuments)
+        .where(eq(applicationDocuments.id, documentId))
+        .limit(1);
+      const doc = rows[0];
+      if (!doc || doc.documentType !== "lender-provided" || doc.applicationId !== `finintake-${serviceRequestId}`) {
+        return NextResponse.json(
+          { ok: false, error: "Only documents you sent to the customer on this deal can be signed.", governance: { traceId } },
+          { status: 400 }
+        );
+      }
+      const docMeta = (doc.metadata ?? {}) as Record<string, unknown>;
+      await db
+        .update(applicationDocuments)
+        .set({
+          metadata: { ...docMeta, signatureRequested: true, signatureRequestedAt: new Date().toISOString(), signatureRequestedBy: actorId },
+          updatedAt: new Date(),
+        })
+        .where(eq(applicationDocuments.id, documentId));
+
+      let customerNotified = false;
+      if (emailConfigured()) {
+        const dealRows = await db
+          .select()
+          .from(serviceRequests)
+          .where(eq(serviceRequests.serviceRequestId, serviceRequestId))
+          .limit(1);
+        const contactEmail = dealRows[0]?.contactEmail;
+        if (contactEmail) {
+          const bodyText =
+            `Your broker has asked for your electronic signature on a document for financing request ${serviceRequestId}.\n\n` +
+            `Review and sign it securely from your status page (enter your reference number and email):\n` +
+            `${portalBaseUrl(req)}/status`;
+          const result = await sendEmail({
+            to: contactEmail,
+            subject: `Your signature is requested — financing request ${serviceRequestId}`,
+            text: `${bodyText}\n\n${LENDER_EMAIL_SIGNATURE}`,
+            html: renderLenderEmailHtml(bodyText),
+            inlineBrandLogo: true,
+          });
+          customerNotified = result.sent;
+        }
+      }
+      const observability = createObservabilityEvent({
+        eventType: "SIGNATURE_REQUESTED",
+        domain: "security",
+        severity: "INFO",
+        message: "The broker requested the customer's electronic signature on a vault document.",
+        traceId,
+        replayRef: traceId,
+        actorId,
+        module: MODULE,
+        metadata: { serviceRequestId, documentId, customerNotified },
+      });
+      await persistGovernanceEvidence({
+        traceId,
+        replayRef: traceId,
+        observability,
+        metadata: { route: "/api/lender/deal-desk", operation, serviceRequestId, documentId },
+      });
+      return NextResponse.json({ ok: true, customerNotified, governance: { traceId } });
     }
 
     if (action === "remind-all") {

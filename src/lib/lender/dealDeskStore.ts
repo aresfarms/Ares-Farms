@@ -139,17 +139,23 @@ export async function listDealDocuments(applicationId: string) {
     .from(applicationDocuments)
     .where(eq(applicationDocuments.applicationId, applicationId))
     .orderBy(desc(applicationDocuments.createdAt));
-  return rows.map((d) => ({
-    id: d.id,
-    documentType: d.documentType,
-    fileName: d.fileName,
-    mimeType: d.mimeType,
-    byteSize: d.byteSize,
-    status: d.status,
-    reviewStatus: d.reviewStatus,
-    storageUri: d.storageUri,
-    receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
-  }));
+  return rows.map((d) => {
+    const m = (d.metadata ?? {}) as Record<string, unknown>;
+    return {
+      id: d.id,
+      documentType: d.documentType,
+      fileName: d.fileName,
+      mimeType: d.mimeType,
+      byteSize: d.byteSize,
+      status: d.status,
+      reviewStatus: d.reviewStatus,
+      storageUri: d.storageUri,
+      receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
+      signatureRequested: m.signatureRequested === true,
+      signed: m.signatureStatus === "signed",
+      signedByTypedName: typeof m.signedByTypedName === "string" ? m.signedByTypedName : null,
+    };
+  });
 }
 
 export async function updateDealDesk(args: {

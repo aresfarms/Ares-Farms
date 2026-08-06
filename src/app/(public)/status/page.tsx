@@ -29,7 +29,10 @@ type StatusView = {
   lenderDocuments?: Array<{
     fileName: string | null;
     receivedAt: string | null;
+    documentType: string;
+    signed: boolean;
     downloadPath: string;
+    signPath?: string;
   }>;
 };
 
@@ -213,19 +216,33 @@ export default function StatusPortalPage() {
                     Documents from your broker
                   </span>
                   {result.lenderDocuments.map((doc) => (
-                    <div key={doc.downloadPath} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, fontSize: 13.5 }}>
+                    <div key={doc.downloadPath} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, fontSize: 13.5, flexWrap: "wrap" }}>
                       <span style={{ color: INK, overflowWrap: "anywhere" }}>
+                        {doc.documentType === "signature-certificate" ? "🖋 " : ""}
                         {doc.fileName ?? "Document"}
                         {shortDate(doc.receivedAt) && (
                           <span style={{ color: "#8090a0", fontSize: 11.5 }}> · {shortDate(doc.receivedAt)}</span>
                         )}
+                        {doc.signed && doc.documentType !== "signature-certificate" && (
+                          <span style={{ color: "#127a4f", fontSize: 11.5, fontWeight: 800 }}> · SIGNED</span>
+                        )}
                       </span>
-                      <a
-                        href={doc.downloadPath}
-                        style={{ flexShrink: 0, fontWeight: 750, color: "#1c5aa0", textDecoration: "none" }}
-                      >
-                        Download ↓
-                      </a>
+                      <span style={{ display: "flex", gap: 12, flexShrink: 0 }}>
+                        {doc.signPath && (
+                          <a
+                            href={doc.signPath}
+                            style={{ fontWeight: 800, color: "#fff", background: "#1c5aa0", borderRadius: 8, padding: "6px 12px", textDecoration: "none" }}
+                          >
+                            Review &amp; sign →
+                          </a>
+                        )}
+                        <a
+                          href={doc.downloadPath}
+                          style={{ fontWeight: 750, color: "#1c5aa0", textDecoration: "none", alignSelf: "center" }}
+                        >
+                          Download ↓
+                        </a>
+                      </span>
                     </div>
                   ))}
                   <span style={{ fontSize: 11.5, color: "#8090a0", lineHeight: 1.5 }}>

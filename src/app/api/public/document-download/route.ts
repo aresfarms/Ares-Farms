@@ -30,7 +30,8 @@ import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
  */
 
 const MODULE = "api.public.document-download";
-export const LENDER_PROVIDED_DOCUMENT_TYPE = "lender-provided";
+// Broker-addressed documents + the customer's own signature certificates.
+const CUSTOMER_DOWNLOADABLE_TYPES = new Set(["lender-provided", "signature-certificate"]);
 
 export async function GET(req: NextRequest) {
   const traceId = `customer-doc-download-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -52,7 +53,7 @@ export async function GET(req: NextRequest) {
   const expectedApplicationId = `finintake-${claims.dealRef}`;
   if (
     !doc ||
-    doc.documentType !== LENDER_PROVIDED_DOCUMENT_TYPE ||
+    !CUSTOMER_DOWNLOADABLE_TYPES.has(doc.documentType) ||
     doc.applicationId !== expectedApplicationId
   ) {
     createObservabilityEvent({

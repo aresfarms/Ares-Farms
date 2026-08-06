@@ -76,6 +76,9 @@ interface DealDocument {
   reviewStatus: string;
   storageUri: string | null;
   receivedAt: string | null;
+  signatureRequested: boolean;
+  signed: boolean;
+  signedByTypedName: string | null;
 }
 
 interface StatusOption {
@@ -298,6 +301,43 @@ export default function LenderDeskPage() {
   const updateDraft = useCallback((id: string, patch: Partial<DraftState>) => {
     setDrafts((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
   }, []);
+
+  // Signature vault: ask the customer to sign a document already sent to
+  // them; ceremony happens on their status page (token-gated, TEST MODE
+  // until counsel review).
+  const requestSignature = useCallback(
+    async (deal: Deal, doc: DealDocument) => {
+      setBusy(deal.serviceRequestId);
+      try {
+        const res = await fetch("/api/lender/deal-desk", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "request-signature",
+            serviceRequestId: deal.serviceRequestId,
+            documentId: doc.id,
+          }),
+        });
+        const json = await res.json();
+        setMessage(
+          deal.serviceRequestId,
+          res.ok && json.ok === true
+            ? json.customerNotified
+              ? `Signature requested on ${doc.fileName ?? "the document"} — the customer was emailed.`
+              : `Signature requested on ${doc.fileName ?? "the document"} — it appears on their status page (notification email not sent).`
+            : typeof json.error === "string"
+              ? json.error
+              : "Signature request failed."
+        );
+        if (res.ok && json.ok === true) await loadDocuments(deal);
+      } catch (error) {
+        setMessage(deal.serviceRequestId, error instanceof Error ? error.message : "Signature request failed.");
+      } finally {
+        setBusy(null);
+      }
+    },
+    [loadDocuments, setMessage]
+  );
 
   // Lender → customer document (approval letter, term sheet, disclosure):
   // begin → browser PUT to the vault → confirm (+ customer notification).
@@ -561,8 +601,28 @@ export default function LenderDeskPage() {
                                 <td style={{ padding: "6px 10px" }}>
                                   {doc.receivedAt ? formatDateTime(doc.receivedAt) : "—"}
                                 </td>
-                                <td style={{ padding: "6px 10px" }}>{doc.status}</td>
                                 <td style={{ padding: "6px 10px" }}>
+                                  {doc.signed ? (
+                                    <span style={{ color: "#166534", fontWeight: 800 }}>
+                                      SIGNED{doc.signedByTypedName ? ` — ${doc.signedByTypedName}` : ""}
+                                    </span>
+                                  ) : doc.signatureRequested ? (
+                                    <span style={{ color: "#9a3412", fontWeight: 700 }}>Awaiting signature</span>
+                                  ) : (
+                                    doc.status
+                                  )}
+                                </td>
+                                <td style={{ padding: "6px 10px" }}>
+                                  {doc.documentType === "lender-provided" && doc.storageUri && !doc.signed && !doc.signatureRequested && (
+                                    <button
+                                      type="button"
+                                      disabled={busy === deal.serviceRequestId}
+                                      onClick={() => void requestSignature(deal, doc)}
+                                      style={{ border: "1px solid #1c5aa0", background: "#fff", color: "#1c5aa0", borderRadius: 8, padding: "4px 10px", fontSize: 12, fontWeight: 750, cursor: "pointer", marginRight: 10 }}
+                                    >
+                                      Request Signature
+                                    </button>
+                                  )}
                                   {doc.storageUri ? (
                                     <a
                                       href={`/api/lender/deal-desk?view=download&documentId=${encodeURIComponent(

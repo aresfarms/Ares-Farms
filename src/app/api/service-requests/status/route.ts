@@ -5,6 +5,7 @@ import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import { getServiceRequestStatus } from "@/lib/serviceRequests/serviceRequestStore";
 import { mintCustomerDownloadToken } from "@/lib/documents/customerDownloadToken";
+import { mintSigningToken } from "@/lib/documents/signingToken";
 
 /**
  * Service Request Status API (customer status portal)
@@ -86,12 +87,24 @@ export async function POST(req: NextRequest) {
         ? status.lenderDocuments.map((doc) => ({
             fileName: doc.fileName,
             receivedAt: doc.receivedAt,
+            documentType: doc.documentType,
+            signed: doc.signed,
             downloadPath: `/api/public/document-download?token=${encodeURIComponent(
               mintCustomerDownloadToken({
                 documentId: doc.id,
                 dealRef: status.serviceRequestId as string,
               }).token
             )}`,
+            // Signing ceremony link only while the broker's request is open.
+            signPath:
+              doc.signatureRequested && !doc.signed
+                ? `/sign?token=${encodeURIComponent(
+                    mintSigningToken({
+                      documentId: doc.id,
+                      dealRef: status.serviceRequestId as string,
+                    }).token
+                  )}`
+                : undefined,
           }))
         : undefined;
 

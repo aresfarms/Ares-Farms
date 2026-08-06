@@ -152,11 +152,18 @@ export type ServiceRequestStatusView = {
   } | null;
   /** Scheduling link so the customer books a call instead of cold-calling. */
   bookingUrl?: string | null;
-  /** Documents the LENDER addressed to the customer (approval letters, term
-   *  sheets). Only lender-provided documents ever appear — never the
-   *  customer's own uploads, never other deals'. Download tokens are minted
-   *  by the API layer, not here. */
-  lenderDocuments?: Array<{ id: string; fileName: string | null; receivedAt: string | null }>;
+  /** Documents the BROKER addressed to the customer (approval letters, term
+   *  sheets) plus signature certificates. Never the customer's own uploads,
+   *  never other deals'. Download/signing tokens are minted by the API
+   *  layer, not here. */
+  lenderDocuments?: Array<{
+    id: string;
+    fileName: string | null;
+    receivedAt: string | null;
+    documentType: string;
+    signatureRequested: boolean;
+    signed: boolean;
+  }>;
 };
 
 /**
@@ -215,16 +222,27 @@ export async function getServiceRequestStatus(
         documentType: applicationDocuments.documentType,
         storageUri: applicationDocuments.storageUri,
         receivedAt: applicationDocuments.receivedAt,
+        metadata: applicationDocuments.metadata,
       })
       .from(applicationDocuments)
       .where(eq(applicationDocuments.applicationId, `finintake-${row.serviceRequestId}`));
     lenderDocuments = docs
-      .filter((d) => d.documentType === "lender-provided" && d.storageUri)
-      .map((d) => ({
-        id: d.id,
-        fileName: d.fileName,
-        receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
-      }));
+      .filter(
+        (d) =>
+          (d.documentType === "lender-provided" || d.documentType === "signature-certificate") &&
+          d.storageUri
+      )
+      .map((d) => {
+        const m = (d.metadata ?? {}) as Record<string, unknown>;
+        return {
+          id: d.id,
+          fileName: d.fileName,
+          receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
+          documentType: d.documentType,
+          signatureRequested: m.signatureRequested === true,
+          signed: m.signatureStatus === "signed",
+        };
+      });
   }
 
   return {

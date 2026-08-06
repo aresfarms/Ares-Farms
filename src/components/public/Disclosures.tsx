@@ -83,7 +83,7 @@ export function Disclosures({
             lineHeight: 1.55,
           }}
         >
-          <span style={{ color: dark ? "#d4b06a" : "#96742f" }}>Why we lay it all out.</span>{" "}
+          <span style={{ color: dark ? "#d4b06a" : "#7a5c1f" }}>Why we lay it all out.</span>{" "}
           Most sites bury the fine print and quietly route what you type to whoever pays for the lead. We
           don&apos;t do either — no account, no data capture, no handoff. The parameters below are exactly how a
           federal regulator or an underwriter reads a deal: unfiltered, unbiased, and entirely in your hands.
@@ -95,7 +95,7 @@ export function Disclosures({
           fontWeight: 800,
           letterSpacing: "0.12em",
           textTransform: "uppercase",
-          color: dark ? "#d4b06a" : "#96742f",
+          color: dark ? "#d4b06a" : "#7a5c1f",
         }}
       >
         ❧ Field note &amp; limitations

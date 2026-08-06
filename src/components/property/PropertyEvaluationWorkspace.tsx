@@ -64,7 +64,7 @@ import { evaluateFinancingPathways } from "@/lib/financing/pathwayEngine";
 import {
   programsForAsset,
   type FinancingProgram,
-} from "@/lib/navigator/financing/financingNodeContract";
+} from "@/lib/navigator/financing/programCatalog";
 import type { AssetClass } from "@/lib/navigator/universalIntentClassifier";
 import {
   loadPropertyEvaluationDraft,
@@ -3929,7 +3929,7 @@ export function PropertyEvaluationWorkspace({
             </div>
           </div>
           <div style={{ padding: "7px 24px", background: "#faf6ec", borderTop: "1px solid #e9ddc4" }}>
-            <span style={{ fontSize: 11, color: "#96742f", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
+            <span style={{ fontSize: 11, color: "#7a5c1f", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
               A furlong — 220 yards of ground — measured, sourced, and logged. Every figure below carries its origin and date.
             </span>
           </div>
@@ -3995,7 +3995,7 @@ export function PropertyEvaluationWorkspace({
             }}
           >
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 10px" }}>
-              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "#96742f", fontFamily: "Georgia, serif" }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a5c1f", fontFamily: "Georgia, serif" }}>
                 Property type
               </span>
               <span style={{ fontSize: 12.5, color: "#4d596d" }}>
@@ -4715,14 +4715,14 @@ export function PropertyEvaluationWorkspace({
         if (rows.length === 0) rows.push({ finding: "Your verified results, above", step: "Bring the whole picture to the licensed lending desk", href: "/explore?lane=financing-capital", accent: "#534AB7" });
         return (
           <section aria-label="Your next step from these results" style={{ display: "grid", gap: 12, border: "1px solid #e9ddc4", borderLeft: "3px solid #c9a84c", background: "#faf6ec", borderRadius: 14, padding: "16px 20px" }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#96742f", fontFamily: "Georgia, serif" }}>
+            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#7a5c1f", fontFamily: "Georgia, serif" }}>
               From these results — your logical next step
             </span>
             <div style={{ display: "grid", gap: 10 }}>
               {rows.map((r) => (
                 <div key={r.finding} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px 12px", padding: "10px 12px", background: "#ffffff", border: "1px solid #e4e9f0", borderRadius: 10 }}>
                   <span style={{ fontSize: 13, fontWeight: 700, color: "#162033", flex: "1 1 200px" }}>{r.finding}</span>
-                  <span aria-hidden style={{ color: "#96742f", fontWeight: 800 }}>→</span>
+                  <span aria-hidden style={{ color: "#7a5c1f", fontWeight: 800 }}>→</span>
                   <a href={r.href} style={{ fontSize: 13, fontWeight: 800, color: r.accent, textDecoration: "none", flex: "1 1 240px" }}>{r.step} →</a>
                 </div>
               ))}

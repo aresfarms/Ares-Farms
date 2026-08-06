@@ -269,8 +269,8 @@ ok(/Start with an address — or just a question —/.test(heroCopy),
   "supporting copy permits address or question entry");
 ok(/Explore anonymously\. No account required\. No hidden handoff\./.test(heroCopy),
   "anonymous first-touch trust line is locked");
-ok(/primaryLabel:\s*"Start with Furlong Navigator"/.test(heroCopy),
-  "canonical Navigator CTA label is locked");
+ok(/primaryLabel:\s*"Check an address — free"/.test(heroCopy),
+  "canonical Navigator CTA label is locked (hero v3 address-first, founder 2026-07-29)");
 ok(fs.existsSync("src/app/(public)/navigator/page.tsx"), "/navigator route exists");
 
 // ── Navigator Decision Framework (addendum 2026-06-11) ────────────────────────

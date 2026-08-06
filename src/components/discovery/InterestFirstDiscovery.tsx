@@ -273,7 +273,7 @@ function PlaceLedger({ brief, onRestart }: { brief: PlaceLevelBrief; onRestart: 
           </strong>
         </div>
         <div style={{ padding: "10px 22px", background: "#faf6ec" }}>
-          <span style={{ fontSize: 12, color: "#96742f", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
+          <span style={{ fontSize: 12, color: "#7a5c1f", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
             A place is not a parcel — everything below is what the area itself publishes.
           </span>
         </div>
@@ -357,7 +357,7 @@ function PlaceLedger({ brief, onRestart }: { brief: PlaceLevelBrief; onRestart: 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section style={{ border: `1px solid ${line}`, borderRadius: 14, background: "#fff", padding: "16px 18px", display: "grid", gap: 8 }}>
-      <strong style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#96742f", fontFamily: "Georgia, serif" }}>
+      <strong style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#7a5c1f", fontFamily: "Georgia, serif" }}>
         {title}
       </strong>
       {children}

@@ -435,14 +435,14 @@ checks.push({
   detail: pairGaps.length ? `Pair-present violations:\n      ${pairGaps.join('\n      ')}` : '',
 });
 
-// ── P19: /explore compass — emblem hub + 8 no-account lane spokes ─────────────
+// ── P19: /explore compass — emblem hub + 7 no-account lane spokes (residential parked, founder 2026-08-05) ─────────────
 const explorePath = join(ROOT, 'src/app/(public)/explore/page.tsx');
 const exploreSrc  = existsSync(explorePath) ? readFileSync(explorePath, 'utf-8') : '';
 const interactiveCompassPath = join(ROOT, 'src/components/public/InteractiveCompassRose.tsx');
 const interactiveCompassSrc = existsSync(interactiveCompassPath) ? readFileSync(interactiveCompassPath, 'utf-8') : '';
 const EXPLORE_LANES = [
-  'property-land', 'farms-agriculture', 'small-business-growth', 'environmental-compliance',
-  'financing-capital', 'housing-development', 'programs-incentives', 'not-sure',
+  'farms-agriculture', 'small-business-growth', 'environmental-compliance',
+  'financing-capital', 'guild', 'programs-incentives', 'not-sure',
 ];
 const exploreProblems = [];
 if (!exploreSrc) {
@@ -457,15 +457,15 @@ if (!exploreSrc) {
   if (!exploreSrc.includes('/explore?lane=')) exploreProblems.push('lanes must link to /explore?lane=<slug>');
   // Emblem hub present.
   if (!exploreSrc.includes('InteractiveCompassRose')) exploreProblems.push('interactive compass component is not rendered');
-  if (!interactiveCompassSrc.includes('/brand/furlong-emblem.png')) exploreProblems.push('interactive compass emblem hub (/brand/furlong-emblem.png) not rendered');
-  // Exactly the 8 lanes present.
+  if (!interactiveCompassSrc.includes('/brand/furlong-ship-emblem-v2.png')) exploreProblems.push('interactive compass emblem hub (/brand/furlong-ship-emblem-v2.png) not rendered');
+  // Exactly the 7 lanes present (residential parked, founder 2026-08-05).
   for (const s of EXPLORE_LANES) {
     if (!exploreSrc.includes(`"${s}"`)) exploreProblems.push(`lane "${s}" missing from the compass`);
   }
 }
 checks.push({
   id: 'P19',
-  label: '/explore renders the emblem hub + 8 no-account lane spokes (no /onboarding)',
+  label: '/explore renders the emblem hub + 7 no-account lane spokes (residential parked, founder 2026-08-05) (no /onboarding)',
   passes: exploreProblems.length === 0,
   detail: exploreProblems.length ? `Explore compass violations:\n      ${exploreProblems.join('\n      ')}` : '',
 });

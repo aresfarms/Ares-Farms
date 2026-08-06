@@ -42,13 +42,13 @@ const PAGES = [
       'furlong does not make official determinations', // old flat-list item (not in new copy)
     ],
     required: [
-      'bring the property. we bring the analysis.',
-      "what the land can earn, what a building's really worth, the deal-killers to dodge, the financing that fits",
-      'start with a property, a place, or just a question.',
+      "type in an address. see if it's worth buying — and exactly how to pay for it.",
+      'start with an address — or just a question — and see the whole picture and your next move before you talk to anyone or share a thing.',
+      
       'explore anonymously. no account required. no hidden handoff.',
       'what you can do here',
       'you do not need a finished plan to begin',
-      'start with furlong navigator',
+      'check an address — free',
       'where do you want to go?',
       // New section heading
       'clear waters, no surprises',

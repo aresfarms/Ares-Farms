@@ -134,6 +134,9 @@ export default function LenderDeskPage() {
   const [drafts, setDrafts] = useState<Record<string, DraftState>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [messages, setMessages] = useState<Record<string, string>>({});
+  const [sendStates, setSendStates] = useState<
+    Record<string, { phase: "sending" | "sent" | "error"; note: string }>
+  >({});
   const [sweepResult, setSweepResult] = useState<string | null>(null);
 
   const loadDeals = useCallback(async () => {
@@ -301,7 +304,10 @@ export default function LenderDeskPage() {
   const sendDocumentToCustomer = useCallback(
     async (deal: Deal, file: File) => {
       setBusy(deal.serviceRequestId);
-      setMessage(deal.serviceRequestId, "");
+      setSendStates((prev) => ({
+        ...prev,
+        [deal.serviceRequestId]: { phase: "sending", note: `Encrypting and transferring ${file.name}…` },
+      }));
       try {
         const beginRes = await fetch("/api/lender/deal-desk", {
           method: "POST",
@@ -341,22 +347,34 @@ export default function LenderDeskPage() {
         });
         const confirm = await confirmRes.json();
         if (!confirmRes.ok || confirm.ok !== true) throw new Error(confirm.error ?? "The transfer could not be confirmed.");
-        setMessage(
-          deal.serviceRequestId,
-          uploaded
-            ? confirm.customerNotified
-              ? `${file.name} is in the vault for the customer — they were emailed to check their status page.`
-              : `${file.name} is in the vault for the customer — it appears on their status page (notification email not sent: email not configured).`
-            : `${file.name} was recorded but NOT stored — secure storage is not active in this environment.`
-        );
+        setSendStates((prev) => ({
+          ...prev,
+          [deal.serviceRequestId]: uploaded
+            ? {
+                phase: "sent",
+                note: confirm.customerNotified
+                  ? `✓ ${file.name} is in the vault for the customer — they were emailed to check their status page. It's listed in the register above; no need to send it again.`
+                  : `✓ ${file.name} is in the vault for the customer — it appears on their status page. (Notification email not sent: email not configured.) It's listed in the register above; no need to send it again.`,
+              }
+            : {
+                phase: "error",
+                note: `${file.name} was recorded but NOT stored — secure storage is not active in this environment.`,
+              },
+        }));
         await loadDocuments(deal);
       } catch (error) {
-        setMessage(deal.serviceRequestId, error instanceof Error ? error.message : "Transfer failed.");
+        setSendStates((prev) => ({
+          ...prev,
+          [deal.serviceRequestId]: {
+            phase: "error",
+            note: error instanceof Error ? error.message : "Transfer failed.",
+          },
+        }));
       } finally {
         setBusy(null);
       }
     },
-    [loadDocuments, setMessage]
+    [loadDocuments]
   );
 
   const active = deals.filter((d) => !FAILURE_STATUSES.has(d.status) && d.status !== "CLOSED_FUNDED");
@@ -586,6 +604,25 @@ export default function LenderDeskPage() {
                         }}
                         style={{ fontSize: 13 }}
                       />
+                      {sendStates[deal.serviceRequestId] && (
+                        <span
+                          role={sendStates[deal.serviceRequestId].phase === "error" ? "alert" : "status"}
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            lineHeight: 1.5,
+                            borderRadius: 8,
+                            padding: "8px 10px",
+                            ...(sendStates[deal.serviceRequestId].phase === "sent"
+                              ? { color: "#166534", background: "#f0fdf4", border: "1px solid #bbf7d0" }
+                              : sendStates[deal.serviceRequestId].phase === "sending"
+                                ? { color: "#334155", background: "#f8fafc", border: "1px solid #e2e8f0" }
+                                : { color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A" }),
+                          }}
+                        >
+                          {sendStates[deal.serviceRequestId].note}
+                        </span>
+                      )}
                     </div>
                   </section>
 

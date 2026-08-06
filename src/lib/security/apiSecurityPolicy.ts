@@ -65,6 +65,11 @@ const PUBLIC_SURFACE_PATHS = new Set([
   "/api/financing/intake",
   "/api/readiness",
   "/api/service-requests/status",
+  // A person exercising rights over their OWN data must not need an account
+  // — the reference+email proof is the authentication, same as the status
+  // lookup. Gating rights behind a login would defeat the right.
+  "/api/public/my-data",
+  "/api/public/chain-of-custody",
 ]);
 
 function cleanPathname(pathname: string): string {

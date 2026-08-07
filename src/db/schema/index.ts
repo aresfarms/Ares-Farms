@@ -83,6 +83,7 @@ export * from "./certifiedConnectorAdapters";
 export * from "./credentialVaultRefs";
 export * from "./credentialedScrapingEvents";
 export * from "./dataClassificationRegistry";
+export * from "./documentAuthenticity";
 export * from "./documentStorageHandoffs";
 export * from "./entitlements";
 export * from "./environmentalComplianceRecords";

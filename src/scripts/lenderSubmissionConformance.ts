@@ -25,8 +25,8 @@ function expectThrow(action: () => unknown, message: string) {
 }
 
 const sources = [
-  { sourceRef: "vault://doc-b", sourceVersion: "v7", canonicalName: "02_financial_statement.pdf", mediaType: "application/pdf", dataCategory: "financial", classification: "RESTRICTED" as const, malwareScanStatus: "CLEAN" as const, redactionStatus: "APPLIED" as const, overlayVersion: "overlay-de-v2", content: "financial-bytes" },
-  { sourceRef: "vault://doc-a", sourceVersion: "v3", canonicalName: "01_application.json", mediaType: "application/json", dataCategory: "application", classification: "CONFIDENTIAL" as const, malwareScanStatus: "CLEAN" as const, redactionStatus: "NOT_REQUIRED" as const, overlayVersion: "overlay-de-v2", content: "application-bytes" },
+  { sourceRef: "vault://doc-b", sourceVersion: "v7", canonicalName: "02_financial_statement.pdf", mediaType: "application/pdf", dataCategory: "financial", classification: "RESTRICTED" as const, malwareScanStatus: "CLEAN" as const, redactionStatus: "APPLIED" as const, overlayVersion: "overlay-de-v2", authenticityEvidenceRef: "auth-fin-001", authenticityClassification: "CORROBORATED" as const, content: "financial-bytes" },
+  { sourceRef: "vault://doc-a", sourceVersion: "v3", canonicalName: "01_application.json", mediaType: "application/json", dataCategory: "application", classification: "CONFIDENTIAL" as const, malwareScanStatus: "CLEAN" as const, redactionStatus: "NOT_REQUIRED" as const, overlayVersion: "overlay-de-v2", authenticityEvidenceRef: "auth-app-001", authenticityClassification: "DIRECT_SOURCE_VERIFIED" as const, content: "application-bytes" },
 ];
 const base = { caseId: "11111111-1111-4111-8111-111111111111", packageVersionId: "22222222-2222-4222-8222-222222222222", version: 1, frozenAt: "2026-08-06T12:00:00.000Z", sources };
 const pkg = buildDeterministicPackage(base);

@@ -27,6 +27,8 @@ export type PackageSource = {
   malwareScanStatus: "CLEAN";
   redactionStatus: "APPLIED" | "NOT_REQUIRED";
   overlayVersion: string;
+  authenticityEvidenceRef: string;
+  authenticityClassification: "DIRECT_SOURCE_VERIFIED" | "CORROBORATED";
   content: Buffer | string;
 };
 
@@ -54,14 +56,15 @@ export function buildDeterministicPackage(input: {
   const names = new Set<string>();
   const sorted = [...input.sources].sort((a, b) => a.canonicalName.localeCompare(b.canonicalName) || a.sourceRef.localeCompare(b.sourceRef));
   const items = sorted.map((source, index) => {
-    if (!source.sourceRef || !source.sourceVersion || !source.canonicalName || !source.overlayVersion) throw new Error("Every package item requires a frozen source reference, source version, canonical name, and active overlay version.");
+    if (!source.sourceRef || !source.sourceVersion || !source.canonicalName || !source.overlayVersion || !source.authenticityEvidenceRef) throw new Error("Every package item requires a frozen source reference, source version, canonical name, active overlay version, and authenticity evidence reference.");
+    if (!["DIRECT_SOURCE_VERIFIED", "CORROBORATED"].includes(source.authenticityClassification)) throw new Error(`Package item is not authenticity-cleared: ${source.canonicalName}`);
     if (source.malwareScanStatus !== "CLEAN") throw new Error(`Package item is not malware-cleared: ${source.canonicalName}`);
     if (!["APPLIED", "NOT_REQUIRED"].includes(source.redactionStatus)) throw new Error(`Package item lacks a governed redaction decision: ${source.canonicalName}`);
     if (!["application/pdf", "application/json", "text/csv", "text/plain"].includes(source.mediaType)) throw new Error(`Package item MIME type is not permitted: ${source.mediaType}`);
     if (names.has(source.canonicalName)) throw new Error(`Duplicate canonical package name: ${source.canonicalName}`);
     names.add(source.canonicalName);
     const bytes = Buffer.isBuffer(source.content) ? source.content : Buffer.from(source.content, "utf8");
-    return { ordinal: index + 1, canonicalName: source.canonicalName, sourceRef: source.sourceRef, sourceVersion: source.sourceVersion, mediaType: source.mediaType, dataCategory: source.dataCategory, classification: source.classification, malwareScanStatus: source.malwareScanStatus, redactionStatus: source.redactionStatus, overlayVersion: source.overlayVersion, sha256: sha256(bytes), byteLength: bytes.length };
+    return { ordinal: index + 1, canonicalName: source.canonicalName, sourceRef: source.sourceRef, sourceVersion: source.sourceVersion, mediaType: source.mediaType, dataCategory: source.dataCategory, classification: source.classification, malwareScanStatus: source.malwareScanStatus, redactionStatus: source.redactionStatus, overlayVersion: source.overlayVersion, authenticityEvidenceRef: source.authenticityEvidenceRef, authenticityClassification: source.authenticityClassification, sha256: sha256(bytes), byteLength: bytes.length };
   });
   const packageVersionId = input.packageVersionId ?? `pkg-${sha256(`${input.caseId}:${input.version}`).slice(0, 24)}`;
   const manifest = { schema: "furlong-lender-package-manifest-v1", caseId: input.caseId, packageVersionId, version: input.version, frozenAt: frozenAt.toISOString(), items };
@@ -102,7 +105,7 @@ export function registerRecipient(input: {
 }
 
 export const AUTHORIZATION_GATE_NAMES = [
-  "promotion", "kill_switches", "package_integrity", "exact_consent", "customer_identity",
+  "promotion", "kill_switches", "package_integrity", "document_authenticity", "lender_evidence_packet", "exact_consent", "customer_identity",
   "recipient_verification", "adapter_certification", "data_classification", "human_review",
   "runtime_secrets", "idempotency_outbox", "ledger_replay", "observability",
 ] as const;

@@ -76,7 +76,7 @@ export async function loadPackage(caseId: string, packageVersionId: string): Pro
   if (!version || version.invalidatedAt) throw new Error("Active package version was not found.");
   const items = await db.select().from(submissionPackageItems).where(eq(submissionPackageItems.packageVersionId, packageVersionId)).orderBy(submissionPackageItems.ordinal);
   const manifestJson = canonicalJson(version.manifestJson);
-  return { packageVersionId, caseId, version: version.version, frozenAt: version.frozenAt.toISOString(), items: items.map((item) => ({ ordinal: item.ordinal, canonicalName: item.canonicalName, sourceRef: item.sourceRef, sourceVersion: item.sourceVersion, mediaType: item.mediaType, dataCategory: item.dataCategory, classification: item.itemClassification as "INTERNAL" | "CONFIDENTIAL" | "RESTRICTED", malwareScanStatus: item.malwareScanStatus as "CLEAN", redactionStatus: item.redactionStatus as "APPLIED" | "NOT_REQUIRED", overlayVersion: item.overlayVersion, sha256: item.sha256, byteLength: item.byteLength })), manifestJson, manifestSha256: version.manifestSha256, packageBytes: Buffer.from(manifestJson) };
+  return { packageVersionId, caseId, version: version.version, frozenAt: version.frozenAt.toISOString(), items: items.map((item) => ({ ordinal: item.ordinal, canonicalName: item.canonicalName, sourceRef: item.sourceRef, sourceVersion: item.sourceVersion, mediaType: item.mediaType, dataCategory: item.dataCategory, classification: item.itemClassification as "INTERNAL" | "CONFIDENTIAL" | "RESTRICTED", malwareScanStatus: item.malwareScanStatus as "CLEAN", redactionStatus: item.redactionStatus as "APPLIED" | "NOT_REQUIRED", overlayVersion: item.overlayVersion, authenticityEvidenceRef: item.authenticityEvidenceRef, authenticityClassification: item.authenticityClassification as "DIRECT_SOURCE_VERIFIED" | "CORROBORATED", sha256: item.sha256, byteLength: item.byteLength })), manifestJson, manifestSha256: version.manifestSha256, packageBytes: Buffer.from(manifestJson) };
 }
 
 export async function persistConsent(input: Omit<Parameters<typeof captureSubmissionConsent>[0], "accepted"> & { accepted: boolean; actorId: string; traceId: string }) {
@@ -128,6 +128,8 @@ export async function authorizeAndPersist(input: { caseId: string; packageVersio
     promotion: input.environment === "sandbox" && input.adapterId === "sandbox-v1" ? "PASS" : "FAIL",
     kill_switches: input.environment === "sandbox" ? "PASS" : "MISSING",
     package_integrity: sha256(pkg.manifestJson) === pkg.manifestSha256 ? "PASS" : "FAIL",
+    document_authenticity: pkg.items.every((item) => Boolean(item.authenticityEvidenceRef) && ["DIRECT_SOURCE_VERIFIED", "CORROBORATED"].includes(item.authenticityClassification)) ? "PASS" : "FAIL",
+    lender_evidence_packet: pkg.items.every((item) => Boolean(item.authenticityEvidenceRef) && Boolean(item.sha256)) ? "PASS" : "FAIL",
     exact_consent: "PASS",
     customer_identity: consent.customerId === caseRecord.customerId && Boolean(input.actorId) ? "PASS" : "FAIL",
     recipient_verification: "PASS",

@@ -65,6 +65,8 @@ export const submissionPackageItems = pgTable(
     malwareScanStatus: text("malware_scan_status").notNull(),
     redactionStatus: text("redaction_status").notNull(),
     overlayVersion: text("overlay_version").notNull(),
+    authenticityEvidenceRef: text("authenticity_evidence_ref").notNull(),
+    authenticityClassification: text("authenticity_classification").notNull(),
     ...evidence,
   },
   (table) => [uniqueIndex("submission_package_item_ordinal_uq").on(table.packageVersionId, table.ordinal)],

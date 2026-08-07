@@ -84,6 +84,25 @@ export async function fetchObjectStream(objectKey: string): Promise<{
   }
 }
 
+export async function fetchObjectBytes(objectKey: string, maxBytes = 25 * 1024 * 1024): Promise<Buffer | null> {
+  const object = await fetchObjectStream(objectKey);
+  if (!object) return null;
+  const declared = object.contentLength ? Number(object.contentLength) : null;
+  if (declared !== null && Number.isFinite(declared) && declared > maxBytes) return null;
+  const chunks: Buffer[] = [];
+  let total = 0;
+  const reader = object.stream.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!value) continue;
+    total += value.byteLength;
+    if (total > maxBytes) return null;
+    chunks.push(Buffer.from(value));
+  }
+  return Buffer.concat(chunks);
+}
+
 /**
  * Server-side write of a small governed object (signature certificates —
  * the ONE case where the runtime itself authors vault bytes; borrower and

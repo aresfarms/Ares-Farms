@@ -208,14 +208,20 @@ export default function ProfessionalAccessPage() {
             fontSize: 13,
             color: "#5b4a22",
             lineHeight: 1.6,
+            display: "grid",
+            gap: 10,
           }}
         >
-          <strong style={{ color: INK }}>Access is verified, not asserted.</strong> Choosing
-          a lane here does not grant it. Standing access requires a credential we verify
-          against the official issuing directory — your bar, commission, or agency — recorded
-          with its source, standing and expiry. Without one, an attorney or agency may still
-          proceed by presenting legal process (court order, subpoena, warrant, or agency
-          demand): that opens only the specific records the process names, and nothing else.
+          <span>
+            <strong style={{ color: INK }}>Access is verified, not asserted.</strong> Choosing
+            a lane here does not grant it. Professional login requires a credential Furlong has
+            automatically checked against an authoritative source or certified verification connector and recorded with its
+            source, standing and expiry. Clean matches can clear automatically; only exceptions need review. Without one, an attorney or agency may still proceed by
+            presenting legal process; that opens only the records the process names.
+          </span>
+          <Link href="/professional-access/verify" style={{ justifySelf: "start", color: NAVY, fontWeight: 800 }}>
+            Request professional credential verification →
+          </Link>
         </div>
 
         {LANES.map((lane) => (

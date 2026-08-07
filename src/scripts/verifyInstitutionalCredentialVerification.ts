@@ -24,6 +24,21 @@ assert.throws(() => verifyInstitutionalCredential({
   standing: "Active", independenceAttested: false, verifiedBy: "governance-1", verifiedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2026-02-01T00:00:00.000Z", reason: "red-team",
 }), /independence/i);
 
+
+assert.throws(() => verifyInstitutionalCredential({
+  principalId: "lender-1", principalEmail: "lender@example.test", fullLegalName: "Lender One", role: "lender",
+  credentialType: "Broker License", credentialIdentifier: "BROKER-1", jurisdictionOrIssuer: "Example Authority",
+  officialSourceRef: "official://broker", officialSourcePayload: "suspended", method: "OFFICIAL_DIRECTORY_AUTOMATED",
+  standing: "Suspended", verifiedBy: "automation:test", verifiedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2026-02-01T00:00:00.000Z", reason: "red-team",
+}), /active or eligible/i);
+
+assert.throws(() => verifyInstitutionalCredential({
+  principalId: "sponsor-1", principalEmail: "sponsor@example.test", fullLegalName: "Sponsor One", role: "sponsor",
+  credentialType: "Participation Authority", credentialIdentifier: "SPONSOR-1", jurisdictionOrIssuer: "Example Institution",
+  officialSourceRef: "official://institution", officialSourcePayload: "active", method: "ISSUER_CONFIRMATION",
+  standing: "Active", verifiedBy: "automation:test", verifiedAt: "2026-01-01T00:00:00.000Z", expiresAt: "2026-02-01T00:00:00.000Z", reason: "red-team",
+}), /organization or institution/i);
+
 const source = fs.readFileSync("src/lib/governance/institutionalCredentialVerification.ts", "utf8");
 assert.ok(!source.includes("credentialIdentifierLast4"), "No license-number suffix may be retained.");
 assert.ok(!source.includes("credentialIdentifierHash"), "License-number hashes are prohibited.");
@@ -36,7 +51,7 @@ assert.ok(source.includes("tokenBoundPrincipalEmail"), "Verification tokens must
 console.log(JSON.stringify({
   ok: true,
   rule: "INSTITUTIONAL-CREDENTIAL-VERIFICATION-001",
-  roles: ["attorney", "government_official", "auditor"],
+  roles: ["attorney", "government_official", "auditor", "lender", "sponsor"],
   credentialNumberStored: false,
   credentialSuffixStored: false,
   postVerificationOpaqueTokenOnly: true,

@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { applicationDocuments } from "@/db/schema";
 import { evaluateAccess, type AccessRole } from "@/lib/auth/accessControl";
 import { operatorByEmail } from "@/lib/auth/operatorRegistry";
-import { professionalRole } from "@/lib/auth/professionalRegistry";
+import { evaluateProfessionalAccess } from "@/lib/auth/professionalAccessAuthority";
 import { apiAuthEnforcementRequired } from "@/lib/security/apiSecurityPolicy";
 import { db } from "@/lib/db";
 import {
@@ -62,7 +62,7 @@ import { serviceRequests } from "@/db/schema";
  */
 
 const MODULE = "api.lender.deal-desk";
-const ALLOWED_ROLES: AccessRole[] = ["lender", "operator", "admin", "governance"];
+const ALLOWED_ROLES: AccessRole[] = ["lender", "admin", "governance"];
 const VALID_STATUSES = new Set(FINANCING_DEAL_STATUSES.map((s) => s.status));
 
 function traceIdFor(op: string): string {
@@ -87,26 +87,32 @@ function portalBaseUrl(req: NextRequest): string {
  *      API_AUTH_ENFORCEMENT=required).
  * Anything else resolves to "user" and is denied by evaluateAccess.
  */
-function resolveIdentity(req: NextRequest): { role: string; actorId: string | null } {
+async function resolveIdentity(req: NextRequest): Promise<{ role: string; actorId: string | null }> {
   const email = req.headers.get("x-ares-authenticated-email")?.trim() || null;
   const sessionActor =
     req.headers.get("x-ares-authenticated-user-id")?.trim() || email;
 
   const operator = operatorByEmail(email);
-  if (operator) {
-    const role =
-      operator.role === "founder-operator"
-        ? "admin"
-        : operator.license?.toLowerCase().includes("finance")
-          ? "lender"
-          : "operator";
-    return { role, actorId: email ?? operator.id };
+  if (operator?.role === "founder-operator") {
+    return { role: "admin", actorId: email ?? operator.id };
   }
 
-  // Outside counterparties (Module 45 named grants) — a registry lookup on
-  // the session-verified email, never a client claim.
-  const granted = professionalRole(email);
-  if (granted) return { role: granted, actorId: email ?? sessionActor };
+  // Lender-file authority is credential-first. A registry entry or a finance
+  // label is only an invitation/basis; it is never sufficient professional
+  // authority by itself. The current verified credential must be bound to the
+  // exact authenticated principal + email.
+  const lenderAccess = await evaluateProfessionalAccess({
+    principalId: sessionActor,
+    principalEmail: email,
+    requestedRole: "lender",
+  });
+  if (lenderAccess.allowed) {
+    return { role: "lender", actorId: lenderAccess.principalId };
+  }
+
+  if (operator) {
+    return { role: "operator", actorId: email ?? operator.id };
+  }
 
   const sessionRole = req.headers.get("x-ares-authenticated-role")?.trim();
   if (sessionRole && ALLOWED_ROLES.includes(sessionRole as AccessRole)) {
@@ -174,7 +180,7 @@ function denied(traceId: string, actorId: string | null, operation: string) {
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
   const view = params.get("view") ?? "deals";
-  const { role, actorId } = resolveIdentity(req);
+  const { role, actorId } = await resolveIdentity(req);
   const traceId = traceIdFor(`read-${view}`);
   const operation = `lender-desk.read-${view}`;
 
@@ -397,7 +403,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Invalid JSON body." }, { status: 400 });
   }
   const action = typeof body.action === "string" ? body.action : "";
-  const { role, actorId } = resolveIdentity(req);
+  const { role, actorId } = await resolveIdentity(req);
   const traceId = traceIdFor(action || "post");
   const operation = `lender-desk.${action || "unknown"}`;
 
@@ -703,6 +709,12 @@ export async function POST(req: NextRequest) {
       if (!doc || doc.documentType !== "lender-provided" || doc.applicationId !== `finintake-${serviceRequestId}`) {
         return NextResponse.json(
           { ok: false, error: "Only documents you sent to the customer on this deal can be signed.", governance: { traceId } },
+          { status: 400 }
+        );
+      }
+      if (!(doc.mimeType === "application/pdf" || doc.fileName?.toLowerCase().endsWith(".pdf"))) {
+        return NextResponse.json(
+          { ok: false, error: "Electronic signing is available only for PDF documents.", governance: { traceId } },
           { status: 400 }
         );
       }

@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
             receivedAt: doc.receivedAt,
             documentType: doc.documentType,
             signed: doc.signed,
+            testSigned: doc.testSigned,
             downloadPath: `/api/public/document-download?token=${encodeURIComponent(
               mintCustomerDownloadToken({
                 documentId: doc.id,

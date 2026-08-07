@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
 import { isProtectedPage } from "@/lib/auth/protectedRoutes";
+import { operatorByEmail } from "@/lib/auth/operatorRegistry";
+import { evaluateProtectedPageRole } from "@/lib/auth/pageRolePolicy";
 import { secureCompare } from "@/lib/security/requestGuards";
 import {
   ClaimedActorContext,
@@ -485,6 +487,19 @@ export async function proxy(req: NextRequest) {
           `${route}${req.nextUrl.search}`,
         )}`;
         return NextResponse.redirect(signInUrl);
+      }
+      const tokenEmail = normalizeOptionalText(pageToken.email);
+      const operator = operatorByEmail(tokenEmail);
+      const pageRole = operator
+        ? operator.role === "founder-operator" ? "governance" : "operator"
+        : normalizeOptionalRole(pageToken.role) ?? "user";
+      const pageAccess = evaluateProtectedPageRole(route, pageRole);
+      if (!pageAccess.allowed) {
+        console.warn(JSON.stringify({ channel: "page-perimeter", route, outcome: "blocked", role: pageRole, reason: pageAccess.reason }));
+        return new NextResponse("Not Found", {
+          status: 404,
+          headers: { "Cache-Control": "no-store", "X-Robots-Tag": "noindex, nofollow" },
+        });
       }
     }
 

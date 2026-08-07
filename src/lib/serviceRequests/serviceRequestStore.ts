@@ -30,7 +30,8 @@ const SERVICE_REQUEST_SOURCE = "service-request-runtime";
 
 export type ServiceRequestType =
   | "environmental_report_order"
-  | "financing_deal_intake";
+  | "financing_deal_intake"
+  | "professional_credential_verification_request";
 
 /**
  * Canonical financing-deal lifecycle (founder direction 2026-08-05: the
@@ -163,6 +164,7 @@ export type ServiceRequestStatusView = {
     documentType: string;
     signatureRequested: boolean;
     signed: boolean;
+    testSigned: boolean;
   }>;
 };
 
@@ -255,7 +257,8 @@ export async function getServiceRequestStatus(
           receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
           documentType: d.documentType,
           signatureRequested: m.signatureRequested === true,
-          signed: m.signatureStatus === "signed",
+          signed: m.signatureStatus === "signed" || m.signatureStatus === "test-signed",
+          testSigned: m.signatureStatus === "test-signed",
         };
       });
   }

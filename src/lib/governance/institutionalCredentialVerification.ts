@@ -5,6 +5,8 @@ import path from "node:path";
 import { chainAppend, verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 import type { InstitutionalReviewRole } from "@/lib/governance/institutionalEvidenceAccess";
 
+export type ProfessionalCredentialRole = InstitutionalReviewRole | "lender" | "sponsor";
+
 export const INSTITUTIONAL_CREDENTIAL_VERIFICATION_RULE =
   "INSTITUTIONAL-CREDENTIAL-VERIFICATION-001" as const;
 
@@ -26,7 +28,7 @@ export type InstitutionalCredentialVerification = {
   principalId: string;
   principalEmail: string;
   fullLegalName: string;
-  role: InstitutionalReviewRole;
+  role: ProfessionalCredentialRole;
   credentialType: string;
   jurisdictionOrIssuer: string;
   verificationToken: string;
@@ -72,7 +74,7 @@ export function verifyInstitutionalCredential(input: {
   principalId: string;
   principalEmail: string;
   fullLegalName: string;
-  role: InstitutionalReviewRole;
+  role: ProfessionalCredentialRole;
   credentialType: string;
   credentialIdentifier: string;
   jurisdictionOrIssuer: string;
@@ -96,12 +98,15 @@ export function verifyInstitutionalCredential(input: {
   if (Date.parse(input.expiresAt) <= Date.parse(input.verifiedAt ?? new Date().toISOString())) {
     throw new Error("Credential verification expiration must be after verification.");
   }
-  if (input.role === "attorney") {
+  if (input.role === "attorney" || input.role === "lender") {
     const normalizedStanding = input.standing.trim().toLowerCase().replace(/[^a-z]+/g, " ").trim();
     const allowedStanding = new Set(["active", "eligible", "good standing", "active good standing", "active eligible"]);
     if (!allowedStanding.has(normalizedStanding)) {
-      throw new Error("Attorney access requires active or eligible standing from the licensing authority.");
+      throw new Error(`${input.role === "lender" ? "Lender" : "Attorney"} access requires active or eligible standing from the authoritative source.`);
     }
+  }
+  if (input.role === "sponsor" && !input.agencyOrFirm?.trim()) {
+    throw new Error("Sponsor verification requires the represented organization or institution.");
   }
   if (input.role === "government_official" && !input.agencyOrFirm?.trim()) {
     throw new Error("Governmental-official verification requires the employing or appointing agency.");
@@ -152,7 +157,7 @@ export function findCredentialVerificationById(verificationId: string): Institut
 export function latestValidCredentialVerification(input: {
   principalId: string;
   principalEmail: string;
-  role: InstitutionalReviewRole;
+  role: ProfessionalCredentialRole;
   at?: string;
 }): InstitutionalCredentialVerification | null {
   const at = Date.parse(input.at ?? new Date().toISOString());

@@ -9,6 +9,8 @@ import {
 } from "@/lib/auth/identity";
 import { evaluateCredentialAuthPolicy } from "@/lib/auth/authActivationPolicy";
 import { findLocalOperator } from "@/lib/auth/localOperatorStore";
+import { professionalByEmail } from "@/lib/auth/professionalRegistry";
+import { evaluateProfessionalAccess } from "@/lib/auth/professionalAccessAuthority";
 import {
   ensureLocalNextAuthUrl,
   resolveNextAuthSecret,
@@ -125,6 +127,31 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
     return null;
   }
 
+  // Professional counterparties are credential-first: a named invitation or
+  // registry entry is not enough to receive a portal session. Before login,
+  // require a current official-source credential bound to the exact email and
+  // professional role. Internal founders/operators who are not professional
+  // counterparties continue through the ordinary operator auth path.
+  const professional = professionalByEmail(email);
+  let professionalRoleForSession: "lender" | "attorney" | "auditor" | "sponsor" | null = null;
+  if (professional) {
+    const professionalAccess = await evaluateProfessionalAccess({
+      principalId: email,
+      principalEmail: email,
+      requestedRole: professional.role,
+    });
+    if (!professionalAccess.allowed) {
+      await persistCredentialRejection(
+        traceId,
+        "AUTH_PROFESSIONAL_CREDENTIAL_REQUIRED",
+        "Professional portal login was denied because current credential verification is required.",
+        { role: professional.role, reasonCode: professionalAccess.reasonCode }
+      );
+      return null;
+    }
+    professionalRoleForSession = professional.role;
+  }
+
   const runtimeGuard = runRuntimeGuard({
     operation: "auth.credentials.authorize",
     module: "api.auth.nextauth",
@@ -223,7 +250,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
   try {
     identity = await ensureDurableIdentity({
       email,
-      role: "user",
+      role: professionalRoleForSession ?? "user",
       traceId,
       source: "api.auth.nextauth",
       metadata: {

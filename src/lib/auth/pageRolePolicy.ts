@@ -1,0 +1,30 @@
+import type { AccessRole } from "@/lib/auth/accessControl";
+import { isInternalChromeRoute, isProtectedPage } from "@/lib/auth/protectedRoutes";
+
+export type PageRoleDecision = Readonly<{
+  protected: boolean;
+  allowed: boolean;
+  reason: string;
+}>;
+
+const INTERNAL_ROLES = new Set<AccessRole>(["operator", "admin", "governance"]);
+
+export function evaluateProtectedPageRole(pathname: string, role: AccessRole): PageRoleDecision {
+  if (!isProtectedPage(pathname)) return { protected: false, allowed: true, reason: "public-page" };
+
+  if (pathname === "/lender-desk" || pathname.startsWith("/lender-desk/")) {
+    const allowed = role === "lender" || role === "admin" || role === "governance";
+    return { protected: true, allowed, reason: allowed ? "lender-desk-role" : "lender-desk-denied" };
+  }
+
+  if (pathname === "/portal" || pathname.startsWith("/portal/")) {
+    const allowed = role === "user" || role === "borrower" || role === "admin" || role === "governance";
+    return { protected: true, allowed, reason: allowed ? "customer-portal-role" : "customer-portal-denied" };
+  }
+  if (isInternalChromeRoute(pathname)) {
+    const allowed = INTERNAL_ROLES.has(role);
+    return { protected: true, allowed, reason: allowed ? "internal-role" : "internal-role-denied" };
+  }
+
+  return { protected: true, allowed: false, reason: "protected-page-no-role-policy" };
+}

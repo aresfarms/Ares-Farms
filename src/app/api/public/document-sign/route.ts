@@ -6,7 +6,7 @@ import { db } from "@/lib/db";
 import { mintCustomerDownloadToken } from "@/lib/documents/customerDownloadToken";
 import { createDocumentStorageHandoff } from "@/lib/documents/storageHandoffStore";
 import { persistDocumentSubmission } from "@/lib/documents/documentStore";
-import { uploadObjectBytes } from "@/lib/documents/gcsResumableUpload";
+import { fetchObjectBytes, objectKeyFromStorageUri, uploadObjectBytes } from "@/lib/documents/gcsResumableUpload";
 import { verifySigningToken } from "@/lib/documents/signingToken";
 import {
   ESIGN_CONSENT_TEXT,
@@ -17,12 +17,15 @@ import {
   signatureMode,
 } from "@/lib/documents/signatureVault";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
-import { scanAllowsStreaming } from "@/lib/documents/malwareScan";
+import { scanStatusOf } from "@/lib/documents/malwareScan";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
 import { LENDER_EMAIL_SIGNATURE, renderLenderEmailHtml } from "@/lib/notifications/lenderSignature";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { serviceRequests } from "@/db/schema";
-import { SIGNATURE_EXECUTION_DOCTRINE } from "@/lib/signature-execution/doctrine";
+import {
+  SIGNATURE_EXECUTION_DOCTRINE, analyzeSignaturePdf, captureMockSignature,
+  finalizeOfflineExecutedPdf, planSignaturePlacement, validateExecutedPdf,
+} from "@/lib/signature-execution";
 
 /**
  * Customer Signing Ceremony API (public, token-gated) — the signature vault's
@@ -49,6 +52,7 @@ async function signableDocument(documentId: string, dealRef: string) {
   if (!doc) return null;
   if (doc.documentType !== "lender-provided") return null;
   if (doc.applicationId !== `finintake-${dealRef}`) return null;
+  if (!(doc.mimeType === "application/pdf" || doc.fileName?.toLowerCase().endsWith(".pdf"))) return null;
   return doc;
 }
 
@@ -70,7 +74,7 @@ export async function GET(req: NextRequest) {
     ok: true,
     dealRef: claims.dealRef,
     fileName: doc.fileName,
-    alreadySigned: metadata.signatureStatus === "signed",
+    alreadySigned: metadata.signatureStatus === "signed" || metadata.signatureStatus === "test-signed",
     viewPath: `/api/public/document-download?token=${encodeURIComponent(view.token)}`,
     consentText: ESIGN_CONSENT_TEXT,
     intentText: ESIGN_INTENT_TEXT,
@@ -96,12 +100,13 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
   }
-  if (SIGNATURE_EXECUTION_DOCTRINE.liveSigningBlocked) {
+  // Live legal execution remains promotion-blocked. Staging/test ceremonies are
+  // permitted only in explicit TEST mode and are stamped as non-operative.
+  const mode = signatureMode();
+  if (mode === "live" && SIGNATURE_EXECUTION_DOCTRINE.liveSigningBlocked) {
     return NextResponse.json({
-      ok: false,
-      error: "Electronic execution is not active. Furlong is validating the governed signing process before any legally operative signature is accepted.",
-      blockerCode: "SIG_PROMOTION_INACTIVE",
-      canonicalResult: "ONE_EXECUTED_PDF",
+      ok: false, error: "Live electronic execution is not active.",
+      blockerCode: "SIG_PROMOTION_INACTIVE", canonicalResult: "ONE_EXECUTED_PDF",
     }, { status: 409 });
   }
   const typedName = typeof body.typedName === "string" ? body.typedName.trim().slice(0, 140) : "";
@@ -115,23 +120,35 @@ export async function POST(req: NextRequest) {
   if (!doc) {
     return NextResponse.json({ ok: false, error: "This document is not available for signing." }, { status: 404 });
   }
-  const signScanGate = scanAllowsStreaming(doc.metadata);
-  if (!signScanGate.allowed) {
+  const signScanStatus = scanStatusOf(doc.metadata);
+  if (signScanStatus !== "clean") {
     return NextResponse.json(
-      { ok: false, error: "This document has not passed the vault's safety scan and cannot be signed yet." },
+      { ok: false, error: "This document has not passed the vault's safety scan and cannot be signed yet.", scanStatus: signScanStatus },
       { status: 423 }
     );
   }
   const metadata = (doc.metadata ?? {}) as Record<string, unknown>;
-  if (metadata.signatureStatus === "signed") {
+  if (metadata.signatureStatus === "signed" || metadata.signatureStatus === "test-signed") {
     return NextResponse.json({ ok: true, alreadySigned: true });
   }
 
   const signerIp = (req.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
   const signerUserAgent = (req.headers.get("user-agent") ?? "unknown").slice(0, 300);
   const signedAtIso = new Date().toISOString();
+  const objectKey = objectKeyFromStorageUri(doc.storageUri);
+  const sourceBytes = objectKey ? await fetchObjectBytes(objectKey) : null;
+  if (!sourceBytes) {
+    return NextResponse.json({ ok: false, error: "The exact PDF bytes could not be loaded from governed storage." }, { status: 503 });
+  }
   const documentSha256 = await sha256OfVaultObject(doc.storageUri);
-  const mode = signatureMode();
+  const analysis = await analyzeSignaturePdf({ bytes: sourceBytes, malwareStatus: "CLEAN" });
+  if (!analysis.safeForOfflinePlanning || analysis.sourceSha256 !== documentSha256) {
+    return NextResponse.json({ ok: false, error: "The PDF failed the governed integrity/signature safety gate.", blockerCodes: analysis.blockerCodes }, { status: 422 });
+  }
+  const plan = planSignaturePlacement({ analysis, profile: "THIRD_PARTY", signerRole: "customer" });
+  if (plan.blockerCodes.length > 0 || !plan.collisionFree) {
+    return NextResponse.json({ ok: false, error: "The PDF cannot be safely finalized for signature.", blockerCodes: plan.blockerCodes }, { status: 422 });
+  }
   const event = {
     dealRef: claims.dealRef,
     documentId: doc.id,
@@ -144,6 +161,41 @@ export async function POST(req: NextRequest) {
     consentVersion: ESIGN_CONSENT_VERSION,
     mode,
   } as const;
+
+  const executionId = `sigexec-${traceId}`;
+  const capture = captureMockSignature({
+    executionId, documentSha256: analysis.sourceSha256, signerName: typedName,
+    capacity: "Self", authorizedAt: signedAtIso,
+  });
+  const finalized = await finalizeOfflineExecutedPdf({
+    sourceBytes, plan, evidence: {
+      executionId, signerName: typedName, capacity: "Self", signedAtIso, timezone: "UTC",
+      sourceSha256: analysis.sourceSha256, authorityRef: `signing-token:${claims.dealRef}`,
+      consentRef: ESIGN_CONSENT_VERSION, intentRef: ESIGN_INTENT_TEXT,
+      reviewRef: `customer-review:${doc.id}:${analysis.sourceSha256}`, captureRef: capture.captureId,
+    },
+  });
+  const validation = await validateExecutedPdf({ sourceBytes, executedBytes: finalized.bytes, plan });
+  if (!validation.valid) {
+    return NextResponse.json({ ok: false, error: "Executed PDF validation failed.", issues: validation.issues }, { status: 500 });
+  }
+  const executedName = `${(doc.fileName ?? `document-${doc.id}`).replace(/\.pdf$/i, "")}-executed-TEST.pdf`;
+  const executedHandoff = await createDocumentStorageHandoff({
+    applicationId: doc.applicationId, documentType: "executed-document-test",
+    documentName: `${claims.dealRef} — executed document (TEST)`, fileName: executedName,
+    mimeType: "application/pdf", byteSize: finalized.bytes.length,
+    storageProvider: "gcs-resumable-v1", storageBucket: process.env.DOCUMENT_STORAGE_BUCKET ?? null,
+    traceId, source: "signature-execution-engine",
+    metadata: { sourceDocumentId: doc.id, sourceSha256: analysis.sourceSha256, executedSha256: validation.executedSha256, executionId },
+  });
+  const executedStored = await uploadObjectBytes({ objectKey: executedHandoff.handoff.objectKey, bytes: Buffer.from(finalized.bytes), contentType: "application/pdf" });
+  const executedDoc = await persistDocumentSubmission({
+    traceId, source: "signature-execution-engine", applicationId: doc.applicationId,
+    documentType: "executed-document-test", documentName: `${claims.dealRef} — executed document (TEST)`,
+    fileName: executedName, mimeType: "application/pdf", byteSize: finalized.bytes.length,
+    checksum: validation.executedSha256, storageUri: executedStored ? executedHandoff.handoff.storageUri : null,
+    metadata: { dealRef: claims.dealRef, sourceDocumentId: doc.id, sourceSha256: analysis.sourceSha256, executedSha256: validation.executedSha256, executionId, validationReportSha256: validation.reportSha256, canonicalSinglePdf: true, mode },
+  });
 
   // Certificate into the vault (governed object key via the handoff store;
   // the ONE runtime-authored vault write).
@@ -187,10 +239,12 @@ export async function POST(req: NextRequest) {
     .set({
       metadata: {
         ...metadata,
-        signatureStatus: "signed",
+        signatureStatus: mode === "test" ? "test-signed" : "signed",
         signatureCertificateId: cert.document.id,
-        signedAt: signedAtIso,
-        signedByTypedName: typedName,
+        executedDocumentId: executedDoc.document.id,
+        sourceSha256: analysis.sourceSha256, executedSha256: validation.executedSha256,
+        executionValidationReportSha256: validation.reportSha256,
+        signedAt: signedAtIso, signedByTypedName: typedName,
       },
       updatedAt: new Date(),
     })
@@ -207,13 +261,13 @@ export async function POST(req: NextRequest) {
     replayRef: traceId,
     actorId: `customer-signer:${claims.dealRef}`,
     module: MODULE,
-    metadata: { ...event, certificateId: cert.document.id, certStored },
+    metadata: { ...event, certificateId: cert.document.id, certStored, executedDocumentId: executedDoc.document.id, executedStored, executedSha256: validation.executedSha256, validationReportSha256: validation.reportSha256 },
   });
   await persistGovernanceEvidence({
     traceId,
     replayRef: traceId,
     observability,
-    metadata: { route: "/api/public/document-sign", signatureEvent: event, certificateId: cert.document.id },
+    metadata: { route: "/api/public/document-sign", signatureEvent: event, certificateId: cert.document.id, executedDocumentId: executedDoc.document.id, sourceSha256: analysis.sourceSha256, executedSha256: validation.executedSha256, validationReportSha256: validation.reportSha256 },
   });
 
   // Notify both parties (minimum disclosure — names of things, never contents).
@@ -255,7 +309,8 @@ export async function POST(req: NextRequest) {
     ok: true,
     signed: true,
     mode,
-    certificateStored: certStored,
-    signedAt: signedAtIso,
+    certificateStored: certStored, executedDocumentStored: executedStored,
+    executedDocumentId: executedDoc.document.id, sourceSha256: analysis.sourceSha256,
+    executedSha256: validation.executedSha256, signedAt: signedAtIso,
   });
 }

@@ -78,6 +78,7 @@ interface DealDocument {
   receivedAt: string | null;
   signatureRequested: boolean;
   signed: boolean;
+  testSigned: boolean;
   signedByTypedName: string | null;
   scanStatus: "pending" | "clean" | "infected" | "unavailable";
 }
@@ -608,8 +609,8 @@ export default function LenderDeskPage() {
                                   ) : doc.scanStatus === "pending" || doc.scanStatus === "unavailable" ? (
                                     <span style={{ color: "#8F6E1F", fontWeight: 700 }}>Scanning…</span>
                                   ) : doc.signed ? (
-                                    <span style={{ color: "#166534", fontWeight: 800 }}>
-                                      SIGNED{doc.signedByTypedName ? ` — ${doc.signedByTypedName}` : ""}
+                                    <span style={{ color: doc.testSigned ? "#8F6E1F" : "#166534", fontWeight: 800 }}>
+                                      {doc.testSigned ? "TEST SIGNED" : "SIGNED"}{doc.signedByTypedName ? ` — ${doc.signedByTypedName}` : ""}
                                     </span>
                                   ) : doc.signatureRequested ? (
                                     <span style={{ color: "#9a3412", fontWeight: 700 }}>Awaiting signature</span>

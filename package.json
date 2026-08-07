@@ -575,7 +575,9 @@
     "verify:document-authenticity": "tsx src/scripts/documentAuthenticityConformance.ts",
     "smoke:document-authenticity": "tsx src/scripts/documentAuthenticityConformance.ts",
     "verify:stripe-connect-allocation": "tsx src/scripts/stripeConnectAllocationConformance.ts",
-    "smoke:stripe-connect-allocation": "tsx src/scripts/stripeConnectAllocationConformance.ts"
+    "smoke:stripe-connect-allocation": "tsx src/scripts/stripeConnectAllocationConformance.ts",
+    "verify:professional-credential-automation": "tsx src/scripts/professionalCredentialAutomationConformance.ts",
+    "verify:professional-page-roles": "tsx src/scripts/professionalPageRoleConformance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

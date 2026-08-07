@@ -1,0 +1,26 @@
+import assert from "node:assert/strict";
+
+import { evaluateProtectedPageRole } from "@/lib/auth/pageRolePolicy";
+
+assert.equal(evaluateProtectedPageRole("/lender-desk", "lender").allowed, true);
+assert.equal(evaluateProtectedPageRole("/lender-desk", "sponsor").allowed, false);
+assert.equal(evaluateProtectedPageRole("/lender-desk", "attorney").allowed, false);
+assert.equal(evaluateProtectedPageRole("/lender-desk", "auditor").allowed, false);
+assert.equal(evaluateProtectedPageRole("/lender-desk", "operator").allowed, false);
+assert.equal(evaluateProtectedPageRole("/lender-desk", "governance").allowed, true);
+
+assert.equal(evaluateProtectedPageRole("/governance", "lender").allowed, false);
+assert.equal(evaluateProtectedPageRole("/governance", "attorney").allowed, false);
+assert.equal(evaluateProtectedPageRole("/audit-replay", "auditor").allowed, false);
+assert.equal(evaluateProtectedPageRole("/sponsor", "sponsor").allowed, false);
+assert.equal(evaluateProtectedPageRole("/governance", "operator").allowed, true);
+
+assert.equal(evaluateProtectedPageRole("/portal", "user").allowed, true);
+assert.equal(evaluateProtectedPageRole("/portal", "lender").allowed, false);
+
+console.log(JSON.stringify({
+  ok: true,
+  lenderSurfaceOnly: "/lender-desk",
+  buildingProfessionalLanesFailClosed: true,
+  internalConsolesProfessionalDenied: true,
+}, null, 2));

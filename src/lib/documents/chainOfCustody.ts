@@ -58,6 +58,7 @@ export interface CustodyDocument {
   checksum: string | null;
   scanStatus: string;
   signed: boolean;
+  testSigned: boolean;
   signedBy: string | null;
   origin: "borrower" | "broker" | "portal";
   attestedAt: string | null;
@@ -128,7 +129,8 @@ export async function buildChainOfCustody(dealRef: string): Promise<ChainOfCusto
       byteSize: d.byteSize,
       checksum: d.checksum,
       scanStatus: typeof m.scanStatus === "string" ? m.scanStatus : "pending",
-      signed: m.signatureStatus === "signed",
+      signed: m.signatureStatus === "signed" || m.signatureStatus === "test-signed",
+      testSigned: m.signatureStatus === "test-signed",
       signedBy: typeof m.signedByTypedName === "string" ? m.signedByTypedName : null,
       origin: originOf(d.source, d.documentType),
       attestedAt: (m.attestation as { affirmedAt?: string } | null)?.affirmedAt ?? null,
@@ -231,7 +233,11 @@ export function renderChainOfCustodyPdf(report: ChainOfCustodyReport): Promise<B
         doc.font("Courier").fontSize(8).fillColor(MUTED).text(`SHA-256 ${d.checksum}`);
       }
       if (d.signed) {
-        doc.font("Times-Roman").fontSize(10).fillColor(NAVY).text(`Signed electronically by ${d.signedBy ?? "the customer"}`);
+        doc.font("Times-Roman").fontSize(10).fillColor(NAVY).text(
+          d.testSigned
+            ? `TEST signature ceremony completed by ${d.signedBy ?? "the customer"} — not legally operative`
+            : `Signed electronically by ${d.signedBy ?? "the customer"}`
+        );
       }
       if (d.attestedAt && d.attestationText) {
         doc.font("Times-Italic").fontSize(9).fillColor(NAVY)

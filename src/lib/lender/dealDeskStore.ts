@@ -152,7 +152,8 @@ export async function listDealDocuments(applicationId: string) {
       storageUri: d.storageUri,
       receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
       signatureRequested: m.signatureRequested === true,
-      signed: m.signatureStatus === "signed",
+      signed: m.signatureStatus === "signed" || m.signatureStatus === "test-signed",
+      testSigned: m.signatureStatus === "test-signed",
       signedByTypedName: typeof m.signedByTypedName === "string" ? m.signedByTypedName : null,
       scanStatus:
         m.scanStatus === "clean" || m.scanStatus === "infected" || m.scanStatus === "unavailable"

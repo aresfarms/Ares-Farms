@@ -26,6 +26,10 @@ export type StripeCheckoutSessionCreateParams = {
   payment_method_types?: string[];
   line_items?: StripeCheckoutLineItem[];
   metadata?: Record<string, string | number | boolean | null | undefined>;
+  payment_intent_data?: {
+    metadata?: Record<string, string | number | boolean | null | undefined>;
+    transfer_group?: string;
+  };
   success_url?: string;
   cancel_url?: string;
   customer_email?: string | null;
@@ -123,6 +127,12 @@ async function createLiveCheckoutSession(
       quantity: item.quantity ?? 1,
     })),
     metadata: normalizeMetadata(params.metadata),
+    payment_intent_data: params.payment_intent_data
+      ? {
+          metadata: normalizeMetadata(params.payment_intent_data.metadata),
+          transfer_group: params.payment_intent_data.transfer_group,
+        }
+      : undefined,
     success_url: params.success_url ?? "http://localhost:3000/success",
     cancel_url: params.cancel_url ?? "http://localhost:3000/dashboard",
     customer_email: params.customer_email ?? undefined,

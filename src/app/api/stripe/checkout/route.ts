@@ -15,6 +15,10 @@ import {
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
+import {
+  furlongCheckoutMetadata,
+  inferRevenueClass,
+} from "@/lib/stripe-connect/paymentProvenance";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   createRuntimeVersionRef,
@@ -38,6 +42,8 @@ type BillingPlanKey = keyof typeof PLANS;
 
 type CheckoutBody = {
   plan?: string | null;
+  customerSubjectRef?: string | null;
+  dealRef?: string | null;
 };
 
 type SessionUserWithTenant = {
@@ -353,6 +359,15 @@ export async function POST(req: Request) {
     const selected = PLANS[body.plan];
     const baseUrl = getBaseUrl();
     const tenantId = sessionUser.tenantId ?? "dev";
+    const revenueClass = inferRevenueClass(body.plan);
+    const checkoutMetadata = furlongCheckoutMetadata({
+      tenantId,
+      plan: body.plan,
+      traceId,
+      customerSubjectRef: body.customerSubjectRef,
+      dealRef: body.dealRef,
+      revenueClass,
+    });
     assertStripeCheckoutAvailable();
     const livePaymentConnector = stripeConfiguredForLivePayments();
 
@@ -371,11 +386,10 @@ export async function POST(req: Request) {
           quantity: 1,
         },
       ],
-      metadata: {
-        tenantId,
-        plan: body.plan,
-        traceId,
-        route: "api.stripe.checkout",
+      metadata: checkoutMetadata,
+      payment_intent_data: {
+        metadata: checkoutMetadata,
+        transfer_group: checkoutMetadata.transferGroup,
       },
       success_url: `${baseUrl}/success`,
       cancel_url: `${baseUrl}/dashboard?cancelled=true`,

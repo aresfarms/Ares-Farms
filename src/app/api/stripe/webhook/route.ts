@@ -15,6 +15,16 @@ import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
+import { persistStripeConnectAllocation } from "@/lib/stripe-connect/allocationStore";
+import {
+  approvedFounderRevenueRule,
+  isFurlongCheckoutSession,
+  normalizeRevenueClass,
+} from "@/lib/stripe-connect/paymentProvenance";
+import {
+  buildAllocationEvidence,
+  type StripeConnectRecipientRegistry,
+} from "@/lib/stripe-connect/runtime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
   createRuntimeVersionRef,
@@ -56,6 +66,19 @@ function createStripeWebhookTraceId(): string {
 
 function webhookSecret(): string | null {
   return readRequiredSecret("STRIPE_WEBHOOK_SECRET");
+}
+
+function stripeConnectRecipients(): StripeConnectRecipientRegistry {
+  return {
+    CAITLIN: {
+      connectedAccountRef: process.env.STRIPE_CONNECT_CAITLIN_ACCOUNT_ID?.trim() || null,
+      certified: process.env.STRIPE_CONNECT_CAITLIN_CERTIFIED === "true",
+    },
+    STUART: {
+      connectedAccountRef: process.env.STRIPE_CONNECT_STUART_ACCOUNT_ID?.trim() || null,
+      certified: process.env.STRIPE_CONNECT_STUART_CERTIFIED === "true",
+    },
+  };
 }
 
 function stripeWebhookVerifier(): Stripe {
@@ -439,6 +462,8 @@ export async function POST(req: Request) {
       event.data?.object?.id ??
       null;
     let entitlement: Entitlement | null = null;
+    let allocationEvidenceId: string | null = null;
+    let allocationRevenueClass: string | null = null;
 
     const classifiedPayload = classifyRecord(payloadRecord, {
       classificationLevel: "RESTRICTED",
@@ -481,6 +506,30 @@ export async function POST(req: Request) {
           },
         }
       );
+
+      const checkoutSession = stripeEvent.data.object as Stripe.Checkout.Session;
+      const revenueClass = normalizeRevenueClass(checkoutSession.metadata?.revenueClass);
+      if (isFurlongCheckoutSession(checkoutSession) && revenueClass) {
+        const rule = approvedFounderRevenueRule(revenueClass);
+        const allocationEvidence = buildAllocationEvidence({
+          paymentRef: checkoutSession.id,
+          sourceTransactionRef: null,
+          grossAmount: checkoutSession.amount_total ?? 0,
+          currency: checkoutSession.currency ?? "usd",
+          rule,
+          recipients: stripeConnectRecipients(),
+          generatedAt: new Date(stripeEvent.created * 1000).toISOString(),
+        });
+        const allocationRecord = await persistStripeConnectAllocation({
+          evidence: allocationEvidence,
+          rule,
+          revenueClass,
+          traceId,
+          replayRef: traceId,
+        });
+        allocationEvidenceId = allocationRecord.evidenceId;
+        allocationRevenueClass = revenueClass;
+      }
     }
 
     const classifiedResult = classifyRecord(

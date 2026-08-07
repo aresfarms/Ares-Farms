@@ -20,6 +20,7 @@
  * ledger (same unit) → data/audit-ledger.ndjson.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -27,8 +28,8 @@ import { SOURCE_ACTIVATION } from "./sourceActivation";
 import { getRuntimeActivation, isSourceLiveRuntime } from "./sourceActivationStore";
 import { recordsForReview } from "./propertyData";
 import { recordIsCurrent, type CanonicalProperty, type PropertySourceId } from "./propertyTypes";
-import { appendAuditEvent } from "./auditLedger";
 import { writeLiveRecords } from "./liveOverlay";
+import { runtimeStatePath } from "./runtimeStatePath";
 import { fetchHudReoRecords } from "./hudAdapter";
 import { fetchTreasuryRealProperty } from "./treasuryAdapter";
 import { fetchGsaRealEstate } from "./gsaRealEstateAdapter";
@@ -38,7 +39,7 @@ import { fetchGsaRealEstate } from "./gsaRealEstateAdapter";
  * fetcher gets a genuine pull + diff each run; one without (USDA's source is a
  * 2018 static archive) is revalidated as a historical snapshot.
  */
-const LIVE_FETCHERS: Record<string, () => Promise<{ records: CanonicalProperty[]; fetchedAt: string }>> = {
+const LIVE_FETCHERS: Partial<Record<string, () => Promise<{ records: CanonicalProperty[]; fetchedAt: string }>>> = {
   hud: fetchHudReoRecords,
   // Auction feeds: genuine daily re-pull so the auction set stays current —
   // concluded auctions drop off the official feed (removedFromFeed), new ones
@@ -48,7 +49,7 @@ const LIVE_FETCHERS: Record<string, () => Promise<{ records: CanonicalProperty[]
   "gsa-realestate": fetchGsaRealEstate,
 };
 
-const REFRESH_STATE_PATH = path.join(process.cwd(), "data", "source-refresh-state.json");
+const REFRESH_STATE_PATH = runtimeStatePath("source-refresh-state.json");
 const DOMAIN = "source-refresh";
 
 export type RefreshStatus = "REFRESHED" | "NO_CHANGE" | "SKIPPED" | "FAILED";
@@ -86,7 +87,7 @@ function writeRefreshState(sourceId: string, r: SourceRefreshResult, now: Date):
 }
 
 function log(sourceId: string, decision: string, r: SourceRefreshResult): void {
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: "system:source-refresh",
     actorName: "source-refresh-job",
     domain: DOMAIN,
@@ -199,7 +200,7 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
         reason: `feed fetch failed — last-good data kept live: ${(e as Error).message}`,
       });
       log(sourceId, "FAILURE", r);
-      appendAuditEvent({
+      canonicalLandRegisterAuthority.append({
         actorId: "system:source-refresh",
         actorName: "source-refresh-job",
         domain: DOMAIN,
@@ -221,6 +222,109 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     await refreshPropertyPlaceFacts({ now });
   } catch {
     /* place-fact refresh is best-effort; property refresh results stand */
+  }
+
+  // Market capital-rate refresh: pull keyless FRED (prime / 5-yr Treasury /
+  // SOFR) into the runtime-state overlay so the displayed rates track the
+  // Fed/market. Best-effort — a failure keeps the committed snapshot live.
+  try {
+    const { refreshCapitalRates } = await import("./capitalRatesRefresh");
+    const rate = await refreshCapitalRates();
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh",
+      actorName: "source-refresh-job",
+      domain: DOMAIN,
+      subject: "capital-rates",
+      decision: rate.status === "FAILED" ? "ALERT" : "REFRESH",
+      reason:
+        rate.status === "FAILED"
+          ? "capital-rate refresh failed — committed snapshot kept live"
+          : `capital rates ${rate.status.toLowerCase()} (prime ${rate.prime ?? "—"}, 5yr ${rate.treasury5yr ?? "—"}, SOFR ${rate.sofr ?? "—"}) as of ${rate.asOf}`,
+    });
+  } catch {
+    /* capital-rate refresh is best-effort; committed snapshot stands */
+  }
+
+  // Market commodity + livestock refresh: pull USDA NASS price-received (grain
+  // $/bu, livestock $/cwt) into the runtime-state overlay so the market tiles
+  // track USDA. Needs NASS_API_KEY in the job env; SKIPPED without it. Best-effort
+  // — a failure keeps the committed snapshot live.
+  try {
+    const { refreshCommodityPrices } = await import("./commodityPricesRefresh");
+    const c = await refreshCommodityPrices();
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh",
+      actorName: "source-refresh-job",
+      domain: DOMAIN,
+      subject: "commodity-prices",
+      decision: c.status === "FAILED" ? "ALERT" : "REFRESH",
+      reason:
+        c.status === "SKIPPED"
+          ? "commodity refresh skipped — NASS_API_KEY not set in the refresh job"
+          : c.status === "FAILED"
+            ? "commodity/livestock refresh failed — committed snapshot kept live"
+            : `commodity prices ${c.status.toLowerCase()} (${c.grain} grain, ${c.livestock} livestock)`,
+    });
+  } catch {
+    /* commodity refresh is best-effort; committed snapshot stands */
+  }
+
+  // Weekly ag refresh (Tier-1 activation 2026-07-28): drought severity (USDM,
+  // keyless) + corn/soybean crop conditions (NASS, same key as above) into the
+  // weekly-ag overlay, so the "local truth" leads — this week's drought map and
+  // crop ratings — track their weekly sources instead of aging in a snapshot.
+  // Best-effort: a thin pull never overwrites the served picture.
+  try {
+    const { refreshWeeklyAg } = await import("./weeklyAgRefresh");
+    const w = await refreshWeeklyAg();
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh",
+      actorName: "source-refresh-job",
+      domain: DOMAIN,
+      subject: "weekly-ag",
+      decision: w.status === "FAILED" ? "ALERT" : "REFRESH",
+      reason:
+        w.status === "FAILED"
+          ? `weekly-ag refresh failed (drought ${w.droughtStates} states) — committed snapshot kept live`
+          : `weekly-ag ${w.status.toLowerCase()} (drought ${w.droughtStates} states, crop conditions ${w.cropStates} states)`,
+    });
+  } catch {
+    /* weekly-ag refresh is best-effort; committed snapshot stands */
+  }
+
+  // Federal loan authority monitor: official SBA, FSA, USDA Rural Development,
+  // eCFR, and Federal Register sources. Content changes are detected and marked
+  // review-stale; the monitor never silently converts changed text into advice.
+  try {
+    const { refreshFederalLoanAuthorities } = await import("@/lib/governance/federalLoanAuthorityMonitor");
+    const federal = await refreshFederalLoanAuthorities({ now: now.toISOString() });
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "federal-loan-authority-refresh", subject: "SBA-FSA-USDA",
+      decision: federal.failed > 0 || federal.timedOut > 0 ? "ALERT" : federal.changed > 0 ? "REVIEW_REQUIRED" : "REFRESH",
+      reason: `Federal loan authority monitor fetched ${federal.fetched}, discovered ${federal.discovered}, detected ${federal.changed} changes, recorded ${federal.failed} failures, and timed out ${federal.timedOut} sources.`,
+      detail: { runId: federal.runId, snapshotSha256: federal.snapshotSha256, attempted: federal.attempted, deferred: federal.deferred, durationMs: federal.durationMs },
+    });
+  } catch (error) {
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "federal-loan-authority-refresh", subject: "SBA-FSA-USDA", decision: "ALERT",
+      reason: `Federal loan authority refresh failed; dependent guidance remains review-bound: ${(error as Error).message}`,
+    });
+  }
+
+  // Official parcel-tax and well-permit evidence refresh. The governed writers
+  // persist immutable versions and receipts in the shared runtime-state mount,
+  // so state survives Cloud Run revisions and scheduled job executions.
+  try {
+    const { refreshOfficialEvidenceSources } = await import("./officialEvidenceScheduledRefresh");
+    await refreshOfficialEvidenceSources(now);
+  } catch (error) {
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "official-evidence-refresh", subject: "all", decision: "ALERT",
+      reason: `official evidence refresh failed; last-good durable state retained: ${(error as Error).message}`,
+    });
   }
 
   return results;

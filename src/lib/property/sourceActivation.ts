@@ -195,6 +195,39 @@ export const SOURCE_ACTIVATION: Record<string, SourceActivationRecord> = {
     },
     sourceLive: false,
   },
+
+  // VEDP — Virginia Economic Development Partnership available properties &
+  // sites (state economic-development inventory; 1,712 for-sale records).
+  // Wired 2026-07-28; ships PENDING — display requires BOTH approvals below.
+  vedp: {
+    sourceId: "vedp",
+    sourceName: "VEDP — Virginia Economic Development Partnership (available properties & sites)",
+    module23: {
+      module: "Module 23 — Source Legal & Licensing Review",
+      status: "PENDING_HUMAN_APPROVAL",
+      facts: [
+        "Official VEDP open-data ArcGIS service (maps.vedp.org PropertiesSites MapServer) — a STATE source, not federal public domain.",
+        "VEDP's published copyright policy grants website visitors fair-use permission (vedp.org/privacy-policy, checked 2026-07-28); the ingested material is structured FACTS (addresses, acreage, zoning, sale status) from the official open-data API — facts are not copyrightable (Feist).",
+        "Commercial buildings and development sites listed for sale/lease by owners and localities; Furlong ingests sale === true only.",
+        "The feed publishes NO prices ('Price on request' — never invented) and NO per-listing public URLs (link-out goes to VEDP's official Site Selection portal, verified live).",
+      ],
+      license:
+        "VEDP copyright policy grants fair-use permission to site visitors; ingested material is uncopyrightable structured facts from the official open-data API, displayed with attribution + link-out to VEDP's own portal. A courtesy heads-up to VEDP remains OPTIONAL goodwill (partner posture), not a prerequisite; Stuart's pre-launch review (#34) is the counsel backstop.",
+      attributionRequired:
+        'Display "Source: VEDP — Virginia Economic Development Partnership (vedp.org)" on every listing.',
+      reviewedBy: null,
+      reviewedAt: null,
+    },
+    module22: {
+      module: "Module 22 — Live Scraper Activation",
+      status: "PENDING_HUMAN_APPROVAL",
+      ingestMethod: "Official VEDP ArcGIS open-data REST service (JSON query; the live HTML portal is NOT scraped)",
+      liveFetchAllowed: false,
+      reviewedBy: null,
+      reviewedAt: null,
+    },
+    sourceLive: false,
+  },
 };
 
 /** True only when a source has BOTH modules APPROVED and sourceLive set. */

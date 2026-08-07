@@ -10,12 +10,24 @@ import { createPostgresSslConfig } from "./postgresSsl";
  * - ensures query API is consistent
  */
 
+function positiveInteger(value: string | undefined, fallback: number): number {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: createPostgresSslConfig(),
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
+  max: positiveInteger(process.env.DB_POOL_MAX, 10),
+  idleTimeoutMillis: positiveInteger(process.env.DB_IDLE_TIMEOUT_MS, 30_000),
+  // Immutable audit appends deliberately serialize at the chain head. Under a
+  // burst, callers must queue for a connection rather than fail after 10s and
+  // risk losing the audit event. This is an acquisition timeout, not a query
+  // timeout, and remains operator-configurable per deployment profile.
+  connectionTimeoutMillis: positiveInteger(
+    process.env.DB_CONNECTION_TIMEOUT_MS,
+    60_000,
+  ),
 });
 pool.on("error", (error) => {
   console.warn(`PostgreSQL idle client warning: ${error.message}`);

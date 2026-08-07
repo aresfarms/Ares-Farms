@@ -21,17 +21,12 @@ function fail(msg) { console.error(`✗  P18 render-swap FAIL — ${msg}`); }
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage();
-  await page.goto(BASE, { waitUntil: "domcontentloaded" });
+  await page.goto(`${BASE}/explore?lane=property-land`, { waitUntil: "domcontentloaded" });
 
-  // Wait for the map card to mount.
-  await page.waitForSelector(".tour-popup-card", { timeout: 15_000 });
-
-  // Advance to a known multi-image stop (St. Augustine, ~4 images). Clicking
-  // Next resets the card to its earliest image; the dissolve then runs on its own.
-  for (let k = 0; k < 6; k++) {
-    await page.click('button[aria-label="Next place"]');
-    await page.waitForTimeout(120);
-  }
+  // The property-land lane opens on a governed multi-image stop. Wait for
+  // the first actual image, then observe the automatic cross-fade without
+  // advancing the interactive map or mutating its compass state.
+  await page.waitForSelector(".tour-popup-card img", { timeout: 15_000 });
 
   const read = () =>
     page.evaluate(() => {

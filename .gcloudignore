@@ -1,0 +1,58 @@
+# =============================================================================
+# .gcloudignore — what `gcloud builds submit` uploads (STAGING-DEPLOY P2.1)
+#
+# LOAD-BEARING for secret safety, like .dockerignore: gcloud uses THIS file
+# (not .dockerignore) to build the upload tarball. Without it, gcloud falls
+# back to .gitignore — which happens to exclude .env, but the exclusion should
+# be explicit, not incidental. Keep the entries below in sync with
+# .dockerignore's secret/artifact sections.
+# =============================================================================
+
+# Secrets: NEVER leave the laptop
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Personal financial / identity / recovery documents: NEVER upload
+Recovery Key.pdf
+*recovery[ _-]key*
+Credit_Summary_*.pdf
+*_Caitlin_Hudson.pdf
+*_Stuart_Fraass.pdf
+*_Frances_Fraass.pdf
+*_ssn*
+*social_security*
+*passport*
+*drivers_license*
+*tax_return*
+*bank_statement*
+
+# Build artifacts: rebuilt fresh in Cloud Build
+.next
+node_modules
+out
+dist
+
+# VCS / local noise
+.git
+.DS_Store
+.vscode
+.idea
+.claude
+coverage
+*.log
+
+# Infra (not needed in the image build context)
+infra
+artifacts
+
+# Runtime/operator state and local working material are not source code
+data
+review-exports
+journey-photos
+work
+scratch
+tmp

@@ -1,5 +1,8 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
+import Stripe from "stripe";
 
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
 import {
@@ -17,6 +20,8 @@ import {
   createRuntimeVersionRef,
   evaluateVersionRuntime,
 } from "@/lib/runtime/versionRuntime";
+import { readRequiredSecret } from "@/lib/security/requestGuards";
+import { stripeConfiguredForLivePayments } from "@/lib/stripe/client";
 
 /**
  * Stripe Webhook API
@@ -30,10 +35,9 @@ import {
  * - Vol V: enforces connector governance, observability, classification, replay,
  *   versioning, and auditability.
  *
- * Current build status:
- * This route remains in local stub mode for signature verification. It requires a
- * Stripe signature header, but cryptographic verification must be promoted later
- * through a controlled connector-hardening step.
+ * Signature posture:
+ * Stripe webhooks must pass cryptographic verification with STRIPE_WEBHOOK_SECRET.
+ * Missing configuration or invalid signatures fail closed.
  */
 
 type StripeWebhookPayload = {
@@ -47,9 +51,18 @@ type StripeWebhookPayload = {
 };
 
 function createStripeWebhookTraceId(): string {
-  return `stripe-webhook-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `stripe-webhook-${randomUUID()}`;
+}
+
+function webhookSecret(): string | null {
+  return readRequiredSecret("STRIPE_WEBHOOK_SECRET");
+}
+
+function stripeWebhookVerifier(): Stripe {
+  // Webhook signature verification uses STRIPE_WEBHOOK_SECRET, not an API
+  // credential. A non-credential sentinel keeps the dormant connector
+  // constructible without putting Stripe-key-shaped content in source.
+  return new Stripe(process.env.STRIPE_SECRET_KEY?.trim() || "not-configured");
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -146,6 +159,8 @@ export async function POST(req: Request) {
     const bodyText = await req.text();
     const headerStore = await headers();
     const signature = headerStore.get("stripe-signature");
+    const configuredWebhookSecret = webhookSecret();
+    const livePaymentConnector = stripeConfiguredForLivePayments();
 
     const runtimeGuard = runRuntimeGuard({
       operation: "billing.stripe.webhook",
@@ -159,7 +174,7 @@ export async function POST(req: Request) {
       metadata: {
         route: "/api/stripe/webhook",
         signaturePresent: Boolean(signature),
-        stubSignatureVerification: true,
+        cryptographicSignatureVerification: true,
         writesEntitlementState: true,
         durableEntitlementState: true,
         durableGovernanceEvidence: true,
@@ -206,6 +221,20 @@ export async function POST(req: Request) {
       );
     }
 
+    if (!configuredWebhookSecret) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "STRIPE_WEBHOOK_SECRET is not configured for this environment.",
+          governance: {
+            traceId,
+            runtimeGuard,
+          },
+        },
+        { status: 503 }
+      );
+    }
+
     const versionRuntime = evaluateVersionRuntime({
       operation: "billing.stripe.webhook",
       module: "api.stripe.webhook",
@@ -243,7 +272,7 @@ export async function POST(req: Request) {
         ),
         createRuntimeVersionRef(
           "api",
-          "stripe-webhook-local-stub-v0.1.0",
+          "stripe-webhook-verified-v1.0.0",
           "src/app/api/stripe/webhook/route.ts",
           traceId
         ),
@@ -328,16 +357,20 @@ export async function POST(req: Request) {
       );
     }
 
-    let parsedPayload: unknown;
+    let stripeEvent: Stripe.Event;
 
     try {
-      parsedPayload = JSON.parse(bodyText);
-    } catch {
+      stripeEvent = stripeWebhookVerifier().webhooks.constructEvent(
+        bodyText,
+        signature,
+        configuredWebhookSecret
+      );
+    } catch (error) {
       const observability = createObservabilityEvent({
-        eventType: "STRIPE_WEBHOOK_INVALID_PAYLOAD",
-        domain: "connector",
+        eventType: "STRIPE_WEBHOOK_SIGNATURE_INVALID",
+        domain: "security",
         severity: "WARN",
-        message: "Stripe webhook rejected because the payload was invalid JSON.",
+        message: "Stripe webhook rejected because signature verification failed.",
         traceId,
         replayRef: traceId,
         actorId: null,
@@ -357,13 +390,13 @@ export async function POST(req: Request) {
           verificationStatus: "rejected",
           deterministic: true,
           replaySafe: versionRuntime.replaySafe,
-          sourceVersion: "stripe-webhook-local-stub-v0.1.0",
+          sourceVersion: "stripe-webhook-verified-v1.0.0",
           replayVersion: "stripe-webhook-rejection-replay-v0.1.0",
           eventCount: 1,
           mismatchCount: 0,
           result: {
             rejected: true,
-            reason: "invalid-json",
+            reason: "invalid-signature",
           },
           metadata: {
             route: "/api/stripe/webhook",
@@ -379,7 +412,10 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error: "Invalid webhook payload.",
+          error:
+            error instanceof Error
+              ? error.message
+              : "Stripe webhook signature verification failed.",
           governance: {
             traceId,
             runtimeGuard,
@@ -392,7 +428,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const payloadRecord = isRecord(parsedPayload) ? parsedPayload : {};
+    const payloadRecord = isRecord(stripeEvent) ? stripeEvent : {};
     const event = payloadRecord as StripeWebhookPayload;
     const metadata = event.data?.object?.metadata;
     const tenantId = getMetadataValue(metadata, "tenantId") ?? "dev";
@@ -441,7 +477,7 @@ export async function POST(req: Request) {
           metadata: {
             requestedPlan,
             eventType: event.type,
-            stubSignatureVerification: true,
+            stubSignatureVerification: false,
           },
         }
       );
@@ -498,8 +534,8 @@ export async function POST(req: Request) {
       checkoutSessionCreated: false,
       webhookReceived: true,
       entitlementGranted: Boolean(entitlement),
-      paymentConnectorLiveMode: false,
-      stubSignatureVerification: true,
+      paymentConnectorLiveMode: livePaymentConnector,
+      stubSignatureVerification: false,
       regulatedDecisionImpactAllowed: false,
       humanReviewRequired: true,
       requestPayload: payloadRecord,
@@ -516,7 +552,7 @@ export async function POST(req: Request) {
         requestedPlan,
         durableBillingEvent: true,
         durableEntitlementState: Boolean(entitlement),
-        stubSignatureVerification: true,
+        stubSignatureVerification: false,
       },
     });
 
@@ -539,7 +575,7 @@ export async function POST(req: Request) {
         durableEntitlementState: true,
         durableGovernanceEvidence: true,
         durableBillingEvent: true,
-        stubSignatureVerification: true,
+        stubSignatureVerification: false,
       },
     });
 
@@ -606,7 +642,7 @@ export async function POST(req: Request) {
           : "warning",
         deterministic: true,
         replaySafe: versionRuntime.replaySafe,
-        sourceVersion: "stripe-webhook-local-stub-v0.1.0",
+        sourceVersion: "stripe-webhook-verified-v1.0.0",
         replayVersion: "stripe-webhook-replay-v0.1.0",
         eventCount: entitlement ? 1 : 0,
         mismatchCount: versionRuntime.ok ? 0 : 1,
@@ -615,7 +651,7 @@ export async function POST(req: Request) {
           billingEventId: billingEvent.billingEventId,
           entitlementGranted: Boolean(entitlement),
           entitlementId: entitlement?.id ?? null,
-          stubSignatureVerification: true,
+          stubSignatureVerification: false,
         },
         metadata: {
           route: "/api/stripe/webhook",

@@ -394,9 +394,12 @@ const results: CheckResult[] = [
   // F — Form accessibility
   // ════════════════════════════════════════════════════════════════════════════
 
+  // The standalone readiness form was folded into the analysis workspace
+  // (founder direction 2026-07-17); the labels obligation moves with the
+  // inputs. /readiness is now a formless bridge page.
   check("F01", "F — Form Accessibility",
-    "Readiness form inputs are wrapped in <label> elements",
-    readiness.includes("<label"),
+    "Analysis workspace form inputs are wrapped in <label> elements",
+    readSrc("src/components/property/PropertyEvaluationWorkspace.tsx").includes("<label"),
     "Form inputs must be programmatically associated with labels (WCAG 3.3.2)."
   ),
 

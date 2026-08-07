@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 
+import { canonicalPropertyAuthority } from "@/lib/platform/authorities/property";
+
 import {
   INSTITUTIONAL_VALIDATION_SOURCES,
   PROPERTY_DISCOVERY_DISCLOSURES,
@@ -8,7 +10,6 @@ import {
   SCRAPER_REGISTRY,
   SOURCE_AUTHORITY_REGISTRY,
   SOURCE_INTELLIGENCE_REQUIRED_DISCLOSURES,
-  canonicalProperty,
   dispatchSourceIntelligenceAction,
   productionGates,
   productionRestrictions,
@@ -214,7 +215,7 @@ function verifyPropertyDiscovery(): void {
 }
 
 function verifyCanonicalProperties(): void {
-  const canonical = canonicalProperty({});
+  const canonical = canonicalPropertyAuthority.resolve({});
 
   assert(
     Array.isArray(canonical.provenance_chain),
@@ -287,7 +288,7 @@ function smokeScraperRegistry(): void {
 }
 
 function smokeListingCanonicalization(): void {
-  const result = canonicalProperty({ canonicalPropertyId: "canonical-test" });
+  const result = canonicalPropertyAuthority.resolve({ canonicalPropertyId: "canonical-test" });
 
   assert(
     JSON.stringify(result).includes("source conflict resolution"),

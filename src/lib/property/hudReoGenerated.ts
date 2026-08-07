@@ -8,14 +8,14 @@
  * Written by src/scripts/ingestHudReo.ts from the official HUD FHA REO open
  * dataset (public domain). Re-run `npm run ingest:hud-reo` to refresh.
  *
- * Ingested at: 2026-06-10T23:39:59.517Z
+ * Ingested at: 2026-07-17T16:15:44.498Z
  * NOT shown publicly until Module 22 + 23 are APPROVED (sourceActivation.ts).
  */
 
 import type { CanonicalProperty } from "./propertyTypes";
 
 export const HUD_INGEST_PROVENANCE = {
-  "fetchedAt": "2026-06-10T23:39:59.517Z",
+  "fetchedAt": "2026-07-17T16:15:44.498Z",
   "feedUrl": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
   "datasetId": "a54aff75cc0a42de8456cc36a7335663_3",
   "rows": 622,
@@ -59,19 +59,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8a496620f78824ba0a3f93249b853ed547da038756966909168c294ef075a9e6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8a496620f78824ba0a3f93249b853ed547da038756966909168c294ef075a9e6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-111-144877",
@@ -113,19 +113,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d7a4ba9c1a8685ea6a657bbea7a4dfc1738bf3df7eb62cfc17d353e01d573529"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d7a4ba9c1a8685ea6a657bbea7a4dfc1738bf3df7eb62cfc17d353e01d573529",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-625906",
@@ -167,19 +167,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "831462409564bb1afe963be70091694209a805eed73bbe0106f56b86d5942e74"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "831462409564bb1afe963be70091694209a805eed73bbe0106f56b86d5942e74",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-640353",
@@ -221,19 +221,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2fd8e2076eb71b0d4ae904b587278824c8d034d72299fd7ca78948ec65466f74"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2fd8e2076eb71b0d4ae904b587278824c8d034d72299fd7ca78948ec65466f74",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-662347",
@@ -275,19 +275,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9ba47884aa056f70f64e36536237da0ec8d5dfef0c85731c17cc35685b09fc18"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9ba47884aa056f70f64e36536237da0ec8d5dfef0c85731c17cc35685b09fc18",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-581746",
@@ -329,19 +329,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "528bd7708c754fdd56c257cd45a9d5fb6aa11ee683a7e6bcfbaa6b53ad88377b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "528bd7708c754fdd56c257cd45a9d5fb6aa11ee683a7e6bcfbaa6b53ad88377b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-583168",
@@ -383,19 +383,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "85780fb07d320c0957bfd73f99f3f85399331d68d212099d5f12df560b70308b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "85780fb07d320c0957bfd73f99f3f85399331d68d212099d5f12df560b70308b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-586507",
@@ -437,19 +437,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "84fbf01b7f6a04672ce8916b61fa14a6d6c0b80105d08c3486dc6b86c4b15018"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "84fbf01b7f6a04672ce8916b61fa14a6d6c0b80105d08c3486dc6b86c4b15018",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-595891",
@@ -491,19 +491,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2181fe4f1f42f3d8559d009b00c9f05b4797f9f0088eddd93e63ab34cbc388c0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2181fe4f1f42f3d8559d009b00c9f05b4797f9f0088eddd93e63ab34cbc388c0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-846674",
@@ -545,19 +545,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e0af873f9f549bc2c7af0313bf071d2910fe86f29eecde4c92a09d54a04bcb98"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e0af873f9f549bc2c7af0313bf071d2910fe86f29eecde4c92a09d54a04bcb98",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-889154",
@@ -599,19 +599,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c1d59c18602f43f39ec78be4f448bc03d60f3e926db72d7ba9fa81a680b52e1c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c1d59c18602f43f39ec78be4f448bc03d60f3e926db72d7ba9fa81a680b52e1c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-673833",
@@ -653,19 +653,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4f59aa173209db04d86eb19484eefaf439127f8f21b5b11623238f1806fba758"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4f59aa173209db04d86eb19484eefaf439127f8f21b5b11623238f1806fba758",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-723332",
@@ -707,19 +707,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bf8e3b22c703c9c08589fb5ee00cb3dcc44b9d893b10bbfc2a783c2760b671a2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bf8e3b22c703c9c08589fb5ee00cb3dcc44b9d893b10bbfc2a783c2760b671a2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-728288",
@@ -761,19 +761,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ffc4ff9f10e7ac04563139f61c35537b2aa9796cad893446b271a6b76e9bca73"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ffc4ff9f10e7ac04563139f61c35537b2aa9796cad893446b271a6b76e9bca73",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-739379",
@@ -815,19 +815,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "05708b7ccd5ed32f7968ef9862ed757368d6b9cb8cc27bff0630d99c8516fcf5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "05708b7ccd5ed32f7968ef9862ed757368d6b9cb8cc27bff0630d99c8516fcf5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-743242",
@@ -869,19 +869,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4b8768d18c7b3aab27b6b35214ea386e9ad712e13d9624c7f6ded54c8f277f3f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4b8768d18c7b3aab27b6b35214ea386e9ad712e13d9624c7f6ded54c8f277f3f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-709974",
@@ -923,19 +923,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8507113cf2e3708f61123b0889e1ceecc2626957c55e463d8a2aba18c42a2fc9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8507113cf2e3708f61123b0889e1ceecc2626957c55e463d8a2aba18c42a2fc9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-900902",
@@ -977,19 +977,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3af722ea130a9be11b8301d950a3a50c8c0885255f5e7bd29e447dc88e2a0c79"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3af722ea130a9be11b8301d950a3a50c8c0885255f5e7bd29e447dc88e2a0c79",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-902501",
@@ -1031,19 +1031,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bb65d95d07501b3ea77a02a9d2c6afb0cc0997d43833f6375a2d1788d31f6ef7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bb65d95d07501b3ea77a02a9d2c6afb0cc0997d43833f6375a2d1788d31f6ef7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-704193",
@@ -1085,19 +1085,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9772249b9215bebda92cbac145f2e6c87ccb76c607bfde68dbd2bae0e5e4d8a7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9772249b9215bebda92cbac145f2e6c87ccb76c607bfde68dbd2bae0e5e4d8a7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-706104",
@@ -1139,19 +1139,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "885108ba8a97e18ce707334376633541a56b2a40b5d379f2dbb16e0d6b9d479c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "885108ba8a97e18ce707334376633541a56b2a40b5d379f2dbb16e0d6b9d479c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-708842",
@@ -1193,19 +1193,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "96dccf0f9e2123257135d64aa101da9d6136c4de8a38dd2fda0b648467e6826d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "96dccf0f9e2123257135d64aa101da9d6136c4de8a38dd2fda0b648467e6826d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-013-003751",
@@ -1247,19 +1247,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bdd11bbfe87a1f61229c2588010902885e2b9164710bdef5e77b31acbd8be3b8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bdd11bbfe87a1f61229c2588010902885e2b9164710bdef5e77b31acbd8be3b8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-013-004333",
@@ -1301,19 +1301,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c2f3e7acd928209ecedfd5f48e91b8d5de4be47b361a2b240af5c4d2418f18f8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c2f3e7acd928209ecedfd5f48e91b8d5de4be47b361a2b240af5c4d2418f18f8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-013-016433",
@@ -1355,19 +1355,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "09fce4cbc70f741b5ba342011150c79a2895297f7d4be77c5535d0abf52d5198"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "09fce4cbc70f741b5ba342011150c79a2895297f7d4be77c5535d0abf52d5198",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-796579",
@@ -1409,19 +1409,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "69b31d94a0962cf1c69852cc0528bba318421658dfa08015373e2ce644f6014d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "69b31d94a0962cf1c69852cc0528bba318421658dfa08015373e2ce644f6014d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-815470",
@@ -1463,19 +1463,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "51b05196572b05d594095ebf0f85e4823456f04ea342b81b5c1ed1aed3b17545"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "51b05196572b05d594095ebf0f85e4823456f04ea342b81b5c1ed1aed3b17545",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-822932",
@@ -1517,19 +1517,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3d1936d82acf1e7dfe3d87bab0e48f1f19aaa3aa892d35554a2811d60b0b2579"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3d1936d82acf1e7dfe3d87bab0e48f1f19aaa3aa892d35554a2811d60b0b2579",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-997021",
@@ -1571,19 +1571,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5bd19e4049f9a880bc7e4e4d5a146741d53a4b29a57f563f849f872858498d40"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5bd19e4049f9a880bc7e4e4d5a146741d53a4b29a57f563f849f872858498d40",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-013-002362",
@@ -1625,19 +1625,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1f808dcb374e411a2eaae384188b59e378035bce807b4a814417653d76b4fd7b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1f808dcb374e411a2eaae384188b59e378035bce807b4a814417653d76b4fd7b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-908238",
@@ -1679,19 +1679,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7f3f1fb2865a67af09e9869e6d2747a8054dcc5bb4832c437e91fefa05e7a581"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7f3f1fb2865a67af09e9869e6d2747a8054dcc5bb4832c437e91fefa05e7a581",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-013-017010",
@@ -1733,19 +1733,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "65b0dfec799a43dfdf4a891812a68b7381d37ed2ff43ba18b8878efdcee2d3a5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "65b0dfec799a43dfdf4a891812a68b7381d37ed2ff43ba18b8878efdcee2d3a5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-979052",
@@ -1787,19 +1787,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bfb4324cb22c46345911c23be8df55bb68710fe5f4b514bffcc77a2ca4b9cffb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bfb4324cb22c46345911c23be8df55bb68710fe5f4b514bffcc77a2ca4b9cffb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-979682",
@@ -1841,19 +1841,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "683c3f9c3e8471bdec681bba24ac9e6294985ab740703771cc8eefc7ca31244f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "683c3f9c3e8471bdec681bba24ac9e6294985ab740703771cc8eefc7ca31244f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-983303",
@@ -1895,19 +1895,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8a828cd7d18f30d40c0232077569b6d097b41fdc59c479293de4712a72f57f4f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8a828cd7d18f30d40c0232077569b6d097b41fdc59c479293de4712a72f57f4f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-989649",
@@ -1949,19 +1949,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0f275ac289686973bf6cb7fd8bd8f356e345fcef23fe2bc12c30e3136c920ceb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0f275ac289686973bf6cb7fd8bd8f356e345fcef23fe2bc12c30e3136c920ceb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-991468",
@@ -2003,19 +2003,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fbbbfb80fffb84ad7abcd0133e6c4bac23b45249fec922556724c6a0f3c04c28"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fbbbfb80fffb84ad7abcd0133e6c4bac23b45249fec922556724c6a0f3c04c28",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-950896",
@@ -2057,19 +2057,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d32cb8c5be542c14f9052599b8c58f85b12773b99f22c5ee768f0552ae952130"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d32cb8c5be542c14f9052599b8c58f85b12773b99f22c5ee768f0552ae952130",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-910264",
@@ -2111,19 +2111,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "19d90bb11e5713cbe3c5ec0d07c8df66924ccbf7ad909d914e0e605f2721589d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "19d90bb11e5713cbe3c5ec0d07c8df66924ccbf7ad909d914e0e605f2721589d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-911128",
@@ -2165,19 +2165,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ab539b38aec219795ce6710f2e3cb358dc7d33fc9919159f079abec369338283"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ab539b38aec219795ce6710f2e3cb358dc7d33fc9919159f079abec369338283",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-918601",
@@ -2219,19 +2219,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "237899bb9e0e1fcab13791187b0b20ecec904eb57e524c43664691431ca367e2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "237899bb9e0e1fcab13791187b0b20ecec904eb57e524c43664691431ca367e2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-939316",
@@ -2273,19 +2273,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d1de9b34ff9622d5942aa016f325b89c4ef5443600d2c1b451e440df8ae7c28d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d1de9b34ff9622d5942aa016f325b89c4ef5443600d2c1b451e440df8ae7c28d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-966004",
@@ -2327,19 +2327,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "350e8d19b6439283146fcfd61a756548444a16c273b1a1a738f39822692bf73d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "350e8d19b6439283146fcfd61a756548444a16c273b1a1a738f39822692bf73d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-969416",
@@ -2381,19 +2381,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "940cac09341d45d0a93e0db84524ad127abb1d676e83fb6648a60eaab79e9bcb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "940cac09341d45d0a93e0db84524ad127abb1d676e83fb6648a60eaab79e9bcb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-973191",
@@ -2435,19 +2435,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4313ae4b5d63a8364b1bdf2afc04ba4815384c4509cbd8933580867611ef2851"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4313ae4b5d63a8364b1bdf2afc04ba4815384c4509cbd8933580867611ef2851",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-011-974537",
@@ -2489,19 +2489,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d3d4cfa1189d013f40d38e87e0d3a9ed1b797284872e82513749787694673fed"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d3d4cfa1189d013f40d38e87e0d3a9ed1b797284872e82513749787694673fed",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-031-566104",
@@ -2543,19 +2543,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "88d649088169ef82731002685bbe461510d96f18983dbb864e4c5dd742d73697"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "88d649088169ef82731002685bbe461510d96f18983dbb864e4c5dd742d73697",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-031-462141",
@@ -2597,19 +2597,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ba22463a7cbfb6c146fc48a4bfb7219dfad634ecf6dc31267b526276054ceeca"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ba22463a7cbfb6c146fc48a4bfb7219dfad634ecf6dc31267b526276054ceeca",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-031-516718",
@@ -2651,19 +2651,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "825d6cd39d4723236c0de7bb891c414173f1706a111b158f2b7465594b6ee993"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "825d6cd39d4723236c0de7bb891c414173f1706a111b158f2b7465594b6ee993",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-022-304274",
@@ -2705,19 +2705,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fa6fdb7597c6248e17f0c8a50a0249974b6547c6188e63bc9688290a96a51076"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fa6fdb7597c6248e17f0c8a50a0249974b6547c6188e63bc9688290a96a51076",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-023-230539",
@@ -2759,19 +2759,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c09f75ce1b603e5aec26db6e51b43aadba470f619d69c9d4a883c9cdd25d38c4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c09f75ce1b603e5aec26db6e51b43aadba470f619d69c9d4a883c9cdd25d38c4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-023-312991",
@@ -2813,19 +2813,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c72ba3fb7eda714fdcb241a4babe5168ee041fee7bbc1e98e2d432e045fae973"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c72ba3fb7eda714fdcb241a4babe5168ee041fee7bbc1e98e2d432e045fae973",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-023-935634",
@@ -2867,19 +2867,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ec150807266ba736aa04415ac7c4a300ff752362f9cdbd995eb2674c80a289d6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ec150807266ba736aa04415ac7c4a300ff752362f9cdbd995eb2674c80a289d6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-023-939425",
@@ -2921,19 +2921,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dfb96021cd712422d620729ea8407195a3fbb940404be88972726593d9a4df77"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dfb96021cd712422d620729ea8407195a3fbb940404be88972726593d9a4df77",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-023-948661",
@@ -2975,19 +2975,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "364bad9f14dcc0e9ba0ef69eca185a8712c5a75149879bc125803ac6ee8f7d29"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "364bad9f14dcc0e9ba0ef69eca185a8712c5a75149879bc125803ac6ee8f7d29",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-048-434197",
@@ -3029,19 +3029,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b191e9b618cbe3951181b01cb46d9af54bd1d9d08ceee5565bb05329b7eb2936"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b191e9b618cbe3951181b01cb46d9af54bd1d9d08ceee5565bb05329b7eb2936",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-043-733846",
@@ -3083,19 +3083,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b881f1bb46ce96812b9304a83f7d2763fc6e894ebba75ec9a417fe5c34b89fbc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b881f1bb46ce96812b9304a83f7d2763fc6e894ebba75ec9a417fe5c34b89fbc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-043-784279",
@@ -3137,19 +3137,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "45bf4126b4a943c8be5190d8643bc6ad501bb5c9e4787f431b2b5bcc5ab79e63"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "45bf4126b4a943c8be5190d8643bc6ad501bb5c9e4787f431b2b5bcc5ab79e63",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-043-792122",
@@ -3191,19 +3191,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d19a6f89f2d39a9c3de5d66fc9609b5165ce700c95e612add2d112b266e15668"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d19a6f89f2d39a9c3de5d66fc9609b5165ce700c95e612add2d112b266e15668",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-043-793100",
@@ -3245,19 +3245,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5fd7af31479ecc9e2c642f7140eb5eea388170a1fd3453d681f9a07ae8f49301"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5fd7af31479ecc9e2c642f7140eb5eea388170a1fd3453d681f9a07ae8f49301",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-044-429526",
@@ -3299,19 +3299,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6950ebb245eeafedef26d0e634297bee9751e987b90fcce8d7cecb1cd385295b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6950ebb245eeafedef26d0e634297bee9751e987b90fcce8d7cecb1cd385295b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-043-729649",
@@ -3353,19 +3353,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "aee6a6c25dbf944a404206e29e4411a2d533bc371432b843578f87eb97dd6e6d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "aee6a6c25dbf944a404206e29e4411a2d533bc371432b843578f87eb97dd6e6d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-049-079130",
@@ -3407,19 +3407,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0f2fc347cb7099ed161b232ee8e5a914295127abfc65eee107e3d17bcf7c606d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0f2fc347cb7099ed161b232ee8e5a914295127abfc65eee107e3d17bcf7c606d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-048-443771",
@@ -3461,19 +3461,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "da454a723d64e3c2444baf10926712ecbf9ee6d2472bc62205bf1f42c342ac0b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "da454a723d64e3c2444baf10926712ecbf9ee6d2472bc62205bf1f42c342ac0b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-045-929280",
@@ -3515,19 +3515,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "91f2f97d964226f9de39fd27da5f2d42d36c7a554e5e9f31670ae0a5a50dd709"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "91f2f97d964226f9de39fd27da5f2d42d36c7a554e5e9f31670ae0a5a50dd709",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-049-174568",
@@ -3569,19 +3569,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ff05575233403c6bbec857d57ec3f872f814999e57aa95f692d2c5ccc2c65a6e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ff05575233403c6bbec857d57ec3f872f814999e57aa95f692d2c5ccc2c65a6e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-045-678340",
@@ -3623,19 +3623,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0bc07a6c45784df5bcd13155fbd5b41f7c1f434ad6db5d05a09638707a47e1b0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0bc07a6c45784df5bcd13155fbd5b41f7c1f434ad6db5d05a09638707a47e1b0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-048-563777",
@@ -3677,19 +3677,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "832e850a842cd39d5ec3b9f38adf2dc3b158c3715899e95f143eec9a9a5069c0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "832e850a842cd39d5ec3b9f38adf2dc3b158c3715899e95f143eec9a9a5069c0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-048-665960",
@@ -3731,19 +3731,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bbc43ec7136c5c2c7148356056ada5efbe7c7728856eb91f4c4449e1c9856bf6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bbc43ec7136c5c2c7148356056ada5efbe7c7728856eb91f4c4449e1c9856bf6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-194-064886",
@@ -3785,19 +3785,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fd0fd87daf67ba30a4e20f03cfc5db6be042e357ce9eaec98827c04e5f5c2056"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fd0fd87daf67ba30a4e20f03cfc5db6be042e357ce9eaec98827c04e5f5c2056",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-198-179032",
@@ -3839,19 +3839,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "976e0386226f8cc283048a8b529674f7193b3b9c2d8c2417d80693432e75dee3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "976e0386226f8cc283048a8b529674f7193b3b9c2d8c2417d80693432e75dee3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-198-180412",
@@ -3893,19 +3893,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "947e29bc4fc67ba5cf775d26bae194bd1e4fd6bf187c3ded629400582162547e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "947e29bc4fc67ba5cf775d26bae194bd1e4fd6bf187c3ded629400582162547e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-197-775570",
@@ -3947,19 +3947,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1335ffa4c29b329e721f8680ce282623358816bfbb65b79e1c609a0a56d76f0f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1335ffa4c29b329e721f8680ce282623358816bfbb65b79e1c609a0a56d76f0f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-197-935374",
@@ -4001,19 +4001,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f20ad1293a491921631a046f9e858d15e0b57a98bdcab8615bafc81267f896e2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f20ad1293a491921631a046f9e858d15e0b57a98bdcab8615bafc81267f896e2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-052-331338",
@@ -4055,19 +4055,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6cdc6495484e60efcc8d48a809a255504215aba66e1afb1c0c0fdb4babd01874"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6cdc6495484e60efcc8d48a809a255504215aba66e1afb1c0c0fdb4babd01874",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-053-092565",
@@ -4109,19 +4109,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d69606d40ac86967f8b563a0e420f0767a57168ee21f72a86af390d9e888c587"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d69606d40ac86967f8b563a0e420f0767a57168ee21f72a86af390d9e888c587",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-052-939209",
@@ -4163,19 +4163,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "57741257d525ac5300e64c5b33d91e3630725c23b2dfbbe6bcefe1c74a9cfe82"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "57741257d525ac5300e64c5b33d91e3630725c23b2dfbbe6bcefe1c74a9cfe82",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-052-940727",
@@ -4217,19 +4217,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "42a2d33055a5b90221271c10c9e8323562e6d7f55fcf86be0bdbd705ad1044b4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "42a2d33055a5b90221271c10c9e8323562e6d7f55fcf86be0bdbd705ad1044b4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-053-025797",
@@ -4271,19 +4271,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "00dce8fb36b49b55fb408ae06826ac8d8383f679eff5a06101362d559abded8f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "00dce8fb36b49b55fb408ae06826ac8d8383f679eff5a06101362d559abded8f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-053-035377",
@@ -4325,19 +4325,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "83d78fab25494c83b3256bb492b97588a1765a889a88b674bde8697326530ce7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "83d78fab25494c83b3256bb492b97588a1765a889a88b674bde8697326530ce7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-053-048849",
@@ -4379,19 +4379,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "83b10dc6504eddeea8f49ea21e1a39a65734e87bf05cb3b66839a4016d399bec"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "83b10dc6504eddeea8f49ea21e1a39a65734e87bf05cb3b66839a4016d399bec",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-053-100482",
@@ -4433,19 +4433,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a380077c9e7266da73afbf4ca0a8e44867b167db0c81e1c657c6acef6befd9e1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a380077c9e7266da73afbf4ca0a8e44867b167db0c81e1c657c6acef6befd9e1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-053-126169",
@@ -4487,19 +4487,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e83248146276826c355849349729349bef7104d780b0a11daa9690e61596791c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e83248146276826c355849349729349bef7104d780b0a11daa9690e61596791c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-053-135874",
@@ -4541,19 +4541,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "19558e75e6826e94521a434dd6fe3953626fbdb89851b5eed082f5f660d4f3d3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "19558e75e6826e94521a434dd6fe3953626fbdb89851b5eed082f5f660d4f3d3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-366631",
@@ -4595,19 +4595,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "71cde79e809680c6056ec810d27a5928bd62db7600a6bfefb5ef1a598d1ec51e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "71cde79e809680c6056ec810d27a5928bd62db7600a6bfefb5ef1a598d1ec51e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-189779",
@@ -4649,19 +4649,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "eae13400c948ba50bbdb7345b1f4569f8bf7b37e74e04ab609f5a43f632d28b9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "eae13400c948ba50bbdb7345b1f4569f8bf7b37e74e04ab609f5a43f632d28b9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-375468",
@@ -4703,19 +4703,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b737e455b97bdd0e204fdd2abdfaa64b71996075a9724d69ac0f5defa9ed6f7e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b737e455b97bdd0e204fdd2abdfaa64b71996075a9724d69ac0f5defa9ed6f7e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-320273",
@@ -4757,19 +4757,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "34d60e8550cae156f26722ced2a51653d46c49904a256f123da379cd03d18e1a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "34d60e8550cae156f26722ced2a51653d46c49904a256f123da379cd03d18e1a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-249480",
@@ -4811,19 +4811,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "638bb0b5ddff4168a56f01a97127a2774b09de20fd7b837632daba61db0c92f7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "638bb0b5ddff4168a56f01a97127a2774b09de20fd7b837632daba61db0c92f7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-359449",
@@ -4865,19 +4865,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dd7ed14c170a3cc8480505fbe601efcb8800d1cb4fe58ba8aae9e1afca2ff4b8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dd7ed14c170a3cc8480505fbe601efcb8800d1cb4fe58ba8aae9e1afca2ff4b8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-542106",
@@ -4919,19 +4919,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "44977fd25f2b2b20ece650f0cfb11cbfa0f616c2261414f2fb19410397b5c4a7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "44977fd25f2b2b20ece650f0cfb11cbfa0f616c2261414f2fb19410397b5c4a7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-535043",
@@ -4973,19 +4973,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "63785555073d843ccec7ba4ec6016726cc18ce2ff4c27547796ab565b5deb1cb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "63785555073d843ccec7ba4ec6016726cc18ce2ff4c27547796ab565b5deb1cb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-567799",
@@ -5027,19 +5027,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ef02c10ec3a917d9de2bba9bf3f0288f1d700f80e33e365117363bda43c55a6e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ef02c10ec3a917d9de2bba9bf3f0288f1d700f80e33e365117363bda43c55a6e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-061-527539",
@@ -5081,19 +5081,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "aa67848e3c50d9f8b677ab8389a7b0151092a4b46c7748742b65dc368ceba8d1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "aa67848e3c50d9f8b677ab8389a7b0151092a4b46c7748742b65dc368ceba8d1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-081-083376",
@@ -5135,19 +5135,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "41fdbcb8c96264489ec11aacee49d8694c0e212a89d21e2264cf164f96f848cc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "41fdbcb8c96264489ec11aacee49d8694c0e212a89d21e2264cf164f96f848cc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-534963",
@@ -5189,19 +5189,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "01d4c7fb7d69bd7e88a8692f69f0ee89e962e157606616ac07ba950ab9294fef"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "01d4c7fb7d69bd7e88a8692f69f0ee89e962e157606616ac07ba950ab9294fef",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-558716",
@@ -5243,19 +5243,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f63ab99089648ec38f18fc27c9d1221418b8a2bc5f211958a210b0eb3d13c24d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f63ab99089648ec38f18fc27c9d1221418b8a2bc5f211958a210b0eb3d13c24d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-599744",
@@ -5297,19 +5297,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1afd589b4c9c1c1ec6d9eec64274bf17f7ddb17c08282fe49ae9cf13389f4198"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1afd589b4c9c1c1ec6d9eec64274bf17f7ddb17c08282fe49ae9cf13389f4198",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-484050",
@@ -5351,19 +5351,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8b38091c0f2ec1130f1eef4a892281d1d448934418efd683a8a5cea69da5aa90"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8b38091c0f2ec1130f1eef4a892281d1d448934418efd683a8a5cea69da5aa90",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-030935",
@@ -5405,19 +5405,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f3a6dbe92c8792568b75b3eeeb9e3e90f32aea54ad5db65f9ccf445f19897dfc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f3a6dbe92c8792568b75b3eeeb9e3e90f32aea54ad5db65f9ccf445f19897dfc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-035898",
@@ -5459,19 +5459,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5537616a0f5d1c6bdc37565a23e2218f16e509a47fc1632f06e8189a0343bb90"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5537616a0f5d1c6bdc37565a23e2218f16e509a47fc1632f06e8189a0343bb90",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-038080",
@@ -5513,19 +5513,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "13d3cadf124d6e2d31c957858998f7ef241893486311002e62cf9f17467bc997"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "13d3cadf124d6e2d31c957858998f7ef241893486311002e62cf9f17467bc997",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-093-673624",
@@ -5567,19 +5567,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b82667f6a33415faf9d6e131db9bfb74328e5974ef2eb0a56154b97a12f66904"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b82667f6a33415faf9d6e131db9bfb74328e5974ef2eb0a56154b97a12f66904",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-198953",
@@ -5621,19 +5621,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d50ff5c39566cc58988cba69eb7955d69fdf9fe7e77d515ddc8165827c98e83c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d50ff5c39566cc58988cba69eb7955d69fdf9fe7e77d515ddc8165827c98e83c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-093-680880",
@@ -5675,19 +5675,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1d79850e870825b20e700ba27b6ef941fc16b2ba3579ba1ffd14b9a0ad5b2de0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1d79850e870825b20e700ba27b6ef941fc16b2ba3579ba1ffd14b9a0ad5b2de0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-093-932108",
@@ -5729,19 +5729,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f79f21d6c37e4052a0391ba52165bd2a70811f1916bfae05235be27f3a02f1a3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f79f21d6c37e4052a0391ba52165bd2a70811f1916bfae05235be27f3a02f1a3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-093-934151",
@@ -5783,19 +5783,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dedd389f3c1a8b6c75ac9ae129e723de7b1aece1ae9fb96033813dbb3980fa8f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dedd389f3c1a8b6c75ac9ae129e723de7b1aece1ae9fb96033813dbb3980fa8f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-093-937068",
@@ -5837,19 +5837,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8d3e774e00366b9f25a6d76d9ed5672448d25930ed946d501fd5a9fe0a1b7b73"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8d3e774e00366b9f25a6d76d9ed5672448d25930ed946d501fd5a9fe0a1b7b73",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-432829",
@@ -5891,19 +5891,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2d6ad976e1947650d7d9b543c38d833191b8869d3e179e6c8ef3c8101914e98e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2d6ad976e1947650d7d9b543c38d833191b8869d3e179e6c8ef3c8101914e98e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-420383",
@@ -5945,19 +5945,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "67dbb4f03c70adcc4d845ffd8384c2493dc4bb2bc3d53f457c417bfe5f9277d8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "67dbb4f03c70adcc4d845ffd8384c2493dc4bb2bc3d53f457c417bfe5f9277d8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-747736",
@@ -5999,19 +5999,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "48e532dfff5566ece94614651f49f6fbab5aac16a06949dfee7f5eb02bb55189"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "48e532dfff5566ece94614651f49f6fbab5aac16a06949dfee7f5eb02bb55189",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-115711",
@@ -6053,19 +6053,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "546d06089f12d63679b6759dc70103d7319ec135982d81269ecd59bd289fb010"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "546d06089f12d63679b6759dc70103d7319ec135982d81269ecd59bd289fb010",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-119598",
@@ -6107,19 +6107,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b4bf4b9eb34d72dff5e9cd0302c3256cf9b9e4593c5145d6c3ececff2c2e38cc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b4bf4b9eb34d72dff5e9cd0302c3256cf9b9e4593c5145d6c3ececff2c2e38cc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-756376",
@@ -6161,19 +6161,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0266ddce60c33d1bf35364bdae501b68d90ad03ecd6cd2033b1db2adfee6aa8d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0266ddce60c33d1bf35364bdae501b68d90ad03ecd6cd2033b1db2adfee6aa8d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-577818",
@@ -6215,19 +6215,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a240f40a7c6055480228b77a7f842236697a17a424a2ade239efeaaa55a322bd"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a240f40a7c6055480228b77a7f842236697a17a424a2ade239efeaaa55a322bd",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-588710",
@@ -6269,19 +6269,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5934cbb1cce3ce51b2461272bb1d76d66699b86a0e63d4757de1da06f5031bc7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5934cbb1cce3ce51b2461272bb1d76d66699b86a0e63d4757de1da06f5031bc7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-590845",
@@ -6323,19 +6323,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b437b23edc29bf8ae23cc945d0a149dcf7ec8c595465392f27ad219f4ccf451e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b437b23edc29bf8ae23cc945d0a149dcf7ec8c595465392f27ad219f4ccf451e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-027689",
@@ -6377,19 +6377,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6d1d2e130af48baf7527f06f1e3c030b917e333c8b0ee2ab0eecf1569a5f7375"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6d1d2e130af48baf7527f06f1e3c030b917e333c8b0ee2ab0eecf1569a5f7375",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-698440",
@@ -6431,19 +6431,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "283c7e219c409adda93ffddfa3b6a489ab1ae8d1c898a2c126689de5f7e49f39"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "283c7e219c409adda93ffddfa3b6a489ab1ae8d1c898a2c126689de5f7e49f39",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-816813",
@@ -6485,19 +6485,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5efc22efaf3c92f225a97886685ff8a5d8fbe2cff2d6da28f157a4ad4978b851"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5efc22efaf3c92f225a97886685ff8a5d8fbe2cff2d6da28f157a4ad4978b851",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-093-614542",
@@ -6539,19 +6539,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4534eda587d9d8f6c1744bcbff3d28482cfb29389d886460057995b5508bfbc5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4534eda587d9d8f6c1744bcbff3d28482cfb29389d886460057995b5508bfbc5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-644763",
@@ -6593,19 +6593,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7c5fd570f373688e7d85a28957deaaa9df5fef5f0db1b23272c2af821367e7db"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7c5fd570f373688e7d85a28957deaaa9df5fef5f0db1b23272c2af821367e7db",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-649445",
@@ -6647,19 +6647,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9144fc4c2773988009ae5f971cc6460292e1b7b5228b11beeb06b1c7e8c078f2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9144fc4c2773988009ae5f971cc6460292e1b7b5228b11beeb06b1c7e8c078f2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-649747",
@@ -6701,19 +6701,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f84d0fedfaacc0022e43371c21e46f02f383a3d87e590d267cd3b2834649ce61"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f84d0fedfaacc0022e43371c21e46f02f383a3d87e590d267cd3b2834649ce61",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-018831",
@@ -6755,19 +6755,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a27b7318efd2f3ff1444ce78f20fb8aae153644871bc8297a0566864b904c6e9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a27b7318efd2f3ff1444ce78f20fb8aae153644871bc8297a0566864b904c6e9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-413258",
@@ -6809,19 +6809,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6767562ad0918c900164c8d6bd5be002810a709a9fad2e69c7423a413358a32b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6767562ad0918c900164c8d6bd5be002810a709a9fad2e69c7423a413358a32b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-406573",
@@ -6863,19 +6863,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fa5874beaac2911014780146d2503aef89259b0969b9fe57458e6dad6ee3c737"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fa5874beaac2911014780146d2503aef89259b0969b9fe57458e6dad6ee3c737",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-406952",
@@ -6917,19 +6917,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5b7a5b5b066b419718d89c6efbcae67e9c48a65e1708a91f1eb939f5be0334ac"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5b7a5b5b066b419718d89c6efbcae67e9c48a65e1708a91f1eb939f5be0334ac",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-407094",
@@ -6971,19 +6971,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "482b546c385e955bf18d41dca497518dfdae977af73d9a0e66b9c02c67e0e4c9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "482b546c385e955bf18d41dca497518dfdae977af73d9a0e66b9c02c67e0e4c9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-022010",
@@ -7025,19 +7025,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ba0a1a45033bde7d2fcdde0dc5172574076fc95aa7b285f9122c6fd3ec10bb9d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ba0a1a45033bde7d2fcdde0dc5172574076fc95aa7b285f9122c6fd3ec10bb9d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-022496",
@@ -7079,19 +7079,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "091c448ac3f33942925c66a60df397325b06adb199d595545752ab2d6e3d2e3d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "091c448ac3f33942925c66a60df397325b06adb199d595545752ab2d6e3d2e3d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-023248",
@@ -7133,19 +7133,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "96e71dfcb6a8e5a685f2a6a8a4b38838f21f9e47c79753bd186ac3eccb1fa738"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "96e71dfcb6a8e5a685f2a6a8a4b38838f21f9e47c79753bd186ac3eccb1fa738",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-023443",
@@ -7187,19 +7187,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "52bf9d578704ef744a9586c03c9f2699d4c1a81f9728da83ddc34ea5104871f1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "52bf9d578704ef744a9586c03c9f2699d4c1a81f9728da83ddc34ea5104871f1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-659373",
@@ -7241,19 +7241,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "aa64880da10289c15aee4f863777ced58713daaa84d80f377354b19950d4f417"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "aa64880da10289c15aee4f863777ced58713daaa84d80f377354b19950d4f417",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-561656",
@@ -7295,19 +7295,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "43bad22b161cbd78a4ea85fb311b16ab9876c9e98753e428364e8818f3740847"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "43bad22b161cbd78a4ea85fb311b16ab9876c9e98753e428364e8818f3740847",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-819016",
@@ -7349,19 +7349,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "59b1d930e61e09ea400772a433933cc6671941c79e0d8822493c2850072b2804"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "59b1d930e61e09ea400772a433933cc6671941c79e0d8822493c2850072b2804",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-834451",
@@ -7403,19 +7403,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "084388d4c9a44fb0057064962366586b7e89c9e57f0082ff1d802f4b81587fb7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "084388d4c9a44fb0057064962366586b7e89c9e57f0082ff1d802f4b81587fb7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-764034",
@@ -7457,19 +7457,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dfdcc5ea979b95e28647d14abd5f17e4f2d0820c009de1b4f49323d7c0933531"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dfdcc5ea979b95e28647d14abd5f17e4f2d0820c009de1b4f49323d7c0933531",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-696962",
@@ -7511,19 +7511,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "cff0204e6628205640afb2eeb958a11863de13e0b33d5c745975cb42979f698a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "cff0204e6628205640afb2eeb958a11863de13e0b33d5c745975cb42979f698a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-405189",
@@ -7565,19 +7565,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "20e7c6fc62b952b056d7f0dfbc1a15db4a558919cb8dba7c8f936e52940f65bc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "20e7c6fc62b952b056d7f0dfbc1a15db4a558919cb8dba7c8f936e52940f65bc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-374291",
@@ -7619,19 +7619,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "52a1a360e2d1cb0e9527079eabe12d897a729f761fcf35216ec6bf48111bde71"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "52a1a360e2d1cb0e9527079eabe12d897a729f761fcf35216ec6bf48111bde71",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-014057",
@@ -7673,19 +7673,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "91ee61a0453b34403d8e976f061995f7a757c9722cfccefda539fbc1b5e68071"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "91ee61a0453b34403d8e976f061995f7a757c9722cfccefda539fbc1b5e68071",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-014556",
@@ -7727,19 +7727,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "80ab78b3192e049fcde8acdc829722c7b8478c7d2cab498117a6aafcb7c583fd"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "80ab78b3192e049fcde8acdc829722c7b8478c7d2cab498117a6aafcb7c583fd",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-014849",
@@ -7781,19 +7781,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "00efe7e9f022cb9e66b736a4518f283b6ac34012bf775669feded48400cddef7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "00efe7e9f022cb9e66b736a4518f283b6ac34012bf775669feded48400cddef7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-522971",
@@ -7835,19 +7835,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "70b3ea6e5cc1f76941064503f29bba317750017cdb6d589e2fdc589a6d4fc2c3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "70b3ea6e5cc1f76941064503f29bba317750017cdb6d589e2fdc589a6d4fc2c3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-059851",
@@ -7889,19 +7889,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2a60ac331197fb608a386a72e74889cfc1705889f2723e1f558377c2620d4b64"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2a60ac331197fb608a386a72e74889cfc1705889f2723e1f558377c2620d4b64",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-024562",
@@ -7943,19 +7943,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "233750bd12cdddbc2a795923515691cda856b3d95c8431578bec76192543369b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "233750bd12cdddbc2a795923515691cda856b3d95c8431578bec76192543369b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-095-027068",
@@ -7997,19 +7997,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "49e0b832e84bdfb2685ac23a514b0e36113ffaf9b1945f62d2a7ffc9eb761517"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "49e0b832e84bdfb2685ac23a514b0e36113ffaf9b1945f62d2a7ffc9eb761517",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-418707",
@@ -8051,19 +8051,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dbdd79797fcda5d6df7d5f8ef8194080e43aa5580cf66fa2bbcae5f38b16e9e4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dbdd79797fcda5d6df7d5f8ef8194080e43aa5580cf66fa2bbcae5f38b16e9e4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-615720",
@@ -8105,19 +8105,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6df75999aaf2a40b447bc4a5038dfec350a5c71e550d8e78fb32913779030eae"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6df75999aaf2a40b447bc4a5038dfec350a5c71e550d8e78fb32913779030eae",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-091-618584",
@@ -8159,19 +8159,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1326d587461de0d085e958406095e36ead49cd2a410bfbd870118daff90d23fc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1326d587461de0d085e958406095e36ead49cd2a410bfbd870118daff90d23fc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-094-519352",
@@ -8213,19 +8213,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a7812a108daa017fd19ef5239b9257ed14b952acbaedcd5ed195f179d2d0d7f2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a7812a108daa017fd19ef5239b9257ed14b952acbaedcd5ed195f179d2d0d7f2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-098-026980",
@@ -8267,19 +8267,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f706fb9dcf229b3a12335b4c9e0c9ab8bd461b26aae19ae0c9b8ed0386c8b2db"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f706fb9dcf229b3a12335b4c9e0c9ab8bd461b26aae19ae0c9b8ed0386c8b2db",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-265176",
@@ -8321,19 +8321,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "44d4258c7a2f972ab599c88bc76074d5d7e1db0384296ce939af97f15628ab51"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "44d4258c7a2f972ab599c88bc76074d5d7e1db0384296ce939af97f15628ab51",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-009808",
@@ -8375,19 +8375,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "aa187ada021b681417ca8f9f32a77a15beb605feae005af7af68260762a2344c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "aa187ada021b681417ca8f9f32a77a15beb605feae005af7af68260762a2344c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-105-583405",
@@ -8429,19 +8429,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "459e601d84f570de4a9d490c3dbf9a68d2fb904fc8a167f95c47cc0a7f155e6a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "459e601d84f570de4a9d490c3dbf9a68d2fb904fc8a167f95c47cc0a7f155e6a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-210294",
@@ -8483,19 +8483,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "858c8a72d101b0744d8a099a8a04e2312f2f98d71021273f7db3f50759567908"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "858c8a72d101b0744d8a099a8a04e2312f2f98d71021273f7db3f50759567908",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-105-734916",
@@ -8537,19 +8537,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "51bc114a517b3d2f86ab6f06e0b6cd1ced2fc413ef6506a87265678e9ea9c687"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "51bc114a517b3d2f86ab6f06e0b6cd1ced2fc413ef6506a87265678e9ea9c687",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-414197",
@@ -8591,19 +8591,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "275c683bfdd5fbdbb44eddc281ddcef8f3730835d60f0df012cc84ab78b0f0bc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "275c683bfdd5fbdbb44eddc281ddcef8f3730835d60f0df012cc84ab78b0f0bc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-457448",
@@ -8645,19 +8645,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ffb716318272981d570c509778309ffbadcb8a8f3a512c0489bfae2381a29fd5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ffb716318272981d570c509778309ffbadcb8a8f3a512c0489bfae2381a29fd5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-476033",
@@ -8699,19 +8699,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "489514d078fe3b2674e6898dae60215c11810708d09c725a12d74a2351be9867"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "489514d078fe3b2674e6898dae60215c11810708d09c725a12d74a2351be9867",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-389475",
@@ -8753,19 +8753,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0cca3c5a4239fc50d2e660b5f4a887c4a55e1b87a9b923a54158fb14a7366a2b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0cca3c5a4239fc50d2e660b5f4a887c4a55e1b87a9b923a54158fb14a7366a2b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-275928",
@@ -8807,19 +8807,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2a9ba5b2a4fc4a399b2de66d3aa00f51b6b7954346d20d14daa460f95d39749b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2a9ba5b2a4fc4a399b2de66d3aa00f51b6b7954346d20d14daa460f95d39749b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-358352",
@@ -8861,19 +8861,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "98f7538eff118b425124d053a048287498dd0c11fc18be1985e8d6f4659724a2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "98f7538eff118b425124d053a048287498dd0c11fc18be1985e8d6f4659724a2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-105-403403",
@@ -8915,19 +8915,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fae10fcba66fd2deb8d2a7938b249fdab7f6b1b270bb071f06ad1e678ec8c7d1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fae10fcba66fd2deb8d2a7938b249fdab7f6b1b270bb071f06ad1e678ec8c7d1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-415924",
@@ -8969,19 +8969,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1d3279473b9247906bfd88286e394046e65f0ebcd924b46627925c3dfcc97a56"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1d3279473b9247906bfd88286e394046e65f0ebcd924b46627925c3dfcc97a56",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-416977",
@@ -9023,19 +9023,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b65841805e00be8a7806a4dfef38ff485f3ec12fd97ffe82d1d4f3f667322f13"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b65841805e00be8a7806a4dfef38ff485f3ec12fd97ffe82d1d4f3f667322f13",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-105-475899",
@@ -9077,19 +9077,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "69ce7d03714533f89148c2a49ada4b3ec858ff9116756d6b57920142917c2e42"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "69ce7d03714533f89148c2a49ada4b3ec858ff9116756d6b57920142917c2e42",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-440500",
@@ -9131,19 +9131,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fb99e75dc23c9877196be63f4cf6549983afd55440bc0468b3e646ee84b2ff7f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fb99e75dc23c9877196be63f4cf6549983afd55440bc0468b3e646ee84b2ff7f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-367323",
@@ -9185,19 +9185,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "06f5afb2f12baf186ecf7f9903439c57ee04898882cdc2e511b78d46b9a82780"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "06f5afb2f12baf186ecf7f9903439c57ee04898882cdc2e511b78d46b9a82780",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-444924",
@@ -9239,19 +9239,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "81c0de69c948c113c67af60c4f0acadb4112e5fef7f002b48c2be09d7e209318"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "81c0de69c948c113c67af60c4f0acadb4112e5fef7f002b48c2be09d7e209318",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-106-446162",
@@ -9293,19 +9293,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0b3e54fb91bd87c1910257926341c2ae5e3d3e6f475c836430a3b24f24587253"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0b3e54fb91bd87c1910257926341c2ae5e3d3e6f475c836430a3b24f24587253",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-161-404005",
@@ -9347,19 +9347,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "efefea1a7e5dbfe91ea841dd33609dc4dae9a8a0da589dc8a27a813f33e15df8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "efefea1a7e5dbfe91ea841dd33609dc4dae9a8a0da589dc8a27a813f33e15df8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-161-354566",
@@ -9401,19 +9401,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dcb374b78db05eeef9bc2c3cf1549a99b2cc997a38c24fb19a17cf8dac2155a7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dcb374b78db05eeef9bc2c3cf1549a99b2cc997a38c24fb19a17cf8dac2155a7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-161-372876",
@@ -9455,19 +9455,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3ec9331a8204e9c2fb349c5a7717a90782e40fa5e1d731e1d68bc02bf5e34c96"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3ec9331a8204e9c2fb349c5a7717a90782e40fa5e1d731e1d68bc02bf5e34c96",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-161-384414",
@@ -9509,19 +9509,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "86eeb58d55d632db32bece31fe63f41ba448d67163342e3f38261470fc6d4e27"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "86eeb58d55d632db32bece31fe63f41ba448d67163342e3f38261470fc6d4e27",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-161-386722",
@@ -9563,19 +9563,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9b9e5b80f3008848972a92c6723d5055f087682b6e42d29c0ee1d171b7f89bc2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9b9e5b80f3008848972a92c6723d5055f087682b6e42d29c0ee1d171b7f89bc2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-161-270708",
@@ -9617,19 +9617,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "12d63e0832c11501088a138369308634066093d153f0546936c1ac275c0d2e88"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "12d63e0832c11501088a138369308634066093d153f0546936c1ac275c0d2e88",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-121-396539",
@@ -9671,19 +9671,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6235797715491cd1f7d1c2bba6bb786687f4d2c9807af6dcc85d1ada838079d9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6235797715491cd1f7d1c2bba6bb786687f4d2c9807af6dcc85d1ada838079d9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-121-404180",
@@ -9725,19 +9725,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "baa8ac9baf906a12631030df2ba16eab077ebaff41829b1514fde5a04ee97eb4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "baa8ac9baf906a12631030df2ba16eab077ebaff41829b1514fde5a04ee97eb4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-131-984976",
@@ -9779,19 +9779,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ac9b79fd59088ef369badd77d7ca5886b43b857d52f4efa2fdf873c20f856364"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ac9b79fd59088ef369badd77d7ca5886b43b857d52f4efa2fdf873c20f856364",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-367295",
@@ -9833,19 +9833,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6e5b963807fb63294f84c34fe0c325db0a98489a88952adc4f826a6a2071c42c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6e5b963807fb63294f84c34fe0c325db0a98489a88952adc4f826a6a2071c42c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-439864",
@@ -9887,19 +9887,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ee8700d4fb71e8362aef79d30f755894bed9095ccc5624060ec80e89c1009e47"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ee8700d4fb71e8362aef79d30f755894bed9095ccc5624060ec80e89c1009e47",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-132-251251",
@@ -9941,19 +9941,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "34746dac8086ed32ab6a444b3a0cf6aa8518af0c19dbdecf6f9e0aa0298370a8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "34746dac8086ed32ab6a444b3a0cf6aa8518af0c19dbdecf6f9e0aa0298370a8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-476928",
@@ -9995,19 +9995,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fcb2b9990832a1b3652b3a383680cbed22291374476de853b80795625de57a46"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fcb2b9990832a1b3652b3a383680cbed22291374476de853b80795625de57a46",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-138-119637",
@@ -10049,19 +10049,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c45e01b1ff5b38d46db8dba10e613b0a735e77034d57ec48632f259090b15229"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c45e01b1ff5b38d46db8dba10e613b0a735e77034d57ec48632f259090b15229",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-132-195232",
@@ -10103,19 +10103,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3bb016723f6437e2950c8da4170e1fd6841585650ef176081e527972d2e82a70"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3bb016723f6437e2950c8da4170e1fd6841585650ef176081e527972d2e82a70",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-132-204559",
@@ -10157,19 +10157,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c8339a8e85f0ffb696bc672553a3a1cb1549dd8580f97d5e129a60ec809fc762"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c8339a8e85f0ffb696bc672553a3a1cb1549dd8580f97d5e129a60ec809fc762",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-138-140608",
@@ -10211,19 +10211,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bc3dad30db599a53c4f9d5f84f2e02508b238d31f479841ea9838e0d4d750c8c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bc3dad30db599a53c4f9d5f84f2e02508b238d31f479841ea9838e0d4d750c8c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-138-149014",
@@ -10265,19 +10265,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c4cc8731c97293b95fba1810fea10a805631c90e8ba65c256481ac7d257814ca"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c4cc8731c97293b95fba1810fea10a805631c90e8ba65c256481ac7d257814ca",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-138-161565",
@@ -10319,19 +10319,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e65eb5b19691141c5fab265a0e8d2c73492298184bb7a98313d4399d2f90ac87"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e65eb5b19691141c5fab265a0e8d2c73492298184bb7a98313d4399d2f90ac87",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-132-362448",
@@ -10373,19 +10373,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c84907defe437c3365fdcad3fbd7a17e57dbe0c7bea43856b9500f5fadf4b8ac"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c84907defe437c3365fdcad3fbd7a17e57dbe0c7bea43856b9500f5fadf4b8ac",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-335412",
@@ -10427,19 +10427,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ac43ce01c6eb7a174238ed011b8100abf1c7038b42a8e47bba9d49eaa7b6b307"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ac43ce01c6eb7a174238ed011b8100abf1c7038b42a8e47bba9d49eaa7b6b307",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-949229",
@@ -10481,19 +10481,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1c347bc55239f69f2e107a3987350a08888ee1fdcb1f86bafc1afdfaf96d09c0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1c347bc55239f69f2e107a3987350a08888ee1fdcb1f86bafc1afdfaf96d09c0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-956812",
@@ -10535,19 +10535,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "34a97abec4f2b1acea399f3abd629d8a8af3d36ceac3794091b2fb5229ce61dc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "34a97abec4f2b1acea399f3abd629d8a8af3d36ceac3794091b2fb5229ce61dc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-960458",
@@ -10589,19 +10589,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6818c3af6c9d13a692ab3f2604ebd04d2ed76639c8aa315e709e2fa3f369936c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6818c3af6c9d13a692ab3f2604ebd04d2ed76639c8aa315e709e2fa3f369936c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-327973",
@@ -10643,19 +10643,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ebf7a66cecfce44d6e0bd71bdfa261bab4808ccfb129ada7e5800995d383b260"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ebf7a66cecfce44d6e0bd71bdfa261bab4808ccfb129ada7e5800995d383b260",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-132-292423",
@@ -10697,19 +10697,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "afa59535765b90b7c75c4aff19413050ff1a5d819bcafd263734184238cdef87"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "afa59535765b90b7c75c4aff19413050ff1a5d819bcafd263734184238cdef87",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-132-264126",
@@ -10751,19 +10751,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bca8c3771d3f6edaac53f6f0cd10f473d24bee9ecd14384396d96e7b661b87c4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bca8c3771d3f6edaac53f6f0cd10f473d24bee9ecd14384396d96e7b661b87c4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-138-016738",
@@ -10805,19 +10805,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0e8a4b81b3cb7ddb7b8a35196894127351838e1b6dffbfad456459c56647cc77"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0e8a4b81b3cb7ddb7b8a35196894127351838e1b6dffbfad456459c56647cc77",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-971580",
@@ -10859,19 +10859,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "249d34cccd1c4e2f22920801acf97f1ee4ce6ff7a484ec24cfd9233fd5f1ed2b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "249d34cccd1c4e2f22920801acf97f1ee4ce6ff7a484ec24cfd9233fd5f1ed2b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-974902",
@@ -10913,19 +10913,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "316edcce159c3ea3ab959f0c5a85d808cbac237157fc7555d8e8bac489b41a6d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "316edcce159c3ea3ab959f0c5a85d808cbac237157fc7555d8e8bac489b41a6d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-509829",
@@ -10967,19 +10967,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ebaa50c93ba7606ab366ce8442a90e73e30cd73123c1f1981baf2ef6c973d0e0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ebaa50c93ba7606ab366ce8442a90e73e30cd73123c1f1981baf2ef6c973d0e0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-218247",
@@ -11021,19 +11021,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b664329a2f6b2cf637d92420f853b1c61e0f360c9f005c8a182f4b0b3643a667"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b664329a2f6b2cf637d92420f853b1c61e0f360c9f005c8a182f4b0b3643a667",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-891998",
@@ -11075,19 +11075,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "eeed10e764d7f8c3871b983995271f626e1acc6dbabd8e06c73d78e3a06d94b3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "eeed10e764d7f8c3871b983995271f626e1acc6dbabd8e06c73d78e3a06d94b3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-892088",
@@ -11129,19 +11129,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "32a44bc80b2f2aa502ddeaeeb9b07e64d9a49e0b96142301159dddf1087d075c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "32a44bc80b2f2aa502ddeaeeb9b07e64d9a49e0b96142301159dddf1087d075c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-321777",
@@ -11183,19 +11183,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0130358b76cb5d4893a315075594c8fec13d3f06528bc84e1049057be5cbd347"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0130358b76cb5d4893a315075594c8fec13d3f06528bc84e1049057be5cbd347",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-137-793461",
@@ -11237,19 +11237,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "691d7b4bb0e97bbca7eb366b97ed7ad0960e0ad0964f9f367c0a123c94f305ed"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "691d7b4bb0e97bbca7eb366b97ed7ad0960e0ad0964f9f367c0a123c94f305ed",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-132-311081",
@@ -11291,19 +11291,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "edae5e1418aa10f4ae85cf46032e8d33fa9b258e36fadb426ac0581b76e4d959"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "edae5e1418aa10f4ae85cf46032e8d33fa9b258e36fadb426ac0581b76e4d959",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-351402",
@@ -11345,19 +11345,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "946c78e5c3067b42fb4c6f5db151f1f975a60504f8ea02b99714357cd9ba4891"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "946c78e5c3067b42fb4c6f5db151f1f975a60504f8ea02b99714357cd9ba4891",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-565384",
@@ -11399,19 +11399,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "aa2b55a6754c732c56f9d085fffddafaf3fa4b3f241ca9b1e7a63596a88a02c9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "aa2b55a6754c732c56f9d085fffddafaf3fa4b3f241ca9b1e7a63596a88a02c9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-568792",
@@ -11453,19 +11453,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "29df9f6235c554e7f4cef7ae5f377e09a1d5cc007b1b7117fba5dbcc0cb85254"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "29df9f6235c554e7f4cef7ae5f377e09a1d5cc007b1b7117fba5dbcc0cb85254",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-569638",
@@ -11507,19 +11507,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b78dc49c71dc6ea801ad1f680ad0482d56cbe6dc0e98bd276937ff89da314602"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b78dc49c71dc6ea801ad1f680ad0482d56cbe6dc0e98bd276937ff89da314602",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-192552",
@@ -11561,19 +11561,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "07fb2a8866a496a85e180ed19d1f4910762d22f91217967637be29ca586a76f4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "07fb2a8866a496a85e180ed19d1f4910762d22f91217967637be29ca586a76f4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-375969",
@@ -11615,19 +11615,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7ac9d8edb19c80d1fc31d34ae0bed3a4b29ea866cc57f10489eb776fae55220d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7ac9d8edb19c80d1fc31d34ae0bed3a4b29ea866cc57f10489eb776fae55220d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-151-824607",
@@ -11669,19 +11669,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3a5613570828d56391a220c5c3f56dbb074bdf666778df07b0bc72f4f46ea53c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3a5613570828d56391a220c5c3f56dbb074bdf666778df07b0bc72f4f46ea53c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-151-839616",
@@ -11723,19 +11723,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "46a03237352821d532f31057c9c9bc44e2a731af87fb6f1b3bea7126b5c0c62b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "46a03237352821d532f31057c9c9bc44e2a731af87fb6f1b3bea7126b5c0c62b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-387661",
@@ -11777,19 +11777,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6976666cba3b5a349978549723a0a2fae3306822df875fa0baa67ae75265a78f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6976666cba3b5a349978549723a0a2fae3306822df875fa0baa67ae75265a78f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-497443",
@@ -11831,19 +11831,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3213a2b72dfeeed5d41d5c23df2703f62b9098b319366bb364b695a8c4d8e074"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3213a2b72dfeeed5d41d5c23df2703f62b9098b319366bb364b695a8c4d8e074",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-448232",
@@ -11885,19 +11885,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "58a3f931a13697398cd90a022f3bea6989a3f206a2341814f3a2df0fe941d44a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "58a3f931a13697398cd90a022f3bea6989a3f206a2341814f3a2df0fe941d44a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-482061",
@@ -11939,19 +11939,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "04ba0a5bd67ef15782ee49a77851fcf75b2526dde028a0a01d32a28c46dae0c5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "04ba0a5bd67ef15782ee49a77851fcf75b2526dde028a0a01d32a28c46dae0c5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-151-936972",
@@ -11993,19 +11993,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e4377ad98dd0f63f4b1fb2a0666e4072b2305d5bc7460872d070c2c277dcba97"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e4377ad98dd0f63f4b1fb2a0666e4072b2305d5bc7460872d070c2c277dcba97",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-472914",
@@ -12047,19 +12047,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8a1881f34684a3aefcd0c7f844b7884b6e62c3a36549f674ab2aafe5cdc807ce"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8a1881f34684a3aefcd0c7f844b7884b6e62c3a36549f674ab2aafe5cdc807ce",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-151-911183",
@@ -12101,19 +12101,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d1e6d0aa70481ec1216a874032440df445d203e8a98dc1834d6729972d4e4e66"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d1e6d0aa70481ec1216a874032440df445d203e8a98dc1834d6729972d4e4e66",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-510102",
@@ -12155,19 +12155,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dd7f81aacf2564360e498340b728a13db47f7e379e276f48ac0928edafaa9b0b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dd7f81aacf2564360e498340b728a13db47f7e379e276f48ac0928edafaa9b0b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-518532",
@@ -12209,19 +12209,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "732030c577d36c066a95254c0af862a9d5fbd0b88e131f7bb05b19f2e4244896"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "732030c577d36c066a95254c0af862a9d5fbd0b88e131f7bb05b19f2e4244896",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-030840",
@@ -12263,19 +12263,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "94e27afae736ab2c73007ed3ea4c6eace8849255d15df314f9cb47fa264170bd"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "94e27afae736ab2c73007ed3ea4c6eace8849255d15df314f9cb47fa264170bd",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-156-007740",
@@ -12317,19 +12317,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8970719707a381215fb46080b92b831be2f72e64395be0f34644feef16d78ef1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8970719707a381215fb46080b92b831be2f72e64395be0f34644feef16d78ef1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-181-311255",
@@ -12371,19 +12371,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "358f5c17f1c35f68f4bf236f73f7929c6123c4875e852fbe0d935cc47d974e3d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "358f5c17f1c35f68f4bf236f73f7929c6123c4875e852fbe0d935cc47d974e3d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-181-296081",
@@ -12425,19 +12425,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7b80a923cbb4292fe63161ebd97ee8f70cbf02c615931ae2df1072728c54c736"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7b80a923cbb4292fe63161ebd97ee8f70cbf02c615931ae2df1072728c54c736",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-644970",
@@ -12479,19 +12479,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "920a49533e1e0ea6823b740e1e2f56da7ffa7ebf372dde926220ad8542814136"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "920a49533e1e0ea6823b740e1e2f56da7ffa7ebf372dde926220ad8542814136",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-662219",
@@ -12533,19 +12533,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "48aa2fa949229b5827c3d8cfe23a731666c909344624e05e9738e12f33264519"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "48aa2fa949229b5827c3d8cfe23a731666c909344624e05e9738e12f33264519",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-632842",
@@ -12587,19 +12587,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b69dc4420cce6219346f0605a989bd7e4293fa1630de133cdbc881ef6af9ef85"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b69dc4420cce6219346f0605a989bd7e4293fa1630de133cdbc881ef6af9ef85",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-648791",
@@ -12641,19 +12641,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7d5152d28ee65bf72e11985bb5edff3c64baa95dbf48008716a0d06acf7850ff"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7d5152d28ee65bf72e11985bb5edff3c64baa95dbf48008716a0d06acf7850ff",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-395530",
@@ -12695,19 +12695,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9a19978ed31b4d8659e9ac364bd4e0f4602d09a78efb3bc41196afd85016ff59"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9a19978ed31b4d8659e9ac364bd4e0f4602d09a78efb3bc41196afd85016ff59",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-607982",
@@ -12749,19 +12749,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e864f00fca2abce3f943b01efee673760ed34e964371e90335429f30179abcc1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e864f00fca2abce3f943b01efee673760ed34e964371e90335429f30179abcc1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-663335",
@@ -12803,19 +12803,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b3945ce6f5ee899e0976305d1f7a3f972a58e36dedfc3546c651aed3700041e4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b3945ce6f5ee899e0976305d1f7a3f972a58e36dedfc3546c651aed3700041e4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-725364",
@@ -12857,19 +12857,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c93aad71fa8e54ee4e9c5b8de513a6b40aead68fadd779df51b7b330f70d0a49"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c93aad71fa8e54ee4e9c5b8de513a6b40aead68fadd779df51b7b330f70d0a49",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-393115",
@@ -12911,19 +12911,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "004444a2ab4f9433c94bc4df53098dcbb6dd48d388cce9c12664fd042fa5bc8a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "004444a2ab4f9433c94bc4df53098dcbb6dd48d388cce9c12664fd042fa5bc8a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-470476",
@@ -12965,19 +12965,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0e6047d668368bf4576ed26d62ecbfe21544eec3524b6a635d6405540e0953af"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0e6047d668368bf4576ed26d62ecbfe21544eec3524b6a635d6405540e0953af",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-333343",
@@ -13019,19 +13019,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6398f22bba6edca3e063ed21b52fa1179c6631a9521b3e403633378061e6c6c3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6398f22bba6edca3e063ed21b52fa1179c6631a9521b3e403633378061e6c6c3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-699237",
@@ -13073,19 +13073,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c01e7c15ec349dd56533b5c034cfc65ba836dedaec7dbbbafbd45cc9781a04b5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c01e7c15ec349dd56533b5c034cfc65ba836dedaec7dbbbafbd45cc9781a04b5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-518427",
@@ -13127,19 +13127,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e96357c4b69c5ceae4f43be979765f0ddfe6689adca0d3c57589c9e4f296b9f4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e96357c4b69c5ceae4f43be979765f0ddfe6689adca0d3c57589c9e4f296b9f4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-598142",
@@ -13181,19 +13181,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fe3db2dde42f51cc5156a6d4a50533f9c648aaa98be82eaa0884c2b1f1c7ede2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fe3db2dde42f51cc5156a6d4a50533f9c648aaa98be82eaa0884c2b1f1c7ede2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-715399",
@@ -13235,19 +13235,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "971dd24324fb86b2fd0ed1e5ac24c1141b7027e18578ed2697d822ddac10c743"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "971dd24324fb86b2fd0ed1e5ac24c1141b7027e18578ed2697d822ddac10c743",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-708007",
@@ -13289,19 +13289,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9fe8b4503be9aa069650d58805d809ccc0780769d9e5a9a5a615d5be5ccaa9ee"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9fe8b4503be9aa069650d58805d809ccc0780769d9e5a9a5a615d5be5ccaa9ee",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-711542",
@@ -13343,19 +13343,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "49f287c29651d46bb253e8292a86971f46aa09916a76a8572fe2dbbc019b9e1e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "49f287c29651d46bb253e8292a86971f46aa09916a76a8572fe2dbbc019b9e1e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-201-596998",
@@ -13397,19 +13397,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e823dce618f2bb61aabc4c1b18c2f0a60a6015d49cd9cf4edc8a265315b38610"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e823dce618f2bb61aabc4c1b18c2f0a60a6015d49cd9cf4edc8a265315b38610",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-573954",
@@ -13451,19 +13451,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4374dba2468043d17760cfdd6663bc5b6473d442f839c1e9616449428892d9ca"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4374dba2468043d17760cfdd6663bc5b6473d442f839c1e9616449428892d9ca",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-446496",
@@ -13505,19 +13505,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5b95d1c978a24ed9dcf615c20bac5d69edd10d951991d34c1dde2a5e0a37fed2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5b95d1c978a24ed9dcf615c20bac5d69edd10d951991d34c1dde2a5e0a37fed2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-657032",
@@ -13559,19 +13559,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ca6f27dfdfd79f6c606862eb52e85b8faa9a6deb68513415b2765709b73f290a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ca6f27dfdfd79f6c606862eb52e85b8faa9a6deb68513415b2765709b73f290a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-582658",
@@ -13613,19 +13613,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "651204ce45caf4efcd73a50befd972eeace1c4e570dd2f2ea6e86ea932840d34"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "651204ce45caf4efcd73a50befd972eeace1c4e570dd2f2ea6e86ea932840d34",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-541791",
@@ -13667,19 +13667,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c9546d30768eca1e49c25368e4a255b870f71b6a61723283710746a0494896b7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c9546d30768eca1e49c25368e4a255b870f71b6a61723283710746a0494896b7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-543231",
@@ -13721,19 +13721,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d6e9b2d57273ee297207fd960ac9af5e03c1195ab2eefdb6f5b568bbafc066a4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d6e9b2d57273ee297207fd960ac9af5e03c1195ab2eefdb6f5b568bbafc066a4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-508894",
@@ -13775,19 +13775,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d4e1104ebec0a1d58bc2843bc9d0f8faec990459fa183cdb85489ec98701b1de"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d4e1104ebec0a1d58bc2843bc9d0f8faec990459fa183cdb85489ec98701b1de",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-584088",
@@ -13829,19 +13829,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "102e8bba0d033c154908c533ca3a780b9854af9988246c9706232f846e0212a5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "102e8bba0d033c154908c533ca3a780b9854af9988246c9706232f846e0212a5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-231671",
@@ -13883,19 +13883,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "51098a3f2edac7fac6c6f728af85864f0157a7dc9d0aaaf1e67e60ac0dbc1dd7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "51098a3f2edac7fac6c6f728af85864f0157a7dc9d0aaaf1e67e60ac0dbc1dd7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-231945",
@@ -13937,19 +13937,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4e0d2c644105dea7042f3ddea3b6a96826cef27033240fc13547602dea190cbe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4e0d2c644105dea7042f3ddea3b6a96826cef27033240fc13547602dea190cbe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-232852",
@@ -13991,19 +13991,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f246359a1c2c435523e4139078b06e07ab851f2894971e95fa3ffb781a128125"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f246359a1c2c435523e4139078b06e07ab851f2894971e95fa3ffb781a128125",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-223177",
@@ -14045,19 +14045,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a372e071fb7a12aaca4974cc4ae1d864dd4752d9571d18758ff554011f5c82c0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a372e071fb7a12aaca4974cc4ae1d864dd4752d9571d18758ff554011f5c82c0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-472262",
@@ -14099,19 +14099,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "15df4a9fe9e24bb19d9565583e2422c6b6534b46e71c17a28a1c5672ed3e0a6e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "15df4a9fe9e24bb19d9565583e2422c6b6534b46e71c17a28a1c5672ed3e0a6e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-541425",
@@ -14153,19 +14153,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0141e45a58b727129ea6d9bc3cc8d1a5e379f7107a71da72f77c0b9e7cd19f36"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0141e45a58b727129ea6d9bc3cc8d1a5e379f7107a71da72f77c0b9e7cd19f36",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-394373",
@@ -14207,19 +14207,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "60f7052464d96b5ccb677f31b8634f9a8b4f4d9060f15669962d40326db2794d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "60f7052464d96b5ccb677f31b8634f9a8b4f4d9060f15669962d40326db2794d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-475040",
@@ -14261,19 +14261,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6e9663e187d4c636e3c5d4f1c4236b968bdc21afc4626b6df77fd9a9d0b72163"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6e9663e187d4c636e3c5d4f1c4236b968bdc21afc4626b6df77fd9a9d0b72163",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-477147",
@@ -14315,19 +14315,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "66ef664082173349056c8d61b523f1ffa78bcaaf9211073307c0b796eb9afe31"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "66ef664082173349056c8d61b523f1ffa78bcaaf9211073307c0b796eb9afe31",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-461790",
@@ -14369,19 +14369,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ceaee4521203b3713fa7ae9af3a2527b6ab40545c2891f0b3a636e0bbd99b051"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ceaee4521203b3713fa7ae9af3a2527b6ab40545c2891f0b3a636e0bbd99b051",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-217106",
@@ -14423,19 +14423,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b0d42ab10ba73695798e4f3bd4173dae7d48f295f21ff887c898d6b6737abea5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b0d42ab10ba73695798e4f3bd4173dae7d48f295f21ff887c898d6b6737abea5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-186243",
@@ -14477,19 +14477,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "53d6a7f05ad597cfaf68a4f701764189a179be0721587c94f4714d977fb9ce76"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "53d6a7f05ad597cfaf68a4f701764189a179be0721587c94f4714d977fb9ce76",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-502098",
@@ -14531,19 +14531,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "22525feceecfb9528b7e533803014e85b59b5e38c24f678039553e22a7fca05d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "22525feceecfb9528b7e533803014e85b59b5e38c24f678039553e22a7fca05d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-527247",
@@ -14585,19 +14585,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9c83d63345c741ce27ae74483669aaf04f1ee8896288e99151cfb78ddf30b81a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9c83d63345c741ce27ae74483669aaf04f1ee8896288e99151cfb78ddf30b81a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-218869",
@@ -14639,19 +14639,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "cd57b4451628fb2e2fe971283f3874f74a5874ad225f567c1c562294b7b9afe9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "cd57b4451628fb2e2fe971283f3874f74a5874ad225f567c1c562294b7b9afe9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-643309",
@@ -14693,19 +14693,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6fba1f0ea17c36b097a89e3735b512f087bf76a828d895082e2fb9ed7d1a8fa6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6fba1f0ea17c36b097a89e3735b512f087bf76a828d895082e2fb9ed7d1a8fa6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-646847",
@@ -14747,19 +14747,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "04c72176d9a96f29c45d110464331f9c5e6d13effdbcfe7b4b343d7232deb74c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "04c72176d9a96f29c45d110464331f9c5e6d13effdbcfe7b4b343d7232deb74c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-617853",
@@ -14801,19 +14801,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "193924bb0d84deaac4f47a46515e9281f92232093b3e452127ddc56ae81992e2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "193924bb0d84deaac4f47a46515e9281f92232093b3e452127ddc56ae81992e2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-215775",
@@ -14855,19 +14855,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4474680bfbc1a95f6584995de8197aa5c98b6dc87874fd8afa0938bcb0bb329d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4474680bfbc1a95f6584995de8197aa5c98b6dc87874fd8afa0938bcb0bb329d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-662983",
@@ -14909,19 +14909,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3c90e721bdc2199c31aa28237102e891d1b333c4435c6d9f469bc7b88fabe084"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3c90e721bdc2199c31aa28237102e891d1b333c4435c6d9f469bc7b88fabe084",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-411839",
@@ -14963,19 +14963,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d6be15b8203e5cc73f1d6f84611d93c1abe7ec2f918c1a520fdf8d13d214f6ba"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d6be15b8203e5cc73f1d6f84611d93c1abe7ec2f918c1a520fdf8d13d214f6ba",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-412858",
@@ -15017,19 +15017,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f1aab99c0b1b4b77d89353555dcab5e38a89570dd734a1207e4cd29abd3cf1ad"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f1aab99c0b1b4b77d89353555dcab5e38a89570dd734a1207e4cd29abd3cf1ad",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-488130",
@@ -15071,19 +15071,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e9fc6a68cae52d99bf7c25fedf6b6cb585f0435f7ad8f23bbbabcc4c95203a5e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e9fc6a68cae52d99bf7c25fedf6b6cb585f0435f7ad8f23bbbabcc4c95203a5e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-488794",
@@ -15125,19 +15125,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ce928f2af9747bf8e506b25a651f243538a6eef182bad8dd08d4a0b594345358"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ce928f2af9747bf8e506b25a651f243538a6eef182bad8dd08d4a0b594345358",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-577266",
@@ -15179,19 +15179,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a004537f54f38ae77738a646e63bed5f3e8d13c761ac1601c0ba531c1701cce7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a004537f54f38ae77738a646e63bed5f3e8d13c761ac1601c0ba531c1701cce7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-207965",
@@ -15233,19 +15233,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5d4b60fbd4c2f3c953a7b911b5c02c2594c22f3b37316b3ce9650f59c98edacf"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5d4b60fbd4c2f3c953a7b911b5c02c2594c22f3b37316b3ce9650f59c98edacf",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-599852",
@@ -15287,19 +15287,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6519c7d52116013a8a4543773ad70eda7b8cd249bf84097d6966edd220d61085"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6519c7d52116013a8a4543773ad70eda7b8cd249bf84097d6966edd220d61085",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-600516",
@@ -15341,19 +15341,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b28364d024aebe0fbaaa596e5daaab2ef22f1c3153ec35f8d5f17334a209475c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b28364d024aebe0fbaaa596e5daaab2ef22f1c3153ec35f8d5f17334a209475c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-587946",
@@ -15395,19 +15395,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8f8570c2018c5b5b8563e9cfedfe08992de00f94713fb882ed38c3c9d5ff883f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8f8570c2018c5b5b8563e9cfedfe08992de00f94713fb882ed38c3c9d5ff883f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-177105",
@@ -15449,19 +15449,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0bcc334663f4c62b54efe3986a4568922131a71676aa6ccd74ba851ffed1a3d3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0bcc334663f4c62b54efe3986a4568922131a71676aa6ccd74ba851ffed1a3d3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-494618",
@@ -15503,19 +15503,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c9304caeb9774d4a5d55de8bea9b041e58ba3efca918234082c91f2de0ef468c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c9304caeb9774d4a5d55de8bea9b041e58ba3efca918234082c91f2de0ef468c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-610437",
@@ -15557,19 +15557,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "548e30e4f027e26edbfe455867bcd32d345be23ae0a4604d98c610f54b778e82"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "548e30e4f027e26edbfe455867bcd32d345be23ae0a4604d98c610f54b778e82",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-170265",
@@ -15611,19 +15611,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "883db849dbbeb2afcc551be7bb4b0ed93c9946cd7eab50a295b66a527d1babc9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "883db849dbbeb2afcc551be7bb4b0ed93c9946cd7eab50a295b66a527d1babc9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-171743",
@@ -15665,19 +15665,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8b3ad462d2030a87b78cfd4824bc8500b12b559a051c92408e73b51d4d3d7fb3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8b3ad462d2030a87b78cfd4824bc8500b12b559a051c92408e73b51d4d3d7fb3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-210061",
@@ -15719,19 +15719,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0824ee585364eb38350ef15e0a8284299b6acabfd71e67750fd915aee8569f3f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0824ee585364eb38350ef15e0a8284299b6acabfd71e67750fd915aee8569f3f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-549399",
@@ -15773,19 +15773,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "df52a3e1f9079092bc9804235214bcc3fecc34615600df08bdef93706897c91a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "df52a3e1f9079092bc9804235214bcc3fecc34615600df08bdef93706897c91a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-549427",
@@ -15827,19 +15827,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "430e4a4425e6bf2045aa2571746e69307d4f8c0bec4b5629bb2cc936824affc2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "430e4a4425e6bf2045aa2571746e69307d4f8c0bec4b5629bb2cc936824affc2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-552145",
@@ -15881,19 +15881,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ee7adcae2d7cd0371ab7786e3c9c9a05f4abe68de082a133e649a90007f1acde"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ee7adcae2d7cd0371ab7786e3c9c9a05f4abe68de082a133e649a90007f1acde",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-221-552828",
@@ -15935,19 +15935,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b4564bd00387ae013f6fe0d8510e0689775d2c1a7119876d1a8129abbef30f84"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b4564bd00387ae013f6fe0d8510e0689775d2c1a7119876d1a8129abbef30f84",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-204534",
@@ -15989,19 +15989,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "03f5d4ff91c83a63dbee3a651c11790c5735326ba4e677fe5c9d1f36d84aca8f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "03f5d4ff91c83a63dbee3a651c11790c5735326ba4e677fe5c9d1f36d84aca8f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-222-199216",
@@ -16043,19 +16043,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c5c4f67589b666ab0109cf27a26596729dbaa08d789d41f2df4d3303c61d4513"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c5c4f67589b666ab0109cf27a26596729dbaa08d789d41f2df4d3303c61d4513",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-251-527089",
@@ -16097,19 +16097,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "308d064adb516ab93f827e73181f20a536955858dc5df4c76d54c776a9f3c4b1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "308d064adb516ab93f827e73181f20a536955858dc5df4c76d54c776a9f3c4b1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-251-584724",
@@ -16151,19 +16151,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1a8ff92fdaaf75e5be18585b41105af71aa393c2d4508387c373d58cf44edbfa"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1a8ff92fdaaf75e5be18585b41105af71aa393c2d4508387c373d58cf44edbfa",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-251-688655",
@@ -16205,19 +16205,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6f045ade2191298a42e010954ec913fa277b903d1e86c32c2ef4e0fab34f1eaf"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6f045ade2191298a42e010954ec913fa277b903d1e86c32c2ef4e0fab34f1eaf",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-244-206516",
@@ -16259,19 +16259,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fa1e4408862407ef895b242ea2483b7efd7c2711e3c54d7fcdc484e34f03b421"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fa1e4408862407ef895b242ea2483b7efd7c2711e3c54d7fcdc484e34f03b421",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-244-214711",
@@ -16313,19 +16313,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3f4baacc9712a3da7efca245a968cd00045a0762be05bd2a8bdfa2f28660e23b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3f4baacc9712a3da7efca245a968cd00045a0762be05bd2a8bdfa2f28660e23b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-241-886088",
@@ -16367,19 +16367,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "06d19dd1dc24f39f707e4a778b350d893c4759e466e8fc383f7ff5d3eefd82ca"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "06d19dd1dc24f39f707e4a778b350d893c4759e466e8fc383f7ff5d3eefd82ca",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-244-116343",
@@ -16421,19 +16421,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "89aa891426b547071f2894b26da8f4dcca48a21eb6c39caa8405593767b5b555"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "89aa891426b547071f2894b26da8f4dcca48a21eb6c39caa8405593767b5b555",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-249-509024",
@@ -16475,19 +16475,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "adf1f5a5c09352a55e86256be54b721ae5b8b07348aba3dad015000812ebff27"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "adf1f5a5c09352a55e86256be54b721ae5b8b07348aba3dad015000812ebff27",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-241-972569",
@@ -16529,19 +16529,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "53a18661809bbff36e757d1a5a58ca17ab48ad7df548eb9ce694ba93d4dd43ea"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "53a18661809bbff36e757d1a5a58ca17ab48ad7df548eb9ce694ba93d4dd43ea",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-241-875600",
@@ -16583,19 +16583,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "50985b81de863a0a6478c5fe2ff0795fb15d6203b0e9a6e097f5841fcba7fcf9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "50985b81de863a0a6478c5fe2ff0795fb15d6203b0e9a6e097f5841fcba7fcf9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-241-799216",
@@ -16637,19 +16637,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c5ea445b4c86349441165a6f446694e698b7b16937991fc7f19c866a59a93712"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c5ea445b4c86349441165a6f446694e698b7b16937991fc7f19c866a59a93712",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-241-756068",
@@ -16691,19 +16691,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "31f3c8275e5adb757c768ea6eb5c5f94e55a6282e3b53b40f1f57313a3ee4821"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "31f3c8275e5adb757c768ea6eb5c5f94e55a6282e3b53b40f1f57313a3ee4821",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-241-768171",
@@ -16745,19 +16745,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "654280c4dcd2502bba72f05d2d65785500fac1827fe62e270ac2e74401fe5a1b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "654280c4dcd2502bba72f05d2d65785500fac1827fe62e270ac2e74401fe5a1b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-576346",
@@ -16799,19 +16799,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0e11b020342299d1a92fbd552273ae6a70e04286128ea37c89b486a86fdb6fa9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0e11b020342299d1a92fbd552273ae6a70e04286128ea37c89b486a86fdb6fa9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-262-256385",
@@ -16853,19 +16853,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d23db27e495d20a23fbba83301c049a6999be1e3039cb08fa19f3dcf8c56b0ba"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d23db27e495d20a23fbba83301c049a6999be1e3039cb08fa19f3dcf8c56b0ba",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-264-328225",
@@ -16907,19 +16907,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7eb787c4e548daa7acf83ccb2cac9d4c1f08852a1c399348e4cf5baa18bf5f94"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7eb787c4e548daa7acf83ccb2cac9d4c1f08852a1c399348e4cf5baa18bf5f94",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-385803",
@@ -16961,19 +16961,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0b7ff620afb3884813b7e596f41b44668812f244630ee3165df3715adf6a5108"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0b7ff620afb3884813b7e596f41b44668812f244630ee3165df3715adf6a5108",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-262-164366",
@@ -17015,19 +17015,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5418095421cff2c743586ec0944689f3edbf6df249bff01e9624e11dade1a304"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5418095421cff2c743586ec0944689f3edbf6df249bff01e9624e11dade1a304",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-672802",
@@ -17069,19 +17069,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d662b76bc08dc083cfc2066e4fb2c92e81af3116da5694503cb5765ed5582a61"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d662b76bc08dc083cfc2066e4fb2c92e81af3116da5694503cb5765ed5582a61",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-262-244131",
@@ -17123,19 +17123,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1ca8016579a6d4d37a5dd8252e6659a36c9c4c74945aa580c36ac8918b9eb950"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1ca8016579a6d4d37a5dd8252e6659a36c9c4c74945aa580c36ac8918b9eb950",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-607145",
@@ -17177,19 +17177,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a456265ad93e6f0d826a1794fb450f46bd8a41d0f627bbee1752dd5ebc66034a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a456265ad93e6f0d826a1794fb450f46bd8a41d0f627bbee1752dd5ebc66034a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-695906",
@@ -17231,19 +17231,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "db52993d04308ad0fef05d7bae54c4bb2addd3456fc7a1af56d718d97ed67652"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "db52993d04308ad0fef05d7bae54c4bb2addd3456fc7a1af56d718d97ed67652",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-264-092275",
@@ -17285,19 +17285,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c2af45d2d41501a9dd839ea0c85e4940d56fe5173464245c8a5d59ca191e318b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c2af45d2d41501a9dd839ea0c85e4940d56fe5173464245c8a5d59ca191e318b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-262-245651",
@@ -17339,19 +17339,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e5eeffaaf1313f35910e5644e8170666c70a64e0cb8e88fa61b3d43fe786dd9b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e5eeffaaf1313f35910e5644e8170666c70a64e0cb8e88fa61b3d43fe786dd9b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-264-290731",
@@ -17393,19 +17393,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d0f55b978801d35f460895798804053661bd58d85a0cb5b2d35708e2b343ec62"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d0f55b978801d35f460895798804053661bd58d85a0cb5b2d35708e2b343ec62",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-262-261130",
@@ -17447,19 +17447,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "72b7142dd719dd61a77ff3b5f43df66ce15b6053f8462699a224b9236875714b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "72b7142dd719dd61a77ff3b5f43df66ce15b6053f8462699a224b9236875714b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-311165",
@@ -17501,19 +17501,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "055738655bab60475139036b006f3d5cecfd03a4abf7e0464e559283399f40bc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "055738655bab60475139036b006f3d5cecfd03a4abf7e0464e559283399f40bc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-262-250441",
@@ -17555,19 +17555,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c9dbaaf71a4ba8f096ac48b7886e5765eb3625863d2dd353b94b5d3790ed1faf"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c9dbaaf71a4ba8f096ac48b7886e5765eb3625863d2dd353b94b5d3790ed1faf",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-676699",
@@ -17609,19 +17609,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e06e9a1a015d29ea02e1c3c4d510033197634b5e9c960c2addf4618c53b70691"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e06e9a1a015d29ea02e1c3c4d510033197634b5e9c960c2addf4618c53b70691",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-678422",
@@ -17663,19 +17663,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9baf4714a44bdb55464df9b6f7393097551b7386793f4649aea7c473205031ca"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9baf4714a44bdb55464df9b6f7393097551b7386793f4649aea7c473205031ca",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-261-885984",
@@ -17717,19 +17717,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "68a6dbc9c057e75fa5087dc11b75a04d713ef56c4aa4605e20b9915c33cb5afe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "68a6dbc9c057e75fa5087dc11b75a04d713ef56c4aa4605e20b9915c33cb5afe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-263-681161",
@@ -17771,19 +17771,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9f1c9559d92d2c22de5d931f88c5b8d0bc6ab1764405dbdf99024be2c60066b6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9f1c9559d92d2c22de5d931f88c5b8d0bc6ab1764405dbdf99024be2c60066b6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-261-892356",
@@ -17825,19 +17825,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "88396bfb5c3d8a9b4976bbdc9431622a31b4973205cb1ddf4a5bb83d087cdaf8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "88396bfb5c3d8a9b4976bbdc9431622a31b4973205cb1ddf4a5bb83d087cdaf8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-261-739114",
@@ -17879,19 +17879,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4be6598d2682c3cda274312b13dcfbe4f3f937f0ec4390454eded2662df3a07d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4be6598d2682c3cda274312b13dcfbe4f3f937f0ec4390454eded2662df3a07d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-264-365191",
@@ -17933,19 +17933,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "11f9d074a91976a6b9bcbb16a4db84fe5f493ec33f8fd2f6d60e299cacbe0c51"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "11f9d074a91976a6b9bcbb16a4db84fe5f493ec33f8fd2f6d60e299cacbe0c51",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-261-901446",
@@ -17987,19 +17987,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "88ef7e91c6d01e96cb3499f22609c19a1cdba32a1555b8b3d34cc6b80855ba02"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "88ef7e91c6d01e96cb3499f22609c19a1cdba32a1555b8b3d34cc6b80855ba02",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-008106",
@@ -18041,19 +18041,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c52e02eb2a140445921011284f98fe1e21c57bcc4300399c1a4b390b671f9f15"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c52e02eb2a140445921011284f98fe1e21c57bcc4300399c1a4b390b671f9f15",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-013774",
@@ -18095,19 +18095,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a1d8962ff94e145658dc276cee908b03b8ca93cc1f62b26b52eca58e4a4de994"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a1d8962ff94e145658dc276cee908b03b8ca93cc1f62b26b52eca58e4a4de994",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-083628",
@@ -18149,19 +18149,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a92ee822a4385cb3a30221c19daf1d2b680811630a33575fca809d56726efdc0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a92ee822a4385cb3a30221c19daf1d2b680811630a33575fca809d56726efdc0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-113607",
@@ -18203,19 +18203,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b6d9e926759840a14b7ac077ced3bad64009a7dcbff4e7a5c90ebc3da5398bb3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b6d9e926759840a14b7ac077ced3bad64009a7dcbff4e7a5c90ebc3da5398bb3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-263971",
@@ -18257,19 +18257,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7e43d220270e864aa26a68fe359c33c843326893ab00ffb0839928dfe202ea7a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7e43d220270e864aa26a68fe359c33c843326893ab00ffb0839928dfe202ea7a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-213168",
@@ -18311,19 +18311,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5e867e553af3ca0992aefdeb18d292a0cf93337006411e5fc92e358d4d89c61d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5e867e553af3ca0992aefdeb18d292a0cf93337006411e5fc92e358d4d89c61d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-001063",
@@ -18365,19 +18365,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "294528954a6aebe1710a9f1119e8a0fa4c41d0fe63e42e7679fb40b44ad7cc2c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "294528954a6aebe1710a9f1119e8a0fa4c41d0fe63e42e7679fb40b44ad7cc2c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-072430",
@@ -18419,19 +18419,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "862ec326975d95ca39b0f8a75805fa5459c7fa21210a0e4ffa791fe811dda01d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "862ec326975d95ca39b0f8a75805fa5459c7fa21210a0e4ffa791fe811dda01d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-277-340795",
@@ -18473,19 +18473,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1a80217f5b1a0b44c7144172efd5b9f48191a2fece076bb9edefe2cbdf697da7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1a80217f5b1a0b44c7144172efd5b9f48191a2fece076bb9edefe2cbdf697da7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-291-554530",
@@ -18527,19 +18527,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6ded135972fcdb94ab05b8c0621fa0a0b05888f8b1220c8e8bffc273c536e2f5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6ded135972fcdb94ab05b8c0621fa0a0b05888f8b1220c8e8bffc273c536e2f5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-291-520840",
@@ -18581,19 +18581,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "38ed3cfc9d829d2f87e39e6164b242d09bae0bc03f3958baea64202c9d0c5dfd"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "38ed3cfc9d829d2f87e39e6164b242d09bae0bc03f3958baea64202c9d0c5dfd",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-291-611566",
@@ -18635,19 +18635,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c7271eea3da5610ddeae6b310e00acb089747270ba3240d1c16a059ae9535152"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c7271eea3da5610ddeae6b310e00acb089747270ba3240d1c16a059ae9535152",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-291-613306",
@@ -18689,19 +18689,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "05b3e8055255f07296f2a94d8bc37715e17c80061864a6416b8323425efd15ff"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "05b3e8055255f07296f2a94d8bc37715e17c80061864a6416b8323425efd15ff",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-292-794102",
@@ -18743,19 +18743,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "41efbdf8bcc894375df79ae9052a1b6baaacc1a70568b3157fca6f33cebe15b7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "41efbdf8bcc894375df79ae9052a1b6baaacc1a70568b3157fca6f33cebe15b7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-292-672777",
@@ -18797,19 +18797,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dce1e644383ac18eea635b1a8d302b10b1d44a2841eee1455fd029b0dc74b4bc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dce1e644383ac18eea635b1a8d302b10b1d44a2841eee1455fd029b0dc74b4bc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-291-619814",
@@ -18851,19 +18851,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "95c9cd16977844753061145038890c5051c4960d0c2c7e4db10ac44e7bedde64"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "95c9cd16977844753061145038890c5051c4960d0c2c7e4db10ac44e7bedde64",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-291-631547",
@@ -18905,19 +18905,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ac580914eccc4a0d574f1838dbb1eb3e05e8db44c50d8419553282295f2e8598"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ac580914eccc4a0d574f1838dbb1eb3e05e8db44c50d8419553282295f2e8598",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-292-785347",
@@ -18959,19 +18959,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "48b66be9223a3712ebdf2c029fecd46c584b6543219c1a18ccf9fd78ae2bcb99"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "48b66be9223a3712ebdf2c029fecd46c584b6543219c1a18ccf9fd78ae2bcb99",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-292-760249",
@@ -19013,19 +19013,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d6d276c3824be8b32ac3911a6ccd4e00ab768c3f05cce4f33e1cbaab79304f3f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d6d276c3824be8b32ac3911a6ccd4e00ab768c3f05cce4f33e1cbaab79304f3f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-292-804958",
@@ -19067,19 +19067,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "863f6fba4a6c4aeff6e5bf05d695805edeb172ea32e59cd9dde2d9f4a5cba2e7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "863f6fba4a6c4aeff6e5bf05d695805edeb172ea32e59cd9dde2d9f4a5cba2e7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-513217",
@@ -19121,19 +19121,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7eb997612abc25a52900ba19a1de3eacd40e46fe1f40e7d7cb90ee32db72d7e6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7eb997612abc25a52900ba19a1de3eacd40e46fe1f40e7d7cb90ee32db72d7e6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-323296",
@@ -19175,19 +19175,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3619fe7d1c741b375ea246c7be1385ebd74f9960a05fbffe3d91605a5fca252e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3619fe7d1c741b375ea246c7be1385ebd74f9960a05fbffe3d91605a5fca252e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-325123",
@@ -19229,19 +19229,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "899aa5eb305dfd8afdbd0e5e456a436f65fd7fe8ecc704b8fa3735702c6bbb2a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "899aa5eb305dfd8afdbd0e5e456a436f65fd7fe8ecc704b8fa3735702c6bbb2a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-527068",
@@ -19283,19 +19283,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b405bbc7468ccd3701cb21bae622acc3fbdaf83b4f14c7882eb1164330c42cbe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b405bbc7468ccd3701cb21bae622acc3fbdaf83b4f14c7882eb1164330c42cbe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-515032",
@@ -19337,19 +19337,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "20f7a81d03699500376517ae473488ecf6f926a28a454897f6c54b707bf31ff8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "20f7a81d03699500376517ae473488ecf6f926a28a454897f6c54b707bf31ff8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-516850",
@@ -19391,19 +19391,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bd781fcd3e229217004d4074c795ffc8ea161e2030c54cdb67804fdb4bdd4ce4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bd781fcd3e229217004d4074c795ffc8ea161e2030c54cdb67804fdb4bdd4ce4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-519266",
@@ -19445,19 +19445,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c5237d7d8157ab193a794e7b882374045aeae3eee6f881a9a3117f1006142e3e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c5237d7d8157ab193a794e7b882374045aeae3eee6f881a9a3117f1006142e3e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-519944",
@@ -19499,19 +19499,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8f1eefa410b9c0f2c10fe76220371fd674edfc9161e525adc36deb496c933a7d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8f1eefa410b9c0f2c10fe76220371fd674edfc9161e525adc36deb496c933a7d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-520584",
@@ -19553,19 +19553,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dae54c4b3bef0d9bed7f007ce252168061fad67e02b0c6a092fecffde58b757e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dae54c4b3bef0d9bed7f007ce252168061fad67e02b0c6a092fecffde58b757e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-479456",
@@ -19607,19 +19607,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3de1cf3fb33cce62757aafd9b3e9126ded1679797f1e80581f210bcbf396aa87"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3de1cf3fb33cce62757aafd9b3e9126ded1679797f1e80581f210bcbf396aa87",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-480871",
@@ -19661,19 +19661,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "df0d1d1d1bee59158416d11f35bcc0ed09283bfd278d6ce78537c225a53dd73f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "df0d1d1d1bee59158416d11f35bcc0ed09283bfd278d6ce78537c225a53dd73f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-481459",
@@ -19715,19 +19715,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a82174cdb4cb42944175db5fb9c5f1ff5d7f785f0bf4b2e1f33952c7aab64b6a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a82174cdb4cb42944175db5fb9c5f1ff5d7f785f0bf4b2e1f33952c7aab64b6a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-504577",
@@ -19769,19 +19769,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ff4c6e4059b2252cc6c8a5755d02c20e47c41c62750d851c416f0ab094c1c4f0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ff4c6e4059b2252cc6c8a5755d02c20e47c41c62750d851c416f0ab094c1c4f0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-530549",
@@ -19823,19 +19823,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "06696c91bbc7d127f980a4827d598e697f6dd3144f84a2d0240872ffc3d615ba"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "06696c91bbc7d127f980a4827d598e697f6dd3144f84a2d0240872ffc3d615ba",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-345692",
@@ -19877,19 +19877,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "768694b2a057735d469934efe3aeb4248c9f1922be51efda4b9da981260de91b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "768694b2a057735d469934efe3aeb4248c9f1922be51efda4b9da981260de91b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-369813",
@@ -19931,19 +19931,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1cc91704522e1e25a7ea45e0562fc863aa03009363ec5a49468b9f16d76d3d2a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1cc91704522e1e25a7ea45e0562fc863aa03009363ec5a49468b9f16d76d3d2a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-482661",
@@ -19985,19 +19985,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "001c39374b55bdbb0f9e7f9123d51c76d140ef85ba5931d6223188fdfebb9bd2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "001c39374b55bdbb0f9e7f9123d51c76d140ef85ba5931d6223188fdfebb9bd2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-507374",
@@ -20039,19 +20039,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "abcbbc76df10d99cb04753bb237972bd4a7b27825e92cc0315664a2317a4466f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "abcbbc76df10d99cb04753bb237972bd4a7b27825e92cc0315664a2317a4466f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-363723",
@@ -20093,19 +20093,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "77a0f5d82abf4cfc70724d51c05016ade7947f48b57beb7855ab19f88cf6677b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "77a0f5d82abf4cfc70724d51c05016ade7947f48b57beb7855ab19f88cf6677b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-462031",
@@ -20147,19 +20147,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "24627737c807fc71c7ad11110c66ea55e2d6f75e034fa5f8b88958b7e015a174"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "24627737c807fc71c7ad11110c66ea55e2d6f75e034fa5f8b88958b7e015a174",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-509079",
@@ -20201,19 +20201,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2bcd570bd3dd959fde4e037e1942c732982dcd3301d85dbf34dfa492539ab0c3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2bcd570bd3dd959fde4e037e1942c732982dcd3301d85dbf34dfa492539ab0c3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-510324",
@@ -20255,19 +20255,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dc31bb648ee37e8b9a1c0f0878ec642d63f30970f0a048701aa47c04cb990cd9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dc31bb648ee37e8b9a1c0f0878ec642d63f30970f0a048701aa47c04cb990cd9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-340934",
@@ -20309,19 +20309,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "56c8adad3eb1fb0c41e5ef5a3c0200e84f9aec876ffb94672bd252152b55e060"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "56c8adad3eb1fb0c41e5ef5a3c0200e84f9aec876ffb94672bd252152b55e060",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-360711",
@@ -20363,19 +20363,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5a0ffc9098aaf58e4f1733521fdbcad333c52be48ea2fa85b32ba6d9274085e6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5a0ffc9098aaf58e4f1733521fdbcad333c52be48ea2fa85b32ba6d9274085e6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-466941",
@@ -20417,19 +20417,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "267fefd2e564c782cbb083f0ace9c79b4026f21dca8aee220842dd474c7eddd8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "267fefd2e564c782cbb083f0ace9c79b4026f21dca8aee220842dd474c7eddd8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-499423",
@@ -20471,19 +20471,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0e6120ef693f9dde196c8f3d85f9a7d3c298cdb7d118ee45d549cd6a265e47df"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0e6120ef693f9dde196c8f3d85f9a7d3c298cdb7d118ee45d549cd6a265e47df",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-337808",
@@ -20525,19 +20525,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "32d74f1d0bcf360ba27f4a24ab6dbe65e5fa8f402f3a1e178e7f38ac7dcbe5fa"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "32d74f1d0bcf360ba27f4a24ab6dbe65e5fa8f402f3a1e178e7f38ac7dcbe5fa",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-458285",
@@ -20579,19 +20579,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f5e7563f1eb560d01bc6dc99e1ff15a09288d1dba264b14d9eeeb6e151538001"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f5e7563f1eb560d01bc6dc99e1ff15a09288d1dba264b14d9eeeb6e151538001",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-441158",
@@ -20633,19 +20633,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4e25e2489d70b7decea6140d46834714d8d17ddcc3b70c2dc0a74cb9c9480dd1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4e25e2489d70b7decea6140d46834714d8d17ddcc3b70c2dc0a74cb9c9480dd1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-446066",
@@ -20687,19 +20687,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "75c06239a7cbb552835210c11e7447a76e5357f4fb51c4e1f4812b197f39e34c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "75c06239a7cbb552835210c11e7447a76e5357f4fb51c4e1f4812b197f39e34c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-447708",
@@ -20741,19 +20741,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "58b9c7299289ec7a3190ecae563cf98b5fa52a78c1e0deddf0d545da833c2819"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "58b9c7299289ec7a3190ecae563cf98b5fa52a78c1e0deddf0d545da833c2819",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-281-433586",
@@ -20795,19 +20795,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "deb81dd7a3b7b75a98aa9ef7566b108068bd01a74a8b4aace154cf220c73882c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "deb81dd7a3b7b75a98aa9ef7566b108068bd01a74a8b4aace154cf220c73882c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-311-258013",
@@ -20849,19 +20849,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "50710113d61d154bea8b76af37f7bcac9aec8b94f8879b2891ed81930de4c43b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "50710113d61d154bea8b76af37f7bcac9aec8b94f8879b2891ed81930de4c43b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-311-220315",
@@ -20903,19 +20903,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "afeb82b7da35b9d04179ac6a9edbd3cd9588b2637f1f9dca2baf107f14d53368"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "afeb82b7da35b9d04179ac6a9edbd3cd9588b2637f1f9dca2baf107f14d53368",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-311-230502",
@@ -20957,19 +20957,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "435df2873a955901a1d66553832b7547d486a0a87ee91ffcd8c0b569438f9d7b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "435df2873a955901a1d66553832b7547d486a0a87ee91ffcd8c0b569438f9d7b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-052116",
@@ -21011,19 +21011,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c512879e17b37a8be2dc0505339b74c91a51ba1b15706c9687253e2a1b0ea5e7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c512879e17b37a8be2dc0505339b74c91a51ba1b15706c9687253e2a1b0ea5e7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-177045",
@@ -21065,19 +21065,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "49fec5ade904943d19f50d95fd3aa2176d65f04bad5f072576ec0acebbe229a0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "49fec5ade904943d19f50d95fd3aa2176d65f04bad5f072576ec0acebbe229a0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-027324",
@@ -21119,19 +21119,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fdfbb1b7b8faa9e1a41ccde3df682dbfbcb8e344cf984b603384a561738ff758"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fdfbb1b7b8faa9e1a41ccde3df682dbfbcb8e344cf984b603384a561738ff758",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-039511",
@@ -21173,19 +21173,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2b80de1d0ac8cfc9d6606b7383e59bb6c438ea8f50945050828a51b0c5376d69"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2b80de1d0ac8cfc9d6606b7383e59bb6c438ea8f50945050828a51b0c5376d69",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-010018",
@@ -21227,19 +21227,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6a7513b74ea2bed7fba71b3082eb5382709a9a961ec33a49f66fa571ac94a0b6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6a7513b74ea2bed7fba71b3082eb5382709a9a961ec33a49f66fa571ac94a0b6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-400630",
@@ -21281,19 +21281,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "de50d0b178a3b4669c0f27c3eebbac395c1920725d7a58205382cf17005405d6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "de50d0b178a3b4669c0f27c3eebbac395c1920725d7a58205382cf17005405d6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-381-784292",
@@ -21335,19 +21335,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "94db3f580be75a505381e7e89ea07d48356c421e15c86f9bca8e8a8fc3cdf437"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "94db3f580be75a505381e7e89ea07d48356c421e15c86f9bca8e8a8fc3cdf437",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-545280",
@@ -21389,19 +21389,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "edf6c568c8d3f80e961a42e01ce736afd0caebe9a799c7c5c8f14646adb3e948"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "edf6c568c8d3f80e961a42e01ce736afd0caebe9a799c7c5c8f14646adb3e948",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-561442",
@@ -21443,19 +21443,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9581e44c72447b0697708df9f54aee51d64a76e85c191ceade71802b9491f051"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9581e44c72447b0697708df9f54aee51d64a76e85c191ceade71802b9491f051",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-381-766587",
@@ -21497,19 +21497,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2b5116444114eb0ad487ca63f9f031129d684d04ecb3c59fe264f0e5e9441f93"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2b5116444114eb0ad487ca63f9f031129d684d04ecb3c59fe264f0e5e9441f93",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-387-484733",
@@ -21551,19 +21551,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "90a65b00a808e633783932b6ab62d12a97fd8b7892f0efdb390634fa4d0ceb64"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "90a65b00a808e633783932b6ab62d12a97fd8b7892f0efdb390634fa4d0ceb64",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-401-154702",
@@ -21605,19 +21605,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d1ecef484dea90d06a26cc6d56a27865f98b267b739420ce8d705c4a53ed5279"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d1ecef484dea90d06a26cc6d56a27865f98b267b739420ce8d705c4a53ed5279",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-401-162244",
@@ -21659,19 +21659,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6c1543c7ab82df63fadf5cd8479f4da9a351b7fe31da383089a9e0f8f08fb203"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6c1543c7ab82df63fadf5cd8479f4da9a351b7fe31da383089a9e0f8f08fb203",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-401-147221",
@@ -21713,19 +21713,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2dac6d32201579bf07971032832d2eebebb1d8d6991c4653c6b1137d65baa558"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2dac6d32201579bf07971032832d2eebebb1d8d6991c4653c6b1137d65baa558",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-352-539965",
@@ -21767,19 +21767,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e7f7e8d6d777f80120182b0777a49019a769d757d5cb3c9fb545b102f60ef0fa"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e7f7e8d6d777f80120182b0777a49019a769d757d5cb3c9fb545b102f60ef0fa",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-351-486308",
@@ -21821,19 +21821,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8fe1a531d1553b206437dd2e5d14cabbf9c2a4a572d9c9641ab5281b261e97bf"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8fe1a531d1553b206437dd2e5d14cabbf9c2a4a572d9c9641ab5281b261e97bf",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-440938",
@@ -21875,19 +21875,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9c289a040e7b7379368a8244fbaceccd6dd666435f57a628c2aa837469078281"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9c289a040e7b7379368a8244fbaceccd6dd666435f57a628c2aa837469078281",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-371775",
@@ -21929,19 +21929,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8a55f0d46243886af4800879c674bb469be37a548546f4f5b5cf21830362260e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8a55f0d46243886af4800879c674bb469be37a548546f4f5b5cf21830362260e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-245206",
@@ -21983,19 +21983,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "46abe1c87ccea06a208dfc5f3b7288f4e8787358f5ca46c49541ef2b1bcb7abe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "46abe1c87ccea06a208dfc5f3b7288f4e8787358f5ca46c49541ef2b1bcb7abe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-366866",
@@ -22037,19 +22037,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2687f57a5df345fbec5efb81dc49b6b23deb4665da3aa439a5adcfccb10f2d35"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2687f57a5df345fbec5efb81dc49b6b23deb4665da3aa439a5adcfccb10f2d35",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-414934",
@@ -22091,19 +22091,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "43047f4d1960290d761963c0d59b6db2553e1e1c510f1a29f1b2b9ada4be325a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "43047f4d1960290d761963c0d59b6db2553e1e1c510f1a29f1b2b9ada4be325a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-474384",
@@ -22145,19 +22145,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "238c8b00c834cc9c19d5c0cbf487d0018027a010355460369d178b06fa46c8b2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "238c8b00c834cc9c19d5c0cbf487d0018027a010355460369d178b06fa46c8b2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-375604",
@@ -22199,19 +22199,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6f5b5cf16f86bab7b5d7207054a97eaaea9f9eada7181a0966f1ad15a74afe49"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6f5b5cf16f86bab7b5d7207054a97eaaea9f9eada7181a0966f1ad15a74afe49",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-402101",
@@ -22253,19 +22253,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "86f8c797ad0e5c38ec35b02ad9f1c1e8c51f2bc7d41043f69efa24fff8b1fcdd"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "86f8c797ad0e5c38ec35b02ad9f1c1e8c51f2bc7d41043f69efa24fff8b1fcdd",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-463522",
@@ -22307,19 +22307,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4fdaaecadc0838d91118500118d8a7b4829b274656ca1f6f63315fb12a3d9a6b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4fdaaecadc0838d91118500118d8a7b4829b274656ca1f6f63315fb12a3d9a6b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-480419",
@@ -22361,19 +22361,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "89ba37e85e43b1417e315a83636d41ef5ca6d0ef34ae1808248018d135502a14"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "89ba37e85e43b1417e315a83636d41ef5ca6d0ef34ae1808248018d135502a14",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-498547",
@@ -22415,19 +22415,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6f192f040aaf32b61d9aa665195fafed855456e86a6e8e2da45fd52bf8863ffb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6f192f040aaf32b61d9aa665195fafed855456e86a6e8e2da45fd52bf8863ffb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-407725",
@@ -22469,19 +22469,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7ae0f197b31a6a2748692e8c7f7e3dc33a742aaf545e0b4a62c692aeb981c85d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7ae0f197b31a6a2748692e8c7f7e3dc33a742aaf545e0b4a62c692aeb981c85d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-452423",
@@ -22523,19 +22523,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8286b7bef5e6484fed7734d0f8cff54a57503c665a80d87775c2ad558a1f01d4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8286b7bef5e6484fed7734d0f8cff54a57503c665a80d87775c2ad558a1f01d4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-306609",
@@ -22577,19 +22577,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "59055a0c6458f3bb3f0baca9e3b7ab0f9c9520dfc19218654810426a700725f3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "59055a0c6458f3bb3f0baca9e3b7ab0f9c9520dfc19218654810426a700725f3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-361-433744",
@@ -22631,19 +22631,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b3bc039a2ea2cb64a0443b0d73ab2bdb1cf2b2094b34939ee23fa0e28e30023d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b3bc039a2ea2cb64a0443b0d73ab2bdb1cf2b2094b34939ee23fa0e28e30023d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-331-192165",
@@ -22685,19 +22685,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c33bb2d3ec0d7372c4379be9b17c43b8876c97c89d1854f034bce1186d53246b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c33bb2d3ec0d7372c4379be9b17c43b8876c97c89d1854f034bce1186d53246b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-332-442632",
@@ -22739,19 +22739,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "62d1b0f52ba920910a82bfaa65cf7f846e1f63933786c423d3d7a731ed20ada4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "62d1b0f52ba920910a82bfaa65cf7f846e1f63933786c423d3d7a731ed20ada4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-372-219162",
@@ -22793,19 +22793,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fb57dba419757753e69745d91759fdb29b5e1f7777fb4a31e881a9585b6acaf5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fb57dba419757753e69745d91759fdb29b5e1f7777fb4a31e881a9585b6acaf5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-371-432191",
@@ -22847,19 +22847,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6e0bb765c649f485fe25e6c165029eac1254622a06fcebfca494b1f148f3d96a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6e0bb765c649f485fe25e6c165029eac1254622a06fcebfca494b1f148f3d96a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-371-542004",
@@ -22901,19 +22901,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5ad5920f1eb02fad51396dd77c3b07304eaf2233fd57a199cc1a1342e1e911d7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5ad5920f1eb02fad51396dd77c3b07304eaf2233fd57a199cc1a1342e1e911d7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-371-487578",
@@ -22955,19 +22955,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2ef2ab7d2ffd81f3b5f380d0cc2784569d03a52c6eba13197a15dc187331dd0f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2ef2ab7d2ffd81f3b5f380d0cc2784569d03a52c6eba13197a15dc187331dd0f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-371-400276",
@@ -23009,19 +23009,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5a1d26a7321850ed7a16bf5252569aa311da63ecfcb6d40d11e315dc582a3e15"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5a1d26a7321850ed7a16bf5252569aa311da63ecfcb6d40d11e315dc582a3e15",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-374-651877",
@@ -23063,19 +23063,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8e9dca417c8350f26e37a8d65a9918c25ee15ff074736a52c0401f97e4fd85e3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8e9dca417c8350f26e37a8d65a9918c25ee15ff074736a52c0401f97e4fd85e3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-411-657526",
@@ -23117,19 +23117,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f7035d44db1057bb20456c1621e4a53671f28445254e45529b73f6c179a138a8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f7035d44db1057bb20456c1621e4a53671f28445254e45529b73f6c179a138a8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-413-752904",
@@ -23171,19 +23171,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "75873b5d88808f3afc5887c977161c6ddcedeb7cb71c1e2183533dfc3232e090"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "75873b5d88808f3afc5887c977161c6ddcedeb7cb71c1e2183533dfc3232e090",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-413-573114",
@@ -23225,19 +23225,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f962455637bae8fb885244a83d128aea91aa8717bf9091eac28d9ec7d4170256"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f962455637bae8fb885244a83d128aea91aa8717bf9091eac28d9ec7d4170256",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-844884",
@@ -23279,19 +23279,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "39ba52f118fdd0dc81cc20fe7d3aac0db2fdea5e67a027256b8e9a0cf0a396fa"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "39ba52f118fdd0dc81cc20fe7d3aac0db2fdea5e67a027256b8e9a0cf0a396fa",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-411-590660",
@@ -23333,19 +23333,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e89c2629dd70cdc6b2c3ea12d8659cc458045cbf14ccc042a922e5cf07cb81f5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e89c2629dd70cdc6b2c3ea12d8659cc458045cbf14ccc042a922e5cf07cb81f5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-797583",
@@ -23387,19 +23387,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a6a72451021918984e308256cda2636cca25b4aa3655747bbdcd14a76d5745a0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a6a72451021918984e308256cda2636cca25b4aa3655747bbdcd14a76d5745a0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-909820",
@@ -23441,19 +23441,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2da2f5a89079f4a48396fb7fed73ab9a770361c506aa58a0b9ac2a5458be5167"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2da2f5a89079f4a48396fb7fed73ab9a770361c506aa58a0b9ac2a5458be5167",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-413-662926",
@@ -23495,19 +23495,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3c11fdcc7385a031c7a7f5dc409d322ef76d77901a6b9107e684f59aa63e91f3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3c11fdcc7385a031c7a7f5dc409d322ef76d77901a6b9107e684f59aa63e91f3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-659800",
@@ -23549,19 +23549,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "26cb3c8364680c2034e5fdd1058bd155078b25075435d7dcf1b6ebb36cc57e60"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "26cb3c8364680c2034e5fdd1058bd155078b25075435d7dcf1b6ebb36cc57e60",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-411-500281",
@@ -23603,19 +23603,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "12ffbaba04ce8d9b3228c3d79f822864fec2cb89f1e50ec3a72eb3ca5f5537b3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "12ffbaba04ce8d9b3228c3d79f822864fec2cb89f1e50ec3a72eb3ca5f5537b3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-413-765633",
@@ -23657,19 +23657,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e0287955ce323278f07e6b694968b97d1d6e2668f48ea19979f74c38baffbbaa"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e0287955ce323278f07e6b694968b97d1d6e2668f48ea19979f74c38baffbbaa",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-413-721618",
@@ -23711,19 +23711,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3462390a2f62d21847b8147d2a0edc2e0cefb10301747f029cb873ac93037707"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3462390a2f62d21847b8147d2a0edc2e0cefb10301747f029cb873ac93037707",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-411-647690",
@@ -23765,19 +23765,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a0555ec2bfccc3d63f0c58077588b6a03f9c4ef891b3dfa78963ec95f0062223"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a0555ec2bfccc3d63f0c58077588b6a03f9c4ef891b3dfa78963ec95f0062223",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-875709",
@@ -23819,19 +23819,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1738b585de81bfa10a8b6b668fc12be3c4c9b19c32d06216e64e8ca67699f87e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1738b585de81bfa10a8b6b668fc12be3c4c9b19c32d06216e64e8ca67699f87e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-411-604743",
@@ -23873,19 +23873,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9d63a0110c761448fb0459208bf57ffbd03a95a18481740c9a28f27f62a1e91e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9d63a0110c761448fb0459208bf57ffbd03a95a18481740c9a28f27f62a1e91e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-837144",
@@ -23927,19 +23927,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "de0945bedd6bfad51718c34452ab04ee2237db6be2abcf6f4080f0d831daedde"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "de0945bedd6bfad51718c34452ab04ee2237db6be2abcf6f4080f0d831daedde",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-557290",
@@ -23981,19 +23981,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dd77cbe97c7f214076af43060fe1da403d07c6c6c8a2c044e69813e2834a70f3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dd77cbe97c7f214076af43060fe1da403d07c6c6c8a2c044e69813e2834a70f3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-866271",
@@ -24035,19 +24035,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f465e89c094d9a6831dae34802dea1b5e1374a748ffc8c4aeea1ebdb3f1f3abd"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f465e89c094d9a6831dae34802dea1b5e1374a748ffc8c4aeea1ebdb3f1f3abd",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-871597",
@@ -24089,19 +24089,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e92a008e9e296d2c2b438b46b2dd3ff28c765068fb1796f39d0455efe4f4c5bb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e92a008e9e296d2c2b438b46b2dd3ff28c765068fb1796f39d0455efe4f4c5bb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-565086",
@@ -24143,19 +24143,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8a0607d08ea6d2ba001a01aae47bf390f6f94536463820a20078e6d655edf5cd"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8a0607d08ea6d2ba001a01aae47bf390f6f94536463820a20078e6d655edf5cd",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-514298",
@@ -24197,19 +24197,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2ac949b4346990b51dd1102e4fea9b2a8ffbef8c0b068e762e39a9e7ef350015"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2ac949b4346990b51dd1102e4fea9b2a8ffbef8c0b068e762e39a9e7ef350015",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-618096",
@@ -24251,19 +24251,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c82a3f5b97ac4ecb6d83a5d35156109f617613612d337adf5d560df863112970"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c82a3f5b97ac4ecb6d83a5d35156109f617613612d337adf5d560df863112970",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-623910",
@@ -24305,19 +24305,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0b888fe5a0f3605e6dd9e9733015774d8065d7995545bbe1e76a668fc1b1bc90"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0b888fe5a0f3605e6dd9e9733015774d8065d7995545bbe1e76a668fc1b1bc90",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-628043",
@@ -24359,19 +24359,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ac06b82705b62337bfefe34abd0cb22b31e4efea60ef704460f9418f5d0b1e26"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ac06b82705b62337bfefe34abd0cb22b31e4efea60ef704460f9418f5d0b1e26",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-413-472169",
@@ -24413,19 +24413,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6aad42028e969ba7940ebf5a3822f2d4ebc2fdd6eeb1fe2d8fc4c1ba1470cc98"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6aad42028e969ba7940ebf5a3822f2d4ebc2fdd6eeb1fe2d8fc4c1ba1470cc98",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-412-911977",
@@ -24467,19 +24467,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "10c7ac143ee05dc8abb4ba6d2124393f000ab2847e28f76d629e89fdf788b36b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "10c7ac143ee05dc8abb4ba6d2124393f000ab2847e28f76d629e89fdf788b36b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-493043",
@@ -24521,19 +24521,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1d7ccfd086ae45eb4a367c2dae5ae13e76a75fba06bdfc7d29948a66e94aa074"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1d7ccfd086ae45eb4a367c2dae5ae13e76a75fba06bdfc7d29948a66e94aa074",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-422-353249",
@@ -24575,19 +24575,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3292eae2bc3e220d94c98e946f1bab15035595294ea7db07b31af8f9d7d8641b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3292eae2bc3e220d94c98e946f1bab15035595294ea7db07b31af8f9d7d8641b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-460246",
@@ -24629,19 +24629,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2e3ad68995cc6177f6f72cf42a863b24faf3700cf0f1993c3661785077958acc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2e3ad68995cc6177f6f72cf42a863b24faf3700cf0f1993c3661785077958acc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-422-330711",
@@ -24683,19 +24683,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d97601dbc4b662d9f0d8bf85c58494caafdd9845bc323f43fa37aa650c6ce7f6"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d97601dbc4b662d9f0d8bf85c58494caafdd9845bc323f43fa37aa650c6ce7f6",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-422-357055",
@@ -24737,19 +24737,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "efcf7887feac5510d562ce5fddd3910cf0387300a385d044cd42b9c99c430c72"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "efcf7887feac5510d562ce5fddd3910cf0387300a385d044cd42b9c99c430c72",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-524074",
@@ -24791,19 +24791,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "834b8b1266cc298ed2f625752a0f4f4687198bbcdb7d36f0d8c7479b52558e4a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "834b8b1266cc298ed2f625752a0f4f4687198bbcdb7d36f0d8c7479b52558e4a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-422-376120",
@@ -24845,19 +24845,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "430f9e564ce0c63b670eb98dfdb328d153fc246fce1b60f12b9ab8d38158efa7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "430f9e564ce0c63b670eb98dfdb328d153fc246fce1b60f12b9ab8d38158efa7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-422-402733",
@@ -24899,19 +24899,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e409bf05055dddf74813b5a815c0f3235cea624e0876502f57f78040ac97b544"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e409bf05055dddf74813b5a815c0f3235cea624e0876502f57f78040ac97b544",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-439034",
@@ -24953,19 +24953,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9f377b0d2e7a5d352cd98cae17d412401a2306edd22c24ecb0268edcf1b2c4bc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9f377b0d2e7a5d352cd98cae17d412401a2306edd22c24ecb0268edcf1b2c4bc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-621409",
@@ -25007,19 +25007,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "077d3ac05bcca036ed3f6d64b3d1a64729319353c666d615d738839b4b8d1612"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "077d3ac05bcca036ed3f6d64b3d1a64729319353c666d615d738839b4b8d1612",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-578077",
@@ -25061,19 +25061,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "70df3bdeb48ab5d6459fb969e0d2a0caf5f75a2b8f691cd7226a6563a91452de"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "70df3bdeb48ab5d6459fb969e0d2a0caf5f75a2b8f691cd7226a6563a91452de",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-585900",
@@ -25115,19 +25115,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ca1217f089c2991bf23d5bb1c61faae325f165040bbc77644f69d917b7acdba7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ca1217f089c2991bf23d5bb1c61faae325f165040bbc77644f69d917b7acdba7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-421-534366",
@@ -25169,19 +25169,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2ed3a17e0969eee04248fada21efdf795f492faac1f29a3f7e59fb8a8831262f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2ed3a17e0969eee04248fada21efdf795f492faac1f29a3f7e59fb8a8831262f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-683224",
@@ -25223,19 +25223,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0d2360641950ee89e6a12967f902338a18365ce3f603f3444174b96703dd9dd3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0d2360641950ee89e6a12967f902338a18365ce3f603f3444174b96703dd9dd3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-692753",
@@ -25277,19 +25277,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3d33b1d50379fbf3ffbed3865e5b7820c1ec34ba3e7a842137fa00029aa3db17"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3d33b1d50379fbf3ffbed3865e5b7820c1ec34ba3e7a842137fa00029aa3db17",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-734579",
@@ -25331,19 +25331,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8bee36ea256e6722e832664ee86f428ff075a983aae6ec684bb21caba5afc7b3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8bee36ea256e6722e832664ee86f428ff075a983aae6ec684bb21caba5afc7b3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-750917",
@@ -25385,19 +25385,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c82db8f6f8e40f1724583facbd9be93630156aabfda343c3f77bda55a7bb8a32"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c82db8f6f8e40f1724583facbd9be93630156aabfda343c3f77bda55a7bb8a32",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-675997",
@@ -25439,19 +25439,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1ea6f60cacaa584173b0039cc41e79fa3b0efd023ac99835e184501f7526785c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1ea6f60cacaa584173b0039cc41e79fa3b0efd023ac99835e184501f7526785c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-751774",
@@ -25493,19 +25493,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6a7bddf2a3f3a8f9371abab8cb8e994de25555e7c327ba2c59a528be1ade9916"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6a7bddf2a3f3a8f9371abab8cb8e994de25555e7c327ba2c59a528be1ade9916",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-460480",
@@ -25547,19 +25547,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b716634a17fb6fc2aa7bc48836743519a8586555af1f062c418feba86a63741a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b716634a17fb6fc2aa7bc48836743519a8586555af1f062c418feba86a63741a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-431-468399",
@@ -25601,19 +25601,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "25d558592eacd63eecea68aff2a2f11875f4839ac771b16c3f2afec445925e45"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "25d558592eacd63eecea68aff2a2f11875f4839ac771b16c3f2afec445925e45",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-441-807901",
@@ -25655,19 +25655,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bd55be1a52361746dee15311f2c19e0a2c602486b65e2b5d39615a4bcbe7166e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bd55be1a52361746dee15311f2c19e0a2c602486b65e2b5d39615a4bcbe7166e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-060216",
@@ -25709,19 +25709,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "144229caccd834de893a1a90c2b97a875be6c6df2b2ed1b4801aff6d1b38ec93"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "144229caccd834de893a1a90c2b97a875be6c6df2b2ed1b4801aff6d1b38ec93",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-387488",
@@ -25763,19 +25763,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3a5c023ef374a43ec7cde5d48d87606feef7a12c7867e6c7017ca85cc37a0744"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3a5c023ef374a43ec7cde5d48d87606feef7a12c7867e6c7017ca85cc37a0744",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-393975",
@@ -25817,19 +25817,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a69c1900e2d59845f5cfc1ef3259a2732692d8df3d48983f6ded5eaf04690dcc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a69c1900e2d59845f5cfc1ef3259a2732692d8df3d48983f6ded5eaf04690dcc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-276369",
@@ -25871,19 +25871,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "11ad4c58ce6cfe48a370b2452c3d2a7f844420598913f5383627d49cdc119d6f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "11ad4c58ce6cfe48a370b2452c3d2a7f844420598913f5383627d49cdc119d6f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-292240",
@@ -25925,19 +25925,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e69892663664ddd194f78eac355b4aaa531c2163eacdd7e068d33768bc71144b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e69892663664ddd194f78eac355b4aaa531c2163eacdd7e068d33768bc71144b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-397081",
@@ -25979,19 +25979,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "122346a1be498a3c9d8493a84771e8ca23b72acbbadd135d805ff47440ae19e4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "122346a1be498a3c9d8493a84771e8ca23b72acbbadd135d805ff47440ae19e4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-295244",
@@ -26033,19 +26033,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8b3259d012b11adb1c2875ffb850c1203435e3c19540d7a94a2f79064dbd4c8f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8b3259d012b11adb1c2875ffb850c1203435e3c19540d7a94a2f79064dbd4c8f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-298712",
@@ -26087,19 +26087,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "119e165ca6214738c639bcc0b1d199231afd47c19f3e83bceec900945a3855cc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "119e165ca6214738c639bcc0b1d199231afd47c19f3e83bceec900945a3855cc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-219443",
@@ -26141,19 +26141,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ef79c989f2f2f9ddd1f7b055497ce429a98133d9350174c1becbc69c82b4780e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ef79c989f2f2f9ddd1f7b055497ce429a98133d9350174c1becbc69c82b4780e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-458596",
@@ -26195,19 +26195,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8910167f5a5953ce064d213bce3d18849fb574bf745c9fd47b2ebaa5dd482767"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8910167f5a5953ce064d213bce3d18849fb574bf745c9fd47b2ebaa5dd482767",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-374138",
@@ -26249,19 +26249,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f4a1c0ea0bea75a4b968d2233e178160f045c308869b30aae36269632e2c6748"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f4a1c0ea0bea75a4b968d2233e178160f045c308869b30aae36269632e2c6748",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-204379",
@@ -26303,19 +26303,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1d6d7233494c9713cd9ef94172686ccea92ff9d1db759f249d6b37e6f76a754b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1d6d7233494c9713cd9ef94172686ccea92ff9d1db759f249d6b37e6f76a754b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-259158",
@@ -26357,19 +26357,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "eed61cbf8501e3be5cdfed4d7335d576417e03c6e681a2d199653d79c6b2d239"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "eed61cbf8501e3be5cdfed4d7335d576417e03c6e681a2d199653d79c6b2d239",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-260488",
@@ -26411,19 +26411,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a5de31166c917ad85c7e225fc9ed1d3e461fd7698e834bb31d4d62a5488314e8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a5de31166c917ad85c7e225fc9ed1d3e461fd7698e834bb31d4d62a5488314e8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-127423",
@@ -26465,19 +26465,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6cb3e0d41af631715af0ab3973573d71b1d52559fa2f5a37972d3d51bbc0c9fe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6cb3e0d41af631715af0ab3973573d71b1d52559fa2f5a37972d3d51bbc0c9fe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-134538",
@@ -26519,19 +26519,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "18e3a2e176e109762f486500847c118c1ecae540e2024bf2cce409f84fd865c8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "18e3a2e176e109762f486500847c118c1ecae540e2024bf2cce409f84fd865c8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-441-813396",
@@ -26573,19 +26573,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "78dba0ca9b28df8f7f8a038957b26b4f2713a04cf9e75037d8e326cf3c7609a4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "78dba0ca9b28df8f7f8a038957b26b4f2713a04cf9e75037d8e326cf3c7609a4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-446-077424",
@@ -26627,19 +26627,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "056279cf93a67a06ff31841ed0ce9ca2b18e27196921b11f8d0b6f6dfc3bbf55"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "056279cf93a67a06ff31841ed0ce9ca2b18e27196921b11f8d0b6f6dfc3bbf55",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-431863",
@@ -26681,19 +26681,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "53031195ff38f89da2882e6fc013ba06277cb3ba13313d8397dcc9607454403b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "53031195ff38f89da2882e6fc013ba06277cb3ba13313d8397dcc9607454403b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-441-841022",
@@ -26735,19 +26735,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "90de6639bd4b4e00581b5ca6aa5bb71623dbcf8da267351ef31e7966db26f8e3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "90de6639bd4b4e00581b5ca6aa5bb71623dbcf8da267351ef31e7966db26f8e3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-364775",
@@ -26789,19 +26789,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f281b3b893861ae4b4bf4992884ff1fa04e8e385154dfe456f8586773589f979"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f281b3b893861ae4b4bf4992884ff1fa04e8e385154dfe456f8586773589f979",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-453157",
@@ -26843,19 +26843,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "036b0187e9a751b6ece96babeac4e3489efa920fa8e62e8d713a0f8a64bad0fe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "036b0187e9a751b6ece96babeac4e3489efa920fa8e62e8d713a0f8a64bad0fe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-441-869603",
@@ -26897,19 +26897,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "606c1ea4163891d1fc7bbf34e04bbc8724c110382f2eb734235288803373f9cb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "606c1ea4163891d1fc7bbf34e04bbc8724c110382f2eb734235288803373f9cb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-281778",
@@ -26951,19 +26951,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "da601a3db1e7623ea02943539b8c179a20e625a1cdfba564835d067f48e28db5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "da601a3db1e7623ea02943539b8c179a20e625a1cdfba564835d067f48e28db5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-441-793594",
@@ -27005,19 +27005,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e76ae20d5bc472bd2301bcd23e3b6c3be9bc63bb966eed0aa41078ef3f6f922c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e76ae20d5bc472bd2301bcd23e3b6c3be9bc63bb966eed0aa41078ef3f6f922c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-441159",
@@ -27059,19 +27059,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "17c789e63204a083c0673f8b50590e9d9e7c9e689bdc39930d7ad95c5206ef95"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "17c789e63204a083c0673f8b50590e9d9e7c9e689bdc39930d7ad95c5206ef95",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-462975",
@@ -27113,19 +27113,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7257e01871d9b39ceb0b88fedcec24e79241a85b166b2dc701dd7ba576742457"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7257e01871d9b39ceb0b88fedcec24e79241a85b166b2dc701dd7ba576742457",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-441-928535",
@@ -27167,19 +27167,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "921b3d96e4aa93cc4119d000f4541791150f35264e179c9c2af65c6ef350cf03"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "921b3d96e4aa93cc4119d000f4541791150f35264e179c9c2af65c6ef350cf03",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-489309",
@@ -27221,19 +27221,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3bab9f8d7e46c67acc9da9b6821cb20bd554aa77fb655b1fde6ec0042e5130ee"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3bab9f8d7e46c67acc9da9b6821cb20bd554aa77fb655b1fde6ec0042e5130ee",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-496285",
@@ -27275,19 +27275,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1977b6eb54421274a1ac8039de11bd9a7018434482bee48d0b85d8c9c5cbd1a3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1977b6eb54421274a1ac8039de11bd9a7018434482bee48d0b85d8c9c5cbd1a3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-501902",
@@ -27329,19 +27329,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "73b3ffb2b36c7c854e6fb139870bda8753ea2703b70345b31319b12973ac20fc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "73b3ffb2b36c7c854e6fb139870bda8753ea2703b70345b31319b12973ac20fc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-442-467760",
@@ -27383,19 +27383,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b5889bcd40e8be83153aa2774e10d37d291e57f74d891529e8023a29bb3cb59e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b5889bcd40e8be83153aa2774e10d37d291e57f74d891529e8023a29bb3cb59e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-441-944144",
@@ -27437,19 +27437,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "609e5bcf788631ea25fbf29073b262e00db72b79a3544faaa708b6ae3d832f5e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "609e5bcf788631ea25fbf29073b262e00db72b79a3544faaa708b6ae3d832f5e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-501-696388",
@@ -27491,19 +27491,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1a9ab96c8ad88586c271d83c0441da3d7faa2b0af3dd777c7bfc05791d91bb3a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1a9ab96c8ad88586c271d83c0441da3d7faa2b0af3dd777c7bfc05791d91bb3a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-777412",
@@ -27545,19 +27545,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a0aff72287f68c34d3e819bf87fc5e6adabac7baa7a882ba8327b8456c9b121e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a0aff72287f68c34d3e819bf87fc5e6adabac7baa7a882ba8327b8456c9b121e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-824700",
@@ -27599,19 +27599,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8ad5f57c46ea55f4a24ff63d673ea08919d2ecbf45aa2836474ff464e038b290"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8ad5f57c46ea55f4a24ff63d673ea08919d2ecbf45aa2836474ff464e038b290",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-666036",
@@ -27653,19 +27653,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2f67b06f8ee358d827a41c4446ef9ae886f1e15c22f7eae78c2327c18e5ad562"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2f67b06f8ee358d827a41c4446ef9ae886f1e15c22f7eae78c2327c18e5ad562",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-694641",
@@ -27707,19 +27707,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "79d340433417a99a93da1304adf0e9f36cdec9b2f7662e7a7a915805e1fb08cc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "79d340433417a99a93da1304adf0e9f36cdec9b2f7662e7a7a915805e1fb08cc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-695578",
@@ -27761,19 +27761,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d94506496dfa11710c8484b3dda1f779f31f60b1a9a58dbdd940f1174597ce01"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d94506496dfa11710c8484b3dda1f779f31f60b1a9a58dbdd940f1174597ce01",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-804230",
@@ -27815,19 +27815,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "461d1fbe4800c834430a28b7b4e1db0ff2813d9c778dc575e8a453693f05e288"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "461d1fbe4800c834430a28b7b4e1db0ff2813d9c778dc575e8a453693f05e288",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-740338",
@@ -27869,19 +27869,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "32abdf3a15473473cf3a247e5b584f35495fcec69f80adc3c6aae8d2cfa25808"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "32abdf3a15473473cf3a247e5b584f35495fcec69f80adc3c6aae8d2cfa25808",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-765188",
@@ -27923,19 +27923,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f3c60d3b4cccbb772f60d8a506392105a14abbb817e779ca8edb6198fb4667fe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f3c60d3b4cccbb772f60d8a506392105a14abbb817e779ca8edb6198fb4667fe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-503922",
@@ -27977,19 +27977,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6b45b5e172b6bc688a9227ab837751e81d2e1e3fef76647d4c1889305e73ccd7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6b45b5e172b6bc688a9227ab837751e81d2e1e3fef76647d4c1889305e73ccd7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-461-525992",
@@ -28031,19 +28031,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "33569c06927e1745da2b93a6407fd6117437dd13811f803fa8cba07ab8cf21df"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "33569c06927e1745da2b93a6407fd6117437dd13811f803fa8cba07ab8cf21df",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-471-146760",
@@ -28085,19 +28085,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e1c46a4a8319cdf79e8ba8cb83433aed741e0c15a5c7ef7a12828e4cc0de2513"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e1c46a4a8319cdf79e8ba8cb83433aed741e0c15a5c7ef7a12828e4cc0de2513",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-471-143673",
@@ -28139,19 +28139,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f857bed115f44c8417f81cdbcc8680cb2be4d29b35ef7291cca538f3a13cf1f3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f857bed115f44c8417f81cdbcc8680cb2be4d29b35ef7291cca538f3a13cf1f3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-483-631541",
@@ -28193,19 +28193,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2b4151c29feb3927aa43d4ba956f266abfbb65fc4ae44827d9b947373c628f1b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2b4151c29feb3927aa43d4ba956f266abfbb65fc4ae44827d9b947373c628f1b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-481-436618",
@@ -28247,19 +28247,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2665ad629367c0f90eb07d1b575595050bf0ddf84316acccd070ca35ff6d83ec"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2665ad629367c0f90eb07d1b575595050bf0ddf84316acccd070ca35ff6d83ec",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-481-340647",
@@ -28301,19 +28301,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1fa30326c8d672ca5b9fe6d96ea3d960f06cfb8f1b1ecc85936f72d3a82978ef"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1fa30326c8d672ca5b9fe6d96ea3d960f06cfb8f1b1ecc85936f72d3a82978ef",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-481-449577",
@@ -28355,19 +28355,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "703d7d918c6940c6d4a8452e77cff461f6717690a9f47ce4267b08376b42a4a4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "703d7d918c6940c6d4a8452e77cff461f6717690a9f47ce4267b08376b42a4a4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-481-450060",
@@ -28409,19 +28409,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "029a910276bc003acf8dd81ef157fe23a984724b2e46c794cc053d30d451e73e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "029a910276bc003acf8dd81ef157fe23a984724b2e46c794cc053d30d451e73e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-483-667519",
@@ -28463,19 +28463,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "93c6da81cad396090f2e964f3b72231ac895b978a92183dfacdb15579572765c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "93c6da81cad396090f2e964f3b72231ac895b978a92183dfacdb15579572765c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-483-681652",
@@ -28517,19 +28517,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c63fc601daf363389cc44b959ac5d28ac53cd21bac8bf35d1746d180e64b61c7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c63fc601daf363389cc44b959ac5d28ac53cd21bac8bf35d1746d180e64b61c7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-483-681773",
@@ -28571,19 +28571,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1554ae57721728ddcd3e057f09f161ab27a9a39eb13a8c2c7113a367fdd7466b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1554ae57721728ddcd3e057f09f161ab27a9a39eb13a8c2c7113a367fdd7466b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-481-480978",
@@ -28625,19 +28625,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5d907f57fed5a17eece71cc9f04ffd8f80b205551dcf8824e6be7cca2516d160"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5d907f57fed5a17eece71cc9f04ffd8f80b205551dcf8824e6be7cca2516d160",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-483453",
@@ -28679,19 +28679,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "17c87a802581741cf1ba31d5f3ab7fabde2788bc0b1a785e3cd10e28358e004e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "17c87a802581741cf1ba31d5f3ab7fabde2788bc0b1a785e3cd10e28358e004e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-519664",
@@ -28733,19 +28733,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7e0f9bea357340cdbc3ae25cdb81ef2245e9e201111213ef12fc970f1f1d3df3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7e0f9bea357340cdbc3ae25cdb81ef2245e9e201111213ef12fc970f1f1d3df3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-185833",
@@ -28787,19 +28787,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1c5f26f73ae9cafde53a8fa789b30d5a8797fdc3103782a2ff54be763013ed7e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1c5f26f73ae9cafde53a8fa789b30d5a8797fdc3103782a2ff54be763013ed7e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-186664",
@@ -28841,19 +28841,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ba156fb9231004077536caa1e9165b0b0f4d572d0697bbf8b766cd56f9d71355"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ba156fb9231004077536caa1e9165b0b0f4d572d0697bbf8b766cd56f9d71355",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-461738",
@@ -28895,19 +28895,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "13cfc47981fb977d374bdf158371ee928cdca2c322fa2132128bc3e548b37e58"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "13cfc47981fb977d374bdf158371ee928cdca2c322fa2132128bc3e548b37e58",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-461807",
@@ -28949,19 +28949,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a559597407a3330beff13b3fe1a0cce9a27bc8d9fc4b8d56cb1e28954cf9330e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a559597407a3330beff13b3fe1a0cce9a27bc8d9fc4b8d56cb1e28954cf9330e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-209693",
@@ -29003,19 +29003,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2c04dc8f7a5718cb32096e1a195739dcafb5f5c11e6b7ce8f6fac23de2ad0d4a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2c04dc8f7a5718cb32096e1a195739dcafb5f5c11e6b7ce8f6fac23de2ad0d4a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-511-303528",
@@ -29057,19 +29057,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e166d90a58c0e37a67570803716614a09ea175635651eec3514717030b095841"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e166d90a58c0e37a67570803716614a09ea175635651eec3514717030b095841",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-511-138414",
@@ -29111,19 +29111,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4d793165487152dcb9c7bb9394f3d5dfc2f51d347ba42675c61e4a43a5666916"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4d793165487152dcb9c7bb9394f3d5dfc2f51d347ba42675c61e4a43a5666916",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-485170",
@@ -29165,19 +29165,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "de12847a8322bd53071159ad936588d0e503a4cf39b9d3e4182bb027654e4e72"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "de12847a8322bd53071159ad936588d0e503a4cf39b9d3e4182bb027654e4e72",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-488531",
@@ -29219,19 +29219,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "644002997aa11aeee18b875e03e436bae9621e549eeede1bca5c80f8e93d8ecf"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "644002997aa11aeee18b875e03e436bae9621e549eeede1bca5c80f8e93d8ecf",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-289541",
@@ -29273,19 +29273,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a8f82612fe70398c04f948bd1f50cf3462815d4619eb97fd59b2ab48997279d1"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a8f82612fe70398c04f948bd1f50cf3462815d4619eb97fd59b2ab48997279d1",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-292786",
@@ -29327,19 +29327,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b972d8b948dbe7705676884ce5ba3a27becbd8375f83e1ceb67e1ef6b1b49392"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b972d8b948dbe7705676884ce5ba3a27becbd8375f83e1ceb67e1ef6b1b49392",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-486866",
@@ -29381,19 +29381,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8c7c8b903e6041d5a91a2bffd7ddbbfde00e0980b3fa1a876cdde56d28817c45"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8c7c8b903e6041d5a91a2bffd7ddbbfde00e0980b3fa1a876cdde56d28817c45",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-488943",
@@ -29435,19 +29435,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4c418d99bd38872c11b26b96a6fae3240ff57f30f0f5c20d8b45d1d63f278f74"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4c418d99bd38872c11b26b96a6fae3240ff57f30f0f5c20d8b45d1d63f278f74",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-275569",
@@ -29489,19 +29489,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "88886b79e5271cd7bb416be11b04d037c13b271d9688cbaa4ff56d87b1ee42dc"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "88886b79e5271cd7bb416be11b04d037c13b271d9688cbaa4ff56d87b1ee42dc",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-137549",
@@ -29543,19 +29543,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "59e2eba133be29ec02ba9b7a365492d05745250e512f7216b8ccbee29c0b1e14"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "59e2eba133be29ec02ba9b7a365492d05745250e512f7216b8ccbee29c0b1e14",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-514390",
@@ -29597,19 +29597,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "84b25aa290beeedf21871654899b84ee1a40869a25fbc3360870d639ad9acbaa"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "84b25aa290beeedf21871654899b84ee1a40869a25fbc3360870d639ad9acbaa",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-140905",
@@ -29651,19 +29651,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "30641b94d2721adf67bc87a453c40f7083986349f7c519fccce5ef3792d5ad99"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "30641b94d2721adf67bc87a453c40f7083986349f7c519fccce5ef3792d5ad99",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-505138",
@@ -29705,19 +29705,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "cd3cdcbdeece9b1fd421a1b91d260c9ec94cbfda901cbdd1ba19d51cb9faeba7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "cd3cdcbdeece9b1fd421a1b91d260c9ec94cbfda901cbdd1ba19d51cb9faeba7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-267123",
@@ -29759,19 +29759,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "28c92a8929125e12eeb4c3b9d40bef3ca2ed18d4f50f87acf704e8d2b2244b5a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "28c92a8929125e12eeb4c3b9d40bef3ca2ed18d4f50f87acf704e8d2b2244b5a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-356270",
@@ -29813,19 +29813,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "b5f39a07252c3baf8eeda57368d2230624f0927a05cf344063aee7cadcf8db73"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "b5f39a07252c3baf8eeda57368d2230624f0927a05cf344063aee7cadcf8db73",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-464755",
@@ -29867,19 +29867,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4c09b802acbc2c03162534fb0c264737b90c2f06ea5ec7a4b24e48d775db3c2d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4c09b802acbc2c03162534fb0c264737b90c2f06ea5ec7a4b24e48d775db3c2d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-472286",
@@ -29921,19 +29921,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "38c3bddb0b08af22e4baab099d1d9f1e31fe319e5f75afc19fa432a742b83d8f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "38c3bddb0b08af22e4baab099d1d9f1e31fe319e5f75afc19fa432a742b83d8f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-506962",
@@ -29975,19 +29975,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "98d6124a3e691d8ef33616de976bb32d71d513e5bc192804481b832bbbe2af5f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "98d6124a3e691d8ef33616de976bb32d71d513e5bc192804481b832bbbe2af5f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-511997",
@@ -30029,19 +30029,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1322ab7fe5ed5ed814a0f76109de0ae855da6f0f8d3c69c1fcfa068ef3c6e59d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1322ab7fe5ed5ed814a0f76109de0ae855da6f0f8d3c69c1fcfa068ef3c6e59d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-105325",
@@ -30083,19 +30083,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "31958490ccc80bf2c3ab81a23a8df177f70793db03afbaa38d6565ba49fbb7b2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "31958490ccc80bf2c3ab81a23a8df177f70793db03afbaa38d6565ba49fbb7b2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-451920",
@@ -30137,19 +30137,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3f23606bb354864c5a1d3e61a95651b39aaa99aa981a92e0e624a8d679a05436"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3f23606bb354864c5a1d3e61a95651b39aaa99aa981a92e0e624a8d679a05436",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-055097",
@@ -30191,19 +30191,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2b12897fd29129d1b389b756f830e690365abe9a969f64cc733ed36893ee70e2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2b12897fd29129d1b389b756f830e690365abe9a969f64cc733ed36893ee70e2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-511-000099",
@@ -30245,19 +30245,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "57550773797783c7ff72edcda1c9f9b3f2b9d02fec70ab90b99b5adeb75ad109"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "57550773797783c7ff72edcda1c9f9b3f2b9d02fec70ab90b99b5adeb75ad109",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-443667",
@@ -30299,19 +30299,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "17cc4f87668b1fdf1d4cff744caeec747ff000a82ac3f86b20530a104a36a4e8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "17cc4f87668b1fdf1d4cff744caeec747ff000a82ac3f86b20530a104a36a4e8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-375120",
@@ -30353,19 +30353,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "beff2eafdd0f69718e748dd0b3845945feeadf6db674d4ac686e5b6fdd8be833"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "beff2eafdd0f69718e748dd0b3845945feeadf6db674d4ac686e5b6fdd8be833",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-245001",
@@ -30407,19 +30407,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "858bb88be04b090837434dea1fdfa3afa52fcfeaca6a1456af135fe1a0970f1a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "858bb88be04b090837434dea1fdfa3afa52fcfeaca6a1456af135fe1a0970f1a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-353996",
@@ -30461,19 +30461,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "bf88bfcb81908f5edb33d170cc125e82ff2f240ca504c4ca79a31c1b0b280211"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "bf88bfcb81908f5edb33d170cc125e82ff2f240ca504c4ca79a31c1b0b280211",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-481326",
@@ -30515,19 +30515,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "38d98a1862a80cf0c1faefbf6edaa0f818a4671b319c183ad0118761ee3d16e8"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "38d98a1862a80cf0c1faefbf6edaa0f818a4671b319c183ad0118761ee3d16e8",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-495-866231",
@@ -30569,19 +30569,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "78656b1660eb4e07a3991daaceb98115edd8fecff8ac11bd323b58124ae81713"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "78656b1660eb4e07a3991daaceb98115edd8fecff8ac11bd323b58124ae81713",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-494-378633",
@@ -30623,19 +30623,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "74147202fb373b0c1540d688e86f412040011c606145c2a4697b2226fa19a96f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "74147202fb373b0c1540d688e86f412040011c606145c2a4697b2226fa19a96f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-511-306006",
@@ -30677,19 +30677,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "18a862c42a5619590c2921bc6515ebb2a8d98cd372e37544a118ccfd690e6b8f"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "18a862c42a5619590c2921bc6515ebb2a8d98cd372e37544a118ccfd690e6b8f",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-136271",
@@ -30731,19 +30731,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d46d3f27342eb39fdfd0a95df4d0f039861b633fb20c65422013a361d0211461"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d46d3f27342eb39fdfd0a95df4d0f039861b633fb20c65422013a361d0211461",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-117043",
@@ -30785,19 +30785,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "02191893e4a609b26bd57d1996336b1266120da2baaa45648f2e5b31ba777d62"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "02191893e4a609b26bd57d1996336b1266120da2baaa45648f2e5b31ba777d62",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-511-266505",
@@ -30839,19 +30839,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "91683dedea30345040541a37556479d590a24d6548f186cd85d677feade70bf4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "91683dedea30345040541a37556479d590a24d6548f186cd85d677feade70bf4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-495-822040",
@@ -30893,19 +30893,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e1d4200a4a242916b0bc9d7d7588bac70a2987064f31de50fe766795c2076952"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e1d4200a4a242916b0bc9d7d7588bac70a2987064f31de50fe766795c2076952",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-350730",
@@ -30947,19 +30947,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "41022b6c63a7f23950ce907140f5ba7a2a32e5d5a1ca8fef0d578df4f55c84a9"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "41022b6c63a7f23950ce907140f5ba7a2a32e5d5a1ca8fef0d578df4f55c84a9",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-079610",
@@ -31001,19 +31001,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9906a51d1a112c98aa5199acdf8e4e06930ee6917979af44f8d0ace32a7c2023"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9906a51d1a112c98aa5199acdf8e4e06930ee6917979af44f8d0ace32a7c2023",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-204897",
@@ -31055,19 +31055,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "419fcfd8b127be869afd21ff87c31ad9a0889c258e0a7b40e8b53cd3c02db9bb"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "419fcfd8b127be869afd21ff87c31ad9a0889c258e0a7b40e8b53cd3c02db9bb",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-228161",
@@ -31109,19 +31109,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f4b83b16c3d5406407b544e1571d7f59e15ccf28ab57db662457f85b9c1372d0"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f4b83b16c3d5406407b544e1571d7f59e15ccf28ab57db662457f85b9c1372d0",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-514-296772",
@@ -31163,19 +31163,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "c44eb44396d88304aa00d0cdfed6d7aad496b7765c8de32d5bebc7db0971951a"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "c44eb44396d88304aa00d0cdfed6d7aad496b7765c8de32d5bebc7db0971951a",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-266031",
@@ -31217,19 +31217,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "737cdb9eb0ad48d6379e1a010f01f0ecfcff33b981c43dad7b410e5531829cb2"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "737cdb9eb0ad48d6379e1a010f01f0ecfcff33b981c43dad7b410e5531829cb2",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-413951",
@@ -31271,19 +31271,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "f3767219908d91a99a6da7cd4124ab33ab715f88247eea2af228ccbca0536815"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "f3767219908d91a99a6da7cd4124ab33ab715f88247eea2af228ccbca0536815",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-493-746742",
@@ -31325,19 +31325,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7c7fc7906036c1c1a26366ea5d14dbfbe15c07aaf9c639fdebba0636bc61336d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7c7fc7906036c1c1a26366ea5d14dbfbe15c07aaf9c639fdebba0636bc61336d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-383489",
@@ -31379,19 +31379,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "0af326e1fa4f3b90cf342e45eb4250a316584e6a801545f9ea6b52c06dbd5a38"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "0af326e1fa4f3b90cf342e45eb4250a316584e6a801545f9ea6b52c06dbd5a38",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-386224",
@@ -31433,19 +31433,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a046e8212b6763592b65df24f758f4ff8a76371080134bc9bfa544e1b03d8c82"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a046e8212b6763592b65df24f758f4ff8a76371080134bc9bfa544e1b03d8c82",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-512-284029",
@@ -31487,19 +31487,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "49324d6962a1f9d1ae0023ee951f76015fc0999bedd829db1b2ea0ae342b9103"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "49324d6962a1f9d1ae0023ee951f76015fc0999bedd829db1b2ea0ae342b9103",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-244538",
@@ -31541,19 +31541,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "323b4ce985b53c5ef02029b6618059fef9d131bf16611e21c2ef019654af7a06"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "323b4ce985b53c5ef02029b6618059fef9d131bf16611e21c2ef019654af7a06",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-511-282379",
@@ -31595,19 +31595,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e82b9b25ed8b55bb3985e5b1e4996c5b7a4a21a40568f9f5d75f365415ac5b17"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e82b9b25ed8b55bb3985e5b1e4996c5b7a4a21a40568f9f5d75f365415ac5b17",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-133363",
@@ -31649,19 +31649,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "3d965c11540983363e244c149ba16adb5c1cbf458c787eaf6e8ca6a00a39ae78"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "3d965c11540983363e244c149ba16adb5c1cbf458c787eaf6e8ca6a00a39ae78",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-513-133444",
@@ -31703,19 +31703,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "99621b9c2cb3e0b38bc6e14bde7e541c9fefe151f4811bddbdc627f6658fea22"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "99621b9c2cb3e0b38bc6e14bde7e541c9fefe151f4811bddbdc627f6658fea22",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-351944",
@@ -31757,19 +31757,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "470741d58277cc927c8f8d0cb4290348f25bfdbab07c4c8851ede6e0e60875da"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "470741d58277cc927c8f8d0cb4290348f25bfdbab07c4c8851ede6e0e60875da",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-041127",
@@ -31811,19 +31811,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "dfe0efb2e5bd6652380f3b8b1be33b6afc083a093fb74c3d6241db8fef713d93"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "dfe0efb2e5bd6652380f3b8b1be33b6afc083a093fb74c3d6241db8fef713d93",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-049205",
@@ -31865,19 +31865,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "71d959228e7b49f9a2c98812a5af70a7bdefe081f750fbc45df2636d3713dd79"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "71d959228e7b49f9a2c98812a5af70a7bdefe081f750fbc45df2636d3713dd79",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-852031",
@@ -31919,19 +31919,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "99d9198efe0bf671668211b99f3dc60bda42427c0e90daa3c7a8b3c3c754e29b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "99d9198efe0bf671668211b99f3dc60bda42427c0e90daa3c7a8b3c3c754e29b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-751599",
@@ -31973,19 +31973,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9e70e531385badaaa7fe8048a6ace6a6d2b158a7b3918c670594661e234ab8ab"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9e70e531385badaaa7fe8048a6ace6a6d2b158a7b3918c670594661e234ab8ab",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-346965",
@@ -32027,19 +32027,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "de8d10157d46829f73a831b3ed455d13add28c6c2c3fb320a215c504ef03a46c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "de8d10157d46829f73a831b3ed455d13add28c6c2c3fb320a215c504ef03a46c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-757634",
@@ -32081,19 +32081,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d768bb93657c286b65e751db067f0ebc6b28b2c51ddd0b5e8c67310c7ac2b37e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d768bb93657c286b65e751db067f0ebc6b28b2c51ddd0b5e8c67310c7ac2b37e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-820802",
@@ -32135,19 +32135,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "d53eea709aca0a4789bc364e526d1620ebfaa3185e05871ee9136d8682257b43"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "d53eea709aca0a4789bc364e526d1620ebfaa3185e05871ee9136d8682257b43",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-879691",
@@ -32189,19 +32189,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "9567a7147b5a85e2806e82de67973abff8ddcec82ba2deccdcc37079a35e298d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "9567a7147b5a85e2806e82de67973abff8ddcec82ba2deccdcc37079a35e298d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-366133",
@@ -32243,19 +32243,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "a1dc1095f1525656c483060b4a3849c4ed881cd4c06df816ead9d43c74c4e4e3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "a1dc1095f1525656c483060b4a3849c4ed881cd4c06df816ead9d43c74c4e4e3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-366443",
@@ -32297,19 +32297,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "6f3f23f37da3ca503955f777a5cad70ae3ac59e8c7dfdc3096282554bdc6671b"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "6f3f23f37da3ca503955f777a5cad70ae3ac59e8c7dfdc3096282554bdc6671b",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-912398",
@@ -32351,19 +32351,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ff32d1b1b80c56f28c7536cd18970fef1d8371398a3ba2b7c0d7e51f5d3fac78"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ff32d1b1b80c56f28c7536cd18970fef1d8371398a3ba2b7c0d7e51f5d3fac78",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-292144",
@@ -32405,19 +32405,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "633e48acddd05f71057af0293192ae7c17751b648e985a5767b3adac99d2b129"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "633e48acddd05f71057af0293192ae7c17751b648e985a5767b3adac99d2b129",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-864219",
@@ -32459,19 +32459,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "444e1cf8dc6075606e14b72f4dd83eebee0c58a0a2e3096d8d9eb7495303da90"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "444e1cf8dc6075606e14b72f4dd83eebee0c58a0a2e3096d8d9eb7495303da90",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-867679",
@@ -32513,19 +32513,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e7eebe023d617aa0f47b13f6a164228d6136e10fa1ac825e93297f0b511a5327"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e7eebe023d617aa0f47b13f6a164228d6136e10fa1ac825e93297f0b511a5327",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-286077",
@@ -32567,19 +32567,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "8a017f44322f35349820623feed56aae857b93e00d8a98cba6331f4916ac65d7"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "8a017f44322f35349820623feed56aae857b93e00d8a98cba6331f4916ac65d7",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-349919",
@@ -32621,19 +32621,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "e64d8d20f5e460069fc758b492bdefaebc7da64f9ac71b1c1090ab1dbc2d6c1c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "e64d8d20f5e460069fc758b492bdefaebc7da64f9ac71b1c1090ab1dbc2d6c1c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-541-845666",
@@ -32675,19 +32675,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "017dabc5e9ca9e5e2882c47b61713bc4ac05449d9fe751c49ae09c7c447dae1d"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "017dabc5e9ca9e5e2882c47b61713bc4ac05449d9fe751c49ae09c7c447dae1d",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-544-322864",
@@ -32729,19 +32729,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2ca45d883d3ccd919c3f7ab23e78d69f3ace0cde7f8e2895c1d4e1397dc492e3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2ca45d883d3ccd919c3f7ab23e78d69f3ace0cde7f8e2895c1d4e1397dc492e3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-566-301243",
@@ -32783,19 +32783,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5fdcdc58ce430f2ada2d69b303ebd6bbabab337ceea61cdedb95208abf5bada4"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5fdcdc58ce430f2ada2d69b303ebd6bbabab337ceea61cdedb95208abf5bada4",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-562-303985",
@@ -32837,19 +32837,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "2d78886e62cf0556b2b2e4915c0f218c3be2f83b3c513ace34f2c25965d10584"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "2d78886e62cf0556b2b2e4915c0f218c3be2f83b3c513ace34f2c25965d10584",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-566-266343",
@@ -32891,19 +32891,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "5f31fd129bead365f8329c6d0b55f638cc04d4a6e82be2841a5a0d2e315d904e"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "5f31fd129bead365f8329c6d0b55f638cc04d4a6e82be2841a5a0d2e315d904e",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-566-272625",
@@ -32945,19 +32945,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "51496e74c1d95c1bd01b28c57e2bb467b2b082ce9d29667413efe54d5f5d9305"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "51496e74c1d95c1bd01b28c57e2bb467b2b082ce9d29667413efe54d5f5d9305",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-566-346635",
@@ -32999,19 +32999,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "803b90e0cfea4e1f2874a426aa603ef1d782c33b559e0cd8a5e88a1c037c1557"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "803b90e0cfea4e1f2874a426aa603ef1d782c33b559e0cd8a5e88a1c037c1557",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-566-356102",
@@ -33053,19 +33053,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "ce61f9354a25069b9e8f8818d46ad9ea39edf3c55e2839f34bc69eafa452d717"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "ce61f9354a25069b9e8f8818d46ad9ea39edf3c55e2839f34bc69eafa452d717",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-566-368659",
@@ -33107,19 +33107,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "403d9f98eb0dd7d206c1b7a794243fb620b01d43ef05a110bf4b9f282c3a4002"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "403d9f98eb0dd7d206c1b7a794243fb620b01d43ef05a110bf4b9f282c3a4002",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-581-459960",
@@ -33161,19 +33161,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "972da2a7c57c5b5ac56cd09a73b9570a04ba21d4f3a90035f7ad8684d71b3256"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "972da2a7c57c5b5ac56cd09a73b9570a04ba21d4f3a90035f7ad8684d71b3256",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-581-348208",
@@ -33215,19 +33215,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "54d54ffdcb9fcd8f20bba4e10ba8509842e732290eb2c28544b5d1f78f254d64"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "54d54ffdcb9fcd8f20bba4e10ba8509842e732290eb2c28544b5d1f78f254d64",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-556-016447",
@@ -33269,19 +33269,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "25dbfc25e753b2b1f9079fc556fac08f4b7621956768b3a8bb5085740a9093c3"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "25dbfc25e753b2b1f9079fc556fac08f4b7621956768b3a8bb5085740a9093c3",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-581-637903",
@@ -33323,19 +33323,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "773fe29470345d9bdb9d100182888fcc0fb0b0f40ce73cb905d885e9fd5f93fe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "773fe29470345d9bdb9d100182888fcc0fb0b0f40ce73cb905d885e9fd5f93fe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-571-158534",
@@ -33377,19 +33377,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "fa98206e0535405ff9c234b0da8f87863812ee77aa60b9ee740fd5d5e332f431"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "fa98206e0535405ff9c234b0da8f87863812ee77aa60b9ee740fd5d5e332f431",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-571-143405",
@@ -33431,19 +33431,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "53cf8ec0e734afeddc1665be08684fa089aa09858e185dffb86b53161eb76ba5"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "53cf8ec0e734afeddc1665be08684fa089aa09858e185dffb86b53161eb76ba5",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-591-137289",
@@ -33485,19 +33485,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "1449ce7549332fea5c6052f42988c64548a62671fd569c1e60412aad48fff4ad"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "1449ce7549332fea5c6052f42988c64548a62671fd569c1e60412aad48fff4ad",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-591-155763",
@@ -33539,19 +33539,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "4fa99d657d1d31cff637820f194f204039de9e828a26026d6ba8b6d270e2134c"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "4fa99d657d1d31cff637820f194f204039de9e828a26026d6ba8b6d270e2134c",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-591-150291",
@@ -33593,19 +33593,19 @@ export const HUD_REO_PROPERTIES: CanonicalProperty[] = [
       {
         "source_id": "hud",
         "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-        "fetched_at": "2026-06-10T23:39:59.517Z",
+        "fetched_at": "2026-07-17T16:15:44.498Z",
         "content_hash": "7771e140a4718a984fd403913d784d40171b0834a0b556807b112887795964fe"
       }
     ],
     "listing_status": "FOR_SALE",
     "listing_history": [
-      "HUD REO feed 2026-06-10"
+      "HUD REO feed 2026-07-17"
     ],
     "confidence_score": 100,
     "source_id": "hud",
     "source_name": "U.S. HUD — FHA (HUD Home Store)",
     "source_url": "https://opendata.arcgis.com/api/v3/datasets/a54aff75cc0a42de8456cc36a7335663_3/downloads/data?format=csv&spatialRefId=4326&where=1%3D1",
-    "fetched_at": "2026-06-10T23:39:59.517Z",
+    "fetched_at": "2026-07-17T16:15:44.498Z",
     "content_hash": "7771e140a4718a984fd403913d784d40171b0834a0b556807b112887795964fe",
     "classification_level": "PUBLIC",
     "replay_ref": "hud-591-109947",

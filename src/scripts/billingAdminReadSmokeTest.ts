@@ -387,7 +387,7 @@ async function main(): Promise<void> {
       [tenantId]
     );
 
-    if (billingRows.rowCount < 2) {
+    if ((billingRows.rowCount ?? 0) < 2) {
       throw new Error("Billing event rows were not persisted.");
     }
 

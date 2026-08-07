@@ -5,6 +5,11 @@ import {
   evaluateProductionOperationsMonitoringGate,
 } from "@/lib/governance/productionOperationsMonitoringGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -176,39 +181,28 @@ async function handleProductionOperationsMonitoring(
     const result = evaluateProductionOperationsMonitoringGate({
       operationsScope,
     });
+    const scope = operationsScope ?? "platform";
     const operationsMonitoring =
-      req.method === "POST"
-        ? {
-            operationsMonitoringPacketId: `production-operations-monitoring-${Date.now()}`,
-            operationsScope: operationsScope ?? "platform",
-            reviewStatus: "PRODUCTION_OPERATIONS_MONITORING_PACKET_RECORDED",
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_OPERATIONS_MONITORING_PACKET",
+            scope,
+            actorId,
             reviewNote: body.reviewNote ?? null,
-            operationsMonitoringApprovalGranted: false,
-            productionMonitoringActivated: false,
-            onCallActivated: false,
-            incidentBridgeActivated: false,
-            rollbackAuthorized: false,
-            emergencyHoldReleased: false,
-            releaseBoardApprovalGranted: false,
-            cutoverAuthorityGranted: false,
-            productionCutoverApproved: false,
-            productionCutoverExecuted: false,
-            launchHoldReleased: false,
-            deploymentExecuted: false,
-            productionSecretsActivated: false,
-            publicDnsCutoverAllowed: false,
-            databaseMigrationAllowed: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_OPERATIONS_MONITORING_PACKET"
+          );
+    const operationsMonitoringHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_OPERATIONS_MONITORING_PACKET"
+    );
+    const releaseBoardEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_RELEASE_BOARD_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionOperationsMonitoringReviews.length,
@@ -218,6 +212,8 @@ async function handleProductionOperationsMonitoring(
         disclosures: result.disclosures,
         operationsPosture: result.operationsPosture,
         operationsMonitoring,
+        operationsMonitoringHistory,
+        releaseBoardEvidence,
         productionBlocked: true,
         operationsMonitoringApprovalGranted: false,
         productionMonitoringActivated: false,
@@ -337,6 +333,8 @@ async function handleProductionOperationsMonitoring(
       disclosures: classifiedOutput.disclosures,
       operationsPosture: classifiedOutput.operationsPosture,
       operationsMonitoring: classifiedOutput.operationsMonitoring,
+      operationsMonitoringHistory: classifiedOutput.operationsMonitoringHistory,
+      releaseBoardEvidence: classifiedOutput.releaseBoardEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       operationsMonitoringApprovalGranted:
         classifiedOutput.operationsMonitoringApprovalGranted,

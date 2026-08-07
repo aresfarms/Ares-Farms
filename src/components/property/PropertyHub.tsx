@@ -8,12 +8,11 @@ import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones
 import { designatedHubzoneForProperty } from "@/lib/property/propertyHubzones";
 import { sfhaForProperty, historicForProperty } from "@/lib/property/propertyFloodHistoric";
 import { nmtcForProperty } from "@/lib/property/propertyNmtc";
-import { PropertyCountsMap } from "@/components/property/PropertyCountsMap";
 import { GuidedIntake } from "@/components/property/GuidedIntake";
-import { propertyStateCounts } from "@/lib/property/propertyStateCounts";
 import { guidedIntakeFeed } from "@/lib/property/guidedIntakeFeed";
 import { SavedTray } from "@/components/property/SavedTray";
 import { PropertySaveControls } from "@/components/property/PropertySaveControls";
+import { PropertyBriefLauncher } from "@/components/property/PropertyBriefLauncher";
 import { ProgramMatches } from "@/components/property/ProgramMatches";
 import {
   buildCategoryTree,
@@ -26,6 +25,7 @@ import {
   financingPathwayTags,
   type PropertyCategoryId,
 } from "@/lib/property/propertyCategories";
+import { CHART_THEMES } from "@/lib/property/chartThemes";
 import { renderableListings } from "@/lib/source-intelligence/listing-intake/listingStore";
 import { STATE_NAMES } from "@/lib/property/stateNames";
 import type { PropertySourceId } from "@/lib/property/propertyTypes";
@@ -48,7 +48,9 @@ import type { PropertySourceId } from "@/lib/property/propertyTypes";
  * personal data leaves Furlong; the provider's own intake handles any data).
  */
 
-const muted = { color: "#5d687a", lineHeight: 1.6 } as const;
+// Chart Table tokens — the hub is themed by CHART_THEMES.buyer (navigator).
+const navigatorTheme = CHART_THEMES.buyer;
+const muted = { color: "#b7ccd9", lineHeight: 1.6 } as const;
 
 /**
  * Honest price label. The feed's listed/asking price — NOT Furlong's valuation,
@@ -78,10 +80,13 @@ function stateName(abbr: string): string {
 export function PropertyHub({
   state,
   category,
+  lane = "property-land",
 }: {
   state?: string | null;
   type?: string | null;
   category?: string | null;
+  /** The compass lane this hub is browsing — kept in every internal link. */
+  lane?: string;
 }) {
   const tree = propertyTree();
   const sources = propertySourceStatuses();
@@ -97,7 +102,11 @@ export function PropertyHub({
   return (
     <main>
       <div style={lightContainer}>
-        <Header sources={sources} />
+        {/* Header block (title + blurb + sources line) removed — founder
+            direction 2026-07-17: cut it out completely. */}
+        <h1 style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0 0 0 0)", whiteSpace: "nowrap", border: 0 }}>
+          Government property listings
+        </h1>
 
         {tree.anyLive && <SavedTray />}
 
@@ -105,25 +114,24 @@ export function PropertyHub({
           <PendingState sources={sources} total={tree.total} />
         ) : !liveCategory ? (
           <>
-            {/* DUAL ENTRY (2026-06-10): (1) browse the map below, or (2) the
-                guided interests-only path — both free, both anonymous. */}
-            {/* Utility counts map — tile-grid, color-by-type, honest counts from
-                the governed feed (live sources, is_current only). State level
-                only; visually distinct from the homepage Living Map. */}
-            <PropertyCountsMap feed={propertyStateCounts()} />
+            {/* The address-check box was removed here (founder direction
+                2026-07-20): the compact place-first check now lives directly
+                under each lane's map, so a second one at the bottom of the hub
+                was redundant. */}
             <GuidedIntake feed={guidedIntakeFeed()} />
-            <CategoryGrid tree={tree} />
+            {/* "Browse by category" grid removed — redundant with the grouped
+                listings above (founder direction 2026-07-17). */}
           </>
         ) : !selectedAbbr ? (
-          <StateList category={liveCategory} />
+          <StateList category={liveCategory} lane={lane} />
         ) : (
-          <Listings categoryId={liveCategory.id} categoryLabel={liveCategory.label} abbr={selectedAbbr} />
+          <Listings categoryId={liveCategory.id} categoryLabel={liveCategory.label} abbr={selectedAbbr} lane={lane} />
         )}
 
-        <Link href="/explore" style={backLink}>
+        <Link href={`/explore?lane=${encodeURIComponent(lane)}`} style={backLink}>
           ← Back to the compass
         </Link>
-        <Disclosures variant="full" />
+        <Disclosures variant="full" tone="dark" />
       </div>
     </main>
   );
@@ -163,29 +171,6 @@ function propertyTree() {
   return tree;
 }
 
-// ── Header (always rendered — carries the "may fit" + both-source framing) ────
-function Header({ sources }: { sources: ReturnType<typeof propertySourceStatuses> }) {
-  return (
-    <header style={{ display: "grid", gap: 10 }}>
-      <span style={{ fontSize: 13, fontWeight: 700, color: "#0f766e", textTransform: "uppercase", letterSpacing: 0.4 }}>
-        Property &amp; land — no account needed
-      </span>
-      <h1 style={{ margin: 0, fontSize: "clamp(28px, 4vw, 38px)", fontWeight: 800, letterSpacing: -0.02, lineHeight: 1.12 }}>
-        Government property listings
-      </h1>
-      <p style={{ margin: 0, fontSize: 17, ...muted, maxWidth: 680 }}>
-        Real listings from federal housing programs — current <strong>HUD (FHA) homes for sale</strong>{" "}
-        and historical <strong>USDA Rural Development examples</strong>. Program criteria shown on a
-        listing are <strong>verified property-side facts</strong>, never assumptions. Furlong is advisory
-        only — we don&apos;t lend, approve, or determine eligibility. Pathways, not promises.
-      </p>
-      <p style={{ margin: 0, fontSize: 13, color: "#7a8aa0" }}>
-        {sources.map((s) => `${s.sourceName}: ${s.live ? "live" : "pending review"} (${s.total.toLocaleString("en-US")})`).join(" · ")} · public-domain open data
-      </p>
-    </header>
-  );
-}
-
 // ── Pending activation (no source live) ───────────────────────────────────────
 function PendingState({
   sources, total,
@@ -217,43 +202,14 @@ function PendingState({
 }
 
 // ── Level 1: category grid (only non-empty categories) ────────────────────────
-function CategoryGrid({ tree }: { tree: ReturnType<typeof buildCategoryTree> }) {
-  return (
-    <section aria-label="Browse by category" style={{ display: "grid", gap: 14 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>Browse by category</h2>
-        <span style={{ fontSize: 14, color: "#5d687a" }}>
-          {tree.liveTotal.toLocaleString("en-US")} listings across {tree.categories.length}{" "}
-          {tree.categories.length === 1 ? "category" : "categories"}
-        </span>
-      </div>
-      <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
-        {tree.categories.map((c) => (
-          <li key={c.id}>
-            <Link href={catHref(c.id)} style={cardLink}>
-              <span style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
-                <strong style={{ fontSize: 17, color: "#162033" }}>{c.label}</strong>
-                <span style={countPill}>{c.count.toLocaleString("en-US")}</span>
-              </span>
-              <span style={{ fontSize: 13, color: "#5d687a" }}>
-                {c.states.length} {c.states.length === 1 ? "state" : "states"} with inventory →
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 // ── Level 2: states within a category (only non-empty states) ─────────────────
-function StateList({ category }: { category: ReturnType<typeof buildCategoryTree>["categories"][number] }) {
+function StateList({ category, lane }: { category: ReturnType<typeof buildCategoryTree>["categories"][number]; lane: string }) {
   return (
     <section aria-label={`${category.label} — states with inventory`} style={{ display: "grid", gap: 14 }}>
-      <Breadcrumb categoryLabel={category.label} />
+      <Breadcrumb categoryLabel={category.label} lane={lane} />
       <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#162033" }}>{category.label}</h2>
-        <span style={{ fontSize: 14, color: "#5d687a" }}>
+        <h2 style={{ margin: 0, fontSize: 20, fontWeight: 800, color: "#eaf3f7" }}>{category.label}</h2>
+        <span style={{ fontSize: 14, color: "#b7ccd9" }}>
           {category.count.toLocaleString("en-US")} listings in {category.states.length}{" "}
           {category.states.length === 1 ? "state" : "states"}
         </span>
@@ -261,8 +217,8 @@ function StateList({ category }: { category: ReturnType<typeof buildCategoryTree
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
         {category.states.map((s) => (
           <li key={s.abbr}>
-            <Link href={stateHref(category.id, s.abbr)} style={{ ...cardLink, flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
-              <strong style={{ fontSize: 15, color: "#162033" }}>{stateName(s.abbr)}</strong>
+            <Link href={stateHref(lane, category.id, s.abbr)} style={{ ...cardLink, flexDirection: "row", alignItems: "baseline", justifyContent: "space-between" }}>
+              <strong style={{ fontSize: 15, color: "#eaf3f7" }}>{stateName(s.abbr)}</strong>
               <span style={countPill}>{s.count.toLocaleString("en-US")}</span>
             </Link>
           </li>
@@ -274,11 +230,12 @@ function StateList({ category }: { category: ReturnType<typeof buildCategoryTree
 
 // ── Level 3: the listings for category + state ────────────────────────────────
 function Listings({
-  categoryId, categoryLabel, abbr,
+  categoryId, categoryLabel, abbr, lane,
 }: {
   categoryId: PropertyCategoryId;
   categoryLabel: string;
   abbr: string;
+  lane: string;
 }) {
   const { listings } = listExploreDetail({ state: abbr, category: categoryId });
   // B10 reconciliation: the list deliberately includes HISTORICAL examples
@@ -294,8 +251,8 @@ function Listings({
   );
   return (
     <section aria-label={`${categoryLabel} in ${stateName(abbr)}`} style={{ display: "grid", gap: 14 }}>
-      <Breadcrumb categoryLabel={categoryLabel} categoryId={categoryId} stateAbbr={abbr} />
-      <p style={{ margin: 0, fontSize: 14, color: "#5d687a" }}>
+      <Breadcrumb categoryLabel={categoryLabel} categoryId={categoryId} stateAbbr={abbr} lane={lane} />
+      <p style={{ margin: 0, fontSize: 14, color: "#b7ccd9" }}>
         {(listings.length + direct.length).toLocaleString("en-US")} {listings.length + direct.length === 1 ? "property" : "properties"} ·{" "}
         {categoryLabel} in {stateName(abbr)} —{" "}
         <strong>{(currentCount + direct.length).toLocaleString("en-US")} current</strong>
@@ -309,9 +266,26 @@ function Listings({
         <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 14 }}>
           {direct.map((d) => (
             <li key={d.listingId} style={{ border: "1px solid #c7b3e6", borderRadius: 12, background: "#fdfcff", padding: "18px 20px", display: "grid", gap: 8 }}>
+              <PropertyBriefLauncher
+                property={{
+                  id: d.listingId,
+                  title: `${d.town}, ${stateName(d.state)}`,
+                  location: `${d.town}, ${stateName(d.state)}`,
+                  town: d.town,
+                  state: d.state,
+                  propertyType: d.propertyType,
+                  priceLabel: d.price && d.price > 0 ? `List price: $${d.price.toLocaleString("en-US")} · as of ${d.asOf}` : "Price on request",
+                  vintageStamp: d.freshnessNotice,
+                  sourceLabel: d.listerType === "broker" ? "Direct broker listing" : "Direct institutional / REO listing",
+                  description: d.description,
+                  pathways: categoryId === "businesses" ? ["SBA"] : ["Conventional"],
+                  categoryLabel,
+                  currentLabel: "Current direct listing",
+                }}
+              />
               <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-                <strong style={{ fontSize: 17, color: "#162033" }}>{d.town}, {stateName(d.state)}</strong>
-                <span style={{ fontSize: 15, fontWeight: 700, color: "#5d687a" }}>
+                <strong style={{ fontSize: 17, color: "#eaf3f7" }}>{d.town}, {stateName(d.state)}</strong>
+                <span style={{ fontSize: 15, fontWeight: 700, color: "#b7ccd9" }}>
                   {d.price && d.price > 0 ? `List price: $${d.price.toLocaleString("en-US")} · as of ${d.asOf} · subject to change` : "Price on request"}
                 </span>
               </div>
@@ -327,8 +301,8 @@ function Listings({
                 </span>
               )}
               <p style={{ margin: 0, fontSize: 14, ...muted }}>{d.description}</p>
-              <p style={{ margin: 0, fontSize: 12, color: "#7a8aa0" }}>{d.venueDisclaimer}</p>
-              <p style={{ margin: 0, fontSize: 11, color: "#7a8aa0" }}>{d.freshnessNotice}</p>
+              <p style={{ margin: 0, fontSize: 12, color: "#7ea4bb" }}>{d.venueDisclaimer}</p>
+              <p style={{ margin: 0, fontSize: 11, color: "#7ea4bb" }}>{d.freshnessNotice}</p>
               <DirectFinanceBridge categoryId={categoryId} />
             </li>
           ))}
@@ -337,12 +311,41 @@ function Listings({
 
       <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 14 }}>
         {listings.map((p) => (
-          <li key={p.id} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#ffffff", padding: "18px 20px", display: "grid", gap: 8 }}>
+          <li key={p.id} style={{ border: `1px solid ${navigatorTheme.waypointBorder}`, borderRadius: 12, background: navigatorTheme.cellBg, padding: "18px 20px", display: "grid", gap: 8 }}>
+            <PropertyBriefLauncher
+              property={{
+                id: p.id,
+                title: locationLine(p.town, p.county, p.state),
+                location: locationLine(p.town, p.county, p.state),
+                town: p.town,
+                county: p.county,
+                state: p.state,
+                propertyType: p.propertyType,
+                priceLabel: priceLabel(p.price, p.sourceId),
+                vintageStamp: p.vintageStamp,
+                sourceLabel:
+                  p.sourceId === "hud"
+                    ? "HUD Home Store"
+                    : p.sourceId === "treasury"
+                      ? "U.S. Treasury auctions"
+                    : p.sourceId === "gsa-realestate"
+                        ? "GSA realestatesales.gov"
+                        : "USDA resales portal",
+                sourceId: p.sourceId,
+                listingUrl: p.listingUrl,
+                exactAddress: p.exactAddress,
+                description: p.description,
+                sourceCitation: p.sourceCitation,
+                pathways: financingPathwayTags(p.sourceId, categoryId),
+                categoryLabel,
+                currentLabel: p.isCurrent ? "Current for-sale listing" : `${p.vintageStamp} · verify current availability`,
+              }}
+            />
             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", alignItems: "baseline", justifyContent: "space-between" }}>
-              <strong style={{ fontSize: 17, color: "#162033" }}>
+              <strong style={{ fontSize: 17, color: "#eaf3f7" }}>
                 {locationLine(p.town, p.county, p.state)}
               </strong>
-              <span style={{ fontSize: 15, fontWeight: 700, color: "#5d687a" }}>
+              <span style={{ fontSize: 15, fontWeight: 700, color: "#b7ccd9" }}>
                 {priceLabel(p.price, p.sourceId)}
               </span>
             </div>
@@ -360,13 +363,13 @@ function Listings({
                 : `${p.vintageStamp} — historical · verify current availability`}
             </span>
             {p.asOf && (
-              <div style={{ fontSize: 11, color: "#7a8aa0" }}>
+              <div style={{ fontSize: 11, color: "#7ea4bb" }}>
                 as of {new Date(p.asOf).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                 {p.isCurrent ? " (source snapshot)" : ""}
               </div>
             )}
             {p.exactAddress && (
-              <div style={{ fontSize: 14, color: "#162033" }}>{p.exactAddress}{p.zip ? `, ${p.state} ${p.zip}` : ""}</div>
+              <div style={{ fontSize: 14, color: "#eaf3f7" }}>{p.exactAddress}{p.zip ? `, ${p.state} ${p.zip}` : ""}</div>
             )}
 
             {/* Place-fact attribute (6 / OZ): coarse tract-level government fact —
@@ -393,10 +396,10 @@ function Listings({
                 program hedge. Programs now render ONLY as verified facts via
                 ProgramMatchesWithPlaceFacts below. */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 14px", alignItems: "center" }}>
-              <a href={p.listingUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 700, color: "#0f766e", textDecoration: "underline" }}>
+              <a href={p.listingUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 700, color: "#7fc4b8", textDecoration: "underline" }}>
                 {p.sourceId === "hud" ? "View on HUD Home Store ↗" : p.sourceId === "treasury" ? "View on Treasury auctions ↗" : p.sourceId === "gsa-realestate" ? "View on GSA realestatesales.gov ↗" : "View on USDA resales portal ↗"}
               </a>
-              <span style={{ fontSize: 12, color: "#7a8aa0" }}>{p.sourceCitation} · {p.vintageStamp}</span>
+              <span style={{ fontSize: 12, color: "#7ea4bb" }}>{p.sourceCitation} · {p.vintageStamp}</span>
             </div>
 
             {/* Save (in-session, no account, no PII) — the property's own public
@@ -605,49 +608,61 @@ function FinanceBridge({ sourceId, categoryId }: { sourceId: PropertySourceId; c
 
 // ── Breadcrumb ────────────────────────────────────────────────────────────────
 function Breadcrumb({
-  categoryLabel, categoryId, stateAbbr,
+  categoryLabel, categoryId, stateAbbr, lane,
 }: {
   categoryLabel: string;
   categoryId?: PropertyCategoryId;
   stateAbbr?: string;
+  lane: string;
 }) {
   return (
     <nav aria-label="Breadcrumb" style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center", fontSize: 13 }}>
-      <Link href={allHref()} style={crumbLink}>All categories</Link>
+      <Link href={allHref(lane)} style={crumbLink}>All categories</Link>
       <span aria-hidden="true" style={{ color: "#9db4d8" }}>›</span>
       {stateAbbr && categoryId ? (
         <>
-          <Link href={catHref(categoryId)} style={crumbLink}>{categoryLabel}</Link>
+          <Link href={catHref(lane, categoryId)} style={crumbLink}>{categoryLabel}</Link>
           <span aria-hidden="true" style={{ color: "#9db4d8" }}>›</span>
-          <span style={{ color: "#162033", fontWeight: 700 }}>{stateName(stateAbbr)}</span>
+          <span style={{ color: "#eaf3f7", fontWeight: 700 }}>{stateName(stateAbbr)}</span>
         </>
       ) : (
-        <span style={{ color: "#162033", fontWeight: 700 }}>{categoryLabel}</span>
+        <span style={{ color: "#eaf3f7", fontWeight: 700 }}>{categoryLabel}</span>
       )}
     </nav>
   );
 }
 
 // ── href + style helpers ──────────────────────────────────────────────────────
-function allHref(): string {
-  return `/explore?${new URLSearchParams({ lane: "property-land" }).toString()}`;
+function allHref(lane: string): string {
+  return `/explore?${new URLSearchParams({ lane }).toString()}`;
 }
-function catHref(categoryId: string): string {
-  return `/explore?${new URLSearchParams({ lane: "property-land", category: categoryId }).toString()}`;
+function catHref(lane: string, categoryId: string): string {
+  return `/explore?${new URLSearchParams({ lane, category: categoryId }).toString()}`;
 }
-function stateHref(categoryId: string, abbr: string): string {
-  return `/explore?${new URLSearchParams({ lane: "property-land", category: categoryId, state: abbr }).toString()}`;
+function stateHref(lane: string, categoryId: string, abbr: string): string {
+  return `/explore?${new URLSearchParams({ lane, category: categoryId, state: abbr }).toString()}`;
 }
 
 const cardLink = {
   display: "flex", flexDirection: "column", gap: 6,
-  border: "1px solid #d7deea", borderRadius: 12, background: "#ffffff",
+  border: `1px solid ${navigatorTheme.waypointBorder}`, borderRadius: 12, background: navigatorTheme.cellBg,
   padding: "16px 18px", textDecoration: "none", height: "100%",
 } as const;
 const countPill = {
-  fontSize: 13, fontWeight: 700, color: "#0f766e", background: "#e1f5ee",
+  fontSize: 13, fontWeight: 700, color: "#7fc4b8", background: "#e1f5ee",
   border: "1px solid #b9e3d4", borderRadius: 999, padding: "1px 10px",
 } as const;
-const crumbLink = { color: "#0f766e", textDecoration: "none", fontWeight: 600 } as const;
-const backLink = { fontSize: 14, fontWeight: 700, color: "#0f766e", textDecoration: "none", width: "fit-content" } as const;
-const lightContainer = { maxWidth: 880, margin: "0 auto", padding: "32px 24px 80px", display: "grid", gap: 24 } as const;
+const crumbLink = { color: "#7fc4b8", textDecoration: "none", fontWeight: 600 } as const;
+const backLink = { fontSize: 14, fontWeight: 700, color: "#7fc4b8", textDecoration: "none", width: "fit-content" } as const;
+// Chart Table cohesion rollout (founder 2026-07-17): the hub sits on the
+// navigator stage — same tokens as ChartTableBrief's buyer theme.
+const lightContainer = {
+  maxWidth: 920,
+  margin: "0 auto",
+  padding: "32px 24px 60px",
+  display: "grid",
+  gap: 24,
+  background: navigatorTheme.stage,
+  borderRadius: 20,
+  color: navigatorTheme.ink,
+} as const;

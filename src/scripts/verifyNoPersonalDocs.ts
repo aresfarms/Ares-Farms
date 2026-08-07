@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { closeSync, constants, existsSync, fstatSync, openSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 /**
@@ -207,6 +207,24 @@ const FALSE_POSITIVE_PATH_TOKENS: ReadonlyArray<RegExp> = [
   /^src\/scripts\/verifyNoPersonalDocs\.ts$/,
   /^src\/scripts\/verifyNoPersonalDocsSmokeTest\.ts$/,
 ];
+
+const GENERATED_PUBLIC_ID_FILES = new Set<string>([
+  "src/lib/property/propertyFloodHistoricGenerated.ts",
+  "src/lib/property/propertyHubzonesGenerated.ts",
+  "src/lib/property/propertyNmtcGenerated.ts",
+  "src/lib/property/propertyOpportunityZonesGenerated.ts",
+  "src/lib/property/usdaResaleGenerated.ts",
+]);
+
+function isGeneratedPublicIdentifierLine(filePath: string, line: string): boolean {
+  if (!GENERATED_PUBLIC_ID_FILES.has(filePath)) return false;
+
+  return (
+    /"canonical_property_id"\s*:\s*"usda-\d+"/.test(line) ||
+    /"listingId"\s*:\s*"\d+"/.test(line) ||
+    /^\s*"usda-\d+"\s*:/.test(line)
+  );
+}
 
 // =============================================================================
 // Allowlist (config-driven; default empty)
@@ -438,10 +456,34 @@ export type ContentHit = {
   // (###-##-####)"); the line number is safe to print.
 };
 
-const MAX_CONTENT_BYTES = 2 * 1024 * 1024; // 2 MiB
+const MAX_CONTENT_BYTES = 8 * 1024 * 1024; // 8 MiB; generated public datasets can exceed 2 MiB
 
 function isFalsePositivePath(filePath: string): boolean {
   return FALSE_POSITIVE_PATH_TOKENS.some((re) => re.test(filePath));
+}
+
+function passesLuhn(candidate: string): boolean {
+  const digits = candidate.replace(/[^0-9]/g, "");
+  if (digits.length < 13 || digits.length > 19) return false;
+  let sum = 0;
+  let doubleNext = false;
+  for (let i = digits.length - 1; i >= 0; i -= 1) {
+    let value = Number(digits[i]);
+    if (doubleNext) {
+      value *= 2;
+      if (value > 9) value -= 9;
+    }
+    sum += value;
+    doubleNext = !doubleNext;
+  }
+  return sum % 10 === 0;
+}
+
+function isApprovedPublicProductCopy(filePath: string, line: string, signatureId: string): boolean {
+  return (
+    signatureId === "credit-report-label" &&
+    filePath.replace(/\\/g, "/").endsWith("src/lib/financing/financingFeeSchedule.ts")
+  );
 }
 
 export function scanFileContent(
@@ -463,7 +505,17 @@ export function scanFileContent(
       ) {
         continue;
       }
-      if (re.exec(line) !== null) {
+      if (isGeneratedPublicIdentifierLine(filePath, line)) {
+        continue;
+      }
+      if (isApprovedPublicProductCopy(filePath, line, def.id)) {
+        continue;
+      }
+      const match = re.exec(line);
+      if (match !== null) {
+        if (def.id === "credit-card-16" && !passesLuhn(match[0])) {
+          continue;
+        }
         hits.push({
           path: filePath,
           signatureId: def.id,
@@ -481,8 +533,10 @@ type ReadResult =
   | { kind: "err"; reason: string };
 
 function readFileSafely(filePath: string): ReadResult {
+  let fd: number | null = null;
   try {
-    const stat = statSync(filePath);
+    fd = openSync(filePath, constants.O_RDONLY | constants.O_NOFOLLOW);
+    const stat = fstatSync(fd);
     if (!stat.isFile()) return { kind: "err", reason: "not a regular file" };
     if (stat.size > MAX_CONTENT_BYTES) {
       return {
@@ -490,12 +544,14 @@ function readFileSafely(filePath: string): ReadResult {
         reason: `file exceeds ${MAX_CONTENT_BYTES} bytes`,
       };
     }
-    return { kind: "ok", content: readFileSync(filePath, "utf8") };
+    return { kind: "ok", content: readFileSync(fd, "utf8") };
   } catch (err) {
     return {
       kind: "err",
       reason: err instanceof Error ? err.message : String(err),
     };
+  } finally {
+    if (fd !== null) closeSync(fd);
   }
 }
 

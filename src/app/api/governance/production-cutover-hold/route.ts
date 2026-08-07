@@ -5,6 +5,7 @@ import {
   evaluateProductionCutoverHoldGate,
 } from "@/lib/governance/productionCutoverHoldGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import { latestReleaseGovernanceEvidence, recordReleaseGovernanceEvidence, releaseGovernanceEvidenceFor } from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -161,36 +162,14 @@ async function handleProductionCutoverHold(
       ],
     });
     const result = evaluateProductionCutoverHoldGate({ cutoverScope });
-    const cutoverHold =
-      req.method === "POST"
-        ? {
-            cutoverHoldId: `production-cutover-hold-${Date.now()}`,
-            cutoverScope: cutoverScope ?? "platform",
-            reviewStatus: "PRODUCTION_CUTOVER_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            productionCutoverApproved: false,
-            productionCutoverExecuted: false,
-            releaseCandidateFreezeApproved: false,
-            releaseCandidateFrozen: false,
-            freezeHoldReleased: false,
-            deploymentHoldReleased: false,
-            finalGoLiveHoldReleased: false,
-            deploymentExecuted: false,
-            productionSecretsActivated: false,
-            publicDnsCutoverAllowed: false,
-            databaseMigrationAllowed: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
-            qualifiedReleaseManagerRequired: true,
-            replayRef: traceId,
-          }
-        : null;
+    const resolvedScope = cutoverScope ?? "platform";
+    const cutoverEvidence =
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({ kind: "PRODUCTION_CUTOVER_HOLD", scope: resolvedScope, actorId, reviewNote: body.reviewNote, replayRef: traceId })
+        : latestReleaseGovernanceEvidence(resolvedScope, "PRODUCTION_CUTOVER_HOLD");
+    const cutoverHold = cutoverEvidence ? { ...cutoverEvidence, cutoverHoldId: cutoverEvidence.evidenceId, cutoverScope: cutoverEvidence.scope, reviewStatus: "PRODUCTION_CUTOVER_HOLD_RECORDED", productionCutoverApproved: false, productionCutoverExecuted: false, releaseCandidateFreezeApproved: false, releaseCandidateFrozen: false, freezeHoldReleased: false, deploymentHoldReleased: false, finalGoLiveHoldReleased: false, publicProductionApiExposureAllowed: false, productionPortalLaunchExecuted: false, qualifiedReleaseManagerRequired: true } : null;
+    const cutoverHistory = releaseGovernanceEvidenceFor(resolvedScope, "PRODUCTION_CUTOVER_HOLD");
+    const freezeEvidence = latestReleaseGovernanceEvidence(resolvedScope, "RELEASE_CANDIDATE_FREEZE_HOLD");
     const classifiedOutput = classifyRecord(
       {
         count: result.productionCutoverHoldReviews.length,
@@ -199,6 +178,8 @@ async function handleProductionCutoverHold(
         disclosures: result.disclosures,
         cutoverPosture: result.cutoverPosture,
         cutoverHold,
+        cutoverHistory,
+        freezeEvidence,
         productionBlocked: true,
         productionCutoverApproved: false,
         productionCutoverExecuted: false,
@@ -304,6 +285,8 @@ async function handleProductionCutoverHold(
       disclosures: classifiedOutput.disclosures,
       cutoverPosture: classifiedOutput.cutoverPosture,
       cutoverHold: classifiedOutput.cutoverHold,
+      cutoverHistory: classifiedOutput.cutoverHistory,
+      freezeEvidence: classifiedOutput.freezeEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       productionCutoverApproved:
         classifiedOutput.productionCutoverApproved,

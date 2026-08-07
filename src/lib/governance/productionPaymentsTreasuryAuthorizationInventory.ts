@@ -1,0 +1,48 @@
+export const productionPaymentsTreasuryAuthorizationVersion = "p5-b07-payments-treasury-authorization-v1";
+
+export const productionPaymentsTreasuryControlInventory = [
+  "PAYMENT_CAPTURE",
+  "FEE_ASSESSMENT",
+  "REFUND",
+  "DISPUTE_CHARGEBACK",
+  "SETTLEMENT_RECONCILIATION",
+  "TREASURY_ALLOCATION",
+  "RESERVE_MOVEMENT",
+  "FINANCIAL_CORRECTION",
+].map((operationType) => ({
+  operationType,
+  qualifiedTreasuryAuthorityRequired: true,
+  separationOfPowersRequired: true,
+  processorCertificationRequired: true,
+  paymentAuthorityRequired: true,
+  feeScheduleApprovalRequired: true,
+  borrowerFeeDisclosureRequired: true,
+  refundPolicyRequired: true,
+  disputePolicyRequired: true,
+  reconciliationPolicyRequired: true,
+  immutableLedgerRequired: true,
+  deterministicReplayRequired: true,
+  classificationRequired: true,
+  auditEvidenceRequired: true,
+  reserveFloorProtectionRequired: true,
+  rollbackKillSwitchRequired: true,
+  humanApprovalRequired: true,
+  executionApproved: false,
+  liveMoneyMovementPermitted: false,
+}));
+
+export const productionPaymentsTreasuryAuthorization = {
+  blockerId: "P5-B07",
+  ownerRole: "TREASURY_AUTHORITY",
+  auditRole: "AUDIT_AUTHORITY",
+  legalComplianceRole: "LEGAL_COMPLIANCE_AUTHORITY",
+  approvalRequired: true,
+  approvalGranted: false,
+  paymentCaptureApproved: false,
+  feeAssessmentApproved: false,
+  refundsApproved: false,
+  settlementsApproved: false,
+  treasuryMovementApproved: false,
+  liveMoneyMovementPermitted: false,
+  productionAuthorized: false,
+} as const;

@@ -5,6 +5,11 @@ import {
   evaluateProductionIncidentResponseReadinessGate,
 } from "@/lib/governance/productionIncidentResponseReadinessGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -178,42 +183,28 @@ async function handleProductionIncidentResponseReadiness(
     const result = evaluateProductionIncidentResponseReadinessGate({
       incidentScope,
     });
+    const scope = incidentScope ?? "platform";
     const incidentReadiness =
-      req.method === "POST"
-        ? {
-            incidentReadinessPacketId: `production-incident-response-readiness-${Date.now()}`,
-            incidentScope: incidentScope ?? "platform",
-            reviewStatus:
-              "PRODUCTION_INCIDENT_RESPONSE_READINESS_PACKET_RECORDED",
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_INCIDENT_RESPONSE_READINESS_PACKET",
+            scope,
+            actorId,
             reviewNote: body.reviewNote ?? null,
-            incidentResponseApprovalGranted: false,
-            incidentResponseActivated: false,
-            incidentBridgeActivated: false,
-            onCallActivated: false,
-            rollbackAuthorized: false,
-            emergencyRollbackExecuted: false,
-            emergencyHoldReleased: false,
-            killSwitchActivated: false,
-            customerCommunicationsReleased: false,
-            regulatoryCommunicationsReleased: false,
-            publicStatusPageEnabled: false,
-            supportEscalationActivated: false,
-            operationsMonitoringApprovalGranted: false,
-            productionMonitoringActivated: false,
-            cutoverAuthorityGranted: false,
-            productionCutoverExecuted: false,
-            deploymentExecuted: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_INCIDENT_RESPONSE_READINESS_PACKET"
+          );
+    const incidentReadinessHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_INCIDENT_RESPONSE_READINESS_PACKET"
+    );
+    const operationsMonitoringEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_OPERATIONS_MONITORING_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionIncidentResponseReadinessReviews.length,
@@ -223,6 +214,8 @@ async function handleProductionIncidentResponseReadiness(
         disclosures: result.disclosures,
         incidentPosture: result.incidentPosture,
         incidentReadiness,
+        incidentReadinessHistory,
+        operationsMonitoringEvidence,
         productionBlocked: true,
         incidentResponseApprovalGranted: false,
         incidentResponseActivated: false,
@@ -354,6 +347,8 @@ async function handleProductionIncidentResponseReadiness(
       disclosures: classifiedOutput.disclosures,
       incidentPosture: classifiedOutput.incidentPosture,
       incidentReadiness: classifiedOutput.incidentReadiness,
+      incidentReadinessHistory: classifiedOutput.incidentReadinessHistory,
+      operationsMonitoringEvidence: classifiedOutput.operationsMonitoringEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       incidentResponseApprovalGranted:
         classifiedOutput.incidentResponseApprovalGranted,

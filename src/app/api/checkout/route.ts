@@ -1,7 +1,13 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
-import { stripe } from "@/lib/stripe";
+import {
+  assertStripeCheckoutAvailable,
+  stripe,
+  stripeConfiguredForLivePayments,
+} from "@/lib/stripe/client";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
@@ -34,9 +40,7 @@ type CheckoutRequest = {
 };
 
 function createCheckoutTraceId(): string {
-  return `checkout-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `checkout-${randomUUID()}`;
 }
 
 function getBaseUrl(): string {
@@ -321,6 +325,9 @@ export async function POST(req: Request) {
     }
 
     const baseUrl = getBaseUrl();
+    assertStripeCheckoutAvailable();
+    const livePaymentConnector = stripeConfiguredForLivePayments();
+
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
@@ -390,7 +397,7 @@ export async function POST(req: Request) {
       checkoutSessionCreated: true,
       webhookReceived: false,
       entitlementGranted: false,
-      paymentConnectorLiveMode: false,
+      paymentConnectorLiveMode: livePaymentConnector,
       stubSignatureVerification: false,
       regulatedDecisionImpactAllowed: false,
       humanReviewRequired: true,

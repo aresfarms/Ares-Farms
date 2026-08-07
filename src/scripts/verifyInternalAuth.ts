@@ -12,8 +12,9 @@
  * body carrying the internal console markers.
  *
  * For each internal API: an unauthenticated request must be rejected (401/403)
- * — never 200 with data. (Middleware runs before the handler, so a GET suffices
- * even for POST-only routes.)
+ * or fail closed with the perimeter's governed missing-secret 503 — never 200
+ * with data. (Middleware runs before the handler, so a GET suffices even for
+ * POST-only routes.)
  *
  * Sanity (so the lock didn't also brick the public site): public pages still
  * load (200, not redirected to sign-in) and the genuinely-public APIs are not
@@ -63,6 +64,7 @@ const INTERNAL_PAGES = [
   "/production-final-authority",
   "/dashboard",
   "/lender/dashboard",
+  "/lender-desk",
   "/sponsor/dashboard",
   "/portal/borrower",
 ];
@@ -85,6 +87,7 @@ const INTERNAL_APIS = [
   "/api/ledger",
   "/api/audit",
   "/api/entitlements",
+  "/api/lender/deal-desk",
 ];
 
 // Public pages must still render (must NOT be redirected to sign-in).
@@ -146,10 +149,32 @@ async function main(): Promise<void> {
 
   // ── Internal APIs must reject (401/403), never serve data ───────────────────
   for (const route of INTERNAL_APIS) {
-    const { status, location } = await get(route);
-    const rejected = status === 401 || status === 403 || isSignInRedirect(status, location);
+    const { status, location, body } = await get(route);
+    let governedMissingSecret = false;
+    if (status === 503) {
+      try {
+        const parsed = JSON.parse(body) as {
+          ok?: unknown;
+          governance?: { policy?: unknown; missingSecret?: unknown };
+        };
+        governedMissingSecret =
+          parsed.ok === false &&
+          parsed.governance?.policy === "session-required" &&
+          parsed.governance?.missingSecret === true;
+      } catch {
+        governedMissingSecret = false;
+      }
+    }
+    const rejected =
+      status === 401 ||
+      status === 403 ||
+      governedMissingSecret ||
+      isSignInRedirect(status, location);
     if (!rejected) {
-      failures.push({ route, detail: `expected 401/403 for anonymous request, got ${status}` });
+      failures.push({
+        route,
+        detail: `expected 401/403 or governed missing-secret 503 for anonymous request, got ${status}`,
+      });
     }
   }
 

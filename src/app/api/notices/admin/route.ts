@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import { evaluateApplicationRecordAccess } from "@/lib/auth/recordAccess";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
@@ -82,7 +84,7 @@ function parseQuery(req: NextRequest): NoticeAdminQuery {
   const params = req.nextUrl.searchParams;
 
   return {
-    role: params.get("role") ?? "user",
+    role: effectiveRole(req),
     userId: normalizeText(params.get("userId")),
     borrowerId: normalizeText(params.get("borrowerId")),
     tenantId: normalizeText(params.get("tenantId")),

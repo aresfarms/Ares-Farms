@@ -4,6 +4,7 @@
  * then FULLY REVERTED (store + overlay removed; nothing live).
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -14,7 +15,6 @@ import {
 import { recordCounselClearance, recordListingDecision, counselClearedStates } from "@/lib/source-intelligence/listing-intake/listingSourceActivationStore";
 import { canListingRender, listingRenderEligibility } from "@/lib/source-intelligence/listing-intake/listingRenderGate";
 import { runDirectListingFreshness } from "@/lib/source-intelligence/listing-intake/directListingFreshness";
-import { readAuditEvents } from "@/lib/property/auditLedger";
 import { SOURCE_AUTHORITY_REGISTRY } from "@/lib/source-intelligence/sourceIntelligenceRuntime";
 
 const fail: string[] = [];
@@ -89,8 +89,8 @@ async function main() {
   ok(run3.suspendedStale + run3.suspendedLicense >= 1, "freshness run must record the suspension (stale or license branch)");
 
   // ── ledger trail ─────────────────────────────────────────────────────────────
-  ok(readAuditEvents({ domain: "listing-license-verification" }).some((e) => e.decision === "LICENSE_VERIFIED"), "license verifications must be ledger-logged");
-  ok(readAuditEvents({ domain: "listing-freshness" }).some((e) => e.decision === "FRESHNESS_RUN"), "freshness runs must be ledger-logged");
+  ok(canonicalLandRegisterAuthority.read({ domain: "listing-license-verification" }).some((e) => e.decision === "LICENSE_VERIFIED"), "license verifications must be ledger-logged");
+  ok(canonicalLandRegisterAuthority.read({ domain: "listing-freshness" }).some((e) => e.decision === "FRESHNESS_RUN"), "freshness runs must be ledger-logged");
 
   // ── REVERT ──────────────────────────────────────────────────────────────────
   try { fs.unlinkSync(STORE); } catch {}

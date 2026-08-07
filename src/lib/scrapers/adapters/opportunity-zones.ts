@@ -28,6 +28,7 @@ import {
   geocodeToCensusTract,
   type CensusGeocodeResult,
 } from "./censusGeocoder";
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
 
 export {
   CENSUS_GEOCODER_URL,
@@ -75,7 +76,7 @@ export async function queryHudOzByGeoid(geoid: string): Promise<{
     f: "pjson",
   });
 
-  const res = await fetch(`${HUD_OZ_FEATURE_URL}?${params.toString()}`, {
+  const res = await governedFetch(`${HUD_OZ_FEATURE_URL}?${params.toString()}`, {
     headers: { Accept: "application/json" },
     signal: AbortSignal.timeout(10_000),
   });

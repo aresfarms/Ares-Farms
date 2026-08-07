@@ -9,6 +9,8 @@
  * benchmark=Public_AR_Current · vintage=Current_Current · U.S. Government work.
  */
 
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
+
 export const CENSUS_GEOCODER_URL =
   "https://geocoding.geo.census.gov/geocoder/geographies/address";
 
@@ -45,7 +47,7 @@ export async function geocodeToCensusTract(
   });
   if (zip) params.set("zip", zip);
 
-  const res = await fetch(`${CENSUS_GEOCODER_URL}?${params.toString()}`, {
+  const res = await governedFetch(`${CENSUS_GEOCODER_URL}?${params.toString()}`, {
     headers: { Accept: "application/json" },
     signal: AbortSignal.timeout(10_000),
   });

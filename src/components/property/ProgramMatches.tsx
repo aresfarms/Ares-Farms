@@ -24,6 +24,7 @@ interface VerifiedMatch {
   administering_body: string;
   verifiedStatement: string;
   basis: string;
+  whyItMatters?: string;
   personSideCaveat: string;
   source_citation: string;
   asOf: string;
@@ -118,6 +119,7 @@ export function ProgramMatches({
             <li key={v.program_id} data-testid="verified-program" style={{ border: "1px solid #b9e3d4", background: "#f4fbf8", borderRadius: 10, padding: "10px 12px", display: "grid", gap: 4 }}>
               <span style={{ fontSize: 13, fontWeight: 700, color: "#0f6e56" }}>{v.name}</span>
               <span style={{ fontSize: 12, color: "#3b475a" }}>{v.verifiedStatement}</span>
+              {v.whyItMatters && <span style={{ fontSize: 12, color: "#0f6e56" }}>{v.whyItMatters}</span>}
               <span style={{ fontSize: 11, color: "#5d687a" }}>Basis: {v.basis}</span>
               <span style={{ fontSize: 11, color: "#9a3412" }}>{v.personSideCaveat}</span>
               <span style={{ fontSize: 11, color: "#9db4d8" }}>Source: {v.source_citation}</span>

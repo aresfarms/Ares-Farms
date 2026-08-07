@@ -433,7 +433,7 @@ function main() {
 
   for (const [checkName, run] of selected) {
     assert(Boolean(run), `Unknown missing doctrine conformance mode: ${checkName}`);
-    results[checkName] = run();
+    results[checkName] = run!();
   }
 
   console.log(

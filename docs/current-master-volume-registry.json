@@ -90,6 +90,11 @@
     "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
     "docs/master-volume-requirements.json",
     "docs/BACKEND_COVERAGE_MATRIX.md",
-    "docs/BACKEND_MODULE_READINESS_DECISION.md"
+    "docs/BACKEND_MODULE_READINESS_DECISION.md",
+    "docs/MASTER_VOLUME_AMENDMENT_INSTITUTIONAL_ACCESS.md",
+    "src/lib/governance/institutionalAbacDisclosure.ts",
+    "src/lib/governance/compelledDisclosureCeremony.ts",
+    "src/lib/governance/institutionalAccessSurveillance.ts",
+    "src/lib/governance/institutionalAccessRuntimeEnforcement.ts"
   ]
 }

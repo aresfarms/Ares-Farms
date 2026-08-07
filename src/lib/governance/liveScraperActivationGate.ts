@@ -9,7 +9,7 @@ import {
   SOURCE_STACK_REGISTRY,
   SOURCE_STACK_VERSION,
   SourceStackSourceProfile,
-} from "@/lib/source-stack/sourceStackRuntime";
+} from "@/lib/platform/authorities/source";
 import { sourceLegalReviewForSource } from "@/lib/governance/sourceLegalReviewGate";
 
 /**

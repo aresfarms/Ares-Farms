@@ -1,0 +1,133 @@
+name: security
+
+on:
+  pull_request:
+    branches: [main, feature/p2-cloud-run-private]
+  push:
+    branches: ["**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with: { fetch-depth: 0 }
+      - name: Gitleaks (secret scanning)
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-sca:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with: { node-version: "24.15.0", cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - name: SCA — npm audit (fail on high+)
+        run: npm audit --audit-level=high
+
+  static-security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with: { node-version: "24.15.0", cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - name: Local secret-pattern gate
+        run: npm run verify:secret-scan
+      - name: Typecheck (static analysis baseline)
+        run: npx tsc --noEmit
+      - name: Lint
+        run: npm run lint:critical
+
+  sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with: { node-version: "24.15.0", cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - name: Generate CycloneDX SBOM
+        run: npx --no-install cyclonedx-npm --output-file sbom.cdx.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with: { name: sbom, path: sbom.cdx.json }
+
+  dependency-review:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Block newly introduced vulnerable dependencies
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4
+        with:
+          fail-on-severity: high
+
+  filesystem-security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Trivy dependencies, secrets, and misconfiguration scan
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+  container-image-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Build core runtime image
+        run: docker build --target runner --tag furlong-core:ci .
+      - name: Verify core runtime is non-root
+        run: test "$(docker image inspect --format '{{.Config.User}}' furlong-core:ci)" = "nextjs"
+      - name: Scan core runtime image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: furlong-core:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+      - name: Build malware scanner image
+        run: docker build --tag furlong-scanner:ci scanner
+      - name: Verify malware scanner runtime is non-root
+        run: test "$(docker image inspect --format '{{.Config.User}}' furlong-scanner:ci)" = "clamav"
+      - name: Scan malware scanner image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: furlong-scanner:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+
+  security-review-gate:
+    # PR gate: block until doctrine conformance and governance security tests pass.
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with: { node-version: "24.15.0", cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - name: Doctrine-to-code security conformance
+        run: npm run verify:security-conformance
+      - name: Security hardening test suite
+        run: npm run verify:security-governance -- --ci
+      - name: Risk-based secret rotation workflow
+        run: npm run verify:secret-rotation-workflow
+      - name: External connector authentication inventory
+        run: npm run verify:external-connector-auth
+      - name: Navigator state integrity
+        run: npm run verify:navigator-state-integrity

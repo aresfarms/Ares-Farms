@@ -1,26 +1,11 @@
-/**
- * Canonical Audit Event Writer
- *
- * Master Volume Governance:
- * - Vol I: Constitutional Backbone
- *   Establishes one governed audit-write authority.
- *
- * - Vol II: Regulatory Governance
- *   Preserves classification and compliance metadata in the audit envelope.
- *
- * - Vol III: Technical Infrastructure
- *   Provides a stable deterministic audit writer contract.
- *
- * - Vol IV: Operational Runbooks
- *   Supports operational inspection, recovery, and future replay procedures.
- *
- * - Vol V: Canonical Platform Doctrines
- *   Enables replayability, observability, explainability, anomaly review,
- *   versioning, and future citation lineage.
- *
- * Purpose:
- * All audit writes must flow through this canonical writer surface.
- */
+import { createHash, randomUUID } from "node:crypto";
+
+import { sql } from "drizzle-orm";
+
+import { auditEvents } from "@/db/schema";
+import { db } from "@/lib/db";
+
+import { hashAuditEvent } from "./hashAuditEvent";
 
 export type AuditEventInput = {
   userId?: string | null;
@@ -32,45 +17,268 @@ export type AuditEventInput = {
   metadata?: Record<string, unknown>;
   classification?: string | null;
   source?: string | null;
+  traceId?: string | null;
+  moduleId?: string | null;
+  anonymousId?: string | null;
+  actorRef?: string | null;
+  target?: { type?: string | null; id?: string | null } | null;
   [key: string]: unknown;
 };
 
 export type AuditEventRecord = {
-  ok: boolean;
-  mode: "migration-stabilization";
+  ok: true;
+  mode: "durable-canonical";
   id: string;
   auditId: string;
-  received: AuditEventInput;
+  eventHash: string;
+  prevHash: string;
+  traceId: string | null;
+  moduleId: string | null;
+  anonymousId: string | null;
+  actorRef: string;
+  target: { type: string | null; id: string | null };
+  normalizationStatus: "CANONICAL" | "NORMALIZED_LEGACY";
+  chainVersion: "audit-chain-v2";
+  hashEncoding: "canonical-json-v2";
   timestamp: string;
   governance: {
     canonicalWriter: true;
+    durable: true;
     replayReady: true;
     classificationRequired: true;
     observable: true;
+    hashChained: true;
   };
 };
 
-function createAuditId(): string {
-  return `audit-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function text(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  const normalized = String(value).trim();
+  return normalized || null;
+}
+
+function record(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function decisionText(value: unknown): string | null {
+  if (value === null || value === undefined) return null;
+  return typeof value === "string" ? value : JSON.stringify(value);
+}
+
+function pseudonymousActorUuid(seed: string): string {
+  const hex = createHash("sha256")
+    .update(seed)
+    .digest("hex")
+    .slice(0, 32)
+    .split("");
+  hex[12] = "5";
+  hex[16] = ((parseInt(hex[16], 16) & 0x3) | 0x8).toString(16);
+  const value = hex.join("");
+  return `${value.slice(0, 8)}-${value.slice(8, 12)}-${value.slice(12, 16)}-${value.slice(16, 20)}-${value.slice(20)}`;
+}
+
+function extractIdentity(input: AuditEventInput) {
+  const metadata = record(input.metadata);
+  const payload = record(input.payload);
+  const traceId =
+    text(input.traceId) ?? text(metadata.traceId) ?? text(payload.traceId);
+  const moduleId =
+    text(input.moduleId) ??
+    text(metadata.moduleId) ??
+    text(metadata.module) ??
+    text(payload.moduleId) ??
+    text(payload.module) ??
+    text(input.source);
+  const anonymousId =
+    text(input.anonymousId) ??
+    text(metadata.anonymousId) ??
+    text(payload.anonymousId) ??
+    (text(input.userId)?.startsWith("anon:")
+      ? (text(input.userId)?.slice(5) ?? null)
+      : null);
+
+  const suppliedActorRef =
+    text(input.actorRef) ?? text(metadata.actorRef) ?? text(payload.actorRef);
+  const actorRef =
+    suppliedActorRef ??
+    (anonymousId
+      ? `anon:${anonymousId}`
+      : text(input.userId)
+        ? `user:${text(input.userId)}`
+        : moduleId
+          ? `module:${moduleId}`
+          : "system:canonical-audit-writer");
+  const suppliedTarget = record(input.target);
+  const target = {
+    type: text(suppliedTarget.type) ?? text(input.entityType),
+    id: text(suppliedTarget.id) ?? text(input.entityId),
+  };
+  const normalizationStatus =
+    input.moduleId && input.traceId && input.actorRef && input.target
+      ? ("CANONICAL" as const)
+      : ("NORMALIZED_LEGACY" as const);
+
+  return {
+    metadata,
+    payload,
+    traceId,
+    moduleId,
+    anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
+  };
 }
 
 export async function writeAuditEvent(
-  input: AuditEventInput = {}
+  input: AuditEventInput = {},
 ): Promise<AuditEventRecord> {
-  const auditId = createAuditId();
-
-  return {
-    ok: true,
-    mode: "migration-stabilization",
-    id: auditId,
-    auditId,
-    received: input,
-    timestamp: new Date().toISOString(),
-    governance: {
-      canonicalWriter: true,
-      replayReady: true,
-      classificationRequired: true,
-      observable: true,
-    },
+  const id = randomUUID();
+  const {
+    metadata,
+    payload,
+    traceId,
+    moduleId,
+    anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
+  } = extractIdentity(input);
+  const classification = text(input.classification) ?? "RESTRICTED";
+  const source = text(input.source) ?? moduleId ?? "canonical-audit-writer";
+  const suppliedUserId = text(input.userId);
+  const userId =
+    suppliedUserId && UUID_PATTERN.test(suppliedUserId)
+      ? suppliedUserId
+      : pseudonymousActorUuid(
+          `furlong-audit-actor:${anonymousId ?? suppliedUserId ?? moduleId ?? "system"}`,
+        );
+  const canonicalPayload = {
+    data: input.payload ?? null,
+    metadata,
+    traceId,
+    moduleId,
+    anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
   };
+  const trace = {
+    traceId,
+    replayRef: text(metadata.replayRef) ?? traceId,
+    moduleId,
+    anonymousId,
+    actorRef,
+    target,
+    normalizationStatus,
+    chainVersion: "audit-chain-v2",
+    hashEncoding: "canonical-json-v2",
+  };
+
+  return db.transaction(async (tx) => {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtext('furlong.audit_events.chain.v2'))`,
+    );
+    const headResult = await tx.execute(sql`
+      select head_hash, head_event_id, anchor_manifest_hash
+      from audit_chain_heads
+      where chain_name = 'audit_events_v2'
+      for update
+    `);
+    const headRows =
+      (headResult as unknown as { rows?: Array<Record<string, unknown>> })
+        .rows ?? [];
+    let prevHash = text(headRows[0]?.head_hash);
+    if (!prevHash) {
+      const historical = await tx
+        .select({ eventHash: auditEvents.eventHash, hash: auditEvents.hash })
+        .from(auditEvents);
+      const historicalHashes = historical
+        .map((row) => row.eventHash ?? row.hash)
+        .filter((value): value is string => Boolean(value))
+        .sort();
+      const anchorManifestHash = createHash("sha256")
+        .update(historicalHashes.join("\n"))
+        .digest("hex");
+      prevHash = `MIGRATION:${anchorManifestHash}`;
+      await tx.execute(sql`
+        insert into audit_chain_heads (chain_name, head_event_id, head_hash, chain_version, anchor_manifest_hash)
+        values ('audit_events_v2', null, ${prevHash}, 'audit-chain-v2', ${anchorManifestHash})
+        on conflict (chain_name) do nothing
+      `);
+    }
+    const timestamp = new Date();
+    const eventHash = hashAuditEvent({
+      prev_hash: prevHash,
+      payload: {
+        id,
+        timestamp: timestamp.toISOString(),
+        eventType: text(input.eventType) ?? "AUDIT_EVENT",
+        entityType: text(input.entityType),
+        entityId: text(input.entityId),
+        decision: decisionText(input.decision),
+        classification,
+        source,
+        canonicalPayload,
+        trace,
+      },
+    });
+
+    await tx.insert(auditEvents).values({
+      id,
+      userId,
+      eventType: text(input.eventType) ?? "AUDIT_EVENT",
+      entityType: text(input.entityType),
+      entityId: text(input.entityId),
+      decision: decisionText(input.decision),
+      input: metadata,
+      output: {},
+      trace,
+      payload: canonicalPayload,
+      prevHash,
+      eventHash,
+      hash: eventHash,
+      classification,
+      source,
+      createdAt: timestamp,
+    });
+
+    await tx.execute(sql`
+      update audit_chain_heads
+      set head_event_id = ${id}, head_hash = ${eventHash}, updated_at = now()
+      where chain_name = 'audit_events_v2'
+    `);
+
+    return {
+      ok: true,
+      mode: "durable-canonical",
+      id,
+      auditId: id,
+      eventHash,
+      prevHash,
+      traceId,
+      moduleId,
+      anonymousId,
+      actorRef,
+      target,
+      normalizationStatus,
+      chainVersion: "audit-chain-v2",
+      hashEncoding: "canonical-json-v2",
+      timestamp: timestamp.toISOString(),
+      governance: {
+        canonicalWriter: true,
+        durable: true,
+        replayReady: true,
+        classificationRequired: true,
+        observable: true,
+        hashChained: true,
+      },
+    };
+  });
 }

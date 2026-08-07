@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import type { InstitutionalAppealRemandResolutionEvaluation } from "@/lib/platform/institutionalAppealRemandResolutionAuthority";
+import { createInstitutionalAppealRemandDispositionImplementationPolicy, evaluateInstitutionalAppealRemandDispositionImplementation } from "@/lib/platform/institutionalAppealRemandDispositionImplementationAuthority";
+
+const resolution={remandPolicyId:"remand-policy",reconciliationId:"recon-1",decision:"ALLOW",resultingState:"RESOLVED_MODIFIED"} as unknown as InstitutionalAppealRemandResolutionEvaluation;
+const policy=createInstitutionalAppealRemandDispositionImplementationPolicy({policyId:"remand-implementation-policy",governanceVersion:"gov-1",allowedModes:["NO_CHANGE","APPLY_SELECTED"],requireExecutionApproval:true,requireImplementationNotice:true,requireActionPlan:true,fullImplementationAuthorized:false,requiredEvidenceRefs:["evidence-final"],auditRefs:["audit-policy"],replayRef:"replay-policy",versionRefs:["version-1"]});
+const allowed=evaluateInstitutionalAppealRemandDispositionImplementation({resolution,policy,mode:"APPLY_SELECTED",affectedScopes:["PUBLICATION"],approvalRefs:["approval-1"],implementationNoticeRef:"notice-1",actionPlanRef:"plan-1",evidenceRefs:["evidence-final"],implementedAt:"2026-07-26T14:10:00Z",auditRefs:["audit-eval"],replayRef:"replay-eval"});
+const review=evaluateInstitutionalAppealRemandDispositionImplementation({resolution,policy,mode:"APPLY_SELECTED",affectedScopes:["PUBLICATION"],evidenceRefs:["evidence-final"],implementedAt:"2026-07-26T14:10:00Z",auditRefs:["audit-review"],replayRef:"replay-review"});
+const blocked=evaluateInstitutionalAppealRemandDispositionImplementation({resolution,policy,mode:"NO_CHANGE",evidenceRefs:["evidence-final"],implementedAt:"2026-07-26T14:10:00Z",auditRefs:["audit-block"],replayRef:"replay-block"});
+assert.equal(allowed.decision,"ALLOW");assert.equal(allowed.resultingState,"PARTIALLY_IMPLEMENTED");assert.equal(review.decision,"REVIEW_REQUIRED");assert.equal(blocked.decision,"BLOCK");
+console.log(JSON.stringify({ok:true,schemaVersion:allowed.schemaVersion,allowed:allowed.decision,review:review.decision,blocked:blocked.decision,state:allowed.resultingState,message:"Institutional appeal remand disposition implementation authority conformance passed."},null,2));

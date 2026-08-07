@@ -1,0 +1,210 @@
+# =============================================================================
+# Cloud Build — furlong staging images (STAGING-DEPLOY P2.1)
+#
+# Builds BOTH image targets from the one Dockerfile and pushes them to
+# Artifact Registry. Run from the repo root (the owner machine has no local
+# Docker; Cloud Build is the P2.1 build path):
+#
+#   npm run build:cloud:staging
+#
+# The upload tarball honors .gcloudignore (gcloud does NOT read .dockerignore),
+# so `.env*` and the prebuilt `.next` NEVER leave the laptop; inside Cloud
+# Build, docker then applies .dockerignore as usual (P0.3 secret-safety holds
+# at both layers).
+#
+# AFTER the build, record the pushed DIGESTS (P2.1 — Terraform pins by digest,
+# never tag):
+#   gcloud artifacts docker images describe \
+#     us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core:p2 \
+#     --format 'value(image_summary.digest)'
+#   (same for furlong-db-migrate:p2)
+# Then set core_image / migrator_image in terraform.tfvars using
+# <repo>/<name>@sha256:<digest> and run the Stage-2 apply.
+# =============================================================================
+
+substitutions:
+  _REPO: us-central1-docker.pkg.dev/furlong-staging-499102/furlong
+  # GitHub's keyless workflow supplies these values. Local owner submissions
+  # retain explicit sentinel values so provenance is never silently invented.
+  _GIT_COMMIT: unknown-local-submission
+  _GIT_REF: unknown-local-submission
+
+steps:
+  # Deployment-blocking canonical authority gates. These run in Cloud Build
+  # before either image is built or published, so Artifact Registry can never
+  # receive an image that bypasses a registered domain authority boundary.
+  - name: node:24.15.0-bookworm
+    id: verify-canonical-authorities
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        npm ci
+        npm run verify:cloud-upload-context
+        npm run verify:secret-rotation-workflow
+        npm run verify:external-connector-auth
+        npm run verify:navigator-state-integrity
+        npm run verify:canonical-domain
+        npm run smoke:canonical-domain-fail-closed
+        npm run smoke:production-source-legal
+        npm run smoke:production-financing-authority
+        npm run smoke:production-connector-activation
+        npm run smoke:production-official-report-authority
+        npm run smoke:production-payments-treasury-authorization
+        npm run smoke:production-domain-cutover-authorization
+        npm run smoke:consolidated-launch-authorization
+        npm run smoke:launch-authorization-decisions
+        npm run smoke:production-data-classification
+        npm run verify:cloud-build-release-rule
+        npm run verify:official-evidence-roadmap
+        npm run verify:official-evidence-source-governance
+        npm run verify:official-evidence-refresh-writer
+        npm run verify:official-evidence-durable-refresh
+        npm run verify:official-evidence-connector-registry
+        npm run verify:official-evidence-connector-durability
+        npm run verify:official-evidence-connector-change-control
+        npm run verify:official-evidence-connector-implementation-binding
+        npm run verify:official-evidence-refresh-provenance
+        npm run verify:official-evidence-read-provenance
+        npm run verify:official-evidence-quarantine
+        npm run verify:official-evidence-quarantine-resolution
+        npm run verify:official-evidence-downstream-invalidation
+        npm run verify:official-evidence-automatic-dependency-capture
+        npm run verify:official-evidence-recomputation-orchestration
+        npm run verify:official-evidence-scheduled-recomputation
+        npm run verify:official-evidence-durable-handler-governance
+        npm run verify:official-evidence-signed-replay
+        npm run verify:official-evidence-replay-key-rotation
+        npm run verify:official-evidence-deterministic-replay
+        npm run verify:official-evidence-production-replay-review
+        npm run verify:official-evidence-production-activation
+        npm run verify:official-evidence-activation-ceremony
+        npm run verify:official-evidence-scheduler-release
+        npm run verify:official-evidence-live-bootstrap
+        npm run verify:official-evidence-batch-replay
+        npm run verify:official-evidence-approval-packet
+        npm run verify:official-evidence-approval-completion
+        npm run verify:official-evidence-review-handoff
+        npm run verify:official-evidence-final-canary-packet
+        npm run verify:official-evidence-canary-transcript
+        npm run verify:official-evidence-post-resume-watchdog
+        npm run verify:official-evidence-steady-state-incident
+        npm run verify:official-evidence-incident-sla
+        npm run verify:official-evidence-incident-notification
+        npm run verify:official-evidence-external-notification-connector
+        npm run verify:official-evidence-external-notification-dry-run
+        npm run verify:official-evidence-external-notification-activation
+        npm run verify:official-evidence-external-notification-delivery
+        npm run verify:official-evidence-external-notification-assurance
+        npm run verify:official-evidence-external-notification-reinstatement
+        npm run verify:official-evidence-external-notification-retirement
+        npm run verify:official-evidence-external-notification-retirement-closure
+        npm run verify:official-evidence-external-notification-retirement-tombstone
+        npm run verify:official-evidence-external-notification-tombstone-incident
+        npm run verify:official-evidence-external-notification-corrective-action
+        npm run verify:official-evidence-external-notification-corrective-action-effectiveness
+        npm run verify:official-evidence-external-notification-institutional-closure
+        npm run verify:controlled-promotion-readiness-reconciliation
+        npm run verify:public-alpha-signoff-ceremony-packet
+        npm run verify:governed-evidence-review-portal
+        npm run verify:institutional-credential-verification
+        npm run verify:institutional-legal-authority
+        npm run verify:institutional-abac-disclosure
+        npm run verify:compelled-disclosure-ceremony
+        npm run verify:institutional-access-surveillance
+        npm run verify:institutional-access-runtime-enforcement
+        npm run verify:institutional-access-surveillance-orchestration
+        npm run verify:institutional-access-surveillance-activation-ceremony
+        npm run verify:institutional-access-surveillance-canary-release
+        npm run verify:institutional-access-surveillance-scheduler-provisioning
+        npm run verify:governed-ultimate-proforma
+        npm run verify:federal-loan-authority-monitor
+        npm run verify:federal-loan-authority-reconciliation
+        npm run verify:federal-loan-authority-refresh-reliability
+        npm run verify:federal-loan-authority-change-triage
+        npm run verify:controlled-public-surface-promotion
+        npm run verify:production-promotion-readiness
+        npm run verify:final-production-promotion-decision
+        npm run verify:internal-change-verification
+        npm run verify:three-founder-release-authority
+        npm run verify:founder-change-review-workspace
+        npm run verify:founder-pilot-test-gate
+        npm run verify:property-profile-classification
+        npm run verify:customer-property-experience
+        npm run verify:three-lane-consumer-command-center
+        npm run verify:compass-lane-entry-routing
+        npm run verify:property-data-resolution
+        npm run verify:deed-verification-access
+        npm run verify:integrated-pre-promotion-features
+        npm run verify:official-property-source-adapters
+        npm run verify:structured-official-evidence
+        npm run verify:property-evidence-ingestion
+        npm run verify:property-evidence-panel
+        npm run verify:property-evidence-manifest
+        npm run verify:public-action-evidence
+        npm run verify:water-insurance-evidence
+        npm run verify:unified-property-risk
+        npm run verify:tax-aware-top-three
+        npm run verify:post-sale-tax
+        npm run verify:property-entry-parity
+
+  # Runtime image (default final stage: runner)
+  - name: gcr.io/cloud-builders/docker
+    id: build-core
+    args:
+      - build
+      - --target=runner
+      - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
+      - -t=${_REPO}/furlong-core:p2
+      - .
+
+  # Migrator Job image (the `migrator` stage — carries tsx + src + migrations)
+  - name: gcr.io/cloud-builders/docker
+    id: build-migrator
+    args:
+      - build
+      - --target=migrator
+      - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
+      - -t=${_REPO}/furlong-db-migrate:p2
+      - .
+
+  # Vault malware scanner (ClamAV, IAM-private; definitions baked at build —
+  # each image build refreshes them)
+  - name: gcr.io/cloud-builders/docker
+    id: build-scanner
+    args:
+      - build
+      - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
+      - -t=${_REPO}/furlong-scanner:p2
+      - scanner
+
+images:
+  - ${_REPO}/furlong-core:p2
+  - ${_REPO}/furlong-db-migrate:p2
+  - ${_REPO}/furlong-scanner:p2
+
+# The default compute service account is intentionally DISABLED (security
+# hardening — it is over-privileged), and Cloud Build defaults to it. The
+# `serviceAccount` field requires a USER-MANAGED SA, so we pin a dedicated
+# least-privilege build SA. Provision it once (owner):
+#   gcloud iam service-accounts create furlong-build --project furlong-staging-499102
+#   gcloud projects add-iam-policy-binding furlong-staging-499102 \
+#     --member=serviceAccount:furlong-build@furlong-staging-499102.iam.gserviceaccount.com \
+#     --role=roles/logging.logWriter --condition=None
+#   gcloud projects add-iam-policy-binding furlong-staging-499102 \
+#     --member=serviceAccount:furlong-build@furlong-staging-499102.iam.gserviceaccount.com \
+#     --role=roles/artifactregistry.writer --condition=None
+#   # A user-managed build SA must also READ the uploaded source tarball. Grant
+#   # this on the source bucket only (least privilege), not project-wide:
+#   gcloud storage buckets add-iam-policy-binding \
+#     gs://furlong-staging-499102_cloudbuild \
+#     --member=serviceAccount:furlong-build@furlong-staging-499102.iam.gserviceaccount.com \
+#     --role=roles/storage.objectViewer
+# CLOUD_LOGGING_ONLY is required whenever a serviceAccount is set.
+serviceAccount: projects/furlong-staging-499102/serviceAccounts/furlong-build@furlong-staging-499102.iam.gserviceaccount.com
+
+options:
+  logging: CLOUD_LOGGING_ONLY

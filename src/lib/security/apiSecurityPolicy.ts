@@ -17,7 +17,8 @@ export type ApiSecurityEnvironment = Record<string, string | undefined>;
 export type PublicApiReason =
   | "nextauth-runtime"
   | "stripe-webhook-signature-gated"
-  | "public-surface-gateway";
+  | "public-surface-gateway"
+  | "internal-source-refresh-iam-gated";
 
 export type ClaimedActorContext = {
   role?: AccessRole | null;
@@ -43,19 +44,32 @@ const NEXTAUTH_PUBLIC_PATHS = new Set([
 
 const PUBLIC_SIGNATURE_GATED_PATHS = new Set(["/api/stripe/webhook"]);
 const PUBLIC_SURFACE_GATEWAY_PREFIX = "/api/public";
+const INTERNAL_IAM_GATED_PATHS = new Set(["/api/internal/source-refresh"]);
 
 /**
  * Public-surface APIs the anonymous public site calls directly (no session):
  *   - the accessibility feedback form POST
  *   - the public financing-pathway discovery lookup
  *   - the public readiness self-check
- * These are intentionally anonymous (advisory discovery only). Everything else
- * under /api stays deny-by-default. Matched exactly or by sub-path.
+ *   - the customer financing intake POST (a customer never has a session;
+ *     the route carries its own consent gates, Section 1071 firewall, and
+ *     runtime governance — staging test 2026-08-05 caught the 401)
+ *   - the customer status lookup (anonymous by design; minimum-disclosure —
+ *     requires BOTH the reference id AND the matching email to return anything)
+ * These are intentionally anonymous. Everything else under /api stays
+ * deny-by-default. Matched exactly or by sub-path.
  */
 const PUBLIC_SURFACE_PATHS = new Set([
   "/api/accessibility-feedback",
   "/api/financing/pathways",
+  "/api/financing/intake",
   "/api/readiness",
+  "/api/service-requests/status",
+  // A person exercising rights over their OWN data must not need an account
+  // — the reference+email proof is the authentication, same as the status
+  // lookup. Gating rights behind a login would defeat the right.
+  "/api/public/my-data",
+  "/api/public/chain-of-custody",
 ]);
 
 function cleanPathname(pathname: string): string {
@@ -114,6 +128,10 @@ export function apiSecurityPublicReason(
     )
   ) {
     return "public-surface-gateway";
+  }
+
+  if (INTERNAL_IAM_GATED_PATHS.has(normalized)) {
+    return "internal-source-refresh-iam-gated";
   }
 
   return null;

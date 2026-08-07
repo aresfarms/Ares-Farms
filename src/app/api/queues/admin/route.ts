@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import {
   RecordAccessDecision,
@@ -92,7 +94,7 @@ function parseQuery(req: NextRequest): OperatorQueueAdminQuery {
   const params = req.nextUrl.searchParams;
 
   return {
-    role: params.get("role") ?? "user",
+    role: effectiveRole(req),
     userId: normalizeText(params.get("userId")),
     borrowerId: normalizeText(params.get("borrowerId")),
     tenantId: normalizeText(params.get("tenantId")),
@@ -143,6 +145,7 @@ function queueItemResponse(record: OperatorQueueAdminRecord) {
     replayRef: record.queueItem.replayRef,
     traceId: record.queueItem.traceId,
     source: record.queueItem.source,
+    metadata: record.queueItem.metadata,
     dueAt: record.queueItem.dueAt,
     lockedAt: record.queueItem.lockedAt,
     completedAt: record.queueItem.completedAt,

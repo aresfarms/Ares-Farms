@@ -5,6 +5,11 @@ import {
   evaluateProductionRelianceVerificationGate,
 } from "@/lib/governance/productionRelianceVerificationGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -175,38 +180,28 @@ async function handleProductionRelianceVerification(
     const result = evaluateProductionRelianceVerificationGate({
       relianceScope,
     });
+    const scope = relianceScope ?? "platform";
     const reliancePacket =
-      req.method === "POST"
-        ? {
-            reliancePacketId: `production-reliance-verification-${Date.now()}`,
-            relianceScope: relianceScope ?? "platform",
-            reviewStatus: "PRODUCTION_RELIANCE_VERIFICATION_PACKET_RECORDED",
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_RELIANCE_VERIFICATION_PACKET",
+            scope,
+            actorId,
             reviewNote: body.reviewNote ?? null,
-            productionRelianceApprovalGranted: false,
-            publicVerificationApprovalGranted: false,
-            publicVerificationGatewayOperational: false,
-            publicVerificationArtifactPublished: false,
-            externalRelianceDisclosureApproved: false,
-            regulatoryRelianceAllowed: false,
-            officialRelianceAllowed: false,
-            legalAdviceProvided: false,
-            postActivationVerificationApprovalGranted: false,
-            postActivationVerificationStarted: false,
-            postActivationVerificationCompleted: false,
-            postActivationVerificationPassed: false,
-            productionHealthCertified: false,
-            productionActivationExecuted: false,
-            finalAuthorityApprovalGranted: false,
-            goLiveApproved: false,
-            productionLaunchAuthorized: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            productionBlocked: true,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_RELIANCE_VERIFICATION_PACKET"
+          );
+    const relianceHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_RELIANCE_VERIFICATION_PACKET"
+    );
+    const postActivationVerificationEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_POST_ACTIVATION_VERIFICATION_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionRelianceVerificationReviews.length,
@@ -216,6 +211,8 @@ async function handleProductionRelianceVerification(
         disclosures: result.disclosures,
         reliancePosture: result.reliancePosture,
         reliancePacket,
+        relianceHistory,
+        postActivationVerificationEvidence,
         productionBlocked: true,
         productionRelianceApprovalGranted: false,
         publicVerificationApprovalGranted: false,
@@ -356,6 +353,9 @@ async function handleProductionRelianceVerification(
       disclosures: classifiedOutput.disclosures,
       reliancePosture: classifiedOutput.reliancePosture,
       reliancePacket: classifiedOutput.reliancePacket,
+      relianceHistory: classifiedOutput.relianceHistory,
+      postActivationVerificationEvidence:
+        classifiedOutput.postActivationVerificationEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       productionRelianceApprovalGranted:
         classifiedOutput.productionRelianceApprovalGranted,

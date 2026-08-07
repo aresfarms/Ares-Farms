@@ -5,6 +5,11 @@ import {
   evaluateProductionLaunchEvidencePacket,
 } from "@/lib/governance/productionLaunchEvidencePacket";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -160,26 +165,28 @@ async function handleProductionLaunchEvidence(
       ],
     });
     const result = evaluateProductionLaunchEvidencePacket({ packetScope });
+    const scope = packetScope ?? "platform";
     const launchHold =
-      req.method === "POST"
-        ? {
-            launchHoldId: `production-launch-evidence-hold-${Date.now()}`,
-            packetScope: packetScope ?? "platform",
-            reviewStatus: "GO_LIVE_RELEASE_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            goLiveApproved: false,
-            portalLaunchExecuted: false,
-            publicLaunchAllowed: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
-            qualifiedHumanApprovalRequired: true,
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_LAUNCH_EVIDENCE_HOLD",
+            scope,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_LAUNCH_EVIDENCE_HOLD"
+          );
+    const launchHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_LAUNCH_EVIDENCE_HOLD"
+    );
+    const portalReadinessEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_PORTAL_READINESS_HOLD"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.launchEvidencePackets.length,
@@ -188,6 +195,8 @@ async function handleProductionLaunchEvidence(
         disclosures: result.disclosures,
         launchReleasePosture: result.launchReleasePosture,
         launchHold,
+        launchHistory,
+        portalReadinessEvidence,
         productionBlocked: true,
         releaseCandidate: false,
         goLiveApproved: false,
@@ -266,6 +275,8 @@ async function handleProductionLaunchEvidence(
       disclosures: classifiedOutput.disclosures,
       launchReleasePosture: classifiedOutput.launchReleasePosture,
       launchHold: classifiedOutput.launchHold,
+      launchHistory: classifiedOutput.launchHistory,
+      portalReadinessEvidence: classifiedOutput.portalReadinessEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       releaseCandidate: classifiedOutput.releaseCandidate,
       goLiveApproved: classifiedOutput.goLiveApproved,

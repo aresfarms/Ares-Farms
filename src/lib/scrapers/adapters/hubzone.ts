@@ -32,6 +32,7 @@ import {
   geocodeToCensusTract,
   type CensusGeocodeResult,
 } from "./censusGeocoder";
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
 
 export { geocodeToCensusTract, type CensusGeocodeResult };
 
@@ -137,7 +138,7 @@ export async function querySbaHubzoneLayer(
     returnGeometry: "false",
     f: "pjson",
   });
-  const res = await fetch(`${HUBZONE_FEATURE_BASE}/${cfg.id}/query?${params}`, {
+  const res = await governedFetch(`${HUBZONE_FEATURE_BASE}/${cfg.id}/query?${params}`, {
     headers: { Accept: "application/json" },
     signal: AbortSignal.timeout(12_000),
   });

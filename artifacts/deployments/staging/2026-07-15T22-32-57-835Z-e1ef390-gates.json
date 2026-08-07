@@ -1,0 +1,70 @@
+{
+  "operation": "deploy:verify-manifest (P2.4)",
+  "outcome": "FAIL",
+  "serviceUrl": "https://furlong-core-mwei3cj3jq-uc.a.run.app",
+  "totalChecks": 10,
+  "failedChecks": 1,
+  "checks": [
+    {
+      "name": "image pinned by digest",
+      "expected": "@sha256:…",
+      "actual": "sha256:965dce3821dd18a9d391ab46417d96c0131d2f10d4302feb6efbebc2c5b5a15a",
+      "pass": true
+    },
+    {
+      "name": "no allUsers/allAuthenticatedUsers invoker binding",
+      "expected": "none",
+      "actual": "none (invokers: serviceAccount:furlong-source-refresh@furlong-staging-499102.iam.gserviceaccount.com, user:chudson@aresfarmsinc.com)",
+      "pass": true
+    },
+    {
+      "name": "anonymous invocation blocked at edge",
+      "expected": "401/403",
+      "actual": "HTTP 403",
+      "pass": true
+    },
+    {
+      "name": "authenticated homepage serves app",
+      "expected": "200 + app surface",
+      "actual": "HTTP 200, 98036B",
+      "pass": true
+    },
+    {
+      "name": "/health/live",
+      "expected": "200",
+      "actual": "HTTP 200",
+      "pass": true
+    },
+    {
+      "name": "/health/ready (DB confirmed)",
+      "expected": "200",
+      "actual": "HTTP 200",
+      "pass": true
+    },
+    {
+      "name": "/internal walls to sign-in",
+      "expected": "3xx redirect",
+      "actual": "HTTP 307",
+      "pass": true
+    },
+    {
+      "name": "anonymous /api/audit rejected",
+      "expected": "401/403",
+      "actual": "HTTP 403",
+      "pass": true
+    },
+    {
+      "name": "furlong-db-migrate latest execution SUCCEEDED",
+      "expected": "succeeded",
+      "actual": "furlong-db-migrate-2gh4l",
+      "pass": true
+    },
+    {
+      "name": "verify:csp-hydration @ deployed URL",
+      "expected": "PASS",
+      "actual": "✗  verify:csp-hydration FAIL — 1: |     ✗ Navigator surface present in served HTML",
+      "pass": false
+    }
+  ],
+  "generatedAtUtc": "2026-07-15T22:32:57.835Z"
+}

@@ -9,9 +9,12 @@
  */
 
 import * as fs from "node:fs";
-import * as path from "node:path";
 
-const LEDGER_PATH = path.join(process.cwd(), "data", "audit-ledger.ndjson");
+import { chainAppend } from "@/lib/security/ledgerHashChain";
+import { runtimeStatePath } from "./runtimeStatePath";
+
+const LEDGER_PATH = runtimeStatePath("audit-ledger.ndjson");
+export const AUDIT_LEDGER_PATH = LEDGER_PATH;
 
 export interface AuditEvent {
   ts: string; // ISO timestamp
@@ -26,8 +29,9 @@ export interface AuditEvent {
 
 export function appendAuditEvent(e: Omit<AuditEvent, "ts"> & { ts?: string }): AuditEvent {
   const event: AuditEvent = { ts: e.ts ?? new Date().toISOString(), ...e };
-  fs.mkdirSync(path.dirname(LEDGER_PATH), { recursive: true });
-  fs.appendFileSync(LEDGER_PATH, JSON.stringify(event) + "\n", "utf8");
+  // Tamper-evident hash chain (control J): each entry carries prevHash + hash;
+  // editing/deleting any chained line breaks verifyLedgerChain.
+  chainAppend(LEDGER_PATH, event as unknown as Record<string, unknown>);
   return event;
 }
 

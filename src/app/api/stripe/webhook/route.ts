@@ -638,7 +638,7 @@ export async function POST(req: Request) {
         targetType: "stripe_webhook",
         targetId: entitlement?.id ?? tenantId,
         verificationStatus: versionRuntime.ok
-          ? "verified_with_stub_signature"
+          ? "cryptographically_verified"
           : "warning",
         deterministic: true,
         replaySafe: versionRuntime.replaySafe,

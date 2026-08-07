@@ -361,7 +361,7 @@ variable "notify_lender_email" {
   type        = string
   # The Financial module's brand address (founder 2026-08-05):
   # finance@compasstocapital.com — Stuart's lane on his own domain.
-  default     = "finance@compasstocapital.com"
+  default = "finance@compasstocapital.com"
 }
 
 variable "lender_booking_url" {

@@ -440,7 +440,27 @@ function pageResponseWithCsp(req: NextRequest): NextResponse {
   return response;
 }
 
+function stripeWebhookIngressOnlyGate(req: NextRequest): NextResponse | null {
+  if (process.env.STRIPE_WEBHOOK_INGRESS_ONLY !== "true") return null;
+
+  if (req.nextUrl.pathname === "/api/stripe/webhook" && req.method === "POST") {
+    return null;
+  }
+
+  return new NextResponse("Not Found", {
+    status: 404,
+    headers: {
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex, nofollow",
+    },
+  });
+}
+
 export async function proxy(req: NextRequest) {
+  // A dedicated Stripe ingress deployment exposes one signed POST route only.
+  const stripeIngressBlock = stripeWebhookIngressOnlyGate(req);
+  if (stripeIngressBlock) return stripeIngressBlock;
+
   // Locked-preview password wall (deploy-only; inert otherwise). Must run first.
   const previewBlock = previewGate(req);
   if (previewBlock) return previewBlock;

@@ -440,6 +440,18 @@ variable "anthropic_api_key_enabled" {
   default     = false
 }
 
+variable "stripe_payments_enabled" {
+  description = "When true, the core service reads STRIPE_SECRET_KEY from an out-of-band Secret Manager secret."
+  type        = bool
+  default     = false
+}
+
+variable "stripe_webhook_enabled" {
+  description = "When true, the core service reads STRIPE_WEBHOOK_SECRET from an out-of-band Secret Manager secret."
+  type        = bool
+  default     = false
+}
+
 variable "tier_preview_mode" {
   description = "FURLONG_TIER_PREVIEW_MODE for the core service. Empty (default) leaves the env unset — the app previews paid tiers, correct for staging/testing. Set to \"off\" at LAUNCH FREEZE so paid tiers stop previewing (see docs/LAUNCH_HYGIENE_CHECKLIST.md)."
   type        = string

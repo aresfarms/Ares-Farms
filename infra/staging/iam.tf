@@ -169,6 +169,22 @@ resource "google_secret_manager_secret_iam_member" "runtime_anthropic_api_key" {
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "runtime_stripe_secret_key" {
+  count     = var.stripe_payments_enabled ? 1 : 0
+  project   = var.project_id
+  secret_id = "STRIPE_SECRET_KEY"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "runtime_stripe_webhook_secret" {
+  count     = var.stripe_webhook_enabled ? 1 : 0
+  project   = var.project_id
+  secret_id = "STRIPE_WEBHOOK_SECRET"
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
 # DATA_GOV_API_KEY is created + versioned out of band by the owner (not TF).
 # Grant the runtime SA read access only when the data.gov lookups are enabled.
 resource "google_secret_manager_secret_iam_member" "runtime_data_gov_api_key" {

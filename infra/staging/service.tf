@@ -251,6 +251,32 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      dynamic "env" {
+        for_each = var.stripe_payments_enabled ? [1] : []
+        content {
+          name = "STRIPE_SECRET_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "STRIPE_SECRET_KEY"
+              version = "latest"
+            }
+          }
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.stripe_webhook_enabled ? [1] : []
+        content {
+          name = "STRIPE_WEBHOOK_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = "STRIPE_WEBHOOK_SECRET"
+              version = "latest"
+            }
+          }
+        }
+      }
+
       # ---- Tier preview flag (launch hygiene) -----------------------------
       # Unset in staging (paid tiers preview for testing). Set "off" at
       # launch freeze — docs/LAUNCH_HYGIENE_CHECKLIST.md step L2.

@@ -18,7 +18,6 @@
 
 import { execFileSync } from "node:child_process";
 import * as fs from "node:fs";
-import * as os from "node:os";
 import * as path from "node:path";
 
 import { parseCsv } from "../lib/property/hudAdapter";
@@ -35,10 +34,11 @@ async function main(): Promise<void> {
     signal: AbortSignal.timeout(120000),
   });
   if (!res.ok) throw new Error(`IPEDS HD${IPEDS_YEAR} HTTP ${res.status}`);
-  const zipPath = path.join(os.tmpdir(), `furlong-ipeds-hd${IPEDS_YEAR}.zip`);
-  fs.writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()));
-  const csv = execFileSync("unzip", ["-p", zipPath], { maxBuffer: 64 * 1024 * 1024 }).toString("latin1");
-  fs.unlinkSync(zipPath);
+  const archive = Buffer.from(await res.arrayBuffer());
+  const csv = execFileSync("unzip", ["-p"], {
+    input: archive,
+    maxBuffer: 64 * 1024 * 1024,
+  }).toString("latin1");
 
   const rows = parseCsv(csv);
   const header = rows[0].map((cell) => cell.trim().toUpperCase());

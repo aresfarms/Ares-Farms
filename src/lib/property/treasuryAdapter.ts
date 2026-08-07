@@ -14,6 +14,7 @@
 
 import { createHash } from "node:crypto";
 
+import { stripHtmlMarkup } from "@/lib/security/htmlText";
 import type { CanonicalProperty, PropertySourceRecord, PropertyType } from "./propertyTypes";
 import { computeAuctionCurrent } from "./propertyTypes";
 import { STATE_NAMES } from "./stateNames";
@@ -60,10 +61,7 @@ function stateAbbr(name: string): string {
 }
 
 function stripTags(html: string): string {
-  return html
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
+  return stripHtmlMarkup(html)
     .replace(/&nbsp;/g, " ")
     .replace(/&plusmn;/g, "+/-")
     .replace(/&amp;/g, "&")

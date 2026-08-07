@@ -118,7 +118,7 @@ async function main(): Promise<void> {
     console.error("  No key provided — nothing fetched. (Free key: quickstats.nass.usda.gov/api — same one as grain.)\n");
     process.exit(1);
   }
-  console.log(`  Key received (${KEY.length} characters) — querying USDA NASS…`);
+  console.log("  Key received — querying USDA NASS…");
   const out: Record<string, { month: string; year: number; pricePerCwt: number }> = {};
   for (const spec of COMMODITIES) {
     const p = (await latest(spec, YEAR).catch(() => null)) ?? (await latest(spec, YEAR - 1).catch(() => null));

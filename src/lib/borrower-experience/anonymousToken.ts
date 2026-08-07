@@ -23,7 +23,7 @@
  * unit holds whatever public property snapshot the visitor chose to keep.
  */
 
-import { createHash, createHmac, randomBytes } from "node:crypto";
+import { createHash, createHmac, randomInt } from "node:crypto";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
@@ -149,10 +149,9 @@ async function log(
 /** Generate a human-keepable token: furlong-XXXX-XXXX-XXXX (base32, no PII). */
 function generateToken(): string {
   const alphabet = "ABCDEFGHJKMNPQRSTVWXYZ23456789"; // no ambiguous chars
-  const bytes = randomBytes(12);
   let out = "";
   for (let i = 0; i < 12; i++) {
-    out += alphabet[bytes[i] % alphabet.length];
+    out += alphabet[randomInt(alphabet.length)];
     if (i % 4 === 3 && i < 11) out += "-";
   }
   return `furlong-${out.toLowerCase()}`;

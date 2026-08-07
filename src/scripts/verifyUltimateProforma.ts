@@ -11,6 +11,8 @@
  *  3. A complete Lane A input renders the full document to a sample PDF.
  */
 import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 
 import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import {
@@ -290,8 +292,9 @@ const docStream = generateLoanProformaPdf(model);
 const chunks: Buffer[] = [];
 docStream.on("data", (c: Buffer) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
 docStream.on("end", () => {
-  const out = "/tmp/furlong-ultimate-proforma-sample.pdf";
-  fs.writeFileSync(out, Buffer.concat(chunks));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-ultimate-proforma-"));
+  const out = path.join(tempDir, "sample.pdf");
+  fs.writeFileSync(out, Buffer.concat(chunks), { mode: 0o600 });
   console.log("━━━ verify:ultimate-proforma ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
   console.log("  gate blocks missing REQUIRED intake: yes (U1 + U13 named)");
   console.log("  lane conditionality (A only):        yes");

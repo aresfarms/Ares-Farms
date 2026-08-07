@@ -12,6 +12,7 @@
 
 import { createHash } from "node:crypto";
 
+import { stripHtmlMarkup } from "@/lib/security/htmlText";
 import type { CanonicalProperty, PropertySourceRecord, PropertyType } from "./propertyTypes";
 import { governedFetch } from "@/lib/security/outboundRequestPolicy";
 
@@ -30,11 +31,10 @@ export function mapGsaType(label: string): PropertyType {
 }
 
 function strip(html: string): string {
-  return html
-    .replace(/<[^>]+>/g, " ")
+  return stripHtmlMarkup(html)
     .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
     .replace(/&#0?39;|&apos;/g, "'")
+    .replace(/&amp;/g, "&")
     .replace(/[ \t\r\n]+/g, " ")
     .trim();
 }

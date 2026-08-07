@@ -118,11 +118,11 @@ export function reconcileFederalLoanAuthority(input: {
 }): { proforma: UltimateProformaInput; overlay: FederalLoanAuthorityOverlay } {
   const blockers: string[] = [];
   const facts = [...input.extractedFacts];
-  const sourceHashes: Record<string, string> = {};
+  const sourceHashes = new Map<string, string>();
   for (const ref of input.proforma.authority.officialSourceRefs) {
     const doc = input.state.documents.find((candidate) => candidate.url === ref);
     if (!doc || !doc.contentHash) blockers.push(`AUTHORITY_BASELINE_REQUIRED:${ref}`);
-    else sourceHashes[ref] = doc.contentHash;
+    else sourceHashes.set(ref, doc.contentHash);
     if (doc?.status === "FETCH_FAILED") blockers.push(`AUTHORITY_FETCH_FAILED:${ref}`);
   }
 
@@ -136,8 +136,9 @@ export function reconcileFederalLoanAuthority(input: {
     .map((item) => `${item.label}: ${item.value} [${item.sourceUrl}]`);
 
   const proforma = structuredClone(input.proforma);
+  const sourceHashRecord = Object.fromEntries(sourceHashes);
   proforma.authority.reviewedAt = input.now;
-  proforma.authority.reviewedContentHashes = sourceHashes;
+  proforma.authority.reviewedContentHashes = sourceHashRecord;
   proforma.authority.formVersion = formFacts.map((item) => item.value).join("; ") || proforma.authority.formVersion;
   proforma.authority.programTermsNote = [
     "Automatically reconciled from monitored official federal-loan authorities.",
@@ -164,7 +165,7 @@ export function reconcileFederalLoanAuthority(input: {
     autoAppliedFactIds: deterministic.map((item) => item.factId),
     reviewRequiredFactIds: reviewRequired.map((item) => item.factId),
     blockers,
-    sourceHashes,
+    sourceHashes: sourceHashRecord,
   } satisfies Omit<FederalLoanAuthorityOverlay, "overlaySha256">;
   return { proforma, overlay: { ...core, overlaySha256: sha(core) } };
 }

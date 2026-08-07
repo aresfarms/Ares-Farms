@@ -87,12 +87,20 @@ function normalizeByteSize(value: unknown): number | null {
 }
 
 function safePathSegment(value: string): string {
-  return value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9._-]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 96);
+  const input = value.trim().toLowerCase().slice(0, 512);
+  let output = "";
+  for (const character of input) {
+    const allowed =
+      (character >= "a" && character <= "z") ||
+      (character >= "0" && character <= "9") ||
+      character === "." || character === "_" || character === "-";
+    if (allowed) output += character;
+    else if (!output.endsWith("-")) output += "-";
+    if (output.length >= 96) break;
+  }
+  while (output.startsWith("-")) output = output.slice(1);
+  while (output.endsWith("-")) output = output.slice(0, -1);
+  return output;
 }
 
 function hashToken(token: string): string {

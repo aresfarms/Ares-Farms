@@ -129,3 +129,5 @@ jobs:
         run: npm run verify:secret-rotation-workflow
       - name: External connector authentication inventory
         run: npm run verify:external-connector-auth
+      - name: Navigator state integrity
+        run: npm run verify:navigator-state-integrity

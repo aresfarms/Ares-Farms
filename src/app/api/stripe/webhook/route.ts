@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import Stripe from "stripe";
@@ -49,9 +51,7 @@ type StripeWebhookPayload = {
 };
 
 function createStripeWebhookTraceId(): string {
-  return `stripe-webhook-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `stripe-webhook-${randomUUID()}`;
 }
 
 function webhookSecret(): string | null {

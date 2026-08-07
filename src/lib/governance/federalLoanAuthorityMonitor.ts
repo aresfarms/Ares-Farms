@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
+import { removeSuppressedHtmlElements, stripHtmlMarkup } from "@/lib/security/htmlText";
 import { runtimeStatePath } from "@/lib/property/runtimeStatePath";
 import {
   buildFederalAuthoritySemanticFingerprint,
@@ -177,13 +178,11 @@ function writeState(state: FederalLoanAuthorityMonitorState): void {
 }
 
 function cleanMonitorText(html: string): string {
-  return html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ").replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;|&#160;/gi, " ").replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim();
+  return stripHtmlMarkup(html).replace(/&nbsp;|&#160;/gi, " ").replace(/&amp;/gi, "&").replace(/\s+/g, " ").trim();
 }
 
 function normalizeHtml(html: string): string {
-  return html
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
+  return removeSuppressedHtmlElements(html)
     .replace(/<!--([\s\S]*?)-->/g, " ")
     .replace(/\s(?:nonce|integrity|data-drupal-selector|data-once|csrf-token)=(?:"[^"]*"|'[^']*')/gi, "")
     .replace(/>\s+</g, "><")
@@ -197,11 +196,13 @@ function titleFromHtml(html: string): string | null {
 }
 
 function inferAgency(url: URL): FederalLoanAgency | null {
-  if (url.hostname.endsWith("sba.gov")) return "SBA";
-  if (url.hostname.endsWith("fsa.usda.gov")) return "FSA";
-  if (url.hostname.endsWith("rd.usda.gov")) return "USDA_RD";
-  if (url.hostname.endsWith("ecfr.gov")) return "ECFR";
-  if (url.hostname.endsWith("federalregister.gov")) return "FEDERAL_REGISTER";
+  const hostMatches = (domain: string) =>
+    url.hostname === domain || url.hostname.endsWith(`.${domain}`);
+  if (hostMatches("sba.gov")) return "SBA";
+  if (hostMatches("fsa.usda.gov")) return "FSA";
+  if (hostMatches("rd.usda.gov")) return "USDA_RD";
+  if (hostMatches("ecfr.gov")) return "ECFR";
+  if (hostMatches("federalregister.gov")) return "FEDERAL_REGISTER";
   return null;
 }
 

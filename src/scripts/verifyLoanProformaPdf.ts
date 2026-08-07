@@ -4,6 +4,8 @@
  * the FORMAT authority only; her figures never enter code or fixtures).
  */
 import * as fs from "node:fs";
+import * as os from "node:os";
+import * as path from "node:path";
 import { generateLoanProformaPdf, type LoanProformaInput } from "@/lib/pdf/generateLoanProformaPdf";
 
 const input: LoanProformaInput = {
@@ -316,8 +318,8 @@ const docStream = generateLoanProformaPdf(input);
 const chunks: Buffer[] = [];
 docStream.on("data", (c: Buffer) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
 docStream.on("end", () => {
-  const out =
-    "/tmp/furlong-proforma-sample.pdf";
-  fs.writeFileSync(out, Buffer.concat(chunks));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-proforma-"));
+  const out = path.join(tempDir, "sample.pdf");
+  fs.writeFileSync(out, Buffer.concat(chunks), { mode: 0o600 });
   console.log("WROTE", out, Buffer.concat(chunks).length, "bytes");
 });

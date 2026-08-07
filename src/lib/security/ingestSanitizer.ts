@@ -9,7 +9,6 @@ export function sanitizeIngestText(input: string | null | undefined, maxLen = 20
   let t = String(input);
   t = t.replace(/<[^>]*>/g, " "); // strip tags entirely
   t = t.replace(/javascript\s*:/gi, "");
-  t = t.replace(/on\w+\s*=\s*"[^"]*"/gi, "");
   // control characters except newline/tab (unicode escapes, never raw bytes)
   t = t.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "");
   t = t.replace(/\s+/g, " ").trim();

@@ -81,6 +81,21 @@ function gcloud(args: string[]): string {
   return sh("gcloud", [...args, "--project", PROJECT]);
 }
 
+function requireCloudRunServiceUrl(raw: string): string {
+  const parsed = new URL(raw);
+  const hostname = parsed.hostname.toLowerCase();
+  if (
+    parsed.protocol !== "https:" ||
+    parsed.username ||
+    parsed.password ||
+    parsed.port ||
+    !hostname.endsWith(".run.app")
+  ) {
+    throw new Error("Cloud Run returned an unexpected service URL; refusing to send an identity token.");
+  }
+  return parsed.origin;
+}
+
 async function http(
   url: string,
   bearer?: string
@@ -136,7 +151,9 @@ async function main(): Promise<void> {
   const gitHead = sh("git", ["rev-parse", "--short", "HEAD"]);
   const terraformCommit = sh("git", ["log", "-1", "--format=%h", "--", "infra/staging"]);
 
-  const serviceUrl = gcloud(["run", "services", "describe", SERVICE, "--region", REGION, "--format", "value(status.url)"]);
+  const serviceUrl = requireCloudRunServiceUrl(
+    gcloud(["run", "services", "describe", SERVICE, "--region", REGION, "--format", "value(status.url)"])
+  );
   const revision = gcloud(["run", "services", "describe", SERVICE, "--region", REGION, "--format", "value(status.latestReadyRevisionName)"]);
   const image = gcloud(["run", "services", "describe", SERVICE, "--region", REGION, "--format", "value(spec.template.spec.containers[0].image)"]);
   const imageDigest = image.includes("@") ? image.split("@")[1] : `UNPINNED(${image})`;

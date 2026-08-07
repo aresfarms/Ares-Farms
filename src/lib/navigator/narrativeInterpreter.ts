@@ -52,6 +52,8 @@ export type DealType =
   | "general";
 
 export interface JourneyState {
+  /** Server-authenticated integrity tag; clients may carry but never mint it. */
+  integrity?: string;
   node: ArcNode;
   /** Free-text fragments the visitor offered, in their words (no identity). */
   story: string[];

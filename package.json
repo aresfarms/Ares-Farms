@@ -26,6 +26,7 @@
     "secrets:rotation:apply": "tsx src/scripts/applySecretRotationSchedules.ts --execute",
     "verify:secret-rotation-workflow": "tsx src/scripts/verifySecretRotationWorkflow.ts",
     "verify:external-connector-auth": "tsx src/scripts/verifyExternalConnectorAuthInventory.ts",
+    "verify:navigator-state-integrity": "tsx src/scripts/verifyNavigatorStateIntegrity.ts",
     "verify:external-secret-readiness": "tsx src/scripts/verifyExternalSecretReadiness.ts",
     "verify:domain-purpose": "tsx src/scripts/verifyDomainPurpose.ts",
     "verify:module-ecosystem": "tsx src/scripts/verifyModuleEcosystem.ts",

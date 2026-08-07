@@ -33,28 +33,28 @@ ok(!DOMAIN_PURPOSE_REGISTRY.some((d) => d.domain === "compass2capital.com"),
 // §7 — furlongpathways.com is the PRIMARY public-domain candidate.
 const pathways = domainPurpose("furlongpathways.com")!;
 ok(pathways.canonicalCandidate === true && pathways.hubCandidate === false &&
-   /PRIMARY public-facing/i.test(pathways.intendedRole) &&
-   pathways.moduleAlignment.some((m) => /Discovery Engine/.test(m)) &&
+   pathways.intendedRole.toLowerCase().includes("primary public-facing") &&
+   pathways.moduleAlignment.some((m) => m.includes("Discovery Engine")) &&
    pathways.productionApproved === false,
   "furlongpathways.com is the primary public-domain candidate (front door), not production-approved");
 
 // §7 — furlonghub.com is the HUB-domain candidate.
 const hub = domainPurpose("furlonghub.com")!;
 ok(hub.hubCandidate === true && hub.canonicalCandidate === false &&
-   /ecosystem HUB/i.test(hub.intendedRole) &&
-   hub.moduleAlignment.some((m) => /provider access/.test(m)) &&
+   hub.intendedRole.toLowerCase().includes("ecosystem hub") &&
+   hub.moduleAlignment.some((m) => m.includes("provider access")) &&
    hub.productionApproved === false,
   "furlonghub.com is the hub-domain candidate (provider/broker/lender/partner), not production-approved");
 
 // §7 — compasstocapital.com is the capital-brand candidate, Furlong-owned, NOT auto Five Borough.
 const compass = domainPurpose("compasstocapital.com")!;
 ok(compass.capitalBrandCandidate === true && compass.canonicalCandidate === false &&
-   compass.hubCandidate === false && /capital-navigation brand/i.test(compass.intendedRole),
+   compass.hubCandidate === false && compass.intendedRole.toLowerCase().includes("capital-navigation brand"),
   "compasstocapital.com is the capital-navigation brand candidate");
-ok(compass.notes.some((n) => /NOT automatically Five Borough/i.test(n)) &&
-   compass.notes.some((n) => /financing-neutrality/i.test(n)),
+ok(compass.notes.some((n) => n.toLowerCase().includes("not automatically five borough")) &&
+   compass.notes.some((n) => n.toLowerCase().includes("financing-neutrality")),
   "compasstocapital.com: Furlong-owned, not auto Five Borough, preserves financing neutrality");
-ok(!compass.moduleAlignment.some((m) => /^Furlong Core$/.test(m)),
+ok(!compass.moduleAlignment.some((m) => m === "Furlong Core"),
   "compasstocapital.com is not Furlong Core");
 
 // §7 — defensive / typo domains are redirect-only defensive registrations.
@@ -91,11 +91,12 @@ ok(DOMAIN_PURPOSE_REGISTRY.every((d) => !d.productionApproved), "no domain produ
 
 // Runbook records the founder-approved inventory.
 const runbook = fs.readFileSync("docs/deployment/GCP_MIGRATION_RUNBOOK.md", "utf8");
-ok(/furlongpathways\.com/.test(runbook) && /furlonghub\.com/.test(runbook) &&
-   /compasstocapital\.com/.test(runbook) && /compasstocapital\.org/.test(runbook) &&
-   /comapss2capital\.com/.test(runbook) && /comapss2capital\.org/.test(runbook),
+const runbookLower = runbook.toLowerCase();
+ok(["furlongpathways.com", "furlonghub.com", "compasstocapital.com",
+    "compasstocapital.org", "comapss2capital.com", "comapss2capital.org"]
+   .every((domain) => runbookLower.includes(domain)),
   "runbook carries the full six-domain inventory");
-ok(/Removed[^\n]*compass2capital\.com/i.test(runbook),
+ok(runbookLower.split("\n").some((line) => line.includes("removed") && line.includes("compass2capital.com")),
   "runbook explicitly records compass2capital.com as removed / not owned");
 
 if (fail.length) {

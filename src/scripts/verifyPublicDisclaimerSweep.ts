@@ -20,6 +20,8 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import { stripHtmlMarkup } from "@/lib/security/htmlText";
+
 const fail: string[] = [];
 const warn: string[] = [];
 const ok = (c: boolean, m: string) => { console.log(`${c ? "✓" : "✗"} ${m}`); if (!c) fail.push(m); };
@@ -70,11 +72,7 @@ const NEGATION = /\b(not|never|no|don't|doesn't|do not|does not|cannot|can't|won
  * not user-visible copy), then strip tags and collapse whitespace.
  */
 function toText(src: string): string {
-  return src
-    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ");
+  return stripHtmlMarkup(src).replace(/\s+/g, " ");
 }
 
 function scanProhibited(raw: string, where: string) {

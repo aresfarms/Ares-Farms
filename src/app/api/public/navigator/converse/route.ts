@@ -53,6 +53,7 @@ import { gateOutputText, gatePathwayPayload } from "@/security/realityPlatform/n
 import { appendReplay, hashEvidence, hashOutput } from "@/security/realityPlatform/realitySecurityReplay";
 import { RATE_LIMIT_MESSAGE } from "@/security/realityPlatform/navigatorRateLimit";
 import { buildSearchGuidance, CANDIDATE_SOURCES_LIVE } from "@/lib/navigator/searchGuidance";
+import { protectJourneyState, verifyJourneyState } from "@/lib/navigator/journeyIntegrity";
 
 export const runtime = "nodejs";
 
@@ -69,6 +70,18 @@ interface Body {
   message?: string;
   journey?: JourneyState;
   intelligenceCase?: ExistingIntelligenceCase | null;
+}
+
+function navigatorJson(payload: Record<string, unknown>) {
+  const journey = payload.journey as JourneyState;
+  return NextResponse.json({ ...payload, journey: protectJourneyState(journey) });
+}
+
+function withoutHouseSuffix(value: string): string {
+  const trimmed = value.trimEnd();
+  return trimmed.toLowerCase().endsWith(" house")
+    ? trimmed.slice(0, -" house".length).trimEnd()
+    : trimmed;
 }
 
 export function intelligenceCaseHandoff(
@@ -124,7 +137,7 @@ export async function POST(req: Request) {
   try { body = (await req.json()) as Body; } catch { body = {}; }
 
   const message = (body.message ?? "").slice(0, 4000);
-  let journey: JourneyState = body.journey && Array.isArray(body.journey.story)
+  let journey: JourneyState = body.journey && Array.isArray(body.journey.story) && verifyJourneyState(body.journey)
     ? { ...FRESH_JOURNEY, ...body.journey }
     : FRESH_JOURNEY;
 
@@ -140,7 +153,7 @@ export async function POST(req: Request) {
     const guarded = guardTurnIntent(journey, intentForNode(journey.node), questionForNode(journey));
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: "navigator:open", ok: true, transcriptHash: hashTranscript([]) });
-    return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
+    return navigatorJson({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
   // 0 — REALITY-SEC-001 INPUT GUARD: payload/script/injection/abuse checks
@@ -161,7 +174,7 @@ export async function POST(req: Request) {
       evidenceBundleHash: hashEvidence(guard.signals), renderedOutputHash: hashOutput(RATE_LIMIT_MESSAGE),
     });
     logInterviewTurn({ source: "fallback", slot: `navigator:guard:${guard.decision}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-    return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
+    return navigatorJson({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
   }
   if (guard.decision === "REFUSE_AND_REDIRECT" && !classifyRefusal(message) && !isUnlawfulEvasionAsk(message)) {
     // injection / prompt-extraction (non-G1/G2): refuse generically + continue.
@@ -175,7 +188,7 @@ export async function POST(req: Request) {
       refusalReason: guard.reasons.join("; "), evidenceBundleHash: hashEvidence(guard.signals), renderedOutputHash: hashOutput(guarded.text),
     });
     logInterviewTurn({ source: "fallback", slot: "navigator:guard:injection", ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-    return NextResponse.json({ kind: "refusal", refusal: "injection", text: guarded.text, turnIntent: guarded.intent, journey });
+    return navigatorJson({ kind: "refusal", refusal: "injection", text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
   // 0.5 — SAFETY ESCALATION (CRITICAL, 2026-06-12): violent threat, targeted
@@ -214,7 +227,7 @@ export async function POST(req: Request) {
       });
     }
     logInterviewTurn({ source: "fallback", slot: `navigator:${decision.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-    return NextResponse.json({ kind: "refusal", refusal: "safety-escalation", text: decision.text, turnIntent: decision.turnIntent, journey });
+    return navigatorJson({ kind: "refusal", refusal: "safety-escalation", text: decision.text, turnIntent: decision.turnIntent, journey });
   }
 
   // 1 — PRIORITY 1: unlawful evasion is checked BEFORE G-1/G-2 (router owns it).
@@ -250,13 +263,13 @@ export async function POST(req: Request) {
         : REFUSAL_LINE;
       const goalText =
         allowedGoal.turnIntent === "ROUTE_WEIRD_BUT_LAWFUL_ARCHITECTURE" || allowedGoal.turnIntent === "ROUTE_EARTH_SHELTERED_HOUSING"
-          ? `But I can help with the lawful part of your goal: finding land where a ${(allowedGoal.echoConcept ?? "unusual").replace(/\s*house$/i, "")}-inspired or earth-sheltered home could realistically be built. For that, we’d look at zoning, building codes, setbacks, utilities, septic/water, HOA restrictions, and local permitting. Are you hoping to build one, buy one, or find land where one could legally be built?`
+          ? `But I can help with the lawful part of your goal: finding land where a ${withoutHouseSuffix(allowedGoal.echoConcept ?? "unusual")}-inspired or earth-sheltered home could realistically be built. For that, we’d look at zoning, building codes, setbacks, utilities, septic/water, HOA restrictions, and local permitting. Are you hoping to build one, buy one, or find land where one could legally be built?`
           : `But I can help with the lawful part of your goal. ${allowedGoal.text}`;
       const text = `${preamble} ${goalText}`;
       journey = { ...journey, lastTurnIntent: refusalIntent, recentTurnIntents: [...(journey.recentTurnIntents ?? []), refusalIntent, allowedGoal.turnIntent].slice(-3) };
       journey = rememberPrompt(journey, text);
       logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}:goal-preserved:${allowedGoal.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-      return NextResponse.json({
+      return navigatorJson({
         kind: "refusal", refusal, text,
         turnIntent: refusalIntent,
         chainedTurnIntents: [refusalIntent, allowedGoal.turnIntent],
@@ -282,7 +295,7 @@ export async function POST(req: Request) {
     const guarded = guardTurnIntent(journey, refusalIntent, `${REFUSAL_LINE} ${followOn}`, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:refusal:${refusal}${wantsDiscovery ? ":guided-discovery" : ""}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-    return NextResponse.json({ kind: "refusal", refusal, text: guarded.text, turnIntent: guarded.intent, journey });
+    return navigatorJson({ kind: "refusal", refusal, text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
   // 2.5 — CONTEXTUAL SHORT-ANSWER: "all of the above" / "yes" / "the first one"
@@ -295,7 +308,7 @@ export async function POST(req: Request) {
     const guarded = guardTurnIntent(journey, contextual.turnIntent, contextual.text, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:${contextual.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
-    return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, classification, journey });
+    return navigatorJson({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, classification, journey });
   }
 
   // 3–8 — THE AUTHORITATIVE ROUTER: safety, sexual-structure boundary, human
@@ -314,7 +327,7 @@ export async function POST(req: Request) {
     const guarded = guardTurnIntent(journey, decision.turnIntent, text, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:${decision.slot}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-    return NextResponse.json({
+    return navigatorJson({
       kind: decision.refusal ? "refusal" : "question",
       ...(decision.refusal ? { refusal: decision.slot } : {}),
       node: journey.node,
@@ -347,7 +360,7 @@ export async function POST(req: Request) {
       const guarded = guardTurnIntent(journey, "CLARIFY_NOVELTY_BUILD_CONCEPT", NOVELTY_BOUNDARY_REPLY, { userMessage: message });
       journey = rememberPrompt(guarded.journey, guarded.text);
       logInterviewTurn({ source: "fallback", slot: "navigator:novelty:gate-blocked-pathways", ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(redacted)" }]) });
-      return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, noveltyGate: journey.noveltyGate, journey });
+      return navigatorJson({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, noveltyGate: journey.noveltyGate, journey });
     }
     const pathways = assessPathways(journey.context);
     const explored = journey.exploredPathways;
@@ -371,7 +384,7 @@ export async function POST(req: Request) {
       const guarded = guardTurnIntent(journey, "ASK_GOAL",
         "We caught something in our own draft answer that doesn't meet our standards, so we held it back. Tell me a bit more and we'll take another honest run at it.", { userMessage: message });
       journey = guarded.journey;
-      return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
+      return navigatorJson({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
     }
     appendReplay({
       ts: new Date().toISOString(), inputDecision: guard.decision, scrubbedFieldCount: 0,
@@ -380,7 +393,7 @@ export async function POST(req: Request) {
       evidenceBundleHash: hashEvidence(pathways.map((x) => x.id)), renderedOutputHash: hashOutput(JSON.stringify(decisionSummary)),
     });
     journey = { ...journey, lastTurnIntent: "PRESENT_PATHWAYS", recentTurnIntents: [...(journey.recentTurnIntents ?? []), "PRESENT_PATHWAYS"].slice(-3) };
-    return NextResponse.json({
+    return navigatorJson({
       kind: "pathways",
       node: journey.node,
       text:
@@ -405,7 +418,7 @@ export async function POST(req: Request) {
     const guarded = guardTurnIntent(journey, "ROUTE_OPEN_DISCOVERY", `${GUIDED_DISCOVERY_OPENER} ${GUIDED_DISCOVERY_FOLLOWUP}`, { userMessage: message });
     journey = rememberPrompt(guarded.journey, guarded.text);
     logInterviewTurn({ source: "fallback", slot: `navigator:guided-discovery:${journey.intent}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
-    return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
+    return navigatorJson({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, journey });
   }
 
   // The next single open question — with BOTH anti-repeat layers: verbatim
@@ -431,7 +444,7 @@ export async function POST(req: Request) {
   const guarded = guardTurnIntent(journey, intent, text, { userMessage: message });
   journey = rememberPrompt(guarded.journey, guarded.text);
   logInterviewTurn({ source: "fallback", slot: `navigator:${journey.node}`, ok: true, transcriptHash: hashTranscript([{ role: "user", text: "(interpreted)" }]) });
-  return NextResponse.json({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, classification, journey });
+  return navigatorJson({ kind: "question", node: journey.node, text: guarded.text, turnIntent: guarded.intent, classification, journey });
 }
 
 // ── prompt bookkeeping (anti-repeat, verbatim-text layer) ────────────────────

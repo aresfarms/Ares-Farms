@@ -28,12 +28,14 @@ function main(): void {
   );
 
   assert(restricted.length > 0, "Fail-closed proof cannot run without restricted implementation modules.");
-  assert(!fs.existsSync(probePath), `Probe path must not already exist: ${probePath}`);
-
   let rejected = 0;
   try {
     for (const probe of restricted) {
-      fs.writeFileSync(probePath, `import "${probe.modulePath}";\n`, "utf8");
+      fs.writeFileSync(probePath, `import "${probe.modulePath}";\n`, {
+        encoding: "utf8",
+        flag: "wx",
+        mode: 0o600,
+      });
       const result = runVerifier();
       const output = `${result.stdout ?? ""}\n${result.stderr ?? ""}`;
       assert(result.status !== 0, `${probe.domain} probe passed unexpectedly: ${probe.modulePath}`);

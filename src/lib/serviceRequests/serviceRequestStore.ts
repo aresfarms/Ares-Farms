@@ -31,7 +31,8 @@ const SERVICE_REQUEST_SOURCE = "service-request-runtime";
 export type ServiceRequestType =
   | "environmental_report_order"
   | "financing_deal_intake"
-  | "professional_credential_verification_request";
+  | "professional_credential_verification_request"
+  | "stripe_connect_account_onboarding";
 
 /**
  * Canonical financing-deal lifecycle (founder direction 2026-08-05: the

@@ -32,6 +32,7 @@ import {
 } from "@/lib/runtime/versionRuntime";
 import { readRequiredSecret } from "@/lib/security/requestGuards";
 import { stripeConfiguredForLivePayments } from "@/lib/stripe/client";
+import { evaluatePaymentRisk, type PaymentRiskDecision } from "@/lib/fraud/paymentRiskRuntime";
 
 /**
  * Stripe Webhook API
@@ -464,6 +465,34 @@ export async function POST(req: Request) {
     let entitlement: Entitlement | null = null;
     let allocationEvidenceId: string | null = null;
     let allocationRevenueClass: string | null = null;
+    let fraudDecision: PaymentRiskDecision | null = null;
+    const stripeObject = (event.data?.object ?? {}) as Record<string, unknown>;
+    if (event.type === "checkout.session.completed") {
+      fraudDecision = { disposition: "HOLD", reasons: ["PAYMENT_RISK_SIGNAL_PENDING"], releaseAllowed: false, humanReviewRequired: false };
+    } else if (event.type === "payment_intent.payment_failed" || event.type === "charge.dispute.created") {
+      fraudDecision = { disposition: "BLOCK", reasons: [event.type === "charge.dispute.created" ? "DISPUTE_OPENED" : "PAYMENT_FAILED"], releaseAllowed: false, humanReviewRequired: true };
+    } else if (event.type === "charge.succeeded") {
+      const outcome = isRecord(stripeObject.outcome) ? stripeObject.outcome : {};
+      const paymentDetails = isRecord(stripeObject.payment_method_details) ? stripeObject.payment_method_details : {};
+      const card = isRecord(paymentDetails.card) ? paymentDetails.card : {};
+      const checks = isRecord(card.checks) ? card.checks : {};
+      const threeDS = isRecord(card.three_d_secure) ? card.three_d_secure : {};
+      const wallet = isRecord(card.wallet) ? card.wallet : null;
+      const rawRisk = typeof outcome.risk_level === "string" ? outcome.risk_level : "not_assessed";
+      const riskLevel = rawRisk === "normal" || rawRisk === "elevated" || rawRisk === "highest" ? rawRisk : "not_assessed";
+      const metadataRecord = isRecord(stripeObject.metadata) ? stripeObject.metadata : {};
+      fraudDecision = evaluatePaymentRisk({
+        stripeRiskLevel: riskLevel,
+        stripeRiskScore: typeof outcome.risk_score === "number" ? outcome.risk_score : null,
+        threeDSecureAuthenticated: threeDS.result === "authenticated",
+        cvcCheck: checks.cvc_check === "pass" || checks.cvc_check === "fail" ? checks.cvc_check : "unavailable",
+        postalCheck: checks.address_postal_code_check === "pass" || checks.address_postal_code_check === "fail" ? checks.address_postal_code_check : "unavailable",
+        idmeIdentityVerified: process.env.IDME_ENFORCEMENT !== "required" || metadataRecord.idmeIdentityVerified === "true",
+        plaidOwnershipMatch: metadataRecord.plaidOwnershipMatch === "true" ? true : metadataRecord.plaidOwnershipMatch === "false" ? false : null,
+        paymentMethod: wallet ? "wallet" : "card",
+        amountCents: typeof stripeObject.amount === "number" ? stripeObject.amount : 0,
+      });
+    }
 
     const classifiedPayload = classifyRecord(payloadRecord, {
       classificationLevel: "RESTRICTED",
@@ -542,8 +571,10 @@ export async function POST(req: Request) {
         plan: entitlement?.plan ?? null,
         permissions: entitlement?.permissions ?? [],
         replayRef: traceId,
+        fraudDecision,
+        paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
         advisory:
-          "Webhook processing updates entitlement state only; it is not a credit, financing, legal, permitting, or regulatory decision.",
+          "Webhook processing updates entitlement state only; payment success is not equivalent to fraud clearance or a regulated decision.",
       },
       {
         classificationLevel: "RESTRICTED",
@@ -596,12 +627,16 @@ export async function POST(req: Request) {
         plan: entitlement?.plan ?? null,
         permissions: entitlement?.permissions ?? [],
         advisoryOnly: true,
+        fraudDecision,
+        paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
       },
       metadata: {
         requestedPlan,
         durableBillingEvent: true,
         durableEntitlementState: Boolean(entitlement),
         stubSignatureVerification: false,
+        fraudDisposition: fraudDecision?.disposition ?? null,
+        paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
       },
     });
 
@@ -625,6 +660,8 @@ export async function POST(req: Request) {
         durableGovernanceEvidence: true,
         durableBillingEvent: true,
         stubSignatureVerification: false,
+        fraudDisposition: fraudDecision?.disposition ?? null,
+        paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
       },
     });
 
@@ -649,6 +686,8 @@ export async function POST(req: Request) {
         durableGovernanceEvidence: true,
         durableBillingEvent: true,
         versionRuntimeOk: versionRuntime.ok,
+        fraudDisposition: fraudDecision?.disposition ?? null,
+        paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
       },
     });
 
@@ -701,6 +740,8 @@ export async function POST(req: Request) {
           entitlementGranted: Boolean(entitlement),
           entitlementId: entitlement?.id ?? null,
           stubSignatureVerification: false,
+          fraudDecision,
+          paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
         },
         metadata: {
           route: "/api/stripe/webhook",

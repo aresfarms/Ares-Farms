@@ -30,6 +30,9 @@ export type StripeCheckoutSessionCreateParams = {
     metadata?: Record<string, string | number | boolean | null | undefined>;
     transfer_group?: string;
   };
+  payment_method_options?: {
+    card?: { request_three_d_secure?: "automatic" | "any" | "challenge" };
+  };
   success_url?: string;
   cancel_url?: string;
   customer_email?: string | null;
@@ -127,6 +130,7 @@ async function createLiveCheckoutSession(
       quantity: item.quantity ?? 1,
     })),
     metadata: normalizeMetadata(params.metadata),
+    payment_method_options: params.payment_method_options,
     payment_intent_data: params.payment_intent_data
       ? {
           metadata: normalizeMetadata(params.payment_intent_data.metadata),

@@ -387,6 +387,12 @@ export async function POST(req: Request) {
         },
       ],
       metadata: checkoutMetadata,
+      payment_method_options: {
+        card: {
+          request_three_d_secure: process.env.STRIPE_3DS_POLICY === "any" ? "any" :
+            process.env.STRIPE_3DS_POLICY === "challenge" ? "challenge" : "automatic",
+        },
+      },
       payment_intent_data: {
         metadata: checkoutMetadata,
         transfer_group: checkoutMetadata.transferGroup,

@@ -13,12 +13,12 @@ export function evaluateProtectedPageRole(pathname: string, role: AccessRole): P
   if (!isProtectedPage(pathname)) return { protected: false, allowed: true, reason: "public-page" };
 
   if (pathname === "/lender-desk" || pathname.startsWith("/lender-desk/")) {
-    const allowed = role === "lender" || role === "admin" || role === "governance";
+    const allowed = role === "lender" || role === "governance";
     return { protected: true, allowed, reason: allowed ? "lender-desk-role" : "lender-desk-denied" };
   }
 
   if (pathname === "/portal" || pathname.startsWith("/portal/")) {
-    const allowed = role === "user" || role === "borrower" || role === "admin" || role === "governance";
+    const allowed = role === "user" || role === "borrower" || role === "governance";
     return { protected: true, allowed, reason: allowed ? "customer-portal-role" : "customer-portal-denied" };
   }
   if (isInternalChromeRoute(pathname)) {

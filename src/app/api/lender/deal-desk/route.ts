@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { applicationDocuments } from "@/db/schema";
 import { evaluateAccess, type AccessRole } from "@/lib/auth/accessControl";
 import { operatorByEmail } from "@/lib/auth/operatorRegistry";
+import { isSoleMaintenanceSuperuser } from "@/lib/auth/maintenanceSuperuser";
 import { evaluateProfessionalAccess } from "@/lib/auth/professionalAccessAuthority";
 import { apiAuthEnforcementRequired } from "@/lib/security/apiSecurityPolicy";
 import { db } from "@/lib/db";
@@ -62,7 +63,7 @@ import { serviceRequests } from "@/db/schema";
  */
 
 const MODULE = "api.lender.deal-desk";
-const ALLOWED_ROLES: AccessRole[] = ["lender", "admin", "governance"];
+const ALLOWED_ROLES: AccessRole[] = ["lender", "governance"];
 const VALID_STATUSES = new Set(FINANCING_DEAL_STATUSES.map((s) => s.status));
 
 function traceIdFor(op: string): string {
@@ -93,8 +94,8 @@ async function resolveIdentity(req: NextRequest): Promise<{ role: string; actorI
     req.headers.get("x-ares-authenticated-user-id")?.trim() || email;
 
   const operator = operatorByEmail(email);
-  if (operator?.role === "founder-operator") {
-    return { role: "admin", actorId: email ?? operator.id };
+  if (isSoleMaintenanceSuperuser(email)) {
+    return { role: "governance", actorId: email ?? operator?.id ?? sessionActor };
   }
 
   // Lender-file authority is credential-first. A registry entry or a finance
@@ -115,8 +116,8 @@ async function resolveIdentity(req: NextRequest): Promise<{ role: string; actorI
   }
 
   const sessionRole = req.headers.get("x-ares-authenticated-role")?.trim();
-  if (sessionRole && ALLOWED_ROLES.includes(sessionRole as AccessRole)) {
-    return { role: sessionRole, actorId: sessionActor };
+  if (sessionRole === "lender") {
+    return { role: "lender", actorId: sessionActor };
   }
 
   if (!apiAuthEnforcementRequired()) {

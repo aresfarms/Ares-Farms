@@ -5,6 +5,7 @@ import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
 import { isProtectedPage } from "@/lib/auth/protectedRoutes";
 import { operatorByEmail } from "@/lib/auth/operatorRegistry";
 import { evaluateProtectedPageRole } from "@/lib/auth/pageRolePolicy";
+import { isSoleMaintenanceSuperuser, maintenanceSuperuserAuditContext } from "@/lib/auth/maintenanceSuperuser";
 import { secureCompare } from "@/lib/security/requestGuards";
 import {
   ClaimedActorContext,
@@ -490,9 +491,11 @@ export async function proxy(req: NextRequest) {
       }
       const tokenEmail = normalizeOptionalText(pageToken.email);
       const operator = operatorByEmail(tokenEmail);
-      const pageRole = operator
-        ? operator.role === "founder-operator" ? "governance" : "operator"
-        : normalizeOptionalRole(pageToken.role) ?? "user";
+      const pageRole = isSoleMaintenanceSuperuser(tokenEmail)
+        ? "governance"
+        : operator
+          ? operator.role === "founder-operator" ? "governance" : "operator"
+          : normalizeOptionalRole(pageToken.role) ?? "user";
       const pageAccess = evaluateProtectedPageRole(route, pageRole);
       if (!pageAccess.allowed) {
         console.warn(JSON.stringify({ channel: "page-perimeter", route, outcome: "blocked", role: pageRole, reason: pageAccess.reason }));
@@ -679,6 +682,8 @@ export async function proxy(req: NextRequest) {
   }
 
   const session = extractSessionContext(token as Record<string, unknown>);
+  const maintenanceOverride = isSoleMaintenanceSuperuser(session.email);
+  if (maintenanceOverride) session.role = "governance";
   const queryClaims = extractClaimedActorContextFromSearchParams(
     req.nextUrl.searchParams
   );
@@ -740,6 +745,7 @@ export async function proxy(req: NextRequest) {
       role: session.role,
       tenantId: session.tenantId,
       actorIdPresent: Boolean(session.actorId),
+      maintenanceSuperuser: maintenanceSuperuserAuditContext(session.email),
     },
     req,
   });

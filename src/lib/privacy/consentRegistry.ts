@@ -36,6 +36,7 @@ export type ConsentId =
   | "identity-verification"
   | "financial-data-handling"
   | "document-attestation"
+  | "lender-submission-sharing"
   | "marketing-optional";
 
 export interface ConsentDefinition {
@@ -175,6 +176,21 @@ export const CONSENTS: Record<ConsentId, ConsentDefinition> = {
       "falsified record. That is the real deterrent against doctored statements, it mirrors the " +
       "certifications SBA/USDA lenders already require, and it puts 'the borrower affirmed this file " +
       "was genuine at this moment' into the chain-of-custody record.",
+  },
+  "lender-submission-sharing": {
+    id: "lender-submission-sharing",
+    version: "lender-package-sharing-v1",
+    capturedAt: "After human review of each exact lender package and before dispatch",
+    lawfulBasis: "consent",
+    required: true,
+    text:
+      "I authorize Furlong to send this exact package to the named lender and verified recipient " +
+      "for the stated financing-review purpose. This authorization is limited to the listed data " +
+      "categories and channel, expires as shown, and may be revoked before dispatch. Submission is " +
+      "not approval, underwriting, a credit decision, or a lender commitment.",
+    basisNote:
+      "Captured against the immutable package version and manifest hash; any package mutation, " +
+      "recipient change, lender change, channel change, expiry, or revocation requires new consent.",
   },
   "marketing-optional": {
     id: "marketing-optional",

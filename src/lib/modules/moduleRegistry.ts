@@ -5507,6 +5507,23 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     eventsConsumed: ["revenue.opportunity.reviewed"],
     featureFlags: translationFlags,
   },
+  {
+    id: "lender-submission",
+    title: "Governed Lender Submission",
+    route: "/lender-submissions",
+    audience: ["borrower", "lender", "internal"],
+    permissions: ["lender-submission:read", "lender-submission:review", "lender-submission:sandbox-dispatch"],
+    dataDependencies: ["application-documents", "lender-submission-cases", "submission-package-versions", "customer-submission-consents", "recipient-verifications", "delivery-outbox", "audit-ledger"],
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    claimsProfile: "live-action-blocked",
+    replayRequired: true,
+    description: "Builds immutable lender packages, captures exact-version customer consent, verifies recipients, and exercises delivery only through the deterministic sandbox adapter.",
+    adjacentModules: ["lender-workflow", "lender-evidence", "documents", "reviews", "audit-replay", "promotion"],
+    eventsPublished: ["lender.submission.package.frozen", "lender.submission.dispatch.statused"],
+    eventsConsumed: ["document.metadata.received", "review.transition.approved", "promotion.gate.blocked"],
+    featureFlags: internalFlags,
+  },
 ];
 
 export const moduleManifests: ModuleManifest[] = rawModuleManifests.map(

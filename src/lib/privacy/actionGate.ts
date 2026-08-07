@@ -40,6 +40,7 @@ export type GatedAction =
   | "upload-financial-document"
   | "sign-document"
   | "receive-broker-document"
+  | "submit-package-to-lender"
   | "order-environmental-work"
   | "export-my-data";
 
@@ -103,6 +104,15 @@ export const ACTION_REQUIREMENTS: Record<GatedAction, ActionRequirement> = {
     because:
       "Reading a document your broker addressed to you requires proving you hold this request's " +
       "reference and email — the same proof as checking your status.",
+  },
+  "submit-package-to-lender": {
+    action: "submit-package-to-lender",
+    minimumTier: "identity-verified",
+    consents: ["lender-submission-sharing"],
+    because:
+      "A lender submission can disclose sensitive financial records. The customer must verify identity " +
+      "and approve the exact immutable package, named lender, verified recipient, purpose, channel, " +
+      "data categories, disclosure version, and expiration before dispatch can be authorized.",
   },
   "order-environmental-work": {
     action: "order-environmental-work",

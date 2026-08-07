@@ -90,6 +90,7 @@ export * from "./externalConnectorExecutions";
 export * from "./externalDataConnectors";
 export * from "./externalSourceStackGovernance";
 export * from "./liveActionReadinessReviews";
+export * from "./lenderSubmissions";
 export * from "./missingDoctrineGovernance";
 export * from "./observabilityEvents";
 export * from "./operatorReviewQueues";

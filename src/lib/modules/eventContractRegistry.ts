@@ -101,7 +101,7 @@ export const eventContractRegistry: EventContract[] = [
   {
     eventType: "document.metadata.received",
     producerModuleId: "documents",
-    consumerModuleIds: ["operator-queue", "reviews", "case-command"],
+    consumerModuleIds: ["operator-queue", "reviews", "case-command", "lender-submission"],
     classificationLevel: "CONFIDENTIAL",
     replayRequired: true,
     publicSurfaceAllowed: false,
@@ -3030,6 +3030,28 @@ export const eventContractRegistry: EventContract[] = [
     ],
     purpose:
       "Record public trust content viewing posture and route review-bound handoffs without approval, eligibility, credit decision, certification, public verification, lender commitment, environmental clearance, payment authorization, official report publication, or legal or regulatory reliance.",
+  },
+  {
+    eventType: "lender.submission.package.frozen",
+    producerModuleId: "lender-submission",
+    consumerModuleIds: ["reviews", "lender-evidence", "audit-replay"],
+    classificationLevel: "RESTRICTED",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: ["case_id", "package_version_id", "manifest_sha256", "frozen_at", "replay_ref"],
+    purpose: "Record the exact immutable lender package presented for human review and customer consent without authorizing external delivery.",
+  },
+  {
+    eventType: "lender.submission.dispatch.statused",
+    producerModuleId: "lender-submission",
+    consumerModuleIds: ["lender-workflow", "audit-replay", "governance"],
+    classificationLevel: "RESTRICTED",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: ["case_id", "authorization_id", "outbox_id", "truth_status", "provider_reference", "reconciliation_required", "replay_ref"],
+    purpose: "Preserve attempted, provider-accepted, delivered, acknowledged, failed, or unknown sandbox delivery truth without converting an attempt into proof of delivery.",
   },
 ];
 

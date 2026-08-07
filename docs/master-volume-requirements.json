@@ -23,7 +23,8 @@
     "Ares Furlong Revenue Source Intelligence Doctrines.docx",
     "SOURCE_STACK_001_Canonical_External_Source_Discovery_Architecture.docx",
     "IMPLEMENTATION_WORKPACKAGES_Revenue_Intelligence_Runtime_Build.docx",
-    "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf"
+    "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf",
+    "Furlong_Lender_Submission_Governed_Implementation_Package.pdf"
   ],
   "allowedStatuses": [
     "implemented",
@@ -32,6 +33,27 @@
     "awaiting_controlled_promotion"
   ],
   "requirements": {
+    "CANON-LENDER-SUBMISSION-001": {
+      "title": "Exact-package lender submission governance",
+      "status": "implemented",
+      "requires": ["deterministic_package", "exact_version_consent", "verified_recipient", "human_review"],
+      "tests": ["verify:lender-submission-doctrine", "verify:lender-package-determinism", "verify:lender-consent-binding"],
+      "evidence": ["src/lib/lender-submission/runtime.ts", "src/db/schema/lenderSubmissions.ts", "docs/doctrine/CANON_LENDER_SUBMISSION_001.md"]
+    },
+    "TECH-LENDER-DELIVERY-001": {
+      "title": "Fail-closed lender delivery and replay",
+      "status": "intentionally_blocked",
+      "requires": ["atomic_authorization", "transactional_outbox", "sandbox_adapter", "truthful_receipts", "reconciliation"],
+      "tests": ["smoke:lender-submission-sandbox", "smoke:lender-delivery-fail-closed", "verify:lender-delivery-replay", "verify:lender-delivery-conformance"],
+      "evidence": ["src/lib/lender-submission/runtime.ts", "src/lib/db/migrations/0045_lender_submission_governance.sql", "docs/TECH_LENDER_DELIVERY_001.md"]
+    },
+    "OPS-LENDER-SUBMISSION-001": {
+      "title": "Lender submission review, retry, and reconciliation runbook",
+      "status": "implemented",
+      "requires": ["human_stop", "retry_limit", "unknown_reconciliation", "production_block"],
+      "tests": ["verify:lender-delivery-conformance"],
+      "evidence": ["docs/runbooks/OPS_LENDER_SUBMISSION_001.md", "src/lib/lender-submission/doctrine.ts"]
+    },
     "CONST-DATA-001": {
       "title": "Immutable audit ledger and hash chain",
       "status": "implemented",

@@ -335,16 +335,24 @@ green while five of these were live. Gates prove what they were told to check.
   provider adapters, and safe dual-key/session behavior are deployed and
   certified.
 
-## G-1. VOLUME-LEVEL GAP — broker-to-funding-lender submission is unscoped
+## G-1. Broker-to-funding-lender submission (RESOLVED IN GOVERNED PACKAGE)
 
 - **Finding:** the deal desk exposes only customer-facing actions (update,
   remind, remind-all, request-signature, upload-begin, upload-confirm). There
   is no path for the broker to package a file and send it to a funding lender.
 - **Searched:** all 41 Master Volume PDFs. ZERO hits in Volume II, III, IV or V,
   and zero in the Lender & Capital Complete Edition.
-- **Status:** this is NOT a missed implementation. The requirement does not
-  exist in the Master Volume Series. It is the broker's core activity, and it
-  needs a Volume amendment authored by the founder before it is built.
+- **Founder amendment received:**
+  `Furlong_Lender_Submission_Governed_Implementation_Package.pdf`, received
+  2026-08-06, establishes `CANON-LENDER-SUBMISSION-001`,
+  `TECH-LENDER-DELIVERY-001`, and `OPS-LENDER-SUBMISSION-001`.
+- **Resolution:** the governed immutable package, exact-version consent,
+  recipient verification, atomic fail-closed authorization, transactional
+  outbox, delivery truth, retry/reconciliation, replay, APIs, and operator
+  surface are implemented on branch `build-lender-submission-001`.
+- **Live posture:** sandbox testing only. Production credentials, network
+  delivery, and adapter promotion remain blocked pending separate human review
+  and controlled promotion.
 
 ## Standing note on this register's own limits
 

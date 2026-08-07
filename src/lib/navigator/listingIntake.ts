@@ -47,7 +47,21 @@ const STATE_RE = /\b(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD
 
 /** Does the text look like a pasted URL? */
 export function looksLikeListingUrl(text: string): boolean {
-  return /^https?:\/\//i.test(text.trim()) || /\b(?:crexi|zillow|redfin|loopnet)\.com\//i.test(text);
+  const trimmed = text.trim();
+  try {
+    const explicit = new URL(trimmed);
+    return explicit.protocol === "http:" || explicit.protocol === "https:";
+  } catch {
+    try {
+      const candidate = new URL(`https://${trimmed}`);
+      const hostname = candidate.hostname.toLowerCase();
+      return HOSTS.some(([domain]) =>
+        hostname === domain || hostname.endsWith(`.${domain}`)
+      );
+    } catch {
+      return false;
+    }
+  }
 }
 
 /** Does the text look like a street address? (number + words + optional state) */

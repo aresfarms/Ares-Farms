@@ -179,12 +179,20 @@ export async function getServiceRequestStatus(
   // Forgive copy-paste debris (founder 2026-08-06: people copy the reference
   // WITH the sentence's trailing period and the lookup breaks): strip any
   // leading/trailing characters that can't be part of a reference or email.
-  const ref = serviceRequestId
-    .trim()
-    .replace(/^[^A-Za-z0-9]+/, "")
-    .replace(/[^A-Za-z0-9]+$/, "")
-    .toUpperCase();
-  const mail = email.trim().replace(/[.,;:]+$/g, "").toLowerCase();
+  const rawRef = serviceRequestId.trim();
+  const isAlphaNumeric = (character: string) =>
+    (character >= "A" && character <= "Z") ||
+    (character >= "a" && character <= "z") ||
+    (character >= "0" && character <= "9");
+  let refStart = 0;
+  let refEnd = rawRef.length;
+  while (refStart < refEnd && !isAlphaNumeric(rawRef[refStart])) refStart += 1;
+  while (refEnd > refStart && !isAlphaNumeric(rawRef[refEnd - 1])) refEnd -= 1;
+  const ref = rawRef.slice(refStart, refEnd).toUpperCase();
+  let mail = email.trim().toLowerCase();
+  while (mail.length > 0 && ".,;:".includes(mail[mail.length - 1])) {
+    mail = mail.slice(0, -1);
+  }
   if (!ref || !mail) return { found: false };
 
   const rows = await db

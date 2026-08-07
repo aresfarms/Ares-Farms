@@ -17,7 +17,6 @@
  */
 
 import * as fs from "node:fs";
-import * as os from "node:os";
 import * as path from "node:path";
 import { execFileSync } from "node:child_process";
 
@@ -60,17 +59,11 @@ async function loadStateFeatures(st: string): Promise<GeoFeature[]> {
     signal: AbortSignal.timeout(120000),
   });
   if (!res.ok) return [];
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-gnis-"));
-  const zipPath = path.join(tempDir, `names-${st}.zip`);
-  fs.writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()), { mode: 0o600 });
-  let text: string;
-  try {
-    text = execFileSync("unzip", ["-p", zipPath, `Text/DomesticNames_${st}.txt`], {
-      maxBuffer: 256 * 1024 * 1024,
-    }).toString("utf8");
-  } finally {
-    fs.rmSync(tempDir, { recursive: true, force: true });
-  }
+  const archive = Buffer.from(await res.arrayBuffer());
+  const text = execFileSync("unzip", ["-p", `Text/DomesticNames_${st}.txt`], {
+    input: archive,
+    maxBuffer: 256 * 1024 * 1024,
+  }).toString("utf8");
   const lines = text.split("\n");
   const features: GeoFeature[] = [];
   for (let i = 1; i < lines.length; i += 1) {

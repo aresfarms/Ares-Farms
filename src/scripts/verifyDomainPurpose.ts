@@ -91,11 +91,12 @@ ok(DOMAIN_PURPOSE_REGISTRY.every((d) => !d.productionApproved), "no domain produ
 
 // Runbook records the founder-approved inventory.
 const runbook = fs.readFileSync("docs/deployment/GCP_MIGRATION_RUNBOOK.md", "utf8");
-ok(/furlongpathways\.com/.test(runbook) && /furlonghub\.com/.test(runbook) &&
-   /compasstocapital\.com/.test(runbook) && /compasstocapital\.org/.test(runbook) &&
-   /comapss2capital\.com/.test(runbook) && /comapss2capital\.org/.test(runbook),
+const runbookLower = runbook.toLowerCase();
+ok(["furlongpathways.com", "furlonghub.com", "compasstocapital.com",
+    "compasstocapital.org", "comapss2capital.com", "comapss2capital.org"]
+   .every((domain) => runbookLower.includes(domain)),
   "runbook carries the full six-domain inventory");
-ok(/Removed[^\n]*compass2capital\.com/i.test(runbook),
+ok(runbookLower.split("\n").some((line) => line.includes("removed") && line.includes("compass2capital.com")),
   "runbook explicitly records compass2capital.com as removed / not owned");
 
 if (fail.length) {

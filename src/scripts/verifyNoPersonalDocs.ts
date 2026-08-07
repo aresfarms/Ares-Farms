@@ -1,5 +1,5 @@
 import { execSync } from "node:child_process";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { closeSync, constants, existsSync, fstatSync, openSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 /**
@@ -533,8 +533,10 @@ type ReadResult =
   | { kind: "err"; reason: string };
 
 function readFileSafely(filePath: string): ReadResult {
+  let fd: number | null = null;
   try {
-    const stat = statSync(filePath);
+    fd = openSync(filePath, constants.O_RDONLY | constants.O_NOFOLLOW);
+    const stat = fstatSync(fd);
     if (!stat.isFile()) return { kind: "err", reason: "not a regular file" };
     if (stat.size > MAX_CONTENT_BYTES) {
       return {
@@ -542,12 +544,14 @@ function readFileSafely(filePath: string): ReadResult {
         reason: `file exceeds ${MAX_CONTENT_BYTES} bytes`,
       };
     }
-    return { kind: "ok", content: readFileSync(filePath, "utf8") };
+    return { kind: "ok", content: readFileSync(fd, "utf8") };
   } catch (err) {
     return {
       kind: "err",
       reason: err instanceof Error ? err.message : String(err),
     };
+  } finally {
+    if (fd !== null) closeSync(fd);
   }
 }
 

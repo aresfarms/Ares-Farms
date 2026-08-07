@@ -35,10 +35,15 @@ async function main(): Promise<void> {
     signal: AbortSignal.timeout(120000),
   });
   if (!res.ok) throw new Error(`IPEDS HD${IPEDS_YEAR} HTTP ${res.status}`);
-  const zipPath = path.join(os.tmpdir(), `furlong-ipeds-hd${IPEDS_YEAR}.zip`);
-  fs.writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()));
-  const csv = execFileSync("unzip", ["-p", zipPath], { maxBuffer: 64 * 1024 * 1024 }).toString("latin1");
-  fs.unlinkSync(zipPath);
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-ipeds-"));
+  const zipPath = path.join(tempDir, `hd${IPEDS_YEAR}.zip`);
+  let csv = "";
+  try {
+    fs.writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()), { mode: 0o600 });
+    csv = execFileSync("unzip", ["-p", zipPath], { maxBuffer: 64 * 1024 * 1024 }).toString("latin1");
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 
   const rows = parseCsv(csv);
   const header = rows[0].map((cell) => cell.trim().toUpperCase());

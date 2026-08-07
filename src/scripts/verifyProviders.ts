@@ -19,6 +19,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { canonicalProviderAuthority } from "../lib/platform/authorities/provider";
+import { removeSuppressedHtmlElements } from "../lib/security/htmlText";
 
 const BASE = (process.env.BASE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 const ROOT = process.cwd();
@@ -62,7 +63,7 @@ async function runtime(): Promise<void> {
     const body = await res.text();
     // Visible text only — strip framework scripts/styles (Next streaming emits
     // tokens like "$1"/"$L…" in inline scripts that are not page content).
-    const visible = body.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<style[\s\S]*?<\/style>/gi, " ");
+    const visible = removeSuppressedHtmlElements(body);
     for (const phrase of MODEL_PHRASES) if (!body.includes(phrase)) note(`MODEL(${p.slug}): rendered page missing "${phrase}".`);
     if (!/separate company/i.test(body)) note(`SEPARATION(${p.slug}): rendered page missing the "separate company" label.`);
     if (!/not a lender|advisory only|not an approval/i.test(body)) note(`SEPARATION(${p.slug}): Furlong disclosures not present on the page.`);

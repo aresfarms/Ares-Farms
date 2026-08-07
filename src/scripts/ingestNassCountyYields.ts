@@ -99,7 +99,7 @@ async function main(): Promise<void> {
     console.error("  No key provided — nothing fetched. (Free key: quickstats.nass.usda.gov/api — same one as grain.)\n");
     process.exit(1);
   }
-  console.log(`  Key received (${KEY.length} characters) — querying USDA NASS…`);
+  console.log("  Key received — querying USDA NASS…");
 
   // Pick ONE base year from corn (the most widely reported county crop), then
   // pull all three crops for that SAME year so no county mixes seasons. County

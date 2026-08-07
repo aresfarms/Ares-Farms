@@ -42,19 +42,20 @@ async function listLatestAvailability(): Promise<{ asOf: string; files: any[] }>
 }
 
 function downloadUnzipCsv(fileId: number): Promise<string> {
-  const zipPath = path.join(os.tmpdir(), `furlong-bdc-${fileId}.zip`);
-  const dir = path.join(os.tmpdir(), `furlong-bdc-${fileId}`);
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-bdc-"));
+  const zipPath = path.join(dir, `availability-${fileId}.zip`);
+  const extractDir = path.join(dir, "extracted");
   return fetch(`${API}/downloads/downloadFile/availability/${fileId}`, { headers: headers(), signal: AbortSignal.timeout(120000) })
     .then((r) => r.arrayBuffer())
     .then((buf) => {
       fs.writeFileSync(zipPath, Buffer.from(buf));
-      fs.mkdirSync(dir, { recursive: true });
+      fs.mkdirSync(extractDir, { recursive: true, mode: 0o700 });
       return new Promise<string>((resolve, reject) => {
-        execFile("unzip", ["-o", zipPath, "-d", dir], (err) => {
+        execFile("unzip", ["-o", zipPath, "-d", extractDir], (err) => {
           fs.unlinkSync(zipPath);
           if (err) return reject(err);
-          const csv = fs.readdirSync(dir).find((f) => f.endsWith(".csv"));
-          resolve(csv ? path.join(dir, csv) : "");
+          const csv = fs.readdirSync(extractDir).find((f) => f.endsWith(".csv"));
+          resolve(csv ? path.join(extractDir, csv) : "");
         });
       });
     });
@@ -81,7 +82,7 @@ async function aggregateCounty(csvPath: string, counties: Map<string, CountyAgg>
     if (c[iWired] === "1") agg.wired += 1;
     counties.set(fips, agg);
   }
-  fs.rmSync(path.dirname(csvPath), { recursive: true, force: true });
+  fs.rmSync(path.dirname(path.dirname(csvPath)), { recursive: true, force: true });
 }
 
 async function main(): Promise<void> {

@@ -104,10 +104,10 @@ export function chainAppend(filePath: string, payload: Record<string, unknown>):
   });
 }
 
-/** Verify the chain; returns ok + where it broke + legacy (pre-chain) count. */
-export function verifyLedgerChain(filePath: string): { ok: boolean; chained: number; legacy: number; brokenAt: number | null } {
-  let lines: string[];
-  try { lines = fs.readFileSync(filePath, "utf8").split("\n").filter(Boolean); } catch { return { ok: true, chained: 0, legacy: 0, brokenAt: null }; }
+type LedgerVerification = { ok: boolean; chained: number; legacy: number; brokenAt: number | null };
+
+function verifyLedgerContent(content: string): LedgerVerification {
+  const lines = content.split("\n").filter(Boolean);
   let prevHash = GENESIS, chained = 0, legacy = 0;
   for (let i = 0; i < lines.length; i++) {
     let e: Record<string, unknown>;
@@ -120,6 +120,15 @@ export function verifyLedgerChain(filePath: string): { ok: boolean; chained: num
     prevHash = e.hash as string; chained++;
   }
   return { ok: true, chained, legacy, brokenAt: null };
+}
+
+/** Verify the chain; returns ok + where it broke + legacy (pre-chain) count. */
+export function verifyLedgerChain(filePath: string): LedgerVerification {
+  try {
+    return verifyLedgerContent(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return { ok: true, chained: 0, legacy: 0, brokenAt: null };
+  }
 }
 
 export type ForensicLedgerRolloverResult = Readonly<{
@@ -151,17 +160,20 @@ export function forensicRolloverLedger(
   }>,
 ): ForensicLedgerRolloverResult {
   return withLedgerLock(filePath, () => {
-    const stat = fs.lstatSync(filePath);
-    if (!stat.isFile() || stat.isSymbolicLink()) {
+    const fd = fs.openSync(filePath, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+    const stat = fs.fstatSync(fd);
+    if (!stat.isFile()) {
+      fs.closeSync(fd);
       throw new Error("Audit ledger rollover requires a regular, non-symlink file.");
     }
 
-    const verification = verifyLedgerChain(filePath);
+    const original = fs.readFileSync(fd);
+    const verification = verifyLedgerContent(original.toString("utf8"));
     if (verification.ok || verification.brokenAt === null) {
+      fs.closeSync(fd);
       throw new Error("Audit ledger is intact; forensic rollover is not permitted.");
     }
 
-    const original = fs.readFileSync(filePath);
     const originalSha256 = createHash("sha256").update(original).digest("hex");
     const originalLineCount = original.toString("utf8").split("\n").filter(Boolean).length;
     const stamp = input.preservedAt.replace(/[^0-9A-Za-z]/g, "-");
@@ -172,12 +184,6 @@ export function forensicRolloverLedger(
     const archivePath = path.join(directory, archiveName);
     const manifestPath = path.join(directory, manifestName);
     const manifestTempPath = `${manifestPath}.tmp`;
-
-    for (const candidate of [archivePath, manifestPath, manifestTempPath]) {
-      if (fs.existsSync(/* turbopackIgnore: true */ candidate)) {
-        throw new Error(`Forensic rollover target already exists: ${path.basename(candidate)}`);
-      }
-    }
 
     const manifest = {
       schemaVersion: 1,
@@ -205,9 +211,15 @@ export function forensicRolloverLedger(
     });
 
     try {
-      fs.renameSync(filePath, archivePath);
+      const current = fs.lstatSync(filePath);
+      if (current.isSymbolicLink() || current.dev !== stat.dev || current.ino !== stat.ino) {
+        throw new Error("Audit ledger changed identity during forensic rollover.");
+      }
+      fs.linkSync(filePath, archivePath);
+      fs.unlinkSync(filePath);
       fs.chmodSync(archivePath, 0o600);
-      fs.renameSync(manifestTempPath, manifestPath);
+      fs.linkSync(manifestTempPath, manifestPath);
+      fs.unlinkSync(manifestTempPath);
 
       const payload = {
         ts: input.preservedAt,
@@ -235,6 +247,8 @@ export function forensicRolloverLedger(
     } catch (error) {
       try { if (fs.existsSync(manifestTempPath)) fs.unlinkSync(manifestTempPath); } catch { /* preserve primary error */ }
       throw error;
+    } finally {
+      fs.closeSync(fd);
     }
 
     return {

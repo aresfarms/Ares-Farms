@@ -36,11 +36,11 @@ export interface PropertyReference {
   parcelId: null;
 }
 
-const HOSTS: [RegExp, ListingSource][] = [
-  [/(^|\.)crexi\.com$/i, "crexi"],
-  [/(^|\.)zillow\.com$/i, "zillow"],
-  [/(^|\.)redfin\.com$/i, "redfin"],
-  [/(^|\.)loopnet\.com$/i, "loopnet"],
+const HOSTS: [string, ListingSource][] = [
+  ["crexi.com", "crexi"],
+  ["zillow.com", "zillow"],
+  ["redfin.com", "redfin"],
+  ["loopnet.com", "loopnet"],
 ];
 
 const STATE_RE = /\b(AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC|PR)\b/;
@@ -100,7 +100,10 @@ export function resolveListingInput(raw: string): PropertyReference | null {
     let url: URL | null = null;
     try { url = new URL(text.startsWith("http") ? text : `https://${text}`); } catch { url = null; }
     if (!url) return null;
-    const source = HOSTS.find(([re]) => re.test(url.hostname))?.[1] ?? "other-url";
+    const hostname = url.hostname.toLowerCase();
+    const source = HOSTS.find(([domain]) =>
+      hostname === domain || hostname.endsWith(`.${domain}`)
+    )?.[1] ?? "other-url";
     // Address-ish slug is usually the longest path segment containing a number.
     const segs = url.pathname.split("/").filter(Boolean);
     const addrSeg = segs

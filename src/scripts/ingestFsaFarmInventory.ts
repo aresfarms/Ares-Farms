@@ -22,6 +22,8 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+import { stripHtmlMarkup } from "@/lib/security/htmlText";
+
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "src/lib/property/fsaFarmInventoryGenerated.ts");
 const BASE = "https://properties.sc.egov.usda.gov/resales/public/searchFSA";
@@ -37,7 +39,7 @@ interface StateResult {
 }
 
 function stripTags(html: string): string {
-  return html.replace(/<script[\s\S]*?<\/script>/gi, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  return stripHtmlMarkup(html).replace(/\s+/g, " ");
 }
 
 async function getSearchPage(): Promise<{ html: string; cookie: string | null }> {

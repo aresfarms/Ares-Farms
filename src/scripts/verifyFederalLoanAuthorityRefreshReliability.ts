@@ -23,7 +23,8 @@ const empty: FederalLoanAuthorityMonitorState = {
 
 function mixedFetch(input: URL | RequestInfo, init?: RequestInit): Promise<Response> {
   const url = String(input);
-  if (url.includes("fsa.usda.gov")) {
+  const hostname = new URL(url).hostname.toLowerCase();
+  if (hostname === "fsa.usda.gov" || hostname.endsWith(".fsa.usda.gov")) {
     return new Promise((_, reject) => {
       init?.signal?.addEventListener("abort", () => reject(new DOMException("Aborted", "AbortError")), { once: true });
     });

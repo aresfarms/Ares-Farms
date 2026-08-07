@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
@@ -45,9 +47,7 @@ type SessionUserWithTenant = {
 };
 
 function createStripeCheckoutTraceId(): string {
-  return `stripe-checkout-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `stripe-checkout-${randomUUID()}`;
 }
 
 function getBaseUrl(): string {

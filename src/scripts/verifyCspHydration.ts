@@ -66,7 +66,7 @@ async function main() {
 
     // EVERY inline <script> must carry the matching nonce — blocked inline
     // scripts are exactly how hydration silently dies.
-    const inlineScripts = [...a.html.matchAll(/<script\b([^>]*)>/g)]
+    const inlineScripts = [...a.html.matchAll(/<script\b([^>]*)>/gi)]
       .map((m) => m[1])
       .filter((attrs) => !/\bsrc=/.test(attrs));
     ok(inlineScripts.length > 0, "page has inline scripts (Next bootstrap present — something to protect)");

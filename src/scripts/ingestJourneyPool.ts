@@ -257,7 +257,7 @@ function ingestDrops(
     const outName = `${stopId}__furlong-${year}-${desc}.jpg`;
     const src = `/journey/${outName}`;
     const dest = path.join(JOURNEY_DIR, outName);
-    if (haveSrc.has(src) || fs.existsSync(dest)) { haveSrc.add(src); continue; } // already published
+    if (haveSrc.has(src)) continue; // already published in the governed manifest
 
     let buf: Buffer;
     try { buf = fs.readFileSync(path.join(DROP_DIR, file)); }
@@ -266,7 +266,15 @@ function ingestDrops(
     if (DRY) { console.log(`  • would publish ${src} (EXIF-stripped) from drop/${file}`); continue; }
 
     const stripped = stripJpegMetadata(buf);
-    fs.writeFileSync(dest, stripped);
+    try {
+      fs.writeFileSync(dest, stripped, { flag: "wx", mode: 0o600 });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "EEXIST") {
+        haveSrc.add(src);
+        continue;
+      }
+      throw error;
+    }
     console.log(`  ✓ published ${src} — Furlong original, EXIF stripped (${buf.length}→${stripped.length} bytes)`);
 
     const readable = desc.replace(/-/g, " ");

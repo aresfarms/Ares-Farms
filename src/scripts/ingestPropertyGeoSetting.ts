@@ -60,15 +60,16 @@ async function loadStateFeatures(st: string): Promise<GeoFeature[]> {
     signal: AbortSignal.timeout(120000),
   });
   if (!res.ok) return [];
-  const zipPath = path.join(os.tmpdir(), `furlong-gnis-${st}.zip`);
-  fs.writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()));
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "furlong-gnis-"));
+  const zipPath = path.join(tempDir, `names-${st}.zip`);
+  fs.writeFileSync(zipPath, Buffer.from(await res.arrayBuffer()), { mode: 0o600 });
   let text: string;
   try {
     text = execFileSync("unzip", ["-p", zipPath, `Text/DomesticNames_${st}.txt`], {
       maxBuffer: 256 * 1024 * 1024,
     }).toString("utf8");
   } finally {
-    fs.unlinkSync(zipPath);
+    fs.rmSync(tempDir, { recursive: true, force: true });
   }
   const lines = text.split("\n");
   const features: GeoFeature[] = [];

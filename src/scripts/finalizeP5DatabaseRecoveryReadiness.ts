@@ -1,6 +1,6 @@
 import { createHash, createHmac } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 const PROJECT = process.env.GCP_PROJECT ?? "furlong-staging-499102";
@@ -25,14 +25,50 @@ function absent(command: string, args: string[], needle: string): boolean {
   try { return !sh(command, args).split("\n").some((line) => line.trim() === needle); } catch { return true; }
 }
 
+function latestArchivedEvidence(): { report: any; reportPath: string; signaturePath: string } {
+  const directory = path.join(process.cwd(), "artifacts", "deployments", "staging");
+  const reports = readdirSync(directory)
+    .filter((name) => name.endsWith("-p5-b09-database-recovery.json"))
+    .sort()
+    .reverse();
+  if (!reports[0]) throw new Error("No archived P5-B09 recovery evidence is available.");
+  const reportPath = path.join(directory, reports[0]);
+  const signaturePath = reportPath.replace(/\.json$/, "-signature.json");
+  if (!existsSync(signaturePath)) throw new Error(`Recovery signature is missing for ${reports[0]}.`);
+  return { report: JSON.parse(readFileSync(reportPath, "utf8")), reportPath, signaturePath };
+}
+
 function main(): void {
   const source = JSON.parse(gcloud(["sql", "instances", "describe", SOURCE, "--format", "json"])) as any;
   const backups = JSON.parse(gcloud(["sql", "backups", "list", "--instance", SOURCE, "--limit", "7", "--format", "json"])) as any[];
-  const clone = JSON.parse(read("clone-operation.json")) as any;
-  const migration = JSON.parse(read("migration-execution.json")) as any;
-  const verify = JSON.parse(read("final-verify-execution.json")) as any;
-  const migrationLog = read("migration-replay.log");
-  const verifyLog = read("final-verify.log");
+  const temporaryEvidenceAvailable = existsSync(path.join(EVIDENCE_DIR, "clone-operation.json"));
+  const archived = temporaryEvidenceAvailable ? null : latestArchivedEvidence();
+  const secret = gcloud(["secrets", "versions", "access", "latest", "--secret", "REPORT_SIGNING_SECRET"]);
+  let archivedSignatureKeyVersion: string | null = null;
+  if (archived) {
+    const archivedBytes = readFileSync(archived.reportPath, "utf8");
+    const archivedSignature = JSON.parse(readFileSync(archived.signaturePath, "utf8")) as { reportSha256?: string; signature?: string };
+    const archivedSha = createHash("sha256").update(archivedBytes).digest("hex");
+    if (archivedSignature.reportSha256 !== archivedSha) {
+      throw new Error("Archived P5-B09 recovery evidence digest verification failed.");
+    }
+    const versions = gcloud(["secrets", "versions", "list", "REPORT_SIGNING_SECRET", "--filter", "state=enabled", "--format", "value(name)"])
+      .split("\n")
+      .map((value) => value.trim())
+      .filter(Boolean);
+    archivedSignatureKeyVersion = versions.find((version) => {
+      const versionSecret = gcloud(["secrets", "versions", "access", version, "--secret", "REPORT_SIGNING_SECRET"]);
+      return createHmac("sha256", versionSecret).update(archivedBytes).digest("base64url") === archivedSignature.signature;
+    }) ?? null;
+    if (!archivedSignatureKeyVersion) {
+      throw new Error("Archived P5-B09 recovery evidence signature verification failed against every enabled key version.");
+    }
+  }
+  const clone = temporaryEvidenceAvailable ? JSON.parse(read("clone-operation.json")) as any : null;
+  const migration = temporaryEvidenceAvailable ? JSON.parse(read("migration-execution.json")) as any : null;
+  const verify = temporaryEvidenceAvailable ? JSON.parse(read("final-verify-execution.json")) as any : null;
+  const migrationLog = temporaryEvidenceAvailable ? read("migration-replay.log") : "";
+  const verifyLog = temporaryEvidenceAvailable ? read("final-verify.log") : "";
   const checks: Array<{ name: string; pass: boolean; actual: string; evidence: string }> = [];
   const add = (name: string, pass: boolean, actual: string, evidence: string) => checks.push({ name, pass, actual, evidence });
   const backup = source.settings?.backupConfiguration ?? {};
@@ -44,12 +80,22 @@ function main(): void {
   add("deletion protection enabled", source.settings?.deletionProtectionEnabled === true, String(source.settings?.deletionProtectionEnabled), SOURCE);
   add("private networking only", ip.ipv4Enabled === false && Boolean(ip.privateNetwork), JSON.stringify({ ipv4Enabled: ip.ipv4Enabled, privateNetwork: ip.privateNetwork }), SOURCE);
   add("recent automated backups successful", backups.length >= 5 && backups.slice(0, 5).every((entry) => entry.status === "SUCCESSFUL"), backups.slice(0, 5).map((entry) => entry.status).join(","), "Cloud SQL backup history");
-  const cloneStart = Date.parse(clone.startTime);
-  const cloneEnd = Date.parse(clone.endTime);
-  const recoverySeconds = Math.round((cloneEnd - cloneStart) / 1000);
-  add("point-in-time clone completed", clone.status === "DONE" && recoverySeconds > 0, `${clone.status}; ${recoverySeconds}s`, CLONE_OPERATION);
-  add("migration replay succeeded", Number(migration.status?.succeededCount ?? 0) === 1 && migrationLog.includes("Canonical governance migrations applied successfully (29 files)."), MIGRATION_EXECUTION, "immutable migrator image replay");
-  add("schema and application reads succeeded", Number(verify.status?.succeededCount ?? 0) === 1 && verifyLog.includes("P5B09_FINAL_END") && verifyLog.includes("TABLE_COUNT applications 1") && verifyLog.includes("TABLE_COUNT operator_review_queue_items 1") && verifyLog.includes("TABLE_COUNT external_data_sources 3"), VERIFY_EXECUTION, "private Cloud Run verification job");
+  const archivedCheck = (name: string) => archived?.report.checks?.find((check: any) => check.name === name);
+  const cloneStart = clone ? Date.parse(clone.startTime) : 0;
+  const cloneEnd = clone ? Date.parse(clone.endTime) : 0;
+  const recoverySeconds = clone
+    ? Math.round((cloneEnd - cloneStart) / 1000)
+    : Number(archived?.report.recoveryTimeSeconds ?? 0);
+  const clonePassed = clone ? clone.status === "DONE" && recoverySeconds > 0 : archivedCheck("point-in-time clone completed")?.pass === true;
+  const migrationPassed = migration
+    ? Number(migration.status?.succeededCount ?? 0) === 1 && migrationLog.includes("Canonical governance migrations applied successfully (29 files).")
+    : archivedCheck("migration replay succeeded")?.pass === true;
+  const verifyPassed = verify
+    ? Number(verify.status?.succeededCount ?? 0) === 1 && verifyLog.includes("P5B09_FINAL_END") && verifyLog.includes("TABLE_COUNT applications 1") && verifyLog.includes("TABLE_COUNT operator_review_queue_items 1") && verifyLog.includes("TABLE_COUNT external_data_sources 3")
+    : archivedCheck("schema and application reads succeeded")?.pass === true;
+  add("point-in-time clone completed", clonePassed, `${clone?.status ?? "ARCHIVED_SIGNED_EVIDENCE"}; ${recoverySeconds}s`, archived?.report.cloneOperationId ?? CLONE_OPERATION);
+  add("migration replay succeeded", migrationPassed, archived?.report.migrationExecution ?? MIGRATION_EXECUTION, "immutable migrator image replay");
+  add("schema and application reads succeeded", verifyPassed, archived?.report.verificationExecution ?? VERIFY_EXECUTION, "private Cloud Run verification job");
   add("temporary verification job deleted", absent("gcloud", ["run", "jobs", "list", "--project", PROJECT, "--region", REGION, "--format", "value(metadata.name)"], VERIFY_JOB), VERIFY_JOB, "post-drill cleanup");
   add("temporary migration job deleted", absent("gcloud", ["run", "jobs", "list", "--project", PROJECT, "--region", REGION, "--format", "value(metadata.name)"], MIGRATE_JOB), MIGRATE_JOB, "post-drill cleanup");
   add("temporary secret deleted", absent("gcloud", ["secrets", "list", "--project", PROJECT, "--format", "value(name)"], TEMP_SECRET), TEMP_SECRET, "post-drill cleanup");
@@ -76,10 +122,11 @@ function main(): void {
     cleanupVerified: checks.filter((check) => check.name.includes("temporary")).every((check) => check.pass),
     liveDatabaseModifiedByDrill: false,
     humanApprovalRequired: true,
+    priorSignedDrillEvidence: archived ? path.relative(process.cwd(), archived.reportPath) : null,
+    priorSignedDrillEvidenceKeyVersion: archivedSignatureKeyVersion,
     generatedAtUtc,
   };
   const bytes = JSON.stringify(report, null, 2);
-  const secret = gcloud(["secrets", "versions", "access", "latest", "--secret", "REPORT_SIGNING_SECRET"]);
   const signature = {
     algorithm: "HMAC-SHA256",
     keyId: "gcp-secret-manager://REPORT_SIGNING_SECRET/latest",

@@ -263,39 +263,33 @@ export default function LenderWorkflowV2Page() {
   const [applicationsText, setApplicationsText] = useState(
     defaultApplicationsJson
   );
-  const [parseError, setParseError] = useState<string | null>(null);
   const [serverResult, setServerResult] = useState<ApiResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const localInput = useMemo<LenderWorkflowV2Input>(() => {
+  const parsedApplications = useMemo(() => {
     try {
-      const applications = JSON.parse(applicationsText);
-      setParseError(null);
-      return {
-        reviewerRole,
-        lenderId,
-        partnerWorkflowId: partnerWorkflowId || null,
-        applications,
-        scope: { sovereignFederationAllowed: sovereignAllowed },
-      };
+      return { applications: JSON.parse(applicationsText), error: null };
     } catch (e) {
-      setParseError(
-        e instanceof Error ? e.message : "Unable to parse applications JSON."
-      );
       return {
-        reviewerRole,
-        lenderId,
-        partnerWorkflowId: partnerWorkflowId || null,
         applications: [],
-        scope: { sovereignFederationAllowed: sovereignAllowed },
+        error: e instanceof Error ? e.message : "Unable to parse applications JSON.",
       };
     }
-  }, [
+  }, [applicationsText]);
+  const parseError = parsedApplications.error;
+
+  const localInput = useMemo<LenderWorkflowV2Input>(() => ({
+    reviewerRole,
+    lenderId,
+    partnerWorkflowId: partnerWorkflowId || null,
+    applications: parsedApplications.applications,
+    scope: { sovereignFederationAllowed: sovereignAllowed },
+  }), [
     reviewerRole,
     lenderId,
     partnerWorkflowId,
-    applicationsText,
+    parsedApplications.applications,
     sovereignAllowed,
   ]);
 

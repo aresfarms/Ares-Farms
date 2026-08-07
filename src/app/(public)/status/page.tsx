@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { readJsonResponse } from "@/lib/http/readJsonResponse";
+
 /**
  * Customer Status Portal — a customer looks up a request they submitted (an
  * environmental order or a financing deal) with their reference id + the email
@@ -89,12 +91,20 @@ export default function StatusPortalPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ serviceRequestId: ref.trim(), email: email.trim() }),
+        signal: AbortSignal.timeout(10_000),
       });
-      const data = await res.json();
+      const data = await readJsonResponse<{ ok?: boolean; error?: string; status?: StatusView }>(res);
       if (!res.ok || !data.ok) throw new Error(data.error ?? "Lookup failed.");
-      setResult(data.status as StatusView);
+      if (!data.status) throw new Error("The service returned an incomplete status response.");
+      setResult(data.status);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Lookup failed.");
+      setError(
+        err instanceof DOMException && err.name === "TimeoutError"
+          ? "The status service took too long to respond. Please retry in a moment."
+          : err instanceof Error
+            ? err.message
+            : "Lookup failed."
+      );
     } finally {
       setState("idle");
     }

@@ -25,6 +25,7 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import { loadEnvConfig } from "@next/env";
 
 import { POOL_MANIFEST, type PoolCandidate } from "../lib/public-content/journeyPoolManifest";
 import { HOLIDAY_MANIFEST, type HolidayCandidate } from "../lib/public-content/holidayPoolManifest";
@@ -35,8 +36,6 @@ import type { ArchivalImage } from "../lib/public-content/americasJourneyStops";
 // Load .env.local so SI_API_KEY (and friends) are available when needed.
 try {
   // @next/env ships with Next.js; loads .env.local for standalone scripts.
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { loadEnvConfig } = require("@next/env");
   loadEnvConfig(process.cwd());
 } catch {
   /* optional — env vars may already be set in the shell */

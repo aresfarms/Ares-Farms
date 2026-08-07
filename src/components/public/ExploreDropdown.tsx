@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 /**
  * ExploreDropdown — Homepage exploration entry point (Build 51).
  *
@@ -25,6 +27,8 @@ const EXPLORE_OPTIONS = [
 ] as const;
 
 export function ExploreDropdown() {
+  const router = useRouter();
+
   return (
     <div className="fl-explore-form">
       <label
@@ -40,8 +44,7 @@ export function ExploreDropdown() {
         style={{ minHeight: 50 }}
         onChange={(e) => {
           if (e.target.value) {
-            window.location.href =
-              `/onboarding?explore=${encodeURIComponent(e.target.value)}`;
+            router.push(`/onboarding?explore=${encodeURIComponent(e.target.value)}`);
           }
         }}
       >

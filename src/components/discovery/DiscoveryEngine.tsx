@@ -89,7 +89,7 @@ export function DiscoveryEngine({ feed }: { feed: GuidedIntakeFeed }) {
     if (started.current) return;
     started.current = true;
     void start();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   async function answer(values: string[]) {

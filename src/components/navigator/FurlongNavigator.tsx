@@ -148,7 +148,7 @@ export function FurlongNavigator({
         }
       } finally { setLoading(false); }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, []);
 
   // Start Over — wipes the visible thread, all results, and ALL browser storage.

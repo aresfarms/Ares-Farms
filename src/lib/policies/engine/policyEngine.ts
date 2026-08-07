@@ -10,7 +10,7 @@ export async function runPolicyEngine(input: any) {
   const acres = input.metadata?.acres ?? 0;
 
   const policies: string[] = [];
-  let eligibility = {
+  const eligibility = {
     usdaEligible: true,
     sbaEligible: true,
     flags: [] as string[],

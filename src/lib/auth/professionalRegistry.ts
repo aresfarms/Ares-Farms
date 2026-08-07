@@ -52,6 +52,22 @@ export function professionalByEmail(email: string | null | undefined): Professio
   return PROFESSIONAL_GRANTS.find((p) => p.email.toLowerCase() === e) ?? null;
 }
 
+
+export function stagingTestProfessionalByEmail(
+  email: string | null | undefined,
+  role: ProfessionalGrant["role"],
+): ProfessionalGrant | null {
+  const e = norm(email);
+  if (process.env.PROFESSIONAL_TEST_PERSONAS_ENABLED !== "true" || e !== "chudson@aresfarmsinc.com") return null;
+  return {
+    email: e,
+    name: "Pocohantus Smith",
+    role,
+    organization: `Furlong Staging Test ${role}`,
+    basis: "STAGING TEST PERSONA ONLY — no real-world professional authority.",
+  };
+}
+
 /** Roles granted to an email (empty = no professional access). */
 export function professionalRole(email: string | null | undefined): ProfessionalGrant["role"] | null {
   return professionalByEmail(email)?.role ?? null;

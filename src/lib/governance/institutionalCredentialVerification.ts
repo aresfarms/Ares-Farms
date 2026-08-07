@@ -21,7 +21,8 @@ export type CredentialVerificationMethod =
   | "OFFICIAL_DIRECTORY_AUTOMATED"
   | "OFFICIAL_DIRECTORY_MANUAL"
   | "ISSUER_CONFIRMATION"
-  | "AGENCY_CONFIRMATION";
+  | "AGENCY_CONFIRMATION"
+  | "STAGING_TEST_FIXTURE";
 
 export type InstitutionalCredentialVerification = {
   verificationId: string;

@@ -469,6 +469,11 @@ export async function proxy(req: NextRequest) {
   if (previewBlock) return previewBlock;
 
   const route = req.nextUrl.pathname;
+  const testPersonaRoleFor = (email: string | null): "lender" | "attorney" | "auditor" | "sponsor" | null => {
+    if (process.env.PROFESSIONAL_TEST_PERSONAS_ENABLED !== "true" || email?.toLowerCase() !== "chudson@aresfarmsinc.com") return null;
+    const role = req.cookies.get("furlong-professional-test-role")?.value;
+    return role === "lender" || role === "attorney" || role === "auditor" || role === "sponsor" ? role : null;
+  };
 
   // ── Page perimeter ──────────────────────────────────────────────────────────
   // Non-API routes: protect internal/operator/portal PAGES. Anonymous visitors
@@ -491,8 +496,11 @@ export async function proxy(req: NextRequest) {
       }
       const tokenEmail = normalizeOptionalText(pageToken.email);
       const operator = operatorByEmail(tokenEmail);
-      const pageRole = isSoleMaintenanceSuperuser(tokenEmail)
-        ? "governance"
+      const testPersonaRole = testPersonaRoleFor(tokenEmail);
+      const pageRole = testPersonaRole
+        ? testPersonaRole
+        : isSoleMaintenanceSuperuser(tokenEmail)
+          ? "governance"
         : operator
           ? operator.role === "founder-operator" ? "governance" : "operator"
           : normalizeOptionalRole(pageToken.role) ?? "user";
@@ -682,8 +690,10 @@ export async function proxy(req: NextRequest) {
   }
 
   const session = extractSessionContext(token as Record<string, unknown>);
-  const maintenanceOverride = isSoleMaintenanceSuperuser(session.email);
-  if (maintenanceOverride) session.role = "governance";
+  const testPersonaRole = testPersonaRoleFor(session.email);
+  const maintenanceOverride = !testPersonaRole && isSoleMaintenanceSuperuser(session.email);
+  if (testPersonaRole) session.role = testPersonaRole;
+  else if (maintenanceOverride) session.role = "governance";
   const queryClaims = extractClaimedActorContextFromSearchParams(
     req.nextUrl.searchParams
   );
@@ -745,7 +755,8 @@ export async function proxy(req: NextRequest) {
       role: session.role,
       tenantId: session.tenantId,
       actorIdPresent: Boolean(session.actorId),
-      maintenanceSuperuser: maintenanceSuperuserAuditContext(session.email),
+      maintenanceSuperuser: { ...maintenanceSuperuserAuditContext(session.email), active: maintenanceOverride, suppressedByTestPersona: Boolean(testPersonaRole) },
+      professionalTestPersona: testPersonaRole ? { active: true, name: "Pocohantus Smith", role: testPersonaRole, testOnly: true } : null,
     },
     req,
   });

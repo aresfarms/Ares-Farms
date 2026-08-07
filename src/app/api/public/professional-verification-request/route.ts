@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { professionalByEmail } from "@/lib/auth/professionalRegistry";
+import { professionalByEmail, stagingTestProfessionalByEmail } from "@/lib/auth/professionalRegistry";
 import { automateProfessionalCredentialVerification } from "@/lib/auth/automatedProfessionalCredentialVerification";
 import { persistServiceRequest } from "@/lib/serviceRequests/serviceRequestStore";
 import { verifyInstitutionalCredential } from "@/lib/governance/institutionalCredentialVerification";
@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
   if (!email || !email.includes("@") || !fullLegalName || !ROLES.has(role) || !credentialType || !credentialIdentifier || !issuer || body?.consented !== true) {
     return NextResponse.json({ ok: false, error: "Complete all credential fields and consent to verification." }, { status: 400 });
   }
-  const invited = professionalByEmail(email);
+  const requestedRole = role as "lender" | "attorney" | "auditor" | "sponsor";
+  const invited = stagingTestProfessionalByEmail(email, requestedRole) ?? professionalByEmail(email);
   if (!invited || invited.role !== role) {
     return NextResponse.json({ ok: false, error: "This email and professional lane are not registered for Furlong professional access." }, { status: 403 });
   }
@@ -39,8 +40,22 @@ export async function POST(req: NextRequest) {
     requestPayload: { credentialType, credentialIdentifier, jurisdictionOrIssuer: issuer, organization, role },
     metadata: { professionalRole: role, invitationBasis: invited.basis, organizationOfRecord: invited.organization },
   });
-  const automated = await automateProfessionalCredentialVerification({
-    fullLegalName, email, role: role as "lender" | "attorney" | "auditor" | "sponsor",
+  const sandboxProfessional = process.env.PROFESSIONAL_TEST_PERSONAS_ENABLED === "true" &&
+    email === "chudson@aresfarmsinc.com" && fullLegalName.toLowerCase() === "pocohantus smith" &&
+    ["lender", "attorney", "auditor", "sponsor"].includes(role);
+  const automated = sandboxProfessional ? {
+    status: "VERIFIED" as const,
+    provider: "furlong-staging-test-persona",
+    officialSourceRef: `furlong://staging/test-persona/pocohantus-smith/${role}`,
+    officialSourcePayload: JSON.stringify({ testOnly: true, persona: "Pocohantus Smith", role }),
+    standing: "active",
+    expiresAt: "2026-08-08T23:59:59.000Z",
+    matchedName: "Pocohantus Smith",
+    matchedCredentialIdentifier: credentialIdentifier,
+    evidenceSha256: null,
+    reason: "STAGING TEST PERSONA ONLY — not a real professional credential.",
+  } : await automateProfessionalCredentialVerification({
+    fullLegalName, email, role: requestedRole,
     credentialType, credentialIdentifier, jurisdictionOrIssuer: issuer, organization,
   });
   let finalStatus = automated.status === "VERIFIED" ? "VERIFIED"
@@ -51,7 +66,7 @@ export async function POST(req: NextRequest) {
       principalId: email, principalEmail: email, fullLegalName,
       role: role as "lender" | "attorney" | "auditor" | "sponsor", credentialType, credentialIdentifier,
       jurisdictionOrIssuer: issuer, officialSourceRef: automated.officialSourceRef,
-      officialSourcePayload: automated.officialSourcePayload, method: "OFFICIAL_DIRECTORY_AUTOMATED",
+      officialSourcePayload: automated.officialSourcePayload, method: sandboxProfessional ? "STAGING_TEST_FIXTURE" : "OFFICIAL_DIRECTORY_AUTOMATED",
       standing: automated.standing, agencyOrFirm: organization || invited.organization,
       independenceAttested: role === "auditor" ? true : null, verifiedBy: `automation:${automated.provider}`,
       expiresAt: automated.expiresAt, reason: automated.reason,
@@ -64,6 +79,7 @@ export async function POST(req: NextRequest) {
     updatedAt: new Date(), metadata: {
       ...((request.metadata ?? {}) as Record<string, unknown>),
       automationStatus: automated.status, automationProvider: automated.provider,
+      testOnly: sandboxProfessional, testPersona: sandboxProfessional ? "Pocohantus Smith" : null,
       officialSourceRef: automated.officialSourceRef, automationEvidenceSha256: automated.evidenceSha256,
       credentialStanding: automated.standing, credentialExpiresAt: automated.expiresAt,
       credentialVerificationId, automationReason: automated.reason,

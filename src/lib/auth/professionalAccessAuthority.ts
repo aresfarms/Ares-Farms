@@ -1,6 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 
-import { professionalByEmail, type ProfessionalGrant } from "@/lib/auth/professionalRegistry";
+import { professionalByEmail, stagingTestProfessionalByEmail, type ProfessionalGrant } from "@/lib/auth/professionalRegistry";
 import { serviceRequests } from "@/db/schema";
 import { db } from "@/lib/db";
 
@@ -16,7 +16,7 @@ export type ProfessionalAccessDecision = Readonly<{
 export async function evaluateProfessionalAccess(input: {
   principalId: string | null; principalEmail: string | null; requestedRole: ProfessionalAccessRole; at?: string;
 }): Promise<ProfessionalAccessDecision> {
-  const grant = professionalByEmail(input.principalEmail);
+  const grant = stagingTestProfessionalByEmail(input.principalEmail, input.requestedRole) ?? professionalByEmail(input.principalEmail);
   if (!grant) return { allowed: false, role: null, principalId: input.principalId, principalEmail: input.principalEmail, organization: null, credentialVerificationId: null, reasonCode: "PROFESSIONAL_NOT_REGISTERED" };
   if (grant.role !== input.requestedRole) return { allowed: false, role: grant.role, principalId: input.principalId, principalEmail: input.principalEmail, organization: grant.organization, credentialVerificationId: null, reasonCode: "PROFESSIONAL_ROLE_MISMATCH" };
   const principalEmail = input.principalEmail?.trim().toLowerCase() ?? null;

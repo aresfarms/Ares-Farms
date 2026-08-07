@@ -36,6 +36,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Professional Access | Furlong",
   description:
@@ -224,6 +226,18 @@ export default function ProfessionalAccessPage() {
           </Link>
         </div>
 
+        {process.env.PROFESSIONAL_TEST_PERSONAS_ENABLED === "true" ? (
+          <div style={{ ...card, borderLeft: "4px solid #7C3AED", background: "#faf7ff" }}>
+            <strong style={{ color: NAVY }}>Staging test persona: Pocohantus Smith</strong>
+            <span style={{ fontSize: 13, color: MUTED, lineHeight: 1.55 }}>
+              Verify Pocohantus Smith for a lane, then activate that lane to test its exact least-privilege boundary using chudson@aresfarmsinc.com. This test persona has no real-world professional authority.
+            </span>
+            <Link href="/api/public/professional-test-persona?clear=1" style={{ justifySelf: "start", color: "#7C3AED", fontWeight: 800 }}>
+              Return to Caitlin maintenance mode →
+            </Link>
+          </div>
+        ) : null}
+
         {LANES.map((lane) => (
           <section key={lane.role} style={{ ...card, borderLeft: `4px solid ${lane.accent}` }}>
             <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 12px" }}>
@@ -253,6 +267,12 @@ export default function ProfessionalAccessPage() {
                 </ul>
               </div>
             </div>
+
+            {process.env.PROFESSIONAL_TEST_PERSONAS_ENABLED === "true" ? (
+              <Link href={`/api/public/professional-test-persona?role=${lane.role}`} style={{ justifySelf: "start", color: lane.accent, fontWeight: 800, fontSize: 13 }}>
+                Test as Pocohantus Smith — {lane.role} →
+              </Link>
+            ) : null}
 
             {lane.status === "live" ? (
               <Link

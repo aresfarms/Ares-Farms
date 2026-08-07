@@ -22,6 +22,7 @@ import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
 import { LENDER_EMAIL_SIGNATURE, renderLenderEmailHtml } from "@/lib/notifications/lenderSignature";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { serviceRequests } from "@/db/schema";
+import { SIGNATURE_EXECUTION_DOCTRINE } from "@/lib/signature-execution/doctrine";
 
 /**
  * Customer Signing Ceremony API (public, token-gated) — the signature vault's
@@ -75,6 +76,8 @@ export async function GET(req: NextRequest) {
     intentText: ESIGN_INTENT_TEXT,
     consentVersion: ESIGN_CONSENT_VERSION,
     mode: signatureMode(),
+    executionPosture: "BLOCKED_PENDING_GOVERNED_EXECUTION",
+    canonicalResult: "ONE_EXECUTED_PDF",
   });
 }
 
@@ -92,6 +95,14 @@ export async function POST(req: NextRequest) {
       { ok: false, error: "This signing link is invalid or has expired — refresh your status page for a fresh one." },
       { status: 401 }
     );
+  }
+  if (SIGNATURE_EXECUTION_DOCTRINE.liveSigningBlocked) {
+    return NextResponse.json({
+      ok: false,
+      error: "Electronic execution is not active. Furlong is validating the governed signing process before any legally operative signature is accepted.",
+      blockerCode: "SIG_PROMOTION_INACTIVE",
+      canonicalResult: "ONE_EXECUTED_PDF",
+    }, { status: 409 });
   }
   const typedName = typeof body.typedName === "string" ? body.typedName.trim().slice(0, 140) : "";
   if (typedName.length < 3 || body.consented !== true) {

@@ -24,7 +24,8 @@
     "SOURCE_STACK_001_Canonical_External_Source_Discovery_Architecture.docx",
     "IMPLEMENTATION_WORKPACKAGES_Revenue_Intelligence_Runtime_Build.docx",
     "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf",
-    "Furlong_Lender_Submission_Governed_Implementation_Package.pdf"
+    "Furlong_Lender_Submission_Governed_Implementation_Package.pdf",
+    "Furlong_Volume_VII_Governed_External_Actions_and_Signature_Execution_Master.pdf"
   ],
   "allowedStatuses": [
     "implemented",
@@ -33,6 +34,27 @@
     "awaiting_controlled_promotion"
   ],
   "requirements": {
+    "CANON-SIGNATURE-EXECUTION-001": {
+      "title": "One-PDF governed signature execution",
+      "status": "intentionally_blocked",
+      "requires": ["exact_source_hash", "separate_authority_consent_intent", "certified_placement", "one_executed_pdf", "truthful_state_machine"],
+      "tests": ["verify:signature-execution", "verify:executed-pdf"],
+      "evidence": ["src/lib/signature-execution", "src/db/schema/signatureExecution.ts", "docs/doctrine/CANON_SIGNATURE_EXECUTION_001.md"]
+    },
+    "TECH-PDF-EXECUTION-001": {
+      "title": "Fail-closed PDF analysis, placement, finalization, and validation",
+      "status": "intentionally_blocked",
+      "requires": ["unsafe_pdf_rejection", "authored_zones", "third_party_append_page", "offline_mock", "production_block"],
+      "tests": ["verify:signature-execution", "smoke:signature-execution", "verify:executed-pdf"],
+      "evidence": ["src/lib/signature-execution/pdf", "src/scripts/signatureExecutionConformance.ts", "docs/TECH_PDF_EXECUTION_001.md"]
+    },
+    "OPS-SIGNATURE-EXECUTION-001": {
+      "title": "Signature review, reconciliation, validation, and incident runbook",
+      "status": "implemented",
+      "requires": ["human_stop", "unknown_reconciliation", "render_validation", "live_action_block"],
+      "tests": ["smoke:signature-reconciliation"],
+      "evidence": ["docs/runbooks/OPS_SIGNATURE_EXECUTION_001.md", "docs/VOLUME_VII_IMPLEMENTATION_AND_THREAT_MATRIX.md"]
+    },
     "CANON-LENDER-SUBMISSION-001": {
       "title": "Exact-package lender submission governance",
       "status": "implemented",

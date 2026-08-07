@@ -300,7 +300,7 @@ green while five of these were live. Gates prove what they were told to check.
 - **Resolution:** market status always renders; absence of a listing feed is
   stated as such.
 
-## C-15. Signed documents do not exist (OPEN — highest priority)
+## C-15. Signed documents do not exist (BUILT OFFLINE — live activation blocked)
 
 - **Controlling volumes:** Vol II (ESIGN/UETA retention), Vol V (evidence).
 - **Defect:** `api/public/document-sign` writes a signature CERTIFICATE and
@@ -308,10 +308,15 @@ green while five of these were live. Gates prove what they were told to check.
   instrument. Both the broker and the customer can open only the blank form
   plus a separate certificate. No lender or closing attorney accepts that as
   an executed document.
-- **Resolution (in progress):** generate a signed counterpart in ONE PDF —
-  Furlong-drafted instruments get a real signature block at a defined stamp
-  zone (we are the drafting party and own the template); third-party PDFs get a
-  non-obscuring margin band plus an appended signature page. `pdf-lib` added.
+- **Resolution:** Volume VII governed execution now produces ONE PDF. Certified
+  Furlong-authored templates use a defined signature zone. Third-party PDFs
+  preserve their original pages and receive a governed signature/execution
+  page appended inside the same file; a margin marker is omitted unless safe
+  unused space can be proven. The old certificate-only POST is fail-closed and
+  an environment variable can no longer activate live signing. Offline mock
+  conformance and full-page visual rendering pass. Live provider, legal
+  overlay, identity, webhook, persistence-service, and promotion work remains
+  explicitly blocked pending human and counsel review.
 
 ## C-16. Risk-based credential rotation requires an execution workflow
 

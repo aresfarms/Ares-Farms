@@ -1,6 +1,7 @@
 import { ClassificationLevel } from "@/lib/runtime/classificationRuntime";
 
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
+import { SIGNATURE_EXECUTION_EVENT_TYPES } from "@/lib/signature-execution/eventContracts";
 
 /**
  * Cross-Module Event Contract Registry
@@ -3053,6 +3054,17 @@ export const eventContractRegistry: EventContract[] = [
     payloadFields: ["case_id", "authorization_id", "outbox_id", "truth_status", "provider_reference", "reconciliation_required", "replay_ref"],
     purpose: "Preserve attempted, provider-accepted, delivered, acknowledged, failed, or unknown sandbox delivery truth without converting an attempt into proof of delivery.",
   },
+  ...SIGNATURE_EXECUTION_EVENT_TYPES.map((eventType): EventContract => ({
+    eventType,
+    producerModuleId: "signature-execution",
+    consumerModuleIds: ["audit-replay", "governance", "reviews"],
+    classificationLevel: "RESTRICTED",
+    replayRequired: true,
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    payloadFields: ["execution_id", "aggregate_version", "document_sha256", "actor_ref", "occurred_at", "replay_ref"],
+    purpose: "Preserve a version-bound signature execution fact without inferring consent, intent, execution, delivery, or acknowledgment from another event.",
+  })),
 ];
 
 const moduleIds = new Set(moduleManifests.map((manifest) => manifest.id));

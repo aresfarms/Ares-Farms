@@ -42,7 +42,9 @@ export const ESIGN_INTENT_TEXT =
   "document and agree to be bound by it, exactly as if I had signed it by hand.";
 
 export function signatureMode(): "test" | "live" {
-  return process.env.SIGNATURE_MODE?.trim().toLowerCase() === "live" ? "live" : "test";
+  // Volume VII forbids environment-variable activation. Live signing requires
+  // a reviewed promotion record, certified provider and approved legal overlay.
+  return "test";
 }
 
 /** SHA-256 of the exact vault bytes, streamed (never bytes-in-memory-forever). */

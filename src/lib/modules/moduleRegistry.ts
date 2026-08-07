@@ -2,6 +2,7 @@ import {
   ModuleFeatureFlags,
   createModuleFeatureFlags,
 } from "@/lib/modules/featureFlagGovernance";
+import { SIGNATURE_EXECUTION_EVENT_TYPES } from "@/lib/signature-execution/eventContracts";
 
 /**
  * Module Manifest Registry
@@ -5521,6 +5522,23 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     description: "Builds immutable lender packages, captures exact-version customer consent, verifies recipients, and exercises delivery only through the deterministic sandbox adapter.",
     adjacentModules: ["lender-workflow", "lender-evidence", "documents", "reviews", "audit-replay", "promotion"],
     eventsPublished: ["lender.submission.package.frozen", "lender.submission.dispatch.statused"],
+    eventsConsumed: ["document.metadata.received", "review.transition.approved", "promotion.gate.blocked"],
+    featureFlags: internalFlags,
+  },
+  {
+    id: "signature-execution",
+    title: "Governed Signature Execution",
+    route: "/signature-executions",
+    audience: ["borrower", "internal"],
+    permissions: ["signature-execution:read", "signature-execution:review", "signature-execution:offline-test"],
+    dataDependencies: ["signature-execution-cases", "execution-document-versions", "signature-placement-plans", "signer-authority-records", "signature-electronic-consents", "signature-intent-records", "signature-execution-authorizations", "signature-command-outbox", "signature-evidence-bundles", "executed-pdf-versions", "signature-validation-reports", "signature-replay-refs"],
+    publicSurfaceAllowed: false,
+    productionBlocked: true,
+    claimsProfile: "live-action-blocked",
+    replayRequired: true,
+    description: "Produces one governed executed PDF through certified placement and offline validation while live signing and delivery remain blocked.",
+    adjacentModules: ["documents", "reviews", "audit-replay", "governance", "promotion", "lender-submission"],
+    eventsPublished: [...SIGNATURE_EXECUTION_EVENT_TYPES],
     eventsConsumed: ["document.metadata.received", "review.transition.approved", "promotion.gate.blocked"],
     featureFlags: internalFlags,
   },

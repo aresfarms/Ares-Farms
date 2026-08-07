@@ -223,7 +223,7 @@ export default function EvidenceResolutionWorkflowPage() {
         bankerSpokeIsolated: spokeIsolation,
         auditAnchorRef: "audit-anchor://review/eng-001",
       },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       riskOverlay: {
         siteContaminationHistory: "NONE",
         waterWetlandProximity: "NONE",

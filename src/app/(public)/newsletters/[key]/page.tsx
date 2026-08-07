@@ -80,7 +80,7 @@ export default async function NewsletterPage({ params }: { params: Promise<{ key
         }}
       >
         {/* Anti-counterfeit watermark — the Furlong emblem, faint, behind the body. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
+        { }
         <img
           src="/brand/furlong-emblem.png"
           alt=""
@@ -109,7 +109,7 @@ export default async function NewsletterPage({ params }: { params: Promise<{ key
             borderBottom: `3px solid ${GOLD}`,
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
+          { }
           <img
             src="/brand/furlong-emblem.png"
             alt="Furlong emblem"

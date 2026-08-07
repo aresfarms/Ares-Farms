@@ -107,7 +107,7 @@ export default function BrokerSetupPage() {
           <div style={{ border: "1px solid #e3ddd0", borderRadius: 10, background: "#FDFBF7", padding: "16px 18px" }}>
             <table role="presentation" cellPadding="0" cellSpacing="0"><tbody><tr>
               <td style={{ verticalAlign: "middle", width: 70, paddingRight: 16 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                { }
                 <img src="/brand/compasstocapital-email-logo.jpg" width={64} height={64} alt="Compass to Capital seal" style={{ display: "block", borderRadius: "50%" }} />
               </td>
               <td style={{ verticalAlign: "middle", borderLeft: "1px solid #e3ddd0", paddingLeft: 16 }}>

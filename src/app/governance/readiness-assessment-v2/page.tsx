@@ -173,7 +173,7 @@ export default function ReadinessAssessmentV2Page() {
         .map((t) => t.trim())
         .filter(Boolean),
       scope: { sovereignFederationAllowed: sovereignAllowed },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
       onboardingState: {
         stage: "BEGINNER",
         location: { country: "US", state: stateValue, county: "Frederick" },

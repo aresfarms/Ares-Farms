@@ -260,7 +260,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
     const out: Record<string, typeof facts> = { property: [], utilities: [], environmental: [], education: [], misc: [] };
     for (const fact of facts) out[categoryForFact(fact.label)].push(fact);
     return out;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [facts, lane]);
 
   const introFor = (id: TabId): string => lane.tabs.find((item) => item.id === id)?.intro ?? "";
@@ -271,6 +271,9 @@ export function GovernedLaneChassis(props: ChassisProps) {
   const renderCategory = (id: CategoryTabId, title: string): ReactNode => <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>{title}</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor(id)}</p></header>{factsByTab[id].length > 0 ? <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}>{factsByTab[id].map(renderFact)}</div> : <div style={card}>No verified information is currently available in this section.</div>}</>;
 
   return <section aria-label="Property command center" data-testid="property-command-center" data-consumer-lane={lane.consumerLaneLabel} style={shell}>
+    <h1 style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0, 0, 0, 0)", whiteSpace: "nowrap", border: 0 }}>
+      {props.title}
+    </h1>
     <nav aria-label="Property workspace sections" style={{ position: "sticky", top: 0, zIndex: 4, background: "rgba(250,248,243,.97)", borderBottom: "1px solid #E5E0D5", padding: "10px 12px", display: "flex", gap: 7, overflowX: "auto", alignItems: "center" }}>
       <img src="/brand/furlong-emblem.png" alt="Furlong emblem" width={38} height={38} style={{ width: 38, height: 38, objectFit: "contain", flex: "none", marginRight: 4 }} />
       {lane.tabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 12px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>{item.label}</button>)}

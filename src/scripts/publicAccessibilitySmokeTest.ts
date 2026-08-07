@@ -199,7 +199,7 @@ async function runBrowserAudit(): Promise<{
   // @axe-core/playwright is an optional dev dependency imported dynamically
   // below; its constructor is typed `any` here so the smoke test compiles under
   // strict mode without the package's types being present at build time.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   let AxeBuilder: any = null;
 
   try {

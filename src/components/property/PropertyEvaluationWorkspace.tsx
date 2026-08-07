@@ -2364,9 +2364,9 @@ export function PropertyEvaluationWorkspace({
               <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: 0.08, textTransform: "uppercase", color: "#0f766e" }}>
                 Property-first analysis
               </span>
-              <strong style={{ fontSize: 26, color: "#101a2b", lineHeight: 1.08 }}>
+              <h1 style={{ margin: 0, fontSize: 26, color: "#101a2b", lineHeight: 1.08 }}>
                 Start with the property. Furlong will build the first-pass analysis from there.
-              </strong>
+              </h1>
               {startingLens && (
                 <span style={{ fontSize: 13.5, color: "#4d596d", lineHeight: 1.6 }}>
                   You entered through <strong>{startingLens.replace(/-/g, " ")}</strong>. We will use that as the starting lens, then test the property across every plausible use, market, cost, environmental, and financing pathway.
@@ -2424,9 +2424,9 @@ export function PropertyEvaluationWorkspace({
               <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: 0.08, textTransform: "uppercase", color: "#854F0B" }}>
                 {context.importScreeningCategory === "restricted-asset" ? "Restricted asset routing" : "Special asset routing"}
               </span>
-              <strong style={{ fontSize: 30, color: "#101a2b", lineHeight: 1.04 }}>
+              <h1 style={{ margin: 0, fontSize: 30, color: "#101a2b", lineHeight: 1.04 }}>
                 {context.title}
-              </strong>
+              </h1>
               <span style={{ fontSize: 14.5, color: "#4d596d", lineHeight: 1.6 }}>
                 {context.location}
                 {context.exactAddress ? ` · ${context.exactAddress}` : ""}
@@ -2968,7 +2968,7 @@ export function PropertyEvaluationWorkspace({
     if (!context.propertyId) return;
     const timer = window.setTimeout(saveDraft, 1_200);
     return () => window.clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [answers, context.propertyId]);
 
   async function requestReportPdf() {
@@ -3418,7 +3418,7 @@ export function PropertyEvaluationWorkspace({
       })(),
     });
     return { map, useScreen, scorecard };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [workspaceProfile.id, effectiveListedPrice, facts, effectivePlaceIntelligence, ownershipContext, topProgramPreview.join("|")]);
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
@@ -3941,7 +3941,7 @@ export function PropertyEvaluationWorkspace({
       {!deepView && (
         <div className="nl-doc" style={{ position: "relative", overflow: "hidden", borderRadius: 16, border: "1px solid #d7deea", boxShadow: "0 6px 22px rgba(16,26,43,0.08)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", padding: "20px 24px", background: "linear-gradient(180deg,#10233b,#14293f)", borderBottom: "3px solid #b8862f" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+            { }
             <img src={report.branding.emblemPath} alt="Furlong seal" width={58} height={58} style={{ width: 58, height: 58, borderRadius: "50%", flexShrink: 0, boxShadow: "0 0 0 2px rgba(201,168,76,0.45)" }} />
             <div style={{ display: "grid", gap: 3, flex: "1 1 240px", fontFamily: "Georgia, 'Times New Roman', serif" }}>
               <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#d4b06a" }}>Furlong · The Land Ledger</span>

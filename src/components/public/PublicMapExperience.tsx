@@ -600,7 +600,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
     if (reduceMotion) { stopTick(); return; }
     startTick();
     return () => stopTick();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [reduceMotion]);
 
   // ── Navigation ───────────────────────────────────────────────────────────────
@@ -1078,7 +1078,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
             </div>
 
             <figure style={{ margin: 0, borderRadius: 8, overflow: "hidden" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img
                 key={hImg.src!}
                 className="tour-popup-img"
@@ -1371,7 +1371,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
                     </p>
                     <figure style={{ margin: 0 }}>
                       {gatewayImg ? (
-                        // eslint-disable-next-line @next/next/no-img-element
+
                         <img
                           key={gatewayImg.src!}
                           className="tour-popup-img"
@@ -1448,7 +1448,7 @@ function possibleForIndex(idx: number): PublicSafeProperty | null {
                     {/* Image: fades in when the displayed image changes. */}
                     {popupImg && (
                       <figure style={{ margin: 0 }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img
                           key={popupImg.src!}
                           className="tour-popup-img"

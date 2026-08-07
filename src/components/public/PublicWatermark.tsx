@@ -49,7 +49,7 @@ export default function PublicWatermark({ opacity = 0.1 }: { opacity?: number })
         opacity,
       }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
+      { }
       <img
         src="/furlong-compass.svg"
         alt=""

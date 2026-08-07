@@ -16,15 +16,15 @@ assert.match(platform.packetSha256, /^[a-f0-9]{64}$/);
 assert.equal(platform.replayRule, "TECH-REPLAY-001");
 assert.equal(platform.ruleMatches.find((r) => r.ruleId === "TECH-LEDGER-001")?.status, "MATCH");
 
-const module = composeGovernedEvidencePacket({
+const modulePacket = composeGovernedEvidencePacket({
   scope: { kind: "MODULE", moduleId: "applications" }, modules: moduleManifests, events,
   chainVerification: { ok: true, chained: 1, legacy: 1, brokenAt: null },
   generatedAt: "2026-01-02T00:00:00.000Z",
 });
-assert.equal(module.moduleCount, 1);
-assert.equal(module.integrityConclusion, "PARTIALLY_VERIFIED_WITH_LEGACY_RECORDS");
-assert.ok(module.unresolvedIssues.length > 0);
-assert.match(module.legalBoundary, /does not determine admissibility/i);
+assert.equal(modulePacket.moduleCount, 1);
+assert.equal(modulePacket.integrityConclusion, "PARTIALLY_VERIFIED_WITH_LEGACY_RECORDS");
+assert.ok(modulePacket.unresolvedIssues.length > 0);
+assert.match(modulePacket.legalBoundary, /does not determine admissibility/i);
 
 const failed = composeGovernedEvidencePacket({
   scope: { kind: "MODULE", moduleId: "applications" }, modules: moduleManifests, events,

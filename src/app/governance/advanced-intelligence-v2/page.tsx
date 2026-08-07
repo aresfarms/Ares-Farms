@@ -11,6 +11,7 @@ import {
   AdvancedIntelligenceV2Result,
   composeAdvancedIntelligenceV2,
 } from "@/lib/intelligence/advancedIntelligenceV2Runtime";
+import { readJsonResponse } from "@/lib/http/readJsonResponse";
 
 type ApiResponse = {
   ok: boolean;
@@ -292,7 +293,7 @@ export default function AdvancedIntelligenceV2Page() {
           body: JSON.stringify(localInput),
         }
       );
-      const data: ApiResponse = await response.json();
+      const data = await readJsonResponse<ApiResponse>(response);
       setServerResult(data);
       if (!data.ok) {
         setError(data.error ?? "Unknown error from API");

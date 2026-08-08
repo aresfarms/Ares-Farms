@@ -155,6 +155,7 @@ steps:
       - build
       - --target=runner
       - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.ref.name=${_GIT_REF}
       - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
       - -t=${_REPO}/furlong-core:p2
       - .
@@ -166,6 +167,7 @@ steps:
       - build
       - --target=migrator
       - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.ref.name=${_GIT_REF}
       - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
       - -t=${_REPO}/furlong-db-migrate:p2
       - .
@@ -177,6 +179,7 @@ steps:
     args:
       - build
       - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
+      - --label=org.opencontainers.image.ref.name=${_GIT_REF}
       - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
       - -t=${_REPO}/furlong-scanner:p2
       - scanner

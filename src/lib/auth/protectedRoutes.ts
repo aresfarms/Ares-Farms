@@ -38,7 +38,7 @@ export const INTERNAL_CHROME_PREFIXES = [
   "/live-scraper-activation", "/release-candidate-freeze",
   "/deployment-environment-readiness", "/environmental-compliance",
   "/named-tester-acceptance", "/launch-authorization",
-  "/source-", "/production-", "/security/mfa",
+  "/source-", "/production-",
 ] as const;
 
 /**
@@ -49,6 +49,10 @@ export const INTERNAL_CHROME_PREFIXES = [
  * sponsor vs borrower) is a deliberate second pass — step one is "no anonymous
  * access to any internal/portal surface".
  */
+export const NO_INTERNAL_CHROME_PREFIXES = [
+  "/security", "/sign-in", "/portal", "/lender-desk",
+] as const;
+
 export const PROTECTED_PAGE_PREFIXES = [
   ...INTERNAL_CHROME_PREFIXES,
   "/security/mfa",
@@ -71,6 +75,7 @@ function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
 
 /** True if `pathname` is an operator/governance console that shows the internal chrome. */
 export function isInternalChromeRoute(pathname: string): boolean {
+  if (matchesPrefix(pathname, NO_INTERNAL_CHROME_PREFIXES)) return false;
   return matchesPrefix(pathname, INTERNAL_CHROME_PREFIXES);
 }
 

@@ -116,6 +116,25 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
       env {
+        name = "PLAID_CLIENT_ID"
+        value_source {
+          secret_key_ref {
+            secret  = "PLAID_CLIENT_ID"
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name = "PLAID_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "PlaidSecret"
+            version = "latest"
+          }
+        }
+      }
+
+      env {
         name = "PLAID_DATA_ENCRYPTION_KEY"
         value_source {
           secret_key_ref {

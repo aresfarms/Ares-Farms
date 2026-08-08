@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import { userHasPasswordByEmail, verifyUserPasswordByEmail } from "@/lib/auth/passwordAuth";
 
 import {
   ensureDurableIdentity,
@@ -108,10 +109,21 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
     return null;
   }
 
-  const credentialPolicy = evaluateCredentialAuthPolicy({
-    email,
-    password: credentials?.password,
-  });
+  const localFounderPasswordConfigured =
+    process.env.NODE_ENV !== "production" &&
+    email === "chudson@aresfarmsinc.com" &&
+    await userHasPasswordByEmail(email).catch(() => false);
+
+  const credentialPolicy = localFounderPasswordConfigured
+    ? {
+        allowed: await verifyUserPasswordByEmail(email, credentials?.password ?? ""),
+        mode: "email-allowlist" as const,
+        email,
+        productionLike: false,
+        reason: "Per-user password verification applied for local founder access.",
+        failureCode: "password_mismatch",
+      }
+    : evaluateCredentialAuthPolicy({ email, password: credentials?.password });
 
   if (!credentialPolicy.allowed) {
     await persistCredentialRejection(

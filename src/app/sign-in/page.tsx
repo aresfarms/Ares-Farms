@@ -9,7 +9,7 @@ export default function SignInPage() {
         <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "#475569" }}>Furlong Secure Access</div>
         <h1 style={{ margin: "8px 0 10px", fontSize: 28 }}>Sign in</h1>
         <p style={{ margin: "0 0 22px", color: "#475569", lineHeight: 1.5 }}>
-          Sign in with your authorized Furlong credential. Privileged sessions must complete passkey MFA before access is granted.
+          Sign in with your authorized Furlong password. Privileged sessions must complete passkey MFA before access is granted.
         </p>
         <Suspense fallback={<div>Loading secure sign-in…</div>}>
           <SignInClient />

@@ -18,7 +18,7 @@ export default function SignInClient() {
     setError(null);
     const result = await signIn("credentials", { email, password, callbackUrl, redirect: false });
     if (!result?.ok) {
-      setError("Sign-in was not accepted. Check your authorized email and credential.");
+      setError("Sign-in was not accepted. Check your authorized email and password.");
       setBusy(false);
       return;
     }
@@ -32,7 +32,7 @@ export default function SignInClient() {
         <input type="email" required autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} style={{ padding: 12, border: "1px solid #cbd5e1", borderRadius: 8 }} />
       </label>
       <label style={{ display: "grid", gap: 6 }}>
-        <span>Credential</span>
+        <span>Password</span>
         <input type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ padding: 12, border: "1px solid #cbd5e1", borderRadius: 8 }} />
       </label>
       {error ? <div role="alert" style={{ color: "#991b1b", background: "#fee2e2", padding: 12, borderRadius: 8 }}>{error}</div> : null}

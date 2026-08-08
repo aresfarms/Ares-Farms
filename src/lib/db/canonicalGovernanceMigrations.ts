@@ -75,6 +75,7 @@ export const CANONICAL_GOVERNANCE_MIGRATION_FILES = [
   "0048_stripe_connect_allocation_governance.sql",
   "0049_founder_economic_events.sql",
   "0050_zero_trust_access_security.sql",
+  "0051_per_user_password.sql",
 ] as const;
 
 /** Directory holding the canonical governance migration SQL files. */

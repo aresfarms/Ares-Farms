@@ -500,7 +500,7 @@ export async function proxy(req: NextRequest) {
 
       if (!pageToken) {
         const signInUrl = req.nextUrl.clone();
-        signInUrl.pathname = "/api/auth/signin";
+        signInUrl.pathname = "/sign-in";
         signInUrl.search = `callbackUrl=${encodeURIComponent(
           `${route}${req.nextUrl.search}`,
         )}`;
@@ -511,7 +511,7 @@ export async function proxy(req: NextRequest) {
       const zeroTrust = await evaluateZeroTrustAccess({ userId: pageUserId, tokenSessionVersion: pageSessionVersion, role: pageToken.role });
       if (!zeroTrust.allowed) {
         const signInUrl = req.nextUrl.clone();
-        signInUrl.pathname = "/api/auth/signin";
+        signInUrl.pathname = "/sign-in";
         signInUrl.search = `callbackUrl=${encodeURIComponent(`${route}${req.nextUrl.search}`)}`;
         return NextResponse.redirect(signInUrl);
       }

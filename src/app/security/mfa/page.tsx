@@ -6,7 +6,7 @@ import MfaClient from "./MfaClient";
 
 export default async function MfaPage(){
   const session=await getServerSession(authOptions); const user=session?.user as {id?:string;email?:string|null;role?:string|null}|undefined;
-  if(!user?.id) redirect("/api/auth/signin?callbackUrl=/security/mfa");
+  if(!user?.id) redirect("/sign-in?callbackUrl=/security/mfa");
   const [state,passkeys]=await Promise.all([ensureAccessSecurityState(user.id),activePasskeys(user.id)]);
   return <main style={{maxWidth:900,margin:"40px auto",padding:"0 24px",fontFamily:"system-ui"}}>
     <div style={{fontSize:12,fontWeight:800,letterSpacing:1,textTransform:"uppercase"}}>Ares Farms / Furlong Security</div>

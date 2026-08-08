@@ -391,6 +391,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
 
 export const authOptions: NextAuthOptions = {
   secret: resolveNextAuthSecret(),
+  pages: { signIn: "/sign-in" },
   providers: [
     CredentialsProvider({
       name: "Farm Login",

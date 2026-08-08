@@ -117,6 +117,13 @@ resource "google_secret_manager_secret_iam_member" "runtime_evidence_replay_sign
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
+resource "google_secret_manager_secret_iam_member" "runtime_plaid_data_encryption" {
+  project   = var.project_id
+  secret_id = google_secret_manager_secret.app["PLAID_DATA_ENCRYPTION_KEY"].secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
 resource "google_secret_manager_secret_iam_member" "runtime_report_signing" {
   project   = var.project_id
   secret_id = google_secret_manager_secret.app["REPORT_SIGNING_SECRET"].secret_id

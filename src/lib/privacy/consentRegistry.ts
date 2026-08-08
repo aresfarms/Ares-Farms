@@ -35,6 +35,7 @@ export type ConsentId =
   | "esign-signature"
   | "identity-verification"
   | "financial-data-handling"
+  | "plaid-financial-account-access"
   | "document-attestation"
   | "lender-submission-sharing"
   | "marketing-optional";
@@ -155,6 +156,17 @@ export const CONSENTS: Record<ConsentId, ConsentDefinition> = {
       "still get a loan arranged. Captured at the moment of the first financial upload so it is " +
       "specific and contemporaneous, and paired with the identity check because these documents are " +
       "the ones an impostor actually wants.",
+  },
+  "plaid-financial-account-access": {
+    id: "plaid-financial-account-access",
+    version: "plaid-financial-access-v1",
+    capturedAt: "Immediately before Plaid Link opens",
+    lawfulBasis: "consent",
+    required: true,
+    text:
+      "I authorize Furlong to use Plaid to connect the financial accounts I choose and to receive, process, securely store, and share the account information I authorize for this financing request. I understand Furlong does not receive my online-banking password, I can disconnect the account, and access will be revoked when it is no longer needed or when I withdraw permission, subject to records that must be retained by law.",
+    basisNote:
+      "Specific, purpose-bound authorization immediately before financial-account connection; separately versioned from general financial-document handling.",
   },
   "document-attestation": {
     id: "document-attestation",

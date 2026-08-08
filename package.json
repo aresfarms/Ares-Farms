@@ -579,7 +579,8 @@
     "verify:professional-credential-automation": "tsx src/scripts/professionalCredentialAutomationConformance.ts",
     "verify:professional-page-roles": "tsx src/scripts/professionalPageRoleConformance.ts",
     "verify:sole-maintenance-superuser": "tsx src/scripts/soleMaintenanceSuperuserConformance.ts",
-    "verify:payment-fraud": "tsx src/scripts/paymentFraudConformance.ts"
+    "verify:payment-fraud": "tsx src/scripts/paymentFraudConformance.ts",
+    "verify:plaid-at-rest-encryption": "tsx src/scripts/verifyPlaidAtRestEncryption.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -116,6 +116,20 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
       env {
+        name = "PLAID_DATA_ENCRYPTION_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app["PLAID_DATA_ENCRYPTION_KEY"].secret_id
+            version = "latest"
+          }
+        }
+      }
+      env {
+        name  = "PLAID_DATA_ENCRYPTION_KEY_VERSION"
+        value = "v1"
+      }
+
+      env {
         name = "REPORT_SIGNING_SECRET"
         value_source {
           secret_key_ref {
@@ -474,6 +488,7 @@ resource "google_cloud_run_v2_service" "core" {
     google_secret_manager_secret_iam_member.runtime_database_url,
     google_secret_manager_secret_iam_member.runtime_nextauth_secret,
     google_secret_manager_secret_iam_member.runtime_report_signing,
+    google_secret_manager_secret_iam_member.runtime_plaid_data_encryption,
     google_secret_manager_secret_iam_member.runtime_sendgrid_api_key,
     google_secret_manager_secret_iam_member.runtime_auth_shared_secret,
     google_storage_bucket_iam_member.runtime_state_core_rw,

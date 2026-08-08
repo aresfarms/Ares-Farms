@@ -100,6 +100,7 @@ export * from "./operatorReviewQueues";
 export * from "./partnerWorkflows";
 export * from "./paymentConnectorAdapters";
 export * from "./paymentConnectorExecutions";
+export * from "./plaidSecureData";
 export * from "./pipeline";
 export * from "./regulatedDecisionNotices";
 export * from "./recommendationReleaseAttestations";

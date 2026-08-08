@@ -97,12 +97,12 @@ export const DOMAIN_PURPOSE_REGISTRY: DomainPurposeRecord[] = [
     capitalBrandCandidate: false,
     defensiveRegistration: false,
     redirectOnly: false,
-    dnsStatus: "unverified",
+    dnsStatus: "configured",
     productionApproved: false,
     securityCritical: true,
     notes: [
       "founder-approved primary public-domain candidate",
-      "production not approved", "DNS not activated", "SEC-DNS-001 remains open",
+      "production not approved", "Squarespace DNS active with Coming Soon parking; application production not activated", "SEC-DNS-001 remains open",
     ],
   },
   {
@@ -141,7 +141,7 @@ export const DOMAIN_PURPOSE_REGISTRY: DomainPurposeRecord[] = [
     capitalBrandCandidate: true,
     defensiveRegistration: false,
     redirectOnly: false,
-    dnsStatus: "unverified",
+    dnsStatus: "configured",
     productionApproved: false,
     securityCritical: true,
     notes: [

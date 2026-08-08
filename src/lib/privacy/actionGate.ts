@@ -38,6 +38,7 @@ export type GatedAction =
   | "submit-financing-request"
   | "upload-supporting-document"
   | "upload-financial-document"
+  | "connect-financial-account"
   | "sign-document"
   | "receive-broker-document"
   | "submit-package-to-lender"
@@ -88,6 +89,13 @@ export const ACTION_REQUIREMENTS: Record<GatedAction, ActionRequirement> = {
       "Tax returns, bank statements and personal financial statements are the most sensitive things " +
       "you will ever send us — and the most valuable to an impostor. Before they enter the vault we " +
       "confirm you are you, once.",
+  },
+  "connect-financial-account": {
+    action: "connect-financial-account",
+    minimumTier: "identity-verified",
+    consents: ["plaid-financial-account-access"],
+    because:
+      "Opening Plaid Link can authorize ongoing access to sensitive financial-account data. The person must verify identity, complete fresh phishing-resistant MFA, and separately authorize Plaid access immediately before Link opens.",
   },
   "sign-document": {
     action: "sign-document",

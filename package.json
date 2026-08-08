@@ -580,7 +580,8 @@
     "verify:professional-page-roles": "tsx src/scripts/professionalPageRoleConformance.ts",
     "verify:sole-maintenance-superuser": "tsx src/scripts/soleMaintenanceSuperuserConformance.ts",
     "verify:payment-fraud": "tsx src/scripts/paymentFraudConformance.ts",
-    "verify:plaid-at-rest-encryption": "tsx src/scripts/verifyPlaidAtRestEncryption.ts"
+    "verify:plaid-at-rest-encryption": "tsx src/scripts/verifyPlaidAtRestEncryption.ts",
+    "verify:plaid-link-security": "tsx src/scripts/plaidLinkSecurityConformance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
@@ -599,6 +600,7 @@
     "postgres": "^3.4.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-plaid-link": "^5.0.0",
     "stripe": "^22.1.1",
     "uuid": "^14.0.0",
     "zod": "^4.4.3"

@@ -28,8 +28,14 @@ CREATE TABLE IF NOT EXISTS signature_placement_plans (
  replay_ref text NOT NULL, trace_id text NOT NULL, metadata jsonb, created_at timestamptz NOT NULL DEFAULT now()
 );
 
-ALTER TABLE signature_execution_cases ADD CONSTRAINT signature_case_active_document_fk FOREIGN KEY (active_document_version_id) REFERENCES execution_document_versions(id);
-ALTER TABLE signature_execution_cases ADD CONSTRAINT signature_case_active_plan_fk FOREIGN KEY (active_placement_plan_id) REFERENCES signature_placement_plans(id);
+DO $$ BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'signature_case_active_document_fk' AND conrelid = 'signature_execution_cases'::regclass) THEN
+  ALTER TABLE signature_execution_cases ADD CONSTRAINT signature_case_active_document_fk FOREIGN KEY (active_document_version_id) REFERENCES execution_document_versions(id);
+ END IF;
+ IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'signature_case_active_plan_fk' AND conrelid = 'signature_execution_cases'::regclass) THEN
+  ALTER TABLE signature_execution_cases ADD CONSTRAINT signature_case_active_plan_fk FOREIGN KEY (active_placement_plan_id) REFERENCES signature_placement_plans(id);
+ END IF;
+END $$;
 
 CREATE TABLE IF NOT EXISTS signer_authority_records (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(), case_id uuid NOT NULL REFERENCES signature_execution_cases(id), signer_id text NOT NULL,

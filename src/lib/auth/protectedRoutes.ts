@@ -38,7 +38,7 @@ export const INTERNAL_CHROME_PREFIXES = [
   "/live-scraper-activation", "/release-candidate-freeze",
   "/deployment-environment-readiness", "/environmental-compliance",
   "/named-tester-acceptance", "/launch-authorization",
-  "/source-", "/production-",
+  "/source-", "/production-", "/security/mfa",
 ] as const;
 
 /**

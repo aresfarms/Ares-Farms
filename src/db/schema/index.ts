@@ -69,6 +69,7 @@ export const properties = pgTable("properties", {
  * Canonical governance schema modules.
  */
 
+export * from "./accessSecurity";
 export * from "./applicationDocuments";
 export * from "./applications";
 export * from "./auditEvents";

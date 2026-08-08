@@ -51,6 +51,8 @@ export const INTERNAL_CHROME_PREFIXES = [
  */
 export const PROTECTED_PAGE_PREFIXES = [
   ...INTERNAL_CHROME_PREFIXES,
+  "/security/mfa",
+  "/security/password-setup",
   "/portal",
   // The Lender Deal Desk is auth-gated but does NOT wear the internal
   // operator chrome — the licensed lender gets a clean working surface,

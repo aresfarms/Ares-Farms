@@ -463,8 +463,6 @@ export async function POST(req: Request) {
       event.data?.object?.id ??
       null;
     let entitlement: Entitlement | null = null;
-    let allocationEvidenceId: string | null = null;
-    let allocationRevenueClass: string | null = null;
     let fraudDecision: PaymentRiskDecision | null = null;
     const stripeObject = (event.data?.object ?? {}) as Record<string, unknown>;
     if (event.type === "checkout.session.completed") {
@@ -487,7 +485,7 @@ export async function POST(req: Request) {
         threeDSecureAuthenticated: threeDS.result === "authenticated",
         cvcCheck: checks.cvc_check === "pass" || checks.cvc_check === "fail" ? checks.cvc_check : "unavailable",
         postalCheck: checks.address_postal_code_check === "pass" || checks.address_postal_code_check === "fail" ? checks.address_postal_code_check : "unavailable",
-        idmeIdentityVerified: process.env.IDME_ENFORCEMENT !== "required" || metadataRecord.idmeIdentityVerified === "true",
+        identityProofed: metadataRecord.identityProofed === "true",
         plaidOwnershipMatch: metadataRecord.plaidOwnershipMatch === "true" ? true : metadataRecord.plaidOwnershipMatch === "false" ? false : null,
         paymentMethod: wallet ? "wallet" : "card",
         amountCents: typeof stripeObject.amount === "number" ? stripeObject.amount : 0,
@@ -549,15 +547,13 @@ export async function POST(req: Request) {
           recipients: stripeConnectRecipients(),
           generatedAt: new Date(stripeEvent.created * 1000).toISOString(),
         });
-        const allocationRecord = await persistStripeConnectAllocation({
+        await persistStripeConnectAllocation({
           evidence: allocationEvidence,
           rule,
           revenueClass,
           traceId,
           replayRef: traceId,
         });
-        allocationEvidenceId = allocationRecord.evidenceId;
-        allocationRevenueClass = revenueClass;
       }
     }
 

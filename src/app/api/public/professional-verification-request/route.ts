@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     fullLegalName, email, role: requestedRole,
     credentialType, credentialIdentifier, jurisdictionOrIssuer: issuer, organization,
   });
-  let finalStatus = automated.status === "VERIFIED" ? "VERIFIED"
+  const finalStatus = automated.status === "VERIFIED" ? "VERIFIED"
     : automated.status === "REJECTED" ? "AUTOMATED_REJECTED" : "AUTOMATION_EXCEPTION";
   let credentialVerificationId: string | null = null;
   if (automated.status === "VERIFIED" && automated.officialSourceRef && automated.officialSourcePayload && automated.standing && automated.expiresAt) {

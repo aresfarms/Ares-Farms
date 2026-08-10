@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 
 import {
+  CANONICAL_GOVERNANCE_MIGRATION_FILES,
+  canonicalTargetSchemaVersion,
+} from "@/lib/db/canonicalGovernanceMigrations";
+import {
   assertSyntheticFixtureLineage,
   bindSyntheticFixtureLineage,
   createSyntheticFixtureContext,
@@ -223,6 +227,13 @@ try {
     "src/app/api/plaid/exchange/route.ts",
     "utf8",
   );
+  assert(
+    CANONICAL_GOVERNANCE_MIGRATION_FILES.includes(
+      "0053_synthetic_fixture_lineage.sql",
+    ),
+    "Synthetic lineage migration must be present in the canonical executable registry.",
+  );
+  assert.equal(canonicalTargetSchemaVersion(), "0053");
   assert(migration.includes("BEFORE UPDATE OR DELETE"));
   assert(migration.includes("synthetic_fixture_lineage_records"));
   assert(financingRoute.includes("syntheticPersonaByHumanVisibleName"));

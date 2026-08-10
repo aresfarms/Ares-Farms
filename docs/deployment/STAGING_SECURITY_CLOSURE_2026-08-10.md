@@ -44,4 +44,13 @@ No statement of completion or production readiness may be made until evidence ex
 6. Governance/security approvals required by the Master Volumes.
 7. Production regional HA provisioning, restore/failover drills, measured RTO/RPO, ten required synthetic borrower journeys, and the governed joint activation ceremony.
 
+## Stripe wallet readiness repair
+
+- Stripe test-mode payment-method configuration `pmc_1U1eJ3DVUdDb7LlbVd4U7aMt` has card, Apple Pay, Google Pay, and Link enabled.
+- Stripe-hosted Checkout domain `checkout.stripe.com` is enabled with active Apple Pay, Google Pay, and Link status. Furlong uses a full Stripe-hosted Checkout redirect, not an embedded wallet form.
+- Test webhook endpoint `we_1U1fTcDVUdDb7LlbcxGHy7CE` subscribes to `checkout.session.completed`, `charge.succeeded`, `payment_intent.payment_failed`, and `charge.dispute.created`. The charge event is required to prove `apple_pay`, `google_pay`, or ordinary card from signed provider evidence.
+- `furlong-stripe-webhook-00004-dnx` serves 100% of webhook traffic from the approved zero-HIGH/zero-CRITICAL digest, uses project Binary Authorization, and pins `DATABASE_URL` version 2 plus `STRIPE_WEBHOOK_SECRET` version 1.
+- A $1 Stripe test-mode card control produced `charge.succeeded` and a signed replay returned HTTP 200 after persisting restricted billing, fraud, observability, classification, and replay evidence. It remained on governance hold because identity was intentionally not bound.
+- Apple Pay and Google Pay cannot be certified by server-side simulation. Caitlin must complete Apple Pay on a compatible Safari/Apple Wallet device; Caitlin or Stuart must complete Google Pay in a supported non-private browser with a wallet card. Both physical-device runs remain open release gates.
+
 `furlong-prod` therefore remains intentionally unprovisioned and blocked.

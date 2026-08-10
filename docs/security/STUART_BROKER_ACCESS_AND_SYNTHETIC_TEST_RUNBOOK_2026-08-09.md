@@ -35,6 +35,7 @@ Legacy broker fixtures—Sam Oranutang, Sammy Snake, Frank Furter, Hound Dog, Sh
 - Plaid is limited to Sandbox.
 - Stripe card and wallet scenarios are limited to test mode.
 - Stripe-hosted Checkout uses Dashboard-managed dynamic payment methods; Apple Pay and Google Pay are enabled in Stripe, not as Google Cloud APIs.
+- The Stripe test webhook must subscribe to `checkout.session.completed`, `charge.succeeded`, `payment_intent.payment_failed`, and `charge.dispute.created`; `charge.succeeded` carries the signed wallet type used for reconciliation.
 - A Stripe webhook must prove the observed method matches the selected scenario: card, Apple Pay, or Google Pay. Mismatches block closure.
 - Apple Pay is exercised on Caitlin's Mac in Safari; Google Pay may be exercised in Chrome or Edge, including Stuart's Windows device.
 - Synthetic activation never approves the pro forma or authorizes a live lender dispatch.

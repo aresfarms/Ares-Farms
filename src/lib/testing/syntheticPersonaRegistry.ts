@@ -141,6 +141,33 @@ export const SYNTHETIC_PERSONAS: readonly SyntheticPersonaDefinition[] = [
     activationMode: "ACTIVE",
   },
   {
+    syntheticPersonaId: "syn-blue-moose-001",
+    humanVisibleName: "Blue Moose",
+    fixtureVersion: "blue-moose-v1.0.0",
+    purpose:
+      "Stuart customer-side account walkthrough followed by lender-side review, pro forma, signing, Google Pay, Plaid, and sandbox delivery testing.",
+    scenarioIds: [
+      "full-lender-lifecycle",
+      "lender-intake",
+      "lender-proforma-review",
+      "lender-document-upload",
+      "lender-signature",
+      "lender-dispatch-sandbox",
+      "plaid-link",
+      "plaid-account-ownership",
+      "stripe-card",
+      "stripe-google-pay",
+    ],
+    providerTargets: [
+      "PLAID_SANDBOX",
+      "STRIPE_TEST_CARD",
+      "STRIPE_TEST_GOOGLE_PAY",
+      "LENDER_SANDBOX_ADAPTER",
+      "SIGNATURE_OFFLINE_TEST",
+    ],
+    activationMode: "ACTIVE",
+  },
+  {
     syntheticPersonaId: "syn-sam-oranutang-legacy-001",
     humanVisibleName: "Sam Oranutang",
     fixtureVersion: "sam-oranutang-legacy-v1.0.0",

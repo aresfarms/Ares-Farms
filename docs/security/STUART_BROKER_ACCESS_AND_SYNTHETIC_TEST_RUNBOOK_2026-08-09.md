@@ -7,6 +7,7 @@ This runbook governs Stuart Fraass's staging access to the Compass to Capital le
 ## Access boundary
 
 - Google IAP admits `sfraas@aresfarmsinc.com` to the staging perimeter.
+- The staging synthetic-fixture allowlist permits Stuart to activate Blue Moose and create his own governed customer-side test run.
 - Furlong credentials establish the application session.
 - Windows Hello supplies phishing-resistant passkey MFA in Edge or Chrome.
 - Stuart's operator-registry capability `operate:lender-desk` grants the lender-desk role in non-production environments only.

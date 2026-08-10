@@ -27,7 +27,8 @@ const original = {
 try {
   process.env.FURLONG_DEPLOYMENT_ENVIRONMENT = "staging";
   process.env.SYNTHETIC_FIXTURES_ENABLED = "true";
-  process.env.SYNTHETIC_FIXTURE_OPERATOR_ALLOWLIST = "chudson@aresfarmsinc.com";
+  process.env.SYNTHETIC_FIXTURE_OPERATOR_ALLOWLIST =
+    "chudson@aresfarmsinc.com,sfraas@aresfarmsinc.com";
 
   const requiredNames = [
     "Pocohantus Smith",
@@ -35,6 +36,7 @@ try {
     "Tuna Fish",
     "Purple Cow",
     "Rainbow Trout",
+    "Blue Moose",
     "Sam Oranutang",
     "Sammy Snake",
     "Frank Furter",
@@ -82,6 +84,20 @@ try {
     allowLegacyBackfill: true,
   });
   assert.equal(legacyBackfillContext.humanVisibleName, "Caitlin Hudson");
+
+  const stuartCustomerContext = createSyntheticFixtureContext({
+    syntheticPersonaId: "syn-blue-moose-001",
+    scenarioId: "full-lender-lifecycle",
+    operatorIdentity: "sfraas@aresfarmsinc.com",
+    environment: "staging",
+    testRunId: "synth-blue-moose-stuart-customer-001",
+    createdAt: "2026-08-10T12:00:00.000Z",
+  });
+  assert.equal(stuartCustomerContext.humanVisibleName, "Blue Moose");
+  assert.equal(
+    stuartCustomerContext.operatorIdentity,
+    "user:sfraas@aresfarmsinc.com",
+  );
 
   const context = createSyntheticFixtureContext({
     syntheticPersonaId: "syn-tree-frog-001",

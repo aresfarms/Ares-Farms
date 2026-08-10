@@ -6,12 +6,12 @@ import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
 import {
   SYNTHETIC_FIXTURE_COOKIE,
   SYNTHETIC_FIXTURE_SESSION_MAX_AGE_SECONDS,
+  allowedSyntheticFixtureOperators,
   createSyntheticFixtureContext,
   issueSyntheticFixtureSessionToken,
+  normalizedOperatorIdentity,
   syntheticFixtureRuntimeEnabled,
 } from "@/lib/testing/syntheticFixtureLineage";
-
-const OWNER_EMAIL = "chudson@aresfarmsinc.com";
 
 function safeReturnTo(value: string | null): string {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
@@ -34,8 +34,12 @@ export async function GET(req: NextRequest) {
   const token = await getToken({ req, secret });
   const email =
     typeof token?.email === "string" ? token.email.trim().toLowerCase() : "";
-  if (email !== OWNER_EMAIL)
+  if (
+    !email ||
+    !allowedSyntheticFixtureOperators().has(normalizedOperatorIdentity(email))
+  ) {
     return new NextResponse("Not Found", { status: 404 });
+  }
 
   const returnTo = safeReturnTo(req.nextUrl.searchParams.get("returnTo"));
   const response = NextResponse.redirect(new URL(returnTo, req.url));

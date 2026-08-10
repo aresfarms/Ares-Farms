@@ -7,14 +7,14 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
 import {
   SYNTHETIC_FIXTURE_COOKIE,
+  allowedSyntheticFixtureOperators,
+  normalizedOperatorIdentity,
   verifySyntheticFixtureSessionToken,
 } from "@/lib/testing/syntheticFixtureLineage";
 import {
   SYNTHETIC_PERSONAS,
   type SyntheticScenarioId,
 } from "@/lib/testing/syntheticPersonaRegistry";
-
-const OWNER_EMAIL = "chudson@aresfarmsinc.com";
 
 function destination(scenarioId: SyntheticScenarioId): string {
   if (scenarioId.startsWith("professional-")) return "/professional-access";
@@ -32,7 +32,12 @@ function destination(scenarioId: SyntheticScenarioId): string {
 export default async function SyntheticFixturesPage() {
   const session = await getServerSession(authOptions);
   const email = session?.user?.email?.trim().toLowerCase() ?? "";
-  if (email !== OWNER_EMAIL) notFound();
+  if (
+    !email ||
+    !allowedSyntheticFixtureOperators().has(normalizedOperatorIdentity(email))
+  ) {
+    notFound();
+  }
   const secret = resolveNextAuthSecret();
   const cookieStore = await cookies();
   const active = secret

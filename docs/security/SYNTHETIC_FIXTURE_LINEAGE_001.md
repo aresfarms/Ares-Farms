@@ -33,6 +33,7 @@ The database trigger rejects updates and deletes to lineage rows.
 | Tuna Fish        | `syn-tuna-fish-001`        | Plaid, Stripe card, Apple Pay, Google Pay, and allocation testing |
 | Purple Cow       | `syn-purple-cow-001`       | Negative-risk, mismatch, fraud hold, and recovery testing         |
 | Rainbow Trout    | `syn-rainbow-trout-001`    | Positive full lender-lifecycle and reconciliation testing         |
+| Blue Moose       | `syn-blue-moose-001`       | Stuart customer-side and lender-side dual-perspective walkthrough |
 
 ## Authorization boundary
 

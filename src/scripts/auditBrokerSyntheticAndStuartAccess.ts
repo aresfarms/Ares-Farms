@@ -14,13 +14,13 @@ import {
 } from "@/lib/auth/operatorRegistry";
 import { professionalByEmail } from "@/lib/auth/professionalRegistry";
 import { db } from "@/lib/db";
+import { allowedSyntheticFixtureOperators } from "@/lib/testing/syntheticFixtureLineage";
 import {
   SYNTHETIC_PERSONAS,
   syntheticPersonaByHumanVisibleName,
 } from "@/lib/testing/syntheticPersonaRegistry";
 
 const STUART_EMAIL = "sfraas@aresfarmsinc.com";
-const FIXTURE_OPERATOR_EMAIL = "chudson@aresfarmsinc.com";
 const STRICT = process.argv.includes("--strict");
 
 function iso(value: Date | null | undefined): string | null {
@@ -65,11 +65,14 @@ async function main() {
     .from(serviceRequests)
     .where(eq(serviceRequests.requestType, "financing_deal_intake"));
 
-  const candidateRecords = financing.filter(
-    (row) =>
+  const fixtureOperators = allowedSyntheticFixtureOperators();
+  const candidateRecords = financing.filter((row) => {
+    const email = row.contactEmail?.trim().toLowerCase() ?? "";
+    return (
       Boolean(syntheticPersonaByHumanVisibleName(row.contactName)) ||
-      row.contactEmail?.trim().toLowerCase() === FIXTURE_OPERATOR_EMAIL,
-  );
+      (email ? fixtureOperators.has(`user:${email}`) : false)
+    );
+  });
   const recordIds = candidateRecords.map((row) => row.serviceRequestId);
   const lineageRows = recordIds.length
     ? await db

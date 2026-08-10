@@ -35,6 +35,14 @@ resource "google_cloud_run_v2_service" "scanner" {
   # anonymous probe cannot reach it).
   ingress = "INGRESS_TRAFFIC_ALL"
 
+  # Cloud Run returns zero values for service-level scaling even when omitted.
+  # Declare them explicitly so a successful deployment converges to a clean
+  # Terraform plan instead of producing perpetual provider-normalization drift.
+  scaling {
+    min_instance_count    = 0
+    manual_instance_count = 0
+  }
+
   template {
     # The scanner accepts bytes and returns a verdict. It needs no database,
     # Secret Manager, or object-storage authority, so it uses a dedicated

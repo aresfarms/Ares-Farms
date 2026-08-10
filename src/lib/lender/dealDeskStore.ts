@@ -1,10 +1,17 @@
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 
-import { applicationDocuments, serviceRequests } from "@/db/schema";
+import {
+  applicationDocuments,
+  serviceRequests,
+  syntheticFixtureLineageRecords,
+} from "@/db/schema";
 import { db } from "@/lib/db";
 import { mintUploadLinkToken } from "@/lib/documents/uploadLinkToken";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
-import { LENDER_EMAIL_SIGNATURE, renderLenderEmailHtml } from "@/lib/notifications/lenderSignature";
+import {
+  LENDER_EMAIL_SIGNATURE,
+  renderLenderEmailHtml,
+} from "@/lib/notifications/lenderSignature";
 
 /**
  * Lender Deal Desk store (founder direction 2026-08-05): the licensed
@@ -42,6 +49,18 @@ export interface DealDeskState {
   updatedBy: string | null;
 }
 
+export interface DealSyntheticFixtureSummary {
+  syntheticPersonaId: string;
+  humanVisibleName: string;
+  testRunId: string;
+  fixtureVersion: string;
+  environment: string;
+  operatorIdentity: string;
+  createdAt: string;
+  scenarioId: string;
+  lineageSha256: string;
+}
+
 export interface DealSummary {
   serviceRequestId: string;
   status: string;
@@ -60,23 +79,32 @@ export interface DealSummary {
   deskState: DealDeskState;
   applicationId: string;
   documentCount: number;
+  syntheticFixture: DealSyntheticFixtureSummary | null;
 }
 
 function mailingAddressFrom(metadata: unknown): string | null {
   const raw = metadata as {
     contactAddress?: string | null;
-    mailingAddress?: { street?: string | null; city?: string | null; state?: string | null; postalCode?: string | null } | null;
+    mailingAddress?: {
+      street?: string | null;
+      city?: string | null;
+      state?: string | null;
+      postalCode?: string | null;
+    } | null;
   } | null;
   const m = raw?.mailingAddress;
   const parts = m
-    ? [m.street, m.city, m.state, m.postalCode].filter((p): p is string => Boolean(p && p.trim()))
+    ? [m.street, m.city, m.state, m.postalCode].filter((p): p is string =>
+        Boolean(p && p.trim()),
+      )
     : [];
   if (parts.length > 0) return parts.join(", ");
   return raw?.contactAddress?.trim() || null;
 }
 
 function deskStateFrom(metadata: unknown): DealDeskState {
-  const raw = (metadata as { dealDesk?: Partial<DealDeskState> } | null)?.dealDesk ?? {};
+  const raw =
+    (metadata as { dealDesk?: Partial<DealDeskState> } | null)?.dealDesk ?? {};
   const t = (raw.timeline ?? {}) as Partial<DealTimeline>;
   return {
     customerNote: raw.customerNote ?? null,
@@ -103,6 +131,22 @@ export async function listLenderDeals(limit = 50): Promise<DealSummary[]> {
     .where(eq(serviceRequests.requestType, FINANCING_TYPE))
     .orderBy(desc(serviceRequests.occurredAt))
     .limit(Math.min(limit, 200));
+  const recordIds = rows.map((row) => row.serviceRequestId);
+  const lineageRows = recordIds.length
+    ? await db
+        .select()
+        .from(syntheticFixtureLineageRecords)
+        .where(
+          and(
+            eq(syntheticFixtureLineageRecords.recordType, "service_request"),
+            inArray(syntheticFixtureLineageRecords.recordId, recordIds),
+          ),
+        )
+    : [];
+  const lineageByRecordId = new Map(
+    lineageRows.map((row) => [row.recordId, row] as const),
+  );
+
   const summaries: DealSummary[] = [];
   for (const row of rows) {
     const applicationId = applicationIdForDeal(row.serviceRequestId);
@@ -128,6 +172,22 @@ export async function listLenderDeals(limit = 50): Promise<DealSummary[]> {
       deskState: deskStateFrom(row.metadata),
       applicationId,
       documentCount: docs.length,
+      syntheticFixture: (() => {
+        const fixture = lineageByRecordId.get(row.serviceRequestId);
+        return fixture
+          ? {
+              syntheticPersonaId: fixture.syntheticPersonaId,
+              humanVisibleName: fixture.humanVisibleName,
+              testRunId: fixture.testRunId,
+              fixtureVersion: fixture.fixtureVersion,
+              environment: fixture.environment,
+              operatorIdentity: fixture.operatorIdentity,
+              createdAt: fixture.fixtureCreatedAt.toISOString(),
+              scenarioId: fixture.scenarioId,
+              lineageSha256: fixture.lineageSha256,
+            }
+          : null;
+      })(),
     });
   }
   return summaries;
@@ -152,11 +212,15 @@ export async function listDealDocuments(applicationId: string) {
       storageUri: d.storageUri,
       receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
       signatureRequested: m.signatureRequested === true,
-      signed: m.signatureStatus === "signed" || m.signatureStatus === "test-signed",
+      signed:
+        m.signatureStatus === "signed" || m.signatureStatus === "test-signed",
       testSigned: m.signatureStatus === "test-signed",
-      signedByTypedName: typeof m.signedByTypedName === "string" ? m.signedByTypedName : null,
+      signedByTypedName:
+        typeof m.signedByTypedName === "string" ? m.signedByTypedName : null,
       scanStatus:
-        m.scanStatus === "clean" || m.scanStatus === "infected" || m.scanStatus === "unavailable"
+        m.scanStatus === "clean" ||
+        m.scanStatus === "infected" ||
+        m.scanStatus === "unavailable"
           ? (m.scanStatus as string)
           : "pending",
     };
@@ -179,7 +243,10 @@ export async function updateDealDesk(args: {
   if (!row) return null;
   const current = deskStateFrom(row.metadata);
   const next: DealDeskState = {
-    customerNote: args.customerNote !== undefined ? args.customerNote : current.customerNote,
+    customerNote:
+      args.customerNote !== undefined
+        ? args.customerNote
+        : current.customerNote,
     timeline: { ...current.timeline, ...(args.timeline ?? {}) },
     reminders: current.reminders,
     updatedAt: new Date().toISOString(),
@@ -189,7 +256,10 @@ export async function updateDealDesk(args: {
     .update(serviceRequests)
     .set({
       status: args.status ?? row.status,
-      metadata: { ...((row.metadata as Record<string, unknown>) ?? {}), dealDesk: next },
+      metadata: {
+        ...((row.metadata as Record<string, unknown>) ?? {}),
+        dealDesk: next,
+      },
       updatedAt: new Date(),
     })
     .where(eq(serviceRequests.serviceRequestId, args.serviceRequestId));
@@ -199,6 +269,22 @@ export async function updateDealDesk(args: {
 function bookingUrl(): string | null {
   const url = process.env.LENDER_BOOKING_URL;
   return url && url.trim() ? url.trim() : null;
+}
+
+async function syntheticFixtureForServiceRequest(
+  serviceRequestId: string,
+): Promise<boolean> {
+  const rows = await db
+    .select({ id: syntheticFixtureLineageRecords.id })
+    .from(syntheticFixtureLineageRecords)
+    .where(
+      and(
+        eq(syntheticFixtureLineageRecords.recordType, "service_request"),
+        eq(syntheticFixtureLineageRecords.recordId, serviceRequestId),
+      ),
+    )
+    .limit(1);
+  return Boolean(rows[0]);
 }
 
 /**
@@ -218,16 +304,25 @@ export async function sendDocumentReminder(args: {
     .limit(1);
   const row = rows[0];
   if (!row) return { sent: false, reason: "deal-not-found" };
+  if (await syntheticFixtureForServiceRequest(row.serviceRequestId)) {
+    return { sent: false, reason: "synthetic-fixture-notification-suppressed" };
+  }
   if (!row.contactEmail) return { sent: false, reason: "no-contact-email" };
   const desk = deskStateFrom(row.metadata);
   if (!args.force) {
-    if (desk.reminders.length >= REMINDER_MAX) return { sent: false, reason: "reminder-cap-reached" };
+    if (desk.reminders.length >= REMINDER_MAX)
+      return { sent: false, reason: "reminder-cap-reached" };
     const last = desk.reminders[desk.reminders.length - 1];
-    if (last && Date.now() - new Date(last).getTime() < REMINDER_INTERVAL_DAYS * 86_400_000) {
+    if (
+      last &&
+      Date.now() - new Date(last).getTime() <
+        REMINDER_INTERVAL_DAYS * 86_400_000
+    ) {
       return { sent: false, reason: "too-soon" };
     }
   }
-  if (!emailConfigured()) return { sent: false, reason: "email-not-configured" };
+  if (!emailConfigured())
+    return { sent: false, reason: "email-not-configured" };
 
   const link = mintUploadLinkToken({
     applicationId: applicationIdForDeal(row.serviceRequestId),
@@ -241,7 +336,9 @@ export async function sendDocumentReminder(args: {
   const bodyText =
     `Your commercial debt broker is waiting on documents for financing request:\n${row.serviceRequestId}\n\n` +
     dueLine +
-    (desk.customerNote ? `Note from your broker: ${desk.customerNote}\n\n` : "") +
+    (desk.customerNote
+      ? `Note from your broker: ${desk.customerNote}\n\n`
+      : "") +
     `Upload them securely here (encrypted, never by email):\n${uploadUrl}\n\n` +
     (booking ? `Schedule a call with your broker:\n${booking}\n\n` : "") +
     `Check your request status any time:\n${args.portalBaseUrl}/status\n\n` +
@@ -254,10 +351,19 @@ export async function sendDocumentReminder(args: {
     inlineBrandLogo: true,
   });
   if (result.sent) {
-    const nextDesk = { ...desk, reminders: [...desk.reminders, new Date().toISOString()] };
+    const nextDesk = {
+      ...desk,
+      reminders: [...desk.reminders, new Date().toISOString()],
+    };
     await db
       .update(serviceRequests)
-      .set({ metadata: { ...((row.metadata as Record<string, unknown>) ?? {}), dealDesk: nextDesk }, updatedAt: new Date() })
+      .set({
+        metadata: {
+          ...((row.metadata as Record<string, unknown>) ?? {}),
+          dealDesk: nextDesk,
+        },
+        updatedAt: new Date(),
+      })
       .where(eq(serviceRequests.serviceRequestId, args.serviceRequestId));
     return { sent: true, reason: "sent" };
   }
@@ -265,7 +371,9 @@ export async function sendDocumentReminder(args: {
 }
 
 /** Run reminders for every deal sitting in DOCUMENTS_REQUESTED. */
-export async function runDueReminders(portalBaseUrl: string): Promise<{ attempted: number; sent: number }> {
+export async function runDueReminders(
+  portalBaseUrl: string,
+): Promise<{ attempted: number; sent: number }> {
   const rows = await db
     .select()
     .from(serviceRequests)
@@ -273,7 +381,10 @@ export async function runDueReminders(portalBaseUrl: string): Promise<{ attempte
     .limit(200);
   let sent = 0;
   for (const row of rows) {
-    const result = await sendDocumentReminder({ serviceRequestId: row.serviceRequestId, portalBaseUrl });
+    const result = await sendDocumentReminder({
+      serviceRequestId: row.serviceRequestId,
+      portalBaseUrl,
+    });
     if (result.sent) sent += 1;
   }
   return { attempted: rows.length, sent };

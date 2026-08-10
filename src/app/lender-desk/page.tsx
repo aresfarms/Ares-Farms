@@ -40,6 +40,18 @@ interface Timeline {
   lenderBacklogNote: string | null;
 }
 
+interface SyntheticFixtureSummary {
+  syntheticPersonaId: string;
+  humanVisibleName: string;
+  testRunId: string;
+  fixtureVersion: string;
+  environment: string;
+  operatorIdentity: string;
+  createdAt: string;
+  scenarioId: string;
+  lineageSha256: string;
+}
+
 interface Deal {
   serviceRequestId: string;
   status: string;
@@ -64,6 +76,7 @@ interface Deal {
   };
   applicationId: string;
   documentCount: number;
+  syntheticFixture: SyntheticFixtureSummary | null;
 }
 
 interface DealDocument {
@@ -135,7 +148,9 @@ export default function LenderDeskPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [documents, setDocuments] = useState<Record<string, DealDocument[]>>({});
+  const [documents, setDocuments] = useState<Record<string, DealDocument[]>>(
+    {},
+  );
   const [drafts, setDrafts] = useState<Record<string, DraftState>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [messages, setMessages] = useState<Record<string, string>>({});
@@ -151,7 +166,9 @@ export default function LenderDeskPage() {
       const res = await fetch(`/api/lender/deal-desk?view=deals`);
       const json = await res.json();
       if (!res.ok || json.ok !== true) {
-        setLoadError(typeof json.error === "string" ? json.error : "Load failed.");
+        setLoadError(
+          typeof json.error === "string" ? json.error : "Load failed.",
+        );
       } else {
         setDeals(json.deals as Deal[]);
         setStatuses(json.statuses as StatusOption[]);
@@ -161,7 +178,8 @@ export default function LenderDeskPage() {
         setDrafts((prev) => {
           const next = { ...prev };
           for (const deal of json.deals as Deal[]) {
-            if (!next[deal.serviceRequestId]) next[deal.serviceRequestId] = draftFrom(deal);
+            if (!next[deal.serviceRequestId])
+              next[deal.serviceRequestId] = draftFrom(deal);
           }
           return next;
         });
@@ -186,7 +204,7 @@ export default function LenderDeskPage() {
       .then((json) => {
         if (json.ok && typeof json.sent === "number" && json.sent > 0) {
           setSweepResult(
-            `Automatic sweep: ${json.sent} document reminder(s) just went out.`
+            `Automatic sweep: ${json.sent} document reminder(s) just went out.`,
           );
         }
       })
@@ -196,22 +214,26 @@ export default function LenderDeskPage() {
   const loadDocuments = useCallback(async (deal: Deal) => {
     const res = await fetch(
       `/api/lender/deal-desk?view=documents&applicationId=${encodeURIComponent(
-        deal.applicationId
-      )}`
+        deal.applicationId,
+      )}`,
     );
     const json = await res.json();
     if (res.ok && json.ok === true) {
-      setDocuments((prev) => ({ ...prev, [deal.serviceRequestId]: json.documents }));
+      setDocuments((prev) => ({
+        ...prev,
+        [deal.serviceRequestId]: json.documents,
+      }));
     }
   }, []);
 
   const toggleExpand = useCallback(
     (deal: Deal) => {
-      const next = expanded === deal.serviceRequestId ? null : deal.serviceRequestId;
+      const next =
+        expanded === deal.serviceRequestId ? null : deal.serviceRequestId;
       setExpanded(next);
       if (next && !documents[deal.serviceRequestId]) void loadDocuments(deal);
     },
-    [expanded, documents, loadDocuments]
+    [expanded, documents, loadDocuments],
   );
 
   const setMessage = useCallback((id: string, message: string) => {
@@ -234,7 +256,9 @@ export default function LenderDeskPage() {
             status: draft.status,
             customerNote: draft.customerNote,
             timeline: {
-              docsDueAt: draft.docsDueAt ? new Date(`${draft.docsDueAt}T12:00:00Z`).toISOString() : "",
+              docsDueAt: draft.docsDueAt
+                ? new Date(`${draft.docsDueAt}T12:00:00Z`).toISOString()
+                : "",
               underwritingEtaAt: draft.underwritingEtaAt
                 ? new Date(`${draft.underwritingEtaAt}T12:00:00Z`).toISOString()
                 : "",
@@ -252,19 +276,19 @@ export default function LenderDeskPage() {
             ? "Saved — the customer's status page reflects this now."
             : typeof json.error === "string"
               ? json.error
-              : "Save failed."
+              : "Save failed.",
         );
         if (res.ok && json.ok === true) await loadDeals();
       } catch (error) {
         setMessage(
           deal.serviceRequestId,
-          error instanceof Error ? error.message : "Save failed."
+          error instanceof Error ? error.message : "Save failed.",
         );
       } finally {
         setBusy(null);
       }
     },
-    [drafts, loadDeals, setMessage]
+    [drafts, loadDeals, setMessage],
   );
 
   const remind = useCallback(
@@ -283,21 +307,26 @@ export default function LenderDeskPage() {
         const json = await res.json();
         const reasonText: Record<string, string> = {
           sent: "Reminder sent with a fresh 72-hour secure upload link.",
-          "too-soon": "Not sent — last reminder was under 3 days ago (use Force to override).",
-          "reminder-cap-reached": "Not sent — 3-reminder cap reached (use Force to override).",
-          "no-contact-email": "Not sent — this deal has no contact email on file.",
-          "not-configured": "Not sent — email delivery is not configured in this environment.",
+          "too-soon":
+            "Not sent — last reminder was under 3 days ago (use Force to override).",
+          "reminder-cap-reached":
+            "Not sent — 3-reminder cap reached (use Force to override).",
+          "no-contact-email":
+            "Not sent — this deal has no contact email on file.",
+          "not-configured":
+            "Not sent — email delivery is not configured in this environment.",
         };
         setMessage(
           deal.serviceRequestId,
-          reasonText[json.reason as string] ?? `Reminder result: ${json.reason ?? "unknown"}`
+          reasonText[json.reason as string] ??
+            `Reminder result: ${json.reason ?? "unknown"}`,
         );
         if (json.sent) await loadDeals();
       } finally {
         setBusy(null);
       }
     },
-    [loadDeals, setMessage]
+    [loadDeals, setMessage],
   );
 
   const updateDraft = useCallback((id: string, patch: Partial<DraftState>) => {
@@ -329,16 +358,19 @@ export default function LenderDeskPage() {
               : `Signature requested on ${doc.fileName ?? "the document"} — it appears on their status page (notification email not sent).`
             : typeof json.error === "string"
               ? json.error
-              : "Signature request failed."
+              : "Signature request failed.",
         );
         if (res.ok && json.ok === true) await loadDocuments(deal);
       } catch (error) {
-        setMessage(deal.serviceRequestId, error instanceof Error ? error.message : "Signature request failed.");
+        setMessage(
+          deal.serviceRequestId,
+          error instanceof Error ? error.message : "Signature request failed.",
+        );
       } finally {
         setBusy(null);
       }
     },
-    [loadDocuments, setMessage]
+    [loadDocuments, setMessage],
   );
 
   // Lender → customer document (approval letter, term sheet, disclosure):
@@ -348,7 +380,10 @@ export default function LenderDeskPage() {
       setBusy(deal.serviceRequestId);
       setSendStates((prev) => ({
         ...prev,
-        [deal.serviceRequestId]: { phase: "sending", note: `Encrypting and transferring ${file.name}…` },
+        [deal.serviceRequestId]: {
+          phase: "sending",
+          note: `Encrypting and transferring ${file.name}…`,
+        },
       }));
       try {
         const beginRes = await fetch("/api/lender/deal-desk", {
@@ -363,15 +398,19 @@ export default function LenderDeskPage() {
           }),
         });
         const begin = await beginRes.json();
-        if (!beginRes.ok || begin.ok !== true) throw new Error(begin.error ?? "Could not start the transfer.");
+        if (!beginRes.ok || begin.ok !== true)
+          throw new Error(begin.error ?? "Could not start the transfer.");
         let uploaded = false;
         if (begin.uploadUrl) {
           const put = await fetch(begin.uploadUrl, {
             method: "PUT",
-            headers: { "Content-Type": file.type || "application/octet-stream" },
+            headers: {
+              "Content-Type": file.type || "application/octet-stream",
+            },
             body: file,
           });
-          if (!put.ok) throw new Error("The secure storage transfer failed — try again.");
+          if (!put.ok)
+            throw new Error("The secure storage transfer failed — try again.");
           uploaded = true;
         }
         const confirmRes = await fetch("/api/lender/deal-desk", {
@@ -388,7 +427,10 @@ export default function LenderDeskPage() {
           }),
         });
         const confirm = await confirmRes.json();
-        if (!confirmRes.ok || confirm.ok !== true) throw new Error(confirm.error ?? "The transfer could not be confirmed.");
+        if (!confirmRes.ok || confirm.ok !== true)
+          throw new Error(
+            confirm.error ?? "The transfer could not be confirmed.",
+          );
         setSendStates((prev) => ({
           ...prev,
           [deal.serviceRequestId]: uploaded
@@ -416,10 +458,12 @@ export default function LenderDeskPage() {
         setBusy(null);
       }
     },
-    [loadDocuments]
+    [loadDocuments],
   );
 
-  const active = deals.filter((d) => !FAILURE_STATUSES.has(d.status) && d.status !== "CLOSED_FUNDED");
+  const active = deals.filter(
+    (d) => !FAILURE_STATUSES.has(d.status) && d.status !== "CLOSED_FUNDED",
+  );
   const awaitingDocs = deals.filter((d) => d.status === "DOCUMENTS_REQUESTED");
   const closedFunded = deals.filter((d) => d.status === "CLOSED_FUNDED");
   const failed = deals.filter((d) => FAILURE_STATUSES.has(d.status));
@@ -443,19 +487,46 @@ export default function LenderDeskPage() {
         <SummaryGrid
           items={[
             { label: "Active Deals", value: active.length, color: "#0f766e" },
-            { label: "Awaiting Documents", value: awaitingDocs.length, color: "#9a3412" },
-            { label: "Closed & Funded", value: closedFunded.length, color: "#2563eb" },
-            { label: "Did Not Complete", value: failed.length, color: "#7c3aed" },
+            {
+              label: "Awaiting Documents",
+              value: awaitingDocs.length,
+              color: "#9a3412",
+            },
+            {
+              label: "Closed & Funded",
+              value: closedFunded.length,
+              color: "#2563eb",
+            },
+            {
+              label: "Did Not Complete",
+              value: failed.length,
+              color: "#7c3aed",
+            },
           ]}
         />
 
         {calendarSrc && (
-          <section style={{ ...panelStyle, padding: 14, display: "grid", gap: 8 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
-              <strong style={{ fontSize: 14 }}>Today&apos;s calls & schedule</strong>
-              <span style={{ color: "#1f2937", fontSize: 13.5, lineHeight: 1.5 }}>
-                Your Google Calendar — visible only to accounts that already have access to it.
-                Customers book through your booking link, never by cold-calling.
+          <section
+            style={{ ...panelStyle, padding: 14, display: "grid", gap: 8 }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                flexWrap: "wrap",
+                gap: 8,
+              }}
+            >
+              <strong style={{ fontSize: 14 }}>
+                Today&apos;s calls & schedule
+              </strong>
+              <span
+                style={{ color: "#1f2937", fontSize: 13.5, lineHeight: 1.5 }}
+              >
+                Your Google Calendar — visible only to accounts that already
+                have access to it. Customers book through your booking link,
+                never by cold-calling.
               </span>
             </div>
             <iframe
@@ -481,15 +552,23 @@ export default function LenderDeskPage() {
         ) : null}
 
         {loadError ? (
-          <div style={{ ...panelStyle, padding: 12, color: "#b91c1c", fontWeight: 700 }}>
+          <div
+            style={{
+              ...panelStyle,
+              padding: 12,
+              color: "#b91c1c",
+              fontWeight: 700,
+            }}
+          >
             {loadError}
           </div>
         ) : null}
 
         {!loading && deals.length === 0 && !loadError ? (
           <EmptyState>
-            No financing deals yet. When a customer submits the financing intake,
-            the deal appears here with its secure document channel already wired.
+            No financing deals yet. When a customer submits the financing
+            intake, the deal appears here with its secure document channel
+            already wired.
           </EmptyState>
         ) : null}
 
@@ -517,15 +596,54 @@ export default function LenderDeskPage() {
               >
                 <div style={{ display: "grid", gap: 4 }}>
                   <h3 style={{ margin: 0, fontSize: 18 }}>
-                    {deal.contactName ?? "Unnamed customer"} — {deal.serviceRequestId}
+                    {deal.contactName ?? "Unnamed customer"} —{" "}
+                    {deal.serviceRequestId}
                   </h3>
+                  {deal.syntheticFixture ? (
+                    <div
+                      role="status"
+                      style={{
+                        border: "2px solid #7c3aed",
+                        background: "#f5f3ff",
+                        color: "#4c1d95",
+                        borderRadius: 8,
+                        padding: "7px 10px",
+                        display: "grid",
+                        gap: 2,
+                        fontSize: 12,
+                      }}
+                    >
+                      <strong>
+                        SYNTHETIC TEST —{" "}
+                        {deal.syntheticFixture.syntheticPersonaId}
+                      </strong>
+                      <span>
+                        Run {deal.syntheticFixture.testRunId} ·{" "}
+                        {deal.syntheticFixture.scenarioId}
+                      </span>
+                      <span>
+                        Fixture {deal.syntheticFixture.fixtureVersion} ·{" "}
+                        {deal.syntheticFixture.environment} ·{" "}
+                        {deal.syntheticFixture.operatorIdentity}
+                      </span>
+                      <code style={{ overflowWrap: "anywhere" }}>
+                        lineage {deal.syntheticFixture.lineageSha256}
+                      </code>
+                    </div>
+                  ) : null}
                   <span style={{ color: "#596579", fontSize: 13 }}>
                     {[
                       deal.serviceCode?.toUpperCase().replace(/_/g, " "),
                       deal.propertyDescriptor,
-                      [deal.locationCounty, deal.locationState].filter(Boolean).join(", "),
-                      deal.estimatedValue ? `≈$${deal.estimatedValue.toLocaleString()}` : null,
-                      deal.submittedAt ? `Submitted ${formatDateTime(deal.submittedAt)}` : null,
+                      [deal.locationCounty, deal.locationState]
+                        .filter(Boolean)
+                        .join(", "),
+                      deal.estimatedValue
+                        ? `≈$${deal.estimatedValue.toLocaleString()}`
+                        : null,
+                      deal.submittedAt
+                        ? `Submitted ${formatDateTime(deal.submittedAt)}`
+                        : null,
                     ]
                       .filter(Boolean)
                       .join(" · ")}
@@ -541,20 +659,39 @@ export default function LenderDeskPage() {
                     {deal.status.replace(/_/g, " ")}
                   </StatusPill>
                   <span style={{ color: "#64748b", fontSize: 12 }}>
-                    {deal.documentCount} document(s) · {reminderCount}/3 reminders sent
+                    {deal.documentCount} document(s) · {reminderCount}/3
+                    reminders sent
                   </span>
                 </div>
               </div>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <ActionButton disabled={isBusy} onClick={() => toggleExpand(deal)}>
-                  {isOpen ? "Hide Documents & Timeline" : "Open Documents & Timeline"}
+                <ActionButton
+                  disabled={isBusy}
+                  onClick={() => toggleExpand(deal)}
+                >
+                  {isOpen
+                    ? "Hide Documents & Timeline"
+                    : "Open Documents & Timeline"}
                 </ActionButton>
-                <ActionButton disabled={isBusy || !emailReady} onClick={() => void remind(deal, false)}>
-                  Send Document Reminder
+                <ActionButton
+                  disabled={
+                    isBusy || !emailReady || Boolean(deal.syntheticFixture)
+                  }
+                  onClick={() => void remind(deal, false)}
+                >
+                  {deal.syntheticFixture
+                    ? "Real Email Suppressed for Test"
+                    : "Send Document Reminder"}
                 </ActionButton>
                 {message ? (
-                  <span style={{ color: "#334155", fontWeight: 700, alignSelf: "center" }}>
+                  <span
+                    style={{
+                      color: "#334155",
+                      fontWeight: 700,
+                      alignSelf: "center",
+                    }}
+                  >
                     {message}
                   </span>
                 ) : null}
@@ -565,17 +702,33 @@ export default function LenderDeskPage() {
                   <section style={{ display: "grid", gap: 8 }}>
                     <strong>Documents in the vault</strong>
                     {!docs ? (
-                      <span style={{ color: "#596579", fontSize: 13 }}>Loading…</span>
+                      <span style={{ color: "#596579", fontSize: 13 }}>
+                        Loading…
+                      </span>
                     ) : docs.length === 0 ? (
                       <span style={{ color: "#596579", fontSize: 13 }}>
-                        Nothing uploaded yet. A reminder re-sends the secure upload link.
+                        Nothing uploaded yet. A reminder re-sends the secure
+                        upload link.
                       </span>
                     ) : (
                       <div style={{ overflowX: "auto" }}>
-                        <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 13 }}>
+                        <table
+                          style={{
+                            borderCollapse: "collapse",
+                            width: "100%",
+                            fontSize: 13,
+                          }}
+                        >
                           <thead>
                             <tr>
-                              {["Type", "File", "Size", "Received", "Status", ""].map((h) => (
+                              {[
+                                "Type",
+                                "File",
+                                "Size",
+                                "Received",
+                                "Status",
+                                "",
+                              ].map((h) => (
                                 <th
                                   key={h}
                                   style={{
@@ -596,52 +749,117 @@ export default function LenderDeskPage() {
                                 <td style={{ padding: "6px 10px" }}>
                                   {doc.documentType.replace(/-/g, " ")}
                                 </td>
-                                <td style={{ padding: "6px 10px", overflowWrap: "anywhere" }}>
+                                <td
+                                  style={{
+                                    padding: "6px 10px",
+                                    overflowWrap: "anywhere",
+                                  }}
+                                >
                                   {doc.fileName ?? "—"}
                                 </td>
-                                <td style={{ padding: "6px 10px" }}>{formatBytes(doc.byteSize)}</td>
                                 <td style={{ padding: "6px 10px" }}>
-                                  {doc.receivedAt ? formatDateTime(doc.receivedAt) : "—"}
+                                  {formatBytes(doc.byteSize)}
+                                </td>
+                                <td style={{ padding: "6px 10px" }}>
+                                  {doc.receivedAt
+                                    ? formatDateTime(doc.receivedAt)
+                                    : "—"}
                                 </td>
                                 <td style={{ padding: "6px 10px" }}>
                                   {doc.scanStatus === "infected" ? (
-                                    <span style={{ color: "#b42318", fontWeight: 800 }}>⛔ QUARANTINED</span>
-                                  ) : doc.scanStatus === "pending" || doc.scanStatus === "unavailable" ? (
-                                    <span style={{ color: "#8F6E1F", fontWeight: 700 }}>Scanning…</span>
+                                    <span
+                                      style={{
+                                        color: "#b42318",
+                                        fontWeight: 800,
+                                      }}
+                                    >
+                                      ⛔ QUARANTINED
+                                    </span>
+                                  ) : doc.scanStatus === "pending" ||
+                                    doc.scanStatus === "unavailable" ? (
+                                    <span
+                                      style={{
+                                        color: "#8F6E1F",
+                                        fontWeight: 700,
+                                      }}
+                                    >
+                                      Scanning…
+                                    </span>
                                   ) : doc.signed ? (
-                                    <span style={{ color: doc.testSigned ? "#8F6E1F" : "#166534", fontWeight: 800 }}>
-                                      {doc.testSigned ? "TEST SIGNED" : "SIGNED"}{doc.signedByTypedName ? ` — ${doc.signedByTypedName}` : ""}
+                                    <span
+                                      style={{
+                                        color: doc.testSigned
+                                          ? "#8F6E1F"
+                                          : "#166534",
+                                        fontWeight: 800,
+                                      }}
+                                    >
+                                      {doc.testSigned
+                                        ? "TEST SIGNED"
+                                        : "SIGNED"}
+                                      {doc.signedByTypedName
+                                        ? ` — ${doc.signedByTypedName}`
+                                        : ""}
                                     </span>
                                   ) : doc.signatureRequested ? (
-                                    <span style={{ color: "#9a3412", fontWeight: 700 }}>Awaiting signature</span>
+                                    <span
+                                      style={{
+                                        color: "#9a3412",
+                                        fontWeight: 700,
+                                      }}
+                                    >
+                                      Awaiting signature
+                                    </span>
                                   ) : (
                                     doc.status
                                   )}
                                 </td>
                                 <td style={{ padding: "6px 10px" }}>
-                                  {doc.documentType === "lender-provided" && doc.storageUri && !doc.signed && !doc.signatureRequested && (
-                                    <button
-                                      type="button"
-                                      disabled={busy === deal.serviceRequestId}
-                                      onClick={() => void requestSignature(deal, doc)}
-                                      style={{ border: "1px solid #1c5aa0", background: "#fff", color: "#1c5aa0", borderRadius: 8, padding: "4px 10px", fontSize: 12, fontWeight: 750, cursor: "pointer", marginRight: 10 }}
-                                    >
-                                      Request Signature
-                                    </button>
-                                  )}
+                                  {doc.documentType === "lender-provided" &&
+                                    doc.storageUri &&
+                                    !doc.signed &&
+                                    !doc.signatureRequested && (
+                                      <button
+                                        type="button"
+                                        disabled={
+                                          busy === deal.serviceRequestId
+                                        }
+                                        onClick={() =>
+                                          void requestSignature(deal, doc)
+                                        }
+                                        style={{
+                                          border: "1px solid #1c5aa0",
+                                          background: "#fff",
+                                          color: "#1c5aa0",
+                                          borderRadius: 8,
+                                          padding: "4px 10px",
+                                          fontSize: 12,
+                                          fontWeight: 750,
+                                          cursor: "pointer",
+                                          marginRight: 10,
+                                        }}
+                                      >
+                                        Request Signature
+                                      </button>
+                                    )}
                                   {doc.storageUri ? (
                                     <a
                                       href={`/api/lender/deal-desk?view=download&documentId=${encodeURIComponent(
-                                        doc.id
+                                        doc.id,
                                       )}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      style={{ color: "#1f4f7a", fontWeight: 700 }}
+                                      style={{
+                                        color: "#1f4f7a",
+                                        fontWeight: 700,
+                                      }}
                                     >
                                       Open
                                     </a>
                                   ) : (
-                                    <span style={{ color: "#9a3412" }}>No stored bytes</span>
+                                    <span style={{ color: "#9a3412" }}>
+                                      No stored bytes
+                                    </span>
                                   )}
                                 </td>
                               </tr>
@@ -651,15 +869,26 @@ export default function LenderDeskPage() {
                       </div>
                     )}
                     <span style={{ color: "#64748b", fontSize: 12 }}>
-                      Every download is a single file streamed through the governed runtime and
-                      recorded in the audit trail. There is no bulk export.
+                      Every download is a single file streamed through the
+                      governed runtime and recorded in the audit trail. There is
+                      no bulk export.
                     </span>
-                    <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 10, display: "grid", gap: 6 }}>
-                      <strong style={{ fontSize: 13.5 }}>Send a document to the customer</strong>
+                    <div
+                      style={{
+                        borderTop: "1px solid #e2e8f0",
+                        paddingTop: 10,
+                        display: "grid",
+                        gap: 6,
+                      }}
+                    >
+                      <strong style={{ fontSize: 13.5 }}>
+                        Send a document to the customer
+                      </strong>
                       <span style={{ color: "#64748b", fontSize: 12 }}>
-                        Approval letters, term sheets, disclosures — it goes into the encrypted
-                        vault, appears on their status page for secure download, and they get a
-                        notification email. Never send documents by email.
+                        Approval letters, term sheets, disclosures — it goes
+                        into the encrypted vault, appears on their status page
+                        for secure download, and they get a notification email.
+                        Never send documents by email.
                       </span>
                       <input
                         type="file"
@@ -674,18 +903,36 @@ export default function LenderDeskPage() {
                       />
                       {sendStates[deal.serviceRequestId] && (
                         <span
-                          role={sendStates[deal.serviceRequestId].phase === "error" ? "alert" : "status"}
+                          role={
+                            sendStates[deal.serviceRequestId].phase === "error"
+                              ? "alert"
+                              : "status"
+                          }
                           style={{
                             fontSize: 13,
                             fontWeight: 700,
                             lineHeight: 1.5,
                             borderRadius: 8,
                             padding: "8px 10px",
-                            ...(sendStates[deal.serviceRequestId].phase === "sent"
-                              ? { color: "#166534", background: "#f0fdf4", border: "1px solid #bbf7d0" }
-                              : sendStates[deal.serviceRequestId].phase === "sending"
-                                ? { color: "#334155", background: "#f8fafc", border: "1px solid #e2e8f0" }
-                                : { color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A" }),
+                            ...(sendStates[deal.serviceRequestId].phase ===
+                            "sent"
+                              ? {
+                                  color: "#166534",
+                                  background: "#f0fdf4",
+                                  border: "1px solid #bbf7d0",
+                                }
+                              : sendStates[deal.serviceRequestId].phase ===
+                                  "sending"
+                                ? {
+                                    color: "#334155",
+                                    background: "#f8fafc",
+                                    border: "1px solid #e2e8f0",
+                                  }
+                                : {
+                                    color: "#8F6E1F",
+                                    background: "#FFF9E8",
+                                    border: "1px solid #D7B85A",
+                                  }),
                           }}
                         >
                           {sendStates[deal.serviceRequestId].note}
@@ -698,13 +945,21 @@ export default function LenderDeskPage() {
                     <strong>Status, customer note & closing timeline</strong>
                     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                       <label style={{ display: "grid", gap: 6, minWidth: 280 }}>
-                        <span style={{ color: "#596579", fontSize: 13, fontWeight: 800 }}>
+                        <span
+                          style={{
+                            color: "#596579",
+                            fontSize: 13,
+                            fontWeight: 800,
+                          }}
+                        >
                           Deal status
                         </span>
                         <select
                           value={draft.status}
                           onChange={(e) =>
-                            updateDraft(deal.serviceRequestId, { status: e.target.value })
+                            updateDraft(deal.serviceRequestId, {
+                              status: e.target.value,
+                            })
                           }
                           style={inputStyle}
                         >
@@ -716,26 +971,40 @@ export default function LenderDeskPage() {
                         </select>
                         <span style={{ color: "#64748b", fontSize: 12 }}>
                           Customer sees: “
-                          {statuses.find((s) => s.status === draft.status)?.customerLabel ??
-                            draft.status}
+                          {statuses.find((s) => s.status === draft.status)
+                            ?.customerLabel ?? draft.status}
                           ”
                         </span>
                       </label>
                       <label style={{ display: "grid", gap: 6, minWidth: 170 }}>
-                        <span style={{ color: "#596579", fontSize: 13, fontWeight: 800 }}>
+                        <span
+                          style={{
+                            color: "#596579",
+                            fontSize: 13,
+                            fontWeight: 800,
+                          }}
+                        >
                           Documents due
                         </span>
                         <input
                           type="date"
                           value={draft.docsDueAt}
                           onChange={(e) =>
-                            updateDraft(deal.serviceRequestId, { docsDueAt: e.target.value })
+                            updateDraft(deal.serviceRequestId, {
+                              docsDueAt: e.target.value,
+                            })
                           }
                           style={inputStyle}
                         />
                       </label>
                       <label style={{ display: "grid", gap: 6, minWidth: 170 }}>
-                        <span style={{ color: "#596579", fontSize: 13, fontWeight: 800 }}>
+                        <span
+                          style={{
+                            color: "#596579",
+                            fontSize: 13,
+                            fontWeight: 800,
+                          }}
+                        >
                           Underwriting ETA
                         </span>
                         <input
@@ -750,7 +1019,13 @@ export default function LenderDeskPage() {
                         />
                       </label>
                       <label style={{ display: "grid", gap: 6, minWidth: 170 }}>
-                        <span style={{ color: "#596579", fontSize: 13, fontWeight: 800 }}>
+                        <span
+                          style={{
+                            color: "#596579",
+                            fontSize: 13,
+                            fontWeight: 800,
+                          }}
+                        >
                           Closing target
                         </span>
                         <input
@@ -766,9 +1041,15 @@ export default function LenderDeskPage() {
                       </label>
                     </div>
                     <label style={{ display: "grid", gap: 6 }}>
-                      <span style={{ color: "#596579", fontSize: 13, fontWeight: 800 }}>
-                        Backlog note (why dates moved — USDA/SBA/lender backlog; shown to the
-                        customer with the timeline)
+                      <span
+                        style={{
+                          color: "#596579",
+                          fontSize: 13,
+                          fontWeight: 800,
+                        }}
+                      >
+                        Backlog note (why dates moved — USDA/SBA/lender backlog;
+                        shown to the customer with the timeline)
                       </span>
                       <input
                         type="text"
@@ -783,22 +1064,38 @@ export default function LenderDeskPage() {
                       />
                     </label>
                     <label style={{ display: "grid", gap: 6 }}>
-                      <span style={{ color: "#596579", fontSize: 13, fontWeight: 800 }}>
-                        Note to the customer (appears on their status page and in reminder
-                        emails — keep it minimum-disclosure: what you need, never figures)
+                      <span
+                        style={{
+                          color: "#596579",
+                          fontSize: 13,
+                          fontWeight: 800,
+                        }}
+                      >
+                        Note to the customer (appears on their status page and
+                        in reminder emails — keep it minimum-disclosure: what
+                        you need, never figures)
                       </span>
                       <textarea
                         value={draft.customerNote}
                         onChange={(e) =>
-                          updateDraft(deal.serviceRequestId, { customerNote: e.target.value })
+                          updateDraft(deal.serviceRequestId, {
+                            customerNote: e.target.value,
+                          })
                         }
                         rows={3}
-                        style={{ ...inputStyle, minHeight: 70, resize: "vertical" }}
+                        style={{
+                          ...inputStyle,
+                          minHeight: 70,
+                          resize: "vertical",
+                        }}
                         placeholder="e.g. Still need your 2024–2025 business tax returns and the executed purchase agreement."
                       />
                     </label>
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <ActionButton disabled={isBusy} onClick={() => void saveDeal(deal)}>
+                      <ActionButton
+                        disabled={isBusy}
+                        onClick={() => void saveDeal(deal)}
+                      >
                         {isBusy ? "Saving…" : "Save Status, Note & Timeline"}
                       </ActionButton>
                       <ActionButton
@@ -818,10 +1115,11 @@ export default function LenderDeskPage() {
         <aside style={{ ...panelStyle, padding: 16, display: "grid", gap: 8 }}>
           <strong>How this desk works</strong>
           <span style={{ color: "#334155", fontSize: 13, lineHeight: 1.5 }}>
-            Deals in “Documents requested” get automatic reminder emails — a fresh 72-hour
-            secure upload link each time, at most one every 3 days, capped at 3 (Force
-            overrides both). Your status, note, and timeline save straight to the
-            customer&apos;s status page. {bookingUrl
+            Deals in “Documents requested” get automatic reminder emails — a
+            fresh 72-hour secure upload link each time, at most one every 3
+            days, capped at 3 (Force overrides both). Your status, note, and
+            timeline save straight to the customer&apos;s status page.{" "}
+            {bookingUrl
               ? "Your booking link is included in every customer touchpoint so calls land on your calendar, not your cell."
               : "Set LENDER_BOOKING_URL to include your scheduling link in every customer touchpoint."}
           </span>

@@ -1,3 +1,4 @@
+import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
 import {
@@ -18,6 +19,15 @@ import { persistServiceRequest } from "@/lib/serviceRequests/serviceRequestStore
 import { notifyOnServiceRequest } from "@/lib/notifications/notificationDispatch";
 import { persistApplicationState } from "@/lib/applications/applicationStore";
 import { mintUploadLinkToken } from "@/lib/documents/uploadLinkToken";
+import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
+import {
+  SYNTHETIC_FIXTURE_COOKIE,
+  bindSyntheticFixtureLineage,
+  verifySyntheticFixtureSessionToken,
+  type SyntheticFixtureContext,
+} from "@/lib/testing/syntheticFixtureLineage";
+import { persistSyntheticFixtureLineage } from "@/lib/testing/syntheticFixtureLineageStore";
+import { syntheticPersonaByHumanVisibleName } from "@/lib/testing/syntheticPersonaRegistry";
 import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
 
 /**
@@ -57,12 +67,109 @@ function serviceRequestReference(traceId: string): string {
   return `FIN-${traceId.slice(-12).toUpperCase()}`;
 }
 
+const SYNTHETIC_LENDER_SCENARIOS = new Set([
+  "lender-intake",
+  "lender-proforma-review",
+  "lender-document-upload",
+  "lender-signature",
+  "lender-dispatch-sandbox",
+  "full-lender-lifecycle",
+]);
+
+async function resolveSyntheticFinancingFixture(
+  req: NextRequest,
+  body: FinancingIntakeRequest,
+): Promise<
+  | { context: SyntheticFixtureContext | null; error: null; status: 200 }
+  | { context: null; error: string; status: 400 | 403 | 409 | 503 }
+> {
+  const signed = req.cookies.get(SYNTHETIC_FIXTURE_COOKIE)?.value ?? null;
+  const visiblePersona = syntheticPersonaByHumanVisibleName(body.contactName);
+  if (!signed) {
+    if (visiblePersona) {
+      return {
+        context: null,
+        error:
+          "This name is reserved for a governed synthetic fixture. Activate its signed test session before submitting.",
+        status: 400,
+      };
+    }
+    return { context: null, error: null, status: 200 };
+  }
+
+  const secret = resolveNextAuthSecret();
+  if (!secret) {
+    return {
+      context: null,
+      error: "Synthetic fixture session authority is unavailable.",
+      status: 503,
+    };
+  }
+  const session = await getToken({ req, secret });
+  const email =
+    typeof session?.email === "string"
+      ? session.email.trim().toLowerCase()
+      : "";
+  if (!email) {
+    return {
+      context: null,
+      error:
+        "An authenticated operator session is required for synthetic fixtures.",
+      status: 403,
+    };
+  }
+  const context = verifySyntheticFixtureSessionToken(signed, secret, email);
+  if (!context) {
+    return {
+      context: null,
+      error: "Synthetic fixture session is invalid or expired.",
+      status: 403,
+    };
+  }
+  if (!SYNTHETIC_LENDER_SCENARIOS.has(context.scenarioId)) {
+    return {
+      context: null,
+      error:
+        "The active synthetic scenario is not authorized for lender intake.",
+      status: 409,
+    };
+  }
+  if ((body.contactName ?? "").trim() !== context.humanVisibleName) {
+    return {
+      context: null,
+      error: "Synthetic fixture name does not match the active persona.",
+      status: 400,
+    };
+  }
+  const operatorEmail = context.operatorIdentity.replace(/^user:/, "");
+  if ((body.contactEmail ?? "").trim().toLowerCase() !== operatorEmail) {
+    return {
+      context: null,
+      error:
+        "Synthetic fixture email must match the authorized operator identity.",
+      status: 400,
+    };
+  }
+  return { context, error: null, status: 200 };
+}
+
 export async function POST(req: NextRequest) {
   const traceId = createFinancingIntakeTraceId();
 
   try {
     const body = (await req.json()) as FinancingIntakeRequest;
     const actorId = body.userId ?? null;
+    const syntheticResolution = await resolveSyntheticFinancingFixture(
+      req,
+      body,
+    );
+    if (syntheticResolution.error) {
+      return NextResponse.json(
+        { ok: false, error: syntheticResolution.error },
+        { status: syntheticResolution.status },
+      );
+    }
+    const syntheticFixtureContext = syntheticResolution.context;
 
     const runtimeGuard = runRuntimeGuard({
       operation: "customer.financing.intake.submit",
@@ -77,6 +184,7 @@ export async function POST(req: NextRequest) {
         route: "/api/financing/intake",
         licensedModule: "licensed-lending-spoke",
         applicationId: body.applicationId ?? null,
+        syntheticFixture: syntheticFixtureContext,
       },
     });
 
@@ -109,7 +217,7 @@ export async function POST(req: NextRequest) {
           error: "Runtime governance guard blocked financing intake request.",
           governance: { traceId, runtimeGuard, observability, evidence },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -122,25 +230,25 @@ export async function POST(req: NextRequest) {
           "schema",
           "financing-intake-request-v0.1.0",
           "src/app/api/financing/intake/route.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "governance",
           "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "rules",
           FINANCING_INTAKE_RUNTIME_VERSION,
           "src/lib/financing/intakeRuntime.ts",
-          traceId
+          traceId,
         ),
       ],
     });
@@ -175,7 +283,10 @@ export async function POST(req: NextRequest) {
     });
 
     const intakeResult = evaluateFinancingIntake(body);
-    const lineagePropertyId = body.applicationId?.trim() || body.propertyDescriptor?.trim() || `financing-intake:${traceId}`;
+    const lineagePropertyId =
+      body.applicationId?.trim() ||
+      body.propertyDescriptor?.trim() ||
+      `financing-intake:${traceId}`;
     captureGeneratedEvidenceArtifact({
       kind: "qualification-result",
       propertyId: lineagePropertyId,
@@ -224,7 +335,7 @@ export async function POST(req: NextRequest) {
           "redact-internal-review-notes-before-public-disclosure",
         ],
         consentRequirements: ["financing-intake-routing-consent"],
-      }
+      },
     );
 
     const explanation = createExplanationLineage({
@@ -240,7 +351,7 @@ export async function POST(req: NextRequest) {
       overlayRefs: [],
       confidenceScore: Math.min(
         0.95,
-        Math.max(0.4, intakeResult.readiness.readinessPercent / 100)
+        Math.max(0.4, intakeResult.readiness.readinessPercent / 100),
       ),
       humanReviewRequired: true,
       replayRefs: [traceId],
@@ -269,7 +380,8 @@ export async function POST(req: NextRequest) {
         purpose: intakeResult.purpose?.code ?? null,
         readinessPercent: intakeResult.readiness.readinessPercent,
         versionRuntimeOk: versionRuntime.ok,
-        classificationLevel: classifiedOutput.classification.classificationLevel,
+        classificationLevel:
+          classifiedOutput.classification.classificationLevel,
       },
     });
 
@@ -368,14 +480,20 @@ export async function POST(req: NextRequest) {
         },
         timeline: body.timeline ?? null,
         readinessPercent: intakeResult.readiness.readinessPercent,
+        syntheticFixtureActive: Boolean(syntheticFixtureContext),
+        externalNotificationSuppressed: Boolean(syntheticFixtureContext),
       },
+      syntheticFixtureContext,
     });
 
     // Alert the licensed lender that a deal is waiting (min-disclosure, never
     // blocks). OUT-OF-NETWORK deals (FSA/farm paper the lender does not
     // originate — founder 2026-08-05) are recorded for demand signal but
     // never sent to the lender's inbox: no false leads, no inundation.
-    if (intakeResult.routedTo === "licensed-lending-spoke") {
+    if (
+      intakeResult.routedTo === "licensed-lending-spoke" &&
+      !syntheticFixtureContext
+    ) {
       await notifyOnServiceRequest({
         requestType: "financing_deal_intake",
         serviceRequestId,
@@ -395,8 +513,27 @@ export async function POST(req: NextRequest) {
           source: "financing-intake",
           applicationId: `finintake-${serviceRequestId}`,
           status: "INTAKE_RECEIVED",
-          metadata: { serviceRequestId, channel: "financing-intake" },
+          metadata: {
+            serviceRequestId,
+            channel: "financing-intake",
+            syntheticFixture: syntheticFixtureContext
+              ? bindSyntheticFixtureLineage(
+                  syntheticFixtureContext,
+                  "application",
+                  `finintake-${serviceRequestId}`,
+                )
+              : null,
+          },
         });
+        if (syntheticFixtureContext) {
+          await persistSyntheticFixtureLineage({
+            context: syntheticFixtureContext,
+            recordType: "application",
+            recordId: app.application.id,
+            traceId,
+            source: "api.financing.intake",
+          });
+        }
         const link = mintUploadLinkToken({
           applicationId: app.application.id,
           dealRef: serviceRequestId,
@@ -422,6 +559,17 @@ export async function POST(req: NextRequest) {
           : null,
       status: serviceRequest.status,
       intakeResult,
+      syntheticFixture: syntheticFixtureContext
+        ? {
+            syntheticPersonaId: syntheticFixtureContext.syntheticPersonaId,
+            testRunId: syntheticFixtureContext.testRunId,
+            fixtureVersion: syntheticFixtureContext.fixtureVersion,
+            environment: syntheticFixtureContext.environment,
+            operatorIdentity: syntheticFixtureContext.operatorIdentity,
+            createdAt: syntheticFixtureContext.createdAt,
+            scenarioId: syntheticFixtureContext.scenarioId,
+          }
+        : null,
       event: classifiedOutput.event,
       governance: {
         traceId,
@@ -468,7 +616,7 @@ export async function POST(req: NextRequest) {
             : "Unknown financing intake runtime error.",
         governance: { traceId, observability, evidence },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

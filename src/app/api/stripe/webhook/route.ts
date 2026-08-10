@@ -32,7 +32,11 @@ import {
 } from "@/lib/runtime/versionRuntime";
 import { readRequiredSecret } from "@/lib/security/requestGuards";
 import { stripeConfiguredForLivePayments } from "@/lib/stripe/client";
-import { evaluatePaymentRisk, type PaymentRiskDecision } from "@/lib/fraud/paymentRiskRuntime";
+import {
+  evaluatePaymentRisk,
+  type PaymentRiskDecision,
+} from "@/lib/fraud/paymentRiskRuntime";
+import { syntheticFixtureContextFromProviderMetadata } from "@/lib/testing/syntheticFixtureLineage";
 
 /**
  * Stripe Webhook API
@@ -72,11 +76,13 @@ function webhookSecret(): string | null {
 function stripeConnectRecipients(): StripeConnectRecipientRegistry {
   return {
     CAITLIN: {
-      connectedAccountRef: process.env.STRIPE_CONNECT_CAITLIN_ACCOUNT_ID?.trim() || null,
+      connectedAccountRef:
+        process.env.STRIPE_CONNECT_CAITLIN_ACCOUNT_ID?.trim() || null,
       certified: process.env.STRIPE_CONNECT_CAITLIN_CERTIFIED === "true",
     },
     STUART: {
-      connectedAccountRef: process.env.STRIPE_CONNECT_STUART_ACCOUNT_ID?.trim() || null,
+      connectedAccountRef:
+        process.env.STRIPE_CONNECT_STUART_ACCOUNT_ID?.trim() || null,
       certified: process.env.STRIPE_CONNECT_STUART_CERTIFIED === "true",
     },
   };
@@ -95,7 +101,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function getMetadataValue(
   metadata: Record<string, unknown> | undefined,
-  key: string
+  key: string,
 ): string | null {
   const value = metadata?.[key];
 
@@ -143,7 +149,7 @@ function mapPlanToPermissions(plan: string | null): EntitlementType[] {
 }
 
 function billingEventResponse(
-  billingEvent: Awaited<ReturnType<typeof persistBillingEvent>>
+  billingEvent: Awaited<ReturnType<typeof persistBillingEvent>>,
 ) {
   return {
     id: billingEvent.id,
@@ -162,8 +168,7 @@ function billingEventResponse(
     entitlementGranted: billingEvent.entitlementGranted,
     paymentConnectorLiveMode: billingEvent.paymentConnectorLiveMode,
     stubSignatureVerification: billingEvent.stubSignatureVerification,
-    regulatedDecisionImpactAllowed:
-      billingEvent.regulatedDecisionImpactAllowed,
+    regulatedDecisionImpactAllowed: billingEvent.regulatedDecisionImpactAllowed,
     humanReviewRequired: billingEvent.humanReviewRequired,
     governanceVersion: billingEvent.governanceVersion,
     classification: billingEvent.classification,
@@ -241,7 +246,7 @@ export async function POST(req: Request) {
             evidence,
           },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -249,13 +254,14 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error: "STRIPE_WEBHOOK_SECRET is not configured for this environment.",
+          error:
+            "STRIPE_WEBHOOK_SECRET is not configured for this environment.",
           governance: {
             traceId,
             runtimeGuard,
           },
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -268,55 +274,55 @@ export async function POST(req: Request) {
           "schema",
           "stripe-webhook-v0.1.0",
           "src/app/api/stripe/webhook/route.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "schema",
           "entitlements-v0.1.0",
           "src/db/schema/entitlements.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "schema",
           "billing-events-v0.1.0",
           "src/db/schema/billingEvents.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "governance",
           "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "api",
           "stripe-webhook-verified-v1.0.0",
           "src/app/api/stripe/webhook/route.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "api",
           "entitlement-store-v0.1.0",
           "src/lib/entitlements/store.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "billing-event-runtime-v0.1.0",
           "src/lib/billing/billingEventStore.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "governance-evidence-store-v0.1.0",
           "src/lib/governance/evidenceStore.ts",
-          traceId
+          traceId,
         ),
       ],
     });
@@ -326,7 +332,8 @@ export async function POST(req: Request) {
         eventType: "STRIPE_WEBHOOK_SIGNATURE_MISSING",
         domain: "security",
         severity: "WARN",
-        message: "Stripe webhook rejected because the signature header is missing.",
+        message:
+          "Stripe webhook rejected because the signature header is missing.",
         traceId,
         replayRef: traceId,
         actorId: null,
@@ -377,7 +384,7 @@ export async function POST(req: Request) {
             evidence,
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -387,14 +394,15 @@ export async function POST(req: Request) {
       stripeEvent = stripeWebhookVerifier().webhooks.constructEvent(
         bodyText,
         signature,
-        configuredWebhookSecret
+        configuredWebhookSecret,
       );
     } catch (error) {
       const observability = createObservabilityEvent({
         eventType: "STRIPE_WEBHOOK_SIGNATURE_INVALID",
         domain: "security",
         severity: "WARN",
-        message: "Stripe webhook rejected because signature verification failed.",
+        message:
+          "Stripe webhook rejected because signature verification failed.",
         traceId,
         replayRef: traceId,
         actorId: null,
@@ -448,13 +456,16 @@ export async function POST(req: Request) {
             evidence,
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const payloadRecord = isRecord(stripeEvent) ? stripeEvent : {};
     const event = payloadRecord as StripeWebhookPayload;
     const metadata = event.data?.object?.metadata;
+    const syntheticFixtureContext = syntheticFixtureContextFromProviderMetadata(
+      isRecord(metadata) ? metadata : null,
+    );
     const tenantId = getMetadataValue(metadata, "tenantId") ?? "dev";
     const requestedPlan = getMetadataValue(metadata, "plan");
     const sessionId =
@@ -466,29 +477,72 @@ export async function POST(req: Request) {
     let fraudDecision: PaymentRiskDecision | null = null;
     const stripeObject = (event.data?.object ?? {}) as Record<string, unknown>;
     if (event.type === "checkout.session.completed") {
-      fraudDecision = { disposition: "HOLD", reasons: ["PAYMENT_RISK_SIGNAL_PENDING"], releaseAllowed: false, humanReviewRequired: false };
-    } else if (event.type === "payment_intent.payment_failed" || event.type === "charge.dispute.created") {
-      fraudDecision = { disposition: "BLOCK", reasons: [event.type === "charge.dispute.created" ? "DISPUTE_OPENED" : "PAYMENT_FAILED"], releaseAllowed: false, humanReviewRequired: true };
+      fraudDecision = {
+        disposition: "HOLD",
+        reasons: ["PAYMENT_RISK_SIGNAL_PENDING"],
+        releaseAllowed: false,
+        humanReviewRequired: false,
+      };
+    } else if (
+      event.type === "payment_intent.payment_failed" ||
+      event.type === "charge.dispute.created"
+    ) {
+      fraudDecision = {
+        disposition: "BLOCK",
+        reasons: [
+          event.type === "charge.dispute.created"
+            ? "DISPUTE_OPENED"
+            : "PAYMENT_FAILED",
+        ],
+        releaseAllowed: false,
+        humanReviewRequired: true,
+      };
     } else if (event.type === "charge.succeeded") {
-      const outcome = isRecord(stripeObject.outcome) ? stripeObject.outcome : {};
-      const paymentDetails = isRecord(stripeObject.payment_method_details) ? stripeObject.payment_method_details : {};
+      const outcome = isRecord(stripeObject.outcome)
+        ? stripeObject.outcome
+        : {};
+      const paymentDetails = isRecord(stripeObject.payment_method_details)
+        ? stripeObject.payment_method_details
+        : {};
       const card = isRecord(paymentDetails.card) ? paymentDetails.card : {};
       const checks = isRecord(card.checks) ? card.checks : {};
       const threeDS = isRecord(card.three_d_secure) ? card.three_d_secure : {};
       const wallet = isRecord(card.wallet) ? card.wallet : null;
-      const rawRisk = typeof outcome.risk_level === "string" ? outcome.risk_level : "not_assessed";
-      const riskLevel = rawRisk === "normal" || rawRisk === "elevated" || rawRisk === "highest" ? rawRisk : "not_assessed";
-      const metadataRecord = isRecord(stripeObject.metadata) ? stripeObject.metadata : {};
+      const rawRisk =
+        typeof outcome.risk_level === "string"
+          ? outcome.risk_level
+          : "not_assessed";
+      const riskLevel =
+        rawRisk === "normal" || rawRisk === "elevated" || rawRisk === "highest"
+          ? rawRisk
+          : "not_assessed";
+      const metadataRecord = isRecord(stripeObject.metadata)
+        ? stripeObject.metadata
+        : {};
       fraudDecision = evaluatePaymentRisk({
         stripeRiskLevel: riskLevel,
-        stripeRiskScore: typeof outcome.risk_score === "number" ? outcome.risk_score : null,
+        stripeRiskScore:
+          typeof outcome.risk_score === "number" ? outcome.risk_score : null,
         threeDSecureAuthenticated: threeDS.result === "authenticated",
-        cvcCheck: checks.cvc_check === "pass" || checks.cvc_check === "fail" ? checks.cvc_check : "unavailable",
-        postalCheck: checks.address_postal_code_check === "pass" || checks.address_postal_code_check === "fail" ? checks.address_postal_code_check : "unavailable",
+        cvcCheck:
+          checks.cvc_check === "pass" || checks.cvc_check === "fail"
+            ? checks.cvc_check
+            : "unavailable",
+        postalCheck:
+          checks.address_postal_code_check === "pass" ||
+          checks.address_postal_code_check === "fail"
+            ? checks.address_postal_code_check
+            : "unavailable",
         identityProofed: metadataRecord.identityProofed === "true",
-        plaidOwnershipMatch: metadataRecord.plaidOwnershipMatch === "true" ? true : metadataRecord.plaidOwnershipMatch === "false" ? false : null,
+        plaidOwnershipMatch:
+          metadataRecord.plaidOwnershipMatch === "true"
+            ? true
+            : metadataRecord.plaidOwnershipMatch === "false"
+              ? false
+              : null,
         paymentMethod: wallet ? "wallet" : "card",
-        amountCents: typeof stripeObject.amount === "number" ? stripeObject.amount : 0,
+        amountCents:
+          typeof stripeObject.amount === "number" ? stripeObject.amount : 0,
       });
     }
 
@@ -498,11 +552,7 @@ export async function POST(req: Request) {
       classificationSource: "api-stripe-webhook-route",
       classificationVersion: "classification-runtime-v0.1.0",
       replayRef: traceId,
-      disclosureAudience: [
-        "authorized-operator",
-        "security",
-        "governance",
-      ],
+      disclosureAudience: ["authorized-operator", "security", "governance"],
       sharingPermissions: ["webhook-processing", "entitlement-review"],
       aiUsagePermissions: [],
       exportRestrictions: [
@@ -531,11 +581,14 @@ export async function POST(req: Request) {
             eventType: event.type,
             stubSignatureVerification: false,
           },
-        }
+        },
       );
 
-      const checkoutSession = stripeEvent.data.object as Stripe.Checkout.Session;
-      const revenueClass = normalizeRevenueClass(checkoutSession.metadata?.revenueClass);
+      const checkoutSession = stripeEvent.data
+        .object as Stripe.Checkout.Session;
+      const revenueClass = normalizeRevenueClass(
+        checkoutSession.metadata?.revenueClass,
+      );
       if (isFurlongCheckoutSession(checkoutSession) && revenueClass) {
         const rule = approvedFounderRevenueRule(revenueClass);
         const allocationEvidence = buildAllocationEvidence({
@@ -578,11 +631,7 @@ export async function POST(req: Request) {
         classificationSource: "api-stripe-webhook-route-output",
         classificationVersion: "classification-runtime-v0.1.0",
         replayRef: traceId,
-        disclosureAudience: [
-          "authorized-operator",
-          "security",
-          "governance",
-        ],
+        disclosureAudience: ["authorized-operator", "security", "governance"],
         sharingPermissions: ["entitlement-review"],
         aiUsagePermissions: [],
         exportRestrictions: [
@@ -590,7 +639,7 @@ export async function POST(req: Request) {
         ],
         redactionRequirements: ["redact-tenant-and-entitlement-identifiers"],
         consentRequirements: ["borrower-payment-consent"],
-      }
+      },
     );
 
     const billingEvent = await persistBillingEvent({
@@ -633,7 +682,9 @@ export async function POST(req: Request) {
         stubSignatureVerification: false,
         fraudDisposition: fraudDecision?.disposition ?? null,
         paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
+        syntheticFixtureActive: Boolean(syntheticFixtureContext),
       },
+      syntheticFixtureContext,
     });
 
     const explanation = createExplanationLineage({
@@ -684,6 +735,7 @@ export async function POST(req: Request) {
         versionRuntimeOk: versionRuntime.ok,
         fraudDisposition: fraudDecision?.disposition ?? null,
         paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
+        syntheticFixtureActive: Boolean(syntheticFixtureContext),
       },
     });
 
@@ -779,7 +831,7 @@ export async function POST(req: Request) {
           traceId,
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

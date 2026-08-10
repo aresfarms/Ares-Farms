@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "../../auth/[...nextauth]/route";
@@ -24,6 +24,12 @@ import {
   createRuntimeVersionRef,
   evaluateVersionRuntime,
 } from "@/lib/runtime/versionRuntime";
+import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
+import {
+  SYNTHETIC_FIXTURE_COOKIE,
+  verifySyntheticFixtureSessionToken,
+  type SyntheticFixtureContext,
+} from "@/lib/testing/syntheticFixtureLineage";
 
 /**
  * Authenticated Stripe Checkout API
@@ -52,6 +58,42 @@ type SessionUserWithTenant = {
   tenantId?: string | null;
 };
 
+const STRIPE_SYNTHETIC_SCENARIOS = new Set([
+  "stripe-card",
+  "stripe-apple-pay",
+  "stripe-google-pay",
+  "stripe-connect-allocation",
+  "negative-payment-risk",
+]);
+
+function checkoutSyntheticFixture(
+  req: NextRequest,
+  email: string | null | undefined,
+): SyntheticFixtureContext | null {
+  const raw = req.cookies.get(SYNTHETIC_FIXTURE_COOKIE)?.value;
+  if (!raw) return null;
+  const secret = resolveNextAuthSecret();
+  const normalizedEmail = email?.trim().toLowerCase() ?? "";
+  if (!secret || !normalizedEmail) {
+    throw new Error(
+      "Synthetic checkout requires authenticated session authority.",
+    );
+  }
+  const context = verifySyntheticFixtureSessionToken(
+    raw,
+    secret,
+    normalizedEmail,
+  );
+  if (!context)
+    throw new Error("Synthetic checkout fixture is invalid or expired.");
+  if (!STRIPE_SYNTHETIC_SCENARIOS.has(context.scenarioId)) {
+    throw new Error(
+      "The active synthetic fixture is not authorized for Stripe testing.",
+    );
+  }
+  return context;
+}
+
 function createStripeCheckoutTraceId(): string {
   return `stripe-checkout-${randomUUID()}`;
 }
@@ -63,12 +105,14 @@ function getBaseUrl(): string {
   );
 }
 
-function isBillingPlanKey(plan: string | null | undefined): plan is BillingPlanKey {
+function isBillingPlanKey(
+  plan: string | null | undefined,
+): plan is BillingPlanKey {
   return Boolean(plan && Object.prototype.hasOwnProperty.call(PLANS, plan));
 }
 
 function billingEventResponse(
-  billingEvent: Awaited<ReturnType<typeof persistBillingEvent>>
+  billingEvent: Awaited<ReturnType<typeof persistBillingEvent>>,
 ) {
   return {
     id: billingEvent.id,
@@ -89,8 +133,7 @@ function billingEventResponse(
     entitlementGranted: billingEvent.entitlementGranted,
     paymentConnectorLiveMode: billingEvent.paymentConnectorLiveMode,
     stubSignatureVerification: billingEvent.stubSignatureVerification,
-    regulatedDecisionImpactAllowed:
-      billingEvent.regulatedDecisionImpactAllowed,
+    regulatedDecisionImpactAllowed: billingEvent.regulatedDecisionImpactAllowed,
     humanReviewRequired: billingEvent.humanReviewRequired,
     governanceVersion: billingEvent.governanceVersion,
     classification: billingEvent.classification,
@@ -103,7 +146,7 @@ function billingEventResponse(
   };
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const traceId = createStripeCheckoutTraceId();
 
   try {
@@ -143,12 +186,30 @@ export async function POST(req: Request) {
             evidence,
           },
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const body = (await req.json()) as CheckoutBody;
     const actorId = sessionUser.id ?? sessionUser.email ?? sessionUser.tenantId;
+    let syntheticFixtureContext: SyntheticFixtureContext | null = null;
+    try {
+      syntheticFixtureContext = checkoutSyntheticFixture(
+        req,
+        sessionUser.email,
+      );
+    } catch (error) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Synthetic checkout authorization failed.",
+        },
+        { status: 403 },
+      );
+    }
 
     const runtimeGuard = runRuntimeGuard({
       operation: "billing.stripe.checkout.create",
@@ -204,7 +265,7 @@ export async function POST(req: Request) {
             evidence,
           },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -217,43 +278,43 @@ export async function POST(req: Request) {
           "schema",
           "stripe-checkout-session-v0.1.0",
           "src/app/api/stripe/checkout/route.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "governance",
           "master-volumes-runtime-v0.1.0",
           "Master Volume Series",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "runtime-enforcement-v0.1.0",
           "src/lib/runtime",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "api",
           "stripe-checkout-adapter-v0.1.0",
           "src/lib/stripe/client.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "schema",
           "billing-events-v0.1.0",
           "src/db/schema/billingEvents.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "billing-event-runtime-v0.1.0",
           "src/lib/billing/billingEventStore.ts",
-          traceId
+          traceId,
         ),
         createRuntimeVersionRef(
           "runtime",
           "governance-evidence-store-v0.1.0",
           "src/lib/governance/evidenceStore.ts",
-          traceId
+          traceId,
         ),
       ],
     });
@@ -276,7 +337,7 @@ export async function POST(req: Request) {
         exportRestrictions: ["do-not-export-payment-metadata-without-review"],
         redactionRequirements: ["redact-tenant-and-user-identifiers"],
         consentRequirements: ["borrower-payment-consent"],
-      }
+      },
     );
 
     if (!isBillingPlanKey(body.plan)) {
@@ -352,7 +413,7 @@ export async function POST(req: Request) {
             evidence,
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -367,6 +428,7 @@ export async function POST(req: Request) {
       customerSubjectRef: body.customerSubjectRef,
       dealRef: body.dealRef,
       revenueClass,
+      syntheticFixtureContext,
     });
     assertStripeCheckoutAvailable();
     const livePaymentConnector = stripeConfiguredForLivePayments();
@@ -389,16 +451,24 @@ export async function POST(req: Request) {
       metadata: checkoutMetadata,
       payment_method_options: {
         card: {
-          request_three_d_secure: process.env.STRIPE_3DS_POLICY === "any" ? "any" :
-            process.env.STRIPE_3DS_POLICY === "challenge" ? "challenge" : "automatic",
+          request_three_d_secure:
+            process.env.STRIPE_3DS_POLICY === "any"
+              ? "any"
+              : process.env.STRIPE_3DS_POLICY === "challenge"
+                ? "challenge"
+                : "automatic",
         },
       },
       payment_intent_data: {
         metadata: checkoutMetadata,
         transfer_group: checkoutMetadata.transferGroup,
       },
-      success_url: `${baseUrl}/success`,
-      cancel_url: `${baseUrl}/dashboard?cancelled=true`,
+      success_url: syntheticFixtureContext
+        ? `${baseUrl}/internal/synthetic-fixtures/stripe/success?session_id={CHECKOUT_SESSION_ID}`
+        : `${baseUrl}/success`,
+      cancel_url: syntheticFixtureContext
+        ? `${baseUrl}/internal/synthetic-fixtures/stripe?cancelled=1`
+        : `${baseUrl}/dashboard?cancelled=true`,
     });
 
     const classifiedCheckout = classifyRecord(
@@ -426,7 +496,7 @@ export async function POST(req: Request) {
         exportRestrictions: ["do-not-export-payment-session-without-review"],
         redactionRequirements: ["redact-tenant-and-session-identifiers"],
         consentRequirements: ["borrower-payment-consent"],
-      }
+      },
     );
 
     const billingEvent = await persistBillingEvent({
@@ -466,7 +536,9 @@ export async function POST(req: Request) {
       metadata: {
         authenticated: true,
         durableBillingEvent: true,
+        syntheticFixtureActive: Boolean(syntheticFixtureContext),
       },
+      syntheticFixtureContext,
     });
 
     const explanation = createExplanationLineage({
@@ -574,6 +646,15 @@ export async function POST(req: Request) {
       url: checkoutSession.url,
       checkout: classifiedCheckout,
       billingEvent: billingEventResponse(billingEvent),
+      syntheticFixture: syntheticFixtureContext
+        ? {
+            syntheticPersonaId: syntheticFixtureContext.syntheticPersonaId,
+            testRunId: syntheticFixtureContext.testRunId,
+            fixtureVersion: syntheticFixtureContext.fixtureVersion,
+            environment: syntheticFixtureContext.environment,
+            scenarioId: syntheticFixtureContext.scenarioId,
+          }
+        : null,
       governance: {
         traceId,
         runtimeGuard,
@@ -597,7 +678,7 @@ export async function POST(req: Request) {
           traceId,
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

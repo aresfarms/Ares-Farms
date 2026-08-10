@@ -339,6 +339,72 @@ variable "stable_revision" {
   default     = ""
 }
 
+variable "deployment_environment" {
+  description = "Explicit runtime environment boundary. Test fixtures are permitted only outside production."
+  type        = string
+  default     = "staging"
+
+  validation {
+    condition     = contains(["development", "staging", "production"], var.deployment_environment)
+    error_message = "deployment_environment must be development, staging, or production."
+  }
+}
+
+variable "professional_test_personas_enabled" {
+  description = "Enable unmistakably synthetic professional personas for authorized owner testing in non-production environments."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !(var.deployment_environment == "production" && var.professional_test_personas_enabled)
+    error_message = "Professional test personas are forbidden in production."
+  }
+}
+
+variable "synthetic_fixtures_enabled" {
+  description = "Enable signed synthetic test sessions and immutable fixture lineage in non-production environments."
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = !(var.deployment_environment == "production" && var.synthetic_fixtures_enabled)
+    error_message = "Synthetic fixtures are forbidden in production."
+  }
+}
+
+variable "synthetic_fixture_operator_allowlist" {
+  description = "Comma-separated operator identities allowed to activate synthetic fixtures. This is authorization metadata, not a secret."
+  type        = string
+  default     = "chudson@aresfarmsinc.com"
+
+  validation {
+    condition     = length(trimspace(var.synthetic_fixture_operator_allowlist)) > 0
+    error_message = "synthetic_fixture_operator_allowlist must contain at least one operator identity."
+  }
+}
+
+variable "role_provisioning_mode" {
+  description = "Role-provisioning enforcement mode. Production and staging privileged access use governed-admin-only."
+  type        = string
+  default     = "locked"
+
+  validation {
+    condition     = contains(["locked", "development-headers", "governed-admin-only"], var.role_provisioning_mode)
+    error_message = "role_provisioning_mode must be locked, development-headers, or governed-admin-only."
+  }
+}
+
+variable "stripe_3ds_policy" {
+  description = "Stripe request_three_d_secure policy: automatic, any, or challenge."
+  type        = string
+  default     = "automatic"
+
+  validation {
+    condition     = contains(["automatic", "any", "challenge"], var.stripe_3ds_policy)
+    error_message = "stripe_3ds_policy must be automatic, any, or challenge."
+  }
+}
+
 variable "tester_feedback_email" {
   description = "When set, the app renders the staging tester banner (build stamp + mailto feedback). Never set in production."
   type        = string

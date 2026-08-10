@@ -1,7 +1,16 @@
 import { and, desc, eq } from "drizzle-orm";
 
-import { applicationDocuments, serviceRequests, type ServiceRequestRow } from "@/db/schema";
+import {
+  applicationDocuments,
+  serviceRequests,
+  syntheticFixtureLineageRecords,
+  type ServiceRequestRow,
+} from "@/db/schema";
 import { db } from "@/lib/db";
+import {
+  bindSyntheticFixtureLineage,
+  type SyntheticFixtureContext,
+} from "@/lib/testing/syntheticFixtureLineage";
 
 /**
  * Canonical Service Request Runtime (licensed-module order + intake store)
@@ -41,21 +50,47 @@ export type ServiceRequestType =
  * portal shows the customer-safe label. Free-form statuses remain accepted
  * for non-financing request types.
  */
-export const FINANCING_DEAL_STATUSES: ReadonlyArray<{ status: string; customerLabel: string }> = [
-  { status: "SUBMITTED_PENDING_REVIEW", customerLabel: "Received — awaiting your broker's first review" },
+export const FINANCING_DEAL_STATUSES: ReadonlyArray<{
+  status: string;
+  customerLabel: string;
+}> = [
+  {
+    status: "SUBMITTED_PENDING_REVIEW",
+    customerLabel: "Received — awaiting your broker's first review",
+  },
   { status: "IN_LENDER_REVIEW", customerLabel: "In review with your broker" },
-  { status: "DOCUMENTS_REQUESTED", customerLabel: "Your broker needs documents — use your secure upload link" },
+  {
+    status: "DOCUMENTS_REQUESTED",
+    customerLabel: "Your broker needs documents — use your secure upload link",
+  },
   { status: "UNDERWRITING_IN_PROGRESS", customerLabel: "In underwriting" },
-  { status: "APPROVED_PROCEEDING_TO_CLOSE", customerLabel: "Approved — proceeding toward closing" },
+  {
+    status: "APPROVED_PROCEEDING_TO_CLOSE",
+    customerLabel: "Approved — proceeding toward closing",
+  },
   { status: "CLOSED_FUNDED", customerLabel: "Closed and funded" },
-  { status: "DECLINED_BY_LENDER", customerLabel: "The lender was unable to proceed with this request" },
-  { status: "WITHDRAWN_BY_CUSTOMER", customerLabel: "Withdrawn at your request" },
-  { status: "CLOSED_NOT_COMPLETED", customerLabel: "Closed without completing — see your broker's note" },
+  {
+    status: "DECLINED_BY_LENDER",
+    customerLabel: "The lender was unable to proceed with this request",
+  },
+  {
+    status: "WITHDRAWN_BY_CUSTOMER",
+    customerLabel: "Withdrawn at your request",
+  },
+  {
+    status: "CLOSED_NOT_COMPLETED",
+    customerLabel: "Closed without completing — see your broker's note",
+  },
 ];
 
-export function customerStatusLabel(status: string | null | undefined): string | null {
+export function customerStatusLabel(
+  status: string | null | undefined,
+): string | null {
   if (!status) return null;
-  return FINANCING_DEAL_STATUSES.find((s) => s.status === status)?.customerLabel ?? status;
+  return (
+    FINANCING_DEAL_STATUSES.find((s) => s.status === status)?.customerLabel ??
+    status
+  );
 }
 
 export type PersistServiceRequestInput = {
@@ -84,6 +119,7 @@ export type PersistServiceRequestInput = {
   requestPayload?: Record<string, unknown>;
   responsePayload?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
+  syntheticFixtureContext?: SyntheticFixtureContext | null;
 };
 
 /**
@@ -93,45 +129,93 @@ export type PersistServiceRequestInput = {
  * contact + scope only, never full financials or any demographic data.
  */
 export async function persistServiceRequest(
-  input: PersistServiceRequestInput
+  input: PersistServiceRequestInput,
 ): Promise<ServiceRequestRow> {
-  const [row] = await db
-    .insert(serviceRequests)
-    .values({
-      serviceRequestId: input.serviceRequestId,
-      requestType: input.requestType,
-      serviceCode: input.serviceCode ?? null,
-      status: input.status ?? "SUBMITTED_PENDING_REVIEW",
-      routedTo: input.routedTo,
-      tenantId: input.tenantId ?? null,
-      actorId: input.actorId ?? null,
-      userId: input.userId ?? null,
-      applicationId: input.applicationId ?? null,
-      reportId: input.reportId ?? null,
-      contactName: input.contactName ?? null,
-      contactEmail: input.contactEmail ?? null,
-      contactPhone: input.contactPhone ?? null,
-      propertyDescriptor: input.propertyDescriptor ?? null,
-      locationState: input.locationState ?? null,
-      locationCounty: input.locationCounty ?? null,
-      scopeSummary: input.scopeSummary ?? null,
-      estimatedValue: input.estimatedValue ?? null,
-      feeDisclosureAcknowledged: input.feeDisclosureAcknowledged ?? false,
-      consentAcknowledged: input.consentAcknowledged ?? false,
-      humanReviewRequired: input.humanReviewRequired ?? true,
-      determinationIssued: false,
-      requestPayload: input.requestPayload ?? null,
-      responsePayload: input.responsePayload ?? null,
-      governanceVersion: GOVERNANCE_VERSION,
-      classification: CLASSIFICATION,
-      replayRef: input.traceId,
-      traceId: input.traceId,
-      source: SERVICE_REQUEST_SOURCE,
-      metadata: input.metadata ?? null,
-    })
-    .returning();
+  const syntheticFixture = input.syntheticFixtureContext
+    ? bindSyntheticFixtureLineage(
+        input.syntheticFixtureContext,
+        "service_request",
+        input.serviceRequestId,
+      )
+    : null;
 
-  return row;
+  if (
+    syntheticFixture &&
+    (input.contactName ?? "").trim() !== syntheticFixture.humanVisibleName
+  ) {
+    throw new Error(
+      "Synthetic fixture human-visible name must match its registered persona.",
+    );
+  }
+
+  const metadata = syntheticFixture
+    ? { ...(input.metadata ?? {}), syntheticFixture }
+    : (input.metadata ?? null);
+
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .insert(serviceRequests)
+      .values({
+        serviceRequestId: input.serviceRequestId,
+        requestType: input.requestType,
+        serviceCode: input.serviceCode ?? null,
+        status: input.status ?? "SUBMITTED_PENDING_REVIEW",
+        routedTo: input.routedTo,
+        tenantId: input.tenantId ?? null,
+        actorId: input.actorId ?? null,
+        userId: input.userId ?? null,
+        applicationId: input.applicationId ?? null,
+        reportId: input.reportId ?? null,
+        contactName: input.contactName ?? null,
+        contactEmail: input.contactEmail ?? null,
+        contactPhone: input.contactPhone ?? null,
+        propertyDescriptor: input.propertyDescriptor ?? null,
+        locationState: input.locationState ?? null,
+        locationCounty: input.locationCounty ?? null,
+        scopeSummary: input.scopeSummary ?? null,
+        estimatedValue: input.estimatedValue ?? null,
+        feeDisclosureAcknowledged: input.feeDisclosureAcknowledged ?? false,
+        consentAcknowledged: input.consentAcknowledged ?? false,
+        humanReviewRequired: input.humanReviewRequired ?? true,
+        determinationIssued: false,
+        requestPayload: input.requestPayload ?? null,
+        responsePayload: input.responsePayload ?? null,
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: CLASSIFICATION,
+        replayRef: input.traceId,
+        traceId: input.traceId,
+        source: SERVICE_REQUEST_SOURCE,
+        metadata,
+      })
+      .returning();
+
+    if (syntheticFixture) {
+      await tx.insert(syntheticFixtureLineageRecords).values({
+        syntheticPersonaId: syntheticFixture.syntheticPersonaId,
+        humanVisibleName: syntheticFixture.humanVisibleName,
+        testRunId: syntheticFixture.testRunId,
+        fixtureVersion: syntheticFixture.fixtureVersion,
+        registryVersion: syntheticFixture.registryVersion,
+        lineageVersion: syntheticFixture.lineageVersion,
+        environment: syntheticFixture.environment,
+        operatorIdentity: syntheticFixture.operatorIdentity,
+        fixtureCreatedAt: new Date(syntheticFixture.createdAt),
+        scenarioId: syntheticFixture.scenarioId,
+        providerTargets: [...syntheticFixture.providerTargets],
+        recordType: syntheticFixture.recordType,
+        recordId: syntheticFixture.recordId,
+        lineageSha256: syntheticFixture.lineageSha256,
+        lineagePayload: syntheticFixture,
+        governanceVersion: GOVERNANCE_VERSION,
+        classification: CLASSIFICATION,
+        replayRef: input.traceId,
+        traceId: input.traceId,
+        source: "synthetic-fixture-lineage-runtime",
+      });
+    }
+
+    return row;
+  });
 }
 
 export type ServiceRequestStatusView = {
@@ -177,7 +261,7 @@ export type ServiceRequestStatusView = {
  */
 export async function getServiceRequestStatus(
   serviceRequestId: string,
-  email: string
+  email: string,
 ): Promise<ServiceRequestStatusView> {
   // Forgive copy-paste debris (founder 2026-08-06: people copy the reference
   // WITH the sentence's trailing period and the lookup breaks): strip any
@@ -213,20 +297,26 @@ export async function getServiceRequestStatus(
   // subset: the note written FOR the customer and the timeline. Never
   // reminders metadata, actor ids, or anything the lender didn't intend
   // the customer to read.
-  const dealDesk = (row.metadata as {
-    dealDesk?: {
-      customerNote?: string | null;
-      timeline?: {
-        docsDueAt?: string | null;
-        underwritingEtaAt?: string | null;
-        closingTargetAt?: string | null;
-        lenderBacklogNote?: string | null;
+  const dealDesk = (
+    row.metadata as {
+      dealDesk?: {
+        customerNote?: string | null;
+        timeline?: {
+          docsDueAt?: string | null;
+          underwritingEtaAt?: string | null;
+          closingTargetAt?: string | null;
+          lenderBacklogNote?: string | null;
+        };
       };
-    };
-  } | null)?.dealDesk;
+    } | null
+  )?.dealDesk;
   const t = dealDesk?.timeline;
   const hasTimeline = Boolean(
-    t && (t.docsDueAt || t.underwritingEtaAt || t.closingTargetAt || t.lenderBacklogNote)
+    t &&
+    (t.docsDueAt ||
+      t.underwritingEtaAt ||
+      t.closingTargetAt ||
+      t.lenderBacklogNote),
   );
   const isFinancing = row.requestType === "financing_deal_intake";
   const bookingUrl = process.env.LENDER_BOOKING_URL?.trim() || null;
@@ -243,12 +333,18 @@ export async function getServiceRequestStatus(
         metadata: applicationDocuments.metadata,
       })
       .from(applicationDocuments)
-      .where(eq(applicationDocuments.applicationId, `finintake-${row.serviceRequestId}`));
+      .where(
+        eq(
+          applicationDocuments.applicationId,
+          `finintake-${row.serviceRequestId}`,
+        ),
+      );
     lenderDocuments = docs
       .filter(
         (d) =>
-          (d.documentType === "lender-provided" || d.documentType === "signature-certificate") &&
-          d.storageUri
+          (d.documentType === "lender-provided" ||
+            d.documentType === "signature-certificate") &&
+          d.storageUri,
       )
       .map((d) => {
         const m = (d.metadata ?? {}) as Record<string, unknown>;
@@ -258,7 +354,9 @@ export async function getServiceRequestStatus(
           receivedAt: d.receivedAt ? d.receivedAt.toISOString() : null,
           documentType: d.documentType,
           signatureRequested: m.signatureRequested === true,
-          signed: m.signatureStatus === "signed" || m.signatureStatus === "test-signed",
+          signed:
+            m.signatureStatus === "signed" ||
+            m.signatureStatus === "test-signed",
           testSigned: m.signatureStatus === "test-signed",
         };
       });
@@ -300,7 +398,7 @@ export type ListServiceRequestsInput = {
  * not the access decision.
  */
 export async function listServiceRequests(
-  input: ListServiceRequestsInput = {}
+  input: ListServiceRequestsInput = {},
 ): Promise<ServiceRequestRow[]> {
   const filters = [
     input.requestType

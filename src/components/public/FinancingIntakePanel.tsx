@@ -60,17 +60,40 @@ const field = {
 type SubmitState =
   | { phase: "idle" }
   | { phase: "submitting" }
-  | { phase: "done"; serviceRequestId: string; nextSteps: string[]; secureUploadPath: string | null; bookingUrl: string | null }
+  | {
+      phase: "done";
+      serviceRequestId: string;
+      nextSteps: string[];
+      secureUploadPath: string | null;
+      bookingUrl: string | null;
+    }
   | { phase: "error"; message: string };
 
-export function FinancingIntakePanel() {
+export type FinancingSyntheticFixture = {
+  syntheticPersonaId: string;
+  humanVisibleName: string;
+  testRunId: string;
+  fixtureVersion: string;
+  environment: string;
+  operatorIdentity: string;
+  createdAt: string;
+  scenarioId: string;
+};
+
+export function FinancingIntakePanel({
+  syntheticFixture = null,
+}: {
+  syntheticFixture?: FinancingSyntheticFixture | null;
+}) {
   // #lender-intake deep links (0% DOWN callout, report hand-off): the browser's
   // native hash scroll fires before below-fold content loads, so re-anchor
   // after mount (founder-caught 2026-07-29).
   useEffect(() => {
     if (window.location.hash !== "#lender-intake") return;
     const land = () =>
-      document.getElementById("lender-intake")?.scrollIntoView({ block: "start" });
+      document
+        .getElementById("lender-intake")
+        ?.scrollIntoView({ block: "start" });
     land();
     // Content above the panel (rates, program tables) can finish rendering
     // after mount and push the anchor down — re-assert once layout settles.
@@ -97,6 +120,15 @@ export function FinancingIntakePanel() {
   const [feeAck, setFeeAck] = useState(false);
   const [consentAck, setConsentAck] = useState(false);
   const [submit, setSubmit] = useState<SubmitState>({ phase: "idle" });
+
+  useEffect(() => {
+    if (!syntheticFixture) return;
+    setContactName((current) => current || syntheticFixture.humanVisibleName);
+    setContactEmail(
+      (current) =>
+        current || syntheticFixture.operatorIdentity.replace(/^user:/, ""),
+    );
+  }, [syntheticFixture]);
 
   const input = useMemo<FinancingIntakeInput>(
     () => ({
@@ -137,7 +169,7 @@ export function FinancingIntakePanel() {
       timeline,
       feeAck,
       consentAck,
-    ]
+    ],
   );
 
   const preview = useMemo(() => evaluateFinancingIntake(input), [input]);
@@ -163,8 +195,12 @@ export function FinancingIntakePanel() {
         phase: "done",
         serviceRequestId: data.serviceRequestId,
         nextSteps: data.intakeResult?.nextSteps ?? [],
-        secureUploadPath: typeof data.secureUploadPath === "string" ? data.secureUploadPath : null,
-        bookingUrl: typeof data.bookingUrl === "string" ? data.bookingUrl : null,
+        secureUploadPath:
+          typeof data.secureUploadPath === "string"
+            ? data.secureUploadPath
+            : null,
+        bookingUrl:
+          typeof data.bookingUrl === "string" ? data.bookingUrl : null,
       });
     } catch (err) {
       const message =
@@ -196,22 +232,48 @@ export function FinancingIntakePanel() {
         <strong style={{ fontSize: 16, color: "#101a2b" }}>
           Your reference is {submit.serviceRequestId}
         </strong>
-        <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-          Your deal is recorded and routed to the commercial debt broker. Here&apos;s what happens next:
+        {syntheticFixture ? (
+          <span style={{ fontSize: 12, color: "#6d28d9", fontWeight: 800 }}>
+            Synthetic test run {syntheticFixture.testRunId} — no real customer
+            authority.
+          </span>
+        ) : null}
+        <p
+          style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}
+        >
+          Your deal is recorded and routed to the commercial debt broker.
+          Here&apos;s what happens next:
         </p>
         {submit.secureUploadPath && (
           <a
             href={submit.secureUploadPath}
-            style={{ justifySelf: "start", borderRadius: 9, padding: "11px 16px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none", fontSize: 13.5 }}
+            style={{
+              justifySelf: "start",
+              borderRadius: 9,
+              padding: "11px 16px",
+              background: "#1C2B45",
+              color: "#fff",
+              fontWeight: 800,
+              textDecoration: "none",
+              fontSize: 13.5,
+            }}
           >
             🔒 Securely upload your documents →
           </a>
         )}
         {submit.secureUploadPath && (
-          <p style={{ margin: 0, fontSize: 11.5, color: "#6B7280", lineHeight: 1.55 }}>
-            Financial statements and identification never travel by email here: the button opens
-            your deal&apos;s encrypted upload channel — single-purpose, expiring, and readable only
-            through your broker&apos;s governed review. Bookmark it or return to this page;
+          <p
+            style={{
+              margin: 0,
+              fontSize: 11.5,
+              color: "#6B7280",
+              lineHeight: 1.55,
+            }}
+          >
+            Financial statements and identification never travel by email here:
+            the button opens your deal&apos;s encrypted upload channel —
+            single-purpose, expiring, and readable only through your
+            broker&apos;s governed review. Bookmark it or return to this page;
             the link stays valid for 72 hours.
           </p>
         )}
@@ -220,18 +282,42 @@ export function FinancingIntakePanel() {
             href={submit.bookingUrl}
             target="_blank"
             rel="noopener noreferrer"
-            style={{ justifySelf: "start", borderRadius: 9, padding: "11px 16px", background: "#1c5aa0", color: "#fff", fontWeight: 800, textDecoration: "none", fontSize: 13.5 }}
+            style={{
+              justifySelf: "start",
+              borderRadius: 9,
+              padding: "11px 16px",
+              background: "#1c5aa0",
+              color: "#fff",
+              fontWeight: 800,
+              textDecoration: "none",
+              fontSize: 13.5,
+            }}
           >
             📅 Schedule a call with your broker →
           </a>
         )}
         {submit.bookingUrl && (
-          <p style={{ margin: 0, fontSize: 11.5, color: "#6B7280", lineHeight: 1.55 }}>
-            Booking a time gets you a focused conversation about your deal — pick a slot that
-            works instead of playing phone tag.
+          <p
+            style={{
+              margin: 0,
+              fontSize: 11.5,
+              color: "#6B7280",
+              lineHeight: 1.55,
+            }}
+          >
+            Booking a time gets you a focused conversation about your deal —
+            pick a slot that works instead of playing phone tag.
           </p>
         )}
-        <ol style={{ margin: 0, paddingLeft: 18, color: "#3b475a", fontSize: 13, lineHeight: 1.6 }}>
+        <ol
+          style={{
+            margin: 0,
+            paddingLeft: 18,
+            color: "#3b475a",
+            fontSize: 13,
+            lineHeight: 1.6,
+          }}
+        >
           {submit.nextSteps.map((s) => (
             <li key={s}>{s}</li>
           ))}
@@ -241,7 +327,15 @@ export function FinancingIntakePanel() {
           funding lender makes that call, and nothing is committed until you and
           the lender agree.
         </span>
-        <a href="/status" style={{ fontSize: 12.5, fontWeight: 700, color: PURPLE, textDecoration: "none" }}>
+        <a
+          href="/status"
+          style={{
+            fontSize: 12.5,
+            fontWeight: 700,
+            color: PURPLE,
+            textDecoration: "none",
+          }}
+        >
           Check your status anytime with this reference →
         </a>
       </section>
@@ -262,13 +356,43 @@ export function FinancingIntakePanel() {
         >
           Bring your deal — a commercial debt broker reviews it
         </span>
-        <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
-          Tell us what you&apos;re trying to finance. We record it and route it to
-          the commercial debt broker, who reviews the fit and follows
-          up. We don&apos;t lend, qualify, or price — your broker arranges your
-          loan with the lenders who do.
+        <p
+          style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}
+        >
+          Tell us what you&apos;re trying to finance. We record it and route it
+          to the commercial debt broker, who reviews the fit and follows up. We
+          don&apos;t lend, qualify, or price — your broker arranges your loan
+          with the lenders who do.
         </p>
       </div>
+
+      {syntheticFixture ? (
+        <div
+          role="status"
+          style={{
+            border: "2px solid #7c3aed",
+            background: "#f5f3ff",
+            borderRadius: 10,
+            padding: "10px 12px",
+            display: "grid",
+            gap: 4,
+            color: "#4c1d95",
+          }}
+        >
+          <strong>
+            SYNTHETIC TEST FIXTURE — {syntheticFixture.humanVisibleName}
+          </strong>
+          <span style={{ fontSize: 12.5 }}>
+            {syntheticFixture.syntheticPersonaId} · {syntheticFixture.testRunId}{" "}
+            · {syntheticFixture.scenarioId}
+          </span>
+          <span style={{ fontSize: 11.5 }}>
+            Version {syntheticFixture.fixtureVersion} ·{" "}
+            {syntheticFixture.environment} · created{" "}
+            {syntheticFixture.createdAt}
+          </span>
+        </div>
+      ) : null}
 
       <div
         style={{
@@ -285,98 +409,267 @@ export function FinancingIntakePanel() {
         {preview.feeDisclosure.note}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: 10,
+        }}
+      >
         <div>
-          <label style={label} htmlFor="fin-purpose">What is the financing for?</label>
-          <select id="fin-purpose" style={field} value={purpose} onChange={(e) => setPurpose(e.target.value as FinancingPurpose | "")}>
+          <label style={label} htmlFor="fin-purpose">
+            What is the financing for?
+          </label>
+          <select
+            id="fin-purpose"
+            style={field}
+            value={purpose}
+            onChange={(e) =>
+              setPurpose(e.target.value as FinancingPurpose | "")
+            }
+          >
             <option value="">Select…</option>
             {FINANCING_PURPOSES.map((p) => (
-              <option key={p.code} value={p.code}>{p.label}</option>
+              <option key={p.code} value={p.code}>
+                {p.label}
+              </option>
             ))}
           </select>
         </div>
         <div>
-          <label style={label} htmlFor="fin-program">Program you have in mind (optional)</label>
-          <select id="fin-program" style={field} value={programInterest} onChange={(e) => setProgramInterest(e.target.value as FinancingProgramInterest | "")}>
+          <label style={label} htmlFor="fin-program">
+            Program you have in mind (optional)
+          </label>
+          <select
+            id="fin-program"
+            style={field}
+            value={programInterest}
+            onChange={(e) =>
+              setProgramInterest(
+                e.target.value as FinancingProgramInterest | "",
+              )
+            }
+          >
             <option value="">Select…</option>
             {/* FSA is not offered here (founder 2026-08-05): the in-network
                 lender doesn't originate FSA paper, so it isn't a selectable
                 destination. FSA education + the FSA-lender hand-off stay in
                 the pathways guide and pro forma — inform, never steer. */}
             {FINANCING_PROGRAMS.filter((p) => p.code !== "fsa").map((p) => (
-              <option key={p.code} value={p.code}>{p.label}</option>
+              <option key={p.code} value={p.code}>
+                {p.label}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          gap: 10,
+        }}
+      >
         <div>
-          <label style={label} htmlFor="fin-name">Your name</label>
-          <input id="fin-name" style={field} value={contactName} onChange={(e) => setContactName(e.target.value)} />
+          <label style={label} htmlFor="fin-name">
+            Your name
+          </label>
+          <input
+            id="fin-name"
+            style={field}
+            value={contactName}
+            onChange={(e) => setContactName(e.target.value)}
+          />
         </div>
         <div>
-          <label style={label} htmlFor="fin-email">Contact email</label>
-          <input id="fin-email" type="email" style={field} value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+          <label style={label} htmlFor="fin-email">
+            Contact email
+          </label>
+          <input
+            id="fin-email"
+            type="email"
+            style={field}
+            value={contactEmail}
+            onChange={(e) => setContactEmail(e.target.value)}
+          />
         </div>
         <div>
-          <label style={label} htmlFor="fin-phone">Phone (optional)</label>
-          <input id="fin-phone" style={field} value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
-        </div>
-      </div>
-
-      <div>
-        <label style={label} htmlFor="fin-address">Your mailing address (optional — your broker collects it later)</label>
-        <input id="fin-address" style={field} value={contactAddress} onChange={(e) => setContactAddress(e.target.value)} placeholder="Street address" />
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 10 }}>
-        <div>
-          <label style={label} htmlFor="fin-city">City</label>
-          <input id="fin-city" style={field} value={contactCity} onChange={(e) => setContactCity(e.target.value)} />
-        </div>
-        <div>
-          <label style={label} htmlFor="fin-mailing-state">State</label>
-          <input id="fin-mailing-state" style={field} value={contactState} onChange={(e) => setContactState(e.target.value)} />
-        </div>
-        <div>
-          <label style={label} htmlFor="fin-zip">ZIP code</label>
-          <input id="fin-zip" style={field} value={contactPostalCode} onChange={(e) => setContactPostalCode(e.target.value)} inputMode="numeric" />
-        </div>
-      </div>
-
-      <div>
-        <label style={label} htmlFor="fin-property">The property or business (optional)</label>
-        <input id="fin-property" style={field} value={propertyDescriptor} onChange={(e) => setPropertyDescriptor(e.target.value)} />
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
-        <div>
-          <label style={label} htmlFor="fin-state">State the property is in</label>
-          <input id="fin-state" style={field} value={state} onChange={(e) => setState(e.target.value)} />
-        </div>
-        <div>
-          <label style={label} htmlFor="fin-county">Property county (optional)</label>
-          <input id="fin-county" style={field} value={county} onChange={(e) => setCounty(e.target.value)} />
-        </div>
-        <div>
-          <label style={label} htmlFor="fin-cost">Estimated project size (optional)</label>
-          <input id="fin-cost" type="number" min="0" style={field} value={estimatedProjectCost} onChange={(e) => setEstimatedProjectCost(e.target.value)} placeholder="$ (context only)" />
+          <label style={label} htmlFor="fin-phone">
+            Phone (optional)
+          </label>
+          <input
+            id="fin-phone"
+            style={field}
+            value={contactPhone}
+            onChange={(e) => setContactPhone(e.target.value)}
+          />
         </div>
       </div>
 
       <div>
-        <label style={label} htmlFor="fin-scope">Tell us about the deal (optional)</label>
-        <textarea id="fin-scope" style={{ ...field, minHeight: 64, resize: "vertical" }} value={scopeSummary} onChange={(e) => setScopeSummary(e.target.value)} />
+        <label style={label} htmlFor="fin-address">
+          Your mailing address (optional — your broker collects it later)
+        </label>
+        <input
+          id="fin-address"
+          style={field}
+          value={contactAddress}
+          onChange={(e) => setContactAddress(e.target.value)}
+          placeholder="Street address"
+        />
       </div>
 
-      <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
-        <input type="checkbox" checked={feeAck} onChange={(e) => setFeeAck(e.target.checked)} style={{ marginTop: 2 }} />
-        <span>I understand there is no fee to submit, and loan costs are set by the lender and disclosed in writing before I commit.</span>
+      <div
+        style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 10 }}
+      >
+        <div>
+          <label style={label} htmlFor="fin-city">
+            City
+          </label>
+          <input
+            id="fin-city"
+            style={field}
+            value={contactCity}
+            onChange={(e) => setContactCity(e.target.value)}
+          />
+        </div>
+        <div>
+          <label style={label} htmlFor="fin-mailing-state">
+            State
+          </label>
+          <input
+            id="fin-mailing-state"
+            style={field}
+            value={contactState}
+            onChange={(e) => setContactState(e.target.value)}
+          />
+        </div>
+        <div>
+          <label style={label} htmlFor="fin-zip">
+            ZIP code
+          </label>
+          <input
+            id="fin-zip"
+            style={field}
+            value={contactPostalCode}
+            onChange={(e) => setContactPostalCode(e.target.value)}
+            inputMode="numeric"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label style={label} htmlFor="fin-property">
+          The property or business (optional)
+        </label>
+        <input
+          id="fin-property"
+          style={field}
+          value={propertyDescriptor}
+          onChange={(e) => setPropertyDescriptor(e.target.value)}
+        />
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: 10,
+        }}
+      >
+        <div>
+          <label style={label} htmlFor="fin-state">
+            State the property is in
+          </label>
+          <input
+            id="fin-state"
+            style={field}
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+          />
+        </div>
+        <div>
+          <label style={label} htmlFor="fin-county">
+            Property county (optional)
+          </label>
+          <input
+            id="fin-county"
+            style={field}
+            value={county}
+            onChange={(e) => setCounty(e.target.value)}
+          />
+        </div>
+        <div>
+          <label style={label} htmlFor="fin-cost">
+            Estimated project size (optional)
+          </label>
+          <input
+            id="fin-cost"
+            type="number"
+            min="0"
+            style={field}
+            value={estimatedProjectCost}
+            onChange={(e) => setEstimatedProjectCost(e.target.value)}
+            placeholder="$ (context only)"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label style={label} htmlFor="fin-scope">
+          Tell us about the deal (optional)
+        </label>
+        <textarea
+          id="fin-scope"
+          style={{ ...field, minHeight: 64, resize: "vertical" }}
+          value={scopeSummary}
+          onChange={(e) => setScopeSummary(e.target.value)}
+        />
+      </div>
+
+      <label
+        style={{
+          display: "flex",
+          gap: 9,
+          alignItems: "flex-start",
+          fontSize: 12.5,
+          color: "#3b475a",
+          lineHeight: 1.5,
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={feeAck}
+          onChange={(e) => setFeeAck(e.target.checked)}
+          style={{ marginTop: 2 }}
+        />
+        <span>
+          I understand there is no fee to submit, and loan costs are set by the
+          lender and disclosed in writing before I commit.
+        </span>
       </label>
-      <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12.5, color: "#3b475a", lineHeight: 1.5 }}>
-        <input type="checkbox" checked={consentAck} onChange={(e) => setConsentAck(e.target.checked)} style={{ marginTop: 2 }} />
-        <span>I consent to routing my request to the commercial debt broker, and understand this is not a qualification, pre-approval, rate lock, or lender commitment.</span>
+      <label
+        style={{
+          display: "flex",
+          gap: 9,
+          alignItems: "flex-start",
+          fontSize: 12.5,
+          color: "#3b475a",
+          lineHeight: 1.5,
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={consentAck}
+          onChange={(e) => setConsentAck(e.target.checked)}
+          style={{ marginTop: 2 }}
+        />
+        <span>
+          I consent to routing my request to the commercial debt broker, and
+          understand this is not a qualification, pre-approval, rate lock, or
+          lender commitment.
+        </span>
       </label>
 
       {!ready && (
@@ -386,7 +679,9 @@ export function FinancingIntakePanel() {
       )}
 
       {submit.phase === "error" && (
-        <span style={{ fontSize: 12.5, color: "#b42318" }}>{submit.message}</span>
+        <span style={{ fontSize: 12.5, color: "#b42318" }}>
+          {submit.message}
+        </span>
       )}
 
       <button
@@ -402,7 +697,8 @@ export function FinancingIntakePanel() {
           fontWeight: 700,
           color: "#ffffff",
           background: ready ? PURPLE : "#a7a3cf",
-          cursor: ready && submit.phase !== "submitting" ? "pointer" : "default",
+          cursor:
+            ready && submit.phase !== "submitting" ? "pointer" : "default",
         }}
       >
         {submit.phase === "submitting" ? "Submitting…" : "Submit my deal"}

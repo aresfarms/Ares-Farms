@@ -6,7 +6,7 @@ export type PaymentRiskInput = {
   threeDSecureAuthenticated?: boolean | null;
   cvcCheck?: "pass" | "fail" | "unavailable" | "unchecked" | null;
   postalCheck?: "pass" | "fail" | "unavailable" | "unchecked" | null;
-  idmeIdentityVerified?: boolean;
+  identityProofed?: boolean;
   plaidOwnershipMatch?: boolean | null;
   paymentMethod: "card" | "bank" | "wallet";
   amountCents: number;
@@ -31,7 +31,7 @@ export function evaluatePaymentRisk(input: PaymentRiskInput): PaymentRiskDecisio
   if ((input.recentInstrumentAttempts ?? 0) >= 5) {
     return { disposition: "BLOCK", reasons: ["PAYMENT_INSTRUMENT_VELOCITY"], releaseAllowed: false, humanReviewRequired: true };
   }
-  if (!input.idmeIdentityVerified) reasons.push("IDENTITY_NOT_BOUND");
+  if (input.identityProofed !== true) reasons.push("IDENTITY_NOT_BOUND");
   if (input.paymentMethod === "bank" && input.plaidOwnershipMatch !== true) reasons.push("BANK_OWNERSHIP_NOT_MATCHED");
   if (input.stripeRiskLevel === "elevated" && input.threeDSecureAuthenticated !== true) reasons.push("3DS_CHALLENGE_REQUIRED");
 

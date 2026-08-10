@@ -1,8 +1,13 @@
 import type Stripe from "stripe";
 import { RevenueClass, directModuleRule } from "./founderEconomics";
 import { createAllocationRule } from "./runtime";
+import {
+  syntheticFixtureProviderMetadata,
+  type SyntheticFixtureContext,
+} from "@/lib/testing/syntheticFixtureLineage";
 
-export const FURLONG_PAYMENT_PROVENANCE_VERSION = "furlong-payment-provenance-v1";
+export const FURLONG_PAYMENT_PROVENANCE_VERSION =
+  "furlong-payment-provenance-v1";
 
 const REVENUE_CLASSES = new Set<RevenueClass>([
   "CAITLIN_ENVIRONMENTAL_MODULE",
@@ -13,11 +18,17 @@ const REVENUE_CLASSES = new Set<RevenueClass>([
 
 export function normalizeRevenueClass(value: unknown): RevenueClass | null {
   if (typeof value !== "string") return null;
-  return REVENUE_CLASSES.has(value as RevenueClass) ? (value as RevenueClass) : null;
+  return REVENUE_CLASSES.has(value as RevenueClass)
+    ? (value as RevenueClass)
+    : null;
 }
 
-export function inferRevenueClass(plan: string | null | undefined): RevenueClass {
-  return plan === "environmental" ? "CAITLIN_ENVIRONMENTAL_MODULE" : "GENERAL_PLATFORM";
+export function inferRevenueClass(
+  plan: string | null | undefined,
+): RevenueClass {
+  return plan === "environmental"
+    ? "CAITLIN_ENVIRONMENTAL_MODULE"
+    : "GENERAL_PLATFORM";
 }
 
 export function approvedFounderRevenueRule(revenueClass: RevenueClass) {
@@ -45,8 +56,12 @@ export function furlongCheckoutMetadata(input: {
   customerSubjectRef?: string | null;
   dealRef?: string | null;
   revenueClass: RevenueClass;
+  syntheticFixtureContext?: SyntheticFixtureContext | null;
 }): Record<string, string> {
   return {
+    ...(input.syntheticFixtureContext
+      ? syntheticFixtureProviderMetadata(input.syntheticFixtureContext)
+      : {}),
     furlongOrigin: "true",
     provenanceVersion: FURLONG_PAYMENT_PROVENANCE_VERSION,
     tenantId: input.tenantId,
@@ -59,7 +74,11 @@ export function furlongCheckoutMetadata(input: {
   };
 }
 
-export function isFurlongCheckoutSession(session: Stripe.Checkout.Session): boolean {
-  return session.metadata?.furlongOrigin === "true" &&
-    session.metadata?.provenanceVersion === FURLONG_PAYMENT_PROVENANCE_VERSION;
+export function isFurlongCheckoutSession(
+  session: Stripe.Checkout.Session,
+): boolean {
+  return (
+    session.metadata?.furlongOrigin === "true" &&
+    session.metadata?.provenanceVersion === FURLONG_PAYMENT_PROVENANCE_VERSION
+  );
 }

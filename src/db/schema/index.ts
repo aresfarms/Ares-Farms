@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-  jsonb,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
 
 /**
  * Canonical Schema Source
@@ -120,3 +114,4 @@ export * from "./stripeConnectAllocations";
 export * from "./sovereignConsentGatewayRecords";
 export * from "./treasury";
 export * from "./versionRegistry";
+export * from "./syntheticFixtureLineage";

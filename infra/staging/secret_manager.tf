@@ -39,5 +39,12 @@ resource "google_secret_manager_secret" "app" {
     auto {}
   }
 
+  # Secret values and provider-side rotation schedules are governed out of band.
+  # Terraform owns the container, labels, and replication boundary but must never
+  # erase active rotation Pub/Sub hooks or next-rotation settings.
+  lifecycle {
+    ignore_changes = [rotation, topics]
+  }
+
   depends_on = [google_project_service.required]
 }

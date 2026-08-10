@@ -1,11 +1,20 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 
 import { FinancingIntakePanel } from "@/components/public/FinancingIntakePanel";
-import { FinancingFeeChart, FinancingFreeOverview } from "@/components/public/FinancingFeeChart";
+import {
+  FinancingFeeChart,
+  FinancingFreeOverview,
+} from "@/components/public/FinancingFeeChart";
 import { NavigatorEntryCta } from "@/components/public/NavigatorEntryCta";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
 import { accentForLane } from "@/lib/property/laneThemes";
 import { activePartners } from "@/lib/modules/licensedModuleRegistry";
+import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
+import {
+  SYNTHETIC_FIXTURE_COOKIE,
+  verifySyntheticFixtureSessionToken,
+} from "@/lib/testing/syntheticFixtureLineage";
 
 /**
  * FinancingLaneSections — the Financial & Capital module's sections. The
@@ -66,42 +75,122 @@ const FINANCING_BRIEFS: FinBrief[] = [
   },
 ];
 
-export function FinancingLaneSections() {
+export async function FinancingLaneSections() {
+  const secret = resolveNextAuthSecret();
+  const cookieStore = await cookies();
+  const activeFixture = secret
+    ? verifySyntheticFixtureSessionToken(
+        cookieStore.get(SYNTHETIC_FIXTURE_COOKIE)?.value,
+        secret,
+      )
+    : null;
+  const lenderScenario =
+    activeFixture &&
+    [
+      "lender-intake",
+      "lender-proforma-review",
+      "lender-document-upload",
+      "lender-signature",
+      "lender-dispatch-sandbox",
+      "full-lender-lifecycle",
+    ].includes(activeFixture.scenarioId)
+      ? activeFixture
+      : null;
+
   return (
     <div style={{ display: "grid", gap: 20 }}>
-      <NavigatorEntryCta lens="financing-capital" support="Use the same Furlong Navigator entry point as the main Compass. Start with a property, business, project, or financing question and carry that context into the capital workspace." />
+      <NavigatorEntryCta
+        lens="financing-capital"
+        support="Use the same Furlong Navigator entry point as the main Compass. Start with a property, business, project, or financing question and carry that context into the capital workspace."
+      />
       {/* Free application promise first, then current rates and program pricing. */}
       <FinancingFreeOverview />
       <LoanProgramComparison />
 
-      <section id="personalized-financing" aria-label="How financing works here" style={{ display: "grid", gap: 12 }}>
-        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
+      <section
+        id="personalized-financing"
+        aria-label="How financing works here"
+        style={{ display: "grid", gap: 12 }}
+      >
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: PURPLE,
+          }}
+        >
           Our dedicated commercial debt broker
         </span>
-        <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6, maxWidth: 720 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 13,
+            color: "#3b475a",
+            lineHeight: 1.6,
+            maxWidth: 720,
+          }}
+        >
           The capital side of every property decision. Learn how the programs
-          map to your project, see today&apos;s public rates, then send your deal
-          to a commercial debt broker who can actually do the work.
+          map to your project, see today&apos;s public rates, then send your
+          deal to a commercial debt broker who can actually do the work.
         </p>
         <div style={cardGrid}>
           {FINANCING_BRIEFS.map((b) => (
             <div key={b.title} style={card}>
-              <strong style={{ fontSize: 14.5, color: "#101a2b", lineHeight: 1.25 }}>{b.title}</strong>
-              <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.55 }}>{b.body}</p>
+              <strong
+                style={{ fontSize: 14.5, color: "#101a2b", lineHeight: 1.25 }}
+              >
+                {b.title}
+              </strong>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 13,
+                  color: "#3b475a",
+                  lineHeight: 1.55,
+                }}
+              >
+                {b.body}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      <section aria-label="Who reviews your deal" style={{ display: "grid", gap: 8 }}>
-        <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
+      <section
+        aria-label="Who reviews your deal"
+        style={{ display: "grid", gap: 8 }}
+      >
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: PURPLE,
+          }}
+        >
           Who reviews your deal
         </span>
-        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+        <div
+          style={{
+            display: "grid",
+            gap: 8,
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          }}
+        >
           {activePartners("financing-capital").map((p) => (
             <div key={p.slug} style={card}>
-              <strong style={{ fontSize: 14, color: "#101a2b" }}>{p.name}</strong>
-              <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>{p.blurb}</span>
+              <strong style={{ fontSize: 14, color: "#101a2b" }}>
+                {p.name}
+              </strong>
+              <span
+                style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}
+              >
+                {p.blurb}
+              </span>
             </div>
           ))}
         </div>
@@ -110,36 +199,60 @@ export function FinancingLaneSections() {
       {/* Stable anchor for every "take me to the lender intake" entry point
           (0% DOWN callout, report-tab hand-off) — founder 2026-07-29. */}
       <div id="lender-intake">
-        <FinancingIntakePanel />
+        <FinancingIntakePanel syntheticFixture={lenderScenario} />
       </div>
 
       {/* Optional paid advisory belongs near the bottom, after rates and intake. */}
       <FinancingFeeChart />
 
-      <section aria-label="Related modules" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-        <Link href="/explore?lane=environmental-compliance" style={{ ...card, textDecoration: "none" }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#127a4f" }}>Environmental &amp; Compliance →</span>
+      <section
+        aria-label="Related modules"
+        style={{
+          display: "grid",
+          gap: 12,
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+        }}
+      >
+        <Link
+          href="/explore?lane=environmental-compliance"
+          style={{ ...card, textDecoration: "none" }}
+        >
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#127a4f" }}>
+            Environmental &amp; Compliance →
+          </span>
           <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.5 }}>
-            A clean Phase I is a lender requirement — the site side of every capital clearance.
+            A clean Phase I is a lender requirement — the site side of every
+            capital clearance.
           </span>
         </Link>
-        <Link href="/explore?lane=farms-agriculture" style={{ ...card, textDecoration: "none" }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#2f6d12" }}>Farms, Agriculture &amp; Land →</span>
+        <Link
+          href="/explore?lane=farms-agriculture"
+          style={{ ...card, textDecoration: "none" }}
+        >
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#2f6d12" }}>
+            Farms, Agriculture &amp; Land →
+          </span>
           <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.5 }}>
-            FSA, Farm Credit, and the farm economics these financing choices ride on.
+            FSA, Farm Credit, and the farm economics these financing choices
+            ride on.
           </span>
         </Link>
         {/* Surfaced 2026-07-28: the ranked pathway engine was live but reachable
             only from a workspace deep-link — a working tool with no door. */}
-        <Link href="/financing-pathways" style={{ ...card, textDecoration: "none" }}>
-          <span style={{ fontSize: 15, fontWeight: 700, color: "#534AB7" }}>Rank your financing pathways →</span>
+        <Link
+          href="/financing-pathways"
+          style={{ ...card, textDecoration: "none" }}
+        >
+          <span style={{ fontSize: 15, fontWeight: 700, color: "#534AB7" }}>
+            Rank your financing pathways →
+          </span>
           <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.5 }}>
-            Answer a few questions about the project and see which federal lanes fit best, with the
-            reasons and what each still needs — guidance, never an approval.
+            Answer a few questions about the project and see which federal lanes
+            fit best, with the reasons and what each still needs — guidance,
+            never an approval.
           </span>
         </Link>
       </section>
-
     </div>
   );
 }

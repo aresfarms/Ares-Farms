@@ -145,7 +145,7 @@ resource "google_cloud_run_v2_service" "core" {
       }
       env {
         name  = "PLAID_DATA_ENCRYPTION_KEY_VERSION"
-        value = "v1"
+        value = "1"
       }
 
       env {
@@ -392,6 +392,36 @@ resource "google_cloud_run_v2_service" "core" {
       env {
         name  = "NAMED_TESTER_ACCEPTANCE_BACKEND"
         value = var.named_tester_acceptance_backend
+      }
+
+      env {
+        name  = "FURLONG_DEPLOYMENT_ENVIRONMENT"
+        value = var.deployment_environment
+      }
+
+      env {
+        name  = "PROFESSIONAL_TEST_PERSONAS_ENABLED"
+        value = var.professional_test_personas_enabled ? "true" : "false"
+      }
+
+      env {
+        name  = "SYNTHETIC_FIXTURES_ENABLED"
+        value = var.synthetic_fixtures_enabled ? "true" : "false"
+      }
+
+      env {
+        name  = "SYNTHETIC_FIXTURE_OPERATOR_ALLOWLIST"
+        value = var.synthetic_fixture_operator_allowlist
+      }
+
+      env {
+        name  = "ROLE_PROVISIONING_MODE"
+        value = var.role_provisioning_mode
+      }
+
+      env {
+        name  = "STRIPE_3DS_POLICY"
+        value = var.stripe_3ds_policy
       }
 
       dynamic "env" {

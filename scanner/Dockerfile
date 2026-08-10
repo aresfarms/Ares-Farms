@@ -1,27 +1,32 @@
 # furlong-scanner — private ClamAV malware-scanning service for the sovereign
-# vault (founder-approved quarantine build, 2026-08-06). IAM-private Cloud Run
-# service; ONLY the core runtime SA may invoke it. Bytes come in, a verdict
-# comes out — nothing is stored, logged, or forwarded.
+# vault. IAM-private: only the core runtime service account may invoke it.
+# Bytes come in, a verdict comes out; nothing is stored, logged, or forwarded.
 #
-# The virus database is baked at IMAGE BUILD time (freshclam during build) so
-# cold starts are fast and the container needs no egress at runtime.
-# Definitions are as fresh as the last image build — rebuild refreshes them.
+# SECURITY-CLOSURE-002: pin the supported 1.4 patch line to 1.4.5. Debian's
+# bookworm package was 1.4.3 and freshclam explicitly reported it outdated.
+# The virus database is refreshed at image build time; runtime egress remains
+# unnecessary and every deployed service image is pinned by final digest.
 
-FROM debian:bookworm-slim
+FROM clamav/clamav-debian:1.4.5
 
-# ca-certificates FIRST — freshclam fetches definitions over TLS and fails
-# with "Problem with the SSL CA cert" on the slim base without it.
+USER root
+
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates clamav clamav-daemon python3 \
+  && apt-get install -y --no-install-recommends ca-certificates python3 \
   && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# Bake definitions at build time (freshclam needs the db dir writable).
+# Fail the build if the engine pin is not the security-patched release.
+RUN clamd --version | grep -F 'ClamAV 1.4.5'
+
+# Refresh definitions while building. The official image is preloaded, so this
+# is an incremental refresh rather than a full cold-start download.
 RUN mkdir -p /var/lib/clamav /run/clamav /srv \
   && chown -R clamav:clamav /var/lib/clamav /run/clamav /srv \
-  && freshclam --foreground --stdout || freshclam --foreground --stdout
+  && freshclam --foreground --stdout
 
-# clamd config: stream-only scanning over a local TCP socket.
+# Stream-only scanning over a local TCP socket. Furlong's HTTP shim is the only
+# network surface and the Cloud Run service itself remains IAM-private.
 RUN printf 'User clamav\nTCPSocket 3310\nTCPAddr 127.0.0.1\nMaxFileSize 60M\nMaxScanSize 60M\nStreamMaxLength 60M\nForeground yes\nLogSyslog no\n' > /etc/clamav/clamd.conf
 
 COPY --chown=clamav:clamav server.py /srv/server.py
@@ -31,5 +36,4 @@ EXPOSE 8080
 
 USER clamav
 
-# Start clamd in the background, then the HTTP shim (which waits for clamd).
 CMD ["/bin/sh", "-c", "clamd & python3 /srv/server.py"]

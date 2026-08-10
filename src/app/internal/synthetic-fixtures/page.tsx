@@ -114,7 +114,9 @@ export default async function SyntheticFixturesPage() {
       </section>
 
       <div style={{ display: "grid", gap: 16 }}>
-        {SYNTHETIC_PERSONAS.map((persona) => (
+        {SYNTHETIC_PERSONAS.filter(
+          (persona) => persona.activationMode === "ACTIVE",
+        ).map((persona) => (
           <section
             key={persona.syntheticPersonaId}
             style={{

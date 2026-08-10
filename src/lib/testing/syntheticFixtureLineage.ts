@@ -114,12 +114,21 @@ export function createSyntheticFixtureContext(input: {
   environment?: string | null;
   testRunId?: string | null;
   createdAt?: string | null;
+  allowLegacyBackfill?: boolean;
 }): SyntheticFixtureContext {
   const persona = syntheticPersonaById(input.syntheticPersonaId);
   if (!persona) throw new Error("Unknown synthetic persona id.");
   if (!syntheticScenarioAllowed(persona, input.scenarioId)) {
     throw new Error(
       "Synthetic persona is not authorized for the requested scenario.",
+    );
+  }
+  if (
+    persona.activationMode === "LEGACY_BACKFILL_ONLY" &&
+    input.allowLegacyBackfill !== true
+  ) {
+    throw new Error(
+      "Legacy synthetic persona is restricted to founder-authorized backfill.",
     );
   }
   const rawEnvironment = (input.environment ?? deploymentEnvironment())

@@ -34,6 +34,34 @@ const SOURCE = "synthetic-fixture-founder-authorized-backfill-2026-08-09";
 
 const EXACT_PERSONAS = new Map([
   [
+    "Caitlin Hudson",
+    {
+      syntheticPersonaId: "syn-founder-smoke-legacy-001",
+      scenarioId: "lender-intake",
+    },
+  ],
+  [
+    "Sam Oranutang",
+    {
+      syntheticPersonaId: "syn-sam-oranutang-legacy-001",
+      scenarioId: "lender-intake",
+    },
+  ],
+  [
+    "Sammy Snake",
+    {
+      syntheticPersonaId: "syn-sammy-snake-legacy-001",
+      scenarioId: "lender-intake",
+    },
+  ],
+  [
+    "Frank Furter",
+    {
+      syntheticPersonaId: "syn-frank-furter-legacy-001",
+      scenarioId: "lender-intake",
+    },
+  ],
+  [
     "Tree Frog",
     {
       syntheticPersonaId: "syn-tree-frog-001",
@@ -44,6 +72,20 @@ const EXACT_PERSONAS = new Map([
     "Tuna Fish",
     {
       syntheticPersonaId: "syn-tuna-fish-001",
+      scenarioId: "lender-intake",
+    },
+  ],
+  [
+    "Hound Dog",
+    {
+      syntheticPersonaId: "syn-hound-dog-legacy-001",
+      scenarioId: "lender-intake",
+    },
+  ],
+  [
+    "Shark Bait",
+    {
+      syntheticPersonaId: "syn-shark-bait-legacy-001",
       scenarioId: "lender-intake",
     },
   ],
@@ -126,6 +168,7 @@ async function roots(environment: string): Promise<RootFixture[]> {
         environment,
         testRunId: `legacy-broker-${persona.syntheticPersonaId.replace(/^syn-/, "")}-${row.serviceRequestId.toLowerCase()}`,
         createdAt,
+        allowLegacyBackfill: true,
       }),
     };
   });

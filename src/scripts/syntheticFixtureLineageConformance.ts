@@ -33,6 +33,12 @@ try {
     "Tuna Fish",
     "Purple Cow",
     "Rainbow Trout",
+    "Sam Oranutang",
+    "Sammy Snake",
+    "Frank Furter",
+    "Hound Dog",
+    "Shark Bait",
+    "Caitlin Hudson",
   ];
   assert.deepEqual(
     SYNTHETIC_PERSONAS.map((persona) => persona.humanVisibleName),
@@ -45,6 +51,35 @@ try {
     assert(persona.fixtureVersion.includes("v1.0.0"));
     assert(persona.scenarioIds.length > 0);
   }
+
+  const legacyPersonas = SYNTHETIC_PERSONAS.filter(
+    (persona) => persona.activationMode === "LEGACY_BACKFILL_ONLY",
+  );
+  assert.equal(
+    legacyPersonas.length,
+    6,
+    "Six exact legacy broker-test personas must be backfill-only.",
+  );
+  assert.throws(
+    () =>
+      createSyntheticFixtureContext({
+        syntheticPersonaId: "syn-founder-smoke-legacy-001",
+        scenarioId: "lender-intake",
+        operatorIdentity: "chudson@aresfarmsinc.com",
+        environment: "staging",
+      }),
+    /restricted to founder-authorized backfill/i,
+  );
+  const legacyBackfillContext = createSyntheticFixtureContext({
+    syntheticPersonaId: "syn-founder-smoke-legacy-001",
+    scenarioId: "lender-intake",
+    operatorIdentity: "chudson@aresfarmsinc.com",
+    environment: "staging",
+    testRunId: "legacy-founder-smoke-conformance-001",
+    createdAt: "2026-07-27T05:35:53.198Z",
+    allowLegacyBackfill: true,
+  });
+  assert.equal(legacyBackfillContext.humanVisibleName, "Caitlin Hudson");
 
   const context = createSyntheticFixtureContext({
     syntheticPersonaId: "syn-tree-frog-001",

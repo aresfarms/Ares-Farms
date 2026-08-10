@@ -83,6 +83,16 @@ records for Tree Frog and Tuna Fish under
 `chudson@aresfarmsinc.com`. Backfill appends immutable lineage and a canonical
 audit event; it does not rewrite the original business record.
 
+### Legacy broker test records
+
+The founder-authorized backfill covers the exact historical staging names `Sam
+Oranutang`, `Sammy Snake`, `Frank Furter`, `Hound Dog`, and `Shark Bait`. They
+are registry entries in `LEGACY_BACKFILL_ONLY` mode and cannot be activated for
+new runs. One earliest founder smoke record used `Caitlin Hudson`; it is
+technically classified as synthetic through immutable lineage but remains a
+visible-clue exception because rewriting historical identity data would destroy
+provenance. New test runs must use the unmistakably synthetic active registry.
+
 ## Verification
 
 - `npm run verify:synthetic-fixture-lineage`

@@ -45,6 +45,7 @@ export type SyntheticPersonaDefinition = Readonly<{
   purpose: string;
   scenarioIds: readonly SyntheticScenarioId[];
   providerTargets: readonly SyntheticProviderTarget[];
+  activationMode: "ACTIVE" | "LEGACY_BACKFILL_ONLY";
 }>;
 
 export const SYNTHETIC_PERSONAS: readonly SyntheticPersonaDefinition[] = [
@@ -60,6 +61,7 @@ export const SYNTHETIC_PERSONAS: readonly SyntheticPersonaDefinition[] = [
       "professional-sponsor",
     ],
     providerTargets: [],
+    activationMode: "ACTIVE",
   },
   {
     syntheticPersonaId: "syn-tree-frog-001",
@@ -79,6 +81,7 @@ export const SYNTHETIC_PERSONAS: readonly SyntheticPersonaDefinition[] = [
       "GOOGLE_CALENDAR_TEST",
       "SIGNATURE_OFFLINE_TEST",
     ],
+    activationMode: "ACTIVE",
   },
   {
     syntheticPersonaId: "syn-tuna-fish-001",
@@ -101,6 +104,7 @@ export const SYNTHETIC_PERSONAS: readonly SyntheticPersonaDefinition[] = [
       "STRIPE_TEST_GOOGLE_PAY",
       "STRIPE_CONNECT_TEST",
     ],
+    activationMode: "ACTIVE",
   },
   {
     syntheticPersonaId: "syn-purple-cow-001",
@@ -114,6 +118,7 @@ export const SYNTHETIC_PERSONAS: readonly SyntheticPersonaDefinition[] = [
       "lender-intake",
     ],
     providerTargets: ["PLAID_SANDBOX", "STRIPE_TEST_CARD"],
+    activationMode: "ACTIVE",
   },
   {
     syntheticPersonaId: "syn-rainbow-trout-001",
@@ -133,6 +138,62 @@ export const SYNTHETIC_PERSONAS: readonly SyntheticPersonaDefinition[] = [
       "GOOGLE_CALENDAR_TEST",
       "SIGNATURE_OFFLINE_TEST",
     ],
+    activationMode: "ACTIVE",
+  },
+  {
+    syntheticPersonaId: "syn-sam-oranutang-legacy-001",
+    humanVisibleName: "Sam Oranutang",
+    fixtureVersion: "sam-oranutang-legacy-v1.0.0",
+    purpose: "Legacy broker-intake smoke record; backfill only.",
+    scenarioIds: ["lender-intake"],
+    providerTargets: [],
+    activationMode: "LEGACY_BACKFILL_ONLY",
+  },
+  {
+    syntheticPersonaId: "syn-sammy-snake-legacy-001",
+    humanVisibleName: "Sammy Snake",
+    fixtureVersion: "sammy-snake-legacy-v1.0.0",
+    purpose: "Legacy broker-intake smoke record; backfill only.",
+    scenarioIds: ["lender-intake"],
+    providerTargets: [],
+    activationMode: "LEGACY_BACKFILL_ONLY",
+  },
+  {
+    syntheticPersonaId: "syn-frank-furter-legacy-001",
+    humanVisibleName: "Frank Furter",
+    fixtureVersion: "frank-furter-legacy-v1.0.0",
+    purpose: "Legacy broker-intake smoke record; backfill only.",
+    scenarioIds: ["lender-intake"],
+    providerTargets: [],
+    activationMode: "LEGACY_BACKFILL_ONLY",
+  },
+  {
+    syntheticPersonaId: "syn-hound-dog-legacy-001",
+    humanVisibleName: "Hound Dog",
+    fixtureVersion: "hound-dog-legacy-v1.0.0",
+    purpose: "Legacy broker-intake smoke record; backfill only.",
+    scenarioIds: ["lender-intake"],
+    providerTargets: [],
+    activationMode: "LEGACY_BACKFILL_ONLY",
+  },
+  {
+    syntheticPersonaId: "syn-shark-bait-legacy-001",
+    humanVisibleName: "Shark Bait",
+    fixtureVersion: "shark-bait-legacy-v1.0.0",
+    purpose: "Legacy broker-intake smoke record; backfill only.",
+    scenarioIds: ["lender-intake"],
+    providerTargets: [],
+    activationMode: "LEGACY_BACKFILL_ONLY",
+  },
+  {
+    syntheticPersonaId: "syn-founder-smoke-legacy-001",
+    humanVisibleName: "Caitlin Hudson",
+    fixtureVersion: "founder-smoke-legacy-v1.0.0",
+    purpose:
+      "Legacy founder-operated staging smoke record predating the unmistakably-fake-name policy; backfill only and never reusable for new tests.",
+    scenarioIds: ["lender-intake"],
+    providerTargets: [],
+    activationMode: "LEGACY_BACKFILL_ONLY",
   },
 ] as const;
 

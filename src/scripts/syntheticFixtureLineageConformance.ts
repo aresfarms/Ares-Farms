@@ -227,6 +227,14 @@ try {
     "src/app/api/plaid/exchange/route.ts",
     "utf8",
   );
+  const backfill = fs.readFileSync(
+    "src/scripts/backfillSyntheticBrokerFixtures.ts",
+    "utf8",
+  );
+  const auditWriter = fs.readFileSync(
+    "src/lib/audit/writeAuditEvent.ts",
+    "utf8",
+  );
   assert(
     CANONICAL_GOVERNANCE_MIGRATION_FILES.includes(
       "0053_synthetic_fixture_lineage.sql",
@@ -236,6 +244,18 @@ try {
   assert.equal(canonicalTargetSchemaVersion(), "0053");
   assert(migration.includes("BEFORE UPDATE OR DELETE"));
   assert(migration.includes("synthetic_fixture_lineage_records"));
+  assert(
+    auditWriter.includes(
+      'const decision = decisionText(input.decision) ?? "PENDING"',
+    ),
+    "Canonical audit writes must honor the physical decision default.",
+  );
+  assert(
+    backfill.includes(
+      "const needsAudit = records.length > 0 || !auditedRuns.has(testRunId)",
+    ),
+    "Backfill retries must repair a missing audit after a partial lineage commit.",
+  );
   assert(financingRoute.includes("syntheticPersonaByHumanVisibleName"));
   assert(financingRoute.includes("externalNotificationSuppressed"));
   assert(dealDeskStore.includes("synthetic-fixture-notification-suppressed"));

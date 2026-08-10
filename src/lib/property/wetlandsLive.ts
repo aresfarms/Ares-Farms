@@ -24,7 +24,10 @@ const NWI_QUERY_URL =
   "https://fwspublicservices.wim.usgs.gov/wetlandsmapservice/rest/services/Wetlands/MapServer/0/query";
 const NWI_TIMEOUT_MS = 10_000;
 
-export async function fetchWetlands(lat: number, lon: number): Promise<WetlandsResult | null> {
+export async function fetchWetlands(
+  lat: number,
+  lon: number,
+): Promise<WetlandsResult | null> {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const params = new URLSearchParams({
     geometry: `${lon.toFixed(5)},${lat.toFixed(5)}`,
@@ -38,11 +41,12 @@ export async function fetchWetlands(lat: number, lon: number): Promise<WetlandsR
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), NWI_TIMEOUT_MS);
   try {
-    const res = await fetch(`${NWI_QUERY_URL}?${params.toString()}`, {
+    const request: RequestInit & { next: { revalidate: number } } = {
       signal: controller.signal,
       // NWI updates on multi-year mapping cycles — a 30-day cache is honest.
       next: { revalidate: 2_592_000 },
-    });
+    };
+    const res = await fetch(`${NWI_QUERY_URL}?${params.toString()}`, request);
     if (!res.ok) return null;
     const data = (await res.json()) as {
       error?: unknown;
@@ -56,15 +60,20 @@ export async function fetchWetlands(lat: number, lon: number): Promise<WetlandsR
     for (const [key, value] of Object.entries(data.features[0].attributes)) {
       attributes[key.split(".").pop() ?? key] = value;
     }
-    const wetlandType = typeof attributes.WETLAND_TYPE === "string" ? attributes.WETLAND_TYPE : null;
+    const wetlandType =
+      typeof attributes.WETLAND_TYPE === "string"
+        ? attributes.WETLAND_TYPE
+        : null;
     if (!wetlandType) return null;
-    const acres = typeof attributes.ACRES === "number" && Number.isFinite(attributes.ACRES)
-      ? Math.round(attributes.ACRES * 10) / 10
-      : null;
+    const acres =
+      typeof attributes.ACRES === "number" && Number.isFinite(attributes.ACRES)
+        ? Math.round(attributes.ACRES * 10) / 10
+        : null;
     return {
       mapped: true,
       wetlandType,
-      nwiCode: typeof attributes.ATTRIBUTE === "string" ? attributes.ATTRIBUTE : null,
+      nwiCode:
+        typeof attributes.ATTRIBUTE === "string" ? attributes.ATTRIBUTE : null,
       acres,
       retrievedAt,
     };

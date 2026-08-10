@@ -37,17 +37,18 @@ async function pointInIneligibleArea(
   lat: number,
   lon: number,
   layer: number,
-  signal: AbortSignal
+  signal: AbortSignal,
 ): Promise<boolean | null> {
   const url =
     `${ELIGIBILITY_BASE}/${layer}/query?geometry=${lon.toFixed(6)},${lat.toFixed(6)}` +
     `&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects` +
     `&returnGeometry=false&outFields=OBJECTID&f=json`;
-  const res = await fetch(url, {
+  const request: RequestInit & { next: { revalidate: number } } = {
     signal,
     // Designations change on census cycles — a 7-day cache is honest.
     next: { revalidate: 604_800 },
-  });
+  };
+  const res = await fetch(url, request);
   if (!res.ok) return null;
   const data = (await res.json()) as { features?: unknown[]; error?: unknown };
   if (data.error || !Array.isArray(data.features)) return null;
@@ -56,7 +57,7 @@ async function pointInIneligibleArea(
 
 export async function fetchUsdaRuralEligibility(
   lat: number,
-  lon: number
+  lon: number,
 ): Promise<UsdaRuralEligibility | null> {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const controller = new AbortController();

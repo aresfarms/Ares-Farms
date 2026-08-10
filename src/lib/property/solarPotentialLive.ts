@@ -31,7 +31,7 @@ const PVWATTS_TIMEOUT_MS = 8_000;
 export async function fetchSolarPotential(
   lat: number,
   lon: number,
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
 ): Promise<SolarPotentialEstimate | null> {
   const apiKey = env.DATA_GOV_API_KEY?.trim();
   if (!apiKey) return null;
@@ -51,11 +51,15 @@ export async function fetchSolarPotential(
   try {
     // developer.nrel.gov was retired 2026-05-29; the lab's APIs now live at
     // developer.nlr.gov (National Laboratory of the Rockies). Same api.data.gov keys.
-    const res = await fetch(`https://developer.nlr.gov/api/pvwatts/v8.json?${params.toString()}`, {
+    const request: RequestInit & { next: { revalidate: number } } = {
       signal: controller.signal,
       // Solar resource is climatological — a week-long cache is honest.
       next: { revalidate: 604_800 },
-    });
+    };
+    const res = await fetch(
+      `https://developer.nlr.gov/api/pvwatts/v8.json?${params.toString()}`,
+      request,
+    );
     if (!res.ok) return null;
     const data = (await res.json()) as {
       outputs?: { ac_annual?: number; solrad_annual?: number };
@@ -64,10 +68,18 @@ export async function fetchSolarPotential(
     if (data.errors?.length) return null;
     const acAnnual = data.outputs?.ac_annual;
     const solrad = data.outputs?.solrad_annual;
-    if (typeof acAnnual !== "number" || !Number.isFinite(acAnnual) || acAnnual <= 0) return null;
+    if (
+      typeof acAnnual !== "number" ||
+      !Number.isFinite(acAnnual) ||
+      acAnnual <= 0
+    )
+      return null;
     return {
       acAnnualKwh: Math.round(acAnnual),
-      solradAnnual: typeof solrad === "number" && Number.isFinite(solrad) ? Math.round(solrad * 100) / 100 : 0,
+      solradAnnual:
+        typeof solrad === "number" && Number.isFinite(solrad)
+          ? Math.round(solrad * 100) / 100
+          : 0,
       capacityKw: REFERENCE_CAPACITY_KW,
       retrievedAt: new Date().toISOString().slice(0, 10),
     };

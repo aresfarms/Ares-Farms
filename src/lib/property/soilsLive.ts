@@ -30,7 +30,10 @@ export interface SoilProfile {
 const SDA_URL = "https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest";
 const SDA_TIMEOUT_MS = 10_000;
 
-export async function fetchSoilProfile(lat: number, lon: number): Promise<SoilProfile | null> {
+export async function fetchSoilProfile(
+  lat: number,
+  lon: number,
+): Promise<SoilProfile | null> {
   // WKT is built from Number-validated coordinates only — never raw strings.
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const wkt = `point(${lon.toFixed(5)} ${lat.toFixed(5)})`;
@@ -47,14 +50,15 @@ export async function fetchSoilProfile(lat: number, lon: number): Promise<SoilPr
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), SDA_TIMEOUT_MS);
   try {
-    const res = await fetch(SDA_URL, {
+    const request: RequestInit & { next: { revalidate: number } } = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ format: "JSON+COLUMNNAME", query }),
       signal: controller.signal,
       // Soil surveys change on multi-year cycles — a 30-day cache is honest.
       next: { revalidate: 2_592_000 },
-    });
+    };
+    const res = await fetch(SDA_URL, request);
     if (!res.ok) return null;
     const data = (await res.json()) as { Table?: string[][] };
     const rows = data.Table;
@@ -67,7 +71,9 @@ export async function fetchSoilProfile(lat: number, lon: number): Promise<SoilPr
     };
     const num = (value: string | null) => {
       const parsed = Number(value);
-      return value != null && value !== "" && Number.isFinite(parsed) ? parsed : null;
+      return value != null && value !== "" && Number.isFinite(parsed)
+        ? parsed
+        : null;
     };
     const mapUnitName = col("muname");
     if (!mapUnitName) return null;

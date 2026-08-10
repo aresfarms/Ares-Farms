@@ -23,7 +23,8 @@ export interface EpaFacilityScreen {
   retrievedAt: string;
 }
 
-const FRS_URL = "https://frs-public.epa.gov/ords/frs_public2/frs_rest_services.get_facilities";
+const FRS_URL =
+  "https://frs-public.epa.gov/ords/frs_public2/frs_rest_services.get_facilities";
 const FRS_TIMEOUT_MS = 12_000;
 const SUPERFUND_RADIUS_MILES = 3;
 const FACILITY_RADIUS_MILES = 1;
@@ -34,7 +35,7 @@ async function frsQuery(
   lat: number,
   lon: number,
   radiusMiles: number,
-  program: string | null
+  program: string | null,
 ): Promise<FrsFacility[] | null> {
   const params = new URLSearchParams({
     latitude83: lat.toFixed(5),
@@ -46,13 +47,17 @@ async function frsQuery(
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FRS_TIMEOUT_MS);
   try {
-    const res = await fetch(`${FRS_URL}?${params.toString()}`, {
+    const request: RequestInit & { next: { revalidate: number } } = {
       signal: controller.signal,
-      // Registry churn is slow — a 7-day cache is honest.
+      // Registry churn is slow — a 7-day cache is honest. The extension is
+      // ignored by standard fetch runtimes and understood by Next.js.
       next: { revalidate: 604_800 },
-    });
+    };
+    const res = await fetch(`${FRS_URL}?${params.toString()}`, request);
     if (!res.ok) return null;
-    const data = (await res.json()) as { Results?: { FRSFacility?: FrsFacility | FrsFacility[] } };
+    const data = (await res.json()) as {
+      Results?: { FRSFacility?: FrsFacility | FrsFacility[] };
+    };
     const raw = data.Results?.FRSFacility;
     if (raw == null) return [];
     return Array.isArray(raw) ? raw : [raw];
@@ -63,7 +68,10 @@ async function frsQuery(
   }
 }
 
-export async function fetchEpaFacilityScreen(lat: number, lon: number): Promise<EpaFacilityScreen | null> {
+export async function fetchEpaFacilityScreen(
+  lat: number,
+  lon: number,
+): Promise<EpaFacilityScreen | null> {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   const [superfund, facilities] = await Promise.all([
     frsQuery(lat, lon, SUPERFUND_RADIUS_MILES, "SEMS"),

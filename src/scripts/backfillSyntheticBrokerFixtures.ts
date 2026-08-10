@@ -3,6 +3,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import {
   applicationDocuments,
   applications,
+  auditEvents,
   customerSubmissionConsents,
   deliveryAttempts,
   deliveryOutbox,
@@ -473,24 +474,30 @@ async function main() {
   const alreadyBound = new Set(
     existing.map((row) => key(row.recordType, row.recordId)),
   );
-  const pending = targets
-    .filter(
-      (target) => !alreadyBound.has(key(target.recordType, target.recordId)),
-    )
-    .map((target) => ({
-      ...target,
-      lineage: bindSyntheticFixtureLineage(
-        target.context,
-        target.recordType,
-        target.recordId,
-      ),
-    }));
+  const prepared = targets.map((target) => ({
+    ...target,
+    lineage: bindSyntheticFixtureLineage(
+      target.context,
+      target.recordType,
+      target.recordId,
+    ),
+  }));
+  const pending = prepared.filter(
+    (target) => !alreadyBound.has(key(target.recordType, target.recordId)),
+  );
 
-  const byRun = new Map<string, typeof pending>();
+  const pendingByRun = new Map<string, typeof pending>();
   for (const target of pending) {
-    const rows = byRun.get(target.context.testRunId) ?? [];
+    const rows = pendingByRun.get(target.context.testRunId) ?? [];
     rows.push(target);
-    byRun.set(target.context.testRunId, rows);
+    pendingByRun.set(target.context.testRunId, rows);
+  }
+
+  const allByRun = new Map<string, typeof prepared>();
+  for (const target of prepared) {
+    const rows = allByRun.get(target.context.testRunId) ?? [];
+    rows.push(target);
+    allByRun.set(target.context.testRunId, rows);
   }
 
   if (!EXECUTE) {
@@ -526,17 +533,43 @@ async function main() {
     return;
   }
 
+  const testRunIds = [...allByRun.keys()];
+  const existingAudits = testRunIds.length
+    ? await db
+        .select({ entityId: auditEvents.entityId })
+        .from(auditEvents)
+        .where(
+          and(
+            eq(auditEvents.eventType, "SYNTHETIC_FIXTURE_LINEAGE_BACKFILLED"),
+            inArray(auditEvents.entityId, testRunIds),
+          ),
+        )
+    : [];
+  const auditedRuns = new Set(
+    existingAudits
+      .map((row) => row.entityId)
+      .filter((value): value is string => Boolean(value)),
+  );
+
   const completed: Array<{
     testRunId: string;
     inserted: number;
     auditId: string;
+    reconciledExistingLineage: boolean;
   }> = [];
-  for (const [testRunId, records] of byRun) {
-    await db.transaction(async (tx) => {
-      await tx
-        .insert(syntheticFixtureLineageRecords)
-        .values(records.map(({ lineage }) => lineageValues(lineage)));
-    });
+  for (const [testRunId, allRecords] of allByRun) {
+    const records = pendingByRun.get(testRunId) ?? [];
+    if (records.length) {
+      await db.transaction(async (tx) => {
+        await tx
+          .insert(syntheticFixtureLineageRecords)
+          .values(records.map(({ lineage }) => lineageValues(lineage)));
+      });
+    }
+
+    const needsAudit = records.length > 0 || !auditedRuns.has(testRunId);
+    if (!needsAudit) continue;
+    const auditRecords = records.length ? records : allRecords;
     const audit = await writeAuditEvent({
       userId: OPERATOR_EMAIL,
       actorRef: `user:${OPERATOR_EMAIL}`,
@@ -552,7 +585,7 @@ async function main() {
         founderAuthorizationDate: "2026-08-09",
         reason:
           "Founder confirmed the exact human-visible names are synthetic staging test records.",
-        records: records.map(({ lineage }) => ({
+        records: auditRecords.map(({ lineage }) => ({
           recordType: lineage.recordType,
           recordId: lineage.recordId,
           lineageSha256: lineage.lineageSha256,
@@ -564,6 +597,7 @@ async function main() {
       testRunId,
       inserted: records.length,
       auditId: audit.auditId,
+      reconciledExistingLineage: records.length === 0,
     });
   }
 

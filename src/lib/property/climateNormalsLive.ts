@@ -30,12 +30,15 @@ async function cdoGet(path: string, token: string): Promise<unknown | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), CDO_TIMEOUT_MS);
   try {
-    const res = await fetch(`${CDO_BASE}${path}`, {
+    const request: RequestInit & { next: { revalidate: number } } = {
       headers: { token },
       signal: controller.signal,
       // Normals are a fixed 30-year product — a 30-day cache is honest.
+      // The typed extension is optional outside Next.js and keeps this module
+      // buildable as a standalone source-intelligence service.
       next: { revalidate: 2_592_000 },
-    });
+    };
+    const res = await fetch(`${CDO_BASE}${path}`, request);
     if (!res.ok) return null;
     return await res.json();
   } catch {
@@ -48,7 +51,7 @@ async function cdoGet(path: string, token: string): Promise<unknown | null> {
 export async function fetchClimateNormals(
   lat: number,
   lon: number,
-  env: NodeJS.ProcessEnv = process.env
+  env: NodeJS.ProcessEnv = process.env,
 ): Promise<ClimateNormals | null> {
   const token = env.NOAA_CDO_TOKEN?.trim();
   if (!token) return null;
@@ -61,23 +64,31 @@ export async function fetchClimateNormals(
   ].join(",");
   const stations = (await cdoGet(
     `/stations?datasetid=NORMAL_ANN&extent=${extent}&limit=5&sortfield=name`,
-    token
-  )) as { results?: Array<{ id: string; name: string; latitude: number; longitude: number }> } | null;
+    token,
+  )) as {
+    results?: Array<{
+      id: string;
+      name: string;
+      latitude: number;
+      longitude: number;
+    }>;
+  } | null;
   const candidates = stations?.results ?? [];
   if (candidates.length === 0) return null;
   // Nearest candidate by simple squared-degree distance — good enough at
   // county scale, deterministic for replay.
   const station = [...candidates].sort(
     (a, b) =>
-      (a.latitude - lat) ** 2 + (a.longitude - lon) ** 2 -
-      ((b.latitude - lat) ** 2 + (b.longitude - lon) ** 2)
+      (a.latitude - lat) ** 2 +
+      (a.longitude - lon) ** 2 -
+      ((b.latitude - lat) ** 2 + (b.longitude - lon) ** 2),
   )[0];
   const data = (await cdoGet(
     `/data?datasetid=NORMAL_ANN&stationid=${encodeURIComponent(station.id)}` +
       `&startdate=2010-01-01&enddate=2010-01-01` +
       `&datatypeid=ANN-TAVG-NORMAL&datatypeid=ANN-PRCP-NORMAL&datatypeid=ANN-SNOW-NORMAL` +
       `&units=standard&limit=10`,
-    token
+    token,
   )) as { results?: Array<{ datatype: string; value: number }> } | null;
   const readings = data?.results ?? [];
   if (readings.length === 0) return null;

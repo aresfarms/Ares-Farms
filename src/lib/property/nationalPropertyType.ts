@@ -107,13 +107,19 @@ const STATE_SERVICES: Record<string, JurisdictionSource> = {
 const USA_STRUCTURES =
   "https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/USA_Structures_View/FeatureServer/0";
 
-async function getJson(url: string, timeoutMs: number = TIMEOUT_MS): Promise<unknown | null> {
+async function getJson(
+  url: string,
+  timeoutMs: number = TIMEOUT_MS,
+): Promise<unknown | null> {
   try {
-    const res = await fetch(url, {
+    const request: RequestInit & { next: { revalidate: number } } = {
       signal: AbortSignal.timeout(timeoutMs),
       headers: { "User-Agent": "Furlong/1.0 (property-type classification)" },
+      // Preserve Next.js revalidation without making standalone builds depend
+      // on Next's ambient fetch augmentation.
       next: { revalidate: 86_400 },
-    });
+    };
+    const res = await fetch(url, request);
     return res.ok ? await res.json() : null;
   } catch {
     return null;
@@ -121,23 +127,46 @@ async function getJson(url: string, timeoutMs: number = TIMEOUT_MS): Promise<unk
 }
 
 /** Map a raw assessor/occupancy string to a canonical profile. */
-export function profileFromUseText(raw: string | null | undefined): PropertyProfileId | null {
+export function profileFromUseText(
+  raw: string | null | undefined,
+): PropertyProfileId | null {
   const t = (raw ?? "").trim().toLowerCase();
   if (!t) return null;
   // Wisconsin PROPCLASS is comma-delimited multi-value ("1,2,4,5,5M"): class 4
   // = Agricultural, 5M = Ag Forest, 6 = Productive Forest.
   const wiClasses = t.split(",").map((c) => c.trim());
-  if (wiClasses.some((c) => c === "4" || c === "5m" || c === "6")) return "farm";
+  if (wiClasses.some((c) => c === "4" || c === "5m" || c === "6"))
+    return "farm";
   // Ohio's StateLUC 100-129 and Indiana's DLGF 100-series are agricultural.
   const numeric = Number.parseInt(t, 10);
-  if (Number.isFinite(numeric) && numeric >= 100 && numeric <= 129) return "farm";
+  if (Number.isFinite(numeric) && numeric >= 100 && numeric <= 129)
+    return "farm";
 
-  if (/mobile home park|manufactured hous(ing|e) (community|park)|trailer park/.test(t)) return "mobile-home-park";
-  if (/hotel|motel|\binn\b|lodg|resort|hospitality|bed and breakfast/.test(t)) return "hospitality";
-  if (/agr\b|agri|farm|ranch|crop|pasture|orchard|vineyard|dairy|poultry|livestock|cauv|timber|forest/.test(t)) return "farm";
-  if (/commerc|retail|industr|warehouse|office|restaurant|store|shopping|manufactur|business/.test(t)) return "commercial";
+  if (
+    /mobile home park|manufactured hous(ing|e) (community|park)|trailer park/.test(
+      t,
+    )
+  )
+    return "mobile-home-park";
+  if (/hotel|motel|\binn\b|lodg|resort|hospitality|bed and breakfast/.test(t))
+    return "hospitality";
+  if (
+    /agr\b|agri|farm|ranch|crop|pasture|orchard|vineyard|dairy|poultry|livestock|cauv|timber|forest/.test(
+      t,
+    )
+  )
+    return "farm";
+  if (
+    /commerc|retail|industr|warehouse|office|restaurant|store|shopping|manufactur|business/.test(
+      t,
+    )
+  )
+    return "commercial";
   if (/vacant|unimproved|\bland\b(?! use)/.test(t)) return "land";
-  if (/resid|dwell|single family|multi.?family|apartment|condo|home|house/.test(t)) return "residential";
+  if (
+    /resid|dwell|single family|multi.?family|apartment|condo|home|house/.test(t)
+  )
+    return "residential";
   return null;
 }
 
@@ -145,12 +174,16 @@ export function profileFromUseText(raw: string | null | undefined): PropertyProf
 async function stateSignal(
   state: string,
   lat: number,
-  lon: number
-): Promise<{ profileId: PropertyProfileId; source: string; raw: string } | null> {
+  lon: number,
+): Promise<{
+  profileId: PropertyProfileId;
+  source: string;
+  raw: string;
+} | null> {
   const svc = STATE_SERVICES[state.toUpperCase()];
   if (!svc) return null;
   const geometry = encodeURIComponent(
-    JSON.stringify({ x: lon, y: lat, spatialReference: { wkid: 4326 } })
+    JSON.stringify({ x: lon, y: lat, spatialReference: { wkid: 4326 } }),
   );
   // where=1=1 is REQUIRED: several of these services reject a spatial-only
   // query with "Invalid query parameters" after ~55s (measured 2026-08-06).
@@ -158,7 +191,9 @@ async function stateSignal(
     `${svc.url}/query?where=1%3D1&geometry=${geometry}&geometryType=esriGeometryPoint&inSR=4326` +
     `&spatialRel=esriSpatialRelIntersects&outFields=${encodeURIComponent(svc.useFields.join(","))}` +
     `&returnGeometry=false&resultRecordCount=1&f=json`;
-  const data = (await getJson(url)) as { features?: Array<{ attributes?: Record<string, unknown> }> } | null;
+  const data = (await getJson(url)) as {
+    features?: Array<{ attributes?: Record<string, unknown> }>;
+  } | null;
   const attrs = data?.features?.[0]?.attributes;
   if (!attrs) return null;
   for (const field of svc.useFields) {
@@ -172,21 +207,30 @@ async function stateSignal(
 /** FEMA/ORNL USA Structures occupancy class at a point. */
 async function structureSignal(
   lat: number,
-  lon: number
-): Promise<{ profileId: PropertyProfileId; source: string; raw: string } | null> {
+  lon: number,
+): Promise<{
+  profileId: PropertyProfileId;
+  source: string;
+  raw: string;
+} | null> {
   // Small envelope (~60 m) — the point may fall between footprints.
   const d = 0.0004;
   const geometry = encodeURIComponent(
     JSON.stringify({
-      xmin: lon - d, ymin: lat - d, xmax: lon + d, ymax: lat + d,
+      xmin: lon - d,
+      ymin: lat - d,
+      xmax: lon + d,
+      ymax: lat + d,
       spatialReference: { wkid: 4326 },
-    })
+    }),
   );
   const url =
     `${USA_STRUCTURES}/query?where=1%3D1&geometry=${geometry}` +
     `&geometryType=esriGeometryEnvelope&inSR=4326&spatialRel=esriSpatialRelIntersects` +
     `&outFields=OCC_CLS,PRIM_OCC&returnGeometry=false&resultRecordCount=6&f=json`;
-  const data = (await getJson(url, STRUCTURE_TIMEOUT_MS)) as { features?: Array<{ attributes?: Record<string, unknown> }> } | null;
+  const data = (await getJson(url, STRUCTURE_TIMEOUT_MS)) as {
+    features?: Array<{ attributes?: Record<string, unknown> }>;
+  } | null;
   const features = data?.features ?? [];
   if (features.length === 0) return null;
   // Prefer the most specific non-residential signal when a site has several
@@ -196,10 +240,19 @@ async function structureSignal(
       occ: String(f.attributes?.OCC_CLS ?? ""),
       prim: String(f.attributes?.PRIM_OCC ?? ""),
     }))
-    .sort((a, b) => (/(agri|commerc|industr)/i.test(b.occ) ? 1 : 0) - (/(agri|commerc|industr)/i.test(a.occ) ? 1 : 0));
+    .sort(
+      (a, b) =>
+        (/(agri|commerc|industr)/i.test(b.occ) ? 1 : 0) -
+        (/(agri|commerc|industr)/i.test(a.occ) ? 1 : 0),
+    );
   for (const r of ranked) {
     const profileId = profileFromUseText(`${r.occ} ${r.prim}`);
-    if (profileId) return { profileId, source: "FEMA USA Structures occupancy class", raw: r.occ || r.prim };
+    if (profileId)
+      return {
+        profileId,
+        source: "FEMA USA Structures occupancy class",
+        raw: r.occ || r.prim,
+      };
   }
   return null;
 }
@@ -220,7 +273,10 @@ export function recordUnmetCoverage(jurisdiction: string | null): void {
 }
 
 /** Demand-ranked list of jurisdictions worth reviewing next. */
-export function unmetCoverageDemand(): Array<{ jurisdiction: string; asks: number }> {
+export function unmetCoverageDemand(): Array<{
+  jurisdiction: string;
+  asks: number;
+}> {
   return [...unmetCoverage.entries()]
     .map(([jurisdiction, asks]) => ({ jurisdiction, asks }))
     .sort((a, b) => b.asks - a.asks);
@@ -243,7 +299,13 @@ export async function classifyPropertyTypeFromPublicRecords(args: {
   lon: number | null;
 }): Promise<NationalTypeSignal | null> {
   const { state, lat, lon } = args;
-  if (lat == null || lon == null || !Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if (
+    lat == null ||
+    lon == null ||
+    !Number.isFinite(lat) ||
+    !Number.isFinite(lon)
+  )
+    return null;
 
   const [assessor, structure] = await Promise.all([
     state ? stateSignal(state, lat, lon) : Promise.resolve(null),

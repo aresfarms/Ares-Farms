@@ -152,6 +152,7 @@ export async function writeAuditEvent(
   } = extractIdentity(input);
   const classification = text(input.classification) ?? "RESTRICTED";
   const source = text(input.source) ?? moduleId ?? "canonical-audit-writer";
+  const decision = decisionText(input.decision) ?? "PENDING";
   const suppliedUserId = text(input.userId);
   const userId =
     suppliedUserId && UUID_PATTERN.test(suppliedUserId)
@@ -222,7 +223,7 @@ export async function writeAuditEvent(
         eventType: text(input.eventType) ?? "AUDIT_EVENT",
         entityType: text(input.entityType),
         entityId: text(input.entityId),
-        decision: decisionText(input.decision),
+        decision,
         classification,
         source,
         canonicalPayload,
@@ -236,7 +237,7 @@ export async function writeAuditEvent(
       eventType: text(input.eventType) ?? "AUDIT_EVENT",
       entityType: text(input.entityType),
       entityId: text(input.entityId),
-      decision: decisionText(input.decision),
+      decision,
       input: metadata,
       output: {},
       trace,

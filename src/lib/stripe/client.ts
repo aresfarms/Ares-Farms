@@ -178,6 +178,85 @@ async function createStubCheckoutSession(
   };
 }
 
+/**
+ * Stripe Identity — verification sessions.
+ *
+ * THE STUB HERE CAN NEVER RETURN "verified", AND THAT IS THE WHOLE POINT.
+ * The checkout stub above may safely fake a success, because a fake payment
+ * harms nobody in local dev. A fake IDENTITY does: it would raise a subject to
+ * the `identity-verified` assurance tier and unlock financial-document upload,
+ * bank connection, and signing — on the strength of a stub. So the stub path
+ * returns `requires_input` forever and says why.
+ */
+export type StripeIdentitySession = {
+  id: string;
+  status: "requires_input" | "processing" | "verified" | "canceled";
+  url: string | null;
+  last_error: { code?: string | null } | null;
+  metadata: Record<string, string>;
+  verified_outputs?: { first_name?: string | null; last_name?: string | null } | null;
+};
+
+export type StripeIdentitySessionCreateParams = {
+  type: "document";
+  options?: { document?: { require_matching_selfie?: boolean } };
+  return_url: string;
+  metadata?: Record<string, string | number | boolean | null | undefined>;
+};
+
+async function createLiveIdentitySession(
+  params: StripeIdentitySessionCreateParams
+): Promise<StripeIdentitySession> {
+  const sdk = stripeSdk();
+  const session = await sdk.identity.verificationSessions.create({
+    type: params.type,
+    options: params.options,
+    return_url: params.return_url,
+    metadata: normalizeMetadata(params.metadata),
+  });
+  return {
+    id: session.id,
+    status: session.status as StripeIdentitySession["status"],
+    url: session.url ?? null,
+    last_error: session.last_error ? { code: session.last_error.code ?? null } : null,
+    metadata: Object.fromEntries(
+      Object.entries(session.metadata ?? {}).map(([key, value]) => [key, value ?? ""])
+    ),
+  };
+}
+
+async function retrieveLiveIdentitySession(id: string): Promise<StripeIdentitySession> {
+  const sdk = stripeSdk();
+  const session = await sdk.identity.verificationSessions.retrieve(id, {
+    expand: ["verified_outputs"],
+  });
+  const outputs = (session as unknown as {
+    verified_outputs?: { first_name?: string | null; last_name?: string | null } | null;
+  }).verified_outputs;
+  return {
+    id: session.id,
+    status: session.status as StripeIdentitySession["status"],
+    url: session.url ?? null,
+    last_error: session.last_error ? { code: session.last_error.code ?? null } : null,
+    metadata: Object.fromEntries(
+      Object.entries(session.metadata ?? {}).map(([key, value]) => [key, value ?? ""])
+    ),
+    verified_outputs: outputs ?? null,
+  };
+}
+
+function stubIdentitySession(id: string, metadata: Record<string, string>): StripeIdentitySession {
+  return {
+    id,
+    // NEVER "verified". See the note above.
+    status: "requires_input",
+    url: null,
+    last_error: { code: "identity_provider_not_configured" },
+    metadata,
+    verified_outputs: null,
+  };
+}
+
 export const stripe = {
   checkout: {
     sessions: {
@@ -190,6 +269,28 @@ export const stripe = {
 
         assertStripeCheckoutAvailable();
         return createStubCheckoutSession(params);
+      },
+    },
+  },
+  identity: {
+    verificationSessions: {
+      create: async (
+        params: StripeIdentitySessionCreateParams
+      ): Promise<StripeIdentitySession> => {
+        if (stripeConfiguredForLivePayments()) {
+          return createLiveIdentitySession(params);
+        }
+        return stubIdentitySession(
+          `stub_identity_session_${Date.now()}`,
+          normalizeMetadata(params.metadata)
+        );
+      },
+      retrieve: async (id: string, _options?: unknown): Promise<StripeIdentitySession> => {
+        void _options;
+        if (stripeConfiguredForLivePayments()) {
+          return retrieveLiveIdentitySession(id);
+        }
+        return stubIdentitySession(id, {});
       },
     },
   },

@@ -29,10 +29,22 @@ resource "google_service_account" "source_refresh_scheduler" {
   depends_on = [google_project_service.required]
 }
 
-resource "google_storage_bucket_iam_member" "runtime_state_core_rw" {
+resource "google_storage_bucket_iam_member" "runtime_state_core_read" {
   bucket = google_storage_bucket.runtime_state.name
-  role   = "roles/storage.objectAdmin"
+  role   = "roles/storage.objectViewer"
   member = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
+resource "google_storage_bucket_iam_member" "runtime_state_refresh_read" {
+  bucket = google_storage_bucket.runtime_state.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.source_refresh_scheduler.email}"
+}
+
+resource "google_storage_bucket_iam_member" "runtime_state_refresh_create" {
+  bucket = google_storage_bucket.runtime_state.name
+  role   = "roles/storage.objectCreator"
+  member = "serviceAccount:${google_service_account.source_refresh_scheduler.email}"
 }
 
 resource "google_cloud_run_v2_job_iam_member" "scheduler_source_refresh_executor" {

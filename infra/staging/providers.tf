@@ -44,6 +44,9 @@ locals {
     "cloudbuild.googleapis.com",           # P2.1 image build (owner has no local Docker)
     "billingbudgets.googleapis.com",       # Existing monthly billing alert inspection/maintenance
     "pubsub.googleapis.com",               # Governed secret-rotation reminders and durable acknowledgement
+    "containeranalysis.googleapis.com",    # Artifact Analysis metadata + attestation notes
+    "ondemandscanning.googleapis.com",     # Deployment-blocking container vulnerability scans
+    "binaryauthorization.googleapis.com",  # Cloud Run admission policy for verified images
   ]
 }
 

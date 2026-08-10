@@ -5,8 +5,9 @@ import {
 } from "@/lib/security/externalSecretInventory";
 
 const issues = validateExternalSecretInventory();
+const currentStatuses = new Set(["ROTATED", "CURRENT_NEWLY_ISSUED"]);
 const pending = externalSecretInventory.secrets
-  .filter((entry) => entry.rotationStatus !== "ROTATED")
+  .filter((entry) => !currentStatuses.has(entry.rotationStatus))
   .map((entry) => ({ name: entry.name, status: entry.rotationStatus }));
 
 console.log(JSON.stringify({

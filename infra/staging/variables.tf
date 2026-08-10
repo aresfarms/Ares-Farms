@@ -105,9 +105,42 @@ variable "backup_start_time" {
 }
 
 variable "backup_retention_days" {
-  description = "Number of automated backups retained (minimum defensible retention for staging)."
+  description = "Number of automated backups retained."
   type        = number
   default     = 7
+}
+
+variable "maintenance_window_day" {
+  description = "Cloud SQL maintenance day, 1=Monday through 7=Sunday."
+  type        = number
+  default     = 7
+
+  validation {
+    condition     = var.maintenance_window_day >= 1 && var.maintenance_window_day <= 7
+    error_message = "maintenance_window_day must be between 1 and 7."
+  }
+}
+
+variable "maintenance_window_hour_utc" {
+  description = "Cloud SQL maintenance start hour in UTC."
+  type        = number
+  default     = 8
+
+  validation {
+    condition     = var.maintenance_window_hour_utc >= 0 && var.maintenance_window_hour_utc <= 23
+    error_message = "maintenance_window_hour_utc must be between 0 and 23."
+  }
+}
+
+variable "maintenance_update_track" {
+  description = "Cloud SQL maintenance update track."
+  type        = string
+  default     = "stable"
+
+  validation {
+    condition     = contains(["stable", "canary"], var.maintenance_update_track)
+    error_message = "maintenance_update_track must be stable or canary."
+  }
 }
 
 variable "enable_point_in_time_recovery" {
@@ -172,7 +205,7 @@ variable "migrator_image" {
 }
 
 variable "invoker_principals" {
-  description = "Explicit identities granted roles/run.invoker on furlong-core during P2 (e.g. [\"user:chudson@aresfarmsinc.com\"]). Recorded in the deployment manifest as p2InvokerPrincipals. NEVER allUsers/allAuthenticatedUsers."
+  description = "Explicit staging identities granted roles/run.invoker on furlong-core during licensed-pathway and authority testing (e.g. [\"user:chudson@aresfarmsinc.com\"]). Recorded in the deployment manifest as p2InvokerPrincipals. Caitlin's direct testing lane remains until she explicitly confirms every licensed and authority pathway is complete; never carry this exception into production. NEVER allUsers/allAuthenticatedUsers."
   type        = list(string)
   default     = []
 
@@ -186,9 +219,22 @@ variable "invoker_principals" {
 }
 
 variable "secret_revision_epoch" {
-  description = "Non-secret revision-forcing counter. Increment after rotating a secret version so Cloud Run mints a new revision (TF referencing `latest` sees no diff otherwise) — spec P2.3."
+  description = "Non-secret audit counter retained for release evidence. Numeric Secret Manager version pins create revision diffs directly."
   type        = number
   default     = 1
+}
+
+variable "secret_versions" {
+  description = "Approved numeric Secret Manager versions keyed by secret id. Release resources must never reference the moving latest alias."
+  type        = map(string)
+  default     = {}
+
+  validation {
+    condition = alltrue([
+      for version in values(var.secret_versions) : can(regex("^[1-9][0-9]*$", version))
+    ])
+    error_message = "Every secret_versions value must be a positive numeric Secret Manager version."
+  }
 }
 
 variable "nextauth_url" {

@@ -102,7 +102,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.app["DATABASE_URL"].secret_id
-            version = "latest"
+            version = var.secret_versions["DATABASE_URL"]
           }
         }
       }
@@ -111,7 +111,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.app["NEXTAUTH_SECRET"].secret_id
-            version = "latest"
+            version = var.secret_versions["NEXTAUTH_SECRET"]
           }
         }
       }
@@ -120,7 +120,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = "PLAID_CLIENT_ID"
-            version = "latest"
+            version = var.secret_versions["PLAID_CLIENT_ID"]
           }
         }
       }
@@ -129,7 +129,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = "PlaidSecret"
-            version = "latest"
+            version = var.secret_versions["PlaidSecret"]
           }
         }
       }
@@ -139,7 +139,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.app["PLAID_DATA_ENCRYPTION_KEY"].secret_id
-            version = "latest"
+            version = var.secret_versions["PLAID_DATA_ENCRYPTION_KEY"]
           }
         }
       }
@@ -153,7 +153,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.app["REPORT_SIGNING_SECRET"].secret_id
-            version = "latest"
+            version = var.secret_versions["REPORT_SIGNING_SECRET"]
           }
         }
       }
@@ -167,7 +167,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = "EVIDENCE_REPLAY_SIGNING_SECRET"
-            version = "latest"
+            version = var.secret_versions["EVIDENCE_REPLAY_SIGNING_SECRET"]
           }
         }
       }
@@ -176,7 +176,7 @@ resource "google_cloud_run_v2_service" "core" {
         value_source {
           secret_key_ref {
             secret  = "EVIDENCE_REPLAY_SIGNING_SECRET_V1"
-            version = "latest"
+            version = var.secret_versions["EVIDENCE_REPLAY_SIGNING_SECRET_V1"]
           }
         }
       }
@@ -260,7 +260,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "SENDGRID_API_KEY"
-              version = "latest"
+              version = var.secret_versions["SENDGRID_API_KEY"]
             }
           }
         }
@@ -278,7 +278,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "ANTHROPIC_API_KEY"
-              version = "latest"
+              version = var.secret_versions["ANTHROPIC_API_KEY"]
             }
           }
         }
@@ -291,7 +291,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "STRIPE_SECRET_KEY"
-              version = "latest"
+              version = var.secret_versions["STRIPE_SECRET_KEY"]
             }
           }
         }
@@ -304,7 +304,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "STRIPE_WEBHOOK_SECRET"
-              version = "latest"
+              version = var.secret_versions["STRIPE_WEBHOOK_SECRET"]
             }
           }
         }
@@ -331,7 +331,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "DATA_GOV_API_KEY"
-              version = "latest"
+              version = var.secret_versions["DATA_GOV_API_KEY"]
             }
           }
         }
@@ -345,7 +345,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "NOAA_CDO_TOKEN"
-              version = "latest"
+              version = var.secret_versions["NOAA_CDO_TOKEN"]
             }
           }
         }
@@ -375,7 +375,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "AUTH_CREDENTIAL_SHARED_SECRET"
-              version = "latest"
+              version = var.secret_versions["AUTH_CREDENTIAL_SHARED_SECRET"]
             }
           }
         }
@@ -431,7 +431,7 @@ resource "google_cloud_run_v2_service" "core" {
           value_source {
             secret_key_ref {
               secret  = "STAGING_SEED_SHARED_SECRET"
-              version = "latest"
+              version = var.secret_versions["STAGING_SEED_SHARED_SECRET"]
             }
           }
         }
@@ -540,7 +540,7 @@ resource "google_cloud_run_v2_service" "core" {
     google_secret_manager_secret_iam_member.runtime_plaid_data_encryption,
     google_secret_manager_secret_iam_member.runtime_sendgrid_api_key,
     google_secret_manager_secret_iam_member.runtime_auth_shared_secret,
-    google_storage_bucket_iam_member.runtime_state_core_rw,
+    google_storage_bucket_iam_member.runtime_state_core_read,
   ]
 }
 

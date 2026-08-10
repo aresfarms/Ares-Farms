@@ -142,6 +142,9 @@ a Stage-1 apply with no images creates no Cloud Run resources.
    ```hcl
    core_image         = "us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-core@sha256:<digest>"
    migrator_image     = "us-central1-docker.pkg.dev/furlong-staging/furlong/furlong-db-migrate@sha256:<digest>"
+   # Temporary staging-only founder testing lane. Keep Caitlin's direct
+   # invocation until she explicitly confirms every licensed and authority
+   # pathway is complete. Never copy this exception into production.
    invoker_principals = ["user:chudson@aresfarmsinc.com"]
    ```
    ```bash

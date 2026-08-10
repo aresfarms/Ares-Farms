@@ -59,6 +59,12 @@ resource "google_sql_database_instance" "pg" {
         retention_unit   = "COUNT"
       }
     }
+
+    maintenance_window {
+      day          = var.maintenance_window_day
+      hour         = var.maintenance_window_hour_utc
+      update_track = var.maintenance_update_track
+    }
   }
 }
 

@@ -18,10 +18,10 @@
 # objects are encrypted under OUR key. Key access is itself audit-logged and
 # revocable; destroying the key crypto-shreds the vault — the kill switch.
 resource "google_kms_key_ring" "vault" {
-  count    = var.core_image == "" ? 0 : 1
-  name     = "furlong-vault"
-  location = var.region
-  project  = var.project_id
+  count      = var.core_image == "" ? 0 : 1
+  name       = "furlong-vault"
+  location   = var.region
+  project    = var.project_id
   depends_on = [google_project_service.required]
 }
 
@@ -52,7 +52,7 @@ resource "google_storage_bucket" "documents" {
   name       = "${var.project_id}-borrower-documents"
   depends_on = [google_kms_crypto_key_iam_member.gcs_uses_vault_key]
   location   = var.region
-  project  = var.project_id
+  project    = var.project_id
 
   uniform_bucket_level_access = true
   public_access_prevention    = "enforced"
@@ -70,7 +70,7 @@ resource "google_storage_bucket" "documents" {
       type = "Delete"
     }
     condition {
-      num_newer_versions = 3
+      num_newer_versions         = 3
       days_since_noncurrent_time = 30
       with_state                 = "ARCHIVED"
     }
@@ -98,12 +98,19 @@ resource "google_storage_bucket" "documents" {
   }
 }
 
-# Runtime SA: object admin on THIS bucket only (initiates resumable sessions,
-# reads for the governed lender workspace). No project-wide storage grants.
+# Runtime SA can create new document generations and read them for governed
+# workspaces, but cannot alter object IAM, retention, or policy metadata.
 resource "google_storage_bucket_iam_member" "runtime_documents" {
   count  = var.core_image == "" ? 0 : 1
   bucket = google_storage_bucket.documents[0].name
-  role   = "roles/storage.objectAdmin"
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.core_runtime.email}"
+}
+
+resource "google_storage_bucket_iam_member" "runtime_documents_creator" {
+  count  = var.core_image == "" ? 0 : 1
+  bucket = google_storage_bucket.documents[0].name
+  role   = "roles/storage.objectCreator"
   member = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 

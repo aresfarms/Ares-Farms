@@ -33,6 +33,7 @@ export type GovernedLocalSecretName = (typeof governedLocalSecretNames)[number];
 export type SecretRotationStatus =
   | "MIGRATED_PENDING_PROVIDER_ROTATION"
   | "MIGRATED_PENDING_CONTROLLED_ROTATION"
+  | "CURRENT_NEWLY_ISSUED"
   | "ROTATED";
 
 export type ExternalSecretInventoryEntry = Readonly<{
@@ -65,6 +66,24 @@ type RotationEvidence = Readonly<{
     status?: string;
     evidence?: string;
   }>;
+  attestedAtUtc?: string;
+  attestedBy?: string;
+  attestationAuthority?: string;
+  rotationPolicyDays?: number;
+  credentials?: ReadonlyArray<Readonly<{
+    name?: string;
+    credentialKind?: string;
+    activatedSecretVersion?: string;
+    secretVersionCreatedAtUtc?: string;
+    currentStatus?: string;
+    previousProviderCredentialRevoked?: boolean | null;
+    providerEventReference?: string;
+    connectorVerification?: Readonly<{
+      status?: string;
+      evidence?: string;
+    }>;
+    nextRotationDueAtUtc?: string;
+  }>>;
 }>;
 
 function validateRotationEvidence(
@@ -127,6 +146,87 @@ function validateRotationEvidence(
   return issues;
 }
 
+function validateCurrentIssuanceEvidence(
+  entry: ExternalSecretInventoryEntry,
+  inventory: ExternalSecretInventory,
+  repositoryRoot: string
+): string[] {
+  const issues: string[] = [];
+  const evidenceReference = entry.rotationEvidence?.trim();
+  if (!evidenceReference) return [`Current credential lacks issuance evidence: ${entry.name}`];
+  if (evidenceReference.startsWith("/") || evidenceReference.includes("..")) {
+    return [`Issuance evidence must be a repository-relative path: ${entry.name}`];
+  }
+
+  const evidencePath = resolve(repositoryRoot, evidenceReference);
+  const relativePath = relative(repositoryRoot, evidencePath);
+  if (relativePath.startsWith("..") || !relativePath.startsWith("artifacts/")) {
+    return [`Issuance evidence must remain under artifacts/: ${entry.name}`];
+  }
+  if (!existsSync(evidencePath)) return [`Issuance evidence file is missing: ${entry.name}`];
+
+  let evidence: RotationEvidence;
+  try {
+    evidence = JSON.parse(readFileSync(evidencePath, "utf8")) as RotationEvidence;
+  } catch {
+    return [`Issuance evidence is not valid JSON: ${entry.name}`];
+  }
+
+  if (evidence.event !== "PROVIDER_CREDENTIAL_CURRENT_ISSUANCE") {
+    issues.push(`Issuance evidence has an unsupported event type: ${entry.name}`);
+  }
+  if (evidence.gcpProjectId !== inventory.gcpProjectId) {
+    issues.push(`Issuance evidence project mismatch: ${entry.name}`);
+  }
+  if (evidence.secretValueDisplayed !== false) {
+    issues.push(`Issuance evidence does not affirm secret non-disclosure: ${entry.name}`);
+  }
+  if (evidence.combinedProductionReady !== false) {
+    issues.push(`Issuance evidence does not preserve the production hold: ${entry.name}`);
+  }
+  if (!evidence.attestedAtUtc || Number.isNaN(Date.parse(evidence.attestedAtUtc))) {
+    issues.push(`Issuance evidence lacks a valid owner-attestation time: ${entry.name}`);
+  }
+  if (!evidence.attestedBy?.trim() || evidence.attestationAuthority !== "owner") {
+    issues.push(`Issuance evidence lacks owner authority: ${entry.name}`);
+  }
+
+  const credential = evidence.credentials?.find((candidate) => candidate.name === entry.name);
+  if (!credential) return [...issues, `Issuance evidence lacks credential entry: ${entry.name}`];
+  if (!/^\d+$/.test(credential.activatedSecretVersion ?? "")) {
+    issues.push(`Issuance evidence lacks an activated secret version: ${entry.name}`);
+  }
+  if (!credential.secretVersionCreatedAtUtc || Number.isNaN(Date.parse(credential.secretVersionCreatedAtUtc))) {
+    issues.push(`Issuance evidence lacks Secret Manager version time: ${entry.name}`);
+  }
+  if (credential.currentStatus !== "CURRENT_NEWLY_ISSUED") {
+    issues.push(`Issuance evidence does not mark credential current: ${entry.name}`);
+  }
+  if (!credential.providerEventReference?.trim()) {
+    issues.push(`Issuance evidence lacks provider event reference: ${entry.name}`);
+  }
+  if (
+    credential.connectorVerification?.status !== "OWNER_ATTESTED_PASS" ||
+    !credential.connectorVerification.evidence?.trim()
+  ) {
+    issues.push(`Issuance evidence lacks owner-attested connector verification: ${entry.name}`);
+  }
+  if (
+    credential.credentialKind === "PROVIDER_CREDENTIAL" &&
+    credential.previousProviderCredentialRevoked !== true
+  ) {
+    issues.push(`Issuance evidence lacks prior-credential revocation: ${entry.name}`);
+  }
+  const nextRotation = Date.parse(credential.nextRotationDueAtUtc ?? "");
+  if (!Number.isFinite(nextRotation)) {
+    issues.push(`Issuance evidence lacks next rotation due time: ${entry.name}`);
+  } else if (nextRotation <= Date.now()) {
+    issues.push(`Provider credential rotation is due: ${entry.name}`);
+  }
+
+  return issues;
+}
+
 export function validateExternalSecretInventory(
   inventory: ExternalSecretInventory = externalSecretInventory,
   repositoryRoot: string = process.cwd()
@@ -141,6 +241,8 @@ export function validateExternalSecretInventory(
     }
     if (entry.rotationStatus === "ROTATED") {
       issues.push(...validateRotationEvidence(entry, inventory, repositoryRoot));
+    } else if (entry.rotationStatus === "CURRENT_NEWLY_ISSUED") {
+      issues.push(...validateCurrentIssuanceEvidence(entry, inventory, repositoryRoot));
     } else if (entry.rotationEvidence !== null) {
       issues.push(`Pending secret must not claim rotation evidence: ${name}`);
     }

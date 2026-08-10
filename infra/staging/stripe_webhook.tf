@@ -72,7 +72,7 @@ resource "google_cloud_run_v2_service" "stripe_webhook" {
         value_source {
           secret_key_ref {
             secret  = google_secret_manager_secret.app["DATABASE_URL"].secret_id
-            version = "latest"
+            version = var.secret_versions["DATABASE_URL"]
           }
         }
       }
@@ -82,7 +82,7 @@ resource "google_cloud_run_v2_service" "stripe_webhook" {
         value_source {
           secret_key_ref {
             secret  = "STRIPE_WEBHOOK_SECRET"
-            version = "latest"
+            version = var.secret_versions["STRIPE_WEBHOOK_SECRET"]
           }
         }
       }

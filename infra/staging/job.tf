@@ -63,7 +63,7 @@ resource "google_cloud_run_v2_job" "db_migrate" {
           value_source {
             secret_key_ref {
               secret  = google_secret_manager_secret.app["MIGRATOR_DATABASE_URL"].secret_id
-              version = "latest"
+              version = var.secret_versions["MIGRATOR_DATABASE_URL"]
             }
           }
         }
@@ -137,7 +137,7 @@ resource "google_cloud_run_v2_job" "runtime_verify" {
           value_source {
             secret_key_ref {
               secret  = google_secret_manager_secret.app["DATABASE_URL"].secret_id
-              version = "latest"
+              version = var.secret_versions["DATABASE_URL"]
             }
           }
         }
@@ -174,7 +174,7 @@ resource "google_cloud_run_v2_job" "source_refresh" {
     parallelism = 1
 
     template {
-      service_account = google_service_account.core_runtime.email
+      service_account = google_service_account.source_refresh_scheduler.email
 
       execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
 
@@ -225,7 +225,7 @@ resource "google_cloud_run_v2_job" "source_refresh" {
             value_source {
               secret_key_ref {
                 secret  = "NASS_API_KEY"
-                version = "latest"
+                version = var.secret_versions["NASS_API_KEY"]
               }
             }
           }
@@ -240,6 +240,8 @@ resource "google_cloud_run_v2_job" "source_refresh" {
   }
 
   depends_on = [
-    google_storage_bucket_iam_member.runtime_state_core_rw,
+    google_storage_bucket_iam_member.runtime_state_refresh_read,
+    google_storage_bucket_iam_member.runtime_state_refresh_create,
+    google_secret_manager_secret_iam_member.source_refresh_nass_api_key,
   ]
 }

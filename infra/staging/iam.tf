@@ -63,15 +63,14 @@ resource "google_secret_manager_secret_iam_member" "runtime_sendgrid_api_key" {
   member    = "serviceAccount:${google_service_account.core_runtime.email}"
 }
 
-# NASS_API_KEY is created + versioned out of band by the owner (not TF). The daily
-# source-refresh job runs as core_runtime; grant it read access only when the
-# commodity/livestock auto-refresh is enabled.
-resource "google_secret_manager_secret_iam_member" "runtime_nass_api_key" {
+# NASS_API_KEY is isolated to the dedicated source-refresh identity. The
+# browser-facing core runtime cannot read ingestion credentials.
+resource "google_secret_manager_secret_iam_member" "source_refresh_nass_api_key" {
   count     = var.nass_api_key_enabled ? 1 : 0
   project   = var.project_id
   secret_id = "NASS_API_KEY"
   role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${google_service_account.core_runtime.email}"
+  member    = "serviceAccount:${google_service_account.source_refresh_scheduler.email}"
 }
 
 # AUTH_CREDENTIAL_SHARED_SECRET — created out of band by the owner; grant the

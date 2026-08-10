@@ -32,6 +32,13 @@ source_refresh_time_zone        = "Etc/UTC"
 security_alert_email_addresses      = ["chudson@aresfarmsinc.com"]
 security_alert_notification_channels = []
 
+# --- Canonical authentication origins ---
+# WebAuthn/passkeys are origin-bound. Use the exact browser-visible staging
+# hostname and keep NEXTAUTH_URL aligned with this origin.
+nextauth_url    = "https://REPLACE_WITH_STAGING_HOST"
+webauthn_rp_id = "REPLACE_WITH_STAGING_HOST"
+webauthn_origin = "https://REPLACE_WITH_STAGING_HOST"
+
 # --- IAP / tester access ---
 enable_iap            = true
 iap_tester_principals = ["user:chudson@aresfarmsinc.com"]

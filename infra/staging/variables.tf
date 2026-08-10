@@ -285,6 +285,28 @@ variable "nextauth_url" {
   default     = ""
 }
 
+variable "webauthn_rp_id" {
+  description = "Canonical WebAuthn relying-party hostname only (no scheme or path). Passkeys are cryptographically bound to this hostname."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.webauthn_rp_id == "" || (!strcontains(var.webauthn_rp_id, "://") && !strcontains(var.webauthn_rp_id, "/"))
+    error_message = "webauthn_rp_id must be a hostname only, without a URL scheme or path."
+  }
+}
+
+variable "webauthn_origin" {
+  description = "Canonical HTTPS browser origin used to verify WebAuthn registration and authentication responses."
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.webauthn_origin == "" || can(regex("^https://[^/]+$", var.webauthn_origin))
+    error_message = "webauthn_origin must be a single HTTPS origin without a path."
+  }
+}
+
 variable "core_max_instances" {
   description = "Max Cloud Run instances. CONNECTION BUDGET (spec P2.3): max_instances x per-instance pool (10, src/lib/db/index.ts) must stay BELOW the SQL tier's connection limit (db-g1-small ~50). 2 x 10 = 20 leaves headroom for the migrator + operators."
   type        = number

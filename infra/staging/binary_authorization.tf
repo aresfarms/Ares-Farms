@@ -51,7 +51,7 @@ resource "google_binary_authorization_attestor" "release" {
     note_reference = google_container_analysis_note.release_attestor.id
 
     public_keys {
-      id = data.google_kms_crypto_key_version.release_attestor.name
+      id = "//cloudkms.googleapis.com/v1/${data.google_kms_crypto_key_version.release_attestor.name}"
 
       pkix_public_key {
         public_key_pem      = data.google_kms_crypto_key_version.release_attestor.public_key[0].pem

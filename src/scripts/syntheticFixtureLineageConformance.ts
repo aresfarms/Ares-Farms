@@ -235,6 +235,10 @@ try {
     "src/lib/audit/writeAuditEvent.ts",
     "utf8",
   );
+  const fixtureActivationRoute = fs.readFileSync(
+    "src/app/api/internal/synthetic-fixtures/route.ts",
+    "utf8",
+  );
   assert(
     CANONICAL_GOVERNANCE_MIGRATION_FILES.includes(
       "0053_synthetic_fixture_lineage.sql",
@@ -266,6 +270,24 @@ try {
       .includes("SYNTHETIC_PAYMENT_METHOD_MISMATCH"),
   );
   assert(plaidExchange.includes("synthetic-fixture lineage"));
+  assert(
+    fixtureActivationRoute.includes("canonicalRedirectOrigin"),
+    "Synthetic fixture redirects must resolve a canonical browser-visible origin.",
+  );
+  assert(
+    fixtureActivationRoute.includes("process.env.NEXTAUTH_URL"),
+    "Synthetic fixture redirects must prefer the configured canonical origin.",
+  );
+  assert(
+    !fixtureActivationRoute.includes("new URL(returnTo, req.url)"),
+    "Synthetic fixture redirects must never inherit Cloud Run's internal listener origin.",
+  );
+  assert(
+    fixtureActivationRoute.includes(
+      'secure: redirectUrl.protocol === "https:"',
+    ),
+    "Synthetic fixture cookies must preserve Secure on the browser-visible HTTPS origin.",
+  );
   assert(
     fs
       .readFileSync("src/lib/lender-submission/store.ts", "utf8")

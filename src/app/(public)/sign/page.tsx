@@ -11,6 +11,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
+import { Disclosures } from "@/components/public/Disclosures";
+
 const NAVY = "#1C2B45";
 const MUTED = "#4d596d";
 
@@ -163,6 +165,7 @@ function SignInner() {
           </span>
         </section>
       )}
+      <Disclosures variant="full" showManifesto={false} />
     </main>
   );
 }

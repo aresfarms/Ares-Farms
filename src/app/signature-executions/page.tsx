@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { Disclosures } from "@/components/public/Disclosures";
 import { SIGNATURE_BLOCKER_CODES } from "@/lib/signature-execution/blockers";
 import { SIGNATURE_EXECUTION_DOCTRINE, SIGNATURE_EXECUTION_STATES } from "@/lib/signature-execution/doctrine";
 
@@ -35,6 +36,7 @@ export default function SignatureExecutionsPage() {
             <div><dt className="font-semibold">Blocker vocabulary</dt><dd className="text-sm text-[#5b6474]">{SIGNATURE_BLOCKER_CODES.length} canonical blocker codes</dd></div>
           </dl>
         </section>
+        <Disclosures variant="full" showManifesto={false} />
       </div>
     </main>
   );

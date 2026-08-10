@@ -367,3 +367,70 @@ and are not modified here — their newest file dates to 15 June 2026. Items
 carrying doctrine changes (C-9, C-10, C-11, C-13) and the unscoped requirement
 (G-1) require founder authorship into the Volumes themselves to become
 governing. Until then they govern the code but not the constitution.
+
+---
+
+# Part V — Identity verification (2026-08-10)
+
+## C-16. The `identity-verified` tier was unreachable
+
+- **Controlling volumes:** Vol II (consent before action, minimum disclosure),
+  Vol III-B (GOV-RUNTIME-001), Vol V (replay-safe, evidenced).
+- **State found:** `actionGate.ts` required the `identity-verified` tier for
+  financial-document upload, document signing, and bank connection. No provider
+  existed. ID.me appeared only as a config-presence readout on a governance
+  dashboard — never a verification path — and Plaid's `identityMatchAdapter.ts`
+  is 17 lines of readiness probe with no matching logic in it. The policy table
+  was therefore unsatisfiable by anyone.
+- **Founder decision:** Stripe Identity. ID.me out on cost; Plaid keeps banking
+  and does not do identity here.
+- **Reasoning recorded because it will be questioned:**
+  1. Our stated basis is fraud prevention and signature attribution, NOT AML.
+     The consent registry says in terms that Furlong is not a financial
+     institution carrying AML duties. Plaid IDV's differentiator is KYC/AML
+     watchlist screening — running screening we have no obligation to run
+     manufactures duties and holds data we should not.
+  2. Stripe retains the document and selfie; we take the outcome. Nothing in
+     `identity_verifications` would harm the person it describes if leaked.
+  3. **Vendor separation is the real prize.** Plaid sees bank data. Stripe sees
+     identity. NEITHER SEES BOTH. One breach, one subpoena, or one vendor
+     compromise cannot reconstruct a borrower. This is stateable to a bank.
+- **Enforcement:** server-side in `/api/public/secure-upload`, on BOTH `begin`
+  and `confirm` — a caller can skip `begin` and post a `confirm` to create a
+  custody record. The rendered gate is an explanation of a rule that holds
+  without it.
+
+## D-5. A stub may fake a payment. It may never fake an identity.
+
+- **Controlling volumes:** Vol II, Vol V.
+- **Doctrine:** the Stripe adapter's local-dev stub returns a synthetic
+  checkout success, which is harmless. The identity stub returns
+  `requires_input` permanently and can never return `verified`, because a
+  faked identity would raise the assurance tier and unlock financial upload,
+  bank connection, and signing on a fiction.
+- **General form:** a stub may fabricate an outcome that costs nothing to be
+  wrong about. It may never fabricate an outcome that GRANTS AUTHORITY.
+
+## G-2. OPEN — bank connection is reachable by the broker, not the borrower
+
+- **Finding:** `/financial-connect` and both Plaid routes gate on
+  `getServerSession` + `user.id` + fresh passkey MFA. Sessions come from
+  `CredentialsProvider` — staff and professionals. Customers have no accounts
+  (consent registry, stated). So the borrower cannot reach bank connection at
+  all, and Stuart can.
+- **Founder-approved design:** make it token-gated like the rest of the
+  customer journey, with a VERIFIED IDENTITY as the step-up in place of passkey
+  MFA. A passkey proves possession of a device; identity verification proves
+  personhood against a government document. For someone with no account it is
+  not a weaker substitute but a stronger assurance, and it is the same check
+  `connect-financial-account` already demands.
+- **Why it is not yet built:** the page conversion was written and then
+  REVERTED. The two Plaid API routes still require a session, so a token door
+  on the page alone opens onto a 401 — the same defect as C-10's counterparty
+  lanes. Doing it properly means restructuring authorization on the routes that
+  open ongoing access to bank accounts, which also touches the subject
+  reference used by the encrypted store, the synthetic-fixture lineage keyed to
+  `user.email`, and the audit actor. That is its own focused piece of work, not
+  a tail-end change.
+- **Rule applied:** a door that opens onto the wrong room, or onto no room, is
+  worse than no door.

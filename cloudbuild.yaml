@@ -1,8 +1,8 @@
 # =============================================================================
 # Cloud Build — furlong staging images (STAGING-DEPLOY P2.1)
 #
-# Builds BOTH image targets from the one Dockerfile and pushes them to
-# Artifact Registry. Run from the repo root (the owner machine has no local
+# Builds the core, migrator, and scanner images and pushes them to Artifact
+# Registry. Run from the repo root (the owner machine has no local
 # Docker; Cloud Build is the P2.1 build path):
 #
 #   npm run build:cloud:staging
@@ -161,7 +161,7 @@ steps:
       - -t=${_REPO}/furlong-core:p2
       - .
 
-  # Migrator Job image (the `migrator` stage — carries tsx + src + migrations)
+  # Migrator Job image (pre-bundled programs + canonical SQL; no toolchain)
   - name: gcr.io/cloud-builders/docker
     id: build-migrator
     args:
@@ -184,6 +184,29 @@ steps:
       - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
       - -t=${_REPO}/furlong-scanner:p2
       - scanner
+
+  # Prove the cross-distribution native closure is complete: clamd must start,
+  # load the baked database, and answer the shim readiness probe as non-root.
+  - name: gcr.io/cloud-builders/docker
+    id: smoke-scanner-runtime
+    entrypoint: bash
+    args:
+      - -ceu
+      - |
+        cid="$$(docker run --detach ${_REPO}/furlong-scanner:p2)"
+        trap 'docker rm --force "$${cid}" >/dev/null 2>&1 || true' EXIT
+        for attempt in $$(seq 1 120); do
+          if docker exec "$${cid}" /usr/bin/python3 -c 'import urllib.request; assert urllib.request.urlopen("http://127.0.0.1:8080/healthz", timeout=2).status == 200' 2>/dev/null; then
+            exit 0
+          fi
+          if ! docker inspect --format '{{.State.Running}}' "$${cid}" | grep -qx true; then
+            docker logs "$${cid}"
+            exit 1
+          fi
+          sleep 1
+        done
+        docker logs "$${cid}"
+        exit 1
 
 images:
   - ${_REPO}/furlong-core:p2

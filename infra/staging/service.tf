@@ -26,6 +26,13 @@ resource "google_cloud_run_v2_service" "core" {
   # deliberate teardown. The DATABASE carries deletion protection instead.
   deletion_protection = false
 
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
+
   # Direct-IAP enablement is currently reasserted with gcloud because the
   # provider does not expose the Cloud Run service annotation directly. That
   # command stamps these two client metadata fields. Ignore only those stamps
@@ -33,10 +40,19 @@ resource "google_cloud_run_v2_service" "core" {
   # every material service field remains governed by this resource.
   lifecycle {
     ignore_changes = [client, client_version]
+
+    precondition {
+      condition = var.deployment_environment != "production" || (
+        !var.founder_testing_lane_enabled && length(var.invoker_principals) == 0
+      )
+      error_message = "Production must not carry the staging founder testing lane or any direct invoker principals."
+    }
   }
 
-  # Network-reachable; the invoker IAM check is the lock (see header).
-  ingress = "INGRESS_TRAFFIC_ALL"
+  # Caitlin's authenticated direct testing lane remains open in staging until
+  # she explicitly closes every licensed and authority pathway test. After
+  # closure, traffic is accepted only through the external load balancer.
+  ingress = var.founder_testing_lane_enabled ? "INGRESS_TRAFFIC_ALL" : "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
 
   # Service-level floor across revisions. Cloud Run persists this separately
   # from the revision template scaling block, so declare it explicitly to keep
@@ -637,4 +653,53 @@ resource "google_service_account_iam_member" "verify_token_creator" {
   service_account_id = google_service_account.verify[0].name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = each.value
+}
+
+# ---- Staging-only automated DAST identity -----------------------------------
+# GitHub OIDC may impersonate this one read-only invocation identity without a
+# stored key. It is deliberately absent when deployment_environment=production.
+resource "google_service_account" "dast" {
+  count = var.core_image != "" && var.enable_staging_dast && var.deployment_environment == "staging" ? 1 : 0
+
+  project      = var.project_id
+  account_id   = "furlong-dast"
+  display_name = "Furlong staging passive DAST (GitHub OIDC, invoke only)"
+}
+
+resource "google_service_account_iam_member" "dast_workload_identity" {
+  count = length(google_service_account.dast)
+
+  service_account_id = google_service_account.dast[0].name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = var.github_actions_principal_set
+}
+
+resource "google_service_account_iam_member" "dast_token_creator" {
+  count = length(google_service_account.dast)
+
+  service_account_id = google_service_account.dast[0].name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = var.github_actions_principal_set
+}
+
+resource "google_cloud_run_v2_service_iam_member" "dast_invoker" {
+  count = length(google_service_account.dast)
+
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.core[0].name
+  role     = "roles/run.invoker"
+  member   = google_service_account.dast[0].member
+}
+
+resource "google_iap_web_cloud_run_service_iam_member" "dast" {
+  count = length(google_service_account.dast) == 0 || !var.enable_iap ? 0 : 1
+
+  project                = var.project_id
+  location               = var.region
+  cloud_run_service_name = google_cloud_run_v2_service.core[0].name
+  role                   = "roles/iap.httpsResourceAccessor"
+  member                 = google_service_account.dast[0].member
+
+  depends_on = [terraform_data.enable_iap]
 }

@@ -92,7 +92,7 @@ jobs:
       - name: Build core runtime image
         run: docker build --target runner --tag furlong-core:ci .
       - name: Verify core runtime is non-root
-        run: test "$(docker image inspect --format '{{.Config.User}}' furlong-core:ci)" = "nextjs"
+        run: test "$(docker image inspect --format '{{.Config.User}}' furlong-core:ci)" = "65532:65532"
       - name: Scan core runtime image
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -100,10 +100,21 @@ jobs:
           severity: CRITICAL,HIGH
           ignore-unfixed: true
           exit-code: "1"
+      - name: Build migrator image
+        run: docker build --target migrator --tag furlong-db-migrate:ci .
+      - name: Verify migrator runtime is non-root
+        run: test "$(docker image inspect --format '{{.Config.User}}' furlong-db-migrate:ci)" = "65532:65532"
+      - name: Scan migrator image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: furlong-db-migrate:ci
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
       - name: Build malware scanner image
         run: docker build --tag furlong-scanner:ci scanner
       - name: Verify malware scanner runtime is non-root
-        run: test "$(docker image inspect --format '{{.Config.User}}' furlong-scanner:ci)" = "clamav"
+        run: test "$(docker image inspect --format '{{.Config.User}}' furlong-scanner:ci)" = "65532:65532"
       - name: Scan malware scanner image
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:

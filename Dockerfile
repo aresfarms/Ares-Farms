@@ -8,19 +8,20 @@
 #   Vol IV   (Operational Runbooks)      — the image the staging deploy runs.
 #
 # Design contract (each line maps to a P0.3 requirement):
-#   * Node major pinned EXACTLY (24.15.0) — same across build + runtime stages.
+#   * Node build toolchain pinned EXACTLY (24.15.0); runtime pinned by
+#     content-addressed distroless Node 24 digest.
 #   * Multi-stage; the runtime layer installs NOTHING and carries NO toolchain.
 #   * Consumes Next.js `output: "standalone"` (see next.config.mjs). standalone
 #     does NOT bundle `public` or `.next/static`, so we copy them in explicitly.
-#   * Runs as a FIXED non-root UID/GID (1001:1001).
+#   * Runs as the FIXED distroless non-root UID/GID (65532:65532).
 #   * Binds 0.0.0.0 on $PORT (Cloud Run sends PORT; default 8080 here).
 #   * NO secrets baked in. `.env*` is excluded by .dockerignore, so the
 #     in-container build cannot trace a secret into `.next/standalone/.env`.
 #     All config arrives at RUN time from Secret Manager -> process env.
 #
-# Reproducibility: the base image is pinned to an exact version tag. For full
-# determinism the deploy pins the base by DIGEST (recorded in the deployment
-# manifest alongside the resolved package-lock and the pushed image digest);
+# Reproducibility: build stages use an exact Node patch tag and final runtime
+# stages use immutable base digests. The deployment manifest records the
+# resolved package-lock and the pushed image digest.
 # Terraform pins the *pushed* image by digest, never by tag (P2.1).
 # =============================================================================
 
@@ -54,41 +55,54 @@ RUN npm run build \
       echo "FATAL: .env leaked into standalone output"; exit 1; \
     fi
 
+# Bundle the two migration and two bounded operations programs during build.
+# The final migrator carries only these bundles plus canonical SQL - no npm,
+# tsx, esbuild, Go tool binaries, or development dependency tree.
+RUN mkdir -p /migrator \
+ && npx --no-install esbuild src/scripts/applyCanonicalGovernanceMigration.ts \
+      --bundle --platform=node --target=node24 --format=cjs \
+      --outfile=/migrator/applyCanonicalGovernanceMigration.cjs \
+ && npx --no-install esbuild src/scripts/applyRuntimeDatabaseGrants.ts \
+      --bundle --platform=node --target=node24 --format=cjs \
+      --outfile=/migrator/applyRuntimeDatabaseGrants.cjs \
+ && npx --no-install esbuild src/scripts/verifyRuntimePrivileges.ts \
+      --bundle --platform=node --target=node24 --format=cjs \
+      --outfile=/migrator/verifyRuntimePrivileges.cjs \
+ && npx --no-install esbuild src/scripts/runSourceRefresh.ts \
+      --bundle --platform=node --target=node24 --format=cjs \
+      --outfile=/migrator/runSourceRefresh.cjs
+
 # -----------------------------------------------------------------------------
 # Stage 3 — migrator: the furlong-db-migrate Job image (STAGING-DEPLOY P2.2).
 # The runner image deliberately CANNOT run migrations (no tsx, no src/, no
 # migration SQL) — that is the authority split at the image layer. This stage
-# carries the full locked node_modules + source so `migrate:schema` runs under
+# carries only pre-bundled migration programs and canonical SQL; it runs under
 # the migrator principal via MIGRATOR_DATABASE_URL (Secret Manager -> env).
 # Build with: docker build --target migrator -t furlong-db-migrate .
 # -----------------------------------------------------------------------------
-FROM node:24.15.0-bookworm-slim AS migrator
+FROM gcr.io/distroless/nodejs24-debian13@sha256:2e3b3a96d1d7286c3e4727f9c84b4dc32b6b33e7d7d4425c5a5c8186ad85fa93 AS migrator
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN groupadd --system --gid 1001 nodejs \
- && useradd  --system --uid 1001 --gid nodejs migrator
+# Only executable migration bundles, the sequential entrypoint, and canonical
+# SQL enter the privileged image. Credentials arrive at run time from Secret
+# Manager; no package manager, shell, source tree, or build tool is present.
+COPY --from=builder --chown=65532:65532 /migrator/ ./
+COPY --from=builder --chown=65532:65532 /app/src/scripts/migratorEntrypoint.mjs ./
+COPY --from=builder --chown=65532:65532 /app/src/lib/db/migrations ./src/lib/db/migrations
 
-# Full locked dependency tree (includes tsx) + the source the scripts need.
-# No .env* can enter (excluded by .dockerignore); credentials arrive at RUN
-# time as MIGRATOR_DATABASE_URL from Secret Manager.
-COPY --from=deps --chown=migrator:nodejs /app/node_modules ./node_modules
-COPY --chown=migrator:nodejs package.json package-lock.json tsconfig.json ./
-COPY --chown=migrator:nodejs src ./src
+USER 65532:65532
 
-USER migrator
-
-# STRICT path (no --allow-database-url): refuses to run unless
-# MIGRATOR_DATABASE_URL is set, then applies schema + runtime grants and exits
-# non-zero on any failure (Cloud Run Job exit-code honesty).
-CMD ["npm", "run", "migrate:schema"]
+# Distroless Node supplies the node entrypoint. The wrapper runs structure then
+# grants sequentially and propagates the first non-zero exit code.
+CMD ["migratorEntrypoint.mjs"]
 
 # -----------------------------------------------------------------------------
 # Stage 4 — runner: minimal production runtime. No npm, no source, no toolchain.
 # -----------------------------------------------------------------------------
-FROM node:24.15.0-bookworm-slim AS runner
+FROM gcr.io/distroless/nodejs24-debian13@sha256:2e3b3a96d1d7286c3e4727f9c84b4dc32b6b33e7d7d4425c5a5c8186ad85fa93 AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -97,34 +111,23 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 
-# The pinned Node base was published with libgnutls30 deb12u6. Debian's deb12u7
-# fixes the current critical/high GnuTLS advisory set. Pin the exact patched
-# package version so the security update remains reproducible.
-RUN apt-get update \
- && apt-get install --no-install-recommends -y libgnutls30=3.7.9-2+deb12u7 \
- && rm -rf /var/lib/apt/lists/*
-
-# Fixed, non-root system account (stable UID/GID for reproducibility).
-RUN groupadd --system --gid 1001 nodejs \
- && useradd  --system --uid 1001 --gid nodejs nextjs \
- && rm -rf /usr/local/lib/node_modules/npm \
-           /usr/local/bin/npm \
-           /usr/local/bin/npx
+# Distroless supplies the pinned Node runtime and CA certificates only: no
+# shell, package manager, OS administration tools, or mutable install layer.
 
 # Copy ONLY the standalone runtime, owned by the non-root user.
 #   * .next/standalone -> /app  (includes the traced server.js + node_modules)
 #   * .next/static     -> /app/.next/static   (not bundled by standalone)
 #   * public           -> /app/public         (not bundled by standalone)
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=65532:65532 /app/.next/standalone ./
+COPY --from=builder --chown=65532:65532 /app/.next/static ./.next/static
+COPY --from=builder --chown=65532:65532 /app/public ./public
 # Next/Turbopack rewrites PDFKit's module directory to /ROOT in the compiled
 # server chunk. Preserve PDFKit's built-in AFM/ICC assets at that traced path
 # as well as under /app/node_modules, or report rendering fails at runtime.
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/pdfkit/js/data /ROOT/node_modules/pdfkit/js/data
+COPY --from=builder --chown=65532:65532 /app/node_modules/pdfkit/js/data /ROOT/node_modules/pdfkit/js/data
 
-USER nextjs
+USER 65532:65532
 EXPOSE 8080
 
-# The minimal standalone server. Reads PORT/HOSTNAME + all app config from env.
-CMD ["node", "server.js"]
+# Distroless Node supplies the node entrypoint; server.js reads all config from env.
+CMD ["server.js"]

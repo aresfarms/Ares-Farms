@@ -2,38 +2,53 @@
 # vault. IAM-private: only the core runtime service account may invoke it.
 # Bytes come in, a verdict comes out; nothing is stored, logged, or forwarded.
 #
-# SECURITY-CLOSURE-002: pin the supported 1.4 patch line to 1.4.5. Debian's
-# bookworm package was 1.4.3 and freshclam explicitly reported it outdated.
-# The virus database is refreshed at image build time; runtime egress remains
-# unnecessary and every deployed service image is pinned by final digest.
+# Build ClamAV and refresh signatures in a mutable stage, then copy only clamd,
+# its runtime libraries, configuration, definitions, and the HTTP shim into a
+# digest-pinned distroless Python runtime.
 
-FROM clamav/clamav-debian:1.4.5
+FROM clamav/clamav-debian:1.4.5 AS clamav-builder
 
 USER root
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates python3 \
+  && apt-get upgrade -y \
+  && apt-get install -y --no-install-recommends ca-certificates pax-utils \
   && update-ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
-# Fail the build if the engine pin is not the security-patched release.
+# Fail the build if the engine pin is not the approved patched release.
 RUN clamd --version | grep -F 'ClamAV 1.4.5'
 
-# Refresh definitions while building. The official image is preloaded, so this
-# is an incremental refresh rather than a full cold-start download.
-RUN mkdir -p /var/lib/clamav /run/clamav /srv \
-  && chown -R clamav:clamav /var/lib/clamav /run/clamav /srv \
+# The official image is preloaded, so this is an incremental signature refresh.
+RUN mkdir -p /var/lib/clamav /run/clamav /scanner-rootfs \
+  && chown -R clamav:clamav /var/lib/clamav /run/clamav \
   && freshclam --foreground --stdout
 
-# Stream-only scanning over a local TCP socket. Furlong's HTTP shim is the only
-# network surface and the Cloud Run service itself remains IAM-private.
-RUN printf 'User clamav\nTCPSocket 3310\nTCPAddr 127.0.0.1\nMaxFileSize 60M\nMaxScanSize 60M\nStreamMaxLength 60M\nForeground yes\nLogSyslog no\n' > /etc/clamav/clamd.conf
+# Stream-only scanning over loopback. The HTTP shim is the only network surface.
+RUN printf 'DatabaseDirectory /var/lib/clamav\nTCPSocket 3310\nTCPAddr 127.0.0.1\nMaxFileSize 60M\nMaxScanSize 60M\nStreamMaxLength 60M\nForeground yes\nLogSyslog no\n' > /etc/clamav/clamd.conf
+# Resolve and preserve exactly the dynamic runtime closure for clamd. Build
+# utilities, freshclam, a shell, and the package manager do not cross this line.
+RUN lddtree -l /usr/sbin/clamd | sort -u \
+  | while IFS= read -r file; do \
+      case "$file" in \
+        */libc.so.6|*/libm.so.6|*/libpthread.so.0|*/libdl.so.2|*/librt.so.1|*/libresolv.so.2|*/ld-linux-x86-64.so.2|*/libssl.so.3|*/libcrypto.so.3|*/libexpat.so.1) ;; \
+        *) cp --parents "$file" /scanner-rootfs ;; \
+      esac; \
+    done
 
-COPY --chown=clamav:clamav server.py /srv/server.py
+FROM gcr.io/distroless/python3-debian13@sha256:325c8639176419afb9c3b50b420fbbd65d608f85f1e3f38bc4b8ba80aeac2e8d
 
+WORKDIR /srv
 ENV PORT=8080
+
+COPY --from=clamav-builder /scanner-rootfs/ /
+COPY --from=clamav-builder --chown=65532:65532 /etc/clamav/clamd.conf /etc/clamav/clamd.conf
+COPY --from=clamav-builder --chown=65532:65532 /var/lib/clamav/ /var/lib/clamav/
+COPY --chown=65532:65532 server.py /srv/server.py
+
+USER 65532:65532
 EXPOSE 8080
 
-USER clamav
-
-CMD ["/bin/sh", "-c", "clamd & python3 /srv/server.py"]
+# Distroless Python supplies the interpreter entrypoint. The shim starts clamd
+# directly and refuses readiness until its baked signature database is loaded.
+CMD ["/srv/server.py"]

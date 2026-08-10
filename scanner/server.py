@@ -14,6 +14,7 @@ import json
 import os
 import socket
 import struct
+import subprocess
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -88,10 +89,25 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    # Wait for clamd to load its database (baked at build; loads in seconds).
+    # Distroless has no shell or process supervisor; start clamd directly and
+    # refuse to serve until the baked signature database is loaded.
+    clamd = subprocess.Popen(
+        ["/usr/sbin/clamd"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+    ready = False
     for _ in range(120):
         if clamd_ping():
+            ready = True
             break
+        if clamd.poll() is not None:
+            raise RuntimeError(f"clamd exited before readiness: {clamd.returncode}")
         time.sleep(1)
+    if not ready:
+        clamd.terminate()
+        raise RuntimeError("clamd did not become ready within 120 seconds")
+
     port = int(os.environ.get("PORT", "8080"))
-    ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()
+    try:
+        ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()
+    finally:
+        clamd.terminate()

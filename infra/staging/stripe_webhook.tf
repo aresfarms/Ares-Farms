@@ -32,7 +32,14 @@ resource "google_cloud_run_v2_service" "stripe_webhook" {
   location            = var.region
   labels              = var.labels
   deletion_protection = false
-  ingress             = "INGRESS_TRAFFIC_ALL"
+
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
+  ingress = "INGRESS_TRAFFIC_ALL"
 
   template {
     service_account       = google_service_account.stripe_webhook_runtime[0].email

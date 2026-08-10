@@ -5,8 +5,8 @@ const dockerfile = readFileSync("scanner/Dockerfile", "utf8");
 
 assert.match(
   dockerfile,
-  /^FROM clamav\/clamav-debian:1\.4\.5$/m,
-  "Scanner must use the official security-patched ClamAV 1.4.5 image.",
+  /^FROM clamav\/clamav-debian:1\.4\.5 AS clamav-builder$/m,
+  "Scanner build stage must use the official security-patched ClamAV 1.4.5 image.",
 );
 assert.match(
   dockerfile,
@@ -23,7 +23,17 @@ assert.doesNotMatch(
   /apt-get install[^\n]*\bclamav\b/,
   "Scanner must not fall back to the stale distribution ClamAV package.",
 );
+assert.match(
+  dockerfile,
+  /^FROM gcr\.io\/distroless\/python3-debian13@sha256:[a-f0-9]{64}$/m,
+  "Scanner runtime must use a digest-pinned distroless Python base.",
+);
+assert.match(
+  dockerfile,
+  /^USER 65532:65532$/m,
+  "Scanner runtime must use the fixed distroless non-root identity.",
+);
 
 console.log(
-  "verify:scanner-image-policy PASS — official ClamAV 1.4.5 engine pin, build-time version assertion, and fresh signatures are enforced.",
+  "verify:scanner-image-policy PASS — patched ClamAV build stage, fresh signatures, digest-pinned distroless runtime, and fixed non-root identity are enforced.",
 );

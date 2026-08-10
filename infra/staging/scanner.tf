@@ -35,6 +35,13 @@ resource "google_cloud_run_v2_service" "scanner" {
   # anonymous probe cannot reach it).
   ingress = "INGRESS_TRAFFIC_ALL"
 
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
+
   # Cloud Run returns zero values for service-level scaling even when omitted.
   # Declare them explicitly so a successful deployment converges to a clean
   # Terraform plan instead of producing perpetual provider-normalization drift.

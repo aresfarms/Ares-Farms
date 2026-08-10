@@ -24,6 +24,13 @@ resource "google_cloud_run_v2_job" "db_migrate" {
 
   deletion_protection = false
 
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
+
   template {
     task_count  = 1
     parallelism = 1
@@ -81,9 +88,9 @@ resource "google_cloud_run_v2_job" "db_migrate" {
 #
 # Proves the live authority split from inside the VPC:
 #   * runs AS the runtime principal (furlong-core-runtime@)
-#   * reuses the migrator image because it contains tsx + src/scripts
+#   * reuses the migrator image's pre-bundled privilege verifier
 #   * reads only the runtime connection secret
-#   * executes `verify:runtime-privileges`, which must prove:
+#   * executes the bounded verifier, which must prove:
 #       - runtime can perform governed DML
 #       - runtime cannot perform DDL
 #       - runtime owns no objects
@@ -99,6 +106,13 @@ resource "google_cloud_run_v2_job" "runtime_verify" {
   labels   = var.labels
 
   deletion_protection = false
+
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
 
   template {
     task_count  = 1
@@ -121,9 +135,10 @@ resource "google_cloud_run_v2_job" "runtime_verify" {
       }
 
       containers {
-        image   = var.migrator_image
-        command = ["npm"]
-        args    = ["run", "verify:runtime-privileges"]
+        image = var.migrator_image
+        # Distroless Node keeps its immutable entrypoint; args replace the image
+        # CMD and select the pre-bundled privilege verifier.
+        args = ["verifyRuntimePrivileges.cjs"]
 
         resources {
           limits = {
@@ -169,6 +184,13 @@ resource "google_cloud_run_v2_job" "source_refresh" {
 
   deletion_protection = false
 
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
+
   template {
     task_count  = 1
     parallelism = 1
@@ -198,9 +220,10 @@ resource "google_cloud_run_v2_job" "source_refresh" {
       }
 
       containers {
-        image   = var.migrator_image
-        command = ["npm"]
-        args    = ["run", "run:source-refresh"]
+        image = var.migrator_image
+        # Select the pre-bundled approved-source refresh program; no npm or
+        # TypeScript toolchain exists in the runtime image.
+        args = ["runSourceRefresh.cjs"]
 
         resources {
           limits = {

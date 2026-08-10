@@ -177,6 +177,30 @@ variable "grant_cloudsql_client" {
   default     = false
 }
 
+variable "enable_staging_dast" {
+  description = "Provision the staging-only GitHub OIDC identity used for authenticated passive DAST. Never creates a production identity."
+  type        = bool
+  default     = true
+}
+
+variable "github_actions_principal_set" {
+  description = "Repository-scoped GitHub Actions Workload Identity principal allowed to impersonate the staging DAST service account."
+  type        = string
+  default     = "principalSet://iam.googleapis.com/projects/859763772114/locations/global/workloadIdentityPools/github-actions/attribute.repository/aresfarms/Ares-Farms"
+}
+
+variable "enable_binary_authorization" {
+  description = "Opt Cloud Run services and jobs into the enforcing project Binary Authorization policy. Keep false until every target digest is scanned and attested."
+  type        = bool
+  default     = false
+}
+
+variable "binary_authorization_signer_principals" {
+  description = "Principals allowed to sign explicitly approved image digests with the staging release-attestor KMS key."
+  type        = set(string)
+  default     = ["user:chudson@aresfarmsinc.com"]
+}
+
 # ---- Cloud Run (P2 — Stage 2) ----------------------------------------------
 # Both images default to "" so a Stage-1 apply (before any image exists) creates
 # NO Cloud Run resources. Set them to DIGEST-pinned refs after the P2.1 push:
@@ -202,6 +226,24 @@ variable "migrator_image" {
     condition     = var.migrator_image == "" || can(regex("@sha256:[a-f0-9]{64}$", var.migrator_image))
     error_message = "migrator_image must be pinned by digest (…@sha256:<64 hex chars>), not a tag."
   }
+}
+
+variable "founder_testing_lane_enabled" {
+  description = "Staging-only founder testing lane. While true, Cloud Run keeps authenticated direct ingress available for Caitlin's licensed and authority pathway testing. Set false only after Caitlin explicitly confirms the complete test program is closed. Production forbids this exception."
+  type        = bool
+  default     = true
+}
+
+variable "enable_edge_security" {
+  description = "Provision the Cloud Armor policy and external managed load-balancer backend. DNS and HTTPS front-end activation remain separately gated by edge_hostname."
+  type        = bool
+  default     = false
+}
+
+variable "edge_hostname" {
+  description = "Founder-approved staging hostname for the managed certificate and HTTPS edge. Empty preserves the DNS/cutover hold while still allowing the WAF backend to be provisioned."
+  type        = string
+  default     = ""
 }
 
 variable "invoker_principals" {

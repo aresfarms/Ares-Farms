@@ -11,6 +11,9 @@ import {
 
 import StripeSyntheticE2EClient from "./StripeSyntheticE2EClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const SCENARIOS = new Set([
   "stripe-card",
   "stripe-apple-pay",

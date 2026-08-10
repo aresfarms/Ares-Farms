@@ -16,6 +16,9 @@ import {
   type SyntheticScenarioId,
 } from "@/lib/testing/syntheticPersonaRegistry";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function destination(scenarioId: SyntheticScenarioId): string {
   if (scenarioId.startsWith("professional-")) return "/professional-access";
   if (scenarioId.startsWith("plaid-")) return "/financial-connect";

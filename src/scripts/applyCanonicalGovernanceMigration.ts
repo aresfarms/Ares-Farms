@@ -146,8 +146,11 @@ async function runApply(opts: Options): Promise<void> {
   const pool = new Pool({
     connectionString,
     max: 1,
-    idleTimeoutMillis: 10000,
-    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 10_000,
+    // Direct-VPC Cloud Run cold starts can exceed ten seconds before the
+    // private database path is ready. Keep one bounded attempt, but allow the
+    // governed migrator enough time to establish that first connection.
+    connectionTimeoutMillis: 30_000,
   });
 
   const client = await pool.connect();

@@ -25,6 +25,10 @@ export function evaluateProtectedPageRole(pathname: string, role: AccessRole): P
     const allowed = role === "user" || role === "borrower" || role === "governance";
     return { protected: true, allowed, reason: allowed ? "customer-portal-role" : "customer-portal-denied" };
   }
+  if (pathname === "/internal/synthetic-fixtures" || pathname.startsWith("/internal/synthetic-fixtures/")) {
+    const allowed = role === "operator" || role === "governance";
+    return { protected: true, allowed, reason: allowed ? "synthetic-fixture-operator" : "synthetic-fixture-operator-denied" };
+  }
   if (isInternalChromeRoute(pathname)) {
     const allowed = INTERNAL_ROLES.has(role);
     return { protected: true, allowed, reason: allowed ? "internal-role" : "internal-role-denied" };

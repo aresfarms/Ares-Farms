@@ -51,6 +51,8 @@ export const INTERNAL_CHROME_PREFIXES = [
  */
 export const NO_INTERNAL_CHROME_PREFIXES = [
   "/security", "/sign-in", "/portal", "/lender-desk",
+  // Authenticated test-launch surface, not the 78-console engine room.
+  "/internal/synthetic-fixtures",
 ] as const;
 
 export const PROTECTED_PAGE_PREFIXES = [

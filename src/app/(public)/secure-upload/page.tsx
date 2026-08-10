@@ -49,6 +49,34 @@ const DOC_SLOTS: Array<{
 
 type UploadState = { status: "idle" | "uploading" | "done" | "pending" | "error"; note?: string };
 
+type IdentityState = {
+  status: "loading" | "not-started" | "pending" | "verified";
+  mode?: string | null;
+  raw?: string | null;
+  note?: string | null;
+};
+
+/**
+ * The four document types that require a verified identity before they may be
+ * uploaded (src/lib/privacy/actionGate.ts, `upload-financial-document`).
+ * Mirrored here rather than imported so a client bundle never pulls the server
+ * gate table — but it must stay in step with FINANCIAL_DOCUMENT_TYPES, and the
+ * API enforces the real gate regardless of what this page renders.
+ */
+const IDENTITY_REQUIRED = new Set([
+  "bank-statements",
+  "tax-returns",
+  "personal-financial-statement",
+  "debt-schedule",
+]);
+
+/** The consent shown before a biometric capture. Sourced from the registry. */
+const IDENTITY_CONSENT_TEXT =
+  "To confirm I am the person this request belongs to, I authorize the portal and its identity " +
+  "verification provider to verify my identity using a government-issued ID and, where required, " +
+  "a photo of my face compared against that ID. This is used only to confirm my identity and to " +
+  "prevent fraud. It is not a credit check and does not affect my credit.";
+
 /** Per-file attestation (founder direction 2026-08-06). Deliberately an
  *  ATTESTATION about THIS file, not a repeated consent — a fresh statement
  *  each time carries evidentiary weight where an identical repeated tick
@@ -66,6 +94,69 @@ function SecureUploadInner() {
   const [linkError, setLinkError] = useState<string | null>(null);
   const [states, setStates] = useState<Record<string, UploadState>>({});
   const [attested, setAttested] = useState<Record<string, boolean>>({});
+  const [identity, setIdentity] = useState<IdentityState>({ status: "loading" });
+  const [identityConsent, setIdentityConsent] = useState(false);
+  const [identityBusy, setIdentityBusy] = useState(false);
+
+  /**
+   * Identity status drives which slots are open. Polled on mount and again on
+   * return from the provider, because the OUTCOME arrives by webhook — the
+   * browser coming back from Stripe proves only that a browser came back.
+   */
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    const check = async () => {
+      const res = await fetch("/api/identity/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "status", token }),
+      });
+      const data = await res.json().catch(() => null);
+      if (cancelled || !data?.ok) return;
+      setIdentity({
+        status: data.verified ? "verified" : data.status === "not-started" ? "not-started" : "pending",
+        mode: data.mode ?? null,
+        raw: data.status ?? null,
+      });
+    };
+    void check();
+    // Returning from the provider: the webhook may land a beat after the
+    // redirect, so re-check a few times rather than showing a stale "pending".
+    if (params.get("identity") === "returned") {
+      const timers = [2000, 5000, 10000].map((ms) => setTimeout(() => void check(), ms));
+      return () => {
+        cancelled = true;
+        timers.forEach(clearTimeout);
+      };
+    }
+    return () => {
+      cancelled = true;
+    };
+  }, [token, params]);
+
+  async function beginIdentity() {
+    setIdentityBusy(true);
+    try {
+      const res = await fetch("/api/identity/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "start", token, consented: true }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error ?? "Identity verification could not be started.");
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+        return;
+      }
+      // Configured but no hosted URL — say so rather than spin.
+      setIdentity({ status: "pending", mode: data.mode ?? null, raw: data.status ?? null, note: data.notice ?? null });
+    } catch (error) {
+      setIdentity((s) => ({ ...s, note: error instanceof Error ? error.message : "Could not start." }));
+    } finally {
+      setIdentityBusy(false);
+    }
+  }
 
   useEffect(() => {
     if (!token) { setLinkError("This page needs a secure link — open it from the link you were sent."); return; }
@@ -151,6 +242,11 @@ function SecureUploadInner() {
       <div style={{ display: "grid", gap: 10 }}>
         {DOC_SLOTS.map((slot) => {
           const st = states[slot.type] ?? { status: "idle" as const };
+          // A financial slot stays shut until identity is verified. The other
+          // slots are unaffected — an entity document or a purchase agreement
+          // needs only the link, and making someone verify to send those would
+          // be friction with no security behind it.
+          const identityBlocks = IDENTITY_REQUIRED.has(slot.type) && identity.status !== "verified";
           return (
             <section key={slot.type} style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#fff", padding: "14px 16px", display: "grid", gap: 6 }}>
               <strong style={{ color: "#1C2B45", fontSize: 14 }}>{slot.label}</strong>
@@ -160,22 +256,68 @@ function SecureUploadInner() {
                   {slot.actionLabel}
                 </a>
               )}
-              <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12.5, color: "#3b475a", lineHeight: 1.55, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 11px" }}>
-                <input
-                  type="checkbox"
-                  checked={attested[slot.type] === true}
-                  onChange={(e) => setAttested((a) => ({ ...a, [slot.type]: e.target.checked }))}
-                  style={{ marginTop: 2 }}
-                />
-                <span>{ATTESTATION_TEXT}</span>
-              </label>
-              <input
-                type="file"
-                aria-label={`Upload ${slot.label}`}
-                disabled={st.status === "uploading" || !dealRef || attested[slot.type] !== true}
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(slot.type, f); e.target.value = ""; }}
-                style={{ fontSize: 13 }}
-              />
+              {identityBlocks ? (
+                <div role="note" style={{ border: "1px solid #B08A2E", background: "#FFF9E8", borderRadius: 9, padding: "11px 13px", display: "grid", gap: 7 }}>
+                  <strong style={{ fontSize: 12.5, color: "#8F6E1F" }}>
+                    {identity.status === "loading"
+                      ? "Checking…"
+                      : identity.status === "pending"
+                        ? "Identity check in progress"
+                        : "One identity check first"}
+                  </strong>
+                  <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.6 }}>
+                    {identity.status === "pending"
+                      ? "Your check has been submitted and is being reviewed by the provider. This slot opens by itself once it clears — you can close this page and come back."
+                      : "Tax returns, bank statements, personal financial statements and debt schedules are the records an impostor most wants. Before they enter the vault we confirm you are you — once, and it covers all four."}
+                  </span>
+                  {identity.status === "not-started" && (
+                    <>
+                      <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12, color: "#3b475a", lineHeight: 1.55 }}>
+                        <input
+                          type="checkbox"
+                          checked={identityConsent}
+                          onChange={(e) => setIdentityConsent(e.target.checked)}
+                          style={{ marginTop: 2 }}
+                        />
+                        <span>{IDENTITY_CONSENT_TEXT}</span>
+                      </label>
+                      <button
+                        type="button"
+                        disabled={!identityConsent || identityBusy}
+                        onClick={() => void beginIdentity()}
+                        style={{ justifySelf: "start", border: 0, borderRadius: 8, padding: "9px 14px", background: identityConsent ? "#1C2B45" : "#a9b6c8", color: "#fff", fontWeight: 800, fontSize: 13, cursor: identityConsent && !identityBusy ? "pointer" : "default" }}
+                      >
+                        {identityBusy ? "Opening…" : "Verify my identity →"}
+                      </button>
+                    </>
+                  )}
+                  {identity.mode === "test" && (
+                    <span style={{ fontSize: 11.5, color: "#8F6E1F", fontWeight: 700 }}>
+                      TEST MODE — a verification ceremony, not a live identity assertion.
+                    </span>
+                  )}
+                  {identity.note && <span role="alert" style={{ fontSize: 12, color: "#a12626" }}>{identity.note}</span>}
+                </div>
+              ) : (
+                <>
+                  <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontSize: 12.5, color: "#3b475a", lineHeight: 1.55, background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 11px" }}>
+                    <input
+                      type="checkbox"
+                      checked={attested[slot.type] === true}
+                      onChange={(e) => setAttested((a) => ({ ...a, [slot.type]: e.target.checked }))}
+                      style={{ marginTop: 2 }}
+                    />
+                    <span>{ATTESTATION_TEXT}</span>
+                  </label>
+                  <input
+                    type="file"
+                    aria-label={`Upload ${slot.label}`}
+                    disabled={st.status === "uploading" || !dealRef || attested[slot.type] !== true}
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(slot.type, f); e.target.value = ""; }}
+                    style={{ fontSize: 13 }}
+                  />
+                </>
+              )}
               {st.status === "uploading" && <span style={{ color: "#5A6172", fontSize: 12.5 }}>Encrypting and transferring…</span>}
               {st.status === "done" && <span style={{ color: "#1C4532", fontSize: 12.5, fontWeight: 700 }}>✓ {st.note}</span>}
               {st.status === "pending" && <span role="alert" style={{ color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A", borderRadius: 8, padding: "6px 9px", fontSize: 12.5, fontWeight: 700 }}>⚠ {st.note}</span>}

@@ -70,6 +70,11 @@ const PUBLIC_SURFACE_PATHS = new Set([
   // lookup. Gating rights behind a login would defeat the right.
   "/api/public/my-data",
   "/api/public/chain-of-custody",
+  // Identity verification is opened by a customer who has NO account — the
+  // deal's signed link token is the authorization, exactly as it is for the
+  // secure upload channel. Gating this behind a session would make the
+  // identity-verified tier unreachable by the only people who need it.
+  "/api/identity/verify",
 ]);
 
 function cleanPathname(pathname: string): string {

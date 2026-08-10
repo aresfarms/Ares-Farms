@@ -1,7 +1,11 @@
 import { createHash } from "node:crypto";
 
+import { desc, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
+import { identityVerifications } from "@/db/schema";
+import { db } from "@/lib/db";
+import { actionForDocumentType } from "@/lib/privacy/actionGate";
 import { createDocumentStorageHandoff } from "@/lib/documents/storageHandoffStore";
 import { persistDocumentSubmission } from "@/lib/documents/documentStore";
 import {
@@ -110,6 +114,31 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  /**
+   * THE GATE THAT ACTUALLY COUNTS.
+   *
+   * The upload page renders an identity gate over the four financial slots,
+   * but a rendered gate is decoration: anyone can POST to this route directly
+   * with documentType="bank-statements" and skip the page entirely. The tier
+   * is enforced HERE, server-side, against the database — and the page is
+   * merely a courteous explanation of a rule that holds without it.
+   *
+   * Policy source is actionGate.ts (`upload-financial-document` requires the
+   * identity-verified tier); this is its enforcement point for the customer
+   * upload channel.
+   */
+  const subjectRef = claims.applicationId;
+  async function identityBlocksFinancialUpload(documentType: string): Promise<boolean> {
+    if (actionForDocumentType(documentType) !== "upload-financial-document") return false;
+    const [record] = await db
+      .select({ verified: identityVerifications.verified })
+      .from(identityVerifications)
+      .where(eq(identityVerifications.subjectRef, subjectRef))
+      .orderBy(desc(identityVerifications.createdAt))
+      .limit(1);
+    return record?.verified !== true;
+  }
+
   if (action === "begin") {
     const fileName = typeof body.fileName === "string" ? body.fileName.slice(0, 200).trim() : "";
     const mimeType = typeof body.mimeType === "string" ? body.mimeType.slice(0, 120) : null;
@@ -120,6 +149,28 @@ export async function POST(req: NextRequest) {
     }
     if (byteSize != null && byteSize > MAX_FILE_BYTES) {
       return NextResponse.json({ ok: false, error: "Files are limited to 50MB each — split larger statements into parts." }, { status: 400 });
+    }
+    if (await identityBlocksFinancialUpload(documentType)) {
+      await createObservabilityEvent({
+        eventType: "SOVEREIGN_UPLOAD_IDENTITY_GATE_BLOCKED",
+        domain: "security",
+        severity: "INFO",
+        message: "A financial-document upload was refused: identity is not verified for this deal.",
+        traceId,
+        replayRef: traceId,
+        actorId: "borrower-via-sovereign-link",
+        module: "api.public.secure-upload",
+        metadata: { applicationId: claims.applicationId, documentType },
+      });
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "This document type needs a verified identity first. Complete the identity check on the upload page — it takes a couple of minutes and covers every financial document on this deal.",
+          identityRequired: true,
+        },
+        { status: 403 }
+      );
     }
     const created = await createDocumentStorageHandoff({
       applicationId: claims.applicationId,
@@ -169,6 +220,15 @@ export async function POST(req: NextRequest) {
     const uploaded = body.uploaded === true;
     if (!fileName) {
       return NextResponse.json({ ok: false, error: "fileName is required." }, { status: 400 });
+    }
+    // Also gated here, not only in `begin`: a caller can skip `begin` entirely
+    // and post a `confirm` to create a custody record. Every entry point to a
+    // financial document must carry the same check.
+    if (await identityBlocksFinancialUpload(documentType)) {
+      return NextResponse.json(
+        { ok: false, error: "This document type needs a verified identity first.", identityRequired: true },
+        { status: 403 }
+      );
     }
     const persisted = await persistDocumentSubmission({
       traceId,

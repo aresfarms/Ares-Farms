@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 
 import { NextResponse } from "next/server";
+
+import { applyVerificationOutcome } from "@/lib/identity/verificationStore";
 import { headers } from "next/headers";
 import Stripe from "stripe";
 
@@ -466,6 +468,62 @@ export async function POST(req: Request) {
 
     const payloadRecord = isRecord(stripeEvent) ? stripeEvent : {};
     const event = payloadRecord as StripeWebhookPayload;
+
+    /**
+     * IDENTITY EVENTS BRANCH HERE, BEFORE THE PAYMENT PIPELINE.
+     *
+     * This is the ONLY place `identity_verifications.verified` is ever set to
+     * true — the signature above is what makes it trustworthy. A browser
+     * returning from Stripe saying "I finished" is a UI event and proves
+     * nothing; anyone can hit that URL.
+     *
+     * Kept separate from the payment path deliberately: an identity result is
+     * not a transaction, and must not acquire an entitlement, a fraud
+     * disposition, or a billing record by passing through machinery built for
+     * money. Different domain, different evidence, early return.
+     */
+    if (typeof stripeEvent.type === "string" && stripeEvent.type.startsWith("identity.verification_session.")) {
+      const sessionObject = (stripeEvent.data?.object ?? {}) as { id?: string };
+      const providerSessionId = typeof sessionObject.id === "string" ? sessionObject.id : null;
+      let outcome: Awaited<ReturnType<typeof applyVerificationOutcome>> = null;
+      if (providerSessionId) {
+        // Re-read from Stripe rather than trusting the payload body: the
+        // event tells us WHICH session changed, the API tells us what it is.
+        outcome = await applyVerificationOutcome(providerSessionId, traceId);
+      }
+      await persistGovernanceEvidence({
+        traceId,
+        replayRef: traceId,
+        versionRuntime,
+        observability: createObservabilityEvent({
+          eventType: "STRIPE_IDENTITY_WEBHOOK_APPLIED",
+          domain: "security",
+          severity: outcome?.nameMatchedRequest === false ? "WARN" : "INFO",
+          message: `Stripe identity event handled: ${stripeEvent.type}.`,
+          traceId,
+          replayRef: traceId,
+          actorId: "identity-provider:stripe-identity",
+          module: "api.stripe.webhook",
+          metadata: {
+            stripeEventType: stripeEvent.type,
+            providerSessionId,
+            applied: Boolean(outcome),
+            verified: outcome?.verified ?? false,
+            nameMatchedRequest: outcome?.nameMatchedRequest ?? null,
+          },
+        }),
+        metadata: { route: "/api/stripe/webhook", domain: "identity", stripeEventType: stripeEvent.type },
+      });
+      return NextResponse.json({
+        ok: true,
+        handled: "identity",
+        // An unknown session id is reported, never silently swallowed — it
+        // means Stripe knows about a verification we have no record of.
+        applied: Boolean(outcome),
+        verified: outcome?.verified ?? false,
+      });
+    }
+
     const metadata = event.data?.object?.metadata;
     const syntheticFixtureContext = syntheticFixtureContextFromProviderMetadata(
       isRecord(metadata) ? metadata : null,

@@ -11,7 +11,8 @@
  * humanAuthorityRegistry bindings (single/dual/quorum clearing). Edge-safe.
  */
 
-export type OperatorCapability = "view:internal" | "approve:source-legal";
+export type OperatorCapability =
+  "view:internal" | "approve:source-legal" | "operate:lender-desk";
 
 export interface Operator {
   id: string;
@@ -46,8 +47,13 @@ export const OPERATORS: Operator[] = [
     email: "sfraas@aresfarmsinc.com",
     name: "Stuart",
     role: "operator",
-    capabilities: ["view:internal", "approve:source-legal"],
-    license: "Finance / commercial debt broker (license status pending confirmation)",
+    capabilities: [
+      "view:internal",
+      "approve:source-legal",
+      "operate:lender-desk",
+    ],
+    license:
+      "Finance / commercial debt broker (license status pending confirmation)",
   },
   {
     id: "op-frances",
@@ -63,20 +69,54 @@ function norm(email: string | null | undefined): string {
   return (email ?? "").trim().toLowerCase();
 }
 
-export function operatorByEmail(email: string | null | undefined): Operator | null {
+export function operatorByEmail(
+  email: string | null | undefined,
+): Operator | null {
   const e = norm(email);
   return OPERATORS.find((o) => o.email.toLowerCase() === e) ?? null;
 }
 
-export function canViewInternalReview(email: string | null | undefined): boolean {
-  return operatorByEmail(email)?.capabilities.includes("view:internal") ?? false;
+export function canViewInternalReview(
+  email: string | null | undefined,
+): boolean {
+  return (
+    operatorByEmail(email)?.capabilities.includes("view:internal") ?? false
+  );
 }
 
-export function canApproveSourceLegal(email: string | null | undefined): boolean {
-  return operatorByEmail(email)?.capabilities.includes("approve:source-legal") ?? false;
+export function canApproveSourceLegal(
+  email: string | null | undefined,
+): boolean {
+  return (
+    operatorByEmail(email)?.capabilities.includes("approve:source-legal") ??
+    false
+  );
 }
 
 /** Operators who may approve source-legal — surfaced so the UI can show "no bottleneck". */
 export function sourceLegalApprovers(): Operator[] {
-  return OPERATORS.filter((o) => o.capabilities.includes("approve:source-legal"));
+  return OPERATORS.filter((o) =>
+    o.capabilities.includes("approve:source-legal"),
+  );
+}
+
+export function canOperateLenderDesk(
+  email: string | null | undefined,
+): boolean {
+  return (
+    operatorByEmail(email)?.capabilities.includes("operate:lender-desk") ??
+    false
+  );
+}
+
+export function internalLenderDeskRole(
+  email: string | null | undefined,
+  environment: string | null | undefined = process.env
+    .FURLONG_DEPLOYMENT_ENVIRONMENT,
+): "lender" | null {
+  const normalizedEnvironment = (environment ?? "development")
+    .trim()
+    .toLowerCase();
+  if (normalizedEnvironment === "production") return null;
+  return canOperateLenderDesk(email) ? "lender" : null;
 }

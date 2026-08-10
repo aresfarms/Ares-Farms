@@ -68,6 +68,16 @@ Stripe test metadata carries the same identifiers so signed webhooks can
 reconstruct the exact Furlong test run. Plaid authorization and token exchange
 must carry matching lineage; a mismatch fails closed.
 
+## Stuart lender-desk stewardship
+
+Stuart Fraass is both an internal Furlong operator and the named steward of the
+licensed lending spoke. Staging grants his verified operator identity the
+`operate:lender-desk` capability so he can test and review the module without
+pretending that staging access is itself professional credential verification.
+The bridge is categorically disabled in production, where current verified
+professional authority remains required. His Windows endpoint uses Windows
+Hello passkey MFA after Google IAP and the Furlong first factor.
+
 ## External-action safety
 
 Synthetic broker records never trigger real document-reminder or new-deal

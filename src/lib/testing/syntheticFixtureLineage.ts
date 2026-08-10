@@ -321,6 +321,30 @@ export function syntheticFixtureContextFromBoundLineage(
   }
 }
 
+export type SyntheticStripeMethodExpectation =
+  "card" | "apple_pay" | "google_pay" | null;
+
+export function expectedStripeMethodForSyntheticScenario(
+  scenarioId: string | null | undefined,
+): SyntheticStripeMethodExpectation {
+  if (scenarioId === "stripe-card" || scenarioId === "negative-payment-risk") {
+    return "card";
+  }
+  if (scenarioId === "stripe-apple-pay") return "apple_pay";
+  if (scenarioId === "stripe-google-pay") return "google_pay";
+  return null;
+}
+
+export function syntheticStripeMethodMatches(
+  scenarioId: string | null | undefined,
+  walletType: string | null | undefined,
+): boolean {
+  const expected = expectedStripeMethodForSyntheticScenario(scenarioId);
+  if (!expected) return true;
+  if (expected === "card") return !walletType;
+  return walletType === expected;
+}
+
 export function syntheticFixtureProviderMetadata(
   context: SyntheticFixtureContext,
 ): Record<string, string> {

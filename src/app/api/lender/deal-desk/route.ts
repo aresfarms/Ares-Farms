@@ -3,7 +3,10 @@ import { eq } from "drizzle-orm";
 
 import { applicationDocuments } from "@/db/schema";
 import { evaluateAccess, type AccessRole } from "@/lib/auth/accessControl";
-import { operatorByEmail } from "@/lib/auth/operatorRegistry";
+import {
+  internalLenderDeskRole,
+  operatorByEmail,
+} from "@/lib/auth/operatorRegistry";
 import { isSoleMaintenanceSuperuser } from "@/lib/auth/maintenanceSuperuser";
 import { evaluateProfessionalAccess } from "@/lib/auth/professionalAccessAuthority";
 import { apiAuthEnforcementRequired } from "@/lib/security/apiSecurityPolicy";
@@ -31,9 +34,17 @@ import {
   initResumableUpload,
 } from "@/lib/documents/gcsResumableUpload";
 import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
-import { scanAllowsStreaming, scanVaultDocumentSoon, sweepPendingScans } from "@/lib/documents/malwareScan";
-import { LENDER_EMAIL_SIGNATURE, renderLenderEmailHtml } from "@/lib/notifications/lenderSignature";
+import {
+  scanAllowsStreaming,
+  scanVaultDocumentSoon,
+  sweepPendingScans,
+} from "@/lib/documents/malwareScan";
+import {
+  LENDER_EMAIL_SIGNATURE,
+  renderLenderEmailHtml,
+} from "@/lib/notifications/lenderSignature";
 import { serviceRequests } from "@/db/schema";
+import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixtureLineageStore";
 
 /**
  * Lender Deal Desk API — the licensed lender's governed working surface
@@ -88,14 +99,19 @@ function portalBaseUrl(req: NextRequest): string {
  *      API_AUTH_ENFORCEMENT=required).
  * Anything else resolves to "user" and is denied by evaluateAccess.
  */
-async function resolveIdentity(req: NextRequest): Promise<{ role: string; actorId: string | null }> {
+async function resolveIdentity(
+  req: NextRequest,
+): Promise<{ role: string; actorId: string | null }> {
   const email = req.headers.get("x-ares-authenticated-email")?.trim() || null;
   const sessionActor =
     req.headers.get("x-ares-authenticated-user-id")?.trim() || email;
 
   const operator = operatorByEmail(email);
   if (isSoleMaintenanceSuperuser(email)) {
-    return { role: "governance", actorId: email ?? operator?.id ?? sessionActor };
+    return {
+      role: "governance",
+      actorId: email ?? operator?.id ?? sessionActor,
+    };
   }
 
   // Lender-file authority is credential-first. A registry entry or a finance
@@ -109,6 +125,18 @@ async function resolveIdentity(req: NextRequest): Promise<{ role: string; actorI
   });
   if (lenderAccess.allowed) {
     return { role: "lender", actorId: lenderAccess.principalId };
+  }
+
+  // Stuart is the named internal steward of the licensed lending spoke. In
+  // non-production environments he must be able to enter and exercise the
+  // broker workflow before live professional reliance is enabled. Production
+  // still requires the verified professional credential above.
+  const internalLenderRole = internalLenderDeskRole(email);
+  if (internalLenderRole) {
+    return {
+      role: internalLenderRole,
+      actorId: email ?? operator?.id ?? sessionActor,
+    };
   }
 
   if (operator) {
@@ -153,7 +181,11 @@ function authorize(args: {
     actorId: args.actorId,
     tenantId: null,
   });
-  return { runtimeGuard, access, allowed: runtimeGuard.allowed && access.allowed };
+  return {
+    runtimeGuard,
+    access,
+    allowed: runtimeGuard.allowed && access.allowed,
+  };
 }
 
 function denied(traceId: string, actorId: string | null, operation: string) {
@@ -174,7 +206,7 @@ function denied(traceId: string, actorId: string | null, operation: string) {
       error: "Role is not authorized for the lender deal desk.",
       governance: { traceId, observability },
     },
-    { status: 403 }
+    { status: 403 },
   );
 }
 
@@ -208,7 +240,9 @@ export async function GET(req: NextRequest) {
         statuses: FINANCING_DEAL_STATUSES,
         bookingUrl: process.env.LENDER_BOOKING_URL?.trim() || null,
         calendarEmbedSrc: process.env.LENDER_CALENDAR_EMBED_SRC?.trim() || null,
-        emailConfigured: Boolean(process.env.EMAIL_FROM && process.env.SENDGRID_API_KEY),
+        emailConfigured: Boolean(
+          process.env.EMAIL_FROM && process.env.SENDGRID_API_KEY,
+        ),
         governance: { traceId },
       });
     }
@@ -217,8 +251,12 @@ export async function GET(req: NextRequest) {
       const applicationId = params.get("applicationId")?.trim();
       if (!applicationId) {
         return NextResponse.json(
-          { ok: false, error: "applicationId is required.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "applicationId is required.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       void sweepPendingScans(applicationId); // opportunistic re-scan of pendings
@@ -234,15 +272,23 @@ export async function GET(req: NextRequest) {
         module: MODULE,
         metadata: { applicationId, count: documents.length },
       });
-      return NextResponse.json({ ok: true, documents, governance: { traceId } });
+      return NextResponse.json({
+        ok: true,
+        documents,
+        governance: { traceId },
+      });
     }
 
     if (view === "download") {
       const documentId = params.get("documentId")?.trim();
       if (!documentId) {
         return NextResponse.json(
-          { ok: false, error: "documentId is required.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "documentId is required.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       const rows = await db
@@ -254,7 +300,7 @@ export async function GET(req: NextRequest) {
       if (!doc) {
         return NextResponse.json(
           { ok: false, error: "Document not found.", governance: { traceId } },
-          { status: 404 }
+          { status: 404 },
         );
       }
       const scanGate = scanAllowsStreaming(doc.metadata);
@@ -269,7 +315,7 @@ export async function GET(req: NextRequest) {
             scanStatus: scanGate.status,
             governance: { traceId },
           },
-          { status: 423 }
+          { status: 423 },
         );
       }
       const objectKey = objectKeyFromStorageUri(doc.storageUri);
@@ -280,7 +326,8 @@ export async function GET(req: NextRequest) {
         eventType: "LENDER_DOCUMENT_DOWNLOAD",
         domain: "security",
         severity: "INFO",
-        message: "A governed borrower document was streamed to an authorized lender-desk actor.",
+        message:
+          "A governed borrower document was streamed to an authorized lender-desk actor.",
         traceId,
         replayRef: traceId,
         actorId,
@@ -314,7 +361,7 @@ export async function GET(req: NextRequest) {
               "This document has no stored bytes yet (upload was recorded before secure storage was configured).",
             governance: { traceId },
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
       const object = await fetchObjectStream(objectKey);
@@ -326,25 +373,44 @@ export async function GET(req: NextRequest) {
               "Secure storage is not reachable from this environment. In production this streams the file; in local dev it degrades honestly.",
             governance: { traceId },
           },
-          { status: 503 }
+          { status: 503 },
         );
       }
-      const fileName = (doc.fileName ?? `document-${documentId}`).replace(/[^\w.\- ]+/g, "_");
+      const fileName = (doc.fileName ?? `document-${documentId}`).replace(
+        /[^\w.\- ]+/g,
+        "_",
+      );
       // Readable types open in the browser; unknown/active types download
       // (inline HTML from our origin = script execution — never).
-      const inlineSafe = new Set(["application/pdf", "image/png", "image/jpeg", "image/gif", "image/webp"]);
-      const disposition = inlineSafe.has(object.contentType) ? "inline" : "attachment";
+      const inlineSafe = new Set([
+        "application/pdf",
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+        "image/webp",
+      ]);
+      const disposition = inlineSafe.has(object.contentType)
+        ? "inline"
+        : "attachment";
       // Extensionless uploads (founder test: raw bytes opened as text) get one derived from the real type.
       const EXT_BY_TYPE: Record<string, string> = {
-        "application/pdf": ".pdf", "image/png": ".png", "image/jpeg": ".jpg",
-        "image/gif": ".gif", "image/webp": ".webp", "text/plain": ".txt",
+        "application/pdf": ".pdf",
+        "image/png": ".png",
+        "image/jpeg": ".jpg",
+        "image/gif": ".gif",
+        "image/webp": ".webp",
+        "text/plain": ".txt",
       };
-      const ext = /\.[A-Za-z0-9]{2,5}$/.test(fileName) ? "" : (EXT_BY_TYPE[object.contentType] ?? "");
+      const ext = /\.[A-Za-z0-9]{2,5}$/.test(fileName)
+        ? ""
+        : (EXT_BY_TYPE[object.contentType] ?? "");
 
       return new NextResponse(object.stream, {
         headers: {
           "Content-Type": object.contentType,
-          ...(object.contentLength ? { "Content-Length": object.contentLength } : {}),
+          ...(object.contentLength
+            ? { "Content-Length": object.contentLength }
+            : {}),
           "Content-Disposition": `${disposition}; filename="${fileName}${ext}"`,
           "X-Content-Type-Options": "nosniff",
           "Cache-Control": "no-store",
@@ -355,7 +421,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(
       { ok: false, error: `Unknown view "${view}".`, governance: { traceId } },
-      { status: 400 }
+      { status: 400 },
     );
   } catch (error) {
     createObservabilityEvent({
@@ -367,11 +433,18 @@ export async function GET(req: NextRequest) {
       replayRef: traceId,
       actorId,
       module: MODULE,
-      metadata: { view, error: error instanceof Error ? error.message : "unknown" },
+      metadata: {
+        view,
+        error: error instanceof Error ? error.message : "unknown",
+      },
     });
     return NextResponse.json(
-      { ok: false, error: "Lender deal desk read failed.", governance: { traceId } },
-      { status: 500 }
+      {
+        ok: false,
+        error: "Lender deal desk read failed.",
+        governance: { traceId },
+      },
+      { status: 500 },
     );
   }
 }
@@ -396,12 +469,21 @@ type PostBody = {
 const LENDER_PROVIDED_DOCUMENT_TYPE = "lender-provided";
 const MAX_LENDER_FILE_BYTES = 50 * 1024 * 1024;
 
+async function isSyntheticDeal(serviceRequestId: string): Promise<boolean> {
+  return Boolean(
+    await syntheticFixtureLineageForRecord("service_request", serviceRequestId),
+  );
+}
+
 export async function POST(req: NextRequest) {
   let body: PostBody;
   try {
     body = (await req.json()) as PostBody;
   } catch {
-    return NextResponse.json({ ok: false, error: "Invalid JSON body." }, { status: 400 });
+    return NextResponse.json(
+      { ok: false, error: "Invalid JSON body." },
+      { status: 400 },
+    );
   }
   const action = typeof body.action === "string" ? body.action : "";
   const { role, actorId } = await resolveIdentity(req);
@@ -414,14 +496,21 @@ export async function POST(req: NextRequest) {
 
     if (action === "update") {
       const serviceRequestId =
-        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
+        typeof body.serviceRequestId === "string"
+          ? body.serviceRequestId.trim()
+          : "";
       if (!serviceRequestId) {
         return NextResponse.json(
-          { ok: false, error: "serviceRequestId is required.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "serviceRequestId is required.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
-      const status = typeof body.status === "string" ? body.status.trim() : null;
+      const status =
+        typeof body.status === "string" ? body.status.trim() : null;
       if (status && !VALID_STATUSES.has(status)) {
         return NextResponse.json(
           {
@@ -430,22 +519,28 @@ export async function POST(req: NextRequest) {
             statuses: FINANCING_DEAL_STATUSES,
             governance: { traceId },
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
       const customerNote =
-        typeof body.customerNote === "string" ? body.customerNote.slice(0, 2000) : undefined;
+        typeof body.customerNote === "string"
+          ? body.customerNote.slice(0, 2000)
+          : undefined;
       const t = (body.timeline ?? null) as Record<string, unknown> | null;
       const timelineField = (key: string): string | null | undefined => {
         if (!t || !(key in t)) return undefined;
         const v = t[key];
-        return typeof v === "string" && v.trim() ? v.trim().slice(0, 500) : null;
+        return typeof v === "string" && v.trim()
+          ? v.trim().slice(0, 500)
+          : null;
       };
       const timeline =
         t === null
           ? undefined
           : {
-              ...(timelineField("docsDueAt") !== undefined && { docsDueAt: timelineField("docsDueAt") }),
+              ...(timelineField("docsDueAt") !== undefined && {
+                docsDueAt: timelineField("docsDueAt"),
+              }),
               ...(timelineField("underwritingEtaAt") !== undefined && {
                 underwritingEtaAt: timelineField("underwritingEtaAt"),
               }),
@@ -466,14 +561,15 @@ export async function POST(req: NextRequest) {
       if (!deskState) {
         return NextResponse.json(
           { ok: false, error: "Deal not found.", governance: { traceId } },
-          { status: 404 }
+          { status: 404 },
         );
       }
       const observability = createObservabilityEvent({
         eventType: "LENDER_DEAL_DESK_UPDATED",
         domain: "operations",
         severity: "INFO",
-        message: "The lender updated a deal's status, customer note, or closing timeline.",
+        message:
+          "The lender updated a deal's status, customer note, or closing timeline.",
         traceId,
         replayRef: traceId,
         actorId,
@@ -489,18 +585,32 @@ export async function POST(req: NextRequest) {
         traceId,
         replayRef: traceId,
         observability,
-        metadata: { route: "/api/lender/deal-desk", operation, serviceRequestId },
+        metadata: {
+          route: "/api/lender/deal-desk",
+          operation,
+          serviceRequestId,
+        },
       });
-      return NextResponse.json({ ok: true, deskState, governance: { traceId } });
+      return NextResponse.json({
+        ok: true,
+        deskState,
+        governance: { traceId },
+      });
     }
 
     if (action === "remind") {
       const serviceRequestId =
-        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
+        typeof body.serviceRequestId === "string"
+          ? body.serviceRequestId.trim()
+          : "";
       if (!serviceRequestId) {
         return NextResponse.json(
-          { ok: false, error: "serviceRequestId is required.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "serviceRequestId is required.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       const result = await sendDocumentReminder({
@@ -521,7 +631,11 @@ export async function POST(req: NextRequest) {
         module: MODULE,
         metadata: { serviceRequestId, ...result },
       });
-      return NextResponse.json({ ok: true, ...result, governance: { traceId } });
+      return NextResponse.json({
+        ok: true,
+        ...result,
+        governance: { traceId },
+      });
     }
 
     // Lender → customer documents (founder direction 2026-08-05): approval
@@ -531,23 +645,37 @@ export async function POST(req: NextRequest) {
     // status page can offer them (and ONLY them) for download.
     if (action === "upload-begin") {
       const serviceRequestId =
-        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
-      const fileName = typeof body.fileName === "string" ? body.fileName.slice(0, 200).trim() : "";
-      const mimeType = typeof body.mimeType === "string" ? body.mimeType.slice(0, 120) : null;
+        typeof body.serviceRequestId === "string"
+          ? body.serviceRequestId.trim()
+          : "";
+      const fileName =
+        typeof body.fileName === "string"
+          ? body.fileName.slice(0, 200).trim()
+          : "";
+      const mimeType =
+        typeof body.mimeType === "string" ? body.mimeType.slice(0, 120) : null;
       const byteSize =
         typeof body.byteSize === "number" && Number.isFinite(body.byteSize)
           ? Math.floor(body.byteSize)
           : null;
       if (!serviceRequestId || !fileName) {
         return NextResponse.json(
-          { ok: false, error: "serviceRequestId and fileName are required.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "serviceRequestId and fileName are required.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       if (byteSize != null && byteSize > MAX_LENDER_FILE_BYTES) {
         return NextResponse.json(
-          { ok: false, error: "Files are limited to 50MB each.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "Files are limited to 50MB each.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       const applicationId = `finintake-${serviceRequestId}`;
@@ -558,11 +686,17 @@ export async function POST(req: NextRequest) {
         fileName,
         mimeType,
         byteSize,
-        storageProvider: documentStorageBucket() ? DOCUMENT_STORAGE_PROVIDER : null,
+        storageProvider: documentStorageBucket()
+          ? DOCUMENT_STORAGE_PROVIDER
+          : null,
         storageBucket: documentStorageBucket(),
         traceId,
         source: "lender-deal-desk",
-        metadata: { dealRef: serviceRequestId, channel: "lender-deal-desk", providedBy: actorId },
+        metadata: {
+          dealRef: serviceRequestId,
+          channel: "lender-deal-desk",
+          providedBy: actorId,
+        },
       });
       const uploadUrl = await initResumableUpload({
         objectKey: created.handoff.objectKey,
@@ -573,7 +707,8 @@ export async function POST(req: NextRequest) {
         eventType: "LENDER_DOC_UPLOAD_BEGIN",
         domain: "runtime",
         severity: "INFO",
-        message: "The lender began sending a document to the customer through the vault.",
+        message:
+          "The lender began sending a document to the customer through the vault.",
         traceId,
         replayRef: traceId,
         actorId,
@@ -591,19 +726,32 @@ export async function POST(req: NextRequest) {
 
     if (action === "upload-confirm") {
       const serviceRequestId =
-        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
-      const fileName = typeof body.fileName === "string" ? body.fileName.slice(0, 200).trim() : "";
-      const mimeType = typeof body.mimeType === "string" ? body.mimeType.slice(0, 120) : null;
+        typeof body.serviceRequestId === "string"
+          ? body.serviceRequestId.trim()
+          : "";
+      const fileName =
+        typeof body.fileName === "string"
+          ? body.fileName.slice(0, 200).trim()
+          : "";
+      const mimeType =
+        typeof body.mimeType === "string" ? body.mimeType.slice(0, 120) : null;
       const byteSize =
         typeof body.byteSize === "number" && Number.isFinite(body.byteSize)
           ? Math.floor(body.byteSize)
           : null;
-      const storageUri = typeof body.storageUri === "string" ? body.storageUri.slice(0, 500) : null;
+      const storageUri =
+        typeof body.storageUri === "string"
+          ? body.storageUri.slice(0, 500)
+          : null;
       const uploaded = body.uploaded === true;
       if (!serviceRequestId || !fileName) {
         return NextResponse.json(
-          { ok: false, error: "serviceRequestId and fileName are required.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "serviceRequestId and fileName are required.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       const applicationId = `finintake-${serviceRequestId}`;
@@ -627,9 +775,10 @@ export async function POST(req: NextRequest) {
 
       // Minimum-disclosure notification: the customer learns a document is
       // waiting and where to get it — never the document itself, never its
-      // name, never financial content.
+      // name, never financial content. Synthetic records never emit real mail.
+      const syntheticDeal = await isSyntheticDeal(serviceRequestId);
       let customerNotified = false;
-      if (uploaded && emailConfigured()) {
+      if (uploaded && emailConfigured() && !syntheticDeal) {
         const dealRows = await db
           .select()
           .from(serviceRequests)
@@ -670,13 +819,20 @@ export async function POST(req: NextRequest) {
           documentId: persisted.document.id,
           uploaded,
           customerNotified,
+          syntheticFixtureActive: syntheticDeal,
+          externalNotificationSuppressed: syntheticDeal,
         },
       });
       await persistGovernanceEvidence({
         traceId,
         replayRef: traceId,
         observability,
-        metadata: { route: "/api/lender/deal-desk", operation, serviceRequestId, documentId: persisted.document.id },
+        metadata: {
+          route: "/api/lender/deal-desk",
+          operation,
+          serviceRequestId,
+          documentId: persisted.document.id,
+        },
       });
       if (uploaded) scanVaultDocumentSoon(persisted.document.id);
       return NextResponse.json({
@@ -693,12 +849,19 @@ export async function POST(req: NextRequest) {
     // itself is token-gated off the customer's status lookup.
     if (action === "request-signature") {
       const serviceRequestId =
-        typeof body.serviceRequestId === "string" ? body.serviceRequestId.trim() : "";
-      const documentId = typeof body.documentId === "string" ? body.documentId.trim() : "";
+        typeof body.serviceRequestId === "string"
+          ? body.serviceRequestId.trim()
+          : "";
+      const documentId =
+        typeof body.documentId === "string" ? body.documentId.trim() : "";
       if (!serviceRequestId || !documentId) {
         return NextResponse.json(
-          { ok: false, error: "serviceRequestId and documentId are required.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "serviceRequestId and documentId are required.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       const rows = await db
@@ -707,29 +870,51 @@ export async function POST(req: NextRequest) {
         .where(eq(applicationDocuments.id, documentId))
         .limit(1);
       const doc = rows[0];
-      if (!doc || doc.documentType !== "lender-provided" || doc.applicationId !== `finintake-${serviceRequestId}`) {
+      if (
+        !doc ||
+        doc.documentType !== "lender-provided" ||
+        doc.applicationId !== `finintake-${serviceRequestId}`
+      ) {
         return NextResponse.json(
-          { ok: false, error: "Only documents you sent to the customer on this deal can be signed.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error:
+              "Only documents you sent to the customer on this deal can be signed.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
-      if (!(doc.mimeType === "application/pdf" || doc.fileName?.toLowerCase().endsWith(".pdf"))) {
+      if (!(
+        doc.mimeType === "application/pdf" ||
+        doc.fileName?.toLowerCase().endsWith(".pdf")
+      )) {
         return NextResponse.json(
-          { ok: false, error: "Electronic signing is available only for PDF documents.", governance: { traceId } },
-          { status: 400 }
+          {
+            ok: false,
+            error: "Electronic signing is available only for PDF documents.",
+            governance: { traceId },
+          },
+          { status: 400 },
         );
       }
       const docMeta = (doc.metadata ?? {}) as Record<string, unknown>;
       await db
         .update(applicationDocuments)
         .set({
-          metadata: { ...docMeta, signatureRequested: true, signatureRequestedAt: new Date().toISOString(), signatureRequestedBy: actorId },
+          metadata: {
+            ...docMeta,
+            signatureRequested: true,
+            signatureRequestedAt: new Date().toISOString(),
+            signatureRequestedBy: actorId,
+          },
           updatedAt: new Date(),
         })
         .where(eq(applicationDocuments.id, documentId));
 
+      const syntheticDeal = await isSyntheticDeal(serviceRequestId);
       let customerNotified = false;
-      if (emailConfigured()) {
+      if (emailConfigured() && !syntheticDeal) {
         const dealRows = await db
           .select()
           .from(serviceRequests)
@@ -755,20 +940,36 @@ export async function POST(req: NextRequest) {
         eventType: "SIGNATURE_REQUESTED",
         domain: "security",
         severity: "INFO",
-        message: "The broker requested the customer's electronic signature on a vault document.",
+        message:
+          "The broker requested the customer's electronic signature on a vault document.",
         traceId,
         replayRef: traceId,
         actorId,
         module: MODULE,
-        metadata: { serviceRequestId, documentId, customerNotified },
+        metadata: {
+          serviceRequestId,
+          documentId,
+          customerNotified,
+          syntheticFixtureActive: syntheticDeal,
+          externalNotificationSuppressed: syntheticDeal,
+        },
       });
       await persistGovernanceEvidence({
         traceId,
         replayRef: traceId,
         observability,
-        metadata: { route: "/api/lender/deal-desk", operation, serviceRequestId, documentId },
+        metadata: {
+          route: "/api/lender/deal-desk",
+          operation,
+          serviceRequestId,
+          documentId,
+        },
       });
-      return NextResponse.json({ ok: true, customerNotified, governance: { traceId } });
+      return NextResponse.json({
+        ok: true,
+        customerNotified,
+        governance: { traceId },
+      });
     }
 
     if (action === "remind-all") {
@@ -777,19 +978,28 @@ export async function POST(req: NextRequest) {
         eventType: "LENDER_DOCUMENT_REMINDER_SWEEP",
         domain: "operations",
         severity: "INFO",
-        message: "Automatic document-reminder sweep ran over deals awaiting documents.",
+        message:
+          "Automatic document-reminder sweep ran over deals awaiting documents.",
         traceId,
         replayRef: traceId,
         actorId,
         module: MODULE,
         metadata: result,
       });
-      return NextResponse.json({ ok: true, ...result, governance: { traceId } });
+      return NextResponse.json({
+        ok: true,
+        ...result,
+        governance: { traceId },
+      });
     }
 
     return NextResponse.json(
-      { ok: false, error: `Unknown action "${action}".`, governance: { traceId } },
-      { status: 400 }
+      {
+        ok: false,
+        error: `Unknown action "${action}".`,
+        governance: { traceId },
+      },
+      { status: 400 },
     );
   } catch (error) {
     createObservabilityEvent({
@@ -801,11 +1011,18 @@ export async function POST(req: NextRequest) {
       replayRef: traceId,
       actorId,
       module: MODULE,
-      metadata: { action, error: error instanceof Error ? error.message : "unknown" },
+      metadata: {
+        action,
+        error: error instanceof Error ? error.message : "unknown",
+      },
     });
     return NextResponse.json(
-      { ok: false, error: "Lender deal desk action failed.", governance: { traceId } },
-      { status: 500 }
+      {
+        ok: false,
+        error: "Lender deal desk action failed.",
+        governance: { traceId },
+      },
+      { status: 500 },
     );
   }
 }

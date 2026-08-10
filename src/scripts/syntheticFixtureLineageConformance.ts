@@ -5,8 +5,10 @@ import {
   assertSyntheticFixtureLineage,
   bindSyntheticFixtureLineage,
   createSyntheticFixtureContext,
+  expectedStripeMethodForSyntheticScenario,
   issueSyntheticFixtureSessionToken,
   syntheticFixtureContextFromProviderMetadata,
+  syntheticStripeMethodMatches,
   syntheticFixtureProviderMetadata,
   verifySyntheticFixtureSessionToken,
 } from "@/lib/testing/syntheticFixtureLineage";
@@ -122,6 +124,25 @@ try {
     providerRoundTrip.syntheticPersonaId,
     context.syntheticPersonaId,
   );
+  assert.equal(expectedStripeMethodForSyntheticScenario("stripe-card"), "card");
+  assert.equal(
+    expectedStripeMethodForSyntheticScenario("stripe-apple-pay"),
+    "apple_pay",
+  );
+  assert.equal(
+    expectedStripeMethodForSyntheticScenario("stripe-google-pay"),
+    "google_pay",
+  );
+  assert.equal(syntheticStripeMethodMatches("stripe-card", null), true);
+  assert.equal(syntheticStripeMethodMatches("stripe-card", "apple_pay"), false);
+  assert.equal(
+    syntheticStripeMethodMatches("stripe-apple-pay", "apple_pay"),
+    true,
+  );
+  assert.equal(
+    syntheticStripeMethodMatches("stripe-apple-pay", "google_pay"),
+    false,
+  );
 
   const sessionSecret = "synthetic-fixture-conformance-secret-32-bytes";
   const signed = issueSyntheticFixtureSessionToken(context, sessionSecret, 300);
@@ -192,6 +213,11 @@ try {
   assert(financingRoute.includes("externalNotificationSuppressed"));
   assert(dealDeskStore.includes("synthetic-fixture-notification-suppressed"));
   assert(stripeCheckout.includes("syntheticFixtureContext"));
+  assert(
+    fs
+      .readFileSync("src/app/api/stripe/webhook/route.ts", "utf8")
+      .includes("SYNTHETIC_PAYMENT_METHOD_MISMATCH"),
+  );
   assert(plaidExchange.includes("synthetic-fixture lineage"));
   assert(
     fs

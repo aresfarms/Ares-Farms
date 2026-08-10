@@ -1,7 +1,10 @@
 import NextAuth from "next-auth";
 import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { userHasPasswordByEmail, verifyUserPasswordByEmail } from "@/lib/auth/passwordAuth";
+import {
+  userHasPasswordByEmail,
+  verifyUserPasswordByEmail,
+} from "@/lib/auth/passwordAuth";
 
 import {
   ensureDurableIdentity,
@@ -11,6 +14,7 @@ import {
 import { evaluateCredentialAuthPolicy } from "@/lib/auth/authActivationPolicy";
 import { ensureAccessSecurityState } from "@/lib/auth/accessSecurityRuntime";
 import { findLocalOperator } from "@/lib/auth/localOperatorStore";
+import { operatorByEmail } from "@/lib/auth/operatorRegistry";
 import { professionalByEmail } from "@/lib/auth/professionalRegistry";
 import { evaluateProfessionalAccess } from "@/lib/auth/professionalAccessAuthority";
 import {
@@ -65,7 +69,7 @@ async function persistCredentialRejection(
   traceId: string,
   eventType: string,
   message: string,
-  metadata: Record<string, unknown> = {}
+  metadata: Record<string, unknown> = {},
 ): Promise<void> {
   const observability = createObservabilityEvent({
     eventType,
@@ -103,7 +107,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
     await persistCredentialRejection(
       traceId,
       "AUTH_CREDENTIAL_EMAIL_MISSING",
-      "Credential authorization rejected a request without a valid email."
+      "Credential authorization rejected a request without a valid email.",
     );
 
     return null;
@@ -112,15 +116,19 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
   const localFounderPasswordConfigured =
     process.env.NODE_ENV !== "production" &&
     email === "chudson@aresfarmsinc.com" &&
-    await userHasPasswordByEmail(email).catch(() => false);
+    (await userHasPasswordByEmail(email).catch(() => false));
 
   const credentialPolicy = localFounderPasswordConfigured
     ? {
-        allowed: await verifyUserPasswordByEmail(email, credentials?.password ?? ""),
+        allowed: await verifyUserPasswordByEmail(
+          email,
+          credentials?.password ?? "",
+        ),
         mode: "email-allowlist" as const,
         email,
         productionLike: false,
-        reason: "Per-user password verification applied for local founder access.",
+        reason:
+          "Per-user password verification applied for local founder access.",
         failureCode: "password_mismatch",
       }
     : evaluateCredentialAuthPolicy({ email, password: credentials?.password });
@@ -134,19 +142,20 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
         mode: credentialPolicy.mode,
         productionLike: credentialPolicy.productionLike,
         failureCode: credentialPolicy.failureCode ?? null,
-      }
+      },
     );
 
     return null;
   }
 
-  // Professional counterparties are credential-first: a named invitation or
-  // registry entry is not enough to receive a portal session. Before login,
-  // require a current official-source credential bound to the exact email and
-  // professional role. Internal founders/operators who are not professional
-  // counterparties continue through the ordinary operator auth path.
-  const professional = professionalByEmail(email);
-  let professionalRoleForSession: "lender" | "attorney" | "auditor" | "sponsor" | null = null;
+  // External professional counterparties are credential-first. Internal named
+  // operators authenticate through the operator registry so they can reach
+  // their governed workspaces and complete testing/onboarding; live
+  // professional actions remain separately credential-gated at the module.
+  const internalOperator = operatorByEmail(email);
+  const professional = internalOperator ? null : professionalByEmail(email);
+  let professionalRoleForSession:
+    "lender" | "attorney" | "auditor" | "sponsor" | null = null;
   if (professional) {
     const professionalAccess = await evaluateProfessionalAccess({
       principalId: email,
@@ -158,7 +167,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
         traceId,
         "AUTH_PROFESSIONAL_CREDENTIAL_REQUIRED",
         "Professional portal login was denied because current credential verification is required.",
-        { role: professional.role, reasonCode: professionalAccess.reasonCode }
+        { role: professional.role, reasonCode: professionalAccess.reasonCode },
       );
       return null;
     }
@@ -188,7 +197,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
       "Credential authorization was blocked by runtime governance.",
       {
         findings: runtimeGuard.findings,
-      }
+      },
     );
 
     return null;
@@ -203,31 +212,31 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
         "schema",
         "nextauth-credentials-v0.1.0",
         "src/app/api/auth/[...nextauth]/route.ts",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "governance",
         "master-volumes-runtime-v0.1.0",
         "Master Volume Series",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "runtime",
         "runtime-enforcement-v0.1.0",
         "src/lib/runtime",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "runtime",
         "governance-evidence-store-v0.1.0",
         "src/lib/governance/evidenceStore.ts",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "api",
         "durable-identity-runtime-v0.1.0",
         "src/lib/auth/identity.ts",
-        traceId
+        traceId,
       ),
     ],
   });
@@ -247,28 +256,33 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
       disclosureAudience: ["authorized-operator", "governance"],
       sharingPermissions: ["identity-session-review"],
       aiUsagePermissions: ["classify", "summarize"],
-      exportRestrictions: [
-        "not-public-user-data",
-        "requires-governed-access",
-      ],
+      exportRestrictions: ["not-public-user-data", "requires-governed-access"],
       redactionRequirements: [
         "redact-user-email-before-public-disclosure",
         "redact-tenant-id-before-public-disclosure",
       ],
       consentRequirements: ["user-session-consent"],
-    }
+    },
   );
 
   let identity;
   try {
     identity = await ensureDurableIdentity({
       email,
-      role: professionalRoleForSession ?? "user",
+      role:
+        professionalRoleForSession ??
+        (internalOperator
+          ? internalOperator.role === "founder-operator"
+            ? "governance"
+            : "operator"
+          : "user"),
       traceId,
       source: "api.auth.nextauth",
       metadata: {
         credentialsProvider: true,
         credentialAuthMode: credentialPolicy.mode,
+        internalOperatorId: internalOperator?.id ?? null,
+        externalProfessionalCredentialGateApplied: Boolean(professional),
       },
     });
   } catch (durableError) {
@@ -311,16 +325,13 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
       disclosureAudience: ["authorized-operator", "governance"],
       sharingPermissions: ["identity-session-review"],
       aiUsagePermissions: ["summarize", "explain"],
-      exportRestrictions: [
-        "not-public-user-data",
-        "requires-governed-access",
-      ],
+      exportRestrictions: ["not-public-user-data", "requires-governed-access"],
       redactionRequirements: [
         "redact-user-email-before-public-disclosure",
         "redact-tenant-id-before-public-disclosure",
       ],
       consentRequirements: ["user-session-consent"],
-    }
+    },
   );
 
   const observability = createObservabilityEvent({

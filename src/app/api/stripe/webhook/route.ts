@@ -36,7 +36,11 @@ import {
   evaluatePaymentRisk,
   type PaymentRiskDecision,
 } from "@/lib/fraud/paymentRiskRuntime";
-import { syntheticFixtureContextFromProviderMetadata } from "@/lib/testing/syntheticFixtureLineage";
+import {
+  expectedStripeMethodForSyntheticScenario,
+  syntheticFixtureContextFromProviderMetadata,
+  syntheticStripeMethodMatches,
+} from "@/lib/testing/syntheticFixtureLineage";
 
 /**
  * Stripe Webhook API
@@ -475,6 +479,7 @@ export async function POST(req: Request) {
       null;
     let entitlement: Entitlement | null = null;
     let fraudDecision: PaymentRiskDecision | null = null;
+    let syntheticPaymentMethodEvidence: Record<string, unknown> | null = null;
     const stripeObject = (event.data?.object ?? {}) as Record<string, unknown>;
     if (event.type === "checkout.session.completed") {
       fraudDecision = {
@@ -508,6 +513,16 @@ export async function POST(req: Request) {
       const checks = isRecord(card.checks) ? card.checks : {};
       const threeDS = isRecord(card.three_d_secure) ? card.three_d_secure : {};
       const wallet = isRecord(card.wallet) ? card.wallet : null;
+      const walletType =
+        wallet && typeof wallet.type === "string" ? wallet.type : null;
+      const expectedSyntheticPaymentMethod =
+        expectedStripeMethodForSyntheticScenario(
+          syntheticFixtureContext?.scenarioId,
+        );
+      const syntheticPaymentMethodMatches = syntheticStripeMethodMatches(
+        syntheticFixtureContext?.scenarioId,
+        walletType,
+      );
       const rawRisk =
         typeof outcome.risk_level === "string"
           ? outcome.risk_level
@@ -519,31 +534,45 @@ export async function POST(req: Request) {
       const metadataRecord = isRecord(stripeObject.metadata)
         ? stripeObject.metadata
         : {};
-      fraudDecision = evaluatePaymentRisk({
-        stripeRiskLevel: riskLevel,
-        stripeRiskScore:
-          typeof outcome.risk_score === "number" ? outcome.risk_score : null,
-        threeDSecureAuthenticated: threeDS.result === "authenticated",
-        cvcCheck:
-          checks.cvc_check === "pass" || checks.cvc_check === "fail"
-            ? checks.cvc_check
-            : "unavailable",
-        postalCheck:
-          checks.address_postal_code_check === "pass" ||
-          checks.address_postal_code_check === "fail"
-            ? checks.address_postal_code_check
-            : "unavailable",
-        identityProofed: metadataRecord.identityProofed === "true",
-        plaidOwnershipMatch:
-          metadataRecord.plaidOwnershipMatch === "true"
-            ? true
-            : metadataRecord.plaidOwnershipMatch === "false"
-              ? false
-              : null,
-        paymentMethod: wallet ? "wallet" : "card",
-        amountCents:
-          typeof stripeObject.amount === "number" ? stripeObject.amount : 0,
-      });
+      fraudDecision = syntheticPaymentMethodMatches
+        ? evaluatePaymentRisk({
+            stripeRiskLevel: riskLevel,
+            stripeRiskScore:
+              typeof outcome.risk_score === "number"
+                ? outcome.risk_score
+                : null,
+            threeDSecureAuthenticated: threeDS.result === "authenticated",
+            cvcCheck:
+              checks.cvc_check === "pass" || checks.cvc_check === "fail"
+                ? checks.cvc_check
+                : "unavailable",
+            postalCheck:
+              checks.address_postal_code_check === "pass" ||
+              checks.address_postal_code_check === "fail"
+                ? checks.address_postal_code_check
+                : "unavailable",
+            identityProofed: metadataRecord.identityProofed === "true",
+            plaidOwnershipMatch:
+              metadataRecord.plaidOwnershipMatch === "true"
+                ? true
+                : metadataRecord.plaidOwnershipMatch === "false"
+                  ? false
+                  : null,
+            paymentMethod: wallet ? "wallet" : "card",
+            amountCents:
+              typeof stripeObject.amount === "number" ? stripeObject.amount : 0,
+          })
+        : {
+            disposition: "BLOCK",
+            reasons: ["SYNTHETIC_PAYMENT_METHOD_MISMATCH"],
+            releaseAllowed: false,
+            humanReviewRequired: true,
+          };
+      syntheticPaymentMethodEvidence = {
+        expected: expectedSyntheticPaymentMethod,
+        observed: walletType ?? "card",
+        matches: syntheticPaymentMethodMatches,
+      };
     }
 
     const classifiedPayload = classifyRecord(payloadRecord, {
@@ -683,6 +712,7 @@ export async function POST(req: Request) {
         fraudDisposition: fraudDecision?.disposition ?? null,
         paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
         syntheticFixtureActive: Boolean(syntheticFixtureContext),
+        syntheticPaymentMethodEvidence: syntheticPaymentMethodEvidence,
       },
       syntheticFixtureContext,
     });
@@ -736,6 +766,7 @@ export async function POST(req: Request) {
         fraudDisposition: fraudDecision?.disposition ?? null,
         paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false,
         syntheticFixtureActive: Boolean(syntheticFixtureContext),
+        syntheticPaymentMethodEvidence: syntheticPaymentMethodEvidence,
       },
     });
 

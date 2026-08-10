@@ -12,7 +12,10 @@ import {
   verifyMfaAssurance,
 } from "@/lib/auth/mfaAssurance";
 import { isProtectedPage } from "@/lib/auth/protectedRoutes";
-import { operatorByEmail } from "@/lib/auth/operatorRegistry";
+import {
+  internalLenderDeskRole,
+  operatorByEmail,
+} from "@/lib/auth/operatorRegistry";
 import { evaluateProtectedPageRole } from "@/lib/auth/pageRolePolicy";
 import {
   isSoleMaintenanceSuperuser,
@@ -576,15 +579,21 @@ export async function proxy(req: NextRequest) {
       const tokenEmail = normalizeOptionalText(pageToken.email);
       const operator = operatorByEmail(tokenEmail);
       const testPersonaRole = testPersonaRoleFor(tokenEmail, pageSecret);
+      const lenderDeskOperatorRole =
+        route === "/lender-desk" || route.startsWith("/lender-desk/")
+          ? internalLenderDeskRole(tokenEmail)
+          : null;
       const pageRole = testPersonaRole
         ? testPersonaRole
-        : isSoleMaintenanceSuperuser(tokenEmail)
-          ? "governance"
-          : operator
-            ? operator.role === "founder-operator"
-              ? "governance"
-              : "operator"
-            : (normalizeOptionalRole(pageToken.role) ?? "user");
+        : lenderDeskOperatorRole
+          ? lenderDeskOperatorRole
+          : isSoleMaintenanceSuperuser(tokenEmail)
+            ? "governance"
+            : operator
+              ? operator.role === "founder-operator"
+                ? "governance"
+                : "operator"
+              : (normalizeOptionalRole(pageToken.role) ?? "user");
       if (
         privilegedMfaRequired(pageRole) &&
         route !== "/security/mfa" &&

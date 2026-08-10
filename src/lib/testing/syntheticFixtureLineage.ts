@@ -107,6 +107,18 @@ export function allowedSyntheticFixtureOperators(
   return new Set(configured);
 }
 
+export function syntheticFixtureOperatorMayActivate(
+  operatorIdentity: string,
+  syntheticPersonaId: string,
+): boolean {
+  const operator = normalizedOperatorIdentity(operatorIdentity);
+  if (operator === "user:chudson@aresfarmsinc.com") return true;
+  return (
+    operator === "user:sfraas@aresfarmsinc.com" &&
+    syntheticPersonaId === "syn-blue-moose-001"
+  );
+}
+
 export function createSyntheticFixtureContext(input: {
   syntheticPersonaId: string;
   scenarioId: string;
@@ -141,8 +153,16 @@ export function createSyntheticFixtureContext(input: {
     throw new Error("Synthetic fixture environment is invalid.");
   }
   const operatorIdentity = normalizedOperatorIdentity(input.operatorIdentity);
-  if (!allowedSyntheticFixtureOperators().has(operatorIdentity)) {
-    throw new Error("Operator is not authorized to create synthetic fixtures.");
+  if (
+    !allowedSyntheticFixtureOperators().has(operatorIdentity) ||
+    !syntheticFixtureOperatorMayActivate(
+      operatorIdentity,
+      persona.syntheticPersonaId,
+    )
+  ) {
+    throw new Error(
+      "Operator is not authorized to activate this synthetic persona.",
+    );
   }
   const createdAt = input.createdAt?.trim() || new Date().toISOString();
   if (Number.isNaN(Date.parse(createdAt)))

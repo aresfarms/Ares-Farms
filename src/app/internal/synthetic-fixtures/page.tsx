@@ -9,6 +9,7 @@ import {
   SYNTHETIC_FIXTURE_COOKIE,
   allowedSyntheticFixtureOperators,
   normalizedOperatorIdentity,
+  syntheticFixtureOperatorMayActivate,
   verifySyntheticFixtureSessionToken,
 } from "@/lib/testing/syntheticFixtureLineage";
 import {
@@ -120,7 +121,12 @@ export default async function SyntheticFixturesPage() {
 
       <div style={{ display: "grid", gap: 16 }}>
         {SYNTHETIC_PERSONAS.filter(
-          (persona) => persona.activationMode === "ACTIVE",
+          (persona) =>
+            persona.activationMode === "ACTIVE" &&
+            syntheticFixtureOperatorMayActivate(
+              email,
+              persona.syntheticPersonaId,
+            ),
         ).map((persona) => (
           <section
             key={persona.syntheticPersonaId}

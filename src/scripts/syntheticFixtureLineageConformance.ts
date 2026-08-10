@@ -102,6 +102,16 @@ try {
     stuartCustomerContext.operatorIdentity,
     "user:sfraas@aresfarmsinc.com",
   );
+  assert.throws(
+    () =>
+      createSyntheticFixtureContext({
+        syntheticPersonaId: "syn-tuna-fish-001",
+        scenarioId: "stripe-google-pay",
+        operatorIdentity: "sfraas@aresfarmsinc.com",
+        environment: "staging",
+      }),
+    /not authorized to activate this synthetic persona/i,
+  );
 
   const context = createSyntheticFixtureContext({
     syntheticPersonaId: "syn-tree-frog-001",

@@ -6,6 +6,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
 import {
   SYNTHETIC_FIXTURE_COOKIE,
+  syntheticFixtureOperatorMayActivate,
   verifySyntheticFixtureSessionToken,
 } from "@/lib/testing/syntheticFixtureLineage";
 
@@ -22,7 +23,7 @@ const SCENARIOS = new Set([
 export default async function StripeSyntheticE2EPage() {
   const session = await getServerSession(authOptions);
   const email = session?.user?.email?.trim().toLowerCase() ?? "";
-  if (email !== "chudson@aresfarmsinc.com") redirect("/sign-in");
+  if (!email) redirect("/sign-in");
   const secret = resolveNextAuthSecret();
   const store = await cookies();
   const fixture = secret
@@ -32,7 +33,11 @@ export default async function StripeSyntheticE2EPage() {
         email,
       )
     : null;
-  if (!fixture || !SCENARIOS.has(fixture.scenarioId)) {
+  if (
+    !fixture ||
+    !SCENARIOS.has(fixture.scenarioId) ||
+    !syntheticFixtureOperatorMayActivate(email, fixture.syntheticPersonaId)
+  ) {
     redirect("/internal/synthetic-fixtures");
   }
   return <StripeSyntheticE2EClient fixture={fixture} />;

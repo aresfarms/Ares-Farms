@@ -489,6 +489,26 @@ resource "google_cloud_run_v2_service" "core" {
         }
       }
 
+      # WebAuthn must use the browser-visible canonical hostname, never Cloud
+      # Run's internal listener address (for example 0.0.0.0). Keeping these
+      # values explicit also prevents passkeys from being enrolled against a
+      # transient service alias.
+      dynamic "env" {
+        for_each = var.webauthn_rp_id == "" ? [] : [var.webauthn_rp_id]
+        content {
+          name  = "WEBAUTHN_RP_ID"
+          value = env.value
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.webauthn_origin == "" ? [] : [var.webauthn_origin]
+        content {
+          name  = "WEBAUTHN_ORIGIN"
+          value = env.value
+        }
+      }
+
       # Sovereign document storage (2026-08-05): the borrower upload channel's
       # IAM-private bucket. Present only when the bucket exists.
       env {

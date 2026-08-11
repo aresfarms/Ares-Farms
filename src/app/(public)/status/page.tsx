@@ -233,9 +233,27 @@ export default function StatusPortalPage() {
                         {shortDate(doc.receivedAt) && (
                           <span style={{ color: "#8090a0", fontSize: 11.5 }}> · {shortDate(doc.receivedAt)}</span>
                         )}
-                        {doc.signed && doc.documentType !== "signature-certificate" && (
-                          <span style={{ color: "#127a4f", fontSize: 11.5, fontWeight: 800 }}> · SIGNED</span>
+                        {/* The executed instrument must be findable AT A GLANCE.
+                            The original complaint was not that it was missing —
+                            it was that nobody could tell which of several
+                            similarly-named PDFs was the one that had been
+                            signed. A filename ending "-executed-TEST.pdf" is
+                            not an answer to that. */}
+                        {(doc.documentType === "executed-document-test" ||
+                          doc.documentType === "executed-document") && (
+                          <span style={{ display: "block", color: "#127a4f", fontSize: 11.5, fontWeight: 800 }}>
+                            ✓ THE SIGNED DOCUMENT — your executed copy, signature on its face
+                            {doc.documentType === "executed-document-test" && (
+                              <span style={{ color: "#8F6E1F" }}> · TEST MODE, not legally operative</span>
+                            )}
+                          </span>
                         )}
+                        {doc.signed &&
+                          doc.documentType !== "signature-certificate" &&
+                          doc.documentType !== "executed-document-test" &&
+                          doc.documentType !== "executed-document" && (
+                            <span style={{ color: "#127a4f", fontSize: 11.5, fontWeight: 800 }}> · SIGNED — see your executed copy below</span>
+                          )}
                       </span>
                       <span style={{ display: "flex", gap: 12, flexShrink: 0 }}>
                         {doc.signPath && (

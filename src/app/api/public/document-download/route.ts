@@ -31,8 +31,29 @@ import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
  */
 
 const MODULE = "api.public.document-download";
-// Broker-addressed documents + the customer's own signature certificates.
-const CUSTOMER_DOWNLOADABLE_TYPES = new Set(["lender-provided", "signature-certificate"]);
+/**
+ * Broker-addressed documents, the customer's own signature certificates, and
+ * — added 2026-08-10 — THE EXECUTED DOCUMENT ITSELF.
+ *
+ * This allowlist and the one in serviceRequestStore.ts are separate gates on
+ * the same journey, and BOTH omitted the executed instrument. A customer who
+ * had just signed could retrieve the original unsigned form and a certificate
+ * pointing at it, but not the thing they signed. ESIGN/UETA requires each
+ * party to be able to retain the signed record; the signer is the last person
+ * who should be unable to.
+ *
+ * This list stays an allowlist. A borrower's own uploaded financial documents
+ * must never be reachable through a status-page token, and adding types here
+ * is the only way that could happen — so additions are deliberate, and each
+ * one is a document the portal itself produced or the broker addressed to
+ * this customer.
+ */
+const CUSTOMER_DOWNLOADABLE_TYPES = new Set([
+  "lender-provided",
+  "signature-certificate",
+  "executed-document-test",
+  "executed-document",
+]);
 
 export async function GET(req: NextRequest) {
   const traceId = `customer-doc-download-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;

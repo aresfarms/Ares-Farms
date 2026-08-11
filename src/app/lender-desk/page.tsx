@@ -747,7 +747,24 @@ export default function LenderDeskPage() {
                             {docs.map((doc) => (
                               <tr key={doc.id}>
                                 <td style={{ padding: "6px 10px" }}>
-                                  {doc.documentType.replace(/-/g, " ")}
+                                  {/* The executed instrument is the one row in
+                                      this table a broker is usually looking
+                                      for. It used to read "executed document
+                                      test" in the same weight as everything
+                                      else, which is how it got missed. */}
+                                  {doc.documentType === "executed-document-test" ||
+                                  doc.documentType === "executed-document" ? (
+                                    <span style={{ fontWeight: 800, color: "#127a4f" }}>
+                                      ✓ EXECUTED DOCUMENT
+                                      {doc.documentType === "executed-document-test" && (
+                                        <span style={{ display: "block", fontWeight: 700, color: "#8F6E1F", fontSize: 11 }}>
+                                          TEST MODE — not legally operative
+                                        </span>
+                                      )}
+                                    </span>
+                                  ) : (
+                                    doc.documentType.replace(/-/g, " ")
+                                  )}
                                 </td>
                                 <td
                                   style={{

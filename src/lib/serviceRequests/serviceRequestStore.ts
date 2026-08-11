@@ -343,7 +343,19 @@ export async function getServiceRequestStatus(
       .filter(
         (d) =>
           (d.documentType === "lender-provided" ||
-            d.documentType === "signature-certificate") &&
+            d.documentType === "signature-certificate" ||
+            // THE EXECUTED DOCUMENT ITSELF (founder-caught 2026-08-06, fixed
+            // 2026-08-10). This allowlist previously ran to two entries, so a
+            // customer who had just signed could open the original UNSIGNED
+            // form and a certificate referring to it — but never the executed
+            // instrument. The signing engine had been producing it correctly
+            // the whole time; nothing read it out.
+            //
+            // Under ESIGN/UETA each party must be able to RETAIN the signed
+            // record. Withholding it from the person who signed is the one
+            // party who must never be unable to see it.
+            d.documentType === "executed-document-test" ||
+            d.documentType === "executed-document") &&
           d.storageUri,
       )
       .map((d) => {

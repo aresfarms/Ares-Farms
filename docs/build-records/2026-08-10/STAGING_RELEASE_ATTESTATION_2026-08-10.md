@@ -59,3 +59,19 @@ Wallets still require real Apple Pay and Google Pay PHYSICAL-DEVICE journeys.
 Apple Pay additionally cannot complete domain verification while staging sits
 behind IAP: Stripe must fetch `/.well-known/apple-developer-merchantid-domain-
 association` over the public internet, and that path returns 302.
+
+## COVERAGE CORRECTION (added 2026-08-10, after this release)
+
+The scan IDs cited above read **OS base-image packages only** — verified
+directly: the core image's entire finding set is 12 glibc + 1 zlib, with no npm
+package examined. The founder attestation signed against this record therefore
+asserted "zero HIGH/CRITICAL" for the OS layer alone.
+
+The application dependency layer was in fact green at the time — GitHub Actions
+`security` workflow run `31422300664` @ `1eef77a` succeeded, and `npm audit` on
+the deploy branch reports 0 total — but that evidence was not cited here, so
+the record claimed less coverage than existed while implying more than the
+container scan proves.
+
+See `STAGING_RELEASE_ATTESTATION_2026-08-10-B.md` for the corrected two-layer
+evidence format, which is the format from here on.

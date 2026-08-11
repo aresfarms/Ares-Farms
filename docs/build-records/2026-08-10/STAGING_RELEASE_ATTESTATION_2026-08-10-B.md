@@ -3,6 +3,51 @@
 Source commit `1166ed4`. Manifest `2026-08-10T20-31-59-583Z-1166ed4`.
 Terraform apply: 1 added, 5 changed, 1 destroyed. All 14 P2.4/P3 gates pass.
 
+## WHAT THE ATTESTATION ACTUALLY COVERS — read this before signing another
+
+The founder attestation asserts "zero HIGH/CRITICAL". Until this record, the
+only evidence cited for that was an Artifact Analysis on-demand scan. **That
+scan reads OS base-image packages ONLY.** Verified directly against scan
+`6308e1f1`: the entire finding set for the core image is
+
+    12  glibc
+     1  zlib
+
+Not one npm package was examined. The tell was visible earlier and missed: the
+core image (a full Next.js application) and the migrator (a minimal migration
+runner) returned IDENTICAL counts — 7 MINIMAL, 5 LOW. Two images with such
+different dependency surfaces cannot match unless what is being measured is the
+shared base layer.
+
+The application dependency tree is covered, but by a DIFFERENT control: the
+`security` GitHub Actions workflow (`npm audit --audit-level=high`, CycloneDX
+SBOM, Trivy over dependencies and both runtime images, and a block on newly
+introduced vulnerable dependencies). That evidence was never cited here, so the
+record simultaneously understated what had been checked and overstated what the
+container scan proved.
+
+Both layers are therefore recorded from here on. A release is "zero
+HIGH/CRITICAL" only when BOTH are green.
+
+| Layer | Control | Evidence for this release | Result |
+| --- | --- | --- | --- |
+| OS base image | Artifact Analysis on-demand scan | scans `6308e1f1`, `a507c623`, `69d55124` | 0 HIGH / 0 CRITICAL |
+| Application dependencies | GitHub Actions `security` workflow | run `31429540028` @ `1bef5e0` | success |
+
+`1bef5e0` differs from the deployed source `1166ed4` by three artifact/doc
+files only — no code and no lockfile change — so its dependency-layer result
+applies to the deployed tree.
+
+Independent confirmation: `npm audit` on the deploy branch reports 0
+vulnerabilities, total 0.
+
+## The 26 GitHub dependency alerts are NOT on this code
+
+GitHub reports 26 alerts (1 critical, 12 high) against the DEFAULT branch.
+This branch is **993 commits ahead of `origin/main`**, with a `package-lock.json`
+differing by 4,820 lines. The alerts describe dependency state that this branch
+has already moved past; they clear on merge. No deployed artifact is affected.
+
 ## Approved runtime evidence
 
 | Runtime | Immutable digest | HIGH | CRITICAL | Other findings | On-demand scan |

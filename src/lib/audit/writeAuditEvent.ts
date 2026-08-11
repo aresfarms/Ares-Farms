@@ -71,7 +71,17 @@ function decisionText(value: unknown): string | null {
   return typeof value === "string" ? value : JSON.stringify(value);
 }
 
-function pseudonymousActorUuid(seed: string): string {
+/**
+ * Deterministic pseudonymous actor UUID.
+ *
+ * EXPORTED (2026-08-11) because `audit_events.user_id` is a NOT NULL uuid, and
+ * some governed actors legitimately have no account — a borrower authorising a
+ * bank connection through a signed deal link, for instance. Rather than mint a
+ * fake user row, the same seed always yields the same uuid, so a later lookup
+ * can recompute the actor it must match. Callers must use the SAME seed shape
+ * as this module does: `furlong-audit-actor:<anonymousId>`.
+ */
+export function pseudonymousActorUuid(seed: string): string {
   const hex = createHash("sha256")
     .update(seed)
     .digest("hex")

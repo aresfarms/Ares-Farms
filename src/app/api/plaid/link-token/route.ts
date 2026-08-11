@@ -1,15 +1,8 @@
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { writeAuditEvent } from "@/lib/audit/writeAuditEvent";
-import { ensureAccessSecurityState } from "@/lib/auth/accessSecurityRuntime";
-import {
-  MFA_ASSURANCE_COOKIE,
-  MFA_STEP_UP_MAX_AGE_SECONDS,
-  verifyMfaAssurance,
-} from "@/lib/auth/mfaAssurance";
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
+import { resolvePlaidPrincipal } from "@/lib/plaid/connectionPrincipal";
 import { captureConsent } from "@/lib/privacy/consentRegistry";
 import {
   SYNTHETIC_FIXTURE_COOKIE,
@@ -62,19 +55,15 @@ function dateOnly(date: Date) {
   return date.toISOString().slice(0, 10);
 }
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const user = session?.user as
-    { id?: string; email?: string; sessionVersion?: number } | undefined;
-  if (!user?.id)
-    return NextResponse.json(
-      { ok: false, error: "Authenticated user required." },
-      { status: 401 },
-    );
-
   const body = (await req.json().catch(() => null)) as {
     consentAgreed?: boolean;
     dealRef?: string;
+    token?: string;
   } | null;
+
+  // Consent is checked BEFORE the caller is even resolved: opening Plaid Link
+  // authorises ongoing access to account data, and that authorisation is the
+  // customer's to give regardless of which door they came through.
   if (body?.consentAgreed !== true) {
     return NextResponse.json(
       {
@@ -85,56 +74,51 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const state = await ensureAccessSecurityState(user.id);
-  if (
-    typeof user.sessionVersion === "number" &&
-    user.sessionVersion !== state.sessionVersion
-  ) {
+  // ONE resolution point for both doors — staff session + fresh passkey MFA,
+  // or a deal link token + a verified identity. See connectionPrincipal.ts.
+  const resolution = await resolvePlaidPrincipal(req, body);
+  if (!resolution.ok) {
     return NextResponse.json(
-      { ok: false, error: "Session authority has changed. Sign in again." },
-      { status: 401 },
+      {
+        ok: false,
+        error: resolution.error,
+        ...(resolution.identityRequired ? { identityRequired: true } : {}),
+      },
+      { status: resolution.status },
     );
   }
-  const secret = resolveNextAuthSecret();
-  if (!secret)
-    return NextResponse.json(
-      { ok: false, error: "Session signing authority unavailable." },
-      { status: 503 },
-    );
+  const principal = resolution.principal;
+
+  // Synthetic fixtures are an OPERATOR testing lane and stay staff-only: the
+  // fixture token is bound to an operator email, which a customer has not got.
   let syntheticFixtureContext: SyntheticFixtureContext | null = null;
-  try {
-    syntheticFixtureContext = activePlaidSyntheticFixture(
-      req,
-      user.email,
-      secret,
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Synthetic Plaid authorization failed.",
-      },
-      { status: 403 },
-    );
+  if (principal.door === "staff-session") {
+    const secret = resolveNextAuthSecret();
+    if (!secret)
+      return NextResponse.json(
+        { ok: false, error: "Session signing authority unavailable." },
+        { status: 503 },
+      );
+    try {
+      syntheticFixtureContext = activePlaidSyntheticFixture(
+        req,
+        principal.email,
+        secret,
+      );
+    } catch (error) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Synthetic Plaid authorization failed.",
+        },
+        { status: 403 },
+      );
+    }
   }
-  const assurance = await verifyMfaAssurance({
-    token: req.cookies.get(MFA_ASSURANCE_COOKIE)?.value,
-    userId: user.id,
-    sessionVersion: state.sessionVersion,
-    secret,
-    maxVerifiedAgeSeconds: MFA_STEP_UP_MAX_AGE_SECONDS,
-  });
-  if (!assurance)
-    return NextResponse.json(
-      {
-        ok: false,
-        error: "Fresh passkey MFA is required before Plaid Link can open.",
-      },
-      { status: 403 },
-    );
+
   const clientId = process.env.PLAID_CLIENT_ID?.trim();
   const plaidSecret = process.env.PLAID_SECRET?.trim();
   if (!clientId || !plaidSecret) {
@@ -145,23 +129,26 @@ export async function POST(req: NextRequest) {
   }
 
   const consent = captureConsent("plaid-financial-account-access", true);
-  const dealRef = body?.dealRef?.trim().slice(0, 120) || null;
+  const dealRef = principal.dealRef;
   const authorization = await writeAuditEvent({
-    userId: user.id,
+    userId: principal.auditUserId,
+    anonymousId: principal.anonymousId,
     eventType: "PLAID_LINK_AUTHORIZED",
     entityType: "PLAID_LINK_AUTHORIZATION",
-    entityId: dealRef ?? user.id,
+    entityId: dealRef ?? principal.subjectRef,
     classification: "RESTRICTED",
     source: "api.plaid.link-token",
     moduleId: "api.plaid.link-token",
-    actorRef: `user:${user.id}`,
-    target: { type: "financial-account-connection", id: dealRef ?? user.id },
+    actorRef: principal.actorRef,
+    target: { type: "financial-account-connection", id: dealRef ?? principal.subjectRef },
     payload: {
       consent,
       dealRef,
-      mfaMethod: assurance.method,
-      mfaVerifiedAt: assurance.verifiedAt,
-      sessionVersion: state.sessionVersion,
+      // Which door, and the evidence that opened it. A reader of this audit
+      // record must be able to tell WHY the connection was permitted.
+      door: principal.door,
+      stepUp: principal.stepUp,
+      sessionVersion: principal.sessionVersion,
       syntheticFixture: syntheticFixtureContext,
     },
   });
@@ -190,8 +177,8 @@ export async function POST(req: NextRequest) {
       country_codes: ["US"],
       user: {
         client_user_id: syntheticFixtureContext
-          ? `${user.id}:${syntheticFixtureContext.testRunId}`
-          : user.id,
+          ? `${principal.plaidClientUserId}:${syntheticFixtureContext.testRunId}`
+          : principal.plaidClientUserId,
       },
       products: ["identity"],
       required_if_supported_products: ["statements"],
@@ -204,7 +191,8 @@ export async function POST(req: NextRequest) {
   >;
   if (!response.ok || typeof plaid.link_token !== "string") {
     const failureAudit = await writeAuditEvent({
-      userId: user.id,
+      userId: principal.auditUserId,
+      anonymousId: principal.anonymousId,
       eventType: "PLAID_LINK_TOKEN_FAILED",
       entityType: "PLAID_LINK_AUTHORIZATION",
       entityId: authorization.auditId,

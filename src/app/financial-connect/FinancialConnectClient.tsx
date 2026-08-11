@@ -20,9 +20,13 @@ type SyntheticFixtureSummary = {
 
 export default function FinancialConnectClient({
   dealRef,
+  linkToken,
   syntheticFixture,
 }: {
   dealRef?: string | null;
+  /** Customer door: the deal's signed link token. Absent on the staff door,
+   *  where the session cookie is the credential. */
+  linkToken?: string | null;
   syntheticFixture?: SyntheticFixtureSummary | null;
 }) {
   const [consentAgreed, setConsentAgreed] = useState(false);
@@ -41,6 +45,9 @@ export default function FinancialConnectClient({
         body: JSON.stringify({
           publicToken,
           authorizationRef: grant.authorizationRef,
+          // Carried on BOTH calls: the exchange re-resolves the caller from
+          // scratch rather than trusting that link-token already vetted them.
+          token: linkToken || undefined,
         }),
       });
       const data = await response.json().catch(() => ({}));
@@ -58,7 +65,7 @@ export default function FinancialConnectClient({
       );
       setBusy(false);
     },
-    [grant, syntheticFixture],
+    [grant, syntheticFixture, linkToken],
   );
 
   const { open, ready } = usePlaidLink({
@@ -73,13 +80,18 @@ export default function FinancialConnectClient({
   async function authorizeAndOpen() {
     if (!consentAgreed) return;
     setBusy(true);
-    setStatus("Recording consent and confirming fresh passkey MFA…");
+    setStatus(
+      linkToken
+        ? "Recording consent and confirming your verified identity…"
+        : "Recording consent and confirming fresh passkey MFA…",
+    );
     const response = await fetch("/api/plaid/link-token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         consentAgreed: true,
         dealRef: dealRef || undefined,
+        token: linkToken || undefined,
       }),
     });
     const data = await response.json().catch(() => ({}));

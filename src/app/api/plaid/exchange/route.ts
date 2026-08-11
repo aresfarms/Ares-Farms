@@ -1,18 +1,15 @@
 import { createHash } from "node:crypto";
 import { and, eq, gt } from "drizzle-orm";
-import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { auditEvents } from "@/db/schema";
 import { writeAuditEvent } from "@/lib/audit/writeAuditEvent";
-import { ensureAccessSecurityState } from "@/lib/auth/accessSecurityRuntime";
-import {
-  MFA_ASSURANCE_COOKIE,
-  MFA_STEP_UP_MAX_AGE_SECONDS,
-  verifyMfaAssurance,
-} from "@/lib/auth/mfaAssurance";
+// MFA_STEP_UP_MAX_AGE_SECONDS still bounds how long a link-token
+// authorization stays exchangeable, for BOTH doors — the window is a property
+// of the authorization, not of how the caller proved themselves.
+import { MFA_STEP_UP_MAX_AGE_SECONDS } from "@/lib/auth/mfaAssurance";
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
+import { resolvePlaidPrincipal } from "@/lib/plaid/connectionPrincipal";
 import { db } from "@/lib/db";
 import { persistPlaidSecret } from "@/lib/plaid/secureDataStore";
 import {
@@ -74,17 +71,10 @@ function plaidBaseUrl() {
   return "https://sandbox.plaid.com";
 }
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const user = session?.user as
-    { id?: string; email?: string; sessionVersion?: number } | undefined;
-  if (!user?.id)
-    return NextResponse.json(
-      { ok: false, error: "Authenticated user required." },
-      { status: 401 },
-    );
   const body = (await req.json().catch(() => null)) as {
     publicToken?: string;
     authorizationRef?: string;
+    token?: string;
   } | null;
   const publicToken = body?.publicToken?.trim();
   const authorizationRef = body?.authorizationRef?.trim();
@@ -98,56 +88,48 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const state = await ensureAccessSecurityState(user.id);
-  if (
-    typeof user.sessionVersion === "number" &&
-    user.sessionVersion !== state.sessionVersion
-  ) {
+  // Same two doors, same rules as link-token. Both routes must agree, or the
+  // weaker one becomes the way in.
+  const resolution = await resolvePlaidPrincipal(req, body);
+  if (!resolution.ok) {
     return NextResponse.json(
-      { ok: false, error: "Session authority has changed. Sign in again." },
-      { status: 401 },
+      {
+        ok: false,
+        error: resolution.error,
+        ...(resolution.identityRequired ? { identityRequired: true } : {}),
+      },
+      { status: resolution.status },
     );
   }
-  const secret = resolveNextAuthSecret();
-  if (!secret)
-    return NextResponse.json(
-      { ok: false, error: "Session signing authority unavailable." },
-      { status: 503 },
-    );
+  const principal = resolution.principal;
+
   let syntheticFixtureContext: SyntheticFixtureContext | null = null;
-  try {
-    syntheticFixtureContext = activePlaidSyntheticFixture(
-      req,
-      user.email,
-      secret,
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Synthetic Plaid authorization failed.",
-      },
-      { status: 403 },
-    );
+  if (principal.door === "staff-session") {
+    const secret = resolveNextAuthSecret();
+    if (!secret)
+      return NextResponse.json(
+        { ok: false, error: "Session signing authority unavailable." },
+        { status: 503 },
+      );
+    try {
+      syntheticFixtureContext = activePlaidSyntheticFixture(
+        req,
+        principal.email,
+        secret,
+      );
+    } catch (error) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Synthetic Plaid authorization failed.",
+        },
+        { status: 403 },
+      );
+    }
   }
-  const assurance = await verifyMfaAssurance({
-    token: req.cookies.get(MFA_ASSURANCE_COOKIE)?.value,
-    userId: user.id,
-    sessionVersion: state.sessionVersion,
-    secret,
-    maxVerifiedAgeSeconds: MFA_STEP_UP_MAX_AGE_SECONDS,
-  });
-  if (!assurance)
-    return NextResponse.json(
-      {
-        ok: false,
-        error: "Fresh passkey MFA is required for Plaid token exchange.",
-      },
-      { status: 403 },
-    );
 
   const cutoff = new Date(Date.now() - MFA_STEP_UP_MAX_AGE_SECONDS * 1000);
   const authRows = await db
@@ -156,7 +138,7 @@ export async function POST(req: NextRequest) {
     .where(
       and(
         eq(auditEvents.id, authorizationRef),
-        eq(auditEvents.userId, user.id),
+        eq(auditEvents.userId, principal.auditUserId),
         eq(auditEvents.eventType, "PLAID_LINK_AUTHORIZED"),
         gt(auditEvents.createdAt, cutoff),
       ),
@@ -229,7 +211,7 @@ export async function POST(req: NextRequest) {
     );
   }
   const secure = await persistPlaidSecret({
-    subjectRef: `user:${user.id}`,
+    subjectRef: principal.subjectRef,
     category: "access-token",
     value: { accessToken: plaid.access_token, itemId: plaid.item_id },
     consentRef: authorizationRef,
@@ -238,14 +220,15 @@ export async function POST(req: NextRequest) {
   });
   const itemRefHash = createHash("sha256").update(plaid.item_id).digest("hex");
   const connectedAudit = await writeAuditEvent({
-    userId: user.id,
+    userId: principal.auditUserId,
+    anonymousId: principal.anonymousId,
     eventType: "PLAID_ITEM_CONNECTED",
     entityType: "PLAID_SECURE_RECORD",
     entityId: secure.id,
     classification: "RESTRICTED",
     source: "api.plaid.exchange",
     moduleId: "api.plaid.exchange",
-    actorRef: `user:${user.id}`,
+    actorRef: principal.actorRef,
     target: { type: "plaid-secure-record", id: secure.id },
     payload: {
       authorizationRef,
@@ -253,7 +236,8 @@ export async function POST(req: NextRequest) {
       itemRefHash,
       plaidRequestId: plaid.request_id ?? null,
       accessTokenPersistedPlaintext: false,
-      mfaVerifiedAt: assurance.verifiedAt,
+      door: principal.door,
+      stepUp: principal.stepUp,
       syntheticFixture: syntheticFixtureContext,
     },
   });

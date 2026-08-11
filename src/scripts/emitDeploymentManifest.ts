@@ -28,7 +28,12 @@ import { canonicalTargetSchemaVersion } from "@/lib/db/canonicalGovernanceMigrat
  *        - /internal walls to sign-in (app-level wall behind IAM);
  *        - anonymous /api/audit rejected;
  *        - verify:csp-hydration against the deployed URL (bearer-forwarded);
- *        - latest furlong-db-migrate execution SUCCEEDED.
+ *        - latest furlong-db-migrate execution SUCCEEDED, AND post-dates the
+ *          running revision, AND ran this release's migrator image. All three
+ *          are required: `terraform apply` updates the migrator job DEFINITION
+ *          without executing it, so "SUCCEEDED" alone is satisfied by a stale
+ *          run and a release can be recorded as fully gated with its schema
+ *          change never applied (observed 2026-08-10, migration 0054).
  *   3. On ALL GREEN: writes
  *        artifacts/deployments/staging/<UTC>-<gitSHA>.json         (manifest)
  *        artifacts/deployments/staging/<UTC>-<gitSHA>-gates.json   (gate report)
@@ -175,9 +180,75 @@ async function main(): Promise<void> {
 
   const executions = JSON.parse(
     gcloud(["run", "jobs", "executions", "list", "--job", JOB, "--region", REGION, "--limit", "1", "--format", "json"])
-  ) as Array<{ metadata?: { name?: string }; status?: { succeededCount?: number; failedCount?: number } }>;
+  ) as Array<{
+    metadata?: { name?: string; creationTimestamp?: string };
+    status?: { succeededCount?: number; failedCount?: number };
+  }>;
   const lastExecution = executions[0];
   const migrationJobExecution = lastExecution?.metadata?.name ?? "NONE";
+
+  /**
+   * MIGRATION FRESHNESS (added 2026-08-11 after a near miss).
+   *
+   * `terraform apply` updates the migrator job's DEFINITION with the new image.
+   * IT DOES NOT RUN IT. So on 2026-08-10 a release carrying migration 0054
+   * applied cleanly, and the newest migrator execution was still one from seven
+   * hours earlier. The old check — "latest execution SUCCEEDED" — was satisfied
+   * by that stale run and the release would have been recorded as fully gated
+   * with its schema change never applied. The application would then have run
+   * against a database missing `identity_verifications`.
+   *
+   * A successful-at-some-point check proves the job works. It does not prove
+   * THIS RELEASE's migration ran. The execution must post-date the revision it
+   * is supposed to have prepared the database for.
+   */
+  const revisionCreated = gcloud([
+    "run", "revisions", "describe", revision, "--region", REGION,
+    "--format", "value(metadata.creationTimestamp)",
+  ]).trim();
+  const migrationStarted = lastExecution?.metadata?.creationTimestamp ?? "";
+  const revisionCreatedMs = Date.parse(revisionCreated);
+  const migrationStartedMs = Date.parse(migrationStarted);
+  const migrationIsFresh =
+    Number.isFinite(revisionCreatedMs) &&
+    Number.isFinite(migrationStartedMs) &&
+    migrationStartedMs >= revisionCreatedMs;
+
+  /**
+   * MIGRATION IMAGE MATCH.
+   *
+   * Freshness alone can still be satisfied by re-running the PREVIOUS migrator
+   * image after a deploy — a new execution that carries none of this release's
+   * migrations. What proves the new migration set was applied is that the
+   * execution ran the migrator image THIS RELEASE deployed.
+   *
+   * Checked against the job's configured image rather than by querying the
+   * database: /health/ready deliberately discloses nothing about schema
+   * versions (Vol V, audit-safe output), and weakening that to satisfy a gate
+   * would trade a real disclosure control for a convenience.
+   */
+  // NOTE the nesting: a JOB is spec.template.spec.template.spec.containers,
+  // an EXECUTION is spec.template.spec.containers. One `template` apart, and a
+  // wrong path here returns EMPTY rather than erroring — which would silently
+  // compare "" to a digest and fail every release for the wrong reason.
+  const jobConfiguredImage = gcloud([
+    "run", "jobs", "describe", JOB, "--region", REGION,
+    "--format", "value(spec.template.spec.template.spec.containers[0].image)",
+  ]).trim();
+  const executionImage = (() => {
+    try {
+      const detail = JSON.parse(
+        gcloud(["run", "jobs", "executions", "describe", migrationJobExecution, "--region", REGION, "--format", "json"])
+      ) as { spec?: { template?: { spec?: { containers?: Array<{ image?: string }> } } } };
+      return detail.spec?.template?.spec?.containers?.[0]?.image ?? "";
+    } catch {
+      return "";
+    }
+  })();
+  const migratorDigest = (value: string) => (value.includes("@") ? value.split("@")[1] : "");
+  const migrationImageMatches =
+    Boolean(migratorDigest(executionImage)) &&
+    migratorDigest(executionImage) === migratorDigest(jobConfiguredImage);
 
   const verifyExecutions = JSON.parse(
     gcloud(["run", "jobs", "executions", "list", "--job", VERIFY_JOB, "--region", REGION, "--limit", "1", "--format", "json"])
@@ -247,6 +318,25 @@ async function main(): Promise<void> {
   // Migration job's latest execution succeeded (P2.2 already run).
   const jobOk = (lastExecution?.status?.succeededCount ?? 0) >= 1 && !(lastExecution?.status?.failedCount ?? 0);
   record("furlong-db-migrate latest execution SUCCEEDED", "succeeded", migrationJobExecution, jobOk);
+
+  // ...AND that execution is for THIS revision, not an inherited earlier one.
+  record(
+    "furlong-db-migrate execution POST-DATES the running revision",
+    `>= ${revisionCreated || "revision creation"}`,
+    migrationStarted
+      ? `${migrationStarted}${migrationIsFresh ? "" : "  <-- STALE: ran BEFORE this revision; execute the job"}`
+      : "NO EXECUTION TIMESTAMP",
+    migrationIsFresh
+  );
+
+  // ...AND it ran the migrator image this release deployed, so the migrations
+  // it applied are THIS release's set.
+  record(
+    "furlong-db-migrate execution ran THIS release's migrator image",
+    migratorDigest(jobConfiguredImage) || "job image digest",
+    migratorDigest(executionImage) || "UNKNOWN",
+    migrationImageMatches
+  );
 
   const verifyJobOk =
     (lastVerifyExecution?.status?.succeededCount ?? 0) >= 1 &&

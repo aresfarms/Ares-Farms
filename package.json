@@ -589,7 +589,8 @@
     "verify:lender-desk-steward-access": "tsx src/scripts/lenderDeskStewardAccessConformance.ts",
     "audit:broker-synthetic-and-stuart-access": "tsx src/scripts/auditBrokerSyntheticAndStuartAccess.ts",
     "audit:broker-synthetic-and-stuart-access:strict": "tsx src/scripts/auditBrokerSyntheticAndStuartAccess.ts --strict",
-    "verify:stripe-wallet-checkout": "tsx src/scripts/stripeWalletCheckoutConformance.ts"
+    "verify:stripe-wallet-checkout": "tsx src/scripts/stripeWalletCheckoutConformance.ts",
+    "verify:public-api-surface": "tsx src/scripts/verifyPublicApiSurface.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

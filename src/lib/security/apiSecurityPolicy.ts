@@ -43,7 +43,70 @@ const NEXTAUTH_PUBLIC_PATHS = new Set([
 ]);
 
 const PUBLIC_SIGNATURE_GATED_PATHS = new Set(["/api/stripe/webhook"]);
-const PUBLIC_SURFACE_GATEWAY_PREFIX = "/api/public";
+/**
+ * EVERY route under /api/public, enumerated.
+ *
+ * This used to be a bare prefix — `/api/public` — which meant a file was
+ * exempt from the API perimeter because of WHERE IT SAT, not because anyone
+ * decided it should be. Add a file to that folder and it was public: no list
+ * entry, no review, no gate (sweep finding S-1, 2026-08-11).
+ *
+ * That is the same polarity error PlatformChrome records having already made
+ * and fixed for page chrome — "the previous design allowlisted public routes
+ * and leaked internal chrome onto anything it forgot to list. Never again."
+ * The page chrome was corrected; the API perimeter was not.
+ *
+ * Each entry below is now a decision with a name attached. `verify:public-api-
+ * surface` fails if a file exists under src/app/api/public/ that is not listed
+ * here, so route 27 cannot inherit publicity for free.
+ *
+ * Matched exactly or by sub-path, so dynamic segments (anon-token/[action])
+ * are covered by their parent entry.
+ */
+export const PUBLIC_API_ROUTES = new Set([
+  // -- Anonymous discovery + property intelligence. No PII, no account. -----
+  "/api/public/property-facts",
+  "/api/public/property-discovery",
+  "/api/public/property-import",
+  "/api/public/property-report-pdf",
+  "/api/public/property-report-token",
+  "/api/public/property-proforma-pdf",
+  "/api/public/market-context",
+  "/api/public/weather-risk",
+  "/api/public/equipment",
+  "/api/public/grants",
+  "/api/public/program-match",
+  "/api/public/special-building-review",
+  "/api/public/surfaces",
+  "/api/public/discovery/converse",
+  "/api/public/navigator/converse",
+  "/api/public/bound-edition-interest",
+
+  // -- The customer's own file. Authorization is a signed token or the
+  //    reference+email pair; a customer never has an account. --------------
+  "/api/public/secure-upload",
+  "/api/public/document-download",
+  "/api/public/document-sign",
+  "/api/public/upload-security-scan",
+  "/api/public/my-data",
+  "/api/public/chain-of-custody",
+  "/api/public/anon-token",
+
+  // -- Counterparty intake. Opens no data; it REQUESTS access. -------------
+  "/api/public/professional-verification-request",
+
+  // -- Guarded non-production surfaces. PUBLIC ONLY IN THE SENSE THAT THE
+  //    PERIMETER DOES NOT GATE THEM; each fails closed on its own:
+  //    · local-founder-password-bootstrap — 404s unless NODE_ENV is not
+  //      production AND the hostname is localhost, and refuses once a
+  //      password exists.
+  //    · professional-test-persona — 404s unless the synthetic-fixture
+  //      runtime is enabled AND the caller's email is the test address.
+  //    Listed explicitly so their presence is a standing decision that a
+  //    reviewer re-reads, rather than an accident of directory layout.
+  "/api/public/local-founder-password-bootstrap",
+  "/api/public/professional-test-persona",
+]);
 const INTERNAL_IAM_GATED_PATHS = new Set(["/api/internal/source-refresh"]);
 
 /**
@@ -120,8 +183,10 @@ export function apiSecurityPublicReason(
   }
 
   if (
-    normalized === PUBLIC_SURFACE_GATEWAY_PREFIX ||
-    normalized.startsWith(`${PUBLIC_SURFACE_GATEWAY_PREFIX}/`)
+    PUBLIC_API_ROUTES.has(normalized) ||
+    Array.from(PUBLIC_API_ROUTES).some((path) =>
+      normalized.startsWith(`${path}/`),
+    )
   ) {
     return "public-surface-gateway";
   }

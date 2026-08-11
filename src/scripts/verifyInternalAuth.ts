@@ -113,8 +113,26 @@ async function get(path: string): Promise<{ status: number; location: string | n
   return { status: res.status, location: res.headers.get("location"), body };
 }
 
+/**
+ * A redirect counts ONLY if it lands on a real sign-in wall.
+ *
+ * This used to accept `/api/auth/signin` alone — NextAuth's built-in page. The
+ * app now redirects to its OWN `/sign-in`, so the check went red on routes that
+ * were correctly protected: `/environmental-compliance` returns
+ * 307 -> /sign-in?callbackUrl=... and was reported as a failure (sweep finding
+ * S-4, 2026-08-11).
+ *
+ * A FALSE RED IS NOT HARMLESS. A gate that fails on healthy code trains
+ * everyone to skip past it, and the next failure — a real one — gets skipped
+ * too. Widened to the custom page, and NOT further: the status must still be
+ * 3xx and the destination must still be a sign-in wall, so a redirect to the
+ * console or to "/" still fails.
+ */
+const SIGN_IN_DESTINATIONS = [/\/api\/auth\/signin/, /^\/sign-in(\?|$)/, /:\/\/[^/]+\/sign-in(\?|$)/];
+
 function isSignInRedirect(status: number, location: string | null): boolean {
-  return status >= 300 && status < 400 && !!location && /\/api\/auth\/signin/.test(location);
+  if (status < 300 || status >= 400 || !location) return false;
+  return SIGN_IN_DESTINATIONS.some((pattern) => pattern.test(location));
 }
 
 async function main(): Promise<void> {

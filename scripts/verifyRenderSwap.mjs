@@ -18,7 +18,35 @@ const DEADLINE_MS = 20_000;
 
 function fail(msg) { console.error(`✗  P18 render-swap FAIL — ${msg}`); }
 
-const browser = await chromium.launch();
+/**
+ * CANNOT-RUN IS NOT THE SAME AS FAILED (sweep finding S-4, 2026-08-11).
+ *
+ * This gate was red for an unknown period because Playwright's browser binary
+ * was never installed on the machine. It reported a raw launch exception, and
+ * the surrounding runner appended the hint "(is the dev server running?)" —
+ * the WRONG diagnosis, which is exactly why nobody could see what was wrong.
+ *
+ * A gate that cannot tell "the map is frozen" from "I have no browser" is
+ * worse than no gate: the first is a defect, the second is a laptop, and
+ * conflating them trains everyone to skip past red. It exits 2 with the exact
+ * remedy, distinct from the exit-1 used for a real render failure.
+ */
+let browser;
+try {
+  browser = await chromium.launch();
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/Executable doesn't exist|please run the following command/i.test(message)) {
+    console.error(
+      "–  P18 render-swap CANNOT RUN — Playwright has no browser binary on this machine.\n" +
+      "   This is NOT a render failure and says nothing about the map.\n" +
+      "   Fix:  npx playwright install chromium"
+    );
+    process.exit(2);
+  }
+  console.error(`✗  P18 render-swap FAIL — browser launch failed: ${message}`);
+  process.exit(1);
+}
 try {
   const page = await browser.newPage();
   await page.goto(`${BASE}/explore?lane=property-land`, { waitUntil: "domcontentloaded" });

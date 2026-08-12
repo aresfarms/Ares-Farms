@@ -139,11 +139,13 @@ async function renderedLayer() {
     return;
   }
   console.log(`\n── RENDERED layer (${BASE}) ──`);
-  let reachable = true;
-  try { const probe = await fetch(BASE + "/"); reachable = probe.ok || probe.status < 500; }
-  catch { reachable = false; }
-  if (!reachable) {
-    warn.push(`BASE_URL ${BASE} not reachable — rendered sweep skipped (static layer still enforced)`);
+  // Confirm the target is THIS app (200 + brand marker), not just reachable —
+  // a foreign/stale 200 on the port would false-fail the disclosure assertions.
+  let confirmed = false;
+  try { const probe = await fetch(BASE + "/"); confirmed = probe.status === 200 && /Furlong/.test(await probe.text().catch(() => "")); }
+  catch { confirmed = false; }
+  if (!confirmed) {
+    warn.push(`BASE_URL ${BASE} is not a confirmed Furlong server — rendered sweep skipped (static layer still enforced)`);
     return;
   }
   for (const r of STATIC_ROUTES) {

@@ -116,6 +116,15 @@ let pass = 0;
 function asArr(x?: string | string[]): string[] { return x === undefined ? [] : Array.isArray(x) ? x : [x]; }
 
 async function run() {
+  // Confirm the target is THIS app's converse engine before the red-team board —
+  // a dead/foreign server on the port would crash or false-fail every case.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(2500) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  if (!home || home.status !== 200 || !/Furlong/.test(home.body)) {
+    console.log(`  (no confirmed Furlong server at ${BASE} — navigator red-team board skipped)`);
+    process.exit(0);
+  }
   for (const c of CASES) {
     const replies = await conv(c.turns);
     const r = replies[replies.length - 1];

@@ -89,7 +89,12 @@ ok(fs.existsSync("docs/doctrine/PROPOSED_SOLUTION_AS_HYPOTHESIS_001.md"), "doctr
 // ── §9 live acceptance ───────────────────────────────────────────────────────
 async function main() {
   const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-  const live = await fetch(BASE, { signal: AbortSignal.timeout(2500) }).then(() => true).catch(() => false);
+  // Live §9 acceptance runs only against a CONFIRMED Furlong server (200 +
+  // brand marker) — a dead/foreign server on the port would false-fail these.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(2500) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  const live = !!home && home.status === 200 && /Furlong/.test(home.body);
   if (live) {
     const converse = (payload: unknown) => fetch(`${BASE}/api/public/navigator/converse`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),

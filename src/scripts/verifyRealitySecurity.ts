@@ -149,7 +149,13 @@ ok(!/\d+\s+candidate (?:properties|matches)|we found \d+/i.test(JSON.stringify(s
 // ── Live conversation probes ─────────────────────────────────────────────────
 async function main() {
   const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-  const live = await fetch(BASE, { signal: AbortSignal.timeout(2500) }).then(() => true).catch(() => false);
+  // Live probes run only against a CONFIRMED Furlong server: a dead/foreign
+  // server on the port would false-fail (or a stale one false-pass) these
+  // converse assertions. Confirm the home page is 200 + Furlong first.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(2500) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  const live = !!home && home.status === 200 && /Furlong/.test(home.body);
   if (live) {
     const converse = (payload: unknown) => fetch(`${BASE}/api/public/navigator/converse`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
@@ -173,7 +179,7 @@ async function main() {
       ok(r4.pathways.every((p: { realityCategory?: string }) => !!p.realityCategory), "live: reality categories on every pathway");
     }
   } else {
-    console.log("  (dev server not reachable — live probes skipped)");
+    console.log("  (no confirmed Furlong server — live probes skipped)");
   }
 
   console.log(`verify:reality-security — input guard · sandbox · privacy (${PRIVACY_PROBES.length + 1} phrasings) · output gate · context firewall · rate limits · replay · 5 blockers${live ? " · LIVE" : ""}.`);

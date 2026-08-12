@@ -56,7 +56,13 @@ if (/<form\b/.test(page)) note("NO-SUBMIT: Provider Page must not contain a <for
 
 // ── Runtime: the live Five Borough page ──────────────────────────────────────
 async function runtime(): Promise<void> {
-  try { await fetch(BASE); } catch { note(`server not reachable at ${BASE}.`); return; }
+  // Confirm the target is THIS app (200 + brand marker) before the runtime
+  // checks — a foreign/stale server on the port would false-fail them.
+  const home = await fetch(BASE).then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") })).catch(() => null);
+  if (!home || home.status !== 200 || !/Furlong/.test(home.body)) {
+    console.log(`  (no confirmed Furlong server at ${BASE} — runtime provider checks skipped; static checks ran)`);
+    return;
+  }
   for (const p of canonicalProviderAuthority.all) {
     const res = await fetch(`${BASE}/providers/${p.slug}`, { headers: { Accept: "text/html" } });
     if (res.status !== 200) { note(`${p.slug}: page returned ${res.status}.`); continue; }

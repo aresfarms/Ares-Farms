@@ -429,7 +429,12 @@ ok(/translated into something lawful, safe, non-sexual/.test(NOVELTY_BOUNDARY_RE
 // ── Live SSR + conversation probes (when the server is up) ───────────────────
 async function main() {
   const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-  const live = await fetch(BASE, { signal: AbortSignal.timeout(2500) }).then(() => true).catch(() => false);
+  // Live probes run only against a CONFIRMED Furlong server (200 + brand
+  // marker) — a dead/foreign server on the port would false-fail these.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(2500) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  const live = !!home && home.status === 200 && /Furlong/.test(home.body);
   if (live) {
     const homeHtml = await fetch(`${BASE}/`).then((r) => r.text());
     // Count the rendered DOM attribute form only — the RSC flight payload

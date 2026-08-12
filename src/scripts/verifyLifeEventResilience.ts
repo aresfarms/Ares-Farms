@@ -42,7 +42,12 @@ ok(fs.existsSync("docs/doctrine/LIFE_EVENT_RESILIENCE_001.md") &&
 // §11 acceptance — live against the existing Navigator (no routing changes).
 async function main() {
   const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-  const live = await fetch(BASE, { signal: AbortSignal.timeout(2500) }).then(() => true).catch(() => false);
+  // Live §11 probes run only against a CONFIRMED Furlong server (200 + brand
+  // marker) — a dead/foreign server on the port would false-fail these.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(2500) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  const live = !!home && home.status === 200 && /Furlong/.test(home.body);
   if (live) {
     const converse = (message: string) => fetch(`${BASE}/api/public/navigator/converse`, {
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ message }),
@@ -66,7 +71,7 @@ async function main() {
         `no decision-for-user / legal-advice language: "${q}"`);
     }
   } else {
-    console.log("  (dev server not reachable — live §11 probes skipped; registry checks ran)");
+    console.log("  (no confirmed Furlong server — live §11 probes skipped; registry checks ran)");
   }
 
   if (fail.length) {

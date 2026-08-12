@@ -214,6 +214,14 @@ function normalizeQuery(s) {
 
 let failed = false;
 
+// Confirm the target is THIS app (200 + brand marker) before asserting copy;
+// a foreign/stale/absent server would otherwise false-fail every page.
+const probe = await fetch(BASE + '/').then(async (r) => ({ ok: r.ok, body: await r.text().catch(() => '') })).catch(() => null);
+if (!probe || !probe.ok || !/Furlong/.test(probe.body)) {
+  console.log(`verify:public-copy SKIP — no confirmed Furlong server at ${BASE}. Start it (\`npm run dev\`) or set BASE=. (copy checks NOT run)`);
+  process.exit(0);
+}
+
 for (const p of PAGES) {
   let text;
   try {

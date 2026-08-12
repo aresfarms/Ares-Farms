@@ -6,8 +6,10 @@
  * 1. Pure resolver: ?mode / ?topic / path segment / entrypoint / priorState all
  *    resolve correctly; the persona interview is returned ONLY with no signal.
  * 2. Structural: the /discover page wires the resolver and renders PlaceFirstDiscovery.
- * 3. Live SSR (when the dev server is reachable): the place URLs render the
- *    place-first card (and NOT the persona card); bare /discover renders persona.
+ * 3. Live SSR (against a CONFIRMED Furlong server): the place URLs render the
+ *    place-first card (and NOT the persona card); bare /discover is now the
+ *    address-first place-first door (spec 2026-07-28); the persona journey is
+ *    preserved but reached explicitly via ?mode=possibilities.
  *
  * Governance basis: Master Volume VI — Property Discovery separated from general
  * customer/revenue intelligence.
@@ -53,7 +55,16 @@ ok(/opportunity-zone/.test(ozRoute), "OZ route resolves the opportunity-zone flo
 // ── 3. live SSR (best-effort; skipped if the dev server isn't up) ─────────────
 async function main() {
   const BASE = process.env.BASE_URL ?? "http://localhost:3000";
-  const live = await fetch(BASE, { signal: AbortSignal.timeout(2500) }).then(() => true).catch(() => false);
+  // Live SSR runs only against a CONFIRMED Furlong server. A dead or foreign
+  // server answering on the port would false-fail every check (and a stale one
+  // could false-pass). Confirm the public home returns 200 AND carries the
+  // Furlong brand marker (independent of the assertions below) before trusting
+  // it; otherwise skip cleanly. The pure resolver + structural checks above
+  // still guarantee the place-first contract regardless.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(2500) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  const live = !!home && home.status === 200 && /Furlong/.test(home.body);
   if (live) {
     const html = async (path: string) => fetch(`${BASE}${path}`).then((r) => r.text()).catch(() => "");
     const placeUrls = ["/discover?mode=place-facts", "/discover?topic=opportunity-zone", "/discover/opportunity-zone"];
@@ -61,16 +72,23 @@ async function main() {
       const h = await html(u);
       ok(h.includes('data-testid="place-first-discovery"'), `${u} must render the PLACE-FIRST card (SSR)`);
       ok(!h.includes('data-testid="discovery-engine"'), `${u} must NOT render the persona intake as the primary card`);
-      ok(/Where is the location\?/.test(h), `${u} must put the location input first`);
+      // "location input first" via the STABLE testid, not prompt copy — the
+      // embedded card renders "Start with the verified address" (not the old
+      // "Where is the location?"), so a copy match would be a false red.
+      ok(h.includes('data-testid="place-inputs"'), `${u} must put the location input first`);
     }
+    // Address-first is now the DEFAULT /discover door (spec 2026-07-28): bare
+    // /discover renders the place-first card, NOT the persona interview. The
+    // persona journey is preserved but reached explicitly via ?mode=possibilities.
     const bare = await html("/discover");
-    // The default flow is now Furlong Navigator (spec 2026-06-11) — one open
-    // conversation, never the chip interview and never the place-first card.
-    ok(bare.includes('data-testid="furlong-navigator"'), "/discover (no signal) renders Furlong Navigator");
-    ok(!bare.includes('data-testid="place-first-discovery"'), "/discover (no signal) does not render the place-first card");
-    ok(/place-facts/.test(bare), "/discover navigator view still links to the place-facts journey");
+    ok(bare.includes('data-testid="place-first-discovery"'), "/discover (no signal) renders the address-first place-first card");
+    ok(!bare.includes('data-testid="discovery-engine"'), "/discover (no signal) does not make the persona intake the primary card");
+    // The persona journey must still be REACHABLE on the explicit ask.
+    const persona = await html("/discover?mode=possibilities");
+    ok(persona.includes('data-testid="discovery-engine"'), "/discover?mode=possibilities still reaches the persona journey");
+    ok(!persona.includes('data-testid="place-first-discovery"'), "?mode=possibilities shows the persona journey, not the place-first card");
   } else {
-    console.log("  (dev server not reachable — live SSR checks skipped; pure + structural ran)");
+    console.log(`  (no confirmed Furlong server at ${BASE} — live SSR checks skipped; pure + structural ran)`);
   }
 
   console.log(`verify:discovery-flow — resolver + structural${live ? " + live SSR" : ""} checked.`);
@@ -79,7 +97,7 @@ async function main() {
     for (const f of fail) console.error(`    ✗ ${f}`);
     process.exit(1);
   }
-  console.log("\n✓  verify:discovery-flow PASS — place-facts / opportunity-zone / property-discovery entrypoints resolve to the place-first card (location first); the generic persona intake is the default ONLY with no place/property signal; persona preserved for the general possibilities journey.");
+  console.log("\n✓  verify:discovery-flow PASS — place-facts / opportunity-zone / property-discovery entrypoints resolve to the place-first card (location input first); address-first is the default /discover door; the generic persona intake is NEVER the primary card for a place/property signal and is preserved, reachable at ?mode=possibilities.");
   process.exit(0);
 }
 main();

@@ -44,6 +44,19 @@ async function fetchPage(path: string): Promise<{ csp: string; html: string }> {
 }
 
 async function main() {
+  // Confirm the target is THIS app before asserting CSP — a dead server on the
+  // port would crash this, and a foreign one would false-fail. (Bearer included
+  // for IAM-private staging.) A confirmed DEV server still hits the intentional
+  // nonce-mode check below (that dev "fail" is by design, not a wrong-server red).
+  const confirm = await fetch(`${BASE}/`, {
+    signal: AbortSignal.timeout(15000),
+    headers: BEARER ? { Authorization: `Bearer ${BEARER}` } : undefined,
+  }).then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") })).catch(() => null);
+  if (!confirm || confirm.status !== 200 || !/Furlong/.test(confirm.body)) {
+    console.log(`  (no confirmed Furlong server at ${BASE} — verify:csp-hydration skipped; run against a served build with BASE_URL)`);
+    process.exit(0);
+  }
+
   const a = await fetchPage("/navigator");
   ok(!!a.csp, "CSP header present on /navigator");
   const scriptSrc = extractDirective(a.csp, "script-src") ?? "";

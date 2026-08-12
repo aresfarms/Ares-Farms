@@ -31,8 +31,13 @@ async function converse(message: string, journey: unknown): Promise<Resp & { jou
 interface Break { seedId: string; guard: string; transform: string; input: string; observed: string; violation: Violation }
 
 async function main() {
-  const live = await fetch(BASE, { signal: AbortSignal.timeout(2500) }).then(() => true).catch(() => false);
-  if (!live) { console.error(`✗ verify:break-me — no server at ${BASE}. Start one and set BASE_URL.`); process.exit(2); }
+  // Adversarial probes must hit THIS app's converse engine, not a stale/foreign
+  // server on the port — confirm 200 + Furlong brand marker first.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(2500) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  const live = !!home && home.status === 200 && /Furlong/.test(home.body);
+  if (!live) { console.error(`✗ verify:break-me — no confirmed Furlong server at ${BASE}. Start it and set BASE_URL.`); process.exit(2); }
 
   const seeds: Seed[] = [...FORBIDDEN_SEEDS, ...LAWFUL_SEEDS];
   const breaks: Break[] = [];

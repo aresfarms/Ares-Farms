@@ -102,9 +102,16 @@ async function main() {
   ok((va?.commercial ?? 0) >= 2, "approved hotel+commercial direct listings must appear in VA commercial counts");
 
   let liveHtml = "";
-  try {
-    liveHtml = await (await fetch("http://localhost:3000/explore?lane=property-land&category=hospitality&state=VA")).text();
-  } catch { /* dev server absent */ }
+  // Only trust a live render from a CONFIRMED Furlong server (200 + brand
+  // marker); a foreign/stale server on :3000 would otherwise false-fail below.
+  const liveConfirmed = await fetch("http://localhost:3000/")
+    .then(async (r) => r.status === 200 && /Furlong/.test(await r.text().catch(() => "")))
+    .catch(() => false);
+  if (liveConfirmed) {
+    try {
+      liveHtml = await (await fetch("http://localhost:3000/explore?lane=property-land&category=hospitality&state=VA")).text();
+    } catch { /* dev server absent mid-run */ }
+  }
   const liveProof = liveHtml.includes("Blue Ridge Realty (TEST)") && liveHtml.includes("advertising venue");
   console.log(`  live page render (hospitality/VA): ${liveProof ? "RENDERED with venue framing ✓" : liveHtml ? "page fetched but listing ABSENT" : "(dev server not reachable — store-level proof stands)"}`);
   if (liveHtml) ok(liveProof, "approved broker listing must render on the live hospitality/VA page with venue framing");

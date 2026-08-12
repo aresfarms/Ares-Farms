@@ -24,8 +24,14 @@ const INCIDENT = path.join(process.cwd(), "data", "incident-state.json");
 const ap = (f: "caitlin" | "stuart", r = "ok"): ApprovalRecord => ({ founderId: f, channel: "in-person", ts: new Date().toISOString(), rationale: r });
 
 async function main() {
-  const live = await fetch(BASE, { signal: AbortSignal.timeout(3000) }).then(() => true).catch(() => false);
-  if (!live && !CI) fail.push("dev server unreachable — start it or run --ci");
+  // Live probes run only against a CONFIRMED Furlong server (200 + brand
+  // marker); a foreign/stale server on the port would false-pass/fail the
+  // operator-wall + governance traps below.
+  const home = await fetch(BASE, { signal: AbortSignal.timeout(3000) })
+    .then(async (r) => ({ status: r.status, body: await r.text().catch(() => "") }))
+    .catch(() => null);
+  const live = !!home && home.status === 200 && /Furlong/.test(home.body);
+  if (!live && !CI) fail.push("confirmed Furlong dev server unreachable — start it or run --ci");
 
   // B — operator wall denies anonymous (live).
   if (live) {

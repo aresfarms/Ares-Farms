@@ -1,0 +1,59 @@
+# infra/staging — example variable values (STAGING-DEPLOY P1)
+# Copy to terraform.tfvars (git-ignored) and adjust. NO SECRETS go here:
+# Terraform never receives a database password.
+
+project_id = "furlong-staging"
+region     = "us-central1"
+
+# --- Cloud SQL sizing (smallest viable; confirm before apply) ---
+cloudsql_tier    = "db-g1-small"
+database_version = "POSTGRES_16"
+app_db_name      = "furlong"
+
+# --- Backups / PITR ---
+# PITR retains WAL storage that IS billed (not free). Set false to keep only
+# daily backups if the cost estimate is not yet approved.
+enable_point_in_time_recovery  = true
+backup_retention_days          = 7
+transaction_log_retention_days = 7
+
+# --- IAM ---
+# Leave false for Direct private-IP PostgreSQL with a normal connection string.
+# Set true ONLY if you adopt the Cloud SQL Auth Proxy / connectors.
+grant_cloudsql_client = false
+
+# --- Automatic approved-source refresh ---
+# Keeps the homepage/property inventory current without weekly manual refreshes.
+enable_source_refresh_scheduler = true
+source_refresh_schedule         = "0 9 * * *"
+source_refresh_time_zone        = "Etc/UTC"
+
+# --- Security observability / alert routing ---
+security_alert_email_addresses      = ["chudson@aresfarmsinc.com"]
+security_alert_notification_channels = []
+
+# --- Canonical authentication origins ---
+# WebAuthn/passkeys are origin-bound. Use the exact browser-visible staging
+# hostname and keep NEXTAUTH_URL aligned with this origin.
+nextauth_url    = "https://REPLACE_WITH_STAGING_HOST"
+webauthn_rp_id = "REPLACE_WITH_STAGING_HOST"
+webauthn_origin = "https://REPLACE_WITH_STAGING_HOST"
+
+# --- IAP / tester access ---
+enable_iap            = true
+iap_tester_principals = ["user:chudson@aresfarmsinc.com"]
+
+# --- Runtime privilege verification gate ---
+verify_runtime_job_timeout_seconds = 300
+
+# --- API perimeter hardening ---
+api_auth_enforcement       = "required"
+rate_limiting_enabled      = true
+api_rate_limit_window_seconds = 60
+api_rate_limit_max            = 120
+
+# --- Security observability / forensics ---
+enable_security_observability      = true
+forensics_retention_days           = 400
+security_alert_notification_channels = []
+expected_secret_reader_emails        = ["chudson@aresfarmsinc.com"]

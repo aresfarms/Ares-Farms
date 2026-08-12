@@ -36,6 +36,88 @@ runtimeGuard();
 const PUBLIC_MAPS_DIR = path.resolve(process.cwd(), "public", "maps");
 const GENERATED_BY = `ingestMapAssets@${MAP_ASSET_INGESTION_RUNTIME_VERSION}`;
 
+const STATE_SIMPLIFICATION_TOLERANCE = 0.01;
+const COUNTY_SIMPLIFICATION_TOLERANCE = 0.0025;
+type Position = [number, number];
+
+function squaredSegmentDistance(point: Position, start: Position, end: Position): number {
+  let x = start[0];
+  let y = start[1];
+  let dx = end[0] - x;
+  let dy = end[1] - y;
+  if (dx !== 0 || dy !== 0) {
+    const t = ((point[0] - x) * dx + (point[1] - y) * dy) / (dx * dx + dy * dy);
+    if (t > 1) { x = end[0]; y = end[1]; }
+    else if (t > 0) { x += dx * t; y += dy * t; }
+  }
+  dx = point[0] - x;
+  dy = point[1] - y;
+  return dx * dx + dy * dy;
+}
+
+function simplifyOpenLine(points: Position[], tolerance: number): Position[] {
+  if (points.length <= 2) return points;
+  const sqTolerance = tolerance * tolerance;
+  const keep = new Uint8Array(points.length);
+  keep[0] = 1;
+  keep[points.length - 1] = 1;
+  const stack: Array<[number, number]> = [[0, points.length - 1]];
+  while (stack.length > 0) {
+    const [first, last] = stack.pop()!;
+    let maxDistance = sqTolerance;
+    let index = -1;
+    for (let i = first + 1; i < last; i += 1) {
+      const distance = squaredSegmentDistance(points[i], points[first], points[last]);
+      if (distance > maxDistance) { index = i; maxDistance = distance; }
+    }
+    if (index >= 0) {
+      keep[index] = 1;
+      stack.push([first, index], [index, last]);
+    }
+  }
+  return points.filter((_, index) => keep[index] === 1);
+}
+
+function simplifyRing(value: unknown, tolerance: number): unknown {
+  if (!Array.isArray(value) || value.length < 4) return value;
+  const points = value.filter((point): point is Position =>
+    Array.isArray(point) && point.length >= 2 &&
+    typeof point[0] === "number" && typeof point[1] === "number"
+  );
+  if (points.length !== value.length) return value;
+  const closed = points[0][0] === points[points.length - 1][0] && points[0][1] === points[points.length - 1][1];
+  const body = closed ? points.slice(0, -1) : points;
+  if (body.length < 3) return value;
+  const simplified = simplifyOpenLine([...body, body[0]], tolerance).slice(0, -1);
+  if (simplified.length < 3) return value;
+  return [...simplified, simplified[0]];
+}
+
+function simplifyGeometry(geometry: unknown, tolerance: number): unknown {
+  if (!geometry || typeof geometry !== "object") return geometry;
+  const candidate = geometry as { type?: unknown; coordinates?: unknown };
+  if (candidate.type === "Polygon" && Array.isArray(candidate.coordinates)) {
+    return { ...candidate, coordinates: candidate.coordinates.map((ring) => simplifyRing(ring, tolerance)) };
+  }
+  if (candidate.type === "MultiPolygon" && Array.isArray(candidate.coordinates)) {
+    return { ...candidate, coordinates: candidate.coordinates.map((polygon) =>
+      Array.isArray(polygon) ? polygon.map((ring) => simplifyRing(ring, tolerance)) : polygon
+    ) };
+  }
+  return geometry;
+}
+
+function simplifyFeatureCollection<T extends { features: unknown[] }>(collection: T, tolerance: number): T {
+  return {
+    ...collection,
+    features: collection.features.map((feature) => {
+      if (!feature || typeof feature !== "object") return feature;
+      const candidate = feature as { geometry?: unknown };
+      return { ...candidate, geometry: simplifyGeometry(candidate.geometry, tolerance) };
+    }),
+  };
+}
+
 async function fetchGeoJSON(url: string, label: string): Promise<unknown> {
   console.log(`  Fetching ${label}…`);
   const res = await fetch(url, {
@@ -72,7 +154,8 @@ async function ingestStates(): Promise<AssetRecord> {
     assertNonEmptyGeometry(f, "states feature");
   }
 
-  const content = JSON.stringify(raw, null, 2);
+  const simplified = simplifyFeatureCollection(raw, STATE_SIMPLIFICATION_TOLERANCE);
+  const content = JSON.stringify(simplified);
   const contentHash = computeContentHash(content);
   const outputPath = path.join(PUBLIC_MAPS_DIR, "us-states.geojson");
   fs.writeFileSync(outputPath, content, "utf-8");
@@ -116,7 +199,8 @@ async function ingestCounties(): Promise<AssetRecord> {
   }
 
   const merged = mergeFeatureCollections(collections);
-  const content = JSON.stringify(merged, null, 2);
+  const simplified = simplifyFeatureCollection(merged, COUNTY_SIMPLIFICATION_TOLERANCE);
+  const content = JSON.stringify(simplified);
   const contentHash = computeContentHash(content);
   const outputPath = path.join(PUBLIC_MAPS_DIR, "us-counties.geojson");
   fs.writeFileSync(outputPath, content, "utf-8");
@@ -158,7 +242,7 @@ async function writeMetadata(
     content_hash: combinedHash,
     license_or_public_domain_note: source.license_or_public_domain_note,
     simplification_level:
-      "Cartographic boundary — Census TIGER State_County MapServer (geometryPrecision=4)",
+      `Cartographic boundary — Census TIGER State_County MapServer (geometryPrecision=4); topology-preserving coordinate simplification states=${STATE_SIMPLIFICATION_TOLERANCE}, counties=${COUNTY_SIMPLIFICATION_TOLERANCE}`,
     replay_ref: replayRef,
     generated_by: GENERATED_BY,
     generated_at: now,

@@ -8,6 +8,7 @@
  */
 
 export const REPORT_LOGO_PATH = "/brand/furlong-logo.png";
+export const REPORT_EMBLEM_PATH = "/brand/furlong-emblem.png";
 export const REPORT_COMPASS_WATERMARK_PATH =
   "/brand/furlong-compass-watermark.jpeg";
 
@@ -24,6 +25,7 @@ export const REPORT_FOOTER_TEXT =
 
 export interface ReportBranding {
   logoPath: string;
+  emblemPath: string;
   compassWatermarkPath: string;
   reportTitle: string;
   advisoryDisclosure: string;
@@ -45,6 +47,7 @@ export function buildReportBranding(opts?: {
   const date = opts?.generatedAt ?? new Date();
   return {
     logoPath: REPORT_LOGO_PATH,
+    emblemPath: REPORT_EMBLEM_PATH,
     compassWatermarkPath: REPORT_COMPASS_WATERMARK_PATH,
     reportTitle: REPORT_TITLE,
     advisoryDisclosure: REPORT_ADVISORY_DISCLOSURE,

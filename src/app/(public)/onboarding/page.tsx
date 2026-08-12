@@ -7,6 +7,7 @@ import {
 } from "@/lib/customer-landing/featuredExplorationStories";
 import { PUBLIC_PAGE_META } from "@/lib/public-content/publicCopyRegistry";
 import { Disclosures } from "@/components/public/Disclosures";
+import { onboardingIntelligenceCaseHandoff } from "@/lib/intelligence/onboardingIntelligenceCaseHandoff";
 
 /**
  * /onboarding — Start Exploring (Build 53)
@@ -67,6 +68,33 @@ export default async function OnboardingPage({
   const slugValue        = resolvedParams.explore;
   const selectedSlug     = Array.isArray(slugValue) ? slugValue[0] : slugValue;
   const selectedCategory = EXPLORATION_CATEGORIES.find((c) => c.slug === selectedSlug) ?? null;
+  const read = (key: string) => typeof resolvedParams[key] === "string" ? resolvedParams[key] as string : null;
+  const split = (value: string | null) => value?.split(",").map((item) => item.trim()).filter(Boolean) ?? [];
+  const existingCaseId = read("caseId");
+  const existingCase = existingCaseId ? {
+    caseId: existingCaseId,
+    displayName: read("name"),
+    goal: read("goal"),
+    state: read("state"),
+    customerTypes: split(read("customerTypes")),
+    intendedUses: split(read("intendedUses")),
+  } : null;
+  const intelligenceCase = selectedCategory
+    ? onboardingIntelligenceCaseHandoff(selectedCategory.slug, selectedCategory.label, existingCase)
+    : null;
+  const categoryHref = (slug?: string) => {
+    const params = new URLSearchParams();
+    if (slug) params.set("explore", slug);
+    if (existingCase) {
+      params.set("caseId", existingCase.caseId);
+      if (existingCase.displayName) params.set("name", existingCase.displayName);
+      if (existingCase.goal) params.set("goal", existingCase.goal);
+      if (existingCase.state) params.set("state", existingCase.state);
+      if (existingCase.customerTypes.length) params.set("customerTypes", existingCase.customerTypes.join(","));
+      if (existingCase.intendedUses.length) params.set("intendedUses", existingCase.intendedUses.join(","));
+    }
+    return `/onboarding?${params.toString()}`;
+  };
 
   return (
     <main>
@@ -101,9 +129,14 @@ export default async function OnboardingPage({
             </span>
             <strong style={{ fontSize: 22, color: "#162033" }}>{selectedCategory.label}</strong>
             <p style={{ margin: 0, fontSize: 16, ...muted }}>{selectedCategory.blurb}</p>
+            <p style={{ margin: 0, fontSize: 13, ...muted }}>
+              {existingCase
+                ? "Add this posture to the same anonymous intelligence case. No identity, address, transcript, listing URL, or hidden account is transferred."
+                : "Carry this choice into one anonymous intelligence case. No identity, address, transcript, listing URL, or hidden account is transferred."}
+            </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 4 }}>
               <Link
-                href={explorationHref(selectedCategory.slug)}
+                href={intelligenceCase?.href ?? explorationHref(selectedCategory.slug)}
                 style={{
                   display:         "inline-flex",
                   minHeight:       48,
@@ -117,10 +150,10 @@ export default async function OnboardingPage({
                   fontSize:        16,
                 }}
               >
-                Explore {selectedCategory.label} →
+                {existingCase ? "Return to your enriched intelligence case →" : "Open your intelligence case →"}
               </Link>
               <Link
-                href="/onboarding"
+                href={existingCase ? categoryHref() : "/onboarding"}
                 style={{
                   display:        "inline-flex",
                   minHeight:      48,
@@ -164,7 +197,7 @@ export default async function OnboardingPage({
               return (
                 <Link
                   key={category.slug}
-                  href={explorationHref(category.slug)}
+                  href={existingCase ? categoryHref(category.slug) : explorationHref(category.slug)}
                   style={{
                     display:        "grid",
                     gap:            8,

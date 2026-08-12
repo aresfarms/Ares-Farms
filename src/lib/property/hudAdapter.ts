@@ -14,6 +14,7 @@
 import { createHash } from "node:crypto";
 
 import type { CanonicalProperty, PropertySourceRecord } from "./propertyTypes";
+import { governedFetch } from "@/lib/security/outboundRequestPolicy";
 
 export const HUD_DATASET_ID = "a54aff75cc0a42de8456cc36a7335663_3";
 export const HUD_FEED_URL =
@@ -122,7 +123,9 @@ export interface HudFetchResult {
 /** Pull + parse the official HUD REO feed into canonical records. Throws on HTTP error. */
 export async function fetchHudReoRecords(): Promise<HudFetchResult> {
   const fetchedAt = new Date().toISOString();
-  const res = await fetch(HUD_FEED_URL, { headers: { "User-Agent": HUD_UA } });
+  const res = await governedFetch(HUD_FEED_URL, {
+    headers: { "User-Agent": HUD_UA },
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status} for HUD feed`);
   const rows = parseCsv(await res.text());
   const header = rows.shift() ?? [];

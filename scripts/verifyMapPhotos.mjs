@@ -302,9 +302,9 @@ const ctaProblems = [];
 // (2) Capstone entry point (in the tour data).
 if (!/href:\s*"\/explore"/.test(tourText)) ctaProblems.push('capstone CTA href is not "/explore"');
 if (!tourText.includes('Ready to begin your Journey?')) ctaProblems.push('capstone CTA label is not "Ready to begin your Journey?"');
-// (1) Under-map entry point (in the map component) — always visible, → /explore.
-if (!src.includes('What are your possibilities?')) ctaProblems.push('under-map CTA "What are your possibilities? →" is missing');
-if (!/href="\/explore"/.test(src)) ctaProblems.push('under-map CTA does not link to "/explore"');
+// The old under-map CTA was intentionally retired to avoid duplicating the
+// governed Navigator action. The capstone remains the Journey entry point.
+if (src.includes('under-map-explore-cta')) ctaProblems.push('retired duplicate under-map CTA is still present');
 // Hard rule: no journey CTA to /onboarding, anywhere on map / homepage / tour.
 if (homepageSrc.includes('href="/onboarding"')) ctaProblems.push('homepage has a journey CTA to /onboarding (must be /explore)');
 if (src.includes('href="/onboarding"') || /href:\s*"\/onboarding"/.test(tourText)) ctaProblems.push('a journey CTA points at /onboarding (must be /explore)');
@@ -312,7 +312,7 @@ if (!exploreExists) ctaProblems.push('/explore route (src/app/(public)/explore/p
 
 checks.push({
   id: 'P13',
-  label: 'Journey CTAs → /explore (under-map + capstone); none → /onboarding',
+  label: 'Journey capstone CTA → /explore; retired duplicate absent; none → /onboarding',
   passes: ctaProblems.length === 0,
   detail: ctaProblems.length > 0
     ? `Journey-CTA-to-/explore violations:\n      ${ctaProblems.join('\n      ')}`
@@ -435,12 +435,14 @@ checks.push({
   detail: pairGaps.length ? `Pair-present violations:\n      ${pairGaps.join('\n      ')}` : '',
 });
 
-// ── P19: /explore compass — emblem hub + 8 no-account lane spokes ─────────────
+// ── P19: /explore compass — emblem hub + 7 no-account lane spokes (residential parked, founder 2026-08-05) ─────────────
 const explorePath = join(ROOT, 'src/app/(public)/explore/page.tsx');
 const exploreSrc  = existsSync(explorePath) ? readFileSync(explorePath, 'utf-8') : '';
+const interactiveCompassPath = join(ROOT, 'src/components/public/InteractiveCompassRose.tsx');
+const interactiveCompassSrc = existsSync(interactiveCompassPath) ? readFileSync(interactiveCompassPath, 'utf-8') : '';
 const EXPLORE_LANES = [
-  'property-land', 'farms-agriculture', 'small-business-growth', 'environmental-compliance',
-  'financing-capital', 'housing-development', 'programs-incentives', 'not-sure',
+  'farms-agriculture', 'small-business-growth', 'environmental-compliance',
+  'financing-capital', 'guild', 'programs-incentives', 'not-sure',
 ];
 const exploreProblems = [];
 if (!exploreSrc) {
@@ -454,15 +456,16 @@ if (!exploreSrc) {
   if (exploreSrc.includes('explorationHref')) exploreProblems.push('uses explorationHref (routes to /onboarding) — use /explore?lane=');
   if (!exploreSrc.includes('/explore?lane=')) exploreProblems.push('lanes must link to /explore?lane=<slug>');
   // Emblem hub present.
-  if (!exploreSrc.includes('furlong-emblem')) exploreProblems.push('compass emblem hub (/brand/furlong-emblem.png) not rendered');
-  // Exactly the 8 lanes present.
+  if (!exploreSrc.includes('InteractiveCompassRose')) exploreProblems.push('interactive compass component is not rendered');
+  if (!interactiveCompassSrc.includes('/brand/furlong-ship-emblem-v2.png')) exploreProblems.push('interactive compass emblem hub (/brand/furlong-ship-emblem-v2.png) not rendered');
+  // Exactly the 7 lanes present (residential parked, founder 2026-08-05).
   for (const s of EXPLORE_LANES) {
     if (!exploreSrc.includes(`"${s}"`)) exploreProblems.push(`lane "${s}" missing from the compass`);
   }
 }
 checks.push({
   id: 'P19',
-  label: '/explore renders the emblem hub + 8 no-account lane spokes (no /onboarding)',
+  label: '/explore renders the emblem hub + 7 no-account lane spokes (residential parked, founder 2026-08-05) (no /onboarding)',
   passes: exploreProblems.length === 0,
   detail: exploreProblems.length ? `Explore compass violations:\n      ${exploreProblems.join('\n      ')}` : '',
 });

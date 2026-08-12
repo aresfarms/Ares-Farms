@@ -381,7 +381,7 @@ function buildMarketIntelligenceInsights(): AdvancedIntelligenceInsight[] {
         competingSignals: trends.map((trend) => ({
           signalId: `market-${category}-${trend}`,
           label: `${trend} trend`,
-          value: trend,
+          value: trend ?? "",
           sourceRefs: signals
             .filter((signal) => signal.trend_direction === trend)
             .flatMap((signal) => signal.source_refs),
@@ -416,7 +416,7 @@ function buildMarketIntelligenceInsights(): AdvancedIntelligenceInsight[] {
         ...signals.map((signal) => ({
           signalId: signal.market_signal_id,
           label: `${signal.market_type} trend`,
-          value: signal.trend_direction,
+          value: signal.trend_direction ?? "",
           sourceRefs: signal.source_refs,
           confidenceScore: signal.volatility_score,
         })),
@@ -537,7 +537,7 @@ function buildPathwayIntelligenceInsights(): AdvancedIntelligenceInsight[] {
     ).map((item) => ({
       signalId: item.marketplace_item_id,
       label: item.category,
-      value: item.price_range,
+      value: item.price_range ?? "",
       sourceRefs: item.source_refs,
       confidenceScore: item.confidence_score,
     }));
@@ -547,7 +547,7 @@ function buildPathwayIntelligenceInsights(): AdvancedIntelligenceInsight[] {
     ).map((entry) => ({
       signalId: entry.revenue_opportunity_id,
       label: entry.product_or_service_category,
-      value: entry.estimated_revenue_range,
+      value: entry.estimated_revenue_range ?? "",
       sourceRefs: entry.source_refs,
       confidenceScore: entry.confidence_score,
     }));

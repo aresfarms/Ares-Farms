@@ -67,10 +67,10 @@
     },
     {
       "key": "volumeVII",
-      "label": "Furlong Volume VII Unified Governance Conformance Matrix",
-      "governingVersion": "v1.0 active conformance matrix",
-      "file": "Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf",
-      "note": "Active conformance proof layer for unified governance, build verification, and doctrine-to-code traceability."
+      "label": "Furlong Volume VII Governed External Actions and Signature Execution Master",
+      "governingVersion": "2026-08-06 signature execution master",
+      "file": "Furlong_Volume_VII_Governed_External_Actions_and_Signature_Execution_Master.pdf",
+      "note": "Controls external-action and signature-execution doctrine; live signing and delivery remain blocked."
     },
     {
       "key": "xref",
@@ -90,6 +90,14 @@
     "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
     "docs/master-volume-requirements.json",
     "docs/BACKEND_COVERAGE_MATRIX.md",
-    "docs/BACKEND_MODULE_READINESS_DECISION.md"
+    "docs/BACKEND_MODULE_READINESS_DECISION.md",
+    "docs/MASTER_VOLUME_AMENDMENT_INSTITUTIONAL_ACCESS.md",
+    "src/lib/governance/institutionalAbacDisclosure.ts",
+    "src/lib/governance/compelledDisclosureCeremony.ts",
+    "src/lib/governance/institutionalAccessSurveillance.ts",
+    "src/lib/governance/institutionalAccessRuntimeEnforcement.ts",
+    "docs/doctrine/CANON_SIGNATURE_EXECUTION_001.md",
+    "docs/TECH_PDF_EXECUTION_001.md",
+    "docs/runbooks/OPS_SIGNATURE_EXECUTION_001.md"
   ]
 }

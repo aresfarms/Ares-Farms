@@ -1,108 +1,170 @@
 import "dotenv/config";
 
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { Pool } from "pg";
+import {
+  applyCanonicalGovernanceMigrations,
+  CANONICAL_GOVERNANCE_MIGRATION_FILES,
+  canonicalTargetSchemaVersion,
+} from "@/lib/db/canonicalGovernanceMigrations";
+import { RUNTIME_GRANT_SCHEMA } from "@/lib/db/runtimeGrants";
 
 /**
- * Apply Canonical Governance Migrations
+ * Apply Canonical Governance Migrations (operator CLI: db:migrate:governance)
  *
  * Master Volume Governance:
  * - Vol I: applies constitutional backend state authority deliberately.
  * - Vol II: creates regulated-data, entitlement, application, document,
  *   connector, rule, overlay, review, adverse-action, and evidence tables.
- * - Vol III: promotes schema, replay, versioning, source authority,
- *   connector governance, rule/overlay governance, review persistence,
- *   operator queues, document storage handoff, lender/sponsor workflows,
- *   certified connector adapters, regulated decision notices, review
- *   transition controls, borrower notice deliveries, borrower notice
- *   delivery receipts, borrower notice exception resolutions, borrower
- *   notice provider execution controls, external connector execution
- *   controls, report records, billing events, payment connector controls,
- *   live action readiness reviews, credentialed agency ingestion controls,
- *   sovereign consent gateway records, scraper/source intelligence governance,
- *   canonical property governance, revenue source intelligence governance,
- *   canonical external source stack governance, source failover,
- *   canonicalization/conflict storage, freshness monitoring, environmental
- *   compliance records, borrower fee-protection controls, and durable runtime
- *   storage.
+ * - Vol III / III-B: promotes the ONE canonical governance schema lineage
+ *   (schema, replay, versioning, classification, observability, source
+ *   authority, connector/rule/overlay governance, review + notice + billing +
+ *   payment + environmental compliance persistence, and durable runtime
+ *   storage) via the shared registry — no competing migration list.
  * - Vol IV: provides a controlled operator migration step.
  * - Vol V: supports classification, observability, source, replay,
  *   rule lineage, overlay precedence, human review, and version doctrine.
  *
+ * This CLI is a THIN WRAPPER over the shared canonical migration registry
+ * (src/lib/db/canonicalGovernanceMigrations.ts), so it applies EXACTLY the same
+ * ordered set that `migrate:schema` runs. `migrate:schema` composes this step
+ * (structure) with `applyRuntimeDatabaseGrants.ts` (authority) — this file NEVER
+ * touches grants or seeds data.
+ *
+ * CREDENTIAL PRECEDENCE + SAFETY GATE:
+ * Migrations are DDL and MUST run as the migrator principal — NEVER as the
+ * runtime principal. So this step uses MIGRATOR_DATABASE_URL, and it will only
+ * fall back to DATABASE_URL when explicitly permitted with --allow-database-url.
+ * Without that flag, a set-but-unintended DATABASE_URL is REFUSED rather than
+ * silently used (which could otherwise run DDL as the runtime principal).
+ *   * governed chain  `migrate:schema`  -> strict: requires MIGRATOR_DATABASE_URL
+ *     (both this step and applyRuntimeDatabaseGrants run as the migrator).
+ *   * local operator  `db:migrate:governance` -> passes --allow-database-url,
+ *     so DATABASE_URL works exactly as before for controlled local dev.
+ *
+ * MODES:
+ *   (default)  Apply the governance migrations. Requires MIGRATOR_DATABASE_URL
+ *              unless --allow-database-url is passed. Exit non-zero on failure.
+ *   --allow-database-url  Permit the DATABASE_URL fallback (local dev only).
+ *   --plan     Open NO database connection. Print the ordered migration lineage
+ *              (0007–0033) and the phase status report:
+ *                namespace       = public
+ *                runtime grants  = pending  (applyRuntimeDatabaseGrants.ts)
+ *                data seed       = excluded (P4 / demo:seed, never here)
+ *                live proof gate = P1.6      (verify:runtime-privileges)
+ *
  * Operator rule:
- * Run this only when the active DATABASE_URL is confirmed to be the intended
- * development or controlled migration database.
+ * Run the default mode only when the resolved migration database (see the logged
+ * credential source) is the intended controlled migration DB, applied by the
+ * migrator principal.
  */
 
-const migrationFiles = [
-  "0007_canonical_governance_spine.sql",
-  "0008_application_persistence.sql",
-  "0009_document_intake.sql",
-  "0010_external_data_connectors.sql",
-  "0011_rule_overlay_registry.sql",
-  "0012_review_workflows.sql",
-  "0013_operator_review_queues.sql",
-  "0014_document_storage_handoffs.sql",
-  "0015_partner_workflows.sql",
-  "0016_certified_connector_adapters.sql",
-  "0017_regulated_decision_notices.sql",
-  "0018_review_transition_controls.sql",
-  "0019_borrower_notice_deliveries.sql",
-  "0020_borrower_notice_delivery_receipts.sql",
-  "0021_borrower_notice_exception_resolutions.sql",
-  "0022_borrower_notice_provider_executions.sql",
-  "0023_external_connector_executions.sql",
-  "0024_report_records.sql",
-  "0025_billing_events.sql",
-  "0026_payment_connector_controls.sql",
-  "0027_live_action_readiness_reviews.sql",
-  "0028_credentialed_agency_ingestion.sql",
-  "0029_sovereign_consent_gateway_records.sql",
-  "0030_scraper_source_governance.sql",
-  "0031_revenue_source_intelligence_governance.sql",
-  "0032_external_source_stack_governance.sql",
-  "0033_environmental_compliance_records.sql",
-];
-
-function migrationPath(fileName: string): string {
-  return path.join(
-    process.cwd(),
-    "src",
-    "lib",
-    "db",
-    "migrations",
-    fileName
-  );
+interface Options {
+  plan: boolean;
+  allowDatabaseUrl: boolean;
 }
 
-async function main(): Promise<void> {
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is required before applying migrations.");
+function parseArgs(argv: string[]): Options {
+  return {
+    plan: argv.includes("--plan"),
+    allowDatabaseUrl: argv.includes("--allow-database-url"),
+  };
+}
+
+/**
+ * Resolve the migration connection. Prefer the migrator principal's URL so the
+ * migrate:schema chain is single-principal. Fall back to DATABASE_URL ONLY when
+ * --allow-database-url is passed; otherwise a set DATABASE_URL is reported as
+ * refused so the caller fails loudly instead of migrating as the wrong principal.
+ */
+function resolveMigrationConnection(opts: Options): {
+  connectionString: string | undefined;
+  source: string;
+} {
+  if (process.env.MIGRATOR_DATABASE_URL) {
+    return {
+      connectionString: process.env.MIGRATOR_DATABASE_URL,
+      source: "MIGRATOR_DATABASE_URL",
+    };
   }
+  if (process.env.DATABASE_URL) {
+    if (opts.allowDatabaseUrl) {
+      return {
+        connectionString: process.env.DATABASE_URL,
+        source: "DATABASE_URL (--allow-database-url)",
+      };
+    }
+    return {
+      connectionString: undefined,
+      source: "DATABASE_URL present but REFUSED (pass --allow-database-url)",
+    };
+  }
+  return { connectionString: undefined, source: "none" };
+}
+
+function runPlan(opts: Options): void {
+  console.log("db:migrate:governance — PLAN (no database connection)");
+  console.log(
+    `\n  canonical governance migration lineage (${CANONICAL_GOVERNANCE_MIGRATION_FILES.length}), applied in order:`
+  );
+  for (const fileName of CANONICAL_GOVERNANCE_MIGRATION_FILES) {
+    console.log(`    - ${fileName}`);
+  }
+  console.log("\n  phase status:");
+  console.log(`    credential src   = ${resolveMigrationConnection(opts).source}  (MIGRATOR_DATABASE_URL; DATABASE_URL only with --allow-database-url)`);
+  console.log(`    namespace        = ${RUNTIME_GRANT_SCHEMA}`);
+  console.log(`    target schema    = ${canonicalTargetSchemaVersion()}`);
+  console.log(
+    "    runtime grants   = pending   (applied by applyRuntimeDatabaseGrants.ts)"
+  );
+  console.log(
+    "    data seed        = excluded  (P4 application-level demo:seed; never here)"
+  );
+  console.log(
+    "    live proof gate  = P1.6      (verify:runtime-privileges, post-P1 bootstrap)"
+  );
+  console.log("\nPLAN OK — no database connection opened, no changes applied.");
+}
+
+async function runApply(opts: Options): Promise<void> {
+  const { connectionString, source } = resolveMigrationConnection(opts);
+  if (!connectionString) {
+    if (process.env.DATABASE_URL && !opts.allowDatabaseUrl) {
+      throw new Error(
+        "Refusing to run migrations on DATABASE_URL. Migrations are DDL and must " +
+          "run as the migrator principal: set MIGRATOR_DATABASE_URL, or pass " +
+          "--allow-database-url for controlled local dev. The runtime principal " +
+          "must never run migrations."
+      );
+    }
+    throw new Error(
+      "MIGRATOR_DATABASE_URL is required before applying migrations " +
+        "(or DATABASE_URL with --allow-database-url for local dev)."
+    );
+  }
+  console.log(`Applying governance migrations using ${source}.`);
 
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
     max: 1,
-    idleTimeoutMillis: 10000,
-    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 10_000,
+    // Direct-VPC Cloud Run cold starts can exceed ten seconds before the
+    // private database path is ready. Keep one bounded attempt, but allow the
+    // governed migrator enough time to establish that first connection.
+    connectionTimeoutMillis: 30_000,
   });
 
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
-
-    for (const fileName of migrationFiles) {
-      const sql = await readFile(migrationPath(fileName), "utf8");
-      await client.query(sql);
-      console.log(`Applied migration: ${fileName}`);
-    }
-
+    await applyCanonicalGovernanceMigrations(client, (message) =>
+      console.log(message)
+    );
     await client.query("COMMIT");
 
     console.log(
-      "Canonical governance migrations applied successfully."
+      `Canonical governance migrations applied successfully ` +
+        `(${CANONICAL_GOVERNANCE_MIGRATION_FILES.length} files).`
     );
   } catch (error) {
     await client.query("ROLLBACK");
@@ -112,6 +174,15 @@ async function main(): Promise<void> {
     client.release();
     await pool.end();
   }
+}
+
+async function main(): Promise<void> {
+  const opts = parseArgs(process.argv.slice(2));
+  if (opts.plan) {
+    runPlan(opts);
+    return;
+  }
+  await runApply(opts);
 }
 
 main().catch((error: unknown) => {

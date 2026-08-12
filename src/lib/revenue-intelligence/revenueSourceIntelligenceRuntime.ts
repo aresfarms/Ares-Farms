@@ -4,6 +4,23 @@ import {
   ADVISORY_ONLY_DISCLOSURE,
   evaluateContentClaims,
 } from "@/lib/governance/contentClaimsPolicy";
+import {
+  GEO_SUITABILITY_PROFILES,
+  MARKET_SIGNALS,
+  PROGRAM_GRAPH,
+  REVENUE_OPPORTUNITY_REGISTRY,
+  REVENUE_PRODUCTION_RESTRICTIONS,
+  REVENUE_SOURCE_REQUIRED_DISCLOSURES,
+} from "@/lib/modules/sourceProgramCatalog";
+
+export {
+  GEO_SUITABILITY_PROFILES,
+  MARKET_SIGNALS,
+  PROGRAM_GRAPH,
+  REVENUE_OPPORTUNITY_REGISTRY,
+  REVENUE_PRODUCTION_RESTRICTIONS,
+  REVENUE_SOURCE_REQUIRED_DISCLOSURES,
+} from "@/lib/modules/sourceProgramCatalog";
 
 /**
  * Revenue Source Intelligence Runtime
@@ -35,17 +52,6 @@ export const REVENUE_SOURCE_INTELLIGENCE_SOURCES = [
   "Ares Furlong Revenue Source Intelligence Doctrines.docx",
 ] as const;
 
-export const REVENUE_SOURCE_REQUIRED_DISCLOSURES = [
-  "Your document was received.",
-  "Human review is pending.",
-  "More information may be needed.",
-  "Revenue intelligence is advisory planning support.",
-  "Program fit is preliminary and review-required.",
-  "Pricing, market, weather, and cost signals may change.",
-  "Regional legal and licensing questions require qualified review.",
-  ADVISORY_ONLY_DISCLOSURE,
-] as const;
-
 export type RevenueSourceActionInput = {
   actorId?: string | null;
   customerId?: string | null;
@@ -73,26 +79,6 @@ export type RevenueDispatchResult = {
   humanReviewRequired: true;
 };
 
-type RevenueOpportunity = {
-  revenue_opportunity_id: string;
-  customer_type: string;
-  geography_scope: string;
-  eligible_entity_types: string[];
-  product_or_service_category: string;
-  program_refs: string[];
-  source_refs: string[];
-  estimated_revenue_range?: string;
-  estimated_cost_range?: string;
-  seasonality_profile?: string;
-  compliance_constraints: string[];
-  age_restrictions?: string[];
-  licensing_requirements?: string[];
-  confidence_score: number;
-  classification_level: string;
-  replay_refs: string[];
-  projection_basis: "verified-data" | "inferred-estimate" | "forecast" | "assumption";
-};
-
 type SellableCatalogItem = {
   item_id: string;
   common_name: string;
@@ -115,23 +101,6 @@ type SellableCatalogItem = {
   replay_refs: string[];
 };
 
-type ProgramNode = {
-  program_id: string;
-  program_name: string;
-  sponsor_type: "federal" | "state" | "county" | "municipal" | "philanthropic" | "private" | "nonprofit";
-  geography_scope: string[];
-  eligible_customer_types: string[];
-  eligible_uses: string[];
-  prohibited_uses: string[];
-  age_constraints?: string[];
-  entity_constraints?: string[];
-  stacking_rules: string[];
-  conflict_rules: string[];
-  deadline_profile?: string;
-  source_refs: string[];
-  replay_refs: string[];
-};
-
 type MarketplaceItem = {
   marketplace_item_id: string;
   category: string;
@@ -147,7 +116,8 @@ type MarketplaceItem = {
   last_verified_at: string;
   confidence_score: number;
   replay_refs: string[];
-  price_basis: "list-price" | "estimated-price" | "used-market-price" | "quoted-price";
+  price_basis:
+    "list-price" | "estimated-price" | "used-market-price" | "quoted-price";
 };
 
 type OperatingCostSignal = {
@@ -161,37 +131,8 @@ type OperatingCostSignal = {
   freshness_status: string;
   volatility_score?: number;
   replay_refs: string[];
-  uncertainty_classification: "OBSERVED" | "ESTIMATE" | "FORECAST" | "USER_PROVIDED";
-};
-
-type MarketSignal = {
-  market_signal_id: string;
-  commodity_or_category: string;
-  geography_scope: string;
-  market_type: string;
-  current_price?: number;
-  price_unit?: string;
-  trend_direction?: string;
-  volatility_score?: number;
-  source_refs: string[];
-  fetched_at: string;
-  replay_refs: string[];
-  signal_basis: "spot" | "futures" | "regional" | "wholesale" | "user-entered-estimate";
-};
-
-type GeoSuitabilityProfile = {
-  geo_profile_id: string;
-  geography_scope: string;
-  parcel_refs?: string[];
-  soil_refs: string[];
-  weather_refs: string[];
-  climate_refs: string[];
-  water_refs: string[];
-  infrastructure_refs: string[];
-  suitability_scores: Record<string, number>;
-  source_refs: string[];
-  replay_refs: string[];
-  weighting_assumptions: string[];
+  uncertainty_classification:
+    "OBSERVED" | "ESTIMATE" | "FORECAST" | "USER_PROVIDED";
 };
 
 type StateRegulatoryRecord = {
@@ -238,17 +179,6 @@ type AdvisoryFusionResult = {
 
 const FIXED_RUNTIME_AT = "2026-05-25T00:00:00.000Z";
 
-export const REVENUE_PRODUCTION_RESTRICTIONS = [
-  "no guaranteed revenue claims",
-  "no program approval claims",
-  "no legal permission claims",
-  "no lender commitment claims",
-  "no underwriting reliance",
-  "no autonomous recommendation without review",
-  "no live source fetch before connector promotion",
-  "no official report publication",
-] as const;
-
 export const REVENUE_SOURCE_CATEGORIES = [
   "USDA specialty crop and program sources",
   "state agriculture and licensing sources",
@@ -259,63 +189,6 @@ export const REVENUE_SOURCE_CATEGORIES = [
   "state regulatory records and entity compliance sources",
   "philanthropic, nonprofit, and local program sources",
 ] as const;
-
-export const REVENUE_OPPORTUNITY_REGISTRY: RevenueOpportunity[] = [
-  {
-    revenue_opportunity_id: "rev-specialty-crop-market-garden",
-    customer_type: "beginning farmer",
-    geography_scope: "state/county",
-    eligible_entity_types: ["individual operator", "farm entity"],
-    product_or_service_category: "specialty crops",
-    program_refs: ["prog-usda-specialty-crop", "prog-state-ag-grant"],
-    source_refs: ["usda-specialty-crop", "state-ag-crop-list", "extension-crop-guide"],
-    estimated_revenue_range: "review-required planning range",
-    estimated_cost_range: "review-required input range",
-    seasonality_profile: "spring through fall production cycle",
-    compliance_constraints: ["food safety review", "local market rule review"],
-    age_restrictions: ["minor operators require guardian/consent review"],
-    licensing_requirements: ["state and local requirements must be reviewed"],
-    confidence_score: 72,
-    classification_level: "CONFIDENTIAL",
-    replay_refs: ["replay-rev-specialty-crop-market-garden-v0.1.0"],
-    projection_basis: "inferred-estimate",
-  },
-  {
-    revenue_opportunity_id: "rev-rural-laundry-efficiency",
-    customer_type: "laundromat owner",
-    geography_scope: "state/utility territory",
-    eligible_entity_types: ["small business", "commercial operator"],
-    product_or_service_category: "energy efficiency add-on",
-    program_refs: ["prog-energy-rebate", "prog-sba-small-business"],
-    source_refs: ["utility-rebate-source", "sba-program-source"],
-    estimated_revenue_range: "advisory operating improvement range",
-    estimated_cost_range: "equipment and utility cost review required",
-    compliance_constraints: ["utility eligibility review", "equipment compatibility review"],
-    licensing_requirements: ["business license review"],
-    confidence_score: 68,
-    classification_level: "CONFIDENTIAL",
-    replay_refs: ["replay-rev-rural-laundry-efficiency-v0.1.0"],
-    projection_basis: "assumption",
-  },
-  {
-    revenue_opportunity_id: "rev-agritourism-farm-experience",
-    customer_type: "agritourism operator",
-    geography_scope: "state/county/municipal",
-    eligible_entity_types: ["farm entity", "rural business"],
-    product_or_service_category: "farm experiences",
-    program_refs: ["prog-rural-tourism", "prog-state-economic-development"],
-    source_refs: ["state-tourism-source", "county-zoning-source"],
-    estimated_revenue_range: "advisory seasonal range",
-    estimated_cost_range: "insurance, permitting, and site-readiness review required",
-    seasonality_profile: "seasonal event calendar",
-    compliance_constraints: ["zoning review", "insurance review", "public safety review"],
-    licensing_requirements: ["local permit review"],
-    confidence_score: 64,
-    classification_level: "CONFIDENTIAL",
-    replay_refs: ["replay-rev-agritourism-farm-experience-v0.1.0"],
-    projection_basis: "forecast",
-  },
-];
 
 export const SELLABLE_CATALOG: SellableCatalogItem[] = [
   {
@@ -329,7 +202,9 @@ export const SELLABLE_CATALOG: SellableCatalogItem[] = [
     water_requirements: ["irrigation availability review"],
     growing_season: "regional frost-date dependent",
     production_cycle: "annual/perennial mix",
-    licensing_requirements: ["nursery or sales licensing review may be required"],
+    licensing_requirements: [
+      "nursery or sales licensing review may be required",
+    ],
     program_eligibility_refs: ["prog-usda-specialty-crop"],
     prohibited_customer_types: [],
     minor_operator_constraints: ["guardian/consent and labor rules review"],
@@ -369,53 +244,6 @@ export const SELLABLE_CATALOG: SellableCatalogItem[] = [
     source_refs: ["extension-greenhouse-guide", "state-nursery-source"],
     confidence_score: 73,
     replay_refs: ["replay-item-greenhouse-herbs-v0.1.0"],
-  },
-];
-
-export const PROGRAM_GRAPH: ProgramNode[] = [
-  {
-    program_id: "prog-usda-specialty-crop",
-    program_name: "USDA specialty crop program source",
-    sponsor_type: "federal",
-    geography_scope: ["federal", "state-administered"],
-    eligible_customer_types: ["farmer", "beginning farmer", "nursery operator"],
-    eligible_uses: ["specialty crop planning", "marketing", "production support"],
-    prohibited_uses: ["unreviewed restricted products", "unverified legal claims"],
-    age_constraints: ["minor/youth posture requires program-specific review"],
-    entity_constraints: ["entity and documentation review required"],
-    stacking_rules: ["stacking must be checked against active program rules"],
-    conflict_rules: ["conflicts route to human review"],
-    deadline_profile: "deadline refresh required before presentation",
-    source_refs: ["usda-program-page", "state-administered-program-source"],
-    replay_refs: ["replay-prog-usda-specialty-crop-v0.1.0"],
-  },
-  {
-    program_id: "prog-energy-rebate",
-    program_name: "Energy efficiency rebate source",
-    sponsor_type: "state",
-    geography_scope: ["state", "utility territory"],
-    eligible_customer_types: ["laundromat owner", "hospitality operator", "energy project operator"],
-    eligible_uses: ["equipment efficiency", "utility demand reduction"],
-    prohibited_uses: ["unreviewed equipment claims"],
-    stacking_rules: ["utility and state stacking review required"],
-    conflict_rules: ["rebate conflict rules must be preserved"],
-    deadline_profile: "active period review required",
-    source_refs: ["state-energy-source", "utility-rebate-source"],
-    replay_refs: ["replay-prog-energy-rebate-v0.1.0"],
-  },
-  {
-    program_id: "prog-rural-tourism",
-    program_name: "Rural tourism program source",
-    sponsor_type: "state",
-    geography_scope: ["state", "county"],
-    eligible_customer_types: ["agritourism operator", "hospitality operator", "rural business owner"],
-    eligible_uses: ["tourism readiness", "site improvement", "marketing support"],
-    prohibited_uses: ["unreviewed public safety or zoning claims"],
-    stacking_rules: ["state and local compatibility review required"],
-    conflict_rules: ["zoning and insurance conflicts require human review"],
-    deadline_profile: "seasonal grant window review required",
-    source_refs: ["state-tourism-source", "county-development-source"],
-    replay_refs: ["replay-prog-rural-tourism-v0.1.0"],
   },
 ];
 
@@ -482,61 +310,22 @@ export const OPERATING_COST_SIGNALS: OperatingCostSignal[] = [
   },
 ];
 
-export const MARKET_SIGNALS: MarketSignal[] = [
-  {
-    market_signal_id: "market-specialty-crop-regional",
-    commodity_or_category: "specialty crops",
-    geography_scope: "regional",
-    market_type: "regional wholesale/advisory",
-    trend_direction: "review-required",
-    volatility_score: 61,
-    source_refs: ["regional-market-source", "extension-market-source"],
-    fetched_at: FIXED_RUNTIME_AT,
-    replay_refs: ["replay-market-specialty-crop-regional-v0.1.0"],
-    signal_basis: "regional",
-  },
-  {
-    market_signal_id: "market-energy-cost",
-    commodity_or_category: "energy",
-    geography_scope: "state/utility",
-    market_type: "utility tariff/advisory",
-    trend_direction: "review-required",
-    volatility_score: 58,
-    source_refs: ["state-energy-source", "utility-rate-source"],
-    fetched_at: FIXED_RUNTIME_AT,
-    replay_refs: ["replay-market-energy-cost-v0.1.0"],
-    signal_basis: "regional",
-  },
-];
-
-export const GEO_SUITABILITY_PROFILES: GeoSuitabilityProfile[] = [
-  {
-    geo_profile_id: "geo-specialty-crop-suitability",
-    geography_scope: "state/county",
-    soil_refs: ["nrcs-soil-source"],
-    weather_refs: ["weather-history-source"],
-    climate_refs: ["climate-normals-source"],
-    water_refs: ["water-availability-source"],
-    infrastructure_refs: ["road-logistics-source", "broadband-source"],
-    suitability_scores: {
-      specialty_crops: 68,
-      greenhouse_products: 72,
-    },
-    source_refs: ["nrcs-soil-source", "climate-source", "water-source"],
-    replay_refs: ["replay-geo-specialty-crop-suitability-v0.1.0"],
-    weighting_assumptions: [
-      "soil, water, climate, and logistics are separated and reviewable",
-    ],
-  },
-];
-
 export const STATE_REGULATORY_RECORDS: StateRegulatoryRecord[] = [
   {
     state_record_id: "state-cottage-food-review",
     jurisdiction: "state",
     regulatory_domain: "cottage food and value-added products",
-    affected_customer_types: ["farmer", "rural business owner", "minor/youth operator"],
-    affected_products_or_services: ["honey", "jams", "sauces", "dried products"],
+    affected_customer_types: [
+      "farmer",
+      "rural business owner",
+      "minor/youth operator",
+    ],
+    affected_products_or_services: [
+      "honey",
+      "jams",
+      "sauces",
+      "dried products",
+    ],
     requirement_summary:
       "State and local food production, labeling, sales, and facility requirements require qualified review.",
     source_refs: ["state-cottage-food-source"],
@@ -555,31 +344,51 @@ export const STATE_REGULATORY_RECORDS: StateRegulatoryRecord[] = [
   },
 ];
 
-export const CUSTOMER_TYPE_ELIGIBILITY_PROFILES: CustomerTypeEligibilityProfile[] = [
-  {
-    profile_id: "profile-beginning-farmer",
-    customer_type: "beginning farmer",
-    eligible_programs: ["prog-usda-specialty-crop", "prog-state-ag-grant"],
-    eligible_revenue_categories: ["specialty crops", "greenhouse products", "value-added products"],
-    prohibited_or_restricted_categories: ["restricted exotics", "unreviewed livestock"],
-    required_documents: ["identity", "entity", "property/control", "program documentation"],
-    licensing_constraints: ["state and local review required"],
-    age_constraints: ["minor/youth posture requires guardian/consent review"],
-    geography_constraints: ["state/county review required"],
-    replay_refs: ["replay-profile-beginning-farmer-v0.1.0"],
-  },
-  {
-    profile_id: "profile-laundromat-owner",
-    customer_type: "laundromat owner",
-    eligible_programs: ["prog-energy-rebate", "prog-sba-small-business"],
-    eligible_revenue_categories: ["energy efficiency add-on", "equipment-supported business lines"],
-    prohibited_or_restricted_categories: ["unreviewed utility claims"],
-    required_documents: ["entity", "utility account", "equipment quote or source reference"],
-    licensing_constraints: ["business licensing review required"],
-    geography_constraints: ["state/utility territory review required"],
-    replay_refs: ["replay-profile-laundromat-owner-v0.1.0"],
-  },
-];
+export const CUSTOMER_TYPE_ELIGIBILITY_PROFILES: CustomerTypeEligibilityProfile[] =
+  [
+    {
+      profile_id: "profile-beginning-farmer",
+      customer_type: "beginning farmer",
+      eligible_programs: ["prog-usda-specialty-crop", "prog-state-ag-grant"],
+      eligible_revenue_categories: [
+        "specialty crops",
+        "greenhouse products",
+        "value-added products",
+      ],
+      prohibited_or_restricted_categories: [
+        "restricted exotics",
+        "unreviewed livestock",
+      ],
+      required_documents: [
+        "identity",
+        "entity",
+        "property/control",
+        "program documentation",
+      ],
+      licensing_constraints: ["state and local review required"],
+      age_constraints: ["minor/youth posture requires guardian/consent review"],
+      geography_constraints: ["state/county review required"],
+      replay_refs: ["replay-profile-beginning-farmer-v0.1.0"],
+    },
+    {
+      profile_id: "profile-laundromat-owner",
+      customer_type: "laundromat owner",
+      eligible_programs: ["prog-energy-rebate", "prog-sba-small-business"],
+      eligible_revenue_categories: [
+        "energy efficiency add-on",
+        "equipment-supported business lines",
+      ],
+      prohibited_or_restricted_categories: ["unreviewed utility claims"],
+      required_documents: [
+        "entity",
+        "utility account",
+        "equipment quote or source reference",
+      ],
+      licensing_constraints: ["business licensing review required"],
+      geography_constraints: ["state/utility territory review required"],
+      replay_refs: ["replay-profile-laundromat-owner-v0.1.0"],
+    },
+  ];
 
 export const ADVISORY_FUSION_RESULTS: AdvisoryFusionResult[] = [
   {
@@ -633,17 +442,19 @@ export const REVENUE_REQUIRED_SCHEMA_TABLES = [
   "revenue_source_lineage_records",
 ] as const;
 
-export function hashRevenueSourceRecord(record: Record<string, unknown>): string {
-  return createHash("sha256")
-    .update(JSON.stringify(record))
-    .digest("hex");
+export function hashRevenueSourceRecord(
+  record: Record<string, unknown>,
+): string {
+  return createHash("sha256").update(JSON.stringify(record)).digest("hex");
 }
 
 function controlledBlocks(input: RevenueSourceActionInput): string[] {
   const blockedReasons: string[] = [];
 
   if (input.liveSourceRefreshRequested) {
-    blockedReasons.push("live source refresh is blocked until connector promotion");
+    blockedReasons.push(
+      "live source refresh is blocked until connector promotion",
+    );
   }
 
   if (input.productionUseRequested) {
@@ -651,15 +462,21 @@ function controlledBlocks(input: RevenueSourceActionInput): string[] {
   }
 
   if (input.officialUseRequested) {
-    blockedReasons.push("official report, legal, financing, and program-use claims are blocked");
+    blockedReasons.push(
+      "official report, legal, financing, and program-use claims are blocked",
+    );
   }
 
   if (input.legalAdviceRequested) {
-    blockedReasons.push("legal advice is blocked and must route to qualified review");
+    blockedReasons.push(
+      "legal advice is blocked and must route to qualified review",
+    );
   }
 
   if (input.guaranteedClaimRequested) {
-    blockedReasons.push("guaranteed revenue, program, or availability claims are blocked");
+    blockedReasons.push(
+      "guaranteed revenue, program, or availability claims are blocked",
+    );
   }
 
   return blockedReasons;
@@ -668,7 +485,7 @@ function controlledBlocks(input: RevenueSourceActionInput): string[] {
 function envelope(
   action: string,
   input: RevenueSourceActionInput,
-  result: Record<string, unknown>
+  result: Record<string, unknown>,
 ): RevenueDispatchResult {
   const blockedReasons = controlledBlocks(input);
   const claimEvaluation = evaluateContentClaims({
@@ -788,7 +605,13 @@ export function marketSignals(input: RevenueSourceActionInput) {
 export function geospatialGovernance(input: RevenueSourceActionInput) {
   return envelope("revenue.geospatial-governance", input, {
     profiles: GEO_SUITABILITY_PROFILES,
-    separationControls: ["soil", "weather", "climate", "water", "infrastructure"],
+    separationControls: [
+      "soil",
+      "weather",
+      "climate",
+      "water",
+      "infrastructure",
+    ],
   });
 }
 
@@ -866,7 +689,7 @@ export function customerRevenueModule(input: RevenueSourceActionInput) {
 
 export function dispatchRevenueSourceIntelligenceAction(
   action: string,
-  input: RevenueSourceActionInput
+  input: RevenueSourceActionInput,
 ): RevenueDispatchResult {
   switch (action) {
     case "revenue.opportunities":

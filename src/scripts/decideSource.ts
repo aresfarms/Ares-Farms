@@ -15,10 +15,10 @@
  * attributed in the audit ledger.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { OPERATORS, operatorByEmail, canApproveSourceLegal } from "../lib/auth/operatorRegistry";
 import { SOURCE_ACTIVATION } from "../lib/property/sourceActivation";
 import { getRuntimeActivation, recordSourceDecision, type ReviewDecision } from "../lib/property/sourceActivationStore";
-import { readAuditEvents } from "../lib/property/auditLedger";
 
 function arg(name: string): string | undefined {
   const hit = process.argv.find((a) => a.startsWith(`--${name}=`));
@@ -52,7 +52,7 @@ function main(): void {
   if (!canApproveSourceLegal(op!.email)) fail(`${op!.name} does not hold Module 45 approve:source-legal authority.`);
 
   const result = recordSourceDecision({ sourceId: source, decision, reviewerId: op!.id, reviewerName: op!.name, reason });
-  const last = readAuditEvents({ domain: "source-review", subject: source }).at(-1);
+  const last = canonicalLandRegisterAuthority.read({ domain: "source-review", subject: source }).at(-1);
 
   console.log(`\n✓ ${decision} recorded for "${source}" by ${op!.name} (${op!.role}).`);
   console.log(`  Module 23: ${result.module23} · Module 22: ${result.module22} · SOURCE_LIVE: ${result.sourceLive}`);

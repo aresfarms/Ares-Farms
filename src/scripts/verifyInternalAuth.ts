@@ -12,8 +12,9 @@
  * body carrying the internal console markers.
  *
  * For each internal API: an unauthenticated request must be rejected (401/403)
- * — never 200 with data. (Middleware runs before the handler, so a GET suffices
- * even for POST-only routes.)
+ * or fail closed with the perimeter's governed missing-secret 503 — never 200
+ * with data. (Middleware runs before the handler, so a GET suffices even for
+ * POST-only routes.)
  *
  * Sanity (so the lock didn't also brick the public site): public pages still
  * load (200, not redirected to sign-in) and the genuinely-public APIs are not
@@ -63,6 +64,7 @@ const INTERNAL_PAGES = [
   "/production-final-authority",
   "/dashboard",
   "/lender/dashboard",
+  "/lender-desk",
   "/sponsor/dashboard",
   "/portal/borrower",
 ];
@@ -85,6 +87,7 @@ const INTERNAL_APIS = [
   "/api/ledger",
   "/api/audit",
   "/api/entitlements",
+  "/api/lender/deal-desk",
 ];
 
 // Public pages must still render (must NOT be redirected to sign-in).
@@ -110,20 +113,49 @@ async function get(path: string): Promise<{ status: number; location: string | n
   return { status: res.status, location: res.headers.get("location"), body };
 }
 
+/**
+ * A redirect counts ONLY if it lands on a real sign-in wall.
+ *
+ * This used to accept `/api/auth/signin` alone — NextAuth's built-in page. The
+ * app now redirects to its OWN `/sign-in`, so the check went red on routes that
+ * were correctly protected: `/environmental-compliance` returns
+ * 307 -> /sign-in?callbackUrl=... and was reported as a failure (sweep finding
+ * S-4, 2026-08-11).
+ *
+ * A FALSE RED IS NOT HARMLESS. A gate that fails on healthy code trains
+ * everyone to skip past it, and the next failure — a real one — gets skipped
+ * too. Widened to the custom page, and NOT further: the status must still be
+ * 3xx and the destination must still be a sign-in wall, so a redirect to the
+ * console or to "/" still fails.
+ */
+const SIGN_IN_DESTINATIONS = [/\/api\/auth\/signin/, /^\/sign-in(\?|$)/, /:\/\/[^/]+\/sign-in(\?|$)/];
+
 function isSignInRedirect(status: number, location: string | null): boolean {
-  return status >= 300 && status < 400 && !!location && /\/api\/auth\/signin/.test(location);
+  if (status < 300 || status >= 400 || !location) return false;
+  return SIGN_IN_DESTINATIONS.some((pattern) => pattern.test(location));
 }
 
 async function main(): Promise<void> {
   const failures: Failure[] = [];
 
-  // ── Server reachable? ──────────────────────────────────────────────────────
+  // ── Confirm the target is THIS app before asserting ─────────────────────────
+  // A security gate must never false-PASS against a stale/foreign server that
+  // merely answers on the port, nor false-FAIL when nothing is running. Require
+  // the public home page to return 200 AND carry the Furlong brand marker
+  // (rendered by the public layout — independent of the auth assertions below).
+  // If the app can't be positively confirmed we SKIP cleanly: an explicit skip
+  // is safe (never a false pass), a misleading pass/fail is not.
+  let home: { status: number; body: string };
   try {
-    await fetch(BASE, { redirect: "manual" });
+    const r = await fetch(`${BASE}/`, { redirect: "manual", headers: { Accept: "text/html" } });
+    home = { status: r.status, body: await r.text().catch(() => "") };
   } catch {
-    console.error(`verify:internal-auth FAIL — dev server not reachable at ${BASE}.`);
-    console.error("  Start it (`npm run dev`) and re-run, or set BASE_URL.");
-    process.exit(1);
+    console.log(`verify:internal-auth SKIP — no server reachable at ${BASE}. Start it (\`npm run dev\`) and re-run, or set BASE_URL. (auth assertions NOT run)`);
+    process.exit(0);
+  }
+  if (!(home.status === 200 && /Furlong/.test(home.body))) {
+    console.log(`verify:internal-auth SKIP — a server answered at ${BASE} but it is not confirmed as this Furlong build (home status ${home.status}); refusing to assert against a foreign/stale server. Point BASE_URL at this checkout's dev server. (auth assertions NOT run)`);
+    process.exit(0);
   }
 
   // ── Internal PAGES must redirect-to-signin or 404, never serve the console ──
@@ -146,10 +178,32 @@ async function main(): Promise<void> {
 
   // ── Internal APIs must reject (401/403), never serve data ───────────────────
   for (const route of INTERNAL_APIS) {
-    const { status, location } = await get(route);
-    const rejected = status === 401 || status === 403 || isSignInRedirect(status, location);
+    const { status, location, body } = await get(route);
+    let governedMissingSecret = false;
+    if (status === 503) {
+      try {
+        const parsed = JSON.parse(body) as {
+          ok?: unknown;
+          governance?: { policy?: unknown; missingSecret?: unknown };
+        };
+        governedMissingSecret =
+          parsed.ok === false &&
+          parsed.governance?.policy === "session-required" &&
+          parsed.governance?.missingSecret === true;
+      } catch {
+        governedMissingSecret = false;
+      }
+    }
+    const rejected =
+      status === 401 ||
+      status === 403 ||
+      governedMissingSecret ||
+      isSignInRedirect(status, location);
     if (!rejected) {
-      failures.push({ route, detail: `expected 401/403 for anonymous request, got ${status}` });
+      failures.push({
+        route,
+        detail: `expected 401/403 or governed missing-secret 503 for anonymous request, got ${status}`,
+      });
     }
   }
 

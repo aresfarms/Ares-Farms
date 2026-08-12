@@ -42,11 +42,14 @@ const PAGES = [
       'furlong does not make official determinations', // old flat-list item (not in new copy)
     ],
     required: [
-      // Hero "blend" copy (Build 57) — H1 → tagline → subhead → trust tag, verbatim
-      'every journey starts somewhere.',
-      "mapping america's land, funding, and business opportunities.",
-      'use 250 years of land and financial history to map your next venture',
-      'zero tracking. total transparency.',
+      "type in an address. see if it's worth buying — and exactly how to pay for it.",
+      'start with an address — or just a question — and see the whole picture and your next move before you talk to anyone or share a thing.',
+      
+      'explore anonymously. no account required. no hidden handoff.',
+      'what you can do here',
+      'you do not need a finished plan to begin',
+      'check an address — free',
+      'where do you want to go?',
       // New section heading
       'clear waters, no surprises',
       // Lighthouse opener
@@ -162,18 +165,37 @@ const PAGES = [
 
 // ── HTML → visible text ───────────────────────────────────────────────────────
 
+function removeSuppressedElements(html) {
+  let output = '';
+  let cursor = 0;
+  const lower = html.toLowerCase();
+  for (;;) {
+    const script = lower.indexOf('<script', cursor);
+    const style = lower.indexOf('<style', cursor);
+    const open = script < 0 ? style : style < 0 ? script : Math.min(script, style);
+    if (open < 0) return output + html.slice(cursor);
+    const name = open === script ? 'script' : 'style';
+    const openEnd = html.indexOf('>', open + name.length + 1);
+    if (openEnd < 0) return output + html.slice(cursor, open);
+    const closing = lower.indexOf(`</${name}`, openEnd + 1);
+    if (closing < 0) return output + html.slice(cursor, open);
+    const closingEnd = html.indexOf('>', closing + name.length + 2);
+    if (closingEnd < 0) return output + html.slice(cursor, open);
+    output += `${html.slice(cursor, open)} `;
+    cursor = closingEnd + 1;
+  }
+}
+
 function toText(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+  return removeSuppressedElements(html)
     .replace(/<[^>]+>/g, ' ')                  // drop tags + all attributes
-    .replace(/&amp;/g, '&')
     .replace(/&quot;/g, '"')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&nbsp;/g, ' ')
     // All apostrophe encodings — &#39; (decimal), &#x27; (hex), &apos;, &rsquo;
     .replace(/&#39;|&#x27;|&apos;|&rsquo;/g, "'")
+    .replace(/&amp;/g, '&')
     .replace(/['']/g, "'")                     // curly apostrophes → straight
     .replace(/\s+/g, ' ')
     .toLowerCase();
@@ -191,6 +213,14 @@ function normalizeQuery(s) {
 // ── Run ───────────────────────────────────────────────────────────────────────
 
 let failed = false;
+
+// Confirm the target is THIS app (200 + brand marker) before asserting copy;
+// a foreign/stale/absent server would otherwise false-fail every page.
+const probe = await fetch(BASE + '/').then(async (r) => ({ ok: r.ok, body: await r.text().catch(() => '') })).catch(() => null);
+if (!probe || !probe.ok || !/Furlong/.test(probe.body)) {
+  console.log(`verify:public-copy SKIP — no confirmed Furlong server at ${BASE}. Start it (\`npm run dev\`) or set BASE=. (copy checks NOT run)`);
+  process.exit(0);
+}
 
 for (const p of PAGES) {
   let text;

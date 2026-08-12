@@ -9,7 +9,7 @@ import {
   MARKET_SIGNALS,
   PROGRAM_GRAPH,
   REVENUE_OPPORTUNITY_REGISTRY,
-} from "@/lib/revenue-intelligence/revenueSourceIntelligenceRuntime";
+} from "@/lib/modules/sourceProgramCatalog";
 
 /**
  * Canonical External Source Stack Runtime
@@ -69,10 +69,14 @@ export const CANONICAL_SOURCE_CATEGORIES = [
   "LandSearch",
   "LoopNet",
   "County GIS",
+  "ArcGIS",
   "Tax assessor",
   "USDA",
   "FSA",
   "SBA",
+  "SAM.gov",
+  "Grants.gov",
+  "USAspending",
   "NOAA",
   "NRCS",
   "FEMA",
@@ -247,10 +251,17 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     sourceCategory: "CREXI",
     sourceAuthorityTier: "Tier 3 commercial marketplace",
     jurisdictionScope: ["marketplace"],
-    licensingRestrictions: ["terms review required", "no republication without review"],
+    licensingRestrictions: [
+      "terms review required",
+      "no republication without review",
+    ],
     provenanceScore: 70,
     replayabilityScore: 70,
-    claimsRestrictions: ["discovery only", "listing may change", "not underwriting truth"],
+    claimsRestrictions: [
+      "discovery only",
+      "listing may change",
+      "not underwriting truth",
+    ],
     freshnessCadence: "manual-review",
     liveFetchAllowed: false,
   },
@@ -307,6 +318,66 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     liveFetchAllowed: false,
   },
   {
+    sourceId: "realtor",
+    sourceName: "Realtor.com",
+    sourceCategory: "Realtor.com",
+    sourceAuthorityTier: "Tier 3 commercial marketplace",
+    jurisdictionScope: ["marketplace"],
+    licensingRestrictions: [
+      "terms review required",
+      "no republication without review",
+    ],
+    provenanceScore: 68,
+    replayabilityScore: 68,
+    claimsRestrictions: [
+      "discovery only",
+      "listing may change",
+      "not underwriting truth",
+    ],
+    freshnessCadence: "manual-review",
+    liveFetchAllowed: false,
+  },
+  {
+    sourceId: "redfin",
+    sourceName: "Redfin",
+    sourceCategory: "Redfin",
+    sourceAuthorityTier: "Tier 3 commercial marketplace",
+    jurisdictionScope: ["marketplace"],
+    licensingRestrictions: [
+      "terms review required",
+      "no republication without review",
+    ],
+    provenanceScore: 68,
+    replayabilityScore: 68,
+    claimsRestrictions: [
+      "discovery only",
+      "listing may change",
+      "not underwriting truth",
+    ],
+    freshnessCadence: "manual-review",
+    liveFetchAllowed: false,
+  },
+  {
+    sourceId: "zillow",
+    sourceName: "Zillow",
+    sourceCategory: "Zillow",
+    sourceAuthorityTier: "Tier 3 commercial marketplace",
+    jurisdictionScope: ["marketplace"],
+    licensingRestrictions: [
+      "terms review required",
+      "no republication without review",
+    ],
+    provenanceScore: 68,
+    replayabilityScore: 68,
+    claimsRestrictions: [
+      "discovery only",
+      "listing may change",
+      "not underwriting truth",
+    ],
+    freshnessCadence: "manual-review",
+    liveFetchAllowed: false,
+  },
+  {
     sourceId: "county-gis",
     sourceName: "County GIS",
     sourceCategory: "County GIS",
@@ -317,6 +388,25 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     replayabilityScore: 90,
     claimsRestrictions: ["source-visible", "human review required"],
     freshnessCadence: "jurisdiction-dependent",
+    liveFetchAllowed: false,
+  },
+  {
+    sourceId: "arcgis",
+    sourceName: "ArcGIS Location and Feature Services",
+    sourceCategory: "ArcGIS",
+    sourceAuthorityTier: "Tier 2 certified institutional/commercial",
+    jurisdictionScope: ["global", "federal", "state", "county", "local"],
+    licensingRestrictions: [
+      "service and layer terms review required",
+      "attribution required",
+    ],
+    provenanceScore: 88,
+    replayabilityScore: 88,
+    claimsRestrictions: [
+      "geocoding and layer discovery require source review",
+      "not parcel authority",
+    ],
+    freshnessCadence: "service-dependent",
     liveFetchAllowed: false,
   },
   {
@@ -341,7 +431,10 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     licensingRestrictions: ["official source citation required"],
     provenanceScore: 95,
     replayabilityScore: 90,
-    claimsRestrictions: ["program fit is preliminary", "official review required"],
+    claimsRestrictions: [
+      "program fit is preliminary",
+      "official review required",
+    ],
     freshnessCadence: "agency-update",
     liveFetchAllowed: false,
   },
@@ -354,7 +447,10 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     licensingRestrictions: ["official source citation required"],
     provenanceScore: 95,
     replayabilityScore: 90,
-    claimsRestrictions: ["program fit is preliminary", "official review required"],
+    claimsRestrictions: [
+      "program fit is preliminary",
+      "official review required",
+    ],
     freshnessCadence: "agency-update",
     liveFetchAllowed: false,
   },
@@ -367,8 +463,59 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     licensingRestrictions: ["official source citation required"],
     provenanceScore: 94,
     replayabilityScore: 90,
-    claimsRestrictions: ["program fit is preliminary", "official review required"],
+    claimsRestrictions: [
+      "program fit is preliminary",
+      "official review required",
+    ],
     freshnessCadence: "agency-update",
+    liveFetchAllowed: false,
+  },
+  {
+    sourceId: "sam-gov",
+    sourceName: "SAM.gov",
+    sourceCategory: "SAM.gov",
+    sourceAuthorityTier: "Tier 1 authoritative government/public",
+    jurisdictionScope: ["federal"],
+    licensingRestrictions: ["official source citation and API terms required"],
+    provenanceScore: 96,
+    replayabilityScore: 92,
+    claimsRestrictions: [
+      "opportunity availability requires verification",
+      "not an award or eligibility determination",
+    ],
+    freshnessCadence: "scheduled-refresh",
+    liveFetchAllowed: false,
+  },
+  {
+    sourceId: "grants-gov",
+    sourceName: "Grants.gov",
+    sourceCategory: "Grants.gov",
+    sourceAuthorityTier: "Tier 1 authoritative government/public",
+    jurisdictionScope: ["federal"],
+    licensingRestrictions: ["official source citation and API terms required"],
+    provenanceScore: 96,
+    replayabilityScore: 92,
+    claimsRestrictions: [
+      "program fit is preliminary",
+      "deadline and eligibility require official verification",
+    ],
+    freshnessCadence: "scheduled-refresh",
+    liveFetchAllowed: false,
+  },
+  {
+    sourceId: "usaspending",
+    sourceName: "USAspending",
+    sourceCategory: "USAspending",
+    sourceAuthorityTier: "Tier 1 authoritative government/public",
+    jurisdictionScope: ["federal", "state", "county", "recipient"],
+    licensingRestrictions: ["official source citation required"],
+    provenanceScore: 95,
+    replayabilityScore: 94,
+    claimsRestrictions: [
+      "historical award context only",
+      "not future award likelihood",
+    ],
+    freshnessCadence: "scheduled-refresh",
     liveFetchAllowed: false,
   },
   {
@@ -445,7 +592,10 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     licensingRestrictions: ["jurisdiction review required"],
     provenanceScore: 90,
     replayabilityScore: 85,
-    claimsRestrictions: ["program fit is preliminary", "deadline review required"],
+    claimsRestrictions: [
+      "program fit is preliminary",
+      "deadline review required",
+    ],
     freshnessCadence: "scheduled-refresh",
     liveFetchAllowed: false,
   },
@@ -562,7 +712,10 @@ export const SOURCE_STACK_REGISTRY: SourceStackSourceProfile[] = [
     licensingRestrictions: ["official source citation required"],
     provenanceScore: 92,
     replayabilityScore: 86,
-    claimsRestrictions: ["legal interpretation blocked", "qualified review required"],
+    claimsRestrictions: [
+      "legal interpretation blocked",
+      "qualified review required",
+    ],
     freshnessCadence: "scheduled-refresh",
     liveFetchAllowed: false,
   },
@@ -597,7 +750,7 @@ export const SOURCE_STACK_CONNECTORS: ConnectorProfile[] =
     failoverSourceRefs: SOURCE_STACK_REGISTRY.filter(
       (candidate) =>
         candidate.sourceCategory === source.sourceCategory &&
-        candidate.sourceId !== source.sourceId
+        candidate.sourceId !== source.sourceId,
     ).map((candidate) => candidate.sourceId),
     liveCallsAllowed: false,
   }));
@@ -612,7 +765,12 @@ export const CANONICAL_ENTITY_PROFILES: CanonicalEntityProfile[] = [
       "county-gis": 0.75,
       landwatch: 0.25,
     },
-    lineage: ["source-ingestion", "provenance", "classification", "canonicalization"],
+    lineage: [
+      "source-ingestion",
+      "provenance",
+      "classification",
+      "canonicalization",
+    ],
     historicalSnapshots: ["property-snapshot-2026-05-25"],
     conflictRefs: ["source-conflict-property-acreage-v0.1.0"],
     canonicalizationStatus: "CONFLICT_PRESERVED",
@@ -621,7 +779,10 @@ export const CANONICAL_ENTITY_PROFILES: CanonicalEntityProfile[] = [
     canonicalEntityId: "canonical-equipment-record-sample-v0.1.0",
     entityType: "canonical_equipment_record",
     canonicalRef: "equipment-discovery-canonical-sample",
-    sourceRecordRefs: ["tractorhouse-item-sample", "machinery-pete-item-sample"],
+    sourceRecordRefs: [
+      "tractorhouse-item-sample",
+      "machinery-pete-item-sample",
+    ],
     sourceWeighting: {
       tractorhouse: 0.5,
       "machinery-pete": 0.5,
@@ -649,7 +810,10 @@ export const CANONICAL_ENTITY_PROFILES: CanonicalEntityProfile[] = [
     canonicalEntityId: "canonical-market-signal-sample-v0.1.0",
     entityType: "canonical_market_signal",
     canonicalRef: "market-signal-canonical-sample",
-    sourceRecordRefs: ["fred-signal-sample", "commodity-exchange-signal-sample"],
+    sourceRecordRefs: [
+      "fred-signal-sample",
+      "commodity-exchange-signal-sample",
+    ],
     sourceWeighting: {
       fred: 0.45,
       "commodity-exchanges": 0.55,
@@ -681,7 +845,10 @@ export const SOURCE_CONFLICT_EVENTS = [
     entityType: "canonical_property_record",
     entityRef: "property-discovery-canonical-sample",
     conflictType: "acreage mismatch",
-    conflictingSourceRefs: ["county-gis-record-sample", "landwatch-listing-sample"],
+    conflictingSourceRefs: [
+      "county-gis-record-sample",
+      "landwatch-listing-sample",
+    ],
     conflictSummary:
       "County GIS acreage and marketplace listing acreage differ and require human review.",
     arbitrationStatus: "HUMAN_REVIEW_REQUIRED",
@@ -692,7 +859,10 @@ export const SOURCE_CONFLICT_EVENTS = [
     entityType: "canonical_equipment_record",
     entityRef: "equipment-discovery-canonical-sample",
     conflictType: "price range mismatch",
-    conflictingSourceRefs: ["tractorhouse-item-sample", "machinery-pete-item-sample"],
+    conflictingSourceRefs: [
+      "tractorhouse-item-sample",
+      "machinery-pete-item-sample",
+    ],
     conflictSummary:
       "Equipment marketplace prices differ and remain advisory until reviewed.",
     arbitrationStatus: "HUMAN_REVIEW_REQUIRED",
@@ -703,7 +873,10 @@ export const SOURCE_CONFLICT_EVENTS = [
     entityType: "canonical_program_record",
     entityRef: "program-graph-canonical-sample",
     conflictType: "deadline mismatch",
-    conflictingSourceRefs: ["usda-program-sample", "state-grants-program-sample"],
+    conflictingSourceRefs: [
+      "usda-program-sample",
+      "state-grants-program-sample",
+    ],
     conflictSummary:
       "Program deadline sources must be reviewed before public or operational use.",
     arbitrationStatus: "HUMAN_REVIEW_REQUIRED",
@@ -720,7 +893,7 @@ export const SOURCE_FRESHNESS_RECORDS = SOURCE_STACK_REGISTRY.slice(0, 10).map(
     nextCheckDueAt: "2026-06-01T00:00:00.000Z",
     staleSourceDetected: index % 3 === 0,
     remediationRequired: true,
-  })
+  }),
 );
 
 export const SOURCE_FAILOVER_EVENTS = [
@@ -776,7 +949,9 @@ function blockedControls(input: SourceStackActionInput): string[] {
   const blockedReasons: string[] = [];
 
   if (input.liveFetchRequested) {
-    blockedReasons.push("live external source fetch is blocked until connector promotion");
+    blockedReasons.push(
+      "live external source fetch is blocked until connector promotion",
+    );
   }
 
   if (input.productionUseRequested) {
@@ -784,11 +959,15 @@ function blockedControls(input: SourceStackActionInput): string[] {
   }
 
   if (input.officialUseRequested) {
-    blockedReasons.push("official use is blocked until human review and promotion");
+    blockedReasons.push(
+      "official use is blocked until human review and promotion",
+    );
   }
 
   if (input.underwritingUseRequested) {
-    blockedReasons.push("underwriting reliance is blocked for source discovery outputs");
+    blockedReasons.push(
+      "underwriting reliance is blocked for source discovery outputs",
+    );
   }
 
   if (input.lenderCommitmentRequested) {
@@ -796,7 +975,9 @@ function blockedControls(input: SourceStackActionInput): string[] {
   }
 
   if (input.legalAdviceRequested) {
-    blockedReasons.push("legal advice is blocked and must route to qualified review");
+    blockedReasons.push(
+      "legal advice is blocked and must route to qualified review",
+    );
   }
 
   return blockedReasons;
@@ -805,7 +986,7 @@ function blockedControls(input: SourceStackActionInput): string[] {
 function envelope(
   action: string,
   input: SourceStackActionInput,
-  result: Record<string, unknown>
+  result: Record<string, unknown>,
 ): SourceStackDispatchResult {
   const blockedReasons = blockedControls(input);
   const claimEvaluation = evaluateContentClaims({
@@ -894,7 +1075,7 @@ export function sourceFailover(input: SourceStackActionInput) {
 export function marketplaceIngestion(input: SourceStackActionInput) {
   return envelope("source-stack.marketplace-ingestion", input, {
     marketplaceSources: SOURCE_STACK_REGISTRY.filter((source) =>
-      source.sourceAuthorityTier.includes("marketplace")
+      source.sourceAuthorityTier.includes("marketplace"),
     ),
     blockedUses: [
       "underwriting truth",
@@ -984,7 +1165,7 @@ export function geoSuitabilityAlias(input: SourceStackActionInput) {
 
 export function dispatchSourceStackAction(
   action: string,
-  input: SourceStackActionInput
+  input: SourceStackActionInput,
 ): SourceStackDispatchResult {
   switch (action) {
     case "source-stack.overview":

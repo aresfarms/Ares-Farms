@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { Disclosures } from "@/components/public/Disclosures";
-import { licenseModelStatement, providerBySlug } from "@/lib/providers/providerRegistry";
+import { canonicalProviderAuthority } from "@/lib/platform/authorities/provider";
 
 /**
  * Provider Page (public, no account) — reusable across lanes.
@@ -24,7 +24,7 @@ export default async function ProviderPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const provider = providerBySlug(slug);
+  const provider = canonicalProviderAuthority.bySlug(slug);
   if (!provider) notFound();
 
   return (
@@ -85,7 +85,7 @@ export default async function ProviderPage({
 
         {/* The transparent license-to-operate model (verbatim; fee amount never shown). */}
         <p style={{ margin: 0, fontSize: 13, ...muted, fontStyle: "italic", borderLeft: "3px solid #c9a84c", paddingLeft: 14 }}>
-          {licenseModelStatement(provider.name)}
+          {canonicalProviderAuthority.licenseModelStatement(provider.name)}
         </p>
 
         {/* Furlong's own canonical disclosures (advisory only; not a lender/broker/agency). */}

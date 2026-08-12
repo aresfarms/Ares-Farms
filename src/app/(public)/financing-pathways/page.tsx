@@ -8,6 +8,7 @@ import {
   FinancingPathwayResult,
   evaluateFinancingPathways,
 } from "@/lib/financing/pathwayEngine";
+import { chartSurface } from "@/lib/property/chartThemes";
 
 /**
  * Financing Pathway Page
@@ -23,6 +24,11 @@ import {
  * - Vol V-VII: preserves public-surface disclosures, source authority,
  *   conformance, and no-live-action boundaries.
  * Build 50 — moved to (public) group. Shell removed; layout provides background, font, and minHeight.
+ *
+ * Chart Table cohesion rollout (founder 2026-07-17): this surface sits on the
+ * ledger stage via chartSurface("finance") — the bankers' lens. Facts and open
+ * items only; presentation change only. FINANCING_NODE_LIVE stays false and
+ * this page still shows no products, rates, terms, or eligibility.
  */
 
 type ApiResponse = {
@@ -46,59 +52,33 @@ type ApiResponse = {
   };
 };
 
-const containerStyle = {
-  maxWidth: 1180,
-  margin: "0 auto",
-  padding: 24,
-  display: "grid",
-  gap: 18,
-} as const;
+const surface = chartSurface("finance");
+const theme = surface.theme;
 
-const panelStyle = {
-  background: "#ffffff",
-  border: "1px solid #d7deea",
-  borderRadius: 8,
-} as const;
+const containerStyle = surface.container;
+const panelStyle = surface.panel;
+const mutedText = surface.muted;
+const inputStyle = surface.input;
 
-const mutedText = {
-  color: "#5d687a",
-  lineHeight: 1.5,
-} as const;
-
-const inputStyle = {
-  width: "100%",
-  minHeight: 42,
-  border: "1px solid #cbd5e1",
-  borderRadius: 6,
-  padding: "8px 10px",
-  fontSize: 14,
-  color: "#162033",
-  background: "#ffffff",
-} as const;
-
-function FieldLabel(props: { children: string }) {
+function FieldLabel(props: { children: string; htmlFor?: string }) {
   return (
-    <span
+    <label
+      htmlFor={props.htmlFor}
       style={{
         display: "block",
         marginBottom: 6,
-        color: "#334155",
+        ...surface.label,
         fontSize: 14,
         fontWeight: 700,
       }}
     >
       {props.children}
-    </span>
+    </label>
   );
 }
 
 function StatusBadge(props: { tone: "ready" | "review" | "blocked"; text: string }) {
-  const tones = {
-    ready: { background: "#e7f5ed", color: "#047857" },
-    review: { background: "#fff7ed", color: "#9a3412" },
-    blocked: { background: "#fff1f0", color: "#b42318" },
-  } as const;
-  const tone = tones[props.tone];
+  const tone = surface.badges[props.tone];
 
   return (
     <span
@@ -253,40 +233,38 @@ export default function FinancingPathwaysPage() {
         <section
           aria-label="Public Alpha pathway discovery and financing reality"
           style={{
-            background: "#ffffff",
-            border: "1px solid #d7deea",
-            borderRadius: 12,
+            ...panelStyle,
             padding: 28,
             marginBottom: 16,
           }}
         >
-          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: "#162033" }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, margin: 0, color: theme.ink }}>
             Pathway discovery
           </h1>
-          <p style={{ marginTop: 12, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 12, fontSize: 14, color: theme.inkSoft, lineHeight: 1.6 }}>
             Each project is reviewed against the following categories.
             This is advisory and is not an approval, guarantee, or
             official determination.
           </p>
-          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: theme.inkSoft, lineHeight: 1.7 }}>
             <li>
-              <strong>Likely pathways</strong> — pathways matched to your project&apos;s stated facts, advisory only.
+              <strong style={{ color: theme.ink }}>Likely pathways</strong> — pathways matched to your project&apos;s stated facts, advisory only.
             </li>
             <li>
-              <strong>Excluded pathways</strong> — pathways your project does not fit, with the rationale.
+              <strong style={{ color: theme.ink }}>Excluded pathways</strong> — pathways your project does not fit, with the rationale.
             </li>
             <li>
-              <strong>Rationale</strong> — plain-English explanation of why a pathway is included or excluded.
+              <strong style={{ color: theme.ink }}>Rationale</strong> — plain-English explanation of why a pathway is included or excluded.
             </li>
           </ul>
 
-          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: "#162033" }}>
+          <h2 style={{ fontSize: 18, fontWeight: 700, marginTop: 24, color: theme.ink }}>
             Financing reality classification
           </h2>
-          <p style={{ marginTop: 8, fontSize: 14, color: "#162033", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 8, fontSize: 14, color: theme.inkSoft, lineHeight: 1.6 }}>
             Each candidate pathway is labeled with one of:
           </p>
-          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: "#162033", lineHeight: 1.7 }}>
+          <ul style={{ marginTop: 8, marginBottom: 0, paddingLeft: 22, color: theme.inkSoft, lineHeight: 1.7 }}>
             <li>likely financeable</li>
             <li>financeable with conditions</li>
             <li>specialist review required</li>
@@ -295,7 +273,7 @@ export default function FinancingPathwaysPage() {
             <li>not enough information</li>
           </ul>
 
-          <p style={{ marginTop: 20, fontSize: 14, color: "#5d687a", lineHeight: 1.6 }}>
+          <p style={{ marginTop: 20, fontSize: 14, color: theme.inkFaint, lineHeight: 1.6 }}>
             This information is advisory only and is not an approval,
             guarantee, or official determination. No legal, regulatory,
             or official reliance may be placed on this information.
@@ -325,17 +303,10 @@ export default function FinancingPathwaysPage() {
             }}
           >
             <div style={{ display: "grid", gap: 8, maxWidth: 760 }}>
-              <span
-                style={{
-                  color: "#456077",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  textTransform: "uppercase",
-                }}
-              >
+              <span style={surface.kicker}>
                 Borrower Financing Pathway
               </span>
-              <h1 style={{ margin: 0, fontSize: 34, lineHeight: 1.1 }}>
+              <h1 style={{ margin: 0, fontSize: 34, lineHeight: 1.1, color: theme.ink }}>
                 Financing Pathway Engine
               </h1>
               <p style={{ ...mutedText, margin: 0 }}>
@@ -359,16 +330,18 @@ export default function FinancingPathwaysPage() {
             }}
           >
             <div>
-              <FieldLabel>Borrower ID</FieldLabel>
+              <FieldLabel htmlFor="fp-borrower-id">Borrower ID</FieldLabel>
               <input
+                id="fp-borrower-id"
                 style={inputStyle}
                 value={borrowerId}
                 onChange={(event) => setBorrowerId(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Application ID</FieldLabel>
+              <FieldLabel htmlFor="fp-application-id">Application ID</FieldLabel>
               <input
+                id="fp-application-id"
                 style={inputStyle}
                 value={applicationId}
                 onChange={(event) => setApplicationId(event.target.value)}
@@ -376,40 +349,45 @@ export default function FinancingPathwaysPage() {
               />
             </div>
             <div>
-              <FieldLabel>State</FieldLabel>
+              <FieldLabel htmlFor="fp-state">State</FieldLabel>
               <input
+                id="fp-state"
                 style={inputStyle}
                 value={stateCode}
                 onChange={(event) => setStateCode(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>County</FieldLabel>
+              <FieldLabel htmlFor="fp-county">County</FieldLabel>
               <input
+                id="fp-county"
                 style={inputStyle}
                 value={county}
                 onChange={(event) => setCounty(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Farm Types</FieldLabel>
+              <FieldLabel htmlFor="fp-farm-types">Farm Types</FieldLabel>
               <input
+                id="fp-farm-types"
                 style={inputStyle}
                 value={farmTypes}
                 onChange={(event) => setFarmTypes(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Goals</FieldLabel>
+              <FieldLabel htmlFor="fp-goals">Goals</FieldLabel>
               <input
+                id="fp-goals"
                 style={inputStyle}
                 value={goals}
                 onChange={(event) => setGoals(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Acreage</FieldLabel>
+              <FieldLabel htmlFor="fp-acreage">Acreage</FieldLabel>
               <input
+                id="fp-acreage"
                 style={inputStyle}
                 type="number"
                 min="0"
@@ -418,8 +396,9 @@ export default function FinancingPathwaysPage() {
               />
             </div>
             <div>
-              <FieldLabel>Requested Amount</FieldLabel>
+              <FieldLabel htmlFor="fp-requested-amount">Requested Amount</FieldLabel>
               <input
+                id="fp-requested-amount"
                 style={inputStyle}
                 type="number"
                 min="0"
@@ -428,16 +407,18 @@ export default function FinancingPathwaysPage() {
               />
             </div>
             <div>
-              <FieldLabel>Supporting Documents</FieldLabel>
+              <FieldLabel htmlFor="fp-documents">Supporting Documents</FieldLabel>
               <input
+                id="fp-documents"
                 style={inputStyle}
                 value={documents}
                 onChange={(event) => setDocuments(event.target.value)}
               />
             </div>
             <div>
-              <FieldLabel>Purpose</FieldLabel>
+              <FieldLabel htmlFor="fp-purpose">Purpose</FieldLabel>
               <input
+                id="fp-purpose"
                 style={inputStyle}
                 value={purpose}
                 onChange={(event) => setPurpose(event.target.value)}
@@ -451,13 +432,10 @@ export default function FinancingPathwaysPage() {
             disabled={submitting}
             style={{
               justifySelf: "start",
-              minHeight: 42,
-              border: 0,
-              borderRadius: 6,
-              padding: "0 16px",
-              background: submitting ? "#94a3b8" : "#1d4ed8",
-              color: "#ffffff",
-              fontWeight: 800,
+              ...surface.primaryButton,
+              background: submitting
+                ? surface.primaryButtonBusyBg
+                : surface.primaryButton.background,
               cursor: submitting ? "default" : "pointer",
             }}
           >
@@ -465,16 +443,7 @@ export default function FinancingPathwaysPage() {
           </button>
 
           {error ? (
-            <div
-              style={{
-                border: "1px solid #fecaca",
-                background: "#fff1f0",
-                color: "#991b1b",
-                borderRadius: 8,
-                padding: 12,
-                fontWeight: 700,
-              }}
-            >
+            <div style={surface.errorPanel}>
               {error}
             </div>
           ) : null}
@@ -488,12 +457,12 @@ export default function FinancingPathwaysPage() {
           }}
         >
           <div style={{ ...panelStyle, padding: 18, display: "grid", gap: 12 }}>
-            <h2 style={{ margin: 0, fontSize: 22 }}>Readiness</h2>
+            <h2 style={{ margin: 0, fontSize: 22, color: theme.ink }}>Readiness</h2>
             <div
               style={{
                 height: 12,
                 borderRadius: 999,
-                background: "#e2e8f0",
+                background: surface.meterTrack,
                 overflow: "hidden",
               }}
             >
@@ -503,22 +472,22 @@ export default function FinancingPathwaysPage() {
                   width: `${result.readiness.readinessPercent}%`,
                   background:
                     result.readiness.readinessPercent >= 80
-                      ? "#059669"
-                      : "#ca8a04",
+                      ? surface.meterGood
+                      : surface.meterWarn,
                 }}
               />
             </div>
-            <strong style={{ fontSize: 28 }}>
+            <strong style={{ fontSize: 28, color: theme.ink }}>
               {result.readiness.readinessPercent}%
             </strong>
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 15 }}>Missing Items</h3>
+              <h3 style={{ margin: 0, fontSize: 15, color: theme.ink }}>Missing Items</h3>
               {result.readiness.missingItems.length === 0 ? (
                 <p style={{ ...mutedText, margin: 0 }}>
                   Core pathway intake is complete enough for review.
                 </p>
               ) : (
-                <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                   {result.readiness.missingItems.map((item) => (
                     <li key={item}>{item}</li>
                   ))}
@@ -526,8 +495,8 @@ export default function FinancingPathwaysPage() {
               )}
             </div>
             <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, fontSize: 15 }}>Review Signals</h3>
-              <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+              <h3 style={{ margin: 0, fontSize: 15, color: theme.ink }}>Review Signals</h3>
+              <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                 {result.readiness.reviewSignals.map((signal) => (
                   <li key={signal}>{signal}</li>
                 ))}
@@ -556,7 +525,7 @@ export default function FinancingPathwaysPage() {
                   }}
                 >
                   <div>
-                    <h2 style={{ margin: 0, fontSize: 20 }}>{pathway.label}</h2>
+                    <h2 style={{ margin: 0, fontSize: 20, color: theme.ink }}>{pathway.label}</h2>
                     <p style={{ ...mutedText, margin: "4px 0 0" }}>
                       Sponsor type: {pathway.sponsorType}
                     </p>
@@ -566,7 +535,7 @@ export default function FinancingPathwaysPage() {
                     text={`${pathway.fitScore}% fit`}
                   />
                 </div>
-                <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+                <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
                   {pathway.fitReasons.map((reason) => (
                     <li key={reason}>{reason}</li>
                   ))}
@@ -576,7 +545,7 @@ export default function FinancingPathwaysPage() {
                     display: "flex",
                     gap: 8,
                     flexWrap: "wrap",
-                    color: "#64748b",
+                    color: theme.inkSoft,
                     fontSize: 12,
                     fontWeight: 800,
                   }}
@@ -585,10 +554,9 @@ export default function FinancingPathwaysPage() {
                     <span
                       key={claim}
                       style={{
-                        border: "1px solid #d7deea",
+                        ...surface.cell,
                         borderRadius: 999,
                         padding: "4px 8px",
-                        background: "#f8fafc",
                       }}
                     >
                       No {claim}
@@ -601,7 +569,7 @@ export default function FinancingPathwaysPage() {
         </section>
 
         <section style={{ ...panelStyle, padding: 18, display: "grid", gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 22 }}>Governance Evidence</h2>
+          <h2 style={{ margin: 0, fontSize: 22, color: theme.ink }}>Governance Evidence</h2>
           <div
             style={{
               display: "grid",
@@ -640,11 +608,7 @@ export default function FinancingPathwaysPage() {
               <Link
                 key={route}
                 href={route}
-                style={{
-                  color: "#1d4ed8",
-                  fontWeight: 800,
-                  textDecoration: "none",
-                }}
+                style={surface.link}
               >
                 {route}
               </Link>
@@ -653,8 +617,8 @@ export default function FinancingPathwaysPage() {
         </section>
 
         <section style={{ ...panelStyle, padding: 18 }}>
-          <h2 style={{ marginTop: 0, fontSize: 22 }}>Disclosures</h2>
-          <ul style={{ margin: 0, paddingLeft: 18, color: "#475569" }}>
+          <h2 style={{ marginTop: 0, fontSize: 22, color: theme.ink }}>Disclosures</h2>
+          <ul style={{ margin: 0, paddingLeft: 18, color: theme.inkSoft }}>
             {result.disclosures.slice(0, 12).map((disclosure) => (
               <li key={disclosure}>{disclosure}</li>
             ))}

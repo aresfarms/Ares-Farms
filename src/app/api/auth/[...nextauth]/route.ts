@@ -1,5 +1,10 @@
 import NextAuth from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import {
+  userHasPasswordByEmail,
+  verifyUserPasswordByEmail,
+} from "@/lib/auth/passwordAuth";
 
 import {
   ensureDurableIdentity,
@@ -7,7 +12,11 @@ import {
   toPublicUserIdentity,
 } from "@/lib/auth/identity";
 import { evaluateCredentialAuthPolicy } from "@/lib/auth/authActivationPolicy";
+import { ensureAccessSecurityState } from "@/lib/auth/accessSecurityRuntime";
 import { findLocalOperator } from "@/lib/auth/localOperatorStore";
+import { operatorByEmail } from "@/lib/auth/operatorRegistry";
+import { professionalByEmail } from "@/lib/auth/professionalRegistry";
+import { evaluateProfessionalAccess } from "@/lib/auth/professionalAccessAuthority";
 import {
   ensureLocalNextAuthUrl,
   resolveNextAuthSecret,
@@ -60,7 +69,7 @@ async function persistCredentialRejection(
   traceId: string,
   eventType: string,
   message: string,
-  metadata: Record<string, unknown> = {}
+  metadata: Record<string, unknown> = {},
 ): Promise<void> {
   const observability = createObservabilityEvent({
     eventType,
@@ -98,16 +107,31 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
     await persistCredentialRejection(
       traceId,
       "AUTH_CREDENTIAL_EMAIL_MISSING",
-      "Credential authorization rejected a request without a valid email."
+      "Credential authorization rejected a request without a valid email.",
     );
 
     return null;
   }
 
-  const credentialPolicy = evaluateCredentialAuthPolicy({
-    email,
-    password: credentials?.password,
-  });
+  const localFounderPasswordConfigured =
+    process.env.NODE_ENV !== "production" &&
+    email === "chudson@aresfarmsinc.com" &&
+    (await userHasPasswordByEmail(email).catch(() => false));
+
+  const credentialPolicy = localFounderPasswordConfigured
+    ? {
+        allowed: await verifyUserPasswordByEmail(
+          email,
+          credentials?.password ?? "",
+        ),
+        mode: "email-allowlist" as const,
+        email,
+        productionLike: false,
+        reason:
+          "Per-user password verification applied for local founder access.",
+        failureCode: "password_mismatch",
+      }
+    : evaluateCredentialAuthPolicy({ email, password: credentials?.password });
 
   if (!credentialPolicy.allowed) {
     await persistCredentialRejection(
@@ -118,10 +142,36 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
         mode: credentialPolicy.mode,
         productionLike: credentialPolicy.productionLike,
         failureCode: credentialPolicy.failureCode ?? null,
-      }
+      },
     );
 
     return null;
+  }
+
+  // External professional counterparties are credential-first. Internal named
+  // operators authenticate through the operator registry so they can reach
+  // their governed workspaces and complete testing/onboarding; live
+  // professional actions remain separately credential-gated at the module.
+  const internalOperator = operatorByEmail(email);
+  const professional = internalOperator ? null : professionalByEmail(email);
+  let professionalRoleForSession:
+    "lender" | "attorney" | "auditor" | "sponsor" | null = null;
+  if (professional) {
+    const professionalAccess = await evaluateProfessionalAccess({
+      principalId: email,
+      principalEmail: email,
+      requestedRole: professional.role,
+    });
+    if (!professionalAccess.allowed) {
+      await persistCredentialRejection(
+        traceId,
+        "AUTH_PROFESSIONAL_CREDENTIAL_REQUIRED",
+        "Professional portal login was denied because current credential verification is required.",
+        { role: professional.role, reasonCode: professionalAccess.reasonCode },
+      );
+      return null;
+    }
+    professionalRoleForSession = professional.role;
   }
 
   const runtimeGuard = runRuntimeGuard({
@@ -147,7 +197,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
       "Credential authorization was blocked by runtime governance.",
       {
         findings: runtimeGuard.findings,
-      }
+      },
     );
 
     return null;
@@ -162,31 +212,31 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
         "schema",
         "nextauth-credentials-v0.1.0",
         "src/app/api/auth/[...nextauth]/route.ts",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "governance",
         "master-volumes-runtime-v0.1.0",
         "Master Volume Series",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "runtime",
         "runtime-enforcement-v0.1.0",
         "src/lib/runtime",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "runtime",
         "governance-evidence-store-v0.1.0",
         "src/lib/governance/evidenceStore.ts",
-        traceId
+        traceId,
       ),
       createRuntimeVersionRef(
         "api",
         "durable-identity-runtime-v0.1.0",
         "src/lib/auth/identity.ts",
-        traceId
+        traceId,
       ),
     ],
   });
@@ -206,28 +256,33 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
       disclosureAudience: ["authorized-operator", "governance"],
       sharingPermissions: ["identity-session-review"],
       aiUsagePermissions: ["classify", "summarize"],
-      exportRestrictions: [
-        "not-public-user-data",
-        "requires-governed-access",
-      ],
+      exportRestrictions: ["not-public-user-data", "requires-governed-access"],
       redactionRequirements: [
         "redact-user-email-before-public-disclosure",
         "redact-tenant-id-before-public-disclosure",
       ],
       consentRequirements: ["user-session-consent"],
-    }
+    },
   );
 
   let identity;
   try {
     identity = await ensureDurableIdentity({
       email,
-      role: "user",
+      role:
+        professionalRoleForSession ??
+        (internalOperator
+          ? internalOperator.role === "founder-operator"
+            ? "governance"
+            : "operator"
+          : "user"),
       traceId,
       source: "api.auth.nextauth",
       metadata: {
         credentialsProvider: true,
         credentialAuthMode: credentialPolicy.mode,
+        internalOperatorId: internalOperator?.id ?? null,
+        externalProfessionalCredentialGateApplied: Boolean(professional),
       },
     });
   } catch (durableError) {
@@ -270,16 +325,13 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
       disclosureAudience: ["authorized-operator", "governance"],
       sharingPermissions: ["identity-session-review"],
       aiUsagePermissions: ["summarize", "explain"],
-      exportRestrictions: [
-        "not-public-user-data",
-        "requires-governed-access",
-      ],
+      exportRestrictions: ["not-public-user-data", "requires-governed-access"],
       redactionRequirements: [
         "redact-user-email-before-public-disclosure",
         "redact-tenant-id-before-public-disclosure",
       ],
       consentRequirements: ["user-session-consent"],
-    }
+    },
   );
 
   const observability = createObservabilityEvent({
@@ -346,6 +398,8 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
     },
   });
 
+  const accessState = await ensureAccessSecurityState(identity.user.id);
+
   return {
     id: identity.user.id,
     email: identity.user.email,
@@ -354,11 +408,13 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
     role: identity.user.role,
     governanceVersion: identity.user.governanceVersion,
     classification: identity.user.classification,
+    sessionVersion: accessState.sessionVersion,
   };
 }
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   secret: resolveNextAuthSecret(),
+  pages: { signIn: "/sign-in" },
   providers: [
     CredentialsProvider({
       name: "Farm Login",
@@ -379,26 +435,44 @@ export const authOptions = {
   ],
   session: {
     strategy: "jwt" as const,
+    maxAge: 4 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token, user }: any) {
+    async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.tenantId = user.tenantId;
-        token.role = user.role;
-        token.governanceVersion = user.governanceVersion;
-        token.classification = user.classification;
+        const furlongUser = user as typeof user & {
+          tenantId?: unknown;
+          role?: unknown;
+          governanceVersion?: unknown;
+          classification?: unknown;
+          sessionVersion?: unknown;
+        };
+        token.id = furlongUser.id;
+        token.tenantId = furlongUser.tenantId;
+        token.role = furlongUser.role;
+        token.governanceVersion = furlongUser.governanceVersion;
+        token.classification = furlongUser.classification;
+        token.sessionVersion = furlongUser.sessionVersion;
       }
 
       return token;
     },
-    async session({ session, token }: any) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id;
-        session.user.tenantId = token.tenantId;
-        session.user.role = token.role;
-        session.user.governanceVersion = token.governanceVersion;
-        session.user.classification = token.classification;
+        const furlongSessionUser = session.user as typeof session.user & {
+          id?: unknown;
+          tenantId?: unknown;
+          role?: unknown;
+          governanceVersion?: unknown;
+          classification?: unknown;
+          sessionVersion?: unknown;
+        };
+        furlongSessionUser.id = token.id;
+        furlongSessionUser.tenantId = token.tenantId;
+        furlongSessionUser.role = token.role;
+        furlongSessionUser.governanceVersion = token.governanceVersion;
+        furlongSessionUser.classification = token.classification;
+        furlongSessionUser.sessionVersion = token.sessionVersion;
       }
 
       return session;

@@ -65,7 +65,7 @@ const primaryRoutes = [
 export function ModuleNav() {
   const items = primaryRoutes
     .map((route) => moduleManifests.find((manifest) => manifest.route === route))
-    .filter(Boolean);
+    .filter((manifest): manifest is NonNullable<typeof manifest> => manifest != null);
 
   return (
     <nav

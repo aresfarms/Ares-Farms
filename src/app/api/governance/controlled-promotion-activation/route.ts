@@ -5,6 +5,11 @@ import {
   evaluateControlledPromotionActivationGate,
 } from "@/lib/governance/controlledPromotionActivationGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestSourceReviewEvidence,
+  recordSourceReviewEvidence,
+  sourceReviewEvidenceFor,
+} from "@/lib/governance/sourceReviewEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -155,22 +160,24 @@ async function handleControlledPromotionActivation(
     });
     const result = evaluateControlledPromotionActivationGate({ sourceId });
     const activationHold =
-      req.method === "POST"
-        ? {
-            activationHoldId: `controlled-promotion-activation-hold-${Date.now()}`,
-            sourceId: sourceId ?? null,
-            reviewStatus: "CONTROLLED_PROMOTION_ACTIVATION_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            activationExecuted: false,
-            legalAdviceProvided: false,
-            liveFetchPerformed: false,
-            externalActionPerformed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
-            humanReviewRequired: true,
+      req.method === "POST" && sourceId && actorId
+        ? recordSourceReviewEvidence({
+            kind: "CONTROLLED_PROMOTION_HOLD",
+            sourceId,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : sourceId
+          ? latestSourceReviewEvidence(sourceId, "CONTROLLED_PROMOTION_HOLD")
+          : null;
+    const activationHistory = sourceReviewEvidenceFor(
+      sourceId,
+      "CONTROLLED_PROMOTION_HOLD"
+    );
+    const readinessEvidence = sourceId
+      ? latestSourceReviewEvidence(sourceId, "PRODUCTION_READINESS_HOLD")
+      : null;
     const classifiedOutput = classifyRecord(
       {
         count: result.controlledPromotionActivationReviews.length,
@@ -180,6 +187,8 @@ async function handleControlledPromotionActivation(
         disclosures: result.disclosures,
         activationPosture: result.activationPosture,
         activationHold,
+        activationHistory,
+        readinessEvidence,
         productionBlocked: true,
         activationExecuted: false,
         promotionAllowed: false,
@@ -250,6 +259,8 @@ async function handleControlledPromotionActivation(
       disclosures: classifiedOutput.disclosures,
       activationPosture: classifiedOutput.activationPosture,
       activationHold: classifiedOutput.activationHold,
+      activationHistory: classifiedOutput.activationHistory,
+      readinessEvidence: classifiedOutput.readinessEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       activationExecuted: classifiedOutput.activationExecuted,
       promotionAllowed: classifiedOutput.promotionAllowed,

@@ -5,7 +5,7 @@ import { evaluateSourceProductionReadinessGate } from "@/lib/governance/sourcePr
 import { eventContractRegistry } from "@/lib/modules/eventContractRegistry";
 import { crossModuleHandoffMap } from "@/lib/modules/handoffMap";
 import { moduleManifests } from "@/lib/modules/moduleRegistry";
-import { SOURCE_STACK_REGISTRY } from "@/lib/source-stack/sourceStackRuntime";
+import { SOURCE_STACK_REGISTRY } from "@/lib/platform/authorities/source";
 
 /**
  * Source Production Promotion Readiness Gate Smoke Test

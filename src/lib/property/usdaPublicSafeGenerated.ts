@@ -6,7 +6,7 @@
  * lat/long, so it is safe to bundle into the client (homepage map "Possible"
  * card). Written by src/scripts/ingestUsdaResale.ts.
  *
- * Ingested at: 2026-06-10T23:40:26.673Z
+ * Ingested at: 2026-07-17T16:15:57.094Z
  */
 
 import type { PublicSafeProperty } from "./propertyTypes";

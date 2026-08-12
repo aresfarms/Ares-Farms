@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectiveRole } from "@/lib/auth/sessionAuthority";
+
 import { evaluateAccess } from "@/lib/auth/accessControl";
 import {
   RecordAccessDecision,
   evaluateApplicationRecordAccess,
 } from "@/lib/auth/recordAccess";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
-import {
-  ReportAdminRecord,
-  getReportAdminScopeRecord,
-  listReportAdminRecords,
-} from "@/lib/reports/reportRecordStore";
+import { canonicalReportAuthority } from "@/lib/platform/authorities/report";
+import type { ReportAdminRecord } from "@/lib/platform/authorities/report";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
@@ -86,7 +85,7 @@ function parseQuery(req: NextRequest): ReportAdminQuery {
   const params = req.nextUrl.searchParams;
 
   return {
-    role: params.get("role") ?? "user",
+    role: effectiveRole(req),
     userId: normalizeText(params.get("userId")),
     borrowerId: normalizeText(params.get("borrowerId")),
     tenantId: normalizeText(params.get("tenantId")),
@@ -334,7 +333,7 @@ export async function GET(req: NextRequest) {
       ],
     });
 
-    const scopeRecord = await getReportAdminScopeRecord({
+    const scopeRecord = await canonicalReportAuthority.getAdminScope({
       reportId: query.reportId,
       applicationId: query.applicationId,
     });
@@ -398,7 +397,7 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const records = await listReportAdminRecords({
+    const records = await canonicalReportAuthority.listAdminRecords({
       reportId: query.reportId,
       applicationId: query.applicationId,
       borrowerId: query.borrowerId,

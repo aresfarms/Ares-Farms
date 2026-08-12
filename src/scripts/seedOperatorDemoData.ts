@@ -23,6 +23,8 @@ import "dotenv/config";
 const baseUrl =
   process.env.BACKEND_SMOKE_BASE_URL?.replace(/\/$/, "") ??
   "http://localhost:3000";
+const bearerToken = process.env.VERIFY_BEARER_TOKEN?.trim() || null;
+const stagingSeedSecret = process.env.STAGING_SEED_SHARED_SECRET?.trim() || null;
 
 type RouteJson = Record<string, unknown> & {
   ok?: boolean;
@@ -112,6 +114,8 @@ async function post(path: string, body: Record<string, unknown>): Promise<RouteJ
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(bearerToken ? { Authorization: `Bearer ${bearerToken}` } : {}),
+        ...(stagingSeedSecret ? { "x-furlong-staging-seed-secret": stagingSeedSecret } : {}),
       },
       body: JSON.stringify(body),
     });
@@ -205,7 +209,7 @@ function completeCredentialedIngestionPayload(input: {
 }
 
 async function main(): Promise<void> {
-  const runId = `operator-demo-seed-${Date.now()}`;
+  const runId = process.env.DEMO_SEED_RUN_ID?.trim() || `operator-demo-seed-${Date.now()}`;
   const tenantId = `${runId}-tenant`;
   const borrowerId = `${runId}-borrower`;
   const applicationId = `${runId}-application`;
@@ -227,8 +231,27 @@ async function main(): Promise<void> {
     tenantId,
     applicationId,
     farmName: "Ares Demo Farm",
-    county: "Wake",
-    state: "NC",
+    property: {
+      name: "Ares Demo Farm",
+      county: "Wake",
+      state: "NC",
+      country: "US",
+      acreage: 128,
+    },
+    state: {
+      stage: "INTERMEDIATE",
+      location: { country: "US", state: "NC", county: "Wake" },
+      farmTypes: ["CROP", "LIVESTOCK"],
+      goals: ["EXPAND_OPERATION", "ACCESS_FINANCING"],
+      acreage: 128,
+      interests: {
+        soilAnalysis: true,
+        environmentalReports: true,
+        financing: true,
+        vendorRecommendations: false,
+        commodityIntelligence: true,
+      },
+    },
     acreage: 128,
     requestedAmount: 485000,
     metadata: sharedMetadata,

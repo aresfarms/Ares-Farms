@@ -1,0 +1,32 @@
+{
+  "environment": "staging",
+  "gitHead": "896810b",
+  "imageDigest": "sha256:de51ce47ca10d26cae42029aeea2eb44eabd593e2ed3610eab6ac1333f72d4ac",
+  "terraformCommit": "2dc6a06",
+  "cloudRunRevision": "furlong-core-896810b",
+  "migrationJobExecution": "furlong-db-migrate-lzpnx",
+  "runtimeVerifyExecution": "furlong-runtime-verify-m7str",
+  "schemaVersion": "0043",
+  "p2InvokerPrincipals": [
+    "serviceAccount:furlong-source-refresh@furlong-staging-499102.iam.gserviceaccount.com",
+    "serviceAccount:service-859763772114@gcp-sa-iap.iam.gserviceaccount.com",
+    "user:chudson@aresfarmsinc.com"
+  ],
+  "gateReportSha256": "68b6985b12680dffbc3a8d7df769df23077593e402bc5a848cc7b03c97be52aa",
+  "deployedAtUtc": "2026-07-28T17:01:51.114Z",
+  "gcpProjectId": "furlong-staging-499102",
+  "region": "us-central1",
+  "combinedProductionReady": false,
+  "openBlockers": 10,
+  "piiPermitted": false,
+  "financingEnabled": false,
+  "dnsCutoverAuthorized": false,
+  "iapEnabled": true,
+  "p3TesterPrincipals": [
+    "serviceAccount:furlong-verify@furlong-staging-499102.iam.gserviceaccount.com",
+    "user:chudson@aresfarmsinc.com",
+    "user:stuart@aresfarmsinc.com"
+  ],
+  "anonymousInvocationAllowed": false,
+  "dataSeedStatus": "NOT_LOADED"
+}

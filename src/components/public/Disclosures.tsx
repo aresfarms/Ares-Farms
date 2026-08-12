@@ -18,6 +18,8 @@
  * Public Alpha remains PENDING.
  */
 
+import { CHART_TONES, type ChartTone } from "@/lib/property/chartThemes";
+
 const FULL_TEXT =
   "This information is advisory only and is not an approval, guarantee, or official determination. " +
   "No legal reliance, no regulatory reliance, and no official reliance may be placed on this information. " +
@@ -35,18 +37,81 @@ const COMPACT_TEXT =
   "Free for borrowers. Borrowers pay nothing. Your information belongs to you. " +
   "Furlong does not secretly submit, sell, or distribute your information. No silent submission. No information sale.";
 
-export function Disclosures({ variant = "full" }: { variant?: "full" | "compact" }) {
+export function Disclosures({
+  variant = "full",
+  tone = "light",
+  showManifesto = true,
+}: {
+  variant?: "full" | "compact";
+  /** Chart Table cohesion: "dark" keeps the disclosure text readable when the
+      strip sits on a chart stage (CHART_TONES ink) — text is identical. */
+  tone?: ChartTone;
+  /** The "Why we lay it all out" preface. Off on surfaces that already carry
+      the elevated Sovereignty Guarantee box (the property report), so the same
+      manifesto doesn't appear twice on one page. Governance text is unaffected. */
+  showManifesto?: boolean;
+}) {
+  // Presentation only (founder direction 2026-07-20): the governance-locked text
+  // is UNCHANGED, but it's framed as an old-ledger "Field note" — a soft cream
+  // marginalia box, muted serif — so the legal disclosure keeps the cozy book
+  // vibe instead of reading like a cold corporate wall.
+  const dark = tone === "dark";
   return (
-    <p
+    <aside
       aria-label="Furlong disclosures"
       style={{
-        margin:     0,
-        fontSize:   13,
-        color:      "#5d687a",
-        lineHeight: 1.65,
+        display: "grid",
+        gap: 6,
+        background: dark ? "rgba(255,255,255,0.05)" : "#faf6ec",
+        border: `1px solid ${dark ? "rgba(201,168,76,0.28)" : "#e9ddc4"}`,
+        borderLeft: `3px solid ${dark ? "rgba(201,168,76,0.55)" : "#c9a84c"}`,
+        borderRadius: 10,
+        padding: "12px 16px",
       }}
     >
-      {variant === "compact" ? COMPACT_TEXT : FULL_TEXT}
-    </p>
+      {/* The Straight-Talk preface (founder direction 2026-07-20): the human WHY
+          above the honest WHAT. Framed as our promise, not an accusation about
+          named competitors — keeps the "we only say what we can stand behind"
+          credibility. Full variant only. */}
+      {variant === "full" && showManifesto && (
+        <p
+          style={{
+            margin: "0 0 2px",
+            fontSize: 12.5,
+            fontWeight: 700,
+            color: dark ? "#eef3f6" : "#3b3730",
+            lineHeight: 1.55,
+          }}
+        >
+          <span style={{ color: dark ? "#d4b06a" : "#7a5c1f" }}>Why we lay it all out.</span>{" "}
+          Most sites bury the fine print and quietly route what you type to whoever pays for the lead. We
+          don&apos;t do either — no account, no data capture, no handoff. The parameters below are exactly how a
+          federal regulator or an underwriter reads a deal: unfiltered, unbiased, and entirely in your hands.
+        </p>
+      )}
+      <span
+        style={{
+          fontSize: 10.5,
+          fontWeight: 800,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: dark ? "#d4b06a" : "#7a5c1f",
+        }}
+      >
+        ❧ Field note &amp; limitations
+      </span>
+      <p
+        style={{
+          margin: 0,
+          fontFamily: "Georgia, 'Times New Roman', serif",
+          fontSize: 12.5,
+          fontStyle: "italic",
+          color: dark ? CHART_TONES.dark.bodyInk : "#6b6152",
+          lineHeight: 1.65,
+        }}
+      >
+        {variant === "compact" ? COMPACT_TEXT : FULL_TEXT}
+      </p>
+    </aside>
   );
 }

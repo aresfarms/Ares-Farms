@@ -51,13 +51,150 @@
  *     longer canonical list ("land, capital, business, and community") stays on
  *     the /about mission line. Do not reintroduce "commercial pathways".
  */
+/**
+ * Hero v3 (founder direction 2026-07-29, from Stuart's positioning review):
+ * the customer's own sentence — "you type in an address and it tells you if
+ * it's worth buying and how to finance it, whoever you are" — stated as an
+ * action + outcome, not a catalog of capabilities. Supersedes "Bring the
+ * property. We bring the analysis." (retired: described Furlong's activity,
+ * not the visitor's outcome; the four-item tagline list covered three
+ * audiences at once and read as comprehensive rather than specific).
+ * Advisory posture preserved: the visitor SEES and decides; nothing promises
+ * value, approval, or eligibility.
+ */
 export const HOMEPAGE_HERO = {
   brandName: "Furlong",
-  headline:  "Every journey starts somewhere.",
-  tagline:   "Mapping America's land, funding, and business opportunities.",
+  headline:  "Type in an address. See if it's worth buying — and exactly how to pay for it.",
+  tagline:
+    "A farm, a commercial building, a rural business property, bare land — Furlong shows you what's really there, what it actually costs to own, the deal-killers hiding in the details, and the financing built for exactly that kind of property. Free, before you commit to anything.",
   subhead:
-    "Use 250 years of land and financial history to map your next venture — property, farming, or small business — on your terms.",
-  trustTag:  "Zero tracking. Total transparency.",
+    "Not sure the property is even right for what you want? That's the exact question this answers. " +
+    "Start with an address — or just a question — and see the whole picture and your next move before you talk to anyone or share a thing.",
+  trustTag:  "Explore anonymously. No account required. No hidden handoff.",
+} as const;
+
+/**
+ * CTA v2 (founder direction 2026-07-29): buttons say the ACTION in the
+ * customer's words, not brand-internal nouns — a first-time visitor doesn't
+ * know what a "Navigator" or "Compass" is yet (Stuart's "What is this?"
+ * reaction lived on these buttons). The Compass keeps its name in the
+ * support line, where it's introduced rather than assumed.
+ */
+export const HOMEPAGE_PRIMARY_ACTIONS = {
+  primaryLabel: "Check an address — free",
+  primarySupport:
+    "Any U.S. address — a home, a farm, a business property, or bare land. The facts come first; no account, no sales call.",
+  secondaryLabel: "Browse every pathway",
+  secondarySupport:
+    "Not address-first? Move through the Furlong Compass — farms, homes, business, financing, and grants on one map.",
+} as const;
+
+export const HOMEPAGE_CAPABILITIES = {
+  heading: "What you can do here",
+  intro:
+    "You do not need a finished plan to begin. Furlong is built to help you orient yourself before the paperwork, pressure, and noise take over.",
+  cards: [
+    {
+      title: "Explore without exposing yourself",
+      href: "/discover",
+      body:
+        "Look around, compare paths, and pressure-test ideas before sharing personal information or talking to anyone.",
+    },
+    {
+      title: "See pathways, not just search results",
+      href: "/explore",
+      body:
+        "Move across land, funding, business, and readiness questions in one place instead of piecing the picture together alone.",
+    },
+    {
+      title: "Understand what stands in the way",
+      href: "/readiness",
+      body:
+        "See missing pieces, likely constraints, and the boundaries around a path before you spend time chasing it.",
+    },
+    {
+      title: "Bring in a human when you're ready",
+      href: "/compass",
+      body:
+        "Use the system to get oriented first, then move to real human review when the moment actually calls for it.",
+    },
+  ],
+} as const;
+
+export const HOMEPAGE_MODULES = {
+  heading: "Where do you want to go?",
+  // Hero v3 alignment (2026-07-29): the modules echo the address-first
+  // promise instead of re-stating the retired "we bring the analysis" line.
+  intro:
+    "Whatever the property is — a farm, a commercial building, a rural business, bare land — there's a lane built for its questions. Explore any of them free; bring in a licensed professional only when you're ready.",
+  cards: [
+    {
+      title: "Farms, Agriculture & Land",
+      href: "/explore?lane=farms-agriculture",
+      accent: "#2f6d12",
+      lead: "Know what the land can actually earn.",
+      body:
+        "Commodity economics, two honest net lines, equipment and hauling — the numbers behind the dirt before you commit.",
+      cta: "Explore farms & land",
+    },
+    {
+      title: "Commercial & Small Business",
+      href: "/explore?lane=small-business-growth",
+      accent: "#0f766e",
+      lead: "See what a building is really worth to a business.",
+      body:
+        "Worth, cash flow, operating capital, leases — the questions a lender will ask, answered before you make an offer.",
+      cta: "Explore commercial",
+    },
+    {
+      title: "Environmental & Compliance",
+      href: "/explore?lane=environmental-compliance",
+      accent: "#127a4f",
+      lead: "Find the deal-killers before they find you.",
+      body:
+        "Phase I, wetlands, contamination, water rights — read it all free, then order a licensed assessment from a PE.",
+      cta: "Explore environmental",
+    },
+    {
+      title: "Financing & Capital",
+      href: "/explore?lane=financing-capital",
+      accent: "#534AB7",
+      lead: "Bring the deal to a licensed lender.",
+      body:
+        "SBA, USDA, and conventional — see how the programs map to your project, then send your deal to a licensed lender.",
+      cta: "Explore financing",
+    },
+  ],
+} as const;
+
+export const HOMEPAGE_HOW_IT_WORKS = {
+  heading: "How Furlong works",
+  steps: [
+    {
+      title: "Start with what you know",
+      href: "/discover",
+      body:
+        "A property, a place, a rough idea, or a problem you are trying to solve is enough to begin.",
+    },
+    {
+      title: "See what may be possible",
+      href: "/explore",
+      body:
+        "Furlong maps potential pathways, opportunity signals, and adjacent routes that may not be obvious at first glance.",
+    },
+    {
+      title: "Understand the boundaries",
+      href: "/readiness",
+      body:
+        "You can see constraints, readiness gaps, and what still needs human judgment before you move too far down the wrong path.",
+    },
+    {
+      title: "Decide your next real step",
+      href: "/compass",
+      body:
+        "When you are ready, move from exploration into human-guided action with more context and less confusion.",
+    },
+  ],
 } as const;
 
 export const HOMEPAGE_SECTION_HEADINGS = {

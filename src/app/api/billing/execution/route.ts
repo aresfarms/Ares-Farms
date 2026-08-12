@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { evaluateAccess } from "@/lib/auth/accessControl";
@@ -54,9 +56,7 @@ type PaymentExecutionRequest = {
 };
 
 function createPaymentExecutionTraceId(): string {
-  return `payment-execution-${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(2, 10)}`;
+  return `payment-execution-${randomUUID()}`;
 }
 
 function actorId(body: PaymentExecutionRequest): string | null {

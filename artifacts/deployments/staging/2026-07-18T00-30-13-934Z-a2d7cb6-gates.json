@@ -1,0 +1,76 @@
+{
+  "operation": "deploy:verify-manifest (P2.4)",
+  "outcome": "PASS",
+  "serviceUrl": "https://furlong-core-mwei3cj3jq-uc.a.run.app",
+  "totalChecks": 11,
+  "failedChecks": 0,
+  "checks": [
+    {
+      "name": "image pinned by digest",
+      "expected": "@sha256:…",
+      "actual": "sha256:f854296a6d9e8c9358df82a1c1c001486cf884721cac4df3c9be8b5917a2d318",
+      "pass": true
+    },
+    {
+      "name": "no allUsers/allAuthenticatedUsers invoker binding",
+      "expected": "none",
+      "actual": "none (invokers: serviceAccount:service-859763772114@gcp-sa-iap.iam.gserviceaccount.com, user:chudson@aresfarmsinc.com)",
+      "pass": true
+    },
+    {
+      "name": "anonymous invocation blocked at edge",
+      "expected": "302/401/403 (IAP)",
+      "actual": "HTTP 302",
+      "pass": true
+    },
+    {
+      "name": "authenticated homepage serves app",
+      "expected": "200 + app surface",
+      "actual": "HTTP 200, 108437B",
+      "pass": true
+    },
+    {
+      "name": "/health/live",
+      "expected": "200",
+      "actual": "HTTP 200",
+      "pass": true
+    },
+    {
+      "name": "/health/ready (DB confirmed)",
+      "expected": "200",
+      "actual": "HTTP 200",
+      "pass": true
+    },
+    {
+      "name": "/internal walls to sign-in",
+      "expected": "3xx redirect",
+      "actual": "HTTP 307",
+      "pass": true
+    },
+    {
+      "name": "anonymous /api/audit rejected",
+      "expected": "302/401/403 (IAP)",
+      "actual": "HTTP 302",
+      "pass": true
+    },
+    {
+      "name": "furlong-db-migrate latest execution SUCCEEDED",
+      "expected": "succeeded",
+      "actual": "furlong-db-migrate-dscbr",
+      "pass": true
+    },
+    {
+      "name": "furlong-runtime-verify latest execution SUCCEEDED",
+      "expected": "succeeded",
+      "actual": "furlong-runtime-verify-4fffc",
+      "pass": true
+    },
+    {
+      "name": "verify:csp-hydration @ deployed URL",
+      "expected": "PASS",
+      "actual": "✓  verify:csp-hydration PASS — PRODUCTION nonce mode: no 'unsafe-inline' in script-src, 'strict-dynamic' on, per-request fresh nonce, ALL inline scripts nonce-t",
+      "pass": true
+    }
+  ],
+  "generatedAtUtc": "2026-07-18T00:30:13.934Z"
+}

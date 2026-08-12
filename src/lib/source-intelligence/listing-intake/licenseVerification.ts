@@ -21,7 +21,7 @@
  * job, which also schedules a renewal re-check at each license's own expiration.
  */
 
-import { appendAuditEvent } from "@/lib/property/auditLedger";
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import type { LicenseStatus, ListerCredential } from "./listingTypes";
 
 export const LICENSE_AUDIT_DOMAIN = "listing-license-verification";
@@ -74,7 +74,7 @@ export function buildLicenseVerification(input: {
     throw new Error("Refused: a license verification requires a recorded verification source/evidence reference.");
   }
   const verifiedAsOf = (input.now ?? new Date()).toISOString().slice(0, 10);
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.actorId,
     actorName: input.actorName,
     domain: LICENSE_AUDIT_DOMAIN,

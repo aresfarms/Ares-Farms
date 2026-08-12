@@ -15,7 +15,12 @@ import { IMAGES }       from "@/lib/public-content/americasJourneyImages";
 import { NOW_IMAGES }   from "@/lib/public-content/americasJourneyNowImages";
 import { EXTRA_IMAGES } from "@/lib/public-content/americasJourneyPool";
 import type { ArchivalImage } from "@/lib/public-content/americasJourneyStops";
-import { publicSafeForState, type LiveSources } from "@/lib/property/propertyPublicSafe";
+import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
+import {
+  publicSafeForState,
+  type LiveSources,
+  type PublicSafeInventoryByState,
+} from "@/lib/property/propertyPublicSafe";
 import { SOURCE_PORTAL, type PublicSafeProperty } from "@/lib/property/propertyTypes";
 import {
   getActiveHoliday,
@@ -186,6 +191,14 @@ function isoWeek(d: Date): number {
   return 1 + Math.round((firstThursday - date.getTime()) / 604_800_000);
 }
 
+function stableStopSeed(input: string): number {
+  let hash = 0;
+  for (let index = 0; index < input.length; index += 1) {
+    hash = (hash * 33 + input.charCodeAt(index)) >>> 0;
+  }
+  return hash;
+}
+
 /** Parse a true-year value to a sortable number. Strings use their first 4-digit
  *  run ("c. 1870s" → 1870); "Present day" / undefined sort last. */
 function yearValue(year: number | string | undefined): number {
@@ -223,7 +236,11 @@ function buildPool(stopId: string): ArchivalImage[] {
  * earlier+later image PAIR (Old → New) AND a live address-stripped property for
  * the stop's state (Possible). These are the "complete" featured stops.
  */
-function completeIndices(journey: (TourPlace | Capstone)[], live: LiveSources): number[] {
+function completeIndices(
+  journey: (TourPlace | Capstone)[],
+  live: LiveSources,
+  inventory: PublicSafeInventoryByState,
+): number[] {
   const out: number[] = [];
   for (let idx = 0; idx < journey.length; idx++) {
     const b = journey[idx];
@@ -231,7 +248,7 @@ function completeIndices(journey: (TourPlace | Capstone)[], live: LiveSources): 
     const p = b as TourPlace;
     if (buildPool(p.id).length < 2) continue; // needs an Old/New pair
     const ts = TOUR.find((s) => s.places.some((pp) => pp.id === p.id));
-    if (ts?.abbr && publicSafeForState(ts.abbr, live)) out.push(idx); // has Possible
+    if (ts?.abbr && publicSafeForState(ts.abbr, live, inventory, idx)) out.push(idx); // has Possible
   }
   return out;
 }
@@ -246,12 +263,29 @@ function completeIndices(journey: (TourPlace | Capstone)[], live: LiveSources): 
 function featuredIndexForWeek(
   journey: (TourPlace | Capstone)[],
   live: LiveSources,
+  inventory: PublicSafeInventoryByState,
   weekSeed: number,
 ): number {
-  const complete = completeIndices(journey, live);
+  const complete = completeIndices(journey, live, inventory);
   if (complete.length === 0) return 0;
   const k = ((Math.trunc(weekSeed) % complete.length) + complete.length) % complete.length;
   return complete[k];
+}
+
+function sourceLabelFor(sourceId: PublicSafeProperty["sourceId"]): string {
+  if (sourceId === "hud") return "HUD Home Store";
+  if (sourceId === "treasury") return "U.S. Treasury auctions";
+  if (sourceId === "gsa-realestate") return "GSA realestatesales.gov";
+  return "USDA resales portal";
+}
+
+function pathwaysForProperty(property: PublicSafeProperty): string[] {
+  const type = property.propertyType.toLowerCase();
+  if (property.sourceId === "usda") return ["USDA"];
+  if (property.sourceId === "hud") return ["Conventional", "FHA context"];
+  if (/commercial|business|hospitality/.test(type)) return ["SBA", "Conventional"];
+  if (/land|farm|ranch/.test(type)) return ["USDA", "Conventional"];
+  return ["Conventional"];
 }
 
 /**
@@ -293,9 +327,17 @@ function PossibleVisual({ propertyType }: { propertyType: string }) {
 export function PublicMapExperience({
   liveSources = {},
   weekSeed = 0,
+  mapInventoryByState = {},
+  fillHeight = false,
 }: {
   liveSources?: LiveSources;
   weekSeed?: number;
+  mapInventoryByState?: PublicSafeInventoryByState;
+  /** Taller map that fills a tall side column, top-aligning the U.S. drawing so
+      the panel gradient fills below (founder direction 2026-07-18: fill the
+      empty space under the map on lanes where the right column runs long). The
+      popup math stays correct because the drawing top-aligns to the SVG box. */
+  fillHeight?: boolean;
 }) {
   // ── Tour state ──────────────────────────────────────────────────────────────
   /**
@@ -310,7 +352,7 @@ export function PublicMapExperience({
    * journey + liveSources + weekSeed (all derived from props), so SSR and the
    * client first render agree — no hydration drift.
    */
-  const initialIndex = featuredIndexForWeek(journey, liveSources, weekSeed);
+  const initialIndex = featuredIndexForWeek(journey, liveSources, mapInventoryByState, weekSeed);
   /** Whether the visitor has explicitly clicked "Begin the tour." */
   const [started, setStarted] = useState(false);
   /** Current index into the weekly journey. */
@@ -493,12 +535,19 @@ export function PublicMapExperience({
   // The public-safe USDA property for a stop's state — address-stripped, bands
   // only. Returns null unless the USDA source is live (Module 22/23 APPROVED), so
   // while the source is pending the map behaves exactly as before (then → now).
-  function possibleForIndex(idx: number): PublicSafeProperty | null {
+function possibleForIndex(idx: number): PublicSafeProperty | null {
     const b = journey[idx];
     if (!b || isCapstone(b)) return null;
     const p = b as TourPlace;
     const ts = TOUR.find((s) => s.places.some((pp) => pp.id === p.id));
-    return ts?.abbr ? publicSafeForState(ts.abbr, liveSources) : null;
+    return ts?.abbr
+      ? publicSafeForState(
+          ts.abbr,
+          liveSources,
+          mapInventoryByState,
+          weekSeed + idx + stableStopSeed(p.id)
+        )
+      : null;
   }
 
   // ── Dissolve + advance ticker ────────────────────────────────────────────────
@@ -551,7 +600,7 @@ export function PublicMapExperience({
     if (reduceMotion) { stopTick(); return; }
     startTick();
     return () => stopTick();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [reduceMotion]);
 
   // ── Navigation ───────────────────────────────────────────────────────────────
@@ -655,6 +704,35 @@ export function PublicMapExperience({
    */
   const possibleProp = place ? possibleForIndex(i) : null;
   const hasPossible  = !!possibleProp;
+  const possibleAnalyzeHref = possibleProp
+    ? buildPropertyAnalysisHref({
+        propertyId: possibleProp.id,
+        title: `${possibleProp.propertyType[0]?.toUpperCase() ?? ""}${possibleProp.propertyType.slice(1)} in ${possibleProp.town}`,
+        location: `${possibleProp.town}${possibleProp.county && possibleProp.county !== "Unknown" ? `, ${possibleProp.county} County` : ""}, ${possibleProp.state}`,
+        propertyType: possibleProp.propertyType,
+        priceLabel: possibleProp.priceBand,
+        vintage: possibleProp.vintageStamp,
+        sourceLabel: sourceLabelFor(possibleProp.sourceId),
+        pathways: pathwaysForProperty(possibleProp),
+        town: possibleProp.town,
+        county: possibleProp.county,
+        state: possibleProp.state,
+        sourceId: possibleProp.sourceId,
+        description: possibleProp.whyMayFit,
+        currentLabel: possibleProp.isCurrent ? "Current government listing" : `${possibleProp.vintageStamp} · historical example`,
+        entryMethod: "map-card",
+      })
+    : null;
+  const cardNavigateHref = possibleAnalyzeHref;
+  const propertyGatewayActive = Boolean(possibleProp && possibleAnalyzeHref);
+
+  function handlePossibleCardNavigation(eventTarget: EventTarget | null) {
+    if (!possibleAnalyzeHref) return;
+    if (eventTarget instanceof HTMLElement && eventTarget.closest("a")) {
+      return;
+    }
+    window.location.href = possibleAnalyzeHref;
+  }
 
   /**
    * Effective phase for rendering. The "possible" phase only renders when a live
@@ -671,6 +749,10 @@ export function PublicMapExperience({
    */
   const popupImg =
     effPhase === "possible" ? null : effPhase === "then" ? earlierImg : laterImg;
+  const gatewayImg =
+    propertyGatewayActive
+      ? (popupImg ?? laterImg ?? earlierImg)
+      : null;
 
   /** The displayed image's REAL year — the card leads with this, not a static label. */
   const displayedYear =
@@ -912,6 +994,31 @@ export function PublicMapExperience({
           color: #5bb8ad;
           text-decoration: underline;
         }
+        .tour-popup-cta-row {
+          display: grid;
+          gap: 8px;
+          margin-top: 2px;
+        }
+        .tour-popup-cta {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 34px;
+          border-radius: 999px;
+          text-decoration: none;
+          font-size: 11.5px;
+          font-weight: 800;
+          padding: 0 12px;
+        }
+        .tour-popup-cta-primary {
+          background: #0f766e;
+          color: #ffffff;
+        }
+        .tour-popup-cta-secondary {
+          border: 1px solid rgba(91, 209, 160, 0.45);
+          color: #5bd1a0;
+          background: rgba(18, 33, 58, 0.55);
+        }
       `}</style>
 
       {/* ── Series label ─────────────────────────────────────────────────────── */}
@@ -971,7 +1078,7 @@ export function PublicMapExperience({
             </div>
 
             <figure style={{ margin: 0, borderRadius: 8, overflow: "hidden" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+              { }
               <img
                 key={hImg.src!}
                 className="tour-popup-img"
@@ -1097,7 +1204,17 @@ export function PublicMapExperience({
             onMouseEnter={handleMapMouseEnter}
             onMouseLeave={handleMapMouseLeave}
             style={{
-              height:         480,   // extra height vs. old 460 to give popup room near top
+              // Width-driven: the container keeps the SVG's 960×580 shape at
+              // ANY width (founder direction 2026-07-18: the map must shrink
+              // into a side column, not command the full page top). The
+              // ResizeObserver re-measures scale on resize, so the on-map
+              // popup card tracks correctly at every size.
+              // Taller box on fillHeight lanes so the map reaches down toward
+              // the long side column; the U.S. drawing top-aligns (xMidYMin)
+              // and the panel gradient fills the space below it.
+              aspectRatio:    fillHeight ? "960 / 720" : "960 / 580",
+              maxHeight:      fillHeight ? 600 : 520,
+              minHeight:      200, // room for the loading/unavailable notes
               display:        "flex",
               alignItems:     "center",
               justifyContent: "center",
@@ -1122,13 +1239,13 @@ export function PublicMapExperience({
               <svg
                 ref={svgRef}
                 viewBox="0 -20 960 580"
-                preserveAspectRatio="xMidYMid meet"
+                preserveAspectRatio={fillHeight ? "xMidYMin meet" : "xMidYMid meet"}
                 aria-label={
                   place
                     ? `Full U.S. map — ${place.name}, ${tourState?.state ?? ""}, ${place.era}. Illustrative exploration; not based on your location.`
                     : "Full U.S. map. Illustrative exploration."
                 }
-                style={{ width: "auto", height: "100%", maxHeight: 480, display: "block" }}
+                style={{ width: "100%", height: "100%", display: "block" }}
               >
                 <defs>
                   <filter id="tour-glow" x="-80%" y="-80%" width="260%" height="260%">
@@ -1158,9 +1275,11 @@ export function PublicMapExperience({
                     <path
                       key={`state-${fi}`}
                       d={d}
-                      fill={isFeatured ? `${GOLD}18` : "#edf2fb"}
-                      stroke={isFeatured ? GOLD : "#c5d3e8"}
-                      strokeWidth={isFeatured ? 1.8 : 0.5}
+                      // Founder feedback 2026-07-16: the old #edf2fb/#c5d3e8 @0.5
+                      // faded into the white page — the map must READ as a map.
+                      fill={isFeatured ? `${GOLD}18` : "#dbe6f4"}
+                      stroke={isFeatured ? GOLD : "#7f9cc4"}
+                      strokeWidth={isFeatured ? 1.8 : 0.9}
                       strokeLinejoin="round"
                     />
                   );
@@ -1204,15 +1323,33 @@ export function PublicMapExperience({
                 aria-live="polite"
                 aria-atomic="true"
                 className="tour-popup-card"
+                role={cardNavigateHref ? "link" : undefined}
+                tabIndex={cardNavigateHref ? 0 : undefined}
+                onClick={cardNavigateHref ? (event) => handlePossibleCardNavigation(event.target) : undefined}
+                onKeyDown={cardNavigateHref ? (event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    handlePossibleCardNavigation(event.target);
+                  }
+                } : undefined}
                 style={{
                   left:      popupPos.left,
                   top:       popupPos.top,
                   transform: popupPos.placement === "above"
                     ? `translate(-50%, calc(-100% - ${CARD_GAP}px))`  // floats above marker
                     : `translate(-50%, ${CARD_GAP + 4}px)`,           // drops below (north states)
+                  cursor: cardNavigateHref ? "pointer" : "default",
+                  // The map now scales into side columns; a full card can be
+                  // taller than a small container, so clamp to the container
+                  // and scroll internally (measuredCardH follows via the
+                  // ResizeObserver, keeping the anchor math consistent).
+                  maxHeight: svgMeasure
+                    ? Math.max(180, svgMeasure.containerHeight - CARD_MARGIN * 2)
+                    : undefined,
+                  overflowY: "auto",
                 }}
               >
-                {effPhase === "possible" && possibleProp ? (
+                {propertyGatewayActive && possibleProp ? (
                   /* ── "Possible" card (Old → New → Possible) ──────────────────
                      Public-safe government property for this state: county/town
                      + bands only — NO exact address, NO lat/long. Framing is
@@ -1222,17 +1359,30 @@ export function PublicMapExperience({
                      Citation required. */
                   <>
                     <p className="tour-popup-label" style={{ color: "#5bd1a0" }}>
-                      POSSIBLE
+                      PROPERTY PATHWAY
+                      {" · "}
+                      {effPhase === "then" ? "OLD" : effPhase === "now" ? "NEW" : "POSSIBLE"}
+                      {" · "}
+                      {gatewayImg?.year ?? displayedYear}
                       {" — "}
                       <span style={{ fontWeight: 500, textTransform: "none", letterSpacing: 0 }}>
                         {possibleProp.state}
                       </span>
                     </p>
-                    {/* Visual: a clean TYPE-BASED graphic (home / land / generic),
-                        NOT a listing photo — HUD/USDA listing photos can carry
-                        third-party (broker) copyright, so we never render them. */}
                     <figure style={{ margin: 0 }}>
-                      <PossibleVisual propertyType={possibleProp.propertyType} />
+                      {gatewayImg ? (
+
+                        <img
+                          key={gatewayImg.src!}
+                          className="tour-popup-img"
+                          src={gatewayImg.src!}
+                          alt={gatewayImg.alt}
+                          loading="lazy"
+                          style={{ width: "100%", height: 110, objectFit: "cover", display: "block" }}
+                        />
+                      ) : (
+                        <PossibleVisual propertyType={possibleProp.propertyType} />
+                      )}
                     </figure>
                     <div style={{ padding: "8px 10px 10px", display: "grid", gap: 6 }}>
                       <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#e8effa" }}>
@@ -1249,17 +1399,28 @@ export function PublicMapExperience({
                       </p>
                       <p style={{ margin: 0, fontSize: 11, color: "#cfe3d8", lineHeight: 1.5 }}>
                         {possibleProp.isCurrent
-                          ? "A current government listing — an example of where a journey can begin. Providers can help you explore financing."
-                          : "A historical government example of where a journey can begin. Providers can help you explore financing."}
+                          ? "This stop now behaves like a direct property entry. Start the Furlong analysis or jump to the live source immediately."
+                          : "This stop routes into a property-first Furlong analysis flow, with the source doorway preserved separately."}
                       </p>
-                      <a
-                        href={SOURCE_PORTAL[possibleProp.sourceId].url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ fontSize: 11, fontWeight: 700, color: "#5bd1a0", textDecoration: "underline" }}
-                      >
-                        {SOURCE_PORTAL[possibleProp.sourceId].label}
-                      </a>
+                      <div className="tour-popup-cta-row">
+                        <a
+                          href={possibleAnalyzeHref ?? undefined}
+                          className="tour-popup-cta tour-popup-cta-primary"
+                        >
+                          Analyze through Furlong
+                        </a>
+                        <a
+                          href={SOURCE_PORTAL[possibleProp.sourceId].url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="tour-popup-cta tour-popup-cta-secondary"
+                        >
+                          Go to source website ↗
+                        </a>
+                      </div>
+                      <p style={{ margin: 0, fontSize: 11, color: "#e8effa", lineHeight: 1.5 }}>
+                        {effPhase === "then" ? place.headline : effPhase === "now" ? place.surprise : possibleProp.whyMayFit}
+                      </p>
                       <p className="tour-popup-credit" style={{ padding: 0 }}>
                         {possibleProp.sourceCitation} · {possibleProp.vintageStamp}
                       </p>
@@ -1287,7 +1448,7 @@ export function PublicMapExperience({
                     {/* Image: fades in when the displayed image changes. */}
                     {popupImg && (
                       <figure style={{ margin: 0 }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        { }
                         <img
                           key={popupImg.src!}
                           className="tour-popup-img"
@@ -1320,6 +1481,19 @@ export function PublicMapExperience({
                     <p className="tour-popup-headline">
                       {phase === "then" ? place.headline : place.surprise}
                     </p>
+                    {cardNavigateHref && (
+                      <p
+                        style={{
+                          margin: "0 10px 10px",
+                          fontSize: 11.5,
+                          fontWeight: 800,
+                          color: "#ffffff",
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        Open this stop's property analysis with Furlong →
+                      </p>
+                    )}
                   </>
                 )}
               </div>
@@ -1457,23 +1631,8 @@ export function PublicMapExperience({
         </span>
       </div>
 
-      {/* ── Always-visible Explore CTA (under-map entry point) ──────────────────
-          One of TWO intentional journey entry points to /explore (the other is
-          the capstone at the tour's end). Visible on load — no playthrough
-          needed. Goes to /explore, never /onboarding. */}
-      <div style={{ marginTop: 14, display: "flex", justifyContent: "center" }}>
-        <a
-          href="/explore"
-          data-testid="under-map-explore-cta"
-          style={{
-            display: "inline-flex", alignItems: "center", gap: 8, minHeight: 48,
-            padding: "0 26px", borderRadius: 999, background: "#0f766e", color: "#ffffff",
-            fontWeight: 800, fontSize: 16, textDecoration: "none", letterSpacing: "0.01em",
-          }}
-        >
-          What are your possibilities? →
-        </a>
-      </div>
+      {/* "What are your possibilities?" CTA removed — redundant under the map
+          (founder direction 2026-07-17). */}
 
       {/* ── Privacy and advisory footnote ──────────────────────────────────────── */}
       <p style={{ margin: "12px 0 0", fontSize: 13, color: "#5d687a", lineHeight: 1.6 }}>

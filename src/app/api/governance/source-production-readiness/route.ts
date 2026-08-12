@@ -5,6 +5,11 @@ import {
   evaluateSourceProductionReadinessGate,
 } from "@/lib/governance/sourceProductionReadinessGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestSourceReviewEvidence,
+  recordSourceReviewEvidence,
+  sourceReviewEvidenceFor,
+} from "@/lib/governance/sourceReviewEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -153,21 +158,27 @@ async function handleSourceProductionReadiness(
     });
     const result = evaluateSourceProductionReadinessGate({ sourceId });
     const readinessHold =
-      req.method === "POST"
-        ? {
-            readinessHoldId: `source-production-readiness-hold-${Date.now()}`,
-            sourceId: sourceId ?? null,
-            reviewStatus: "SOURCE_PRODUCTION_READINESS_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            legalAdviceProvided: false,
-            liveFetchPerformed: false,
-            externalActionPerformed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
-            humanReviewRequired: true,
+      req.method === "POST" && sourceId && actorId
+        ? recordSourceReviewEvidence({
+            kind: "PRODUCTION_READINESS_HOLD",
+            sourceId,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : sourceId
+          ? latestSourceReviewEvidence(sourceId, "PRODUCTION_READINESS_HOLD")
+          : null;
+    const readinessHistory = sourceReviewEvidenceFor(
+      sourceId,
+      "PRODUCTION_READINESS_HOLD"
+    );
+    const legalReviewEvidence = sourceId
+      ? latestSourceReviewEvidence(sourceId, "LEGAL_REVIEW_HOLD")
+      : null;
+    const promotionPacketEvidence = sourceId
+      ? latestSourceReviewEvidence(sourceId, "PROMOTION_PACKET_HOLD")
+      : null;
     const classifiedOutput = classifyRecord(
       {
         count: result.sourceProductionReadinessReviews.length,
@@ -177,6 +188,9 @@ async function handleSourceProductionReadiness(
         disclosures: result.disclosures,
         readinessPosture: result.readinessPosture,
         readinessHold,
+        readinessHistory,
+        legalReviewEvidence,
+        promotionPacketEvidence,
         productionBlocked: true,
         promotionAllowed: false,
         liveFetchPerformed: false,
@@ -244,6 +258,9 @@ async function handleSourceProductionReadiness(
       disclosures: classifiedOutput.disclosures,
       readinessPosture: classifiedOutput.readinessPosture,
       readinessHold: classifiedOutput.readinessHold,
+      readinessHistory: classifiedOutput.readinessHistory,
+      legalReviewEvidence: classifiedOutput.legalReviewEvidence,
+      promotionPacketEvidence: classifiedOutput.promotionPacketEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       promotionAllowed: classifiedOutput.promotionAllowed,
       liveFetchPerformed: classifiedOutput.liveFetchPerformed,

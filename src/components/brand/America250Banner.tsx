@@ -1,17 +1,9 @@
 /**
- * America250Banner — Build 52
+ * America250Banner — post-July-4 civic ribbon
  *
- * Full-width commemorative panel placed between PublicSiteHeader and the
- * homepage hero. Structure (desktop row, mobile column):
- *   [Betsy Ross 13-star flag]  |  AMERICA 250 centrepiece  |  US 50-star flag
- *
- * "Then → Now" symbolism: 1777 circle of 13 stars to 2026 grid of 50.
- *
- * Accessible contrast on #162033 navy background (WCAG 2.2 AA):
- *   Furlong gold   #c9a84c  →  7.1:1  (heading, "innovation") ✓ AA
- *   Civic blue     #93c5fd  →  9.3:1  ("growth", "opportunity") ✓ AAA
- *   Civic red      #fc8181  →  7.0:1  ("stewardship") ✓ AA
- *   Light body     rgba(232,239,250,0.88)  →  ~9.5:1  ✓ AAA
+ * The anniversary can still be referenced, but it is no longer the main event.
+ * This keeps the America 250 thread present in a lighter, reflective way while
+ * returning the homepage focus to Furlong's core promise.
  *
  * No animation. No geolocation. No visitor data.
  * Public Alpha remains PENDING.
@@ -106,151 +98,133 @@ export function America250Banner() {
   return (
     <div
       style={{
-        background: "#162033",
-        borderBottom: "2px solid #c9a84c",
+        background:
+          "linear-gradient(180deg, rgba(22,32,51,0.96) 0%, rgba(22,32,51,0.9) 100%)",
+        borderBottom: "1px solid rgba(201,168,76,0.32)",
         width: "100%",
       }}
       role="banner"
-      aria-label="America 250 — Celebrating 250 years of American history"
+      aria-label="America 250 reflection ribbon"
     >
       <style>{`
-        /* ── Banner layout ───────────────────────────────────────── */
+        /* ── Ribbon layout ───────────────────────────────────────── */
         .a250-inner {
           max-width: 1040px;
           margin: 0 auto;
-          padding: 22px 24px 18px;
+          padding: 12px 24px;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 20px;
+          justify-content: center;
+          gap: 14px;
         }
 
-        /* ── Flag column ─────────────────────────────────────────── */
+        /* ── Flag chips ──────────────────────────────────────────── */
         .a250-flag-col {
           flex: 0 0 auto;
-          width: 120px;
+          width: 58px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 6px;
+          gap: 4px;
         }
         .a250-flag-label {
-          font-size: 11px;
+          font-size: 9px;
           font-weight: 700;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
-          color: rgba(201,168,76,0.75);
+          color: rgba(201,168,76,0.62);
           text-align: center;
           white-space: nowrap;
         }
 
-        /* ── Centre copy ─────────────────────────────────────────── */
+        /* ── Center copy ─────────────────────────────────────────── */
         .a250-center {
           flex: 1 1 auto;
-          text-align: center;
           display: grid;
-          gap: 6px;
-          justify-items: center;
+          gap: 2px;
+          text-align: left;
         }
         .a250-heading {
           margin: 0;
-          font-size: clamp(26px, 3.5vw, 42px);
-          font-weight: 900;
-          color: #c9a84c;
-          letter-spacing: 0.07em;
+          font-size: clamp(12px, 1.4vw, 13px);
+          font-weight: 800;
+          color: rgba(201,168,76,0.9);
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          line-height: 1.05;
+          line-height: 1.1;
         }
         .a250-sub {
           margin: 0;
-          font-size: clamp(13px, 1.6vw, 16px);
-          color: rgba(232,239,250,0.88);
-          line-height: 1.55;
-          max-width: 520px;
+          font-size: clamp(12.5px, 1.6vw, 14px);
+          color: rgba(232,239,250,0.84);
+          line-height: 1.45;
+          max-width: 680px;
           font-weight: 500;
         }
-        .a250-word-growth      { color: #93c5fd; font-weight: 700; }
-        .a250-word-innovation  { color: #c9a84c; font-weight: 700; }
-        .a250-word-stewardship { color: #fc8181; font-weight: 700; }
-        .a250-word-opportunity { color: #93c5fd; font-weight: 700; }
+        .a250-accent {
+          color: #c9a84c;
+          font-weight: 700;
+        }
+        .a250-word-opportunity {
+          color: #93c5fd;
+          font-weight: 700;
+        }
 
         /* ── Responsive ──────────────────────────────────────────── */
         @media (max-width: 600px) {
           .a250-inner {
-            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
             align-items: center;
-            gap: 14px;
-            padding: 18px 20px 16px;
-          }
-          /* Flags side-by-side above the title on mobile */
-          .a250-flags-mobile-row {
-            display: flex;
-            gap: 16px;
-            align-items: flex-end;
-            justify-content: center;
-            width: 100%;
-          }
-          .a250-flag-col {
-            width: 90px;
+            gap: 10px;
+            padding: 12px 20px;
           }
           .a250-center {
-            order: 2;
+            text-align: center;
           }
-          .a250-flags-desktop-left  { display: none; }
-          .a250-flags-desktop-right { display: none; }
+          .a250-flag-col {
+            width: 52px;
+          }
+          .a250-flags-mobile-row {
+            display: none;
+          }
         }
-        @media (min-width: 601px) {
-          .a250-flags-mobile-row { display: none; }
-          .a250-flags-desktop-left  { display: flex; }
-          .a250-flags-desktop-right { display: flex; }
+        @media (max-width: 460px) {
+          .a250-inner {
+            gap: 8px;
+          }
+          .a250-flag-col {
+            display: none;
+          }
         }
       `}</style>
 
       <div className="a250-inner">
-
-        {/* Desktop: left flag */}
         <div
-          className="a250-flag-col a250-flags-desktop-left"
+          className="a250-flag-col"
           style={{ flexDirection: "column", alignItems: "center", gap: 6 }}
         >
           <BetsyRossFlag />
-          <span className="a250-flag-label">1777 · Then</span>
+          <span className="a250-flag-label">1777</span>
         </div>
 
-        {/* Mobile: both flags side by side, above the title */}
-        <div className="a250-flags-mobile-row" aria-hidden="true">
-          <div className="a250-flag-col">
-            <BetsyRossFlag />
-            <span className="a250-flag-label">1777</span>
-          </div>
-          <div className="a250-flag-col">
-            <USFlag />
-            <span className="a250-flag-label">2026</span>
-          </div>
-        </div>
-
-        {/* Centre copy */}
         <div className="a250-center">
           <h2 className="a250-heading">America 250</h2>
           <p className="a250-sub">
-            Celebrating 250 years of American{" "}
-            <span className="a250-word-growth">growth</span>,{" "}
-            <span className="a250-word-innovation">innovation</span>,{" "}
-            <span className="a250-word-stewardship">stewardship</span>,{" "}
-            and{" "}
-            <span className="a250-word-opportunity">opportunity</span>.
+            The July 4 commemoration has passed, but the thread remains:
+            <span className="a250-accent"> 250 years of American continuity</span>,
+            land, and civic memory still shape how we think about place,
+            stewardship, and <span className="a250-word-opportunity">opportunity</span>.
           </p>
         </div>
 
-        {/* Desktop: right flag */}
         <div
-          className="a250-flag-col a250-flags-desktop-right"
+          className="a250-flag-col"
           style={{ flexDirection: "column", alignItems: "center", gap: 6 }}
         >
           <USFlag />
-          <span className="a250-flag-label">2026 · Now</span>
+          <span className="a250-flag-label">2026</span>
         </div>
-
       </div>
     </div>
   );

@@ -1,0 +1,275 @@
+{
+  "schemaVersion": "p5-payments-treasury-authorization-readiness-v1",
+  "environment": "staging",
+  "targetRevision": "furlong-core-00102-mg7",
+  "targetImage": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:6ef364ee70c1b80f8f261b38b62a2c762307c6afaff6714b9d5f9f8023dfd9d4",
+  "blockerId": "P5-B07",
+  "blockerStatus": "EVIDENCE_READY_HUMAN_APPROVAL_REQUIRED",
+  "outcome": "PASS",
+  "productionAuthorized": false,
+  "liveMoneyMovementPermitted": false,
+  "inventoryVersion": "p5-b07-payments-treasury-authorization-v1",
+  "inventory": [
+    {
+      "operationType": "PAYMENT_CAPTURE",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    },
+    {
+      "operationType": "FEE_ASSESSMENT",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    },
+    {
+      "operationType": "REFUND",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    },
+    {
+      "operationType": "DISPUTE_CHARGEBACK",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    },
+    {
+      "operationType": "SETTLEMENT_RECONCILIATION",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    },
+    {
+      "operationType": "TREASURY_ALLOCATION",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    },
+    {
+      "operationType": "RESERVE_MOVEMENT",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    },
+    {
+      "operationType": "FINANCIAL_CORRECTION",
+      "qualifiedTreasuryAuthorityRequired": true,
+      "separationOfPowersRequired": true,
+      "processorCertificationRequired": true,
+      "paymentAuthorityRequired": true,
+      "feeScheduleApprovalRequired": true,
+      "borrowerFeeDisclosureRequired": true,
+      "refundPolicyRequired": true,
+      "disputePolicyRequired": true,
+      "reconciliationPolicyRequired": true,
+      "immutableLedgerRequired": true,
+      "deterministicReplayRequired": true,
+      "classificationRequired": true,
+      "auditEvidenceRequired": true,
+      "reserveFloorProtectionRequired": true,
+      "rollbackKillSwitchRequired": true,
+      "humanApprovalRequired": true,
+      "executionApproved": false,
+      "liveMoneyMovementPermitted": false
+    }
+  ],
+  "authorization": {
+    "blockerId": "P5-B07",
+    "ownerRole": "TREASURY_AUTHORITY",
+    "auditRole": "AUDIT_AUTHORITY",
+    "legalComplianceRole": "LEGAL_COMPLIANCE_AUTHORITY",
+    "approvalRequired": true,
+    "approvalGranted": false,
+    "paymentCaptureApproved": false,
+    "feeAssessmentApproved": false,
+    "refundsApproved": false,
+    "settlementsApproved": false,
+    "treasuryMovementApproved": false,
+    "liveMoneyMovementPermitted": false,
+    "productionAuthorized": false
+  },
+  "checks": [
+    {
+      "name": "target revision is live",
+      "pass": true,
+      "evidence": "furlong-core-00102-mg7 expected furlong-core-00102-mg7"
+    },
+    {
+      "name": "live image is digest pinned",
+      "pass": true,
+      "evidence": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:6ef364ee70c1b80f8f261b38b62a2c762307c6afaff6714b9d5f9f8023dfd9d4"
+    },
+    {
+      "name": "payments treasury authority smoke",
+      "pass": true,
+      "evidence": "npm run smoke:production-payments-treasury-authorization"
+    },
+    {
+      "name": "payment connector control implementation",
+      "pass": true,
+      "evidence": "paymentConnectorControlStore.ts"
+    },
+    {
+      "name": "treasury governance guard",
+      "pass": true,
+      "evidence": "treasuryGovernanceGuard.ts"
+    },
+    {
+      "name": "all financial operations inventoried",
+      "pass": true,
+      "evidence": "8 operations"
+    },
+    {
+      "name": "qualified treasury authority required",
+      "pass": true,
+      "evidence": "all operations"
+    },
+    {
+      "name": "processor payment and fee authority required",
+      "pass": true,
+      "evidence": "all operations"
+    },
+    {
+      "name": "borrower fee disclosure required",
+      "pass": true,
+      "evidence": "all operations"
+    },
+    {
+      "name": "refund and dispute controls required",
+      "pass": true,
+      "evidence": "all operations"
+    },
+    {
+      "name": "reconciliation required",
+      "pass": true,
+      "evidence": "all operations"
+    },
+    {
+      "name": "immutable ledger replay and audit required",
+      "pass": true,
+      "evidence": "all operations"
+    },
+    {
+      "name": "reserve and rollback controls required",
+      "pass": true,
+      "evidence": "all operations"
+    },
+    {
+      "name": "human financial approval preserved",
+      "pass": true,
+      "evidence": "{\"blockerId\":\"P5-B07\",\"ownerRole\":\"TREASURY_AUTHORITY\",\"auditRole\":\"AUDIT_AUTHORITY\",\"legalComplianceRole\":\"LEGAL_COMPLIANCE_AUTHORITY\",\"approvalRequired\":true,\"approvalGranted\":false,\"paymentCaptureApproved\":false,\"feeAssessmentApproved\":false,\"refundsApproved\":false,\"settlementsApproved\":false,\"treasuryMovementApproved\":false,\"liveMoneyMovementPermitted\":false,\"productionAuthorized\":false}"
+    },
+    {
+      "name": "live money movement remains blocked",
+      "pass": true,
+      "evidence": "fail-closed"
+    }
+  ],
+  "generatedAtUtc": "2026-07-21T19:35:09.809Z"
+}

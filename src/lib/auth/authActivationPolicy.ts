@@ -66,6 +66,8 @@ const PROVISIONABLE_ROLES = new Set<AccessRole>([
   "operator",
   "underwriter",
   "auditor",
+  "government_official",
+  "attorney",
   "admin",
   "governance",
 ]);
@@ -73,6 +75,8 @@ const ELEVATED_PROVISIONING_ROLES = new Set<AccessRole>([
   "operator",
   "underwriter",
   "auditor",
+  "government_official",
+  "attorney",
   "admin",
   "governance",
 ]);
@@ -147,10 +151,21 @@ export function roleProvisioningMode(
   return "locked";
 }
 
+export function credentialSharedSecretMinimumLength(
+  env: AuthActivationEnvironment = process.env
+): number {
+  const configured = Number(env.AUTH_CREDENTIAL_MIN_LENGTH ?? 32);
+  if (!Number.isInteger(configured)) return 32;
+  return Math.min(32, Math.max(20, configured));
+}
+
 export function strongCredentialSharedSecret(
   env: AuthActivationEnvironment = process.env
 ): boolean {
-  return Boolean(env.AUTH_CREDENTIAL_SHARED_SECRET?.length >= 32);
+  return Boolean(
+    (env.AUTH_CREDENTIAL_SHARED_SECRET?.length ?? 0) >=
+      credentialSharedSecretMinimumLength(env)
+  );
 }
 
 export function credentialAllowlistConfigured(
@@ -216,7 +231,11 @@ export function evaluateCredentialAuthPolicy(input: {
   }
 
   const allowlist = parseEmailAllowlist(env.AUTH_CREDENTIAL_EMAIL_ALLOWLIST);
-  const sharedSecret = env.AUTH_CREDENTIAL_SHARED_SECRET;
+  // Trim BOTH sides of the comparison: the typed password is normalized
+  // (trimmed), so an invisible trailing newline in the stored secret version
+  // (the classic `echo | gcloud secrets versions add` artifact) would make
+  // sign-in impossible forever (founder staging test 2026-08-05).
+  const sharedSecret = env.AUTH_CREDENTIAL_SHARED_SECRET?.trim();
 
   if (!allowlist.has(email)) {
     return {

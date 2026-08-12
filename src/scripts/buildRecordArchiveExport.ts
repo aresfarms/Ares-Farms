@@ -159,7 +159,7 @@ function routeInventory() {
 }
 
 function markdownTable(headers: string[], rows: string[][]): string {
-  const escape = (value: string) => value.replace(/\|/g, "\\|");
+  const escape = (value: string) => value.replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
 
   return [
     `| ${headers.map(escape).join(" | ")} |`,

@@ -15,9 +15,9 @@
  * lookup happens here in the backend pipeline, never at render time.
  */
 
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
 import { recordsForReview, PROPERTY_SOURCE_IDS } from "./propertyData";
 import { isSourceLiveRuntime } from "./sourceActivationStore";
-import { appendAuditEvent } from "./auditLedger";
 import { PROPERTY_OZ_FACTS } from "./propertyOpportunityZonesGenerated";
 import { PROPERTY_HUBZONE_FACTS } from "./propertyHubzonesGenerated";
 import { readPlaceFactOverlay, writePlaceFactOverlay } from "./placeFactOverlay";
@@ -132,7 +132,7 @@ export async function refreshPropertyPlaceFacts(opts?: { limit?: number; now?: D
 }
 
 function log(r: PlaceFactRefreshResult): void {
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: "system:place-fact-refresh",
     actorName: "place-fact-refresh-job",
     domain: DOMAIN,

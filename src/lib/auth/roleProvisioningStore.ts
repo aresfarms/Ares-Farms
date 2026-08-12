@@ -10,6 +10,7 @@ import {
   normalizeIdentityEmail,
 } from "@/lib/auth/identity";
 import { db } from "@/lib/db";
+import { recordMover } from "@/lib/auth/accessSecurityRuntime";
 
 /**
  * Governed Role Provisioning Store
@@ -147,6 +148,10 @@ export async function provisionUserRole(
     })
     .where(eq(users.id, target.id))
     .returning();
+
+  if (previousRole !== targetRole || previousTenantId !== targetTenantId) {
+    await recordMover(target.id, input.provisionedBy, input.reason, { previousRole, targetRole, previousTenantId, targetTenantId });
+  }
 
   return {
     user: updatedRows[0] ?? target,

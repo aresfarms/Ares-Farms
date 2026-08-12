@@ -54,39 +54,39 @@ This roadmap governs the practical build order after the backend foundation. It 
 
 These are the next practical product surfaces. They should use the existing governed backend, claims controls, classification, replay, observability, human review, and production-block posture.
 
-| Priority | Workstream | Purpose | Existing Backend Spine | Current Safety Boundary |
-| --- | --- | --- | --- | --- |
-| 1 | Core borrower onboarding | Let borrowers begin, update, and understand their intake path. | `/api/apply`, `/api/onboard`, borrower portal surfaces, applications, documents, data rights | Complete as a review-bound vertical surface; no eligibility, approval, funding, legal, permitting, or regulatory determination. |
-| 2 | Financing pathway engine | Translate borrower context into possible financing pathways and next steps. | rules, recommendations, ranking, revenue/source intelligence, claims runtime | Complete as a review-bound vertical surface; no approval, pre-approval, underwriting decision, guarantee, lender commitment, eligibility determination, or legal/regulatory reliance. |
-| 3 | Readiness assessment | Show what is complete, what is missing, and what human review may need. | module readiness, application records, document metadata, review transitions, public claims | Readiness is operational guidance only; no official certification or public verification. |
-| 4 | Environmental intake | Collect environmental context and route trigger/exemption posture. | environmental compliance runtime, source ingestion, document handoff, human review | Intake and review routing only; no official environmental report, clearance, permit, or provider engagement. |
-| 5 | Opportunity discovery | Show advisory grants, programs, properties, equipment, market context, and revenue opportunities. | public source DTOs, source stack, revenue intelligence, property discovery, scraper activation blocks | Discovery intelligence only; no live scraping, source certainty, guaranteed revenue, program approval, or legal permission claim. |
-| 6 | Public trust pages | Explain what Furlong is, what it is not, and what protections apply. | public surfaces, content claims, disclosure audit, data rights, build evidence archive | Public copy must carry advisory/no-approval/no-guarantee/no-reliance boundaries. |
-| 7 | Basic lender workflow | Give lenders an organized review surface for applications, overlays, evidence, and borrower packets. | lender surfaces, overlays, evidence, partner workflow, claims controls | Coordination only; no underwriting reliance, lender commitment, or official credit decision. |
+| Priority | Workstream               | Purpose                                                                                              | Existing Backend Spine                                                                                | Current Safety Boundary                                                                                                                                                               |
+| -------- | ------------------------ | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1        | Core borrower onboarding | Let borrowers begin, update, and understand their intake path.                                       | `/api/apply`, `/api/onboard`, borrower portal surfaces, applications, documents, data rights          | Complete as a review-bound vertical surface; no eligibility, approval, funding, legal, permitting, or regulatory determination.                                                       |
+| 2        | Financing pathway engine | Translate borrower context into possible financing pathways and next steps.                          | rules, recommendations, ranking, revenue/source intelligence, claims runtime                          | Complete as a review-bound vertical surface; no approval, pre-approval, underwriting decision, guarantee, lender commitment, eligibility determination, or legal/regulatory reliance. |
+| 3        | Readiness assessment     | Show what is complete, what is missing, and what human review may need.                              | module readiness, application records, document metadata, review transitions, public claims           | Readiness is operational guidance only; no official certification or public verification.                                                                                             |
+| 4        | Environmental intake     | Collect environmental context and route trigger/exemption posture.                                   | environmental compliance runtime, source ingestion, document handoff, human review                    | Intake and review routing only; no official environmental report, clearance, permit, or provider engagement.                                                                          |
+| 5        | Opportunity discovery    | Show advisory grants, programs, properties, equipment, market context, and revenue opportunities.    | public source DTOs, source stack, revenue intelligence, property discovery, scraper activation blocks | Discovery intelligence only; no live scraping, source certainty, guaranteed revenue, program approval, or legal permission claim.                                                     |
+| 6        | Public trust pages       | Explain what Furlong is, what it is not, and what protections apply.                                 | public surfaces, content claims, disclosure audit, data rights, build evidence archive                | Public copy must carry advisory/no-approval/no-guarantee/no-reliance boundaries.                                                                                                      |
+| 7        | Basic lender workflow    | Give lenders an organized review surface for applications, overlays, evidence, and borrower packets. | lender surfaces, overlays, evidence, partner workflow, claims controls                                | Coordination only; no underwriting reliance, lender commitment, or official credit decision.                                                                                          |
 
 ## Build Next
 
 These deepen institutional readiness after the borrower/lender practical path is usable.
 
-| Priority | Workstream | Purpose | Required Gate Before Promotion |
-| --- | --- | --- | --- |
-| 8 | Governance evidence engine | Turn evidence, audit, replay, and module state into reusable review packets. | Evidence Pack Generator and human authority mapping remain review-bound. |
-| 9 | Certification engine | Certify internal readiness, source posture, connector posture, and module conformance. | No external certification claims until public verification and reliance gates are approved. |
-| 10 | Registry framework | Formalize registries for modules, sources, public surfaces, controlled promotion, and participant roles. | Registry output remains internal evidence unless separately promoted. |
-| 11 | Connector certification | Expand connector review, certification evidence, rollback, monitoring, and activation checks. | Live external connector execution remains blocked until qualified approval. |
-| 12 | Advanced intelligence modules | Expand source, revenue, market, geospatial, and pathway intelligence. | Outputs remain advisory, replay-safe, conflict-preserving, and human-review-bound. |
+| Priority | Workstream                    | Purpose                                                                                                  | Required Gate Before Promotion                                                              |
+| -------- | ----------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| 8        | Governance evidence engine    | Turn evidence, audit, replay, and module state into reusable review packets.                             | Evidence Pack Generator and human authority mapping remain review-bound.                    |
+| 9        | Certification engine          | Certify internal readiness, source posture, connector posture, and module conformance.                   | No external certification claims until public verification and reliance gates are approved. |
+| 10       | Registry framework            | Formalize registries for modules, sources, public surfaces, controlled promotion, and participant roles. | Registry output remains internal evidence unless separately promoted.                       |
+| 11       | Connector certification       | Expand connector review, certification evidence, rollback, monitoring, and activation checks.            | Live external connector execution remains blocked until qualified approval.                 |
+| 12       | Advanced intelligence modules | Expand source, revenue, market, geospatial, and pathway intelligence.                                    | Outputs remain advisory, replay-safe, conflict-preserving, and human-review-bound.          |
 
 ## Build Later
 
 These are ecosystem-scale capabilities and must not be treated as near-term launch prerequisites.
 
-| Workstream | Purpose | Boundary |
-| --- | --- | --- |
-| Full institutional ecosystem | Coordinate USDA, SBA, state, lender, sponsor, and partner workflows at scale. | Requires production authority, participant governance, privacy, security, legal, and operational readiness. |
-| Volume VII automation | Automate doctrine-to-code proof and conformance matrix maintenance. | Must remain subordinate to Master Volume text and human governance authority. |
-| Third-party certification marketplace | Allow qualified third parties to certify or review governed artifacts. | Requires external certification doctrine, contracts, credentialing, auditability, and claims controls. |
-| Federated participant network | Enable governed multi-party participation across institutions. | Requires federation governance, RBAC, connector certification, participant registry, and incident/rollback controls. |
-| External conformance program | Provide external-facing conformance review and evidence exchange. | Requires public verification infrastructure, legal/compliance review, and official reliance boundary approval. |
+| Workstream                            | Purpose                                                                       | Boundary                                                                                                             |
+| ------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Full institutional ecosystem          | Coordinate USDA, SBA, state, lender, sponsor, and partner workflows at scale. | Requires production authority, participant governance, privacy, security, legal, and operational readiness.          |
+| Volume VII automation                 | Automate doctrine-to-code proof and conformance matrix maintenance.           | Must remain subordinate to Master Volume text and human governance authority.                                        |
+| Third-party certification marketplace | Allow qualified third parties to certify or review governed artifacts.        | Requires external certification doctrine, contracts, credentialing, auditability, and claims controls.               |
+| Federated participant network         | Enable governed multi-party participation across institutions.                | Requires federation governance, RBAC, connector certification, participant registry, and incident/rollback controls. |
+| External conformance program          | Provide external-facing conformance review and evidence exchange.             | Requires public verification infrastructure, legal/compliance review, and official reliance boundary approval.       |
 
 ## Immediate Next Sequence
 
@@ -107,3 +107,183 @@ These are ecosystem-scale capabilities and must not be treated as near-term laun
 - Public and partner surfaces must preserve required disclosures.
 - Human review is required where decisions, escalation, certification, or promotion are implicated.
 - Live external actions, production launch, public verification, legal/regulatory reliance, payment capture, notices, and official reports remain blocked.
+
+## Roadmap Hard Rule
+
+No implementation step may be skipped, reordered, or substituted through developer discretion, automation, release pressure, or convenience. Every sequence transition must prove that all canonical predecessor steps exist, retain their mandatory verifier, and remain present in Cloud Build. A proposed step outside the recorded sequence is blocked until the roadmap is amended through attributed human governance, replay-preserved rationale, and an updated canonical sequence manifest.
+
+The machine-enforced sequence for the current official-evidence notification workstream is:
+
+`3Q Connector -> 3R Dry Run -> 3S Activation -> 3T Delivery -> 3U Assurance -> 3V Reinstatement -> 3W Retirement -> 3X Retirement Closure -> 3Y Tombstone Surveillance -> 3Z Tombstone Incident Containment -> 4A Corrective Action Verification`
+
+**FINAL HARD RULE:** Cloud Build must fail before image construction whenever the roadmap manifest is missing, predecessor order is incomplete, a completed-step artifact is absent, or the mandatory roadmap verifier is removed.
+
+### Roadmap Amendment RA-2026-07-26-001
+
+Attributed governance direction: continue the canonical sequence after Step 3W without deviation. Step 3X is added as the mandatory retirement-closure control. It does not weaken, reorder, or replace any predecessor. It proves decommission completion after permanent retirement through credential revocation, provider callback disablement, routing alias removal, runtime secret-reference removal, zero open operational references, and continued Module 45 internal-queue authority.
+
+### Step 3Y — Retirement Tombstone Surveillance
+
+Closed connector registrations remain under permanent resurrection surveillance. Any post-closure approval, activation, dry run, delivery, or reinstatement evidence bound to the retired registration produces `TOMBSTONE_FAIL`. A clean scan produces `TOMBSTONE_PASS`. Replacement registrations remain independent and must not be mistaken for resurrection of the retired registration.
+
+**FINAL HARD RULE:** A closed registration is never considered safely decommissioned without a current tombstone receipt. A detected resurrection event cannot reactivate the connector and must remain visible as immutable failure evidence.
+
+### Roadmap Amendment — Step 4A
+
+Step 4A begins the post-incident assurance phase. A resolved 3Z tombstone incident is not institutionally closed until root cause, credential, provider, routing, and secret-control evidence are bound to a corrective-action record; zero post-resolution recurrence events are proven; and attributed Module 45 authority records remediation verification and final closure. Permanent connector retirement remains in force throughout.
+
+### Step 4B — Corrective-Action Effectiveness Monitoring
+
+A closed corrective action must remain under a 72-hour effectiveness window with three clean checkpoints separated by at least 24 hours. Any recurrence evidence fails the window and blocks closure. External delivery remains blocked and the Module 45 internal queue remains authoritative throughout.
+
+## Step 4C — Independent Institutional Closure Attestation
+
+A completed 72-hour effectiveness window does not permit self-attested institutional closure. A second Module 45 actor, distinct from the effectiveness-window closer, must attest the complete incident, corrective-action, effectiveness, and tombstone evidence snapshot. The attestation binds the exact registration and implementation hash, preserves external-delivery blocking and internal-queue authority, and emits an immutable SHA-256 evidence snapshot.
+
+## Step 4D — Controlled-Promotion Readiness Reconciliation
+
+After institutional closure of the notification lifecycle, the platform must reconcile current Master Volume conformance, Build Self-Report, Human Authority, Public Alpha, security, controlled-promotion, and external-evidence postures into one immutable readiness packet. Engineering completion, Public Alpha authorization, and production authorization must remain separate conclusions. A packet may report engineering PASS while Public Alpha remains PENDING_SIGNOFF and production remains BLOCKED. The packet never grants production authority; named human governance remains controlling.
+
+
+## Step 4E — Public Alpha Sign-Off Ceremony Packet
+
+After controlled-promotion readiness reconciliation, the platform prepares a read-only Ceremony Part D packet for founder review. The packet freezes the five Public Alpha §9 decisions, the 2-of-3 founder quorum rule, six machine-verifiable entry conditions, and the two remaining external-evidence conditions: a recorded DR restore test and signed participation terms for every invited participant. It records no founder vote, grants no Alpha entry, permits no external action, and preserves production BLOCKED posture.
+
+
+## Step 4F — Governed Evidence Review Portal and Plain-Language Legal Timeline
+
+After the Public Alpha sign-off packet is prepared, Furlong must provide a password-protected review surface for provisioned auditor, governance, and administrator accounts. The surface composes a standardized Governed Evidence Packet for either the whole platform or one module at a time. Every packet binds module scope, rule-by-rule evidence matching, deterministic replay posture under TECH-REPLAY-001, append-only ledger posture under TECH-LEDGER-001, cryptographic chain verification, unresolved integrity limitations, and a plain-language chronological record. Legacy records outside the SHA-256 chain must be labeled as unchained and may never be represented as cryptographically verified. The packet presents evidence and replay references but does not determine admissibility, legal effect, liability, or the merits of a dispute. Auditors, governmental officials, and attorneys are separate governed identities. Auditors may review only their assigned institutional scope. Governmental officials require an identity-bound agency, matter, jurisdiction, tenant, module, subject, and/or time-window grant. Attorneys are never treated as auditors and never receive general audit-trail access: each attorney review must be bound either to a validated anonymous token in their possession or to an expressly approved matter and date/time window. Plaintext anonymous tokens may not enter URLs, packets, or logs. Every login, view, search, hash verification, export, and denial is written to a dedicated append-only institutional access ledger. No public or borrower access is permitted.
+
+
+## Step 4G — Institutional Credential Verification and Matter Authority
+
+Before any attorney, governmental official, or auditor grant may activate, the authenticated principal must hold a current role-specific credential-verification receipt. Attorney verification requires active or eligible standing from an official licensing authority. Governmental-official verification requires confirmation of the employing or appointing public body, jurisdiction, and title or classification. Auditor verification requires an issuer or employer-backed credential and an engagement-specific independence attestation. Professional status never grants dataset access by itself: a separate client, agency, examination, token, subject, module, tenant, matter, and/or time-window authority remains mandatory. Credential identifiers are never written in plaintext, masked form, or last-four form to the general ledger. The system records only an opaque verification ID and a random post-verification token bound to the exact authenticated principal ID, verified email, legal name, and role. The token cannot be transferred or reused by another identity. No plaintext, masked suffix, hash, HMAC, or other derived credential-number representation may be persisted after the official licensing-source check completes. Every verification, grant, view, search, hash check, export, and denial remains append-only and replayable.
+
+
+### Step 4G authority hardening
+
+Professional or official credential verification and legal/matter authority are independent proofs. A valid license, appointment, or audit credential never grants dataset access by itself. Every institutional grant must also bind an independently corroborated authority receipt matching the exact authenticated principal, client or agency subject, matter or examination, jurisdiction, effective period, and role. Uploaded paperwork is evidence to evaluate, not self-authenticating proof. Any name, subject, matter, jurisdiction, date, revocation, or independent-source mismatch causes an immediate append-only denial and prevents packet construction. No auditor, governmental official, or attorney receives unscoped portal access.
+
+## Step 4H — Institutional ABAC and Field-Level Disclosure
+
+RBAC identifies an institutional lane but never grants dataset authority. Every attorney, auditor, and governmental-official request must be reevaluated using authenticated identity, current credential and authority receipts, matter, tenant, subject, module, purpose, action, classification, jurisdiction, consent, legal-hold posture, time window, and step-up authentication. Unauthorized records and fields must be removed before packet, hash, timeline, API response, or export construction. Successful decisions issue only short-lived, scope-bound capability tokens. Sensitive exports require step-up authentication.
+
+**Hard rule:** Role, title, email domain, uploaded paperwork, or token possession alone can never authorize an institutional evidence request.
+
+## Step 4I — Legal Hold and Compelled-Disclosure Dual-Control Ceremony
+
+Court orders, subpoenas, warrants, and agency demands require independently verified authority, a legal hold established before disclosure, a deterministic scope manifest, distinct legal and security approvers, selector-bound record release, a bounded disclosure window, and a governed notice posture. Legal hold never implies disclosure authority. Delayed or prohibited notice requires a scheduled legal review. The system may release only records named by the verified scope manifest; unrelated records remain inaccessible.
+
+**Hard rule:** No single actor may approve both legal validity and security release, and no general vault or portal bypass is permitted.
+
+## Step 4J — Institutional Access Surveillance and Post-Access Closure
+
+Institutional access remains under continuous credential and authority recheck, export-volume monitoring, denied-request monitoring, automatic expiration, and anomaly review. Credential or authority failure revokes access immediately. Material findings require independent post-access closure by an actor other than the original grant issuer. Every access, denial, export, revocation, review, and closure remains append-only and replayable.
+
+**Hard rule:** A previously valid grant does not survive stale credentials, revoked authority, scope drift, abnormal export behavior, or an expired access window.
+
+
+## Step 4K — Institutional Access Runtime Enforcement
+
+The governed evidence portal must invoke the canonical credential, legal-authority, ABAC, and access-ledger controls on every packet request before any evidence enters a packet object, hash, timeline, response, or export. The request path revalidates the exact credential and authority receipts against the authenticated principal, role, matter, subject, module, and active dates; requires explicit matter, module, and subject scope; filters classified evidence before composition; issues only a five-minute scope-bound capability token; records allowed and denied observations; and prohibits governance or administrator identities from being silently treated as auditors.
+
+**Hard rule:** A control that exists only as a library or build-time verifier is not considered operationally enforced. Removal of the runtime orchestrator, portal integration, or mandatory verifier must fail Cloud Build before image construction.
+
+
+## Step 4L — Institutional Access Surveillance Orchestration
+
+The platform must continuously evaluate every unrevoked institutional evidence grant against current credential status, current legal or engagement authority, grant expiry, export volume, and denied-request patterns. The surveillance planner must be deterministic and replayable; the durable runner must append a surveillance receipt for every evaluated grant and automatically revoke grants when credentials, authority, or time validity fail. Anomaly-only findings remain review-bound and require independent closure. The protected internal route fails closed unless its dedicated runtime secret is configured.
+
+**Hard rule:** Surveillance that exists only as a library or synthetic verifier is not continuous enforcement. Every unrevoked grant, including a grant that expired between runs, must remain discoverable by the surveillance runner until it is cleanly recorded or revoked. This step does not enable a Cloud Scheduler job and does not resume the paused evidence-recomputation scheduler.
+
+
+## Step 4M — Institutional Surveillance Activation Ceremony
+
+Before continuous institutional-access surveillance may be scheduled, the platform must produce a read-only activation packet binding the canonical route, scheduler identity, approved cadence, route-authentication posture, clean canary evidence, rollback action, alert owner, and two distinct human approvers. The packet must preserve the separate paused state of evidence recomputation and may not create or enable a scheduler itself.
+
+**Hard rule:** A deployed surveillance runner is not authorized for scheduled execution without a current clean canary, configured route authentication, dual-control approval, and a deterministic activation packet. Step 4M performs no scheduler mutation.
+
+
+## Step 4N — Institutional Surveillance Canary and Scheduler Release Packet
+
+Before a surveillance scheduler may be created, the platform must produce a deterministic dry-run transcript over synthetic or approved isolated grant state. The canary may identify grants that would be clean, review-bound, or revoked, but it must perform zero durable mutations. A separate scheduler-release packet binds the exact 4M activation packet, canary run, plan snapshot, route-authentication readiness, release reason, and two distinct human approvers.
+
+**Hard rule:** A canary failure, duplicate revocation attempt, invalid snapshot, authentication gap, approver collision, or activation-packet mismatch blocks release. Step 4N may permit later scheduler creation, but it never permits scheduler enablement and performs neither action.
+
+## Step 4O — Institutional Surveillance Scheduler Provisioning Contract
+
+Before a Cloud Scheduler job may be created for institutional-access surveillance, the platform must freeze a deterministic provisioning manifest binding the exact release packet, project, region, canonical job name, target route, HTTP method, cadence, timezone, authentication reference, service identity, attempt deadline, retry policy, and initial state. The only permitted initial state is `PAUSED`. A post-create attestation must prove the observed job matches the manifest and has executed zero times.
+
+**Hard rule:** Step 4O does not create a scheduler, configure a secret, or enable execution. Plaintext credentials are prohibited, and any job observed as enabled or previously executed fails attestation.
+
+## Step 4P — Governed Ultimate Pro Forma Preparation
+
+The completed Ultimate Pro Forma template may enter the platform only through a governed preparation runtime. Every material financial figure must be deterministically recomputed; sources, assumptions, borrower attestations, calculations, and official program authority must remain distinguishable in a cryptographically bound evidence manifest. Current official program sources must be reviewed within the permitted freshness window. Full SSNs, TINs, EINs, bank-account numbers, and routing numbers are prohibited from the rendered PDF. Lane-specific content may render only for the selected lane, signatures remain blank, and the current official agency forms and lender instructions remain controlling.
+
+The authenticated preparation route is application-scoped and limited to operator, underwriter, governance, and administrator roles. It persists a canonical report record and governance evidence, but the resulting PDF remains an internal preparation artifact requiring human review. Borrower delivery, lender delivery, official-form submission, eligibility determination, approval, commitment, and external reliance remain blocked.
+
+**Hard rule:** Display strings are never trusted as financial proof. A missing evidence item, stale authority snapshot, arithmetic mismatch, prohibited identifier, content-claim overreach, unauthorized role, or cross-application access attempt blocks PDF generation before bytes are returned.
+
+## Step 4Q — Federal Loan Authority Continuous Update Monitor
+
+Furlong must continuously monitor official SBA, Farm Service Agency, USDA Rural Development, eCFR, and Federal Register authorities that govern federal loan programs, forms, handbooks, notices, rates, fees, servicing, eligibility, and program requirements. Discovery may follow only HTTPS links on the approved official-domain allowlist and must remain bounded by agency and relevance. Every fetched document receives an immutable content hash, retrieval metadata, version history, and change receipt.
+
+A changed official source does not silently overwrite portal guidance. The affected authority becomes review-stale immediately, while the last-good snapshot remains available only for audit and comparison. Any pro forma or loan-guidance artifact must bind the exact content hash reviewed by a human; a source change, fetch failure, missing baseline, absent hash binding, or hash mismatch blocks generation or current-requirements claims.
+
+**Hard rule:** “Always current” means continuous detection plus fail-closed reliance, not automatic legal interpretation. Only official sources may be monitored, and changed regulations or program requirements require attributed human review before the portal may rely on the new content.
+
+## Step 4R — Federal Loan Authority Automatic Reconciliation
+
+The Ultimate Pro Forma must reconcile itself automatically against the latest monitored SBA, FSA, USDA Rural Development, eCFR, and Federal Register authority snapshot before every generation. Deterministically extractable changes—such as form versions, effective dates, maximum loan amounts, guaranty percentages, interest-rate terms, fees, ownership thresholds, source links, and enumerated document requirements—are automatically applied and rebound to the exact current source hashes. The current authority overlay is rendered in the PDF with its official-source lineage.
+
+Human intervention is required only when a detected change is material to eligibility, legal interpretation, collateral, guaranties, citizenship or ownership, credit-elsewhere analysis, environmental or flood obligations, use of proceeds, refinancing, borrower contribution, or when the changed text is ambiguous, conflicting, binary-only, or cannot be parsed deterministically.
+
+**Hard rule:** The portal must automatically update safe, structured program facts and calculations, but it may never silently infer a legal conclusion from ambiguous regulatory text. Material or uncertain changes fail closed for attributed review.
+
+
+### Step 4S — Federal Loan Authority Refresh Reliability
+The continuous SBA/FSA/USDA authority monitor executes with bounded concurrency, a per-source deadline, and a hard whole-run deadline. Healthy sources publish partial success even when another source is unavailable. Timed-out and deferred sources receive explicit durable states and cannot support current pro forma reliance. The scheduled job must complete without allowing one degraded federal source to exhaust the entire refresh window.
+
+
+### Step 4T — Federal Loan Authority Change Triage and Semantic Diff
+Classify official-source changes using stable lending-authority fingerprints. Cosmetic and non-lending informational changes may be isolated automatically; lending-relevant and legally material changes remain review-bound. Missing prior semantic history fails closed.
+
+
+### Step 4U — Controlled Public Surface Promotion
+Public translation surfaces must expose only deterministic public aliases, public-safe provenance summaries, advisory status, and bounded governance posture. Internal source identifiers, replay references, canonical object identifiers, source-document filenames, runtime module paths, and full observability evidence remain restricted to authorized audit surfaces. Claims governance, classification, redaction, and human-review posture execute before every public response.
+
+**Hard rule:** Promotion of public translation surfaces does not authorize lender reliance, agency reliance, official decisions, payments, notices, submissions, or any other live public action. Standing proof: `npm run verify:controlled-public-surface-promotion`.
+
+
+### Step 4V — Production Promotion Readiness and Perimeter Hardening
+Before final production or public-action promotion, the platform must produce a deterministic readiness packet that verifies canonical HTTPS URLs, the approved identity perimeter, secret-manager bindings, required API authentication, bounded rate limiting, credential allowlist posture, and governed administrator-only role provisioning. The packet may declare technical readiness for a human promotion decision, but it never grants launch, payment, notice, official-report, external-action, or official-reliance authority. Named release-board, constitutional, qualified release-manager, and final-activation approvals remain separate attributed human actions. Standing proof: `npm run verify:production-promotion-readiness`.
+
+
+### Step 4W — Final Production Promotion Decision Packet
+A final decision packet must bind the exact immutable production image, the 4V readiness packet, a hash-only credential allowlist, a bounded activation window, an attributed rollback owner, and four distinct signed human approvals: release board, constitutional authority, qualified release manager, and final activation authority. The packet may become ready for a separately executed activation ceremony, but it cannot set environment variables, release holds, activate live actions, or grant official reliance. Standing proof: `npm run verify:final-production-promotion-decision`.
+
+
+### Step 4X — Cross-Functional Internal Change Verification
+Every code, configuration, security, finance, underwriting, or public-communications change must originate from a frozen plain-language request and produce one immutable Internal Change Verification and Plain-Language Assurance Report. The report combines a common machine-evidence backbone with a domain-specific checklist overlay. It records the exact request version, owner, commit, immutable image, build, tests, affected routes, permissions, database and configuration changes, known limitations, unverified claims, rollback image, release invariants, and post-release regression checks.
+
+The change owner may implement and attest but may not independently approve the change. Caitlin-owned technical and governance changes require Stuart and Francis; Stuart-owned finance and underwriting changes require Caitlin and Francis; Francis-owned public and communications changes require Caitlin and Stuart. Any change to the request, evidence, code, configuration, test results, image, or report hash invalidates all prior signatures. A rejection, failed checklist item, failed regression, missing rollback, or external-review requirement keeps activation blocked.
+
+**Hard rule:** No governed change may be activated, promoted, or relied upon without a valid frozen report, owner attestation, both required outside-group approvals, and passing post-release invariants. The report must explain in plain English what changed, what tests proved, what tests did not prove, principal risks, and how to reverse the change. Standing proof: `npm run verify:internal-change-verification`.
+
+
+### Step 4Y — Three-Founder Cross-Functional Release Authority Addendum
+The initial production opening requires all three founders to participate across technical/governance, finance/release-risk, and public/independent-review roles. Routine group-owned changes require the two founders outside the owning group. The change owner may attest to implementation but may not independently approve their own change. Each founder retains unilateral stop and rollback authority within an observed risk event. Domain objections block release until resolved or escalated.
+
+**Hard rule:** The three-founder model replaces artificial four-person distinct-principal requirements, but it never weakens owner exclusion, packet binding, signature integrity, domain review, or separate activation. Initial launch requires unanimous three-founder participation; routine changes require both outside-group approvals. Standing proof: `npm run verify:three-founder-release-authority`.
+
+
+### Step 4Z — Founder Change Review Workspace
+The platform must provide a restricted operational workspace that freezes the plain-language internal change report, binds actions to configured founder identities, stores owner attestations and outside-group reviews as immutable signed events, reconstructs the current report deterministically, and records the three-founder initial-launch authority separately. The workspace may display readiness but never activate a release. Standing proof: `npm run verify:founder-change-review-workspace`.
+
+**Hard rule:** No unauthenticated or unassigned identity may freeze, attest, review, or record launch authority. A material change after freeze requires a new request version; existing signatures cannot be edited or silently reused.
+
+
+### Step 5A — Two-Founder Controlled Internal Pilot Gate
+Caitlin and Stuart may conduct a testing-only internal pilot before Francis or broader testers are bound. Caitlin remains the implementation owner and attestor; Stuart is the sole initial pilot tester and may record a green light, rejection, or retest requirement against the exact frozen report hash. Francis may remain intentionally unbound during this phase.
+
+**Hard rule:** Pilot readiness authorizes only controlled internal testing. It does not authorize public launch, external actions, payments, notices, official reports, lender or agency reliance, or final production promotion. Francis or another final reviewer remains required before launch. Standing proof: `npm run verify:founder-pilot-test-gate`.

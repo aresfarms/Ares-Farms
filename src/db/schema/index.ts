@@ -1,10 +1,4 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  uuid,
-  jsonb,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
 
 /**
  * Canonical Schema Source
@@ -69,6 +63,7 @@ export const properties = pgTable("properties", {
  * Canonical governance schema modules.
  */
 
+export * from "./accessSecurity";
 export * from "./applicationDocuments";
 export * from "./applications";
 export * from "./auditEvents";
@@ -83,21 +78,29 @@ export * from "./certifiedConnectorAdapters";
 export * from "./credentialVaultRefs";
 export * from "./credentialedScrapingEvents";
 export * from "./dataClassificationRegistry";
+export * from "./documentAuthenticity";
 export * from "./documentStorageHandoffs";
 export * from "./entitlements";
 export * from "./environmentalComplianceRecords";
 export * from "./externalConnectorExecutions";
 export * from "./externalDataConnectors";
 export * from "./externalSourceStackGovernance";
+export * from "./founderEconomicEvents";
 export * from "./liveActionReadinessReviews";
+export * from "./lenderSubmissions";
 export * from "./missingDoctrineGovernance";
 export * from "./observabilityEvents";
 export * from "./operatorReviewQueues";
 export * from "./partnerWorkflows";
 export * from "./paymentConnectorAdapters";
 export * from "./paymentConnectorExecutions";
+export * from "./plaidSecureData";
+export * from "./identityVerifications";
 export * from "./pipeline";
 export * from "./regulatedDecisionNotices";
+export * from "./recommendationReleaseAttestations";
+export * from "./recommendationReleaseEscalationAcknowledgements";
+export * from "./recommendationReleaseRecords";
 export * from "./reportRecords";
 export * from "./revenueSourceIntelligenceGovernance";
 export * from "./replayVerification";
@@ -106,5 +109,10 @@ export * from "./reviewWorkflows";
 export * from "./ruleOverlayRegistry";
 export * from "./schemaRegistry";
 export * from "./scraperSourceGovernance";
+export * from "./serviceRequests";
+export * from "./signatureExecution";
+export * from "./stripeConnectAllocations";
 export * from "./sovereignConsentGatewayRecords";
+export * from "./treasury";
 export * from "./versionRegistry";
+export * from "./syntheticFixtureLineage";

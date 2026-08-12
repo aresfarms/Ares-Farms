@@ -3,33 +3,33 @@
   "source_url": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer",
   "source_authority_tier": "tier-1-federal",
   "source_version_or_year": "2023",
-  "fetched_at": "2026-06-05T17:08:10.301Z",
-  "content_hash": "a6db7490190ababa5dbe2a917768d7e9f88d739751d9b29dd8e549dadd12ac02",
+  "fetched_at": "2026-07-24T00:09:32.696Z",
+  "content_hash": "8876f3f11d85c58638287be84dea0ea79c6dc3f336842f6d692289df2009563d",
   "license_or_public_domain_note": "U.S. federal government data in the public domain. No license required. Source: U.S. Census Bureau, TIGER/Line Shapefiles and Cartographic Boundary Files. See https://www.census.gov/about/policies/open-gov/copyright-intellectual-property.html",
-  "simplification_level": "Cartographic boundary — Census TIGER State_County MapServer (geometryPrecision=4)",
-  "replay_ref": "MAP_ASSET_INGESTION_2026-06-05T17-08-10",
+  "simplification_level": "Cartographic boundary — Census TIGER State_County MapServer (geometryPrecision=4); topology-preserving coordinate simplification states=0.01, counties=0.0025",
+  "replay_ref": "MAP_ASSET_INGESTION_2026-07-24T00-09-32",
   "generated_by": "ingestMapAssets@1.0.0",
-  "generated_at": "2026-06-05T17:08:10.301Z",
+  "generated_at": "2026-07-24T00:09:32.696Z",
   "assets": {
     "us-states.geojson": {
       "filename": "us-states.geojson",
-      "content_hash": "40a4a35b0b455805575bde7381892db0d6b297416e46f09dd6dc41f3b02e2382",
+      "content_hash": "69fc9fddf2c89a70f49d40eda1854041a15a7e43219c7850f701ade149d76305",
       "feature_count": 56,
       "source_name": "U.S. Census Bureau TIGER Web Services (GeoJSON REST API)",
       "source_url": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/12/query?where=1%3D1&outFields=NAME%2CSTUSAB%2CGEOID%2CSTATE&geometryPrecision=4&f=geojson&resultRecordCount=60",
       "source_authority_tier": "tier-1-federal",
       "license_or_public_domain_note": "U.S. federal government data in the public domain. No license required. Source: U.S. Census Bureau, TIGER/Line Shapefiles and Cartographic Boundary Files. See https://www.census.gov/about/policies/open-gov/copyright-intellectual-property.html",
-      "fetched_at": "2026-06-05T17:07:57.612Z"
+      "fetched_at": "2026-07-24T00:09:11.095Z"
     },
     "us-counties.geojson": {
       "filename": "us-counties.geojson",
-      "content_hash": "9bd4f01d8364581e61182d758416fecc1cdcc659c7ff7a54833ca2160c5ced8b",
+      "content_hash": "76c108fcd0975ecca6f89364225fc980ec7044ef66fee00dc35468270bab704b",
       "feature_count": 8,
       "source_name": "U.S. Census Bureau TIGER Web Services (GeoJSON REST API)",
       "source_url": "https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'47'%20AND%20NAME%3D'Maury%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'19'%20AND%20NAME%3D'Story%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'42'%20AND%20NAME%3D'Lancaster%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'29'%20AND%20NAME%3D'Boone%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'37'%20AND%20NAME%3D'Catawba%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'17'%20AND%20NAME%3D'McLean%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'20'%20AND%20NAME%3D'Harvey%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5; https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/State_County/MapServer/13/query?where=STATE%3D'41'%20AND%20NAME%3D'Linn%20County'&outFields=NAME%2CGEOID%2CSTATE%2CCOUNTY&geometryPrecision=4&f=geojson&resultRecordCount=5",
       "source_authority_tier": "tier-1-federal",
       "license_or_public_domain_note": "U.S. federal government data in the public domain. No license required. Source: U.S. Census Bureau, TIGER/Line Shapefiles and Cartographic Boundary Files. See https://www.census.gov/about/policies/open-gov/copyright-intellectual-property.html",
-      "fetched_at": "2026-06-05T17:08:09.032Z"
+      "fetched_at": "2026-07-24T00:09:31.286Z"
     }
   }
 }

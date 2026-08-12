@@ -30,9 +30,16 @@ import * as path from "path";
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function readSrc(rel: string): string {
-  const abs = path.join(process.cwd(), rel);
-  try { return fs.readFileSync(abs, "utf8"); }
-  catch { return ""; }
+  // Pages migrated into the (public) route group (Build 50) — try both
+  // locations so a moved file NEVER silently reads as empty (an empty read
+  // fails every substring check and masks the real cause).
+  const candidates = [rel, rel.replace("src/app/", "src/app/(public)/")];
+  for (const candidate of candidates) {
+    try { return fs.readFileSync(path.join(process.cwd(), candidate), "utf8"); }
+    catch { /* try next */ }
+  }
+  console.warn(`verify:accessibility — source not found: ${rel}`);
+  return "";
 }
 
 function check(
@@ -140,11 +147,13 @@ const results = [
     "All interactive elements must show a visible focus indicator (WCAG 2.4.7)."
   ),
 
-  // ── 12. Dropdown menu items have focus-visible styles ────────────────────
+  // ── 12. Header nav links have focus-visible styles ───────────────────────
+  // (The legacy Stewardship dropdown was retired — stewardship folded into
+  // /compass; the keyboard-focus obligation moves to the current nav links.)
   check(
-    "Stewardship dropdown menu items have :focus-visible styles",
-    header.includes(".ps-stw-menu a:focus-visible"),
-    "Dropdown keyboard navigation requires visible focus (WCAG 2.1.1)."
+    "Header nav links have :focus-visible styles",
+    header.includes(".ps-nav-link:focus-visible"),
+    "Keyboard navigation requires visible focus on nav links (WCAG 2.1.1)."
   ),
 
   // ── 13. Story selector buttons have focus-visible ─────────────────────────
@@ -168,11 +177,13 @@ const results = [
     "Form select elements must show a keyboard focus indicator (WCAG 2.4.7)."
   ),
 
-  // ── 16. Homepage explore submit button has focus-visible ──────────────────
+  // ── 16. Homepage secondary CTA has focus-visible ──────────────────────────
+  // (The explore form's submit button was retired — the select navigates;
+  // its focus style is check 15. The secondary CTA carries this obligation.)
   check(
-    "Homepage explore submit button has :focus-visible style",
-    homepage.includes("fl-explore-btn:focus-visible"),
-    "Submit buttons must be keyboard-accessible with visible focus (WCAG 2.1.1)."
+    "Homepage secondary CTA has :focus-visible style",
+    homepage.includes("fl-cta-secondary:focus-visible"),
+    "Interactive CTAs must be keyboard-accessible with visible focus (WCAG 2.1.1)."
   ),
 
   // ── 17. No #7a8fa8 low-contrast color on homepage ────────────────────────
@@ -219,10 +230,13 @@ const results = [
     "Fallback diagrams shown when map is unavailable must be labeled."
   ),
 
-  // ── 22. Forms have labels (readiness form inputs) ─────────────────────────
+  // ── 22. Forms have labels ──────────────────────────────────────────────────
+  // The standalone readiness form was folded into the property analysis
+  // workspace (founder direction 2026-07-17); the labels obligation moves
+  // with the inputs.
   check(
-    "Readiness form inputs are wrapped in <label> elements",
-    readiness.includes("<label"),
+    "Analysis workspace form inputs are wrapped in <label> elements",
+    readSrc("src/components/property/PropertyEvaluationWorkspace.tsx").includes("<label"),
     "Form inputs must be programmatically associated with labels (WCAG 1.3.1)."
   ),
 

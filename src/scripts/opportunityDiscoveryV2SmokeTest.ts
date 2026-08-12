@@ -11,7 +11,7 @@ import {
   OPPORTUNITY_DISCOVERY_V2_RUNTIME_VERSION,
   composeOpportunityDiscoveryV2,
   opportunityDiscoveryV2Lineage,
-} from "@/lib/opportunity/discoveryV2Runtime";
+} from "@/lib/platform/authorities/opportunity";
 import { REVENUE_INTELLIGENCE_V2_RUNTIME_VERSION } from "@/lib/revenue-intelligence/revenueIntelligenceV2Runtime";
 import { REVENUE_SOURCE_INTELLIGENCE_VERSION } from "@/lib/revenue-intelligence/revenueSourceIntelligenceRuntime";
 

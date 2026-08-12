@@ -5,6 +5,11 @@ import {
   evaluateProductionFinalAuthorityGate,
 } from "@/lib/governance/productionFinalAuthorityGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -182,46 +187,32 @@ async function handleProductionFinalAuthority(
     const result = evaluateProductionFinalAuthorityGate({
       authorityScope,
     });
+    const scope = authorityScope ?? "platform";
     const authorityPacket =
-      req.method === "POST"
-        ? {
-            authorityPacketId: `production-final-authority-${Date.now()}`,
-            authorityScope: authorityScope ?? "platform",
-            reviewStatus: "PRODUCTION_FINAL_AUTHORITY_PACKET_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            finalAuthorityApprovalGranted: false,
-            goLiveApproved: false,
-            productionLaunchAuthorized: false,
-            constitutionalOfficerAttestationReceived: false,
-            qualifiedReleaseManagerApprovalGranted: false,
-            supportCommunicationsApprovalGranted: false,
-            supportOperationsActivated: false,
-            supportEscalationActivated: false,
-            customerCommunicationsReleased: false,
-            regulatoryCommunicationsReleased: false,
-            publicStatusPageEnabled: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            legalAdviceProvided: false,
-            officialRelianceAllowed: false,
-            incidentResponseActivated: false,
-            incidentBridgeActivated: false,
-            rollbackAuthorized: false,
-            emergencyRollbackExecuted: false,
-            emergencyHoldReleased: false,
-            killSwitchActivated: false,
-            cutoverAuthorityGranted: false,
-            productionCutoverExecuted: false,
-            deploymentExecuted: false,
-            publicProductionApiExposureAllowed: false,
-            productionPortalLaunchExecuted: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            productionBlocked: true,
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_FINAL_AUTHORITY_PACKET",
+            scope,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_FINAL_AUTHORITY_PACKET"
+          );
+    const authorityHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_FINAL_AUTHORITY_PACKET"
+    );
+    const releaseBoardEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_RELEASE_BOARD_PACKET"
+    );
+    const supportCommunicationsEvidence = latestReleaseGovernanceEvidence(
+      scope,
+      "PRODUCTION_SUPPORT_COMMUNICATIONS_READINESS_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionFinalAuthorityReviews.length,
@@ -231,6 +222,9 @@ async function handleProductionFinalAuthority(
         disclosures: result.disclosures,
         authorityPosture: result.authorityPosture,
         authorityPacket,
+        authorityHistory,
+        releaseBoardEvidence,
+        supportCommunicationsEvidence,
         productionBlocked: true,
         finalAuthorityApprovalGranted: false,
         goLiveApproved: false,
@@ -361,6 +355,10 @@ async function handleProductionFinalAuthority(
       disclosures: classifiedOutput.disclosures,
       authorityPosture: classifiedOutput.authorityPosture,
       authorityPacket: classifiedOutput.authorityPacket,
+      authorityHistory: classifiedOutput.authorityHistory,
+      releaseBoardEvidence: classifiedOutput.releaseBoardEvidence,
+      supportCommunicationsEvidence:
+        classifiedOutput.supportCommunicationsEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       finalAuthorityApprovalGranted:
         classifiedOutput.finalAuthorityApprovalGranted,

@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 /**
  * ExploreDropdown — Homepage exploration entry point (Build 51).
  *
@@ -15,17 +17,18 @@
  */
 
 const EXPLORE_OPTIONS = [
-  { slug: "property-land",             label: "Property & Land" },
-  { slug: "farms-agriculture",         label: "Farms & Agriculture" },
-  { slug: "small-business-growth",     label: "Small Business Growth" },
+  { slug: "farms-agriculture",         label: "Farms, Agriculture & Land" },
+  { slug: "small-business-growth",     label: "Commercial Properties" },
   { slug: "environmental-compliance",  label: "Environmental & Compliance" },
   { slug: "financing-capital",         label: "Financing & Capital" },
-  { slug: "housing-development",       label: "Housing & Development" },
-  { slug: "programs-incentives",       label: "Grants, Programs & Incentives" },
-  { slug: "not-sure",                  label: "I'm Not Sure Yet" },
+  { slug: "housing-development",       label: "Newsletters & Podcasts" },
+  { slug: "programs-incentives",       label: "Grants & State and Federal Programs" },
+  { slug: "not-sure",                  label: "Taxes, Accounting & Regulations" },
 ] as const;
 
 export function ExploreDropdown() {
+  const router = useRouter();
+
   return (
     <div className="fl-explore-form">
       <label
@@ -41,8 +44,7 @@ export function ExploreDropdown() {
         style={{ minHeight: 50 }}
         onChange={(e) => {
           if (e.target.value) {
-            window.location.href =
-              `/onboarding?explore=${encodeURIComponent(e.target.value)}`;
+            router.push(`/onboarding?explore=${encodeURIComponent(e.target.value)}`);
           }
         }}
       >

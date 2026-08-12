@@ -1,0 +1,106 @@
+{
+  "operation": "deploy:verify-manifest (P2.4)",
+  "outcome": "FAIL",
+  "serviceUrl": "https://furlong-core-mwei3cj3jq-uc.a.run.app",
+  "totalChecks": 16,
+  "failedChecks": 2,
+  "checks": [
+    {
+      "name": "image pinned by digest",
+      "expected": "@sha256:…",
+      "actual": "sha256:4327b3ab90905cbf43e969ccdfc15fd15acbcf202f699c8a6acca04bb4f22339",
+      "pass": true
+    },
+    {
+      "name": "no allUsers/allAuthenticatedUsers invoker binding",
+      "expected": "none",
+      "actual": "none (invokers: serviceAccount:furlong-dast@furlong-staging-499102.iam.gserviceaccount.com, serviceAccount:furlong-source-refresh@furlong-staging-499102.iam.gserviceaccount.com, serviceAccount:service-859763772114@gcp-sa-iap.iam.gserviceaccount.com, user:chudson@aresfarmsinc.com)",
+      "pass": true
+    },
+    {
+      "name": "anonymous invocation blocked at edge",
+      "expected": "302/401/403 (IAP)",
+      "actual": "HTTP 302",
+      "pass": true
+    },
+    {
+      "name": "authenticated homepage serves app",
+      "expected": "200 + app surface",
+      "actual": "HTTP 200, 112210B",
+      "pass": true
+    },
+    {
+      "name": "/health/live",
+      "expected": "200",
+      "actual": "HTTP 200",
+      "pass": true
+    },
+    {
+      "name": "/health/ready (DB confirmed)",
+      "expected": "200",
+      "actual": "HTTP 200",
+      "pass": true
+    },
+    {
+      "name": "/internal walls to sign-in",
+      "expected": "3xx redirect",
+      "actual": "HTTP 307",
+      "pass": true
+    },
+    {
+      "name": "anonymous /api/audit rejected",
+      "expected": "302/401/403 (IAP)",
+      "actual": "HTTP 302",
+      "pass": true
+    },
+    {
+      "name": "furlong-db-migrate latest execution SUCCEEDED",
+      "expected": "succeeded",
+      "actual": "furlong-db-migrate-qcx45",
+      "pass": true
+    },
+    {
+      "name": "furlong-db-migrate execution POST-DATES the running revision",
+      "expected": ">= 2026-08-11T17:48:36.957158Z",
+      "actual": "2026-08-10T20:29:45.583749Z  <-- STALE: ran BEFORE this revision; execute the job",
+      "pass": false
+    },
+    {
+      "name": "furlong-db-migrate execution ran THIS release's migrator image",
+      "expected": "sha256:6d3a7994206305d959a5508d3224826bdff89f026150716e2c13df5ddf95fe32",
+      "actual": "sha256:ef082ef9d828f0517b104dc59855c6f607c436b6799388720dc21b2d0d293a03",
+      "pass": false
+    },
+    {
+      "name": "furlong-runtime-verify latest execution SUCCEEDED",
+      "expected": "succeeded",
+      "actual": "furlong-runtime-verify-vq8x7",
+      "pass": true
+    },
+    {
+      "name": "verify:csp-hydration @ deployed URL",
+      "expected": "PASS",
+      "actual": "✓  verify:csp-hydration PASS — PRODUCTION nonce mode: no 'unsafe-inline' in script-src, 'strict-dynamic' on, per-request fresh nonce, ALL inline scripts nonce-t",
+      "pass": true
+    },
+    {
+      "name": "IAP enabled on service",
+      "expected": "true",
+      "actual": "true",
+      "pass": true
+    },
+    {
+      "name": "IAP allowlist is named principals only",
+      "expected": "user:* + verify SA; no allUsers/group/domain",
+      "actual": "serviceAccount:furlong-dast@furlong-staging-499102.iam.gserviceaccount.com, serviceAccount:furlong-verify@furlong-staging-499102.iam.gserviceaccount.com, user:chudson@aresfarmsinc.com, user:sfraas@aresfarmsinc.com",
+      "pass": true
+    },
+    {
+      "name": "unlisted visitor gets Google sign-in wall",
+      "expected": "302 → sign-in",
+      "actual": "google-signin",
+      "pass": true
+    }
+  ],
+  "generatedAtUtc": "2026-08-11T17:49:45.285Z"
+}

@@ -1,0 +1,725 @@
+# =============================================================================
+# infra/staging — furlong-core Cloud Run service (STAGING-DEPLOY P2.3)
+#
+# Access posture — IAM-PRIVATE (precise, per spec):
+#   * ingress stays "all" so authenticated P2 verification can use the default
+#     run.app URL (do NOT set internal for this milestone — it would block the
+#     owner's browser verification; P3 adds direct IAP on the service).
+#   * The Cloud Run invoker IAM check stays ENABLED; NEITHER allUsers NOR
+#     allAuthenticatedUsers is ever bound (variable validation enforces this).
+#     Only var.invoker_principals (owner / deploy verifier) can invoke.
+#   Reachable at the network edge, NOT anonymously invokable.
+#
+# Created ONLY when var.core_image is set (digest-pinned) — a Stage-1 apply
+# with no image produces no Cloud Run resources.
+# =============================================================================
+
+resource "google_cloud_run_v2_service" "core" {
+  count = var.core_image == "" ? 0 : 1
+
+  name     = "furlong-core"
+  project  = var.project_id
+  location = var.region
+  labels   = var.labels
+
+  # Recreatable from Terraform in minutes; protection here would only block
+  # deliberate teardown. The DATABASE carries deletion protection instead.
+  deletion_protection = false
+
+  dynamic "binary_authorization" {
+    for_each = var.enable_binary_authorization ? [1] : []
+    content {
+      use_default = true
+    }
+  }
+
+  # Direct-IAP enablement is currently reasserted with gcloud because the
+  # provider does not expose the Cloud Run service annotation directly. That
+  # command stamps these two client metadata fields. Ignore only those stamps
+  # so Terraform does not manufacture a perpetual service update/IAP replay;
+  # every material service field remains governed by this resource.
+  lifecycle {
+    ignore_changes = [client, client_version]
+
+    precondition {
+      condition = var.deployment_environment != "production" || (
+        !var.founder_testing_lane_enabled && length(var.invoker_principals) == 0
+      )
+      error_message = "Production must not carry the staging founder testing lane or any direct invoker principals."
+    }
+  }
+
+  # Caitlin's authenticated direct testing lane remains open in staging until
+  # she explicitly closes every licensed and authority pathway test. After
+  # closure, traffic is accepted only through the external load balancer.
+  ingress = var.founder_testing_lane_enabled ? "INGRESS_TRAFFIC_ALL" : "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+
+  # Service-level floor across revisions. Cloud Run persists this separately
+  # from the revision template scaling block, so declare it explicitly to keep
+  # Terraform state aligned with the API response.
+  scaling {
+    min_instance_count = 0
+  }
+
+  template {
+    service_account = google_service_account.core_runtime.email
+
+    volumes {
+      name = "runtime-state"
+      gcs {
+        bucket    = google_storage_bucket.runtime_state.name
+        read_only = false
+      }
+    }
+
+    # 2nd-generation execution environment — recommended for Direct VPC egress;
+    # scales networking to zero with the workload (spec Rev 3 hardening).
+    execution_environment = "EXECUTION_ENVIRONMENT_GEN2"
+
+    scaling {
+      min_instance_count = 0
+      max_instance_count = var.core_max_instances
+    }
+
+    # Direct VPC egress on the designated subnet (no Serverless VPC connector).
+    # PRIVATE_RANGES_ONLY: only RFC-1918 traffic (the private-IP Cloud SQL)
+    # routes through the VPC; other egress goes direct.
+    vpc_access {
+      egress = "PRIVATE_RANGES_ONLY"
+      network_interfaces {
+        network    = google_compute_network.vpc.id
+        subnetwork = google_compute_subnetwork.egress.id
+      }
+    }
+
+    containers {
+      # Pinned by DIGEST, never a tag (validated in variables.tf).
+      image = var.core_image
+
+      ports {
+        container_port = 8080
+      }
+
+      resources {
+        limits = {
+          cpu    = var.core_cpu
+          memory = var.core_memory
+        }
+        cpu_idle = true
+        # Cold start is CPU-starved with cpu_idle: the first request has to
+        # load the route tree before /health/live can answer. Boost startup
+        # (deploy failure 2026-08-06: 10 consecutive 3s probe timeouts).
+        startup_cpu_boost = true
+      }
+
+      # ---- Secrets by REFERENCE (no plaintext env, no baked secrets) --------
+      env {
+        name = "DATABASE_URL"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app["DATABASE_URL"].secret_id
+            version = var.secret_versions["DATABASE_URL"]
+          }
+        }
+      }
+      env {
+        name = "NEXTAUTH_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app["NEXTAUTH_SECRET"].secret_id
+            version = var.secret_versions["NEXTAUTH_SECRET"]
+          }
+        }
+      }
+      env {
+        name = "PLAID_CLIENT_ID"
+        value_source {
+          secret_key_ref {
+            secret  = "PLAID_CLIENT_ID"
+            version = var.secret_versions["PLAID_CLIENT_ID"]
+          }
+        }
+      }
+      env {
+        name = "PLAID_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "PlaidSecret"
+            version = var.secret_versions["PlaidSecret"]
+          }
+        }
+      }
+
+      env {
+        name = "PLAID_DATA_ENCRYPTION_KEY"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app["PLAID_DATA_ENCRYPTION_KEY"].secret_id
+            version = var.secret_versions["PLAID_DATA_ENCRYPTION_KEY"]
+          }
+        }
+      }
+      env {
+        name  = "PLAID_DATA_ENCRYPTION_KEY_VERSION"
+        value = "1"
+      }
+
+      env {
+        name = "REPORT_SIGNING_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = google_secret_manager_secret.app["REPORT_SIGNING_SECRET"].secret_id
+            version = var.secret_versions["REPORT_SIGNING_SECRET"]
+          }
+        }
+      }
+
+      # Evidence-replay signing secrets (+ rotation variant) — created and
+      # versioned OUT OF BAND by the owner (same pattern as SENDGRID_API_KEY).
+      # Signs governed evidence-lineage replay packets; the customer financing
+      # intake 500s without them (staging test 2026-08-05).
+      env {
+        name = "EVIDENCE_REPLAY_SIGNING_SECRET"
+        value_source {
+          secret_key_ref {
+            secret  = "EVIDENCE_REPLAY_SIGNING_SECRET"
+            version = var.secret_versions["EVIDENCE_REPLAY_SIGNING_SECRET"]
+          }
+        }
+      }
+      env {
+        name = "EVIDENCE_REPLAY_SIGNING_SECRET_V1"
+        value_source {
+          secret_key_ref {
+            secret  = "EVIDENCE_REPLAY_SIGNING_SECRET_V1"
+            version = var.secret_versions["EVIDENCE_REPLAY_SIGNING_SECRET_V1"]
+          }
+        }
+      }
+
+      # Non-secret revision forcer: incrementing var.secret_revision_epoch
+      # after a rotation mints a new revision so `latest` is re-resolved.
+      env {
+        name  = "SECRET_REVISION_EPOCH"
+        value = tostring(var.secret_revision_epoch)
+      }
+
+      env {
+        name  = "FURLONG_RUNTIME_STATE_DIR"
+        value = "/var/furlong-state"
+      }
+
+      env {
+        name  = "API_AUTH_ENFORCEMENT"
+        value = var.api_auth_enforcement
+      }
+
+      # ---- Response notifications ------------------------------------------
+      # Recipients are always set; sending stays OFF until EMAIL_FROM +
+      # SENDGRID_API_KEY (secret) are both present.
+      env {
+        name  = "NOTIFY_PE_EMAIL"
+        value = var.notify_pe_email
+      }
+      env {
+        name  = "NOTIFY_LENDER_EMAIL"
+        value = var.notify_lender_email
+      }
+      dynamic "env" {
+        for_each = var.lender_booking_url == "" ? [] : [var.lender_booking_url]
+        content {
+          name  = "LENDER_BOOKING_URL"
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = var.lender_calendar_embed_src == "" ? [] : [var.lender_calendar_embed_src]
+        content {
+          name  = "LENDER_CALENDAR_EMBED_SRC"
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = var.email_from == "" ? [] : [var.email_from]
+        content {
+          name  = "EMAIL_FROM"
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = var.gmail_delegated_user == "" ? [] : [var.gmail_delegated_user]
+        content {
+          name  = "GMAIL_DELEGATED_USER"
+          value = env.value
+        }
+      }
+      # Vault malware quarantine (scanner is a private in-project service).
+      dynamic "env" {
+        for_each = var.scanner_image == "" ? [] : [1]
+        content {
+          name  = "SCANNER_URL"
+          value = google_cloud_run_v2_service.scanner[0].uri
+        }
+      }
+      env {
+        name  = "QUARANTINE_MODE"
+        value = var.quarantine_mode
+      }
+
+      # SendGrid API key — the secret is created + versioned OUT OF BAND by the
+      # owner (never Terraform, never the agent). Wired only when EMAIL_FROM is
+      # set, so an unconfigured env can't reference a missing secret.
+      dynamic "env" {
+        for_each = var.email_from == "" ? [] : [1]
+        content {
+          name = "SENDGRID_API_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "SENDGRID_API_KEY"
+              version = var.secret_versions["SENDGRID_API_KEY"]
+            }
+          }
+        }
+      }
+
+      # Anthropic API key — activates the platform's two governed AI seams
+      # (discovery-interview phrasing + property-import image extraction; both
+      # fall back deterministically without it). The secret is created +
+      # versioned OUT OF BAND by the owner (never Terraform, never the agent).
+      # Gated so an unversioned secret can't break a revision rollout.
+      dynamic "env" {
+        for_each = var.anthropic_api_key_enabled ? [1] : []
+        content {
+          name = "ANTHROPIC_API_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "ANTHROPIC_API_KEY"
+              version = var.secret_versions["ANTHROPIC_API_KEY"]
+            }
+          }
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.stripe_payments_enabled ? [1] : []
+        content {
+          name = "STRIPE_SECRET_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "STRIPE_SECRET_KEY"
+              version = var.secret_versions["STRIPE_SECRET_KEY"]
+            }
+          }
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.stripe_webhook_enabled ? [1] : []
+        content {
+          name = "STRIPE_WEBHOOK_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = "STRIPE_WEBHOOK_SECRET"
+              version = var.secret_versions["STRIPE_WEBHOOK_SECRET"]
+            }
+          }
+        }
+      }
+
+      # ---- Tier preview flag (launch hygiene) -----------------------------
+      # Unset in staging (paid tiers preview for testing). Set "off" at
+      # launch freeze — docs/LAUNCH_HYGIENE_CHECKLIST.md step L2.
+      dynamic "env" {
+        for_each = var.tier_preview_mode == "" ? [] : [var.tier_preview_mode]
+        content {
+          name  = "FURLONG_TIER_PREVIEW_MODE"
+          value = env.value
+        }
+      }
+
+      # ---- api.data.gov key (NREL PVWatts solar estimate) -----------------
+      # Same out-of-band pattern as ANTHROPIC_API_KEY: owner-created secret,
+      # gated so an unversioned secret can't break a revision rollout.
+      dynamic "env" {
+        for_each = var.data_gov_api_key_enabled ? [1] : []
+        content {
+          name = "DATA_GOV_API_KEY"
+          value_source {
+            secret_key_ref {
+              secret  = "DATA_GOV_API_KEY"
+              version = var.secret_versions["DATA_GOV_API_KEY"]
+            }
+          }
+        }
+      }
+
+      # ---- NOAA CDO token (climate normals) -------------------------------
+      dynamic "env" {
+        for_each = var.noaa_cdo_token_enabled ? [1] : []
+        content {
+          name = "NOAA_CDO_TOKEN"
+          value_source {
+            secret_key_ref {
+              secret  = "NOAA_CDO_TOKEN"
+              version = var.secret_versions["NOAA_CDO_TOKEN"]
+            }
+          }
+        }
+      }
+
+      # ---- Operator credential login --------------------------------------
+      # Enabled only when auth_credentials_mode is set. The shared-secret value
+      # is created out of band by the owner; TF only references it by name.
+      dynamic "env" {
+        for_each = var.auth_credentials_mode == "" ? [] : [var.auth_credentials_mode]
+        content {
+          name  = "AUTH_CREDENTIALS_MODE"
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = var.auth_credentials_mode == "" ? [] : [var.auth_credential_email_allowlist]
+        content {
+          name  = "AUTH_CREDENTIAL_EMAIL_ALLOWLIST"
+          value = env.value
+        }
+      }
+      dynamic "env" {
+        for_each = var.auth_credentials_mode == "" ? [] : [1]
+        content {
+          name = "AUTH_CREDENTIAL_SHARED_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = "AUTH_CREDENTIAL_SHARED_SECRET"
+              version = var.secret_versions["AUTH_CREDENTIAL_SHARED_SECRET"]
+            }
+          }
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.staging_seed_enabled ? [1] : []
+        content {
+          name  = "STAGING_SEED_ENABLED"
+          value = "true"
+        }
+      }
+
+      env {
+        name  = "NAMED_TESTER_ACCEPTANCE_BACKEND"
+        value = var.named_tester_acceptance_backend
+      }
+
+      env {
+        name  = "FURLONG_DEPLOYMENT_ENVIRONMENT"
+        value = var.deployment_environment
+      }
+
+      env {
+        name  = "PROFESSIONAL_TEST_PERSONAS_ENABLED"
+        value = var.professional_test_personas_enabled ? "true" : "false"
+      }
+
+      env {
+        name  = "SYNTHETIC_FIXTURES_ENABLED"
+        value = var.synthetic_fixtures_enabled ? "true" : "false"
+      }
+
+      env {
+        name  = "SYNTHETIC_FIXTURE_OPERATOR_ALLOWLIST"
+        value = var.synthetic_fixture_operator_allowlist
+      }
+
+      env {
+        name  = "ROLE_PROVISIONING_MODE"
+        value = var.role_provisioning_mode
+      }
+
+      env {
+        name  = "STRIPE_3DS_POLICY"
+        value = var.stripe_3ds_policy
+      }
+
+      dynamic "env" {
+        for_each = var.staging_seed_enabled ? [1] : []
+        content {
+          name = "STAGING_SEED_SHARED_SECRET"
+          value_source {
+            secret_key_ref {
+              secret  = "STAGING_SEED_SHARED_SECRET"
+              version = var.secret_versions["STAGING_SEED_SHARED_SECRET"]
+            }
+          }
+        }
+      }
+
+      env {
+        name  = "AMENITY_LIVE_LOOKUP_ENABLED"
+        value = var.amenity_live_lookup_enabled ? "true" : "false"
+      }
+
+      dynamic "env" {
+        for_each = var.tester_feedback_email == "" ? [] : [var.tester_feedback_email]
+        content {
+          name  = "FURLONG_TESTER_FEEDBACK_EMAIL"
+          value = env.value
+        }
+      }
+
+      env {
+        name  = "RATE_LIMITING_ENABLED"
+        value = var.rate_limiting_enabled ? "true" : "false"
+      }
+
+      env {
+        name  = "API_RATE_LIMIT_WINDOW_SECONDS"
+        value = tostring(var.api_rate_limit_window_seconds)
+      }
+
+      env {
+        name  = "API_RATE_LIMIT_MAX"
+        value = tostring(var.api_rate_limit_max)
+      }
+
+      dynamic "env" {
+        for_each = var.nextauth_url == "" ? [] : [var.nextauth_url]
+        content {
+          name  = "NEXTAUTH_URL"
+          value = env.value
+        }
+      }
+
+      # WebAuthn must use the browser-visible canonical hostname, never Cloud
+      # Run's internal listener address (for example 0.0.0.0). Keeping these
+      # values explicit also prevents passkeys from being enrolled against a
+      # transient service alias.
+      dynamic "env" {
+        for_each = var.webauthn_rp_id == "" ? [] : [var.webauthn_rp_id]
+        content {
+          name  = "WEBAUTHN_RP_ID"
+          value = env.value
+        }
+      }
+
+      dynamic "env" {
+        for_each = var.webauthn_origin == "" ? [] : [var.webauthn_origin]
+        content {
+          name  = "WEBAUTHN_ORIGIN"
+          value = env.value
+        }
+      }
+
+      # Sovereign document storage (2026-08-05): the borrower upload channel's
+      # IAM-private bucket. Present only when the bucket exists.
+      env {
+        name  = "DOCUMENT_STORAGE_BUCKET"
+        value = var.core_image == "" ? "" : "${var.project_id}-borrower-documents"
+      }
+
+      # ---- Health (spec P2.3: three distinct concepts) ----------------------
+      # Startup probe: Node process initialized (NO DB).
+      startup_probe {
+        http_get {
+          path = "/health/live"
+          port = 8080
+        }
+        initial_delay_seconds = 5
+        period_seconds        = 10
+        timeout_seconds       = 10
+        failure_threshold     = 24 # ~4 min: the app grew past the old 53s budget
+      }
+
+      # Liveness: process answers HTTP (NO DB) — DB blips must not recycle
+      # containers. /health/ready (bounded DB check) is the P2.4 verification
+      # and diagnostic signal; Cloud Run has no readiness probe concept, so it
+      # is deliberately NOT wired here.
+      liveness_probe {
+        http_get {
+          path = "/health/live"
+          port = 8080
+        }
+        period_seconds    = 30
+        timeout_seconds   = 3
+        failure_threshold = 3
+      }
+
+      volume_mounts {
+        name       = "runtime-state"
+        mount_path = "/var/furlong-state"
+      }
+    }
+  }
+
+  # Traffic: latest serves 100%; an optional "stable" tag pins a blessed
+  # revision on its own URL (0% of default traffic) so testers keep a known
+  # build while the owner iterates on latest (P3, founder 2026-07-17).
+  traffic {
+    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+    percent = 100
+  }
+  dynamic "traffic" {
+    for_each = var.stable_revision == "" ? [] : [var.stable_revision]
+    content {
+      type     = "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION"
+      revision = traffic.value
+      tag      = "stable"
+      percent  = 0
+    }
+  }
+
+  # The first revision resolves secrets at startup — the runtime SA's accessor
+  # bindings must exist before the service does.
+  depends_on = [
+    google_secret_manager_secret_iam_member.runtime_database_url,
+    google_secret_manager_secret_iam_member.runtime_nextauth_secret,
+    google_secret_manager_secret_iam_member.runtime_report_signing,
+    google_secret_manager_secret_iam_member.runtime_plaid_data_encryption,
+    google_secret_manager_secret_iam_member.runtime_sendgrid_api_key,
+    google_secret_manager_secret_iam_member.runtime_auth_shared_secret,
+    google_storage_bucket_iam_member.runtime_state_core_read,
+  ]
+}
+
+# ---- Invoker IAM: explicit principals ONLY (never allUsers) ------------------
+resource "google_cloud_run_v2_service_iam_member" "invokers" {
+  for_each = var.core_image == "" ? toset([]) : toset(var.invoker_principals)
+
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.core[0].name
+  role     = "roles/run.invoker"
+  member   = each.value
+}
+
+resource "google_cloud_run_v2_service_iam_member" "iap_invoker" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.core[0].name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:service-${data.google_project.staging.number}@gcp-sa-iap.iam.gserviceaccount.com"
+}
+
+resource "terraform_data" "enable_iap" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  triggers_replace = {
+    project = var.project_id
+    region  = var.region
+    service = google_cloud_run_v2_service.core[0].name
+    mode    = "enabled"
+  }
+
+  lifecycle {
+    replace_triggered_by = [google_cloud_run_v2_service.core]
+  }
+
+  provisioner "local-exec" {
+    command = "gcloud run services update ${self.triggers_replace.service} --project ${self.triggers_replace.project} --region ${self.triggers_replace.region} --iap --quiet"
+  }
+
+  depends_on = [
+    google_cloud_run_v2_service.core,
+    google_cloud_run_v2_service_iam_member.iap_invoker,
+  ]
+}
+
+resource "google_iap_web_cloud_run_service_iam_member" "testers" {
+  for_each = var.core_image == "" || !var.enable_iap ? toset([]) : toset(var.iap_tester_principals)
+
+  project                = var.project_id
+  location               = var.region
+  cloud_run_service_name = google_cloud_run_v2_service.core[0].name
+  role                   = "roles/iap.httpsResourceAccessor"
+  member                 = each.value
+
+  depends_on = [terraform_data.enable_iap]
+}
+
+# ---- P2.4 deploy-verify identity (IAP-aware) --------------------------------
+# The deploy:verify-manifest gate must reach the app THROUGH IAP to prove
+# health. A user credential cannot mint an IAP-audience token, so a dedicated
+# least-privilege service account holds roles/iap.httpsResourceAccessor and the
+# operator self-signs a short-lived JWT AS it (aud = service URL, direct Cloud
+# Run IAP has no OAuth brand). This SA has NO other capability — it can only be
+# authenticated-read through IAP.
+resource "google_service_account" "verify" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  project      = var.project_id
+  account_id   = "furlong-verify"
+  display_name = "Furlong P2.4 deploy-verify (IAP-aware, read-through-IAP only)"
+}
+
+resource "google_iap_web_cloud_run_service_iam_member" "verify" {
+  count = var.core_image == "" || !var.enable_iap ? 0 : 1
+
+  project                = var.project_id
+  location               = var.region
+  cloud_run_service_name = google_cloud_run_v2_service.core[0].name
+  role                   = "roles/iap.httpsResourceAccessor"
+  member                 = "serviceAccount:${google_service_account.verify[0].email}"
+
+  depends_on = [terraform_data.enable_iap]
+}
+
+# Operator principals may self-sign a JWT AS the verify SA (signJwt) to run the
+# gate locally. Scoped to this ONE service account — not project-wide token
+# creation.
+resource "google_service_account_iam_member" "verify_token_creator" {
+  for_each = var.core_image == "" || !var.enable_iap ? toset([]) : toset(var.invoker_principals)
+
+  service_account_id = google_service_account.verify[0].name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = each.value
+}
+
+# ---- Staging-only automated DAST identity -----------------------------------
+# GitHub OIDC may impersonate this one read-only invocation identity without a
+# stored key. It is deliberately absent when deployment_environment=production.
+resource "google_service_account" "dast" {
+  count = var.core_image != "" && var.enable_staging_dast && var.deployment_environment == "staging" ? 1 : 0
+
+  project      = var.project_id
+  account_id   = "furlong-dast"
+  display_name = "Furlong staging passive DAST (GitHub OIDC, invoke only)"
+}
+
+resource "google_service_account_iam_member" "dast_workload_identity" {
+  count = length(google_service_account.dast)
+
+  service_account_id = google_service_account.dast[0].name
+  role               = "roles/iam.workloadIdentityUser"
+  member             = var.github_actions_principal_set
+}
+
+resource "google_service_account_iam_member" "dast_token_creator" {
+  count = length(google_service_account.dast)
+
+  service_account_id = google_service_account.dast[0].name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = var.github_actions_principal_set
+}
+
+resource "google_cloud_run_v2_service_iam_member" "dast_invoker" {
+  count = length(google_service_account.dast)
+
+  project  = var.project_id
+  location = var.region
+  name     = google_cloud_run_v2_service.core[0].name
+  role     = "roles/run.invoker"
+  member   = google_service_account.dast[0].member
+}
+
+resource "google_iap_web_cloud_run_service_iam_member" "dast" {
+  count = length(google_service_account.dast) == 0 || !var.enable_iap ? 0 : 1
+
+  project                = var.project_id
+  location               = var.region
+  cloud_run_service_name = google_cloud_run_v2_service.core[0].name
+  role                   = "roles/iap.httpsResourceAccessor"
+  member                 = google_service_account.dast[0].member
+
+  depends_on = [terraform_data.enable_iap]
+}

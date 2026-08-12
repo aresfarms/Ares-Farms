@@ -21,7 +21,9 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
 
-import { appendAuditEvent, readAuditEvents } from "@/lib/property/auditLedger";
+import { canonicalLandRegisterAuthority } from "@/lib/platform/authorities/landRegister";
+import type { AuditEvent } from "@/lib/platform/authorities/landRegister";
+
 import {
   PLACE_FACT_ACTIVATIONS,
   PLACE_FACT_SOURCE_IDS,
@@ -115,8 +117,8 @@ export function listRuntimePlaceFactActivations(): EffectivePlaceFactActivation[
 }
 
 /** Recent audit-ledger entries for a place-fact source (most recent first). */
-export function readPlaceFactAudit(sourceId: string, limit = 10) {
-  return readAuditEvents({ domain: PLACE_FACT_AUDIT_DOMAIN, subject: sourceId })
+export function readPlaceFactAudit(sourceId: string, limit = 10): AuditEvent[] {
+  return canonicalLandRegisterAuthority.read({ domain: PLACE_FACT_AUDIT_DOMAIN, subject: sourceId })
     .slice(-limit)
     .reverse();
 }
@@ -159,7 +161,7 @@ export function recordPlaceFactDecision(input: {
   };
   writeOverlay(overlay);
 
-  appendAuditEvent({
+  canonicalLandRegisterAuthority.append({
     actorId: input.reviewerId,
     actorName: input.reviewerName,
     domain: PLACE_FACT_AUDIT_DOMAIN,

@@ -2,7 +2,30 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
+import {
+  evaluateZeroTrustAccess,
+  privilegedMfaRequired,
+} from "@/lib/auth/accessSecurityRuntime";
+import {
+  MFA_ASSURANCE_COOKIE,
+  MFA_STEP_UP_MAX_AGE_SECONDS,
+  verifyMfaAssurance,
+} from "@/lib/auth/mfaAssurance";
 import { isProtectedPage } from "@/lib/auth/protectedRoutes";
+import {
+  internalLenderDeskRole,
+  operatorByEmail,
+} from "@/lib/auth/operatorRegistry";
+import { evaluateProtectedPageRole } from "@/lib/auth/pageRolePolicy";
+import {
+  isSoleMaintenanceSuperuser,
+  maintenanceSuperuserAuditContext,
+} from "@/lib/auth/maintenanceSuperuser";
+import { secureCompare } from "@/lib/security/requestGuards";
+import {
+  SYNTHETIC_FIXTURE_COOKIE,
+  verifySyntheticFixtureSessionToken,
+} from "@/lib/testing/syntheticFixtureLineage";
 import {
   ClaimedActorContext,
   apiAuthEnforcementRequired,
@@ -59,11 +82,55 @@ type RateLimitBucket = {
 
 type SessionContext = {
   actorId: string | null;
+  email: string | null;
   role: string | null;
   tenantId: string | null;
 };
 
+type ApiPerimeterSeverity = "info" | "warning" | "error";
+
 const rateLimitBuckets = new Map<string, RateLimitBucket>();
+const MAX_RATE_LIMIT_BUCKETS = 10_000;
+
+const STAGING_SEED_ROUTES = new Set([
+  "/api/onboard",
+  "/api/apply",
+  "/api/documents/submit",
+  "/api/documents/storage-handoff",
+  "/api/queues/operator",
+  "/api/connectors/source-check",
+  "/api/rules/evaluate",
+  "/api/reviews/human",
+  "/api/connectors/credentialed-ingestion",
+  "/api/partners/workflows",
+  "/api/reports/pdf",
+]);
+
+function stagingSeedAuthorityAllowed(req: NextRequest, route: string): boolean {
+  if (req.method !== "POST" || !STAGING_SEED_ROUTES.has(route)) return false;
+  if (process.env.STAGING_SEED_ENABLED !== "true") return false;
+  const expected = process.env.STAGING_SEED_SHARED_SECRET?.trim();
+  const provided = req.headers.get("x-furlong-staging-seed-secret")?.trim();
+  return Boolean(expected && provided && secureCompare(provided, expected));
+}
+
+const MFA_BOOTSTRAP_API_PREFIX = "/api/security/mfa/";
+const STEP_UP_ROUTE_PREFIXES = [
+  "/api/auth/role-provisioning",
+  "/api/auth/access-lifecycle",
+  "/api/stripe/connect",
+  "/api/public/document-sign",
+  "/api/lender-submissions",
+  "/api/governance",
+  "/api/treasury",
+  "/api/payments",
+] as const;
+function stepUpRequired(route: string, method: string): boolean {
+  if (["GET", "HEAD", "OPTIONS"].includes(method)) return false;
+  return STEP_UP_ROUTE_PREFIXES.some(
+    (p) => route === p || route.startsWith(`${p}/`),
+  );
+}
 
 function createSecurityTraceId(): string {
   return `api-security-${Date.now()}-${Math.random()
@@ -71,11 +138,54 @@ function createSecurityTraceId(): string {
     .slice(2, 10)}`;
 }
 
+function logApiPerimeterEvent(input: {
+  severity: ApiPerimeterSeverity;
+  traceId: string;
+  route: string;
+  method: string;
+  policy: string;
+  outcome: "allowed" | "blocked";
+  publicReason?: string | null;
+  status?: number;
+  detail?: Record<string, unknown>;
+  req: NextRequest;
+}) {
+  const event = {
+    channel: "api-perimeter",
+    ts: new Date().toISOString(),
+    severity: input.severity,
+    traceId: input.traceId,
+    route: input.route,
+    method: input.method,
+    policy: input.policy,
+    outcome: input.outcome,
+    status: input.status ?? null,
+    publicReason: input.publicReason ?? null,
+    clientContextPresent: clientIdentity(input.req) !== "unknown-client",
+    userAgentPresent: Boolean(input.req.headers.get("user-agent")),
+    detail: input.detail ?? {},
+  };
+
+  const line = JSON.stringify(event);
+
+  if (input.severity === "error") {
+    console.error(line);
+    return;
+  }
+
+  if (input.severity === "warning") {
+    console.warn(line);
+    return;
+  }
+
+  console.log(line);
+}
+
 function jsonBlocked(
   status: number,
   error: string,
   governance: Record<string, unknown>,
-  headers?: HeadersInit
+  headers?: HeadersInit,
 ) {
   return NextResponse.json(
     {
@@ -86,7 +196,7 @@ function jsonBlocked(
     {
       status,
       headers,
-    }
+    },
   );
 }
 
@@ -118,10 +228,21 @@ function evaluateRateLimit(req: NextRequest): {
 } {
   const windowSeconds = parsePositiveInteger(
     process.env.API_RATE_LIMIT_WINDOW_SECONDS,
-    60
+    60,
   );
   const limit = parsePositiveInteger(process.env.API_RATE_LIMIT_MAX, 120);
   const now = Date.now();
+  if (rateLimitBuckets.size >= MAX_RATE_LIMIT_BUCKETS) {
+    for (const [bucketKey, bucket] of rateLimitBuckets) {
+      if (bucket.resetAt <= now) rateLimitBuckets.delete(bucketKey);
+    }
+    while (rateLimitBuckets.size >= MAX_RATE_LIMIT_BUCKETS) {
+      const oldestKey = rateLimitBuckets.keys().next().value as
+        string | undefined;
+      if (!oldestKey) break;
+      rateLimitBuckets.delete(oldestKey);
+    }
+  }
   const key = `${clientIdentity(req)}:${req.nextUrl.pathname}`;
   const existing = rateLimitBuckets.get(key);
 
@@ -162,9 +283,13 @@ function rateLimitHeaders(rateLimit: {
 }
 
 async function readBodyClaimedActorContext(
-  req: NextRequest
+  req: NextRequest,
 ): Promise<ClaimedActorContext> {
-  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") {
+  if (
+    req.method === "GET" ||
+    req.method === "HEAD" ||
+    req.method === "OPTIONS"
+  ) {
     return {};
   }
 
@@ -183,9 +308,60 @@ async function readBodyClaimedActorContext(
   }
 }
 
+function requestBodyExceedsLimit(req: NextRequest): boolean {
+  const contentLength = req.headers.get("content-length");
+  if (!contentLength) return false;
+  if (!/^\d+$/.test(contentLength)) return true;
+  const bytes = Number(contentLength);
+  const maxBytes = parsePositiveInteger(
+    process.env.API_MAX_JSON_BODY_BYTES,
+    1_048_576,
+  );
+  return !Number.isFinite(bytes) || bytes < 0 || bytes > maxBytes;
+}
+
+function trustedMutationOrigins(req: NextRequest): Set<string> {
+  const origins = new Set<string>([req.nextUrl.origin]);
+  const forwardedHost = req.headers
+    .get("x-forwarded-host")
+    ?.split(",")[0]
+    ?.trim();
+  const forwardedProto =
+    req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ?? "https";
+  const host = req.headers.get("host")?.trim();
+
+  for (const candidate of [
+    forwardedHost ? `${forwardedProto}://${forwardedHost}` : null,
+    host ? `${req.nextUrl.protocol}//${host}` : null,
+    process.env.NEXTAUTH_URL,
+    process.env.APP_BASE_URL,
+    process.env.NEXT_PUBLIC_BASE_URL,
+  ]) {
+    if (!candidate) continue;
+    try {
+      origins.add(new URL(candidate).origin);
+    } catch {
+      // Invalid configured origins are ignored; the request remains fail closed.
+    }
+  }
+
+  return origins;
+}
+
+function isCrossSiteMutation(req: NextRequest): boolean {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return false;
+  const origin = req.headers.get("origin");
+  if (!origin) return req.headers.get("sec-fetch-site") === "cross-site";
+  try {
+    return !trustedMutationOrigins(req).has(new URL(origin).origin);
+  } catch {
+    return true;
+  }
+}
+
 function combineClaimedContexts(
   query: ClaimedActorContext,
-  body: ClaimedActorContext
+  body: ClaimedActorContext,
 ): ClaimedActorContext {
   return {
     role: body.role ?? query.role ?? null,
@@ -197,6 +373,7 @@ function combineClaimedContexts(
 function extractSessionContext(token: Record<string, unknown>): SessionContext {
   return {
     actorId: normalizeOptionalText(token.id ?? token.sub ?? token.email),
+    email: normalizeOptionalText(token.email),
     role: normalizeOptionalRole(token.role),
     tenantId: normalizeOptionalText(token.tenantId),
   };
@@ -204,12 +381,16 @@ function extractSessionContext(token: Record<string, unknown>): SessionContext {
 
 function requestWithSessionHeaders(
   req: NextRequest,
-  session: SessionContext
+  session: SessionContext,
 ): NextResponse {
   const requestHeaders = new Headers(req.headers);
 
   if (session.actorId) {
     requestHeaders.set("x-ares-authenticated-user-id", session.actorId);
+  }
+
+  if (session.email) {
+    requestHeaders.set("x-ares-authenticated-email", session.email);
   }
 
   if (session.role) {
@@ -240,7 +421,7 @@ function previewGate(req: NextRequest): NextResponse | null {
   const pass = process.env.PREVIEW_BASIC_AUTH_PASSWORD;
   if (!user || !pass) return null; // not a locked preview → no-op
   const expected = `Basic ${btoa(`${user}:${pass}`)}`;
-  if ((req.headers.get("authorization") ?? "") !== expected) {
+  if (!secureCompare(req.headers.get("authorization") ?? "", expected)) {
     return new NextResponse("Authentication required", {
       status: 401,
       headers: {
@@ -252,12 +433,113 @@ function previewGate(req: NextRequest): NextResponse | null {
   return null; // password ok → fall through to the normal operator gate
 }
 
+/**
+ * Nonce-based CSP (GCP/production readiness, 2026-06-12). Pages get a fresh
+ * cryptographically random nonce per request; Next reads the CSP from the
+ * REQUEST headers (the fork's documented proxy pattern) and tags its inline
+ * bootstrap/hydration <script>s with it, so PRODUCTION script-src needs NO
+ * 'unsafe-inline'. Development stays relaxed ('unsafe-eval' for React's debug
+ * eval, 'unsafe-inline' for turbopack dev chunks) — clearly gated to dev only.
+ *
+ * style-src keeps 'unsafe-inline' WITHOUT a nonce on purpose: the app styles
+ * via React inline style ATTRIBUTES, which a style-src nonce would void
+ * (CSP3 ignores 'unsafe-inline' when a nonce is present). Script injection is
+ * the XSS vector this hardens; style attributes carry no script capability.
+ */
+function pageResponseWithCsp(req: NextRequest): NextResponse {
+  const isDev = process.env.NODE_ENV === "development";
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = (
+    isDev
+      ? [
+          "default-src 'self'",
+          "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+          "style-src 'self' 'unsafe-inline'",
+          "img-src 'self' data: https:",
+          // storage.googleapis.com: the sovereign vault's browser→GCS direct
+          // upload (resumable session PUT). The ONLY external connect allowed —
+          // CSP blocked it as "Failed to fetch" (founder staging test 2026-08-05).
+          "connect-src 'self' https://storage.googleapis.com",
+          // calendar.google.com: the lender desk's agenda embed (renders only
+          // for Google sessions that already have calendar access).
+          "frame-src https://calendar.google.com",
+          "frame-ancestors 'none'",
+          "base-uri 'self'",
+          "form-action 'self'",
+          "object-src 'none'",
+        ]
+      : [
+          "default-src 'self'",
+          `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+          "style-src 'self' 'unsafe-inline'",
+          "img-src 'self' data: https:",
+          "connect-src 'self' https://storage.googleapis.com",
+          "frame-src https://calendar.google.com",
+          "frame-ancestors 'none'",
+          "base-uri 'self'",
+          "form-action 'self'",
+          "object-src 'none'",
+          "upgrade-insecure-requests",
+        ]
+  ).join("; ");
+
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("Content-Security-Policy", csp);
+  return response;
+}
+
+function stripeWebhookIngressOnlyGate(req: NextRequest): NextResponse | null {
+  if (process.env.STRIPE_WEBHOOK_INGRESS_ONLY !== "true") return null;
+
+  if (req.nextUrl.pathname === "/api/stripe/webhook" && req.method === "POST") {
+    return null;
+  }
+
+  return new NextResponse("Not Found", {
+    status: 404,
+    headers: {
+      "Cache-Control": "no-store",
+      "X-Robots-Tag": "noindex, nofollow",
+    },
+  });
+}
+
 export async function proxy(req: NextRequest) {
+  // A dedicated Stripe ingress deployment exposes one signed POST route only.
+  const stripeIngressBlock = stripeWebhookIngressOnlyGate(req);
+  if (stripeIngressBlock) return stripeIngressBlock;
+
   // Locked-preview password wall (deploy-only; inert otherwise). Must run first.
   const previewBlock = previewGate(req);
   if (previewBlock) return previewBlock;
 
   const route = req.nextUrl.pathname;
+  const testPersonaRoleFor = (
+    email: string | null,
+    secret: string | null | undefined,
+  ): "lender" | "attorney" | "auditor" | "sponsor" | null => {
+    if (!secret || email?.toLowerCase() !== "chudson@aresfarmsinc.com")
+      return null;
+    const context = verifySyntheticFixtureSessionToken(
+      req.cookies.get(SYNTHETIC_FIXTURE_COOKIE)?.value,
+      secret,
+      email,
+    );
+    if (!context || context.syntheticPersonaId !== "syn-pocohantus-smith-001") {
+      return null;
+    }
+    const role = context.scenarioId.replace(/^professional-/, "");
+    return role === "lender" ||
+      role === "attorney" ||
+      role === "auditor" ||
+      role === "sponsor"
+      ? role
+      : null;
+  };
 
   // ── Page perimeter ──────────────────────────────────────────────────────────
   // Non-API routes: protect internal/operator/portal PAGES. Anonymous visitors
@@ -272,26 +554,115 @@ export async function proxy(req: NextRequest) {
 
       if (!pageToken) {
         const signInUrl = req.nextUrl.clone();
-        signInUrl.pathname = "/api/auth/signin";
+        signInUrl.pathname = "/sign-in";
         signInUrl.search = `callbackUrl=${encodeURIComponent(
           `${route}${req.nextUrl.search}`,
         )}`;
         return NextResponse.redirect(signInUrl);
       }
+      const pageUserId = normalizeOptionalText(pageToken.id);
+      const pageSessionVersion =
+        typeof pageToken.sessionVersion === "number"
+          ? pageToken.sessionVersion
+          : null;
+      const zeroTrust = await evaluateZeroTrustAccess({
+        userId: pageUserId,
+        tokenSessionVersion: pageSessionVersion,
+        role: pageToken.role,
+      });
+      if (!zeroTrust.allowed) {
+        const signInUrl = req.nextUrl.clone();
+        signInUrl.pathname = "/sign-in";
+        signInUrl.search = `callbackUrl=${encodeURIComponent(`${route}${req.nextUrl.search}`)}`;
+        return NextResponse.redirect(signInUrl);
+      }
+      const tokenEmail = normalizeOptionalText(pageToken.email);
+      const operator = operatorByEmail(tokenEmail);
+      const testPersonaRole = testPersonaRoleFor(tokenEmail, pageSecret);
+      const lenderDeskOperatorRole =
+        route === "/lender-desk" || route.startsWith("/lender-desk/")
+          ? internalLenderDeskRole(tokenEmail)
+          : null;
+      const pageRole = testPersonaRole
+        ? testPersonaRole
+        : lenderDeskOperatorRole
+          ? lenderDeskOperatorRole
+          : isSoleMaintenanceSuperuser(tokenEmail)
+            ? "governance"
+            : operator
+              ? operator.role === "founder-operator"
+                ? "governance"
+                : "operator"
+              : (normalizeOptionalRole(pageToken.role) ?? "user");
+      if (
+        privilegedMfaRequired(pageRole) &&
+        route !== "/security/mfa" &&
+        !route.startsWith("/security/mfa/")
+      ) {
+        const assurance = await verifyMfaAssurance({
+          token: req.cookies.get(MFA_ASSURANCE_COOKIE)?.value,
+          userId: pageUserId!,
+          sessionVersion: zeroTrust.sessionVersion!,
+          secret: pageSecret!,
+        });
+        if (!assurance) {
+          const mfaUrl = req.nextUrl.clone();
+          mfaUrl.pathname = "/security/mfa";
+          mfaUrl.search = `callbackUrl=${encodeURIComponent(`${route}${req.nextUrl.search}`)}`;
+          return NextResponse.redirect(mfaUrl);
+        }
+      }
+      const pageAccess = evaluateProtectedPageRole(route, pageRole);
+      if (!pageAccess.allowed) {
+        console.warn(
+          JSON.stringify({
+            channel: "page-perimeter",
+            route,
+            outcome: "blocked",
+            role: pageRole,
+            reason: pageAccess.reason,
+          }),
+        );
+        return new NextResponse("Not Found", {
+          status: 404,
+          headers: {
+            "Cache-Control": "no-store",
+            "X-Robots-Tag": "noindex, nofollow",
+          },
+        });
+      }
     }
 
-    return NextResponse.next();
+    // Pages render under the per-request nonce CSP (production: no
+    // 'unsafe-inline' in script-src).
+    return pageResponseWithCsp(req);
   }
 
   // ── API perimeter ───────────────────────────────────────────────────────────
   const traceId = createSecurityTraceId();
   const publicReason = apiSecurityPublicReason(route);
-  const rateLimitEnabled = apiRateLimitingEnabled();
+  const rateLimitEnabled = apiRateLimitingEnabled() || Boolean(publicReason);
 
   if (rateLimitEnabled) {
     const rateLimit = evaluateRateLimit(req);
 
     if (!rateLimit.allowed) {
+      logApiPerimeterEvent({
+        severity: "warning",
+        traceId,
+        route,
+        method: req.method,
+        policy: "rate-limit",
+        outcome: "blocked",
+        publicReason,
+        status: 429,
+        detail: {
+          limit: rateLimit.limit,
+          remaining: rateLimit.remaining,
+          resetAt: new Date(rateLimit.resetAt).toISOString(),
+        },
+        req,
+      });
       return jsonBlocked(
         429,
         "API rate limit exceeded.",
@@ -302,22 +673,114 @@ export async function proxy(req: NextRequest) {
           policy: "rate-limit",
           publicReason,
         },
-        rateLimitHeaders(rateLimit)
+        rateLimitHeaders(rateLimit),
       );
     }
   }
 
   if (publicReason || req.method === "OPTIONS") {
+    if (publicReason && process.env.API_LOG_PUBLIC_ALLOW_EVENTS === "true") {
+      logApiPerimeterEvent({
+        severity: "info",
+        traceId,
+        route,
+        method: req.method,
+        policy: "public-allowlist",
+        outcome: "allowed",
+        publicReason,
+        status: 200,
+        req,
+      });
+    }
+    return NextResponse.next();
+  }
+
+  if (stagingSeedAuthorityAllowed(req, route)) {
+    logApiPerimeterEvent({
+      severity: "info",
+      traceId,
+      route,
+      method: req.method,
+      policy: "staging-seed-authority",
+      outcome: "allowed",
+      status: 200,
+      req,
+      detail: { restrictedRoute: true, productionAuthority: false },
+    });
     return NextResponse.next();
   }
 
   if (!apiAuthEnforcementRequired()) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "session-required",
+      outcome: "allowed",
+      status: 200,
+      detail: {
+        reason: "API_AUTH_ENFORCEMENT not required",
+      },
+      req,
+    });
     return NextResponse.next();
+  }
+
+  if (requestBodyExceedsLimit(req)) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "request-size",
+      outcome: "blocked",
+      status: 413,
+      req,
+    });
+    return jsonBlocked(413, "Request body exceeds the governed API limit.", {
+      traceId,
+      module: "api.security.proxy",
+      route,
+      policy: "request-size",
+    });
+  }
+
+  if (isCrossSiteMutation(req)) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "same-origin-mutation",
+      outcome: "blocked",
+      status: 403,
+      req,
+    });
+    return jsonBlocked(403, "Cross-site mutation requests are not allowed.", {
+      traceId,
+      module: "api.security.proxy",
+      route,
+      policy: "same-origin-mutation",
+    });
   }
 
   const secret = resolveNextAuthSecret();
 
   if (!secret) {
+    logApiPerimeterEvent({
+      severity: "error",
+      traceId,
+      route,
+      method: req.method,
+      policy: "session-required",
+      outcome: "blocked",
+      status: 503,
+      detail: {
+        missingSecret: true,
+      },
+      req,
+    });
     return jsonBlocked(503, "API authentication secret is not configured.", {
       traceId,
       module: "api.security.proxy",
@@ -333,6 +796,16 @@ export async function proxy(req: NextRequest) {
   });
 
   if (!token) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "session-required",
+      outcome: "blocked",
+      status: 401,
+      req,
+    });
     return jsonBlocked(401, "Authenticated session is required.", {
       traceId,
       module: "api.security.proxy",
@@ -342,40 +815,164 @@ export async function proxy(req: NextRequest) {
   }
 
   const session = extractSessionContext(token as Record<string, unknown>);
+  const testPersonaRole = testPersonaRoleFor(session.email, secret);
+  const maintenanceOverride =
+    !testPersonaRole && isSoleMaintenanceSuperuser(session.email);
+  if (testPersonaRole) session.role = testPersonaRole;
+  else if (maintenanceOverride) session.role = "governance";
+  const tokenSessionVersion =
+    typeof (token as Record<string, unknown>).sessionVersion === "number"
+      ? ((token as Record<string, unknown>).sessionVersion as number)
+      : null;
+  const zeroTrust = await evaluateZeroTrustAccess({
+    userId: session.actorId,
+    tokenSessionVersion,
+    role: session.role,
+  });
+  if (!zeroTrust.allowed) {
+    logApiPerimeterEvent({
+      severity: "warning",
+      traceId,
+      route,
+      method: req.method,
+      policy: "zero-trust-current-authority",
+      outcome: "blocked",
+      status: 401,
+      detail: { reason: zeroTrust.reason },
+      req,
+    });
+    return jsonBlocked(401, "Session authority is no longer current.", {
+      traceId,
+      module: "api.security.proxy",
+      route,
+      policy: "zero-trust-current-authority",
+      reason: zeroTrust.reason,
+    });
+  }
+  if (
+    privilegedMfaRequired(session.role) &&
+    !route.startsWith(MFA_BOOTSTRAP_API_PREFIX)
+  ) {
+    const assurance = await verifyMfaAssurance({
+      token: req.cookies.get(MFA_ASSURANCE_COOKIE)?.value,
+      userId: session.actorId!,
+      sessionVersion: zeroTrust.sessionVersion!,
+      secret,
+      maxVerifiedAgeSeconds: stepUpRequired(route, req.method)
+        ? MFA_STEP_UP_MAX_AGE_SECONDS
+        : undefined,
+    });
+    if (!assurance) {
+      logApiPerimeterEvent({
+        severity: "warning",
+        traceId,
+        route,
+        method: req.method,
+        policy: stepUpRequired(route, req.method)
+          ? "step-up-mfa"
+          : "session-mfa",
+        outcome: "blocked",
+        status: 403,
+        req,
+      });
+      return jsonBlocked(
+        403,
+        stepUpRequired(route, req.method)
+          ? "Fresh step-up passkey verification is required."
+          : "Passkey MFA is required for this privileged session.",
+        {
+          traceId,
+          module: "api.security.proxy",
+          route,
+          policy: stepUpRequired(route, req.method)
+            ? "step-up-mfa"
+            : "session-mfa",
+          mfaUrl: "/security/mfa",
+        },
+      );
+    }
+  }
   const queryClaims = extractClaimedActorContextFromSearchParams(
-    req.nextUrl.searchParams
+    req.nextUrl.searchParams,
   );
   const bodyClaims = await readBodyClaimedActorContext(req);
   const claimed = combineClaimedContexts(queryClaims, bodyClaims);
 
-  if (
-    roleClaimConflictsWithSession({
-      sessionRole: session.role,
-      claimedRole: claimed.role,
-    }) ||
-    actorClaimConflictsWithSession({
-      sessionActorId: session.actorId,
-      claimedActorId: claimed.actorId,
-    }) ||
-    tenantClaimConflictsWithSession({
-      sessionTenantId: session.tenantId,
-      claimedTenantId: claimed.tenantId,
-    })
-  ) {
-    return jsonBlocked(403, "Caller-claimed authority conflicts with session.", {
+  const roleConflict = roleClaimConflictsWithSession({
+    sessionRole: session.role,
+    claimedRole: claimed.role,
+  });
+  const actorConflict = actorClaimConflictsWithSession({
+    sessionActorId: session.actorId,
+    claimedActorId: claimed.actorId,
+  });
+  const tenantConflict = tenantClaimConflictsWithSession({
+    sessionTenantId: session.tenantId,
+    claimedTenantId: claimed.tenantId,
+  });
+
+  if (roleConflict || actorConflict || tenantConflict) {
+    logApiPerimeterEvent({
+      severity: "warning",
       traceId,
-      module: "api.security.proxy",
       route,
+      method: req.method,
       policy: "session-authority",
-      session: {
-        actorId: session.actorId,
-        role: session.role,
-        tenantId: session.tenantId,
+      outcome: "blocked",
+      status: 403,
+      detail: {
+        roleConflict,
+        actorConflict,
+        tenantConflict,
+        sessionRole: session.role,
       },
-      claimed,
+      req,
     });
+    return jsonBlocked(
+      403,
+      "Caller-claimed authority conflicts with session.",
+      {
+        traceId,
+        module: "api.security.proxy",
+        route,
+        policy: "session-authority",
+        conflicts: {
+          role: roleConflict,
+          actor: actorConflict,
+          tenant: tenantConflict,
+        },
+      },
+    );
   }
 
+  logApiPerimeterEvent({
+    severity: "info",
+    traceId,
+    route,
+    method: req.method,
+    policy: "session-authority",
+    outcome: "allowed",
+    status: 200,
+    detail: {
+      role: session.role,
+      tenantId: session.tenantId,
+      actorIdPresent: Boolean(session.actorId),
+      maintenanceSuperuser: {
+        ...maintenanceSuperuserAuditContext(session.email),
+        active: maintenanceOverride,
+        suppressedByTestPersona: Boolean(testPersonaRole),
+      },
+      professionalTestPersona: testPersonaRole
+        ? {
+            active: true,
+            name: "Pocohantus Smith",
+            role: testPersonaRole,
+            testOnly: true,
+          }
+        : null,
+    },
+    req,
+  });
   return requestWithSessionHeaders(req, session);
 }
 

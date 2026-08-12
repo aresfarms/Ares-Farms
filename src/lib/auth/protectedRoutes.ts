@@ -31,11 +31,13 @@ export const INTERNAL_CHROME_PREFIXES = [
   "/applications", "/documents", "/reviews", "/rules", "/decisions",
   "/notices", "/audit-replay", "/connectors", "/partners", "/billing",
   "/reports", "/promotion", "/case-command", "/evidence-packets",
-  "/exception-remediation", "/module-readiness", "/lender", "/sponsor",
+  "/exception-remediation", "/module-readiness", "/lender",
+  "/sponsor",
   "/portfolio", "/customer-revenue", "/dashboard", "/build-preservation",
   "/doctrine-gap-ledger", "/controlled-promotion-activation",
   "/live-scraper-activation", "/release-candidate-freeze",
   "/deployment-environment-readiness", "/environmental-compliance",
+  "/named-tester-acceptance", "/launch-authorization",
   "/source-", "/production-",
 ] as const;
 
@@ -47,9 +49,19 @@ export const INTERNAL_CHROME_PREFIXES = [
  * sponsor vs borrower) is a deliberate second pass — step one is "no anonymous
  * access to any internal/portal surface".
  */
+export const NO_INTERNAL_CHROME_PREFIXES = [
+  "/security", "/sign-in", "/portal", "/lender-desk",
+] as const;
+
 export const PROTECTED_PAGE_PREFIXES = [
   ...INTERNAL_CHROME_PREFIXES,
+  "/security/mfa",
+  "/security/password-setup",
   "/portal",
+  // The Lender Deal Desk is auth-gated but does NOT wear the internal
+  // operator chrome — the licensed lender gets a clean working surface,
+  // not the 76-console engine room (founder test 2026-08-05).
+  "/lender-desk",
 ] as const;
 
 function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
@@ -63,6 +75,7 @@ function matchesPrefix(pathname: string, prefixes: readonly string[]): boolean {
 
 /** True if `pathname` is an operator/governance console that shows the internal chrome. */
 export function isInternalChromeRoute(pathname: string): boolean {
+  if (matchesPrefix(pathname, NO_INTERNAL_CHROME_PREFIXES)) return false;
   return matchesPrefix(pathname, INTERNAL_CHROME_PREFIXES);
 }
 

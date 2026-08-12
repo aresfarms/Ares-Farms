@@ -75,7 +75,7 @@ ok(postDeleteRefused, "no new consent after deletion");
 
 // ── 7. Append-only + token-keyed history (what the customer sees) ────────────
 const hist = consentHistory(TOKEN);
-ok(hist.length >= 5 && hist.every((e) => e.token === TOKEN), "consent history is token-keyed and complete");
+ok(hist.length >= 5 && hist.every((e) => e.token.startsWith("sha256:")), "consent history is token-keyed (hashed at rest) and complete");
 ok(hist.some((e) => e.type === "STOP") && hist.some((e) => e.type === "TOKEN_DELETED"), "stop + delete events preserved (append-only — nothing rewritten)");
 
 // ── cleanup: remove TEST ledgers (runtime files, git-ignored) ─────────────────

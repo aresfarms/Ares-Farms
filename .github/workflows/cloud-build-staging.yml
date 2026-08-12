@@ -1,0 +1,75 @@
+name: Keyless staging image build
+
+on:
+  workflow_dispatch: {}
+
+# Vol III / III-B / TECH-SEC-001:
+# GitHub OIDC is exchanged for a short-lived Google credential. No stored
+# Google service-account key or GitHub cloud credential is used.
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: keyless-staging-build
+  cancel-in-progress: false
+
+jobs:
+  submit:
+    name: Submit governed Cloud Build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout exact protected-main commit
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Exchange GitHub OIDC for short-lived Google identity
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: projects/859763772114/locations/global/workloadIdentityPools/github-actions/providers/ares-farms
+          service_account: furlong-github-build@furlong-staging-499102.iam.gserviceaccount.com
+
+      - name: Set up Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+
+      - name: Submit source with commit provenance
+        id: build
+        shell: bash
+        run: |
+          set -euo pipefail
+          build_id="$(gcloud builds submit . \
+            --project=furlong-staging-499102 \
+            --config=cloudbuild.yaml \
+            --async \
+            --substitutions=_GIT_COMMIT="${GITHUB_SHA}",_GIT_REF="${GITHUB_REF_NAME}" \
+            --format='value(id)')"
+          test -n "${build_id}"
+          echo "build_id=${build_id}" >> "${GITHUB_OUTPUT}"
+          echo "Cloud Build ${build_id} submitted for ${GITHUB_SHA}." >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Wait for governed build result
+        shell: bash
+        env:
+          BUILD_ID: ${{ steps.build.outputs.build_id }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 180); do
+            status="$(gcloud builds describe "${BUILD_ID}" \
+              --project=furlong-staging-499102 \
+              --format='value(status)')"
+            case "${status}" in
+              SUCCESS)
+                echo "Cloud Build ${BUILD_ID} succeeded." >> "${GITHUB_STEP_SUMMARY}"
+                exit 0
+                ;;
+              FAILURE|INTERNAL_ERROR|TIMEOUT|CANCELLED|EXPIRED)
+                echo "Cloud Build ${BUILD_ID} ended with ${status}." >> "${GITHUB_STEP_SUMMARY}"
+                exit 1
+                ;;
+            esac
+            sleep 15
+          done
+          echo "Cloud Build ${BUILD_ID} did not finish within the workflow window." >> "${GITHUB_STEP_SUMMARY}"
+          exit 1

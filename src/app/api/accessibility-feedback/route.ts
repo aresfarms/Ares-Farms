@@ -131,10 +131,11 @@ export async function POST(req: NextRequest) {
 
   if (!delivered) {
     // No provider configured, or send failed: never lose the report.
-    console.warn(
-      `[accessibility-feedback] report NOT emailed (mail provider not configured or send failed). ` +
-        `Deliver manually to ${TO_ADDRESS}:\n${textBody}`,
-    );
+    console.warn("[accessibility-feedback] delivery fallback", JSON.stringify({
+      delivery: "manual",
+      recipient: TO_ADDRESS,
+      report: textBody,
+    }));
   }
 
   // Always thank the visitor: their report is captured either way.

@@ -8,6 +8,7 @@ import {
   EvidencePackResult,
   composeGovernanceEvidencePack,
 } from "@/lib/governance/evidenceEngine";
+import { readJsonResponse } from "@/lib/http/readJsonResponse";
 
 /**
  * Governance Evidence Engine Page
@@ -210,7 +211,7 @@ export default function GovernanceEvidenceEnginePage() {
           userId: reviewerRole,
         }),
       });
-      const data = (await response.json()) as ApiResponse;
+      const data = await readJsonResponse<ApiResponse>(response);
 
       if (!response.ok || !data.ok) {
         throw new Error(

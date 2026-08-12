@@ -203,7 +203,7 @@ export default function ProductionLaunchEvidencePage() {
 
         setActionMessage(
           `Go-live release hold recorded: ${shortId(
-            launchHold.launchHoldId
+            launchHold.evidenceId
           )}. No production launch, public verification, live external action, payment capture, borrower notice send, official report publication, or official reliance was approved.`
         );
         await loadAll({ clearActionMessage: false });

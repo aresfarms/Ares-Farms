@@ -1,12 +1,42 @@
 /**
  * gsaRealEstatePublicSafeGenerated — GENERATED FILE. Do not edit by hand.
  * CLIENT-SAFE projection (no exact address, no lat/long).
- * Ingested at: 2026-06-10T23:40:10.092Z
+ * Ingested at: 2026-07-17T16:15:54.771Z
  */
 
 import type { PublicSafeProperty } from "./propertyTypes";
 
 export const GSA_RE_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
+  "CO": {
+    "id": "gsa-re-68",
+    "sourceId": "gsa-realestate",
+    "state": "CO",
+    "county": "Unknown",
+    "town": "Denver",
+    "propertyType": "commercial",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "$100k–$250k",
+    "whyMayFit": "GSA federal surplus property auction in Denver, CO — providers can help you explore financing options.",
+    "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
+    "asOf": "2026-07-17T16:15:54.771Z",
+    "isCurrent": true,
+    "vintageStamp": "current listing"
+  },
+  "DE": {
+    "id": "gsa-re-66",
+    "sourceId": "gsa-realestate",
+    "state": "DE",
+    "county": "Unknown",
+    "town": "Townsend",
+    "propertyType": "other",
+    "acreageBand": "Acreage not specified",
+    "priceBand": "Under $100k",
+    "whyMayFit": "GSA federal surplus property auction in Townsend, DE — providers can help you explore financing options.",
+    "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
+    "asOf": "2026-07-17T16:15:54.771Z",
+    "isCurrent": true,
+    "vintageStamp": "current listing"
+  },
   "IN": {
     "id": "gsa-re-63",
     "sourceId": "gsa-realestate",
@@ -15,10 +45,10 @@ export const GSA_RE_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "town": "Hobart",
     "propertyType": "land",
     "acreageBand": "Acreage not specified",
-    "priceBand": "Under $100k",
+    "priceBand": "$100k–$250k",
     "whyMayFit": "GSA federal surplus property auction in Hobart, IN — providers can help you explore financing options.",
     "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
-    "asOf": "2026-06-10T23:40:10.092Z",
+    "asOf": "2026-07-17T16:15:54.771Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -33,7 +63,7 @@ export const GSA_RE_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "$500k+",
     "whyMayFit": "GSA federal surplus property auction in Grand Rapids, MI — providers can help you explore financing options.",
     "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
-    "asOf": "2026-06-10T23:40:10.092Z",
+    "asOf": "2026-07-17T16:15:54.771Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -48,22 +78,22 @@ export const GSA_RE_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Price on request",
     "whyMayFit": "GSA federal surplus property auction in Somerville, NJ — providers can help you explore financing options.",
     "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
-    "asOf": "2026-06-10T23:40:10.092Z",
+    "asOf": "2026-07-17T16:15:54.771Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
   "TX": {
-    "id": "gsa-re-62",
+    "id": "gsa-re-59",
     "sourceId": "gsa-realestate",
     "state": "TX",
     "county": "Unknown",
     "town": "Port Lavaca",
     "propertyType": "home",
     "acreageBand": "Acreage not specified",
-    "priceBand": "Under $100k",
+    "priceBand": "$100k–$250k",
     "whyMayFit": "GSA federal surplus property auction in Port Lavaca, TX — providers can help you explore financing options.",
     "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
-    "asOf": "2026-06-10T23:40:10.092Z",
+    "asOf": "2026-07-17T16:15:54.771Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -78,7 +108,7 @@ export const GSA_RE_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "Under $100k",
     "whyMayFit": "GSA federal surplus property auction in Perry, UT — providers can help you explore financing options.",
     "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
-    "asOf": "2026-06-10T23:40:10.092Z",
+    "asOf": "2026-07-17T16:15:54.771Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   },
@@ -93,7 +123,7 @@ export const GSA_RE_PUBLIC_SAFE_BY_STATE: Record<string, PublicSafeProperty> = {
     "priceBand": "$500k+",
     "whyMayFit": "GSA federal surplus property auction in Montpelier, VT — providers can help you explore financing options.",
     "sourceCitation": "Source: GSA — Federal surplus real property (realestatesales.gov)",
-    "asOf": "2026-06-10T23:40:10.092Z",
+    "asOf": "2026-07-17T16:15:54.771Z",
     "isCurrent": true,
     "vintageStamp": "current listing"
   }

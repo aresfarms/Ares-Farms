@@ -191,7 +191,7 @@ export default function PublicAlphaProfilePage() {
       auditSafe: true,
       federationScoped: true,
       conflictPreserving: true,
-    } as PublicAlphaProfileResult;
+    } as unknown as PublicAlphaProfileResult;
   }, [reviewerRole]);
 
   const result = serverResult?.result ?? emptyResult;

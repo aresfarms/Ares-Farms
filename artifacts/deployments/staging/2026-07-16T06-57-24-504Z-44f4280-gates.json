@@ -1,0 +1,76 @@
+{
+  "operation": "deploy:verify-manifest (P2.4)",
+  "outcome": "FAIL",
+  "serviceUrl": "https://furlong-core-mwei3cj3jq-uc.a.run.app",
+  "totalChecks": 11,
+  "failedChecks": 4,
+  "checks": [
+    {
+      "name": "image pinned by digest",
+      "expected": "@sha256:…",
+      "actual": "sha256:dced1fe79ae3d33a77118e033bb5a46e625b09ada97be61365262e29bfab212f",
+      "pass": true
+    },
+    {
+      "name": "no allUsers/allAuthenticatedUsers invoker binding",
+      "expected": "none",
+      "actual": "none (invokers: serviceAccount:service-859763772114@gcp-sa-iap.iam.gserviceaccount.com, user:chudson@aresfarmsinc.com)",
+      "pass": true
+    },
+    {
+      "name": "anonymous invocation blocked at edge",
+      "expected": "302/401/403 (IAP)",
+      "actual": "HTTP 302",
+      "pass": true
+    },
+    {
+      "name": "authenticated homepage serves app",
+      "expected": "200 + app surface",
+      "actual": "HTTP 200, 98048B",
+      "pass": true
+    },
+    {
+      "name": "/health/live",
+      "expected": "200",
+      "actual": "HTTP 401",
+      "pass": false
+    },
+    {
+      "name": "/health/ready (DB confirmed)",
+      "expected": "200",
+      "actual": "HTTP 401",
+      "pass": false
+    },
+    {
+      "name": "/internal walls to sign-in",
+      "expected": "3xx redirect",
+      "actual": "HTTP 401",
+      "pass": false
+    },
+    {
+      "name": "anonymous /api/audit rejected",
+      "expected": "302/401/403 (IAP)",
+      "actual": "HTTP 302",
+      "pass": true
+    },
+    {
+      "name": "furlong-db-migrate latest execution SUCCEEDED",
+      "expected": "succeeded",
+      "actual": "furlong-db-migrate-dscbr",
+      "pass": true
+    },
+    {
+      "name": "furlong-runtime-verify latest execution SUCCEEDED",
+      "expected": "succeeded",
+      "actual": "furlong-runtime-verify-4fffc",
+      "pass": true
+    },
+    {
+      "name": "verify:csp-hydration @ deployed URL",
+      "expected": "PASS",
+      "actual": "    ✗ CSP header present on /navigator |     ✗ server is NOT in nonce-CSP mode — run against a production build (npm run build && npm run start); dev override: ",
+      "pass": false
+    }
+  ],
+  "generatedAtUtc": "2026-07-16T06:57:24.504Z"
+}

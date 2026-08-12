@@ -5,6 +5,11 @@ import {
   evaluateProductionPortalReadinessGate,
 } from "@/lib/governance/productionPortalReadinessGate";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
+import {
+  latestReleaseGovernanceEvidence,
+  recordReleaseGovernanceEvidence,
+  releaseGovernanceEvidenceFor,
+} from "@/lib/governance/releaseGovernanceEvidenceStore";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 import {
@@ -157,25 +162,28 @@ async function handleProductionPortalReadiness(
       ],
     });
     const result = evaluateProductionPortalReadinessGate({ surfaceId });
+    const scope = surfaceId ?? "platform";
     const launchHold =
-      req.method === "POST"
-        ? {
-            launchHoldId: `production-portal-readiness-hold-${Date.now()}`,
-            surfaceId: surfaceId ?? null,
-            reviewStatus: "PRODUCTION_PORTAL_LAUNCH_HOLD_RECORDED",
-            reviewNote: body.reviewNote ?? null,
-            portalLaunchExecuted: false,
-            publicLaunchAllowed: false,
-            liveExternalActionPerformed: false,
-            paymentCaptureAllowed: false,
-            borrowerNoticeSendAllowed: false,
-            officialReportPublicationAllowed: false,
-            publicVerificationAllowed: false,
-            productionBlocked: true,
-            humanReviewRequired: true,
+      req.method === "POST" && actorId
+        ? recordReleaseGovernanceEvidence({
+            kind: "PRODUCTION_PORTAL_READINESS_HOLD",
+            scope,
+            actorId,
+            reviewNote: body.reviewNote,
             replayRef: traceId,
-          }
-        : null;
+          })
+        : latestReleaseGovernanceEvidence(
+            scope,
+            "PRODUCTION_PORTAL_READINESS_HOLD"
+          );
+    const launchHoldHistory = releaseGovernanceEvidenceFor(
+      scope,
+      "PRODUCTION_PORTAL_READINESS_HOLD"
+    );
+    const supportCommunicationsEvidence = latestReleaseGovernanceEvidence(
+      "platform",
+      "PRODUCTION_SUPPORT_COMMUNICATIONS_READINESS_PACKET"
+    );
     const classifiedOutput = classifyRecord(
       {
         count: result.productionPortalReadinessReviews.length,
@@ -185,6 +193,8 @@ async function handleProductionPortalReadiness(
         disclosures: result.disclosures,
         launchPosture: result.launchPosture,
         launchHold,
+        launchHoldHistory,
+        supportCommunicationsEvidence,
         productionBlocked: true,
         portalLaunchExecuted: false,
         publicLaunchAllowed: false,
@@ -260,6 +270,9 @@ async function handleProductionPortalReadiness(
       disclosures: classifiedOutput.disclosures,
       launchPosture: classifiedOutput.launchPosture,
       launchHold: classifiedOutput.launchHold,
+      launchHoldHistory: classifiedOutput.launchHoldHistory,
+      supportCommunicationsEvidence:
+        classifiedOutput.supportCommunicationsEvidence,
       productionBlocked: classifiedOutput.productionBlocked,
       portalLaunchExecuted: classifiedOutput.portalLaunchExecuted,
       publicLaunchAllowed: classifiedOutput.publicLaunchAllowed,

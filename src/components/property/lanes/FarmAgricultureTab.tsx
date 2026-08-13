@@ -3,15 +3,18 @@
 /**
  * FarmAgricultureTab — the farm lane's Agriculture tab content (founder
  * request 2026-07-28: "best crop, orchard, hay crop, flower, vines, etc. for
- * growing here ... one crop or diversify?").
+ * growing here ... one crop or diversify?"; 2026-08-12: replace the ranked
+ * cards with a living pro-forma — a coverage verdict up top, then a numbers
+ * table with per-enterprise economics that recompute as the visitor changes
+ * inputs, so the answer to "can this land pay for itself?" is prominent).
  *
- * Pure presentation of the deterministic farmBestUse engine output: the
- * ranked enterprise options for THIS parcel (soil-, yield-, and market-
- * driven) and the single-anchor vs diversify verdict. Advisory screening
- * only — the copy keeps the extension-office / NRCS confirmation boundary.
+ * When the parcel's economics (acreage + price + soil) are resolved, the
+ * living pro-forma leads. The older ranked-options fallback still renders when
+ * only the qualitative best-use is available. Advisory screening only.
  */
 
 import type { FarmBestUse } from "@/lib/property/farmAnswerEngine";
+import { FarmLivingProForma, type FarmLivingProFormaProps } from "@/components/property/FarmLivingProForma";
 
 const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
 
@@ -22,7 +25,42 @@ const TIER_STYLE: Record<string, { label: string; bg: string; ink: string }> = {
   marginal: { label: "MARGINAL", bg: "#F3F4F6", ink: "#6B7280" },
 };
 
-export function FarmAgricultureTab({ bestUse }: { bestUse: FarmBestUse | null }) {
+const disclaimer = (
+  <p style={{ margin: 0, color: "#6B7280", fontSize: 11.5, lineHeight: 1.6 }}>
+    Screening guidance from public data (USDA-NRCS soil survey, USDA NASS county yields and rents,
+    market-access signals) — not an agronomic prescription, eligibility finding, or income guarantee.
+    Zoning, water rights, and an actual buyer for each crop still control; the county extension office
+    and NRCS field staff are the free first calls before committing acreage.
+  </p>
+);
+
+export function FarmAgricultureTab({
+  bestUse,
+  proForma,
+}: {
+  bestUse: FarmBestUse | null;
+  proForma?: FarmLivingProFormaProps | null;
+}) {
+  // Living pro-forma leads whenever the parcel economics are resolved.
+  if (proForma) {
+    return (
+      <>
+        {bestUse && (
+          <section style={{ ...card, display: "grid", gap: 8 }}>
+            <span style={{ fontSize: 10.5, fontWeight: 850, letterSpacing: ".14em", textTransform: "uppercase", color: "#8F6E1F" }}>
+              What this ground grows best
+            </span>
+            <p style={{ margin: 0, color: "#3d4655", fontSize: 13.5, lineHeight: 1.65 }}>{bestUse.headline}</p>
+          </section>
+        )}
+        <div style={card}>
+          <FarmLivingProForma {...proForma} />
+        </div>
+        {disclaimer}
+      </>
+    );
+  }
+
   if (!bestUse) {
     return (
       <div style={card}>
@@ -31,6 +69,8 @@ export function FarmAgricultureTab({ bestUse }: { bestUse: FarmBestUse | null })
       </div>
     );
   }
+
+  // Fallback: qualitative best-use when economics aren't resolved yet.
   const advice = bestUse.portfolioAdvice;
   return (
     <>
@@ -72,12 +112,7 @@ export function FarmAgricultureTab({ bestUse }: { bestUse: FarmBestUse | null })
         })}
       </div>
 
-      <p style={{ margin: 0, color: "#6B7280", fontSize: 11.5, lineHeight: 1.6 }}>
-        Screening guidance from public data (USDA-NRCS soil survey, USDA NASS county yields and rents,
-        market-access signals) — not an agronomic prescription, eligibility finding, or income guarantee.
-        Zoning, water rights, and an actual buyer for each crop still control; the county extension office
-        and NRCS field staff are the free first calls before committing acreage.
-      </p>
+      {disclaimer}
     </>
   );
 }

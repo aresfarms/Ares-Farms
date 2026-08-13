@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AgriculturalOpportunityOptimizerPanel } from "@/components/property/AgriculturalOpportunityOptimizerPanel";
+import { FarmLivingProForma } from "@/components/property/FarmLivingProForma";
 import { CHART_THEMES } from "@/lib/property/chartThemes";
 
 const inputStyle = {
@@ -31,7 +32,13 @@ export function FarmBestUseFinanceWorkspace() {
         <label style={{ display: "grid", gap: 5, fontSize: 12, fontWeight: 750, color: "#334155" }}>Purchase price<input aria-label="Purchase price" type="number" min="0" step="10000" value={price} onChange={(e) => setPrice(Number(e.target.value) || 0)} style={inputStyle} /></label>
         <label style={{ display: "grid", gap: 5, fontSize: 12, fontWeight: 750, color: "#334155" }}>Interest rate (%)<input aria-label="Interest rate" type="number" min="0" max="30" step="0.125" value={rate} onChange={(e) => setRate(Number(e.target.value) || 0)} style={inputStyle} /></label>
       </div>
-      <AgriculturalOpportunityOptimizerPanel acreage={acreage} price={price} rate={rate} theme={CHART_THEMES.finance} />
+      <FarmLivingProForma acres={acreage} listPrice={price} ratePct={rate} />
+      <details style={{ border: "1px solid #d7deea", borderRadius: 12, background: "#f8fafc", padding: 12 }}>
+        <summary style={{ cursor: "pointer", fontWeight: 800, color: "#334155", fontSize: 13 }}>Show the full optimizer (all levers)</summary>
+        <div style={{ marginTop: 12 }}>
+          <AgriculturalOpportunityOptimizerPanel acreage={acreage} price={price} rate={rate} theme={CHART_THEMES.finance} />
+        </div>
+      </details>
     </section>
   );
 }

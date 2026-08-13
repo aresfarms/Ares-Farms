@@ -33,8 +33,9 @@ const railBg = "#f7f8fa";
 const figures = { fontVariantNumeric: "tabular-nums", fontFeatureSettings: '"tnum"' } as const;
 
 export interface FarmLivingProFormaProps {
-  acres: number;
-  /** List price when known; null falls back to the BPO estimate. */
+  /** Parcel acreage when resolved; null prompts the visitor to enter it. */
+  acres: number | null;
+  /** List price when known; null → the visitor enters an offer to unlock the verdict. */
   listPrice: number | null;
   /** Broker price opinion / estimated value, used when no list price. */
   bpo?: number | null;
@@ -50,14 +51,20 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
   const ltv = props.ltv ?? 0.8;
   const hasList = typeof props.listPrice === "number" && props.listPrice > 0;
 
-  const [acres, setAcres] = useState(props.acres > 0 ? props.acres : 60);
+  const [acres, setAcres] = useState(props.acres && props.acres > 0 ? props.acres : 0);
   const [useBpo, setUseBpo] = useState(!hasList);
   const [price, setPrice] = useState(
-    (hasList ? props.listPrice : props.bpo) ?? 600_000,
+    (hasList ? props.listPrice : props.bpo) ?? 0,
   );
   const [rate, setRate] = useState(ratePct);
   const [pick, setPick] = useState<OpportunityKey | null>(null);
   const [openRow, setOpenRow] = useState<OpportunityKey | null>(null);
+
+  // Acreage alone drives the enterprise table; a price unlocks the coverage
+  // verdict. Missing either just prompts — the pro-forma is always the surface,
+  // never a fall-back to qualitative cards.
+  const ready = acres > 0;
+  const priceReady = ready && price > 0;
 
   const r = rate / 100;
   const annualDebtService = useMemo(
@@ -101,8 +108,8 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
   // Rows: every eligible enterprise, ranked by real net; money-losers sink to
   // the bottom because we rank on NOI (fixes commodity-as-best on small ground).
   const rows = useMemo(
-    () => model.ranked.filter((x) => x.eligible).slice().sort((a, b) => b.noi - a.noi),
-    [model],
+    () => (acres > 0 ? model.ranked.filter((x) => x.eligible).slice().sort((a, b) => b.noi - a.noi) : []),
+    [model, acres],
   );
 
   const bestKey = rows[0]?.key ?? null;
@@ -170,19 +177,30 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
         </p>
       </header>
 
-      {/* 1 — THE VERDICT */}
-      <div style={{ border: `1px solid ${tone.bd}`, background: tone.bg, borderRadius: 12, padding: "16px 18px", display: "grid", gap: 8 }}>
-        <span style={{ fontSize: 11, fontWeight: 850, letterSpacing: ".08em", color: tone.ink }}>{tone.tag}</span>
-        <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: tone.ink, fontWeight: 500 }}>{verdictLine}</p>
-        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", fontSize: 12.5, color: tone.ink, ...figures }}>
-          <span><strong>Debt service</strong> ~{money(coverage.annualDebtService)}/yr</span>
-          <span><strong>Best modeled net</strong> {money(bestNoi)}/yr</span>
-          <span><strong>Coverage</strong> {bestDscr.toFixed(2)}×</span>
-          {coverage.maxSupportablePrice != null && v !== "clears" && (
-            <span><strong>Pencils near</strong> {money(coverage.maxSupportablePrice)}</span>
-          )}
+      {/* 1 — THE VERDICT (or the prompt to unlock it) */}
+      {priceReady ? (
+        <div style={{ border: `1px solid ${tone.bd}`, background: tone.bg, borderRadius: 12, padding: "16px 18px", display: "grid", gap: 8 }}>
+          <span style={{ fontSize: 11, fontWeight: 850, letterSpacing: ".08em", color: tone.ink }}>{tone.tag}</span>
+          <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: tone.ink, fontWeight: 500 }}>{verdictLine}</p>
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap", fontSize: 12.5, color: tone.ink, ...figures }}>
+            <span><strong>Debt service</strong> ~{money(coverage.annualDebtService)}/yr</span>
+            <span><strong>Best modeled net</strong> {money(bestNoi)}/yr</span>
+            <span><strong>Coverage</strong> {bestDscr.toFixed(2)}×</span>
+            {coverage.maxSupportablePrice != null && v !== "clears" && (
+              <span><strong>Pencils near</strong> {money(coverage.maxSupportablePrice)}</span>
+            )}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div style={{ border: `1px dashed ${line}`, background: railBg, borderRadius: 12, padding: "16px 18px", display: "grid", gap: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: 850, letterSpacing: ".08em", color: inkSoft }}>CAN IT CARRY ITS OWN DEBT?</span>
+          <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.55, color: ink }}>
+            {ready
+              ? "Enter this property's asking price or your intended offer below — the pro-forma then says whether the land can carry its own mortgage, and if not, by how much and at what price it would."
+              : "Enter the parcel's acreage below to run the enterprise economics; add a price to test whether the land carries its own debt."}
+          </p>
+        </div>
+      )}
 
       {/* Inputs */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, padding: 14, border: `1px solid ${line}`, borderRadius: 12, background: railBg }}>
@@ -259,11 +277,19 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
                 </Fragment>
               );
             })}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={7} style={{ padding: "16px", fontSize: 13, color: inkSoft, textAlign: "center" }}>
+                  Enter the parcel&apos;s acreage above to see the enterprise economics for this ground.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       {/* 3 — BEST vs YOUR PICK */}
+      {ready && (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
         <div style={{ border: `1px solid ${line}`, borderRadius: 11, padding: 14, background: "#f3faf5" }}>
           <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "#166534" }}>Best case &middot; {bestPlanKind}</div>
@@ -289,6 +315,7 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
           )}
         </div>
       </div>
+      )}
 
       <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.55, color: inkSoft }}>
         {coverage.notes[0]}{" "}Screening model only — a documented operating history outranks these county assumptions at underwriting.

@@ -4153,15 +4153,15 @@ export function PropertyEvaluationWorkspace({
             <FarmAgricultureTab
               bestUse={effectivePlaceIntelligence?.farmBestUse ?? null}
               proForma={(() => {
-                if (workspaceProfile.id !== "farm" || effectiveListedPrice == null) return null;
+                if (workspaceProfile.id !== "farm" && workspaceProfile.id !== "land") return null;
                 const acresMatch = (facts?.propertyRecord?.acreageText ?? "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
                 const acres = facts?.propertyRecord?.offeredAcreage ?? (acresMatch ? Number(acresMatch[1]) : null);
-                if (!acres || acres <= 0) return null;
                 const ratePct = ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? undefined;
-                // Match the workspace/PDF farm-coverage convention (full price
-                // financed, 40-yr amortization) so the tab agrees with the
-                // pro-forma PDF and the DSCR coverage panel.
-                return { acres, listPrice: effectiveListedPrice, ratePct, amortYears: 40, ltv: 1.0, soil: effectivePlaceIntelligence?.soilProfile ?? null };
+                // The pro-forma is ALWAYS the surface for farm/land — never a
+                // fall-back to the old cards. Acreage drives the enterprise table;
+                // a price (may be absent for imported place-facts) unlocks the
+                // coverage verdict. Full-price 40-yr screen matches the PDF.
+                return { acres: acres ?? null, listPrice: effectiveListedPrice ?? null, ratePct, amortYears: 40, ltv: 1.0, soil: effectivePlaceIntelligence?.soilProfile ?? null };
               })()}
             />
           ) : workspaceProfile.id === "residential" ? (

@@ -45,6 +45,7 @@ import { buildLenderTestScorecard, evaluateProgramFit, type ProgramFitContext } 
 import { modelCommercialUses } from "@/lib/property/commercialUseModel";
 import { FinanceAnalysisPanel } from "@/components/property/lanes/FinanceAnalysisPanel";
 import { solveDscrCoverage } from "@/lib/property/dscrCoverageSolver";
+import { indicateMarketValue } from "@/lib/property/marketValueIndication";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
 import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
@@ -4157,11 +4158,33 @@ export function PropertyEvaluationWorkspace({
                 const acresMatch = (facts?.propertyRecord?.acreageText ?? "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
                 const acres = facts?.propertyRecord?.offeredAcreage ?? (acresMatch ? Number(acresMatch[1]) : null);
                 const ratePct = ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? undefined;
-                // The pro-forma is ALWAYS the surface for farm/land — never a
-                // fall-back to the old cards. Acreage drives the enterprise table;
-                // a price (may be absent for imported place-facts) unlocks the
-                // coverage verdict. Full-price 40-yr screen matches the PDF.
-                return { acres: acres ?? null, listPrice: effectiveListedPrice ?? null, ratePct, amortYears: 40, ltv: 1.0, soil: effectivePlaceIntelligence?.soilProfile ?? null };
+                // No asking price → seed Furlong's assessment-based value
+                // indication (cited), which the visitor can override; a real
+                // price always wins. This is an assessment-reconciliation screen,
+                // NOT a closed-comps BPO. The pro-forma is ALWAYS the surface for
+                // farm/land — never the old cards. Full-price 40-yr screen matches the PDF.
+                const indication = effectiveListedPrice == null
+                  ? indicateMarketValue({
+                      assessedTotalValue: facts?.propertyRecord?.assessedTotalValue ?? null,
+                      stateCode: analysisContext.stateCode ?? null,
+                      county: analysisContext.county ?? null,
+                    })
+                  : null;
+                const estimateMid = indication?.status === "indicated" ? indication.midUsd : null;
+                const band = indication?.status === "indicated" && indication.lowUsd != null && indication.highUsd != null
+                  ? { low: indication.lowUsd, high: indication.highUsd }
+                  : null;
+                return {
+                  acres: acres ?? null,
+                  listPrice: effectiveListedPrice ?? null,
+                  bpo: estimateMid,
+                  priceIsEstimate: estimateMid != null,
+                  estimateBand: band,
+                  estimateSources: indication?.sources ?? [],
+                  estimateNote: indication?.method ?? null,
+                  ratePct, amortYears: 40, ltv: 1.0,
+                  soil: effectivePlaceIntelligence?.soilProfile ?? null,
+                };
               })()}
             />
           ) : workspaceProfile.id === "residential" ? (

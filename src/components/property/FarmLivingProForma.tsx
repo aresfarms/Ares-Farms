@@ -35,10 +35,21 @@ const figures = { fontVariantNumeric: "tabular-nums", fontFeatureSettings: '"tnu
 export interface FarmLivingProFormaProps {
   /** Parcel acreage when resolved; null prompts the visitor to enter it. */
   acres: number | null;
-  /** List price when known; null → the visitor enters an offer to unlock the verdict. */
+  /** A real asking/contract price when known — always outranks the estimate. */
   listPrice: number | null;
-  /** Broker price opinion / estimated value, used when no list price. */
+  /** Our assessment-based value indication, used to seed the price when there is
+      no asking price (founder direction 2026-08-13: don't just prompt — fill our
+      own estimate, cited, and let the visitor override with a real number). */
   bpo?: number | null;
+  /** True when the seeded price is our estimate, not a real asking price. */
+  priceIsEstimate?: boolean;
+  /** ±screening band around the estimate — drives the honesty note + how far the
+      verdict holds across the value's uncertainty. */
+  estimateBand?: { low: number; high: number } | null;
+  /** Source citations for the estimate (assessment record + price index). */
+  estimateSources?: string[];
+  /** One-line method note shown under the seeded estimate. */
+  estimateNote?: string | null;
   ratePct?: number;
   amortYears?: number;
   ltv?: number;
@@ -50,13 +61,13 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
   const amortYears = props.amortYears ?? 25;
   const ltv = props.ltv ?? 0.8;
   const hasList = typeof props.listPrice === "number" && props.listPrice > 0;
+  const seededPrice = (hasList ? props.listPrice : props.bpo) ?? 0;
 
   const [acres, setAcres] = useState(props.acres && props.acres > 0 ? props.acres : 0);
-  const [useBpo, setUseBpo] = useState(!hasList);
-  const [price, setPrice] = useState(
-    (hasList ? props.listPrice : props.bpo) ?? 0,
-  );
+  const [price, setPrice] = useState(seededPrice);
   const [rate, setRate] = useState(ratePct);
+  // The seeded price is our estimate only while the visitor hasn't overridden it.
+  const showingEstimate = !hasList && !!props.priceIsEstimate && price === seededPrice && seededPrice > 0;
   const [pick, setPick] = useState<OpportunityKey | null>(null);
   const [openRow, setOpenRow] = useState<OpportunityKey | null>(null);
 
@@ -126,6 +137,23 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
   const bestNoi = Math.max(coverage.bestSingle?.annualNoi ?? 0, coverage.bestMix?.annualNoi ?? 0);
   const bestDscr = annualDebtService > 0 ? bestNoi / annualDebtService : 0;
 
+  // Verdict robustness across the estimate's value band. NOI is value-
+  // independent and debt service scales linearly with price, so coverage at a
+  // band edge is just bestNoi / debtService(edgeValue) — no re-solve needed.
+  const dscrAtValue = (v: number) => {
+    const ds = v > 0 ? v * ltv * (r > 0 ? r / (1 - Math.pow(1 + r, -amortYears)) : 1 / amortYears) : 0;
+    return ds > 0 ? bestNoi / ds : 0;
+  };
+  const catOf = (d: number) => (d >= DSCR_FLOOR ? "clears" : d >= 1 ? "close" : "cannot");
+  const bandDscrLow = showingEstimate && props.estimateBand ? dscrAtValue(props.estimateBand.high) : null; // high value → lowest coverage
+  const bandDscrHigh = showingEstimate && props.estimateBand ? dscrAtValue(props.estimateBand.low) : null; // low value → highest coverage
+  const bandNote =
+    bandDscrLow != null && bandDscrHigh != null
+      ? catOf(bandDscrLow) === catOf(bandDscrHigh)
+        ? `Estimated value, so coverage runs ${bandDscrLow.toFixed(2)}×–${bandDscrHigh.toFixed(2)}× across the ±20% band — the same call holds end to end.`
+        : `Estimated value: the call is NOT robust — coverage runs ${bandDscrLow.toFixed(2)}×–${bandDscrHigh.toFixed(2)}× across the ±20% band, so the answer changes within the value's uncertainty. Get a real price before relying on it.`
+      : null;
+
   // Best case is the most profitable PLAN — a combination of revenue streams
   // when the mix out-earns any single enterprise (common on small acreage),
   // otherwise the single enterprise, stated plainly (founder direction
@@ -190,6 +218,7 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
               <span><strong>Pencils near</strong> {money(coverage.maxSupportablePrice)}</span>
             )}
           </div>
+          {bandNote && <p style={{ margin: 0, fontSize: 12, lineHeight: 1.5, color: tone.ink, opacity: 0.9 }}>{bandNote}</p>}
         </div>
       ) : (
         <div style={{ border: `1px dashed ${line}`, background: railBg, borderRadius: 12, padding: "16px 18px", display: "grid", gap: 6 }}>
@@ -203,14 +232,22 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
       )}
 
       {/* Inputs */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, padding: 14, border: `1px solid ${line}`, borderRadius: 12, background: railBg }}>
-        {numInput("Acres modeled", acres, setAcres, 1)}
-        {numInput(useBpo ? "Estimated value (BPO)" : "Purchase price", price, setPrice, 5000, "$")}
-        {numInput("Interest rate %", rate, setRate, 0.125)}
-        {!hasList && (
-          <label style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 12, color: inkSoft, alignSelf: "end", paddingBottom: 8 }}>
-            <input type="checkbox" checked={useBpo} onChange={(e) => setUseBpo(e.target.checked)} /> Using estimated value (no list price)
-          </label>
+      <div style={{ display: "grid", gap: 8, padding: 14, border: `1px solid ${line}`, borderRadius: 12, background: railBg }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
+          {numInput("Acres modeled", acres, setAcres, 1)}
+          {numInput(showingEstimate ? "Estimated value — edit to your offer" : "Purchase price / offer", price, setPrice, 5000, "$")}
+          {numInput("Interest rate %", rate, setRate, 0.125)}
+        </div>
+        {showingEstimate && (
+          <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: inkSoft }}>
+            No asking price on file — pre-filled with Furlong&apos;s <strong>assessment-based value indication</strong>
+            {props.estimateBand ? ` (${money(props.estimateBand.low)}–${money(props.estimateBand.high)}, a ±20% screening band)` : ""}. This is a screen, <em>not</em> an appraisal or a
+            closed-comps BPO — it walks the county assessment forward on a price index. A real asking or offer price
+            outranks it; type it in and everything recomputes.
+            {props.estimateSources && props.estimateSources.length > 0 && (
+              <> Source: {props.estimateSources.join("; ")}.</>
+            )}
+          </p>
         )}
       </div>
 

@@ -1,5 +1,9 @@
 export type OpportunityKey = "row-crops"|"cash-rent"|"hay-pasture"|"alfalfa-small-square"|"livestock"|"poultry"|"specialty-crops"|"greenhouse"|"solar-lease"|"agrivoltaics"|"battery-storage"|"mixed-portfolio";
-export type OpportunityAssumptions = { acres:number; purchasePrice:number; debtService:number; waterScore:number; laborCapacity:number; capitalCapacity:number; marketAccess:number; gridEvidence:boolean; solarZoningEvidence:boolean; hayYieldTonsPerAcre?:number; hayBaleWeightLb?:number; haySummerPrice?:number; hayWinterPrice?:number; hayWinterShare?:number; hayVariableCostPerAcre?:number; hayHandlingCostPerBale?:number; hayShrinkPct?:number; irrigationInstallCost?:number; irrigationAnnualPowerCost?:number; irrigationAnnualMaintenanceCost?:number; soilSuitability?:number; weatherSuitability?:number; localMarketDepth?:number; competitionPressure?:number; };
+export type OpportunityAssumptions = { acres:number; purchasePrice:number; debtService:number; waterScore:number; laborCapacity:number; capitalCapacity:number; marketAccess:number; gridEvidence:boolean; solarZoningEvidence:boolean; hayYieldTonsPerAcre?:number; hayBaleWeightLb?:number; haySummerPrice?:number; hayWinterPrice?:number; hayWinterShare?:number; hayVariableCostPerAcre?:number; hayHandlingCostPerBale?:number; hayShrinkPct?:number; irrigationInstallCost?:number; irrigationAnnualPowerCost?:number; irrigationAnnualMaintenanceCost?:number; soilSuitability?:number; weatherSuitability?:number; localMarketDepth?:number; competitionPressure?:number;
+ /** Market-linked row-crop revenue $/ac = CURRENT USDA grain price × county yield.
+  * When supplied, row-crop revenue tracks the grain market instead of the static
+  * benchmark, so the pro-forma reflects what the crop is worth right now. */
+ rowCropMarketGrossPerAcre?:number; };
 type Candidate = { key:OpportunityKey; label:string; acresShare:number; grossPerAcre:number; costPct:number; startupPerAcre:number; labor:number; water:number; market:number; soil:number; weather:number; yearsToCash:number; gate?:"grid"|"solar"; note:string };
 const CANDIDATES: Candidate[] = [
  {key:"row-crops",label:"Commodity row crops",acresShare:.8,grossPerAcre:700,costPct:.82,startupPerAcre:350,labor:35,water:45,market:40,soil:55,weather:55,yearsToCash:1,note:"Corn, soybeans, wheat, or contracted rotation."},
@@ -26,7 +30,8 @@ export function optimizeAgriculturalOpportunities(a:OpportunityAssumptions){
   const averageBalePrice=(a.haySummerPrice ?? 20)*(1-winterShare)+(a.hayWinterPrice ?? 35)*winterShare;
   const shrink=clamp(a.hayShrinkPct ?? 8,0,50)/100;
   const sellableBales=usedAcres*hayYield*balesPerTon*(1-shrink);
-  const gross=eligible?(c.key==="alfalfa-small-square"?sellableBales*averageBalePrice:usedAcres*c.grossPerAcre):0;
+  const rowCropGross=c.key==="row-crops"&&a.rowCropMarketGrossPerAcre!=null&&a.rowCropMarketGrossPerAcre>0?a.rowCropMarketGrossPerAcre:c.grossPerAcre;
+  const gross=eligible?(c.key==="alfalfa-small-square"?sellableBales*averageBalePrice:usedAcres*rowCropGross):0;
   const irrigationDependent=c.water>=60;
   const irrigationAnnual=irrigationDependent?((a.irrigationAnnualPowerCost ?? 30000)+(a.irrigationAnnualMaintenanceCost ?? 10000)):0;
   const baseOpex=c.key==="alfalfa-small-square"

@@ -4184,6 +4184,7 @@ export function PropertyEvaluationWorkspace({
                   estimateNote: indication?.method ?? null,
                   ratePct, amortYears: 40, ltv: 1.0,
                   soil: effectivePlaceIntelligence?.soilProfile ?? null,
+                  valuationInputs: effectivePlaceIntelligence?.farmValuationInputs ?? null,
                 };
               })()}
             />

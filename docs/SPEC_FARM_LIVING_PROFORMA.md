@@ -98,3 +98,42 @@ whole point, so these ship with defensible data, clearly labeled, tunable.
      surfaced market must be genuinely convertible to currency, or it doesn't get shown.
 5. **Per-species sub-toggles** — swap sheep/cattle/goats, apple/peach, specific vegetables/flowers —
    built on the real per-species economics from #1–#4, not placeholders.
+
+## Property valuation — Furlong's own, comps-free (founder direction 2026-08-13)
+**Decision: build this feature COMPLETE, then one clean deploy — no half-shipped version.**
+A tool that can't stand behind a property's value loses the customer for every other number.
+We derive value ourselves, from **published government data + this parcel's own economics** — never
+individual comparable sales (noisy/biased), never deferring to the realtor. Engine:
+`src/lib/property/farmlandValuation.ts` (built; the FARM profile of a shared engine).
+
+- **Three headline values** a customer wants: **Land alone · Improvements alone · Combined.**
+  - Land = acres × USDA state farm real-estate $/ac, soil-capability adjusted (reliable).
+  - Improvements = cost approach: depreciated replacement (value) AND undepreciated rebuild cost.
+  - Combined = land + improvements.
+- **Income / productive value** cross-check = best-use NOI ÷ cap rate (cap rate = USDA cash rent ÷
+  USDA land value). "With discount" (earnings-only) vs "without" (market land) falls out naturally.
+- **Square footage is NEVER trusted on entry** — record or customer. Plausibility-guarded (abs bounds
+  + can't exceed half the parcel); only a MEASURED/calculated footprint is "verified"; unverified sqft
+  is flagged and excluded from the reliable value. A wrong number must never skew the result.
+- Every rate is a named, tunable constant; every figure USDA-cited. Screening, not an appraisal;
+  a licensed appraisal and a real arm's-length price both outrank it.
+- **Seeds the pro-forma price** (Combined value) so the coverage verdict computes even with no asking
+  price; a real asking/offer price always wins. Replaces the "±20%, trust the market" hedge.
+
+### Hazard-adjusted rebuild estimator (part of this feature)
+The rebuild figure becomes parcel-specific so a customer can catch a contractor over/under-bidding:
+- **Rebuild RANGE** ($/ft² low–high × area), not a single number.
+- **Flood** (FEMA zone A/V/coastal) → elevated foundation: **piers/pilings, breakaway walls, flood
+  vents**; premium added; explicit "must be built on piers" callout for beach/river/lake incl. Great Lakes.
+- **Seismic** (USGS seismic design category by location) → bracing, foundation reinforcement, anchorage.
+- **Wind / hurricane** (ASCE 7 wind-speed; strictest FL/GA/NC/Gulf — Florida Building Code, Miami-Dade
+  HVHZ) → hurricane straps, impact-rated glazing, roof-attachment upgrades.
+- Each applicable hazard NAMES its required construction and adds its cost premium; output states
+  "code here requires [X], so a real rebuild runs $A–$B — a bid far under that is missing the hazard work."
+- Grounded in FEMA + USGS + ASCE public data. Where a hazard's data source isn't wired yet, say so
+  rather than guess (same integrity rule as the closed-comps BPO).
+
+### Generalize to all three lanes (same engine, different weighting — later phase, not this ship)
+- Farm/land: land value leads, income cross-checks. **(this feature)**
+- Commercial: **income (NOI ÷ cap) leads**, cost cross-checks — type-specific cap rates.
+- Residential: **cost (land + improvements) + assessment-reconciliation lead**, income only for rentals.

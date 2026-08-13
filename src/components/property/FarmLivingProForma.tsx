@@ -19,6 +19,10 @@
 import { Fragment, useMemo, useState, type CSSProperties } from "react";
 import { optimizeAgriculturalOpportunities, type OpportunityKey } from "@/lib/property/agriculturalOpportunityOptimizer";
 import { solveDscrCoverage, type SoilConstraintInput, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
+import { valueFarmland } from "@/lib/property/farmlandValuation";
+import { estimateHazardRebuild } from "@/lib/property/hazardRebuildEstimate";
+import { COMMODITY_PRICES } from "@/lib/property/commodityPricesGenerated";
+import { COUNTY_HAZARD_RISK } from "@/lib/property/countyHazardRiskGenerated";
 
 const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 const perAc = (total: number, acres: number) => (acres > 0 ? total / acres : 0);
@@ -54,6 +58,38 @@ export interface FarmLivingProFormaProps {
   amortYears?: number;
   ltv?: number;
   soil?: SoilConstraintInput | null;
+  /** Public data for Furlong's own value + rebuild (all USDA/FEMA, comps-free).
+      Grain prices default to the generated USDA snapshot; pass runtime-live to
+      track the market this week. */
+  valuationInputs?: {
+    stateFarmlandPerAcre?: number | null;
+    croplandRentPerAcre?: number | null;
+    cornYieldPerAcre?: number | null;
+    soybeanYieldPerAcre?: number | null;
+    wheatYieldPerAcre?: number | null;
+    soilCapabilityClass?: number | null;
+    squareFeet?: number | null;
+    yearBuilt?: number | null;
+    squareFeetVerified?: boolean;
+    countyFips?: string | null;
+    femaFloodZone?: string | null;
+    grainPrices?: { corn?: number | null; soybeans?: number | null; wheat?: number | null } | null;
+  } | null;
+}
+
+/** Live-linked row-crop revenue $/ac = current USDA grain price × county yield —
+ *  the best-paying grain the ground supports. Falls back to the generated USDA
+ *  snapshot when no runtime-live override is passed. */
+function marketRowCropGross(vi: NonNullable<FarmLivingProFormaProps["valuationInputs"]>): number | undefined {
+  const g = vi.grainPrices ?? {};
+  const rev = (price: number | null | undefined, yieldPerAc: number | null | undefined) =>
+    (price ?? 0) > 0 && (yieldPerAc ?? 0) > 0 ? price! * yieldPerAc! : 0;
+  const best = Math.max(
+    rev(g.corn ?? COMMODITY_PRICES.corn?.pricePerBushel, vi.cornYieldPerAcre),
+    rev(g.soybeans ?? COMMODITY_PRICES.soybeans?.pricePerBushel, vi.soybeanYieldPerAcre),
+    rev(g.wheat ?? COMMODITY_PRICES.wheat?.pricePerBushel, vi.wheatYieldPerAcre),
+  );
+  return best > 0 ? Math.round(best) : undefined;
 }
 
 export function FarmLivingProForma(props: FarmLivingProFormaProps) {
@@ -61,27 +97,83 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
   const amortYears = props.amortYears ?? 25;
   const ltv = props.ltv ?? 0.8;
   const hasList = typeof props.listPrice === "number" && props.listPrice > 0;
-  const seededPrice = (hasList ? props.listPrice : props.bpo) ?? 0;
+  const vi = props.valuationInputs ?? null;
+  const rowCropMarketGrossPerAcre = vi ? marketRowCropGross(vi) : undefined;
+  const asOfYear = new Date().getFullYear();
 
   const [acres, setAcres] = useState(props.acres && props.acres > 0 ? props.acres : 0);
-  const [price, setPrice] = useState(seededPrice);
+  const [priceInput, setPriceInput] = useState(hasList ? (props.listPrice ?? 0) : 0);
   const [rate, setRate] = useState(ratePct);
-  // The seeded price is our estimate only while the visitor hasn't overridden it.
-  const showingEstimate = !hasList && !!props.priceIsEstimate && price === seededPrice && seededPrice > 0;
   const [pick, setPick] = useState<OpportunityKey | null>(null);
   const [openRow, setOpenRow] = useState<OpportunityKey | null>(null);
 
-  // Acreage alone drives the enterprise table; a price unlocks the coverage
-  // verdict. Missing either just prompts — the pro-forma is always the surface,
-  // never a fall-back to qualitative cards.
   const ready = acres > 0;
+
+  // NOI is independent of price/debt — compute it once (debtService 0), with
+  // row-crop revenue LIVE-LINKED to current USDA grain price × county yield, so
+  // it can drive BOTH the valuation and the enterprise table.
+  const model = useMemo(
+    () =>
+      optimizeAgriculturalOpportunities({
+        acres,
+        purchasePrice: 0,
+        debtService: 0,
+        waterScore: 70,
+        laborCapacity: 55,
+        capitalCapacity: 55,
+        marketAccess: 60,
+        gridEvidence: false,
+        solarZoningEvidence: false,
+        rowCropMarketGrossPerAcre,
+        ...(props.soil?.capabilityClass != null
+          ? { soilSuitability: props.soil.capabilityClass <= 2 ? 85 : props.soil.capabilityClass <= 4 ? 60 : 35 }
+          : {}),
+      }),
+    [acres, rowCropMarketGrossPerAcre, props.soil],
+  );
+  const bestModelNoi = Math.max(model.mostProfitable?.noi ?? 0, model.portfolioNoi ?? 0);
+
+  // Furlong's own value — land + income + improvements, comps-free, USDA-grounded.
+  const valuation = useMemo(
+    () =>
+      valueFarmland({
+        acres: acres > 0 ? acres : null,
+        stateFarmlandPerAcre: vi?.stateFarmlandPerAcre ?? null,
+        croplandRentPerAcre: vi?.croplandRentPerAcre ?? null,
+        bestUseNoiAnnual: bestModelNoi > 0 ? bestModelNoi : null,
+        soilCapabilityClass: vi?.soilCapabilityClass ?? props.soil?.capabilityClass ?? null,
+        squareFeet: vi?.squareFeet ?? null,
+        yearBuilt: vi?.yearBuilt ?? null,
+        squareFeetVerified: vi?.squareFeetVerified,
+        asOfYear,
+      }),
+    [acres, vi, bestModelNoi, props.soil, asOfYear],
+  );
+  const estimatedValue = valuation.combinedUsd ?? valuation.midUsd ?? null;
+
+  // Hazard-adjusted rebuild (FEMA NRI + flood zone), inflation-escalated.
+  const rebuild = useMemo(
+    () =>
+      estimateHazardRebuild({
+        squareFeet: vi?.squareFeet ?? null,
+        squareFeetVerified: vi?.squareFeetVerified,
+        yearBuilt: vi?.yearBuilt ?? null,
+        acres: acres > 0 ? acres : null,
+        countyHazard: vi?.countyFips ? COUNTY_HAZARD_RISK[vi.countyFips] ?? null : null,
+        femaFloodZone: vi?.femaFloodZone ?? null,
+        asOfYear,
+      }),
+    [vi, acres, asOfYear],
+  );
+
+  // Price: the visitor's entry wins; else our estimated Combined value seeds it,
+  // so the coverage verdict computes even with no asking price.
+  const price = priceInput > 0 ? priceInput : hasList ? (props.listPrice ?? 0) : estimatedValue ?? 0;
+  const showingEstimate = !hasList && priceInput <= 0 && (estimatedValue ?? 0) > 0;
   const priceReady = ready && price > 0;
 
   const r = rate / 100;
-  const annualDebtService = useMemo(
-    () => (price > 0 ? price * ltv * (r > 0 ? r / (1 - Math.pow(1 + r, -amortYears)) : 1 / amortYears) : 0),
-    [price, ltv, r, amortYears],
-  );
+  const annualDebtService = price > 0 ? price * ltv * (r > 0 ? r / (1 - Math.pow(1 + r, -amortYears)) : 1 / amortYears) : 0;
 
   const coverage = useMemo(
     () =>
@@ -97,27 +189,6 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
     [acres, price, annualDebtService, rate, amortYears, ltv, props.soil],
   );
 
-  const model = useMemo(
-    () =>
-      optimizeAgriculturalOpportunities({
-        acres,
-        purchasePrice: price,
-        debtService: annualDebtService,
-        waterScore: 70,
-        laborCapacity: 55,
-        capitalCapacity: 55,
-        marketAccess: 60,
-        gridEvidence: false,
-        solarZoningEvidence: false,
-        ...(props.soil?.capabilityClass != null
-          ? { soilSuitability: props.soil.capabilityClass <= 2 ? 85 : props.soil.capabilityClass <= 4 ? 60 : 35 }
-          : {}),
-      }),
-    [acres, price, annualDebtService, props.soil],
-  );
-
-  // Rows: every eligible enterprise, ranked by real net; money-losers sink to
-  // the bottom because we rank on NOI (fixes commodity-as-best on small ground).
   const rows = useMemo(
     () => (acres > 0 ? model.ranked.filter((x) => x.eligible).slice().sort((a, b) => b.noi - a.noi) : []),
     [model, acres],
@@ -145,13 +216,13 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
     return ds > 0 ? bestNoi / ds : 0;
   };
   const catOf = (d: number) => (d >= DSCR_FLOOR ? "clears" : d >= 1 ? "close" : "cannot");
-  const bandDscrLow = showingEstimate && props.estimateBand ? dscrAtValue(props.estimateBand.high) : null; // high value → lowest coverage
-  const bandDscrHigh = showingEstimate && props.estimateBand ? dscrAtValue(props.estimateBand.low) : null; // low value → highest coverage
+  const bandDscrLow = showingEstimate && valuation.highUsd ? dscrAtValue(valuation.highUsd) : null; // high value → lowest coverage
+  const bandDscrHigh = showingEstimate && valuation.lowUsd ? dscrAtValue(valuation.lowUsd) : null; // low value → highest coverage
   const bandNote =
     bandDscrLow != null && bandDscrHigh != null
       ? catOf(bandDscrLow) === catOf(bandDscrHigh)
-        ? `Estimated value, so coverage runs ${bandDscrLow.toFixed(2)}×–${bandDscrHigh.toFixed(2)}× across the ±20% band — the same call holds end to end.`
-        : `Estimated value: the call is NOT robust — coverage runs ${bandDscrLow.toFixed(2)}×–${bandDscrHigh.toFixed(2)}× across the ±20% band, so the answer changes within the value's uncertainty. Get a real price before relying on it.`
+        ? `On Furlong's estimated value, coverage runs ${bandDscrLow.toFixed(2)}×–${bandDscrHigh.toFixed(2)}× across the value range — the same call holds end to end.`
+        : `On Furlong's estimated value the call is NOT robust — coverage runs ${bandDscrLow.toFixed(2)}×–${bandDscrHigh.toFixed(2)}× across the value range, so the answer changes within the estimate's uncertainty. Get a real price before relying on it.`
       : null;
 
   // Best case is the most profitable PLAN — a combination of revenue streams
@@ -235,21 +306,67 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
       <div style={{ display: "grid", gap: 8, padding: 14, border: `1px solid ${line}`, borderRadius: 12, background: railBg }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
           {numInput("Acres modeled", acres, setAcres, 1)}
-          {numInput(showingEstimate ? "Estimated value — edit to your offer" : "Purchase price / offer", price, setPrice, 5000, "$")}
+          {numInput(showingEstimate ? "Estimated value — edit to your offer" : "Purchase price / offer", price, setPriceInput, 5000, "$")}
           {numInput("Interest rate %", rate, setRate, 0.125)}
         </div>
         {showingEstimate && (
           <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: inkSoft }}>
-            No asking price on file — pre-filled with Furlong&apos;s <strong>assessment-based value indication</strong>
-            {props.estimateBand ? ` (${money(props.estimateBand.low)}–${money(props.estimateBand.high)}, a ±20% screening band)` : ""}. This is a screen, <em>not</em> an appraisal or a
-            closed-comps BPO — it walks the county assessment forward on a price index. A real asking or offer price
-            outranks it; type it in and everything recomputes.
-            {props.estimateSources && props.estimateSources.length > 0 && (
-              <> Source: {props.estimateSources.join("; ")}.</>
-            )}
+            No asking price on file — pre-filled with <strong>Furlong&apos;s own value</strong> (below), from USDA land
+            values, county cash rents, and this parcel&apos;s earnings — never a neighbor&apos;s sale. A real asking or
+            offer price outranks it; type it in and everything recomputes.
           </p>
         )}
       </div>
+
+      {/* VALUE — Land / Improvements / Combined + income (Furlong's own, comps-free) */}
+      {valuation.status === "valued" && (
+        <div style={{ border: `1px solid ${line}`, borderRadius: 12, padding: 16, display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+            <strong style={{ fontSize: 14 }}>What this parcel is worth — Furlong&apos;s own value</strong>
+            <span style={{ fontSize: 11, color: inkSoft }}>USDA-grounded · comps-free</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 10 }}>
+            {([
+              ["Land alone", valuation.landValueUsd, false],
+              ["Improvements", valuation.improvementsValueUsd, !valuation.improvementsVerified],
+              ["Combined", valuation.combinedUsd, false],
+              ["Land-income", valuation.incomeValueUsd, false],
+            ] as [string, number | null, boolean][]).map(([label, val, flagged]) => (
+              <div key={label} style={{ padding: "10px 12px", border: `1px solid ${line}`, borderRadius: 9, background: label === "Combined" ? "#f3faf5" : paper }}>
+                <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: ".05em", color: inkSoft }}>{label}{flagged ? " (est.)" : ""}</div>
+                <strong style={{ display: "block", marginTop: 3, fontSize: 15, ...figures }}>{val != null ? money(val) : "—"}</strong>
+              </div>
+            ))}
+          </div>
+          <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: inkSoft }}>
+            {valuation.methods.find((m) => m.key === "market-land")?.basis}. Income capitalized at {valuation.capRatePct ?? "—"}%.
+            {valuation.improvementsVerified ? "" : " Improvements are an estimate (square footage unverified), shown separately and NOT folded into the reliable land+income value."}
+            {" "}Screening, not an appraisal — {valuation.sources.join("; ")}.
+          </p>
+        </div>
+      )}
+
+      {/* REBUILD — hazard-adjusted (fire/flood insurance basis + contractor-bid check) */}
+      {rebuild.status === "estimated" && (
+        <div style={{ border: `1px solid ${line}`, borderRadius: 12, padding: 16, display: "grid", gap: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+            <strong style={{ fontSize: 14 }}>Rebuild cost — hazard-adjusted (insurance / contractor check)</strong>
+            <strong style={{ fontSize: 15, ...figures }}>{money(rebuild.rebuildLowUsd ?? 0)}–{money(rebuild.rebuildHighUsd ?? 0)}</strong>
+          </div>
+          {rebuild.hazardRequirements.length > 0 && (
+            <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 5 }}>
+              {rebuild.hazardRequirements.map((rq) => (
+                <li key={rq.hazard} style={{ fontSize: 12.5, lineHeight: 1.5, color: ink }}>
+                  <strong style={{ textTransform: "capitalize" }}>{rq.hazard}</strong> (+{rq.premiumPct}%, {rq.riskLabel}): {rq.requirement}
+                </li>
+              ))}
+            </ul>
+          )}
+          {rebuild.notes.map((n, i) => (
+            <p key={i} style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: inkSoft }}>{n}</p>
+          ))}
+        </div>
+      )}
 
       {/* 2 — THE LIVING TABLE */}
       <div style={{ overflowX: "auto", border: `1px solid ${line}`, borderRadius: 12 }}>

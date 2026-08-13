@@ -202,6 +202,20 @@ export interface PropertyBriefIntelligence {
       enterprise scored for THIS parcel, the best named, incl. change-of-use,
       solar, and developer-friendliness. Null for non-farm-shaped properties. */
   farmBestUse: FarmBestUse | null;
+  /** Public-data bundle for Furlong's own comps-free value + hazard rebuild. */
+  farmValuationInputs: {
+    stateFarmlandPerAcre: number | null;
+    croplandRentPerAcre: number | null;
+    cornYieldPerAcre: number | null;
+    soybeanYieldPerAcre: number | null;
+    wheatYieldPerAcre: number | null;
+    soilCapabilityClass: number | null;
+    squareFeet: number | null;
+    yearBuilt: number | null;
+    squareFeetVerified: boolean;
+    countyFips: string | null;
+    femaFloodZone: string | null;
+  } | null;
   /** Residential lane "burning questions" answered FOR THIS property (cost-to-own,
       flood, schools, rent, daily life, resale) from the facts we hold, with honest
       "confirm at X" fallbacks. Null unless the property is residential-shaped. */
@@ -1848,6 +1862,22 @@ export function buildPropertyBriefIntelligence(args: {
           yieldYear: fmrFips ? COUNTY_YIELDS[fmrFips]?.year ?? null : null,
         })
       : null,
+    // Public-data bundle for Furlong's own value + hazard rebuild (comps-free).
+    farmValuationInputs: farmShaped
+      ? {
+          stateFarmlandPerAcre: (args.stateCode ? STATE_FARMLAND[args.stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+          croplandRentPerAcre: fmrFips ? COUNTY_CASH_RENTS[fmrFips]?.cropland ?? null : null,
+          cornYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.corn ?? null : null,
+          soybeanYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.soybeans ?? null : null,
+          wheatYieldPerAcre: fmrFips ? COUNTY_YIELDS[fmrFips]?.wheat ?? null : null,
+          soilCapabilityClass: id ? PROPERTY_SOIL[id]?.capabilityClass ?? null : null,
+          squareFeet: sourceRecord?.squareFeet ?? null,
+          yearBuilt: sourceRecord?.yearBuilt ?? null,
+          squareFeetVerified: false,
+          countyFips: fmrFips ?? null,
+          femaFloodZone: floodRecord?.floodZone ?? null,
+        }
+      : null,
     residentialAnswers:
       profile.id === "residential"
         ? answerResidentialQuestions({
@@ -2469,6 +2499,21 @@ export async function buildLocationBriefIntelligence(args: {
           wheatYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.wheat ?? null : null,
           yieldYear: countyFips ? COUNTY_YIELDS[countyFips]?.year ?? null : null,
         })
+      : null,
+    farmValuationInputs: locFarmShaped
+      ? {
+          stateFarmlandPerAcre: (stateCode ? STATE_FARMLAND[stateCode.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+          croplandRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.cropland ?? null : null,
+          cornYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.corn ?? null : null,
+          soybeanYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.soybeans ?? null : null,
+          wheatYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.wheat ?? null : null,
+          soilCapabilityClass: null,
+          squareFeet: null,
+          yearBuilt: null,
+          squareFeetVerified: false,
+          countyFips: countyFips ?? null,
+          femaFloodZone: placeFacts.flood?.floodZone ?? null,
+        }
       : null,
     residentialAnswers:
       locProfile.id === "residential"

@@ -70,3 +70,31 @@ heuristic `farmBestUse` (hardcoded strings, generic diversify). The REAL engine
 - A parcel that cannot carry the debt shows the prominent "not a good buy on the numbers"
   verdict with the shortfall, max supportable price, and off-farm income to close it.
 - `npx tsc --noEmit` green; verify in the browser preview; ships via the governed staging redeploy.
+
+## Next accuracy build (founder direction 2026-08-13) — do these RIGHT, not rushed
+Emphasis: accuracy for a lender-facing tool. Rough placeholder numbers would undercut the
+whole point, so these ship with defensible data, clearly labeled, tunable.
+
+1. **True combination optimization** — optimize the acre allocation across ALL feasible streams
+   to maximize net (today's "best mix" is the engine's top-3 heuristic at fixed 50/30/20 shares,
+   not a real optimizer). On small acreage a tuned pair (e.g. alfalfa + clover small squares)
+   often beats a broader spread — the model must find that, and say when a single stream truly wins.
+2. **Climate / region feasibility** — gate crops by hardiness zone / region; you can't grow
+   alfalfa in FL/AL (except a specific variety that likely isn't worth it). `hardinessZone` is
+   already on FarmPropertyFacts, unused today. Say the honest "specific variety, not worth it."
+3. **State water / runoff / sustainability rules** — per-state water-use, runoff, and
+   environmental constraints that change what's viable and its true cost; fold into feasibility + cost.
+4. **Market-access pricing + channel depth** (this is where the money is real):
+   - **Settable prices** per enterprise (the engine already takes bale price as a parameter —
+     expose it). A grower who can move small squares at $25–40/bale pencils completely
+     differently from one who can't.
+   - **"Do you have the channel?"** input — the same crop is a different business with vs.
+     without the market. Reflect it in the numbers, not just a note.
+   - **Market saturation** — does the market exist, and is it 2 players, 200, or 2,000? Depth and
+     competition move the achievable price and volume; show it.
+   - **Novel / untapped markets** for the parcel as a genuine advantage to surface — BUT only
+     ones with a real, legal path to actual revenue and profit. No wish-and-a-prayer picks:
+     "pot is legal in most states" ≠ "you can plant it and convert it to profit easily." Every
+     surfaced market must be genuinely convertible to currency, or it doesn't get shown.
+5. **Per-species sub-toggles** — swap sheep/cattle/goats, apple/peach, specific vegetables/flowers —
+   built on the real per-species economics from #1–#4, not placeholders.

@@ -4,15 +4,21 @@ export type OpportunityAssumptions = { acres:number; purchasePrice:number; debtS
   * When supplied, row-crop revenue tracks the grain market instead of the static
   * benchmark, so the pro-forma reflects what the crop is worth right now. */
  rowCropMarketGrossPerAcre?:number; };
-type Candidate = { key:OpportunityKey; label:string; acresShare:number; grossPerAcre:number; costPct:number; startupPerAcre:number; labor:number; water:number; market:number; soil:number; weather:number; yearsToCash:number; gate?:"grid"|"solar"; note:string };
+type Candidate = { key:OpportunityKey; label:string; acresShare:number; grossPerAcre:number; costPct:number; startupPerAcre:number; labor:number; water:number; market:number; soil:number; weather:number; yearsToCash:number; gate?:"grid"|"solar"; irrigates?:boolean; note:string };
+// Screening-grade field-irrigation cost, scaled PER IRRIGATED ACRE (not a flat
+// system cost). A center-pivot number divided over a small parcel is nonsense,
+// so irrigation is charged only to enterprises that actually field-irrigate
+// (irrigates:true) and only on that enterprise's own acreage.
+const IRRIGATION_INSTALL_PER_ACRE = 3500; // drip/sprinkler install per irrigated acre
+const IRRIGATION_ANNUAL_PER_ACRE = 300;   // power + maintenance per irrigated acre / yr
 const CANDIDATES: Candidate[] = [
  {key:"row-crops",label:"Commodity row crops",acresShare:.8,grossPerAcre:700,costPct:.82,startupPerAcre:350,labor:35,water:45,market:40,soil:55,weather:55,yearsToCash:1,note:"Corn, soybeans, wheat, or contracted rotation."},
  {key:"cash-rent",label:"Lease tillable acreage",acresShare:.8,grossPerAcre:200,costPct:.08,startupPerAcre:5,labor:5,water:5,market:20,soil:25,weather:25,yearsToCash:1,note:"Lower operating risk; depends on local lease evidence."},
  {key:"hay-pasture",label:"Bulk hay and managed pasture",acresShare:.7,grossPerAcre:520,costPct:.55,startupPerAcre:220,labor:30,water:30,market:35,soil:40,weather:45,yearsToCash:1,note:"Generic bulk-forage or pasture benchmark; not a premium small-square-bale model."},
- {key:"alfalfa-small-square",label:"Irrigated alfalfa — premium small squares",acresShare:.7,grossPerAcre:0,costPct:0,startupPerAcre:650,labor:82,water:78,market:72,soil:70,weather:65,yearsToCash:1,note:"Bale-level model using irrigated yield, bale weight, seasonal prices, handling, storage, and shrink."},
+ {key:"alfalfa-small-square",label:"Irrigated alfalfa — premium small squares",acresShare:.7,grossPerAcre:0,costPct:0,startupPerAcre:650,labor:82,water:78,market:72,soil:70,weather:65,yearsToCash:1,irrigates:true,note:"Bale-level model using irrigated yield, bale weight, seasonal prices, handling, storage, and shrink."},
  {key:"livestock",label:"Grazing livestock enterprise",acresShare:.55,grossPerAcre:1100,costPct:.66,startupPerAcre:950,labor:70,water:65,market:55,soil:45,weather:45,yearsToCash:2,note:"Requires fencing, handling, water, winter feed, and operator capacity."},
  {key:"poultry",label:"Contract or independent poultry",acresShare:.08,grossPerAcre:9000,costPct:.72,startupPerAcre:12000,labor:75,water:75,market:80,soil:20,weather:35,yearsToCash:2,note:"High gross density, but integrator contract, permits, buildings, utilities, and litter plan control."},
- {key:"specialty-crops",label:"Vegetables, berries, flowers, or orchard",acresShare:.18,grossPerAcre:10500,costPct:.68,startupPerAcre:5000,labor:90,water:85,market:85,soil:75,weather:70,yearsToCash:2,note:"Higher potential margin with much higher labor, irrigation, post-harvest, and market risk."},
+ {key:"specialty-crops",label:"Vegetables, berries, flowers, or orchard",acresShare:.18,grossPerAcre:10500,costPct:.68,startupPerAcre:5000,labor:90,water:85,market:85,soil:75,weather:70,yearsToCash:2,irrigates:true,note:"Higher potential margin with much higher labor, irrigation, post-harvest, and market risk."},
  {key:"greenhouse",label:"Greenhouse / controlled environment",acresShare:.03,grossPerAcre:140000,costPct:.78,startupPerAcre:450000,labor:95,water:70,market:90,soil:15,weather:25,yearsToCash:3,note:"Very high capital and management intensity; power and offtake matter more than raw acreage."},
  {key:"solar-lease",label:"Utility or community solar lease",acresShare:.25,grossPerAcre:1400,costPct:.05,startupPerAcre:10,labor:3,water:0,market:10,soil:10,weather:20,yearsToCash:4,gate:"solar",note:"Credit only after zoning, utility territory, interconnection, setbacks, and lease terms are evidenced."},
  {key:"agrivoltaics",label:"Agrivoltaics with grazing or crops",acresShare:.18,grossPerAcre:1900,costPct:.25,startupPerAcre:300,labor:25,water:20,market:25,soil:35,weather:35,yearsToCash:4,gate:"solar",note:"Combines energy rent with compatible agricultural use; design and program eligibility control."},
@@ -32,14 +38,14 @@ export function optimizeAgriculturalOpportunities(a:OpportunityAssumptions){
   const sellableBales=usedAcres*hayYield*balesPerTon*(1-shrink);
   const rowCropGross=c.key==="row-crops"&&a.rowCropMarketGrossPerAcre!=null&&a.rowCropMarketGrossPerAcre>0?a.rowCropMarketGrossPerAcre:c.grossPerAcre;
   const gross=eligible?(c.key==="alfalfa-small-square"?sellableBales*averageBalePrice:usedAcres*rowCropGross):0;
-  const irrigationDependent=c.water>=60;
-  const irrigationAnnual=irrigationDependent?((a.irrigationAnnualPowerCost ?? 30000)+(a.irrigationAnnualMaintenanceCost ?? 10000)):0;
+  const irrigationDependent=c.irrigates===true;
+  const irrigationAnnual=irrigationDependent?usedAcres*IRRIGATION_ANNUAL_PER_ACRE:0;
   const baseOpex=c.key==="alfalfa-small-square"
     ? usedAcres*(a.hayVariableCostPerAcre ?? 1400)+sellableBales*(a.hayHandlingCostPerBale ?? 2)
     : gross*c.costPct;
   const opex=baseOpex+irrigationAnnual;
   const noi=gross-opex;
-  const irrigationCapex=irrigationDependent?(a.irrigationInstallCost ?? 450000):0;
+  const irrigationCapex=irrigationDependent?usedAcres*IRRIGATION_INSTALL_PER_ACRE:0;
   const startup=usedAcres*c.startupPerAcre+irrigationCapex;
   const soilFit=clamp((a.soilSuitability ?? 50)-c.soil+50);
   const weatherFit=clamp((a.weatherSuitability ?? 50)-c.weather+50);

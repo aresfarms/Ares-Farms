@@ -16,9 +16,10 @@
  * only: never an appraisal, agronomic prescription, or credit decision.
  */
 
-import { Fragment, useMemo, useState, type CSSProperties } from "react";
-import { optimizeAgriculturalOpportunities, type OpportunityKey } from "@/lib/property/agriculturalOpportunityOptimizer";
-import { solveDscrCoverage, type SoilConstraintInput, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
+import { useMemo, useState, type CSSProperties } from "react";
+import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
+import { solveDscrCoverage, soilExcludedKeys, type SoilConstraintInput, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
+import { planAllocation } from "@/lib/property/agriculturalAllocationPlan";
 import { valueFarmland } from "@/lib/property/farmlandValuation";
 import { estimateHazardRebuild } from "@/lib/property/hazardRebuildEstimate";
 import { COMMODITY_PRICES } from "@/lib/property/commodityPricesGenerated";
@@ -104,8 +105,10 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
   const [acres, setAcres] = useState(props.acres && props.acres > 0 ? props.acres : 0);
   const [priceInput, setPriceInput] = useState(hasList ? (props.listPrice ?? 0) : 0);
   const [rate, setRate] = useState(ratePct);
-  const [pick, setPick] = useState<OpportunityKey | null>(null);
-  const [openRow, setOpenRow] = useState<OpportunityKey | null>(null);
+  // Manual per-enterprise acre allocations (the toggles). Empty = use the
+  // recommended sustainability-weighted mix.
+  const [overrides, setOverrides] = useState<Record<string, number>>({});
+  const [showAlternatives, setShowAlternatives] = useState(false);
 
   const ready = acres > 0;
 
@@ -189,24 +192,40 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
     [acres, price, annualDebtService, rate, amortYears, ltv, props.soil],
   );
 
+  // THE diversified, sustainability-weighted acre allocation — acres sum to the
+  // parcel, never past it (fixes the overlapping-scenario table). This is the
+  // authoritative "best modeled net", not the old overlapping mix.
+  const plan = useMemo(
+    () =>
+      planAllocation(model, acres, {
+        overrides: Object.keys(overrides).length ? overrides : null,
+        excludedKeys: soilExcludedKeys(props.soil ?? null),
+      }),
+    [model, acres, overrides, props.soil],
+  );
+  const planNet = plan.recommendation === "single" && plan.bestSingle ? plan.bestSingle.netTotal : plan.totalNet;
+  const usingOverrides = Object.keys(overrides).length > 0;
+
+  // The full per-acre economics for EVERY enterprise — kept as a clearly-labeled
+  // "mutually-exclusive alternatives, not additive" reference, never the plan.
   const rows = useMemo(
     () => (acres > 0 ? model.ranked.filter((x) => x.eligible).slice().sort((a, b) => b.noi - a.noi) : []),
     [model, acres],
   );
 
-  const bestKey = rows[0]?.key ?? null;
-  const pickedRow = pick ? rows.find((x) => x.key === pick) ?? null : null;
-  const pickedDscr = pickedRow && annualDebtService > 0 ? pickedRow.noi / annualDebtService : null;
-
-  // Verdict styling.
-  const v = coverage.verdict;
+  // Verdict from the REAL plan's net (not overlapping scenarios).
+  const bestNoi = planNet;
+  const bestDscr = annualDebtService > 0 ? bestNoi / annualDebtService : 0;
+  const v: "clears" | "close" | "cannot" =
+    bestDscr >= DSCR_FLOOR ? "clears" : bestDscr >= 1 ? "close" : "cannot";
   const tone =
     v === "clears" ? { bg: "#eef7f0", bd: "#57997a", ink: "#14532d", tag: "CARRIES ITS OWN DEBT" }
     : v === "close" ? { bg: "#fdf6e9", bd: "#c99a3a", ink: "#7a5312", tag: "CLOSE — DOESN'T CLEAR THE LENDER FLOOR" }
     : { bg: "#fbeeee", bd: "#c26565", ink: "#7f1d1d", tag: "THE NUMBERS SAY THINK HARD" };
-
-  const bestNoi = Math.max(coverage.bestSingle?.annualNoi ?? 0, coverage.bestMix?.annualNoi ?? 0);
-  const bestDscr = annualDebtService > 0 ? bestNoi / annualDebtService : 0;
+  const paymentFactor = ltv * (r > 0 ? r / (1 - Math.pow(1 + r, -amortYears)) : 1 / amortYears);
+  const maxSupportablePrice = bestNoi > 0 && paymentFactor > 0 ? Math.round(bestNoi / DSCR_FLOOR / paymentFactor) : null;
+  const gapAnnual = v === "clears" ? 0 : Math.max(0, Math.round(annualDebtService * DSCR_FLOOR - bestNoi));
+  const outsideIncomeNeeded = gapAnnual;
 
   // Verdict robustness across the estimate's value band. NOI is value-
   // independent and debt service scales linearly with price, so coverage at a
@@ -225,25 +244,22 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
         : `On Furlong's estimated value the call is NOT robust — coverage runs ${bandDscrLow.toFixed(2)}×–${bandDscrHigh.toFixed(2)}× across the value range, so the answer changes within the estimate's uncertainty. Get a real price before relying on it.`
       : null;
 
-  // Best case is the most profitable PLAN — a combination of revenue streams
-  // when the mix out-earns any single enterprise (common on small acreage),
-  // otherwise the single enterprise, stated plainly (founder direction
-  // 2026-08-13: evaluate all streams, and say when one alone is genuinely best).
-  const mixNoi = coverage.bestMix?.annualNoi ?? 0;
-  const bestIsMix = mixNoi >= (coverage.bestSingle?.annualNoi ?? 0) && (coverage.bestMix?.parts.length ?? 0) > 1;
-  const bestPlanLabel = bestIsMix
-    ? coverage.bestMix!.parts.map((pt) => `${pt.sharePct}% ${pt.label}`).join("  +  ")
-    : coverage.bestSingle?.label ?? rows[0]?.label ?? "No feasible use";
-  const bestPlanKind = bestIsMix
-    ? `Combination — ${coverage.bestMix!.parts.length} revenue streams`
-    : "Single enterprise is best here";
+  // Best case = the diversified allocation plan (or the single use when it is
+  // vastly superior). Acres are ALLOCATED, so the plan is real, not overlapping.
+  const bestIsMix = plan.recommendation === "mix" && plan.isDiversified;
+  const bestPlanLabel = plan.status === "planned" ? plan.headline : "No feasible plan on this ground";
+  const bestPlanKind = plan.recommendation === "single"
+    ? "One use is vastly superior here"
+    : plan.isDiversified
+      ? `Diversified plan — ${plan.slices.length} revenue streams`
+      : "Single feasible use on this ground";
 
   const verdictLine =
     v === "clears"
-      ? `On the screening numbers, this parcel can carry its own mortgage: the best modeled use nets about ${money(bestNoi)}/yr against ~${money(coverage.annualDebtService)}/yr of debt service — a ${bestDscr.toFixed(2)}× coverage, at or above the ${DSCR_FLOOR}× a lender looks for.`
+      ? `On the screening numbers, this parcel can carry its own mortgage: the recommended plan nets about ${money(bestNoi)}/yr against ~${money(annualDebtService)}/yr of debt service — a ${bestDscr.toFixed(2)}× coverage, at or above the ${DSCR_FLOOR}× a lender looks for.`
       : v === "close"
-        ? `This parcel covers the payment but falls short of the ${DSCR_FLOOR}× lenders want. The best modeled use nets about ${money(bestNoi)}/yr (${bestDscr.toFixed(2)}×) against ~${money(coverage.annualDebtService)}/yr of debt — a gap of about ${money(coverage.gapAnnual ?? 0)}/yr. It pencils with roughly ${money(coverage.outsideIncomeNeeded ?? 0)}/yr of off-farm income (counted in global coverage), or at a price near ${coverage.maxSupportablePrice ? money(coverage.maxSupportablePrice) : "—"}.`
-        : `On the numbers, agriculture alone will not carry this purchase at ${money(price)}. The best modeled use nets about ${money(bestNoi)}/yr (${bestDscr.toFixed(2)}×) against ~${money(coverage.annualDebtService)}/yr of debt — short about ${money(coverage.gapAnnual ?? 0)}/yr. It only starts to pencil near a price of ${coverage.maxSupportablePrice ? money(coverage.maxSupportablePrice) : "—"}, or with about ${money(coverage.outsideIncomeNeeded ?? 0)}/yr of outside income. Honestly: unless you're bringing that income or documented history the county screen doesn't see, this one is a hard look before you commit ${money(price)}.`;
+        ? `This parcel covers the payment but falls short of the ${DSCR_FLOOR}× lenders want. The recommended plan nets about ${money(bestNoi)}/yr (${bestDscr.toFixed(2)}×) against ~${money(annualDebtService)}/yr of debt — a gap of about ${money(gapAnnual)}/yr. It pencils with roughly ${money(outsideIncomeNeeded)}/yr of off-farm income (counted in global coverage), or at a price near ${maxSupportablePrice ? money(maxSupportablePrice) : "—"}.`
+        : `On the numbers, agriculture alone will not carry this purchase at ${money(price)}. The recommended plan nets about ${money(bestNoi)}/yr (${bestDscr.toFixed(2)}×) against ~${money(annualDebtService)}/yr of debt — short about ${money(gapAnnual)}/yr. It only starts to pencil near a price of ${maxSupportablePrice ? money(maxSupportablePrice) : "—"}, or with about ${money(outsideIncomeNeeded)}/yr of outside income. Honestly: unless you're bringing that income or documented history the county screen doesn't see, this one is a hard look before you commit ${money(price)}.`;
 
   const th: CSSProperties = { textAlign: "right", padding: "8px 12px", fontSize: 11, fontWeight: 700, letterSpacing: ".03em", color: inkSoft, textTransform: "uppercase", borderBottom: `1.5px solid ${line}`, whiteSpace: "nowrap" };
   const thL: CSSProperties = { ...th, textAlign: "left" };
@@ -259,6 +275,24 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
           type="number" min="0" step={step} value={value}
           onChange={(e) => onChange(Number(e.target.value) || 0)}
           style={{ width: "100%", padding: prefix ? "8px 10px 8px 20px" : "8px 10px", border: `1px solid ${line}`, borderRadius: 8, fontSize: 14, color: ink, background: paper, ...figures }}
+        />
+      </span>
+    </label>
+  );
+
+  // Dollar amounts get thousands separators so "$78000" can't be misread as
+  // $780,000 (founder-caught 2026-08-14). type=number can't show commas, so this
+  // is a text field with grouped display and a digits-only parse.
+  const moneyInput = (label: string, value: number, onChange: (n: number) => void) => (
+    <label style={{ display: "grid", gap: 4, fontSize: 12, fontWeight: 650, color: inkSoft }}>
+      {label}
+      <span style={{ position: "relative", display: "flex", alignItems: "center" }}>
+        <span style={{ position: "absolute", left: 10, color: inkSoft, fontSize: 13 }}>$</span>
+        <input
+          type="text" inputMode="numeric" value={value > 0 ? value.toLocaleString("en-US") : ""}
+          placeholder="0"
+          onChange={(e) => onChange(Number(e.target.value.replace(/[^0-9.]/g, "")) || 0)}
+          style={{ width: "100%", padding: "8px 10px 8px 20px", border: `1px solid ${line}`, borderRadius: 8, fontSize: 14, color: ink, background: paper, ...figures }}
         />
       </span>
     </label>
@@ -306,7 +340,7 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
       <div style={{ display: "grid", gap: 8, padding: 14, border: `1px solid ${line}`, borderRadius: 12, background: railBg }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
           {numInput("Acres modeled", acres, setAcres, 1)}
-          {numInput(showingEstimate ? "Estimated value — edit to your offer" : "Purchase price / offer", price, setPriceInput, 5000, "$")}
+          {moneyInput(showingEstimate ? "Estimated value — edit to your offer" : "Purchase price / offer", price, setPriceInput)}
           {numInput("Interest rate %", rate, setRate, 0.125)}
         </div>
         {showingEstimate && (
@@ -368,107 +402,141 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
         </div>
       )}
 
-      {/* 2 — THE LIVING TABLE */}
-      <div style={{ overflowX: "auto", border: `1px solid ${line}`, borderRadius: 12 }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 640 }}>
-          <thead>
-            <tr>
-              <th style={thL}>Enterprise</th>
-              <th style={th}>Acres</th>
-              <th style={th}>Gross / ac</th>
-              <th style={th}>Expenses / ac</th>
-              <th style={th}>Net / ac</th>
-              <th style={th}>Total net / yr</th>
-              <th style={th}>Coverage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((x) => {
-              const isBest = x.key === bestKey;
-              const isPick = x.key === pick;
-              const dscr = annualDebtService > 0 ? x.noi / annualDebtService : null;
-              const net = x.noi;
-              const rowBg = isPick ? "#eef4ff" : isBest ? "#f3faf5" : paper;
-              return (
-                <Fragment key={x.key}>
-                  <tr
-                    onClick={() => setPick(isPick ? null : x.key)}
-                    style={{ background: rowBg, cursor: "pointer" }}
-                    title="Click to set as your scenario"
-                  >
-                    <td style={{ ...tdL, fontWeight: isBest || isPick ? 700 : 500 }}>
-                      <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                        <span
-                          onClick={(e) => { e.stopPropagation(); setOpenRow(openRow === x.key ? null : x.key); }}
-                          style={{ color: inkSoft, fontSize: 12, width: 14, display: "inline-block" }}
-                          aria-hidden
-                        >{openRow === x.key ? "▾" : "▸"}</span>
-                        {x.label}
-                        {isBest && <span style={{ fontSize: 10, fontWeight: 800, color: "#166534", background: "#dcefe1", borderRadius: 5, padding: "1px 6px" }}>BEST</span>}
-                        {isPick && !isBest && <span style={{ fontSize: 10, fontWeight: 800, color: "#1d4ed8", background: "#dbe6ff", borderRadius: 5, padding: "1px 6px" }}>YOUR PICK</span>}
-                      </span>
-                    </td>
-                    <td style={td}>{x.usedAcres.toFixed(0)}</td>
-                    <td style={td}>{money(perAc(x.gross, x.usedAcres))}</td>
-                    <td style={td}>{money(perAc(x.opex, x.usedAcres))}</td>
-                    <td style={{ ...td, color: net < 0 ? "#b91c1c" : ink, fontWeight: 600 }}>{signed(perAc(net, x.usedAcres))}</td>
-                    <td style={{ ...td, color: net < 0 ? "#b91c1c" : ink, fontWeight: 700 }}>{signed(net)}</td>
-                    <td style={td}>{dscr != null ? `${dscr.toFixed(2)}×` : "—"}</td>
-                  </tr>
-                  {openRow === x.key && (
-                    <tr key={`${x.key}-detail`} style={{ background: railBg }}>
-                      <td colSpan={7} style={{ padding: "10px 16px 12px 34px", fontSize: 12.5, color: inkSoft, borderBottom: `1px solid ${line}`, lineHeight: 1.6 }}>
-                        <div style={{ display: "flex", gap: 20, flexWrap: "wrap", ...figures }}>
-                          <span><strong style={{ color: ink }}>Gross</strong> {money(x.gross)}/yr</span>
-                          <span><strong style={{ color: ink }}>Operating expenses</strong> {money(x.opex)}/yr</span>
-                          <span><strong style={{ color: ink }}>Startup / establishment</strong> {money(x.startup)}</span>
-                          {x.irrigationAnnual > 0 && <span><strong style={{ color: ink }}>Irrigation (in opex)</strong> {money(x.irrigationAnnual)}/yr</span>}
-                        </div>
-                        <p style={{ margin: "8px 0 0" }}>{x.note}</p>
-                      </td>
-                    </tr>
-                  )}
-                </Fragment>
-              );
-            })}
-            {rows.length === 0 && (
-              <tr>
-                <td colSpan={7} style={{ padding: "16px", fontSize: 13, color: inkSoft, textAlign: "center" }}>
-                  Enter the parcel&apos;s acreage above to see the enterprise economics for this ground.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {/* 2 — THE RECOMMENDED PLAN (real acre allocation, sums to the parcel) */}
+      {ready && plan.status === "planned" && (
+        <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ border: `1px solid ${line}`, borderRadius: 12, padding: "14px 16px", background: "#f3faf5", display: "grid", gap: 6 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 8 }}>
+              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "#166534" }}>{usingOverrides ? "Your plan" : "Recommended plan"} &middot; {bestPlanKind}</span>
+              {plan.sustainabilityScore != null && <span style={{ fontSize: 11.5, color: inkSoft }}>Sustainability {plan.sustainabilityScore}/100</span>}
+            </div>
+            <strong style={{ fontSize: 15, lineHeight: 1.4 }}>{bestPlanLabel}</strong>
+            <div style={{ fontSize: 13, color: ink, ...figures }}>
+              {money(planNet)}/yr net &middot; {plan.allocatedAcres} of {plan.parcelAcres} ac farmed{annualDebtService > 0 ? ` · ${bestDscr.toFixed(2)}× coverage` : ""}
+            </div>
+            <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: inkSoft }}>{plan.rationale}</p>
+          </div>
 
-      {/* 3 — BEST vs YOUR PICK */}
-      {ready && (
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
-        <div style={{ border: `1px solid ${line}`, borderRadius: 11, padding: 14, background: "#f3faf5" }}>
-          <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: "#166534" }}>Best case &middot; {bestPlanKind}</div>
-          <strong style={{ display: "block", marginTop: 4, fontSize: 15, lineHeight: 1.35 }}>{bestPlanLabel}</strong>
-          <div style={{ marginTop: 6, fontSize: 13, color: ink, ...figures }}>{money(bestNoi)}/yr &middot; {bestDscr.toFixed(2)}× coverage {bestIsMix ? "(all streams combined)" : ""}</div>
-        </div>
-        <div style={{ border: `1px solid ${pickedRow ? "#1d4ed8" : line}`, borderRadius: 11, padding: 14, background: pickedRow ? "#eef4ff" : railBg }}>
-          <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", color: pickedRow ? "#1d4ed8" : inkSoft }}>Your scenario</div>
-          {pickedRow ? (
-            <>
-              <strong style={{ display: "block", marginTop: 4, fontSize: 15 }}>{pickedRow.label}</strong>
-              <div style={{ marginTop: 6, fontSize: 13, color: ink, ...figures }}>
-                {signed(pickedRow.noi)}/yr &middot; {pickedDscr != null ? `${pickedDscr.toFixed(2)}×` : "—"} coverage
-                {pickedDscr != null && (
-                  <span style={{ marginLeft: 8, color: pickedDscr >= DSCR_FLOOR ? "#166534" : pickedDscr >= 1 ? "#7a5312" : "#b91c1c", fontWeight: 700 }}>
-                    {pickedDscr >= DSCR_FLOOR ? "clears the floor" : pickedDscr >= 1 ? "covers the payment, below floor" : `short ${money(annualDebtService - pickedRow.noi)}/yr`}
-                  </span>
+          <div style={{ overflowX: "auto", border: `1px solid ${line}`, borderRadius: 12 }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 620 }}>
+              <thead>
+                <tr>
+                  <th style={thL}>Enterprise</th>
+                  <th style={th}>Acres — drag/type to plan</th>
+                  <th style={th}>Net / ac</th>
+                  <th style={th}>Total net / yr</th>
+                  <th style={th}>Sustain.</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plan.allocable.map((en) => {
+                  const shown = plan.slices.find((s) => s.key === en.key)?.acres ?? 0;
+                  const inMix = shown > 0;
+                  return (
+                    <tr key={en.key} style={{ background: inMix ? "#f8fcf9" : paper }}>
+                      <td style={{ ...tdL, fontWeight: inMix ? 700 : 500 }}>{en.label}</td>
+                      <td style={{ ...td, padding: "5px 8px" }}>
+                        <input
+                          type="number" min={0} max={en.maxAcres} step={1} value={shown}
+                          onChange={(e) => {
+                            const val = Math.max(0, Math.min(en.maxAcres, Number(e.target.value) || 0));
+                            setOverrides((prev) => {
+                              const base = Object.keys(prev).length ? prev : Object.fromEntries(plan.allocable.map((a) => [a.key, a.recommendedAcres]));
+                              return { ...base, [en.key]: val };
+                            });
+                          }}
+                          title={`Ceiling on this parcel: ${en.maxAcres} ac`}
+                          style={{ width: 82, textAlign: "right", padding: "6px 8px", border: `1px solid ${line}`, borderRadius: 7, fontSize: 13.5, color: ink, background: paper, ...figures }}
+                        />
+                        <span style={{ marginLeft: 6, fontSize: 10.5, color: inkSoft }}>/ {en.maxAcres} max</span>
+                      </td>
+                      <td style={td}>{money(en.netPerAcre)}</td>
+                      <td style={{ ...td, fontWeight: 700 }}>{money(shown * en.netPerAcre)}</td>
+                      <td style={td} title={en.sustainabilityNote}>{Math.round(en.sustainability * 100)}</td>
+                    </tr>
+                  );
+                })}
+                {plan.conservationAcres > 0 && (
+                  <tr style={{ background: railBg }}>
+                    <td style={{ ...tdL, color: inkSoft }}>Conservation / runoff buffer</td>
+                    <td style={{ ...td, color: inkSoft }}>{plan.conservationAcres}</td>
+                    <td style={{ ...td, color: inkSoft }}>—</td>
+                    <td style={{ ...td, color: inkSoft }}>—</td>
+                    <td style={{ ...td, color: inkSoft }}>100</td>
+                  </tr>
                 )}
-              </div>
-            </>
-          ) : (
-            <p style={{ margin: "6px 0 0", fontSize: 12.5, color: inkSoft }}>Click any enterprise in the table to model it as your plan and compare it to the best case.</p>
+                <tr style={{ borderTop: `2px solid ${line}` }}>
+                  <td style={{ ...tdL, fontWeight: 800 }}>Total plan</td>
+                  <td style={{ ...td, fontWeight: 800 }}>{plan.allocatedAcres + plan.conservationAcres} / {plan.parcelAcres} ac</td>
+                  <td style={td}>—</td>
+                  <td style={{ ...td, fontWeight: 800 }}>{money(plan.totalNet)}</td>
+                  <td style={{ ...td, fontWeight: 800 }}>{plan.sustainabilityScore ?? "—"}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+            <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: inkSoft, maxWidth: 620 }}>
+              These acres are <strong>allocated</strong> — they add up to your parcel and never past it. Change any enterprise&apos;s acres and the plan, totals, and verdict recompute. Each use is capped at what a parcel this size realistically supports.
+            </p>
+            {usingOverrides && (
+              <button
+                onClick={() => setOverrides({})}
+                style={{ fontSize: 12, fontWeight: 700, color: "#166534", background: "#eef7f0", border: `1px solid #57997a`, borderRadius: 8, padding: "7px 12px", cursor: "pointer", whiteSpace: "nowrap" }}
+              >↺ Reset to recommended mix</button>
+            )}
+          </div>
+        </div>
+      )}
+      {ready && plan.status !== "planned" && (
+        <div style={{ border: `1px solid ${line}`, background: railBg, borderRadius: 12, padding: "16px 18px", fontSize: 13, color: ink, lineHeight: 1.55 }}>
+          {plan.rationale}
+        </div>
+      )}
+
+      {/* Per-acre economics — mutually-exclusive ALTERNATIVES, never the plan */}
+      {ready && rows.length > 0 && (
+        <div style={{ border: `1px solid ${line}`, borderRadius: 12, overflow: "hidden" }}>
+          <button
+            onClick={() => setShowAlternatives((s) => !s)}
+            style={{ width: "100%", textAlign: "left", padding: "11px 14px", background: railBg, border: "none", borderBottom: showAlternatives ? `1px solid ${line}` : "none", fontSize: 12.5, fontWeight: 700, color: ink, cursor: "pointer" }}
+          >
+            {showAlternatives ? "▾" : "▸"} Per-acre economics — every enterprise (alternatives, NOT a combined plan)
+          </button>
+          {showAlternatives && (
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+                <thead>
+                  <tr>
+                    <th style={thL}>If devoted to…</th>
+                    <th style={th}>Gross / ac</th>
+                    <th style={th}>Expenses / ac</th>
+                    <th style={th}>Net / ac</th>
+                    <th style={th}>Sustain.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((x) => {
+                    const net = x.noi;
+                    return (
+                      <tr key={x.key} style={{ background: paper }}>
+                        <td style={tdL}>{x.label}</td>
+                        <td style={td}>{money(perAc(x.gross, x.usedAcres))}</td>
+                        <td style={td}>{money(perAc(x.opex, x.usedAcres))}</td>
+                        <td style={{ ...td, color: net < 0 ? "#b91c1c" : ink, fontWeight: 600 }}>{signed(perAc(net, x.usedAcres))}</td>
+                        <td style={td}>{Math.round((plan.allocable.find((a) => a.key === x.key)?.sustainability ?? 0.5) * 100)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <p style={{ margin: 0, padding: "10px 14px", fontSize: 11, lineHeight: 1.5, color: inkSoft }}>
+                Each row is the economics <em>if you devoted the suitable acreage to that one use</em>. They are alternatives and do <strong>not</strong> add up — the allocation plan above is the real, non-overlapping farm plan.
+              </p>
+            </div>
           )}
         </div>
-      </div>
       )}
 
       <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.55, color: inkSoft }}>

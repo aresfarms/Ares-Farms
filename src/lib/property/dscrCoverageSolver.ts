@@ -113,6 +113,13 @@ function soilAdjustments(soil: SoilConstraintInput | null): {
   return { excluded, penalties, soilSuitability, notes };
 }
 
+/** Enterprise keys the mapped soil/topography rules out entirely — so the acre
+ *  allocation never puts a use on ground that can't sustain it (e.g. alfalfa on
+ *  poorly drained soil). Exposed for the allocation planner. */
+export function soilExcludedKeys(soil: SoilConstraintInput | null): string[] {
+  return [...soilAdjustments(soil).excluded.keys()];
+}
+
 export interface CoverageMixPart {
   label: string;
   sharePct: number;

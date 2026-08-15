@@ -168,7 +168,12 @@ export async function resolveJurisdictionParcel(input: AddressInput): Promise<Ju
   // Hand-tuned bespoke resolvers first (multi-parcel/point logic the generic
   // engine doesn't express).
   if (input.state.toUpperCase() === "MD") return resolveMaryland(input);
-  if (input.state.toUpperCase() === "DE") return resolveDelawareSussex(input);
+  if (input.state.toUpperCase() === "DE") {
+    // Sussex is bespoke; New Castle + Kent come from the registry below. Try
+    // Sussex first, then fall through so the other two counties still resolve.
+    const sussex = await resolveDelawareSussex(input);
+    if (sussex) return sussex;
+  }
   // Every other state resolves through the registry-driven generic ArcGIS engine
   // — coverage grows by adding a verified source to parcelSourceRegistry, no new
   // code. Try each registered source for the state until one matches.

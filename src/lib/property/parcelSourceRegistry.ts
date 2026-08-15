@@ -230,6 +230,45 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     },
     assessmentAsOf: null,
   },
+  // Delaware, county-by-county to complete the state (Sussex is a bespoke
+  // resolver; these finish New Castle + Kent — founder direction 2026-08-15).
+  {
+    state: "DE",
+    county: "New Castle",
+    sourceName: "New Castle County, Delaware — Parcels + Assessment",
+    sourceUrl: "https://apps-nccde.hub.arcgis.com/",
+    queryUrl: "https://services.arcgis.com/G4S1dGvn7PIgYd6Y/arcgis/rest/services/Parcels_owners/FeatureServer/0/query",
+    addressMatchField: "LOC_ADDRESS",
+    fields: {
+      parcelId: "PIN_COMMON",
+      address: "LOC_ADDRESS",
+      acres: "ACRE_PLAN_TOT",
+      assessedLand: "LOT_ASSESS",
+      assessedImprovement: "PROP_ASSESS",
+      assessedTotal: "TOT_ASSESS",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    state: "DE",
+    county: "Kent",
+    sourceName: "Kent County, Delaware — Parcels + Assessment",
+    sourceUrl: "https://gis-kentcountyde.hub.arcgis.com/",
+    queryUrl: "https://gis.kentcountyde.gov/server/rest/services/Parcels/Parcels/MapServer/0/query",
+    addressMatchField: "LOCATION",
+    fields: {
+      parcelId: "Name",
+      address: "LOCATION",
+      acres: "DEEDACREAGE",
+      assessedLand: "LANDASSESSMENT",
+      assessedImprovement: "IMPROVE",
+      assessedTotal: "TOTALASSESSMENT",
+      yearBuilt: "YearBuilt",
+      landUse: "PropertyUse",
+      buildingStyle: "StructureType",
+    },
+    assessmentAsOf: null,
+  },
 ];
 
 /** Look up the parcel source(s) for a state (statewide entries first). */

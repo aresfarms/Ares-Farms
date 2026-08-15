@@ -283,7 +283,7 @@ export async function POST(req: NextRequest) {
               squareFeet: null,
               acreageText: null,
               listingId: null,
-              listingStatus: "Address verified · no governed listing match",
+              listingStatus: "Address verified · Furlong carries no listing feed here",
               recordBasis: "verified-address-only",
               parcelSourceName: null, parcelSourceAsOf: null, parcelSourceUrl: null, landUse: null, zoning: null, deedReference: null, legalDescription: null, assessedLandValue: null, assessedImprovementValue: null, assessedTotalValue: null, publicWater: null, publicSewer: null, waterfront: null,
             }

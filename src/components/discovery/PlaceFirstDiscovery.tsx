@@ -348,9 +348,12 @@ export function PlaceFirstDiscovery({
       title,
       priceLabel: commercialAddressRecord?.priceLabel || (result?.propertyRecord?.price != null
         ? `$${result.propertyRecord.price.toLocaleString("en-US")}`
-        : result?.propertyRecord?.listingStatus
-          ? `${result.propertyRecord.listingStatus} · no seller asking price published`
-          : "Off market · no seller asking price published"),
+        // NEVER assert "off market" — Furlong carries no listing feed, so a
+        // for-sale status is UNKNOWN, not false. Claiming off-market fabricates a
+        // fact (founder-caught 2026-08-14: a $1.995M active listing read as
+        // off-market). State the absence of our feed and that a live price may
+        // exist we can't see — matching the Market-status chip's honesty.
+        : `${result?.propertyRecord?.listingStatus ?? "Address verified"} — no asking price on file here. Furlong carries no listing feed for this area, so this property may well be for sale at a price this brief can't see; confirm current status with the listing broker or owner.`),
       vintage: "Current address verification",
       sourceLabel: commercialAddressRecord?.sourceLabel || (result?.canonicalMatch
         ? "Furlong canonical property match"

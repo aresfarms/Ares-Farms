@@ -250,6 +250,23 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     assessmentAsOf: null,
   },
   {
+    state: "CO",
+    sourceName: "Colorado OIT — Statewide Public Parcels (county appraised values)",
+    sourceUrl: "https://geodata.colorado.gov/datasets/colorado-public-parcels",
+    queryUrl: "https://gis.colorado.gov/public/rest/services/Address_and_Parcel/Colorado_Public_Parcels/FeatureServer/0/query",
+    addressMatchField: "situsAdd",
+    cityField: "sitAddCty",
+    fields: {
+      parcelId: "parcel_id",
+      address: "situsAdd",
+      acres: "landAcres",
+      assessedTotal: "apprValTot", // county APPRAISED (actual/market) value
+      landUse: "landUseDsc",
+      zoning: "zoningDesc",
+    },
+    assessmentAsOf: null,
+  },
+  {
     state: "DE",
     county: "Kent",
     sourceName: "Kent County, Delaware — Parcels + Assessment",

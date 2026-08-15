@@ -249,6 +249,41 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     },
     assessmentAsOf: null,
   },
+  // ── Metro-county entries for states with no clean public statewide layer
+  // (founder direction 2026-08-15: biggest counties first). ──────────────────
+  {
+    state: "GA",
+    county: "Fulton",
+    sourceName: "Fulton County, Georgia (Atlanta) — Tax Parcels + CAMA appraised value",
+    sourceUrl: "https://gisdata.fultoncountyga.gov/",
+    queryUrl: "https://gismaps.fultoncountyga.gov/arcgispub2/rest/services/PropertyMapViewer/PropertyMapViewer/MapServer/11/query",
+    addressMatchField: "Address",
+    fields: {
+      parcelId: "ParcelID",
+      address: "Address",
+      acres: "LandAcres",
+      assessedLand: "LandAppr",
+      assessedImprovement: "ImprAppr",
+      assessedTotal: "TotAppr", // Georgia FAIR MARKET (appraised) value
+    },
+    assessmentAsOf: null,
+  },
+  {
+    state: "PA",
+    county: "Philadelphia",
+    sourceName: "City of Philadelphia OPA — Property Assessments (market value)",
+    sourceUrl: "https://opendataphilly.org/datasets/opa-properties-public/",
+    queryUrl: "https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/OPA_Properties_Public/FeatureServer/0/query",
+    addressMatchField: "location",
+    fields: {
+      parcelId: "parcel_number",
+      address: "location",
+      assessedTotal: "market_value",
+      yearBuilt: "year_built",
+      landUse: "category_code_description",
+    },
+    assessmentAsOf: null,
+  },
   {
     state: "CO",
     sourceName: "Colorado OIT — Statewide Public Parcels (county appraised values)",

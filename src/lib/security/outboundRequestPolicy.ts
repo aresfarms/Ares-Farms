@@ -1,4 +1,5 @@
 import { isLoopbackHostname } from "@/lib/security/requestGuards";
+import { PARCEL_SOURCE_HOSTS } from "@/lib/property/parcelSourceRegistry";
 
 const STATIC_ALLOWED_HOSTS = new Set([
   "geocoding.geo.census.gov",
@@ -11,6 +12,10 @@ const STATIC_ALLOWED_HOSTS = new Set([
   "map.sussexcountyde.gov",
   "www.treasury.gov",
   "realestatesales.gov",
+  // National parcel coverage: every verified statewide/county government parcel
+  // service registered in parcelSourceRegistry. Adding a source there governs its
+  // egress here automatically — no source can open an ungoverned path.
+  ...PARCEL_SOURCE_HOSTS,
 ]);
 
 function configuredAllowedHosts(): Set<string> {

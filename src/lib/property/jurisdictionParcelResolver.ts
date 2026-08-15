@@ -1,4 +1,6 @@
 import { governedFetch } from "@/lib/security/outboundRequestPolicy";
+import { parcelSourcesForState } from "./parcelSourceRegistry";
+import { resolveArcgisParcel } from "./genericArcgisParcelResolver";
 
 export type JurisdictionParcelRecord = {
   sourceName: string;
@@ -34,7 +36,7 @@ export type JurisdictionParcelRecord = {
   resolvedParcelCount: number;
 };
 
-type AddressInput = { street: string; city: string; state: string; zip?: string | null; parcelId?: string | null; lat?: string | number | null; lon?: string | number | null };
+export type AddressInput = { street: string; city: string; state: string; zip?: string | null; parcelId?: string | null; lat?: string | number | null; lon?: string | number | null };
 
 function clean(value: unknown): string | null {
   const text = String(value ?? "").trim();
@@ -163,7 +165,21 @@ async function resolveDelawareSussex(input: AddressInput): Promise<JurisdictionP
 }
 
 export async function resolveJurisdictionParcel(input: AddressInput): Promise<JurisdictionParcelRecord | null> {
+  // Hand-tuned bespoke resolvers first (multi-parcel/point logic the generic
+  // engine doesn't express).
   if (input.state.toUpperCase() === "MD") return resolveMaryland(input);
   if (input.state.toUpperCase() === "DE") return resolveDelawareSussex(input);
+  // Every other state resolves through the registry-driven generic ArcGIS engine
+  // — coverage grows by adding a verified source to parcelSourceRegistry, no new
+  // code. Try each registered source for the state until one matches.
+  for (const source of parcelSourcesForState(input.state)) {
+    try {
+      const record = await resolveArcgisParcel(source, input);
+      if (record) return record;
+    } catch {
+      // A single source failing must not sink the request — try the next, and
+      // fall through to null so the brief states the absence honestly.
+    }
+  }
   return null;
 }

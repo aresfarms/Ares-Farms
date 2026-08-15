@@ -30,7 +30,10 @@ function parseStreet(street: string): { number: string; name: string } | null {
 }
 
 async function queryFeatures(src: ArcgisParcelSource, where: string): Promise<Array<Record<string, unknown>>> {
-  const outFields = [...new Set(Object.values(src.fields).filter(Boolean) as string[]), src.streetNumberField, src.streetNameField, ...(src.cityField ? [src.cityField] : [])].join(",");
+  const outFields = [...new Set([
+    ...(Object.values(src.fields).filter(Boolean) as string[]),
+    src.streetNumberField, src.streetNameField, src.addressMatchField, src.cityField,
+  ].filter(Boolean) as string[])].join(",");
   const params = new URLSearchParams({ f: "json", where, outFields, returnGeometry: "false", resultRecordCount: "5" });
   const res = await governedFetch(`${src.queryUrl}?${params.toString()}`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) return [];
@@ -46,15 +49,25 @@ function pick(attrs: Record<string, unknown>, map: ArcgisFieldMap, key: keyof Ar
 export async function resolveArcgisParcel(src: ArcgisParcelSource, input: AddressInput): Promise<JurisdictionParcelRecord | null> {
   const parsed = parseStreet(input.street);
   if (!parsed) return null;
-  let where = `${src.streetNumberField}='${esc(parsed.number)}' AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`;
-  if (src.cityField && clean(input.city)) where += ` AND UPPER(${src.cityField}) LIKE '%${esc(input.city.trim().toUpperCase())}%'`;
 
-  let rows = await queryFeatures(src, where);
+  // Two address-matching modes: a single combined address-string field (E911 /
+  // site-location, anchored on the number to avoid 10 matching 110), or a split
+  // number + name pair. A source must declare one; otherwise it can't be queried.
+  const addressClause: string | null = src.addressMatchField
+    ? `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%'`
+    : src.streetNumberField && src.streetNameField
+      ? `${src.streetNumberField}='${esc(parsed.number)}' AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`
+      : null;
+  if (!addressClause) return null;
+
+  const cityClause = src.cityField && clean(input.city)
+    ? ` AND UPPER(${src.cityField}) LIKE '%${esc(input.city.trim().toUpperCase())}%'`
+    : "";
+
+  let rows = await queryFeatures(src, addressClause + cityClause);
   // Retry without the city constraint if nothing matched (municipality naming
   // often differs from the mailing city).
-  if (!rows.length && src.cityField) {
-    rows = await queryFeatures(src, `${src.streetNumberField}='${esc(parsed.number)}' AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`);
-  }
+  if (!rows.length && cityClause) rows = await queryFeatures(src, addressClause);
   if (!rows.length) return null;
   const a = rows[0];
 

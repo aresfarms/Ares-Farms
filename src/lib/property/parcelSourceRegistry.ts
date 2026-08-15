@@ -55,11 +55,16 @@ export interface ArcgisParcelSource {
   sourceUrl: string;
   /** The ArcGIS REST layer `/query` endpoint. */
   queryUrl: string;
-  /** Field carrying the street NUMBER (for the address WHERE clause). */
-  streetNumberField: string;
+  /** Field carrying the street NUMBER (for the address WHERE clause). Used with
+   *  streetNameField when the source splits address into number + name (e.g. NY). */
+  streetNumberField?: string;
   /** Field carrying the street NAME. */
-  streetNameField: string;
-  /** Optional municipality/city field to disambiguate common street names. */
+  streetNameField?: string;
+  /** A SINGLE combined address-string field (E911 / site-location, e.g. VT, CT),
+   *  used instead of the number+name pair. WHERE becomes:
+   *  UPPER(field) LIKE '<num> %' AND UPPER(field) LIKE '%<name>%'. */
+  addressMatchField?: string;
+  /** Optional municipality/city/town field to disambiguate common street names. */
   cityField?: string;
   fields: ArcgisFieldMap;
   /** The assessment-roll vintage the SOURCE itself publishes, when known. Null
@@ -103,6 +108,44 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     // the service itself does not stamp a per-parcel roll date, so this stays null
     // rather than assert a vintage the source doesn't publish per record.
     assessmentAsOf: null,
+  },
+  {
+    state: "VT",
+    sourceName: "Vermont Center for Geographic Information (VCGI) — Statewide Parcels + Grand List",
+    sourceUrl: "https://vcgi.vermont.gov/data-and-programs/parcel-program",
+    queryUrl: "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/arcgis/rest/services/FS_VCGI_VTPARCELS_WM_NOCACHE_v2/FeatureServer/1/query",
+    addressMatchField: "E911ADDR",
+    cityField: "TNAME",
+    fields: {
+      parcelId: "SPAN",
+      address: "E911ADDR",
+      acres: "ACRESGL",
+      assessedLand: "LAND_LV",
+      assessedImprovement: "IMPRV_LV",
+      assessedTotal: "REAL_FLV",
+      landUse: "DESCPROP",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    state: "CT",
+    sourceName: "Connecticut (CT OPM/CTMaps) — Statewide CAMA & Parcel Layer 2024",
+    sourceUrl: "https://geodata.ct.gov/maps/ctmaps::connecticut-cama-and-parcel-layer",
+    queryUrl: "https://services3.arcgis.com/3FL1kr7L4LvwA2Kb/arcgis/rest/services/Connecticut_CAMA_and_Parcel_Layer_2024/FeatureServer/0/query",
+    addressMatchField: "Location_1",
+    cityField: "Property_City",
+    fields: {
+      parcelId: "Parcel_ID",
+      address: "Location_1",
+      acres: "Land_Acres",
+      buildingSqft: "Living_Area",
+      yearBuilt: "ayb",
+      assessedLand: "Assessed_Land",
+      assessedImprovement: "Assessed_Building",
+      assessedTotal: "Assessed_Total",
+      landUse: "State_Use_Description",
+    },
+    assessmentAsOf: "2024 grand list",
   },
 ];
 

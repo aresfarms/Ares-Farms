@@ -147,6 +147,26 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     },
     assessmentAsOf: "2024 grand list",
   },
+  {
+    state: "NJ",
+    sourceName: "New Jersey NJGIN — Statewide Parcels + MOD-IV assessment composite",
+    sourceUrl: "https://nj.gov/njgin/edata/parcels/",
+    queryUrl: "https://services2.arcgis.com/XVOqAjTOJ5P6ngMu/arcgis/rest/services/Parcels_Composite_NJ_WM/FeatureServer/0/query",
+    addressMatchField: "PROP_LOC",
+    cityField: "MUN_NAME",
+    fields: {
+      parcelId: "PAMS_PIN",
+      address: "PROP_LOC",
+      acres: "CALC_ACRE",
+      yearBuilt: "YR_CONSTR",
+      assessedLand: "LAND_VAL",
+      assessedImprovement: "IMPRVT_VAL",
+      assessedTotal: "NET_VALUE",
+      landUse: "PROP_USE",
+      buildingStyle: "BLDG_DESC",
+    },
+    assessmentAsOf: null,
+  },
 ];
 
 /** Look up the parcel source(s) for a state (statewide entries first). */

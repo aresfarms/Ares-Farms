@@ -67,6 +67,29 @@ export interface ArcgisParcelSource {
   /** Optional municipality/city/town field to disambiguate common street names. */
   cityField?: string;
   fields: ArcgisFieldMap;
+  /** How to find the parcel:
+   *  - "address" (default): WHERE on the address field(s) above.
+   *  - "point": geocode the address (Census), then an INDEXED spatial point query
+   *    — for huge layers where a text scan times out (e.g. FL, 10.8M parcels), or
+   *    geometry-only layers with no address field (join the values via assessJoin). */
+  queryMode?: "address" | "point";
+  /** Point mode only: buffer (meters) to catch a nearby CENTROID on a point-
+   *  geometry layer. Polygon layers intersect the point directly (omit / 0). */
+  pointBufferMeters?: number;
+  /** Optional related assessor TABLE joined on a shared parcel key (e.g. MassGIS
+   *  L3: a geometry parcel layer + an ASSESS table joined on LOC_ID). When set, the
+   *  resolver looks up this table after finding the parcel and its fields take
+   *  precedence for the canonical values. */
+  assessJoin?: {
+    /** The assessor table's `/query` endpoint. */
+    tableUrl: string;
+    /** Key field on the PARCEL layer. */
+    parcelKeyField: string;
+    /** Matching key field on the assessor TABLE. */
+    tableKeyField: string;
+    /** Assessor-table field map (address, values, acres, year built, …). */
+    fields: ArcgisFieldMap;
+  };
   /** The assessment-roll vintage the SOURCE itself publishes, when known. Null
    *  means the source states none — which must be said, never faked. */
   assessmentAsOf?: string | null;
@@ -167,6 +190,46 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     },
     assessmentAsOf: null,
   },
+  {
+    // FL is 10.8M parcels — an address text-scan times out, so we geocode and do
+    // an INDEXED spatial point query instead (verified: ~8s, well-formed result).
+    state: "FL",
+    sourceName: "Florida DOR — Statewide Cadastral (NAL tax roll, 2025)",
+    sourceUrl: "https://geodata.floridagio.gov/datasets/FGIO::florida-statewide-parcels",
+    queryUrl: "https://services9.arcgis.com/Gh9awoU677aKree0/arcgis/rest/services/Florida_Statewide_Cadastral/FeatureServer/0/query",
+    queryMode: "point",
+    fields: {
+      parcelId: "PARCEL_ID",
+      address: "PHY_ADDR1",
+      assessedLand: "LND_VAL",
+      assessedTotal: "JV", // DOR "just value" (market-value basis)
+      buildingSqft: "TOT_LVG_AR",
+      yearBuilt: "ACT_YR_BLT",
+      lotSqft: "LND_SQFOOT",
+    },
+    assessmentAsOf: "DOR 2025 roll",
+  },
+  {
+    // MassGIS L3: the standardized ASSESS table carries site address AND values,
+    // so it's a direct address query on the table (no geometry/join needed).
+    state: "MA",
+    sourceName: "MassGIS — Standardized Assessors' Parcels (Level 3 ASSESS)",
+    sourceUrl: "https://www.mass.gov/info-details/massgis-data-property-tax-parcels",
+    queryUrl: "https://arcgisserver.digital.mass.gov/arcgisserver/rest/services/AGOL/MassachusettsPropertyTaxParcels/FeatureServer/4/query",
+    addressMatchField: "SITE_ADDR",
+    cityField: "CITY",
+    fields: {
+      parcelId: "LOC_ID",
+      address: "SITE_ADDR",
+      assessedLand: "LAND_VAL",
+      assessedImprovement: "BLDG_VAL",
+      assessedTotal: "TOTAL_VAL",
+      buildingSqft: "RES_AREA",
+      yearBuilt: "YEAR_BUILT",
+      zoning: "ZONING",
+    },
+    assessmentAsOf: null,
+  },
 ];
 
 /** Look up the parcel source(s) for a state (statewide entries first). */
@@ -180,8 +243,9 @@ export function parcelSourcesForState(stateCode: string): ArcgisParcelSource[] {
  *  outbound allowlist so adding a source can't open an ungoverned egress path. */
 export const PARCEL_SOURCE_HOSTS: string[] = [
   ...new Set(
-    ARCGIS_PARCEL_SOURCES.map((s) => {
-      try { return new URL(s.queryUrl).hostname.toLowerCase(); } catch { return ""; }
+    ARCGIS_PARCEL_SOURCES.flatMap((s) => {
+      const urls = [s.queryUrl, ...(s.assessJoin ? [s.assessJoin.tableUrl] : [])];
+      return urls.map((u) => { try { return new URL(u).hostname.toLowerCase(); } catch { return ""; } });
     }).filter(Boolean),
   ),
 ];

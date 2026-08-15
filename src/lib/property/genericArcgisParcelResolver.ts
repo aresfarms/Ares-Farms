@@ -1,19 +1,24 @@
 /**
  * genericArcgisParcelResolver — ONE resolver that turns any registry entry
  * (parcelSourceRegistry) into a governed parcel lookup. This is the engine that
- * makes national coverage a data problem, not a code problem: add a verified
- * ArcGIS parcel service to the registry and this resolves addresses against it.
+ * makes national coverage a data problem, not a code problem.
  *
- * Strategy: build an address WHERE from the source's street-number/name fields
- * and query the layer. Deterministic, governed egress (governedFetch enforces the
- * allowlist the registry feeds), and audit-safe — a bad/empty response returns
- * null so the brief states the absence rather than fabricating a record.
+ * Three matching strategies, all config-selected:
+ *   - address WHERE (NY/VT/CT/NJ): text match on the source's address field(s).
+ *   - geocode → point query (FL and any huge/slow layer): geocode the address with
+ *     the Census geocoder, then an INDEXED spatial point-in-parcel query — fast
+ *     where a text scan over millions of rows times out.
+ *   - related-table join (MassGIS L3 and the common county pattern): find the
+ *     parcel (by address or point), then look up the assessor TABLE by a shared
+ *     key and merge its values.
  *
- * Building square footage is taken as an ESTIMATE (never a measured footprint),
- * consistent with the platform-wide sqft doctrine.
+ * Deterministic, governed egress (governedFetch enforces the registry-fed
+ * allowlist), audit-safe (empty/bad response → null so the brief states the
+ * absence). Building square footage is an ESTIMATE, never a measured footprint.
  */
 
 import { governedFetch } from "@/lib/security/outboundRequestPolicy";
+import { geocodeToCensusTract } from "@/lib/scrapers/adapters/censusGeocoder";
 import type { ArcgisParcelSource, ArcgisFieldMap } from "./parcelSourceRegistry";
 import type { AddressInput, JurisdictionParcelRecord } from "./jurisdictionParcelResolver";
 
@@ -29,73 +34,103 @@ function parseStreet(street: string): { number: string; name: string } | null {
   return { number: m[1].replace(/[^0-9A-Za-z]/g, ""), name: m[2].trim().replace(/\s+/g, " ").toUpperCase() };
 }
 
-async function queryFeatures(src: ArcgisParcelSource, where: string): Promise<Array<Record<string, unknown>>> {
-  const outFields = [...new Set([
-    ...(Object.values(src.fields).filter(Boolean) as string[]),
-    src.streetNumberField, src.streetNameField, src.addressMatchField, src.cityField,
-  ].filter(Boolean) as string[])].join(",");
-  const params = new URLSearchParams({ f: "json", where, outFields, returnGeometry: "false", resultRecordCount: "5" });
-  const res = await governedFetch(`${src.queryUrl}?${params.toString()}`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(12_000) });
+async function runQuery(url: string, params: URLSearchParams): Promise<Array<Record<string, unknown>>> {
+  const res = await governedFetch(`${url}?${params.toString()}`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) return [];
   const body = (await res.json()) as { features?: Array<{ attributes?: Record<string, unknown> }> };
   return (body.features ?? []).map((f) => f.attributes ?? {});
 }
 
-function pick(attrs: Record<string, unknown>, map: ArcgisFieldMap, key: keyof ArcgisFieldMap): unknown {
-  const field = map[key];
-  return field ? attrs[field] : undefined;
+function parcelOutFields(src: ArcgisParcelSource): string {
+  return [...new Set([
+    ...(Object.values(src.fields).filter(Boolean) as string[]),
+    src.streetNumberField, src.streetNameField, src.addressMatchField, src.cityField,
+    src.assessJoin?.parcelKeyField,
+  ].filter(Boolean) as string[])].join(",");
 }
 
-export async function resolveArcgisParcel(src: ArcgisParcelSource, input: AddressInput): Promise<JurisdictionParcelRecord | null> {
+async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Promise<Record<string, unknown> | null> {
   const parsed = parseStreet(input.street);
   if (!parsed) return null;
-
-  // Two address-matching modes: a single combined address-string field (E911 /
-  // site-location, anchored on the number to avoid 10 matching 110), or a split
-  // number + name pair. A source must declare one; otherwise it can't be queried.
-  const addressClause: string | null = src.addressMatchField
+  const addressClause = src.addressMatchField
     ? `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%'`
     : src.streetNumberField && src.streetNameField
       ? `${src.streetNumberField}='${esc(parsed.number)}' AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`
       : null;
   if (!addressClause) return null;
+  const cityClause = src.cityField && clean(input.city) ? ` AND UPPER(${src.cityField}) LIKE '%${esc(input.city.trim().toUpperCase())}%'` : "";
+  const base = new URLSearchParams({ f: "json", outFields: parcelOutFields(src), returnGeometry: "false", resultRecordCount: "5" });
+  const withCity = new URLSearchParams(base); withCity.set("where", addressClause + cityClause);
+  let rows = await runQuery(src.queryUrl, withCity);
+  if (!rows.length && cityClause) { const noCity = new URLSearchParams(base); noCity.set("where", addressClause); rows = await runQuery(src.queryUrl, noCity); }
+  return rows[0] ?? null;
+}
 
-  const cityClause = src.cityField && clean(input.city)
-    ? ` AND UPPER(${src.cityField}) LIKE '%${esc(input.city.trim().toUpperCase())}%'`
-    : "";
+async function findByPoint(src: ArcgisParcelSource, input: AddressInput): Promise<Record<string, unknown> | null> {
+  let lat = input.lat != null ? Number(input.lat) : NaN;
+  let lon = input.lon != null ? Number(input.lon) : NaN;
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    const geo = await geocodeToCensusTract(input.street, input.city, input.state, input.zip ?? undefined);
+    lat = Number(geo?.lat); lon = Number(geo?.lon);
+  }
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  const params = new URLSearchParams({
+    f: "json", geometry: `${lon},${lat}`, geometryType: "esriGeometryPoint", inSR: "4326",
+    spatialRel: "esriSpatialRelIntersects", outFields: parcelOutFields(src), returnGeometry: "false", resultRecordCount: "5",
+  });
+  if (src.pointBufferMeters) { params.set("distance", String(src.pointBufferMeters)); params.set("units", "esriSRUnit_Meter"); }
+  const rows = await runQuery(src.queryUrl, params);
+  return rows[0] ?? null;
+}
 
-  let rows = await queryFeatures(src, addressClause + cityClause);
-  // Retry without the city constraint if nothing matched (municipality naming
-  // often differs from the mailing city).
-  if (!rows.length && cityClause) rows = await queryFeatures(src, addressClause);
-  if (!rows.length) return null;
-  const a = rows[0];
+export async function resolveArcgisParcel(src: ArcgisParcelSource, input: AddressInput): Promise<JurisdictionParcelRecord | null> {
+  const parcel = src.queryMode === "point" ? await findByPoint(src, input) : await findByAddress(src, input);
+  if (!parcel) return null;
 
-  const f = src.fields;
-  const assessedLand = num(pick(a, f, "assessedLand"));
-  const assessedImprovement = num(pick(a, f, "assessedImprovement"));
-  let assessedTotal = num(pick(a, f, "assessedTotal"));
+  // Optional assessor-table join: look up values by the shared parcel key.
+  let assessor: Record<string, unknown> | null = null;
+  if (src.assessJoin) {
+    const key = clean(parcel[src.assessJoin.parcelKeyField]);
+    if (key) {
+      const params = new URLSearchParams({
+        f: "json", where: `${src.assessJoin.tableKeyField}='${esc(key)}'`,
+        outFields: [...new Set(Object.values(src.assessJoin.fields).filter(Boolean) as string[])].join(","),
+        returnGeometry: "false", resultRecordCount: "1",
+      });
+      assessor = (await runQuery(src.assessJoin.tableUrl, params))[0] ?? null;
+    }
+  }
+
+  // Field lookup: joined assessor table wins, else the parcel layer.
+  const get = (k: keyof ArcgisFieldMap): unknown => {
+    if (assessor && src.assessJoin?.fields[k]) { const v = assessor[src.assessJoin.fields[k]!]; if (v != null && String(v).trim() !== "") return v; }
+    return src.fields[k] ? parcel[src.fields[k]!] : undefined;
+  };
+
+  const assessedLand = num(get("assessedLand"));
+  const assessedImprovement = num(get("assessedImprovement"));
+  let assessedTotal = num(get("assessedTotal"));
   if (assessedTotal == null && (assessedLand != null || assessedImprovement != null)) assessedTotal = (assessedLand ?? 0) + (assessedImprovement ?? 0);
-  const acres = num(pick(a, f, "acres"));
-  const parcelId = clean(pick(a, f, "parcelId"));
+  const acres = num(get("acres"));
+  const parcelId = clean(get("parcelId"));
+  const addr = clean(get("address"));
 
   return {
     sourceName: src.sourceName,
     sourceAsOf: src.assessmentAsOf ?? null,
     assessmentAsOf: src.assessmentAsOf ?? null,
     sourceUrl: src.sourceUrl,
-    accountId: parcelId ?? clean(pick(a, f, "address")) ?? `${parsed.number} ${parsed.name}`,
+    accountId: parcelId ?? addr ?? `${src.state} parcel`,
     parcelRefs: parcelId ? [parcelId] : [],
     acreageText: acres != null ? `${acres.toLocaleString("en-US", { maximumFractionDigits: 3 })} acres (${src.state} statewide parcel source; the recorded plat governs)` : null,
-    landUse: clean(pick(a, f, "landUse")),
-    zoning: clean(pick(a, f, "zoning")),
+    landUse: clean(get("landUse")),
+    zoning: clean(get("zoning")),
     deedReference: null,
-    legalDescription: clean(pick(a, f, "legal")),
-    yearBuilt: num(pick(a, f, "yearBuilt")),
-    // Building area is a STRUCTURE estimate, never a measured footprint.
-    squareFeet: src.buildingSqftIsLotArea ? null : num(pick(a, f, "buildingSqft")),
-    lotSquareFeet: num(pick(a, f, "lotSqft")) ?? (src.buildingSqftIsLotArea ? num(pick(a, f, "buildingSqft")) : null),
-    buildingStyle: clean(pick(a, f, "buildingStyle")),
+    legalDescription: clean(get("legal")),
+    yearBuilt: num(get("yearBuilt")),
+    squareFeet: src.buildingSqftIsLotArea ? null : num(get("buildingSqft")),
+    lotSquareFeet: num(get("lotSqft")) ?? (src.buildingSqftIsLotArea ? num(get("buildingSqft")) : null),
+    buildingStyle: clean(get("buildingStyle")),
     buildingType: null,
     assessedLandValue: assessedLand,
     assessedImprovementValue: assessedImprovement ?? (assessedTotal != null && assessedLand != null ? assessedTotal - assessedLand : null),

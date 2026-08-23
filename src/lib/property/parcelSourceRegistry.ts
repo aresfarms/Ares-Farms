@@ -64,6 +64,12 @@ export interface ArcgisParcelSource {
    *  used instead of the number+name pair. WHERE becomes:
    *  UPPER(field) LIKE '<num> %' AND UPPER(field) LIKE '%<name>%'. */
   addressMatchField?: string;
+  /** Some sources store addressMatchField as "STREET NAME, NUMBER" instead of
+   *  the usual "NUMBER STREET NAME" (confirmed on Tennessee's statewide
+   *  layer, e.g. "DUNCAN LN 419") — set "trailing" so the WHERE clause
+   *  matches the number at the END of the field instead of the start.
+   *  Defaults to "leading" (the standard US order). */
+  addressNumberPosition?: "leading" | "trailing";
   /** Optional municipality/city/town field to disambiguate common street names. */
   cityField?: string;
   fields: ArcgisFieldMap;
@@ -76,6 +82,22 @@ export interface ArcgisParcelSource {
   /** Point mode only: buffer (meters) to catch a nearby CENTROID on a point-
    *  geometry layer. Polygon layers intersect the point directly (omit / 0). */
   pointBufferMeters?: number;
+  /** Point mode only: use this jurisdiction's own address-point (NG911/E911)
+   *  layer for precise rooftop coordinates instead of the Census geocoder's
+   *  street-interpolated estimate. Matters for parcel layers with no address
+   *  field at all (e.g. a cadastral/PLSS layer) — Census interpolation can
+   *  land just outside the correct polygon; a rooftop-precise address point
+   *  intersects it directly. Falls back to Census geocoding if no match. */
+  addressPointsSource?: {
+    /** The address-point layer's `/query` endpoint. */
+    queryUrl: string;
+    /** Single combined address-string field on the address-point layer. */
+    addressMatchField: string;
+    /** Latitude/longitude field names on the address-point layer (already
+     *  WGS84 decimal degrees — no reprojection performed). */
+    latField: string;
+    lonField: string;
+  };
   /** Optional related assessor TABLE joined on a shared parcel key (e.g. MassGIS
    *  L3: a geometry parcel layer + an ASSESS table joined on LOC_ID). When set, the
    *  resolver looks up this table after finding the parcel and its fields take
@@ -285,21 +307,25 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     assessmentAsOf: null,
   },
   {
+    // Supersedes the earlier Wake-County-only entry: NC OneMap (the state GIS
+    // consortium) compiles ALL 100 counties into one layer (verified: 7712 Bill
+    // Love Rd, Wake -> $619,967 total assessed, 4.81 ac).
     state: "NC",
-    county: "Wake",
-    sourceName: "Wake County, North Carolina (Raleigh) — Real Estate Parcels + Assessment",
-    sourceUrl: "https://data-wake.opendata.arcgis.com/datasets/parcels-1",
-    queryUrl: "https://maps.wake.gov/arcgis/rest/services/Property/Parcels/MapServer/0/query",
-    addressMatchField: "SITE_ADDRESS",
+    sourceName: "NC OneMap — Statewide Parcels (all 100 counties, county-sourced CAMA)",
+    sourceUrl: "https://www.nconemap.gov/pages/parcels",
+    queryUrl: "https://services.nconemap.gov/secure/rest/services/NC1Map_Parcels/MapServer/1/query",
+    addressMatchField: "siteadd",
+    cityField: "scity",
     fields: {
-      parcelId: "PIN_NUM",
-      address: "SITE_ADDRESS",
-      acres: "DEED_ACRES",
-      assessedLand: "LAND_VAL",
-      assessedImprovement: "BLDG_VAL",
-      assessedTotal: "TOTAL_VALUE_ASSD",
-      yearBuilt: "YEAR_BUILT",
-      landUse: "TYPE_USE_DECODE",
+      parcelId: "parno",
+      address: "siteadd",
+      county: "cntyname",
+      acres: "gisacres",
+      assessedLand: "landval",
+      assessedImprovement: "improvval",
+      assessedTotal: "parval",
+      landUse: "parusedesc",
+      legal: "legdecfull",
     },
     assessmentAsOf: null,
   },
@@ -317,6 +343,764 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
       assessedTotal: "apprValTot", // county APPRAISED (actual/market) value
       landUse: "landUseDsc",
       zoning: "zoningDesc",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide CAMA — Wisconsin DOA compiles ALL counties into one layer
+    // with real assessed values (verified: Dane County, 9572 Overland Rd ->
+    // $650,700 total assessed, 2025 tax roll).
+    state: "WI",
+    sourceName: "Wisconsin Department of Administration — Statewide Parcels (V1200, CAMA-joined)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=2386813b23ea4e51a009f7d1d6b76e02",
+    queryUrl: "https://services3.arcgis.com/n6uYoouQZW75n5WI/arcgis/rest/services/Wisconsin_Statewide_Parcels_DB/FeatureServer/0/query",
+    addressMatchField: "SITEADRESS",
+    cityField: "PLACENAME",
+    fields: {
+      parcelId: "PARCELID",
+      address: "SITEADRESS",
+      county: "CONAME",
+      acres: "DEEDACRES",
+      assessedLand: "LNDVALUE",
+      assessedImprovement: "IMPVALUE",
+      assessedTotal: "CNTASSDVALUE",
+      marketValue: "ESTFMKVALUE",
+      landUse: "PROPCLASS",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide CAMA (verified: 1245 N 15th Ave, Broken Bow, Custer
+    // County -> $916,850 total assessed).
+    state: "NE",
+    sourceName: "Nebraska Dept of Revenue / gis.ne.gov — Statewide Parcels (CAMA-joined)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=ba7dda0642cd4c0c9660a35081fee517",
+    queryUrl: "https://gis.ne.gov/Enterprise/rest/services/StatewideParcelsExternal/FeatureServer/0/query",
+    addressMatchField: "Ph_Full_Address",
+    cityField: "Ph_City",
+    fields: {
+      parcelId: "Parcel_ID",
+      address: "Ph_Full_Address",
+      acres: "Acres_Deeded",
+      assessedLand: "Land_Value",
+      assessedImprovement: "Improvements_Value",
+      assessedTotal: "Total_Assessed_Value",
+      yearBuilt: "BuildingYear",
+      buildingSqft: "ImpSF",
+      zoning: "Zoning",
+      landUse: "Classification_Code",
+      legal: "Legal_Description",
+    },
+    // County_ID on this source is a numeric county code, not a name — omitted
+    // from fields.county rather than surface a code as if it were a name.
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide values (verified live: King County parcel, $111,100+
+    // land value; many parcels lack a site address — vacant/unaddressed
+    // land — resolver returns null address rather than fabricate one).
+    state: "WA",
+    sourceName: "Washington State Dept of Revenue — Statewide Parcels (county-sourced CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=2b603a599a0842a3b2284c04c8927f35",
+    queryUrl: "https://services.arcgis.com/jsIt88o09Q0r1j8h/arcgis/rest/services/Current_Parcels/FeatureServer/0/query",
+    addressMatchField: "SITUS_ADDRESS",
+    cityField: "SITUS_CITY_NM",
+    fields: {
+      parcelId: "PARCEL_ID_NR",
+      address: "SITUS_ADDRESS",
+      assessedLand: "VALUE_LAND",
+      assessedImprovement: "VALUE_BLDG",
+      landUse: "LANDUSE_CD",
+    },
+    // COUNTY_NM on this source is a numeric code, not a name — omitted from
+    // fields.county rather than surface a code as if it were a name.
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide CAMA (verified: parcel RP04S16E350T09, Lincoln County ->
+    // 111.58 ac, $306,230 total assessed).
+    state: "ID",
+    sourceName: "Idaho State Tax Commission / INSIDE Idaho — Public Idaho Parcels (statewide CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=65a3f7c6d4ca404ba6ab677913953b35",
+    queryUrl: "https://services1.arcgis.com/CNPdEkvnGl65jCX8/arcgis/rest/services/Public_Idaho_Parcels_/FeatureServer/0/query",
+    addressMatchField: "SITE_ADD",
+    cityField: "SITE_CITY",
+    fields: {
+      parcelId: "PARCEL_ID",
+      address: "SITE_ADD",
+      county: "County",
+      acres: "ASR_ACRES",
+      assessedLand: "VAL_LAND",
+      assessedImprovement: "VAL_IMPVTS",
+      assessedTotal: "VAL_TOTAL",
+      legal: "LGL_DESCR",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide CAMA, hosted on the state's own gis.arkansas.gov domain
+    // (verified: 19 Oak Forest Loop, Maumelle, Pulaski County -> $150,870
+    // total assessed).
+    state: "AR",
+    sourceName: "Arkansas GIS Office — County Assessor Mapping Program (CAMP), statewide parcels",
+    sourceUrl: "https://gis.arkansas.gov/product/parcel-boundaries/",
+    queryUrl: "https://gis.arkansas.gov/arcgis/rest/services/FEATURESERVICES/Planning_Cadastre/FeatureServer/6/query",
+    // adrnum is typed as an integer on this service; a quoted-string number
+    // match (streetNumberField) silently returns zero rows on this backend,
+    // so match on the single pre-built text label instead (verified fix).
+    addressMatchField: "adrlabel",
+    cityField: "adrcity",
+    fields: {
+      parcelId: "parcelid",
+      address: "adrlabel",
+      county: "county",
+      assessedLand: "landvalue",
+      assessedImprovement: "impvalue",
+      assessedTotal: "totalvalue",
+      legal: "parcellgl",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide CAMA with farm-specific acreage breakdowns (irrigated,
+    // grazing, crop, forest) — strong fit for Furlong's land focus. Verified:
+    // Bozeman-area parcel, Gallatin County, 40 ac, $2,430 assessed.
+    state: "MT",
+    sourceName: "Montana State Library / Dept of Revenue — Montana Cadastral Framework (statewide CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=f161a98b347b4cf29d371a6d7697912a",
+    queryUrl: "https://services.arcgis.com/qnjIrwR8z5Izc0ij/arcgis/rest/services/Montana_Cadastral_Framework/FeatureServer/1/query",
+    addressMatchField: "AddressLine1",
+    cityField: "CountyName",
+    fields: {
+      parcelId: "PARCELID",
+      address: "AddressLine1",
+      county: "CountyName",
+      acres: "TotalAcres",
+      assessedLand: "TotalLandValue",
+      assessedImprovement: "TotalBuildingValue",
+      assessedTotal: "TotalValue",
+      legal: "LegalDescriptionShort",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide CAMA (verified: 3110 MacCorkle Ave SE, Charleston,
+    // Kanawha County -> $38,800 total appraisal).
+    state: "WV",
+    sourceName: "WV GIS Technical Center (WVU) — Statewide Tax Parcel Info (CAMA-joined)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=ac91069462b24c50b54612ed70c5435c",
+    queryUrl: "https://services9.arcgis.com/oBiZycLxRnTJhJER/arcgis/rest/services/WVU_TaxParcel_Info_WVGISTC_2021/FeatureServer/81/query",
+    addressMatchField: "SAMSAddress",
+    cityField: "SAMSCity",
+    fields: {
+      parcelId: "ParcelID",
+      address: "SAMSAddress",
+      county: "CountyName",
+      acres: "DeededAcres",
+      assessedLand: "LandAppraisal",
+      assessedImprovement: "BuildingAppraisal",
+      assessedTotal: "TotalAppraisal",
+      yearBuilt: "YearBuilt",
+      buildingSqft: "StructureArea",
+      landUse: "PropertyClassDescription",
+      legal: "FullLegalDescription",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full statewide CAMA with cultivated/uncultivated acreage split (good
+    // fit for farmland). Verified: Old Canton Rd, Jackson, Hinds County ->
+    // $120,480 assessed.
+    state: "MS",
+    sourceName: "Mississippi statewide parcel compilation (county-sourced CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=399921dbc1e646b49ab7b7b7cd26c80e",
+    queryUrl: "https://gis.waggonereng.com/server/rest/services/Hosted/Mississippi_Parcels_Staewide/FeatureServer/3/query",
+    addressMatchField: "siteadd",
+    cityField: "scity",
+    fields: {
+      parcelId: "parno",
+      address: "siteadd",
+      county: "cntyname",
+      acres: "total_ac",
+      assessedLand: "landval",
+      assessedTotal: "totval",
+      zoning: "zoning",
+      legal: "legldesc",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry (no clean LA statewide layer). Verified: 18815 E
+    // Arcadian Shores Dr, EBR Parish -> $61,562 assessed.
+    state: "LA",
+    county: "East Baton Rouge",
+    sourceName: "East Baton Rouge Parish GIS — Tax Parcel (CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=b961ea0510d04a2b86fa0ca55a79e8a7",
+    queryUrl: "https://maps.brla.gov/gis/rest/services/Cadastral/Tax_Parcel/MapServer/0/query",
+    addressMatchField: "PHYSICAL_ADDRESS",
+    fields: {
+      parcelId: "ASSESSMENT_NUM",
+      address: "PHYSICAL_ADDRESS",
+      assessedLand: "SUM_LAND_VALUE",
+      assessedImprovement: "SUM_IMPROVEMENT_VALUE",
+      assessedTotal: "SUM_ASSESSED_VALUE",
+      marketValue: "SUM_FAIR_MARKET_VALUE",
+      legal: "LEGAL_DESCRIPTION",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry (no clean NM statewide layer; Doña Ana is NM's
+    // 2nd-largest county). Verified: 701 Two Counties Rd, Garfield ->
+    // $82,327 total assessed.
+    state: "NM",
+    county: "Doña Ana",
+    sourceName: "Doña Ana County, New Mexico — Assessed Parcels (CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=0bc04c9f958e47c0bc3096cd1b32828c",
+    queryUrl: "https://services7.arcgis.com/JMIoqakAkedEx0oU/arcgis/rest/services/DAC_Parcels/FeatureServer/0/query",
+    addressMatchField: "SITUSADDRS",
+    cityField: "CITY",
+    fields: {
+      parcelId: "PARCELNUMBER",
+      address: "SITUSADDRS",
+      acres: "TOTALACRES",
+      assessedLand: "LANDVALUE",
+      assessedImprovement: "BLDGVALUE",
+      assessedTotal: "TOTALVALUE",
+      yearBuilt: "RES_YEAR_BUILT",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry (no clean WY statewide layer; Laramie is WY's
+    // most-populous county, Cheyenne). totallandv/totalimpsv are the
+    // full-value components; Wyoming's separate ratio-discounted tax-billing
+    // figure (assessedv, ~9.5% of value) is intentionally NOT used here to
+    // avoid understating value — assessedTotal is left null so the resolver
+    // sums land+improvement instead (verified: Road 206, Buford -> 106.35 ac,
+    // $117,516 land value).
+    state: "WY",
+    county: "Laramie",
+    sourceName: "Laramie County, Wyoming (Cheyenne) — Assessor Parcels",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=d051f2ef8f7141cf8cd049a521c02b06",
+    queryUrl: "https://maps.laramiecounty.com/arcgis/rest/services/features/CountyBaseMapFeatures/MapServer/2/query",
+    streetNumberField: "streetno",
+    streetNameField: "streetname",
+    cityField: "city",
+    fields: {
+      parcelId: "accountno",
+      acres: "netacres",
+      assessedLand: "totallandv",
+      assessedImprovement: "totalimpsv",
+      legal: "legal",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry (no clean SC statewide layer; York is Rock
+    // Hill/Charlotte-metro). Apr* fields are market/appraised value; SC's
+    // separate ratio-discounted Asd* billing figures are not used here for
+    // the same reason as Wyoming above (verified: 5741 Morris Hunt Dr ->
+    // $785,400 appraised land+building).
+    state: "SC",
+    county: "York",
+    sourceName: "York County, South Carolina (Rock Hill) — Parcels + Appraisal",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=c27c00901daa4f0484c47a3719a8f03b",
+    queryUrl: "https://services1.arcgis.com/2AGLxyiJoNiVHKwq/arcgis/rest/services/Parcels/FeatureServer/0/query",
+    addressMatchField: "PropertyAddress",
+    fields: {
+      parcelId: "TAXMAPID",
+      address: "PropertyAddress",
+      acres: "deededacres",
+      assessedLand: "AprLandVal",
+      assessedImprovement: "AprBldgVal",
+      assessedTotal: "AprTotVal",
+      yearBuilt: "YearBuilt",
+      buildingSqft: "FinishedSQFT",
+      landUse: "LandUseDesc",
+      legal: "LegalDescription",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry (no clean OK statewide layer; Canadian County is
+    // OKC-metro). Verified: 21851 E Second St, unincorporated Canadian
+    // County -> $2,352 total assessed (rural parcel).
+    state: "OK",
+    county: "Canadian",
+    sourceName: "Canadian County, Oklahoma (OKC metro) — Parcel Data (CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=7bbc6322290241a891f237dc43ed16bd",
+    queryUrl: "https://services2.arcgis.com/0NjdXxmJp53hZWPd/arcgis/rest/services/ParcelDataService_2_view/FeatureServer/3/query",
+    addressMatchField: "situs",
+    cityField: "situs_city",
+    fields: {
+      parcelId: "parcel_id",
+      address: "situs",
+      assessedLand: "land_val",
+      assessedImprovement: "bldg_val",
+      assessedTotal: "total_val",
+      landUse: "prop_class",
+      legal: "legal",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Multi-county entry: Metro (Portland regional government) compiles
+    // Multnomah, Washington, and Clackamas counties into ONE layer — three
+    // counties from a single source (verified: 15651 NW Ridgeline St,
+    // Portland (Washington Co.) -> $601,280 assessed).
+    state: "OR",
+    sourceName: "Metro (Portland regional govt) RLIS — Taxlots for Multnomah/Washington/Clackamas Counties",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=b3cabe5845ec47eab61c54e0c631313c",
+    queryUrl: "https://services2.arcgis.com/McQ0OlIABe29rJJy/arcgis/rest/services/Taxlots_(Public)/FeatureServer/3/query",
+    addressMatchField: "SITEADDR",
+    cityField: "SITECITY",
+    fields: {
+      // COUNTY on this source is a single-letter code (M/W/C), not a name —
+      // omitted from fields.county rather than surface a code as a name.
+      parcelId: "PRIMACCNUM",
+      address: "SITEADDR",
+      acres: "A_T_ACRES",
+      assessedLand: "LANDVAL",
+      assessedImprovement: "BLDGVAL",
+      assessedTotal: "ASSESSVAL",
+      marketValue: "TOTALVAL",
+      yearBuilt: "YEARBUILT",
+      buildingSqft: "BLDGSQFT",
+      landUse: "LANDUSE",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // No address field at all on the parcel layer (a PLSS/plat-based
+    // cadastral layer — Lot/Block/Section/Township/Range, not street
+    // addressing). Unlocked via addressPointsSource: ND's own statewide
+    // NG911 address-point layer gives a rooftop-precise lat/lon (unlike
+    // Census's street-interpolated estimate, which this exact layer showed
+    // could miss the correct polygon), then a zero-buffer point intersect —
+    // this IS a polygon layer, so no buffer is needed once the point itself
+    // is accurate. Verified end to end: 301 Broadway St, Logan County ->
+    // 159.17 ac. No value fields (ND has no statewide CAMA layer).
+    state: "ND",
+    sourceName: "North Dakota GIS Hub — Statewide Parcels (boundary + acreage via NG911 address-point join, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=ac6da1176038457db16e8debe3f1abaf",
+    queryUrl: "https://services1.arcgis.com/GOcSXpzwBHyk2nog/arcgis/rest/services/NDGISHUB_Parcels/FeatureServer/0/query",
+    queryMode: "point",
+    addressPointsSource: {
+      queryUrl: "https://services1.arcgis.com/GOcSXpzwBHyk2nog/arcgis/rest/services/NDGISHUBSiteStructureAddressPoints/FeatureServer/0/query",
+      addressMatchField: "ADDRESS",
+      latField: "Lat",
+      lonField: "Long",
+    },
+    fields: {
+      parcelId: "UniqueGISID",
+      county: "CountyName",
+      acres: "CalculatedAcres",
+    },
+    assessmentAsOf: null,
+  },
+  // NOT added: Douglas County, KS (gis.dgcoks.gov/Tax_Parcel) has real
+  // address/acreage/legal data, but its Cloudflare WAF returns HTTP 403
+  // "blocked" specifically on the two-clause `UPPER(field) LIKE 'NUM %' AND
+  // UPPER(field) LIKE '%NAME%'` pattern this resolver always builds for
+  // addressMatchField sources — confirmed a single simple LIKE (no UPPER(),
+  // one clause) returns 200 from the same host. Every real production
+  // lookup would silently 403. Fixing this needs a per-source "skip UPPER(),
+  // single-clause" query mode, not just a registry entry — a real but
+  // separate follow-up if KS coverage is wanted later.
+  {
+    // NRPC (Nashua Regional Planning Commission)-hosted, NH's most populous
+    // city outside the Manchester metro. No acreage or value fields on this
+    // layer. Verified: 133 Colgate Rd; fast (though the first live call ran
+    // 1.5s, likely cold-start — well under any usable timeout).
+    state: "NH",
+    county: "Hillsborough",
+    sourceName: "Nashua Regional Planning Commission — Nashua Parcels (boundary + address only, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=59ffa3bb9e464c46ba572722e5d3d5b2",
+    queryUrl: "https://services6.arcgis.com/2ZriDy2NFXltCIFR/arcgis/rest/services/NRPC_Open_Data_Nashua_v2/FeatureServer/2/query",
+    addressMatchField: "LOCATION",
+    fields: {
+      parcelId: "LAB_PID",
+      address: "LOCATION",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full CAMA, hosted on the county's own gis.miottawa.org domain
+    // (Michigan's western-Michigan lakeshore county). AssessedValue is
+    // Michigan's own field name; TaxableValue is capped under Michigan's
+    // Prop A and usually runs lower — not used here to avoid understating
+    // value, same reasoning as Wyoming/South Carolina above. Verified:
+    // 12714 Rich St, Grand Haven -> $140,600 assessed, 2.88 ac.
+    state: "MI",
+    county: "Ottawa",
+    sourceName: "Ottawa County, Michigan (Grand Haven/Holland) — Parcels (CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=2821d458e93e4c95a43279ef6a164172",
+    queryUrl: "https://gis.miottawa.org/arcgis/rest/services/HostedServices/ParcelsPublic/FeatureServer/0/query",
+    addressMatchField: "PropertyAddress",
+    cityField: "PropertyCity",
+    fields: {
+      parcelId: "FinalPIN",
+      address: "PropertyAddress",
+      acres: "Acreage",
+      assessedTotal: "AssessedValue",
+      landUse: "PropertyClassDescription",
+      legal: "LegalDesc",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // City of Sioux Falls-hosted parcel layer covering Minnehaha County (SD's
+    // most populous). Verified: 1910 E Robur Dr -> 4.41 ac; fast (0.44s). No
+    // value fields.
+    state: "SD",
+    county: "Minnehaha",
+    sourceName: "City of Sioux Falls / Minnehaha County, South Dakota — Property Parcels (boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=d57efdf717064169a21c70b8b380e387",
+    queryUrl: "https://gis.siouxfalls.gov/arcgis/rest/services/Data/Property/MapServer/1/query",
+    addressMatchField: "ADDRESS",
+    fields: {
+      parcelId: "TAG",
+      address: "ADDRESS",
+      county: "COUNTY",
+      acres: "ACREAGE",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Kentucky's own state GIS server (kygisserver.ky.gov) hosts only ONE
+    // county's PVA parcels — Webster (rural, small) — confirmed by listing
+    // every service on that server; KY's other 119 counties host their PVA
+    // data independently (LOJIC/Jefferson checked separately, thin — no
+    // address/values). Verified: 70 Honeysuckle Ln, Henderson -> 6.13 ac. No
+    // value fields.
+    state: "KY",
+    county: "Webster",
+    sourceName: "Webster County, Kentucky PVA — Parcels (boundary + acreage, no values)",
+    sourceUrl: "https://kygisserver.ky.gov/arcgis/rest/services/WGS84WM_Services/Ky_PVA_Webster_Parcels_WGS84WM/MapServer",
+    queryUrl: "https://kygisserver.ky.gov/arcgis/rest/services/WGS84WM_Services/Ky_PVA_Webster_Parcels_WGS84WM/MapServer/1/query",
+    addressMatchField: "LOCATION",
+    cityField: "CITY",
+    fields: {
+      parcelId: "PARCEL_ID",
+      address: "LOCATION",
+      acres: "ACRES",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // MN's own "opt-in" state tracker (plan_parcels_open) is NOT a parcel
+    // source itself — confirmed it's only a per-county participation index
+    // (rundate/notes/data_url), not parcel records — but its data_url/
+    // viewer_url fields are a real lead-generation directory: Olmsted County
+    // (Rochester) is one of the participating counties with its own live,
+    // full-CAMA ArcGIS service. Verified: 6314 29th Ave, Rochester ->
+    // $242,600 estimated market value.
+    state: "MN",
+    county: "Olmsted",
+    sourceName: "Olmsted County, Minnesota (Rochester) — Parcels Composite (CAMA)",
+    sourceUrl: "https://gis.data.mn.gov/datasets/minnesota::olmsted-county-parcels/about",
+    queryUrl: "https://public.gis.olmstedcounty.gov/arcgis/rest/services/AGOL_Open_Data/Parcels/FeatureServer/0/query",
+    streetNumberField: "SiteAddrNo",
+    streetNameField: "SiteStName",
+    cityField: "SiteCity",
+    fields: {
+      parcelId: "PARID",
+      acres: "DeedAcres",
+      assessedLand: "EMVLand",
+      assessedImprovement: "EMVBldg",
+      assessedTotal: "EMVTotal",
+      landUse: "LandUseDes",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Full CAMA (no MO statewide layer or county-level GIS found in the
+    // remaining 114 counties; St. Louis City is its own independent
+    // county-equivalent). Verified: 1110 Childress Ave -> $44,470 assessed
+    // total, built 1940. LandArea field returned 0 on every sampled row
+    // (same unreliable-acreage pattern seen on Ohio's layer), so left
+    // unmapped rather than surface a wrong figure.
+    state: "MO",
+    county: "St. Louis City",
+    sourceName: "City of St. Louis Assessor — Public Parcels (CAMA)",
+    sourceUrl: "https://www.stlouis-mo.gov/data/datasets/distribution.cfm?id=119",
+    queryUrl: "https://maps8.stlouis-mo.gov/arcgis/rest/services/ASSESSOR/Assessor_Public_Parcels/MapServer/11/query",
+    addressMatchField: "SITEADDR",
+    fields: {
+      parcelId: "ParcelId",
+      address: "SITEADDR",
+      assessedLand: "AsdLand",
+      assessedImprovement: "AsdImprove",
+      assessedTotal: "AsdTotal",
+      yearBuilt: "FirstYearBuilt",
+      zoning: "Zoning",
+      legal: "LegalDesc1",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // REJECTED: a Nevada DOT-hosted "statewide" compilation was found first,
+    // but its own SourceDate field showed the snapshot frozen at 2017-09-15
+    // — nine years stale, unacceptable for a system meant to serve current
+    // data. Pulled rather than shipped. This entry instead uses Washoe
+    // County's (Reno) own live ArcGIS org, served directly by the county
+    // assessor's mapping system — current, not a historical mirror.
+    // Metro-county entry (no live NV statewide layer found). Verified: 1680
+    // Alamo Dr, Washoe County. No acreage or value fields on this layer
+    // (values live at the county's separate DATALINK-referenced assessor
+    // site).
+    state: "NV",
+    county: "Washoe",
+    sourceName: "Washoe County, Nevada (Reno) — Parcels (boundary + address only, no values)",
+    sourceUrl: "https://www.washoecounty.gov/assessor/Mapping/index.php",
+    queryUrl: "https://services5.arcgis.com/RjM4BJrv5ZkqP4XC/ArcGIS/rest/services/Parcels/FeatureServer/3/query",
+    addressMatchField: "SITEADDR",
+    fields: {
+      parcelId: "PIN",
+      address: "SITEADDR",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // The known AGRC item (arcgis.com "Parcels - Statewide Utah (AGRC)")
+    // points to a dead mapserv.utah.gov URL (confirmed 404). Found the
+    // current live service via opendata.gis.utah.gov's Hub page → its
+    // backing item id → this URL, owned by UtahAGRC. Verified: 1505 S Birch
+    // Creek Rd, Daggett County; fast (0.44s). No value fields, no acreage.
+    state: "UT",
+    sourceName: "Utah Geospatial Resource Center (UGRC/AGRC) — Statewide Parcels (boundary + address only, no values)",
+    sourceUrl: "https://opendata.gis.utah.gov/datasets/utah-statewide-parcels/explore",
+    queryUrl: "https://services1.arcgis.com/99lidPhWCzftIe9K/arcgis/rest/services/UtahStatewideParcels/FeatureServer/0/query",
+    addressMatchField: "PARCEL_ADD",
+    cityField: "PARCEL_CITY",
+    fields: {
+      parcelId: "PARCEL_ID",
+      address: "PARCEL_ADD",
+      county: "County",
+    },
+    assessmentAsOf: null,
+  },
+  // ── Boundary/address-only sources (founder-approved partial coverage,
+  // 2026-08-23): these states route their actual CAMA dollar values to each
+  // county's own separate portal rather than a shared statewide layer, so
+  // the fields below are honestly limited to what the shared layer itself
+  // publishes — parcel ID, address, acreage, land use. assessedTotal and
+  // friends are left unset rather than approximated, and simply resolve to
+  // null downstream. Full CAMA values for these states require going to each
+  // county individually, same as the full-value entries above.
+  // Ohio and Texas below WERE unusable in address mode (55+ second unindexed
+  // text scans; Texas also errored outright) but ARE usable via queryMode:
+  // "point" — a fast indexed spatial pre-filter, then addressMatchField
+  // narrows the candidates client-side (see findByPoint in
+  // genericArcgisParcelResolver.ts). All entries here were caught failing by
+  // an end-to-end resolver test with a real address AFTER the health check
+  // passed clean — the health check only proves an endpoint answers
+  // `where=1=1`, not that a real query is usable.
+  {
+    // Verified via point-mode: 419 Duncan Ln, Anderson County -> 1.42 deeded
+    // acres (address-mode also timed out at 55s+ here, same OGRIP-style
+    // pathology as Ohio/Texas). Every address on this layer is ALSO stored
+    // "STREET NAME, NUMBER" (e.g. "DUNCAN LN 419") — reversed from the usual
+    // US order — so addressNumberPosition: "trailing" matches the number at
+    // the end of the candidate address instead of the start, same fix
+    // findByAddress uses, applied in findByPoint's client-side filter. No
+    // value fields (TN routes CAMA $ to each county's separate TPAD portal).
+    state: "TN",
+    sourceName: "Tennessee Comptroller (tnmap.tn.gov) — Statewide Property Boundaries Public Use (boundary + address only, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=e356f1a241844d6f9025f2fa4e977df3",
+    queryUrl: "https://services1.arcgis.com/YuVBSS7Y1of2Qud1/arcgis/rest/services/Tennessee_Property_Boundaries_Public_Use/FeatureServer/0/query",
+    queryMode: "point",
+    pointBufferMeters: 300,
+    addressMatchField: "ADDRESS",
+    addressNumberPosition: "trailing",
+    fields: {
+      parcelId: "PARCELID",
+      address: "ADDRESS",
+      county: "COUNTY_NAME",
+      acres: "DEEDAC",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Verified via point-mode: 84 W Dodridge St, Franklin County (Columbus)
+    // resolves correctly (0.5s) where address-mode timed out at 55s+. No
+    // value fields on this "public view" (LandArea also proved unreliable —
+    // 0 on an improved residential parcel — so left unmapped).
+    state: "OH",
+    sourceName: "OGRIP (Ohio Geographically Referenced Information Program) — Statewide Parcels (boundary + address only, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=26ab5fad8d5d4258a7492a14de83bc0e",
+    queryUrl: "https://services2.arcgis.com/MlJ0G8iWUyC7jAmu/arcgis/rest/services/OhioStatewidePacels_full_view/FeatureServer/0/query",
+    queryMode: "point",
+    pointBufferMeters: 100,
+    addressMatchField: "SitusAddressAll",
+    fields: {
+      parcelId: "LocalParcelID",
+      address: "SitusAddressAll",
+      county: "County",
+      landUse: "StateLUC",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry — one ArcGIS service actually covers 12 of AZ's 15
+    // counties as separate layers (Apache, Cochise, Coconino, Gila, Graham,
+    // Greenlee, LaPaz, Navajo, Pima, Pinal, SantaCruz, Yuma — Maricopa/
+    // Mohave/Yavapai not included). Pima (Tucson, AZ's 2nd-largest) wired in
+    // here; the other 11 share this exact schema/host, just a different
+    // layer index — cheap follow-up if broader AZ coverage is wanted.
+    // Verified: 11 E Orange Grove Rd, unincorporated Pima County -> 21.83 ac.
+    // No value fields on this layer.
+    state: "AZ",
+    county: "Pima",
+    sourceName: "Pima County, Arizona (Tucson) — Parcels (boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=c33b63281f80430f89db6f3401154674",
+    queryUrl: "https://services.arcgis.com/C34zQ7veRS0V1t04/arcgis/rest/services/Parcels/FeatureServer/10/query",
+    addressMatchField: "SITE_ADDRESS",
+    cityField: "SITE_CITY",
+    fields: {
+      parcelId: "APN",
+      address: "SITE_ADDRESS",
+      acres: "ACRES_US",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Same shared AZ multi-county service as Pima above, layer 2. Verified:
+    // 1300 Green Ridge Dr, Happy Jack -> 1.13 ac.
+    state: "AZ",
+    county: "Coconino",
+    sourceName: "Coconino County, Arizona (Flagstaff) — Parcels (boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=c33b63281f80430f89db6f3401154674",
+    queryUrl: "https://services.arcgis.com/C34zQ7veRS0V1t04/arcgis/rest/services/Parcels/FeatureServer/2/query",
+    addressMatchField: "SITE_ADDRESS",
+    cityField: "SITE_CITY",
+    fields: {
+      parcelId: "APN",
+      address: "SITE_ADDRESS",
+      acres: "ACRES_US",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Same shared AZ multi-county service as Pima above, layer 13. Verified:
+    // 11380 S Tucson Dr, Yuma -> 0.025 ac.
+    state: "AZ",
+    county: "Yuma",
+    sourceName: "Yuma County, Arizona — Parcels (boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=c33b63281f80430f89db6f3401154674",
+    queryUrl: "https://services.arcgis.com/C34zQ7veRS0V1t04/arcgis/rest/services/Parcels/FeatureServer/13/query",
+    addressMatchField: "SITE_ADDRESS",
+    cityField: "SITE_CITY",
+    fields: {
+      parcelId: "APN",
+      address: "SITE_ADDRESS",
+      acres: "ACRES_US",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Verified via point-mode: 1815 Treadwell St, Austin resolves correctly
+    // where address-mode both timed out at 55s+ AND errored outright. 300m
+    // buffer (wider than Ohio's 100m) — this layer's address interpolation
+    // needed the extra margin to catch the exact house number. GIS_AREA
+    // values looked unreliable for urban parcels sampled, so acreage is left
+    // unmapped; no county field on this layer.
+    state: "TX",
+    sourceName: "Texas Geographic Information Office (TxGIO) — StratMap Statewide Land Parcels (boundary + address only, partial county coverage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=03956e7e3fb84df587a54f1ee9e1091f",
+    queryUrl: "https://services1.arcgis.com/1mtXwieMId59thmg/arcgis/rest/services/2019_Texas_Parcels_StratMap/FeatureServer/0/query",
+    queryMode: "point",
+    pointBufferMeters: 300,
+    addressMatchField: "SITUS_ADDR",
+    fields: {
+      parcelId: "Prop_ID",
+      address: "SITUS_ADDR",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Verified: Garden Hwy, Sacramento County — real address, no acreage or
+    // value fields on this public view.
+    state: "CA",
+    sourceName: "CAL FIRE — California Statewide Parcels Public View (boundary + address only, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=2061fbc963464c5198ec064100802624",
+    queryUrl: "https://bz1uwWPKUInZBK94.svcs5.arcgis.com/bz1uwWPKUInZBK94/arcgis/rest/services/CA_Statewide_Parcels_Public_view/FeatureServer/0/query",
+    addressMatchField: "FullStreetAddress",
+    cityField: "SITE_CITY",
+    fields: {
+      parcelId: "PARCEL_APN",
+      address: "FullStreetAddress",
+      county: "COUNTYNAME",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Verified: 5755 Catawba Creek Rd, Roanoke County -> 378.08 deeded acres,
+    // no value fields.
+    state: "VA",
+    sourceName: "Virginia Tech-hosted statewide parcel compilation (county-sourced boundaries, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=a7eafe99849d4dd99b86325bc4d05720",
+    queryUrl: "https://arcgis-central.gis.vt.edu/arcgis/rest/services/facilities/VABuildingandParcel/FeatureServer/1/query",
+    addressMatchField: "site_addr",
+    fields: {
+      parcelId: "parcel_id",
+      address: "site_addr",
+      county: "county",
+      acres: "deed_acres",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Verified: 4404 W Co Rd 700 S, Greensburg — real address. tax_county is
+    // null on most records (data-quality gap on the source), so county is
+    // left unmapped; cityField (prop_city) is populated and used instead. No
+    // acreage or value fields on this layer.
+    state: "IN",
+    sourceName: "IndianaMap (gisdata.in.gov) — Parcel Boundaries of Indiana Current (boundary + address only, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=70565d886f1e4528a43a86be6ce5c2f3",
+    queryUrl: "https://gisdata.in.gov/server/rest/services/Hosted/Parcel_Boundaries_of_Indiana_Current/FeatureServer/0/query",
+    addressMatchField: "prop_add",
+    cityField: "prop_city",
+    fields: {
+      parcelId: "parcel_id",
+      address: "prop_add",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry (no clean IL statewide layer; Lake County is
+    // Chicago-exurb, IL's 3rd most populous). Verified: 1063 W IL Route 173,
+    // Antioch — real address; fast query (0.48s). No acreage or value fields
+    // on this layer.
+    state: "IL",
+    county: "Lake",
+    sourceName: "Lake County, Illinois GIS — Parcel Polygons (boundary + address only, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=318e616ff0d14efe83927d8dd3bc1e12",
+    queryUrl: "https://services3.arcgis.com/HESxeTbDliKKvec2/arcgis/rest/services/OpenData_ParcelPolygons/FeatureServer/0/query",
+    addressMatchField: "situs_addr_line_1_First",
+    cityField: "situs_addr_city_First",
+    fields: {
+      parcelId: "PIN",
+      address: "situs_addr_line_1_First",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Metro-county entry (no clean AL statewide layer; Mobile County is AL's
+    // 3rd most populous). Verified: 19975 Shepard Lake Rd, Mt Vernon -> 1.0
+    // ac; fast query (0.56s). No value fields on this layer.
+    state: "AL",
+    county: "Mobile",
+    sourceName: "Mobile County, Alabama Revenue Commission — Public Parcels (boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=07c93ca64bbf4fb8a8d49b7ea80ef067",
+    queryUrl: "https://services8.arcgis.com/HND1NcQt6vgOGn1z/arcgis/rest/services/MCRC_Public_Parcels/FeatureServer/0/query",
+    addressMatchField: "PropAddr1",
+    cityField: "PropCity",
+    fields: {
+      parcelId: "Parcel_Number",
+      address: "PropAddr1",
+      acres: "Acreage",
     },
     assessmentAsOf: null,
   },

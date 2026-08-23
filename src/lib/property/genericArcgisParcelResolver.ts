@@ -31,7 +31,13 @@ const esc = (v: string): string => v.replace(/'/g, "''");
 function parseStreet(street: string): { number: string; name: string } | null {
   const m = street.trim().match(/^(\d+[A-Za-z]?)\s+(.+?)(?:\s+(?:RD|ROAD|ST|STREET|AVE|AVENUE|LN|LANE|DR|DRIVE|CT|COURT|HWY|HIGHWAY|BLVD|BOULEVARD|WAY|PIKE|TRL|TRAIL|PL|PLACE|CIR|CIRCLE|TER|TERRACE|LOOP|RUN|PATH|ROW))?$/i);
   if (!m) return null;
-  return { number: m[1].replace(/[^0-9A-Za-z]/g, ""), name: m[2].trim().replace(/\s+/g, " ").toUpperCase() };
+  let name = m[2].trim().replace(/\s+/g, " ").toUpperCase();
+  // Numbered-street grids (e.g. "6314 29th Ave") sometimes store the name as
+  // the bare number ("29") rather than the ordinal form ("29TH") — strip the
+  // ordinal suffix so LIKE '%29%'/.includes("29") still matches either
+  // storage convention. Safe because it only widens a substring match.
+  name = name.replace(/^(\d+)(ST|ND|RD|TH)$/, "$1");
+  return { number: m[1].replace(/[^0-9A-Za-z]/g, ""), name };
 }
 
 async function runQuery(url: string, params: URLSearchParams): Promise<Array<Record<string, unknown>>> {
@@ -53,7 +59,9 @@ async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Prom
   const parsed = parseStreet(input.street);
   if (!parsed) return null;
   const addressClause = src.addressMatchField
-    ? `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%'`
+    ? src.addressNumberPosition === "trailing"
+      ? `UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%' AND UPPER(${src.addressMatchField}) LIKE '% ${esc(parsed.number)}'`
+      : `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%'`
     : src.streetNumberField && src.streetNameField
       ? `${src.streetNumberField}='${esc(parsed.number)}' AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`
       : null;
@@ -66,21 +74,75 @@ async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Prom
   return rows[0] ?? null;
 }
 
+/** Point-mode sources that ALSO define an address field use the buffer purely
+ *  as a fast spatial pre-filter (indexed, not a text scan) and then pick the
+ *  candidate whose own address text-matches the input — same "starts with
+ *  the number, contains the name" check the address-mode path uses via SQL,
+ *  applied client-side here instead. Without an address field (e.g. a
+ *  cadastral layer with no address column at all), behavior is unchanged:
+ *  take the first spatial hit. */
+
+/** Geocode via a jurisdiction's own NG911/E911 address-point layer — rooftop
+ *  precision, unlike the Census geocoder's street-interpolated estimate.
+ *  Reuses the same "starts with the number, contains the name" text match as
+ *  address mode. Returns null on no match (caller falls back to Census). */
+async function geocodeViaAddressPoints(
+  src: NonNullable<ArcgisParcelSource["addressPointsSource"]>,
+  input: AddressInput,
+): Promise<{ lat: number; lon: number } | null> {
+  const parsed = parseStreet(input.street);
+  if (!parsed) return null;
+  const params = new URLSearchParams({
+    f: "json",
+    where: `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%'`,
+    outFields: `${src.latField},${src.lonField}`,
+    returnGeometry: "false",
+    resultRecordCount: "1",
+  });
+  const rows = await runQuery(src.queryUrl, params);
+  const lat = Number(rows[0]?.[src.latField]);
+  const lon = Number(rows[0]?.[src.lonField]);
+  return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+}
+
 async function findByPoint(src: ArcgisParcelSource, input: AddressInput): Promise<Record<string, unknown> | null> {
   let lat = input.lat != null ? Number(input.lat) : NaN;
   let lon = input.lon != null ? Number(input.lon) : NaN;
+  if ((!Number.isFinite(lat) || !Number.isFinite(lon)) && src.addressPointsSource) {
+    const precise = await geocodeViaAddressPoints(src.addressPointsSource, input);
+    if (precise) { lat = precise.lat; lon = precise.lon; }
+  }
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
     const geo = await geocodeToCensusTract(input.street, input.city, input.state, input.zip ?? undefined);
     lat = Number(geo?.lat); lon = Number(geo?.lon);
   }
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  const addressField = src.addressMatchField ?? src.streetNameField;
   const params = new URLSearchParams({
     f: "json", geometry: `${lon},${lat}`, geometryType: "esriGeometryPoint", inSR: "4326",
-    spatialRel: "esriSpatialRelIntersects", outFields: parcelOutFields(src), returnGeometry: "false", resultRecordCount: "5",
+    spatialRel: "esriSpatialRelIntersects", outFields: parcelOutFields(src), returnGeometry: "false",
   });
+  // resultRecordCount is deliberately omitted when address-matching against a
+  // buffer: at least one production ArcGIS Server (Ohio's OGRIP) times out at
+  // 55s+ and errors when resultRecordCount is combined with distance/units,
+  // while the same query with no resultRecordCount (server default page size)
+  // answers in under a second — confirmed directly against that service.
+  // Without an address field there's no buffer-driven candidate list to
+  // filter, so the original tight cap still applies.
+  if (!addressField) params.set("resultRecordCount", "5");
   if (src.pointBufferMeters) { params.set("distance", String(src.pointBufferMeters)); params.set("units", "esriSRUnit_Meter"); }
   const rows = await runQuery(src.queryUrl, params);
-  return rows[0] ?? null;
+  if (!addressField) return rows[0] ?? null;
+
+  const parsed = parseStreet(input.street);
+  if (!parsed) return rows[0] ?? null;
+  const match = rows.find((r) => {
+    const val = String(r[addressField] ?? "").trim().toUpperCase();
+    return src.addressNumberPosition === "trailing"
+      ? val.endsWith(` ${parsed.number}`) && val.includes(parsed.name)
+      : val.startsWith(`${parsed.number} `) && val.includes(parsed.name);
+  });
+  return match ?? rows[0] ?? null;
 }
 
 export async function resolveArcgisParcel(src: ArcgisParcelSource, input: AddressInput): Promise<JurisdictionParcelRecord | null> {

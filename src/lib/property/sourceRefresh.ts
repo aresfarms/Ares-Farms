@@ -313,6 +313,30 @@ export async function refreshAllSources(opts?: { now?: Date; failSource?: string
     });
   }
 
+  // Sovereign parcel-source registry health: confirms every government ArcGIS
+  // endpoint in parcelSourceRegistry is still reachable. Governments rename or
+  // retire these services without notice; this is what catches it instead of a
+  // customer hitting a silent null lookup first.
+  try {
+    const { checkAllParcelSources } = await import("./parcelSourceHealthCheck");
+    const health = await checkAllParcelSources();
+    const downLabel = (s: { state: string; county: string | null }) => (s.county ? `${s.state}-${s.county}` : s.state);
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "parcel-source-health", subject: "national-parcel-registry",
+      decision: health.unhealthy > 0 ? "ALERT" : "REFRESH",
+      reason: `Parcel source health check: ${health.healthy}/${health.total} reachable.` +
+        (health.unhealthy > 0 ? ` Down: ${health.sources.filter((s) => !s.ok).map(downLabel).join(", ")}.` : ""),
+      detail: { checkedAt: health.checkedAt, total: health.total, healthy: health.healthy, unhealthy: health.unhealthy },
+    });
+  } catch (error) {
+    canonicalLandRegisterAuthority.append({
+      actorId: "system:source-refresh", actorName: "source-refresh-job",
+      domain: "parcel-source-health", subject: "national-parcel-registry", decision: "ALERT",
+      reason: `Parcel source health check failed to run: ${(error as Error).message}`,
+    });
+  }
+
   // Official parcel-tax and well-permit evidence refresh. The governed writers
   // persist immutable versions and receipts in the shared runtime-state mount,
   // so state survives Cloud Run revisions and scheduled job executions.

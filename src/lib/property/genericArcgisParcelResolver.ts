@@ -131,8 +131,14 @@ async function findByAddressKeyJoin(
     returnGeometry: "false",
     resultRecordCount: "1",
   }));
-  const key = clean(keyRows[0]?.[join.keyField]);
-  if (!key) return null;
+  const rawKey = clean(keyRows[0]?.[join.keyField]);
+  if (!rawKey) return null;
+  // Truncate only when the config says the two layers publish the same key at
+  // different precisions (see keyTruncateLength). A truncation that would
+  // empty the key is ignored rather than sent as a bogus match.
+  const key = join.keyTruncateLength && rawKey.length > join.keyTruncateLength
+    ? rawKey.slice(0, join.keyTruncateLength)
+    : rawKey;
   const literal = join.parcelKeyFieldType === "numeric" ? esc(key) : `'${esc(key)}'`;
   const rows = await runQuery(src.queryUrl, new URLSearchParams({
     f: "json",

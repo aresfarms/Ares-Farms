@@ -130,6 +130,16 @@ export interface ArcgisParcelSource {
      *  WHERE clause) or text. Same quoting concern as
      *  streetNumberFieldType. Defaults to "text". */
     parcelKeyFieldType?: "text" | "numeric";
+    /** Optional: keep only this many LEADING characters of the crosswalk's
+     *  key before matching the parcel layer, for jurisdictions that publish
+     *  the same parcel key at two different precisions.
+     *
+     *  Confirmed on Maui County, HI: the address-point layer publishes a
+     *  12-digit TMK while the parcel layer's cty_tmk is that same parcel's
+     *  first 8 digits (the trailing 4 encode a unit/CPR suffix). Verified
+     *  systematic across 6 sampled addresses, each resolving to a distinct
+     *  parcel with distinct values — not a coincidental single match. */
+    keyTruncateLength?: number;
   };
   /** Optional related assessor TABLE joined on a shared parcel key (e.g. MassGIS
    *  L3: a geometry parcel layer + an ASSESS table joined on LOC_ID). When set, the
@@ -1388,6 +1398,70 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
       acres: "GIS_AC",
       lotSqft: "GIS_SF",
       zoning: "DominantZo",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // MAINE — first ME coverage, statewide (all "organized towns"; Maine's
+    // unorganized territories are a separate layer not wired in). Address is
+    // split across PROPLOCNUM + PROP_LOC, and PROPLOCNUM is a genuine
+    // Double, so it needs the numeric quoting path. Maine GeoLibrary's own
+    // caveat applies and is worth honoring downstream: towns submit updates
+    // voluntarily and on no fixed schedule, so some towns' data is
+    // materially older than others. No value or acreage fields on this
+    // layer. Verified: 17 Ellsworth Rd, Aurora (Hancock County).
+    state: "ME",
+    sourceName: "Maine GeoLibrary — Statewide Parcels, Organized Towns (boundary + address only, no values; town update cadence varies)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=346131b710a645ffb624f448a9cba6d4",
+    queryUrl: "https://services1.arcgis.com/RbMX0mRVOFNTdLzd/arcgis/rest/services/Maine_Parcels_Organized_Towns/FeatureServer/10/query",
+    streetNumberField: "PROPLOCNUM",
+    streetNumberFieldType: "numeric",
+    streetNameField: "PROP_LOC",
+    cityField: "TOWN",
+    fields: {
+      parcelId: "STATE_ID",
+      address: "PROP_LOC",
+      county: "COUNTY",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // HAWAII — first HI coverage, and it carries REAL VALUES. Hawaii's
+    // statewide TMK layer has no address field at all (only a TMK parcel
+    // key), and its per-county parcel layers likewise carry values but no
+    // address — which is why earlier attempts here failed. Maui County
+    // publishes a Site_Address_Point layer with both a street address AND
+    // the parcel's TMK, so this uses addressKeyJoin with keyTruncateLength:
+    // the address points' 12-digit TMK truncates to the parcel layer's
+    // 8-digit cty_tmk (trailing 4 digits are a unit/CPR suffix). Verified
+    // systematic across 6 sampled addresses, each resolving to a distinct
+    // parcel: 10600 Hana Hwy -> $629,100 land + $205,300 building, 27.96
+    // tax acres.
+    //
+    // Deliberately NOT used for Hawaii: the qpublic.schneidercorp.com links
+    // embedded in the state's own layers point at a private vendor's
+    // (Schneider Geospatial) hosted portal, not a government API. The data
+    // there is public record, but scraping that portal would put a vendor's
+    // page structure between us and the source of record — exactly what
+    // this registry exists to avoid.
+    state: "HI",
+    county: "Maui",
+    sourceName: "Maui County, Hawaii — Parcels + Assessment (CAMA, address→TMK crosswalk)",
+    sourceUrl: "https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/30",
+    queryUrl: "https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/30/query",
+    addressKeyJoin: {
+      queryUrl: "https://services3.arcgis.com/fsrDo0QMPlK9CkZD/arcgis/rest/services/Site_Address_Point/FeatureServer/0/query",
+      addressMatchField: "FULLADDR",
+      keyField: "TMK",
+      parcelKeyField: "cty_tmk",
+      keyTruncateLength: 8,
+    },
+    fields: {
+      parcelId: "tmk_txt",
+      acres: "taxacres",
+      assessedLand: "landvalue",
+      assessedImprovement: "bldgvalue",
+      zoning: "zone",
     },
     assessmentAsOf: null,
   },

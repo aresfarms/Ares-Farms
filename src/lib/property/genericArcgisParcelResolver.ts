@@ -23,7 +23,15 @@ import type { ArcgisParcelSource, ArcgisFieldMap } from "./parcelSourceRegistry"
 import type { AddressInput, JurisdictionParcelRecord } from "./jurisdictionParcelResolver";
 
 const clean = (v: unknown): string | null => { const t = String(v ?? "").trim(); return t || null; };
-const num = (v: unknown): number | null => { const n = Number(v); return Number.isFinite(n) && n !== 0 ? n : null; };
+// Some sources store numeric values as comma-formatted, whitespace-padded
+// TEXT fields (confirmed on Maricopa County, AZ: "  29,514,527") rather than
+// a numeric type — strip thousands separators/whitespace before parsing so
+// real values aren't silently lost to a formatting quirk. A no-op for
+// sources that already return clean numeric types.
+const num = (v: unknown): number | null => {
+  const n = typeof v === "string" ? Number(v.replace(/[,\s]/g, "")) : Number(v);
+  return Number.isFinite(n) && n !== 0 ? n : null;
+};
 const esc = (v: string): string => v.replace(/'/g, "''");
 
 /** Split "10 South Arm Road" → { number: "10", name: "SOUTH ARM" } — strips the

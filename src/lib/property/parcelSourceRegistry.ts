@@ -550,6 +550,32 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     assessmentAsOf: null,
   },
   {
+    // NM's Office of the State Engineer hosts ALL 33 NM counties as
+    // separate layers on ONE service (County_Parcels_2026) — real
+    // structural coverage for the whole state, not just a lead. Bernalillo
+    // (Albuquerque, NM's dominant metro) wired in here; the other 32
+    // counties share this exact schema/host, just a different layer index —
+    // a cheap, high-value follow-up for full NM coverage. No dollar values
+    // on this layer (LocalCamaId/StateCamaId fields suggest values live in a
+    // separate, unpublished CAMA table this service doesn't expose).
+    // Verified: 1209 Scotty Ct SW, Albuquerque -> 0.2497 ac.
+    state: "NM",
+    county: "Bernalillo",
+    sourceName: "New Mexico OSE — Bernalillo County Parcels (Albuquerque, boundary + acreage, no values)",
+    sourceUrl: "https://gis.ose.nm.gov/server_s/rest/services/Parcels/County_Parcels_2026/MapServer/0",
+    queryUrl: "https://gis.ose.nm.gov/server_s/rest/services/Parcels/County_Parcels_2026/MapServer/0/query",
+    addressMatchField: "SitusAddressAll",
+    cityField: "SitusCity",
+    fields: {
+      parcelId: "UPC",
+      address: "SitusAddressAll",
+      acres: "LandArea",
+      landUse: "LandUseDescription",
+      legal: "LegalDescription",
+    },
+    assessmentAsOf: null,
+  },
+  {
     // Metro-county entry (no clean NM statewide layer; Doña Ana is NM's
     // 2nd-largest county). Verified: 701 Two Counties Rd, Garfield ->
     // $82,327 total assessed.
@@ -645,6 +671,30 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     assessmentAsOf: null,
   },
   {
+    // Oklahoma County (Oklahoma City itself, not just the metro exurb like
+    // Canadian above) — full CAMA. currentmarket used for assessedTotal
+    // rather than currentassessed/currenttaxable, which run much lower
+    // under OK's assessment ratio — same "don't understate" reasoning as
+    // WY/SC/MI/AZ above. Verified: 19325 NE 164th St, Luther -> $345,500
+    // market value, 1.53 ac.
+    state: "OK",
+    county: "Oklahoma",
+    sourceName: "Oklahoma County, Oklahoma (OKC) — Assessor Parcels (CAMA)",
+    sourceUrl: "https://ok-county-gis-hub-ok-co.hub.arcgis.com/datasets/tax-parcels-public",
+    queryUrl: "https://services8.arcgis.com/euhkr1dAJeQBIjV0/arcgis/rest/services/TaxParcelsPublics_view/FeatureServer/0/query",
+    addressMatchField: "location",
+    cityField: "city",
+    fields: {
+      parcelId: "pin",
+      address: "location",
+      acres: "acres",
+      assessedLand: "landvalue",
+      assessedTotal: "currentmarket",
+      legal: "legal",
+    },
+    assessmentAsOf: null,
+  },
+  {
     // Multi-county entry: Metro (Portland regional government) compiles
     // Multnomah, Washington, and Clackamas counties into ONE layer — three
     // counties from a single source (verified: 15651 NW Ridgeline St,
@@ -700,19 +750,46 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     assessmentAsOf: null,
   },
   // NOT added: Douglas County, KS (gis.dgcoks.gov/Tax_Parcel) has real
-  // address/acreage/legal data, but its Cloudflare WAF returns HTTP 403
-  // "blocked" specifically on the two-clause `UPPER(field) LIKE 'NUM %' AND
-  // UPPER(field) LIKE '%NAME%'` pattern this resolver always builds for
-  // addressMatchField sources — confirmed a single simple LIKE (no UPPER(),
-  // one clause) returns 200 from the same host. Every real production
-  // lookup would silently 403. Fixing this needs a per-source "skip UPPER(),
-  // single-clause" query mode, not just a registry entry — a real but
-  // separate follow-up if KS coverage is wanted later.
+  // address/acreage/legal data, but its Cloudflare protection returns a
+  // JavaScript challenge page (not a plain 403) after the first flagged
+  // request — confirmed it's bot/rate-limit detection, not a fixable query
+  // pattern: a follow-up request with a SIMPLER query (single LIKE, no
+  // UPPER()) got blocked too, once the IP had been flagged. A server-side
+  // integration has no browser to solve that challenge with, so this isn't
+  // a "tune the WHERE clause" problem — genuinely out of reach this way.
   {
-    // NRPC (Nashua Regional Planning Commission)-hosted, NH's most populous
-    // city outside the Manchester metro. No acreage or value fields on this
-    // layer. Verified: 133 Colgate Rd; fast (though the first live call ran
-    // 1.5s, likely cold-start — well under any usable timeout).
+    // City of Manchester's own GIS (ags.manchesternh.gov) — NH's largest
+    // city, full CAMA. Full name searches for "townofmanchester.org" find a
+    // DIFFERENT Manchester (a town in Connecticut, already covered
+    // statewide) — confirmed this is the correct NH one via the city's own
+    // manchesternh.gov domain and MANCHESTER city values in the data.
+    // Verified: 130 President Rd -> $292,400 total valuation, built 1975.
+    state: "NH",
+    county: "Hillsborough",
+    sourceName: "City of Manchester, New Hampshire — Assessor Parcels (CAMA)",
+    sourceUrl: "https://www.manchesternh.gov/Departments/Assessors",
+    queryUrl: "https://ags.manchesternh.gov/agsgis7/rest/services/Community/Parcels/MapServer/0/query",
+    addressMatchField: "StreetAddress",
+    cityField: "City",
+    fields: {
+      parcelId: "ParcelID",
+      address: "StreetAddress",
+      lotSqft: "TotalLandAreaSqFt",
+      assessedLand: "LandValuation",
+      assessedImprovement: "BuildingsImprovementsValuation",
+      assessedTotal: "TotalValuation",
+      yearBuilt: "YearBuilt",
+      buildingSqft: "TotalLivingAreaSqFt",
+      landUse: "LandUse",
+      buildingStyle: "BuildingStyle",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // NRPC (Nashua Regional Planning Commission)-hosted, NH's 2nd-largest
+    // city. No acreage or value fields on this layer. Verified: 133 Colgate
+    // Rd; fast (though the first live call ran 1.5s, likely cold-start —
+    // well under any usable timeout).
     state: "NH",
     county: "Hillsborough",
     sourceName: "Nashua Regional Planning Commission — Nashua Parcels (boundary + address only, no values)",
@@ -722,6 +799,25 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     fields: {
       parcelId: "LAB_PID",
       address: "LOCATION",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // City of Detroit (not all of Wayne County) — hosted by Detroit Water &
+    // Sewerage Dept for stormwater billing, so it carries acreage but no
+    // assessed values. MI's dominant metro; Wayne County itself has no
+    // county-wide open parcel service found. Verified: 1302 Crawford St ->
+    // 0.084 ac.
+    state: "MI",
+    county: "Wayne",
+    sourceName: "City of Detroit (DWSD) — Parcels (boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=7e22885870124b69b0b76c83e3412412",
+    queryUrl: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Detroit_Parcels_2025_(Impervious_Surfaces_Viewer)/FeatureServer/2/query",
+    addressMatchField: "address",
+    fields: {
+      parcelId: "parcel_id",
+      address: "address",
+      acres: "TOTALACREAGEFINAL",
     },
     assessmentAsOf: null,
   },
@@ -943,6 +1039,32 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     assessmentAsOf: null,
   },
   {
+    // Maricopa County (Phoenix) — AZ's dominant metro, ~4.5M people, hosted
+    // on the Assessor's own domain (gis.mcassessor.maricopa.gov). Full CAMA:
+    // FCV_CUR (Full Cash Value, market basis) used for assessedTotal rather
+    // than LPV_CUR (Limited Property Value, AZ's capped/taxable figure,
+    // usually lower) — same "don't understate" reasoning as WY/SC/MI above.
+    // Value fields are comma-formatted TEXT ("  29,514,527") — this is what
+    // motivated stripping commas/whitespace in the resolver's num() helper.
+    // Verified: 100 E Tempe Townlake, Tempe -> $1,672,544 FCV, built 2001.
+    state: "AZ",
+    county: "Maricopa",
+    sourceName: "Maricopa County, Arizona (Phoenix) — Assessor Parcels (CAMA)",
+    sourceUrl: "https://maps.mcassessor.maricopa.gov/help/g_rest.html",
+    queryUrl: "https://gis.mcassessor.maricopa.gov/arcgis/rest/services/MaricopaDynamicQueryService/MapServer/3/query",
+    addressMatchField: "PHYSICAL_ADDRESS",
+    cityField: "PHYSICAL_CITY",
+    fields: {
+      parcelId: "APN",
+      address: "PHYSICAL_ADDRESS",
+      lotSqft: "LAND_SIZE",
+      assessedTotal: "FCV_CUR",
+      yearBuilt: "CONST_YEAR",
+      zoning: "CITY_ZONING",
+    },
+    assessmentAsOf: null,
+  },
+  {
     // Metro-county entry — one ArcGIS service actually covers 12 of AZ's 15
     // counties as separate layers (Apache, Cochise, Coconino, Gila, Graham,
     // Greenlee, LaPaz, Navajo, Pima, Pinal, SantaCruz, Yuma — Maricopa/
@@ -1065,6 +1187,38 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     fields: {
       parcelId: "parcel_id",
       address: "prop_add",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Cook County (Chicago) — IL's dominant metro, ~5.1M people, full CAMA
+    // values. All three value fields are STRING-typed on this service (not
+    // numeric — confirmed via field metadata), which is why a numeric WHERE
+    // filter like TotalValue>0 errors; the resolver never builds that kind
+    // of filter (only address-text LIKE clauses), so this doesn't affect
+    // real lookups — Number() coercion downstream handles numeric strings
+    // fine. Verified: 231 W Main St, Barrington -> $65,253 total (2024);
+    // 231 W Main St, Glenwood -> $13,000 total (same address string, two
+    // different suburbs — confirms the resolver's per-row match, not a
+    // guess). BldgSqft returned 0 on a sampled record so treated as
+    // unreliable like Ohio's LandArea — left unmapped.
+    state: "IL",
+    county: "Cook",
+    sourceName: "Cook County, Illinois (Chicago) — Assessor Parcels (CAMA)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=f22d4d1f587447969d6363a36ad1cf31",
+    queryUrl: "https://gis.cookcountyil.gov/traditional/rest/services/cookVwrDynmc/MapServer/44/query",
+    addressMatchField: "Address",
+    cityField: "City",
+    fields: {
+      parcelId: "Pin10",
+      address: "Address",
+      // No county field mapped: TownNum/Town are township codes/names WITHIN
+      // Cook County, not the county name itself — leaving fields.county
+      // unset here rather than surface a township code as if it were "the
+      // county."
+      assessedLand: "LandValue",
+      assessedImprovement: "BldgValue",
+      assessedTotal: "TotalValue",
     },
     assessmentAsOf: null,
   },

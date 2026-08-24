@@ -130,13 +130,21 @@ function score(a: string): number {
  * suite uses.
  */
 const FIXED_CASES: Record<string, { street: string; city: string }> = {
-  OH: { street: "84 W Dodridge St", city: "Columbus" },
-  TX: { street: "1815 Treadwell St", city: "Austin" },
-  TN: { street: "419 Duncan Ln", city: "Andersonville" },
+  "OH:": { street: "84 W Dodridge St", city: "Columbus" },
+  "TX:": { street: "1815 Treadwell St", city: "Austin" },
+  "TN:": { street: "419 Duncan Ln", city: "Andersonville" },
+  // Also fixed, for the same reason — each was skipped on a sampled address
+  // that failed to geocode or produced no usable row, leaving the source with
+  // NO adversarial coverage while the summary still looked clean.
+  "FL:": { street: "2601 NE 160TH LN", city: "Gainesville" },
+  "MS:": { street: "102 Oriole Terrace", city: "Natchez" },
+  "AZ:Coconino": { street: "3167 N Kyle Loop", city: "Flagstaff" },
 };
 
 async function sample(src: ArcgisParcelSource): Promise<{ street: string; city: string } | null> {
-  const fixed = FIXED_CASES[src.state.toUpperCase()];
+  // Keyed by state AND county: Arizona has four sources, and a state-only key
+  // would hand Coconino's address to Maricopa.
+  const fixed = FIXED_CASES[`${src.state.toUpperCase()}:${src.county ?? ""}`];
   if (fixed) return fixed;
   const helper = src.addressKeyJoin ?? src.addressPointsSource;
   const cityField = src.cityField;

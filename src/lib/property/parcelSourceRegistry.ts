@@ -647,8 +647,13 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
       acres: "TOTALACRES",
       assessedLand: "LANDVALUE",
       assessedImprovement: "BLDGVALUE",
-      assessedTotal: "TOTALVALUE",
-      yearBuilt: "RES_YEAR_BUILT",
+      // No assessedTotal / yearBuilt: this layer publishes neither. It was
+      // previously mapped to TOTALVALUE and RES_YEAR_BUILT, which DO NOT
+      // EXIST on the service — and because every mapped field goes into
+      // outFields, that made the whole query 400 and the source return null
+      // for every address. The resolver derives the total from land +
+      // improvement, so nothing is lost by dropping it.
+      lotSqft: "TOTALSQFT",
     },
     assessmentAsOf: null,
   },

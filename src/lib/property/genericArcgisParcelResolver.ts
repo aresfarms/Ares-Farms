@@ -48,6 +48,41 @@ function parseStreet(street: string): { number: string; name: string } | null {
   return { number: m[1].replace(/[^0-9A-Za-z]/g, ""), name };
 }
 
+/** Word pairs jurisdictions record inconsistently INSIDE a street name. The
+ *  street-TYPE suffix (St/Rd/Ave) is already stripped by parseStreet; these
+ *  are the ones that survive into the name we match on. */
+const NAME_EQUIVALENTS: Array<[RegExp, string]> = [
+  [/\bSAINT\b/g, "ST"], [/\bST\b/g, "SAINT"],
+  [/\bMOUNT\b/g, "MT"], [/\bMT\b/g, "MOUNT"],
+  [/\bFORT\b/g, "FT"], [/\bFT\b/g, "FORT"],
+  [/\bNORTH\b/g, "N"], [/\bSOUTH\b/g, "S"], [/\bEAST\b/g, "E"], [/\bWEST\b/g, "W"],
+];
+
+/**
+ * Alternate spellings of a street NAME to match against, because sources
+ * record these differently and a single LIKE silently misses.
+ *
+ * Found live: East Baton Rouge stores "ST LOUIS ST", so a search for
+ * "222 Saint Louis St" returned nothing at all — no error, just an empty
+ * result the customer would read as "no such property".
+ *
+ * Capped deliberately: each variant becomes another OR in the WHERE clause,
+ * and these run against multi-million-row layers. The original spelling is
+ * always first so the common case is unaffected.
+ */
+function streetNameVariants(name: string): string[] {
+  const out = [name];
+  for (const [pattern, replacement] of NAME_EQUIVALENTS) {
+    if (out.length >= 4) break;
+    for (const base of [...out]) {
+      if (out.length >= 4) break;
+      const swapped = base.replace(pattern, replacement);
+      if (swapped !== base && !out.includes(swapped)) out.push(swapped);
+    }
+  }
+  return out;
+}
+
 async function runQuery(url: string, params: URLSearchParams): Promise<Array<Record<string, unknown>>> {
   const res = await governedFetch(`${url}?${params.toString()}`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(12_000) });
   if (!res.ok) return [];
@@ -63,23 +98,72 @@ function parcelOutFields(src: ArcgisParcelSource): string {
   ].filter(Boolean) as string[])].join(",");
 }
 
+/** Significant tokens of a place name — drops the filler words that differ
+ *  between how a person writes a place and how a jurisdiction records it
+ *  ("Wisconsin Dells" vs "TOWN OF DELL PRAIRIE"). */
+function placeTokens(value: string): string[] {
+  return value.toUpperCase().replace(/[^A-Z0-9 ]/g, " ").split(/\s+/)
+    .filter((t) => t.length > 2 && !["TOWN", "CITY", "OF", "THE", "VILLAGE", "TWP", "TOWNSHIP", "BORO", "BOROUGH", "COUNTY", "UNINCORPORATED"].includes(t));
+}
+
+/**
+ * Guard for the city-less retry below. Returns false when the row is clearly
+ * somewhere else entirely.
+ *
+ * Without this, dropping the city filter accepts ANY parcel with the same
+ * street number and name anywhere the source covers: a Rochester MN address
+ * matched a parcel in Hennepin County (Minneapolis) during testing, which
+ * would attach a completely unrelated property's assessed value to an
+ * address. That is the worst failure this resolver can produce.
+ *
+ * Deliberately permissive in the ambiguous direction: if the source publishes
+ * no city for the row, or the names share any significant token, or either
+ * contains the other, the match stands. Only a clear conflict is rejected, so
+ * genuinely messy-but-correct naming still resolves.
+ */
+function cityPlausiblyMatches(src: ArcgisParcelSource, row: Record<string, unknown>, inputCity: string): boolean {
+  if (!src.cityField) return true;
+  const rowCity = clean(row[src.cityField]);
+  const wanted = clean(inputCity);
+  if (!rowCity || !wanted) return true;
+  const a = rowCity.toUpperCase(), b = wanted.toUpperCase();
+  if (a.includes(b) || b.includes(a)) return true;
+  const rowTokens = placeTokens(rowCity), wantTokens = placeTokens(wanted);
+  if (!rowTokens.length || !wantTokens.length) return true;
+  // Prefix-tolerant so singular/plural and shortened forms of the same place
+  // still count as agreement — "Wisconsin Dells" against a parcel recorded in
+  // "TOWN OF DELL PRAIRIE" is the same area, and rejecting it would trade one
+  // wrong answer for a different wrong answer. The 4-character floor keeps
+  // this from matching on incidental short fragments.
+  return rowTokens.some((a) => wantTokens.some((b) => {
+    const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+    return short.length >= 4 && long.startsWith(short);
+  }));
+}
+
 async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Promise<Record<string, unknown> | null> {
   const parsed = parseStreet(input.street);
   if (!parsed) return null;
+  const nameMatch = (field: string) => streetNameVariants(parsed.name)
+    .map((v) => `UPPER(${field}) LIKE '%${esc(v)}%'`).join(" OR ");
   const addressClause = src.addressMatchField
     ? src.addressNumberPosition === "trailing"
-      ? `UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%' AND UPPER(${src.addressMatchField}) LIKE '% ${esc(parsed.number)}'`
-      : `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%'`
+      ? `(${nameMatch(src.addressMatchField)}) AND UPPER(${src.addressMatchField}) LIKE '% ${esc(parsed.number)}'`
+      : `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND (${nameMatch(src.addressMatchField)})`
     : src.streetNumberField && src.streetNameField
-      ? `${src.streetNumberField}=${src.streetNumberFieldType === "numeric" ? esc(parsed.number) : `'${esc(parsed.number)}'`} AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`
+      ? `${src.streetNumberField}=${src.streetNumberFieldType === "numeric" ? esc(parsed.number) : `'${esc(parsed.number)}'`} AND (${nameMatch(src.streetNameField)})`
       : null;
   if (!addressClause) return null;
   const cityClause = src.cityField && clean(input.city) ? ` AND UPPER(${src.cityField}) LIKE '%${esc(input.city.trim().toUpperCase())}%'` : "";
   const base = new URLSearchParams({ f: "json", outFields: parcelOutFields(src), returnGeometry: "false", resultRecordCount: "5" });
   const withCity = new URLSearchParams(base); withCity.set("where", addressClause + cityClause);
-  let rows = await runQuery(src.queryUrl, withCity);
-  if (!rows.length && cityClause) { const noCity = new URLSearchParams(base); noCity.set("where", addressClause); rows = await runQuery(src.queryUrl, noCity); }
-  return rows[0] ?? null;
+  const cityRows = await runQuery(src.queryUrl, withCity);
+  // A city-filtered hit is already qualified — take it as-is.
+  if (cityRows.length) return cityRows[0];
+  if (!cityClause) return null;
+  const noCity = new URLSearchParams(base); noCity.set("where", addressClause);
+  const rows = await runQuery(src.queryUrl, noCity);
+  return rows.find((r) => cityPlausiblyMatches(src, r, input.city)) ?? null;
 }
 
 /** Point-mode sources that ALSO define an address field use the buffer purely

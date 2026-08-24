@@ -71,7 +71,7 @@ async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Prom
       ? `UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%' AND UPPER(${src.addressMatchField}) LIKE '% ${esc(parsed.number)}'`
       : `UPPER(${src.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${src.addressMatchField}) LIKE '%${esc(parsed.name)}%'`
     : src.streetNumberField && src.streetNameField
-      ? `${src.streetNumberField}='${esc(parsed.number)}' AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`
+      ? `${src.streetNumberField}=${src.streetNumberFieldType === "numeric" ? esc(parsed.number) : `'${esc(parsed.number)}'`} AND UPPER(${src.streetNameField}) LIKE '%${esc(parsed.name)}%'`
       : null;
   if (!addressClause) return null;
   const cityClause = src.cityField && clean(input.city) ? ` AND UPPER(${src.cityField}) LIKE '%${esc(input.city.trim().toUpperCase())}%'` : "";

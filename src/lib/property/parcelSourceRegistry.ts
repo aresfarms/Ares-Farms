@@ -58,6 +58,13 @@ export interface ArcgisParcelSource {
   /** Field carrying the street NUMBER (for the address WHERE clause). Used with
    *  streetNameField when the source splits address into number + name (e.g. NY). */
   streetNumberField?: string;
+  /** streetNumberField's actual ArcGIS field type. Matters because the WHERE
+   *  clause quotes the number as a string literal by default (works on NY's
+   *  and Arkansas's text-typed number fields) — set "numeric" when the
+   *  source's field is a genuine integer/double (confirmed on Hennepin
+   *  County, MN's HOUSE_NO: a quoted literal against that field errors with
+   *  HTTP 400, unquoted succeeds). Defaults to "text". */
+  streetNumberFieldType?: "text" | "numeric";
   /** Field carrying the street NAME. */
   streetNameField?: string;
   /** A SINGLE combined address-string field (E911 / site-location, e.g. VT, CT),
@@ -881,6 +888,37 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
       parcelId: "PARCEL_ID",
       address: "LOCATION",
       acres: "ACRES",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // Hennepin County (Minneapolis) — MN's dominant metro, hosted on the
+    // county's own gis.hennepin.us domain. Full CAMA with up to 4 separate
+    // property-type value segments per parcel (PR_TYP1-4/LAND_MV1-4/etc,
+    // for split-use parcels); segment 1's values used as the canonical
+    // figures. No single combined address field — HOUSE_NO/STREET_NM are
+    // separate, same pattern as NY. Verified: 2901 78th St E, Bloomington
+    // -> $3,444,700 market value, built 1965.
+    state: "MN",
+    county: "Hennepin",
+    sourceName: "Hennepin County, Minnesota (Minneapolis) — Parcels (CAMA)",
+    sourceUrl: "https://gis-hennepin.hub.arcgis.com/datasets/county-parcels/explore",
+    queryUrl: "https://gis.hennepin.us/arcgis/rest/services/HennepinData/LAND_PROPERTY/MapServer/1/query",
+    streetNumberField: "HOUSE_NO",
+    streetNumberFieldType: "numeric",
+    streetNameField: "STREET_NM",
+    cityField: "MUNIC_NM",
+    fields: {
+      parcelId: "PID_TEXT",
+      // PARCEL_AREA is square feet, not acres (confirmed against sampled
+      // values) — mapped to lotSqft, NOT acres, so acreageText never labels
+      // a sqft number as acres.
+      lotSqft: "PARCEL_AREA",
+      assessedLand: "LAND_MV1",
+      assessedImprovement: "BLDG_MV1",
+      assessedTotal: "MKT_VAL_TOT",
+      yearBuilt: "BUILD_YR",
+      landUse: "PR_TYP_NM1",
     },
     assessmentAsOf: null,
   },

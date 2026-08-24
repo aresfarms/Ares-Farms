@@ -50,6 +50,17 @@ export interface ArcgisParcelSource {
   state: string;
   /** Optional county name when the source is county-scoped, not statewide. */
   county?: string;
+  /** Human label for what this source ACTUALLY covers, used verbatim in
+   *  customer-facing coverage disclosure. Set it whenever `${county} County`
+   *  would overstate or misname the real extent — a single city inside a
+   *  larger county, an Alaska borough, a Louisiana parish, an independent
+   *  city, or a multi-county region. */
+  coverageArea?: string;
+  /** Set "partial" on a source with NO `county` that is nevertheless not
+   *  truly statewide — a regional compilation, or a state-published layer
+   *  whose own publisher documents missing counties. Without this, a
+   *  county-less source is reported as full statewide coverage. */
+  coverageScope?: "statewide" | "partial";
   sourceName: string;
   /** Human-facing catalog/landing page for provenance. */
   sourceUrl: string;
@@ -578,6 +589,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "LA",
     county: "East Baton Rouge",
     sourceName: "East Baton Rouge Parish GIS — Tax Parcel (CAMA)",
+    coverageArea: "East Baton Rouge Parish",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=b961ea0510d04a2b86fa0ca55a79e8a7",
     queryUrl: "https://maps.brla.gov/gis/rest/services/Cadastral/Tax_Parcel/MapServer/0/query",
     addressMatchField: "PHYSICAL_ADDRESS",
@@ -744,6 +756,8 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     // Portland (Washington Co.) -> $601,280 assessed).
     state: "OR",
     sourceName: "Metro (Portland regional govt) RLIS — Taxlots for Multnomah/Washington/Clackamas Counties",
+    coverageScope: "partial",
+    coverageArea: "the Portland metro area (Multnomah, Washington and Clackamas Counties)",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=b3cabe5845ec47eab61c54e0c631313c",
     queryUrl: "https://services2.arcgis.com/McQ0OlIABe29rJJy/arcgis/rest/services/Taxlots_(Public)/FeatureServer/3/query",
     addressMatchField: "SITEADDR",
@@ -810,6 +824,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "NH",
     county: "Hillsborough",
     sourceName: "City of Manchester, New Hampshire — Assessor Parcels (CAMA)",
+    coverageArea: "the City of Manchester",
     sourceUrl: "https://www.manchesternh.gov/Departments/Assessors",
     queryUrl: "https://ags.manchesternh.gov/agsgis7/rest/services/Community/Parcels/MapServer/0/query",
     addressMatchField: "StreetAddress",
@@ -836,6 +851,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "NH",
     county: "Hillsborough",
     sourceName: "Nashua Regional Planning Commission — Nashua Parcels (boundary + address only, no values)",
+    coverageArea: "the City of Nashua",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=59ffa3bb9e464c46ba572722e5d3d5b2",
     queryUrl: "https://services6.arcgis.com/2ZriDy2NFXltCIFR/arcgis/rest/services/NRPC_Open_Data_Nashua_v2/FeatureServer/2/query",
     addressMatchField: "LOCATION",
@@ -854,6 +870,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "MI",
     county: "Wayne",
     sourceName: "City of Detroit (DWSD) — Parcels (boundary + acreage, no values)",
+    coverageArea: "the City of Detroit (not the rest of Wayne County)",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=7e22885870124b69b0b76c83e3412412",
     queryUrl: "https://services2.arcgis.com/qvkbeam7Wirps6zC/arcgis/rest/services/Detroit_Parcels_2025_(Impervious_Surfaces_Viewer)/FeatureServer/2/query",
     addressMatchField: "address",
@@ -895,6 +912,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "SD",
     county: "Minnehaha",
     sourceName: "City of Sioux Falls / Minnehaha County, South Dakota — Property Parcels (boundary + acreage, no values)",
+    coverageArea: "the Sioux Falls area (Minnehaha County)",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=d57efdf717064169a21c70b8b380e387",
     queryUrl: "https://gis.siouxfalls.gov/arcgis/rest/services/Data/Property/MapServer/1/query",
     addressMatchField: "ADDRESS",
@@ -994,6 +1012,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "MO",
     county: "St. Louis City",
     sourceName: "City of St. Louis Assessor — Public Parcels (CAMA)",
+    coverageArea: "the City of St. Louis (not St. Louis County)",
     sourceUrl: "https://www.stlouis-mo.gov/data/datasets/distribution.cfm?id=119",
     queryUrl: "https://maps8.stlouis-mo.gov/arcgis/rest/services/ASSESSOR/Assessor_Public_Parcels/MapServer/11/query",
     addressMatchField: "SITEADDR",
@@ -1204,6 +1223,8 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     // unmapped; no county field on this layer.
     state: "TX",
     sourceName: "Texas Geographic Information Office (TxGIO) — StratMap Statewide Land Parcels (boundary + address only, partial county coverage, no values)",
+    coverageScope: "partial",
+    coverageArea: "most of Texas (the state compilation omits some counties)",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=03956e7e3fb84df587a54f1ee9e1091f",
     queryUrl: "https://services1.arcgis.com/1mtXwieMId59thmg/arcgis/rest/services/2019_Texas_Parcels_StratMap/FeatureServer/0/query",
     queryMode: "point",
@@ -1328,6 +1349,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "AK",
     county: "Fairbanks North Star",
     sourceName: "Fairbanks North Star Borough, Alaska — Parcels with Taxroll (CAMA, address→PAN crosswalk)",
+    coverageArea: "the Fairbanks North Star Borough",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=4af1635b48c1490784c5f9cb1e0a8a49",
     queryUrl: "https://services.arcgis.com/f4rR7WnIfGBdVYFd/arcgis/rest/services/FNSB_Parcels_with_Taxroll_Information/FeatureServer/0/query",
     addressKeyJoin: {
@@ -1389,6 +1411,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "RI",
     county: "Newport",
     sourceName: "Town of Middletown, Rhode Island — Parcels (Middletown only, boundary + acreage, no values)",
+    coverageArea: "the Town of Middletown",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=c99ab6d06a4943ff984e26abffb68c36",
     queryUrl: "https://services5.arcgis.com/h6RSw6HV2SnVSCaN/arcgis/rest/services/MiddletownParcelsAssess1/FeatureServer/0/query",
     addressMatchField: "Location",
@@ -1412,6 +1435,8 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     // layer. Verified: 17 Ellsworth Rd, Aurora (Hancock County).
     state: "ME",
     sourceName: "Maine GeoLibrary — Statewide Parcels, Organized Towns (boundary + address only, no values; town update cadence varies)",
+    coverageScope: "partial",
+    coverageArea: "Maine's organized towns (unorganized territories are not included)",
     sourceUrl: "https://www.arcgis.com/home/item.html?id=346131b710a645ffb624f448a9cba6d4",
     queryUrl: "https://services1.arcgis.com/RbMX0mRVOFNTdLzd/arcgis/rest/services/Maine_Parcels_Organized_Towns/FeatureServer/10/query",
     streetNumberField: "PROPLOCNUM",
@@ -1447,6 +1472,7 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     state: "HI",
     county: "Maui",
     sourceName: "Maui County, Hawaii — Parcels + Assessment (CAMA, address→TMK crosswalk)",
+    coverageArea: "Maui County",
     sourceUrl: "https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/30",
     queryUrl: "https://geodata.hawaii.gov/arcgis/rest/services/ParcelsZoning/MapServer/30/query",
     addressKeyJoin: {
@@ -1534,8 +1560,131 @@ export const PARCEL_SOURCE_HOSTS: string[] = [
   ),
 ];
 
-/** States with governed parcel coverage today (bespoke + registry), for honest
- *  "we don't cover [state] yet" messaging. */
-export const COVERED_PARCEL_STATES: string[] = [
-  ...new Set(["MD", "DE", ...ARCGIS_PARCEL_SOURCES.map((s) => s.state.toUpperCase())]),
+/** Coverage the two BESPOKE resolvers add on top of the registry array
+ *  (jurisdictionParcelResolver runs these before the generic engine): Maryland
+ *  statewide via SDAT, and Delaware's Sussex County. Declared here so coverage
+ *  reporting reflects what the resolver actually answers, not just what this
+ *  file's array happens to list. */
+const BESPOKE_COVERAGE: Array<{ state: string; county?: string; coverageArea?: string; hasValues: boolean }> = [
+  { state: "MD", hasValues: true },
+  { state: "DE", county: "Sussex", hasValues: true },
 ];
+
+/** States with governed parcel coverage today (bespoke + registry).
+ *
+ *  CAUTION: state-level presence in this list does NOT mean statewide
+ *  coverage — 22 of these states are currently one or a few counties only.
+ *  Use parcelCoverageForState() for anything customer-facing; this flat list
+ *  is for internal inventory and would overstate coverage if rendered
+ *  directly. */
+export const COVERED_PARCEL_STATES: string[] = [
+  ...new Set([
+    ...BESPOKE_COVERAGE.map((b) => b.state),
+    ...ARCGIS_PARCEL_SOURCES.map((s) => s.state.toUpperCase()),
+  ]),
+];
+
+/** Total county count for states we assemble county-by-county and could
+ *  plausibly complete, so "all N counties covered" reports as statewide
+ *  rather than claiming gaps that don't exist. Add a state here only with a
+ *  verified count. */
+const TOTAL_COUNTIES_BY_STATE: Record<string, number> = {
+  DE: 3, // Kent, New Castle, Sussex — all three covered today.
+};
+
+export type ParcelCoverageScope = "STATEWIDE" | "PARTIAL_COUNTIES" | "NONE";
+
+export interface ParcelCoverage {
+  state: string;
+  scope: ParcelCoverageScope;
+  /** Named counties/jurisdictions when scope is PARTIAL_COUNTIES. Empty for
+   *  STATEWIDE and NONE. */
+  counties: string[];
+  /** Whether ANY covering source for this state publishes assessed or market
+   *  dollar values. False means we can locate the parcel but must state that
+   *  no valuation is available from the source — never imply one. */
+  hasAssessedValues: boolean;
+  /** Plain-language sentence safe to show a customer as-is. States the limit
+   *  rather than implying coverage we don't have. */
+  disclosure: string;
+}
+
+/**
+ * What we can HONESTLY say about parcel coverage for one state.
+ *
+ * Exists because "we cover 49 states" is true only at the loosest reading —
+ * many states are a single county, and a customer searching Providence RI or
+ * Louisville KY would get nothing while a naive state-level check claimed
+ * coverage. This reports at the granularity the resolver actually answers at.
+ */
+export function parcelCoverageForState(stateCode: string): ParcelCoverage {
+  const st = stateCode.trim().toUpperCase();
+  const registry = ARCGIS_PARCEL_SOURCES.filter((s) => s.state.toUpperCase() === st);
+  const bespoke = BESPOKE_COVERAGE.filter((b) => b.state === st);
+  const all = [
+    ...bespoke.map((b) => ({
+      county: b.county, coverageArea: b.coverageArea,
+      statewide: !b.county, hasValues: b.hasValues,
+    })),
+    ...registry.map((s) => ({
+      county: s.county, coverageArea: s.coverageArea,
+      // A source is statewide only if it names no county AND isn't flagged
+      // partial by its own publisher's documented gaps.
+      statewide: !s.county && s.coverageScope !== "partial",
+      hasValues: Boolean(s.fields.assessedTotal || s.fields.assessedLand),
+    })),
+  ];
+
+  if (all.length === 0) {
+    return {
+      state: st, scope: "NONE", counties: [], hasAssessedValues: false,
+      disclosure: `We do not have parcel records for ${st} yet.`,
+    };
+  }
+
+  const hasAssessedValues = all.some((a) => a.hasValues);
+  const valueNote = hasAssessedValues
+    ? ""
+    : " Parcel boundaries and identifiers only — this source publishes no assessed value.";
+
+  if (all.some((a) => a.statewide)) {
+    return {
+      state: st, scope: "STATEWIDE", counties: [], hasAssessedValues,
+      disclosure: `We have statewide parcel records for ${st}.${valueNote}`,
+    };
+  }
+
+  // A state whose every county is covered IS statewide, even though it was
+  // assembled county by county (Delaware: all 3 counties).
+  const covered = [...new Set(all.map((a) => a.county).filter(Boolean) as string[])];
+  const totalCounties = TOTAL_COUNTIES_BY_STATE[st];
+  if (totalCounties && covered.length >= totalCounties) {
+    return {
+      state: st, scope: "STATEWIDE", counties: covered.sort(), hasAssessedValues,
+      disclosure: `We have statewide parcel records for ${st} (all ${totalCounties} counties).${valueNote}`,
+    };
+  }
+
+  // Sources with no county but flagged partial are broad-but-gapped state
+  // layers, not a short list of counties — "only, not the rest of the state"
+  // would misdescribe them.
+  if (all.every((a) => !a.county)) {
+    const caveat = all.map((a) => a.coverageArea).filter(Boolean).join("; ");
+    return {
+      state: st, scope: "PARTIAL_COUNTIES", counties: [], hasAssessedValues,
+      disclosure: `Our ${st} parcel records cover ${caveat || "most of the state, with some gaps"}.${valueNote}`,
+    };
+  }
+
+  // Prefer each source's own honest coverageArea label; fall back to
+  // "<county> County" only where that is actually correct.
+  const areas = [...new Set(all.map((a) => a.coverageArea ?? `${a.county} County`))].sort();
+  const counties = [...new Set(all.map((a) => a.county).filter(Boolean) as string[])].sort();
+  const list = areas.length === 1
+    ? areas[0]
+    : `${areas.slice(0, -1).join(", ")} and ${areas[areas.length - 1]}`;
+  return {
+    state: st, scope: "PARTIAL_COUNTIES", counties, hasAssessedValues,
+    disclosure: `In ${st} we currently have parcel records for ${list} only — not the rest of the state.${valueNote}`,
+  };
+}

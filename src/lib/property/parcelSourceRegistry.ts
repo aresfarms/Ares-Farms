@@ -166,6 +166,11 @@ export interface ArcgisParcelSource {
     /** Assessor-table field map (address, values, acres, year built, …). */
     fields: ArcgisFieldMap;
   };
+  /** Override the per-query timeout for a source that is reliably slow.
+   *  Default is 12s. New York's statewide layer measured 6.9-13.4s on
+   *  consecutive identical queries, so the default silently dropped real
+   *  lookups. Raise this only with a measurement, not a guess. */
+  queryTimeoutMs?: number;
   /** The assessment-roll vintage the SOURCE itself publishes, when known. Null
    *  means the source states none — which must be said, never faked. */
   assessmentAsOf?: string | null;
@@ -186,6 +191,8 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     sourceName: "New York State ITS GIS — Statewide Tax Parcel Centroids (ORPTS assessment roll)",
     sourceUrl: "https://gis.ny.gov/parcels",
     queryUrl: "https://gisservices.its.ny.gov/arcgis/rest/services/NYS_Tax_Parcel_Centroid_Points/MapServer/0/query",
+    // Measured 6.9s / 8.4s / 13.4s on identical consecutive queries.
+    queryTimeoutMs: 25_000,
     streetNumberField: "LOC_ST_NBR",
     streetNameField: "LOC_STREET",
     cityField: "CITYTOWN_NAME",

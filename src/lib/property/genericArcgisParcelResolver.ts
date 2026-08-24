@@ -222,11 +222,31 @@ function coreVariants(core: string): string[] {
   return out;
 }
 
-async function runQuery(url: string, params: URLSearchParams): Promise<Array<Record<string, unknown>>> {
-  const res = await governedFetch(`${url}?${params.toString()}`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(12_000) });
-  if (!res.ok) return [];
-  const body = (await res.json()) as { features?: Array<{ attributes?: Record<string, unknown> }> };
-  return (body.features ?? []).map((f) => f.attributes ?? {});
+/**
+ * One governed query, with a single retry when the request TIMES OUT.
+ *
+ * Measured against New York's statewide layer: the same query takes 6.9s,
+ * 8.4s, 13.4s on consecutive attempts, and occasionally 40s+. A fixed 12s
+ * budget therefore fails New York lookups intermittently for no reason the
+ * customer could understand. Sources with this behaviour set their own
+ * queryTimeoutMs; the retry covers the rest.
+ *
+ * Only timeouts are retried — an HTTP error or a bad response is a real
+ * answer and retrying it just doubles the wait.
+ */
+async function runQuery(url: string, params: URLSearchParams, timeoutMs = 12_000): Promise<Array<Record<string, unknown>>> {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await governedFetch(`${url}?${params.toString()}`, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(timeoutMs) });
+      if (!res.ok) return [];
+      const body = (await res.json()) as { features?: Array<{ attributes?: Record<string, unknown> }> };
+      return (body.features ?? []).map((f) => f.attributes ?? {});
+    } catch (error) {
+      const timedOut = (error as Error)?.name === "TimeoutError" || /timeout/i.test(String((error as Error)?.message ?? ""));
+      if (!timedOut || attempt === 1) return [];
+    }
+  }
+  return [];
 }
 
 function parcelOutFields(src: ArcgisParcelSource): string {
@@ -350,7 +370,7 @@ async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Prom
   // candidate set too.
   const base = new URLSearchParams({ f: "json", outFields: parcelOutFields(src), returnGeometry: "false", resultRecordCount: "25" });
   const withCity = new URLSearchParams(base); withCity.set("where", addressClause + cityClause);
-  const cityRows = await runQuery(src.queryUrl, withCity);
+  const cityRows = await runQuery(src.queryUrl, withCity, src.queryTimeoutMs);
   // City-filtered hits are already qualified on location; still rank them so
   // the closest street match wins.
   if (cityRows.length) {
@@ -360,7 +380,7 @@ async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Prom
   // Retry without the city filter — but only when there WAS one to drop.
   if (cityClause) {
     const noCity = new URLSearchParams(base); noCity.set("where", addressClause);
-    const rows = await runQuery(src.queryUrl, noCity);
+    const rows = await runQuery(src.queryUrl, noCity, src.queryTimeoutMs);
     const plausible = rows.filter((r) => cityPlausiblyMatches(src, r, input.city));
     const hit = bestAddressMatch(plausible, src, parsed);
     if (hit) return hit;
@@ -371,10 +391,10 @@ async function findByAddress(src: ArcgisParcelSource, input: AddressInput): Prom
   const looseClause = buildClause(true);
   if (!looseClause || looseClause === addressClause) return null;
   const loose = new URLSearchParams(base); loose.set("where", looseClause + cityClause);
-  let looseRows = await runQuery(src.queryUrl, loose);
+  let looseRows = await runQuery(src.queryUrl, loose, src.queryTimeoutMs);
   if (!looseRows.length && cityClause) {
     const looseNoCity = new URLSearchParams(base); looseNoCity.set("where", looseClause);
-    looseRows = (await runQuery(src.queryUrl, looseNoCity)).filter((r) => cityPlausiblyMatches(src, r, input.city));
+    looseRows = (await runQuery(src.queryUrl, looseNoCity, src.queryTimeoutMs)).filter((r) => cityPlausiblyMatches(src, r, input.city));
   }
   return bestAddressMatch(looseRows, src, parsed);
 }
@@ -404,6 +424,8 @@ async function geocodeViaAddressPoints(
     returnGeometry: "false",
     resultRecordCount: "1",
   });
+  // Default timeout: this is the address-point helper layer, not the parcel
+  // layer, so it carries no per-source override.
   const rows = await runQuery(src.queryUrl, params);
   const lat = Number(rows[0]?.[src.latField]);
   const lon = Number(rows[0]?.[src.lonField]);
@@ -475,7 +497,7 @@ async function findByPoint(src: ArcgisParcelSource, input: AddressInput): Promis
   // when an address field existed, which left every point source WITHOUT one
   // (Florida) still broken.
   if (src.pointBufferMeters) { params.set("distance", String(src.pointBufferMeters)); params.set("units", "esriSRUnit_Meter"); }
-  const rows = await runQuery(src.queryUrl, params);
+  const rows = await runQuery(src.queryUrl, params, src.queryTimeoutMs);
   if (!addressField) return rows[0] ?? null;
 
   const parsed = parseStreet(input.street);

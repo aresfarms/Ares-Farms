@@ -121,7 +121,23 @@ function score(a: string): number {
   return s;
 }
 
+/**
+ * Point-mode sources resolve by GEOCODING, which needs a city, and their
+ * layers either bury the city inside the address string or omit it. Sampling
+ * therefore produces an address that cannot establish a baseline, and the
+ * source gets skipped — meaning TX, OH and TN were receiving NO adversarial
+ * coverage at all. These are the same hand-verified addresses the round-trip
+ * suite uses.
+ */
+const FIXED_CASES: Record<string, { street: string; city: string }> = {
+  OH: { street: "84 W Dodridge St", city: "Columbus" },
+  TX: { street: "1815 Treadwell St", city: "Austin" },
+  TN: { street: "419 Duncan Ln", city: "Andersonville" },
+};
+
 async function sample(src: ArcgisParcelSource): Promise<{ street: string; city: string } | null> {
+  const fixed = FIXED_CASES[src.state.toUpperCase()];
+  if (fixed) return fixed;
   const helper = src.addressKeyJoin ?? src.addressPointsSource;
   const cityField = src.cityField;
   let rows: Array<Record<string, unknown>>; let f: string; let cf: string | null;

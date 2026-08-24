@@ -113,6 +113,37 @@ async function geocodeViaAddressPoints(
   return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
 }
 
+/** Two-step lookup for parcel layers with no usable address field of their
+ *  own: resolve the address to a parcel key via the jurisdiction's published
+ *  crosswalk, then fetch the parcel by that key. Deterministic (a published
+ *  key match, not a spatial approximation). */
+async function findByAddressKeyJoin(
+  src: ArcgisParcelSource & { addressKeyJoin: NonNullable<ArcgisParcelSource["addressKeyJoin"]> },
+  input: AddressInput,
+): Promise<Record<string, unknown> | null> {
+  const join = src.addressKeyJoin;
+  const parsed = parseStreet(input.street);
+  if (!parsed) return null;
+  const keyRows = await runQuery(join.queryUrl, new URLSearchParams({
+    f: "json",
+    where: `UPPER(${join.addressMatchField}) LIKE '${esc(parsed.number)} %' AND UPPER(${join.addressMatchField}) LIKE '%${esc(parsed.name)}%'`,
+    outFields: join.keyField,
+    returnGeometry: "false",
+    resultRecordCount: "1",
+  }));
+  const key = clean(keyRows[0]?.[join.keyField]);
+  if (!key) return null;
+  const literal = join.parcelKeyFieldType === "numeric" ? esc(key) : `'${esc(key)}'`;
+  const rows = await runQuery(src.queryUrl, new URLSearchParams({
+    f: "json",
+    where: `${join.parcelKeyField}=${literal}`,
+    outFields: parcelOutFields(src),
+    returnGeometry: "false",
+    resultRecordCount: "1",
+  }));
+  return rows[0] ?? null;
+}
+
 async function findByPoint(src: ArcgisParcelSource, input: AddressInput): Promise<Record<string, unknown> | null> {
   let lat = input.lat != null ? Number(input.lat) : NaN;
   let lon = input.lon != null ? Number(input.lon) : NaN;
@@ -154,7 +185,11 @@ async function findByPoint(src: ArcgisParcelSource, input: AddressInput): Promis
 }
 
 export async function resolveArcgisParcel(src: ArcgisParcelSource, input: AddressInput): Promise<JurisdictionParcelRecord | null> {
-  const parcel = src.queryMode === "point" ? await findByPoint(src, input) : await findByAddress(src, input);
+  const parcel = src.addressKeyJoin
+    ? await findByAddressKeyJoin(src as ArcgisParcelSource & { addressKeyJoin: NonNullable<ArcgisParcelSource["addressKeyJoin"]> }, input)
+    : src.queryMode === "point"
+      ? await findByPoint(src, input)
+      : await findByAddress(src, input);
   if (!parcel) return null;
 
   // Optional assessor-table join: look up values by the shared parcel key.

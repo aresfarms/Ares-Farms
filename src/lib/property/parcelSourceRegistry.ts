@@ -105,6 +105,32 @@ export interface ArcgisParcelSource {
     latField: string;
     lonField: string;
   };
+  /** Some parcel layers carry NO usable address field at all, but the
+   *  jurisdiction publishes a separate address → parcel-key CROSSWALK. Look
+   *  the key up by address there first, then fetch the parcel by that key.
+   *  This is the REVERSE direction from assessJoin below (which finds the
+   *  parcel first, then joins values onto it).
+   *
+   *  Confirmed on Fairbanks North Star Borough, AK: the taxroll parcel layer
+   *  publishes only the OWNER's mailing address (not the property's own
+   *  location), while a separate `address_pan` layer maps street address →
+   *  PAN parcel number. Strictly better than a spatial guess here — a
+   *  Census-geocoded point on this same layer landed on a road
+   *  right-of-way parcel (PAN 9999999, all values null), not the home. */
+  addressKeyJoin?: {
+    /** The address→key crosswalk layer's `/query` endpoint. */
+    queryUrl: string;
+    /** Combined address-string field on the crosswalk layer. */
+    addressMatchField: string;
+    /** The parcel-key field on the CROSSWALK layer. */
+    keyField: string;
+    /** The matching key field on the PARCEL layer. */
+    parcelKeyField: string;
+    /** Whether parcelKeyField is a genuine numeric type (unquoted in the
+     *  WHERE clause) or text. Same quoting concern as
+     *  streetNumberFieldType. Defaults to "text". */
+    parcelKeyFieldType?: "text" | "numeric";
+  };
   /** Optional related assessor TABLE joined on a shared parcel key (e.g. MassGIS
    *  L3: a geometry parcel layer + an ASSESS table joined on LOC_ID). When set, the
    *  resolver looks up this table after finding the parcel and its fields take
@@ -1279,6 +1305,93 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     assessmentAsOf: null,
   },
   {
+    // ALASKA — first AK coverage. The taxroll layer publishes current (2026)
+    // land/improvement/total values but NO property address, only the
+    // OWNER's mailing address, so neither address-mode nor point-mode works:
+    // a Census-geocoded point landed on a road right-of-way parcel (PAN
+    // 9999999, all values null) rather than the home. The borough publishes
+    // a separate address→PAN crosswalk (43,380 addresses), so this uses
+    // addressKeyJoin — a published key match, not a spatial guess. PAN is a
+    // genuine integer on both layers. Verified end to end: 2091 Flight St ->
+    // PAN 327778 -> $24,968 land + $400,349 improvements = $425,317 total,
+    // tax year 2026, Residential.
+    state: "AK",
+    county: "Fairbanks North Star",
+    sourceName: "Fairbanks North Star Borough, Alaska — Parcels with Taxroll (CAMA, address→PAN crosswalk)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=4af1635b48c1490784c5f9cb1e0a8a49",
+    queryUrl: "https://services.arcgis.com/f4rR7WnIfGBdVYFd/arcgis/rest/services/FNSB_Parcels_with_Taxroll_Information/FeatureServer/0/query",
+    addressKeyJoin: {
+      queryUrl: "https://services.arcgis.com/f4rR7WnIfGBdVYFd/arcgis/rest/services/address_pan/FeatureServer/0/query",
+      addressMatchField: "Address",
+      keyField: "PAN",
+      parcelKeyField: "PAN",
+      parcelKeyFieldType: "numeric",
+    },
+    fields: {
+      parcelId: "PAN",
+      assessedLand: "Land_Value",
+      assessedImprovement: "Improvements",
+      assessedTotal: "Total_Value",
+      landUse: "Assessing_Primary_Use",
+      legal: "PARCEL_SUB",
+    },
+    // The layer stamps its own Tax_Year (2026 on sampled rows), but the
+    // registry's assessmentAsOf is a static string and this value is
+    // per-record — left null rather than hardcode a year that could drift.
+    assessmentAsOf: null,
+  },
+  {
+    // IOWA — first IA coverage. Woodbury County (Sioux City, IA's 4th most
+    // populous). Address is split across addr_num + addr_stname, same shape
+    // as NY/Hennepin; both are text-typed here (no numeric-quoting issue).
+    // Polk County (Des Moines) was checked first and rejected: its layer
+    // carries a house number but NO street name at all, so an address match
+    // is impossible there. No value fields on this layer (net_tax/con_tax
+    // are tax billed, not assessed value — deliberately not mapped to a
+    // value field). Verified: 4765 340th St, Danbury -> 39 ac, Ag_Dwelling.
+    state: "IA",
+    county: "Woodbury",
+    sourceName: "Woodbury County, Iowa (Sioux City) — Parcel Data (boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=e0c2830cf2a74fd39d3875434d756fb4",
+    queryUrl: "https://services.arcgis.com/kd1jFI4TM5bZHeP8/arcgis/rest/services/Woodbury_County_IA_Parcel_Data_Feature/FeatureServer/0/query",
+    streetNumberField: "addr_num",
+    streetNameField: "addr_stname",
+    cityField: "addr_city",
+    fields: {
+      parcelId: "PIN",
+      acres: "land_acres",
+      lotSqft: "land_sq_ft",
+      landUse: "land_class_descr",
+      zoning: "ZONING",
+      legal: "legal",
+    },
+    assessmentAsOf: null,
+  },
+  {
+    // RHODE ISLAND — first RI coverage, and honestly a SMALL one: the town
+    // of Middletown only (~16k people), not Providence. RI has no statewide
+    // parcel service and most towns route through vendor portals; this is
+    // the one town found publishing a real queryable layer with a situs
+    // address. AValPerSF (assessed value per square foot) is deliberately
+    // NOT mapped to a value field — deriving a total from it would be a
+    // computation this source does not publish. Verified: 331 Wolcott Ave
+    // -> 0.28 ac.
+    state: "RI",
+    county: "Newport",
+    sourceName: "Town of Middletown, Rhode Island — Parcels (Middletown only, boundary + acreage, no values)",
+    sourceUrl: "https://www.arcgis.com/home/item.html?id=c99ab6d06a4943ff984e26abffb68c36",
+    queryUrl: "https://services5.arcgis.com/h6RSw6HV2SnVSCaN/arcgis/rest/services/MiddletownParcelsAssess1/FeatureServer/0/query",
+    addressMatchField: "Location",
+    fields: {
+      parcelId: "PIN",
+      address: "Location",
+      acres: "GIS_AC",
+      lotSqft: "GIS_SF",
+      zoning: "DominantZo",
+    },
+    assessmentAsOf: null,
+  },
+  {
     // Metro-county entry (no clean AL statewide layer; Mobile County is AL's
     // 3rd most populous). Verified: 19975 Shepard Lake Rd, Mt Vernon -> 1.0
     // ac; fast query (0.56s). No value fields on this layer.
@@ -1329,8 +1442,19 @@ export function parcelSourcesForState(stateCode: string): ArcgisParcelSource[] {
  *  outbound allowlist so adding a source can't open an ungoverned egress path. */
 export const PARCEL_SOURCE_HOSTS: string[] = [
   ...new Set(
+    // EVERY outbound URL a source can reach must be listed here, not just the
+    // primary parcel layer — addressPointsSource and addressKeyJoin each hit
+    // their own endpoint, and a source whose helper layer lives on a
+    // different host than its parcel layer would otherwise be rejected by
+    // governedFetch at runtime (they happen to be same-host today, which is
+    // exactly why this is easy to miss).
     ARCGIS_PARCEL_SOURCES.flatMap((s) => {
-      const urls = [s.queryUrl, ...(s.assessJoin ? [s.assessJoin.tableUrl] : [])];
+      const urls = [
+        s.queryUrl,
+        ...(s.assessJoin ? [s.assessJoin.tableUrl] : []),
+        ...(s.addressPointsSource ? [s.addressPointsSource.queryUrl] : []),
+        ...(s.addressKeyJoin ? [s.addressKeyJoin.queryUrl] : []),
+      ];
       return urls.map((u) => { try { return new URL(u).hostname.toLowerCase(); } catch { return ""; } });
     }).filter(Boolean),
   ),

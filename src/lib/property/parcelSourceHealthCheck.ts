@@ -60,11 +60,15 @@ async function probeEndpoint(label: string, url: string, timeoutMs: number): Pro
   }
 }
 
-/** Checks one registry entry's query endpoint(s), including its assessor-table
- *  join when the source has one — both must respond for the source to be "ok". */
+/** Checks every endpoint one registry entry depends on — the parcel layer plus
+ *  any assessor-table join, address-point source, or address→key crosswalk.
+ *  ALL of them must respond for the source to be "ok": a source whose helper
+ *  layer is down is broken in practice even if its parcel layer answers. */
 export async function checkParcelSourceHealth(src: ArcgisParcelSource, timeoutMs = 10_000): Promise<ParcelSourceHealth> {
   const endpoints: ParcelEndpointHealth[] = [await probeEndpoint("parcel layer", src.queryUrl, timeoutMs)];
   if (src.assessJoin) endpoints.push(await probeEndpoint("assessor table", src.assessJoin.tableUrl, timeoutMs));
+  if (src.addressPointsSource) endpoints.push(await probeEndpoint("address points", src.addressPointsSource.queryUrl, timeoutMs));
+  if (src.addressKeyJoin) endpoints.push(await probeEndpoint("address→key crosswalk", src.addressKeyJoin.queryUrl, timeoutMs));
   return {
     state: src.state,
     county: src.county ?? null,

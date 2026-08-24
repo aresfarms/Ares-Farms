@@ -11,6 +11,7 @@ import { findCanonicalPropertyByExactAddress, findCanonicalPropertyById } from "
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { officialPropertyEvidenceRecords } from "@/lib/property/officialPropertySourceAdapters";
 import { resolveJurisdictionParcel } from "@/lib/property/jurisdictionParcelResolver";
+import { parcelCoverageForState } from "@/lib/property/parcelSourceRegistry";
 import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnapshot";
 
 
@@ -208,11 +209,48 @@ export async function POST(req: NextRequest) {
         tone: record.parcelMatchConfidence === "review-required" ? "caution" : "neutral",
       });
     }
+    // Why parcel data is (or isn't) here. Follows the same rule this route
+    // already applies to listingStatus below: a null must be EXPLAINED, not
+    // left blank. Without this, a visitor searching Providence RI or
+    // Louisville KY got an empty parcel section indistinguishable from "this
+    // property does not exist" — our parcel coverage in those states is one
+    // town and one rural county respectively. Always included, since the
+    // scope also qualifies a parcel record we DID find.
+    const parcelState = imported.parsedAddress?.state ?? body.stateCode ?? null;
+    const parcelCoverage = parcelState ? parcelCoverageForState(parcelState) : null;
+    // Surface the gap in the brief's own `unknowns` channel — the existing
+    // mechanism for "we cannot verify this yet, here is how you find out" —
+    // rather than as a verified fact, which it is not. Only when we actually
+    // came back empty AND our coverage explains why; a statewide source that
+    // simply had no such address is a different situation and says nothing
+    // about coverage.
+    if (parcelCoverage && !jurisdictionParcel && parcelCoverage.scope !== "STATEWIDE") {
+      placeIntelligence.unknowns.push({
+        label: "County parcel record (not covered here yet)",
+        pointer: `${parcelCoverage.state} county assessor / property appraiser`,
+        howToFind:
+          `${parcelCoverage.disclosure} ` +
+          `Search this address directly on the county assessor or property appraiser site for the county it sits in — ` +
+          `that office is the source of record for parcel boundaries, acreage, and assessed value.`,
+      });
+    }
     const payload = {
       ok: true,
       propertyId: canonicalMatch?.canonical_property_id ?? propertyId,
       canonicalMatch: canonicalMatch
         ? { propertyId: canonicalMatch.canonical_property_id, matchedBy: "normalized-exact-address" }
+        : null,
+      parcelCoverage: parcelCoverage
+        ? {
+            state: parcelCoverage.state,
+            scope: parcelCoverage.scope,
+            areas: parcelCoverage.counties,
+            hasAssessedValues: parcelCoverage.hasAssessedValues,
+            disclosure: parcelCoverage.disclosure,
+            // True only when we found nothing AND the gap is explained by our
+            // own coverage limits rather than by the address itself.
+            explainsMissingParcel: !jurisdictionParcel && parcelCoverage.scope !== "STATEWIDE",
+          }
         : null,
       propertyRecord: matchedSourceRecord || jurisdictionParcel || listingSnapshot
         ? {

@@ -167,14 +167,16 @@ async function findByPoint(src: ArcgisParcelSource, input: AddressInput): Promis
     f: "json", geometry: `${lon},${lat}`, geometryType: "esriGeometryPoint", inSR: "4326",
     spatialRel: "esriSpatialRelIntersects", outFields: parcelOutFields(src), returnGeometry: "false",
   });
-  // resultRecordCount is deliberately omitted when address-matching against a
-  // buffer: at least one production ArcGIS Server (Ohio's OGRIP) times out at
-  // 55s+ and errors when resultRecordCount is combined with distance/units,
-  // while the same query with no resultRecordCount (server default page size)
-  // answers in under a second — confirmed directly against that service.
-  // Without an address field there's no buffer-driven candidate list to
-  // filter, so the original tight cap still applies.
-  if (!addressField) params.set("resultRecordCount", "5");
+  // NEVER send resultRecordCount on a spatial query. Two large production
+  // layers time out pathologically when it is combined with point/spatial
+  // params, while the identical query without it answers in well under a
+  // second — measured, not inferred:
+  //   Ohio OGRIP        55s+ (also returned an outright query error)
+  //   Florida Cadastral 45s+ timeout vs 0.3-0.8s without
+  // It buys nothing either: we take rows[0], or filter the server's default
+  // page client-side. An earlier version of this fix only dropped the param
+  // when an address field existed, which left every point source WITHOUT one
+  // (Florida) still broken.
   if (src.pointBufferMeters) { params.set("distance", String(src.pointBufferMeters)); params.set("units", "esriSRUnit_Meter"); }
   const rows = await runQuery(src.queryUrl, params);
   if (!addressField) return rows[0] ?? null;

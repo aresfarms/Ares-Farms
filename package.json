@@ -16,6 +16,7 @@
     "test:health": "bash scripts/test-health.sh",
     "test:portal-reliability": "tsx src/scripts/portalReliabilityPerformanceTest.ts",
     "verify:parcel-source-health": "tsx src/scripts/verifyParcelSourceHealth.ts",
+    "verify:parcel-roundtrip": "tsx src/scripts/verifyParcelLookupRoundTrip.ts",
     "verify:schema": "tsx src/scripts/verifySchemaSingularity.ts",
     "verify:csp-hydration": "tsx src/scripts/verifyCspHydration.ts",
     "verify:repo-secrets": "tsx src/scripts/verifyRepoSecrets.ts",

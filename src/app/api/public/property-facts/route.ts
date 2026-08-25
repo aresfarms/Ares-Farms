@@ -12,6 +12,7 @@ import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { officialPropertyEvidenceRecords } from "@/lib/property/officialPropertySourceAdapters";
 import { resolveJurisdictionParcel } from "@/lib/property/jurisdictionParcelResolver";
 import { parcelCoverageForState } from "@/lib/property/parcelSourceRegistry";
+import { profileFromUseText } from "@/lib/property/nationalPropertyType";
 import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnapshot";
 
 
@@ -216,6 +217,21 @@ export async function POST(req: NextRequest) {
     // property does not exist" — our parcel coverage in those states is one
     // town and one rural county respectively. Always included, since the
     // scope also qualifies a parcel record we DID find.
+    // The COUNTY'S OWN land-use code, mapped to a property type.
+    //
+    // Reported on 545 Westfall Road, Delanson NY: a 187-acre working farm the
+    // report called residential. The county had already classified it — ORPTS
+    // class 113, livestock farm — and that code was carried in
+    // jurisdictionParcel.landUse and then never consulted for typing, so the
+    // property fell through to lanePropertyType, i.e. the visitor's own guess.
+    //
+    // Ranked BELOW a matched canonical record and a governed listing (both
+    // curated) but ABOVE the visitor's lane, on the principle this codebase
+    // already states in nationalPropertyType: an assessor's own classification
+    // beats any model. This code came from a parcel matched on house number
+    // AND street, so it describes this property and not a neighbour's.
+    const assessorPropertyType = profileFromUseText(jurisdictionParcel?.landUse ?? null);
+
     const parcelState = imported.parsedAddress?.state ?? body.stateCode ?? null;
     const parcelCoverage = parcelState ? parcelCoverageForState(parcelState) : null;
     // Surface the gap in the brief's own `unknowns` channel — the existing
@@ -257,7 +273,7 @@ export async function POST(req: NextRequest) {
             exactAddress: matchedSourceRecord?.exactAddress ?? imported.normalizedAddress,
             zip: matchedSourceRecord?.zip ?? imported.parsedAddress?.zip ?? null,
             rawPropertyStyle: matchedSourceRecord?.rawPropertyStyle ?? listingSnapshot?.propertyType ?? jurisdictionParcel?.landUse ?? (lanePropertyType === "farm" ? "Farm / agricultural property" : lanePropertyType),
-            propertyType: matchedSourceRecord?.propertyType ?? listingSnapshot?.propertyType ?? lanePropertyType,
+            propertyType: matchedSourceRecord?.propertyType ?? listingSnapshot?.propertyType ?? assessorPropertyType ?? lanePropertyType,
             price: matchedSourceRecord?.price ?? listingSnapshot?.askingPrice ?? null,
             county: matchedSourceRecord?.county ?? body.county ?? null,
             town: matchedSourceRecord?.town ?? body.town ?? imported.parsedAddress?.city ?? null,

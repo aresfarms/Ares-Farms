@@ -137,9 +137,18 @@ export function profileFromUseText(
   const wiClasses = t.split(",").map((c) => c.trim());
   if (wiClasses.some((c) => c === "4" || c === "5m" || c === "6"))
     return "farm";
-  // Ohio's StateLUC 100-129 and Indiana's DLGF 100-series are agricultural.
+  // The 100-series is agricultural in every numeric-code jurisdiction this
+  // reads: Ohio StateLUC, Indiana DLGF, and New York ORPTS.
+  //
+  // Range widened from 100-129 to the full 100-199 for New York, whose ORPTS
+  // agricultural codes run past 129 — 140 truck crops, 150/151 orchard, 170
+  // nursery/greenhouse, 180 game preserve, 190 fish hatchery. A real 187-acre
+  // livestock farm (545 Westfall Rd, class 113) already fell inside the old
+  // range, but an orchard or nursery would have been typed as "unknown" and
+  // fallen through to the visitor's own guess. Ohio and Indiana also treat
+  // 100-199 as agricultural, so widening does not disturb them.
   const numeric = Number.parseInt(t, 10);
-  if (Number.isFinite(numeric) && numeric >= 100 && numeric <= 129)
+  if (Number.isFinite(numeric) && numeric >= 100 && numeric <= 199)
     return "farm";
 
   if (

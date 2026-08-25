@@ -245,6 +245,16 @@ async function runOne(state: string, area: string, street: string, city: string,
   }
 }
 
+/** Print each result the moment it lands. A full run now covers ~100 sources
+ *  and takes many minutes; batching all output to the end makes it impossible
+ *  to tell a slow run from a hung one. */
+function report(r: Result): void {
+  const tag = r.outcome === "RESOLVED" ? "PASS" : r.outcome === "NO_MATCH" ? "FAIL" : r.outcome;
+  console.log(`[${tag}] ${r.state} · ${r.area}`);
+  console.log(`        tried: ${r.sampledAddress ?? "—"}`);
+  console.log(`        ${r.detail}`);
+}
+
 async function main() {
   const only = process.argv[2]?.toUpperCase().split(",").filter(Boolean) ?? null;
   const results: Result[] = [];
@@ -256,26 +266,25 @@ async function main() {
     try {
       sample = await sampleAddress(src);
     } catch (e) {
-      results.push({ state: src.state, area, outcome: "ERROR", sampledAddress: null, detail: `sampling failed: ${(e as Error).message}` });
+      const r: Result = { state: src.state, area, outcome: "ERROR", sampledAddress: null, detail: `sampling failed: ${(e as Error).message}` };
+      results.push(r); report(r);
       continue;
     }
     if (!sample) {
-      results.push({ state: src.state, area, outcome: "NO_SAMPLE", sampledAddress: null, detail: "no usable address found in source data" });
+      const r: Result = { state: src.state, area, outcome: "NO_SAMPLE", sampledAddress: null, detail: "no usable address found in source data" };
+      results.push(r); report(r);
       continue;
     }
-    results.push(await runOne(src.state, area, sample.street, sample.city));
+    const r = await runOne(src.state, area, sample.street, sample.city);
+    results.push(r);
+    report(r);
   }
 
   for (const b of BESPOKE_CASES) {
     if (only && !only.includes(b.state)) continue;
-    results.push(await runOne(b.state, b.area, b.street, b.city));
-  }
-
-  for (const r of results) {
-    const tag = r.outcome === "RESOLVED" ? "PASS" : r.outcome === "NO_MATCH" ? "FAIL" : r.outcome;
-    console.log(`[${tag}] ${r.state} · ${r.area}`);
-    console.log(`        tried: ${r.sampledAddress ?? "—"}`);
-    console.log(`        ${r.detail}`);
+    const r = await runOne(b.state, b.area, b.street, b.city);
+    results.push(r);
+    report(r);
   }
 
   const counts = results.reduce<Record<string, number>>((a, r) => ({ ...a, [r.outcome]: (a[r.outcome] ?? 0) + 1 }), {});

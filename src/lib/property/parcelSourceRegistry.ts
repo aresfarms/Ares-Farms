@@ -2265,6 +2265,21 @@ const TOTAL_COUNTIES_BY_STATE: Record<string, number> = {
   AZ: 15, // 13 covered; Mohave and Yavapai are not on the shared service.
 };
 
+/**
+ * Why a gap exists, in the customer's terms.
+ *
+ * Stated generically ON PURPOSE. The real reasons vary by jurisdiction — some
+ * counties publish no open GIS service at all, some publish parcel shapes with
+ * no address or value attached, some sit behind a private vendor's portal —
+ * and encoding a specific claim per county would go stale the moment a county
+ * changes what it publishes. This says the true general thing without
+ * asserting something we would then have to keep re-verifying.
+ */
+const GAP_REASON =
+  "We publish parcel records only where the county or state makes them available " +
+  "in a public data service; not every county does. The county assessor or " +
+  "recorder's office remains the source of record either way.";
+
 export type ParcelCoverageScope = "STATEWIDE" | "PARTIAL_COUNTIES" | "NONE";
 
 export interface ParcelCoverage {
@@ -2311,7 +2326,7 @@ export function parcelCoverageForState(stateCode: string): ParcelCoverage {
   if (all.length === 0) {
     return {
       state: st, scope: "NONE", counties: [], hasAssessedValues: false,
-      disclosure: `We do not have parcel records for ${st} yet.`,
+      disclosure: `We do not have parcel records for ${st}. ${GAP_REASON}`,
     };
   }
 
@@ -2366,6 +2381,6 @@ export function parcelCoverageForState(stateCode: string): ParcelCoverage {
         : `${areas.length} counties, including ${areas.slice(0, 3).join(", ")}`;
   return {
     state: st, scope: "PARTIAL_COUNTIES", counties, hasAssessedValues,
-    disclosure: `In ${st} we currently have parcel records for ${list} only — not the rest of the state.${valueNote}`,
+    disclosure: `In ${st} we currently have parcel records for ${list} only — not the rest of the state. ${GAP_REASON}${valueNote}`,
   };
 }

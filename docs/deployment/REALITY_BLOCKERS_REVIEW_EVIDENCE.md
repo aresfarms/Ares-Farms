@@ -69,6 +69,48 @@ BASE_URL=http://localhost:3001 npm run verify:reality-security
 Plus a rendered smoke of each probe above in the Navigator UI (console open,
 watch for zero CSP violations).
 
+## Re-verification at current HEAD (2026-08-24)
+
+**Why this section exists:** the evidence above was gathered at `main @ 06391f4`.
+HEAD is now `5c4914d` — **978 commits later**, and **20 guardrail source files have
+changed** since, including `api/public/navigator/converse/route.ts`,
+`navigator/listingIntake.ts`, `navigator/narrativeInterpreter.ts` and
+`security/requestGuards.ts`. That is exactly the code these four blockers
+certify, so the original bundle must NOT be signed as-written. Re-run below.
+
+| Suite | Result at `5c4914d` | Mode |
+|---|---|---|
+| `verify:navigator` | **PASS** | live (`BASE_URL` set) |
+| `verify:navigator-red-team-v3` | **PASS** — all conversational + guardrail rows green | live |
+| `verify:reality-security` | **PASS** | live |
+| `verify:break-me` (`BREAKME_SEED=42`) | **PASS** — 780 variants, **0 breaks**, under=0 over=0 | live |
+
+### Rendered smoke — NOT refreshed, and this matters
+The bundle calls for a rendered smoke **against a production nonce-CSP server**
+(`NODE_ENV=production` activates the nonce-CSP path in `src/proxy.ts`). The
+re-run above used the **dev server**, which does not exercise that path.
+
+Observed on dev, for what it is worth: the Navigator page rendered, console
+showed **zero CSP violations**, and the only console errors were dev-mode HMR
+websocket noise plus `401 Unauthorized` on `/api/recommendation-releases`
+(an operator endpoint correctly refusing an unauthenticated visitor on a public
+page — the perimeter working as designed, not a defect).
+
+**This is not equivalent evidence.** The rendered-smoke row in the sign-off
+table below should stay unchecked until someone runs it against a production
+nonce-CSP server.
+
+### What is still owner-only
+Recording sign-off remains yours. The build agent re-ran the suites and reported
+results; it did **not** review the evidence, did **not** record sign-off, and did
+**not** close any blocker. Posture is unchanged: 10 open, `production_ready=false`.
+
+Note also that **REALITY-URL-001 is deliberately absent** from this bundle and is
+not review-ready — it stays open until a real licensed fetcher is mounted and the
+SSRF sandbox is verified against the live fetch path. Four blockers here, not five.
+
+---
+
 ## Sign-off (OWNER — leave blank until you have actually reviewed)
 For each, record name + date + the evidence you personally reviewed. Recording
 sign-off is what moves the blocker toward closure; it is NOT done in this file by

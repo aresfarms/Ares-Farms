@@ -676,9 +676,25 @@ export function buildOwnershipCostModel(
   const recurringLow = monthly.reduce((sum, line) => sum + line.low, 0);
   const recurringHigh = monthly.reduce((sum, line) => sum + line.high, 0);
 
-  const cheapestEntry = scenarios[0];
-  const twentyDown = scenarios[scenarios.length - 1];
-  const monthlyTotals = [cheapestEntry, twentyDown].map((s) => ({
+  // Farm mode shows EVERY financing structure the model built, not just the
+  // cheapest and the cash-down bookend.
+  //
+  // Showing first-and-last put "FSA Direct Farm Ownership" at the top of the
+  // report as though it were the path. It is one path, and it is the one that
+  // runs through USDA's direct loan-making — the program with a documented
+  // record of discrimination against farmers who are not white men (the
+  // Pigford litigation, and the 2022 Inflation Reduction Act §22007 relief
+  // that exists because of it). A borrower who will not, or would rather not,
+  // rely on that channel was being shown a headline number for it and no
+  // priced alternative except the 25%-cash-down bookend.
+  //
+  // The commercially-originated structures the model ALREADY computes —
+  // FSA Guaranteed through a local ag bank, and an equity-secured loan through
+  // a Farm Credit association — now appear with their own numbers, so the
+  // choice of channel is the borrower's and not an artifact of which two
+  // array positions were sampled.
+  const shown = inputs.farmMode ? scenarios : [scenarios[0], scenarios[scenarios.length - 1]];
+  const monthlyTotals = shown.map((s) => ({
     program: s.program,
     low: round10(s.monthlyPrincipalInterest + s.monthlyMortgageInsurance + recurringLow),
     high: round10(s.monthlyPrincipalInterest + s.monthlyMortgageInsurance + recurringHigh),

@@ -191,11 +191,24 @@ export const ARCGIS_PARCEL_SOURCES: ArcgisParcelSource[] = [
     sourceName: "New York State ITS GIS — Statewide Tax Parcel Centroids (ORPTS assessment roll)",
     sourceUrl: "https://gis.ny.gov/parcels",
     queryUrl: "https://gisservices.its.ny.gov/arcgis/rest/services/NYS_Tax_Parcel_Centroid_Points/MapServer/0/query",
-    // Measured 6.9s / 8.4s / 13.4s on identical consecutive queries.
+    // POINT MODE, not text search. Measured on 545 Westfall Rd (a real farm):
+    //   text search, no city clause .................  7.3s
+    //   text search WITH the city clause ............ 67.8s  → every timeout blown
+    //   indexed spatial query ........................ 0.4s  → found it
+    // The text path also failed for a second reason: the customer's postal
+    // town ("Delanson") is not the TOWN OF RECORD ("Wright"), so the city
+    // clause matched nothing and the fallback then timed out. Postal name ≠
+    // assessing town is normal across rural New York, so the city clause was
+    // both slow and wrong.
     queryTimeoutMs: 25_000,
     streetNumberField: "LOC_ST_NBR",
     streetNameField: "LOC_STREET",
-    cityField: "CITYTOWN_NAME",
+    // cityField DELIBERATELY UNSET. CITYTOWN_NAME is the assessing TOWN, not
+    // the postal name a customer types: 545 Westfall Rd is posted "Delanson"
+    // but assessed in the town of "Wright". Filtering on it matched nothing
+    // AND made the query 9x slower, so it was both wrong and expensive.
+    // Candidates are still verified on LOC_ST_NBR + LOC_STREET and ranked, so
+    // dropping the clause widens the search without loosening the match.
     fields: {
       parcelId: "PRINT_KEY",
       address: "PARCEL_ADDR",

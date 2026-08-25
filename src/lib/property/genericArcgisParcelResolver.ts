@@ -510,14 +510,24 @@ async function findByPoint(src: ArcgisParcelSource, input: AddressInput): Promis
   let bestScore = 0;
   for (const r of rows) {
     const rowTokens = normalizeStreetTokens(String(r[addressField] ?? ""));
-    const numberOk = src.addressNumberPosition === "trailing"
-      ? rowTokens[rowTokens.length - 1] === parsed.number
-      : rowTokens[0] === parsed.number;
+    // Sources that keep the house number in its OWN field (New York:
+    // LOC_ST_NBR + LOC_STREET) put only the street name in addressField, so
+    // comparing the first token to the house number would always fail and
+    // reject every candidate. Check the dedicated number field instead.
+    const numberOk = src.streetNumberField && !src.addressMatchField
+      ? normalizeStreetTokens(String(r[src.streetNumberField] ?? ""))[0] === parsed.number
+      : src.addressNumberPosition === "trailing"
+        ? rowTokens[rowTokens.length - 1] === parsed.number
+        : rowTokens[0] === parsed.number;
     if (!numberOk) continue;
     const score = rowTokens.filter((t) => wanted.has(t)).length;
     if (score > bestScore) { bestScore = score; best = r; }
   }
-  return best ?? rows[0] ?? null;
+  // Only return a VERIFIED candidate. A spatial buffer returns every
+  // neighbouring parcel, so falling back to rows[0] here would hand back
+  // whichever parcel happened to sort first — a wrong-property answer, which
+  // is worse than saying nothing.
+  return best;
 }
 
 export async function resolveArcgisParcel(src: ArcgisParcelSource, input: AddressInput): Promise<JurisdictionParcelRecord | null> {

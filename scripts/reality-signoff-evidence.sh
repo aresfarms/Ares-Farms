@@ -18,7 +18,10 @@ set -uo pipefail
 PORT="${PORT:-3011}"
 BASE="http://localhost:${PORT}"
 SEED="${BREAKME_SEED:-42}"          # the seed the evidence bundle prescribes
-LOG="$(pwd)/reality-evidence-$(date +%Y%m%d-%H%M%S).log"
+# Log goes to a TEMP dir, never the repo. Writing it into the working tree made
+# the tree dirty, which this script's own dirty-tree check then refused on the
+# next run — it broke itself on the second invocation.
+LOG="$(mktemp -t reality-evidence).log"
 SERVER_PID=""
 
 cleanup() {

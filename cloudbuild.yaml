@@ -43,7 +43,7 @@ steps:
         npm run verify:cloud-upload-context
         npm run verify:borrower-financial-controls
         npm run verify:institutional-assurance
-        npm run verify:master-volumes
+        npm run verify:master-volume-mirror
         npm run verify:scanner-image-policy
         npm run verify:secret-rotation-workflow
         npm run verify:external-connector-auth

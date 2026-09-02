@@ -28,11 +28,13 @@ export function evaluateProtectedPageRole(
   }
 
   if (pathname === "/lender-desk" || pathname.startsWith("/lender-desk/")) {
-    const allowed = role === "lender" || role === "governance";
+    // Historical route name retained for compatibility; this surface is the
+    // broker deal desk. Lenders must use their separate institution-scoped lane.
+    const allowed = role === "broker" || role === "governance";
     return {
       protected: true,
       allowed,
-      reason: allowed ? "lender-desk-role" : "lender-desk-denied",
+      reason: allowed ? "broker-desk-role" : "broker-desk-denied",
     };
   }
 

@@ -3,7 +3,11 @@ import assert from "node:assert/strict";
 import { evaluateProtectedPageRole } from "@/lib/auth/pageRolePolicy";
 import { isInternalChromeRoute } from "@/lib/auth/protectedRoutes";
 
-assert.equal(evaluateProtectedPageRole("/lender-desk", "lender").allowed, true);
+assert.equal(evaluateProtectedPageRole("/lender-desk", "broker").allowed, true);
+assert.equal(
+  evaluateProtectedPageRole("/lender-desk", "lender").allowed,
+  false,
+);
 assert.equal(
   evaluateProtectedPageRole("/lender-desk", "sponsor").allowed,
   false,
@@ -66,7 +70,8 @@ console.log(
   JSON.stringify(
     {
       ok: true,
-      lenderSurfaceOnly: "/lender-desk",
+      brokerSurfaceOnly: "/lender-desk",
+      lenderSurfaceSeparated: true,
       buildingProfessionalLanesFailClosed: true,
       internalConsolesProfessionalDenied: true,
       syntheticFixtureChromeIsolated: true,

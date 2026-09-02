@@ -1,14 +1,19 @@
 "use client";
 
-import { startAuthentication, startRegistration } from "@simplewebauthn/browser";
+import {
+  startAuthentication,
+  startRegistration,
+} from "@simplewebauthn/browser";
 import { useState } from "react";
 
-const DEFAULT_DESTINATION = "/internal";
+const DEFAULT_DESTINATION = "/professional-access";
 
 type MfaMode = "register" | "authenticate";
 
 function requestedDestination(): string {
-  const requested = new URLSearchParams(window.location.search).get("callbackUrl");
+  const requested = new URLSearchParams(window.location.search).get(
+    "callbackUrl",
+  );
   if (!requested) return DEFAULT_DESTINATION;
 
   try {

@@ -264,8 +264,18 @@ const domainEvidence: Array<[RegExp, string[], string[]]> = [
   ],
 ];
 
+function cloudBuildPortableEvidence(pathname: string): boolean {
+  const normalized = pathname.replace(/\\/g, "/");
+  const excludedPrefixes = ["infra/", "artifacts/", "data/", "review-exports/", "journey-photos/", "work/", "scratch/", "tmp/"];
+  if (excludedPrefixes.some((prefix) => normalized.startsWith(prefix))) return false;
+  if (normalized.split("/").includes("coverage")) return false;
+  return true;
+}
+
 function existing(items: string[]): string[] {
-  return [...new Set(items)].filter((x) => fs.existsSync(x));
+  return [...new Set(items)].filter(
+    (x) => fs.existsSync(x) && cloudBuildPortableEvidence(x),
+  );
 }
 function classify(id: string, currentStatus: unknown): MirrorStatus {
   if (AWAITING.has(id)) return "awaiting_controlled_promotion";

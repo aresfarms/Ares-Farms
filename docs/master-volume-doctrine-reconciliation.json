@@ -3223,7 +3223,6 @@
       "evidence": [
         "src/lib/governance/constitutionalDoctrineRuntime.ts",
         "src/app/api/implementation/manifest/route.ts",
-        "src/app/api/implementation/coverage/route.ts",
         "src/scripts/backendModuleReadinessGate.ts",
         "src/scripts/masterVolumeConformanceTest.ts",
         "src/db/schema/missingDoctrineGovernance.ts",
@@ -7481,8 +7480,6 @@
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/scripts/verifyCloudBuildUploadContext.ts",
-        "infra/keyless-ci/main.tf",
-        "infra/keyless-ci/README.md",
         "src/lib/security/apiSecurityPolicy.ts",
         "src/lib/auth/accessControl.ts",
         "src/db/schema/accessSecurity.ts",

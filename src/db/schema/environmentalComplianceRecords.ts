@@ -37,7 +37,13 @@ export const borrowerProtectionFeeControls = pgTable(
     borrowerId: text("borrower_id"),
     tenantId: text("tenant_id").notNull(),
     actorId: text("actor_id"),
+    moduleId: text("module_id"),
+    serviceCode: text("service_code"),
+    scopeAcceptanceId: text("scope_acceptance_id"),
     feeType: text("fee_type").notNull(),
+    maximumFeeAmount: integer("maximum_fee_amount"),
+    feeRateAmount: integer("fee_rate_amount"),
+    currency: text("currency").notNull().default("USD"),
     feeAmount: integer("fee_amount").notNull().default(0),
     standardMarketRateAmount: integer("standard_market_rate_amount")
       .notNull()
@@ -46,6 +52,10 @@ export const borrowerProtectionFeeControls = pgTable(
       .notNull()
       .default(0),
     feeDisclosureRef: text("fee_disclosure_ref").notNull(),
+    disclosureVersion: text("disclosure_version"),
+    regulatoryBasis: text("regulatory_basis"),
+    waiverConditions: jsonb("waiver_conditions"),
+    enforcementMechanism: text("enforcement_mechanism"),
     disclosureStatus: text("disclosure_status").notNull(),
     disclosedBeforeAssessment: boolean("disclosed_before_assessment")
       .notNull()
@@ -61,6 +71,9 @@ export const borrowerProtectionFeeControls = pgTable(
       .notNull()
       .default(false),
     providerSelection: text("provider_selection"),
+    scopeAcceptedBeforeWork: boolean("scope_accepted_before_work").notNull().default(false),
+    disclosureAt: timestamp("disclosure_at", { withTimezone: true }),
+    borrowerAcceptedAt: timestamp("borrower_accepted_at", { withTimezone: true }),
     governanceVersion: text("governance_version").notNull(),
     classification: text("classification").notNull(),
     replayRef: text("replay_ref"),

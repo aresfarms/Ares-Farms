@@ -68,6 +68,7 @@ export * from "./applicationDocuments";
 export * from "./applications";
 export * from "./auditEvents";
 export * from "./billingEvents";
+export * from "./borrowerFinancialControls";
 export * from "./borrowerNoticeDeliveries";
 export * from "./borrowerNoticeDeliveryReceipts";
 export * from "./borrowerNoticeExceptionResolutions";
@@ -115,3 +116,5 @@ export * from "./sovereignConsentGatewayRecords";
 export * from "./treasury";
 export * from "./versionRegistry";
 export * from "./syntheticFixtureLineage";
+
+export * from "./institutionalAssuranceControls";

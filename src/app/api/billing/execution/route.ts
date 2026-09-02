@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { evaluateAccess } from "@/lib/auth/accessControl";
+import { sessionAuthority } from "@/lib/auth/sessionAuthority";
+import { evaluateRecordedPaymentAuthorization } from "@/lib/treasury/borrowerFinancialControlStore";
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
 import { persistPaymentConnectorExecution } from "@/lib/billing/paymentConnectorControlStore";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
@@ -52,19 +54,15 @@ type PaymentExecutionRequest = {
   consentStatus?: string | null;
   isolationRef?: string | null;
   isolationStatus?: string | null;
+  scopeAcceptanceId?: string | null;
+  feeControlId?: string | null;
+  actualWorkEvidenceId?: string | null;
+  moduleAttribution?: string | null;
   metadata?: Record<string, unknown>;
 };
 
 function createPaymentExecutionTraceId(): string {
   return `payment-execution-${randomUUID()}`;
-}
-
-function actorId(body: PaymentExecutionRequest): string | null {
-  return body.actorId ?? body.userId ?? null;
-}
-
-function routeActorRole(body: PaymentExecutionRequest): unknown {
-  return body.role ?? body.metadata?.role ?? body.metadata?.actorRole ?? "user";
 }
 
 function executionResponse(
@@ -180,7 +178,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = (await req.json()) as PaymentExecutionRequest;
-    const actor = actorId(body);
+    const authority = sessionAuthority(req);
+    const actor = authority.actorId;
 
     const runtimeGuard = runRuntimeGuard({
       operation: "payment-connector.execution",
@@ -202,7 +201,7 @@ export async function POST(req: NextRequest) {
     });
 
     const access = evaluateAccess({
-      role: routeActorRole(body),
+      role: authority.role,
       allowedRoles: ["operator", "admin", "governance"],
       operation: "payment-connector.execution",
       module: "api.billing.execution",
@@ -355,6 +354,27 @@ export async function POST(req: NextRequest) {
       }
     );
 
+    const financialPreflight = await evaluateRecordedPaymentAuthorization({
+      tenantId: body.tenantId!,
+      scopeAcceptanceId: body.scopeAcceptanceId,
+      feeControlId: body.feeControlId,
+      actualWorkEvidenceId: body.actualWorkEvidenceId,
+      moduleAttribution: body.moduleAttribution,
+      expectedAmountCents: body.amountTotal ?? null,
+    });
+    if (!financialPreflight.allowed) {
+      const observability = createObservabilityEvent({
+        eventType: "PAYMENT_EXECUTION_FINANCIAL_CONTROL_BLOCKED",
+        domain: "operations",
+        severity: "WARN",
+        message: "Payment execution authorization was blocked by the borrower financial-control chain.",
+        traceId, replayRef: traceId, actorId: actor, module: "api.billing.execution",
+        metadata: { blockers: financialPreflight.blockers },
+      });
+      const evidence = await persistGovernanceEvidence({ traceId, replayRef: traceId, observability, metadata: { route: "/api/billing/execution", financialPreflight } });
+      return NextResponse.json({ ok: false, error: "Payment authorization requires accepted scope, fee control, module attribution, and verified actual-work evidence.", financialPreflight, governance: { traceId, runtimeGuard, access, versionRuntime, observability, evidence } }, { status: 409 });
+    }
+
     const paymentExecution = await persistPaymentConnectorExecution({
       traceId,
       adapterId: body.adapterId,
@@ -377,6 +397,11 @@ export async function POST(req: NextRequest) {
       isolationStatus: body.isolationStatus,
       metadata: {
         ...(body.metadata ?? {}),
+        financialPreflight,
+        scopeAcceptanceId: body.scopeAcceptanceId ?? null,
+        feeControlId: body.feeControlId ?? null,
+        actualWorkEvidenceId: body.actualWorkEvidenceId ?? null,
+        moduleAttribution: body.moduleAttribution ?? null,
         access,
       },
     });

@@ -6,6 +6,11 @@ import Stripe from "stripe";
 
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
 import {
+  recordGovernedPayment,
+  recordModuleRevenueAttribution,
+  recordObservedProviderRefund,
+} from "@/lib/treasury/borrowerFinancialControlStore";
+import {
   Entitlement,
   EntitlementPlan,
   EntitlementType,
@@ -60,6 +65,7 @@ import {
  */
 
 type StripeWebhookPayload = {
+  id?: string;
   type?: string;
   data?: {
     object?: {
@@ -490,14 +496,17 @@ export async function POST(req: Request) {
       };
     } else if (
       event.type === "payment_intent.payment_failed" ||
-      event.type === "charge.dispute.created"
+      event.type === "charge.dispute.created" ||
+      event.type === "charge.refunded"
     ) {
       fraudDecision = {
         disposition: "BLOCK",
         reasons: [
           event.type === "charge.dispute.created"
             ? "DISPUTE_OPENED"
-            : "PAYMENT_FAILED",
+            : event.type === "charge.refunded"
+              ? "REFUND_OBSERVED"
+              : "PAYMENT_FAILED",
         ],
         releaseAllowed: false,
         humanReviewRequired: true,
@@ -716,6 +725,75 @@ export async function POST(req: Request) {
       },
       syntheticFixtureContext,
     });
+
+    let governedPaymentRecord: Awaited<ReturnType<typeof recordGovernedPayment>> | null = null;
+    let moduleAttributionRecord: Awaited<ReturnType<typeof recordModuleRevenueAttribution>> | null = null;
+    let governedRefundRecord: Awaited<ReturnType<typeof recordObservedProviderRefund>> | null = null;
+    if (!syntheticFixtureContext && event.type === "checkout.session.completed") {
+      const checkoutSession = stripeEvent.data.object as Stripe.Checkout.Session;
+      const scopeAcceptanceId = checkoutSession.metadata?.scopeAcceptanceId;
+      const feeControlId = checkoutSession.metadata?.feeControlId;
+      const actualWorkEvidenceId = checkoutSession.metadata?.actualWorkEvidenceId;
+      const moduleAttribution = checkoutSession.metadata?.moduleAttribution;
+      if (
+        scopeAcceptanceId && scopeAcceptanceId !== "none" &&
+        feeControlId && feeControlId !== "none" &&
+        actualWorkEvidenceId && actualWorkEvidenceId !== "none" &&
+        moduleAttribution && moduleAttribution !== "none"
+      ) {
+        const providerPaymentRef =
+          typeof checkoutSession.payment_intent === "string"
+            ? checkoutSession.payment_intent
+            : checkoutSession.id;
+        const amount = ((checkoutSession.amount_total ?? 0) / 100).toFixed(2);
+        governedPaymentRecord = await recordGovernedPayment({
+          provider: "stripe",
+          providerPaymentRef,
+          billingEventId: billingEvent.billingEventId,
+          scopeAcceptanceId,
+          feeControlId,
+          actualWorkEvidenceId,
+          moduleAttribution,
+          amount,
+          currency: (checkoutSession.currency ?? "usd").toUpperCase(),
+          paymentPurpose: requestedPlan ?? "professional-service",
+          status: fraudDecision?.releaseAllowed ? "processor_completed_released" : "processor_completed_hold",
+          liveCapture: livePaymentConnector,
+          traceId,
+        });
+        moduleAttributionRecord = await recordModuleRevenueAttribution({
+          paymentRecordId: governedPaymentRecord.paymentRecordId,
+          moduleId: moduleAttribution,
+          serviceCode: requestedPlan ?? "professional-service",
+          providerEntity: "Furlong",
+          grossAmount: amount,
+          refundAmount: "0.00",
+          netAmount: amount,
+          contributorShare: "0.00",
+          platformOverhead: "0.00",
+          currency: (checkoutSession.currency ?? "usd").toUpperCase(),
+          restrictions: { paymentReleaseAllowed: fraudDecision?.releaseAllowed ?? false },
+          taxPosture: "PENDING_RECONCILIATION",
+          relatedParty: false,
+          traceId,
+        });
+      }
+    } else if (!syntheticFixtureContext && event.type === "charge.refunded") {
+      const charge = stripeEvent.data.object as Stripe.Charge;
+      const providerPaymentRef =
+        typeof charge.payment_intent === "string" ? charge.payment_intent : null;
+      if (providerPaymentRef) {
+        governedRefundRecord = await recordObservedProviderRefund({
+          providerPaymentRef,
+          providerRefundRef: event.id ?? traceId,
+          amount: ((charge.amount_refunded ?? 0) / 100).toFixed(2),
+          currency: (charge.currency ?? "usd").toUpperCase(),
+          reason: "Stripe charge refund observed",
+          status: "processor_refund_observed",
+          traceId,
+        });
+      }
+    }
 
     const explanation = createExplanationLineage({
       outputIdentifier: traceId,

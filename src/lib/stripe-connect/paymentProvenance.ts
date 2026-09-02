@@ -56,6 +56,10 @@ export function furlongCheckoutMetadata(input: {
   customerSubjectRef?: string | null;
   dealRef?: string | null;
   revenueClass: RevenueClass;
+  scopeAcceptanceId?: string | null;
+  feeControlId?: string | null;
+  actualWorkEvidenceId?: string | null;
+  moduleAttribution?: string | null;
   syntheticFixtureContext?: SyntheticFixtureContext | null;
 }): Record<string, string> {
   return {
@@ -70,6 +74,10 @@ export function furlongCheckoutMetadata(input: {
     customerSubjectRef: input.customerSubjectRef?.trim() || "none",
     dealRef: input.dealRef?.trim() || "none",
     revenueClass: input.revenueClass,
+    scopeAcceptanceId: input.scopeAcceptanceId?.trim() || "none",
+    feeControlId: input.feeControlId?.trim() || "none",
+    actualWorkEvidenceId: input.actualWorkEvidenceId?.trim() || "none",
+    moduleAttribution: input.moduleAttribution?.trim() || "none",
     transferGroup: checkoutTransferGroup(input.traceId),
   };
 }

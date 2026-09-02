@@ -78,6 +78,8 @@ export const CANONICAL_GOVERNANCE_MIGRATION_FILES = [
   "0051_per_user_password.sql",
   "0052_plaid_secure_data.sql",
   "0053_synthetic_fixture_lineage.sql",
+  "0054_borrower_financial_control_chain.sql",
+  "0055_institutional_assurance_controls.sql",
 ] as const;
 
 /** Directory holding the canonical governance migration SQL files. */

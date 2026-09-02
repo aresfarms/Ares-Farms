@@ -151,6 +151,30 @@ function applyModuleConformance(
   }
 
   if (
+    manifest.id === "billing" ||
+    manifest.id.includes("treasury") ||
+    manifest.dataDependencies.some((dependency) =>
+      [
+        "engagement-scope-acceptances",
+        "borrower-protection-fee-controls",
+        "service-delivery-evidence-records",
+        "treasury-revenue-events",
+        "governed-payment-records",
+        "governed-refund-records",
+        "treasury-reconciliation-records",
+      ].includes(dependency)
+    )
+  ) {
+    requirements.push(
+      "CANON-ECON-001",
+      "CANON-TREASURY-001",
+      "TREASURY-ENGINE-001",
+      "OPS-TREASURY-001",
+      "REG-TREASURY-001"
+    );
+  }
+
+  if (
     manifest.id.includes("environmental") ||
     manifest.dataDependencies.some((dependency) =>
       [
@@ -634,12 +658,22 @@ const rawModuleManifests: Array<Omit<ModuleManifest, "requiredGovernance">> = [
     route: "/billing",
     audience: ["internal"],
     permissions: ["billing:read", "payments:review"],
-    dataDependencies: ["billing-events", "payment-connector-executions"],
+    dataDependencies: [
+      "billing-events",
+      "payment-connector-executions",
+      "engagement-scope-acceptances",
+      "borrower-protection-fee-controls",
+      "service-delivery-evidence-records",
+      "treasury-revenue-events",
+      "governed-payment-records",
+      "governed-refund-records",
+      "treasury-reconciliation-records",
+    ],
     publicSurfaceAllowed: false,
     productionBlocked: true,
     claimsProfile: "live-action-blocked",
     replayRequired: true,
-    description: "Billing, entitlement, and payment connector controls without payment capture.",
+    description: "Billing and payment governance with advance scope acceptance, fee-control, actual-work evidence, module attribution, payment/refund lineage, and treasury reconciliation; production capture remains separately gated.",
     adjacentModules: ["promotion", "module-readiness"],
     eventsPublished: ["payment.capture.blocked"],
     eventsConsumed: ["partner.workflow.opened"],

@@ -5,7 +5,7 @@ import path from "node:path";
 import { chainAppend, verifyLedgerChain } from "@/lib/security/ledgerHashChain";
 import type { InstitutionalReviewRole } from "@/lib/governance/institutionalEvidenceAccess";
 
-export type ProfessionalCredentialRole = InstitutionalReviewRole | "lender" | "sponsor";
+export type ProfessionalCredentialRole = InstitutionalReviewRole | "broker" | "lender" | "sponsor";
 
 export const INSTITUTIONAL_CREDENTIAL_VERIFICATION_RULE =
   "INSTITUTIONAL-CREDENTIAL-VERIFICATION-001" as const;

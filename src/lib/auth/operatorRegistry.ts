@@ -113,10 +113,10 @@ export function internalLenderDeskRole(
   email: string | null | undefined,
   environment: string | null | undefined = process.env
     .FURLONG_DEPLOYMENT_ENVIRONMENT,
-): "lender" | null {
+): "broker" | null {
   const normalizedEnvironment = (environment ?? "development")
     .trim()
     .toLowerCase();
   if (normalizedEnvironment === "production") return null;
-  return canOperateLenderDesk(email) ? "lender" : null;
+  return canOperateLenderDesk(email) ? "broker" : null;
 }

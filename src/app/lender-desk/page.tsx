@@ -16,7 +16,7 @@ import {
 } from "@/app/internalModuleKit";
 
 /**
- * Lender Deal Desk — the licensed lender's working console
+ * Broker Deal Desk — the commercial debt broker's working console
  * (founder direction 2026-08-05).
  *
  * One screen answers "what does Stuart do from his end": every financing
@@ -473,8 +473,8 @@ export default function LenderDeskPage() {
       <div style={moduleContainerStyle}>
         <ModuleHeader
           moduleNumber="LD"
-          title="Lender Deal Desk"
-          subtitle="Every financing deal, its documents, the closing timeline, and the customer communication loop — in one governed console."
+          title="Broker Deal Desk"
+          subtitle="Borrower financing requests, documents, pro forma coordination, lender routing, and the customer communication loop — in one governed broker console."
           badges={[
             "Broker Access Only",
             emailReady ? "Reminders Live" : "Reminders Pending Email Config",
@@ -530,7 +530,7 @@ export default function LenderDeskPage() {
               </span>
             </div>
             <iframe
-              title="Lender calendar agenda"
+              title="Broker calendar agenda"
               src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(calendarSrc)}&mode=AGENDA&showTitle=0&showPrint=0&showTabs=0&showCalendars=0`}
               style={{ border: 0, width: "100%", height: 340, borderRadius: 8 }}
             />

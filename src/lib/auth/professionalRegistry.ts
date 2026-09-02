@@ -20,7 +20,7 @@ import type { AccessRole } from "@/lib/auth/accessControl";
 export interface ProfessionalGrant {
   email: string;
   name: string;
-  role: Extract<AccessRole, "lender" | "attorney" | "auditor" | "sponsor">;
+  role: Extract<AccessRole, "broker" | "lender" | "attorney" | "auditor" | "sponsor">;
   /** Organization of record — shown in access logs, never to customers. */
   organization: string;
   /** Why this person has access; the audit answer to "who let them in". */
@@ -35,9 +35,9 @@ export const PROFESSIONAL_GRANTS: ProfessionalGrant[] = [
   {
     email: "sfraas@aresfarmsinc.com",
     name: "Stuart",
-    role: "lender",
+    role: "broker",
     organization: "Furlong Inc. — Compass to Capital",
-    basis: "Network commercial debt broker; financing deals route to this desk.",
+    basis: "Network commercial debt broker; borrower financing requests route to the broker workspace before any governed lender handoff.",
   },
 ];
 

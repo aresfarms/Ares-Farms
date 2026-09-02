@@ -7,7 +7,7 @@ import { recordSecurityEvent } from "@/security/securityRuntimeGuards";
 export const ZERO_TRUST_ACCESS_VERSION = "zero-trust-access-v1";
 
 export const PRIVILEGED_MFA_ROLES = new Set([
-  "lender", "sponsor", "operator", "underwriter", "auditor",
+  "broker", "lender", "sponsor", "operator", "underwriter", "auditor",
   "government_official", "attorney", "admin", "governance",
 ]);
 

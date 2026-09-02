@@ -60,8 +60,8 @@ export const PROTECTED_PAGE_PREFIXES = [
   "/security/mfa",
   "/security/password-setup",
   "/portal",
-  // The Lender Deal Desk is auth-gated but does NOT wear the internal
-  // operator chrome — the licensed lender gets a clean working surface,
+  // The Broker Deal Desk is auth-gated but does NOT wear the internal
+  // operator chrome — the broker gets a clean working surface,
   // not the 76-console engine room (founder test 2026-08-05).
   "/lender-desk",
 ] as const;

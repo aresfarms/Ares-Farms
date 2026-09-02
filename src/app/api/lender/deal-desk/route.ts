@@ -47,7 +47,7 @@ import { serviceRequests } from "@/db/schema";
 import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixtureLineageStore";
 
 /**
- * Lender Deal Desk API — the licensed lender's governed working surface
+ * Broker Deal Desk API — the commercial debt broker's governed working surface
  * (founder direction 2026-08-05).
  *
  * GET  ?view=deals                          → all financing deals + desk state
@@ -61,7 +61,7 @@ import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixture
  *        DOCUMENTS_REQUESTED (3-day spacing, cap 3, honest per-deal reasons)
  *
  * Master Volume Governance:
- * - Vol I: accountable authority — role-gated via evaluateAccess (lender/
+ * - Vol I: accountable authority — role-gated via evaluateAccess (broker/
  *   operator/admin/governance), behind IAP at the platform boundary.
  * - Vol II: regulated borrower-document handling; single-file audited reads;
  *   customer communication is minimum-disclosure (reminder emails carry a
@@ -74,7 +74,7 @@ import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixture
  */
 
 const MODULE = "api.lender.deal-desk";
-const ALLOWED_ROLES: AccessRole[] = ["lender", "governance"];
+const ALLOWED_ROLES: AccessRole[] = ["broker", "governance"];
 const VALID_STATUSES = new Set(FINANCING_DEAL_STATUSES.map((s) => s.status));
 
 function traceIdFor(op: string): string {
@@ -121,10 +121,10 @@ async function resolveIdentity(
   const lenderAccess = await evaluateProfessionalAccess({
     principalId: sessionActor,
     principalEmail: email,
-    requestedRole: "lender",
+    requestedRole: "broker",
   });
   if (lenderAccess.allowed) {
-    return { role: "lender", actorId: lenderAccess.principalId };
+    return { role: "broker", actorId: lenderAccess.principalId };
   }
 
   // Stuart is the named internal steward of the licensed lending spoke. In
@@ -144,12 +144,12 @@ async function resolveIdentity(
   }
 
   const sessionRole = req.headers.get("x-ares-authenticated-role")?.trim();
-  if (sessionRole === "lender") {
-    return { role: "lender", actorId: sessionActor };
+  if (sessionRole === "broker") {
+    return { role: "broker", actorId: sessionActor };
   }
 
   if (!apiAuthEnforcementRequired()) {
-    return { role: "lender", actorId: sessionActor ?? "dev-lender-console" };
+    return { role: "broker", actorId: sessionActor ?? "dev-broker-console" };
   }
 
   return { role: "user", actorId: sessionActor };
@@ -193,7 +193,7 @@ function denied(traceId: string, actorId: string | null, operation: string) {
     eventType: "LENDER_DEAL_DESK_ACCESS_DENIED",
     domain: "security",
     severity: "WARN",
-    message: "Lender deal desk access was denied by runtime or role controls.",
+    message: "Broker deal desk access was denied by runtime or role controls.",
     traceId,
     replayRef: traceId,
     actorId,
@@ -203,7 +203,7 @@ function denied(traceId: string, actorId: string | null, operation: string) {
   return NextResponse.json(
     {
       ok: false,
-      error: "Role is not authorized for the lender deal desk.",
+      error: "Role is not authorized for the broker deal desk.",
       governance: { traceId, observability },
     },
     { status: 403 },

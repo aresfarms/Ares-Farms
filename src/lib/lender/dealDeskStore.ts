@@ -14,8 +14,8 @@ import {
 } from "@/lib/notifications/lenderSignature";
 
 /**
- * Lender Deal Desk store (founder direction 2026-08-05): the licensed
- * lender's working surface over financing deals — status + customer-visible
+ * Broker Deal Desk store (founder direction 2026-08-05): the commercial
+ * debt broker's working surface over borrower financing requests — status + customer-visible
  * note + closing timeline (lender-editable for USDA/SBA backlogs), the
  * document register, and the automatic document-reminder engine that ends
  * the customer-chasing Stuart hates.

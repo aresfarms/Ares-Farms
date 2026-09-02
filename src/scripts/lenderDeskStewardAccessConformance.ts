@@ -11,11 +11,11 @@ assert.equal(canOperateLenderDesk("chudson@aresfarmsinc.com"), false);
 assert.equal(canOperateLenderDesk("frances@aresfarmsinc.com"), false);
 assert.equal(
   internalLenderDeskRole("sfraas@aresfarmsinc.com", "staging"),
-  "lender",
+  "broker",
 );
 assert.equal(
   internalLenderDeskRole("sfraas@aresfarmsinc.com", "development"),
-  "lender",
+  "broker",
 );
 assert.equal(
   internalLenderDeskRole("sfraas@aresfarmsinc.com", "production"),
@@ -48,7 +48,7 @@ console.log(
     {
       ok: true,
       operator: "sfraas@aresfarmsinc.com",
-      stagingRole: "lender",
+      stagingRole: "broker",
       productionBridgeDisabled: true,
       phishingResistantMfa: "Windows Hello passkey",
       syntheticExternalNotificationsSuppressed: true,

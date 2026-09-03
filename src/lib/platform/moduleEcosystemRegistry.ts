@@ -15,7 +15,7 @@
  *  - Furlong Core does NOT: underwrite, approve, qualify, broker loans, submit
  *    applications, make legal/tax/financial determinations, decide for the
  *    user, or force a transaction path.
- *  - Five Borough Capital is NOT Furlong — it may CONNECT as a professional
+ *  - An external broker workspace is NOT Furlong — it may CONNECT as a professional
  *    financing module under its own professional authority. The build must
  *    never merge those two layers.
  *
@@ -120,12 +120,12 @@ export const MODULE_ECOSYSTEM: EcosystemModule[] = [
     auditReplay: "reality-security replay", fallback: STANDARD_FALLBACK, dependsOnHub: false,
   },
   {
-    id: "five-borough-capital", name: "Five Borough Capital Module", kind: "licensed_professional",
-    doctrine: "Stuart Fraass's LICENSED financing module — separate professional authority; NOT Furlong; never merged into core",
+    id: "five-borough-capital", name: "External Broker Workspace", kind: "licensed_professional",
+    doctrine: "External professional financing spoke - separate authority; NOT Furlong; never merged into core; no ownership or governance rights conveyed",
     activation: "inactive", publicSurface: false,
     inputContract: "explicit user opt-in handoff + user-provided financials (never silent submission)",
     outputContract: "professional structuring under its own authority and disclosures",
-    eligibilityGate: "licensing + counsel + founders' economics session (membership/monetization shelved until then)",
+    eligibilityGate: "credential verification + counsel + owner-approved economics policy (membership/monetization remains separately governed)",
     reviewGate: "licensed human professional review", auditReplay: "module-owned audit (separate from core)",
     fallback: STANDARD_FALLBACK, dependsOnHub: false,
   },

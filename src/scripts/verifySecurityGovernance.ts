@@ -21,7 +21,7 @@ const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 const CI = process.argv.includes("--ci");
 const TMP = path.join(process.cwd(), "data", "sec-gov-test.ndjson");
 const INCIDENT = path.join(process.cwd(), "data", "incident-state.json");
-const ap = (f: "caitlin" | "stuart", r = "ok"): ApprovalRecord => ({ founderId: f, channel: "in-person", ts: new Date().toISOString(), rationale: r });
+const ap = (f: "owner" | "independent-reviewer", r = "ok"): ApprovalRecord => ({ founderId: f, channel: "in-person", ts: new Date().toISOString(), rationale: r });
 
 async function main() {
   const live = await fetch(BASE, { signal: AbortSignal.timeout(3000) }).then(() => true).catch(() => false);
@@ -42,13 +42,13 @@ async function main() {
   }
 
   // C/E — multi-party founder governance.
-  ok(requireMultiParty("prod-permissions", [ap("caitlin")]).ok === false, "C: single founder cannot change prod permissions");
-  ok(requireMultiParty("prod-permissions", [ap("caitlin"), ap("stuart")]).ok === true, "C: two founders can change prod permissions");
-  ok(requireMultiParty("disable-audit", [ap("caitlin"), ap("stuart")]).ok === true, "C: all-founders can disable audit (quorum met)");
-  ok(requireMultiParty("disable-audit", [ap("caitlin"), ap("caitlin")]).ok === false, "C: duplicate approver rejected");
-  ok(requireMultiParty("financial-high-risk", [ap("caitlin"), ap("caitlin")]).ok === false, "E: Stuart steward required for financial high-risk");
-  ok(requireMultiParty("financial-high-risk", [ap("stuart")]).ok === false, "E: Stuart alone is NOT unilateral override");
-  ok(requireMultiParty("financial-high-risk", [ap("stuart"), ap("caitlin")]).ok === true, "E: Stuart + 1 founder approves financial high-risk");
+  ok(requireMultiParty("prod-permissions", [ap("owner")]).ok === false, "C: owner alone cannot change prod permissions");
+  ok(requireMultiParty("prod-permissions", [ap("owner"), ap("independent-reviewer")]).ok === true, "C: owner + independent reviewer can change prod permissions");
+  ok(requireMultiParty("disable-audit", [ap("owner"), ap("independent-reviewer")]).ok === true, "C: role-separated quorum can clear the protected control gate");
+  ok(requireMultiParty("disable-audit", [ap("owner"), ap("owner")]).ok === false, "C: duplicate approver rejected");
+  ok(requireMultiParty("financial-high-risk", [ap("owner"), ap("owner")]).ok === false, "E: independent reviewer required for financial high-risk");
+  ok(requireMultiParty("financial-high-risk", [ap("independent-reviewer")]).ok === false, "E: independent reviewer alone is NOT unilateral override");
+  ok(requireMultiParty("financial-high-risk", [ap("independent-reviewer"), ap("owner")]).ok === true, "E: owner + independent reviewer approve financial high-risk");
   ok(governanceInvariants().ok, `C: governance invariants — ${governanceInvariants().findings.join("; ")}`);
 
   // D — human-security traps (must REFUSE without out-of-band verification).
@@ -108,6 +108,6 @@ async function main() {
   const st = securityHardeningStatus();
   console.log(`verify:security-governance — live:${live ? "RAN" : "CI-SKIP"} · gate=${SECURITY_HARDENING_GOVERNANCE} · implemented=${st.counts.implemented}/${st.counts.total} · partial=${st.counts.partial} doctrine=${st.counts.doctrineOnly} missing=${st.counts.missing} external=${st.counts.requiredExternal} · prod-blockers=${st.productionBlockersOpen.length}`);
   if (fail.length) { console.error(`\n✗ FAIL — ${fail.length}:`); for (const f of fail) console.error("    ✗ " + f); process.exit(1); }
-  console.log("\n✓ verify:security-governance PASS — operator wall + CSRF + headers live-proven; multi-party founder governance (Stuart=steward) enforced; human-security traps refused; MFA/step-up fail-closed; hash-chain detects tamper; sanitization + injection + honeytoken + incident switches enforced; gate ALPHA_PENDING, production blocked.");
+  console.log("\n✓ verify:security-governance PASS — operator wall + CSRF + headers live-proven; role-separated multi-party governance enforced; human-security traps refused; MFA/step-up fail-closed; hash-chain detects tamper; sanitization + injection + honeytoken + incident switches enforced; gate ALPHA_PENDING, production blocked.");
 }
 main().catch((e) => { console.error("error:", e); process.exit(1); });

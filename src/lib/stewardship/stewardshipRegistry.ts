@@ -100,7 +100,7 @@ export const STEWARDSHIP_DOMAINS: StewardshipDomain[] = [
     stewardTitle: "Steward of Financing & Capital",
     description:
       "Helps illuminate the kinds of financing and capital pathways that might fit a project, and the readiness questions worth exploring first.",
-    currentSteward: "Stuart Fraass",
+    currentSteward: "Furlong Capital Desk",
     profileRoute: "/stewardship/financing-capital",
     explorationSpecialistDomain: "FINANCING_CAPITAL",
     helpsIlluminate: [
@@ -154,7 +154,7 @@ export const STEWARDSHIP_DOMAINS: StewardshipDomain[] = [
     stewardTitle: "Steward of Communications & Public Trust",
     description:
       "Helps illuminate how Furlong communicates clearly and keeps your information yours, so you can explore with confidence.",
-    currentSteward: "Frances Fraass",
+    currentSteward: "Furlong Trust Desk",
     profileRoute: "/stewardship/communications-public-trust",
     explorationSpecialistDomain: "PUBLIC_TRUST",
     helpsIlluminate: [

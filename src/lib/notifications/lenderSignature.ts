@@ -7,7 +7,7 @@
  */
 export const LENDER_EMAIL_SIGNATURE =
   `--\n` +
-  `Stuart Fraass | Principal — Domestic Commercial Debt Broker\n` +
+  `Stuart Fraass | Domestic Commercial Debt Broker — External Professional Spoke\n` +
   `Furlong Inc.\n` +
   `Direct: 212.203.6603 | finance@compasstocapital.com\n` +
   `www.furlongpathways.com | linkedin.com/in/stuart-fraass-8959755\n` +
@@ -59,7 +59,7 @@ export function renderLenderEmailHtml(bodyText: string): string {
     `<td style="vertical-align:middle;width:86px;padding-right:20px;"><img src="cid:brand-logo" width="80" height="80" alt="Furlong — Compass to Capital" style="display:block;border-radius:50%;"/></td>` +
     `<td style="vertical-align:middle;border-left:1px solid #e3ddd0;padding-left:20px;">` +
     `<div style="font-family:Didot,'Bodoni MT',Cochin,Garamond,'Times New Roman',serif;font-size:21px;letter-spacing:0.03em;color:#0F1D3A;">Stuart Fraass</div>` +
-    `<div style="font-family:Didot,'Bodoni MT',Garamond,'Times New Roman',serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${GOLD};margin-top:5px;white-space:nowrap;">Principal&nbsp;·&nbsp;Domestic&nbsp;Commercial&nbsp;Debt&nbsp;Broker</div>` +
+    `<div style="font-family:Didot,'Bodoni MT',Garamond,'Times New Roman',serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:${GOLD};margin-top:5px;white-space:nowrap;">Domestic&nbsp;Commercial&nbsp;Debt&nbsp;Broker&nbsp;·&nbsp;External&nbsp;Professional&nbsp;Spoke</div>` +
     `<div style="font-family:Copperplate,'Copperplate Gothic Light',Georgia,serif;font-size:12px;letter-spacing:0.1em;color:${INK_SOFT};margin-top:9px;">Furlong Inc.</div>` +
     `<div style="font-family:Garamond,'Book Antiqua',Palatino,Georgia,serif;font-size:13px;color:${INK_SOFT};margin-top:9px;">212.203.6603` +
     `<span style="color:${GOLD};">&nbsp;&nbsp;·&nbsp;&nbsp;</span>` +

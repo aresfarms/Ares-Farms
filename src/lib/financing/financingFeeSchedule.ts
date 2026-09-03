@@ -6,7 +6,7 @@
  * broker can provide.
  *
  * HONEST DATA RULE: the only filled-in fee is the founder-provided $250/hr
- * advisory rate. Anything else is "Quoted to scope" until Stuart provides the
+ * advisory rate. Anything else is "Quoted to scope" until an approved financing policy provides the
  * real figure — we never fabricate a professional fee or a service he hasn't
  * confirmed offering.
  *

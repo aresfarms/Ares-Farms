@@ -15,7 +15,7 @@ import { accentForLane } from "@/lib/property/laneThemes";
 /**
  * FinancingIntakePanel — the customer-facing intake for the licensed Financial
  * module. The customer submits a financing deal; it is recorded and routed to
- * the licensed lender (Stuart / the lending spoke) who reviews it and follows
+ * an appropriately credentialed lender or external financing spoke that reviews it and follows
  * up. Client component: local readiness preview mirrors the governed route,
  * then submit posts to /api/financing/intake.
  *

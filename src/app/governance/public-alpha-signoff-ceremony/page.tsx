@@ -11,7 +11,7 @@ export default function PublicAlphaSignoffCeremonyPage() {
       <header style={{ border: "1px solid #d7deea", borderRadius: 12, padding: 20 }}>
         <h1>Public Alpha Sign-Off Ceremony Packet</h1>
         <p>Founder review packet only. No vote is recorded here, and production remains blocked.</p>
-        <p><b>{packet.ceremonyStatus}</b> · quorum {packet.quorumRule} · votes recorded {packet.founderVoteCount}</p>
+        <p><b>{packet.ceremonyStatus}</b> · quorum {packet.quorumRule} · votes recorded {packet.reviewDecisionCount}</p>
       </header>
       <section style={{ border: "1px solid #d7deea", borderRadius: 12, padding: 20 }}>
         <h2>Readiness boundary</h2>

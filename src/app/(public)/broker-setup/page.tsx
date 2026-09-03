@@ -1,5 +1,5 @@
 /**
- * Broker Setup — the ONE link Stuart opens to do everything (founder ask
+ * Broker Setup — isolated external-broker workspace retained during the ownership/governance transition (original ask
  * 2026-08-06: "one link that he can go to to do everything at once").
  * Staging sits entirely behind IAP, so reaching this page already proves
  * the Google sign-in worked; the page then walks the remaining steps in
@@ -118,7 +118,7 @@ export default function BrokerSetupPage() {
             and use your PIN, fingerprint, or face. This verifies your device
             session; it does not rerun identity proofing. If the desk ever shows
             Not Found, the portal recognized you as an ordinary operator instead
-            of the named lender-workspace steward — report that exact screen to
+            of the external broker-workspace operator — report that exact screen to
             Caitlin.
           </p>
           <a href="/security/mfa?callbackUrl=%2Flender-desk" style={button}>
@@ -158,8 +158,8 @@ export default function BrokerSetupPage() {
             style={{ margin: 0, fontSize: 13.5, color: INK, lineHeight: 1.65 }}
           >
             Every customer surface currently describes you as a{" "}
-            <strong>commercial debt broker</strong> (Principal — Domestic
-            Commercial Debt Broker). Tell Caitlin the exact wording you want —
+            <strong>external commercial debt broker</strong> (Domestic
+            Commercial Debt Broker — External Professional Spoke). Tell Caitlin the exact wording you want —
             and whether you hold any license or registration we should cite. If
             you do, the word &quot;licensed&quot; goes back into the copy with
             the citation; if not, it stays out. Accuracy here is a compliance
@@ -234,7 +234,7 @@ export default function BrokerSetupPage() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      Principal · Domestic Commercial Debt Broker
+                      Domestic Commercial Debt Broker · External Professional Spoke
                     </div>
                     <div
                       style={{

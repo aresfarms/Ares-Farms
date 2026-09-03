@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
-export const STRIPE_CONNECT_GOVERNANCE_VERSION = "stripe-connect-allocation-v1";
+export const STRIPE_CONNECT_GOVERNANCE_VERSION = "stripe-connect-owner-allocation-v2";
 export const STRIPE_CONNECT_TRANSFER_PROMOTION_ACTIVE = false;
 
-export type StripeConnectRecipient = "CAITLIN" | "STUART";
+export type StripeConnectRecipient = "CAITLIN";
 export type AllocationRuleStatus = "DRAFT" | "APPROVED" | "RETIRED";
 
 export type StripeConnectAllocationRule = {
@@ -12,14 +12,12 @@ export type StripeConnectAllocationRule = {
   version: number;
   status: AllocationRuleStatus;
   caitlinBasisPoints: number;
-  stuartBasisPoints: number;
   effectiveAt: string;
   approvedByRefs: string[];
 };
 
 export type StripeConnectRecipientRegistry = {
   CAITLIN: { connectedAccountRef: string | null; certified: boolean };
-  STUART: { connectedAccountRef: string | null; certified: boolean };
 };
 
 export type StripeConnectAllocation = {
@@ -68,8 +66,7 @@ function stableJson(value: unknown): string {
 
 export function createAllocationRule(input: StripeConnectAllocationRule): StripeConnectAllocationRule {
   assertBasisPoints(input.caitlinBasisPoints, "caitlinBasisPoints");
-  assertBasisPoints(input.stuartBasisPoints, "stuartBasisPoints");
-  if (input.caitlinBasisPoints + input.stuartBasisPoints > 10_000) {
+  if (input.caitlinBasisPoints > 10_000) {
     throw new Error("Connected-account allocations cannot exceed 100% of the payment.");
   }
   if (input.version < 1 || !Number.isInteger(input.version)) {
@@ -85,7 +82,6 @@ export function defaultRetainAllRule(revenueClass = "UNCLASSIFIED"): StripeConne
     version: 1,
     status: "DRAFT",
     caitlinBasisPoints: 0,
-    stuartBasisPoints: 0,
     effectiveAt: "1970-01-01T00:00:00.000Z",
     approvedByRefs: [],
   });
@@ -104,8 +100,7 @@ export function buildAllocationEvidence(input: {
   }
   const rule = createAllocationRule(input.rule);
   const caitlinAmount = Math.floor(input.grossAmount * rule.caitlinBasisPoints / 10_000);
-  const stuartAmount = Math.floor(input.grossAmount * rule.stuartBasisPoints / 10_000);
-  const furlongRetainedAmount = input.grossAmount - caitlinAmount - stuartAmount;
+  const furlongRetainedAmount = input.grossAmount - caitlinAmount;
   const transferGroup = `furlong:${input.paymentRef}:rule:${rule.ruleId}:v${rule.version}`;
   const allocations: StripeConnectAllocation[] = [
     {
@@ -114,13 +109,6 @@ export function buildAllocationEvidence(input: {
       basisPoints: rule.caitlinBasisPoints,
       connectedAccountRef: input.recipients.CAITLIN.connectedAccountRef,
       transferEligible: rule.status === "APPROVED" && caitlinAmount > 0 && input.recipients.CAITLIN.certified && Boolean(input.recipients.CAITLIN.connectedAccountRef),
-    },
-    {
-      recipient: "STUART",
-      amount: stuartAmount,
-      basisPoints: rule.stuartBasisPoints,
-      connectedAccountRef: input.recipients.STUART.connectedAccountRef,
-      transferEligible: rule.status === "APPROVED" && stuartAmount > 0 && input.recipients.STUART.certified && Boolean(input.recipients.STUART.connectedAccountRef),
     },
   ];
   const base = {

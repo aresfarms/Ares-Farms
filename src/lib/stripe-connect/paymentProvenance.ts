@@ -10,10 +10,9 @@ export const FURLONG_PAYMENT_PROVENANCE_VERSION =
   "furlong-payment-provenance-v1";
 
 const REVENUE_CLASSES = new Set<RevenueClass>([
-  "CAITLIN_ENVIRONMENTAL_MODULE",
-  "STUART_FINANCING_MODULE",
+  "OWNER_ENVIRONMENTAL_MODULE",
+  "PLATFORM_FINANCING_MODULE",
   "GENERAL_PLATFORM",
-  "FRANCES_FUTURE_MODULE",
 ]);
 
 export function normalizeRevenueClass(value: unknown): RevenueClass | null {
@@ -27,21 +26,20 @@ export function inferRevenueClass(
   plan: string | null | undefined,
 ): RevenueClass {
   return plan === "environmental"
-    ? "CAITLIN_ENVIRONMENTAL_MODULE"
+    ? "OWNER_ENVIRONMENTAL_MODULE"
     : "GENERAL_PLATFORM";
 }
 
-export function approvedFounderRevenueRule(revenueClass: RevenueClass) {
+export function approvedPlatformRevenueRule(revenueClass: RevenueClass) {
   const direct = directModuleRule(revenueClass);
   return createAllocationRule({
-    ruleId: `founder-revenue-${revenueClass.toLowerCase()}`,
+    ruleId: `platform-revenue-${revenueClass.toLowerCase()}`,
     revenueClass,
-    version: 1,
+    version: 2,
     status: "APPROVED",
     caitlinBasisPoints: direct.caitlinBasisPoints,
-    stuartBasisPoints: direct.stuartBasisPoints,
     effectiveAt: "2026-08-07T00:00:00.000Z",
-    approvedByRefs: ["founder-economic-policy-2026-08-07"],
+    approvedByRefs: ["owner-controlled-platform-transition-2026-09-03"],
   });
 }
 

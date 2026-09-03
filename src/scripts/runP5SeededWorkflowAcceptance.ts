@@ -73,7 +73,7 @@ async function main(): Promise<void> {
   add("all governed seed route families observed in Cloud Logging", missingRoutes.length === 0, missingRoutes.length ? `missing: ${missingRoutes.join(", ")}` : `${new Set(routes).size} route families`, "api-perimeter staging-seed-authority logs");
 
   const blockers = [
-    ["P5-B01","Named tester acceptance","Caitlin Hudson / Stuart Fraass","Both named testers record PASS or documented findings","OPEN"],
+    ["P5-B01","Owner staging acceptance","Caitlin Hudson","Owner records PASS or documented findings; independent production review remains separate","OPEN"],
     ["P5-B02","Production data classification and PII authorization","Data Rights Officer","Approved PII inventory, retention and redaction evidence","OPEN"],
     ["P5-B03","Financing activation authority","Credit/Eligibility Authority","Qualified human approval and lender workflow controls","OPEN"],
     ["P5-B04","Live source legal and licensing approval","Source Legal Authority","Source-by-source license, ToS, retention and display approval","OPEN"],

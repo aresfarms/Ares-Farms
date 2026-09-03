@@ -22,7 +22,7 @@ import { createExplanationLineage } from "@/lib/runtime/explainabilityRuntime";
 import { createObservabilityEvent } from "@/lib/runtime/observabilityRuntime";
 import { persistStripeConnectAllocation } from "@/lib/stripe-connect/allocationStore";
 import {
-  approvedFounderRevenueRule,
+  approvedPlatformRevenueRule,
   isFurlongCheckoutSession,
   normalizeRevenueClass,
 } from "@/lib/stripe-connect/paymentProvenance";
@@ -89,11 +89,6 @@ function stripeConnectRecipients(): StripeConnectRecipientRegistry {
       connectedAccountRef:
         process.env.STRIPE_CONNECT_CAITLIN_ACCOUNT_ID?.trim() || null,
       certified: process.env.STRIPE_CONNECT_CAITLIN_CERTIFIED === "true",
-    },
-    STUART: {
-      connectedAccountRef:
-        process.env.STRIPE_CONNECT_STUART_ACCOUNT_ID?.trim() || null,
-      certified: process.env.STRIPE_CONNECT_STUART_CERTIFIED === "true",
     },
   };
 }
@@ -628,7 +623,7 @@ export async function POST(req: Request) {
         checkoutSession.metadata?.revenueClass,
       );
       if (isFurlongCheckoutSession(checkoutSession) && revenueClass) {
-        const rule = approvedFounderRevenueRule(revenueClass);
+        const rule = approvedPlatformRevenueRule(revenueClass);
         const allocationEvidence = buildAllocationEvidence({
           paymentRef: checkoutSession.id,
           sourceTransactionRef: null,

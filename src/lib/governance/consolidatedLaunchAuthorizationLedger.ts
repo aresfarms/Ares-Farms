@@ -3,7 +3,7 @@ export const CONSOLIDATED_LAUNCH_LEDGER_VERSION = "p6-consolidated-launch-author
 export type HumanDecision = "PENDING" | "APPROVE" | "APPROVE_WITH_CONDITIONS" | "REJECT";
 
 export const launchAuthorizationRequirements = [
-  { blockerId: "P5-B01", title: "Named tester acceptance", authorityRoles: ["CAITLIN_NAMED_TESTER", "STUART_NAMED_TESTER"], evidencePattern: "runtime-state named tester attestations", minimumApprovals: 2 },
+  { blockerId: "P5-B01", title: "Owner staging acceptance", authorityRoles: ["CAITLIN_NAMED_TESTER"], evidencePattern: "runtime-state owner tester attestation", minimumApprovals: 1 },
   { blockerId: "P5-B02", title: "Production data classification and PII authorization", authorityRoles: ["DATA_RIGHTS_OFFICER"], evidencePattern: "p5-b02-data-classification", minimumApprovals: 1 },
   { blockerId: "P5-B03", title: "Financing activation authority", authorityRoles: ["CREDIT_ELIGIBILITY_AUTHORITY", "LEGAL_COMPLIANCE_AUTHORITY"], evidencePattern: "p5-b03-financing-authority", minimumApprovals: 2 },
   { blockerId: "P5-B04", title: "Live source legal and licensing approval", authorityRoles: ["SOURCE_LEGAL_AUTHORITY"], evidencePattern: "p5-b04-source-legal", minimumApprovals: 1 },

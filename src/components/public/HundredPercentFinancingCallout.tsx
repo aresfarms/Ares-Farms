@@ -6,7 +6,7 @@ import { accentForLane } from "@/lib/property/laneThemes";
  * HundredPercentFinancingCallout — a cross-lane cue that 100% (no-money-down)
  * financing genuinely exists for some buyers and programs (USDA, VA, and select
  * SBA/farm structures), routing to the licensed lender. Founder direction
- * 2026-07-19 (per Stuart, these are real). Honest + hedged: "possible for some,"
+ * Product note: these structures may exist for qualified transactions. Honest + hedged: "possible for some,"
  * never a promise or a qualification; the licensed lender confirms fit.
  *
  * Master Volume Governance: FACILITATION-001 — facilitate, not decide; routes

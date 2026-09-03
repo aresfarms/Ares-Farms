@@ -8,7 +8,7 @@ export type CeremonyDecision = {
   decisionId: string;
   label: string;
   doctrineProposal: string | null;
-  status: "PENDING_FOUNDER_DECISION";
+  status: "PENDING_OWNER_DECISION";
 };
 
 export type CeremonyEntryCondition = {
@@ -22,10 +22,10 @@ export type PublicAlphaSignoffCeremonyPacket = {
   predecessor: "4D_CONTROLLED_PROMOTION_READINESS_RECONCILIATION";
   rule: typeof PUBLIC_ALPHA_SIGNOFF_CEREMONY_RULE;
   generatedAt: string;
-  ceremonyStatus: "READY_FOR_FOUNDER_REVIEW";
-  quorumRule: "2_OF_3_FOUNDERS";
+  ceremonyStatus: "READY_FOR_OWNER_AND_INDEPENDENT_REVIEW";
+  quorumRule: "OWNER_PLUS_INDEPENDENT_REVIEW";
   minimumAffirmativeVotes: 2;
-  founderVoteCount: 0;
+  reviewDecisionCount: 0;
   voteRecordingPermitted: false;
   decisions: CeremonyDecision[];
   entryConditions: CeremonyEntryCondition[];
@@ -42,31 +42,31 @@ const DECISIONS: CeremonyDecision[] = [
     decisionId: "sustained_window_duration",
     label: "Sustained clean-window duration for Alpha exit",
     doctrineProposal: "30 days",
-    status: "PENDING_FOUNDER_DECISION",
+    status: "PENDING_OWNER_DECISION",
   },
   {
     decisionId: "cohort_size",
     label: "Invited borrower and partner-lender cohort size",
     doctrineProposal: null,
-    status: "PENDING_FOUNDER_DECISION",
+    status: "PENDING_OWNER_DECISION",
   },
   {
     decisionId: "module_21_environmental_compliance_featured_or_deferred",
     label: "Feature or defer environmental-compliance workflow",
     doctrineProposal: "Deferred for Alpha unless a qualified independent reviewer is assigned",
-    status: "PENDING_FOUNDER_DECISION",
+    status: "PENDING_OWNER_DECISION",
   },
   {
     decisionId: "module_10_connectors_live_or_simulated",
     label: "Use simulated review or a live lender connector",
     doctrineProposal: "Simulated review; live external connectors remain blocked",
-    status: "PENDING_FOUNDER_DECISION",
+    status: "PENDING_OWNER_DECISION",
   },
   {
     decisionId: "named_governance_authority",
     label: "Named governance authority for Alpha entry and exit",
     doctrineProposal: null,
-    status: "PENDING_FOUNDER_DECISION",
+    status: "PENDING_OWNER_DECISION",
   },
 ];
 
@@ -116,11 +116,11 @@ export function composePublicAlphaSignoffCeremonyPacket(input?: {
   const snapshot = {
     predecessor: "4D_CONTROLLED_PROMOTION_READINESS_RECONCILIATION",
     readinessEvidenceSnapshotHash: readiness.evidenceSnapshotHash,
-    quorumRule: "2_OF_3_FOUNDERS",
+    quorumRule: "OWNER_PLUS_INDEPENDENT_REVIEW",
     decisions: DECISIONS,
     entryConditions: CONDITIONS,
     productionStatus: "BLOCKED",
-    founderVoteCount: 0,
+    reviewDecisionCount: 0,
   };
   const evidenceSnapshotHash = createHash("sha256")
     .update(JSON.stringify(snapshot))
@@ -131,10 +131,10 @@ export function composePublicAlphaSignoffCeremonyPacket(input?: {
     predecessor: "4D_CONTROLLED_PROMOTION_READINESS_RECONCILIATION",
     rule: PUBLIC_ALPHA_SIGNOFF_CEREMONY_RULE,
     generatedAt,
-    ceremonyStatus: "READY_FOR_FOUNDER_REVIEW",
-    quorumRule: "2_OF_3_FOUNDERS",
+    ceremonyStatus: "READY_FOR_OWNER_AND_INDEPENDENT_REVIEW",
+    quorumRule: "OWNER_PLUS_INDEPENDENT_REVIEW",
     minimumAffirmativeVotes: 2,
-    founderVoteCount: 0,
+    reviewDecisionCount: 0,
     voteRecordingPermitted: false,
     decisions: DECISIONS,
     entryConditions: CONDITIONS,

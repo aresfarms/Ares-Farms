@@ -19,7 +19,7 @@ import {
 /**
  * FinancingLaneSections — the Financial & Capital module's sections. The
  * customer learns how financing works, sees live public capital rates, then
- * submits a deal that is routed to the licensed lender (Stuart / the lending
+ * submits a deal that is routed to the appropriately credentialed lender or external financing
  * spoke). Wears the financing PURPLE accent. Server component; the intake panel
  * is the one client island.
  *

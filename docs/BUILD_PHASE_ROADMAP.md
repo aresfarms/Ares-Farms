@@ -147,7 +147,7 @@ After institutional closure of the notification lifecycle, the platform must rec
 
 ## Step 4E — Public Alpha Sign-Off Ceremony Packet
 
-After controlled-promotion readiness reconciliation, the platform prepares a read-only Ceremony Part D packet for founder review. The packet freezes the five Public Alpha §9 decisions, the 2-of-3 founder quorum rule, six machine-verifiable entry conditions, and the two remaining external-evidence conditions: a recorded DR restore test and signed participation terms for every invited participant. It records no founder vote, grants no Alpha entry, permits no external action, and preserves production BLOCKED posture.
+After controlled-promotion readiness reconciliation, the platform prepares a read-only Ceremony Part D packet for owner and independent review. The packet freezes the five Public Alpha §9 decisions, the owner-plus-independent-review quorum rule, six machine-verifiable entry conditions, and the two remaining external-evidence conditions: a recorded DR restore test and signed participation terms for every invited participant. It records no review decision, grants no Alpha entry, permits no external action, and preserves production BLOCKED posture.
 
 
 ## Step 4F — Governed Evidence Review Portal and Plain-Language Legal Timeline
@@ -266,13 +266,13 @@ A final decision packet must bind the exact immutable production image, the 4V r
 ### Step 4X — Cross-Functional Internal Change Verification
 Every code, configuration, security, finance, underwriting, or public-communications change must originate from a frozen plain-language request and produce one immutable Internal Change Verification and Plain-Language Assurance Report. The report combines a common machine-evidence backbone with a domain-specific checklist overlay. It records the exact request version, owner, commit, immutable image, build, tests, affected routes, permissions, database and configuration changes, known limitations, unverified claims, rollback image, release invariants, and post-release regression checks.
 
-The change owner may implement and attest but may not independently approve the change. Caitlin-owned technical and governance changes require Stuart and Francis; Stuart-owned finance and underwriting changes require Caitlin and Francis; Francis-owned public and communications changes require Caitlin and Stuart. Any change to the request, evidence, code, configuration, test results, image, or report hash invalidates all prior signatures. A rejection, failed checklist item, failed regression, missing rollback, or external-review requirement keeps activation blocked.
+The platform owner may implement and attest but may not independently approve a constitutionally significant change. Independent review is role-based and must be identity-bound before it can clear a separation-of-duties gate. Any change to the request, evidence, code, configuration, test results, image, or report hash invalidates all prior signatures. A rejection, failed checklist item, failed regression, missing rollback, or external-review requirement keeps activation blocked.
 
 **Hard rule:** No governed change may be activated, promoted, or relied upon without a valid frozen report, owner attestation, both required outside-group approvals, and passing post-release invariants. The report must explain in plain English what changed, what tests proved, what tests did not prove, principal risks, and how to reverse the change. Standing proof: `npm run verify:internal-change-verification`.
 
 
 ### Step 4Y — Three-Founder Cross-Functional Release Authority Addendum
-The initial production opening requires all three founders to participate across technical/governance, finance/release-risk, and public/independent-review roles. Routine group-owned changes require the two founders outside the owning group. The change owner may attest to implementation but may not independently approve their own change. Each founder retains unilateral stop and rollback authority within an observed risk event. Domain objections block release until resolved or escalated.
+The initial production opening requires role-separated participation across technical/governance, finance/release-risk, and public/independent-review roles. The platform owner may attest to implementation but may not independently approve their own constitutionally significant change. Independent review remains mandatory where separation-of-duties applies. Any authorized control-role holder retains stop and rollback authority within an observed risk event. Domain objections block release until resolved or escalated.
 
 **Hard rule:** The three-founder model replaces artificial four-person distinct-principal requirements, but it never weakens owner exclusion, packet binding, signature integrity, domain review, or separate activation. Initial launch requires unanimous three-founder participation; routine changes require both outside-group approvals. Standing proof: `npm run verify:three-founder-release-authority`.
 
@@ -284,6 +284,6 @@ The platform must provide a restricted operational workspace that freezes the pl
 
 
 ### Step 5A — Two-Founder Controlled Internal Pilot Gate
-Caitlin and Stuart may conduct a testing-only internal pilot before Francis or broader testers are bound. Caitlin remains the implementation owner and attestor; Stuart is the sole initial pilot tester and may record a green light, rejection, or retest requirement against the exact frozen report hash. Francis may remain intentionally unbound during this phase.
+Caitlin may conduct a testing-only owner pilot before an independent production reviewer is appointed. The owner may record a staging green light, rejection, or retest requirement against the exact frozen report hash. This testing posture grants no public-launch, live-action, payment-capture, notice-send, or official-reliance authority; independent review remains required for final production authority.
 
 **Hard rule:** Pilot readiness authorizes only controlled internal testing. It does not authorize public launch, external actions, payments, notices, official reports, lender or agency reliance, or final production promotion. Francis or another final reviewer remains required before launch. Standing proof: `npm run verify:founder-pilot-test-gate`.

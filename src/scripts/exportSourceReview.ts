@@ -2,7 +2,7 @@
  * exportSourceReview — Deliverable A: quick review export for a PENDING source.
  *
  * Writes the ingested records of a pending property source to CSV + JSON review
- * files under review-exports/ so a human reviewer (Caitlin / Stuart / Frances)
+ * files under review-exports/ so an authorized human reviewer
  * can eyeball the data in minutes — you can't approve data you can't inspect.
  *
  *   npm run review:export-source              (USDA, default)

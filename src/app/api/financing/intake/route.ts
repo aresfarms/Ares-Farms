@@ -35,7 +35,7 @@ import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenc
  *
  * Master Volume Governance:
  * - Vol I (CONST-PATHWAY-001 / FACILITATION-001 §3.32): records + routes a deal
- *   to the licensed lending spoke (Stuart); the platform facilitates, it does
+ *   to an appropriately credentialed external lending spoke; the platform facilitates, it does
  *   not decide, qualify, price, or approve.
  * - Vol II (Section 1071 firewall §3.20): NO demographic data. (CONST-FAIR-001/
  *   002): no adverse-action or qualification determination is made here.

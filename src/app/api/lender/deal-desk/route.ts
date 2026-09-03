@@ -127,7 +127,7 @@ async function resolveIdentity(
     return { role: "broker", actorId: lenderAccess.principalId };
   }
 
-  // Stuart is the named internal steward of the licensed lending spoke. In
+  // The authenticated external broker is the operator of this isolated lending workspace. In
   // non-production environments he must be able to enter and exercise the
   // broker workflow before live professional reliance is enabled. Production
   // still requires the verified professional credential above.

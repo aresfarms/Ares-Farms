@@ -50,8 +50,8 @@ ok(/Automation may discover/.test(COP_HUMAN_SELECTION_RULE) &&
 
 // §4 weekly curation model + volume targets.
 ok(COP_WEEKLY_CURATION.reviewers.Caitlin.includes("environmental") &&
-   COP_WEEKLY_CURATION.reviewers.Stuart.includes("financing pathways") &&
-   COP_WEEKLY_CURATION.reviewers.Frances.includes("public appeal") &&
+   COP_WEEKLY_CURATION.reviewers.CapitalReview.includes("financing pathways") &&
+   COP_WEEKLY_CURATION.reviewers.PublicTrustReview.includes("public appeal") &&
    COP_WEEKLY_CURATION.perReviewerNominationsPerWeek.min === 5 &&
    COP_WEEKLY_CURATION.perReviewerNominationsPerWeek.max === 10 &&
    COP_WEEKLY_CURATION.reviewedPipelinePerWeek.min === 15 &&
@@ -129,5 +129,5 @@ if (fail.length) {
   for (const f of fail) console.error("    ✗ " + f);
   process.exit(1);
 }
-console.log("✓  verify:curated-opportunity PASS — COP-001 captured as Build-Later doctrine: decision-intelligence-not-listing-portal core; four source families; human selection mandatory at every automation phase; weekly curation (Caitlin/Stuart/Frances, 5–10 / 15–30 / 5–15); 11-section opportunity card; membership is for intelligence not listing access; source attribution mandatory; anti-portal list locked; constitutional lock verbatim; pipeline NOT activated (COP_PIPELINE_LIVE=false).");
+console.log("✓  verify:curated-opportunity PASS — COP-001 captured as Build-Later doctrine: decision-intelligence-not-listing-portal core; four source families; human selection mandatory at every automation phase; weekly curation (owner + role-based review queues, 5–10 / 15–30 / 5–15); 11-section opportunity card; membership is for intelligence not listing access; source attribution mandatory; anti-portal list locked; constitutional lock verbatim; pipeline NOT activated (COP_PIPELINE_LIVE=false).");
 process.exit(0);

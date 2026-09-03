@@ -2,10 +2,10 @@ import { createHash } from "node:crypto";
 import type { InternalChangeVerificationReport } from "@/lib/governance/internalChangeVerification";
 
 export const FOUNDER_PILOT_TEST_GATE_RULE =
-  "TWO-FOUNDER-INTERNAL-PILOT-TEST-GATE-001" as const;
+  "OWNER-INTERNAL-PILOT-TEST-GATE-002" as const;
 
 export type PilotTesterAcceptance = {
-  tester: "STUART";
+  tester: "OWNER";
   decision: "GREEN_LIGHT" | "REJECT" | "RETEST_REQUIRED";
   signedAt: string;
   signatureRef: string;
@@ -27,7 +27,7 @@ export type FounderPilotTestDecision = {
   paymentCaptureAllowed: false;
   noticeSendAllowed: false;
   officialRelianceAllowed: false;
-  francisBindingRequiredForFinalLaunch: true;
+  independentReviewRequiredForFinalLaunch: true;
   blockers: string[];
   decisionSha256: string;
 };
@@ -54,8 +54,8 @@ export function evaluateFounderPilotTestGate(input: {
   if (!report) blockers.push("frozen-change-report-required");
   if (report) {
     if (!report.ownerAttestation) blockers.push("owner-attestation-required");
-    if (report.evidence.changeOwner !== "CAITLIN")
-      blockers.push("initial-pilot-change-owner-must-be-caitlin");
+    if (report.evidence.changeOwner !== "OWNER")
+      blockers.push("initial-pilot-change-owner-must-be-owner");
     if (report.evidence.buildStatus !== "SUCCESS") blockers.push("successful-build-required");
     if (report.evidence.tests.some((test) => test.status !== "PASS"))
       blockers.push("all-tests-must-pass");
@@ -67,9 +67,9 @@ export function evaluateFounderPilotTestGate(input: {
       blockers.push("review-rejected");
   }
 
-  if (!acceptance) blockers.push("stuart-pilot-acceptance-required");
+  if (!acceptance) blockers.push("owner-pilot-acceptance-required");
   else {
-    if (acceptance.tester !== "STUART") blockers.push("pilot-tester-must-be-stuart");
+    if (acceptance.tester !== "OWNER") blockers.push("pilot-tester-must-be-owner");
     if (acceptance.decision !== "GREEN_LIGHT") blockers.push("pilot-not-green-lit");
     if (!acceptance.signatureRef.trim() || !Number.isFinite(Date.parse(acceptance.signedAt)))
       blockers.push("pilot-signature-invalid");
@@ -90,7 +90,7 @@ export function evaluateFounderPilotTestGate(input: {
     paymentCaptureAllowed: false as const,
     noticeSendAllowed: false as const,
     officialRelianceAllowed: false as const,
-    francisBindingRequiredForFinalLaunch: true as const,
+    independentReviewRequiredForFinalLaunch: true as const,
     blockers: [...new Set(blockers)].sort(),
   };
   return {

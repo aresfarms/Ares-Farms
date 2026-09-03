@@ -1,10 +1,9 @@
 /**
  * Operator registry — pragmatic Module 45 (Human Authority Registry) alignment.
  *
- * Multiple operators (not a single shared owner). VIEWING internal review
- * surfaces is open to every operator; the right to APPROVE a gate (e.g. Module 23
- * source legal review) is held by enough operators that no one person is a
- * bottleneck, and every approve/reject is attributed in the audit ledger.
+ * Platform governance is owner-controlled with independent review required at
+ * constitutionally significant gates. External professional workspaces may remain
+ * available without conferring Furlong ownership, governance, or approval authority.
  *
  * This is the pragmatic first pass: the operator identities + capabilities live
  * here, aligned to Module 45 roles. A later pass can drive these fully from the
@@ -30,8 +29,8 @@ export interface Operator {
 }
 
 /**
- * Authorized operators. Approve authority for source-legal is granted to more
- * than one holder (no single-person bottleneck); all three can view.
+ * Authorized operators. Caitlin is the current Furlong operator. A legacy
+ * external-broker workspace remains available solely for lender-desk operation.
  */
 export const OPERATORS: Operator[] = [
   {
@@ -43,25 +42,13 @@ export const OPERATORS: Operator[] = [
     license: "Environmental / compliance (licensed)",
   },
   {
-    id: "op-stuart",
+    id: "op-external-broker-workspace",
     email: "sfraas@aresfarmsinc.com",
     name: "Stuart",
-    role: "operator",
-    capabilities: [
-      "view:internal",
-      "approve:source-legal",
-      "operate:lender-desk",
-    ],
+    role: "external-broker-operator",
+    capabilities: ["operate:lender-desk"],
     license:
-      "Finance / commercial debt broker (license status pending confirmation)",
-  },
-  {
-    id: "op-frances",
-    email: "frances@aresfarmsinc.com",
-    name: "Frances",
-    role: "operator",
-    capabilities: ["view:internal", "approve:source-legal"],
-    license: null, // Media / Communications — no professional license required
+      "Commercial debt broker workspace - credential status must be independently verified before regulated reliance",
   },
 ];
 

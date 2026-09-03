@@ -2,7 +2,7 @@
  * Financing Intake Runtime (customer submits a deal — PURE)
  *
  * The customer submits a financing deal, which is recorded and routed to the
- * licensed lending spoke (Stuart / Five Borough) who works it in his licensed
+ * appropriately credentialed external lending spoke that works it under its own licensed
  * capacity. This runtime is pure and deterministic: it validates the intake and
  * routes it. It NEVER qualifies, approves, prices, or makes any credit
  * determination — Furlong facilitates; the licensed lender decides.

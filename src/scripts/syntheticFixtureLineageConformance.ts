@@ -89,17 +89,17 @@ try {
   });
   assert.equal(legacyBackfillContext.humanVisibleName, "Caitlin Hudson");
 
-  const stuartCustomerContext = createSyntheticFixtureContext({
+  const externalBrokerCustomerContext = createSyntheticFixtureContext({
     syntheticPersonaId: "syn-blue-moose-001",
     scenarioId: "full-lender-lifecycle",
     operatorIdentity: "sfraas@aresfarmsinc.com",
     environment: "staging",
-    testRunId: "synth-blue-moose-stuart-customer-001",
+    testRunId: "synth-blue-moose-external-broker-customer-001",
     createdAt: "2026-08-10T12:00:00.000Z",
   });
-  assert.equal(stuartCustomerContext.humanVisibleName, "Blue Moose");
+  assert.equal(externalBrokerCustomerContext.humanVisibleName, "Blue Moose");
   assert.equal(
-    stuartCustomerContext.operatorIdentity,
+    externalBrokerCustomerContext.operatorIdentity,
     "user:sfraas@aresfarmsinc.com",
   );
 

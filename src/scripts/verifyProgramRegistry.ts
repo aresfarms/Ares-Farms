@@ -1,7 +1,7 @@
 /**
  * verify:program-registry — registry validation + locked-language honesty +
  * engine behavior + ledger event, AND writes the reviewable catalog deliverable
- * (docs/program-registry-catalog-<date>.md) for Caitlin + Stuart to mark
+ * (docs/program-registry-catalog-<date>.md) for the owner/reviewer queue to mark
  * free/paid. Free-vs-paywall is decided AFTER that review — this gate FAILS if
  * any entry ships with paywall_candidate already set.
  */
@@ -70,7 +70,7 @@ const date = "2026-06-10";
 const lines: string[] = [
   `# Program Registry Catalog — ${date}`,
   ``,
-  `Reviewable inventory for Caitlin + Stuart. Mark each program FREE or PAID in the`,
+  `Reviewable inventory for the owner/reviewer queue. Mark each program FREE or PAID in the`,
   `"Free/Paid (decide)" column — \`paywall_candidate\` stays null in code until that`,
   `review lands. "Property-verifiable" = every property-side criterion machine-checkable`,
   `against a wired, cited dataset → can render a VERIFIED match (locked language).`,

@@ -18,7 +18,7 @@ import {
  * debt broker's working surface over borrower financing requests — status + customer-visible
  * note + closing timeline (lender-editable for USDA/SBA backlogs), the
  * document register, and the automatic document-reminder engine that ends
- * the customer-chasing Stuart hates.
+ * unnecessary customer-chasing and duplicate follow-up.
  *
  * All lender-authored deal state lives in serviceRequests.metadata.dealDesk
  * (no migration needed): { customerNote, timeline{docsDueAt, underwritingEtaAt,

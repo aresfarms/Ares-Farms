@@ -121,7 +121,7 @@ export function buildFinalProductionPromotionDecisionPacket(
 
   const principals = input.approvals.map((approval) => approval.principalId);
   if (new Set(principals).size !== 3 || principals.length != 3)
-    blockers.push("initial-launch-requires-three-distinct-founders");
+    blockers.push("initial-launch-requires-three-distinct-role-separated-principals");
 
   for (const approval of input.approvals) {
     if (approval.decision !== "APPROVE") blockers.push(`approval-rejected:${approval.role}`);

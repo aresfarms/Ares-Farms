@@ -13,7 +13,6 @@ export async function persistStripeConnectAllocation(input: {
   transferExecutionPerformed?: boolean;
 }) {
   const caitlin = input.evidence.allocations.find((item) => item.recipient === "CAITLIN");
-  const stuart = input.evidence.allocations.find((item) => item.recipient === "STUART");
 
   const rows = await db.insert(stripeConnectAllocations).values({
     evidenceId: input.evidence.evidenceId,
@@ -28,14 +27,14 @@ export async function persistStripeConnectAllocation(input: {
     ruleVersion: input.rule.version,
     ruleStatus: input.rule.status,
     caitlinBasisPoints: input.rule.caitlinBasisPoints,
-    stuartBasisPoints: input.rule.stuartBasisPoints,
+    legacyPartnerBasisPoints: 0,
     caitlinAmount: caitlin?.amount ?? 0,
-    stuartAmount: stuart?.amount ?? 0,
+    legacyPartnerAmount: 0,
     furlongRetainedAmount: input.evidence.furlongRetainedAmount,
     caitlinConnectedAccountRef: caitlin?.connectedAccountRef ?? null,
-    stuartConnectedAccountRef: stuart?.connectedAccountRef ?? null,
+    legacyPartnerConnectedAccountRef: null,
     caitlinRecipientCertified: Boolean(caitlin?.transferEligible),
-    stuartRecipientCertified: Boolean(stuart?.transferEligible),
+    legacyPartnerRecipientCertified: false,
     transferPromotionActive: false,
     transferExecutionPerformed: input.transferExecutionPerformed ?? false,
     approvedByRefs: input.rule.approvedByRefs,

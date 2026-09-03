@@ -80,7 +80,7 @@ RUN mkdir -p /migrator \
 # the migrator principal via MIGRATOR_DATABASE_URL (Secret Manager -> env).
 # Build with: docker build --target migrator -t furlong-db-migrate .
 # -----------------------------------------------------------------------------
-FROM gcr.io/distroless/nodejs24-debian13@sha256:2e3b3a96d1d7286c3e4727f9c84b4dc32b6b33e7d7d4425c5a5c8186ad85fa93 AS migrator
+FROM gcr.io/distroless/nodejs24-debian13@sha256:7cca079bad19303c78cd874a5da79832441985a216b767196507d69b8784a698 AS migrator
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -102,7 +102,7 @@ CMD ["migratorEntrypoint.mjs"]
 # -----------------------------------------------------------------------------
 # Stage 4 — runner: minimal production runtime. No npm, no source, no toolchain.
 # -----------------------------------------------------------------------------
-FROM gcr.io/distroless/nodejs24-debian13@sha256:2e3b3a96d1d7286c3e4727f9c84b4dc32b6b33e7d7d4425c5a5c8186ad85fa93 AS runner
+FROM gcr.io/distroless/nodejs24-debian13@sha256:7cca079bad19303c78cd874a5da79832441985a216b767196507d69b8784a698 AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production

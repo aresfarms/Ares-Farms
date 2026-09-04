@@ -595,7 +595,8 @@
     "verify:master-volume-mirror": "MASTER_VOLUME_MIRROR_STRICT=true tsx src/scripts/masterVolumeConformanceTest.ts",
     "verify:institutional-assurance": "tsx src/scripts/institutionalAssuranceConformance.ts",
     "reconcile:master-volume-doctrines": "tsx src/scripts/reconcileMasterVolumeDoctrines.ts",
-    "verify:capital-network": "tsx src/scripts/capitalNetworkConformance.ts"
+    "verify:capital-network": "tsx src/scripts/capitalNetworkConformance.ts",
+    "verify:property-intelligence-expansion": "tsx src/scripts/propertyIntelligenceExpansionConformance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

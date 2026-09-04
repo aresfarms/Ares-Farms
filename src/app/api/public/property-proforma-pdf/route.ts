@@ -363,6 +363,8 @@ export async function POST(req: NextRequest) {
       landUse: typeof buildingRaw?.landUse === "string" ? buildingRaw.landUse.slice(0, 120) : null,
       squareFeet: num(buildingRaw?.squareFeet),
       town: typeof buildingRaw?.town === "string" ? buildingRaw.town.slice(0, 80) : null,
+      county: typeof buildingRaw?.county === "string" ? buildingRaw.county.slice(0, 80) : (typeof body.county === "string" ? body.county.slice(0, 80) : null),
+      stateCode: typeof buildingRaw?.stateCode === "string" ? buildingRaw.stateCode.slice(0, 8) : (typeof body.state === "string" ? body.state.slice(0, 8) : null),
       screeningPrice,
       benchRatePct,
     });
@@ -397,10 +399,14 @@ export async function POST(req: NextRequest) {
       title: "BEST-USE INCOME & COVERAGE SCREEN",
       leadIns: [
         {
-          text: useScreen.bestUse
-            ? `Best modeled use: ${useScreen.bestUse.use} — ≈${fmtNoi(useScreen.bestUse.noiMid)}/yr modeled NOI, DSCR ${useScreen.bestUse.dscr?.toFixed(2)} against the 1.25x floor at ${useScreen.referenceTerms}${useScreen.bestUse.clearsFloor ? " — the property clears on its own paper." : " — under the floor at the stated screening value."}`
-            : useScreen.note,
+          text: `Property classification: ${useScreen.propertyClassification}. Current use: ${useScreen.currentUse ?? "not verified"}. Best-supported use: ${useScreen.bestSupportedUse?.use ?? "needs more evidence"}.${useScreen.secondaryOpportunity ? ` Secondary opportunity: ${useScreen.secondaryOpportunity.use}, subject to zoning/conversion review.` : ""}`,
           bold: true,
+        },
+        {
+          text: useScreen.bestUse
+            ? `Best DSCR-modeled use: ${useScreen.bestUse.use} — ≈${fmtNoi(useScreen.bestUse.noiMid)}/yr modeled NOI, DSCR ${useScreen.bestUse.dscr?.toFixed(2)} against the 1.25x floor at ${useScreen.referenceTerms}${useScreen.bestUse.clearsFloor ? " — the property clears on its own paper." : " — under the floor at the stated screening value."}`
+            : useScreen.note,
+          bold: false,
         },
       ],
       tables: [
@@ -416,8 +422,8 @@ export async function POST(req: NextRequest) {
             rows: useScreen.uses.map((u) => ({
               cells: [
                 u.use,
-                `$${u.netPerSqftLow}\u2013$${u.netPerSqftHigh}`,
-                u.noiMid != null ? `${fmtNoi(u.noiLow)}\u2013${fmtNoi(u.noiHigh)}` : "needs sq ft",
+                u.financialModelAvailable ? `$${u.netPerSqftLow}\u2013$${u.netPerSqftHigh}` : "unit/room model required",
+                u.noiMid != null ? `${fmtNoi(u.noiLow)}\u2013${fmtNoi(u.noiHigh)}` : u.financialModelAvailable ? "needs sq ft" : "operating model required",
                 u.dscr != null ? u.dscr.toFixed(2) : "\u2014",
                 u.clearsFloor == null ? "\u2014" : u.clearsFloor ? "CLEARS" : "SHORT",
               ],
@@ -428,7 +434,37 @@ export async function POST(req: NextRequest) {
       ],
       paragraphs: [useScreen.note],
     });
-    document.sections.splice(insertAt + 1, 0, {
+    const secondary = useScreen.secondaryOpportunity;
+    if (secondary) {
+      const c = secondary.conversion;
+      const months = (r: { low: number; high: number }) => r.low === r.high ? `${r.low} months` : `${r.low}\u2013${r.high} months`;
+      const moneyRange = `${fmtNoi(c.professionalSoftCost.low)}\u2013${fmtNoi(c.professionalSoftCost.high)}`;
+      document.sections.splice(insertAt + 1, 0, {
+        title: "SECONDARY OPPORTUNITY & APPROVAL RUNWAY",
+        leadIns: [{ text: `Secondary opportunity: ${secondary.use} \u2014 subject to zoning/conversion review.`, bold: true }],
+        tables: [{
+          table: {
+            columns: [
+              { header: "Item", width: 0.30, align: "left" },
+              { header: "Screening finding", width: 0.70, align: "left" },
+            ],
+            rows: [
+              { cells: ["Regulatory path", c.pathLabel] },
+              { cells: ["Zoning / land-use review", `Approx. ${months(c.zoningReviewMonths)}`] },
+              { cells: ["End-to-end entitlement/design/permit runway", `Approx. ${months(c.endToEndMonths)}`] },
+              { cells: ["Resubmission outer case", `${c.resubmissionUpperMonths}+ months if redesign, denial or a new hearing cycle is required`] },
+              { cells: ["Professional soft-cost allowance", `${moneyRange} before construction, plus current municipal application/permit fees`] },
+            ],
+          },
+        }],
+        paragraphs: [
+          ...c.steps.map((step, index) => `${index + 1}. ${step}`),
+          c.note,
+          secondary.financialModelNote,
+        ],
+      });
+    }
+    document.sections.splice(insertAt + (secondary ? 2 : 1), 0, {
       title: "LENDER-TEST SCORECARD \u2014 PROPERTY-SIDE ONLY",
       leadIns: [{ text: "Which of a lender's property-side checklist items this parcel passes on paper. Not an approval, an approval probability, or an eligibility determination \u2014 borrower qualification is the licensed lender's decision.", bold: false }],
       tables: [

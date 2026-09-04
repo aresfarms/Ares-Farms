@@ -3343,6 +3343,8 @@ export function PropertyEvaluationWorkspace({
           landUse: facts?.propertyRecord?.landUse ?? null,
           squareFeet: facts?.propertyRecord?.squareFeet ?? null,
           town: analysisContext.location ?? null,
+          county: analysisContext.county ?? null,
+          stateCode: analysisContext.stateCode ?? facts?.verification?.parsedAddress?.state ?? null,
           screeningPrice,
           benchRatePct: ownershipContext?.rates.rate30 ?? null,
         })
@@ -3776,6 +3778,8 @@ export function PropertyEvaluationWorkspace({
             landUse: facts?.propertyRecord?.landUse ?? null,
             squareFeet: facts?.propertyRecord?.squareFeet ?? null,
             town: context.town ?? null,
+            county: context.county ?? null,
+            stateCode: context.stateCode ?? null,
           },
           acreage,
           fsaRatePct,

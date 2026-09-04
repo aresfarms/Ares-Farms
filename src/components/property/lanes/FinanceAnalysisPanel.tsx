@@ -24,6 +24,7 @@ const STATUS_STYLE: Record<LenderTest["status"], { label: string; bg: string; in
 };
 
 const dollars = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
+const monthRange = (r: { low: number; high: number }) => r.low === r.high ? `${r.low} months` : `${r.low}–${r.high} months`;
 
 export function FinanceAnalysisPanel({
   useScreen,
@@ -40,6 +41,24 @@ export function FinanceAnalysisPanel({
           <span style={{ fontSize: 10.5, fontWeight: 850, letterSpacing: ".14em", textTransform: "uppercase", color: "#8F6E1F" }}>
             What this building earns best — modeled income and coverage by use
           </span>
+          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+            <div style={{ border: "1px solid #E5E0D5", borderRadius: 10, padding: "10px 12px", background: "#FAFAF8" }}>
+              <div style={{ fontSize: 10, color: "#6B7280", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>Property classification</div>
+              <div style={{ marginTop: 4, color: "#1C2B45", fontWeight: 800, fontSize: 13 }}>{useScreen.propertyClassification}</div>
+            </div>
+            <div style={{ border: "1px solid #E5E0D5", borderRadius: 10, padding: "10px 12px", background: "#FAFAF8" }}>
+              <div style={{ fontSize: 10, color: "#6B7280", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>Current use</div>
+              <div style={{ marginTop: 4, color: "#1C2B45", fontWeight: 800, fontSize: 13 }}>{useScreen.currentUse ?? "Not verified from the parcel record"}</div>
+            </div>
+            <div style={{ border: "1px solid #D9E5DC", borderRadius: 10, padding: "10px 12px", background: "#F5FAF6" }}>
+              <div style={{ fontSize: 10, color: "#53705B", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>Best-supported use</div>
+              <div style={{ marginTop: 4, color: "#1C4532", fontWeight: 800, fontSize: 13 }}>{useScreen.bestSupportedUse?.use ?? "Needs more operating data"}</div>
+            </div>
+            <div style={{ border: "1px solid #E8D7A6", borderRadius: 10, padding: "10px 12px", background: "#FFF9EA" }}>
+              <div style={{ fontSize: 10, color: "#8F6E1F", fontWeight: 800, textTransform: "uppercase", letterSpacing: ".08em" }}>Secondary opportunity</div>
+              <div style={{ marginTop: 4, color: "#5B4611", fontWeight: 800, fontSize: 13 }}>{useScreen.secondaryOpportunity?.use ?? "No second use surfaced yet"}</div>
+            </div>
+          </div>
           {useScreen.bestUse ? (
             <p style={{ margin: 0, color: "#1C2B45", fontSize: 13.5, lineHeight: 1.6 }}>
               <strong>Best modeled use: {useScreen.bestUse.use}</strong> — ≈{dollars(useScreen.bestUse.noiMid ?? 0)}/yr modeled NOI,
@@ -48,6 +67,31 @@ export function FinanceAnalysisPanel({
             </p>
           ) : (
             <p style={{ margin: 0, color: "#5A6172", fontSize: 13, lineHeight: 1.6 }}>{useScreen.note}</p>
+          )}
+          {useScreen.secondaryOpportunity && (
+            <div style={{ border: "1px solid #E8D7A6", borderRadius: 12, background: "#FFFDF7", padding: "12px 14px", display: "grid", gap: 8 }}>
+              <div style={{ color: "#5B4611", fontWeight: 850, fontSize: 13 }}>
+                Secondary opportunity: {useScreen.secondaryOpportunity.use} — subject to zoning/conversion review
+              </div>
+              <p style={{ margin: 0, color: "#3D4655", fontSize: 12.5, lineHeight: 1.6 }}>
+                <strong>Approval runway:</strong> zoning/land-use review ≈ {monthRange(useScreen.secondaryOpportunity.conversion.zoningReviewMonths)};
+                end-to-end entitlement/design/permit runway ≈ {monthRange(useScreen.secondaryOpportunity.conversion.endToEndMonths)}.
+                A redesign, denial or resubmission cycle can push the outer case toward {useScreen.secondaryOpportunity.conversion.resubmissionUpperMonths}+ months.
+              </p>
+              <p style={{ margin: 0, color: "#3D4655", fontSize: 12.5, lineHeight: 1.6 }}>
+                <strong>Screening professional-cost allowance:</strong> {dollars(useScreen.secondaryOpportunity.conversion.professionalSoftCost.low)}–{dollars(useScreen.secondaryOpportunity.conversion.professionalSoftCost.high)}
+                before construction, plus municipal application/permit fees that Furlong should pull from the current local fee schedule.
+              </p>
+              <p style={{ margin: 0, color: "#6B7280", fontSize: 11.5, lineHeight: 1.55 }}>
+                {useScreen.secondaryOpportunity.conversion.pathLabel}. {useScreen.secondaryOpportunity.conversion.note}
+              </p>
+              <details>
+                <summary style={{ cursor: "pointer", color: "#1C4532", fontWeight: 800, fontSize: 12 }}>How Furlong streamlines the zoning/conversion path</summary>
+                <ol style={{ margin: "8px 0 0 20px", padding: 0, color: "#3D4655", fontSize: 12, lineHeight: 1.6 }}>
+                  {useScreen.secondaryOpportunity.conversion.steps.map((step) => <li key={step}>{step}</li>)}
+                </ol>
+              </details>
+            </div>
           )}
           {useScreen.uses.some((u) => u.noiMid != null) && (
             <div style={{ overflowX: "auto" }}>
@@ -65,8 +109,8 @@ export function FinanceAnalysisPanel({
                   {useScreen.uses.map((u) => (
                     <tr key={u.use} style={{ background: u.use === useScreen.bestUse?.use ? "#FBF5E6" : "transparent" }}>
                       <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4", color: "#1C2B45", fontWeight: u.use === useScreen.bestUse?.use ? 800 : 500 }}>{u.use}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4", color: "#3d4655" }}>${u.netPerSqftLow}–${u.netPerSqftHigh}</td>
-                      <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4", color: "#3d4655" }}>{u.noiMid != null ? `${dollars(u.noiLow ?? 0)}–${dollars(u.noiHigh ?? 0)}` : "needs sq ft"}</td>
+                      <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4", color: "#3d4655" }}>{u.financialModelAvailable ? `$${u.netPerSqftLow}–$${u.netPerSqftHigh}` : "unit/room model required"}</td>
+                      <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4", color: "#3d4655" }}>{u.noiMid != null ? `${dollars(u.noiLow ?? 0)}–${dollars(u.noiHigh ?? 0)}` : u.financialModelAvailable ? "needs sq ft" : "operating model required"}</td>
                       <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4", color: "#1C2B45", fontWeight: 700 }}>{u.dscr != null ? u.dscr.toFixed(2) : "—"}</td>
                       <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4" }}>
                         {u.clearsFloor == null ? <span style={{ color: "#6B7280" }}>—</span> : u.clearsFloor ? <span style={{ color: "#1C4532", fontWeight: 800 }}>CLEARS</span> : <span style={{ color: "#8F1F1F", fontWeight: 700 }}>SHORT</span>}

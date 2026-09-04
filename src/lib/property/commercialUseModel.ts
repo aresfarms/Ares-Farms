@@ -17,6 +17,7 @@
  */
 
 import { commercialAlternativeUses } from "@/lib/property/commercialAlternativeUses";
+import { buildCommercialConversionIntelligence, type ConversionIntelligence } from "@/lib/property/commercialConversionIntelligence";
 
 export interface ModeledUse {
   use: string;
@@ -32,16 +33,24 @@ export interface ModeledUse {
   clearsFloor: boolean | null;
   why: string;
   watch: string;
+  financialModelAvailable: boolean;
+  financialModelNote: string;
+  conversion: ConversionIntelligence;
 }
 
 export interface CommercialUseScreen {
   squareFeet: number | null;
+  propertyClassification: string;
   screeningPrice: number | null;
   referenceTerms: string;
   occupancyFactor: number;
   uses: ModeledUse[];
-  /** Highest-DSCR use that zoning didn't rule out (null without inputs). */
+  currentUse: string | null;
+  /** Highest-DSCR use that zoning did not rule out (null without inputs). */
   bestUse: ModeledUse | null;
+  bestSupportedUse: ModeledUse | null;
+  /** A deliberately surfaced non-primary use, favoring senior housing when the shell plausibly supports it. */
+  secondaryOpportunity: ModeledUse | null;
   note: string;
 }
 
@@ -69,6 +78,8 @@ export function modelCommercialUses(args: {
   landUse: string | null;
   squareFeet: number | null;
   town: string | null;
+  county?: string | null;
+  stateCode?: string | null;
   screeningPrice: number | null;
   /** Published 30-yr benchmark; lender terms modeled at benchmark +0.75, 25-yr, 80% LTV. */
   benchRatePct: number | null;
@@ -88,8 +99,9 @@ export function modelCommercialUses(args: {
   const uses: ModeledUse[] = candidates.uses.map((candidate) => {
     const band = NET_BANDS.find((b) => b.pattern.test(candidate.use)) ?? { low: 6, high: 11 };
     const sqft = args.squareFeet;
-    const noiLow = sqft != null ? Math.round(sqft * band.low * OCCUPANCY) : null;
-    const noiHigh = sqft != null ? Math.round(sqft * band.high * OCCUPANCY) : null;
+    const operatingModelRequired = /senior housing|extended-stay hospitality/i.test(candidate.use);
+    const noiLow = !operatingModelRequired && sqft != null ? Math.round(sqft * band.low * OCCUPANCY) : null;
+    const noiHigh = !operatingModelRequired && sqft != null ? Math.round(sqft * band.high * OCCUPANCY) : null;
     const noiMid = noiLow != null && noiHigh != null ? Math.round((noiLow + noiHigh) / 2) : null;
     const dscr = noiMid != null && ads != null && ads > 0 ? noiMid / ads : null;
     return {
@@ -103,14 +115,46 @@ export function modelCommercialUses(args: {
       clearsFloor: dscr != null ? dscr >= DSCR_FLOOR : null,
       why: candidate.why,
       watch: candidate.watch,
+      financialModelAvailable: !operatingModelRequired,
+      financialModelNote: operatingModelRequired
+        ? "Requires a unit/room-level operating model, staffing/service assumptions where applicable, and code-capex before NOI or DSCR is credible."
+        : "Square-foot screening model available; replace it with verified rent roll, lease comps or operating statements when available.",
+      conversion: buildCommercialConversionIntelligence({
+        currentLandUse: args.landUse,
+        zoning: args.zoning,
+        targetUse: candidate.use,
+        squareFeet: args.squareFeet,
+        town: args.town,
+        county: args.county,
+        stateCode: args.stateCode,
+      }),
     };
   });
 
   const scored = uses.filter((u) => u.dscr != null).sort((a, b) => (b.dscr ?? 0) - (a.dscr ?? 0));
   const bestUse = scored[0] ?? null;
+  const sourceUse = `${args.landUse ?? ""} ${args.zoning ?? ""}`;
+  const hospitalityShell = /hotel|motel|hospitality|lodging|inn|resort/i.test(sourceUse);
+  const propertyClassification = hospitalityShell
+    ? "Commercial—hospitality"
+    : /industrial|warehouse|flex|manufactur/i.test(sourceUse)
+      ? "Commercial—industrial/flex"
+      : /retail|storefront|shopping/i.test(sourceUse)
+        ? "Commercial—retail/service"
+        : /office|medical/i.test(sourceUse)
+          ? "Commercial—office/medical"
+          : "Commercial—general";
+  const extendedStay = uses.find((u) => /extended-stay hospitality/i.test(u.use)) ?? null;
+  const bestSupportedUse = hospitalityShell && extendedStay ? extendedStay : bestUse;
+  const seniorOpportunity = uses.find((u) => /senior housing|independent-living/i.test(u.use)) ?? null;
+  const secondaryOpportunity =
+    seniorOpportunity && seniorOpportunity.use !== bestSupportedUse?.use
+      ? seniorOpportunity
+      : uses.find((u) => u.use !== bestSupportedUse?.use) ?? null;
 
   return {
     squareFeet: args.squareFeet,
+    propertyClassification,
     screeningPrice: args.screeningPrice,
     referenceTerms:
       ratePct != null
@@ -118,10 +162,13 @@ export function modelCommercialUses(args: {
         : "reference lender terms unavailable (no published benchmark loaded)",
     occupancyFactor: OCCUPANCY,
     uses,
+    currentUse: args.landUse?.trim() || null,
     bestUse,
+    bestSupportedUse,
+    secondaryOpportunity,
     note:
       args.squareFeet == null
         ? "The income model needs the building's square footage — add it (or confirm the parcel record) and every use gets a modeled NOI and DSCR."
-        : `Screening assumptions: conservative small-market net-to-owner rent bands per use × ${Math.round(OCCUPANCY * 100)}% stabilized occupancy; not an appraisal, rent comp, or value opinion. An actual rent roll or appraisal outranks this model the moment one exists. ${candidates.note}`,
+        : `Screening assumptions: conservative small-market net-to-owner rent bands per use × ${Math.round(OCCUPANCY * 100)}% stabilized occupancy; not an appraisal, rent comp, or value opinion. Senior-housing and extended-stay opportunities deliberately do not receive invented NOI/DSCR without a unit/room operating model. An actual rent roll, operating statement, appraisal, zoning determination or permit record outranks this model the moment one exists. ${candidates.note}`,
   };
 }

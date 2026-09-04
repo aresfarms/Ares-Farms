@@ -9,6 +9,7 @@ import { nmtcForProperty } from "@/lib/property/propertyNmtc";
 import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones";
 import { findCanonicalPropertyByExactAddress, findCanonicalPropertyById } from "@/lib/property/propertyData";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
+import { indicateMarketValue } from "@/lib/property/marketValueIndication";
 import { officialPropertyEvidenceRecords } from "@/lib/property/officialPropertySourceAdapters";
 import { resolveJurisdictionParcel } from "@/lib/property/jurisdictionParcelResolver";
 import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnapshot";
@@ -243,6 +244,7 @@ export async function POST(req: NextRequest) {
             recordBasis: matchedSourceRecord ? "matched-approved-source-record" : listingSnapshot ? "matched-governed-listing-and-parcel-record" : "matched-jurisdiction-parcel-record",
             parcelSourceName: jurisdictionParcel?.sourceName ?? null,
             parcelSourceAsOf: jurisdictionParcel?.sourceAsOf ?? null,
+            assessmentAsOf: jurisdictionParcel?.assessmentAsOf ?? null,
             parcelSourceUrl: jurisdictionParcel?.sourceUrl ?? null,
             landUse: jurisdictionParcel?.landUse ?? null,
             zoning: jurisdictionParcel?.zoning ?? null,
@@ -251,6 +253,18 @@ export async function POST(req: NextRequest) {
             assessedLandValue: jurisdictionParcel?.assessedLandValue ?? null,
             assessedImprovementValue: jurisdictionParcel?.assessedImprovementValue ?? null,
             assessedTotalValue: jurisdictionParcel?.assessedTotalValue ?? null,
+            propertyValueScreen: indicateMarketValue({
+              assessedTotalValue: jurisdictionParcel?.assessedTotalValue ?? null,
+              assessmentAsOf: jurisdictionParcel?.assessmentAsOf ?? null,
+              stateCode: matchedSourceRecord?.state ?? imported.parsedAddress?.state ?? body.stateCode ?? null,
+              county: matchedSourceRecord?.county ?? body.county ?? null,
+              knownPriceUsd: matchedSourceRecord?.price ?? listingSnapshot?.askingPrice ?? null,
+              knownPriceLabel: canonicalMatch?.listing_status ?? listingSnapshot?.status ?? "Asking price",
+              propertyType: matchedSourceRecord?.rawPropertyStyle ?? matchedSourceRecord?.propertyType ?? listingSnapshot?.propertyType ?? lanePropertyType,
+              landUse: jurisdictionParcel?.landUse ?? null,
+              acreage: listingSnapshot?.offeredAcreage ?? null,
+              acreageText: listingSnapshot?.offeredAcreage ? `${listingSnapshot.offeredAcreage} acres` : derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null,
+            }),
             publicWater: jurisdictionParcel?.publicWater ?? null,
             publicSewer: jurisdictionParcel?.publicSewer ?? null,
             waterfront: jurisdictionParcel?.waterfront ?? null,
@@ -285,7 +299,7 @@ export async function POST(req: NextRequest) {
               listingId: null,
               listingStatus: "Address verified · no governed listing match",
               recordBasis: "verified-address-only",
-              parcelSourceName: null, parcelSourceAsOf: null, parcelSourceUrl: null, landUse: null, zoning: null, deedReference: null, legalDescription: null, assessedLandValue: null, assessedImprovementValue: null, assessedTotalValue: null, publicWater: null, publicSewer: null, waterfront: null,
+              parcelSourceName: null, parcelSourceAsOf: null, assessmentAsOf: null, parcelSourceUrl: null, landUse: null, zoning: null, deedReference: null, legalDescription: null, assessedLandValue: null, assessedImprovementValue: null, assessedTotalValue: null, propertyValueScreen: null, publicWater: null, publicSewer: null, waterfront: null,
             }
           : null,
       placeFacts: imported.placeFacts,

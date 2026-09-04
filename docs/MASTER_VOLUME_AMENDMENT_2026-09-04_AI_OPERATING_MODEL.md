@@ -17,19 +17,23 @@ The customer may therefore enter the operating facts they know. Furlong calculat
 3. Enter rooms/units, occupancy, ADR or monthly unit revenue, ancillary income, expenses, acquisition/conversion costs and proposed debt terms.
 4. Deterministic runtime computes revenue, NOI, operating margin, debt service, DSCR, break-even occupancy, capital/equity need, maximum property-side loan supported at the chosen DSCR target and sensitivity cases.
 5. AI receives those calculated outputs as evidence. It may explain the result, identify weak assumptions, ask follow-up questions and propose diligence/execution steps. It may not recalculate or replace the authoritative math.
-6. The improved case flows conceptually into entitlement/environmental/conversion diligence, Capital Readiness, USDA/FSA/SBA/conventional pathway comparison, Capital Network matching, borrower-selected lender delivery, underwriting/conditions and closing.
+6. The improved case flows conceptually into entitlement/environmental/conversion diligence, Capital Readiness, USDA/FSA/SBA/conventional pathway comparison, Capital Network matching, borrower-selected lender delivery, provider-side borrower underwriting/conditions and closing.
 
-## Credit and borrower-obstacle doctrine
+## Nonresidential property-only boundary
 
-Credit is a financing variable, not a moral score and not a Furlong punishment mechanism. Furlong must not auto-reject a customer merely because they identify credit as a concern. It may help identify what can strengthen a real lender file: repayment/cash-flow support, lower project cost, additional lawful equity, collateral, reserves, experience, complete documentation, explanations for isolated derogatory events, seller-supported structure, guarantor/co-borrower structure where lawful, or a different program/lender credit box.
+For commercial, agricultural, farm, hospitality, mobile-home-park, business-property and other nonresidential property intelligence, Furlong evaluates the **property/project**, not the customer's personal financial profile. Property feasibility, program-pathway ranking and Capital Network matching must not depend on or score personal credit score, personal income, household debt-to-income, household assets, personal liquidity, personal net worth or similar personal financial-profile data.
 
-This does **not** mean credit is irrelevant. Many programs and lenders consider credit history, guarantees, repayment ability, collateral, equity and program-specific eligibility. Only the actual lender/program authority makes the credit or approval decision.
+Property/project economics remain valid inputs because they describe the transaction itself: purchase price, operating history, rent roll, room/unit economics, project revenue and expenses, NOI, DSCR, conversion budget, collateral/property facts, zoning, environmental posture, market support and execution timing.
+
+This boundary does **not** claim that SBA, USDA, FSA or conventional lenders ignore borrower creditworthiness or repayment ability. The selected provider performs any borrower/business underwriting required by its program and institution. If the customer later authorizes Furlong to transmit lender-required borrower financial documents, Furlong treats them as recipient-bound evidence for that provider; they do not alter Furlong's nonresidential property score, program ranking or provider ranking.
+
+The residential lane is the explicit exception: residential mortgage readiness may require customer credit/income/debt/asset information because those products are borrower-underwritten. Even there, Furlong remains advisory and does not make the lender's credit decision.
 
 ## From answer to keys
 
 Furlong's intended outcome is not merely "we found a lender." The governed execution chain is:
 
-`property -> current use -> best-supported use -> alternative use -> entitlement runway -> environmental -> conversion cost -> operating economics -> DSCR -> USDA/FSA/SBA/conventional comparison -> borrower-readiness obstacles -> lender fit -> borrower selection/consent -> package -> underwriting conditions -> closing readiness -> closing/keys`
+`property -> current use -> best-supported use -> alternative use -> entitlement runway -> environmental -> conversion cost -> operating economics -> DSCR -> USDA/FSA/SBA/conventional comparison -> property/project obstacles -> lender fit -> borrower selection/consent -> package -> provider-side borrower underwriting/conditions -> closing readiness -> closing/keys`
 
 Furlong may expose add-on services that help the customer cure missing information or execution blockers, but must distinguish analysis, professional services, lender decisions and government approvals.
 

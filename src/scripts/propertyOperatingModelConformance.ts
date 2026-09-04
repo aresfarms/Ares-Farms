@@ -42,8 +42,8 @@ assert(model.equityRequired === 940_000);
 const advisor = readFileSync("src/lib/property/propertyOperatingModelAdvisor.ts", "utf8");
 assert(advisor.includes("The financial calculations in DETERMINISTIC_CALCULATED_RESULT are authoritative"));
 assert(advisor.includes("never recalculate, replace or invent them"));
-assert(advisor.includes("Credit is one underwriting variable, not a moral score"));
-assert(advisor.toLowerCase().includes("never promise eligibility, approval, a rate, a closing"));
+assert(advisor.includes("Furlong does not use personal credit, personal income, household assets, DTI or other personal financial-profile data"));
+assert(advisor.toLowerCase().includes("never promise eligibility, approval, a rate or a closing"));
 assert(advisor.includes("buildModelContext"));
 
 const api = readFileSync("src/app/api/public/property-operating-model/route.ts", "utf8");
@@ -55,18 +55,22 @@ assert(api.includes("persistsAnonymousInputs: false"));
 assert(api.includes("operating-model-ai"));
 assert(api.includes("pii-scrub"));
 assert(api.includes("safeCustomerGoal"));
+assert(api.includes("nonResidentialPersonalFinancialScoring: false"));
+assert(api.includes('borrowerUnderwritingAuthority: "selected_provider_only"'));
 
 const ui = readFileSync("src/components/property/OperatingModelWorkbench.tsx", "utf8");
 assert(ui.includes("Calculate + review with AI"));
 assert(ui.includes("AI cannot change the math or issue a credit decision"));
 assert(ui.includes("Break-even occupancy"));
 assert(ui.includes("Loan supported at target"));
-assert(ui.includes("Biggest financing concern"));
-assert(ui.includes("Credit profile"));
+assert(ui.includes("Biggest property/project concern"));
+assert(!ui.includes("Credit profile"));
+assert(!ui.includes("Biggest financing concern"));
 assert(ui.includes("Execution path"));
 assert(ui.includes("Furlong's finish line is the closing table, not a lender introduction."));
 assert(ui.includes("From this model to keys"));
-assert(ui.includes("credit, equity, liquidity, experience or documentation issues become specific cure/workup tasks, not automatic rejection"));
+assert(ui.includes("price, operating economics, conversion cost, entitlement, environmental and timing issues become explicit cure/workup tasks"));
+assert(ui.includes("without using personal financials to score the nonresidential property"));
 
 const commercial = readFileSync("src/components/property/lanes/FinanceAnalysisPanel.tsx", "utf8");
 assert(commercial.includes("OperatingModelWorkbench"));
@@ -88,8 +92,10 @@ console.log(JSON.stringify({
     mayChangeMath: false,
     mayIssueCreditDecision: false,
   },
-  borrowerPosture: {
-    creditConcernIsNavigatedNotAutoRejected: true,
-    lenderDecisionPreserved: true,
+  nonResidentialBoundary: {
+    personalFinancialScoring: false,
+    propertyProjectRankingOnly: true,
+    selectedProviderOwnsBorrowerUnderwriting: true,
+    residentialExceptionPreserved: true,
   },
 }, null, 2));

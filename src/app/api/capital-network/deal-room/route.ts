@@ -12,7 +12,9 @@ import {
   listCapitalDealRoomsForCapitalDesk,
   listProviderDealRooms,
   publicProvider,
+  recordCapitalNetworkExecutionOutcome,
 } from "@/lib/financing/capitalNetworkStore";
+import type { CapitalExecutionOutcome } from "@/lib/financing/capitalNetworkExecutionReliability";
 import { recordCapitalNetworkEvidence } from "@/lib/financing/capitalNetworkGovernance";
 import { createSubmissionCase } from "@/lib/lender-submission/store";
 
@@ -96,7 +98,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const trace = traceId("create-submission");
+  const trace = traceId("action");
   const actorId = actorEmail(req);
   if (!internalAllowed(req, trace)) {
     return NextResponse.json(
@@ -109,14 +111,66 @@ export async function POST(req: NextRequest) {
       action?: string;
       serviceRequestId?: string;
       providerId?: string;
+      outcome?: CapitalExecutionOutcome;
+      outcomeReasonCategory?: string | null;
+      providerFirstResponseAt?: string | null;
+      providerDispositionAt?: string | null;
+      closedFundedAt?: string | null;
+      evidenceRefs?: string[];
     };
-    if (body.action !== "create-submission-case") {
-      throw new Error("Unsupported Capital Network deal-room action.");
-    }
     const serviceRequestId = (body.serviceRequestId ?? "").trim().toUpperCase();
     const providerId = (body.providerId ?? "").trim();
     if (!serviceRequestId || !providerId) {
       throw new Error("serviceRequestId and providerId are required.");
+    }
+    if (body.action === "record-execution-outcome") {
+      const allowed = new Set<CapitalExecutionOutcome>([
+        "CLOSED_FUNDED", "PROVIDER_DECLINED", "PROVIDER_WITHDREW", "PROVIDER_NO_RESPONSE",
+        "BORROWER_WITHDREW", "PROPERTY_OR_PROGRAM_BLOCKED", "THIRD_PARTY_OR_EXTERNAL_BLOCKED", "CANCELED",
+      ]);
+      if (!body.outcome || !allowed.has(body.outcome)) throw new Error("A valid Capital Network execution outcome is required.");
+      const parseDate = (value?: string | null) => {
+        if (!value) return null;
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) throw new Error("Execution milestone dates must be valid ISO date/time values.");
+        return date;
+      };
+      const record = await recordCapitalNetworkExecutionOutcome({
+        serviceRequestId,
+        providerId,
+        outcome: body.outcome,
+        outcomeReasonCategory: body.outcomeReasonCategory,
+        providerFirstResponseAt: parseDate(body.providerFirstResponseAt),
+        providerDispositionAt: parseDate(body.providerDispositionAt),
+        closedFundedAt: parseDate(body.closedFundedAt),
+        evidenceRefs: Array.isArray(body.evidenceRefs) ? body.evidenceRefs : [],
+        actorId: actorId ?? "capital-desk",
+        traceId: trace,
+      });
+      const evidence = await recordCapitalNetworkEvidence({
+        traceId: trace,
+        operation: "capital-network.execution.record-verified-outcome",
+        actorId,
+        eventType: "CAPITAL_NETWORK_EXECUTION_OUTCOME_VERIFIED",
+        message: "Capital Desk recorded an evidence-backed provider execution outcome for future reliability history.",
+        targetId: serviceRequestId,
+        metadata: { providerId, outcome: record.outcome, executionRecordId: record.id, personalFinancialScoring: false },
+      });
+      return NextResponse.json({
+        ok: true,
+        executionRecord: record,
+        governance: {
+          traceId: trace,
+          evidence: evidence.evidence,
+          evidenceBacked: true,
+          compensationInfluence: false,
+          affiliationInfluence: false,
+          personalFinancialScoring: false,
+        },
+      }, { status: 201 });
+    }
+    if (body.action !== "create-submission-case") {
+      throw new Error("Unsupported Capital Network deal-room action.");
     }
     const selection = await assertSelectedProviderForSubmission(serviceRequestId, providerId);
     if (selection.room.submissionCaseId) {

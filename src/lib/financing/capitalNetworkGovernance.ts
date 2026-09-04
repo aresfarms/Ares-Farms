@@ -7,8 +7,8 @@ import {
 } from "@/lib/runtime/versionRuntime";
 import { CAPITAL_NETWORK_RUNTIME_VERSION } from "@/lib/financing/capitalNetworkRuntime";
 
-export const CAPITAL_NETWORK_SCHEMA_VERSION = "capital-network-schema-v1.0.0";
-export const CAPITAL_NETWORK_GOVERNANCE_VERSION = "capital-network-v1.0.0";
+export const CAPITAL_NETWORK_SCHEMA_VERSION = "capital-network-schema-v1.1.0";
+export const CAPITAL_NETWORK_GOVERNANCE_VERSION = "capital-network-v1.1.0";
 
 export function capitalNetworkGovernanceContext(input: {
   operation: string;

@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     module: "api.capital-network.providers",
     traceId: trace,
     schemaVersion: "capital-network-provider-v1.0.0",
-    governanceVersion: "capital-network-v1.0.0",
+    governanceVersion: "capital-network-v1.1.0",
     classificationLevel: "CONFIDENTIAL",
     replayRef: trace,
     actorId: email,

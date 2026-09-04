@@ -1,5 +1,7 @@
 "use client";
 
+import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
@@ -137,6 +139,7 @@ type PropertyFactsResponse = {
     recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
     parcelSourceName?: string | null;
     parcelSourceAsOf?: string | null;
+    assessmentAsOf?: string | null;
     parcelSourceUrl?: string | null;
     landUse?: string | null;
     zoning?: string | null;
@@ -145,6 +148,7 @@ type PropertyFactsResponse = {
     assessedLandValue?: number | null;
     assessedImprovementValue?: number | null;
     assessedTotalValue?: number | null;
+    propertyValueScreen?: MarketValueIndication | null;
     publicWater?: boolean | null;
     publicSewer?: boolean | null;
     waterfront?: boolean | null;
@@ -2061,17 +2065,22 @@ export function PropertyEvaluationWorkspace({
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
   const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
-  // Residential screening basis (founder 2026-07-29: the pro forma must
-  // carry real numbers "period" — same stated-basis chain the farm and
-  // commercial lanes already use): entered/listed price, else the county-
-  // assessed total value, with the basis printed on every figure.
-  const residentialAssessedTotal = facts?.propertyRecord?.assessedTotalValue ?? null;
-  const residentialBasisPrice = effectiveListedPrice ?? residentialAssessedTotal;
+  // Residential ownership-cost/pro-forma basis: a real asking/entered price
+  // wins. Without one, use Furlong's residential-only assessment/HPI screen
+  // ONLY when that screen is actually supportable. Never substitute a raw tax
+  // assessment for market/acquisition value merely because no listing exists.
+  const residentialValueScreen = facts?.propertyRecord?.propertyValueScreen ?? null;
+  const residentialScreenMid =
+    residentialValueScreen?.status === "indicated" &&
+    residentialValueScreen.profileId === "residential"
+      ? residentialValueScreen.midUsd
+      : null;
+  const residentialBasisPrice = effectiveListedPrice ?? residentialScreenMid;
   const residentialBasisNote =
     effectiveListedPrice != null
       ? null
-      : residentialAssessedTotal != null
-        ? `No asking price is published for this parcel, so every figure runs on the county-assessed total value of $${residentialAssessedTotal.toLocaleString("en-US")} as a stated screening basis — the county's taxation value, not a market appraisal. Enter your intended offer on the report page to run your own number; the negotiated price and an appraisal govern.`
+      : residentialScreenMid != null
+        ? `No asking price is published for this parcel, so the residential ownership-cost screen uses the Furlong Property Estimate midpoint of $${residentialScreenMid.toLocaleString("en-US")} as a stated planning basis. ${residentialValueScreen?.method ?? ""} This is not an appraisal; enter an intended offer when you have one.`
         : null;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
@@ -3009,6 +3018,7 @@ export function PropertyEvaluationWorkspace({
             verdict: report.verdict,
             executiveSummary: report.executiveSummary,
             propertySummary: report.propertySummary,
+            propertyValueScreen: facts?.propertyRecord?.propertyValueScreen ?? undefined,
             conceptSummary: report.conceptSummary,
             strengths: report.strengths,
             risks: report.risks,
@@ -3080,14 +3090,14 @@ export function PropertyEvaluationWorkspace({
               ];
               const farmOnly = [
                 { name: "FSA Direct Farm Ownership", body: "USDA lends directly — lowest rate, ~$600K limit (indexed), targeted at beginning and underserved farmers; government processing timelines." },
-                { name: "FSA Guaranteed Farm Ownership", body: "The commercial farm path most established farmers use: a local ag bank or Farm Credit association makes the loan at bank speed and USDA guarantees up to 95% — limits near $2.25M (indexed)." },
+                { name: "FSA Guaranteed Farm Ownership", body: "A commercial agricultural lender makes and services the loan and FSA provides the guarantee. The current FY2026 guaranteed-loan ceiling is $2.343M and is indexed; the selected lender/FSA office confirms the current limit and borrower underwriting." },
                 { name: "Farm Credit System", body: "The nationwide cooperative ag lender network — farm real estate and operating credit as their core business, with patronage refunds to member-borrowers." },
               ];
               return {
                 heading: "The Federal Programs That Fund Properties Like This",
                 items: isFarm ? [...farmOnly, ...shared] : shared,
                 fsaNote: isFarm
-                  ? "Furlong's in-network commercial debt broker sources commercial and business debt and does NOT originate FSA farm loans. FSA-guaranteed lenders (local ag banks and Farm Credit associations) and FSA direct loans make these — find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take this report and its pro forma with you; they are built for exactly that conversation."
+                  ? "Furlong does not force an agricultural case through one broker. Use the Capital Network, nominate your own FSA-guaranteed lender/Farm Credit contact, or invite a verified one-case guest provider. FSA direct loans are handled by FSA itself. Your property/project report and pro forma can travel with the borrower-selected provider after explicit consent; that provider performs any borrower underwriting required for approval."
                   : undefined,
               };
             })(),

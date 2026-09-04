@@ -56,7 +56,7 @@ function escapeSql(value: string): string { return value.replace(/'/g, "''"); }
 async function queryMaryland(where: string, count = 20): Promise<Array<Record<string, unknown>>> {
   const params = new URLSearchParams({
     f: "json", where,
-    outFields: "ACCTID,ADDRESS,PREMSNUM,PREMSNAM,PREMSTYP,PREMCITY,PREMZIP,LEGAL1,LEGAL2,LEGAL3,DR1LIBER,DR1FOLIO,MAP,GRID,PARCEL,LOT,ZONING,DESCLU,ACRES,LANDAREA,LUOM,PFUW,PFUS,PFLW,YEARBLT,SQFTSTRC,DESCSTYL,DESCBLDG,NFMLNDVL,NFMIMPVL,NFMTTLVL,SDATWEBADR,SDATDATE",
+    outFields: "ACCTID,ADDRESS,PREMSNUM,PREMSNAM,PREMSTYP,PREMCITY,PREMZIP,LEGAL1,LEGAL2,LEGAL3,DR1LIBER,DR1FOLIO,MAP,GRID,PARCEL,LOT,ZONING,DESCLU,ACRES,LANDAREA,LUOM,PFUW,PFUS,PFLW,YEARBLT,SQFTSTRC,DESCSTYL,DESCBLDG,NFMLNDVL,NFMIMPVL,NFMTTLVL,SDATWEBADR,SDATDATE,LASTASSD",
     returnGeometry: "false", resultRecordCount: String(count),
   });
   const endpoint = `https://mdgeodata.md.gov/imap/rest/services/PlanningCadastre/MD_PropertyData/MapServer/0/query?${params.toString()}`;
@@ -92,9 +92,12 @@ async function resolveMaryland(input: AddressInput): Promise<JurisdictionParcelR
   const totalAcres = rows.reduce((sum, attrs) => sum + (number(attrs.ACRES) ?? (String(attrs.LUOM ?? "").toUpperCase() === "A" ? number(attrs.LANDAREA) ?? 0 : 0)), 0);
   const sum = (field: string) => { const value = rows.reduce((total, attrs) => total + (number(attrs[field]) ?? 0), 0); return value || null; };
   return {
-    // Maryland DOES publish its own assessment date (SDATDATE) — so this one
-    // is a real vintage, not a fetch timestamp.
-    sourceName: "Maryland SDAT / MD iMAP Property Data", sourceAsOf: clean(primary.SDATDATE), assessmentAsOf: clean(primary.SDATDATE), sourceUrl: clean(primary.SDATWEBADR),
+    // MD iMAP distinguishes the Assessments DATA-LINKAGE date (SDATDATE,
+    // e.g. 2026MAY) from LASTASSD (alias "Last Date Assessed", e.g. 202301).
+    // Only LASTASSD is a usable valuation-vintage input. Treating SDATDATE as
+    // the assessment date materially overstates freshness and can distort a
+    // walk-forward estimate.
+    sourceName: "Maryland SDAT / MD iMAP Property Data", sourceAsOf: clean(primary.SDATDATE), assessmentAsOf: clean(primary.LASTASSD), sourceUrl: clean(primary.SDATWEBADR),
     accountId: clean(primary.ACCTID)!, parcelRefs: refs, acreageText: totalAcres ? `${totalAcres.toLocaleString("en-US", { maximumFractionDigits: 3 })} acres across ${rows.length} resolved parcel${rows.length === 1 ? "" : "s"}` : null,
     landUse: [...new Set(rows.map((attrs) => clean(attrs.DESCLU)).filter(Boolean))].join(" / ") || null, zoning: [...new Set(rows.map((attrs) => clean(attrs.ZONING)).filter(Boolean))].join(" / ") || null,
     // SQFTSTRC is structure area — genuine BUILDING square footage.

@@ -81,6 +81,7 @@ export const CANONICAL_GOVERNANCE_MIGRATION_FILES = [
   "0054_borrower_financial_control_chain.sql",
   "0055_institutional_assurance_controls.sql",
   "0056_capital_network_multi_provider.sql",
+  "0057_capital_network_execution_reliability.sql",
 ] as const;
 
 /** Directory holding the canonical governance migration SQL files. */

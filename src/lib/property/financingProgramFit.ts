@@ -3,8 +3,8 @@
  * stated 2026-08-05: "weigh the actual property values and determine which
  * program is the best fit mathematically for a yes from a lender — leaning
  * on the property metrics instead of the customer's financial situation.
- * Can this property get a loan on its own paper before a customer ever adds
- * their financials?").
+ * Can this property support the proposed financing on its own paper without
+ * collecting or scoring the customer's personal financial profile?").
  *
  * Replaces the lanes' static hard-coded orderings (FSA-always-first on farm,
  * SBA-always-first on commercial) with fit computed from THIS property:
@@ -44,7 +44,7 @@ export interface ProgramFit {
 const DSCR_FLOOR = 1.25;
 // Statutory / program screening parameters (indexed figures noted as ≈).
 const FSA_DIRECT_LIMIT = 600_000;
-const FSA_GUARANTEED_LIMIT = 2_251_000;
+const FSA_GUARANTEED_LIMIT = 2_343_000;
 
 const dollars = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 
@@ -116,7 +116,7 @@ export function buildLenderTestScorecard(args: {
     tests.push(
       args.bestDscr >= 1.25
         ? { test: "Debt-service coverage (1.25x floor)", status: "pass", detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — the property covers the loan on its own paper.` }
-        : { test: "Debt-service coverage (1.25x floor)", status: "fail", detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — under the floor; outside income or a lower price closes the gap.` }
+        : { test: "Debt-service coverage (1.25x floor)", status: "fail", detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — under the floor; price, project NOI or debt structure must improve for the property-side case to clear.` }
     );
   } else {
     tests.push({ test: "Debt-service coverage (1.25x floor)", status: "unknown", detail: "Coverage needs a price and an income model (square footage for commercial, acreage for farm)." });
@@ -211,7 +211,7 @@ export function evaluateProgramFit(programName: string, ctx: ProgramFitContext):
     if (/usda business|business & industry|business and industry/.test(name)) {
       if (ctx.usdaRural?.businessEligible === true) {
         const c = coverage(ctx, bench != null ? bench + 0.75 : null, "illustrative B&I bank rate ≈ benchmark +0.75", 25, 0.8);
-        const ruralLine = "Address verified inside the USDA-eligible rural area for business programs (live USDA layer) — the B&I geographic gate passes; eligible business purpose and lender participation still control.";
+        const ruralLine = "Address verified inside the USDA-eligible rural area for business programs (live USDA layer) — the B&I geographic gate passes; eligible business purpose and lender participation still control. Borrower underwriting is performed separately by the selected provider and is not part of Furlong's property score.";
         return c
           ? { score: c.score + 1, line: `${ruralLine} ${c.line}` }
           : { score: 3, line: ruralLine };
@@ -224,14 +224,14 @@ export function evaluateProgramFit(programName: string, ctx: ProgramFitContext):
     if (/sba 504/.test(name)) {
       const c = coverage(ctx, bench != null ? bench + 0.4 : null, "illustrative 504 blended rate ≈ benchmark +0.4", 25, 0.9);
       return c
-        ? { ...c, line: `${c.line} Owner-occupancy by an eligible operating business is the program's own gate.` }
+        ? { ...c, line: `${c.line} Owner-occupancy by an eligible operating business is a program-side gate. Borrower underwriting is provider-side and does not affect Furlong's property ranking.` }
         : { score: 2, line: "Fit turns on owner-occupancy: SBA 504 requires an eligible operating business occupying the property." };
     }
     if (/sba/.test(name)) {
       const c = coverage(ctx, bench != null ? bench + 1.0 : null, "illustrative 7(a) rate ≈ benchmark +1.0", 25, 0.85);
       return c
-        ? { ...c, line: `${c.line} Owner-occupancy by an eligible operating business is the program's own gate.` }
-        : { score: 2, line: "Fit turns on owner-occupancy: SBA financing requires an eligible operating business occupying the property — a property-plus-business question, not a property-alone one." };
+        ? { ...c, line: `${c.line} Owner-occupancy by an eligible operating business is a program-side gate. Borrower underwriting is provider-side and does not affect Furlong's property ranking.` }
+        : { score: 2, line: "Property/program fit turns on owner-occupancy: SBA financing requires an eligible operating business occupying the property. Furlong does not use personal financials for this ranking; borrower creditworthiness and repayment underwriting are handled by the selected SBA lender." };
     }
     if (/conventional/.test(name)) {
       const c = coverage(ctx, bench != null ? bench + 1.0 : null, "illustrative bank CRE rate ≈ benchmark +1.0", 20, 0.75);

@@ -4,8 +4,9 @@ import { NextResponse } from "next/server";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
 import { guardPublicInput } from "@/security/realityPlatform/publicInputGuard";
 import { calculatePropertyOperatingModel, type PropertyOperatingModelInput, type OperatingUseType, type OperatingRevenueCadence } from "@/lib/property/propertyOperatingModel";
-import { adviseOnPropertyOperatingModel, buildDeterministicOperatingModelAdvice } from "@/lib/property/propertyOperatingModelAdvisor";
+import { adviseOnPropertyOperatingModel, buildDeterministicOperatingModelAdvice, type ProjectConcern } from "@/lib/property/propertyOperatingModelAdvisor";
 import { decideRate } from "@/security/realityPlatform/navigatorRateLimit";
+import { indicateMarketValue } from "@/lib/property/marketValueIndication";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,11 @@ interface OperatingModelRequest {
     entitlementSummary?: string | null;
   };
   customerGoal?: string | null;
-  financingConcern?: "none" | "credit" | "equity" | "liquidity" | "documentation" | "experience" | "time" | "unknown";
+  projectConcern?: ProjectConcern;
+  valuation?: {
+    capRateLowPct?: number | null;
+    capRateHighPct?: number | null;
+  };
   requestAdvice?: boolean;
 }
 
@@ -105,17 +110,28 @@ export async function POST(request: Request) {
     entitlementSummary: text(parsed.body.propertyContext?.entitlementSummary, 600),
   };
   const result = calculatePropertyOperatingModel(model);
+  const capRateLowPct = bounded(parsed.body.valuation?.capRateLowPct, 30);
+  const capRateHighPct = bounded(parsed.body.valuation?.capRateHighPct, 30);
+  const valuation = capRateLowPct > 0 && capRateHighPct > 0
+    ? indicateMarketValue({
+        propertyType: propertyContext.classification || propertyContext.currentUse || "commercial",
+        landUse: propertyContext.currentUse,
+        noiAnnual: result.noi,
+        capRateLowPct,
+        capRateHighPct,
+      })
+    : null;
   const budget = parsed.body.requestAdvice === false ? null : aiBudget(request);
   const advice = parsed.body.requestAdvice === false
     ? null
     : budget && !budget.allowed
-      ? buildDeterministicOperatingModelAdvice(result, parsed.body.financingConcern ?? "unknown")
+      ? buildDeterministicOperatingModelAdvice(result, parsed.body.projectConcern ?? "unknown")
       : await adviseOnPropertyOperatingModel({
           modelInput: model,
           result,
           propertyContext,
           customerGoal: safeCustomerGoal,
-          financingConcern: parsed.body.financingConcern ?? "unknown",
+          projectConcern: parsed.body.projectConcern ?? "unknown",
         });
 
   return NextResponse.json(
@@ -123,6 +139,7 @@ export async function POST(request: Request) {
       ok: true,
       model,
       result,
+      valuation,
       advice,
       posture: {
         mathAuthority: "deterministic",
@@ -132,6 +149,8 @@ export async function POST(request: Request) {
         aiRetryAfterMs: budget && !budget.allowed ? budget.retryAfterMs ?? null : null,
         creditDecision: false,
         financingApproval: false,
+        nonResidentialPersonalFinancialScoring: false,
+        borrowerUnderwritingAuthority: "selected_provider_only",
       },
     },
     { headers: { "Cache-Control": "no-store, private" } },

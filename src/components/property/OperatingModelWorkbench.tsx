@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { CommercialUseScreen } from "@/lib/property/commercialUseModel";
 import type { PropertyOperatingModelResult, OperatingUseType, OperatingRevenueCadence } from "@/lib/property/propertyOperatingModel";
 import type { OperatingModelAiAdvice } from "@/lib/property/propertyOperatingModelAdvisor";
+import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
 
 type ExpenseKey = "payrollMonthly" | "utilitiesMonthly" | "insuranceMonthly" | "propertyTaxMonthly" | "maintenanceHousekeepingMonthly" | "foodServicesMonthly" | "managementMarketingMonthly" | "licensingOtherMonthly";
 
@@ -23,6 +24,8 @@ type FormState = {
   interestRatePct: string;
   amortizationYears: string;
   targetDscr: string;
+  capRateLowPct: string;
+  capRateHighPct: string;
   expenses: Record<ExpenseKey, string>;
 };
 
@@ -60,6 +63,8 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
       interestRatePct: screen.referenceRatePct ? screen.referenceRatePct.toFixed(2) : "",
       amortizationYears: "25",
       targetDscr: "1.25",
+      capRateLowPct: "",
+      capRateHighPct: "",
       expenses: {
         payrollMonthly: "",
         utilitiesMonthly: "",
@@ -75,9 +80,10 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
 
   const [form, setForm] = useState<FormState>(initial);
   const [goal, setGoal] = useState("");
-  const [concern, setConcern] = useState("unknown");
+  const [projectConcern, setProjectConcern] = useState("unknown");
   const [result, setResult] = useState<PropertyOperatingModelResult | null>(null);
   const [advice, setAdvice] = useState<OperatingModelAiAdvice | null>(null);
+  const [valuation, setValuation] = useState<MarketValueIndication | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,13 +121,18 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
           entitlementSummary: screen.secondaryOpportunity ? `${screen.secondaryOpportunity.conversion.pathLabel}; ${screen.secondaryOpportunity.conversion.endToEndMonths.low}-${screen.secondaryOpportunity.conversion.endToEndMonths.high} month screening runway` : null,
         },
         customerGoal: goal,
-        financingConcern: concern,
+        projectConcern,
+        valuation: {
+          capRateLowPct: num(form.capRateLowPct),
+          capRateHighPct: num(form.capRateHighPct),
+        },
         requestAdvice: true,
       };
       const response = await fetch("/api/public/property-operating-model", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const data = await response.json() as { ok?: boolean; error?: string; result?: PropertyOperatingModelResult; advice?: OperatingModelAiAdvice };
+      const data = await response.json() as { ok?: boolean; error?: string; result?: PropertyOperatingModelResult; valuation?: MarketValueIndication | null; advice?: OperatingModelAiAdvice };
       if (!response.ok || !data.ok || !data.result) throw new Error(data.error || "The operating-model service could not complete the analysis.");
       setResult(data.result);
+      setValuation(data.valuation ?? null);
       setAdvice(data.advice ?? null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "The model could not be calculated.");
@@ -153,7 +164,7 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
           You supply the operating assumptions. Furlong calculates revenue, NOI, debt service, DSCR, break-even occupancy, capital need and sensitivity with deterministic math; AI then explains the result, challenges weak assumptions and suggests what to verify next. The AI cannot change the math or issue a credit decision.
         </p>
         <div style={{ fontSize: 11.5, color: "#334155", background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 9, padding: "8px 10px", lineHeight: 1.55 }}>
-          <strong>Furlong's finish line is the closing table, not a lender introduction.</strong> This model is meant to feed the same case through entitlement, environmental, conversion budget, Capital Readiness, USDA/FSA/SBA/conventional comparison, borrower-obstacle work, Capital Network matching, lender conditions and closing readiness.
+          <strong>Furlong's finish line is the closing table, not a lender introduction.</strong> This model is meant to feed the same case through entitlement, environmental, conversion budget, Capital Readiness, USDA/FSA/SBA/conventional comparison, Capital Network matching, provider underwriting/conditions and closing readiness.
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 8 }}>
           <label style={labelStyle}>Use model<select value={form.useType} onChange={(e) => update("useType", e.target.value)} style={fieldStyle}><option value="extended_stay">Extended-stay hospitality</option><option value="hotel">Hotel</option><option value="senior_independent_living">Senior independent living</option><option value="senior_assisted_living">Senior assisted living / care</option><option value="other_units">Other room/unit use</option></select></label>
@@ -176,11 +187,13 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
           <label style={labelStyle}>Interest rate %<input inputMode="decimal" value={form.interestRatePct} onChange={(e) => update("interestRatePct", e.target.value)} style={fieldStyle} /></label>
           <label style={labelStyle}>Amortization years<input inputMode="decimal" value={form.amortizationYears} onChange={(e) => update("amortizationYears", e.target.value)} style={fieldStyle} /></label>
           <label style={labelStyle}>DSCR target<input inputMode="decimal" value={form.targetDscr} onChange={(e) => update("targetDscr", e.target.value)} style={fieldStyle} /></label>
-        </div></details>
+          <label style={labelStyle}>Market cap rate — low % (optional)<input inputMode="decimal" value={form.capRateLowPct} onChange={(e) => update("capRateLowPct", e.target.value)} style={fieldStyle} placeholder="Use local market evidence" /></label>
+          <label style={labelStyle}>Market cap rate — high % (optional)<input inputMode="decimal" value={form.capRateHighPct} onChange={(e) => update("capRateHighPct", e.target.value)} style={fieldStyle} placeholder="Use local market evidence" /></label>
+        </div><p style={{ margin: "7px 0 0", color: "#64748B", fontSize: 11, lineHeight: 1.5 }}>For commercial/hospitality value, Furlong uses NOI ÷ a market-supported cap-rate range. It will not apply a residential house-price index or invent a generic cap rate. Leave these blank until you have local broker/appraiser/closed-sale evidence.</p></details>
 
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,2fr) minmax(180px,1fr)", gap: 8 }}>
-          <label style={labelStyle}>What are you trying to accomplish? (optional)<input value={goal} onChange={(e) => setGoal(e.target.value.slice(0, 1000))} style={fieldStyle} placeholder="Example: convert the hotel to independent senior living and close with the lowest practical cash injection." /></label>
-          <label style={labelStyle}>Biggest financing concern<select value={concern} onChange={(e) => setConcern(e.target.value)} style={fieldStyle}><option value="unknown">Not sure yet</option><option value="none">No known concern</option><option value="credit">Credit profile</option><option value="equity">Cash injection / equity</option><option value="liquidity">Liquidity</option><option value="documentation">Documentation</option><option value="experience">Operating experience</option><option value="time">Time to close</option></select></label>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0,2fr) minmax(200px,1fr)", gap: 8 }}>
+          <label style={labelStyle}>What are you trying to accomplish? (optional)<input value={goal} onChange={(e) => setGoal(e.target.value.slice(0, 1000))} style={fieldStyle} placeholder="Example: convert the hotel to independent senior living and determine what must be true for the property to close." /></label>
+          <label style={labelStyle}>Biggest property/project concern<select value={projectConcern} onChange={(e) => setProjectConcern(e.target.value)} style={fieldStyle}><option value="unknown">Not sure yet</option><option value="none">No known concern</option><option value="price_debt">Purchase price / debt structure</option><option value="revenue_occupancy">Revenue / occupancy</option><option value="operating_expenses">Operating expenses</option><option value="conversion_capex">Conversion / construction cost</option><option value="entitlement">Zoning / permits / entitlement</option><option value="environmental">Environmental</option><option value="time">Time to close</option></select></label>
         </div>
 
         <button type="button" disabled={busy} onClick={() => void calculate()} style={{ justifySelf: "start", border: 0, borderRadius: 9, background: "#1C4532", color: "white", fontWeight: 850, padding: "9px 14px", cursor: busy ? "wait" : "pointer" }}>{busy ? "Calculating…" : "Calculate + review with AI"}</button>
@@ -190,7 +203,9 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 7 }}>{[
             ["Annual revenue", money(result.annualRevenue)], ["NOI", money(result.noi)], ["NOI margin", result.noiMarginPct == null ? "—" : `${result.noiMarginPct.toFixed(1)}%`], ["Annual debt service", money(result.annualDebtService)], ["DSCR", result.dscr == null ? "—" : `${result.dscr.toFixed(2)}x`], ["Break-even occupancy", result.breakEvenOccupancyPct == null ? "—" : `${result.breakEvenOccupancyPct.toFixed(1)}%`], ["Project cost", money(result.totalProjectCost)], ["Equity required", result.equityRequired == null ? "—" : `${money(result.equityRequired)}${result.equityRequiredPct == null ? "" : ` (${result.equityRequiredPct.toFixed(1)}%)`}`], ["Loan supported at target", money(result.maxLoanSupportedAtTarget)]
           ].map(([label, value]) => <div key={label} style={{ border: "1px solid #E2E8F0", borderRadius: 9, padding: "8px 10px", background: "#F8FAFC" }}><div style={{ fontSize: 9.5, color: "#64748B", fontWeight: 800, textTransform: "uppercase" }}>{label}</div><div style={{ marginTop: 3, color: "#0F172A", fontSize: 13, fontWeight: 850 }}>{value}</div></div>)}</div>
-          {result.annualCoverageGap != null && result.annualCoverageGap > 0 && <div style={{ fontSize: 12, color: "#92400E", background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 9, padding: "8px 10px" }}>At the entered debt terms, this property-side case needs about <strong>{money(result.annualCoverageGap)}/yr more NOI</strong> to reach the {result.targetDscr.toFixed(2)}x target. That gap can be attacked through price, debt structure, revenue, occupancy, expense control or verified outside/global support where a lender/program permits it.</div>}
+          {valuation?.status === "indicated" && <div style={{ border: "1px solid #C7D7CD", borderRadius: 10, padding: "10px 12px", background: "#F7FBF8", fontSize: 12, color: "#334155", lineHeight: 1.55 }}><strong style={{ color: "#1C4532" }}>Furlong Property Estimate — income-capitalization screen:</strong> {money(valuation.lowUsd)}–{money(valuation.highUsd)} <span style={{ color: "#64748B" }}>(midpoint {money(valuation.midUsd)})</span>. {valuation.method} {valuation.cautions.join(" ")}</div>}
+          {result && !valuation && <div style={{ border: "1px solid #E2E8F0", borderRadius: 9, padding: "8px 10px", background: "#F8FAFC", fontSize: 11.5, color: "#64748B", lineHeight: 1.5 }}><strong>Commercial value screen not run yet.</strong> Enter a market-supported cap-rate range above and recalculate. Furlong will use the modeled NOI; it will not manufacture a commercial value from a residential index.</div>}
+          {result.annualCoverageGap != null && result.annualCoverageGap > 0 && <div style={{ fontSize: 12, color: "#92400E", background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 9, padding: "8px 10px" }}>At the entered debt terms, this property-side case needs about <strong>{money(result.annualCoverageGap)}/yr more NOI</strong> to reach the {result.targetDscr.toFixed(2)}x target. That property-side gap can be attacked through price, debt structure, revenue, occupancy, expense control or a better-supported operating plan. Any borrower-side support is evaluated separately by the selected provider and does not change Furlong's property score.</div>}
           <details><summary style={{ cursor: "pointer", color: "#334155", fontSize: 12, fontWeight: 800 }}>Sensitivity — what happens if occupancy or unit revenue moves?</summary><div style={{ overflowX: "auto", marginTop: 7 }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11.5 }}><thead><tr><th style={{ textAlign: "left", padding: 5 }}>Case</th><th style={{ textAlign: "right", padding: 5 }}>Revenue</th><th style={{ textAlign: "right", padding: 5 }}>NOI</th><th style={{ textAlign: "right", padding: 5 }}>DSCR</th></tr></thead><tbody>{result.sensitivity.map((s) => <tr key={s.label}><td style={{ padding: 5, borderTop: "1px solid #E2E8F0" }}>{s.label}</td><td style={{ padding: 5, borderTop: "1px solid #E2E8F0", textAlign: "right" }}>{money(s.annualRevenue)}</td><td style={{ padding: 5, borderTop: "1px solid #E2E8F0", textAlign: "right" }}>{money(s.noi)}</td><td style={{ padding: 5, borderTop: "1px solid #E2E8F0", textAlign: "right" }}>{s.dscr == null ? "—" : `${s.dscr.toFixed(2)}x`}</td></tr>)}</tbody></table></div></details>
         </div>}
 
@@ -202,7 +217,7 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
           <div><strong style={{ fontSize: 11.5 }}>Questions that most improve the answer:</strong><ul style={{ margin: "4px 0 0 18px", padding: 0, fontSize: 11.5, lineHeight: 1.55 }}>{advice.questionsToImproveModel.map((x) => <li key={x}>{x}</li>)}</ul></div>
           <div><strong style={{ fontSize: 11.5 }}>Execution path:</strong><ol style={{ margin: "4px 0 0 18px", padding: 0, fontSize: 11.5, lineHeight: 1.55 }}>{advice.nextActions.map((x) => <li key={x}>{x}</li>)}</ol></div>
           <p style={{ margin: 0, fontSize: 11.5, color: "#475569", lineHeight: 1.55 }}><strong>Financing:</strong> {advice.financingPosture}</p>
-          <p style={{ margin: 0, fontSize: 11.5, color: "#475569", lineHeight: 1.55 }}><strong>Credit:</strong> {advice.creditContext}</p>
+          <p style={{ margin: 0, fontSize: 11.5, color: "#475569", lineHeight: 1.55 }}><strong>Provider underwriting boundary:</strong> {advice.borrowerUnderwritingBoundary}</p>
         </div>}
 
         {result && <details>
@@ -213,9 +228,9 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
             <li><strong>Conversion budget:</strong> bind construction, professional, permit, licensing and contingency costs.</li>
             <li><strong>Operating economics:</strong> rerun this model with verified inputs and lender-specific DSCR requirements.</li>
             <li><strong>Capital Readiness:</strong> compare USDA, FSA, SBA and conventional paths without forcing the customer into one program family.</li>
-            <li><strong>Borrower obstacle work:</strong> credit, equity, liquidity, experience or documentation issues become specific cure/workup tasks, not automatic rejection.</li>
+            <li><strong>Property/project obstacle work:</strong> price, operating economics, conversion cost, entitlement, environmental and timing issues become explicit cure/workup tasks instead of hidden deal killers.</li>
             <li><strong>Capital Network:</strong> rank verified providers for fit + execution; borrower selects exactly who receives the file.</li>
-            <li><strong>Underwriting + conditions:</strong> track third-party reports, questions, conditions and exceptions to a closing-ready checklist.</li>
+            <li><strong>Provider underwriting + conditions:</strong> the selected lender performs its own borrower underwriting; Furlong tracks authorized conditions and third-party requirements without using personal financials to score the nonresidential property.</li>
             <li><strong>Closing:</strong> confirm final terms/documents/funds and close the transaction — keys/possession are the success event.</li>
           </ol>
           <a href="/financing-pathways" style={{ display: "inline-flex", marginTop: 9, borderRadius: 8, padding: "7px 10px", background: "#1C2B45", color: "#fff", textDecoration: "none", fontSize: 11.5, fontWeight: 850 }}>Continue to financing pathways</a>

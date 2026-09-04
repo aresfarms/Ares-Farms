@@ -24,6 +24,19 @@ Every business-purpose property report should strive to show, in this order:
 8. Financing-path comparison across the program families actually relevant to the property.
 9. Execution risks and next evidence needed to turn a screen into a decision-ready package.
 
+## Furlong Property Estimate — type-aware valuation rule
+
+Furlong must **not** use one universal estimate formula across residential, farm, commercial, hospitality and land. The valuation method must follow the asset class and the evidence actually available.
+
+- **Residential:** an assessment-derived screen may be produced only when the jurisdiction's assessment-to-market basis **and the source-verified assessment effective date** are known. The assessment is then walked forward using the exact quarter-to-quarter FHFA single-family House Price Index for that state. If the parcel source does not publish the assessment vintage, Furlong publishes **no numeric estimate** from that assessment. A fetch date must never masquerade as a valuation date.
+- **Commercial / hospitality / mobile-home park:** Furlong must never apply the residential FHFA HPI. A numeric screen requires property/project NOI plus a current market-supported capitalization-rate range, or a future governed closed-sale-comparable method. Direct capitalization is `NOI ÷ cap rate`; the cap rate must be market evidence, not an invented generic national assumption. Hotels and operating businesses may also require going-concern/business-value allocation and additional appraisal methods.
+- **Farm / agricultural:** when verified acreage is available, Furlong may use the current USDA NASS state average farm-real-estate value per acre (land + buildings) as a deliberately broad state-level screen. It must carry a wide band and clearly state that soils, productive acres, water, improvements, easements, conservation restrictions, development pressure, access and local closed sales can move an individual farm far outside the state average.
+- **Bare non-agricultural land:** Furlong publishes no numeric estimate from residential HPI or a generic acreage multiplier. It requires recent closed land comparables or another parcel-specific market basis.
+
+A seller's asking price is market **evidence**, not proof of market value. An arm's-length contract or closed sale is stronger transaction-level evidence, but a material divergence from a screening model must still be reconciled rather than blindly forcing the model to equal the transaction price. A licensed appraisal outranks every Furlong screening indication.
+
+The customer-facing label is **Furlong Property Estimate — screening**. If the required valuation evidence is missing, the correct output is **Needs property-specific valuation evidence** with the missing inputs named. Refusing to publish an unsupported number is a successful control, not a missing feature.
+
 ## Senior-housing conversion rule
 
 Hospitality and similar buildings may surface **Senior housing / independent-living conversion** as a secondary opportunity when the shell is plausibly adaptable. It must always be labeled **subject to zoning/conversion review**.
@@ -58,13 +71,21 @@ Research basis reviewed 2026-09-04:
 - NAIOP Research Foundation, *The Development Approvals Index* (2021) and follow-on approvals analysis (2023): approval-process transparency, accountability and consistency affect duration, cost and completion risk.
 - PropertyShark subscription feature/pricing page, reviewed 2026-09-04.
 - Crexi Intelligence feature/pricing page, reviewed 2026-09-04.
+- FHFA House Price Index: state single-family house-price movement; Furlong snapshot refreshed 2026-09-04 through 2026Q2.
+- Maryland MD iMAP / SDAT field metadata: `SDATDATE` is the Assessments data-linkage/download date, while `LASTASSD` is the parcel field labeled **Last Date Assessed**. Furlong uses `LASTASSD` as the assessment-vintage input and never substitutes `SDATDATE`.
+- USDA NASS, Ag Land Asset Value: state farm real-estate value per acre (land + buildings), 2025 series used as agricultural screening context.
+- Appraisal Institute income-capitalization guidance: direct capitalization converts a single year's stabilized NOI into value using a market-derived capitalization rate; Furlong does not invent the rate.
 
 ## Implementation anchors
 
 - `src/lib/property/commercialAlternativeUses.ts`
 - `src/lib/property/commercialConversionIntelligence.ts`
 - `src/lib/property/commercialUseModel.ts`
+- `src/lib/property/marketValueIndication.ts`
+- `src/lib/property/stateHpiGenerated.ts`
+- `src/lib/property/stateFarmlandGenerated.ts`
 - `src/components/property/lanes/FinanceAnalysisPanel.tsx`
 - `src/app/api/public/property-proforma-pdf/route.ts`
 - `src/scripts/propertyIntelligenceExpansionConformance.ts`
 - gate: `npm run verify:property-intelligence-expansion`
+- gate: `npm run verify:property-value-indication`

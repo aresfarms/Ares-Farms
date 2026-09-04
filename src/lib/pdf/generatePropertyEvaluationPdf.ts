@@ -41,6 +41,19 @@ type PropertyEvaluationPdfInput = {
   };
   executiveSummary: string;
   propertySummary: string[];
+  propertyValueScreen?: {
+    status: "indicated" | "needs-property-evidence" | "no-registered-basis" | "no-assessed-value";
+    profileId: string;
+    methodCode: string;
+    confidence: string;
+    lowUsd: number | null;
+    midUsd: number | null;
+    highUsd: number | null;
+    method: string;
+    cautions: string[];
+    sources: string[];
+    requiredInputs: string[];
+  };
   conceptSummary: string[];
   strengths: string[];
   risks: string[];
@@ -684,6 +697,27 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       .filter((row) => !/^(asset|location|asking posture|immediate deal type|asset type|source)$/i.test(row.label)),
   ]);
 
+  if (input.propertyValueScreen) {
+    const value = input.propertyValueScreen;
+    heading("Furlong Property Estimate — Screening");
+    if (value.status === "indicated" && value.lowUsd != null && value.midUsd != null && value.highUsd != null) {
+      factsTable([
+        { label: "Screening range", value: `$${value.lowUsd.toLocaleString("en-US")} – $${value.highUsd.toLocaleString("en-US")}` },
+        { label: "Midpoint", value: `$${value.midUsd.toLocaleString("en-US")}` },
+        { label: "Method", value: `${value.methodCode} · ${value.confidence}` },
+      ]);
+      paragraph(value.method, { size: 9.5 });
+    } else {
+      panel({
+        title: "Needs property-specific valuation evidence",
+        lines: [value.method, ...(value.requiredInputs.length ? [`Needed next: ${value.requiredInputs.join("; ")}`] : [])],
+        fill: ACCENT_SOFT,
+      });
+    }
+    for (const caution of value.cautions) paragraph(caution, { size: 8.5, color: COLORS.muted });
+    if (value.sources.length) paragraph(`Sources: ${value.sources.join(" · ")}`, { size: 8, color: COLORS.faint });
+  }
+
   // ── LANE QUESTIONS, ANSWERED ───────────────────────────────────────────────
   // Directly after the snapshot — the founder's direct-to-answers principle
   // applies to the printed ledger too.
@@ -870,9 +904,9 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     panel({
       title: "When you're ready to move",
       lines: [
-        "Furlong coordinates financing files with Five Borough Capital, the professional financing module in the Furlong ecosystem. When you're ready, your profile and documents can carry forward — nothing re-typed, nothing resold.",
-        "Worth having ready: photo ID, recent income documentation, a rough source-of-funds picture, and (once you have one) the property contract. Your readiness list tracks what's still missing.",
-        "Financing decisions belong to licensed lenders — Furlong never approves, guarantees, or determines eligibility.",
+        "Furlong Capital Desk can carry the property/project case into the Capital Network. You choose the provider; Furlong does not sell leads, auction files, or improve ranking because a provider pays more.",
+        "For nonresidential property, Furlong ranks the property/project from use, location, economics, DSCR, entitlement, environmental and program fit. Personal financials do not change that ranking. A selected provider may separately request borrower/business underwriting documents before approval.",
+        "Financing decisions belong to the selected lender or program authority — Furlong never approves, guarantees, or determines eligibility.",
       ],
       fill: ACCENT_SOFT,
     });

@@ -596,8 +596,10 @@
     "verify:institutional-assurance": "tsx src/scripts/institutionalAssuranceConformance.ts",
     "reconcile:master-volume-doctrines": "tsx src/scripts/reconcileMasterVolumeDoctrines.ts",
     "verify:capital-network": "tsx src/scripts/capitalNetworkConformance.ts",
+    "verify:capital-network-execution": "tsx src/scripts/capitalNetworkExecutionReliabilityConformance.ts",
     "verify:property-intelligence-expansion": "tsx src/scripts/propertyIntelligenceExpansionConformance.ts",
-    "verify:property-operating-model": "tsx src/scripts/propertyOperatingModelConformance.ts"
+    "verify:property-operating-model": "tsx src/scripts/propertyOperatingModelConformance.ts",
+    "verify:property-value-indication": "tsx src/scripts/propertyValueIndicationConformance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

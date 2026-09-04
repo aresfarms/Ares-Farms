@@ -18,12 +18,26 @@ type ProviderView = {
   disclosure: string;
 };
 
+type ExecutionReliabilityView = {
+  verifiedOutcomeCount: number;
+  closedFundedCount: number;
+  closeRatePct: number | null;
+  completedDispositionRatePct: number | null;
+  medianFirstResponseDays: number | null;
+  medianConsentToCloseDays: number | null;
+  publicDisplayEligible: boolean;
+  rankingTieBreakEligible: boolean;
+  customerLabel: string;
+  methodology: string;
+};
+
 type MatchView = {
   matchId: string;
   score: number;
   reasons: string[];
   selected: boolean;
   provider: ProviderView;
+  executionReliability: ExecutionReliabilityView | null;
 };
 
 export function CapitalNetworkMatches({
@@ -98,7 +112,7 @@ export function CapitalNetworkMatches({
         </span>
         <strong style={{ fontSize: 16, color: "#101a2b" }}>Choose who you want to work with</strong>
         <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.55 }}>
-          Furlong compares certified providers against declared geography, program, deal size, and other fit factors. This is matching, not underwriting or approval. Affiliation with Furlong never improves a provider&apos;s score.
+          Furlong compares certified providers on the property/project: program fit, geography, transaction type, deal size, property/collateral type, industry appetite, declared ability to execute and, when enough verified history exists, demonstrated closing performance. This is matching, not underwriting or approval. Personal credit/income does not change a nonresidential match, and neither affiliation nor compensation can improve a provider&apos;s score.
         </span>
       </div>
 
@@ -132,6 +146,20 @@ export function CapitalNetworkMatches({
               <div style={{ fontSize: 11.5, color: "#64748b", lineHeight: 1.5 }}>
                 {match.provider.disclosure}
               </div>
+              {match.executionReliability && (
+                <div style={{ border: "1px solid #e2e8f0", borderRadius: 9, padding: "8px 10px", background: "#f8fafc", display: "grid", gap: 3, fontSize: 11.5, color: "#475569" }}>
+                  <strong style={{ color: "#334155" }}>Verified Furlong execution record</strong>
+                  <span>{match.executionReliability.customerLabel}</span>
+                  {match.executionReliability.publicDisplayEligible && (
+                    <span>
+                      {match.executionReliability.closeRatePct != null ? `Close/fund rate ${match.executionReliability.closeRatePct}% · ` : ""}
+                      {match.executionReliability.medianFirstResponseDays != null ? `median first response ${match.executionReliability.medianFirstResponseDays} days · ` : ""}
+                      {match.executionReliability.medianConsentToCloseDays != null ? `median consent-to-close ${match.executionReliability.medianConsentToCloseDays} days` : "closing-time history still developing"}
+                    </span>
+                  )}
+                  <details><summary style={{ cursor: "pointer" }}>How this is calculated</summary><span>{match.executionReliability.methodology}</span></details>
+                </div>
+              )}
               {match.provider.website && (
                 <a href={match.provider.website} target="_blank" rel="noopener noreferrer" style={{ color: "#534AB7", fontSize: 12.5, fontWeight: 700, width: "fit-content" }}>
                   Provider website ↗

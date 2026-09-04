@@ -140,12 +140,14 @@ export async function POST(req: NextRequest) {
       })(),
     });
   } else {
-  // ── Screening value derivation (founder direction 2026-07-29: "we HAVE the
-  // numbers"). Many parcels publish no asking price; the pro forma still runs
-  // on the best value we verifiably hold, with the basis printed on the page:
-  //   entered/listing price → official assessed total value → USDA state
-  //   farmland average × acreage. No basis available → the figures honestly
-  //   say what they require.
+  // ── Acquisition-price screening basis.
+  // A county tax assessment is NEVER substituted for acquisition/market value
+  // in a nonresidential pro forma. Commercial/hospitality value requires
+  // property NOI + market cap-rate evidence (or closed sales). Farm lane B may
+  // use USDA NASS state farm-real-estate $/acre only as a broad screening
+  // fallback when no entered/listing price exists. Otherwise no price means no
+  // debt-sizing number — Furlong states the missing evidence instead of
+  // manufacturing one.
   const stateCode = typeof body.state === "string" ? body.state.slice(0, 40) : null;
   const acreage = num(body.acreage);
   const fsaRatePct = num(body.fsaRatePct);
@@ -154,14 +156,13 @@ export async function POST(req: NextRequest) {
   const stateFarmland = stateCode ? STATE_FARMLAND[stateCode.toUpperCase()] : undefined;
   let screeningPrice: number | null = enteredPrice;
   let valuationNote: string | null = enteredPrice != null ? "Asking price / intended offer as entered; appraisal governs" : null;
-  if (screeningPrice == null && assessedTotal != null) {
-    screeningPrice = assessedTotal;
-    valuationNote = "SCREENING VALUE — official assessed total value from the jurisdiction parcel record; asking price and appraisal govern";
-  }
-  if (screeningPrice == null && acreage != null && acreage > 0 && stateFarmland) {
+  if (screeningPrice == null && lane === "B" && acreage != null && acreage > 0 && stateFarmland) {
     screeningPrice = Math.round(acreage * stateFarmland.dollarsPerAcre);
-    valuationNote = `SCREENING VALUE — ${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres × USDA ${stateFarmland.year ?? STATE_FARMLAND_PROVENANCE.asOf} state farm real-estate average ($${stateFarmland.dollarsPerAcre.toLocaleString("en-US")}/acre); asking price and appraisal govern`;
+    valuationNote = `BROAD FARM SCREEN — ${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres × USDA ${stateFarmland.year ?? STATE_FARMLAND_PROVENANCE.asOf} state farm real-estate average ($${stateFarmland.dollarsPerAcre.toLocaleString("en-US")}/acre). This state average is not a parcel appraisal; local closed sales, soils, improvements and appraisal govern.`;
   }
+  // Keep the assessment available only as a tax/assessment fact. It must not
+  // become the acquisition price simply because the listing price is missing.
+  void assessedTotal;
 
   // Soil/topography constraints (founder direction 2026-07-29): the parcel's
   // SSURGO facts gate what this ground can sustainably grow.
@@ -234,8 +235,8 @@ export async function POST(req: NextRequest) {
           ? `CLEARS THE FLOOR — the diversified mix below services the debt at ${(solution.bestMix?.dscr ?? 0).toFixed(2)}x. On this screen, agriculture alone can carry the purchase at the screening price.`
           : `CLEARS THE FLOOR — a single modeled enterprise, ${solution.bestSingle?.label ?? "the best enterprise"}, services the debt at ${(solution.bestSingle?.dscr ?? 0).toFixed(2)}x. The diversified screen alone does not (${(solution.bestMix?.dscr ?? 0).toFixed(2)}x) — clearing the floor on this screen means committing to that enterprise, with the concentration risk and capital requirements that carries. Agriculture can carry this purchase, but only on that plan.`
         : solution.verdict === "close"
-          ? `COVERS THE PAYMENT, MISSES THE FLOOR — the best modeled option covers the debt (≥1.0x) but falls ${dollars(solution.gapAnnual ?? 0)}/yr short of the ${DSCR_FLOOR}x lender floor. Documented off-farm income of ${dollars(solution.outsideIncomeNeeded ?? 0)}/yr (counted in GLOBAL coverage), an acquisition price near ${solution.maxSupportablePrice != null ? dollars(solution.maxSupportablePrice) : "a lower level"}, or stronger operator records close the gap.`
-          : `NO MODELED COMBINATION CLEARS THE FLOOR — on this screen, no mix of crops, livestock, hay, flowers, or orchard services this debt at the screening price. Agriculture alone will not carry this purchase: plan on documented outside income of ${dollars(solution.outsideIncomeNeeded ?? 0)}/yr (counted in GLOBAL coverage), or an acquisition price near ${solution.maxSupportablePrice != null ? dollars(solution.maxSupportablePrice) : "a substantially lower level"} where the best mix clears ${DSCR_FLOOR}x.`;
+          ? `COVERS THE PAYMENT, MISSES THE FLOOR — the best modeled property/project option covers the debt (≥1.0x) but falls ${dollars(solution.gapAnnual ?? 0)}/yr short of the ${DSCR_FLOOR}x property-side floor. On Furlong's screen, close the gap through a lower acquisition price, stronger documented farm NOI, lower project cost, or a different debt structure. Any borrower-side support is considered separately by the selected provider and does not change Furlong's property score.`
+          : `NO MODELED COMBINATION CLEARS THE FLOOR — on this property/project screen, no modeled mix of crops, livestock, hay, flowers, or orchard services this debt at the screening price. The property-side case needs a lower acquisition price, stronger documented NOI, lower project cost, or a different debt structure before Furlong can show standalone coverage.`;
     const mixRows = [
       ...(solution.bestMix
         ? solution.bestMix.parts.map((part) => ({

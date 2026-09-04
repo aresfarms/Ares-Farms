@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 
 import { apiSecurityPublicReason } from "@/lib/security/apiSecurityPolicy";
 import {
+  CAPITAL_NETWORK_NON_NEGOTIABLES,
   matchCapitalProviders,
   type CapitalDealMatchInput,
   type CapitalProviderProfile,
@@ -49,6 +50,15 @@ const affiliate: CapitalProviderProfile = {
   organizationName: "Furlong Lending Affiliate",
   affiliation: "FURLONG_AFFILIATE",
 };
+const runtimeSource = readFileSync("src/lib/financing/capitalNetworkRuntime.ts", "utf8");
+for (const forbidden of ["creditScore", "personalIncome", "householdIncome", "debtToIncome", "dti", "personalLiquidity", "personalNetWorth"]) {
+  assert(!runtimeSource.includes(`${forbidden}:`), `Capital Network match input must not score personal financial field ${forbidden}.`);
+}
+assert(runtimeSource.includes("propertyType"));
+assert(runtimeSource.includes("estimatedAmount"));
+assert(runtimeSource.includes("program"));
+assert(runtimeSource.includes("industry"));
+
 const matches = matchCapitalProviders(deal, [independent, affiliate]);
 assert.equal(matches.length, 2);
 assert.equal(matches[0].eligible, true);
@@ -77,9 +87,21 @@ const conventional = matchCapitalProviders({ ...deal, program: "conventional" },
 assert.equal(conventional.eligible, true, "Canonical conventional intake must map to declared commercial conventional appetite.");
 
 const migration = readFileSync("src/lib/db/migrations/0056_capital_network_multi_provider.sql", "utf8");
+const executionMigration = readFileSync("src/lib/db/migrations/0057_capital_network_execution_reliability.sql", "utf8");
+assert.equal(CAPITAL_NETWORK_NON_NEGOTIABLES.sellsBorrowerLeads, false);
+assert.equal(CAPITAL_NETWORK_NON_NEGOTIABLES.auctionsBorrowerFiles, false);
+assert.equal(CAPITAL_NETWORK_NON_NEGOTIABLES.compensationInfluencesRanking, false);
+assert.equal(CAPITAL_NETWORK_NON_NEGOTIABLES.affiliationInfluencesRanking, false);
+assert.equal(CAPITAL_NETWORK_NON_NEGOTIABLES.shotgunRoutingAllowed, false);
+assert.equal(CAPITAL_NETWORK_NON_NEGOTIABLES.borrowerChoosesRecipients, true);
+assert.equal(CAPITAL_NETWORK_NON_NEGOTIABLES.nonResidentialPersonalFinancialScoring, false);
 assert(migration.includes("capital_network_providers"));
 assert(migration.includes("capital_network_matches"));
 assert(migration.includes("capital_network_deal_rooms"));
+assert(executionMigration.includes("capital_network_execution_records"));
+assert(executionMigration.includes("evidence_refs"));
+assert(!executionMigration.includes("credit_score"));
+assert(!executionMigration.includes("compensation_amount"));
 assert(migration.includes("'retained-external-broker'"));
 assert(migration.includes("FALSE, TRUE,\n  FALSE"), "Transition seed must not enable automatic matching or live routing.");
 
@@ -101,7 +123,9 @@ assert(brokerDesk.includes("providerMayAccessServiceRequest"));
 
 const statusComponent = readFileSync("src/components/public/CapitalNetworkMatches.tsx", "utf8");
 assert(statusComponent.includes("Selecting a provider does not disclose or deliver your file."));
-assert(statusComponent.includes("Affiliation with Furlong never improves a provider"));
+assert(statusComponent.includes("neither affiliation nor compensation can improve a provider"));
+assert(statusComponent.includes("Personal credit/income does not change a nonresidential match"));
+assert(statusComponent.includes("demonstrated closing performance"));
 
 
 assert.equal(
@@ -124,7 +148,7 @@ console.log(JSON.stringify({
   ok: true,
   neutrality: { affiliateScoreEqual: true, deterministic: true },
   onboarding: { applicationIsNotActivation: true, certificationGated: true },
-  matching: { geographyProgramAmountAppetite: true, creditDecision: false },
+  matching: { geographyProgramAmountAppetite: true, propertyProjectOnly: true, personalFinancialScoring: false, creditDecision: false, sellsLeads: false, auctionsFiles: false, compensationInfluence: false, affiliationInfluence: false },
   borrowerSelection: { selectionSharesData: false, multipleProvidersSupported: true },
   packageDelivery: { exactProviderConsent: true, verifiedRecipientBinding: true },
   dealRooms: { providerScoped: true, accessAfterPackageConsent: true },

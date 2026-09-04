@@ -116,6 +116,41 @@ export const capitalNetworkDealRooms = pgTable(
   ],
 );
 
+
+export const capitalNetworkExecutionRecords = pgTable(
+  "capital_network_execution_records",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    serviceRequestId: text("service_request_id").notNull(),
+    providerId: text("provider_id").notNull(),
+    submissionCaseId: uuid("submission_case_id"),
+    program: text("program"),
+    propertyType: text("property_type"),
+    industry: text("industry"),
+    locationState: text("location_state"),
+    selectedAt: timestamp("selected_at", { withTimezone: true }),
+    consentedAt: timestamp("consented_at", { withTimezone: true }),
+    providerFirstResponseAt: timestamp("provider_first_response_at", { withTimezone: true }),
+    providerDispositionAt: timestamp("provider_disposition_at", { withTimezone: true }),
+    closedFundedAt: timestamp("closed_funded_at", { withTimezone: true }),
+    outcome: text("outcome").notNull(),
+    outcomeReasonCategory: text("outcome_reason_category"),
+    verificationStatus: text("verification_status").notNull().default("PENDING_VERIFICATION"),
+    evidenceRefs: jsonb("evidence_refs").notNull(),
+    recordedBy: text("recorded_by").notNull(),
+    verifiedBy: text("verified_by"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    ...evidence,
+  },
+  (table) => [
+    uniqueIndex("capital_network_execution_case_provider_uq").on(
+      table.serviceRequestId,
+      table.providerId,
+    ),
+  ],
+);
+
 export type CapitalNetworkProviderRow = typeof capitalNetworkProviders.$inferSelect;
 export type CapitalNetworkMatchRow = typeof capitalNetworkMatches.$inferSelect;
 export type CapitalNetworkDealRoomRow = typeof capitalNetworkDealRooms.$inferSelect;
+export type CapitalNetworkExecutionRecordRow = typeof capitalNetworkExecutionRecords.$inferSelect;

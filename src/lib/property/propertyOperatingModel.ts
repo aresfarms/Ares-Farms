@@ -206,8 +206,8 @@ export function calculatePropertyOperatingModel(input: PropertyOperatingModelInp
   if (!(amortYears > 0)) missingInputs.push("amortization term");
 
   const warnings: string[] = [
-    "Screening model only: replace assumptions with verified operating statements, rent/room data, staffing plan, taxes, insurance, utility quotes, licensing requirements and contractor pricing as they become available.",
-    "DSCR is property-side math, not a credit decision or financing approval. Each lender/program applies its own coverage, guarantor, credit, collateral, equity, eligibility and documentation rules.",
+    "Screening model only: replace assumptions with verified property/project operating statements, rent/room data, staffing plan, taxes, insurance, utility quotes, licensing requirements and contractor pricing as they become available.",
+    "DSCR here is property/project-side math, not a credit decision or financing approval. Furlong does not use personal credit, personal income, household assets, DTI or other personal financial-profile data to score this nonresidential property. A selected lender/program may separately require borrower underwriting before approval.",
   ];
   if (/senior_assisted_living/.test(input.useType)) {
     warnings.push("Assisted-living/care models require state-specific licensing, staffing and service-cost assumptions; independent-living economics must not be reused as a care-facility model.");

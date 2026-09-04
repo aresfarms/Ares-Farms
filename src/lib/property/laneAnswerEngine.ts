@@ -209,7 +209,7 @@ export function answerCommercialQuestions(f: CommercialFacts): LaneAnswer[] {
     answer:
       `If you'll occupy at least 51%, this typically points to SBA — 504 for buying/building (low ~10% down, long fixed term) or 7(a) for a more flexible mix; a rural location can open USDA B&I. If it's a pure investment (leased to others), it's conventional commercial financing. The program comparison on this lane lays out how each is built — but the fit and the terms are the licensed lender's call.`,
     confirm:
-      "Bring the deal to an authorized licensed lender or broker through the Furlong Capital Desk — occupancy %, your financials, and the property type decide which program fits and what the terms would actually be.",
+      "Bring the deal to an authorized lender or broker through the Furlong Capital Desk — property type, use, location, occupancy, project economics and the provider's program rules determine which pathways are worth testing. The selected provider handles borrower-side underwriting separately; Furlong does not use personal financials to rank the nonresidential property.",
   });
 
   // 4. Deal-killers

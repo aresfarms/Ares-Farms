@@ -2,13 +2,27 @@
 
 **Effective:** 2026-09-04  
 **Status:** Current owner-controlled build doctrine  
-**Runtime version:** `capital-network-runtime-v1.0.0`
+**Runtime version:** `capital-network-runtime-v1.1.0`
 
 ## Purpose
 
 Furlong is a case-centered one-stop platform, not a single-broker funnel. A borrower may use one Furlong case to organize property/business analysis, financing readiness, environmental work, documents, program navigation, and professional-provider handoffs. Multiple commercial finance brokers and funding institutions may participate in the Capital Network under governed, replaceable provider identities.
 
 Furlong owns the case orchestration and customer experience. Each broker, lender, CDC, Farm Credit institution, or other funding provider retains its own regulated/professional decisions. Furlong Core does not make the provider's credit decision, price a loan, issue a commitment, or determine final program eligibility.
+
+## Non-negotiable borrower-routing rules
+
+These are hard platform rules, not marketing preferences:
+
+- **Furlong does not sell borrower leads.**
+- **Furlong does not auction borrower files.**
+- **Furlong does not route based on which provider pays Furlong the most.** Compensation has zero influence on provider ranking.
+- **Furlong does not shotgun a case to a large lender list.** A borrower chooses the recipient(s), and exact recipient/package consent is required before disclosure.
+- **A Furlong-affiliated provider receives no preference.** Affiliation has zero scoring value.
+- **For nonresidential property, Furlong does not score personal credit, personal income, household DTI, personal assets/liquidity/net worth, or other personal-financial profile data.** Furlong ranks the property/project and program/provider fit. The selected provider separately performs any borrower/business underwriting its program requires.
+- **Residential is the explicit exception to the property-only personal-financial boundary.** Residential mortgage readiness may legitimately require borrower credit/income/debt/asset inputs, but Furlong still does not make the lender's credit decision.
+
+The machine-readable mirror is `CAPITAL_NETWORK_NON_NEGOTIABLES` in `src/lib/financing/capitalNetworkRuntime.ts` and is covered by Capital Network conformance tests.
 
 ## Provider lifecycle
 
@@ -24,9 +38,19 @@ Each provider profile can declare states, programs, financing purposes, property
 
 The Capital Network matching runtime compares coarse case facts to declared provider appetite. A provider must be `CERTIFIED_ACTIVE` and matching-enabled before it can appear in automatic borrower matching.
 
-Geography and program coverage are required fit gates. Deal amount, purpose, property type, industry, and borrower type refine the fit. Matching is advisory only and cannot approve, decline, underwrite, price, or generate adverse action.
+Geography and program coverage are required fit gates. Deal amount, purpose, property/collateral type, industry, and relevant non-financial program/entity characteristics refine the fit. Matching is advisory only and cannot approve, decline, underwrite, price, or generate adverse action. Personal-financial profile fields are absent from the nonresidential match input.
 
-An affiliated future Furlong lending company receives no scoring preference. Affiliation is deliberately absent from the scoring formula. Equal matches use deterministic neutral ordering rather than ownership preference.
+An affiliated future Furlong lending company receives no scoring preference. Affiliation and compensation are deliberately absent from the scoring formula. Base suitability score always comes first.
+
+## Execution reliability record
+
+Furlong maintains an evidence-backed execution record because a nominal rate quote is less useful than knowing whether a provider actually responds, reaches a disposition, and closes/funds transactions of the relevant kind.
+
+Migration `0057_capital_network_execution_reliability.sql` creates one durable provider/case execution record with provider-selection/consent/response/disposition/closed-funded milestones, final outcome, verification status, and evidence references. Capital Desk—not the provider—records the verified outcome. Personal-financial fields and compensation fields are prohibited from this dataset.
+
+Customer-facing reliability is deliberately sample-gated. Fewer than **5 verified Furlong outcomes** displays only “not enough verified Furlong history yet.” Reliability may affect ordering only as a **tie-break between otherwise-equal suitability scores**, only after **both providers have at least 10 verified provider-decision outcomes**. A new provider is therefore not penalized merely because it is new to Furlong.
+
+The public record can show verified close/fund count, close/fund rate for provider-decision outcomes, median first-response time, and median consent-to-close time when enough evidence exists. Borrower withdrawals and property/program/third-party/external blocks are separately counted and excluded from the provider close-rate denominator. The methodology is visible to the customer. Interest rate, compensation, affiliation, and borrower personal-financial profile never enter the reliability calculation.
 
 ## Borrower choice and consent
 
@@ -52,10 +76,10 @@ The lender-network discovery registry remains separate from the active provider 
 
 ## Current truth posture
 
-The multi-provider data model, onboarding API and UI, lender-neutral match runtime, borrower match/selection surface, provider-specific deal-room boundary, exact-provider lender-submission binding, and retained-broker compatibility path are implemented in the application build.
+The multi-provider data model, onboarding API and UI, lender-neutral match runtime, borrower match/selection surface, provider-specific deal-room boundary, exact-provider lender-submission binding, retained-broker compatibility path, and evidence-backed execution-reliability record are implemented in the application build.
 
 No newly researched lender candidate is represented as a certified Capital Network provider merely because outreach occurred. No direct federal lender approval is inferred. No production lender-delivery adapter is promoted by this build. Provider certification, contracts, licensing/authority evidence, and production delivery remain real-world controlled gates.
 
 ## Master Volume traceability
 
-This architecture implements the existing Furlong governance chain rather than creating a competing doctrine: `CONST-FAIR-001` lender neutrality; `CONST-ARCH-001` module/provider isolation; `CONST-ID-001` accountable identity; `CONST-PATHWAY-001` financing pathway integrity; `REG-STATE-001`, `REG-LICENSE-001`, `REG-TPRM-001`, `REG-KYC-001`, `REG-OFAC-001`; `OPS-LENDER-001`; and the canonical consent, classification, treasury, replay, observability, source, and simulation controls.
+This architecture implements the existing Furlong governance chain rather than creating a competing doctrine. Conformance gates include `npm run verify:capital-network` and `npm run verify:capital-network-execution`. The doctrine maps to: `CONST-FAIR-001` lender neutrality; `CONST-ARCH-001` module/provider isolation; `CONST-ID-001` accountable identity; `CONST-PATHWAY-001` financing pathway integrity; `REG-STATE-001`, `REG-LICENSE-001`, `REG-TPRM-001`, `REG-KYC-001`, `REG-OFAC-001`; `OPS-LENDER-001`; and the canonical consent, classification, treasury, replay, observability, source, and simulation controls.

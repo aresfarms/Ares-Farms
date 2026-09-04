@@ -3,10 +3,12 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 
 import {
   capitalNetworkDealRooms,
+  capitalNetworkExecutionRecords,
   capitalNetworkMatches,
   capitalNetworkProviders,
   serviceRequests,
   type CapitalNetworkProviderRow,
+  type CapitalNetworkExecutionRecordRow,
 } from "@/db/schema";
 import { db } from "@/lib/db";
 import {
@@ -15,8 +17,14 @@ import {
   type CapitalDealMatchInput,
   type CapitalProviderProfile,
 } from "@/lib/financing/capitalNetworkRuntime";
+import {
+  executionReliabilityTieBreak,
+  summarizeProviderExecutionReliability,
+  type CapitalExecutionOutcome,
+  type ProviderExecutionReliability,
+} from "@/lib/financing/capitalNetworkExecutionReliability";
 
-export const CAPITAL_NETWORK_GOVERNANCE_VERSION = "capital-network-v1.0.0";
+export const CAPITAL_NETWORK_GOVERNANCE_VERSION = "capital-network-v1.1.0";
 const RETAINED_BROKER_PROVIDER_ID = "retained-external-broker";
 
 export type ProviderApplicationInput = {
@@ -87,6 +95,125 @@ function money(value: number | null | undefined): number | null {
   if (value == null || !Number.isFinite(value)) return null;
   const rounded = Math.round(value);
   return rounded >= 0 ? rounded : null;
+}
+
+
+function executionRecordForSummary(row: CapitalNetworkExecutionRecordRow) {
+  return {
+    providerId: row.providerId,
+    outcome: row.outcome as CapitalExecutionOutcome,
+    verificationStatus: row.verificationStatus,
+    selectedAt: row.selectedAt,
+    consentedAt: row.consentedAt,
+    providerFirstResponseAt: row.providerFirstResponseAt,
+    providerDispositionAt: row.providerDispositionAt,
+    closedFundedAt: row.closedFundedAt,
+  };
+}
+
+export async function executionReliabilityForProviders(providerIds: string[]) {
+  const unique = [...new Set(providerIds.filter(Boolean))];
+  const rows = unique.length
+    ? await db.select().from(capitalNetworkExecutionRecords).where(inArray(capitalNetworkExecutionRecords.providerId, unique))
+    : [];
+  const byProvider = new Map<string, CapitalNetworkExecutionRecordRow[]>();
+  for (const row of rows) {
+    const list = byProvider.get(row.providerId) ?? [];
+    list.push(row);
+    byProvider.set(row.providerId, list);
+  }
+  const summaries = new Map<string, ProviderExecutionReliability>();
+  for (const providerId of unique) {
+    summaries.set(
+      providerId,
+      summarizeProviderExecutionReliability(
+        providerId,
+        (byProvider.get(providerId) ?? []).map(executionRecordForSummary),
+      ),
+    );
+  }
+  return summaries;
+}
+
+export async function recordCapitalNetworkExecutionOutcome(input: {
+  serviceRequestId: string;
+  providerId: string;
+  outcome: CapitalExecutionOutcome;
+  outcomeReasonCategory?: string | null;
+  providerFirstResponseAt?: Date | null;
+  providerDispositionAt?: Date | null;
+  closedFundedAt?: Date | null;
+  evidenceRefs: string[];
+  actorId: string;
+  traceId: string;
+}) {
+  const serviceRequestId = input.serviceRequestId.trim().toUpperCase();
+  const providerId = input.providerId.trim();
+  const evidenceRefs = [...new Set(input.evidenceRefs.map((ref) => ref.trim()).filter(Boolean))];
+  if (!serviceRequestId || !providerId) throw new Error("serviceRequestId and providerId are required.");
+  if (!evidenceRefs.length) throw new Error("At least one evidence reference is required before an execution outcome can be VERIFIED.");
+
+  const [room] = await db.select().from(capitalNetworkDealRooms).where(and(
+    eq(capitalNetworkDealRooms.serviceRequestId, serviceRequestId),
+    eq(capitalNetworkDealRooms.providerId, providerId),
+  )).limit(1);
+  if (!room) throw new Error("A Capital Network deal room is required before an execution outcome can be recorded.");
+
+  const [request] = await db.select().from(serviceRequests).where(eq(serviceRequests.serviceRequestId, serviceRequestId)).limit(1);
+  if (!request) throw new Error("Financing request was not found.");
+  const metadata = (request.metadata ?? {}) as Record<string, unknown>;
+  const now = new Date();
+  const closedFundedAt = input.outcome === "CLOSED_FUNDED"
+    ? input.closedFundedAt ?? input.providerDispositionAt ?? now
+    : null;
+  const providerDispositionAt = input.providerDispositionAt ?? now;
+  const values = {
+    serviceRequestId,
+    providerId,
+    submissionCaseId: room.submissionCaseId,
+    program: request.serviceCode,
+    propertyType: typeof metadata.propertyType === "string" ? metadata.propertyType : null,
+    industry: typeof metadata.industry === "string" ? metadata.industry : null,
+    locationState: request.locationState,
+    selectedAt: room.selectedAt,
+    consentedAt: room.consentedAt,
+    providerFirstResponseAt: input.providerFirstResponseAt ?? null,
+    providerDispositionAt,
+    closedFundedAt,
+    outcome: input.outcome,
+    outcomeReasonCategory: input.outcomeReasonCategory?.trim() || null,
+    verificationStatus: "VERIFIED",
+    evidenceRefs,
+    recordedBy: input.actorId,
+    verifiedBy: input.actorId,
+    verifiedAt: now,
+    governanceVersion: CAPITAL_NETWORK_GOVERNANCE_VERSION,
+    classification: "CONFIDENTIAL",
+    replayRef: input.traceId,
+    traceId: input.traceId,
+    metadata: {
+      propertyProjectOnly: true,
+      personalFinancialScoring: false,
+      compensationRanking: false,
+      affiliationRanking: false,
+    },
+    updatedAt: now,
+  } as const;
+
+  const [record] = await db.insert(capitalNetworkExecutionRecords).values(values).onConflictDoUpdate({
+    target: [capitalNetworkExecutionRecords.serviceRequestId, capitalNetworkExecutionRecords.providerId],
+    set: values,
+  }).returning();
+
+  await db.update(capitalNetworkDealRooms).set({
+    roomStatus: input.outcome === "CLOSED_FUNDED" ? "CLOSED_FUNDED" : "EXECUTION_OUTCOME_RECORDED",
+    closedAt: closedFundedAt ?? providerDispositionAt,
+    traceId: input.traceId,
+    replayRef: input.traceId,
+    updatedAt: now,
+  }).where(eq(capitalNetworkDealRooms.id, room.id));
+
+  return record;
 }
 
 export function providerProfileFromRow(row: CapitalNetworkProviderRow): CapitalProviderProfile {
@@ -359,7 +486,8 @@ export async function publicMatchesForRequest(serviceRequestId: string, email: s
     ? await db.select().from(capitalNetworkProviders).where(inArray(capitalNetworkProviders.providerId, providerIds))
     : [];
   const providerById = new Map(providers.map((row) => [row.providerId, row] as const));
-  return rows.flatMap((row) => {
+  const reliability = await executionReliabilityForProviders(providerIds);
+  const publicRows = rows.flatMap((row) => {
     const provider = providerById.get(row.providerId);
     if (!provider) return [];
     return [{
@@ -368,8 +496,18 @@ export async function publicMatchesForRequest(serviceRequestId: string, email: s
       reasons: row.reasons as string[],
       selected: row.matchStatus === "BORROWER_SELECTED",
       provider: publicProvider(provider),
+      executionReliability: reliability.get(row.providerId) ?? null,
     }];
   });
+  publicRows.sort((left, right) => {
+    if (left.score !== right.score) return right.score - left.score;
+    if (left.executionReliability && right.executionReliability) {
+      const execution = executionReliabilityTieBreak(left.executionReliability, right.executionReliability);
+      if (execution !== 0) return execution;
+    }
+    return left.provider.organizationName.localeCompare(right.provider.organizationName);
+  });
+  return publicRows;
 }
 
 export async function selectProviderForRequest(serviceRequestId: string, email: string, providerId: string, traceId: string) {
@@ -528,11 +666,19 @@ export async function listCapitalDealRoomsForCapitalDesk(limit = 200) {
         .from(capitalNetworkProviders)
         .where(inArray(capitalNetworkProviders.providerId, providerIds))
     : [];
+  const executionRecords = requestIds.length
+    ? await db
+        .select()
+        .from(capitalNetworkExecutionRecords)
+        .where(inArray(capitalNetworkExecutionRecords.serviceRequestId, requestIds))
+    : [];
   const requestById = new Map(requests.map((row) => [row.serviceRequestId, row] as const));
   const providerById = new Map(providers.map((row) => [row.providerId, row] as const));
+  const executionByCaseProvider = new Map(executionRecords.map((row) => [`${row.serviceRequestId}::${row.providerId}`, row] as const));
   return rooms.map((room) => {
     const request = requestById.get(room.serviceRequestId);
     const provider = providerById.get(room.providerId);
+    const execution = executionByCaseProvider.get(`${room.serviceRequestId}::${room.providerId}`);
     return {
       roomId: room.id,
       serviceRequestId: room.serviceRequestId,
@@ -552,6 +698,9 @@ export async function listCapitalDealRoomsForCapitalDesk(limit = 200) {
       locationCounty: request?.locationCounty ?? null,
       propertyDescriptor: request?.propertyDescriptor ?? null,
       scopeSummary: request?.scopeSummary ?? null,
+      executionOutcome: execution?.outcome ?? null,
+      executionVerificationStatus: execution?.verificationStatus ?? null,
+      executionVerifiedAt: execution?.verifiedAt?.toISOString() ?? null,
     };
   });
 }

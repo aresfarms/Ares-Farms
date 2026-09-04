@@ -2,10 +2,24 @@
  * Capital Network pure matching runtime.
  *
  * This is an advisory fit engine, never underwriting. It uses only declared
- * provider appetite + coarse deal facts. Affiliation never increases score;
- * equal fits are deterministically ordered by organization name/provider id.
+ * provider appetite + property/project deal facts. Personal financial-profile
+ * data never enters nonresidential scoring. Affiliation and compensation never
+ * increase score. Verified execution history may only break otherwise-equal
+ * suitability ties after minimum evidence thresholds; new providers are neutral.
  */
-export const CAPITAL_NETWORK_RUNTIME_VERSION = "capital-network-runtime-v1.0.0";
+export const CAPITAL_NETWORK_RUNTIME_VERSION = "capital-network-runtime-v1.1.0";
+
+export const CAPITAL_NETWORK_NON_NEGOTIABLES = Object.freeze({
+  sellsBorrowerLeads: false,
+  auctionsBorrowerFiles: false,
+  compensationInfluencesRanking: false,
+  affiliationInfluencesRanking: false,
+  shotgunRoutingAllowed: false,
+  borrowerChoosesRecipients: true,
+  exactRecipientConsentRequired: true,
+  nonResidentialPersonalFinancialScoring: false,
+  executionHistoryMayOnlyTieBreakAfterMinimumVerifiedSample: true,
+});
 
 export type CapitalProviderRole = "BROKER" | "LENDER";
 export type CapitalProviderStatus =

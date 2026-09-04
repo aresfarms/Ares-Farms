@@ -147,6 +147,7 @@ for (const file of [parity.changeRegister, parity.sourceSnapshot, parity.buildPr
 }
 
 assert.equal(registry.activeBuildDate, parity.effectiveDate);
+assert.equal(registry.buildBinding?.parityImplementationCommit, parity.parityImplementationCommit);
 assert.equal(registry.buildBinding?.canonicalSchemaTarget, canonicalTargetSchemaVersion());
 assert.equal(
   registry.buildBinding?.capitalNetworkRuntimeVersion,

@@ -1,6 +1,6 @@
 {
   "registryId": "current-master-volume-registry",
-  "generatedAt": "2026-09-04T22:18:53Z",
+  "generatedAt": "2026-09-04T22:20:57Z",
   "repository": "ares-farms",
   "activeBuildDate": "2026-09-04",
   "controllingRule": "This registry is the machine-readable current-version pointer for build verification. The doctrine truth mirror requires an authoritative source, explicit platform status, existing evidence files, registered verification commands, and a reconciliation basis for every canonical doctrine. Later scoped amendments registered here control over conflicting older wording within their stated scope, while historical files remain preserved as versioned evidence. Mirror certification means documentation and platform state agree; it does not imply every doctrine is deployed, live, externally validated, certified, or production-authorized.",
@@ -183,7 +183,6 @@
   ],
   "buildBinding": {
     "branch": "feature/ai-operating-model-20260904",
-    "behaviorBaselineCommit": "8ead373",
     "canonicalSchemaTarget": "0057",
     "capitalNetworkRuntimeVersion": "capital-network-runtime-v1.1.0",
     "capitalNetworkReliabilityVersion": "capital-network-execution-reliability-v1.0.0",
@@ -191,6 +190,8 @@
     "parityGate": "verify:master-volume-build-parity",
     "nonResidentialRankRuntimeVersion": "ranking-runtime-v0.2.0",
     "nonResidentialDiagnosticRuntimeVersion": "property-project-diagnostic-v0.2.0",
-    "activeNonResidentialScoring": "property-project-only; personal-financial scoring inputs rejected"
+    "activeNonResidentialScoring": "property-project-only; personal-financial scoring inputs rejected",
+    "preParityBehaviorBaselineCommit": "8ead373",
+    "parityImplementationCommit": "a81579e"
   }
 }

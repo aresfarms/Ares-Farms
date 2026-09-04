@@ -4,8 +4,8 @@
  * The customer submits a financing deal, which is recorded and routed to the
  * appropriately credentialed external lending spoke that works it under its own licensed
  * capacity. This runtime is pure and deterministic: it validates the intake and
- * routes it. It NEVER qualifies, approves, prices, or makes any credit
- * determination — Furlong facilitates; the licensed lender decides.
+ * routes it into the Furlong Capital Desk. It NEVER qualifies, approves, prices,
+ * or makes any credit determination — Furlong facilitates; the funding institution decides.
  *
  * Master Volume Governance:
  * - Vol I (CONST-PATHWAY-001 / FACILITATION-001 §3.32): facilitate, do not
@@ -15,14 +15,14 @@
  *   qualification determination is made here.
  * - Vol II (MATERIALITY-TIER / FACILITATION-001): no Tier-A (credit) decision
  *   by AI without human confirmation — this route makes NO decision at all.
- * - Vol III-B (HITL-GOV-001 §3.51): human review required — the licensed lender
- *   is the reviewer of record.
+ * - Vol III-B (HITL-GOV-001 §3.51): human review required. Capital Desk review
+ *   never substitutes for the funding institution's underwriting authority.
  * - Vol V (CANON-TREASURY-001 §9.1): any fee disclosed at intake, no post-hoc.
  *
  * Deterministic: the only non-determinism is the `generatedAt` timestamp.
  */
 
-export const FINANCING_INTAKE_RUNTIME_VERSION = "financing-intake-runtime-v0.1.0";
+export const FINANCING_INTAKE_RUNTIME_VERSION = "financing-intake-runtime-v0.2.0";
 
 export type FinancingPurpose =
   | "acquisition"
@@ -98,11 +98,9 @@ export interface FinancingIntakeResult {
   generatedAt: string;
   purpose: FinancingPurposeOption | null;
   programInterest: FinancingProgramOption | null;
-  routedTo: "licensed-lending-spoke" | "recorded-no-network-lender";
-  /** Honest routing note shown to the customer when no in-network lender
-      handles this deal type (founder 2026-08-05: the licensed lender does
-      commercial/business debt — FSA farm loans and residential mortgages
-      are out-of-network and must never pretend otherwise). */
+  routedTo: "furlong-capital-desk";
+  /** Honest network posture. Intake does not imply that a live lender has been
+      selected or that a candidate is authorized to receive borrower data. */
   networkNote: string | null;
   readiness: {
     readinessPercent: number;
@@ -145,7 +143,7 @@ function buildMissingItems(input: FinancingIntakeInput): string[] {
   if (!input.feeDisclosureAcknowledged)
     missing.push("Acknowledge the fee posture");
   if (!input.consentAcknowledged)
-    missing.push("Consent to route your request to the commercial debt broker");
+    missing.push("Consent to route your request through the Furlong Capital Desk");
   return missing;
 }
 
@@ -180,20 +178,17 @@ export function evaluateFinancingIntake(
     ((totalChecks - missingItems.length) / totalChecks) * 100
   );
 
-  // FSA farm loans are out-of-network: the in-network licensed lender
-  // sources commercial/business debt and does not originate FSA or
-  // residential paper (founder 2026-08-05). The deal is still recorded —
-  // demand is a real signal — but never routed as a live lead.
-  const outOfNetwork = input.programInterest === "fsa";
+  const networkNote =
+    input.programInterest === "fsa"
+      ? "FSA farm financing is now a Capital Desk network-search pathway. Furlong can prepare the file and identify appropriate FSA/Farm Credit candidates, but no candidate receives your information until that institution is certified for live routing and you consent to that exact handoff."
+      : "Your request enters the Furlong Capital Desk first. A live lender handoff occurs only after a qualified network recipient is certified for the program/jurisdiction and the governed consent/delivery gates are satisfied.";
   return {
     runtimeVersion: FINANCING_INTAKE_RUNTIME_VERSION,
     generatedAt: new Date().toISOString(),
     purpose,
     programInterest: program,
-    routedTo: outOfNetwork ? "recorded-no-network-lender" : "licensed-lending-spoke",
-    networkNote: outOfNetwork
-      ? "Heads up: our in-network licensed lender sources commercial and business debt — FSA farm loans aren't in network. Your submission is recorded, but it will not be reviewed by a lender here. FSA-guaranteed lenders, Farm Credit associations, and ag banks make these loans — your Furlong pro forma is built to take to any of them."
-      : null,
+    routedTo: "furlong-capital-desk",
+    networkNote,
     readiness: {
       readinessPercent: Math.max(0, Math.min(100, readinessPercent)),
       missingItems,
@@ -201,20 +196,21 @@ export function evaluateFinancingIntake(
     },
     feeDisclosure: {
       payerPosture:
-        "There is no fee to submit your deal or to have the licensed lender review it.",
+        "There is no fee to submit your deal or receive the Capital Desk's initial readiness review.",
       amountLabel: "No submission fee",
-      note: "Loan costs (rate, points, closing costs) are set by the lender and the program at closing and are disclosed to you in writing before you commit — never after the fact.",
+      note: "Any later paid packaging, brokerage, referral, or consulting service requires a separate written scope, state/program authority review, and advance compensation disclosure before work begins. Loan costs are set by the funding institution.",
     },
     nextSteps: [
-      "Your deal is recorded and routed to the licensed lender (the lending spoke).",
-      "The lender reviews it and contacts you to discuss fit and next steps.",
-      "You decide whether to proceed — nothing is committed until you and the lender agree.",
+      "Your deal is recorded in the Furlong Capital Desk.",
+      "The Capital Desk organizes readiness evidence and identifies lender/program candidates without making a credit decision.",
+      "Before any live lender receives your case, Furlong verifies the recipient and obtains consent binding the exact provider, purpose, package, and delivery channel.",
+      "The funding institution performs underwriting and decides whether to offer credit; you decide whether to proceed.",
     ],
     disclosures: [
-      "Furlong records and routes your request; it does not lend, qualify, approve, price, or determine eligibility.",
-      "A program fitting your project is not the same as you qualifying — the licensed lender makes that call.",
-      "This is not a loan application decision, a pre-approval, or a rate lock.",
-      "Furlong takes no compensation tied to your transaction — it is not paid a commission or a per-deal fee.",
+      "Furlong records, prepares, and coordinates your request; Furlong Core does not lend, qualify, approve, price, or determine eligibility.",
+      "A program fitting your project is not the same as you qualifying — the funding institution makes that call.",
+      "This is not a loan application decision, a pre-approval, a commitment, or a rate lock.",
+      "No paid commercial brokerage, packaging, or referral service is activated merely by submitting this intake. Any such service requires separate legal/program clearance and written disclosure.",
       "Your information is classified RESTRICTED, human-reviewed, and handled under the platform's data-protection controls.",
     ],
     blockedClaims: [

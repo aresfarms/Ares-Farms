@@ -16,10 +16,10 @@ import {
 } from "@/app/internalModuleKit";
 
 /**
- * Broker Deal Desk — the commercial debt broker's working console
+ * Capital Deal Desk — owner-controlled Capital Desk plus retained external-broker workspace
  * (founder direction 2026-08-05).
  *
- * One screen provides the external broker workflow for every financing
+ * One governed console supports Capital Desk cases while external brokers see only legacy/assigned financing
  * deal, its documents (single-file audited downloads), status + a customer-
  * visible note, the closing timeline he adjusts for lender/USDA/SBA backlogs,
  * and one-click document reminders that chase customers so he doesn't.
@@ -473,10 +473,10 @@ export default function LenderDeskPage() {
       <div style={moduleContainerStyle}>
         <ModuleHeader
           moduleNumber="LD"
-          title="Broker Deal Desk"
-          subtitle="Borrower financing requests, documents, pro forma coordination, lender routing, and the customer communication loop — in one governed broker console."
+          title="Capital Deal Desk"
+          subtitle="Borrower financing requests, document readiness, lender-network coordination, and customer communication — with external brokers restricted to legacy or explicitly assigned cases."
           badges={[
-            "Broker Access Only",
+            "Capital Desk / Broker Access",
             emailReady ? "Reminders Live" : "Reminders Pending Email Config",
             bookingUrl ? "Booking Link Active" : "Booking Link Not Set",
           ]}
@@ -530,7 +530,7 @@ export default function LenderDeskPage() {
               </span>
             </div>
             <iframe
-              title="Broker calendar agenda"
+              title="Assigned finance calendar agenda"
               src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(calendarSrc)}&mode=AGENDA&showTitle=0&showPrint=0&showTabs=0&showCalendars=0`}
               style={{ border: 0, width: "100%", height: 340, borderRadius: 8 }}
             />

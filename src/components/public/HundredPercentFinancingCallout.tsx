@@ -3,14 +3,12 @@ import Link from "next/link";
 import { accentForLane } from "@/lib/property/laneThemes";
 
 /**
- * HundredPercentFinancingCallout — a cross-lane cue that 100% (no-money-down)
- * financing genuinely exists for some buyers and programs (USDA, VA, and select
- * SBA/farm structures), routing to the licensed lender. Founder direction
- * Product note: these structures may exist for qualified transactions. Honest + hedged: "possible for some,"
- * never a promise or a qualification; the licensed lender confirms fit.
+ * HundredPercentFinancingCallout — a cross-lane cue that some federal/agricultural
+ * structures can materially reduce borrower equity needs. It routes to the Capital Desk
+ * for comparison only; it is never a promise, qualification, or credit determination.
  *
  * Master Volume Governance: FACILITATION-001 — facilitate, not decide; routes
- * to the licensed lender, makes no credit determination.
+ * to the Capital Desk, which makes no credit determination.
  */
 
 const PURPLE = accentForLane("financing-capital", "light"); // #534AB7
@@ -46,15 +44,14 @@ export function HundredPercentFinancingCallout() {
           whiteSpace: "nowrap",
         }}
       >
-        0% DOWN
+        LOWER EQUITY
       </span>
       <span style={{ display: "grid", gap: 2 }}>
         <strong style={{ fontSize: 14.5, color: "#101a2b", lineHeight: 1.3 }}>
-          100% financing is possible for some buyers.
+          Some programs can substantially reduce upfront equity.
         </strong>
         <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.45 }}>
-          No-money-down programs exist (USDA, VA, and select structures). Talk with our licensed lender
-          to see if one fits your situation →
+          USDA, FSA, SBA, and other structures can differ sharply in equity requirements. Compare the published pathways in the Capital Desk; the funding institution confirms what actually applies →
         </span>
       </span>
     </Link>

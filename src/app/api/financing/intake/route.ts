@@ -31,7 +31,7 @@ import { syntheticPersonaByHumanVisibleName } from "@/lib/testing/syntheticPerso
 import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenceGenerationCapture";
 
 /**
- * Financing Deal Intake API (customer submits a deal → licensed lender)
+ * Financing Deal Intake API (customer submits a deal → Furlong Capital Desk)
  *
  * Master Volume Governance:
  * - Vol I (CONST-PATHWAY-001 / FACILITATION-001 §3.32): records + routes a deal
@@ -42,8 +42,8 @@ import { captureGeneratedEvidenceArtifact } from "@/lib/property/officialEvidenc
  * - Vol III-B (GOV-RUNTIME-001 §3.49, HITL-GOV-001 §3.51): full runtime
  *   substrate on every request — runtime guard, version lineage, classification
  *   (RESTRICTED), explainability, observability, replay verification, persisted
- *   governance evidence, audit-safe error envelope. Human review required (the
- *   licensed lender is the reviewer of record).
+ *   governance evidence, audit-safe error envelope. Human review required; the
+ *   Capital Desk coordinates while the funding institution retains credit authority.
  * - Vol V (CANON-TREASURY-001 §9.1): fee posture disclosed at intake. Bright
  *   line: Furlong takes NO transaction-tied compensation (build-spec doctrine).
  *
@@ -182,7 +182,7 @@ export async function POST(req: NextRequest) {
       actorId,
       metadata: {
         route: "/api/financing/intake",
-        licensedModule: "licensed-lending-spoke",
+        licensedModule: "furlong-capital-desk",
         applicationId: body.applicationId ?? null,
         syntheticFixture: syntheticFixtureContext,
       },
@@ -262,11 +262,11 @@ export async function POST(req: NextRequest) {
       disclosureAudience: [
         "borrower",
         "authorized-operator",
-        "licensed-lending-spoke",
+        "furlong-capital-desk",
         "governance",
       ],
       sharingPermissions: [
-        "licensed-lending-fulfillment",
+        "capital-desk-readiness",
         "regulated-operational-review",
       ],
       aiUsagePermissions: ["classify", "route"],
@@ -317,11 +317,11 @@ export async function POST(req: NextRequest) {
         disclosureAudience: [
           "borrower",
           "authorized-operator",
-          "licensed-lending-spoke",
+          "furlong-capital-desk",
           "governance",
         ],
         sharingPermissions: [
-          "licensed-lending-fulfillment",
+          "capital-desk-readiness",
           "regulated-operational-review",
         ],
         aiUsagePermissions: ["summarize", "explain"],
@@ -344,9 +344,7 @@ export async function POST(req: NextRequest) {
       audience: "borrower",
       claimType: "recommendation",
       summary:
-        intakeResult.routedTo === "licensed-lending-spoke"
-          ? "Customer financing deal recorded and routed to the commercial debt broker. No qualification, pre-approval, pricing, or credit decision is made; the funding lender decides."
-          : "Customer financing deal recorded WITHOUT lender routing — the requested program (FSA/farm) is outside the in-network lender's practice; the customer was told honestly and pointed to the lenders who make these loans.",
+        "Customer financing deal recorded in the Furlong Capital Desk for readiness coordination and lender-network matching. No candidate lender receives borrower data from this intake alone, and no qualification, pricing, commitment, or credit decision is made; the funding institution decides.",
       ruleVersion: FINANCING_INTAKE_RUNTIME_VERSION,
       overlayRefs: [],
       confidenceScore: Math.min(
@@ -369,7 +367,7 @@ export async function POST(req: NextRequest) {
       eventType: "FINANCING_INTAKE_RECORDED",
       domain: "operations",
       severity: "INFO",
-      message: "Customer financing deal routed to the licensed lending spoke.",
+      message: "Customer financing deal recorded in the Furlong Capital Desk.",
       traceId,
       replayRef: traceId,
       actorId,
@@ -486,14 +484,11 @@ export async function POST(req: NextRequest) {
       syntheticFixtureContext,
     });
 
-    // Alert the licensed lender that a deal is waiting (min-disclosure, never
-    // blocks). OUT-OF-NETWORK deals (FSA/farm paper the lender does not
-    // originate — founder 2026-08-05) are recorded for demand signal but
-    // never sent to the lender's inbox: no false leads, no inundation.
-    if (
-      intakeResult.routedTo === "licensed-lending-spoke" &&
-      !syntheticFixtureContext
-    ) {
+    // Alert the owner-controlled Capital Desk that a new deal is waiting.
+    // The notification is minimum-disclosure and does NOT send the case to a
+    // lender or the retained external broker. A later lender handoff requires
+    // recipient certification plus package-specific borrower consent.
+    if (!syntheticFixtureContext) {
       await notifyOnServiceRequest({
         requestType: "financing_deal_intake",
         serviceRequestId,
@@ -502,12 +497,11 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Sovereign upload link (founder 2026-08-05): in-network deals get an
-    // encrypted, expiring document-upload link so financials/PII never
-    // travel by email. The deal's application record anchors custody.
+    // Every Capital Desk intake may receive an encrypted, expiring upload link.
+    // This does not grant any external provider access; document custody remains
+    // inside Furlong until an independently governed handoff is authorized.
     let secureUploadPath: string | null = null;
-    if (intakeResult.routedTo === "licensed-lending-spoke") {
-      try {
+    try {
         const app = await persistApplicationState({
           traceId,
           source: "financing-intake",
@@ -539,24 +533,19 @@ export async function POST(req: NextRequest) {
           dealRef: serviceRequestId,
         });
         secureUploadPath = `/secure-upload?token=${encodeURIComponent(link.token)}`;
-      } catch {
-        // The intake must never fail because the upload link could not be
-        // minted; the lender can issue a fresh link from the operator queue.
-        secureUploadPath = null;
-      }
+    } catch {
+      // The intake must never fail because the upload link could not be minted;
+      // the Capital Desk can issue a fresh link from the governed queue.
+      secureUploadPath = null;
     }
 
     return NextResponse.json({
       ok: true,
       serviceRequestId,
       secureUploadPath,
-      // Scheduling beats phone tag (founder 2026-08-05): in-network deals
-      // surface the lender's booking page so the first call lands on his
-      // calendar. Hidden until LENDER_BOOKING_URL is configured.
-      bookingUrl:
-        intakeResult.routedTo === "licensed-lending-spoke"
-          ? process.env.LENDER_BOOKING_URL?.trim() || null
-          : null,
+      // Optional owner-controlled Capital Desk scheduling. This is separate
+      // from any external broker or lender calendar.
+      bookingUrl: process.env.CAPITAL_DESK_BOOKING_URL?.trim() || null,
       status: serviceRequest.status,
       intakeResult,
       syntheticFixture: syntheticFixtureContext

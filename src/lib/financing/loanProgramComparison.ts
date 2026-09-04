@@ -6,7 +6,7 @@
  * HONEST + NOT ADVICE: these are the programs' published structural facts (max
  * size, use of proceeds, term, how the rate is set, the eligibility hinge) —
  * NOT a quote, a pre-approval, or a determination. "A program fitting a project
- * is not the same as you qualifying" — the licensed lender confirms the fit.
+ * is not the same as you qualifying" — the funding institution confirms the fit.
  *
  * Master Volume Governance: CONST-PATHWAY-001 / FACILITATION-001 (facilitate,
  * not decide); Section 1071 firewall (no borrower data collected here — this is
@@ -83,4 +83,4 @@ export const LOAN_PROGRAMS: LoanProgram[] = [
 ];
 
 export const LOAN_COMPARISON_NOTE =
-  "This compares how the programs are built — not a quote, a pre-approval, or a decision. A program fitting your project is not the same as you qualifying; the licensed lender confirms what actually fits and what the terms would be, disclosed to you in writing. Equity/down-payment figures are typical published structures (USDA Rural Development & SBA program rules and the USDA–SBA Loan Comparison Matrix), not a requirement set for any borrower. Bring your deal and they'll map it to the right program.";
+  "This compares how the programs are built — not a quote, a pre-approval, or a decision. A program fitting your project is not the same as you qualifying; the funding institution confirms what actually fits and what the terms would be, disclosed to you in writing. Equity/down-payment figures are typical published structures, not a requirement set for any borrower. Bring the deal to the Furlong Capital Desk to organize the path; a certified funding institution makes the actual credit decision.";

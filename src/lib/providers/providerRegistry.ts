@@ -1,7 +1,7 @@
 /**
  * Provider registry — the neutral-directory / license-to-operate model.
  *
- * Furlong is a neutral directory + gateway, NOT a lender/broker/agency. Each
+ * Furlong is a neutral directory + gateway. Public providers are optional. Each
  * licensed provider gets a Provider Page (their branding + claims, under THEIR
  * license) with a single portal-out CTA to the provider's OWN site/intake.
  * Furlong passes NO personal data (no silent submission). Providers pay a flat
@@ -49,39 +49,14 @@ export function licenseModelStatement(providerName: string): string {
   );
 }
 
-export const PROVIDERS: Provider[] = [
-  {
-    slug: "five-borough-capital",
-    name: "Five Borough Capital",
-    lane: "financing-capital",
-    tagline: "SBA & USDA financing brokerage — structuring and consultation for borrowers.",
-    separateCompanyLabel: "Five Borough Capital is a separate company.",
-    affiliationNote:
-      "Five Borough Capital is affiliated with Furlong. It is listed on the same license terms as every " +
-      "other provider — no referral fee, no special placement.",
-    whatTheyDo: [
-      "Helps borrowers pursue SBA and USDA financing pathways.",
-      "Loan structuring and packaging support.",
-      "One-on-one consultation on options and readiness.",
-    ],
-    whoTheyServe: "Small businesses, farmers, and property buyers exploring SBA / USDA financing.",
-    licenseStatement: "Licensed commercial loan broker (verified at onboarding — Module 10 certification).",
-    // These claims belong to the licensed broker, under its own brand + disclosures.
-    // PLACEHOLDER copy pending Stuart's PDF — to be polished separately for accuracy.
-    providerClaims: [
-      "100% SBA / USDA financing structures for eligible projects.",
-      "Deal structuring and lender packaging.",
-      "Borrower consultation from a licensed broker.",
-    ],
-    providerDisclosures: [
-      "Five Borough Capital is a licensed commercial loan broker; these statements are its own, made under its license and regulation — not Furlong's.",
-      "Financing is subject to lender approval, eligibility, and underwriting. Nothing here is a commitment to lend or a guarantee of funding.",
-    ],
-    // PLACEHOLDER — confirm the real intake URL with Stuart before launch.
-    portalOutUrl: "https://www.fiveboroughcapital.com",
-    portalOutLabel: "Go to Five Borough Capital",
-  },
-];
+export const PROVIDERS: Provider[] = [];
+
+/**
+ * No public financing provider is currently listed. The retained external
+ * broker workspace is an authenticated transition workspace only; keeping that
+ * portal open does not make the broker a public Furlong provider, affiliate,
+ * preferred recipient, or automatic routing destination.
+ */
 
 export function providerBySlug(slug: string): Provider | null {
   return PROVIDERS.find((p) => p.slug === slug) ?? null;

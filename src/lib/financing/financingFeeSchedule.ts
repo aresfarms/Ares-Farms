@@ -1,29 +1,22 @@
 /**
- * financingFeeSchedule — the Financial module's fee chart (founder direction
- * 2026-07-19). States plainly that lending applications are FREE; the only paid
- * services are one-on-one time with the licensed lender ($250/hr, or included
- * with Guild membership) and other financial analysis a licensed mortgage
- * broker can provide.
+ * Financing fee posture — owner-controlled Furlong Capital Desk.
  *
- * HONEST DATA RULE: the only filled-in fee is the founder-provided $250/hr
- * advisory rate. Anything else is "Quoted to scope" until an approved financing policy provides the
- * real figure — we never fabricate a professional fee or a service he hasn't
- * confirmed offering.
+ * Intake, program navigation, and initial readiness coordination are free.
+ * Compensated packaging, brokerage/referral, or consulting is NOT activated by
+ * this schedule. Any paid activity requires state/program authority clearance,
+ * an accepted written scope, advance fee disclosure, and SBA Form 159 handling
+ * when applicable.
  *
  * Master Volume Governance:
- * - FACILITATION-001: the loan itself is the lender's; the platform facilitates.
- * - CANON-TREASURY-001 §9.1: fees disclosed up front, quoted + approved before
- *   any work, no post-hoc fees.
- * - Bright line: Furlong takes NO transaction-tied compensation. Loan costs
- *   (rate, points, closing) are set by the lender at closing, not here.
+ * - FACILITATION-001 / CONST-FAIR-001: no credit decision or paid placement.
+ * - REG-STATE-001 / REG-LICENSE-001: jurisdictional authority before activity.
+ * - CANON-TREASURY-001: no undisclosed or post-hoc compensation.
  */
 
-export const FINANCING_ADVISORY_HOURLY_USD = 250;
-
-/** The headline promise, shown prominently above the paid-services table. */
 export const FINANCING_FREE_STATEMENT = {
-  lead: "All lending applications are free.",
-  body: "You never pay to apply for a loan, to be matched to a program, or to have the licensed lender review your deal. Loan costs — rate, points, and closing costs — are set by the lender and the program at closing, and disclosed to you in writing before you commit.",
+  lead: "Capital Desk intake and initial readiness review are free.",
+  body:
+    "You can submit a deal, compare program pathways, organize the first readiness picture, and identify potential lender categories without paying Furlong. The funding institution sets its own loan pricing and closing costs. Any later paid Furlong professional service requires a separate written engagement and legal/program clearance before work begins.",
 };
 
 export interface FinFeeLine {
@@ -31,95 +24,95 @@ export interface FinFeeLine {
   detail: string;
   fee: string;
   feeConfirmed: boolean;
-  /** How this line is handled for Guild members. */
   guild: string;
-  /** An emphasized selling-point line rendered in bold under the detail. */
   emphasis?: string;
 }
 
 export const FINANCING_FEE_LINES: FinFeeLine[] = [
   {
-    service: "Hourly consulting",
-    detail: "Strategic planning, credit-repair guidance, or complex financial structuring — for when you just want advice, not to apply yet.",
-    fee: `$${FINANCING_ADVISORY_HOURLY_USD}/hr`,
+    service: "Capital Desk intake & program navigation",
+    detail:
+      "Record the project, compare SBA/USDA/FSA/conventional pathways, and build the initial readiness picture.",
+    fee: "$0",
     feeConfirmed: true,
-    guild: "Included / credited",
+    guild: "Included",
   },
   {
-    // "Financial Tune-Up" (founder 2026-07-29): plain-language rename —
-    // "Engagement retainer" read as jargon even to the founder.
-    service: "Financial Tune-Up",
-    detail: "A flat-fee financial check-up: we evaluate your tax returns, assess debt-to-income, and map a long-term borrowing strategy.",
-    emphasis: "Credited back to you in full if a loan closes.",
-    fee: "$500 – $2,500",
+    service: "Initial document-readiness organization",
+    detail:
+      "Identify common document gaps and organize evidence already supplied by the customer without making a credit decision.",
+    fee: "$0",
     feeConfirmed: true,
-    guild: "Free — every tier",
+    guild: "Included",
   },
   {
-    // "Advisory fee" (founder 2026-07-29): a "flat" fee cannot carry a range —
-    // the range stays, the contradiction goes.
-    service: "Advisory fee",
-    detail: "Shopping the market, negotiating with multiple wholesale lenders, and reviewing tailored loan offers on your behalf. Quoted up front for your situation before any work begins.",
-    fee: "$500 – $2,000",
+    service: "Compensated packaging / brokerage / referral",
+    detail:
+      "Not currently activated. Before any paid work begins, Furlong must clear the activity for the applicable state and program, issue a written scope and compensation disclosure, and satisfy any program-specific agent disclosure requirement.",
+    fee: "Not activated",
     feeConfirmed: true,
-    guild: "Included / credited",
+    guild: "Not activated",
+    emphasis:
+      "Submitting a deal does not enroll you in a paid service and does not create a commission or referral obligation.",
   },
 ];
 
-/** What the licensed mortgage broker does for you — descriptive, no fee. */
 export const FINANCING_OFFERINGS: { title: string; body: string }[] = [
   {
-    title: "Market sourcing",
-    body: "Access to wholesale lenders and products that aren't offered directly to the public.",
+    title: "Program navigation",
+    body:
+      "Compare how SBA 7(a), SBA 504, USDA B&I, FSA, and conventional structures may relate to the project without treating a pathway match as qualification.",
   },
   {
-    title: "Credit analysis & repair strategy",
-    body: "A close read of your credit report to catch errors and a step-by-step plan to strengthen your score before you shop.",
+    title: "Readiness & document organization",
+    body:
+      "Build a lender-ready evidence picture, surface missing items, and keep sensitive documents inside the governed vault.",
   },
   {
-    title: "DTI & affordability modeling",
-    body: "Structuring non-traditional income, self-employment, or complex assets so you can actually qualify.",
+    title: "Lender-network coordination",
+    body:
+      "Identify institutions whose published program, geography, and deal profile may fit. Candidate status is not a partnership or endorsement, and no case is sent until the recipient and consent gates pass.",
   },
   {
-    title: "Pre-approval & documentation prep",
-    body: "Collecting, organizing, and vetting your paperwork into a rock-solid pre-approval that makes you competitive.",
-  },
-  {
-    title: "Loan structuring & negotiation",
-    body: "Helping you pick the right loan — FHA, VA, conventional, jumbo, or non-QM — and negotiating the terms.",
-  },
-  {
-    title: "Coordination through closing",
-    body: "Acting as your liaison with the underwriter, appraiser, and title company all the way to the closing table.",
+    title: "Environmental-finance coordination",
+    body:
+      "Keep environmental screening and financing readiness connected for SBA, USDA, agricultural, commercial, and mixed-use transactions without letting the platform make the lender's or environmental professional's determination.",
   },
 ];
 
 export interface FinancingTrustLine {
   text: string;
-  /** Optional trailing link (e.g. the NMLS Consumer Access lookup). */
   link?: { label: string; href: string };
 }
 
-/** Trust + compliance signals for a licensed mortgage broker. */
 export const FINANCING_TRUST: FinancingTrustLine[] = [
   {
-    text: "Licensed mortgage broker, registered in the NMLS — verify the license and status in the",
-    link: {
-      label: "NMLS Consumer Access database",
-      href: "https://www.nmlsconsumeraccess.org/",
-    },
+    text:
+      "Furlong Core is not the creditor. Underwriting, pricing, approval, commitment, servicing, and adverse-action authority remain with the applicable funding institution.",
   },
-  { text: "By federal law, a broker cannot be paid by both you and the lender on the same transaction." },
-  { text: "Broker fees are capped by federal law and are never tied to the interest rate you're given." },
-  { text: "Every fee is itemized in writing on your fee agreement and Loan Estimate (CFPB / TILA / RESPA)." },
-  { text: "A broker owes you a fiduciary duty — to act in your best interest, not a lender's." },
+  {
+    text:
+      "Lender ranking and routing may not be sold. An affiliated lender, if one is created later, must compete under the same disclosed neutral-routing rules as outside institutions.",
+  },
+  {
+    text:
+      "A lender-network candidate receives no borrower data merely because it appears in the network registry; live delivery requires certification, verified recipient authority, and borrower consent bound to the exact package and purpose.",
+  },
+  {
+    text:
+      "Paid commercial packaging, brokerage, referral, or consulting remains off until jurisdiction and program requirements are cleared and the customer accepts the written scope and compensation disclosure.",
+  },
+  {
+    text:
+      "For SBA 7(a)/504 transactions, compensated Agent activity is routed through the applicable SBA Form 159 disclosure/compensation control when required.",
+  },
 ];
 
 export const FINANCING_FEE_NOTES = {
   guild:
-    "Guild members receive this advisory time included or credited — the more complete tiers include one-on-one hours outright.",
+    "Membership does not create an exception to licensing, disclosure, conflict, or program-agent requirements.",
   broker:
-    "Fee ranges are typical; you receive a written quote for your specific engagement before any work begins.",
+    "No paid commercial brokerage or packaging fee is authorized by this page today.",
   disclosure:
-    "The advisory service is separate from originating a loan: you can use it and take a loan anywhere. Fees are quoted and approved before any work, and Furlong takes no compensation tied to your transaction.",
+    "If Furlong later activates a paid professional service, the exact scope, payer, amount or calculation method, provider, legal basis, and required program disclosures must be accepted before work begins.",
 };

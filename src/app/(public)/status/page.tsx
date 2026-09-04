@@ -52,7 +52,9 @@ function friendlyStatus(s: StatusView): { headline: string; detail: string } {
   const who =
     s.requestType === "environmental_report_order"
       ? "the licensed PE"
-      : "your broker";
+      : s.routedTo === "furlong-capital-desk"
+        ? "the Furlong Capital Desk"
+        : "your assigned finance professional";
   const status = (s.status ?? "").toUpperCase();
   if (status.includes("PENDING") || status.includes("SUBMITTED")) {
     return {
@@ -185,7 +187,7 @@ export default function StatusPortalPage() {
               {result.lenderNote && (
                 <div style={{ borderTop: "1px solid #e6ecf3", paddingTop: 10, display: "grid", gap: 4 }}>
                   <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#3b475a" }}>
-                    From your broker
+                    From your finance reviewer
                   </span>
                   <p style={{ margin: 0, fontSize: 13.5, color: INK, lineHeight: 1.6 }}>{result.lenderNote}</p>
                 </div>
@@ -214,8 +216,7 @@ export default function StatusPortalPage() {
                     </p>
                   )}
                   <span style={{ fontSize: 11.5, color: "#8090a0", lineHeight: 1.5 }}>
-                    Dates are your broker&apos;s working estimates and move with real lender and
-                    agency processing backlogs — never a promise of any outcome.
+                    Dates are working estimates and move with actual lender and agency processing backlogs — never a promise of any outcome.
                   </span>
                 </div>
               )}
@@ -223,7 +224,7 @@ export default function StatusPortalPage() {
               {result.lenderDocuments && result.lenderDocuments.length > 0 && (
                 <div style={{ borderTop: "1px solid #e6ecf3", paddingTop: 10, display: "grid", gap: 6 }}>
                   <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.06em", textTransform: "uppercase", color: "#3b475a" }}>
-                    Documents from your broker
+                    Financing documents
                   </span>
                   {result.lenderDocuments.map((doc) => (
                     <div key={doc.downloadPath} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, fontSize: 13.5, flexWrap: "wrap" }}>
@@ -282,7 +283,7 @@ export default function StatusPortalPage() {
                       textDecoration: "none",
                     }}
                   >
-                    Schedule a call with your broker
+                    Schedule a financing review call
                   </a>
                   <span style={{ fontSize: 11.5, color: "#8090a0" }}>
                     Booking a time gets you a focused call — faster than phone tag.

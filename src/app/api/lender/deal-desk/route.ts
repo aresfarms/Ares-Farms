@@ -188,6 +188,44 @@ function authorize(args: {
   };
 }
 
+async function externalBrokerMayAccessApplication(
+  applicationId: string,
+): Promise<boolean> {
+  if (!applicationId.startsWith("finintake-")) return false;
+  const serviceRequestId = applicationId.slice("finintake-".length);
+  const rows = await db
+    .select({
+      requestType: serviceRequests.requestType,
+      routedTo: serviceRequests.routedTo,
+    })
+    .from(serviceRequests)
+    .where(eq(serviceRequests.serviceRequestId, serviceRequestId))
+    .limit(1);
+  const row = rows[0];
+  return (
+    row?.requestType === "financing_deal_intake" &&
+    row?.routedTo === "licensed-lending-spoke"
+  );
+}
+
+async function externalBrokerMayAccessServiceRequest(
+  serviceRequestId: string,
+): Promise<boolean> {
+  return externalBrokerMayAccessApplication(`finintake-${serviceRequestId}`);
+}
+
+function brokerScopeDenied(traceId: string) {
+  return NextResponse.json(
+    {
+      ok: false,
+      error:
+        "This financing case belongs to the Furlong Capital Desk and has not been assigned to the external broker workspace.",
+      governance: { traceId },
+    },
+    { status: 403 },
+  );
+}
+
 function denied(traceId: string, actorId: string | null, operation: string) {
   const observability = createObservabilityEvent({
     eventType: "LENDER_DEAL_DESK_ACCESS_DENIED",
@@ -222,7 +260,13 @@ export async function GET(req: NextRequest) {
     if (!auth.allowed) return denied(traceId, actorId, operation);
 
     if (view === "deals") {
-      const deals = await listLenderDeals();
+      // External brokers see only legacy/explicit broker-spoke cases. New
+      // owner-controlled Capital Desk intakes are not exposed merely because
+      // the broker workspace remains open.
+      const deals = await listLenderDeals(
+        50,
+        role === "broker" ? "licensed-lending-spoke" : null,
+      );
       createObservabilityEvent({
         eventType: "LENDER_DEAL_DESK_READ",
         domain: "operations",
@@ -258,6 +302,12 @@ export async function GET(req: NextRequest) {
           },
           { status: 400 },
         );
+      }
+      if (
+        role === "broker" &&
+        !(await externalBrokerMayAccessApplication(applicationId))
+      ) {
+        return brokerScopeDenied(traceId);
       }
       void sweepPendingScans(applicationId); // opportunistic re-scan of pendings
       const documents = await listDealDocuments(applicationId);
@@ -302,6 +352,12 @@ export async function GET(req: NextRequest) {
           { ok: false, error: "Document not found.", governance: { traceId } },
           { status: 404 },
         );
+      }
+      if (
+        role === "broker" &&
+        !(await externalBrokerMayAccessApplication(doc.applicationId))
+      ) {
+        return brokerScopeDenied(traceId);
       }
       const scanGate = scanAllowsStreaming(doc.metadata);
       if (!scanGate.allowed) {
@@ -493,6 +549,18 @@ export async function POST(req: NextRequest) {
   try {
     const auth = authorize({ role, actorId, operation, traceId });
     if (!auth.allowed) return denied(traceId, actorId, operation);
+
+    const requestedServiceRequestId =
+      typeof body.serviceRequestId === "string"
+        ? body.serviceRequestId.trim()
+        : "";
+    if (
+      role === "broker" &&
+      requestedServiceRequestId &&
+      !(await externalBrokerMayAccessServiceRequest(requestedServiceRequestId))
+    ) {
+      return brokerScopeDenied(traceId);
+    }
 
     if (action === "update") {
       const serviceRequestId =
@@ -973,7 +1041,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "remind-all") {
-      const result = await runDueReminders(portalBaseUrl(req));
+      const result = await runDueReminders(
+        portalBaseUrl(req),
+        role === "broker" ? "licensed-lending-spoke" : null,
+      );
       createObservabilityEvent({
         eventType: "LENDER_DOCUMENT_REMINDER_SWEEP",
         domain: "operations",

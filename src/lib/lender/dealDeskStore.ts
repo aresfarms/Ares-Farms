@@ -124,11 +124,20 @@ export function applicationIdForDeal(serviceRequestId: string): string {
   return `finintake-${serviceRequestId}`;
 }
 
-export async function listLenderDeals(limit = 50): Promise<DealSummary[]> {
+export async function listLenderDeals(
+  limit = 50,
+  routedTo: string | null = null,
+): Promise<DealSummary[]> {
+  const dealFilter = routedTo
+    ? and(
+        eq(serviceRequests.requestType, FINANCING_TYPE),
+        eq(serviceRequests.routedTo, routedTo),
+      )
+    : eq(serviceRequests.requestType, FINANCING_TYPE);
   const rows = await db
     .select()
     .from(serviceRequests)
-    .where(eq(serviceRequests.requestType, FINANCING_TYPE))
+    .where(dealFilter)
     .orderBy(desc(serviceRequests.occurredAt))
     .limit(Math.min(limit, 200));
   const recordIds = rows.map((row) => row.serviceRequestId);
@@ -373,11 +382,18 @@ export async function sendDocumentReminder(args: {
 /** Run reminders for every deal sitting in DOCUMENTS_REQUESTED. */
 export async function runDueReminders(
   portalBaseUrl: string,
+  routedTo: string | null = null,
 ): Promise<{ attempted: number; sent: number }> {
+  const reminderFilter = routedTo
+    ? and(
+        eq(serviceRequests.status, "DOCUMENTS_REQUESTED"),
+        eq(serviceRequests.routedTo, routedTo),
+      )
+    : eq(serviceRequests.status, "DOCUMENTS_REQUESTED");
   const rows = await db
     .select()
     .from(serviceRequests)
-    .where(eq(serviceRequests.status, "DOCUMENTS_REQUESTED"))
+    .where(reminderFilter)
     .limit(200);
   let sent = 0;
   for (const row of rows) {

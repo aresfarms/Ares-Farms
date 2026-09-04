@@ -241,8 +241,7 @@ export function FinancingIntakePanel({
         <p
           style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}
         >
-          Your deal is recorded and routed to the commercial debt broker.
-          Here&apos;s what happens next:
+          Your deal is recorded in the Furlong Capital Desk. Here&apos;s what happens next:
         </p>
         {submit.secureUploadPath && (
           <a
@@ -272,8 +271,8 @@ export function FinancingIntakePanel({
           >
             Financial statements and identification never travel by email here:
             the button opens your deal&apos;s encrypted upload channel —
-            single-purpose, expiring, and readable only through your
-            broker&apos;s governed review. Bookmark it or return to this page;
+            single-purpose, expiring, and held inside Furlong&apos;s governed custody until an authorized
+            Capital Desk or later consented lender handoff. Bookmark it or return to this page;
             the link stays valid for 72 hours.
           </p>
         )}
@@ -293,7 +292,7 @@ export function FinancingIntakePanel({
               fontSize: 13.5,
             }}
           >
-            📅 Schedule a call with your broker →
+            📅 Schedule a Capital Desk call →
           </a>
         )}
         {submit.bookingUrl && (
@@ -354,15 +353,15 @@ export function FinancingIntakePanel({
             color: PURPLE,
           }}
         >
-          Bring your deal — a commercial debt broker reviews it
+          Bring your deal — the Furlong Capital Desk organizes the path
         </span>
         <p
           style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}
         >
-          Tell us what you&apos;re trying to finance. We record it and route it
-          to the commercial debt broker, who reviews the fit and follows up. We
-          don&apos;t lend, qualify, or price — your broker arranges your loan
-          with the lenders who do.
+          Tell us what you&apos;re trying to finance. We record it in the Furlong Capital Desk,
+          organize readiness evidence, and identify appropriate lender/program candidates. Furlong Core
+          does not lend, qualify, price, or approve. No lender receives your case from this intake alone;
+          a live handoff requires a certified recipient and your exact consent.
         </p>
       </div>
 
@@ -451,11 +450,7 @@ export function FinancingIntakePanel({
             }
           >
             <option value="">Select…</option>
-            {/* FSA is not offered here (founder 2026-08-05): the in-network
-                lender doesn't originate FSA paper, so it isn't a selectable
-                destination. FSA education + the FSA-lender hand-off stay in
-                the pathways guide and pro forma — inform, never steer. */}
-            {FINANCING_PROGRAMS.filter((p) => p.code !== "fsa").map((p) => (
+            {FINANCING_PROGRAMS.map((p) => (
               <option key={p.code} value={p.code}>
                 {p.label}
               </option>
@@ -509,7 +504,7 @@ export function FinancingIntakePanel({
 
       <div>
         <label style={label} htmlFor="fin-address">
-          Your mailing address (optional — your broker collects it later)
+          Your mailing address (optional — useful for later lender paperwork)
         </label>
         <input
           id="fin-address"
@@ -666,9 +661,9 @@ export function FinancingIntakePanel({
           style={{ marginTop: 2 }}
         />
         <span>
-          I consent to routing my request to the commercial debt broker, and
-          understand this is not a qualification, pre-approval, rate lock, or
-          lender commitment.
+          I consent to placing my request in the Furlong Capital Desk for readiness review and
+          lender-network coordination. I understand this is not a qualification, pre-approval, rate lock,
+          lender commitment, or permission to send my information to an outside lender without a later governed handoff.
         </span>
       </label>
 

@@ -7,7 +7,7 @@
  * Flow: the page exchanges its signed link token for the deal reference and
  * checklist, then for each file: begin (governed handoff + direct-to-storage
  * session) → browser PUTs bytes straight to the IAM-private bucket over TLS
- * → confirm (custody record for the licensed lender). File bytes never pass
+ * → confirm (governed custody record for the Capital Desk / assigned reviewer). File bytes never pass
  * through the application servers. When the storage provider is not
  * configured (local dev), the page says so honestly and records metadata
  * custody only — never a fake success.
@@ -44,7 +44,7 @@ const DOC_SLOTS: Array<{
     hint: "Farm records, subsidy history, or FSA loan documents — download them yourself from your farmers.gov account or request them from your county FSA office. We will NEVER ask for your federal login.",
   },
   { type: "purchase-agreement", label: "Purchase agreement", hint: "The signed contract, if the deal has one yet" },
-  { type: "other-supporting", label: "Anything else", hint: "Whatever your broker asked for that isn't above" },
+  { type: "other-supporting", label: "Anything else", hint: "Whatever your Capital Desk or assigned finance reviewer asked for that isn't above" },
 ];
 
 type UploadState = { status: "idle" | "uploading" | "done" | "pending" | "error"; note?: string };
@@ -55,7 +55,7 @@ type UploadState = { status: "idle" | "uploading" | "done" | "pending" | "error"
  *  does not, and it creates real exposure for a falsified record. */
 const ATTESTATION_TEXT =
   "I confirm this file is a true, complete and unaltered copy of the record it claims to be, that " +
-  "I am authorised to provide it, and that my broker and any lender will rely on it.";
+  "I am authorised to provide it, and that Furlong's authorized finance reviewer and any lender I later authorize may rely on it.";
 
 function SecureUploadInner() {
   const params = useSearchParams();
@@ -109,7 +109,7 @@ function SecureUploadInner() {
         [documentType]: uploaded
           ? {
               status: "done",
-              note: `${file.name} — received into secure custody; your broker will be able to review it.`,
+              note: `${file.name} — received into secure custody; the authorized Capital Desk / assigned finance reviewer can review it.`,
             }
           : {
               // Honest degradation must not LOOK like success (founder test
@@ -138,14 +138,14 @@ function SecureUploadInner() {
       <p style={{ margin: 0, color: "#3b475a", fontSize: 14, lineHeight: 1.65 }}>
         {dealRef ? <>For deal <strong>{dealRef}</strong>. </> : "Verifying your link… "}
         Files travel encrypted, directly into access-controlled storage that only your
-        broker&apos;s review process can reach — nothing is sent by email, and this page never sees
+        Capital Desk / assigned finance-review process can reach — nothing is sent by email, and this page never sees
         or stores your account numbers itself. This link is single-purpose and expires
         {expiresAt ? ` on ${new Date(expiresAt).toLocaleDateString()}` : " after a few days"}.
       </p>
       {providerConfigured === false && (
         <p style={{ margin: 0, color: "#8F6E1F", background: "#FFF9E8", border: "1px solid #D7B85A", borderRadius: 10, padding: "10px 12px", fontSize: 13, lineHeight: 1.55 }}>
           Heads-up: secure storage is not yet activated in this environment. Your file details will be
-          recorded for your broker, but hold the documents themselves until the portal confirms live storage.
+          recorded for the financing case, but hold the documents themselves until the portal confirms live storage.
         </p>
       )}
       <div style={{ display: "grid", gap: 10 }}>
@@ -186,7 +186,7 @@ function SecureUploadInner() {
       </div>
       <p style={{ margin: 0, color: "#6B7280", fontSize: 11.5, lineHeight: 1.6 }}>
         Chain of custody: every file is classified CONFIDENTIAL on receipt, access-logged, retained
-        per policy, and reviewable only through your broker&apos;s governed workspace.
+        per policy, and reviewable only through the governed Capital Desk or an explicitly assigned professional workspace.
         Uploading here is your consent to that handling for this financing request; nothing here is
         a credit decision, and you may request deletion of documents for a withdrawn request at any time.
       </p>

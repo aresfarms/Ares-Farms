@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Signing Ceremony — the customer signs a document their broker placed in
+ * Signing Ceremony — the customer signs a document an authorized finance reviewer placed in
  * the vault (founder-approved signature vault, 2026-08-06). ESIGN/UETA
  * process: view the exact document, versioned consent, explicit intent,
  * typed legal name. TEST MODE banner until counsel review flips
@@ -97,7 +97,7 @@ function SignInner() {
         </p>
       )}
       <p style={{ margin: 0, color: "#3b475a", fontSize: 14, lineHeight: 1.65 }}>
-        For financing request <strong>{ceremony.dealRef}</strong>. Your broker has asked for your
+        For financing request <strong>{ceremony.dealRef}</strong>. Your authorized finance reviewer has asked for your
         signature on <strong>{ceremony.fileName ?? "a document"}</strong>. Read it first — the
         signature you record here is bound to the exact file below.
       </p>
@@ -115,7 +115,7 @@ function SignInner() {
           <strong style={{ color: "#166534", fontSize: 15 }}>✓ Signature recorded</strong>
           <p style={{ margin: 0, color: "#166534", fontSize: 13.5, lineHeight: 1.6 }}>
             Your signature certificate is in the vault — you can download it from your status
-            page any time, and your broker has been notified.
+            page any time, and the financing case has been updated.
             {ceremony.mode === "test" && " (Test mode: this was a rehearsal ceremony.)"}
           </p>
         </section>

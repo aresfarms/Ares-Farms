@@ -70,26 +70,12 @@ export const LICENSED_MODULES: LicensedModule[] = [
     slug: "financing-capital",
     label: "Financing & Capital",
     accent: "#534AB7",
-    routedTo: "licensed-lending-spoke",
+    routedTo: "furlong-capital-desk",
     requestType: "financing_deal_intake",
-    partners: [
-      {
-        slug: "five-borough",
-        name: "Licensed lending desk",
-        kind: "lender",
-        status: "active",
-        blurb:
-          "SBA, USDA, and conventional financing reviewed and originated by a licensed lender.",
-      },
-      {
-        slug: "chamois-bank",
-        name: "Chamois Bank",
-        kind: "lender",
-        status: "pending-certification",
-        blurb: "Partner lender.",
-        gate: "Not live: certified connector (TECH-CONN-001) + data agreement (REG-TPRM-001) + named-lender consent required before any customer PII is transmitted.",
-      },
-    ],
+    // Step 3 lender candidates live in lenderNetworkRegistry.ts and remain
+    // non-routable until certified. The retained external broker workspace is
+    // not a public/active financing partner.
+    partners: [],
   },
 ];
 

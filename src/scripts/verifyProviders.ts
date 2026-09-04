@@ -40,7 +40,8 @@ const registry = read("src/lib/providers/providerRegistry.ts");
 const stmt = canonicalProviderAuthority.licenseModelStatement("ACME");
 for (const p of MODEL_PHRASES) if (!stmt.includes(p)) note(`MODEL: canonicalProviderAuthority.licenseModelStatement() is missing "${p}".`);
 if (/\$\s?\d/.test(registry)) note("MODEL: provider registry appears to contain a fee amount ($…) — the fee amount must never be published.");
-if (canonicalProviderAuthority.all.length === 0) note("registry has no providers.");
+// An empty public directory is valid. Professional portal access is governed
+// separately and must not force a person into the public provider registry.
 for (const p of canonicalProviderAuthority.all) {
   if (!/^https:\/\//.test(p.portalOutUrl)) note(`SEPARATION: ${p.slug} portalOutUrl must be the provider's own https site.`);
   if (!p.separateCompanyLabel) note(`SEPARATION: ${p.slug} missing separateCompanyLabel.`);
@@ -54,7 +55,7 @@ if (!/not Furlong&apos;s|not Furlong's/.test(page)) note("SEPARATION: Provider P
 if (!page.includes('target="_blank"')) note("NO-SUBMIT: portal-out CTA must open the provider's own site (target=_blank).");
 if (/<form\b/.test(page)) note("NO-SUBMIT: Provider Page must not contain a <form> (link-out only — Furlong passes no data).");
 
-// ── Runtime: the live Five Borough page ──────────────────────────────────────
+// ── Runtime: every currently registered public provider page ─────────────────
 async function runtime(): Promise<void> {
   try { await fetch(BASE); } catch { note(`server not reachable at ${BASE}.`); return; }
   for (const p of canonicalProviderAuthority.all) {

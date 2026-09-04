@@ -350,6 +350,7 @@
     "verify:proposed-solution-hypothesis": "tsx src/scripts/verifyProposedSolutionHypothesis.ts",
     "verify:objective-discovery": "tsx src/scripts/verifyObjectiveDiscovery.ts",
     "verify:financing-node": "tsx src/scripts/verifyFinancingNode.ts",
+    "verify:commercial-finance-expansion": "tsx src/scripts/commercialFinanceExpansionConformance.ts",
     "verify:reality-security": "tsx src/scripts/verifyRealitySecurity.ts",
     "verify:security-hardening": "tsx src/scripts/verifySecurityHardeningSweep.ts",
     "ingest:property-flood-historic": "tsx src/scripts/ingestPropertyFloodHistoric.ts",

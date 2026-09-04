@@ -56,12 +56,12 @@ export const FINANCING_DEAL_STATUSES: ReadonlyArray<{
 }> = [
   {
     status: "SUBMITTED_PENDING_REVIEW",
-    customerLabel: "Received — awaiting your broker's first review",
+    customerLabel: "Received — awaiting Capital Desk review",
   },
-  { status: "IN_LENDER_REVIEW", customerLabel: "In review with your broker" },
+  { status: "IN_LENDER_REVIEW", customerLabel: "In review with the Capital Desk / assigned finance provider" },
   {
     status: "DOCUMENTS_REQUESTED",
-    customerLabel: "Your broker needs documents — use your secure upload link",
+    customerLabel: "Documents requested — use your secure upload link",
   },
   { status: "UNDERWRITING_IN_PROGRESS", customerLabel: "In underwriting" },
   {
@@ -79,7 +79,7 @@ export const FINANCING_DEAL_STATUSES: ReadonlyArray<{
   },
   {
     status: "CLOSED_NOT_COMPLETED",
-    customerLabel: "Closed without completing — see your broker's note",
+    customerLabel: "Closed without completing — see the case note",
   },
 ];
 
@@ -319,7 +319,10 @@ export async function getServiceRequestStatus(
       t.lenderBacklogNote),
   );
   const isFinancing = row.requestType === "financing_deal_intake";
-  const bookingUrl = process.env.LENDER_BOOKING_URL?.trim() || null;
+  const bookingUrl =
+    row.routedTo === "furlong-capital-desk"
+      ? process.env.CAPITAL_DESK_BOOKING_URL?.trim() || null
+      : process.env.LENDER_BOOKING_URL?.trim() || null;
 
   let lenderDocuments: ServiceRequestStatusView["lenderDocuments"];
   if (isFinancing) {

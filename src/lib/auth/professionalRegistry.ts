@@ -28,7 +28,7 @@ export interface ProfessionalGrant {
 }
 
 /**
- * Live grants. Add a person ONLY with a founder decision and a real basis —
+ * Live grants. Add a person ONLY with an owner/governance decision and a real basis —
  * this list is the answer to a regulator asking "who could see this file?"
  */
 export const PROFESSIONAL_GRANTS: ProfessionalGrant[] = [
@@ -36,8 +36,8 @@ export const PROFESSIONAL_GRANTS: ProfessionalGrant[] = [
     email: "sfraas@aresfarmsinc.com",
     name: "Stuart",
     role: "broker",
-    organization: "Furlong Inc. — Compass to Capital",
-    basis: "Network commercial debt broker; borrower financing requests route to the broker workspace before any governed lender handoff.",
+    organization: "External commercial debt broker — retained transition workspace",
+    basis: "Temporary external-broker workspace access for legacy or explicitly assigned financing cases only. New Furlong Capital Desk intakes are not automatically visible or routed here.",
   },
 ];
 

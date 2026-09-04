@@ -16,7 +16,7 @@ step states the exact command or console click.
 ## 2. IAM / service accounts
 - `furlong-run@<project>` — Cloud Run runtime SA: roles `cloudsql.client`, `secretmanager.secretAccessor`, `logging.logWriter`. NOTHING broader.
 - `furlong-deploy@<project>` — CI deploy SA: `run.admin`, `artifactregistry.writer`, `iam.serviceAccountUser` (on the runtime SA only).
-- Humans: Caitlin = Owner; Stuart = steward per multi-party governance (no unilateral prod change — matches FortKnox doctrine).
+- Human authority: Caitlin = Owner/operator; independent review remains role-bound where the applicable production gate requires it. External broker access grants no production-governance authority.
 - No SA keys downloaded; use Workload Identity / `gcloud auth` only. (Owner-only secrets rule stands.)
 
 ## 3. Secret Manager
@@ -114,7 +114,7 @@ financing work when separately activated — Furlong Core never silently becomes
 - [ ] All 10 blockers individually reviewed (close only with evidence)
 - [ ] Counsel items resolved: LEGAL-REVIEW-001 (threat metadata), financing disclaimer, FHA/ownership/advisory language, saved-journeys privacy
 - [ ] DNS rollback plan read and approved
-- [ ] Stuart steward sign-off where multi-party governance requires it
+- [ ] independent role-bound sign-off where the applicable governance gate requires it
 
 ## 13. No-go criteria (any true ⇒ STOP)
 Blocker count ≠ 10-as-expected · any SEC blocker open without approved override · production CSP contains `'unsafe-inline'` in script-src · production-CSP hydration fails · secrets committed · DB restore untested · DNS rollback missing · threat/privacy legal review unresolved · financing node live without approval · internal routes public · Navigator rendered smoke fails.

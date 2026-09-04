@@ -60,8 +60,8 @@ if it is ever activated, import it into terraform first.
 
 - Rotate ALL keys before go-live (#33) — SendGrid known-exposed; Anthropic key
   expires ~2026-08-27 (rotation reminder scheduled 2026-08-24).
-- Stuart's compliance review of financing surfaces (#34).
-- Payments / Guild billing stays OFF until Stuart tests the model (#35).
+- Independent financing-compliance review of regulated financing surfaces (#34).
+- Payments / Guild billing stays OFF until the governed billing model passes independent compliance testing (#35).
 - VEDP stays DARK for launch (founder decision 2026-07-29 — legal comfort not
-  reached). Not a launch step; revisit only if counsel clears it in Stuart's
+  reached). Not a launch step; revisit only if counsel clears it in the independent financing-compliance
   review (#34).

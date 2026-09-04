@@ -19,7 +19,7 @@ import {
  * Broker Deal Desk — the commercial debt broker's working console
  * (founder direction 2026-08-05).
  *
- * One screen answers "what does Stuart do from his end": every financing
+ * One screen provides the external broker workflow for every financing
  * deal, its documents (single-file audited downloads), status + a customer-
  * visible note, the closing timeline he adjusts for lender/USDA/SBA backlogs,
  * and one-click document reminders that chase customers so he doesn't.

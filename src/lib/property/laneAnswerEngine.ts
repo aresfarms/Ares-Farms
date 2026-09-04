@@ -10,7 +10,7 @@
  *     rate, this building's zoning, the lease), say so and point to where to
  *     confirm it — never guess, never appraise, never quote.
  *   - Facts and plain-English context only. "What should I pay / will I qualify"
- *     routes to the licensed professionals (the Guild / Stuart), never decided
+ *     routes to authorized licensed professionals, never decided
  *     here.
  *
  * Deterministic + pure: same facts in → same answers out, no I/O.
@@ -209,7 +209,7 @@ export function answerCommercialQuestions(f: CommercialFacts): LaneAnswer[] {
     answer:
       `If you'll occupy at least 51%, this typically points to SBA — 504 for buying/building (low ~10% down, long fixed term) or 7(a) for a more flexible mix; a rural location can open USDA B&I. If it's a pure investment (leased to others), it's conventional commercial financing. The program comparison on this lane lays out how each is built — but the fit and the terms are the licensed lender's call.`,
     confirm:
-      "Bring the deal to the licensed lender (Stuart's desk) — occupancy %, your financials, and the property type decide which program fits and what the terms would actually be.",
+      "Bring the deal to an authorized licensed lender or broker through the Furlong Capital Desk — occupancy %, your financials, and the property type decide which program fits and what the terms would actually be.",
   });
 
   // 4. Deal-killers

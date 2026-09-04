@@ -987,7 +987,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   // ── FINAL PASS: footer + page numbers on every buffered page ───────────────
   //
-  // THE TIER ARTIFACT BOUNDARY (founder direction 2026-07-18, for Stuart's
+  // THE TIER ARTIFACT BOUNDARY (founder direction 2026-07-18, for the external broker
   // tier verdict): the FREE export keeps the diagonal informational watermark
   // — free forever, share it anywhere, it advertises Furlong. The PAID tiers
   // export CLEAN: no diagonal line, a "prepared for institutional use" footer

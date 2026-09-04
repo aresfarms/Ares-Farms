@@ -34,7 +34,7 @@ own published policy the same day:
 
 Verdict: the reuse-confirmation email is OPTIONAL goodwill (a warm
 partner-development touch someday), **not a prerequisite**. Counsel backstop =
-Stuart's scheduled pre-launch review (#34). Approve whenever ready.
+The scheduled independent financing-compliance review (#34). Approve whenever ready.
 
 ## Module 22 — activation facts
 
@@ -56,7 +56,7 @@ review).
 Caitlin's call: leave VEDP dark. Reason: unresolved comfort on whether the
 listings can legally be redisplayed, notwithstanding the fair-use read above.
 Do NOT activate, do NOT re-pitch activation. The wiring stays as-is (PENDING,
-zero public surfaces) so that IF counsel (Stuart pre-launch review, #34)
+zero public surfaces) so that IF counsel / independent financing-compliance review (#34)
 clears it later, activation remains a single founder click on
 /source-legal-review — no rebuild needed. Until then this source is treated
 as OFF for launch planning.

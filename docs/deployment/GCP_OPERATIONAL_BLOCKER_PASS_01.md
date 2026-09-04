@@ -124,7 +124,7 @@ action · Why still open.** Nothing here is closeable in this pass.
    `secretmanager.secretAccessor`, `logging.logWriter`); `furlong-deploy@` (CI:
    `run.admin`, `artifactregistry.writer`, `iam.serviceAccountUser` on the
    runtime SA only). Workload Identity; **no downloaded SA keys**. Caitlin=Owner;
-   Stuart=steward (no unilateral prod change).
+   external broker workspace = no production-governance authority; required independent review is role-bound.
 3. **Secret Manager inventory** (names only — values owner-set, never in repo):
    `NEXTAUTH_SECRET`, `DATABASE_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
    `AUTH_CREDENTIAL_SHARED_SECRET`, `ANTHROPIC_API_KEY`, `GSA_API_KEY`,

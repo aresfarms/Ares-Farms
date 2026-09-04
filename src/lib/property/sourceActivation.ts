@@ -212,7 +212,7 @@ export const SOURCE_ACTIVATION: Record<string, SourceActivationRecord> = {
         "The feed publishes NO prices ('Price on request' — never invented) and NO per-listing public URLs (link-out goes to VEDP's official Site Selection portal, verified live).",
       ],
       license:
-        "VEDP copyright policy grants fair-use permission to site visitors; ingested material is uncopyrightable structured facts from the official open-data API, displayed with attribution + link-out to VEDP's own portal. A courtesy heads-up to VEDP remains OPTIONAL goodwill (partner posture), not a prerequisite; Stuart's pre-launch review (#34) is the counsel backstop.",
+        "VEDP copyright policy grants fair-use permission to site visitors; ingested material is uncopyrightable structured facts from the official open-data API, displayed with attribution + link-out to VEDP's own portal. A courtesy heads-up to VEDP remains OPTIONAL goodwill (partner posture), not a prerequisite; the independent financing-compliance review (#34) is the counsel backstop.",
       attributionRequired:
         'Display "Source: VEDP — Virginia Economic Development Partnership (vedp.org)" on every listing.',
       reviewedBy: null,

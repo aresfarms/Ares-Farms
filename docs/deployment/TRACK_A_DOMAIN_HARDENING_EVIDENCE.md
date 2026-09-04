@@ -109,7 +109,7 @@ excluded. Canonical public-domain selection (furlongpathways.com) remains
 | Current authoritative DNS | ☐ (per Phase 1 DNS-provider column) |
 | Future authoritative DNS | ☐ (GCP Cloud DNS / LB — per GCP runbook §8; gated) |
 | Rollback DNS authority | ☐ (exported zone files from Phase 4 + low pre-cutover TTL) |
-| Registrar access owners | Caitlin = Owner; Stuart = steward (multi-party; no unilateral change) |
+| Registrar access owners | Caitlin = Owner/operator; independent registrar-control review is role-bound when required; external broker access has no registrar authority |
 
 **Success:** rollback path identified before any cutover is contemplated. (No
 cutover occurs in this track.)

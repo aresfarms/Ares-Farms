@@ -2508,14 +2508,14 @@
         "src/app/governance/founder-change-review/page.tsx"
       ]
     },
-    "OPS-TWO-FOUNDER-INTERNAL-PILOT-001": {
-      "title": "Two-founder controlled internal pilot gate",
+    "OPS-OWNER-CONTROLLED-INTERNAL-PILOT-001": {
+      "title": "Owner-controlled internal pilot gate",
       "status": "implemented",
       "requires": [
-        "caitlin_owner_attestation",
-        "stuart_pilot_acceptance",
+        "owner_attestation",
+        "owner_pilot_acceptance",
         "testing_only_boundary",
-        "francis_deferred_until_final_launch"
+        "independent_review_deferred_until_final_launch"
       ],
       "tests": [
         "verify:founder-pilot-test-gate",

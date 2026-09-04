@@ -58,7 +58,7 @@ Generate secrets locally and paste the values in. **Names only here:**
 | `NEXTAUTH_URL` | `https://<your-railway-domain>` (fill after step 7) |
 | `NEXTAUTH_SECRET` | generate: `openssl rand -base64 32` |
 | `AUTH_CREDENTIALS_MODE` | `email-allowlist` |
-| `AUTH_CREDENTIAL_EMAIL_ALLOWLIST` | `chudson@aresfarmsinc.com,stuart@aresfarmsinc.com,frances@aresfarmsinc.com` |
+| `AUTH_CREDENTIAL_EMAIL_ALLOWLIST` | `chudson@aresfarmsinc.com,stuart@aresfarmsinc.com` |
 | `AUTH_CREDENTIAL_SHARED_SECRET` | generate: `openssl rand -base64 24` — this is the **operator login password** |
 | `API_AUTH_ENFORCEMENT` | `required` |
 | `PREVIEW_BASIC_AUTH_USER` | `stuart` |

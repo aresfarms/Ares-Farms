@@ -105,7 +105,7 @@ are the traceability record.
 ## 6. Notification target + email infrastructure
 
 - **Change:** Lender notifications route to `finance@compasstocapital.com`
-  (Stuart's module address on his brand domain). Sending remains OFF until
+  (the temporarily retained external-broker workspace address on its isolated domain). Sending remains OFF until
   `EMAIL_FROM` + `SENDGRID_API_KEY` are configured; every send path reports
   honestly when unconfigured. Key rotation remains a go-live gate.
 

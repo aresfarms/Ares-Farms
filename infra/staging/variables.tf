@@ -536,7 +536,7 @@ variable "notify_lender_email" {
   description = "Recipient for new financing deals (the licensed lender)."
   type        = string
   # The Financial module's brand address (founder 2026-08-05):
-  # finance@compasstocapital.com — Stuart's lane on his own domain.
+  # finance@compasstocapital.com — isolated external-broker workspace lane; no Furlong governance authority.
   default = "finance@compasstocapital.com"
 }
 

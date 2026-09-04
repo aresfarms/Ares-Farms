@@ -56,7 +56,7 @@ power-user input, never required.
 ## Compliance seam (how this exists without a license)
 
 - **Furlong core:** the informational, property-anchored comparison. No advice, no "you qualify."
-- **Licensed handoff:** personalized feasibility / structuring / underwriting → Stuart's licensed finance
+- **Licensed handoff:** personalized feasibility / structuring / underwriting → an authorized external finance
   module (Five Borough) or a licensed provider in the directory (a firm like MMCG is exactly that paid
   provider). Furlong routes a ready user out; it does not give the advice itself.
 - Locked rule, always visible: **"a program fitting this project is not the same as you qualifying."**

@@ -13,7 +13,7 @@ import {
 import { affiliateReadinessSummary } from "@/lib/financing/lendingAffiliateReadiness";
 import { federalLenderRoadmapSummary } from "@/lib/financing/federalLenderApprovalRoadmap";
 import { PROFESSIONAL_GRANTS } from "@/lib/auth/professionalRegistry";
-import { PROVIDERS } from "@/lib/providers/providerRegistry";
+import { canonicalProviderAuthority } from "@/lib/platform/authorities/provider";
 
 const ROOT = process.cwd();
 const findings: string[] = [];
@@ -101,7 +101,7 @@ assert(
   "Retained broker grant must be explicitly limited to legacy/assigned cases.",
 );
 assert(
-  PROVIDERS.every((provider) => !/five borough|stuart|fraass/i.test(`${provider.name} ${provider.slug}`)),
+  canonicalProviderAuthority.all.every((provider) => !/five borough|stuart|fraass/i.test(`${provider.name} ${provider.slug}`)),
   "Retained external broker must not remain a public Furlong provider listing.",
 );
 

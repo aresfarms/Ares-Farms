@@ -621,7 +621,7 @@ variable "labels" {
 }
 
 variable "anthropic_api_key_enabled" {
-  description = "When true, the core service reads ANTHROPIC_API_KEY (an out-of-band Secret Manager secret) to activate the governed AI seams (interview phrasing + import image extraction). Requires the secret to hold at least one enabled version. Default false = deterministic fallbacks only."
+  description = "When true, the core service reads ANTHROPIC_API_KEY (an out-of-band Secret Manager secret) to activate the governed AI seams (interview phrasing + import image extraction + property operating-model interpretation). Requires the secret to hold at least one enabled version. Default false = deterministic fallbacks only."
   type        = bool
   default     = false
 }

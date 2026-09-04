@@ -12,7 +12,7 @@ export const RATE_LIMIT_MESSAGE = "We need to slow this down for security. You c
 
 export type RateAction =
   | "navigator-message" | "link-ingestion" | "ordinance-lookup" | "parcel-resolution"
-  | "market-comp" | "pro-forma" | "map-exploration" | "refusal-trigger";
+  | "market-comp" | "pro-forma" | "map-exploration" | "operating-model-ai" | "refusal-trigger";
 
 /** Budgets: max events per rolling window (ms). */
 export const RATE_BUDGETS: Record<RateAction, { max: number; windowMs: number }> = {
@@ -23,6 +23,7 @@ export const RATE_BUDGETS: Record<RateAction, { max: number; windowMs: number }>
   "market-comp": { max: 10, windowMs: 60_000 },
   "pro-forma": { max: 4, windowMs: 60_000 },
   "map-exploration": { max: 60, windowMs: 60_000 },
+  "operating-model-ai": { max: 6, windowMs: 60 * 60_000 },
   "refusal-trigger": { max: 5, windowMs: 120_000 },
 };
 

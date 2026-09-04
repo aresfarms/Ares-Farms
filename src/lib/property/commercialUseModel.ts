@@ -43,6 +43,7 @@ export interface CommercialUseScreen {
   propertyClassification: string;
   screeningPrice: number | null;
   referenceTerms: string;
+  referenceRatePct: number | null;
   occupancyFactor: number;
   uses: ModeledUse[];
   currentUse: string | null;
@@ -160,6 +161,7 @@ export function modelCommercialUses(args: {
       ratePct != null
         ? `${ratePct.toFixed(2)}% (benchmark +0.75), 25-yr amortization, 80% LTV — lender-shaped reference terms`
         : "reference lender terms unavailable (no published benchmark loaded)",
+    referenceRatePct: ratePct,
     occupancyFactor: OCCUPANCY,
     uses,
     currentUse: args.landUse?.trim() || null,

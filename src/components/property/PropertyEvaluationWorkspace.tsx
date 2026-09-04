@@ -4150,6 +4150,7 @@ export function PropertyEvaluationWorkspace({
           <FinanceAnalysisPanel
             useScreen={financingProgramFit.useScreen}
             scorecard={financingProgramFit.scorecard}
+            location={analysisContext.location}
           />
         }
         agricultureSlot={

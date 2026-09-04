@@ -14,6 +14,7 @@
 
 import type { CommercialUseScreen } from "@/lib/property/commercialUseModel";
 import type { LenderTest } from "@/lib/property/financingProgramFit";
+import { OperatingModelWorkbench } from "@/components/property/OperatingModelWorkbench";
 
 const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
 
@@ -29,9 +30,11 @@ const monthRange = (r: { low: number; high: number }) => r.low === r.high ? `${r
 export function FinanceAnalysisPanel({
   useScreen,
   scorecard,
+  location,
 }: {
   useScreen: CommercialUseScreen | null;
   scorecard: LenderTest[] | null;
+  location?: string | null;
 }) {
   if (!useScreen && !scorecard) return null;
   return (
@@ -91,6 +94,7 @@ export function FinanceAnalysisPanel({
                   {useScreen.secondaryOpportunity.conversion.steps.map((step) => <li key={step}>{step}</li>)}
                 </ol>
               </details>
+              <OperatingModelWorkbench screen={useScreen} location={location} />
             </div>
           )}
           {useScreen.uses.some((u) => u.noiMid != null) && (

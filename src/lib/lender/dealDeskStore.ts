@@ -12,6 +12,10 @@ import {
   LENDER_EMAIL_SIGNATURE,
   renderLenderEmailHtml,
 } from "@/lib/notifications/lenderSignature";
+import {
+  listProviderDealRooms,
+  retainedExternalBrokerProviderId,
+} from "@/lib/financing/capitalNetworkStore";
 
 /**
  * Broker Deal Desk store (founder direction 2026-08-05): the commercial
@@ -124,22 +128,7 @@ export function applicationIdForDeal(serviceRequestId: string): string {
   return `finintake-${serviceRequestId}`;
 }
 
-export async function listLenderDeals(
-  limit = 50,
-  routedTo: string | null = null,
-): Promise<DealSummary[]> {
-  const dealFilter = routedTo
-    ? and(
-        eq(serviceRequests.requestType, FINANCING_TYPE),
-        eq(serviceRequests.routedTo, routedTo),
-      )
-    : eq(serviceRequests.requestType, FINANCING_TYPE);
-  const rows = await db
-    .select()
-    .from(serviceRequests)
-    .where(dealFilter)
-    .orderBy(desc(serviceRequests.occurredAt))
-    .limit(Math.min(limit, 200));
+async function summarizeDealRows(rows: Array<typeof serviceRequests.$inferSelect>): Promise<DealSummary[]> {
   const recordIds = rows.map((row) => row.serviceRequestId);
   const lineageRows = recordIds.length
     ? await db
@@ -200,6 +189,54 @@ export async function listLenderDeals(
     });
   }
   return summaries;
+}
+
+export async function listLenderDeals(
+  limit = 50,
+  routedTo: string | null = null,
+): Promise<DealSummary[]> {
+  const dealFilter = routedTo
+    ? and(
+        eq(serviceRequests.requestType, FINANCING_TYPE),
+        eq(serviceRequests.routedTo, routedTo),
+      )
+    : eq(serviceRequests.requestType, FINANCING_TYPE);
+  const rows = await db
+    .select()
+    .from(serviceRequests)
+    .where(dealFilter)
+    .orderBy(desc(serviceRequests.occurredAt))
+    .limit(Math.min(limit, 200));
+  return summarizeDealRows(rows);
+}
+
+/**
+ * Provider-specific working queue. A provider sees only Capital Network deal
+ * rooms whose exact package consent has activated provider access. The retained
+ * transition broker additionally keeps its historical routedTo cases so the old
+ * workspace remains intact without exposing new Capital Desk intake.
+ */
+export async function listLenderDealsForProvider(
+  providerId: string,
+  limit = 50,
+): Promise<DealSummary[]> {
+  const rooms = await listProviderDealRooms(providerId);
+  const assignedIds = new Set(rooms.map((room) => room.serviceRequestId));
+  const includeLegacy = providerId === retainedExternalBrokerProviderId;
+  const rows = await db
+    .select()
+    .from(serviceRequests)
+    .where(eq(serviceRequests.requestType, FINANCING_TYPE))
+    .orderBy(desc(serviceRequests.occurredAt))
+    .limit(500);
+  const scoped = rows
+    .filter(
+      (row) =>
+        assignedIds.has(row.serviceRequestId) ||
+        (includeLegacy && row.routedTo === "licensed-lending-spoke"),
+    )
+    .slice(0, Math.min(limit, 200));
+  return summarizeDealRows(scoped);
 }
 
 export async function listDealDocuments(applicationId: string) {
@@ -383,25 +420,33 @@ export async function sendDocumentReminder(args: {
 export async function runDueReminders(
   portalBaseUrl: string,
   routedTo: string | null = null,
+  providerId: string | null = null,
 ): Promise<{ attempted: number; sent: number }> {
-  const reminderFilter = routedTo
-    ? and(
-        eq(serviceRequests.status, "DOCUMENTS_REQUESTED"),
-        eq(serviceRequests.routedTo, routedTo),
-      )
-    : eq(serviceRequests.status, "DOCUMENTS_REQUESTED");
-  const rows = await db
-    .select()
-    .from(serviceRequests)
-    .where(reminderFilter)
-    .limit(200);
+  const serviceRequestIds = providerId
+    ? (await listLenderDealsForProvider(providerId, 200))
+        .filter((deal) => deal.status === "DOCUMENTS_REQUESTED")
+        .map((deal) => deal.serviceRequestId)
+    : (
+        await db
+          .select({ serviceRequestId: serviceRequests.serviceRequestId })
+          .from(serviceRequests)
+          .where(
+            routedTo
+              ? and(
+                  eq(serviceRequests.status, "DOCUMENTS_REQUESTED"),
+                  eq(serviceRequests.routedTo, routedTo),
+                )
+              : eq(serviceRequests.status, "DOCUMENTS_REQUESTED"),
+          )
+          .limit(200)
+      ).map((row) => row.serviceRequestId);
   let sent = 0;
-  for (const row of rows) {
+  for (const serviceRequestId of serviceRequestIds) {
     const result = await sendDocumentReminder({
-      serviceRequestId: row.serviceRequestId,
+      serviceRequestId,
       portalBaseUrl,
     });
     if (result.sent) sent += 1;
   }
-  return { attempted: rows.length, sent };
+  return { attempted: serviceRequestIds.length, sent };
 }

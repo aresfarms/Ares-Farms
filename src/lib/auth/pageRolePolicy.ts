@@ -27,6 +27,47 @@ export function evaluateProtectedPageRole(
     };
   }
 
+  if (
+    pathname === "/capital-network/onboarding" ||
+    pathname.startsWith("/capital-network/onboarding/")
+  ) {
+    const allowed = new Set<AccessRole>([
+      "user",
+      "borrower",
+      "broker",
+      "lender",
+      "operator",
+      "admin",
+      "governance",
+    ]).has(role);
+    return {
+      protected: true,
+      allowed,
+      reason: allowed
+        ? "capital-provider-onboarding"
+        : "capital-provider-onboarding-denied",
+    };
+  }
+
+  if (
+    pathname === "/capital-network/provider" ||
+    pathname.startsWith("/capital-network/provider/")
+  ) {
+    const allowed = new Set<AccessRole>([
+      "broker",
+      "lender",
+      "admin",
+      "governance",
+    ]).has(role);
+    return {
+      protected: true,
+      allowed,
+      reason: allowed
+        ? "capital-provider-workspace"
+        : "capital-provider-workspace-denied",
+    };
+  }
+
   if (pathname === "/lender-desk" || pathname.startsWith("/lender-desk/")) {
     // Historical route name retained for compatibility; this surface is the
     // broker deal desk. Lenders must use their separate institution-scoped lane.

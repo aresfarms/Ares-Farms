@@ -23,6 +23,11 @@ import {
 } from "@/lib/testing/syntheticFixtureLineage";
 import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixtureLineageStore";
 import {
+  activateDealRoomAfterConsent,
+  assertSelectedProviderForSubmission,
+  linkSubmissionCaseToDealRoom,
+} from "@/lib/financing/capitalNetworkStore";
+import {
   LENDER_SUBMISSION_DOCTRINE,
   LenderSubmissionState,
   assertTransition,
@@ -120,13 +125,44 @@ async function fixtureContextForApplication(
 export async function createSubmissionCase(input: {
   applicationId: string;
   customerId: string;
+  providerId?: string | null;
+  serviceRequestId?: string | null;
   actorId: string;
   traceId: string;
 }) {
   const applicationId = input.applicationId.trim();
   const customerId = input.customerId.trim();
+  const providerId = input.providerId?.trim() || null;
+  const serviceRequestId = input.serviceRequestId?.trim().toUpperCase() || null;
   if (!applicationId || !customerId) {
     throw new Error("applicationId and customerId are required.");
+  }
+  if (Boolean(providerId) !== Boolean(serviceRequestId)) {
+    throw new Error(
+      "providerId and serviceRequestId must be supplied together for a Capital Network submission.",
+    );
+  }
+  if (providerId && serviceRequestId) {
+    await assertSelectedProviderForSubmission(serviceRequestId, providerId);
+    const [existing] = await db
+      .select()
+      .from(lenderSubmissionCases)
+      .where(
+        and(
+          eq(lenderSubmissionCases.serviceRequestId, serviceRequestId),
+          eq(lenderSubmissionCases.providerId, providerId),
+        ),
+      )
+      .limit(1);
+    if (existing) {
+      await linkSubmissionCaseToDealRoom(
+        serviceRequestId,
+        providerId,
+        existing.id,
+        input.traceId,
+      );
+      return existing;
+    }
   }
   const fixtureContext = await fixtureContextForApplication(applicationId);
   const caseId = randomUUID();
@@ -137,17 +173,20 @@ export async function createSubmissionCase(input: {
         caseId,
       )
     : null;
-  return db.transaction(async (tx) => {
-    const [record] = await tx
+  const record = await db.transaction(async (tx) => {
+    const [created] = await tx
       .insert(lenderSubmissionCases)
       .values({
         id: caseId,
         applicationId,
         customerId,
+        providerId,
+        serviceRequestId,
         state: "DRAFT",
         productionDeliveryBlocked: true,
         metadata: {
           createdBy: input.actorId,
+          providerBound: Boolean(providerId),
           doctrineIds: [
             LENDER_SUBMISSION_DOCTRINE.canonicalId,
             LENDER_SUBMISSION_DOCTRINE.technicalId,
@@ -165,8 +204,17 @@ export async function createSubmissionCase(input: {
           lineageValues(caseLineage, input.traceId, "lender-submission.case"),
         );
     }
-    return record;
+    return created;
   });
+  if (providerId && serviceRequestId) {
+    await linkSubmissionCaseToDealRoom(
+      serviceRequestId,
+      providerId,
+      record.id,
+      input.traceId,
+    );
+  }
+  return record;
 }
 
 export async function loadSubmissionCase(caseId: string) {
@@ -372,6 +420,11 @@ export async function persistConsent(
   },
 ) {
   const caseRecord = await loadSubmissionCase(input.caseId);
+  if (caseRecord.providerId && input.lenderId !== caseRecord.providerId) {
+    throw new Error(
+      "Consent provider does not match the borrower-selected Capital Network provider.",
+    );
+  }
   if (
     caseRecord.state !== "AWAITING_CUSTOMER_CONSENT" ||
     caseRecord.customerId !== input.customerId ||
@@ -396,7 +449,7 @@ export async function persistConsent(
         consent.id,
       )
     : null;
-  return db.transaction(async (tx) => {
+  const persisted = await db.transaction(async (tx) => {
     const [record] = await tx
       .insert(customerSubmissionConsents)
       .values({
@@ -448,6 +501,12 @@ export async function persistConsent(
     }
     return record;
   });
+  await activateDealRoomAfterConsent(
+    caseRecord.serviceRequestId,
+    caseRecord.providerId,
+    input.traceId,
+  );
+  return persisted;
 }
 
 export async function loadConsent(
@@ -583,12 +642,22 @@ export async function authorizeAndPersist(input: {
   }
   const pkg = await loadPackage(input.caseId, input.packageVersionId);
   const consent = await loadConsent(input.consentId);
+  if (caseRecord.providerId && consent.lenderId !== caseRecord.providerId) {
+    throw new Error(
+      "Dispatch consent is not bound to the borrower-selected Capital Network provider.",
+    );
+  }
   const [recipient] = await db
     .select()
     .from(recipientVerifications)
     .where(eq(recipientVerifications.id, input.recipientVerificationId))
     .limit(1);
   if (!recipient) throw new Error("Recipient verification was not found.");
+  if (caseRecord.providerId && recipient.lenderId !== caseRecord.providerId) {
+    throw new Error(
+      "Verified recipient is not bound to the borrower-selected Capital Network provider.",
+    );
+  }
   const recipientFixture = fixtureContextFromMetadata(recipient.metadata);
   if (fixtureContext || recipientFixture) {
     if (

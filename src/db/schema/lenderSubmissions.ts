@@ -19,17 +19,32 @@ const evidence = {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 };
 
-export const lenderSubmissionCases = pgTable("lender_submission_cases", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  applicationId: text("application_id").notNull(),
-  customerId: text("customer_id").notNull(),
-  state: text("state").notNull().default("DRAFT"),
-  activePackageVersionId: uuid("active_package_version_id"),
-  productionDeliveryBlocked: boolean("production_delivery_blocked").notNull().default(true),
-  closedAt: timestamp("closed_at", { withTimezone: true }),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-  ...evidence,
-});
+export const lenderSubmissionCases = pgTable(
+  "lender_submission_cases",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    applicationId: text("application_id").notNull(),
+    customerId: text("customer_id").notNull(),
+    providerId: text("provider_id"),
+    serviceRequestId: text("service_request_id"),
+    state: text("state").notNull().default("DRAFT"),
+    activePackageVersionId: uuid("active_package_version_id"),
+    productionDeliveryBlocked: boolean("production_delivery_blocked")
+      .notNull()
+      .default(true),
+    closedAt: timestamp("closed_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    ...evidence,
+  },
+  (table) => [
+    uniqueIndex("lender_submission_case_service_provider_uq").on(
+      table.serviceRequestId,
+      table.providerId,
+    ),
+  ],
+);
 
 export const submissionPackageVersions = pgTable(
   "submission_package_versions",

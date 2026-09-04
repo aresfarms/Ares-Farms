@@ -29,7 +29,7 @@
 export const INTERNAL_CHROME_PREFIXES = [
   "/internal", "/governance", "/operator-queue", "/operator-demo",
   "/applications", "/documents", "/reviews", "/rules", "/decisions",
-  "/notices", "/audit-replay", "/connectors", "/partners", "/billing",
+  "/notices", "/audit-replay", "/connectors", "/partners", "/capital-network", "/billing",
   "/reports", "/promotion", "/case-command", "/evidence-packets",
   "/exception-remediation", "/module-readiness", "/lender",
   "/sponsor",
@@ -51,6 +51,7 @@ export const INTERNAL_CHROME_PREFIXES = [
  */
 export const NO_INTERNAL_CHROME_PREFIXES = [
   "/security", "/sign-in", "/portal", "/lender-desk",
+  "/capital-network/onboarding", "/capital-network/provider",
   // Authenticated test-launch surface, not the 78-console engine room.
   "/internal/synthetic-fixtures",
 ] as const;

@@ -65,6 +65,8 @@ const PUBLIC_SURFACE_PATHS = new Set([
   "/api/financing/intake",
   "/api/readiness",
   "/api/service-requests/status",
+  // Same ref+email proof as status; matching and selection share no file by themselves.
+  "/api/capital-network/matches",
   // A person exercising rights over their OWN data must not need an account
   // — the reference+email proof is the authentication, same as the status
   // lookup. Gating rights behind a login would defeat the right.

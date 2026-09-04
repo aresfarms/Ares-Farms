@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { readJsonResponse } from "@/lib/http/readJsonResponse";
+import { CapitalNetworkMatches } from "@/components/public/CapitalNetworkMatches";
 
 /**
  * Customer Status Portal — a customer looks up a request they submitted (an
@@ -263,6 +264,13 @@ export default function StatusPortalPage() {
                     status check again any time for fresh ones.
                   </span>
                 </div>
+              )}
+
+              {result.requestType === "financing_deal_intake" && result.serviceRequestId && (
+                <CapitalNetworkMatches
+                  serviceRequestId={result.serviceRequestId}
+                  email={email.trim()}
+                />
               )}
 
               {result.bookingUrl && (

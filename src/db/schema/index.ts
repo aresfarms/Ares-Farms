@@ -75,6 +75,7 @@ export * from "./borrowerNoticeExceptionResolutions";
 export * from "./borrowerNoticeProviderExecutions";
 export * from "./canonicalLedger";
 export * from "./canonicalLedgerMeta";
+export * from "./capitalNetwork";
 export * from "./certifiedConnectorAdapters";
 export * from "./credentialVaultRefs";
 export * from "./credentialedScrapingEvents";

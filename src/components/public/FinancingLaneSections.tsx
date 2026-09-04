@@ -185,8 +185,36 @@ export async function FinancingLaneSections() {
         </div>
       </section>
 
-      {/* Stable anchor for every "take me to the lender intake" entry point
-          (0% DOWN callout, report-tab hand-off) — founder 2026-07-29. */}
+      <section
+        aria-label="Furlong Capital Network"
+        style={{ ...card, borderColor: "#c9c4f3", background: "#f8f7ff" }}
+      >
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: PURPLE,
+          }}
+        >
+          One case · multiple providers
+        </span>
+        <strong style={{ fontSize: 16, color: "#101a2b" }}>
+          The Capital Network is built for choice, not a single-lender funnel.
+        </strong>
+        <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
+          Certified brokers and funding institutions declare the states, programs, deal sizes, and transaction types they actually work. Furlong compares those declared profiles to your case without making a credit decision. You choose which matched providers you want to work with, and choosing one does not send the file — package-specific consent and recipient verification still come first.
+        </p>
+        <Link
+          href="/capital-network/onboarding"
+          style={{ color: PURPLE, fontSize: 12.5, fontWeight: 800, textDecoration: "none", width: "fit-content" }}
+        >
+          Broker or lender? Apply to join the Capital Network →
+        </Link>
+      </section>
+
+      {/* Stable anchor for every financing-intake entry point. */}
       <div id="lender-intake">
         <FinancingIntakePanel syntheticFixture={lenderScenario} />
       </div>

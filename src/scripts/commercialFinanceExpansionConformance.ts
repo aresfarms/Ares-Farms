@@ -111,8 +111,10 @@ assert(
   "Broker Deal Desk API must enforce case-level external-broker scope.",
 );
 assert(
-  dealDeskApi.includes('role === "broker" ? "licensed-lending-spoke" : null'),
-  "Broker Deal Desk list/reminder operations must be restricted to legacy broker-spoke cases.",
+  dealDeskApi.includes("listLenderDealsForProvider") &&
+    dealDeskApi.includes("providerMayAccessServiceRequest") &&
+    dealDeskApi.includes("retainedExternalBrokerProviderId"),
+  "Broker Deal Desk list/reminder operations must be provider-scoped; the retained broker may keep legacy broker-spoke cases plus explicitly consented Capital Network assignments.",
 );
 
 const intakeApi = read("src/app/api/financing/intake/route.ts");

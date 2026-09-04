@@ -129,6 +129,13 @@
     "src/lib/governance/institutionalAssuranceRuntime.ts",
     "src/scripts/institutionalAssuranceConformance.ts",
     "src/lib/db/migrations/0055_institutional_assurance_controls.sql",
-    "docs/MASTER_VOLUME_AMENDMENT_2026-09-02_DOCTRINE_MIRROR_RECONCILIATION_V3.md"
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-02_DOCTRINE_MIRROR_RECONCILIATION_V3.md",
+    "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+    "src/db/schema/capitalNetwork.ts",
+    "src/lib/financing/capitalNetworkRuntime.ts",
+    "src/lib/financing/capitalNetworkGovernance.ts",
+    "src/lib/financing/capitalNetworkStore.ts",
+    "src/scripts/capitalNetworkConformance.ts",
+    "src/lib/db/migrations/0056_capital_network_multi_provider.sql"
   ]
 }

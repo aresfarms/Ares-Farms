@@ -29,6 +29,33 @@ assert.equal(
   true,
 );
 
+assert.equal(
+  evaluateProtectedPageRole("/capital-network/onboarding", "user").allowed,
+  true,
+);
+assert.equal(
+  evaluateProtectedPageRole("/capital-network/onboarding", "lender").allowed,
+  true,
+);
+assert.equal(
+  evaluateProtectedPageRole("/capital-network/provider", "broker").allowed,
+  true,
+);
+assert.equal(
+  evaluateProtectedPageRole("/capital-network/provider", "lender").allowed,
+  true,
+);
+assert.equal(
+  evaluateProtectedPageRole("/capital-network/provider", "user").allowed,
+  false,
+);
+assert.equal(
+  evaluateProtectedPageRole("/capital-network", "lender").allowed,
+  false,
+);
+assert.equal(isInternalChromeRoute("/capital-network/provider"), false);
+assert.equal(isInternalChromeRoute("/capital-network/onboarding"), false);
+
 assert.equal(evaluateProtectedPageRole("/governance", "lender").allowed, false);
 assert.equal(
   evaluateProtectedPageRole("/governance", "attorney").allowed,
@@ -72,6 +99,8 @@ console.log(
       ok: true,
       brokerSurfaceOnly: "/lender-desk",
       lenderSurfaceSeparated: true,
+      capitalNetworkProviderWorkspace: "broker-or-lender",
+      capitalNetworkOnboarding: "authenticated-applicant",
       buildingProfessionalLanesFailClosed: true,
       internalConsolesProfessionalDenied: true,
       syntheticFixtureChromeIsolated: true,

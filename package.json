@@ -44,7 +44,7 @@
     "backend:module-readiness": "tsx src/scripts/backendModuleReadinessGate.ts",
     "build-record:archive": "tsx src/scripts/buildRecordArchiveExport.ts",
     "demo:seed": "tsx src/scripts/seedOperatorDemoData.ts",
-    "verify:master-volumes": "tsx src/scripts/masterVolumeConformanceTest.ts",
+    "verify:master-volumes": "tsx src/scripts/verifyMasterVolumeBuildParity.ts && tsx src/scripts/masterVolumeConformanceTest.ts",
     "verify:module-manifests": "tsx src/scripts/moduleConformanceTest.ts",
     "verify:module-separability": "tsx src/scripts/verifyModuleSeparability.ts",
     "verify:standalone-build": "tsx src/scripts/verifyStandaloneBuild.ts",
@@ -592,14 +592,15 @@
     "audit:broker-synthetic-and-stuart-access:strict": "tsx src/scripts/auditBrokerSyntheticAndStuartAccess.ts --strict",
     "verify:stripe-wallet-checkout": "tsx src/scripts/stripeWalletCheckoutConformance.ts",
     "verify:borrower-financial-controls": "tsx src/scripts/borrowerFinancialControlConformance.ts",
-    "verify:master-volume-mirror": "MASTER_VOLUME_MIRROR_STRICT=true tsx src/scripts/masterVolumeConformanceTest.ts",
+    "verify:master-volume-mirror": "tsx src/scripts/verifyMasterVolumeBuildParity.ts && MASTER_VOLUME_MIRROR_STRICT=true tsx src/scripts/masterVolumeConformanceTest.ts",
     "verify:institutional-assurance": "tsx src/scripts/institutionalAssuranceConformance.ts",
     "reconcile:master-volume-doctrines": "tsx src/scripts/reconcileMasterVolumeDoctrines.ts",
     "verify:capital-network": "tsx src/scripts/capitalNetworkConformance.ts",
     "verify:capital-network-execution": "tsx src/scripts/capitalNetworkExecutionReliabilityConformance.ts",
     "verify:property-intelligence-expansion": "tsx src/scripts/propertyIntelligenceExpansionConformance.ts",
     "verify:property-operating-model": "tsx src/scripts/propertyOperatingModelConformance.ts",
-    "verify:property-value-indication": "tsx src/scripts/propertyValueIndicationConformance.ts"
+    "verify:property-value-indication": "tsx src/scripts/propertyValueIndicationConformance.ts",
+    "verify:master-volume-build-parity": "tsx src/scripts/verifyMasterVolumeBuildParity.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

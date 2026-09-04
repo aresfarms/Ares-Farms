@@ -1,5 +1,5 @@
 {
-  "frameworkVersion": "master-volume-conformance-v0.6.0",
+  "frameworkVersion": "master-volume-conformance-v0.7.0",
   "createdAt": "2026-05-31",
   "sourceDocuments": [
     "Furlong_Volume_0_Platform_Orientation.pdf",
@@ -25,7 +25,14 @@
     "IMPLEMENTATION_WORKPACKAGES_Revenue_Intelligence_Runtime_Build.docx",
     "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf",
     "Furlong_Lender_Submission_Governed_Implementation_Package.pdf",
-    "Furlong_Volume_VII_Governed_External_Actions_and_Signature_Execution_Master.pdf"
+    "Furlong_Volume_VII_Governed_External_Actions_and_Signature_Execution_Master.pdf",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+    "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+    "COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
+    "OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
+    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md"
   ],
   "allowedStatuses": [
     "implemented",
@@ -2766,7 +2773,7 @@
       ]
     },
     "ADA-508-OPS-001": {
-      "title": "Master Volume doctrine — ADA-508-OPS-001",
+      "title": "Master Volume doctrine \u2014 ADA-508-OPS-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2788,7 +2795,7 @@
       "outstandingObligations": []
     },
     "AI-ETHICS-001": {
-      "title": "Master Volume doctrine — AI-ETHICS-001",
+      "title": "Master Volume doctrine \u2014 AI-ETHICS-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2817,7 +2824,7 @@
       "outstandingObligations": []
     },
     "AI-ORCH-ENGINE-001": {
-      "title": "Master Volume doctrine — AI-ORCH-ENGINE-001",
+      "title": "Master Volume doctrine \u2014 AI-ORCH-ENGINE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2852,7 +2859,7 @@
       "outstandingObligations": []
     },
     "AI-TIER-001": {
-      "title": "Master Volume doctrine — AI-TIER-001",
+      "title": "Master Volume doctrine \u2014 AI-TIER-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2882,7 +2889,7 @@
       "outstandingObligations": []
     },
     "AI-TRAIN-001": {
-      "title": "Master Volume doctrine — AI-TRAIN-001",
+      "title": "Master Volume doctrine \u2014 AI-TRAIN-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2910,7 +2917,7 @@
       "outstandingObligations": []
     },
     "AMENDMENT-LOG-001": {
-      "title": "Master Volume doctrine — AMENDMENT-LOG-001",
+      "title": "Master Volume doctrine \u2014 AMENDMENT-LOG-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2934,7 +2941,7 @@
       "outstandingObligations": []
     },
     "API-GOV-001": {
-      "title": "Master Volume doctrine — API-GOV-001",
+      "title": "Master Volume doctrine \u2014 API-GOV-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2960,7 +2967,7 @@
       "outstandingObligations": []
     },
     "BORROWER-TRUST-001": {
-      "title": "Master Volume doctrine — BORROWER-TRUST-001",
+      "title": "Master Volume doctrine \u2014 BORROWER-TRUST-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -2988,7 +2995,7 @@
       "outstandingObligations": []
     },
     "CANON-AI-TIER-001": {
-      "title": "Master Volume doctrine — CANON-AI-TIER-001",
+      "title": "Master Volume doctrine \u2014 CANON-AI-TIER-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3015,7 +3022,7 @@
       "outstandingObligations": []
     },
     "CANON-CONSENT-001": {
-      "title": "Master Volume doctrine — CANON-CONSENT-001",
+      "title": "Master Volume doctrine \u2014 CANON-CONSENT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3053,7 +3060,7 @@
       "outstandingObligations": []
     },
     "CANON-CONTINUITY-001": {
-      "title": "Master Volume doctrine — CANON-CONTINUITY-001",
+      "title": "Master Volume doctrine \u2014 CANON-CONTINUITY-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3084,7 +3091,7 @@
       ]
     },
     "CANON-DATALIFECYCLE-001": {
-      "title": "Master Volume doctrine — CANON-DATALIFECYCLE-001",
+      "title": "Master Volume doctrine \u2014 CANON-DATALIFECYCLE-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3114,7 +3121,7 @@
       ]
     },
     "CANON-EVENT-001": {
-      "title": "Master Volume doctrine — CANON-EVENT-001",
+      "title": "Master Volume doctrine \u2014 CANON-EVENT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3142,7 +3149,7 @@
       "outstandingObligations": []
     },
     "CANON-EXPL-001": {
-      "title": "Master Volume doctrine — CANON-EXPL-001",
+      "title": "Master Volume doctrine \u2014 CANON-EXPL-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3171,7 +3178,7 @@
       "outstandingObligations": []
     },
     "CANON-EXTSOURCE-001": {
-      "title": "Master Volume doctrine — CANON-EXTSOURCE-001",
+      "title": "Master Volume doctrine \u2014 CANON-EXTSOURCE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3208,29 +3215,41 @@
       "outstandingObligations": []
     },
     "CANON-FACILITATE-001": {
-      "title": "Master Volume doctrine — CANON-FACILITATE-001",
+      "title": "Master Volume doctrine \u2014 CANON-FACILITATE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
       ],
       "tests": [
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:capital-network",
+        "verify:capital-network-execution",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "src/lib/financing/capitalNetworkRuntime.ts",
+        "src/lib/financing/capitalNetworkExecutionReliability.ts",
+        "src/scripts/capitalNetworkConformance.ts",
+        "src/scripts/capitalNetworkExecutionReliabilityConformance.ts"
       ],
-      "reconciliationBasis": "CANON-FACILITATE-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "CANON-FACILITATE-001 remains implemented under the 2026-09-04 current-build amendment: Furlong facilitates rather than decides; provider matching is neutral; compensation and affiliation do not influence ranking; the borrower chooses recipients; selection alone shares no file; and execution history is evidence-backed and only a sample-gated tie-break after equal suitability.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
-        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "CANON-FED-001": {
-      "title": "Master Volume doctrine — CANON-FED-001",
+      "title": "Master Volume doctrine \u2014 CANON-FED-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3255,7 +3274,7 @@
       "outstandingObligations": []
     },
     "CANON-MATERIALITY-001": {
-      "title": "Master Volume doctrine — CANON-MATERIALITY-001",
+      "title": "Master Volume doctrine \u2014 CANON-MATERIALITY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3281,7 +3300,7 @@
       "outstandingObligations": []
     },
     "CANON-OBS-001": {
-      "title": "Master Volume doctrine — CANON-OBS-001",
+      "title": "Master Volume doctrine \u2014 CANON-OBS-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3304,7 +3323,7 @@
       "outstandingObligations": []
     },
     "CANON-OVER-001": {
-      "title": "Master Volume doctrine — CANON-OVER-001",
+      "title": "Master Volume doctrine \u2014 CANON-OVER-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3330,7 +3349,7 @@
       "outstandingObligations": []
     },
     "CANON-SIM-001": {
-      "title": "Master Volume doctrine — CANON-SIM-001",
+      "title": "Master Volume doctrine \u2014 CANON-SIM-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3357,7 +3376,7 @@
       "outstandingObligations": []
     },
     "CANON-SOURCE-001": {
-      "title": "Master Volume doctrine — CANON-SOURCE-001",
+      "title": "Master Volume doctrine \u2014 CANON-SOURCE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3384,7 +3403,7 @@
       "outstandingObligations": []
     },
     "CANON-VER-001": {
-      "title": "Master Volume doctrine — CANON-VER-001",
+      "title": "Master Volume doctrine \u2014 CANON-VER-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3413,7 +3432,7 @@
       "outstandingObligations": []
     },
     "CERT-LIFECYCLE-001": {
-      "title": "Master Volume doctrine — CERT-LIFECYCLE-001",
+      "title": "Master Volume doctrine \u2014 CERT-LIFECYCLE-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3444,7 +3463,7 @@
       ]
     },
     "CERT-RUNTIME-001": {
-      "title": "Master Volume doctrine — CERT-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 CERT-RUNTIME-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3482,7 +3501,7 @@
       ]
     },
     "CERTIFICATION-AUTHORITY-001": {
-      "title": "Master Volume doctrine — CERTIFICATION-AUTHORITY-001",
+      "title": "Master Volume doctrine \u2014 CERTIFICATION-AUTHORITY-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3515,7 +3534,7 @@
       ]
     },
     "CERTIFICATION-HANDBOOK-001": {
-      "title": "Master Volume doctrine — CERTIFICATION-HANDBOOK-001",
+      "title": "Master Volume doctrine \u2014 CERTIFICATION-HANDBOOK-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3546,7 +3565,7 @@
       ]
     },
     "CERTIFICATION-LIFECYCLE-001": {
-      "title": "Master Volume doctrine — CERTIFICATION-LIFECYCLE-001",
+      "title": "Master Volume doctrine \u2014 CERTIFICATION-LIFECYCLE-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3579,7 +3598,7 @@
       ]
     },
     "CIVIC-RESILIENCE-001": {
-      "title": "Master Volume doctrine — CIVIC-RESILIENCE-001",
+      "title": "Master Volume doctrine \u2014 CIVIC-RESILIENCE-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3612,7 +3631,7 @@
       ]
     },
     "CONST-AGENCY-INGEST-001": {
-      "title": "Master Volume doctrine — CONST-AGENCY-INGEST-001",
+      "title": "Master Volume doctrine \u2014 CONST-AGENCY-INGEST-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3643,7 +3662,7 @@
       "outstandingObligations": []
     },
     "CONST-AI-001": {
-      "title": "Master Volume doctrine — CONST-AI-001",
+      "title": "Master Volume doctrine \u2014 CONST-AI-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3675,7 +3694,7 @@
       "outstandingObligations": []
     },
     "CONST-AI-002": {
-      "title": "Master Volume doctrine — CONST-AI-002",
+      "title": "Master Volume doctrine \u2014 CONST-AI-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3704,7 +3723,7 @@
       "outstandingObligations": []
     },
     "CONST-AI-003": {
-      "title": "Master Volume doctrine — CONST-AI-003",
+      "title": "Master Volume doctrine \u2014 CONST-AI-003",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3734,7 +3753,7 @@
       "outstandingObligations": []
     },
     "CONST-AISAFETY-001": {
-      "title": "Master Volume doctrine — CONST-AISAFETY-001",
+      "title": "Master Volume doctrine \u2014 CONST-AISAFETY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3762,7 +3781,7 @@
       "outstandingObligations": []
     },
     "CONST-ARCH-001": {
-      "title": "Master Volume doctrine — CONST-ARCH-001",
+      "title": "Master Volume doctrine \u2014 CONST-ARCH-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3785,7 +3804,7 @@
       "outstandingObligations": []
     },
     "CONST-BRAND-001": {
-      "title": "Master Volume doctrine — CONST-BRAND-001",
+      "title": "Master Volume doctrine \u2014 CONST-BRAND-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3808,7 +3827,7 @@
       "outstandingObligations": []
     },
     "CONST-CERT-001": {
-      "title": "Master Volume doctrine — CONST-CERT-001",
+      "title": "Master Volume doctrine \u2014 CONST-CERT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3836,7 +3855,7 @@
       "outstandingObligations": []
     },
     "CONST-CONSENT-001": {
-      "title": "Master Volume doctrine — CONST-CONSENT-001",
+      "title": "Master Volume doctrine \u2014 CONST-CONSENT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3866,7 +3885,7 @@
       "outstandingObligations": []
     },
     "CONST-DATA-002": {
-      "title": "Master Volume doctrine — CONST-DATA-002",
+      "title": "Master Volume doctrine \u2014 CONST-DATA-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3891,7 +3910,7 @@
       "outstandingObligations": []
     },
     "CONST-DATA-003": {
-      "title": "Master Volume doctrine — CONST-DATA-003",
+      "title": "Master Volume doctrine \u2014 CONST-DATA-003",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3914,7 +3933,7 @@
       "outstandingObligations": []
     },
     "CONST-DISCLOSURE-001": {
-      "title": "Master Volume doctrine — CONST-DISCLOSURE-001",
+      "title": "Master Volume doctrine \u2014 CONST-DISCLOSURE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3942,7 +3961,7 @@
       "outstandingObligations": []
     },
     "CONST-DISPUTE-001": {
-      "title": "Master Volume doctrine — CONST-DISPUTE-001",
+      "title": "Master Volume doctrine \u2014 CONST-DISPUTE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3965,7 +3984,7 @@
       "outstandingObligations": []
     },
     "CONST-FAIR-001": {
-      "title": "Master Volume doctrine — CONST-FAIR-001",
+      "title": "Master Volume doctrine \u2014 CONST-FAIR-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -3973,7 +3992,10 @@
       "tests": [
         "verify:human-authority",
         "verify:institutional-assurance",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:capital-network",
+        "verify:capital-network-execution",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
@@ -3983,21 +4005,30 @@
         "src/lib/human-authority/humanAuthorityRegistryRuntime.ts",
         "src/lib/governance/institutionalAssuranceRuntime.ts",
         "src/db/schema/institutionalAssuranceControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "src/lib/financing/capitalNetworkRuntime.ts",
+        "src/lib/financing/capitalNetworkExecutionReliability.ts",
+        "src/scripts/capitalNetworkConformance.ts",
+        "src/scripts/capitalNetworkExecutionReliabilityConformance.ts"
       ],
-      "reconciliationBasis": "CONST-FAIR-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "CONST-FAIR-001 remains implemented under the 2026-09-04 current-build amendment: Furlong facilitates rather than decides; provider matching is neutral; compensation and affiliation do not influence ranking; the borrower chooses recipients; selection alone shares no file; and execution history is evidence-backed and only a sample-gated tie-break after equal suitability.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
         "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
         "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
-        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "CONST-FAIR-002": {
-      "title": "Master Volume doctrine — CONST-FAIR-002",
+      "title": "Master Volume doctrine \u2014 CONST-FAIR-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4026,7 +4057,7 @@
       "outstandingObligations": []
     },
     "CONST-GOV-001": {
-      "title": "Master Volume doctrine — CONST-GOV-001",
+      "title": "Master Volume doctrine \u2014 CONST-GOV-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4056,7 +4087,7 @@
       "outstandingObligations": []
     },
     "CONST-GOV-002": {
-      "title": "Master Volume doctrine — CONST-GOV-002",
+      "title": "Master Volume doctrine \u2014 CONST-GOV-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4084,7 +4115,7 @@
       "outstandingObligations": []
     },
     "CONST-GOV-003": {
-      "title": "Master Volume doctrine — CONST-GOV-003",
+      "title": "Master Volume doctrine \u2014 CONST-GOV-003",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4111,7 +4142,7 @@
       "outstandingObligations": []
     },
     "CONST-ID-001": {
-      "title": "Master Volume doctrine — CONST-ID-001",
+      "title": "Master Volume doctrine \u2014 CONST-ID-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4133,7 +4164,7 @@
       "outstandingObligations": []
     },
     "CONST-JURIS-001": {
-      "title": "Master Volume doctrine — CONST-JURIS-001",
+      "title": "Master Volume doctrine \u2014 CONST-JURIS-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4161,7 +4192,7 @@
       "outstandingObligations": []
     },
     "CONST-OPEN-001": {
-      "title": "Master Volume doctrine — CONST-OPEN-001",
+      "title": "Master Volume doctrine \u2014 CONST-OPEN-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4189,7 +4220,7 @@
       "outstandingObligations": []
     },
     "CONST-PATHWAY-001": {
-      "title": "Master Volume doctrine — CONST-PATHWAY-001",
+      "title": "Master Volume doctrine \u2014 CONST-PATHWAY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4226,7 +4257,7 @@
       "outstandingObligations": []
     },
     "CONST-PRIV-001": {
-      "title": "Master Volume doctrine — CONST-PRIV-001",
+      "title": "Master Volume doctrine \u2014 CONST-PRIV-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4254,7 +4285,7 @@
       "outstandingObligations": []
     },
     "CONST-RESILIENCE-001": {
-      "title": "Master Volume doctrine — CONST-RESILIENCE-001",
+      "title": "Master Volume doctrine \u2014 CONST-RESILIENCE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4283,7 +4314,7 @@
       "outstandingObligations": []
     },
     "CONST-SEC-001": {
-      "title": "Master Volume doctrine — CONST-SEC-001",
+      "title": "Master Volume doctrine \u2014 CONST-SEC-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4314,7 +4345,7 @@
       "outstandingObligations": []
     },
     "CONST-SUCCESSOR-001": {
-      "title": "Master Volume doctrine — CONST-SUCCESSOR-001",
+      "title": "Master Volume doctrine \u2014 CONST-SUCCESSOR-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4341,7 +4372,7 @@
       ]
     },
     "CONSTITUTIONAL-AUDIT-001": {
-      "title": "Master Volume doctrine — CONSTITUTIONAL-AUDIT-001",
+      "title": "Master Volume doctrine \u2014 CONSTITUTIONAL-AUDIT-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4373,7 +4404,7 @@
       "outstandingObligations": []
     },
     "CONSTITUTIONAL-CANON-001": {
-      "title": "Master Volume doctrine — CONSTITUTIONAL-CANON-001",
+      "title": "Master Volume doctrine \u2014 CONSTITUTIONAL-CANON-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4400,7 +4431,7 @@
       "outstandingObligations": []
     },
     "CONSTITUTIONAL-COMPENDIUM-001": {
-      "title": "Master Volume doctrine — CONSTITUTIONAL-COMPENDIUM-001",
+      "title": "Master Volume doctrine \u2014 CONSTITUTIONAL-COMPENDIUM-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4427,7 +4458,7 @@
       "outstandingObligations": []
     },
     "CONSTITUTIONAL-SUCCESSION-001": {
-      "title": "Master Volume doctrine — CONSTITUTIONAL-SUCCESSION-001",
+      "title": "Master Volume doctrine \u2014 CONSTITUTIONAL-SUCCESSION-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4462,7 +4493,7 @@
       ]
     },
     "CONTINUITY-OPS-001": {
-      "title": "Master Volume doctrine — CONTINUITY-OPS-001",
+      "title": "Master Volume doctrine \u2014 CONTINUITY-OPS-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4496,7 +4527,7 @@
       ]
     },
     "CONTINUITY-STATE-001": {
-      "title": "Master Volume doctrine — CONTINUITY-STATE-001",
+      "title": "Master Volume doctrine \u2014 CONTINUITY-STATE-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4530,7 +4561,7 @@
       ]
     },
     "CROSS-GENERATIONAL-001": {
-      "title": "Master Volume doctrine — CROSS-GENERATIONAL-001",
+      "title": "Master Volume doctrine \u2014 CROSS-GENERATIONAL-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4552,7 +4583,7 @@
       "outstandingObligations": []
     },
     "DATA-MODEL-001": {
-      "title": "Master Volume doctrine — DATA-MODEL-001",
+      "title": "Master Volume doctrine \u2014 DATA-MODEL-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4584,7 +4615,7 @@
       "outstandingObligations": []
     },
     "DATA-RETENTION-001": {
-      "title": "Master Volume doctrine — DATA-RETENTION-001",
+      "title": "Master Volume doctrine \u2014 DATA-RETENTION-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4610,7 +4641,7 @@
       "outstandingObligations": []
     },
     "DEPLOYMENT-RUNTIME-001": {
-      "title": "Master Volume doctrine — DEPLOYMENT-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 DEPLOYMENT-RUNTIME-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4636,7 +4667,7 @@
       "outstandingObligations": []
     },
     "DOCTRINE-CODE-001": {
-      "title": "Master Volume doctrine — DOCTRINE-CODE-001",
+      "title": "Master Volume doctrine \u2014 DOCTRINE-CODE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4662,7 +4693,7 @@
       "outstandingObligations": []
     },
     "DOCTRINE-INHERITANCE-MAP-001": {
-      "title": "Master Volume doctrine — DOCTRINE-INHERITANCE-MAP-001",
+      "title": "Master Volume doctrine \u2014 DOCTRINE-INHERITANCE-MAP-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4689,7 +4720,7 @@
       "outstandingObligations": []
     },
     "DODD-FRANK-1071-001": {
-      "title": "Master Volume doctrine — DODD-FRANK-1071-001",
+      "title": "Master Volume doctrine \u2014 DODD-FRANK-1071-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4716,7 +4747,7 @@
       ]
     },
     "DR-RUNTIME-001": {
-      "title": "Master Volume doctrine — DR-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 DR-RUNTIME-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4753,7 +4784,7 @@
       ]
     },
     "ECON-CONFLICT-001": {
-      "title": "Master Volume doctrine — ECON-CONFLICT-001",
+      "title": "Master Volume doctrine \u2014 ECON-CONFLICT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4761,7 +4792,10 @@
       "tests": [
         "verify:borrower-financial-controls",
         "smoke:stripe-connect-allocation",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:capital-network",
+        "verify:capital-network-execution",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
@@ -4769,19 +4803,28 @@
         "src/lib/financing/financingFeeSchedule.ts",
         "src/lib/treasury/borrowerFinancialControlStore.ts",
         "src/db/schema/borrowerFinancialControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "src/lib/financing/capitalNetworkRuntime.ts",
+        "src/lib/financing/capitalNetworkExecutionReliability.ts",
+        "src/scripts/capitalNetworkConformance.ts",
+        "src/scripts/capitalNetworkExecutionReliabilityConformance.ts"
       ],
-      "reconciliationBasis": "ECON-CONFLICT-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "ECON-CONFLICT-001 remains implemented under the 2026-09-04 current-build amendment: Furlong facilitates rather than decides; provider matching is neutral; compensation and affiliation do not influence ranking; the borrower chooses recipients; selection alone shares no file; and execution history is evidence-backed and only a sample-gated tie-break after equal suitability.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
-        "Furlong_Volume_I_Constitutional_Backbone_Master.pdf"
+        "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "ECON-CONFLICT-REG-001": {
-      "title": "Master Volume doctrine — ECON-CONFLICT-REG-001",
+      "title": "Master Volume doctrine \u2014 ECON-CONFLICT-REG-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4789,25 +4832,37 @@
       "tests": [
         "verify:borrower-financial-controls",
         "smoke:stripe-connect-allocation",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:capital-network",
+        "verify:capital-network-execution",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/financingFeeSchedule.ts",
         "src/lib/treasury/borrowerFinancialControlStore.ts",
         "src/db/schema/borrowerFinancialControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "src/lib/financing/capitalNetworkRuntime.ts",
+        "src/lib/financing/capitalNetworkExecutionReliability.ts",
+        "src/scripts/capitalNetworkConformance.ts",
+        "src/scripts/capitalNetworkExecutionReliabilityConformance.ts"
       ],
-      "reconciliationBasis": "ECON-CONFLICT-REG-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "ECON-CONFLICT-REG-001 remains implemented under the 2026-09-04 current-build amendment: Furlong facilitates rather than decides; provider matching is neutral; compensation and affiliation do not influence ranking; the borrower chooses recipients; selection alone shares no file; and execution history is evidence-backed and only a sample-gated tie-break after equal suitability.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "ENG-ALIGN-001": {
-      "title": "Master Volume doctrine — ENG-ALIGN-001",
+      "title": "Master Volume doctrine \u2014 ENG-ALIGN-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4834,7 +4889,7 @@
       "outstandingObligations": []
     },
     "EVENT-ARCH-001": {
-      "title": "Master Volume doctrine — EVENT-ARCH-001",
+      "title": "Master Volume doctrine \u2014 EVENT-ARCH-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4859,7 +4914,7 @@
       "outstandingObligations": []
     },
     "EXECUTIVE-CONSTITUTION-001": {
-      "title": "Master Volume doctrine — EXECUTIVE-CONSTITUTION-001",
+      "title": "Master Volume doctrine \u2014 EXECUTIVE-CONSTITUTION-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4886,7 +4941,7 @@
       "outstandingObligations": []
     },
     "EXPORT-ENGINE-001": {
-      "title": "Master Volume doctrine — EXPORT-ENGINE-001",
+      "title": "Master Volume doctrine \u2014 EXPORT-ENGINE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4907,7 +4962,7 @@
       "outstandingObligations": []
     },
     "FED-DATAFLOW-001": {
-      "title": "Master Volume doctrine — FED-DATAFLOW-001",
+      "title": "Master Volume doctrine \u2014 FED-DATAFLOW-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4934,7 +4989,7 @@
       "outstandingObligations": []
     },
     "FEDERATED-OPERATIONS-001": {
-      "title": "Master Volume doctrine — FEDERATED-OPERATIONS-001",
+      "title": "Master Volume doctrine \u2014 FEDERATED-OPERATIONS-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4956,7 +5011,7 @@
       "outstandingObligations": []
     },
     "FEDERATION-CHARTER-001": {
-      "title": "Master Volume doctrine — FEDERATION-CHARTER-001",
+      "title": "Master Volume doctrine \u2014 FEDERATION-CHARTER-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -4984,7 +5039,7 @@
       "outstandingObligations": []
     },
     "FINAL-CONSTITUTION-001": {
-      "title": "Master Volume doctrine — FINAL-CONSTITUTION-001",
+      "title": "Master Volume doctrine \u2014 FINAL-CONSTITUTION-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5012,7 +5067,7 @@
       "outstandingObligations": []
     },
     "FOUNDATIONAL-CHARTER-001": {
-      "title": "Master Volume doctrine — FOUNDATIONAL-CHARTER-001",
+      "title": "Master Volume doctrine \u2014 FOUNDATIONAL-CHARTER-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5039,7 +5094,7 @@
       "outstandingObligations": []
     },
     "FUTURE-GOVERNANCE-001": {
-      "title": "Master Volume doctrine — FUTURE-GOVERNANCE-001",
+      "title": "Master Volume doctrine \u2014 FUTURE-GOVERNANCE-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5072,7 +5127,7 @@
       "outstandingObligations": []
     },
     "GLOSSARY-ARCH-001": {
-      "title": "Master Volume doctrine — GLOSSARY-ARCH-001",
+      "title": "Master Volume doctrine \u2014 GLOSSARY-ARCH-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5099,7 +5154,7 @@
       "outstandingObligations": []
     },
     "GOV-COMMS-001": {
-      "title": "Master Volume doctrine — GOV-COMMS-001",
+      "title": "Master Volume doctrine \u2014 GOV-COMMS-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5135,7 +5190,7 @@
       ]
     },
     "GOV-CONFORMANCE-001": {
-      "title": "Master Volume doctrine — GOV-CONFORMANCE-001",
+      "title": "Master Volume doctrine \u2014 GOV-CONFORMANCE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5161,7 +5216,7 @@
       "outstandingObligations": []
     },
     "GOV-GLOSSARY-001": {
-      "title": "Master Volume doctrine — GOV-GLOSSARY-001",
+      "title": "Master Volume doctrine \u2014 GOV-GLOSSARY-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5189,7 +5244,7 @@
       "outstandingObligations": []
     },
     "GOV-RUNTIME-001": {
-      "title": "Master Volume doctrine — GOV-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 GOV-RUNTIME-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5222,7 +5277,7 @@
       "outstandingObligations": []
     },
     "GOVERNANCE-METRICS-001": {
-      "title": "Master Volume doctrine — GOVERNANCE-METRICS-001",
+      "title": "Master Volume doctrine \u2014 GOVERNANCE-METRICS-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5254,7 +5309,7 @@
       "outstandingObligations": []
     },
     "HITL-GOV-001": {
-      "title": "Master Volume doctrine — HITL-GOV-001",
+      "title": "Master Volume doctrine \u2014 HITL-GOV-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5301,7 +5356,7 @@
       "outstandingObligations": []
     },
     "HUMAN-GOV-001": {
-      "title": "Master Volume doctrine — HUMAN-GOV-001",
+      "title": "Master Volume doctrine \u2014 HUMAN-GOV-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5330,7 +5385,7 @@
       "outstandingObligations": []
     },
     "HUMAN-GOV-RUNTIME-001": {
-      "title": "Master Volume doctrine — HUMAN-GOV-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 HUMAN-GOV-RUNTIME-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5356,7 +5411,7 @@
       "outstandingObligations": []
     },
     "HUMANITY-PRINCIPLE-001": {
-      "title": "Master Volume doctrine — HUMANITY-PRINCIPLE-001",
+      "title": "Master Volume doctrine \u2014 HUMANITY-PRINCIPLE-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5383,7 +5438,7 @@
       "outstandingObligations": []
     },
     "IMPL-SEQ-001": {
-      "title": "Master Volume doctrine — IMPL-SEQ-001",
+      "title": "Master Volume doctrine \u2014 IMPL-SEQ-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5410,7 +5465,7 @@
       "outstandingObligations": []
     },
     "IMPLEMENTATION-WORKPACKAGES-001": {
-      "title": "Master Volume doctrine — IMPLEMENTATION-WORKPACKAGES-001",
+      "title": "Master Volume doctrine \u2014 IMPLEMENTATION-WORKPACKAGES-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5436,7 +5491,7 @@
       "outstandingObligations": []
     },
     "INCIDENT-BREACH-001": {
-      "title": "Master Volume doctrine — INCIDENT-BREACH-001",
+      "title": "Master Volume doctrine \u2014 INCIDENT-BREACH-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5467,7 +5522,7 @@
       ]
     },
     "INCIDENT-RUNTIME-001": {
-      "title": "Master Volume doctrine — INCIDENT-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 INCIDENT-RUNTIME-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5494,7 +5549,7 @@
       "outstandingObligations": []
     },
     "INSTITUTIONAL-MEMORY-001": {
-      "title": "Master Volume doctrine — INSTITUTIONAL-MEMORY-001",
+      "title": "Master Volume doctrine \u2014 INSTITUTIONAL-MEMORY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5515,7 +5570,7 @@
       "outstandingObligations": []
     },
     "KNOWLEDGE-GRAPH-001": {
-      "title": "Master Volume doctrine — KNOWLEDGE-GRAPH-001",
+      "title": "Master Volume doctrine \u2014 KNOWLEDGE-GRAPH-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5536,7 +5591,7 @@
       "outstandingObligations": []
     },
     "LEGACY-TRANSFORMATION-001": {
-      "title": "Master Volume doctrine — LEGACY-TRANSFORMATION-001",
+      "title": "Master Volume doctrine \u2014 LEGACY-TRANSFORMATION-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5557,7 +5612,7 @@
       "outstandingObligations": []
     },
     "LENDER-INTEROP-001": {
-      "title": "Master Volume doctrine — LENDER-INTEROP-001",
+      "title": "Master Volume doctrine \u2014 LENDER-INTEROP-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5588,7 +5643,7 @@
       ]
     },
     "LENDER-OPS-ARCH-001": {
-      "title": "Master Volume doctrine — LENDER-OPS-ARCH-001",
+      "title": "Master Volume doctrine \u2014 LENDER-OPS-ARCH-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5619,7 +5674,7 @@
       ]
     },
     "MASTER-INDEX-001": {
-      "title": "Master Volume doctrine — MASTER-INDEX-001",
+      "title": "Master Volume doctrine \u2014 MASTER-INDEX-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5645,7 +5700,7 @@
       "outstandingObligations": []
     },
     "OBS-ENGINE-001": {
-      "title": "Master Volume doctrine — OBS-ENGINE-001",
+      "title": "Master Volume doctrine \u2014 OBS-ENGINE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5667,7 +5722,7 @@
       "outstandingObligations": []
     },
     "ONBOARDING-ARCH-001": {
-      "title": "Master Volume doctrine — ONBOARDING-ARCH-001",
+      "title": "Master Volume doctrine \u2014 ONBOARDING-ARCH-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5689,7 +5744,7 @@
       "outstandingObligations": []
     },
     "OPS-AML-001": {
-      "title": "Master Volume doctrine — OPS-AML-001",
+      "title": "Master Volume doctrine \u2014 OPS-AML-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5725,7 +5780,7 @@
       ]
     },
     "OPS-AUDIT-001": {
-      "title": "Master Volume doctrine — OPS-AUDIT-001",
+      "title": "Master Volume doctrine \u2014 OPS-AUDIT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5754,7 +5809,7 @@
       "outstandingObligations": []
     },
     "OPS-BORROWER-001": {
-      "title": "Master Volume doctrine — OPS-BORROWER-001",
+      "title": "Master Volume doctrine \u2014 OPS-BORROWER-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5781,7 +5836,7 @@
       "outstandingObligations": []
     },
     "OPS-CERT-001": {
-      "title": "Master Volume doctrine — OPS-CERT-001",
+      "title": "Master Volume doctrine \u2014 OPS-CERT-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5812,7 +5867,7 @@
       ]
     },
     "OPS-COMMS-001": {
-      "title": "Master Volume doctrine — OPS-COMMS-001",
+      "title": "Master Volume doctrine \u2014 OPS-COMMS-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5843,7 +5898,7 @@
       ]
     },
     "OPS-CONN-002": {
-      "title": "Master Volume doctrine — OPS-CONN-002",
+      "title": "Master Volume doctrine \u2014 OPS-CONN-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5882,7 +5937,7 @@
       "outstandingObligations": []
     },
     "OPS-CONSENT-001": {
-      "title": "Master Volume doctrine — OPS-CONSENT-001",
+      "title": "Master Volume doctrine \u2014 OPS-CONSENT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5910,7 +5965,7 @@
       "outstandingObligations": []
     },
     "OPS-CONTINUITY-001": {
-      "title": "Master Volume doctrine — OPS-CONTINUITY-001",
+      "title": "Master Volume doctrine \u2014 OPS-CONTINUITY-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5943,7 +5998,7 @@
       ]
     },
     "OPS-DR-001": {
-      "title": "Master Volume doctrine — OPS-DR-001",
+      "title": "Master Volume doctrine \u2014 OPS-DR-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -5974,7 +6029,7 @@
       ]
     },
     "OPS-DRTEST-001": {
-      "title": "Master Volume doctrine — OPS-DRTEST-001",
+      "title": "Master Volume doctrine \u2014 OPS-DRTEST-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6008,7 +6063,7 @@
       ]
     },
     "OPS-FSA-001": {
-      "title": "Master Volume doctrine — OPS-FSA-001",
+      "title": "Master Volume doctrine \u2014 OPS-FSA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6016,26 +6071,33 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "OPS-FSA-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-FSA-001 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
         "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
-        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-FSA-002": {
-      "title": "Master Volume doctrine — OPS-FSA-002",
+      "title": "Master Volume doctrine \u2014 OPS-FSA-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6043,24 +6105,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "OPS-FSA-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-FSA-002 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_IV_Operational_Runbooks_Master.pdf"
+        "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-GEO-001": {
-      "title": "Master Volume doctrine — OPS-GEO-001",
+      "title": "Master Volume doctrine \u2014 OPS-GEO-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6087,7 +6156,7 @@
       "outstandingObligations": []
     },
     "OPS-INTEL-001": {
-      "title": "Master Volume doctrine — OPS-INTEL-001",
+      "title": "Master Volume doctrine \u2014 OPS-INTEL-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6110,7 +6179,7 @@
       "outstandingObligations": []
     },
     "OPS-KYC-001": {
-      "title": "Master Volume doctrine — OPS-KYC-001",
+      "title": "Master Volume doctrine \u2014 OPS-KYC-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6143,7 +6212,7 @@
       ]
     },
     "OPS-LENDER-001": {
-      "title": "Master Volume doctrine — OPS-LENDER-001",
+      "title": "Master Volume doctrine \u2014 OPS-LENDER-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6176,7 +6245,7 @@
       ]
     },
     "OPS-LICENSE-001": {
-      "title": "Master Volume doctrine — OPS-LICENSE-001",
+      "title": "Master Volume doctrine \u2014 OPS-LICENSE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6198,7 +6267,7 @@
       "outstandingObligations": []
     },
     "OPS-MODEL-001": {
-      "title": "Master Volume doctrine — OPS-MODEL-001",
+      "title": "Master Volume doctrine \u2014 OPS-MODEL-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6231,7 +6300,7 @@
       ]
     },
     "OPS-REGCHANGE-001": {
-      "title": "Master Volume doctrine — OPS-REGCHANGE-001",
+      "title": "Master Volume doctrine \u2014 OPS-REGCHANGE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6259,7 +6328,7 @@
       "outstandingObligations": []
     },
     "OPS-REGISTRY-001": {
-      "title": "Master Volume doctrine — OPS-REGISTRY-001",
+      "title": "Master Volume doctrine \u2014 OPS-REGISTRY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6285,7 +6354,7 @@
       "outstandingObligations": []
     },
     "OPS-RESEARCH-001": {
-      "title": "Master Volume doctrine — OPS-RESEARCH-001",
+      "title": "Master Volume doctrine \u2014 OPS-RESEARCH-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6307,7 +6376,7 @@
       "outstandingObligations": []
     },
     "OPS-RETAIN-001": {
-      "title": "Master Volume doctrine — OPS-RETAIN-001",
+      "title": "Master Volume doctrine \u2014 OPS-RETAIN-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6337,7 +6406,7 @@
       "outstandingObligations": []
     },
     "OPS-SBA-001": {
-      "title": "Master Volume doctrine — OPS-SBA-001",
+      "title": "Master Volume doctrine \u2014 OPS-SBA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6345,26 +6414,33 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "OPS-SBA-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-SBA-001 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
         "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
-        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-SBA-002": {
-      "title": "Master Volume doctrine — OPS-SBA-002",
+      "title": "Master Volume doctrine \u2014 OPS-SBA-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6372,24 +6448,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "OPS-SBA-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-SBA-002 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_IV_Operational_Runbooks_Master.pdf"
+        "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-SCORE-001": {
-      "title": "Master Volume doctrine — OPS-SCORE-001",
+      "title": "Master Volume doctrine \u2014 OPS-SCORE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6397,7 +6480,10 @@
       "tests": [
         "verify:human-authority",
         "verify:institutional-assurance",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "smoke:readiness-assessment",
+        "verify:property-operating-model",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
@@ -6405,20 +6491,36 @@
         "src/lib/human-authority/humanAuthorityRegistryRuntime.ts",
         "src/lib/governance/institutionalAssuranceRuntime.ts",
         "src/db/schema/institutionalAssuranceControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/readiness/readinessAssessment.ts",
+        "src/lib/property/propertyOperatingModel.ts",
+        "src/lib/capital-graph/programRegistry.ts",
+        "src/app/api/rank/route.ts",
+        "src/app/api/test-score/route.ts",
+        "src/services/scoring/calculatePropertyScore.ts",
+        "src/app/portfolio/page.tsx",
+        "src/LOCKED_MODULES.md",
+        "docs/BACKEND_COVERAGE_MATRIX.md",
+        "src/components/public/FarmFinancialHealthCheck.tsx",
+        "src/lib/property/farmFinancialScorecard.ts"
       ],
-      "reconciliationBasis": "OPS-SCORE-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-SCORE-001 is reconciled to the current 2026-09-04 build: nonresidential Furlong readiness/property scoring is operational or property/project-side, not a personal-credit financing-likelihood score. Legacy credit-score, household DTI, personal-income, personal-liquidity and personal-net-worth scoring language is superseded for nonresidential Furlong Core; residential is a separately governed exception and provider underwriting remains provider-owned.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
         "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
-        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-SCORE-002": {
-      "title": "Master Volume doctrine — OPS-SCORE-002",
+      "title": "Master Volume doctrine \u2014 OPS-SCORE-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6426,7 +6528,10 @@
       "tests": [
         "verify:human-authority",
         "verify:institutional-assurance",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "smoke:readiness-assessment",
+        "verify:property-operating-model",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
@@ -6434,20 +6539,34 @@
         "src/lib/human-authority/humanAuthorityRegistryRuntime.ts",
         "src/lib/governance/institutionalAssuranceRuntime.ts",
         "src/db/schema/institutionalAssuranceControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/readiness/readinessAssessment.ts",
+        "src/lib/property/propertyOperatingModel.ts",
+        "src/lib/capital-graph/programRegistry.ts",
+        "src/app/api/rank/route.ts",
+        "src/app/api/test-score/route.ts",
+        "src/services/scoring/calculatePropertyScore.ts",
+        "src/app/portfolio/page.tsx",
+        "src/LOCKED_MODULES.md",
+        "docs/BACKEND_COVERAGE_MATRIX.md"
       ],
-      "reconciliationBasis": "OPS-SCORE-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-SCORE-002 is reconciled to the current 2026-09-04 build: nonresidential Furlong readiness/property scoring is operational or property/project-side, not a personal-credit financing-likelihood score. Legacy credit-score, household DTI, personal-income, personal-liquidity and personal-net-worth scoring language is superseded for nonresidential Furlong Core; residential is a separately governed exception and provider underwriting remains provider-owned.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
         "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
-        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-SCORING-001": {
-      "title": "Master Volume doctrine — OPS-SCORING-001",
+      "title": "Master Volume doctrine \u2014 OPS-SCORING-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6481,7 +6600,7 @@
       ]
     },
     "OPS-SEC-001": {
-      "title": "Master Volume doctrine — OPS-SEC-001",
+      "title": "Master Volume doctrine \u2014 OPS-SEC-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6516,7 +6635,7 @@
       ]
     },
     "OPS-SRE-001": {
-      "title": "Master Volume doctrine — OPS-SRE-001",
+      "title": "Master Volume doctrine \u2014 OPS-SRE-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6547,7 +6666,7 @@
       ]
     },
     "OPS-SUCCESSION-001": {
-      "title": "Master Volume doctrine — OPS-SUCCESSION-001",
+      "title": "Master Volume doctrine \u2014 OPS-SUCCESSION-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6578,7 +6697,7 @@
       ]
     },
     "OPS-USDA-001": {
-      "title": "Master Volume doctrine — OPS-USDA-001",
+      "title": "Master Volume doctrine \u2014 OPS-USDA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6586,25 +6705,32 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "OPS-USDA-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-USDA-001 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
-        "Furlong_Volume_I_Constitutional_Backbone_Master.pdf"
+        "Furlong_Volume_I_Constitutional_Backbone_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-USDA-002": {
-      "title": "Master Volume doctrine — OPS-USDA-002",
+      "title": "Master Volume doctrine \u2014 OPS-USDA-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6612,24 +6738,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "OPS-USDA-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-USDA-002 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_IV_Operational_Runbooks_Master.pdf"
+        "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-USDA-003": {
-      "title": "Master Volume doctrine — OPS-USDA-003",
+      "title": "Master Volume doctrine \u2014 OPS-USDA-003",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6637,26 +6770,33 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "OPS-USDA-003 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "OPS-USDA-003 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
         "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
-        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+        "Furlong_Volume_V_Canonical_Doctrines_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "OPS-VENDOR-001": {
-      "title": "Master Volume doctrine — OPS-VENDOR-001",
+      "title": "Master Volume doctrine \u2014 OPS-VENDOR-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6689,7 +6829,7 @@
       ]
     },
     "ORCH-ENGINE-001": {
-      "title": "Master Volume doctrine — ORCH-ENGINE-001",
+      "title": "Master Volume doctrine \u2014 ORCH-ENGINE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6718,7 +6858,7 @@
       "outstandingObligations": []
     },
     "OVERLAY-ENGINE-001": {
-      "title": "Master Volume doctrine — OVERLAY-ENGINE-001",
+      "title": "Master Volume doctrine \u2014 OVERLAY-ENGINE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6752,7 +6892,7 @@
       "outstandingObligations": []
     },
     "PERF-GOV-001": {
-      "title": "Master Volume doctrine — PERF-GOV-001",
+      "title": "Master Volume doctrine \u2014 PERF-GOV-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6788,7 +6928,7 @@
       ]
     },
     "PLATFORM-CUTOVER-001": {
-      "title": "Master Volume doctrine — PLATFORM-CUTOVER-001",
+      "title": "Master Volume doctrine \u2014 PLATFORM-CUTOVER-001",
       "status": "awaiting_controlled_promotion",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6818,7 +6958,7 @@
       ]
     },
     "PLATFORM-RUNTIME-001": {
-      "title": "Master Volume doctrine — PLATFORM-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 PLATFORM-RUNTIME-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6847,7 +6987,7 @@
       "outstandingObligations": []
     },
     "RATIFICATION-DECLARATION-001": {
-      "title": "Master Volume doctrine — RATIFICATION-DECLARATION-001",
+      "title": "Master Volume doctrine \u2014 RATIFICATION-DECLARATION-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6869,7 +7009,7 @@
       "outstandingObligations": []
     },
     "REG-1071-001": {
-      "title": "Master Volume doctrine — REG-1071-001",
+      "title": "Master Volume doctrine \u2014 REG-1071-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6895,7 +7035,7 @@
       ]
     },
     "REG-ACCESS-001": {
-      "title": "Master Volume doctrine — REG-ACCESS-001",
+      "title": "Master Volume doctrine \u2014 REG-ACCESS-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6924,7 +7064,7 @@
       "outstandingObligations": []
     },
     "REG-AML-001": {
-      "title": "Master Volume doctrine — REG-AML-001",
+      "title": "Master Volume doctrine \u2014 REG-AML-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6957,7 +7097,7 @@
       ]
     },
     "REG-BENEFICIAL-001": {
-      "title": "Master Volume doctrine — REG-BENEFICIAL-001",
+      "title": "Master Volume doctrine \u2014 REG-BENEFICIAL-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -6990,7 +7130,7 @@
       ]
     },
     "REG-BSA-001": {
-      "title": "Master Volume doctrine — REG-BSA-001",
+      "title": "Master Volume doctrine \u2014 REG-BSA-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7022,7 +7162,7 @@
       ]
     },
     "REG-ECOA-001": {
-      "title": "Master Volume doctrine — REG-ECOA-001",
+      "title": "Master Volume doctrine \u2014 REG-ECOA-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7056,7 +7196,7 @@
       ]
     },
     "REG-FAIRLEND-001": {
-      "title": "Master Volume doctrine — REG-FAIRLEND-001",
+      "title": "Master Volume doctrine \u2014 REG-FAIRLEND-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7089,7 +7229,7 @@
       ]
     },
     "REG-FSA-001": {
-      "title": "Master Volume doctrine — REG-FSA-001",
+      "title": "Master Volume doctrine \u2014 REG-FSA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7097,24 +7237,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-FSA-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-FSA-001 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-FSA-002": {
-      "title": "Master Volume doctrine — REG-FSA-002",
+      "title": "Master Volume doctrine \u2014 REG-FSA-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7122,24 +7269,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-FSA-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-FSA-002 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-GLBA-001": {
-      "title": "Master Volume doctrine — REG-GLBA-001",
+      "title": "Master Volume doctrine \u2014 REG-GLBA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7168,7 +7322,7 @@
       "outstandingObligations": []
     },
     "REG-KYC-001": {
-      "title": "Master Volume doctrine — REG-KYC-001",
+      "title": "Master Volume doctrine \u2014 REG-KYC-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7201,7 +7355,7 @@
       ]
     },
     "REG-LICENSE-001": {
-      "title": "Master Volume doctrine — REG-LICENSE-001",
+      "title": "Master Volume doctrine \u2014 REG-LICENSE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7224,7 +7378,7 @@
       "outstandingObligations": []
     },
     "REG-MODELRISK-001": {
-      "title": "Master Volume doctrine — REG-MODELRISK-001",
+      "title": "Master Volume doctrine \u2014 REG-MODELRISK-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7256,7 +7410,7 @@
       ]
     },
     "REG-OFAC-001": {
-      "title": "Master Volume doctrine — REG-OFAC-001",
+      "title": "Master Volume doctrine \u2014 REG-OFAC-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7289,7 +7443,7 @@
       ]
     },
     "REG-PATHWAY-001": {
-      "title": "Master Volume doctrine — REG-PATHWAY-001",
+      "title": "Master Volume doctrine \u2014 REG-PATHWAY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7315,7 +7469,7 @@
       "outstandingObligations": []
     },
     "REG-POLICY-001": {
-      "title": "Master Volume doctrine — REG-POLICY-001",
+      "title": "Master Volume doctrine \u2014 REG-POLICY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7342,7 +7496,7 @@
       "outstandingObligations": []
     },
     "REG-REGCHANGE-001": {
-      "title": "Master Volume doctrine — REG-REGCHANGE-001",
+      "title": "Master Volume doctrine \u2014 REG-REGCHANGE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7369,7 +7523,7 @@
       "outstandingObligations": []
     },
     "REG-RESPA-001": {
-      "title": "Master Volume doctrine — REG-RESPA-001",
+      "title": "Master Volume doctrine \u2014 REG-RESPA-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7401,7 +7555,7 @@
       ]
     },
     "REG-SBA-001": {
-      "title": "Master Volume doctrine — REG-SBA-001",
+      "title": "Master Volume doctrine \u2014 REG-SBA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7409,25 +7563,32 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-SBA-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-SBA-001 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-SBA-002": {
-      "title": "Master Volume doctrine — REG-SBA-002",
+      "title": "Master Volume doctrine \u2014 REG-SBA-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7435,24 +7596,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-SBA-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-SBA-002 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-SBA-003": {
-      "title": "Master Volume doctrine — REG-SBA-003",
+      "title": "Master Volume doctrine \u2014 REG-SBA-003",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7460,24 +7628,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-SBA-003 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-SBA-003 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-SCORE-001": {
-      "title": "Master Volume doctrine — REG-SCORE-001",
+      "title": "Master Volume doctrine \u2014 REG-SCORE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7485,7 +7660,10 @@
       "tests": [
         "verify:human-authority",
         "verify:institutional-assurance",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "smoke:readiness-assessment",
+        "verify:property-operating-model",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
@@ -7493,18 +7671,34 @@
         "src/lib/human-authority/humanAuthorityRegistryRuntime.ts",
         "src/lib/governance/institutionalAssuranceRuntime.ts",
         "src/db/schema/institutionalAssuranceControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/readiness/readinessAssessment.ts",
+        "src/lib/property/propertyOperatingModel.ts",
+        "src/lib/capital-graph/programRegistry.ts",
+        "src/app/api/rank/route.ts",
+        "src/app/api/test-score/route.ts",
+        "src/services/scoring/calculatePropertyScore.ts",
+        "src/app/portfolio/page.tsx",
+        "src/LOCKED_MODULES.md",
+        "docs/BACKEND_COVERAGE_MATRIX.md",
+        "src/components/public/FarmFinancialHealthCheck.tsx",
+        "src/lib/property/farmFinancialScorecard.ts"
       ],
-      "reconciliationBasis": "REG-SCORE-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-SCORE-001 is reconciled to the current 2026-09-04 build: nonresidential Furlong readiness/property scoring is operational or property/project-side, not a personal-credit financing-likelihood score. Legacy credit-score, household DTI, personal-income, personal-liquidity and personal-net-worth scoring language is superseded for nonresidential Furlong Core; residential is a separately governed exception and provider underwriting remains provider-owned.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-SCORE-002": {
-      "title": "Master Volume doctrine — REG-SCORE-002",
+      "title": "Master Volume doctrine \u2014 REG-SCORE-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7512,7 +7706,10 @@
       "tests": [
         "verify:human-authority",
         "verify:institutional-assurance",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "smoke:readiness-assessment",
+        "verify:property-operating-model",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
@@ -7520,18 +7717,32 @@
         "src/lib/human-authority/humanAuthorityRegistryRuntime.ts",
         "src/lib/governance/institutionalAssuranceRuntime.ts",
         "src/db/schema/institutionalAssuranceControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/readiness/readinessAssessment.ts",
+        "src/lib/property/propertyOperatingModel.ts",
+        "src/lib/capital-graph/programRegistry.ts",
+        "src/app/api/rank/route.ts",
+        "src/app/api/test-score/route.ts",
+        "src/services/scoring/calculatePropertyScore.ts",
+        "src/app/portfolio/page.tsx",
+        "src/LOCKED_MODULES.md",
+        "docs/BACKEND_COVERAGE_MATRIX.md"
       ],
-      "reconciliationBasis": "REG-SCORE-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-SCORE-002 is reconciled to the current 2026-09-04 build: nonresidential Furlong readiness/property scoring is operational or property/project-side, not a personal-credit financing-likelihood score. Legacy credit-score, household DTI, personal-income, personal-liquidity and personal-net-worth scoring language is superseded for nonresidential Furlong Core; residential is a separately governed exception and provider underwriting remains provider-owned.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-SCORE-003": {
-      "title": "Master Volume doctrine — REG-SCORE-003",
+      "title": "Master Volume doctrine \u2014 REG-SCORE-003",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7539,7 +7750,10 @@
       "tests": [
         "verify:human-authority",
         "verify:institutional-assurance",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "smoke:readiness-assessment",
+        "verify:property-operating-model",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
@@ -7547,18 +7761,32 @@
         "src/lib/human-authority/humanAuthorityRegistryRuntime.ts",
         "src/lib/governance/institutionalAssuranceRuntime.ts",
         "src/db/schema/institutionalAssuranceControls.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/readiness/readinessAssessment.ts",
+        "src/lib/property/propertyOperatingModel.ts",
+        "src/lib/capital-graph/programRegistry.ts",
+        "src/app/api/rank/route.ts",
+        "src/app/api/test-score/route.ts",
+        "src/services/scoring/calculatePropertyScore.ts",
+        "src/app/portfolio/page.tsx",
+        "src/LOCKED_MODULES.md",
+        "docs/BACKEND_COVERAGE_MATRIX.md"
       ],
-      "reconciliationBasis": "REG-SCORE-003 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-SCORE-003 is reconciled to the current 2026-09-04 build: nonresidential Furlong readiness/property scoring is operational or property/project-side, not a personal-credit financing-likelihood score. Legacy credit-score, household DTI, personal-income, personal-liquidity and personal-net-worth scoring language is superseded for nonresidential Furlong Core; residential is a separately governed exception and provider underwriting remains provider-owned.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-SCORING-001": {
-      "title": "Master Volume doctrine — REG-SCORING-001",
+      "title": "Master Volume doctrine \u2014 REG-SCORING-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7591,7 +7819,7 @@
       ]
     },
     "REG-STATE-001": {
-      "title": "Master Volume doctrine — REG-STATE-001",
+      "title": "Master Volume doctrine \u2014 REG-STATE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7614,7 +7842,7 @@
       "outstandingObligations": []
     },
     "REG-TPRM-001": {
-      "title": "Master Volume doctrine — REG-TPRM-001",
+      "title": "Master Volume doctrine \u2014 REG-TPRM-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7646,7 +7874,7 @@
       ]
     },
     "REG-USDA-001": {
-      "title": "Master Volume doctrine — REG-USDA-001",
+      "title": "Master Volume doctrine \u2014 REG-USDA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7654,25 +7882,32 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-USDA-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-USDA-001 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
         "Furlong_Volume_IV_Operational_Runbooks_Master.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-USDA-002": {
-      "title": "Master Volume doctrine — REG-USDA-002",
+      "title": "Master Volume doctrine \u2014 REG-USDA-002",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7680,24 +7915,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-USDA-002 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-USDA-002 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REG-USDA-003": {
-      "title": "Master Volume doctrine — REG-USDA-003",
+      "title": "Master Volume doctrine \u2014 REG-USDA-003",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7705,24 +7947,31 @@
       "tests": [
         "smoke:financing-pathway-engine-v2",
         "verify:program-registry",
-        "verify:master-volumes"
+        "verify:master-volumes",
+        "verify:master-volume-build-parity"
       ],
       "evidence": [
         "docs/master-volume-doctrine-inventory.json",
         "src/lib/financing/pathwayEngineV2Runtime.ts",
         "src/lib/capital-graph/programRegistry.ts",
-        "docs/master-volume-doctrine-reconciliation.json"
+        "docs/master-volume-doctrine-reconciliation.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "src/lib/financing/pathwayEngine.ts"
       ],
-      "reconciliationBasis": "REG-USDA-003 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
+      "reconciliationBasis": "REG-USDA-003 is implemented under the controlling 2026-09-04 scope as property/program-fit and evidence-navigation logic. Legacy language that had Furlong Core make person-side borrower financial determinations is superseded for nonresidential workflows: Program Registry person-side criteria are never verifiable by Furlong, and the selected provider owns borrower/business underwriting and any credit decision.",
       "masterSources": [
         "Furlong_Master_Cross_Reference_Index.pdf",
-        "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+        "Furlong_Volume_II_Regulatory_Governance_Master.pdf",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
     },
     "REGULATORY-MAPPING-001": {
-      "title": "Master Volume doctrine — REGULATORY-MAPPING-001",
+      "title": "Master Volume doctrine \u2014 REGULATORY-MAPPING-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7746,7 +7995,7 @@
       "outstandingObligations": []
     },
     "REPLAY-CERTIFICATION-001": {
-      "title": "Master Volume doctrine — REPLAY-CERTIFICATION-001",
+      "title": "Master Volume doctrine \u2014 REPLAY-CERTIFICATION-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7780,7 +8029,7 @@
       "outstandingObligations": []
     },
     "REPLAY-ENGINE-001": {
-      "title": "Master Volume doctrine — REPLAY-ENGINE-001",
+      "title": "Master Volume doctrine \u2014 REPLAY-ENGINE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7806,7 +8055,7 @@
       "outstandingObligations": []
     },
     "RESPA-GOV-001": {
-      "title": "Master Volume doctrine — RESPA-GOV-001",
+      "title": "Master Volume doctrine \u2014 RESPA-GOV-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7842,7 +8091,7 @@
       ]
     },
     "SANDBOX-RUNTIME-001": {
-      "title": "Master Volume doctrine — SANDBOX-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 SANDBOX-RUNTIME-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7870,7 +8119,7 @@
       "outstandingObligations": []
     },
     "SCHEMA-SINGULARITY-001": {
-      "title": "Master Volume doctrine — SCHEMA-SINGULARITY-001",
+      "title": "Master Volume doctrine \u2014 SCHEMA-SINGULARITY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7898,7 +8147,7 @@
       "outstandingObligations": []
     },
     "SEC-RUNTIME-001": {
-      "title": "Master Volume doctrine — SEC-RUNTIME-001",
+      "title": "Master Volume doctrine \u2014 SEC-RUNTIME-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7930,7 +8179,7 @@
       "outstandingObligations": []
     },
     "SIM-TEST-001": {
-      "title": "Master Volume doctrine — SIM-TEST-001",
+      "title": "Master Volume doctrine \u2014 SIM-TEST-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7955,7 +8204,7 @@
       "outstandingObligations": []
     },
     "STATE-PRIVACY-EXPANSION-001": {
-      "title": "Master Volume doctrine — STATE-PRIVACY-EXPANSION-001",
+      "title": "Master Volume doctrine \u2014 STATE-PRIVACY-EXPANSION-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -7981,7 +8230,7 @@
       "outstandingObligations": []
     },
     "TECH-AI-001": {
-      "title": "Master Volume doctrine — TECH-AI-001",
+      "title": "Master Volume doctrine \u2014 TECH-AI-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8010,7 +8259,7 @@
       "outstandingObligations": []
     },
     "TECH-API-001": {
-      "title": "Master Volume doctrine — TECH-API-001",
+      "title": "Master Volume doctrine \u2014 TECH-API-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8039,7 +8288,7 @@
       "outstandingObligations": []
     },
     "TECH-CACHE-001": {
-      "title": "Master Volume doctrine — TECH-CACHE-001",
+      "title": "Master Volume doctrine \u2014 TECH-CACHE-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8060,7 +8309,7 @@
       "outstandingObligations": []
     },
     "TECH-DR-001": {
-      "title": "Master Volume doctrine — TECH-DR-001",
+      "title": "Master Volume doctrine \u2014 TECH-DR-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8094,7 +8343,7 @@
       ]
     },
     "TECH-EXPORT-001": {
-      "title": "Master Volume doctrine — TECH-EXPORT-001",
+      "title": "Master Volume doctrine \u2014 TECH-EXPORT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8115,7 +8364,7 @@
       "outstandingObligations": []
     },
     "TECH-GEO-001": {
-      "title": "Master Volume doctrine — TECH-GEO-001",
+      "title": "Master Volume doctrine \u2014 TECH-GEO-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8142,7 +8391,7 @@
       "outstandingObligations": []
     },
     "TECH-ID-001": {
-      "title": "Master Volume doctrine — TECH-ID-001",
+      "title": "Master Volume doctrine \u2014 TECH-ID-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8165,7 +8414,7 @@
       "outstandingObligations": []
     },
     "TECH-INTEGRATION-001": {
-      "title": "Master Volume doctrine — TECH-INTEGRATION-001",
+      "title": "Master Volume doctrine \u2014 TECH-INTEGRATION-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8191,7 +8440,7 @@
       "outstandingObligations": []
     },
     "TECH-KYC-001": {
-      "title": "Master Volume doctrine — TECH-KYC-001",
+      "title": "Master Volume doctrine \u2014 TECH-KYC-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8223,7 +8472,7 @@
       ]
     },
     "TECH-LEDGER-001": {
-      "title": "Master Volume doctrine — TECH-LEDGER-001",
+      "title": "Master Volume doctrine \u2014 TECH-LEDGER-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8259,7 +8508,7 @@
       "outstandingObligations": []
     },
     "TECH-META-001": {
-      "title": "Master Volume doctrine — TECH-META-001",
+      "title": "Master Volume doctrine \u2014 TECH-META-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8286,7 +8535,7 @@
       "outstandingObligations": []
     },
     "TECH-MODEL-001": {
-      "title": "Master Volume doctrine — TECH-MODEL-001",
+      "title": "Master Volume doctrine \u2014 TECH-MODEL-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8322,7 +8571,7 @@
       ]
     },
     "TECH-NOTIFY-001": {
-      "title": "Master Volume doctrine — TECH-NOTIFY-001",
+      "title": "Master Volume doctrine \u2014 TECH-NOTIFY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8348,7 +8597,7 @@
       "outstandingObligations": []
     },
     "TECH-PROV-001": {
-      "title": "Master Volume doctrine — TECH-PROV-001",
+      "title": "Master Volume doctrine \u2014 TECH-PROV-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8377,7 +8626,7 @@
       "outstandingObligations": []
     },
     "TECH-REGISTRY-001": {
-      "title": "Master Volume doctrine — TECH-REGISTRY-001",
+      "title": "Master Volume doctrine \u2014 TECH-REGISTRY-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8404,7 +8653,7 @@
       "outstandingObligations": []
     },
     "TECH-RULES-001": {
-      "title": "Master Volume doctrine — TECH-RULES-001",
+      "title": "Master Volume doctrine \u2014 TECH-RULES-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8432,7 +8681,7 @@
       "outstandingObligations": []
     },
     "TECH-SCHEMA-001": {
-      "title": "Master Volume doctrine — TECH-SCHEMA-001",
+      "title": "Master Volume doctrine \u2014 TECH-SCHEMA-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8460,7 +8709,7 @@
       "outstandingObligations": []
     },
     "TECH-SCORE-001": {
-      "title": "Master Volume doctrine — TECH-SCORE-001",
+      "title": "Master Volume doctrine \u2014 TECH-SCORE-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8493,7 +8742,7 @@
       ]
     },
     "TECH-SCORING-001": {
-      "title": "Master Volume doctrine — TECH-SCORING-001",
+      "title": "Master Volume doctrine \u2014 TECH-SCORING-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8526,7 +8775,7 @@
       ]
     },
     "TECH-SEC-001": {
-      "title": "Master Volume doctrine — TECH-SEC-001",
+      "title": "Master Volume doctrine \u2014 TECH-SEC-001",
       "status": "partially_implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8562,7 +8811,7 @@
       ]
     },
     "TECH-TEST-001": {
-      "title": "Master Volume doctrine — TECH-TEST-001",
+      "title": "Master Volume doctrine \u2014 TECH-TEST-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8590,7 +8839,7 @@
       "outstandingObligations": []
     },
     "TECH-UX-001": {
-      "title": "Master Volume doctrine — TECH-UX-001",
+      "title": "Master Volume doctrine \u2014 TECH-UX-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8618,7 +8867,7 @@
       "outstandingObligations": []
     },
     "TECH-VAULT-001": {
-      "title": "Master Volume doctrine — TECH-VAULT-001",
+      "title": "Master Volume doctrine \u2014 TECH-VAULT-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8649,7 +8898,7 @@
       "outstandingObligations": []
     },
     "UNIVERSAL-PRINCIPLES-001": {
-      "title": "Master Volume doctrine — UNIVERSAL-PRINCIPLES-001",
+      "title": "Master Volume doctrine \u2014 UNIVERSAL-PRINCIPLES-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8684,7 +8933,7 @@
       "outstandingObligations": []
     },
     "VOL-0-001": {
-      "title": "Master Volume doctrine — VOL-0-001",
+      "title": "Master Volume doctrine \u2014 VOL-0-001",
       "status": "documentary_governance",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8705,7 +8954,7 @@
       "outstandingObligations": []
     },
     "BORROWER-UX-ARCH-001": {
-      "title": "Master Volume doctrine — BORROWER-UX-ARCH-001",
+      "title": "Master Volume doctrine \u2014 BORROWER-UX-ARCH-001",
       "status": "implemented",
       "requires": [
         "individual_doctrine_reconciliation"
@@ -8725,6 +8974,206 @@
       "reconciliationBasis": "BORROWER-UX-ARCH-001 is mapped to concrete platform code and verification evidence and is represented as implemented subject to its existing production/live-action gates.",
       "masterSources": [
         "Furlong_Volume_III_Technical_Infrastructure_Master.pdf"
+      ],
+      "operationallyComplete": true,
+      "outstandingObligations": []
+    },
+    "MASTER-BUILD-PARITY-2026-09-04": {
+      "title": "Current Master Volume Series to executable build parity",
+      "status": "implemented",
+      "requires": [
+        "current_series_and_runtime_machine_mirror_must_agree"
+      ],
+      "tests": [
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "docs/current-build-parity.json",
+        "docs/current-master-volume-registry.json",
+        "docs/versions.json",
+        "src/scripts/verifyMasterVolumeBuildParity.ts",
+        "docs/MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+        "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
+        "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
+        "src/app/api/rank/route.ts",
+        "src/app/api/test-score/route.ts",
+        "src/services/scoring/calculatePropertyScore.ts",
+        "src/app/portfolio/page.tsx",
+        "src/scripts/backendSmokeTest.ts",
+        "src/LOCKED_MODULES.md",
+        "docs/BACKEND_COVERAGE_MATRIX.md",
+        "src/components/public/FarmFinancialHealthCheck.tsx",
+        "src/lib/property/farmFinancialScorecard.ts"
+      ],
+      "reconciliationBasis": "The current-build amendment, machine parity mirror and executable verification gate bind the current Master Volume Series to schema/runtime hard rules and fail when the two drift.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+        "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md"
+      ],
+      "operationallyComplete": true,
+      "outstandingObligations": []
+    },
+    "CAPITAL-NETWORK-001": {
+      "title": "Multi-provider Capital Network with neutral matching and borrower choice",
+      "status": "partially_implemented",
+      "requires": [
+        "provider_onboarding_neutral_matching_borrower_selection_provider_scoped_deal_rooms"
+      ],
+      "tests": [
+        "verify:capital-network",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "docs/current-build-parity.json",
+        "src/db/schema/capitalNetwork.ts",
+        "src/lib/financing/capitalNetworkRuntime.ts",
+        "src/lib/financing/capitalNetworkStore.ts",
+        "src/lib/db/migrations/0056_capital_network_multi_provider.sql"
+      ],
+      "reconciliationBasis": "The multi-provider Capital Network is built in source with neutral matching, borrower selection and provider-scoped deal rooms; real provider certification and controlled deployment remain operational gates.",
+      "masterSources": [
+        "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
+      ],
+      "operationallyComplete": false,
+      "outstandingObligations": [
+        "Apply canonical migrations through 0057 in the governed environment.",
+        "Onboard/certify real providers before representing them as selectable.",
+        "Promote provider delivery adapters only through controlled authorization."
+      ]
+    },
+    "CAPITAL-NETWORK-EXECUTION-001": {
+      "title": "Evidence-backed provider execution reliability",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "verified_provider_case_outcomes_sample_gates_and_tie_break_only_ranking_use"
+      ],
+      "tests": [
+        "verify:capital-network-execution",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "docs/current-build-parity.json",
+        "src/db/schema/capitalNetwork.ts",
+        "src/lib/financing/capitalNetworkExecutionReliability.ts",
+        "src/lib/db/migrations/0057_capital_network_execution_reliability.sql",
+        "src/scripts/capitalNetworkExecutionReliabilityConformance.ts"
+      ],
+      "reconciliationBasis": "Execution-reliability code and migration are built and conformance-tested; migration 0057 and the corresponding application revision still require governed promotion before operational use.",
+      "masterSources": [
+        "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
+      ],
+      "operationallyComplete": false,
+      "outstandingObligations": [
+        "Apply migration 0057 through the governed migrator.",
+        "Promote the application revision through security/attestation gates.",
+        "Verify persisted outcome recording and customer/provider views in the deployed environment."
+      ]
+    },
+    "PROPERTY-AI-OPERATING-MODEL-001": {
+      "title": "AI-guided deterministic nonresidential property operating model",
+      "status": "implemented",
+      "requires": [
+        "deterministic_property_project_math_ai_interpretation_only_no_personal_financial_scoring"
+      ],
+      "tests": [
+        "verify:property-operating-model",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "docs/current-build-parity.json",
+        "src/lib/property/propertyOperatingModel.ts",
+        "src/lib/property/propertyOperatingModelAdvisor.ts",
+        "src/scripts/propertyOperatingModelConformance.ts"
+      ],
+      "reconciliationBasis": "The deterministic operating model and advisory AI boundary are implemented; nonresidential personal-financial scoring is explicitly prohibited and provider underwriting remains downstream.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
+      ],
+      "operationallyComplete": true,
+      "outstandingObligations": []
+    },
+    "PROPERTY-VALUE-INDICATION-001": {
+      "title": "Asset-type-specific Furlong Property Estimate screening",
+      "status": "implemented",
+      "requires": [
+        "asset_type_specific_valuation_and_no_unsupported_numeric_estimate"
+      ],
+      "tests": [
+        "verify:property-value-indication",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+        "docs/current-build-parity.json",
+        "src/lib/property/marketValueIndication.ts",
+        "src/scripts/propertyValueIndicationConformance.ts"
+      ],
+      "reconciliationBasis": "Residential, farm and commercial valuation screens use different evidence and unsupported numeric estimates fail closed; residential FHFA HPI is prohibited outside residential.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
+      ],
+      "operationallyComplete": true,
+      "outstandingObligations": []
+    },
+    "OWNER-CONTROLLED-PLATFORM-001": {
+      "title": "Owner-controlled platform governance and provider isolation",
+      "status": "implemented",
+      "requires": [
+        "current_owner_control_and_external_provider_no_platform_governance_authority"
+      ],
+      "tests": [
+        "verify:capital-network",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/governance/OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
+        "docs/current-build-parity.json",
+        "src/lib/auth/professionalRegistry.ts",
+        "src/lib/financing/capitalNetworkStore.ts"
+      ],
+      "reconciliationBasis": "Current governance is owner-controlled; external broker/provider workspaces are scoped professional surfaces and confer no ownership, treasury, architecture or platform-governance authority.",
+      "masterSources": [
+        "OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
+      ],
+      "operationallyComplete": true,
+      "outstandingObligations": []
+    },
+    "PROPERTY-INTELLIGENCE-2026-09-04": {
+      "title": "Property intelligence, conversion runway and progressive disclosure",
+      "status": "implemented",
+      "requires": [
+        "property_classification_best_use_conversion_environmental_dscr_financing_pathway_screen"
+      ],
+      "tests": [
+        "verify:property-intelligence-expansion",
+        "verify:property-value-indication",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+        "src/lib/property/marketValueIndication.ts",
+        "src/scripts/propertyIntelligenceExpansionConformance.ts",
+        "src/scripts/propertyValueIndicationConformance.ts"
+      ],
+      "reconciliationBasis": "The current property intelligence hierarchy, conversion runway, environmental/DSCR/financing integration and type-aware valuation are implemented as screening/advisory build capabilities.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []

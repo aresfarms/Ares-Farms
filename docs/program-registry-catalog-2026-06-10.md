@@ -1,6 +1,6 @@
 # Program Registry Catalog — 2026-06-10
 
-Reviewable inventory for the Furlong owner/operator + designated independent finance reviewer. Mark each program FREE or PAID in the
+Reviewable inventory for the owner/reviewer queue. Mark each program FREE or PAID in the
 "Free/Paid (decide)" column — `paywall_candidate` stays null in code until that
 review lands. "Property-verifiable" = every property-side criterion machine-checkable
 against a wired, cited dataset → can render a VERIFIED match (locked language).

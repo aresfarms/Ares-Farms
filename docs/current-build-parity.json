@@ -1,0 +1,77 @@
+{
+  "mirrorId": "master-volume-current-build-parity-v1.0.0",
+  "effectiveDate": "2026-09-04",
+  "controllingAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+  "canonicalSchemaTarget": "0057",
+  "capitalNetwork": {
+    "runtimeVersion": "capital-network-runtime-v1.1.0",
+    "sellsBorrowerLeads": false,
+    "auctionsBorrowerFiles": false,
+    "compensationInfluencesRanking": false,
+    "affiliationInfluencesRanking": false,
+    "shotgunRoutingAllowed": false,
+    "borrowerChoosesRecipients": true,
+    "exactRecipientConsentRequired": true,
+    "nonResidentialPersonalFinancialScoring": false,
+    "executionHistoryMayOnlyTieBreakAfterMinimumVerifiedSample": true
+  },
+  "executionReliability": {
+    "runtimeVersion": "capital-network-execution-reliability-v1.0.0",
+    "publicMinimumVerifiedOutcomes": 5,
+    "rankingTieBreakMinimumProviderDecisionOutcomes": 10,
+    "rankingUse": "tie-break-only-after-equal-suitability",
+    "borrowerOrExternalExitsExcludedFromProviderCloseRate": true,
+    "personalFinancialProfileInfluence": false,
+    "compensationInfluence": false,
+    "affiliationInfluence": false,
+    "interestRateInfluence": false
+  },
+  "programRegistry": {
+    "propertyProgramFitIsNotBorrowerApproval": true,
+    "personSideCriteriaVerifiableByFurlong": false,
+    "selectedProviderOwnsBorrowerBusinessUnderwriting": true
+  },
+  "nonResidential": {
+    "propertyProjectRankingOnly": true,
+    "personalCreditScoring": false,
+    "personalIncomeScoring": false,
+    "householdDtiScoring": false,
+    "personalAssetLiquidityNetWorthScoring": false,
+    "residentialExceptionPreserved": true
+  },
+  "valuation": {
+    "assetTypeSpecific": true,
+    "fhfaResidentialOnly": true,
+    "unsupportedNumericEstimateProhibited": true
+  },
+  "governance": {
+    "ownerControlledPlatform": true,
+    "retainedExternalBrokerHasPlatformGovernanceAuthority": false,
+    "providerAccessIsCaseScoped": true,
+    "providerAccessRequiresConsent": true
+  },
+  "changeRegister": "docs/MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+  "sourceSnapshot": "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
+  "buildProtocol": "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
+  "activeNonResidentialScoring": {
+    "rankRoute": "/api/rank",
+    "rankRuntimeVersion": "ranking-runtime-v0.2.0",
+    "diagnosticRoute": "/api/test-score",
+    "diagnosticRuntimeVersion": "property-project-diagnostic-v0.2.0",
+    "propertyProjectOnly": true,
+    "personalFinancialInputsRejected": true,
+    "personalFinancialScoring": false,
+    "legacyPersonalFinancialScoringReachableFromAppRoutes": false,
+    "selectedProviderOwnsBorrowerBusinessUnderwriting": true
+  },
+  "optionalCustomerCalculators": {
+    "farmFinancialSelfCheck": {
+      "clientSideOnly": true,
+      "sendsInputsToFurlongServer": false,
+      "persistsInputsAtFurlong": false,
+      "influencesNonResidentialPropertyScore": false,
+      "influencesFinancingPathwayRank": false,
+      "influencesProviderMatch": false
+    }
+  }
+}

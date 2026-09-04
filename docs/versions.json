@@ -1,95 +1,196 @@
 {
   "registryId": "current-master-volume-registry",
-  "generatedAt": "2026-06-01T20:35:02.012Z",
+  "generatedAt": "2026-09-04T22:18:53Z",
   "repository": "ares-farms",
-  "activeBuildDate": "2026-06-01",
-  "controllingRule": "This registry is the single machine-readable current-version pointer for build verification. Specific amended volume text controls over older compatibility rows.",
+  "activeBuildDate": "2026-09-04",
+  "controllingRule": "This registry is the machine-readable current-version pointer for build verification. The doctrine truth mirror requires an authoritative source, explicit platform status, existing evidence files, registered verification commands, and a reconciliation basis for every canonical doctrine. Later scoped amendments registered here control over conflicting older wording within their stated scope, while historical files remain preserved as versioned evidence. Mirror certification means documentation and platform state agree; it does not imply every doctrine is deployed, live, externally validated, certified, or production-authorized.",
   "documents": [
     {
       "key": "toc",
       "label": "Furlong Master Volume Series Unified TOC",
-      "governingVersion": "v1.0",
-      "file": "Furlong_Master_Volume_Series_Unified_TOC.pdf"
+      "governingVersion": "v1.2 - 2026-09-02 doctrine-mirror reconciliation",
+      "file": "Furlong_Master_Volume_Series_Unified_TOC_v1.2.pdf",
+      "note": "Current 253-doctrine file map and truth-mirror status; supersedes v1.1 parity statement."
     },
     {
       "key": "buildMatrix",
       "label": "Furlong Build Conformance & Cross-Reference Matrix",
-      "governingVersion": "v1.0",
+      "governingVersion": "v1.2",
       "file": "Furlong_Build_Conformance_Cross_Reference_Matrix.pdf"
     },
     {
       "key": "volume0",
       "label": "Furlong Volume 0 Platform Orientation",
-      "governingVersion": "v14.0",
-      "file": "Furlong_Volume_0_Platform_Orientation.pdf"
+      "governingVersion": "v14.2 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_0_Platform_Orientation_v14.2.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeI",
       "label": "Ares/Furlong Volume I Constitutional Backbone Master",
-      "governingVersion": "v29.0",
-      "file": "Furlong_Volume_I_Constitutional_Backbone_Master.pdf"
+      "governingVersion": "v31.2 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_I_Constitutional_Backbone_Master_v31.2.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeII",
       "label": "Ares/Furlong Volume II Regulatory Governance Master",
-      "governingVersion": "v23.0 compatibility state",
-      "file": "Furlong_Volume_II_Regulatory_Governance_Master.pdf"
+      "governingVersion": "v25.2 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_II_Regulatory_Governance_Master_v25.2.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeIII",
       "label": "Ares/Furlong Volume III Technical Infrastructure Master",
-      "governingVersion": "v25.0",
-      "file": "Furlong_Volume_III_Technical_Infrastructure_Master.pdf"
+      "governingVersion": "v25.2 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_III_Technical_Infrastructure_Master_v25.2.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeIII-B",
       "label": "Ares/Furlong Volume III-B Governance Runtime Master",
-      "governingVersion": "v4.0",
-      "file": "Furlong_Volume_III_B_Governance_Runtime_Master.pdf"
+      "governingVersion": "v4.2 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_III_B_Governance_Runtime_Master_v4.2.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeIV",
       "label": "Ares/Furlong Volume IV Operational Runbooks Master",
-      "governingVersion": "v22.0",
-      "file": "Furlong_Volume_IV_Operational_Runbooks_Master.pdf"
+      "governingVersion": "v23.2 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_IV_Operational_Runbooks_Master_v23.2.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeV",
       "label": "Ares/Furlong Volume V Canonical Doctrines Master",
-      "governingVersion": "v10.0",
-      "file": "Furlong_Volume_V_Canonical_Doctrines_Master.pdf"
+      "governingVersion": "v10.2 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_V_Canonical_Doctrines_Master_v10.2.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeVI",
       "label": "Ares/Furlong Volume VI Source Intelligence Integration Master",
-      "governingVersion": "v1.1",
-      "file": "Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf"
+      "governingVersion": "v1.4 - doctrine mirror v3 annotation",
+      "file": "Furlong_Volume_VI_Source_Intelligence_Integration_Master_v1.4.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
     },
     {
       "key": "volumeVII",
       "label": "Furlong Volume VII Unified Governance Conformance Matrix",
-      "governingVersion": "v1.0 active conformance matrix",
+      "governingVersion": "v1.0",
       "file": "Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf",
-      "note": "Active conformance proof layer for unified governance, build verification, and doctrine-to-code traceability."
+      "note": "Authoritative doctrine-to-runtime conformance matrix; does not by itself certify unresolved doctrines as implemented."
     },
     {
       "key": "xref",
       "label": "Ares/Furlong Master Cross-Reference Index",
-      "governingVersion": "v22.0 active build-control reference",
-      "file": "Furlong_Master_Cross_Reference_Index.pdf",
-      "note": "The supplied copy still carries some v21.0 compatibility rows; later amended volume text and the active build matrix control."
+      "governingVersion": "v24.1 - doctrine mirror v3 annotation",
+      "file": "Furlong_Master_Cross_Reference_Index_v24.1.pdf",
+      "note": "Versioned doctrine text preserved; September 2 doctrine-mirror v3 annotation controls platform-status interpretation."
+    },
+    {
+      "key": "doctrineMirrorAmendment",
+      "label": "Master Volume Amendment - Doctrine Mirror Reconciliation",
+      "governingVersion": "v3.0 - 2026-09-02",
+      "file": "Furlong_Master_Volume_Amendment_2026-09-02_Doctrine_Mirror_Reconciliation_v3.pdf",
+      "note": "Current supplementary truth record: 253/253 canonical doctrines individually reconciled; 53 remain expressly non-operational."
+    },
+    {
+      "key": "currentBuildParityAmendment",
+      "label": "Master Volume Amendment - Current Build Parity",
+      "governingVersion": "2026-09-04 controlling current-build amendment",
+      "file": "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+      "note": "Controls current property/program/provider boundaries, Capital Network neutrality, execution reliability, valuation-method scope, owner-controlled governance, and schema target 0057 where older exported wording conflicts."
     }
   ],
   "supportingDocuments": [
-    "Furlong_Master_Series_Hub.html",
-    "Volume_VI_Consolidation_and_Changes_Summary.md",
+    "Furlong_Master_Series_Hub_v1.1.html",
     "Furlong_Customer_Version.pdf",
-    "Furlong_Governance_Doctrines_Master_Series.pdf"
+    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-02.md",
+    "Furlong_Master_Volume_Series_Unified_TOC_v1.2.pdf",
+    "Furlong_Master_Volume_Amendment_2026-09-02_Doctrine_Mirror_Reconciliation_v3.pdf",
+    "Furlong_Master_Cross_Reference_Index_v24.1.pdf",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+    "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+    "COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
+    "OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
+    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md"
   ],
   "repositoryEvidence": [
     "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
     "docs/master-volume-requirements.json",
     "docs/BACKEND_COVERAGE_MATRIX.md",
-    "docs/BACKEND_MODULE_READINESS_DECISION.md"
-  ]
+    "docs/BACKEND_MODULE_READINESS_DECISION.md",
+    "docs/MASTER_VOLUME_AMENDMENT_INSTITUTIONAL_ACCESS.md",
+    "src/lib/governance/institutionalAbacDisclosure.ts",
+    "src/lib/governance/compelledDisclosureCeremony.ts",
+    "src/lib/governance/institutionalAccessSurveillance.ts",
+    "src/lib/governance/institutionalAccessRuntimeEnforcement.ts",
+    "docs/doctrine/CANON_SIGNATURE_EXECUTION_001.md",
+    "docs/TECH_PDF_EXECUTION_001.md",
+    "docs/runbooks/OPS_SIGNATURE_EXECUTION_001.md",
+    "docs/master-volume-doctrine-inventory.json",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-02_PLATFORM_TRUTH_FINANCIAL_CONTROLS_V2.md",
+    "src/db/schema/borrowerFinancialControls.ts",
+    "src/lib/treasury/borrowerFinancialControlStore.ts",
+    "src/scripts/borrowerFinancialControlConformance.ts",
+    "src/lib/db/migrations/0054_borrower_financial_control_chain.sql",
+    "docs/master-volume-doctrine-reconciliation.json",
+    "docs/master-volume-doctrine-reconciliation-evidence.json",
+    "src/db/schema/institutionalAssuranceControls.ts",
+    "src/lib/governance/institutionalAssuranceRuntime.ts",
+    "src/scripts/institutionalAssuranceConformance.ts",
+    "src/lib/db/migrations/0055_institutional_assurance_controls.sql",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-02_DOCTRINE_MIRROR_RECONCILIATION_V3.md",
+    "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+    "src/db/schema/capitalNetwork.ts",
+    "src/lib/financing/capitalNetworkRuntime.ts",
+    "src/lib/financing/capitalNetworkGovernance.ts",
+    "src/lib/financing/capitalNetworkStore.ts",
+    "src/scripts/capitalNetworkConformance.ts",
+    "src/lib/db/migrations/0056_capital_network_multi_provider.sql",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+    "docs/current-build-parity.json",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+    "docs/COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
+    "docs/governance/OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
+    "src/lib/capital-graph/programRegistry.ts",
+    "src/lib/financing/pathwayEngine.ts",
+    "src/lib/readiness/readinessAssessment.ts",
+    "src/lib/financing/capitalNetworkExecutionReliability.ts",
+    "src/lib/property/propertyOperatingModel.ts",
+    "src/lib/property/marketValueIndication.ts",
+    "src/lib/db/canonicalGovernanceMigrations.ts",
+    "src/lib/db/migrations/0057_capital_network_execution_reliability.sql",
+    "src/scripts/capitalNetworkExecutionReliabilityConformance.ts",
+    "src/scripts/propertyOperatingModelConformance.ts",
+    "src/scripts/propertyValueIndicationConformance.ts",
+    "src/scripts/verifyMasterVolumeBuildParity.ts",
+    "docs/MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+    "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
+    "src/app/api/rank/route.ts",
+    "src/app/api/test-score/route.ts",
+    "src/services/scoring/calculatePropertyScore.ts",
+    "src/app/portfolio/page.tsx",
+    "src/scripts/backendSmokeTest.ts",
+    "src/LOCKED_MODULES.md",
+    "src/components/public/FarmFinancialHealthCheck.tsx",
+    "src/lib/property/farmFinancialScorecard.ts",
+    "src/scripts/backendModuleReadinessGate.ts"
+  ],
+  "buildBinding": {
+    "branch": "feature/ai-operating-model-20260904",
+    "behaviorBaselineCommit": "8ead373",
+    "canonicalSchemaTarget": "0057",
+    "capitalNetworkRuntimeVersion": "capital-network-runtime-v1.1.0",
+    "capitalNetworkReliabilityVersion": "capital-network-execution-reliability-v1.0.0",
+    "parityMirror": "docs/current-build-parity.json",
+    "parityGate": "verify:master-volume-build-parity",
+    "nonResidentialRankRuntimeVersion": "ranking-runtime-v0.2.0",
+    "nonResidentialDiagnosticRuntimeVersion": "property-project-diagnostic-v0.2.0",
+    "activeNonResidentialScoring": "property-project-only; personal-financial scoring inputs rejected"
+  }
 }

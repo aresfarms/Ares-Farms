@@ -1,55 +1,68 @@
 # Master Volume Source Snapshot
 
-This snapshot records the governing Master Volume files used by the backend build as of 2026-05-31.
+This snapshot records the governing Master Volume files and current scoped supplements used by the Furlong build as of **2026-09-04**.
 
-The source DOCX/PDF/HTML/MD files live at:
+The maintained source PDF/DOCX/HTML/MD files live at:
 
 `/Users/caitlinhudson/Documents/Master Build Volume Documents 05-2026/`
+
+The machine-readable current-version pointer is `docs/current-master-volume-registry.json`. The executable semantic mirror is `docs/current-build-parity.json` and is enforced by `npm run verify:master-volume-build-parity` as part of the normal Master Volume verification chain.
 
 ## Current Governing Versions
 
 | Document | Governing Version |
 | --- | --- |
-| Furlong Master Volume Series Unified TOC | v1.0 |
-| Furlong Build Conformance & Cross-Reference Matrix | v1.0 |
-| Furlong Volume 0 Platform Orientation | v14.0 |
-| Ares/Furlong Volume I Constitutional Backbone Master | v29.0 |
-| Ares/Furlong Volume II Regulatory Governance Master | v23.0 compatibility state |
-| Ares/Furlong Volume III Technical Infrastructure Master | v25.0 |
-| Ares/Furlong Volume III-B Governance Runtime Master | v4.0 |
-| Ares/Furlong Volume IV Operational Runbooks Master | v22.0 |
-| Ares/Furlong Volume V Canonical Doctrines Master | v10.0 |
-| Ares/Furlong Volume VI Source Intelligence Integration Master | v1.1 |
-| Furlong Volume VII Unified Governance Conformance Matrix | v1.0 active conformance matrix |
-| Ares/Furlong Master Cross-Reference Index | v22.0 active build-control reference |
+| Furlong Master Volume Series Unified TOC | v1.2 |
+| Furlong Build Conformance & Cross-Reference Matrix | v1.2 |
+| Furlong Volume 0 Platform Orientation | v14.2 current annotated |
+| Ares/Furlong Volume I Constitutional Backbone Master | v31.2 current annotated |
+| Ares/Furlong Volume II Regulatory Governance Master | v25.2 current annotated |
+| Ares/Furlong Volume III Technical Infrastructure Master | v25.2 current annotated |
+| Ares/Furlong Volume III-B Governance Runtime Master | v4.2 current annotated |
+| Ares/Furlong Volume IV Operational Runbooks Master | v23.2 current annotated |
+| Ares/Furlong Volume V Canonical Doctrines Master | v10.2 current annotated |
+| Ares/Furlong Volume VI Source Intelligence Integration Master | v1.4 current annotated |
+| Furlong Volume VII Unified Governance Conformance Matrix | v1.0 |
+| Ares/Furlong Master Cross-Reference Index | v24.1 current annotated |
+| Doctrine Mirror Reconciliation | v3 — 2026-09-02 |
+| Current Build Parity amendment | 2026-09-04 controlling scoped amendment |
+| Master Series Hub | v1.1, updated 2026-09-04 for current parity |
 
-Note: the supplied Master Cross-Reference Index and Build Conformance Matrix still
-show some earlier compatibility rows, while the individual Volume I, III, IV, and
-V files contain the Batch 25 environmental governance amendments. Until Caitlin
-issues the next consolidated Master Series update, specific amended volume text
-controls over older index rows for Batch 25 environmental scope, schema, fee,
-provider-license, and borrower-journey requirements.
+### Current source-build binding
 
-## Source File Hashes
+- Branch: `feature/ai-operating-model-20260904`
+- Behavior baseline at reconciliation: `8ead373`
+- Canonical schema target: `0057`
+- Capital Network runtime: `capital-network-runtime-v1.1.0`
+- Capital Network execution-reliability runtime: `capital-network-execution-reliability-v1.0.0`
+- Active nonresidential ranking runtime: `ranking-runtime-v0.2.0`
+- Active nonresidential diagnostic runtime: `property-project-diagnostic-v0.2.0`
+- Current parity supplement: `MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md`
 
-These hashes help confirm whether the local PDF files changed again.
+The earlier exported PDFs remain historical/versioned evidence. Where the September 4 parity amendment expressly changes the implementation meaning of an older provision, the later scoped amendment controls. In particular, nonresidential Furlong Core is property/project anchored; person-side financial underwriting belongs to the selected provider. Residential is the separately governed exception.
+
+## Current Source File Hashes
+
+These SHA-256 values identify the actual maintained current files reviewed for this reconciliation.
 
 | File | SHA-256 |
 | --- | --- |
-| `Furlong_Volume_0_Platform_Orientation.pdf` | `54e51f85d1ac1b5a0f134bccdbb0e6ce213e67534952463434c4fb5147126e6b` |
-| `Furlong_Volume_I_Constitutional_Backbone_Master.pdf` | `6e379c94fec16ea61ce480836baa877b2aa744a4a1f04a04288684a004078bc6` |
-| `Furlong_Volume_II_Regulatory_Governance_Master.pdf` | `97bf5fa0a9d5682e3cbebf7eae5c46b3335df31597e07eda5fb0b530b4101df9` |
-| `Furlong_Volume_III_Technical_Infrastructure_Master.pdf` | `51d238a450d15a6fd3037e973d3daa5562976e05f80adaf40288ac454a382466` |
-| `Furlong_Volume_III_B_Governance_Runtime_Master.pdf` | `b0aa74475ae49d10e7332bc5342820643df4ce6ef1e5c2c9ba740b1db291db9d` |
-| `Furlong_Volume_IV_Operational_Runbooks_Master.pdf` | `5b680a045bbb5876e40da19092853a1ee99fae1814d657e0fac3044ef70cb816` |
-| `Furlong_Volume_V_Canonical_Doctrines_Master.pdf` | `7c91a6e3d07212bd0b7e04f88260a2d59828a5bb5b134fbab124b41bc597db92` |
-| `Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf` | `4d66b37f228726c063a17ce36723b89da935a0a7ba26570a88049f237730b204` |
-| `Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf` | `0bfc1f11ed79fa0a4723d73918b0e37998e42bc8d1ffb65ef755c41acc7c2530` |
-| `Furlong_Master_Cross_Reference_Index.pdf` | `07faff413ceadbd1a6cd83e239a2fe22ff135a1d30b72e2b2b883a463af321f0` |
-| `Furlong_Master_Volume_Series_Unified_TOC.pdf` | `a90777cdcc6cd1176bef4bbccd1fd434f5956be25a5a69ac386c2c425f7866be` |
-| `Furlong_Build_Conformance_Cross_Reference_Matrix.pdf` | `07bd0f9dd3ed05a8b8878e63f26d9eb7fab2235c98636232a753bf7a0ee30b16` |
-| `Furlong_Master_Series_Hub.html` | `f953cfe7f1d04a5f6f08855c1b1cb7c964f78c3a12ac3ff14b827f85b149c191` |
-| `Volume_VI_Consolidation_and_Changes_Summary.md` | `c44802c3f8c782e6ca86b7934b805a4671baf3c6b0d7668f645384f4d1d26f76` |
+| `Furlong_Master_Volume_Series_Unified_TOC_v1.2.pdf` | `c40cf035036d05a9f2134c437cd1c12847b2cd6d2ed12dd0defdd2741b2cc007` |
+| `Furlong_Build_Conformance_Cross_Reference_Matrix.pdf` | `d76b82c6162abe1b46e6205e2da0267ca245092b9e443d4925eebdf00280441b` |
+| `Furlong_Volume_0_Platform_Orientation_v14.2.pdf` | `7bf4f78e6e6b8c5fe99ab79102dd2bf6e1458b6dfe1fc2bd0dfca7189e73d9a0` |
+| `Furlong_Volume_I_Constitutional_Backbone_Master_v31.2.pdf` | `e3de19ba7620e68e213665a76e1846388e2932ccb6651a81c85296eb7ad459e4` |
+| `Furlong_Volume_II_Regulatory_Governance_Master_v25.2.pdf` | `a833f650631f18f22c845f1b15e906226ae336f9684b0fc081f8f54e01226b62` |
+| `Furlong_Volume_III_Technical_Infrastructure_Master_v25.2.pdf` | `d6f311dd2584ec39a3d2a057269208047cd3d70ad26ef39a77667ae88e8e8737` |
+| `Furlong_Volume_III_B_Governance_Runtime_Master_v4.2.pdf` | `c200faf6e080902b78e5d60e845679f8ad5ab5a4df7b3d642d5614d848e6c1f5` |
+| `Furlong_Volume_IV_Operational_Runbooks_Master_v23.2.pdf` | `60fe2d192f1d1de1505a43accff2621fbd5da65c7a6fe5ce07d83e9d72641fca` |
+| `Furlong_Volume_V_Canonical_Doctrines_Master_v10.2.pdf` | `a3974e27a140d3402e78cd28a6a154edb9c5aaff11c556c9d6ede2094271e03f` |
+| `Furlong_Volume_VI_Source_Intelligence_Integration_Master_v1.4.pdf` | `397a28f130cda145d0228497643615be03add31b29fb9ddd954acf20a09cabf4` |
+| `Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf` | `04aadb41e21da21c3e169fbb9b9377fef4d99f2e88218a6a77c86026cbc3e4c7` |
+| `Furlong_Master_Cross_Reference_Index_v24.1.pdf` | `98e076a2c84946f639485dfc135eaca4d75c3ab847b420cf038e5adcfbb1bf4a` |
+| `Furlong_Master_Series_Hub_v1.1.html` | `de41790294c4b87a55d72e61de3207d447e4234ca7993ae85cb9cb9c04c7d9c5` |
+| `Furlong_Master_Volume_Amendment_2026-09-02_Doctrine_Mirror_Reconciliation_v3.pdf` | `a253af9041e89b5ee1cb8e8dccdd144a52eca122a0ccdc319a4f1870d8638733` |
+
+The unversioned compatibility copies may remain in the folder for historical links, but they are not the current-version pointer when a newer annotated/versioned file is registered above.
 
 ## Supplemental Governing Inputs
 
@@ -91,6 +104,13 @@ through Volume VI rather than as loose pending inputs.
 ## Backend-Impacting Updates
 
 The current backend build must incorporate these updated requirements:
+
+- The 2026-09-04 current-build parity amendment is a controlling scoped supplement. Its machine mirror is `docs/current-build-parity.json`, and `verify:master-volume-build-parity` is chained into the ordinary and strict Master Volume gates.
+- Nonresidential Furlong property/program/provider ranking is property/project anchored. Personal credit score, personal income, household DTI, personal assets/liquidity/net worth and similar personal-financial profile data are not Furlong ranking inputs; provider-side underwriting remains provider-owned. Residential remains the separately governed exception.
+- The Capital Network is multi-provider and borrower-choice based. Lead sale, file auction, shotgun routing, compensation preference and affiliate preference are prohibited hard rules.
+- Active `/api/rank` and `/api/test-score` scoring surfaces are property/project-only and reject personal-financial scoring inputs. The portfolio example uses the same current contract. Superseded applicant-credit scoring modules are quarantined and may not be imported into active API routes.
+- The current canonical source schema target is 0057. Migration 0056 creates the multi-provider Capital Network; migration 0057 creates evidence-backed provider execution reliability. Source presence does not imply that either migration has been applied to a deployed database.
+- Historical Volume II/IV scoring and SBA runbook wording is retained as versioned evidence. Where it conflicts with the current nonresidential implementation boundary above, the September 4 scoped amendment controls rather than silently rewriting the old PDF.
 
 - `Volume_VI_Consolidation_and_Changes_Summary.md` is a standing
   change-control input. It records Volume VI as the de-duplicated consolidation

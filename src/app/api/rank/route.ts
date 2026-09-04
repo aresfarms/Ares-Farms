@@ -36,16 +36,12 @@ import {
 type RankApplication = {
   id?: string | null;
   tenantId?: string | null;
-  score?: number | null;
-  rankScore?: number | null;
-  risk?: number | { volatility?: number | null; survivability?: number | null };
-  acreage?: number | null;
-  liquidity?: number | null;
-  scores?: {
-    sba?: number | null;
-    liquidity?: number | null;
-    [key: string]: unknown;
-  };
+  propertyReadinessScore?: number | null;
+  programFitScore?: number | null;
+  evidenceCompletenessScore?: number | null;
+  executionReadinessScore?: number | null;
+  environmentalReadinessScore?: number | null;
+  propertyRiskScore?: number | null;
   metadata?: Record<string, unknown>;
   [key: string]: unknown;
 };
@@ -65,7 +61,31 @@ type RankRequest = {
   applications?: RankApplication[];
   farms?: RankApplication[];
   metadata?: Record<string, unknown>;
+  [key: string]: unknown;
 };
+
+const FORBIDDEN_PERSONAL_FINANCIAL_RANKING_KEYS = new Set([
+  "creditscore",
+  "credit_score",
+  "liquidity",
+  "personalincome",
+  "householdincome",
+  "debttoincome",
+  "dti",
+  "personalnetworth",
+  "networth",
+  "personalassets",
+  "householdassets",
+]);
+
+function containsForbiddenRankingInput(value: unknown): boolean {
+  if (Array.isArray(value)) return value.some(containsForbiddenRankingInput);
+  if (!value || typeof value !== "object") return false;
+  return Object.entries(value as Record<string, unknown>).some(([key, child]) => {
+    const normalized = key.replace(/[^a-z0-9_]/gi, "").toLowerCase();
+    return FORBIDDEN_PERSONAL_FINANCIAL_RANKING_KEYS.has(normalized) || containsForbiddenRankingInput(child);
+  });
+}
 
 function createRankTraceId(): string {
   return `rank-${Date.now()}-${Math.random()
@@ -73,56 +93,40 @@ function createRankTraceId(): string {
     .slice(2, 10)}`;
 }
 
-function toSafeNumber(value: unknown): number {
+function clamp100(value: unknown): number {
   const numeric = Number(value);
-
-  if (!Number.isFinite(numeric)) {
-    return 0;
-  }
-
-  return numeric;
-}
-
-function toRiskPenalty(app: RankApplication): number {
-  if (typeof app.risk === "number") {
-    return toSafeNumber(app.risk);
-  }
-
-  if (app.risk && typeof app.risk === "object") {
-    return toSafeNumber(app.risk.volatility);
-  }
-
-  return 0;
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(100, numeric));
 }
 
 function computeRankScore(app: RankApplication): number {
-  const baseScore = toSafeNumber(app.score ?? app.rankScore);
-  const sbaScore = toSafeNumber(app.scores?.sba);
-  const liquidity = toSafeNumber(app.liquidity ?? app.scores?.liquidity);
-  const acreage = toSafeNumber(app.acreage);
-  const riskPenalty = toRiskPenalty(app);
+  const propertyReadiness = clamp100(app.propertyReadinessScore);
+  const programFit = clamp100(app.programFitScore);
+  const evidenceCompleteness = clamp100(app.evidenceCompletenessScore);
+  const executionReadiness = clamp100(app.executionReadinessScore);
+  const environmentalReadiness = clamp100(app.environmentalReadinessScore);
+  const propertyRisk = clamp100(app.propertyRiskScore);
 
-  return baseScore + sbaScore + liquidity + acreage - riskPenalty;
+  const positive =
+    propertyReadiness * 0.30 +
+    programFit * 0.25 +
+    evidenceCompleteness * 0.20 +
+    executionReadiness * 0.15 +
+    environmentalReadiness * 0.10;
+  return Math.max(0, Math.min(100, positive - propertyRisk * 0.15));
 }
 
 function normalizeApplications(body: RankRequest): RankApplication[] {
-  if (Array.isArray(body.applications)) {
-    return body.applications;
-  }
-
-  if (Array.isArray(body.farms)) {
-    return body.farms;
-  }
-
+  if (Array.isArray(body.applications)) return body.applications;
+  if (Array.isArray(body.farms)) return body.farms;
   return [];
 }
 
 function rankApplications(applications: RankApplication[]): RankedApplication[] {
   return applications
     .map((app, index) => {
-      const stableId = String(app.id ?? app.tenantId ?? `application-${index + 1}`);
+      const stableId = String(app.id ?? app.tenantId ?? `property-${index + 1}`);
       const computedRankScore = computeRankScore(app);
-
       return {
         ...app,
         id: stableId,
@@ -131,12 +135,8 @@ function rankApplications(applications: RankApplication[]): RankedApplication[] 
         rankScore: computedRankScore,
       };
     })
-    .sort((a, b) => b.computedRankScore - a.computedRankScore)
-    .map((app, index) => ({
-      ...app,
-      rank: index + 1,
-      rankPosition: index + 1,
-    }));
+    .sort((a, b) => b.computedRankScore - a.computedRankScore || a.id.localeCompare(b.id))
+    .map((app, index) => ({ ...app, rank: index + 1, rankPosition: index + 1 }));
 }
 
 export async function POST(req: NextRequest) {
@@ -145,11 +145,22 @@ export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as RankRequest;
 
+    if (containsForbiddenRankingInput(body)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Nonresidential property/project ranking does not accept personal-financial scoring inputs.",
+          governance: { traceId, propertyProjectOnly: true, selectedProviderOwnsBorrowerUnderwriting: true },
+        },
+        { status: 400 },
+      );
+    }
+
     const runtimeGuard = runRuntimeGuard({
-      operation: "ranking.execute",
+      operation: "property-project-ranking.execute",
       module: "api.rank",
       traceId,
-      schemaVersion: "ranking-runtime-v0.1.0",
+      schemaVersion: "ranking-runtime-v0.2.0",
       governanceVersion: "master-volumes-runtime-v0.1.0",
       classificationLevel: "CONFIDENTIAL",
       replayRef: traceId,
@@ -202,13 +213,13 @@ export async function POST(req: NextRequest) {
     }
 
     const versionRuntime = evaluateVersionRuntime({
-      operation: "ranking.execute",
+      operation: "property-project-ranking.execute",
       module: "api.rank",
       traceId,
       versions: [
         createRuntimeVersionRef(
           "schema",
-          "ranking-runtime-v0.1.0",
+          "ranking-runtime-v0.2.0",
           "src/app/api/rank/route.ts",
           traceId
         ),
@@ -232,7 +243,7 @@ export async function POST(req: NextRequest) {
         ),
         createRuntimeVersionRef(
           "rules",
-          "ranking-rules-v0.1.0",
+          "property-project-ranking-v0.2.0",
           "api.rank.runtime",
           traceId
         ),
@@ -251,7 +262,7 @@ export async function POST(req: NextRequest) {
         "governance",
       ],
       sharingPermissions: [
-        "regulated-ranking-review",
+        "property-project-ranking-review",
         "internal-ranking-operations",
       ],
       aiUsagePermissions: ["score", "rank", "explain"],
@@ -284,12 +295,12 @@ export async function POST(req: NextRequest) {
           "governance",
         ],
         sharingPermissions: [
-          "regulated-ranking-review",
+          "property-project-ranking-review",
           "internal-ranking-operations",
         ],
         aiUsagePermissions: ["score", "rank", "explain"],
         exportRestrictions: [
-          "not-a-final-credit-decision",
+          "not-underwriting-or-credit-decision",
           "requires-human-review",
         ],
         redactionRequirements: [
@@ -301,12 +312,12 @@ export async function POST(req: NextRequest) {
 
     const explanation = createExplanationLineage({
       outputIdentifier: traceId,
-      outputType: "borrower_ranking",
+      outputType: "property_project_ranking",
       audience: "internal",
       claimType: "recommendation",
       summary:
-        "Ranking executed through governed runtime controls using replay-safe scoring lineage.",
-      ruleVersion: "ranking-runtime-v0.1.0",
+        "Property/project ranking executed from property-side readiness inputs only through governed replay-safe runtime controls.",
+      ruleVersion: "ranking-runtime-v0.2.0",
       overlayRefs: [],
       confidenceScore: 0.75,
       humanReviewRequired: true,
@@ -315,6 +326,8 @@ export async function POST(req: NextRequest) {
       metadata: {
         rankedCount: ranked.length,
         notFinalCreditDecision: true,
+        personalFinancialScoring: false,
+        propertyProjectOnly: true,
       },
     });
 
@@ -323,7 +336,7 @@ export async function POST(req: NextRequest) {
       domain: "operations",
       severity: "INFO",
       message:
-        "Borrower/application ranking executed through governed runtime controls.",
+        "Property/project ranking executed through governed runtime controls.",
       traceId,
       replayRef: traceId,
       actorId: body.userId ?? body.borrowerId ?? null,
@@ -375,7 +388,7 @@ export async function POST(req: NextRequest) {
         verificationStatus: versionRuntime.ok ? "PASS" : "WARN",
         deterministic: true,
         replaySafe: versionRuntime.replaySafe,
-        sourceVersion: "ranking-runtime-v0.1.0",
+        sourceVersion: "ranking-runtime-v0.2.0",
         replayVersion: "governance-evidence-store-v0.1.0",
         eventCount: ranked.length,
         mismatchCount: versionRuntime.ok ? 0 : 1,
@@ -385,12 +398,12 @@ export async function POST(req: NextRequest) {
         },
         metadata: {
           route: "/api/rank",
-          operation: "ranking.execute",
+          operation: "property-project-ranking.execute",
         },
       },
       metadata: {
         route: "/api/rank",
-        operation: "ranking.execute",
+        operation: "property-project-ranking.execute",
       },
     });
 

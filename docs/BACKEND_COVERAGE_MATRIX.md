@@ -142,9 +142,9 @@ SOC 2/FedRAMP posture honesty.
 | Identity | `/api/auth/init`, `/api/auth/[...nextauth]`, `/api/user` | Governed session and user surfaces | `npm run smoke:auth`, `npm run smoke:backend` |
 | Role provisioning | `/api/auth/role-provisioning` | Governed elevated-role provisioning through authenticated session authority | `npm run smoke:auth-activation-policy`, `npm run auth:activation` |
 | API perimeter | `src/proxy.ts` over `/api/:path*` | Governed session enforcement, caller-claim conflict checks, and rate limiting | `npm run smoke:security-policy`, `npm run security:audit`, `npm run build` |
-| Diagnostics | `/api/test-score` | Governed backend diagnostic route | `npm run smoke:backend` |
+| Diagnostics | `/api/test-score` | Governed property/project-only diagnostic route; personal-financial scoring inputs fail closed | `npm run smoke:backend`, `npm run verify:master-volume-build-parity` |
 | Applications | `/api/onboard`, `/api/apply`, `/api/applications/admin` | Durable application/property persistence and admin/read | `npm run smoke:persistence`, `npm run smoke:applications-admin-read` |
-| Scoring and guidance | `/api/rank`, `/api/recommend`, `/api/decision` | Advisory, classified, replay-evidenced workflow routes | `npm run smoke:backend` |
+| Scoring and guidance | `/api/rank`, `/api/recommend`, `/api/decision` | Advisory, classified, replay-evidenced workflow routes; active nonresidential ranking is property/project-only and provider underwriting remains downstream | `npm run smoke:backend`, `npm run verify:master-volume-build-parity` |
 | Audit and ledger | `/api/audit/export`, `/api/audit/verify`, `/api/ledger`, `/api/ledger/admin`, `/api/ledger/verify`, `/api/ledger/replay-verify`, `/api/ledger/canonical`, `/api/ledger/canonical/plan`, `/api/verify-ledger` | Governed read, verify, bounded admin/read, and repair-plan surfaces | `npm run smoke:ledger-admin-read`, `npm run smoke:backend` |
 | Ledger repair | `/api/ledger/repair` | Mutation-sensitive repair route | Manual operational runbook only |
 | Documents | `/api/documents/submit`, `/api/documents/admin`, `/api/documents/storage-handoff` | Metadata intake, admin/read, and storage intent handoff | `npm run smoke:documents`, `npm run smoke:documents-admin-read`, `npm run smoke:storage` |

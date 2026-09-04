@@ -1,9 +1,9 @@
 {
   "registryId": "current-master-volume-registry",
-  "generatedAt": "2026-09-02T21:55:00Z",
+  "generatedAt": "2026-09-04T22:18:53Z",
   "repository": "ares-farms",
-  "activeBuildDate": "2026-09-02",
-  "controllingRule": "This registry is the machine-readable current-version pointer for build verification. The doctrine truth mirror requires an authoritative source, explicit platform status, existing evidence files, registered verification commands, and a reconciliation basis for every canonical doctrine. Mirror certification means documentation and platform state agree; it does not imply every doctrine is deployed, live, externally validated, certified, or production-authorized.",
+  "activeBuildDate": "2026-09-04",
+  "controllingRule": "This registry is the machine-readable current-version pointer for build verification. The doctrine truth mirror requires an authoritative source, explicit platform status, existing evidence files, registered verification commands, and a reconciliation basis for every canonical doctrine. Later scoped amendments registered here control over conflicting older wording within their stated scope, while historical files remain preserved as versioned evidence. Mirror certification means documentation and platform state agree; it does not imply every doctrine is deployed, live, externally validated, certified, or production-authorized.",
   "documents": [
     {
       "key": "toc",
@@ -94,6 +94,13 @@
       "governingVersion": "v3.0 - 2026-09-02",
       "file": "Furlong_Master_Volume_Amendment_2026-09-02_Doctrine_Mirror_Reconciliation_v3.pdf",
       "note": "Current supplementary truth record: 253/253 canonical doctrines individually reconciled; 53 remain expressly non-operational."
+    },
+    {
+      "key": "currentBuildParityAmendment",
+      "label": "Master Volume Amendment - Current Build Parity",
+      "governingVersion": "2026-09-04 controlling current-build amendment",
+      "file": "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+      "note": "Controls current property/program/provider boundaries, Capital Network neutrality, execution reliability, valuation-method scope, owner-controlled governance, and schema target 0057 where older exported wording conflicts."
     }
   ],
   "supportingDocuments": [
@@ -102,7 +109,14 @@
     "MASTER_VOLUME_CHANGE_REGISTER_2026-09-02.md",
     "Furlong_Master_Volume_Series_Unified_TOC_v1.2.pdf",
     "Furlong_Master_Volume_Amendment_2026-09-02_Doctrine_Mirror_Reconciliation_v3.pdf",
-    "Furlong_Master_Cross_Reference_Index_v24.1.pdf"
+    "Furlong_Master_Cross_Reference_Index_v24.1.pdf",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+    "CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+    "COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
+    "OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
+    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md"
   ],
   "repositoryEvidence": [
     "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
@@ -136,6 +150,47 @@
     "src/lib/financing/capitalNetworkGovernance.ts",
     "src/lib/financing/capitalNetworkStore.ts",
     "src/scripts/capitalNetworkConformance.ts",
-    "src/lib/db/migrations/0056_capital_network_multi_provider.sql"
-  ]
+    "src/lib/db/migrations/0056_capital_network_multi_provider.sql",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
+    "docs/current-build-parity.json",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+    "docs/COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
+    "docs/governance/OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
+    "src/lib/capital-graph/programRegistry.ts",
+    "src/lib/financing/pathwayEngine.ts",
+    "src/lib/readiness/readinessAssessment.ts",
+    "src/lib/financing/capitalNetworkExecutionReliability.ts",
+    "src/lib/property/propertyOperatingModel.ts",
+    "src/lib/property/marketValueIndication.ts",
+    "src/lib/db/canonicalGovernanceMigrations.ts",
+    "src/lib/db/migrations/0057_capital_network_execution_reliability.sql",
+    "src/scripts/capitalNetworkExecutionReliabilityConformance.ts",
+    "src/scripts/propertyOperatingModelConformance.ts",
+    "src/scripts/propertyValueIndicationConformance.ts",
+    "src/scripts/verifyMasterVolumeBuildParity.ts",
+    "docs/MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+    "docs/MASTER_VOLUME_BUILD_PROTOCOL.md",
+    "src/app/api/rank/route.ts",
+    "src/app/api/test-score/route.ts",
+    "src/services/scoring/calculatePropertyScore.ts",
+    "src/app/portfolio/page.tsx",
+    "src/scripts/backendSmokeTest.ts",
+    "src/LOCKED_MODULES.md",
+    "src/components/public/FarmFinancialHealthCheck.tsx",
+    "src/lib/property/farmFinancialScorecard.ts",
+    "src/scripts/backendModuleReadinessGate.ts"
+  ],
+  "buildBinding": {
+    "branch": "feature/ai-operating-model-20260904",
+    "behaviorBaselineCommit": "8ead373",
+    "canonicalSchemaTarget": "0057",
+    "capitalNetworkRuntimeVersion": "capital-network-runtime-v1.1.0",
+    "capitalNetworkReliabilityVersion": "capital-network-execution-reliability-v1.0.0",
+    "parityMirror": "docs/current-build-parity.json",
+    "parityGate": "verify:master-volume-build-parity",
+    "nonResidentialRankRuntimeVersion": "ranking-runtime-v0.2.0",
+    "nonResidentialDiagnosticRuntimeVersion": "property-project-diagnostic-v0.2.0",
+    "activeNonResidentialScoring": "property-project-only; personal-financial scoring inputs rejected"
+  }
 }

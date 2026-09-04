@@ -207,7 +207,8 @@ export function FarmFinancialHealthCheck() {
           <strong>Farm Financial Scorecard</strong>{" "}measures — the same liquidity, solvency, profitability,
           efficiency, and repayment ratios a lender or advisor runs — each next to its published
           &ldquo;strong / watch / vulnerable&rdquo; band. Nothing you type leaves this page or is saved. This is a
-          calculator, not advice.
+          calculator, not advice. These numbers do not enter Furlong&apos;s nonresidential property score,
+          financing-pathway rank, or provider match.
         </p>
       </div>
 

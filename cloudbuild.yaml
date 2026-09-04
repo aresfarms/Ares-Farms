@@ -238,3 +238,4 @@ serviceAccount: projects/furlong-staging-499102/serviceAccounts/furlong-build@fu
 
 options:
   logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8

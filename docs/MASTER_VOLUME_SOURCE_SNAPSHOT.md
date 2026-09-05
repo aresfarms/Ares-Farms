@@ -32,7 +32,7 @@ The machine-readable current-version pointer is `docs/current-master-volume-regi
 
 - Branch: `feature/ai-operating-model-20260904`
 - Pre-parity behavior baseline: `8ead373`
-- Parity implementation commit: `a81579e`
+- Parity implementation commit: `19e654b`
 - Canonical schema target: `0057`
 - Capital Network runtime: `capital-network-runtime-v1.1.0`
 - Capital Network execution-reliability runtime: `capital-network-execution-reliability-v1.0.0`

@@ -74,7 +74,7 @@
       "influencesProviderMatch": false
     }
   },
-  "parityImplementationCommit": "a81579e",
+  "parityImplementationCommit": "19e654b",
   "propertyUseIntegrity": {
     "runtimeVersion": "farm-use-integrity-v1.0.0",
     "currentUseClassificationIsNotHighestBestUse": true,

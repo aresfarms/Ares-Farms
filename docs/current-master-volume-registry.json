@@ -1,6 +1,6 @@
 {
   "registryId": "current-master-volume-registry",
-  "generatedAt": "2026-09-04T22:20:57Z",
+  "generatedAt": "2026-09-05T01:33:09Z",
   "repository": "ares-farms",
   "activeBuildDate": "2026-09-04",
   "controllingRule": "This registry is the machine-readable current-version pointer for build verification. The doctrine truth mirror requires an authoritative source, explicit platform status, existing evidence files, registered verification commands, and a reconciliation basis for every canonical doctrine. Later scoped amendments registered here control over conflicting older wording within their stated scope, while historical files remain preserved as versioned evidence. Mirror certification means documentation and platform state agree; it does not imply every doctrine is deployed, live, externally validated, certified, or production-authorized.",
@@ -198,7 +198,7 @@
     "nonResidentialDiagnosticRuntimeVersion": "property-project-diagnostic-v0.2.0",
     "activeNonResidentialScoring": "property-project-only; personal-financial scoring inputs rejected",
     "preParityBehaviorBaselineCommit": "8ead373",
-    "parityImplementationCommit": "a81579e",
+    "parityImplementationCommit": "19e654b",
     "farmUseIntegrityRuntimeVersion": "farm-use-integrity-v1.0.0",
     "farmLandUseBoundary": "agricultural enterprise screen is separate from property-wide highest/best-supported use"
   }

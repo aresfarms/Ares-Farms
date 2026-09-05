@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyPropertyPrograms } from "@/lib/capital-graph/programVerification";
 import { sfhaForProperty, historicForProperty } from "@/lib/property/propertyFloodHistoric";
 import { verifyImportedPropertyAddress } from "@/lib/property/importedPropertyVerification";
-import { buildLocationBriefIntelligence, startEnvironmentalLookups } from "@/lib/property/propertyBriefIntelligence";
+import { applyResolvedFarmParcelContext, buildLocationBriefIntelligence, startEnvironmentalLookups } from "@/lib/property/propertyBriefIntelligence";
 import { designatedHubzoneForProperty } from "@/lib/property/propertyHubzones";
 import { nmtcForProperty } from "@/lib/property/propertyNmtc";
 import { designatedOzForProperty } from "@/lib/property/propertyOpportunityZones";
@@ -160,7 +160,7 @@ export async function POST(req: NextRequest) {
     // the geocode and the strongest available asset evidence. An exact address
     // match carries its canonical property style into classification; a visitor
     // correction remains secondary and never replaces available parcel facts.
-    const [jurisdictionParcel, placeIntelligence] = await Promise.all([
+    const [jurisdictionParcel, basePlaceIntelligence] = await Promise.all([
       jurisdictionParcelPromise,
       buildLocationBriefIntelligence({
         geocode: imported.geocode,
@@ -171,6 +171,24 @@ export async function POST(req: NextRequest) {
         envPrefetch,
       }),
     ]);
+    const resolvedAcreageText = listingSnapshot?.offeredAcreage
+      ? `${listingSnapshot.offeredAcreage.toLocaleString("en-US")} acres offered across ${listingSnapshot.offeredParcelCount ?? "multiple"} parcels`
+      : derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null;
+    const placeIntelligence = applyResolvedFarmParcelContext(basePlaceIntelligence, {
+      propertyType:
+        lanePropertyType ??
+        matchedSourceRecord?.rawPropertyStyle ??
+        listingSnapshot?.propertyType ??
+        jurisdictionParcel?.landUse ??
+        null,
+      acreageText: resolvedAcreageText,
+      offeredAcreage: listingSnapshot?.offeredAcreage ?? null,
+      stateCode: matchedSourceRecord?.state ?? imported.parsedAddress?.state ?? body.stateCode ?? null,
+      landUse: jurisdictionParcel?.landUse ?? null,
+      zoningCode: jurisdictionParcel?.zoning ?? null,
+      publicWater: jurisdictionParcel?.publicWater ?? null,
+      publicSewer: jurisdictionParcel?.publicSewer ?? null,
+    });
     if (matchedSourceRecord || jurisdictionParcel || listingSnapshot) {
       const sizeBits = [
         matchedSourceRecord?.squareFeet ? `${matchedSourceRecord.squareFeet.toLocaleString("en-US")} sq ft` : jurisdictionParcel?.squareFeet ? `${jurisdictionParcel.squareFeet.toLocaleString("en-US")} sq ft` : null,
@@ -231,7 +249,7 @@ export async function POST(req: NextRequest) {
             bathrooms: listingSnapshot?.bathrooms ?? null,
             yearBuilt: matchedSourceRecord?.yearBuilt ?? listingSnapshot?.yearBuilt ?? jurisdictionParcel?.yearBuilt ?? null,
             squareFeet: matchedSourceRecord?.squareFeet ?? listingSnapshot?.squareFeet ?? jurisdictionParcel?.squareFeet ?? null,
-            acreageText: listingSnapshot?.offeredAcreage ? `${listingSnapshot.offeredAcreage.toLocaleString("en-US")} acres offered across ${listingSnapshot.offeredParcelCount ?? "multiple"} parcels` : derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null,
+            acreageText: resolvedAcreageText,
             listingId: matchedSourceRecord?.listingId ?? listingSnapshot?.listingId ?? jurisdictionParcel?.accountId ?? null,
             // MARKET STATUS ONLY. Matching a parcel record says nothing about
             // whether the property is for sale, under contract, or sold — it

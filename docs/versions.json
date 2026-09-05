@@ -179,7 +179,13 @@
     "src/LOCKED_MODULES.md",
     "src/components/public/FarmFinancialHealthCheck.tsx",
     "src/lib/property/farmFinancialScorecard.ts",
-    "src/scripts/backendModuleReadinessGate.ts"
+    "src/scripts/backendModuleReadinessGate.ts",
+    "src/lib/property/farmAnswerEngine.ts",
+    "src/lib/property/propertyBriefIntelligence.ts",
+    "src/lib/property/zoningUseCurated.ts",
+    "src/app/api/public/property-facts/route.ts",
+    "src/components/property/lanes/FarmAgricultureTab.tsx",
+    "src/scripts/farmUseIntegrityConformance.ts"
   ],
   "buildBinding": {
     "branch": "feature/ai-operating-model-20260904",
@@ -192,6 +198,8 @@
     "nonResidentialDiagnosticRuntimeVersion": "property-project-diagnostic-v0.2.0",
     "activeNonResidentialScoring": "property-project-only; personal-financial scoring inputs rejected",
     "preParityBehaviorBaselineCommit": "8ead373",
-    "parityImplementationCommit": "a81579e"
+    "parityImplementationCommit": "a81579e",
+    "farmUseIntegrityRuntimeVersion": "farm-use-integrity-v1.0.0",
+    "farmLandUseBoundary": "agricultural enterprise screen is separate from property-wide highest/best-supported use"
   }
 }

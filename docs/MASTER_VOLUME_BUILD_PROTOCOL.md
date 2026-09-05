@@ -58,6 +58,7 @@ Current governing snapshot (machine pointer: `docs/current-master-volume-registr
 - Current Build Parity amendment — 2026-09-04 (`MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md`)
 - Canonical schema target for the current source build: 0057
 - Active nonresidential rank/diagnostic runtimes: `ranking-runtime-v0.2.0` / `property-project-diagnostic-v0.2.0`
+- Farm/land use-integrity runtime: `farm-use-integrity-v1.0.0`; agricultural enterprise screening is separate from property-wide highest/best-supported use, and `verify:farm-use-integrity` is a standing parity gate.
 
 The detailed source snapshot and file hashes are recorded in:
 

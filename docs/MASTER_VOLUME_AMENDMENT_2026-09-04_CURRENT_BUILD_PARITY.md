@@ -71,6 +71,22 @@ The current property-intelligence amendments remain controlling. Residential, fa
 
 The deterministic operating model is property/project-side math. AI may interpret and challenge assumptions but may not replace the deterministic calculation, make a credit decision or introduce personal-financial scoring into the nonresidential model.
 
+### 7.1 Property-use integrity and agricultural scope
+
+A county land-use classification describes the current assessment/land-use record; it is **not** a highest-and-best-use conclusion. Likewise, an agricultural enterprise ranking is only one branch of property feasibility and must never be presented as though a crop choice were the property-wide best use.
+
+For farm and land properties, Furlong must preserve these boundaries:
+
+- Verified acreage is a controlling agricultural-ranking input. If acreage is unavailable, Furlong must fail closed rather than allow prime-soil status or county crop data to manufacture a leading enterprise.
+- Prime farmland or a favorable NRCS capability class establishes agricultural capability; it does not by itself make commodity row crops the best use.
+- Commodity row crops may rank as a genuine agricultural anchor when tract scale and supporting soil/yield/economic evidence justify that result. On smaller tracts they may remain a rotation, rental, or component without being labeled the property's best use.
+- Gross revenue, net operating margin, startup capital, and long-cycle value are different economic measures. Furlong may show them together only when the basis is clearly labeled; it may not rank unlike measures as if they were directly interchangeable.
+- Imported-address workflows must reconcile the resolved parcel acreage and land-use/zoning record into the agricultural screen before publishing its ranking. Parallel source retrieval may not leave the ranking on an earlier `acres = unknown` state after the official parcel record has resolved.
+- Property-wide highest/best-supported use must separately test legal permissibility, physical feasibility, entitlement/infrastructure, market demand, timing, and economics. Development, subdivision, agritourism, renewable-energy/storage, conservation, and other alternatives may not be downgraded merely because the property is rural.
+- Zoning interpretation is jurisdiction-specific and source-cited. If Furlong does not have an exact supported jurisdiction/code interpretation, it must show the raw code and require official verification rather than inventing a use meaning.
+
+The customer-facing farm lane therefore uses **Agricultural enterprise screen** / **Leading ag screen** terminology rather than `BEST FIT` or a crop-level `highest-and-best-use` label. Property-wide alternatives are displayed separately with their zoning/evidence dependencies.
+
 ## 8. Current governance and provider identity
 
 Furlong is owner-controlled under the current governance transition. The retained external broker workspace remains a transition/provider instance only and confers no ownership, treasury, governance, architecture or default-routing authority. Current provider identity and case access are provider-scoped and consent-scoped.
@@ -88,6 +104,11 @@ Standing implementation/proof anchors include:
 - `src/lib/financing/capitalNetworkExecutionReliability.ts`
 - `src/lib/property/propertyOperatingModel.ts`
 - `src/lib/property/marketValueIndication.ts`
+- `src/lib/property/farmAnswerEngine.ts`
+- `src/lib/property/propertyBriefIntelligence.ts`
+- `src/lib/property/zoningUseCurated.ts`
+- `src/app/api/public/property-facts/route.ts`
+- `src/components/property/lanes/FarmAgricultureTab.tsx`
 - `src/lib/db/canonicalGovernanceMigrations.ts`
 - `src/lib/db/migrations/0056_capital_network_multi_provider.sql`
 - `src/lib/db/migrations/0057_capital_network_execution_reliability.sql`
@@ -106,6 +127,7 @@ Standing gates:
 - `npm run smoke:readiness-assessment`
 - `npm run verify:property-operating-model`
 - `npm run verify:property-value-indication`
+- `npm run verify:farm-use-integrity`
 - `npm run build`
 
 ## 10. Final parity rule

@@ -13,6 +13,7 @@ import {
   RELIABILITY_PUBLIC_MIN_SAMPLE,
   RELIABILITY_RANKING_MIN_SAMPLE,
 } from "@/lib/financing/capitalNetworkExecutionReliability";
+import { FARM_USE_INTEGRITY_VERSION } from "@/lib/property/farmAnswerEngine";
 
 const root = process.cwd();
 const readJson = <T>(file: string): T =>
@@ -67,12 +68,30 @@ assert.equal(parity.nonResidential.personalIncomeScoring, false);
 assert.equal(parity.nonResidential.householdDtiScoring, false);
 assert.equal(parity.nonResidential.personalAssetLiquidityNetWorthScoring, false);
 assert.equal(parity.nonResidential.residentialExceptionPreserved, true);
+assert.equal(parity.propertyUseIntegrity.runtimeVersion, FARM_USE_INTEGRITY_VERSION);
+for (const rule of [
+  "currentUseClassificationIsNotHighestBestUse",
+  "agriculturalEnterpriseScreenIsNotPropertyWideHighestBestUse",
+  "verifiedAcreageRequiredBeforeAgriculturalLeaderClaim",
+  "importedParcelAcreageReconciledBeforeFarmScreen",
+  "primeSoilAloneCannotMakeCommodityRowCropsBest",
+  "grossNetStartupEconomicsNotDirectlyInterchangeable",
+  "propertyWideUseMustTestLegalPhysicalEntitlementMarketEconomics",
+  "unsupportedZoningInterpretationFailsClosed",
+  "developmentMayNotBeDowngradedFromRuralLocationAlone",
+] as const) {
+  assert.equal(parity.propertyUseIntegrity[rule], true, `Property-use parity drift: ${rule}`);
+}
 
 const activeRankRoute = fs.readFileSync(path.join(root, "src/app/api/rank/route.ts"), "utf8");
 const activeDiagnosticRoute = fs.readFileSync(path.join(root, "src/app/api/test-score/route.ts"), "utf8");
 const activePropertyScore = fs.readFileSync(path.join(root, "src/services/scoring/calculatePropertyScore.ts"), "utf8");
 const portfolioSurface = fs.readFileSync(path.join(root, "src/app/portfolio/page.tsx"), "utf8");
 const farmFinancialSelfCheck = fs.readFileSync(path.join(root, "src/components/public/FarmFinancialHealthCheck.tsx"), "utf8");
+const farmUseEngine = fs.readFileSync(path.join(root, "src/lib/property/farmAnswerEngine.ts"), "utf8");
+const propertyFactsRoute = fs.readFileSync(path.join(root, "src/app/api/public/property-facts/route.ts"), "utf8");
+const farmAgricultureTab = fs.readFileSync(path.join(root, "src/components/property/lanes/FarmAgricultureTab.tsx"), "utf8");
+const zoningUseCurated = fs.readFileSync(path.join(root, "src/lib/property/zoningUseCurated.ts"), "utf8");
 
 assert.equal(parity.activeNonResidentialScoring.propertyProjectOnly, true);
 assert.equal(parity.activeNonResidentialScoring.personalFinancialInputsRejected, true);
@@ -104,6 +123,17 @@ assert.ok(!farmFinancialSelfCheck.includes("fetch("));
 assert.ok(!farmFinancialSelfCheck.includes("localStorage"));
 assert.ok(!farmFinancialSelfCheck.includes("sessionStorage"));
 assert.ok(farmFinancialSelfCheck.includes("do not enter Furlong&apos;s nonresidential property score"));
+assert.ok(farmUseEngine.includes(FARM_USE_INTEGRITY_VERSION));
+assert.ok(farmUseEngine.includes('scope: "agricultural-enterprise-screen"'));
+assert.ok(farmUseEngine.includes("Prime-soil status by itself cannot make commodity row crops the answer"));
+assert.ok(farmUseEngine.includes("gross revenue, net operating margin and startup capital are different measures"));
+assert.ok(propertyFactsRoute.includes("applyResolvedFarmParcelContext"));
+assert.ok(propertyFactsRoute.includes("resolvedAcreageText"));
+assert.ok(farmAgricultureTab.includes("Property-wide use context"));
+assert.ok(farmAgricultureTab.includes("LEADING AG SCREEN"));
+assert.ok(!farmAgricultureTab.includes('label: "BEST FIT"'));
+assert.ok(zoningUseCurated.includes("Do not label development marginal from rural location alone"));
+assert.ok(zoningUseCurated.includes("return null"));
 
 const activeApiRoot = path.join(root, "src", "app", "api");
 const routeFiles: string[] = [];
@@ -165,6 +195,8 @@ assert.equal(
   registry.buildBinding?.nonResidentialDiagnosticRuntimeVersion,
   parity.activeNonResidentialScoring.diagnosticRuntimeVersion,
 );
+assert.equal(registry.buildBinding?.farmUseIntegrityRuntimeVersion, FARM_USE_INTEGRITY_VERSION);
+assert.match(registry.buildBinding?.farmLandUseBoundary ?? "", /agricultural enterprise screen.*separate/i);
 assert.ok(
   registry.documents.some(
     (doc: any) => doc.file === "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
@@ -188,6 +220,12 @@ const requiredEvidence = [
   "src/lib/financing/capitalNetworkExecutionReliability.ts",
   "src/lib/property/propertyOperatingModel.ts",
   "src/lib/property/marketValueIndication.ts",
+  "src/lib/property/farmAnswerEngine.ts",
+  "src/lib/property/propertyBriefIntelligence.ts",
+  "src/lib/property/zoningUseCurated.ts",
+  "src/app/api/public/property-facts/route.ts",
+  "src/components/property/lanes/FarmAgricultureTab.tsx",
+  "src/scripts/farmUseIntegrityConformance.ts",
   "src/lib/db/migrations/0056_capital_network_multi_provider.sql",
   "src/lib/db/migrations/0057_capital_network_execution_reliability.sql",
   "src/app/api/rank/route.ts",
@@ -297,6 +335,7 @@ for (const id of [
   "CAPITAL-NETWORK-EXECUTION-001",
   "PROPERTY-AI-OPERATING-MODEL-001",
   "PROPERTY-VALUE-INDICATION-001",
+  "PROPERTY-USE-INTEGRITY-001",
 ] as const) {
   assert.ok(requirements.requirements[id], `Current build requirement missing: ${id}`);
 }
@@ -306,6 +345,8 @@ for (const phrase of [
   "Furlong does not auction borrower files",
   "Provider compensation has zero influence on ranking",
   "Residential mortgage workflows are the explicit exception",
+  "Prime farmland or a favorable NRCS capability class establishes agricultural capability; it does not by itself make commodity row crops the best use",
+  "Agricultural enterprise screen",
   "canonical schema target for this build is **0057**",
 ] as const) {
   assert.ok(amendment.includes(phrase), `Parity amendment lost hard rule: ${phrase}`);
@@ -334,6 +375,10 @@ console.log(
         activeNonResidentialRankAndDiagnosticPropertyProjectOnly: true,
         activeLegacyPersonalFinancialScoringReachableFromAppRoutes: false,
         clientSideFarmFinancialSelfCheckInfluencesRanking: false,
+        agriculturalEnterpriseScreenIsPropertyWideHighestBestUse: false,
+        primeSoilAloneCanMakeCommodityRowCropsBest: false,
+        importedParcelAcreageReconciledBeforeFarmScreen: true,
+        unsupportedZoningInterpretationFailsClosed: true,
       },
       message:
         "Current Master Volume parity mirror matches the executable property/program/provider boundaries and canonical schema target.",

@@ -15,6 +15,10 @@ A second active-route audit also found two real runtime remnants that documentat
 
 The machine-readable version pointers were also stale: the current registry still reflected the September 2 build, `docs/versions.json` still reflected the June snapshot, and the source snapshot/build protocol listed older governing-version numbers.
 
+A testing-phase property review then exposed a separate property-use defect in the farm lane. The imported-address path could resolve official parcel acreage after the place-intelligence bundle had already calculated its agricultural ranking with `acres = null`. Prime-soil evidence could therefore elevate commodity row crops even though the official parcel record later supplied acreage, and the old explanation could describe an acreage-unknown parcel as "small." The same surface also mixed gross and net per-acre figures under one apparent ranking and used crop-level `BEST FIT` / highest-and-best-use language even though development, subdivision, agritourism, energy/storage, infrastructure, entitlement and market alternatives had not been compared on a common basis.
+
+The current build now treats a farm ranking as an **agricultural enterprise screen**, not a property-wide highest/best-use conclusion. Resolved parcel acreage is reconciled into the screen before publication; missing acreage fails closed; prime soil alone cannot make row crops the answer; gross/net/startup bases are labeled; and property-wide alternatives remain separate until legal, physical, entitlement/infrastructure, market and economic evidence support a conclusion. Jurisdiction-specific zoning interpretation is source-cited and otherwise fails closed.
+
 ## Reconciliation action
 
 1. Added `MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md` as the controlling scoped amendment for current property/program/provider behavior.
@@ -25,7 +29,8 @@ The machine-readable version pointers were also stale: the current registry stil
 6. Updated the current-version registry and `docs/versions.json` to the September 4 build and canonical schema target `0057`.
 7. Remediated the active `/api/rank`, `/api/test-score`, property diagnostic scoring service and portfolio demo so current nonresidential scoring is property/project-only and forbidden personal-financial scoring inputs fail closed.
 8. Marked the original applicant-credit scoring baseline as quarantined migration/history code and added a parity check that active API routes cannot import that superseded path.
-9. Preserved all historical PDFs unchanged. Earlier wording remains versioned evidence; the later scoped amendment controls only where it expressly supersedes a conflicting older implementation description.
+9. Corrected the farm/land use-analysis path so resolved parcel acreage is reconciled before agricultural ranking, crop rankings are explicitly agricultural-only, unlike economic bases are labeled, property-wide alternatives remain separate, and unsupported zoning interpretations fail closed. Added `verify:farm-use-integrity` as a permanent regression gate.
+10. Preserved all historical PDFs unchanged. Earlier wording remains versioned evidence; the later scoped amendment controls only where it expressly supersedes a conflicting older implementation description.
 
 ## Current hard boundary
 
@@ -41,8 +46,8 @@ The Farm Financial Health self-check remains available as an optional browser-si
 - Capital Network runtime: `capital-network-runtime-v1.1.0`.
 - Execution reliability runtime: `capital-network-execution-reliability-v1.0.0`.
 - Multi-provider network code exists; real provider certification and production delivery remain controlled operational gates.
-- Migration `0057` exists in source but is not represented here as already applied to a deployed database.
-- Property operating model and type-aware property valuation are implemented screening/advisory build capabilities.
+- Migrations `0056` and `0057` are applied in the controlled staging/testing database; permanent production promotion remains separate and is not implied by this source-build record.
+- Property operating model, type-aware property valuation, and farm/land property-use integrity screening are implemented advisory build capabilities.
 
 ## Standing proof
 
@@ -54,6 +59,7 @@ The Farm Financial Health self-check remains available as an optional browser-si
 - `npm run verify:capital-network-execution`
 - `npm run verify:property-operating-model`
 - `npm run verify:property-value-indication`
+- `npm run verify:farm-use-integrity`
 - `npm run build`
 
 Any later material runtime/schema change must update the controlling Master Volume pointer and parity mirror in the same change set. A passing historical doctrine count is not sufficient if the executable hard rules have drifted.

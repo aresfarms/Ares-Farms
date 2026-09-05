@@ -600,7 +600,8 @@
     "verify:property-intelligence-expansion": "tsx src/scripts/propertyIntelligenceExpansionConformance.ts",
     "verify:property-operating-model": "tsx src/scripts/propertyOperatingModelConformance.ts",
     "verify:property-value-indication": "tsx src/scripts/propertyValueIndicationConformance.ts",
-    "verify:master-volume-build-parity": "tsx src/scripts/verifyMasterVolumeBuildParity.ts"
+    "verify:master-volume-build-parity": "tsx src/scripts/verifyMasterVolumeBuildParity.ts",
+    "verify:farm-use-integrity": "tsx src/scripts/farmUseIntegrityConformance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

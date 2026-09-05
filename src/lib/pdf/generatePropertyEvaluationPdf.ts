@@ -998,7 +998,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   doc.text("Why we lay it all out.", PAGE.marginX, y, { continued: true });
   setFont("regular", 11, COLORS.text);
   doc.text(
-    " We open every figure with its source and date because this is your ground, not ours to gate. Reading and analyzing stay anonymous — no account, no data capture, no handoff. The one exception, stated plainly: if you choose to join a waitlist or the Guild, we ask your name and email only to reach you, and tell you exactly why. That is a guarantee about our own conduct — the part we fully control. Read it, check it, and carry it wherever you like.",
+    " We open every figure with its source and date because this is your ground, not ours to gate. The open property analysis can remain anonymous. If you choose a paid report, save a case, nominate a provider, open a deal room, request a professional service, or authorize delivery, Furlong collects only what that chosen workflow requires and states the purpose at collection. Furlong never sells borrower leads, auctions borrower files, or lets compensation improve provider ranking. Read it, check it, and carry it wherever you like.",
     { width: CONTENT_W, lineGap: 3 }
   );
   y = doc.y + 14;
@@ -1011,11 +1011,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   heading("Route This File — Your Next Coordinates");
   checklist([
-    "Route this dossier to the licensed lending desk for financing coordination — USDA, SBA, or conventional mapping.",
-    "Route this dossier to the Guild's licensed PE for environmental review — wetland boundary and Phase I.",
+    "Use the Capital Network to compare suitable providers, nominate your own provider, or invite a verified one-case guest provider for financing coordination.",
+    "Request a qualified environmental professional when the property or financing path calls for wetland, Phase I, or other environmental diligence.",
   ]);
   paragraph(
-    "These route to Furlong's own disclosed people. Furlong facilitates the introduction; it never decides your deal and takes no cut of your transaction.",
+    "These are optional borrower-controlled workflows. A provider receives only the exact package you authorize for that exact recipient. Furlong does not sell leads, auction files, shotgun-route a case, or let compensation or affiliation improve provider ranking.",
     { size: 9, color: COLORS.muted }
   );
 

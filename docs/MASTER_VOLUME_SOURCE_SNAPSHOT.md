@@ -38,6 +38,7 @@ The machine-readable current-version pointer is `docs/current-master-volume-regi
 - Capital Network execution-reliability runtime: `capital-network-execution-reliability-v1.0.0`
 - Active nonresidential ranking runtime: `ranking-runtime-v0.2.0`
 - Active nonresidential diagnostic runtime: `property-project-diagnostic-v0.2.0`
+- Farm/land use-integrity runtime: `farm-use-integrity-v1.0.0`
 - Current parity supplement: `MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md`
 
 The earlier exported PDFs remain historical/versioned evidence. Where the September 4 parity amendment expressly changes the implementation meaning of an older provision, the later scoped amendment controls. In particular, nonresidential Furlong Core is property/project anchored; person-side financial underwriting belongs to the selected provider. Residential is the separately governed exception.
@@ -110,7 +111,8 @@ The current backend build must incorporate these updated requirements:
 - Nonresidential Furlong property/program/provider ranking is property/project anchored. Personal credit score, personal income, household DTI, personal assets/liquidity/net worth and similar personal-financial profile data are not Furlong ranking inputs; provider-side underwriting remains provider-owned. Residential remains the separately governed exception.
 - The Capital Network is multi-provider and borrower-choice based. Lead sale, file auction, shotgun routing, compensation preference and affiliate preference are prohibited hard rules.
 - Active `/api/rank` and `/api/test-score` scoring surfaces are property/project-only and reject personal-financial scoring inputs. The portfolio example uses the same current contract. Superseded applicant-credit scoring modules are quarantined and may not be imported into active API routes.
-- The current canonical source schema target is 0057. Migration 0056 creates the multi-provider Capital Network; migration 0057 creates evidence-backed provider execution reliability. Source presence does not imply that either migration has been applied to a deployed database.
+- Farm/land use analysis is explicitly split into an agricultural-enterprise screen and a separate property-wide highest/best-supported-use inquiry. Resolved acreage must be reconciled before agricultural ranking; missing acreage fails closed; prime soil alone cannot make commodity row crops the best use; unlike economic bases are labeled; and unsupported zoning interpretation fails closed.
+- The current canonical source schema target is 0057. Migration 0056 creates the multi-provider Capital Network; migration 0057 creates evidence-backed provider execution reliability. Both are applied in the controlled staging/testing database; permanent production promotion remains a separate gate.
 - Historical Volume II/IV scoring and SBA runbook wording is retained as versioned evidence. Where it conflicts with the current nonresidential implementation boundary above, the September 4 scoped amendment controls rather than silently rewriting the old PDF.
 
 - `Volume_VI_Consolidation_and_Changes_Summary.md` is a standing

@@ -5,12 +5,15 @@
  * zoning, confirm at X). The lane PAGE keeps its generic educational cards; this
  * engine adds the property-specific layer inside the analysis + PDF.
  *
- * Data we reason from (all we reliably have per property): acreage (when the feed
- * carries it), county + state, county cash rents (USDA NASS), state farmland
- * value. Data we do NOT have at the parcel level — zoning, soil survey, water
- * rights — yields an explicit "confirm at …" note rather than a guess. Facts and
- * enterprise economics only; never a promise, an appraisal, or a credit decision.
+ * Data we reason from: verified acreage when available, county/state context,
+ * USDA NASS rents/yields, NRCS soil facts, and exact jurisdiction/zoning
+ * interpretation only where Furlong has a source-cited rule. Missing zoning,
+ * market/offtake, water or other controlling evidence remains explicit instead
+ * of being guessed. Facts and enterprise economics only; never an appraisal,
+ * eligibility finding, or credit decision.
  */
+
+export const FARM_USE_INTEGRITY_VERSION = "farm-use-integrity-v1.0.0" as const;
 
 export interface FarmPropertyFacts {
   /** Parcel acreage in acres, when the source feed carries it (often null). */
@@ -42,23 +45,50 @@ export interface FarmPropertyFacts {
   wheatYieldPerAcre?: number | null;
   /** Survey year the county yields are drawn from. */
   yieldYear?: number | null;
+  /** Parcel-record land use and zoning. Zoning semantics are attached only when
+      Furlong has an exact, source-cited jurisdiction interpretation. */
+  landUse?: string | null;
+  zoningCode?: string | null;
+  zoningLabel?: string | null;
+  zoningSummary?: string | null;
+  zoningSource?: string | null;
+  zoningSourceUrl?: string | null;
+  propertyWideCandidates?: string[];
+  developmentNote?: string | null;
+  energyNote?: string | null;
+  publicWater?: boolean | null;
+  publicSewer?: boolean | null;
 }
 
 export interface BestUseOption {
   name: string;
-  /** best | strong | possible | marginal — a ranked verdict for THIS parcel. */
-  tier: "best" | "strong" | "possible" | "marginal";
+  /** This is an AGRICULTURAL enterprise screen, not a property-wide HBU verdict. */
+  tier: "leading-screen" | "strong" | "possible" | "marginal" | "needs-evidence";
+  /** Kept for payload compatibility. The text itself states gross/net/unpriced. */
   grossPerAcre: string;
+  economicsBasis: "gross" | "net" | "mixed" | "unpriced";
   why: string;
 }
 
 export interface FarmBestUse {
+  /** Explicit scope prevents a crop ranking from masquerading as highest-and-best use. */
+  scope: "agricultural-enterprise-screen";
+  evidenceStatus: "insufficient" | "screening" | "supported-screen";
+  missingCriticalInputs: string[];
   headline: string;
   options: BestUseOption[];
-  /** Single-enterprise vs diversified recommendation for THIS parcel
-      (founder request 2026-07-28: "grow only one crop or diversify?"). */
+  propertyWideContext: {
+    currentUse: string | null;
+    zoning: string | null;
+    zoningSummary: string | null;
+    source: string | null;
+    sourceUrl: string | null;
+    candidates: string[];
+    note: string;
+  };
+  /** Single-enterprise vs diversified AGRICULTURAL screen only. */
   portfolioAdvice: {
-    verdict: "single-anchor" | "diversify";
+    verdict: "single-anchor" | "diversify" | "not-yet-ranked";
     title: string;
     reasons: string[];
   };
@@ -198,240 +228,312 @@ export function answerFarmQuestions(f: FarmPropertyFacts): FarmPropertyAnswer[] 
 }
 
 /**
- * Highest-and-best-USE for this parcel (founder direction 2026-07-19): don't just
- * answer "can I grow commodity" — rank EVERY realistic enterprise by the numbers
- * for THIS parcel and name the best, including outside-the-box changes of use
- * (flowers, orchard, vineyard/winery, Christmas trees, agritourism), passive
- * income (solar/battery land lease), and whether it reads developer-friendly.
- * Heuristic + honest — a starting rank a real budget refines, never a promise.
- * Grounded in acreage + region + county cash rent + metro proximity; soil (NRCS
- * SSURGO) + climate zone are the next data wires to sharpen it.
+ * Agricultural enterprise screen for this parcel.
+ *
+ * IMPORTANT: this is deliberately NOT a property-wide highest-and-best-use
+ * conclusion. Current county use classification is not the same thing as best
+ * economic use, and crop suitability is only one branch of land feasibility.
+ * Property-wide alternatives (development, agritourism, energy/storage,
+ * conservation, etc.) must be tested through zoning, infrastructure,
+ * entitlement and market evidence before Furlong names a highest/best use.
  */
 export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
   const a = f.acres;
-  const acresKnown = typeof a === "number" && a > 0;
-  const small = acresKnown && a! < 20;
-  const mid = acresKnown && a! >= 20 && a! <= 120;
-  const large = acresKnown && a! > 120;
+  const acresKnown = typeof a === "number" && Number.isFinite(a) && a > 0;
+  const small = acresKnown && a! < 30;
+  const mid = acresKnown && a! >= 30 && a! <= 120;
+  const midsize = acresKnown && a! > 120 && a! < 500;
+  const commodityScale = acresKnown && a! >= 500;
+
   const m = f.nearestMetroMiles ?? null;
-  const metroNear = m != null && m <= 40;
-  const metroMid = m != null && m <= 90;
+  const marketKnown = m != null && Number.isFinite(m);
+  const metroNear = marketKnown && m! <= 40;
+  const metroMid = marketKnown && m! <= 90;
+
   const rent = f.croplandRentPerAcre;
   const goodCropland = rent != null && rent >= 180;
   const poorCropland = rent != null && rent < 130;
-  // Soil signals (USDA-NRCS): capability class 1–4 = arable cropland, 5–8 =
-  // pasture/limited; prime-farmland is the strongest "grow commodity here" flag.
   const cap = f.capabilityClass ?? null;
   const isPrime = /prime farmland/i.test(f.primeFarmland ?? "") && !/not prime/i.test(f.primeFarmland ?? "");
+  const soilKnown = Boolean(f.primeFarmland) || cap != null;
   const goodSoil = isPrime || (cap != null && cap <= 3);
   const limitedSoil = cap != null && cap >= 5;
-  // County yield signal (USDA NASS): corn is the most widely reported county
-  // crop, so it's the primary read; fall back to soybeans. US county corn
-  // averages ~175 bu/ac — >175 strong, >150 healthy, <120 weak ground.
+
   const cornY = f.cornYieldPerAcre ?? null;
   const soyY = f.soybeanYieldPerAcre ?? null;
   const strongYield = cornY != null ? cornY >= 175 : soyY != null ? soyY >= 58 : false;
   const goodYield = cornY != null ? cornY >= 150 : soyY != null ? soyY >= 50 : false;
   const weakYield = cornY != null ? cornY < 120 : soyY != null ? soyY < 38 : false;
+  const countyEconomicsKnown = rent != null || cornY != null || soyY != null || f.wheatYieldPerAcre != null;
   const where = acreLabel(f.county, f.state).replace(/^ in /, "");
 
-  const raw: Array<{ name: string; score: number; grossPerAcre: string; why: string }> = [
+  const missingCriticalInputs = [
+    !acresKnown ? "verified acreage" : null,
+    !soilKnown ? "parcel soil/capability evidence" : null,
+    !countyEconomicsKnown ? "county production/rent benchmark" : null,
+    !marketKnown ? "verified market/offtake access" : null,
+    !f.zoningCode ? "zoning code and current use-table interpretation" : null,
+  ].filter((x): x is string => Boolean(x));
+
+  const rowScaleAdjustment = !acresKnown
+    ? -24
+    : commodityScale
+      ? 28
+      : a! >= 250
+        ? 8
+        : midsize
+          ? -8
+          : mid
+            ? -26
+            : -38;
+
+  type Candidate = {
+    name: string;
+    score: number;
+    grossPerAcre: string;
+    economicsBasis: BestUseOption["economicsBasis"];
+    why: string;
+    marketSensitive?: boolean;
+    evidenceSensitive?: boolean;
+  };
+
+  const raw: Candidate[] = [
     {
-      name: "Commodity row crops (corn/soy/wheat)",
-      score:
-        40 + (large && goodCropland ? 30 : 0) - (small ? 30 : 0) - (poorCropland ? 18 : 0) +
-        (goodSoil ? 18 : 0) - (limitedSoil ? 22 : 0) +
-        (strongYield ? 12 : goodYield ? 6 : 0) - (weakYield ? 12 : 0),
-      grossPerAcre: "~$0–$150 net/ac — often a loss on FULL cost at today's prices",
+      name: "Hay / forage / alfalfa",
+      score: 52 + (mid ? 19 : midsize ? 12 : commodityScale ? 4 : small ? 2 : 0) + (goodSoil ? 8 : 0) + (poorCropland ? 5 : 0),
+      grossPerAcre: "Gross and net vary sharply by hay type, yield, bale format, storage and seasonal market - model this parcel before relying on a number",
+      economicsBasis: "mixed",
       why:
-        (limitedSoil
-          ? `USDA soil here is land-capability class ${cap} — better suited to pasture or specialty than row crops`
-          : goodSoil
-            ? large
-              ? "prime / high-capability cropland at scale — a commodity base genuinely fits here"
-              : "the soil is prime cropland, but the parcel is small for commodity to pay a living"
-            : large
-              ? goodCropland
-                ? "the acreage and county cash rent both support a commodity base"
-                : "big enough for commodity, but average ground means thin margins"
-              : "this parcel is too small for commodity crops to pay a living") +
-        (cornY != null
-          ? weakYield
-            ? ` — and county corn yields run light (~${cornY} bu/ac), thinning margins further`
-            : strongYield
-              ? ` — and county corn yields run strong (~${cornY} bu/ac), which helps commodity pencil`
-              : ` (county corn ~${cornY} bu/ac)`
-          : ""),
+        acresKnown && a! <= 120
+          ? `${a!.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres is a workable forage/hay scale; soil, drainage, yield, storage and the local horse/livestock market determine whether premium hay beats commodity production`
+          : "forage and hay can monetize agricultural ground without requiring commodity-grain scale, but the actual bale/yield/market model controls",
     },
     {
       name: "Pasture livestock (cattle, sheep, goats)",
-      score:
-        52 + (mid || large ? 15 : 0) + (poorCropland ? 10 : 0) + (limitedSoil ? 12 : 0) -
-        (small && a! < 10 ? 15 : 0),
-      grossPerAcre: "~$50–$200 net/ac on good pasture; rewards paid-off land",
+      score: 50 + (mid ? 18 : midsize ? 12 : commodityScale ? 6 : 0) + (poorCropland ? 10 : 0) + (limitedSoil ? 12 : 0) - (small ? 15 : 0),
+      grossPerAcre: "Net/acre depends on stocking rate, fencing, water, winter feed, animal class and direct-sale versus commodity marketing",
+      economicsBasis: "net",
       why: limitedSoil
-        ? `class ${cap} ground that won't pay as cropland often pencils better under grazing`
-        : poorCropland
-          ? "cheaper ground that underperforms for crops often pencils better under grazing"
-          : "a solid, lower-labor base that fits most mid-to-large parcels",
+        ? `class ${cap} ground that will not pay as cropland can screen better under managed grazing`
+        : mid
+          ? "this acreage is in the diversified pasture/livestock range; fencing, water and market strategy control the real result"
+          : "a lower-intensity agricultural use whose economics turn on stocking rate, infrastructure and market channel",
     },
     {
-      name: "Cut flowers / market produce (intensive)",
-      score: 46 + (small || mid ? 28 : 0) + (metroNear ? 26 : metroMid ? 12 : 0) - (large ? 18 : 0),
-      grossPerAcre: "$25k–$35k GROSS/ac at intensive scale — labor-heavy, market is the job",
-      why: metroNear
-        ? "a nearby metro is the buyer (florists, restaurants, markets, CSAs) — 2–10 intensive acres here can out-earn 100 of commodity"
-        : "highest revenue per acre by far, but you must build the sales channel yourself",
+      name: "Specialty crops / cut flowers / market produce",
+      score: 43 + (small ? 20 : mid ? 14 : midsize ? 5 : -8) + (goodSoil ? 6 : 0) + (metroNear ? 18 : metroMid ? 8 : marketKnown ? 0 : -10),
+      grossPerAcre: "Potential gross/acre can be high, but labor, irrigation, pack/handling loss and the sales channel dominate net return",
+      economicsBasis: "gross",
+      why: marketKnown
+        ? "higher-value intensive production can outperform commodity acres when a real buyer channel is close enough and labor/water are workable"
+        : "high revenue density is possible, but Furlong will not rank this as best without verified buyer/market access and water",
+      marketSensitive: true,
     },
     {
       name: "Orchard / fruit",
-      score: 42 + (mid ? 15 : 0) + (metroMid ? 16 : 0),
-      grossPerAcre: "$5k–$20k+ gross/ac at maturity — 3–5 yr to bear, then decades",
-      why: metroMid
-        ? "pick-your-own + farm-stand demand from the metro rewards fruit near a market"
-        : "high long-run value, but a multi-year establishment cost before the first crop",
+      score: 40 + (mid ? 14 : midsize ? 9 : 0) + (metroMid ? 10 : marketKnown ? 0 : -8),
+      grossPerAcre: "Multi-year establishment before mature revenue; variety, yield, labor, storage and direct-market strategy determine net return",
+      economicsBasis: "gross",
+      why: marketKnown
+        ? "tree fruit can create strong long-run value where drainage, variety, labor and direct-market access line up"
+        : "the soil may support tree fruit, but a multi-year establishment decision should not outrank other uses until the market and water are verified",
+      marketSensitive: true,
+    },
+    {
+      name: "Greenhouse / nursery / controlled environment",
+      score: 34 + (mid ? 12 : small ? 16 : 4) + (metroNear ? 14 : metroMid ? 7 : marketKnown ? 0 : -10) - (f.publicWater === false ? 3 : 0),
+      grossPerAcre: "High revenue density but capital, power, water, structures and contracted/verified demand dominate the economics",
+      economicsBasis: "gross",
+      why: "this is an infrastructure-and-market business more than an acreage business; do not credit the upside until utilities, water, structures and demand are evidenced",
+      marketSensitive: true,
     },
     {
       name: "Vineyard / winery",
-      score: 36 + (metroMid ? 22 : 0) + (mid ? 10 : 0),
-      grossPerAcre: "$8k–$25k+ gross/ac — heavy capital + 3–4 yr, tasting-room margin is the prize",
-      why: metroMid
-        ? "agritourism + a tasting room turns a mid-size parcel near a metro into an experience business, not just a crop"
-        : "high ceiling, but capital- and expertise-intensive and slow to return",
+      score: 33 + (mid ? 8 : midsize ? 5 : 0) + (metroMid ? 12 : marketKnown ? 0 : -9),
+      grossPerAcre: "Capital-heavy and slow to cash; tasting-room/direct-sales economics matter more than grape revenue alone",
+      economicsBasis: "gross",
+      why: marketKnown
+        ? "a vineyard/winery is an experience and direct-sales model; drainage, permitting and visitor access matter as much as the crop"
+        : "the agronomic ceiling may exist, but Furlong will not treat it as a leading use without market, visitor-access and permit evidence",
+      marketSensitive: true,
     },
     {
-      name: "Christmas trees",
-      score: 34 + (metroMid ? 16 : 0) + (mid ? 10 : 0),
-      grossPerAcre: "$10k–$25k gross/ac at harvest — a 7–10 yr cycle, choose-and-cut is the margin",
-      why: metroMid
-        ? "choose-and-cut demand from a nearby metro pays a premium and stacks with agritourism"
-        : "steady long-cycle income on ground that doesn't need to be prime",
+      name: "Agritourism / farm experience",
+      score: 31 + (mid ? 11 : midsize ? 8 : 0) + (metroNear ? 22 : metroMid ? 10 : marketKnown ? 0 : -8) + ((f.propertyWideCandidates ?? []).some((x) => /agricultural tourism/i.test(x)) ? 10 : 0),
+      grossPerAcre: "Project-specific - revenue comes from the experience, events, direct sales or lodging, not a generic per-acre yield",
+      economicsBasis: "unpriced",
+      why: (f.propertyWideCandidates ?? []).some((x) => /agricultural tourism/i.test(x))
+        ? "the current zoning interpretation includes agricultural tourism as a candidate use, but access, parking, sanitation, structures, event rules and market demand still control"
+        : "agritourism can multiply farm revenue, but zoning/use-table permission and a real visitor market must be verified first",
+      marketSensitive: true,
     },
     {
-      name: "Agritourism (pick-your-own, events, glamping)",
-      score: 30 + (metroNear ? 34 : metroMid ? 15 : 0),
-      grossPerAcre: "highly variable — the margin is in the experience, not the acre",
-      why: metroNear
-        ? "close to a metro is the whole game for agritourism — weekend visitors are the revenue"
-        : "works best paired with a crop or animals as a second income line",
+      name: "Commodity row crops (corn/soy/wheat)",
+      score:
+        42 + rowScaleAdjustment + (goodCropland ? 8 : 0) - (poorCropland ? 12 : 0) +
+        (goodSoil ? 12 : 0) - (limitedSoil ? 20 : 0) +
+        (strongYield ? 10 : goodYield ? 5 : 0) - (weakYield ? 10 : 0),
+      grossPerAcre: "Thin-margin commodity system - evaluate full cost, rent/equipment, basis, yield and rotation; do not infer value from prime-soil status alone",
+      economicsBasis: "net",
+      why: !acresKnown
+        ? "acreage is not confirmed, so Furlong will not treat prime soil as enough evidence to call commodity grain the best use"
+        : commodityScale
+          ? "the parcel has commodity scale; soil, county yield, basis, equipment and full-cost economics still decide whether grain should be the anchor"
+          : a! >= 120
+            ? `at ~${a!.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres, row crops can be a rotation, lease or component, but the tract is still below stand-alone commodity scale`
+            : `at ~${a!.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres, the soil may grow grain well but the parcel is well below stand-alone commodity scale; row crops can be a rotation or rental component, not an automatic best use`,
     },
     {
-      name: "Solar / battery land lease (passive)",
-      score: 30 + (large ? 25 : mid ? 10 : 0),
-      grossPerAcre: "$500–$2,000/ac/yr passive — depends entirely on grid/substation access",
-      why: large
-        ? "a large parcel with transmission access can earn more leasing to solar than farming — zero-labor income"
-        : "possible on smaller acreage, but developers want scale and a nearby substation",
-    },
-    {
-      name: "Sell or hold for development",
-      score: 18 + (metroNear ? 40 : metroMid ? 15 : 0),
-      grossPerAcre: "one-time land sale — value tracks metro demand + zoning",
-      why: metroNear
-        ? "close enough to a metro to read developer-friendly now or soon — worth knowing what the ground is worth as future lots, not just as a farm"
-        : "rural enough that development isn't the near-term play",
+      name: "Forestry / Christmas trees",
+      score: 30 + (mid ? 8 : midsize ? 8 : 0) + (metroMid ? 8 : marketKnown ? 0 : -5),
+      grossPerAcre: "Long-cycle use - value depends on species, survival, harvest cycle and choose-and-cut/wholesale channel",
+      economicsBasis: "gross",
+      why: "a slower-cash land use that may fit portions of a tract, but it should not outrank faster or more productive uses without market and site evidence",
+      marketSensitive: true,
     },
   ];
 
-  // Drainage steering (NRCS drainage class, live SSURGO): tree and vine crops
-  // need drained ground; hay/pasture tolerates wet ground; wet commodity ground
-  // carries tiling cost. Applied programmatically so every option stays honest
-  // about WHY its rank moved.
   const drainage = (f.drainageClass ?? "").trim();
   const wetGround = /poorly drained/i.test(drainage);
   const drained = /^(well|excessively|somewhat excessively) drained/i.test(drainage);
-  const drainageAdjusted = raw.map((o) => {
+  const adjusted = raw.map((o) => {
     let score = o.score;
     let why = o.why;
     if (wetGround) {
-      if (/^(Orchard|Vineyard|Christmas)/.test(o.name)) {
-        score -= 18;
-        why = `${why}; NRCS maps the dominant soil here as ${drainage.toLowerCase()} — tree and vine crops need drained ground, raised beds, or tile before they pay`;
-      } else if (/^Pasture/.test(o.name)) {
-        score += 10;
-        why = `${why}; ${drainage.toLowerCase()} ground carries forage and pasture better than deep-rooted plantings`;
+      if (/^(Orchard|Vineyard|Forestry)/.test(o.name)) {
+        score -= 16;
+        why = `${why}; NRCS maps the dominant soil as ${drainage.toLowerCase()}, so deep-rooted/perennial plantings need drainage design before they earn a high rank`;
+      } else if (/^(Pasture|Hay)/.test(o.name)) {
+        score += 8;
       } else if (/^Commodity/.test(o.name)) {
         score -= 6;
       }
     } else if (drained && /^(Orchard|Vineyard)/.test(o.name)) {
-      score += 8;
-      why = `${why}; the ${drainage.toLowerCase()} dominant soil is the drainage profile tree and vine crops want`;
+      score += 7;
+      why = `${why}; the ${drainage.toLowerCase()} dominant soil is favorable drainage evidence for tree/vine establishment`;
     }
-    return { ...o, score, why };
+    if (o.marketSensitive && !marketKnown) score = Math.min(score, 55);
+    return { ...o, score: Math.max(0, Math.min(100, score)), why };
   });
 
-  const sorted = drainageAdjusted
-    .map((o) => ({ ...o, score: Math.max(0, Math.min(100, o.score)) }))
-    .sort((x, y) => y.score - x.score);
+  const sorted = [...adjusted].sort((x, y) => y.score - x.score);
+  const evidenceStatus: FarmBestUse["evidenceStatus"] = !acresKnown
+    ? "insufficient"
+    : soilKnown && countyEconomicsKnown && marketKnown && Boolean(f.zoningCode)
+      ? "supported-screen"
+      : "screening";
 
   const options: BestUseOption[] = sorted.map((o, i) => ({
     name: o.name,
-    tier: i === 0 ? "best" : o.score >= 55 ? "strong" : o.score >= 42 ? "possible" : "marginal",
+    tier: evidenceStatus === "insufficient"
+      ? "needs-evidence"
+      : evidenceStatus === "screening"
+        ? o.score >= 42
+          ? "possible"
+          : "marginal"
+        : i === 0
+          ? "leading-screen"
+          : o.score >= 60
+            ? "strong"
+            : o.score >= 42
+              ? "possible"
+              : "marginal",
     grossPerAcre: o.grossPerAcre,
+    economicsBasis: o.economicsBasis,
     why: o.why,
   }));
 
-  const top = sorted[0];
-  const commodity = sorted.find((o) => o.name.startsWith("Commodity"))!;
-  const beatsCommodity = top.name !== commodity.name && top.score > commodity.score + 8;
-  const parcel = acresKnown ? `this ~${a!.toLocaleString("en-US")}-acre parcel` : "this parcel";
+  const top = sorted[0] ?? null;
+  const commodity = sorted.find((o) => o.name.startsWith("Commodity")) ?? null;
+  const parcel = acresKnown ? `this ~${a!.toLocaleString("en-US", { maximumFractionDigits: 1 })}-acre parcel` : "this parcel";
   const place = where ? ` in ${where}` : "";
   const soilNote = f.primeFarmland
-    ? ` USDA soil: ${f.primeFarmland.toLowerCase()}${cap != null ? `, land-capability class ${cap}` : ""}${f.hardinessZone ? `, hardiness zone ${f.hardinessZone}` : ""}.`
-    : f.hardinessZone
-      ? ` Plant-hardiness zone ${f.hardinessZone}.`
-      : "";
+    ? ` USDA soil: ${f.primeFarmland.toLowerCase()}${cap != null ? `, land-capability class ${cap}` : ""}.`
+    : "";
   const yieldParts = [
     cornY != null ? `corn ~${cornY} bu/ac` : null,
     soyY != null ? `soybeans ~${soyY} bu/ac` : null,
     f.wheatYieldPerAcre != null ? `wheat ~${f.wheatYieldPerAcre} bu/ac` : null,
   ].filter(Boolean);
-  const yieldNote =
-    yieldParts.length > 0
-      ? ` County row-crop yields (USDA NASS${f.yieldYear ? ` ${f.yieldYear}` : ""}): ${yieldParts.join(", ")} — a county benchmark, not this parcel's guarantee.`
-      : "";
-  const headline = beatsCommodity
-    ? `For ${parcel}${place}, the numbers lean toward ${top.name.replace(/\s*\(.*\)/, "").toLowerCase()} over commodity row crops — ${top.why}.${soilNote}${yieldNote} Read the ranked options below as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`
-    : `For ${parcel}${place}, the ranked options below weigh real per-acre economics for this ground.${soilNote}${yieldNote} Read each as "possible here if the zoning, water, and market line up," and price your top one or two before committing.`;
+  const yieldNote = yieldParts.length
+    ? ` County crop benchmarks (USDA NASS${f.yieldYear ? ` ${f.yieldYear}` : ""}): ${yieldParts.join(", ")}.`
+    : "";
 
-  // Single anchor crop vs diversified portfolio (founder request 2026-07-28).
-  // Deterministic read of the same signals that built the ranking — advisory
-  // screening only, never an agronomic prescription.
+  const headline = evidenceStatus === "insufficient"
+    ? `Agricultural enterprise screen only - NOT the property's highest-and-best-use conclusion. Furlong does not have verified acreage for ${parcel}${place}, so it is not naming a best agricultural enterprise. Prime-soil status by itself cannot make commodity row crops the answer.${soilNote}${yieldNote}`
+    : evidenceStatus === "screening"
+      ? `Agricultural enterprise screen only - NOT the property's highest-and-best-use conclusion. For ${parcel}${place}, the current evidence orders ${top ? `${top.name.toLowerCase()} first among the agricultural candidates` : "the agricultural candidates"}, but one or more controlling inputs are still missing, so Furlong is not labeling any agricultural enterprise the leading use yet.${soilNote}${yieldNote}${commodity && !commodityScale ? ` Commodity row crops are treated as a rotation, lease, or component rather than an automatic best use because this tract is below stand-alone commodity scale.` : ""}`
+      : `Agricultural enterprise screen only - NOT the property's highest-and-best-use conclusion. For ${parcel}${place}, ${top ? `${top.name.toLowerCase()} currently leads the supported agricultural fit screen` : "no agricultural enterprise leads yet"}.${soilNote}${yieldNote}${commodity && !commodityScale ? ` Commodity row crops are treated as a rotation, lease, or component rather than an automatic best use because this tract is below stand-alone commodity scale.` : ""}`;
+
   const second = sorted[1] ?? null;
-  const topThreeClustered =
-    sorted.length >= 3 && sorted[0].score - sorted[2].score <= 12;
-  const commodityDominates =
-    top.name === commodity.name &&
-    large &&
-    goodSoil &&
-    (strongYield || goodCropland) &&
-    (second == null || top.score - second.score >= 12);
-  const portfolioAdvice: FarmBestUse["portfolioAdvice"] = commodityDominates
+  const topThreeClustered = sorted.length >= 3 && sorted[0].score - sorted[2].score <= 12;
+  const commodityDominates = Boolean(
+    commodityScale && commodity && top && top.name === commodity.name &&
+    goodSoil && (strongYield || goodCropland) &&
+    (second == null || top.score - second.score >= 12)
+  );
+
+  const portfolioAdvice: FarmBestUse["portfolioAdvice"] = !acresKnown
     ? {
-        verdict: "single-anchor",
-        title: "Run one anchor crop system here — a commodity rotation, not a monoculture",
+        verdict: "not-yet-ranked",
+        title: "Do not choose one crop or a diversified mix until acreage is verified",
         reasons: [
-          `The parcel has the scale${isPrime ? ", prime soil" : ""}${strongYield ? ", and county yields" : ""} for a commodity base, and no alternative scores close to it.`,
-          "One anchor SYSTEM still means a rotation (corn/soy/wheat) — rotating within the system protects soil, spreads workload, and is not the same as planting a single crop forever.",
-          "Add a small secondary enterprise only where it does not compete for labor at planting and harvest.",
+          "Parcel size is a controlling agricultural-use input. The earlier behavior let prime-soil status outrank the missing acreage and could falsely elevate row crops.",
+          "Once acreage is verified, Furlong can compare agricultural enterprises; property-wide highest/best use still requires zoning, infrastructure, entitlement and market feasibility.",
         ],
       }
-    : {
-        verdict: "diversify",
-        title: "Diversify — two or three complementary enterprises fit this ground better than one",
-        reasons: [
-          small
-            ? `At ${acresKnown ? `~${a!.toLocaleString("en-US")} acres` : "this size"}, a single commodity crop cannot carry the overhead — smaller parcels pay through higher-value mixes (produce, flowers, hay, agritourism).`
-            : topThreeClustered
-              ? "No single use clearly dominates — the top options score within a few points of each other, which is exactly when spreading across two or three of them beats betting on one."
-              : "The leading option is strong but not dominant — pairing it with a complementary second enterprise spreads weather and price risk across seasons.",
-          ...(wetGround
-            ? ["Drainage varies across ground like this — keep the wet portions in hay or pasture while the drained portion carries the higher-value planting."]
-            : []),
-          "Diversification also staggers cash flow through the year instead of concentrating it in one harvest window.",
-          "Before committing acreage, confirm zoning, water, and an actual buyer for each enterprise — the extension office and NRCS field staff are the free first calls.",
-        ],
-      };
+    : commodityDominates
+      ? {
+          verdict: "single-anchor",
+          title: "A commodity rotation can screen as the agricultural anchor at this scale",
+          reasons: [
+            "The parcel has commodity scale plus supporting soil/yield or rent evidence, and no other agricultural candidate is close enough to displace the rotation as the initial screen.",
+            "One anchor system still means a rotation (corn/soy/wheat), not a permanent monoculture.",
+            "This is an agricultural-enterprise conclusion only; nonagricultural alternatives remain a separate property feasibility question.",
+          ],
+        }
+      : {
+          verdict: "diversify",
+          title: topThreeClustered
+            ? "Several agricultural enterprises remain plausible - compare two or three before committing"
+            : "The leading agricultural screen is not dominant - compare it with a complementary second enterprise",
+          reasons: [
+            topThreeClustered
+              ? "No agricultural enterprise dominates the evidence enough to justify treating a single crop/use as the answer."
+              : "The leading agricultural option has a fit advantage, but not enough to skip enterprise-specific budgets, market/offtake and site constraints.",
+            "Use one economic basis at a time: gross revenue, net operating margin and startup capital are different measures and must not be ranked as though they were interchangeable.",
+            "Before committing acreage, verify zoning/use-table treatment, water, actual buyers/offtake, enterprise-specific costs and site constraints.",
+          ],
+        };
 
-  return { headline, options, portfolioAdvice };
+  const genericCandidates = [
+    "Agricultural production",
+    "Agritourism / value-added agriculture",
+    "Rural residential or subdivision potential where legally permitted",
+    "Renewable energy / storage where zoning and interconnection support it",
+    "Conservation / forestry / hold",
+  ];
+  const zoning = f.zoningLabel ?? f.zoningCode ?? null;
+  const propertyWideContext: FarmBestUse["propertyWideContext"] = {
+    currentUse: f.landUse ?? null,
+    zoning,
+    zoningSummary: f.zoningSummary ?? null,
+    source: f.zoningSource ?? null,
+    sourceUrl: f.zoningSourceUrl ?? null,
+    candidates: (f.propertyWideCandidates?.length ? f.propertyWideCandidates : genericCandidates),
+    note:
+      `${f.developmentNote ? `${f.developmentNote} ` : ""}` +
+      `${f.energyNote ? `${f.energyNote} ` : ""}` +
+      "Furlong must test legal permissibility, physical feasibility, entitlement/infrastructure, market demand and economics before naming a property-wide highest/best-supported use.",
+  };
+
+  return {
+    scope: "agricultural-enterprise-screen",
+    evidenceStatus,
+    missingCriticalInputs,
+    headline,
+    options,
+    propertyWideContext,
+    portfolioAdvice,
+  };
 }

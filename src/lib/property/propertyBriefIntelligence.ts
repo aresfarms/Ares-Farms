@@ -68,6 +68,7 @@ import {
   farmBestUse,
   type FarmBestUse,
   type FarmPropertyAnswer,
+  type FarmPropertyFacts,
 } from "./farmAnswerEngine";
 import {
   PROPERTY_TENURE_FACTS,
@@ -100,6 +101,7 @@ import { fetchWetlands } from "./wetlandsLive";
 import { fetchEpaFacilityScreen } from "./epaFacilitiesLive";
 import { fetchUsdaRuralEligibility, type UsdaRuralEligibility } from "./usdaRuralLive";
 import { STATE_ELECTRICITY, STATE_ELECTRICITY_PROVENANCE } from "./stateElectricityGenerated";
+import { zoningUseInterpretation } from "./zoningUseCurated";
 import {
   AMENITY_RADIUS_MILES,
   amenityLiveLookupEnabled,
@@ -198,9 +200,11 @@ export interface PropertyBriefIntelligence {
    * this is the per-property answer layer inside the analysis + PDF.
    */
   farmEnterpriseAnswers: FarmPropertyAnswer[] | null;
-  /** Highest-and-best-USE ranking for a farm/land parcel — every realistic
-      enterprise scored for THIS parcel, the best named, incl. change-of-use,
-      solar, and developer-friendliness. Null for non-farm-shaped properties. */
+  /** Agricultural enterprise screen for a farm/land parcel. It ranks crop,
+      forage, livestock and related farm-business candidates from the evidence
+      available, while keeping property-wide highest/best-supported use separate
+      for zoning, entitlement, infrastructure, market and conversion analysis.
+      Null for non-farm-shaped properties. */
   farmBestUse: FarmBestUse | null;
   /** Residential lane "burning questions" answered FOR THIS property (cost-to-own,
       flood, schools, rent, daily life, resale) from the facts we hold, with honest
@@ -1097,6 +1101,81 @@ function agConditionsFacts(stateCode: string | null): BriefFactLine[] {
     is the canonical taxonomy for everything else.) */
 function isFarmShaped(propertyType: string | null): boolean {
   return /farm|ranch|land|acre|agric|crop|pasture|homestead/i.test(propertyType ?? "");
+}
+
+
+/**
+ * Rebuild imported farm/land answers after the jurisdiction parcel lookup has
+ * resolved. The environmental/place bundle deliberately starts in parallel for
+ * speed, so its first pass may not yet know acreage or zoning. This second pure
+ * pass prevents missing acreage from turning prime-soil status into a false
+ * "best use" conclusion.
+ */
+export function applyResolvedFarmParcelContext(
+  intelligence: PropertyBriefIntelligence,
+  args: {
+    propertyType?: string | null;
+    acreageText?: string | null;
+    offeredAcreage?: number | null;
+    stateCode?: string | null;
+    landUse?: string | null;
+    zoningCode?: string | null;
+    publicWater?: boolean | null;
+    publicSewer?: boolean | null;
+  },
+): PropertyBriefIntelligence {
+  if (!isFarmShaped(args.propertyType ?? args.landUse ?? null)) return intelligence;
+
+  const acres =
+    typeof args.offeredAcreage === "number" && Number.isFinite(args.offeredAcreage) && args.offeredAcreage > 0
+      ? args.offeredAcreage
+      : parseAcres(args.acreageText ?? null);
+  const countyFips = intelligence.resolvedCounty?.fips ?? null;
+  const state = intelligence.resolvedCounty?.state ?? args.stateCode ?? null;
+  const county = intelligence.resolvedCounty?.name ?? null;
+  const zoning = zoningUseInterpretation({
+    state,
+    county,
+    zoningCode: args.zoningCode ?? null,
+  });
+
+  const farmFacts: FarmPropertyFacts = {
+    acres,
+    county,
+    state,
+    croplandRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.cropland ?? null : null,
+    pastureRentPerAcre: countyFips ? COUNTY_CASH_RENTS[countyFips]?.pasture ?? null : null,
+    stateFarmlandPerAcre:
+      (state ? STATE_FARMLAND[state.toUpperCase()]?.dollarsPerAcre : null) ?? null,
+    // Do not use distance to a major airport as a substitute for verified
+    // buyer/offtake access. The market signal stays unknown until Furlong has a
+    // real market-distance/offtake source for the enterprise being screened.
+    nearestMetroMiles: null,
+    primeFarmland: intelligence.soilProfile?.farmlandClass ?? null,
+    capabilityClass: intelligence.soilProfile?.capabilityClass ?? null,
+    drainageClass: intelligence.soilProfile?.drainageClass ?? null,
+    cornYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.corn ?? null : null,
+    soybeanYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.soybeans ?? null : null,
+    wheatYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.wheat ?? null : null,
+    yieldYear: countyFips ? COUNTY_YIELDS[countyFips]?.year ?? null : null,
+    landUse: args.landUse ?? null,
+    zoningCode: args.zoningCode ?? null,
+    zoningLabel: zoning?.zoningLabel ?? null,
+    zoningSummary: zoning?.summary ?? null,
+    zoningSource: zoning ? `${zoning.sourceName}, ${zoning.sourceAsOf}` : null,
+    zoningSourceUrl: zoning?.sourceUrl ?? null,
+    propertyWideCandidates: zoning?.propertyWideCandidates ?? undefined,
+    developmentNote: zoning?.developmentNote ?? null,
+    energyNote: zoning?.energyNote ?? null,
+    publicWater: args.publicWater ?? null,
+    publicSewer: args.publicSewer ?? null,
+  };
+
+  return {
+    ...intelligence,
+    farmEnterpriseAnswers: answerFarmQuestions(farmFacts),
+    farmBestUse: farmBestUse(farmFacts),
+  };
 }
 
 /**

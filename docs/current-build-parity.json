@@ -74,5 +74,17 @@
       "influencesProviderMatch": false
     }
   },
-  "parityImplementationCommit": "a81579e"
+  "parityImplementationCommit": "a81579e",
+  "propertyUseIntegrity": {
+    "runtimeVersion": "farm-use-integrity-v1.0.0",
+    "currentUseClassificationIsNotHighestBestUse": true,
+    "agriculturalEnterpriseScreenIsNotPropertyWideHighestBestUse": true,
+    "verifiedAcreageRequiredBeforeAgriculturalLeaderClaim": true,
+    "importedParcelAcreageReconciledBeforeFarmScreen": true,
+    "primeSoilAloneCannotMakeCommodityRowCropsBest": true,
+    "grossNetStartupEconomicsNotDirectlyInterchangeable": true,
+    "propertyWideUseMustTestLegalPhysicalEntitlementMarketEconomics": true,
+    "unsupportedZoningInterpretationFailsClosed": true,
+    "developmentMayNotBeDowngradedFromRuralLocationAlone": true
+  }
 }

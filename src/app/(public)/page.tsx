@@ -1,15 +1,11 @@
 import Link from "next/link";
 
 import { America250Banner } from "@/components/brand/America250Banner";
-import { CompassRose } from "@/components/public/CompassRose";
-import { NewsletterSignup } from "@/components/public/NewsletterSignup";
-import { discoveryPrimary, DISCOVERY_HREF } from "@/lib/discovery/discoveryConfig";
+import { HomePropertyFrontDoor } from "@/components/public/HomePropertyFrontDoor";
 import { Disclosures } from "@/components/public/Disclosures";
 import {
   HOMEPAGE_CAPABILITIES,
   HOMEPAGE_HERO,
-  HOMEPAGE_MODULES,
-  HOMEPAGE_PRIMARY_ACTIONS,
   HOMEPAGE_CLEAR_WATERS,
 } from "@/lib/public-content/publicCopyRegistry";
 
@@ -600,9 +596,186 @@ export default async function HomePage() {
             user-select: none;
           }
 
+          /* ── Single dominant property front door ─────────────────────── */
+          .fl-front-door {
+            position: relative;
+            margin: 22px auto 0;
+            width: min(100%, 920px);
+            padding: clamp(30px, 5vw, 54px);
+            display: grid;
+            justify-items: center;
+            gap: 24px;
+            text-align: center;
+            border: 1px solid rgba(184,134,47,0.42);
+            border-radius: 24px;
+            background:
+              radial-gradient(circle at 50% -20%, rgba(201,168,76,0.22), transparent 48%),
+              linear-gradient(145deg, #13253a 0%, #0f3141 56%, #124b4b 100%);
+            box-shadow: 0 26px 70px rgba(18,36,55,0.18);
+            overflow: hidden;
+          }
+          .fl-front-door::after {
+            content: "";
+            position: absolute;
+            width: 330px;
+            height: 330px;
+            right: -190px;
+            bottom: -220px;
+            border: 1px solid rgba(201,168,76,0.2);
+            border-radius: 999px;
+            box-shadow: 0 0 0 32px rgba(201,168,76,0.04), 0 0 0 68px rgba(201,168,76,0.025);
+            pointer-events: none;
+          }
+          .fl-front-door-copy {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            justify-items: center;
+            gap: 12px;
+            max-width: 750px;
+          }
+          .fl-front-door-eyebrow {
+            color: #e2c46f;
+            font-size: 12px;
+            font-weight: 850;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+          }
+          .fl-front-door-copy h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: clamp(28px, 4.5vw, 48px);
+            line-height: 1.08;
+            letter-spacing: -0.03em;
+          }
+          .fl-front-door-copy p {
+            margin: 0;
+            max-width: 700px;
+            color: #d6e1ea;
+            font-size: clamp(15px, 1.8vw, 18px);
+            line-height: 1.65;
+          }
+          .fl-front-door-form {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 760px);
+            display: grid;
+            gap: 9px;
+            text-align: left;
+          }
+          .fl-front-door-form label {
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+          }
+          .fl-front-door-control {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            padding: 7px;
+            background: #ffffff;
+            border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 15px;
+            box-shadow: 0 15px 42px rgba(0,0,0,0.2);
+          }
+          .fl-front-door-control:focus-within {
+            outline: 3px solid #e2c46f;
+            outline-offset: 3px;
+          }
+          .fl-front-door-control input {
+            min-width: 0;
+            min-height: 52px;
+            padding: 0 14px;
+            color: #162033;
+            background: transparent;
+            border: 0;
+            outline: 0;
+            font: inherit;
+            font-size: 16px;
+          }
+          .fl-front-door-control button {
+            min-height: 52px;
+            padding: 0 24px;
+            border: 0;
+            border-radius: 10px;
+            background: #9a6814;
+            color: #ffffff;
+            font: inherit;
+            font-size: 15px;
+            font-weight: 850;
+            cursor: pointer;
+          }
+          .fl-front-door-control button:hover { background: #7f540e; }
+          .fl-front-door-control button:disabled { cursor: progress; opacity: 0.72; }
+          .fl-front-door-support {
+            color: #b9c9d6;
+            font-size: 12px;
+            line-height: 1.5;
+          }
+          .fl-front-door-error {
+            min-height: 18px;
+            color: #ffd3c7;
+            font-size: 12.5px;
+            font-weight: 700;
+          }
+          .fl-possibilities-link {
+            position: relative;
+            z-index: 1;
+            color: #eef5f8;
+            font-size: 14px;
+            font-weight: 750;
+            text-underline-offset: 4px;
+          }
+          .fl-possibilities-link:hover { color: #e2c46f; }
+          .fl-possibilities-link:focus-visible { outline: 3px solid #e2c46f; outline-offset: 4px; }
+          .fl-front-door-outcomes {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 720px);
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.16);
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            color: #c5d3dc;
+            font-size: 12.5px;
+            line-height: 1.45;
+          }
+          .fl-front-door-outcomes span { display: grid; justify-items: center; gap: 7px; }
+          .fl-front-door-outcomes strong {
+            width: 29px;
+            height: 29px;
+            display: grid;
+            place-items: center;
+            border-radius: 999px;
+            color: #10263b;
+            background: #e2c46f;
+          }
+
           /* ── Responsive ────────────────────────────────────────────── */
           @media (max-width: 640px) {
-            .fl-hero { padding: 52px 0 28px; }
+            .fl-hero { padding: 44px 0 18px; }
+            .fl-front-door {
+              padding: 28px 18px;
+              border-radius: 18px;
+              gap: 20px;
+            }
+            .fl-front-door-control {
+              grid-template-columns: 1fr;
+            }
+            .fl-front-door-control button {
+              width: 100%;
+            }
+            .fl-front-door-outcomes {
+              grid-template-columns: 1fr;
+              gap: 12px;
+              text-align: left;
+            }
+            .fl-front-door-outcomes span {
+              grid-template-columns: 29px 1fr;
+              justify-items: start;
+              align-items: center;
+            }
             .fl-trust-strip-items { gap: 8px 16px; }
             .fl-not-grid { grid-template-columns: 1fr; }
             .fl-explore-select { min-height: 48px; }
@@ -664,62 +837,10 @@ export default async function HomePage() {
           </header>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════════
-            THE COMPASS — the /explore compass-rose explorer, moved to the
-            front page intact (founder direction 2026-07-17: keep it exactly).
-            Its "Explore your opportunities" heading is hidden here (redundant
-            with the hero above); the Navigator CTA sits BELOW it. Full-bleed
-            dark stage; breaks out of the max-width container.
-            ══════════════════════════════════════════════════════════════ */}
-        <div style={{ marginInline: "calc(50% - 50vw)" }}>
-          <CompassRose showHeading={false} showObjectives />
-        </div>
-
-        {/* Start-with-Furlong CTA — moved below the compass (founder direction
-            2026-07-17). */}
-        {discoveryPrimary() && (
-          <section className="fl-section" aria-label="Start with Furlong" style={{ textAlign: "center", display: "grid", gap: 12, justifyItems: "center" }}>
-            <p className="fl-hero-trust" style={{ margin: 0 }}>{HOMEPAGE_HERO.trustTag}</p>
-            <div className="fl-hero-action" style={{ display: "grid", gap: 8, justifyItems: "center" }}>
-              <Link href="/navigator" className="fl-cta-primary" data-testid="cta-navigator">
-                {HOMEPAGE_PRIMARY_ACTIONS.primaryLabel} →
-              </Link>
-              <span data-testid="cta-navigator-support" className="fl-hero-action-support">
-                {HOMEPAGE_PRIMARY_ACTIONS.primarySupport}
-              </span>
-            </div>
-          </section>
-        )}
-
-        {/* ═══════════════════════════════════════════════════════════════
-            MODULE CONVERSION — the four live modules, benefit-led, each a
-            direct path in. Bring the property/question, get the analysis;
-            explore free, bring in a licensed professional when ready.
-            ══════════════════════════════════════════════════════════════ */}
-        <section className="fl-section" aria-label="Where do you want to go">
-          <h2 className="fl-section-title">{HOMEPAGE_MODULES.heading}</h2>
-          <p className="fl-section-intro">{HOMEPAGE_MODULES.intro}</p>
-          <div className="fl-modules-grid">
-            {HOMEPAGE_MODULES.cards.map((card) => (
-              <Link
-                key={card.title}
-                href={card.href}
-                className="fl-module-card"
-                style={{ ["--mod-accent" as string]: card.accent }}
-              >
-                <span className="fl-module-eyebrow">{card.title}</span>
-                <p className="fl-module-lead">{card.lead}</p>
-                <p className="fl-module-body">{card.body}</p>
-                <span className="fl-module-cta">{card.cta} →</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Retention loop — capture the visitor who liked the free value. */}
-        <section className="fl-section" aria-label="Get the Compass" style={{ justifyItems: "center" }}>
-          <NewsletterSignup />
-        </section>
+        {/* Single dominant public front door. Furlong resolves the property
+            and reveals the relevant governed modules after the address is
+            verified; visitors without a property retain one quiet path. */}
+        <HomePropertyFrontDoor />
 
         <section className="fl-section" aria-label="What you can do here">
           <h2 className="fl-section-title">{HOMEPAGE_CAPABILITIES.heading}</h2>

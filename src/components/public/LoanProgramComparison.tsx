@@ -67,7 +67,7 @@ export function LoanProgramComparison() {
         </span>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6, maxWidth: 720 }}>
           How the main programs are built and what each is priced at right now — so you can see which one
-          your project points to. Not a quote or an approval; the licensed lender confirms the fit.
+          your project points to. Not a quote or an approval; the funding institution confirms the fit.
         </p>
         <span style={{ fontSize: 11.5, color: "#7a8aa0" }}>As of {rates.asOf} · your rate is set at your loan&apos;s closing</span>
       </div>

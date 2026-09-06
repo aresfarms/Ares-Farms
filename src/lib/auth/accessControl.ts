@@ -14,6 +14,7 @@ export type AccessRole =
   | "anonymous"
   | "user"
   | "borrower"
+  | "broker"
   | "lender"
   | "sponsor"
   | "operator"
@@ -40,6 +41,7 @@ const ROLE_ALIASES: Record<string, AccessRole> = {
   anonymous: "anonymous",
   user: "user",
   borrower: "borrower",
+  broker: "broker",
   lender: "lender",
   sponsor: "sponsor",
   operator: "operator",

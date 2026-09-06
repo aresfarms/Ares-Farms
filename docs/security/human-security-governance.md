@@ -6,8 +6,7 @@ securityIncidentRunbook.ts.
 - No single founder can: change production permissions · rotate master credentials · disable audit/
   replay/security/governance runtime · export sensitive financial/PII records. (Quorum ≥2; control-
   disable = ALL founders.)
-- Stuart = financial STEWARD, not unilateral override: financial high-risk / treasury / financial export
-  require Stuart + at least one additional founder. Stuart alone is always refused.
+- Financial high-risk / treasury / financial-export actions require the role-bound separation-of-powers approval defined by the current owner-controlled governance packet. The owner cannot self-approve a constitutionally significant financial control when independent review is required. External broker access confers no treasury or release authority.
 
 ## Founder procedures (executable via the incident runbook)
 - Compromise: forensicLockdown → globalSessionRevocation → treasuryFreeze → multi-party key rotation.

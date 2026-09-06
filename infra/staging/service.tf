@@ -222,8 +222,19 @@ resource "google_cloud_run_v2_service" "core" {
         value = var.notify_pe_email
       }
       env {
+        name  = "NOTIFY_CAPITAL_DESK_EMAIL"
+        value = var.notify_capital_desk_email
+      }
+      env {
         name  = "NOTIFY_LENDER_EMAIL"
         value = var.notify_lender_email
+      }
+      dynamic "env" {
+        for_each = var.capital_desk_booking_url == "" ? [] : [var.capital_desk_booking_url]
+        content {
+          name  = "CAPITAL_DESK_BOOKING_URL"
+          value = env.value
+        }
       }
       dynamic "env" {
         for_each = var.lender_booking_url == "" ? [] : [var.lender_booking_url]

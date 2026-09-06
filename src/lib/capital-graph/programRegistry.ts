@@ -50,7 +50,7 @@ export interface ProgramRegistryEntry {
   person_side_criteria: PersonSideFactor[];
   source_citation: string;
   freshness_cadence: string;
-  /** FREE | PAID | null — null until Caitlin + Stuart review the catalog. */
+  /** FREE | PAID | null — null until the owner/operator + designated independent finance reviewer review the catalog. */
   paywall_candidate: "FREE" | "PAID" | null;
   status: ProgramStatus;
 }

@@ -6,7 +6,7 @@
  * themed per audience lens:
  *   buyer         · navigator teal/gold  (the original Place Brief chart)
  *   environmental · surveyor green       (engineering / site-screen lens)
- *   finance       · ledger gold/slate    (Stuart's module — bankers' lens)
+ *   finance       · ledger gold/slate    (capital module — bankers' lens)
  *   commercial    · harbor copper        (commercial property buyers)
  *
  * GOVERNANCE (binding):

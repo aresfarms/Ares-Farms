@@ -3,7 +3,7 @@
  * (doctrine-only, Build-Later / Governance Approved Concept).
  * Doc: docs/doctrine/CURATED_OPPORTUNITY_PIPELINE_001.md
  *
- * Owner: Caitlin.  Reviewers: Stuart Fraass, Frances Fraass.
+ * Owner: Caitlin. Functional review queues are role-based, not person-bound.
  * Target surface: Furlong Hub (the [[furlong-module-spine]] discovery layer).
  *
  * CORE PRINCIPLE: Furlong is NOT a listing platform — it is a Decision
@@ -81,11 +81,11 @@ export const COP_WEEKLY_CURATION = {
       "environmental", "compliance", "agricultural", "unusual opportunities",
       "adaptive reuse", "stewardship potential",
     ],
-    Stuart: [
+    CapitalReview: [
       "financing pathways", "capital stack", "business viability",
       "lender attractiveness", "transaction feasibility",
     ],
-    Frances: [
+    PublicTrustReview: [
       "public appeal", "community value", "story potential",
       "communications impact", "audience interest",
     ],

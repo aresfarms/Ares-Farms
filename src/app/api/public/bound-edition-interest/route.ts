@@ -21,7 +21,7 @@ import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
  *     kept OUT of the audit ledger (which is broadly persisted/replayed) — the
  *     audit records only that a contactable reservation was made, never the raw
  *     name/email.
- *   - COUNSEL GATE: real PII collection is on Stuart's compliance review (#34)
+ *   - COUNSEL GATE: real PII collection remains subject to independent compliance review
  *     before this faces the public; alpha runs on IAP-private staging (only
  *     allowlisted testers can reach it), which contains it.
  *

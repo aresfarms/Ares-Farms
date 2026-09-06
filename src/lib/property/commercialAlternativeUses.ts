@@ -29,8 +29,22 @@ export function commercialAlternativeUses(args: {
   const sqft = args.squareFeet;
   const industrialish = /industrial|warehouse|flex|manufactur/i.test(zoningText);
   const mainStreetish = /mixed|central business|village|town center|downtown|main street|\bcbd\b/i.test(zoningText);
+  const hospitalityish = /hotel|motel|hospitality|lodging|inn|resort/i.test(zoningText);
 
   const uses: AlternativeUse[] = [];
+
+  if (hospitalityish) {
+    uses.push({
+      use: "Extended-stay hospitality",
+      why: "A hotel shell may support longer-stay demand with less turnover and a more stable occupancy profile when room mix, kitchens and local demand cooperate.",
+      watch: "Confirm zoning, room configuration, life-safety, accessibility, transient-occupancy rules, licensing and whether kitchen additions trigger building or health review.",
+    });
+    uses.push({
+      use: "Senior housing / independent-living conversion",
+      why: "Hospitality buildings can have a useful conversion geometry: many private rooms, common areas, parking and an existing commercial life-safety envelope. The opportunity is real only if land-use, accessibility, egress, utilities and the operating model work.",
+      watch: "Treat this as a regulatory-conversion project, not a simple rent change. Zoning or special-exception review, change of occupancy, fire/life-safety, accessibility and potentially state care-facility licensing can control the deal timeline.",
+    });
+  }
 
   uses.push({
     use: "Professional / medical office",
@@ -68,7 +82,7 @@ export function commercialAlternativeUses(args: {
   });
 
   return {
-    uses: uses.slice(0, 5),
+    uses: uses.slice(0, 7),
     note:
       `A building is often marketed for its last use, not its highest${args.town ? ` — in ${args.town}, ` : " — "}the screen above lists uses the verified record does not rule out. ` +
       `${zoningKnown ? `Recorded zoning ("${args.zoning}") was used to filter; the municipal use table is the authority.` : "No zoning is recorded for this parcel — zoning verification is step one before any of these."} ` +

@@ -19,8 +19,8 @@ import {
 const COOKIE = "furlong-professional-test-role";
 const TEST_EMAIL = "chudson@aresfarmsinc.com";
 const TEST_NAME = "Pocohantus Smith";
-const ROLES = new Set(["lender", "attorney", "auditor", "sponsor"]);
-type TestRole = "lender" | "attorney" | "auditor" | "sponsor";
+const ROLES = new Set(["broker", "lender", "attorney", "auditor", "sponsor"]);
+type TestRole = "broker" | "lender" | "attorney" | "auditor" | "sponsor";
 async function currentEmail(req: NextRequest): Promise<string | null> {
   const secret = resolveNextAuthSecret();
   if (!secret) return null;

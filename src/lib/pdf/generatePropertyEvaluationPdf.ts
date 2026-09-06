@@ -41,6 +41,19 @@ type PropertyEvaluationPdfInput = {
   };
   executiveSummary: string;
   propertySummary: string[];
+  propertyValueScreen?: {
+    status: "indicated" | "needs-property-evidence" | "no-registered-basis" | "no-assessed-value";
+    profileId: string;
+    methodCode: string;
+    confidence: string;
+    lowUsd: number | null;
+    midUsd: number | null;
+    highUsd: number | null;
+    method: string;
+    cautions: string[];
+    sources: string[];
+    requiredInputs: string[];
+  };
   conceptSummary: string[];
   strengths: string[];
   risks: string[];
@@ -684,6 +697,27 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       .filter((row) => !/^(asset|location|asking posture|immediate deal type|asset type|source)$/i.test(row.label)),
   ]);
 
+  if (input.propertyValueScreen) {
+    const value = input.propertyValueScreen;
+    heading("Furlong Property Estimate — Screening");
+    if (value.status === "indicated" && value.lowUsd != null && value.midUsd != null && value.highUsd != null) {
+      factsTable([
+        { label: "Screening range", value: `$${value.lowUsd.toLocaleString("en-US")} – $${value.highUsd.toLocaleString("en-US")}` },
+        { label: "Midpoint", value: `$${value.midUsd.toLocaleString("en-US")}` },
+        { label: "Method", value: `${value.methodCode} · ${value.confidence}` },
+      ]);
+      paragraph(value.method, { size: 9.5 });
+    } else {
+      panel({
+        title: "Needs property-specific valuation evidence",
+        lines: [value.method, ...(value.requiredInputs.length ? [`Needed next: ${value.requiredInputs.join("; ")}`] : [])],
+        fill: ACCENT_SOFT,
+      });
+    }
+    for (const caution of value.cautions) paragraph(caution, { size: 8.5, color: COLORS.muted });
+    if (value.sources.length) paragraph(`Sources: ${value.sources.join(" · ")}`, { size: 8, color: COLORS.faint });
+  }
+
   // ── LANE QUESTIONS, ANSWERED ───────────────────────────────────────────────
   // Directly after the snapshot — the founder's direct-to-answers principle
   // applies to the printed ledger too.
@@ -870,9 +904,9 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
     panel({
       title: "When you're ready to move",
       lines: [
-        "Furlong coordinates financing files with Five Borough Capital, the professional financing module in the Furlong ecosystem. When you're ready, your profile and documents can carry forward — nothing re-typed, nothing resold.",
-        "Worth having ready: photo ID, recent income documentation, a rough source-of-funds picture, and (once you have one) the property contract. Your readiness list tracks what's still missing.",
-        "Financing decisions belong to licensed lenders — Furlong never approves, guarantees, or determines eligibility.",
+        "Furlong Capital Desk can carry the property/project case into the Capital Network. You choose the provider; Furlong does not sell leads, auction files, or improve ranking because a provider pays more.",
+        "For nonresidential property, Furlong ranks the property/project from use, location, economics, DSCR, entitlement, environmental and program fit. Personal financials do not change that ranking. A selected provider may separately request borrower/business underwriting documents before approval.",
+        "Financing decisions belong to the selected lender or program authority — Furlong never approves, guarantees, or determines eligibility.",
       ],
       fill: ACCENT_SOFT,
     });
@@ -964,7 +998,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   doc.text("Why we lay it all out.", PAGE.marginX, y, { continued: true });
   setFont("regular", 11, COLORS.text);
   doc.text(
-    " We open every figure with its source and date because this is your ground, not ours to gate. Reading and analyzing stay anonymous — no account, no data capture, no handoff. The one exception, stated plainly: if you choose to join a waitlist or the Guild, we ask your name and email only to reach you, and tell you exactly why. That is a guarantee about our own conduct — the part we fully control. Read it, check it, and carry it wherever you like.",
+    " We open every figure with its source and date because this is your ground, not ours to gate. The open property analysis can remain anonymous. If you choose a paid report, save a case, nominate a provider, open a deal room, request a professional service, or authorize delivery, Furlong collects only what that chosen workflow requires and states the purpose at collection. Furlong never sells borrower leads, auctions borrower files, or lets compensation improve provider ranking. Read it, check it, and carry it wherever you like.",
     { width: CONTENT_W, lineGap: 3 }
   );
   y = doc.y + 14;
@@ -977,17 +1011,17 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   heading("Route This File — Your Next Coordinates");
   checklist([
-    "Route this dossier to the licensed lending desk for financing coordination — USDA, SBA, or conventional mapping.",
-    "Route this dossier to the Guild's licensed PE for environmental review — wetland boundary and Phase I.",
+    "Use the Capital Network to compare suitable providers, nominate your own provider, or invite a verified one-case guest provider for financing coordination.",
+    "Request a qualified environmental professional when the property or financing path calls for wetland, Phase I, or other environmental diligence.",
   ]);
   paragraph(
-    "These route to Furlong's own disclosed people. Furlong facilitates the introduction; it never decides your deal and takes no cut of your transaction.",
+    "These are optional borrower-controlled workflows. A provider receives only the exact package you authorize for that exact recipient. Furlong does not sell leads, auction files, shotgun-route a case, or let compensation or affiliation improve provider ranking.",
     { size: 9, color: COLORS.muted }
   );
 
   // ── FINAL PASS: footer + page numbers on every buffered page ───────────────
   //
-  // THE TIER ARTIFACT BOUNDARY (founder direction 2026-07-18, for Stuart's
+  // THE TIER ARTIFACT BOUNDARY (founder direction 2026-07-18, for the external broker
   // tier verdict): the FREE export keeps the diagonal informational watermark
   // — free forever, share it anywhere, it advertises Furlong. The PAID tiers
   // export CLEAN: no diagonal line, a "prepared for institutional use" footer

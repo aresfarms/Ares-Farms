@@ -3,14 +3,13 @@
  * (founder direction 2026-07-29: the downloadable pro forma must be the REAL
  * SBA/USDA-structured document, not the property report).
  *
- * Maps what Furlong verifiably knows about the PROPERTY (price, acreage,
- * county economics, modeled enterprise NOI, published FSA rate) into the
- * UltimateProformaInput (Parts I–IV). Everything borrower-side — identity,
- * ownership tables, guarantor PFS, balance sheet, registers — is left empty
- * ON PURPOSE, so the Part V generation gate stays red, the document renders
- * with the DRAFT banner, and the gate checklist page lists exactly what SBA
- * and USDA underwriting still requires. Deterministic: same inputs → same
- * document (generationDate is supplied by the caller).
+ * Maps what Furlong verifiably knows about the PROPERTY/PROJECT (price,
+ * acreage, county economics, modeled enterprise NOI, published program rate)
+ * into the UltimateProformaInput (Parts I–IV). Borrower-side identity and
+ * financial fields are not Furlong nonresidential scoring inputs. Where an
+ * SBA/USDA/FSA lender later requires them, the DRAFT leaves those fields open
+ * for recipient-bound provider underwriting after customer authorization.
+ * Deterministic: same property/project inputs → same document.
  */
 
 import type { LoanLane, UltimateProformaInput } from "@/lib/pdf/ultimateProformaTemplate";
@@ -53,9 +52,10 @@ export interface DraftProformaPropertyArgs {
 }
 
 const TO_SUPPLY = "TO BE SUPPLIED AT UNDERWRITING";
-// Personal financial statement fields route through Furlong's licensed
-// Financial module, not a generic underwriting hand-off (founder 2026-07-29).
-const VIA_FINANCIAL_MODULE = "INCLUDED WITH THE PERSONAL FINANCIAL MODULE";
+// Borrower financial statement fields, where required by a selected provider,
+// are recipient-bound underwriting evidence. They do not feed Furlong's
+// nonresidential property score, program ranking, or Capital Network ranking.
+const VIA_FINANCIAL_MODULE = "PROVIDER-REQUIRED BORROWER EVIDENCE — RECIPIENT-BOUND; NOT A FURLONG PROPERTY-SCORING INPUT";
 
 const dollars = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
 
@@ -213,9 +213,8 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         netWorth: VIA_FINANCIAL_MODULE,
         totalAnnualIncome: VIA_FINANCIAL_MODULE,
       },
-      // The opening balance sheet is borrower financial data too — it is
-      // collected through the personal Financial module alongside the PFS
-      // (founder 2026-07-29), not left to a generic underwriting hand-off.
+      // Borrower balance-sheet data is provider-side underwriting evidence,
+      // not a Furlong property-ranking input. It remains open in the DRAFT.
       balanceSheet: {
         current: { assets: VIA_FINANCIAL_MODULE, liabilities: VIA_FINANCIAL_MODULE },
         intermediate: { assets: VIA_FINANCIAL_MODULE, liabilities: VIA_FINANCIAL_MODULE },
@@ -264,10 +263,10 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
     partII: {
       laneRationale:
         args.lane === "B"
-          ? `USDA/FSA farm-ownership is the screening lane for an agricultural acquisition${where ? ` in ${where}` : ""}: purpose-built for farm real estate, ${AMORT_YEARS}-year terms, and the published direct rate used in the debt-service model. Final lane selection is made with the lender against the borrower's full file.`
-          : `SBA 7(a) is the screening lane for an owner-operated business acquisition${where ? ` in ${where}` : ""}. Final lane selection is made with the lender against the borrower's full file.`,
+          ? `USDA/FSA farm-ownership is the property/program screening lane for an agricultural acquisition${where ? ` in ${where}` : ""}: purpose-built for farm real estate, ${AMORT_YEARS}-year terms, and the published direct rate used in the debt-service model. Furlong's ranking remains property/project-only; the selected provider performs any borrower underwriting required for approval.`
+          : `SBA 7(a) is a property/program screening lane for an owner-operated business acquisition${where ? ` in ${where}` : ""}. Furlong's ranking remains property/project-only; the selected provider performs any borrower/business underwriting required for approval.`,
       eligibilityNarrative:
-        `Property-side screening only: the figures in Parts I and IV come from the ${propertyCount > 1 ? `${propertyCount} included properties'` : "property's"} verified record${propertyCount > 1 ? "s" : ""}, county economics, and modeled enterprise income.${unmodeledIncomeNote} Borrower eligibility, credit, injection capacity, and program qualification are determined exclusively at underwriting — this DRAFT makes no eligibility finding.`,
+        `Property/project screening only: the figures in Parts I and IV come from the ${propertyCount > 1 ? `${propertyCount} included properties'` : "property's"} verified record${propertyCount > 1 ? "s" : ""}, county economics, and modeled enterprise income.${unmodeledIncomeNote} Personal credit, income, DTI, assets and liquidity do not alter Furlong's nonresidential property/program ranking. The selected provider separately determines borrower/business underwriting, program eligibility and approval — this DRAFT makes no eligibility finding.`,
     },
     ...(args.lane === "B"
       ? { moduleB: { countyOffice: args.county ? `${args.county}${/county/i.test(args.county) ? "" : " County"} USDA Service Center` : "County USDA Service Center (identified from the parcel county)" } }
@@ -280,7 +279,7 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         margins: { conservative: "NOI-modeled", stabilized: "NOI-modeled" },
         debtService: annualDebtService != null ? dollars(annualDebtService) : "Requires acquisition price + rate",
         dscrStandalone: { conservative: dscr(consNoi), stabilized: dscr(stabNoi) },
-        dscrGlobal: { conservative: "Requires borrower's full obligations", stabilized: "Requires borrower's full obligations" },
+        dscrGlobal: { conservative: "Not used in Furlong nonresidential property scoring — selected provider handles borrower-side underwriting separately", stabilized: "Not used in Furlong nonresidential property scoring — selected provider handles borrower-side underwriting separately" },
         dscrFloor: "1.25x screening threshold",
         stressDescription: `Conservative-case net operating income stressed a further -25%.${unmodeledIncomeNote}`,
         dscrStress: dscr(stressNoi),

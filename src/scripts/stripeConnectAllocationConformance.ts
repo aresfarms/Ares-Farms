@@ -10,7 +10,6 @@ import {
 
 const recipients = {
   CAITLIN: { connectedAccountRef: "acct_caitlin_fixture", certified: true },
-  STUART: { connectedAccountRef: "acct_stuart_fixture", certified: true },
 };
 
 const retainAll = buildAllocationEvidence({
@@ -31,7 +30,6 @@ const approved = createAllocationRule({
   version: 3,
   status: "APPROVED",
   caitlinBasisPoints: 2500,
-  stuartBasisPoints: 3500,
   effectiveAt: "2026-08-06T00:00:00.000Z",
   approvedByRefs: ["founder-review-fixture"],
 });
@@ -46,14 +44,13 @@ const split = buildAllocationEvidence({
 });
 
 assert.equal(split.allocations[0].amount, 2500);
-assert.equal(split.allocations[1].amount, 3500);
-assert.equal(split.furlongRetainedAmount, 4000);
+assert.equal(split.furlongRetainedAmount, 7500);
 assert.equal(split.allocations.every((item) => item.transferEligible), true);
 assert.equal(buildStripeTransferPlan(split).every((item) => item.executionAllowed === false), true);
 assert.match(split.evidenceSha256, /^[a-f0-9]{64}$/);
 assert.throws(
-  () => createAllocationRule({ ...approved, caitlinBasisPoints: 6000, stuartBasisPoints: 5000 }),
-  /cannot exceed 100%/
+  () => createAllocationRule({ ...approved, caitlinBasisPoints: 11_000 }),
+  /must be an integer from 0 through 10000 basis points/
 );
 
 const replay = buildAllocationEvidence({
@@ -67,11 +64,8 @@ const replay = buildAllocationEvidence({
 });
 assert.equal(replay.evidenceSha256, split.evidenceSha256);
 
-assert.deepEqual(directModuleRule("CAITLIN_ENVIRONMENTAL_MODULE"), { caitlinBasisPoints: 10_000, stuartBasisPoints: 0 });
-assert.deepEqual(directModuleRule("STUART_FINANCING_MODULE"), { caitlinBasisPoints: 0, stuartBasisPoints: 10_000 });
-const frances = directModuleRule("FRANCES_FUTURE_MODULE");
-assert.equal(frances.stuartBasisPoints, 10_000);
-assert.equal(frances.economicOwner, "FRANCES");
+assert.deepEqual(directModuleRule("OWNER_ENVIRONMENTAL_MODULE"), { caitlinBasisPoints: 0 });
+assert.deepEqual(directModuleRule("PLATFORM_FINANCING_MODULE"), { caitlinBasisPoints: 0 });
 
 const waterfall = buildGeneralFundWaterfall({
   paymentRef: "pi_general_fixture",
@@ -94,9 +88,9 @@ const waterfall = buildGeneralFundWaterfall({
 assert.equal(waterfall.stewardshipEntitlementThisMonth, 400_000);
 assert.equal(waterfall.stewardshipCashPaidOnThisPayment, 400_000);
 assert.equal(waterfall.buildRecoveryPaid > 0, true);
-assert.equal(waterfall.caitlinGeneralDistribution, waterfall.stuartGeneralDistribution);
+assert.equal(waterfall.caitlinGeneralDistribution, 0);
 assert.equal(
-  waterfall.totalCaitlinTransfer + waterfall.totalStuartTransfer + waterfall.platformReserveRetained + waterfall.externalDeductions + waterfall.operatingExpenses,
+  waterfall.totalCaitlinTransfer + waterfall.platformReserveRetained + waterfall.externalDeductions + waterfall.operatingExpenses,
   waterfall.grossAmount
 );
 assert.match(waterfall.evidenceSha256, /^[a-f0-9]{64}$/);
@@ -118,7 +112,6 @@ console.log(JSON.stringify({
   ok: true,
   retainAll: retainAll.furlongRetainedAmount,
   caitlin: split.allocations[0].amount,
-  stuart: split.allocations[1].amount,
   furlongRetained: split.furlongRetainedAmount,
   transferPromotionActive: false,
   evidenceSha256: split.evidenceSha256,

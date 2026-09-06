@@ -9,7 +9,6 @@ import {
 import { NavigatorEntryCta } from "@/components/public/NavigatorEntryCta";
 import { LoanProgramComparison } from "@/components/public/LoanProgramComparison";
 import { accentForLane } from "@/lib/property/laneThemes";
-import { activePartners } from "@/lib/modules/licensedModuleRegistry";
 import { resolveNextAuthSecret } from "@/lib/auth/nextAuthSecurity";
 import {
   SYNTHETIC_FIXTURE_COOKIE,
@@ -19,8 +18,9 @@ import {
 /**
  * FinancingLaneSections — the Financial & Capital module's sections. The
  * customer learns how financing works, sees live public capital rates, then
- * submits a deal that is routed to the licensed lender (Stuart / the lending
- * spoke). Wears the financing PURPLE accent. Server component; the intake panel
+ * submits a deal into the owner-controlled Capital Desk. A later external
+ * financing handoff requires a certified recipient plus exact borrower consent.
+ * Wears the financing PURPLE accent. Server component; the intake panel
  * is the one client island.
  *
  * Master Volume Governance:
@@ -28,8 +28,9 @@ import {
  *   it never lends, qualifies, prices, or approves. "A program fitting a
  *   project is not the same as you qualifying."
  * - Section 1071 firewall: no demographic data is collected anywhere here.
- * - Bright line: Furlong takes no transaction-tied compensation.
- * Educational + illustrative; the licensed lender is the decision authority.
+ * - Bright line: paid brokerage/packaging is not activated by intake; any later
+ *   compensation requires the commercial-finance authority gate.
+ * Educational + illustrative; the funding institution is the decision authority.
  */
 
 const PURPLE = accentForLane("financing-capital", "light"); // #534AB7
@@ -59,7 +60,7 @@ interface FinBrief {
 const FINANCING_BRIEFS: FinBrief[] = [
   {
     title: "How this works",
-    body: "You bring the deal; we route it to a commercial debt broker who reviews the fit and follows up. Furlong is the analysis and coordination layer — it does not lend, qualify, price, or approve, and it takes no fee tied to your transaction.",
+    body: "You bring the deal; the Furlong Capital Desk organizes readiness, compares pathways, and identifies possible lender categories. No outside lender or broker receives the case from this intake alone, and Furlong Core does not lend, qualify, price, or approve.",
   },
   {
     title: "SBA, USDA, or conventional — the quick map",
@@ -121,7 +122,7 @@ export async function FinancingLaneSections() {
             color: PURPLE,
           }}
         >
-          Our dedicated commercial debt broker
+          Furlong Capital Desk
         </span>
         <p
           style={{
@@ -133,8 +134,8 @@ export async function FinancingLaneSections() {
           }}
         >
           The capital side of every property decision. Learn how the programs
-          map to your project, see today&apos;s public rates, then send your
-          deal to a commercial debt broker who can actually do the work.
+          map to your project, see current public rate context, then place the
+          deal in the Capital Desk so readiness and lender-network options can be organized before any external handoff.
         </p>
         <div style={cardGrid}>
           {FINANCING_BRIEFS.map((b) => (
@@ -174,30 +175,46 @@ export async function FinancingLaneSections() {
         >
           Who reviews your deal
         </span>
-        <div
-          style={{
-            display: "grid",
-            gap: 8,
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          }}
-        >
-          {activePartners("financing-capital").map((p) => (
-            <div key={p.slug} style={card}>
-              <strong style={{ fontSize: 14, color: "#101a2b" }}>
-                {p.name}
-              </strong>
-              <span
-                style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}
-              >
-                {p.blurb}
-              </span>
-            </div>
-          ))}
+        <div style={card}>
+          <strong style={{ fontSize: 14, color: "#101a2b" }}>
+            Capital Desk first; funding institution second
+          </strong>
+          <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>
+            Furlong organizes the case and identifies possible institutions. Candidate lenders are not represented as partners until certification is complete. The selected funding institution performs underwriting and makes the credit decision.
+          </span>
         </div>
       </section>
 
-      {/* Stable anchor for every "take me to the lender intake" entry point
-          (0% DOWN callout, report-tab hand-off) — founder 2026-07-29. */}
+      <section
+        aria-label="Furlong Capital Network"
+        style={{ ...card, borderColor: "#c9c4f3", background: "#f8f7ff" }}
+      >
+        <span
+          style={{
+            fontSize: 11.5,
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: PURPLE,
+          }}
+        >
+          One case · multiple providers
+        </span>
+        <strong style={{ fontSize: 16, color: "#101a2b" }}>
+          The Capital Network is built for choice, not a single-lender funnel.
+        </strong>
+        <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>
+          Certified brokers and funding institutions declare the states, programs, deal sizes, and transaction types they actually work. Furlong compares those declared profiles to your case without making a credit decision. You choose which matched providers you want to work with, and choosing one does not send the file — package-specific consent and recipient verification still come first.
+        </p>
+        <Link
+          href="/capital-network/onboarding"
+          style={{ color: PURPLE, fontSize: 12.5, fontWeight: 800, textDecoration: "none", width: "fit-content" }}
+        >
+          Broker or lender? Apply to join the Capital Network →
+        </Link>
+      </section>
+
+      {/* Stable anchor for every financing-intake entry point. */}
       <div id="lender-intake">
         <FinancingIntakePanel syntheticFixture={lenderScenario} />
       </div>

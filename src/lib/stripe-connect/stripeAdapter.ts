@@ -19,10 +19,6 @@ export function stripeConnectRecipientRegistryFromEnv() {
       connectedAccountRef: process.env.STRIPE_CONNECT_CAITLIN_ACCOUNT_ID?.trim() || null,
       certified: process.env.STRIPE_CONNECT_CAITLIN_CERTIFIED === "true",
     },
-    STUART: {
-      connectedAccountRef: process.env.STRIPE_CONNECT_STUART_ACCOUNT_ID?.trim() || null,
-      certified: process.env.STRIPE_CONNECT_STUART_CERTIFIED === "true",
-    },
   } as const;
 }
 

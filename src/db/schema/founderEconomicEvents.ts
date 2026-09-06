@@ -1,6 +1,6 @@
 import { integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-/** Immutable founder/platform economic allocation evidence. */
+/** Immutable owner/platform economic allocation evidence. Legacy physical column names are preserved only for replay compatibility. */
 export const founderEconomicEvents = pgTable("founder_economic_events", {
   id: uuid("id").defaultRandom().primaryKey(),
   evidenceId: text("evidence_id").notNull().unique(),
@@ -17,7 +17,7 @@ export const founderEconomicEvents = pgTable("founder_economic_events", {
   founderExpenseReimbursement: integer("founder_expense_reimbursement").notNull().default(0),
   buildRecoveryPaid: integer("build_recovery_paid").notNull().default(0),
   caitlinGeneralDistribution: integer("caitlin_general_distribution").notNull().default(0),
-  stuartGeneralDistribution: integer("stuart_general_distribution").notNull().default(0),
+  legacyPartnerGeneralDistribution: integer("stuart_general_distribution").notNull().default(0),
   platformReserveRetained: integer("platform_reserve_retained").notNull().default(0),
   allocationPayload: jsonb("allocation_payload").notNull(),
   governanceVersion: text("governance_version").notNull(),

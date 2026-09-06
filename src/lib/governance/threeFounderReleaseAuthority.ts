@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 
 export const THREE_FOUNDER_RELEASE_AUTHORITY_RULE =
-  "THREE-FOUNDER-CROSS-FUNCTIONAL-RELEASE-AUTHORITY-001" as const;
+  "ROLE-SEPARATED-CROSS-FUNCTIONAL-RELEASE-AUTHORITY-002" as const;
 
-export type Founder = "CAITLIN" | "STUART" | "FRANCIS";
+export type Founder = "OWNER" | "INDEPENDENT_REVIEWER" | "FINANCE_RISK_REVIEWER" | "INDEPENDENT_FINAL_REVIEWER";
 export type FounderDomain =
   | "TECHNICAL_GOVERNANCE"
   | "FINANCE_UNDERWRITING"
@@ -34,7 +34,7 @@ export type ThreeFounderReleaseDecision = {
   rule: typeof THREE_FOUNDER_RELEASE_AUTHORITY_RULE;
   status: "BLOCKED" | "READY_FOR_SEPARATE_ACTIVATION";
   activationPerformed: false;
-  unanimousInitialLaunchRequired: true;
+  roleSeparatedInitialLaunchRequired: true;
   ownerSelfApprovalProhibited: true;
   unilateralStopAuthority: true;
   blockers: string[];
@@ -59,7 +59,7 @@ export function evaluateThreeFounderReleaseAuthority(
   const founders = new Set(input.approvals.map((a) => a.founder));
 
   if (input.initialLaunch && founders.size !== 3)
-    blockers.push("initial-launch-requires-unanimous-three-founder-approval");
+    blockers.push("initial-launch-requires-three-role-separated-approvals");
   const ownerRecords = input.approvals.filter((a) => a.founder === input.changeOwner);
   if (ownerRecords.some((a) => a.role !== "TECHNICAL_CONSTITUTIONAL_ATTESTATION"))
     blockers.push("change-owner-cannot-independently-approve-own-change");
@@ -82,7 +82,7 @@ export function evaluateThreeFounderReleaseAuthority(
       ? ("READY_FOR_SEPARATE_ACTIVATION" as const)
       : ("BLOCKED" as const),
     activationPerformed: false as const,
-    unanimousInitialLaunchRequired: true as const,
+    roleSeparatedInitialLaunchRequired: true as const,
     ownerSelfApprovalProhibited: true as const,
     unilateralStopAuthority: true as const,
     blockers: [...new Set(blockers)].sort(),

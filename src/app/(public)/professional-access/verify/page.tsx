@@ -35,7 +35,7 @@ export default function ProfessionalVerificationPage() {
         <label style={field}><span>Full legal name</span><input name="fullLegalName" required style={input} /></label>
         <label style={field}><span>Email invited to Furlong</span><input name="email" type="email" required style={input} /></label>
         <label style={field}><span>Professional lane</span><select name="role" required style={input} defaultValue="lender">
-          <option value="lender">Lender / Debt Broker</option><option value="attorney">Attorney / Counsel</option><option value="auditor">Auditor / Examiner</option><option value="sponsor">Sponsor / Institutional Partner</option>
+          <option value="broker">Commercial Debt Broker</option><option value="lender">Funding Lender</option><option value="attorney">Attorney / Counsel</option><option value="auditor">Auditor / Examiner</option><option value="sponsor">Sponsor / Institutional Partner</option>
         </select></label>
         <label style={field}><span>Credential type</span><input name="credentialType" required style={input} placeholder="e.g. broker license, bar admission, examiner commission" /></label>
         <label style={field}><span>Credential / license identifier</span><input name="credentialIdentifier" required style={input} /></label>

@@ -24,7 +24,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief";
 import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
-import { indicateMarketValue } from "@/lib/property/marketValueIndication";
+import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
 
 export type TabId = "summary" | "property" | "agriculture" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
 export type CategoryTabId = Exclude<TabId, "summary" | "report" | "finance">;
@@ -77,6 +77,7 @@ export type LaneWorkspaceProps = ChartTableBriefProps & {
     recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
     parcelSourceName?: string | null;
     parcelSourceAsOf?: string | null;
+    assessmentAsOf?: string | null;
     parcelSourceUrl?: string | null;
     landUse?: string | null;
     zoning?: string | null;
@@ -85,6 +86,7 @@ export type LaneWorkspaceProps = ChartTableBriefProps & {
     assessedLandValue?: number | null;
     assessedImprovementValue?: number | null;
     assessedTotalValue?: number | null;
+    propertyValueScreen?: MarketValueIndication | null;
     publicWater?: boolean | null;
     publicSewer?: boolean | null;
     waterfront?: boolean | null;
@@ -180,13 +182,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
         ? `Source: ${record.parcelSourceName ?? "official jurisdiction parcel record"} · ${record.parcelSourceAsOf ? `source-published data date ${record.parcelSourceAsOf}` : "this source publishes no data date — the figures may be years old"}`
         : "Source: matched property/listing record";
     const place = [record.town, record.county, record.state].filter(Boolean).join(", ");
-    const valuation = indicateMarketValue({
-      assessedTotalValue: record.assessedTotalValue,
-      stateCode: record.state,
-      county: record.county,
-      knownPriceUsd: record.price,
-      knownPriceLabel: record.listingStatus ? `${record.listingStatus} at` : "Asking price",
-    });
+    const valuation = record.propertyValueScreen ?? null;
     return [
       record.exactAddress ? { label: "Verified address", value: record.exactAddress, text: "The entered property address resolved successfully through the public address-verification path.", provenance: source, tone: "neutral" as const } : null,
       place ? { label: "Property location", value: place, text: "Town, county, and state carried into the property record from the verified intake context.", provenance: source, tone: "neutral" as const } : null,
@@ -213,13 +209,15 @@ export function GovernedLaneChassis(props: ChassisProps) {
       // platform"). The assessed value must never stand as the only dollar
       // figure on the page — left alone it becomes, by default, the number a
       // reader takes away as what the property is worth.
-      valuation.status === "indicated"
-        ? { label: "Indicated market value (Furlong)", value: `$${valuation.lowUsd!.toLocaleString("en-US")} – $${valuation.highUsd!.toLocaleString("en-US")}`, text: `Midpoint $${valuation.midUsd!.toLocaleString("en-US")}. ${valuation.method} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.map((s) => `Source: ${s}`).join(" · "), tone: "neutral" as const }
-        : { label: "Indicated market value (Furlong)", value: "Cannot be produced for this address", text: `${valuation.method} ${valuation.cautions.join(" ")}`, provenance: "Stated limitation — Furlong does not publish a value it cannot source", tone: "caution" as const },
-      // The divergence line is the single most decision-relevant output when a
-      // real price exists: a buyer paying a real number outranks any model.
-      valuation.divergence
-        ? { label: "Market price vs. indicated value", value: `${valuation.divergence.knownPriceLabel} $${valuation.divergence.knownPriceUsd.toLocaleString("en-US")} · ${valuation.divergence.multipleOfMid}× the indication`, text: valuation.divergence.verdict, provenance: "Furlong reconciliation of the known market price against the indicated value", tone: "caution" as const }
+      valuation
+        ? valuation.status === "indicated"
+          ? { label: "Furlong Property Estimate — screening", value: `$${valuation.lowUsd!.toLocaleString("en-US")} – $${valuation.highUsd!.toLocaleString("en-US")}`, text: `Midpoint $${valuation.midUsd!.toLocaleString("en-US")} · ${valuation.profileId} · ${valuation.confidence}. ${valuation.method} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.map((sourceLine) => `Source: ${sourceLine}`).join(" · "), tone: "neutral" as const }
+          : { label: "Furlong Property Estimate — screening", value: "Needs property-specific valuation evidence", text: `${valuation.method}${valuation.requiredInputs.length ? ` Needed next: ${valuation.requiredInputs.join("; ")}.` : ""} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.length ? valuation.sources.map((sourceLine) => `Source: ${sourceLine}`).join(" · ") : "Stated limitation — Furlong does not publish a value when the valuation method lacks the evidence it requires", tone: "caution" as const }
+        : null,
+      // Divergence is evidence to reconcile. A closed/contract transaction is
+      // stronger than an asking price; an asking price remains a seller signal.
+      valuation?.divergence
+        ? { label: "Known price vs. Furlong screen", value: `${valuation.divergence.knownPriceLabel} $${valuation.divergence.knownPriceUsd.toLocaleString("en-US")} · ${valuation.divergence.multipleOfMid}× the indication`, text: valuation.divergence.verdict, provenance: "Furlong reconciliation of known price evidence against the method-specific screening indication", tone: "caution" as const }
         : null,
       record.bedrooms != null ? { label: "Bedrooms", value: String(record.bedrooms), text: "Bedroom count reported by the matched property record.", provenance: source, tone: "neutral" as const } : null,
       record.bathrooms != null ? { label: "Bathrooms", value: String(record.bathrooms), text: "Bathroom count reported by the matched listing record.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}` : source, tone: "neutral" as const } : null,

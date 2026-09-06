@@ -532,12 +532,22 @@ variable "notify_pe_email" {
   default     = "chudson@aresfarmsinc.com"
 }
 
-variable "notify_lender_email" {
-  description = "Recipient for new financing deals (the licensed lender)."
+variable "notify_capital_desk_email" {
+  description = "Owner-controlled Furlong Capital Desk recipient for new financing intakes. New cases enter this desk before any external lender/broker handoff."
   type        = string
-  # The Financial module's brand address (founder 2026-08-05):
-  # finance@compasstocapital.com — Stuart's lane on his own domain.
-  default = "finance@compasstocapital.com"
+  default     = "chudson@aresfarmsinc.com"
+}
+
+variable "notify_lender_email" {
+  description = "Legacy external-broker notification recipient. Retained for explicitly assigned/legacy broker cases only; new Capital Desk intakes do not route here."
+  type        = string
+  default     = "finance@compasstocapital.com"
+}
+
+variable "capital_desk_booking_url" {
+  description = "Optional owner-controlled Capital Desk appointment page. Separate from the retained external broker calendar. Empty = hidden."
+  type        = string
+  default     = ""
 }
 
 variable "lender_booking_url" {
@@ -611,7 +621,7 @@ variable "labels" {
 }
 
 variable "anthropic_api_key_enabled" {
-  description = "When true, the core service reads ANTHROPIC_API_KEY (an out-of-band Secret Manager secret) to activate the governed AI seams (interview phrasing + import image extraction). Requires the secret to hold at least one enabled version. Default false = deterministic fallbacks only."
+  description = "When true, the core service reads ANTHROPIC_API_KEY (an out-of-band Secret Manager secret) to activate the governed AI seams (interview phrasing + import image extraction + property operating-model interpretation). Requires the secret to hold at least one enabled version. Default false = deterministic fallbacks only."
   type        = bool
   default     = false
 }

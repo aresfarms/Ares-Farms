@@ -37,7 +37,7 @@ const readiness = buildProductionPromotionReadinessPacket({
 const internalInput: InternalChangeVerificationInput = {
   evidence: {
     requestId: "launch-change", requestVersion: "v1", requirementText: "Prepare the governed release.", successCriteria: ["all gates pass"],
-    changeOwner: "CAITLIN", domain: "TECHNICAL_GOVERNANCE", commitSha: "d".repeat(40), imageDigest: `sha256:${"e".repeat(64)}`,
+    changeOwner: "OWNER", domain: "TECHNICAL_GOVERNANCE", commitSha: "d".repeat(40), imageDigest: `sha256:${"e".repeat(64)}`,
     buildId: "build-launch", buildStatus: "SUCCESS", changedComponents: ["release"], affectedRoutes: [], affectedPermissions: [], databaseChanges: [], configurationChanges: [],
     tests: [{ name: "release", status: "PASS", evidenceRef: "test:release" }], securityFindings: [], knownLimitations: [], unverifiedClaims: [],
     rollbackImageDigest: `sha256:${"f".repeat(64)}`, rollbackProcedure: "Restore prior image.", releaseInvariants: ["auth remains enforced"], postReleaseChecks: [{ name: "health", status: "PASS" }],
@@ -45,8 +45,8 @@ const internalInput: InternalChangeVerificationInput = {
   summary: { whatChanged: "The governed release candidate was prepared.", whyItChanged: "Production readiness.", whoIsAffected: "Authorized users.", whatTestsProved: ["Gates pass"], whatTestsDidNotProve: ["Human approval is still required"], principalRisks: ["Configuration drift"], rollbackExplanation: "Restore prior image." },
 };
 const internalHash = internalChangeReportHash(internalInput);
-internalInput.ownerAttestation = { principal: "CAITLIN", signedAt: "2026-07-27T10:00:00Z", signatureRef: "owner", statement: "implemented", reportSha256: internalHash };
-internalInput.reviewerApprovals = ["STUART", "FRANCIS"].map((principal, index) => ({ principal: principal as "STUART" | "FRANCIS", role: index === 0 ? "REQUESTER_ACCEPTANCE" as const : "INDEPENDENT_REVIEW" as const, decision: "APPROVE" as const, checklistVersion: "technical-v1", checklistAnswers: [{ itemId: "all", answer: "YES" as const }], signedAt: "2026-07-27T11:00:00Z", signatureRef: `review-${principal}`, reportSha256: internalHash }));
+internalInput.ownerAttestation = { principal: "OWNER", signedAt: "2026-07-27T10:00:00Z", signatureRef: "owner", statement: "implemented", reportSha256: internalHash };
+internalInput.reviewerApprovals = [{ principal: "INDEPENDENT_REVIEWER", role: "INDEPENDENT_REVIEW", decision: "APPROVE", checklistVersion: "technical-v1", checklistAnswers: [{ itemId: "all", answer: "YES" }], signedAt: "2026-07-27T11:00:00Z", signatureRef: "review-independent", reportSha256: internalHash }];
 const internalReport = buildInternalChangeVerificationReport(internalInput);
 
 const roles: PromotionApprovalRole[] = [
@@ -101,14 +101,14 @@ const collided = buildFinalProductionPromotionDecisionPacket({
   rollbackOwnerPrincipalId: "rollback-owner",
   approvals: approvals.map((approval) => ({ ...approval, principalId: "same-principal" })),
 });
-assert(collided.blockers.includes("initial-launch-requires-three-distinct-founders"), "Three-founder principal collision must block.");
+assert(collided.blockers.includes("initial-launch-requires-three-distinct-role-separated-principals"), "Role-separated principal collision must block.");
 
 console.log(JSON.stringify({
   ok: true,
   rule: FINAL_PRODUCTION_PROMOTION_DECISION_RULE,
   allowlistStoredAsHashOnly: true,
   exactImageBindingRequired: true,
-  threeFounderCrossFunctionalAuthorityRequired: true,
+  roleSeparatedCrossFunctionalAuthorityRequired: true,
   boundedActivationWindowRequired: true,
   activationPerformed: false,
 }, null, 2));

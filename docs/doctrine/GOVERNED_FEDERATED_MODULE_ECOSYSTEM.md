@@ -19,7 +19,7 @@ known / unknown / cannot-determine outputs.
 financial determinations; decide for the user; force a transaction path.
 
 **Professional modules** (separate but connected; can be active / inactive / replaced / licensed / gated /
-paywalled / human-reviewed): Five Borough Capital / Stuart Fraass financing module; environmental/compliance
+paywalled / human-reviewed): external professional financing workspace; environmental/compliance
 module; communications/public-trust module; future licensed provider modules.
 
 ## 3. Five Borough Capital boundary

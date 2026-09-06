@@ -11,14 +11,14 @@ function assert(condition: boolean, message: string): void {
 }
 
 const owners: Record<ChangeDomain, FounderPrincipal> = {
-  TECHNICAL_GOVERNANCE: "CAITLIN",
-  FINANCE_UNDERWRITING: "STUART",
-  PUBLIC_COMMUNICATIONS: "FRANCIS",
+  TECHNICAL_GOVERNANCE: "OWNER",
+  FINANCE_UNDERWRITING: "OWNER",
+  PUBLIC_COMMUNICATIONS: "OWNER",
 };
 const reviewers: Record<ChangeDomain, FounderPrincipal[]> = {
-  TECHNICAL_GOVERNANCE: ["STUART", "FRANCIS"],
-  FINANCE_UNDERWRITING: ["CAITLIN", "FRANCIS"],
-  PUBLIC_COMMUNICATIONS: ["CAITLIN", "STUART"],
+  TECHNICAL_GOVERNANCE: ["INDEPENDENT_REVIEWER"],
+  FINANCE_UNDERWRITING: ["INDEPENDENT_REVIEWER"],
+  PUBLIC_COMMUNICATIONS: ["INDEPENDENT_REVIEWER"],
 };
 
 function base(domain: ChangeDomain): InternalChangeVerificationInput {
@@ -89,9 +89,9 @@ for (const domain of Object.keys(owners) as ChangeDomain[]) {
 
 const ownerSelfApproval = base("TECHNICAL_GOVERNANCE");
 const ownerHash = internalChangeReportHash(ownerSelfApproval);
-ownerSelfApproval.ownerAttestation = { principal: "CAITLIN", signedAt: "2026-07-27T10:00:00Z", signatureRef: "owner", statement: "implemented", reportSha256: ownerHash };
+ownerSelfApproval.ownerAttestation = { principal: "OWNER", signedAt: "2026-07-27T10:00:00Z", signatureRef: "owner", statement: "implemented", reportSha256: ownerHash };
 ownerSelfApproval.reviewerApprovals = [{
-  principal: "CAITLIN", role: "INDEPENDENT_REVIEW", decision: "APPROVE", checklistVersion: "v1",
+  principal: "OWNER", role: "INDEPENDENT_REVIEW", decision: "APPROVE", checklistVersion: "v1",
   checklistAnswers: [{ itemId: "x", answer: "YES" }], signedAt: "2026-07-27T11:00:00Z", signatureRef: "self", reportSha256: ownerHash,
 }];
 assert(buildInternalChangeVerificationReport(ownerSelfApproval).blockers.includes("implementer-cannot-independently-approve"), "Implementer self-approval must be blocked.");
@@ -102,7 +102,7 @@ console.log(JSON.stringify({
   commonEvidenceBackbone: true,
   tailoredDomainOverlays: true,
   ownerCannotSelfApprove: true,
-  twoOutsideGroupApprovalsRequired: true,
+  independentReviewRequired: true,
   signatureInvalidationOnMutation: true,
   postReleaseRegressionChecksRequired: true,
 }, null, 2));

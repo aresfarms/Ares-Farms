@@ -20,7 +20,10 @@ type RequirementStatus =
   | "implemented"
   | "intentionally_blocked"
   | "not_applicable"
-  | "awaiting_controlled_promotion";
+  | "awaiting_controlled_promotion"
+  | "partially_implemented"
+  | "documentary_governance"
+  | "unreconciled";
 
 type RequirementRecord = {
   title: string;
@@ -28,6 +31,10 @@ type RequirementRecord = {
   requires: string[];
   tests: string[];
   evidence: string[];
+  reconciliationBasis?: string;
+  masterSources?: string[];
+  operationallyComplete?: boolean;
+  outstandingObligations?: string[];
 };
 
 type RequirementMatrix = {
@@ -39,6 +46,14 @@ type RequirementMatrix = {
 
 const repoRoot = process.cwd();
 const matrixPath = path.join(repoRoot, "docs/master-volume-requirements.json");
+const doctrineInventoryPath = path.join(
+  repoRoot,
+  "docs/master-volume-doctrine-inventory.json",
+);
+const doctrineReconciliationPath = path.join(
+  repoRoot,
+  "docs/master-volume-doctrine-reconciliation.json",
+);
 const volumeViRequirementIds = [
   "SOURCEINT-001",
   "SOURCEINT-002",
@@ -116,15 +131,47 @@ function readJson<T>(pathname: string): T {
 }
 
 function packageScripts(): Record<string, string> {
-  return readJson<{ scripts?: Record<string, string> }>(
-    path.join(repoRoot, "package.json")
-  ).scripts ?? {};
+  return (
+    readJson<{ scripts?: Record<string, string> }>(
+      path.join(repoRoot, "package.json"),
+    ).scripts ?? {}
+  );
 }
 
 function main() {
-  assert(exists("docs/master-volume-requirements.json"), "Requirement matrix missing.");
+  assert(
+    exists("docs/master-volume-requirements.json"),
+    "Requirement matrix missing.",
+  );
 
   const matrix = readJson<RequirementMatrix>(matrixPath);
+  const doctrineInventory = exists("docs/master-volume-doctrine-inventory.json")
+    ? readJson<{
+        canonicalDoctrineIds?: string[];
+        canonicalDoctrineCount?: number;
+        missingDocuments?: string[];
+      }>(doctrineInventoryPath)
+    : {
+        canonicalDoctrineIds: [],
+        canonicalDoctrineCount: 0,
+        missingDocuments: ["doctrine inventory missing"],
+      };
+  const doctrineReconciliation = exists(
+    "docs/master-volume-doctrine-reconciliation.json",
+  )
+    ? readJson<{
+        doctrines?: Array<{
+          doctrineId: string;
+          status: RequirementStatus;
+          sourceDocuments: string[];
+          evidence: string[];
+          tests: string[];
+          reconciliationBasis: string;
+          operationallyComplete: boolean;
+          outstandingObligations?: string[];
+        }>;
+      }>(doctrineReconciliationPath)
+    : { doctrines: [] };
   const scripts = packageScripts();
   const allowedStatuses = new Set(matrix.allowedStatuses);
   const requirements = Object.entries(matrix.requirements);
@@ -132,55 +179,55 @@ function main() {
   assert(requirements.length > 0, "Requirement matrix cannot be empty.");
   assert(
     updatedMasterVolumeSources.every((source) =>
-      matrix.sourceDocuments.includes(source)
+      matrix.sourceDocuments.includes(source),
     ),
-    "Requirement matrix must reference the updated unified TOC, Volumes VI-VII, cross-reference index, and build conformance matrix."
+    "Requirement matrix must reference the updated unified TOC, Volumes VI-VII, cross-reference index, and build conformance matrix.",
   );
   assert(
     volumeViRequirementIds.every((requirementId) =>
-      Boolean(matrix.requirements[requirementId])
+      Boolean(matrix.requirements[requirementId]),
     ),
-    "Requirement matrix must include all Volume VI canonical doctrine IDs."
+    "Requirement matrix must include all Volume VI canonical doctrine IDs.",
   );
   assert(
     batch25EnvironmentalRequirementIds.every((requirementId) =>
-      Boolean(matrix.requirements[requirementId])
+      Boolean(matrix.requirements[requirementId]),
     ),
-    "Requirement matrix must include all Batch 25 environmental pathway doctrine IDs."
+    "Requirement matrix must include all Batch 25 environmental pathway doctrine IDs.",
   );
   assert(
     volumeViConsolidationRequirementIds.every((requirementId) =>
-      Boolean(matrix.requirements[requirementId])
+      Boolean(matrix.requirements[requirementId]),
     ),
-    "Requirement matrix must include Volume VI consolidation and build-conformance doctrine IDs."
+    "Requirement matrix must include Volume VI consolidation and build-conformance doctrine IDs.",
   );
 
   for (const [requirementId, requirement] of requirements) {
     assert(
       allowedStatuses.has(requirement.status),
-      `${requirementId} has an unknown status.`
+      `${requirementId} has an unknown status.`,
     );
     assert(
       requirement.requires.length > 0,
-      `${requirementId} must declare required runtime components.`
+      `${requirementId} must declare required runtime components.`,
     );
     assert(
       requirement.tests.every((testName) => Boolean(scripts[testName])),
-      `${requirementId} references a missing package script.`
+      `${requirementId} references a missing package script.`,
     );
     assert(
       requirement.evidence.every(exists),
-      `${requirementId} references missing evidence.`
+      `${requirementId} references missing evidence.`,
     );
   }
 
   const unknownRequirements = requirements.filter(
-    ([, requirement]) => !allowedStatuses.has(requirement.status)
+    ([, requirement]) => !allowedStatuses.has(requirement.status),
   );
 
   assert(
     unknownRequirements.length === 0,
-    "No Master Volume doctrine may exist in an unknown state."
+    "No Master Volume doctrine may exist in an unknown state.",
   );
 
   assert(
@@ -189,28 +236,28 @@ function main() {
         manifest.requiredGovernance.length > 0 &&
         manifest.requiredGovernance.includes("CANON-CLASS-001") &&
         manifest.requiredGovernance.includes("TECH-LEDGER-001") &&
-        manifest.requiredGovernance.includes("TECH-REPLAY-001")
+        manifest.requiredGovernance.includes("TECH-REPLAY-001"),
     ),
-    "Every module manifest must carry constitutional governance tags."
+    "Every module manifest must carry constitutional governance tags.",
   );
 
   assert(
     moduleManifests.every((manifest) => manifest.productionBlocked),
-    "All current module manifests must remain production blocked."
+    "All current module manifests must remain production blocked.",
   );
 
   assert(
     eventContractRegistry.every((contract) => contract.replayRequired),
-    "Every event contract must require replay."
+    "Every event contract must require replay.",
   );
   assert(
     crossModuleHandoffMap.every(
       (handoff) =>
         handoff.replayRequired &&
         handoff.humanReviewBoundary &&
-        handoff.productionBlocked
+        handoff.productionBlocked,
     ),
-    "Every cross-module handoff must preserve replay, human review, and production blocks."
+    "Every cross-module handoff must preserve replay, human review, and production blocks.",
   );
 
   const publicPayload = buildPublicSurfaceGatewayPayload();
@@ -222,21 +269,81 @@ function main() {
           surface.route,
           surface.claimsProfile,
           ...surface.statusMessages,
-        ].join(" ")
+        ].join(" "),
       ),
       ...publicPayload.productionBlocks,
     ],
   });
 
-  assert(publicClaims.ok, "All public-safe responses must pass the claims gate.");
+  assert(
+    publicClaims.ok,
+    "All public-safe responses must pass the claims gate.",
+  );
   assert(
     publicPayload.surfaces.every((surface) =>
       REQUIRED_SURFACE_STATUS_MESSAGES.every((message) =>
-        surface.statusMessages.includes(message)
-      )
+        surface.statusMessages.includes(message),
+      ),
     ),
-    "All public-safe surfaces must include the required safe status messages."
+    "All public-safe surfaces must include the required safe status messages.",
   );
+
+  const inventoriedDoctrineIds = doctrineInventory.canonicalDoctrineIds ?? [];
+  const registeredDoctrineIds = new Set(Object.keys(matrix.requirements));
+  const unregisteredDoctrineIds = inventoriedDoctrineIds.filter(
+    (id) => !registeredDoctrineIds.has(id),
+  );
+  const unreconciledDoctrineIds = inventoriedDoctrineIds.filter(
+    (id) => matrix.requirements[id]?.status === "unreconciled",
+  );
+  const reconciliationRows = doctrineReconciliation.doctrines ?? [];
+  const reconciliationById = new Map(
+    reconciliationRows.map((row) => [row.doctrineId, row]),
+  );
+  const missingReconciliationIds = inventoriedDoctrineIds.filter(
+    (id) => !reconciliationById.has(id),
+  );
+  const invalidReconciliationIds = inventoriedDoctrineIds.filter((id) => {
+    const row = reconciliationById.get(id);
+    if (!row) return false;
+    return (
+      row.sourceDocuments.length === 0 ||
+      row.evidence.length === 0 ||
+      row.tests.length === 0 ||
+      row.reconciliationBasis.trim().length === 0 ||
+      row.evidence.some((evidencePath) => !exists(evidencePath)) ||
+      row.tests.some((testName) => !scripts[testName]) ||
+      matrix.requirements[id]?.status !== row.status ||
+      ((row.status === "partially_implemented" ||
+        row.status === "awaiting_controlled_promotion") &&
+        (!row.outstandingObligations ||
+          row.outstandingObligations.length === 0))
+    );
+  });
+  const truthMirrorCertified =
+    unregisteredDoctrineIds.length === 0 &&
+    unreconciledDoctrineIds.length === 0 &&
+    missingReconciliationIds.length === 0 &&
+    invalidReconciliationIds.length === 0 &&
+    (doctrineInventory.missingDocuments ?? []).length === 0;
+  const operationallyIncompleteDoctrineIds = inventoriedDoctrineIds.filter(
+    (id) => reconciliationById.get(id)?.operationallyComplete !== true,
+  );
+  const fullyOperational =
+    truthMirrorCertified && operationallyIncompleteDoctrineIds.length === 0;
+
+  if (process.env.MASTER_VOLUME_MIRROR_STRICT === "true") {
+    assert(
+      truthMirrorCertified,
+      `Master Volume truth mirror is not certified: ${unregisteredDoctrineIds.length} unregistered, ${unreconciledDoctrineIds.length} unreconciled, ${missingReconciliationIds.length} missing reconciliation records, ${invalidReconciliationIds.length} invalid evidence bindings, and ${(doctrineInventory.missingDocuments ?? []).length} missing authoritative documents.`,
+    );
+  }
+  if (process.env.MASTER_VOLUME_OPERATIONAL_STRICT === "true") {
+    assert(
+      fullyOperational,
+      `Master Volume operational completion is blocked by ${operationallyIncompleteDoctrineIds.length} reconciled-but-not-fully-operational doctrines.`,
+    );
+  }
 
   console.log(
     JSON.stringify(
@@ -255,13 +362,33 @@ function main() {
               (accumulator[requirement.status] ?? 0) + 1;
             return accumulator;
           },
-          {}
+          {},
         ),
-        message: "Master Volume conformance test passed.",
+        doctrineInventory: {
+          inventoried: inventoriedDoctrineIds.length,
+          registeredFromInventory:
+            inventoriedDoctrineIds.length - unregisteredDoctrineIds.length,
+          unregistered: unregisteredDoctrineIds.length,
+          unreconciled: unreconciledDoctrineIds.length,
+          missingDocuments: doctrineInventory.missingDocuments ?? [],
+          truthMirrorCertified,
+          fullyOperational,
+          missingReconciliationIds,
+          invalidReconciliationIds,
+          operationallyIncomplete: operationallyIncompleteDoctrineIds.length,
+          operationallyIncompleteDoctrineIds,
+          unregisteredDoctrineIds,
+          unreconciledDoctrineIds,
+        },
+        message: truthMirrorCertified
+          ? fullyOperational
+            ? "The Master Volume truth mirror is certified and every inventoried doctrine is operationally complete."
+            : `The Master Volume truth mirror is certified: platform and Series agree on doctrine state. ${operationallyIncompleteDoctrineIds.length} doctrines remain truthfully marked partial or awaiting controlled promotion and are NOT represented as fully operational.`
+          : "Master Volume truth-mirror certification is BLOCKED by missing or invalid reconciliation evidence.",
       },
       null,
-      2
-    )
+      2,
+    ),
   );
 }
 

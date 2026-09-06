@@ -12,19 +12,19 @@ Use these documents as the source of truth:
 
 | Volume | File | Build Role |
 | --- | --- | --- |
-| Volume 0 | `Furlong_Volume_0_Platform_Orientation.pdf` | Platform identity, institutional purpose, borrower/lender positioning, executive orientation |
-| Volume I | `Furlong_Volume_I_Constitutional_Backbone_Master.pdf` | Constitutional authority, doctrine hierarchy, role authority, amendment control, compliance checklist |
-| Volume II | `Furlong_Volume_II_Regulatory_Governance_Master.pdf` | USDA/SBA/regulatory rules, adverse action, retention, policy versioning, regulatory monitoring |
-| Volume III | `Furlong_Volume_III_Technical_Infrastructure_Master.pdf` | Technical architecture, ledger, replay, schema singularity, implementation sequence |
-| Volume III-B | `Furlong_Volume_III_B_Governance_Runtime_Master.pdf` | Governance runtime, metrics, human-in-the-loop rules, observability, onboarding architecture |
-| Volume IV | `Furlong_Volume_IV_Operational_Runbooks_Master.pdf` | Operational runbooks, deployment sequencing, workpackages, escalation and continuity procedures |
-| Volume V | `Furlong_Volume_V_Canonical_Doctrines_Master.pdf` | Canonical doctrines: classification, explainability, overlays, versioning, observability, simulation, treasury, consent, source, sovereignty, economics |
-| Volume VI | `Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf` | Canonical de-duplicated authority for source intelligence, scraper governance, revenue/source intelligence, runtime governance, platform integration, module integration, conformance, backend readiness, and portable vertical surface alignment |
+| Volume 0 | `Furlong_Volume_0_Platform_Orientation_v14.2.pdf` | Platform identity, institutional purpose, borrower/lender positioning, executive orientation |
+| Volume I | `Furlong_Volume_I_Constitutional_Backbone_Master_v31.2.pdf` | Constitutional authority, doctrine hierarchy, role authority, amendment control, compliance checklist |
+| Volume II | `Furlong_Volume_II_Regulatory_Governance_Master_v25.2.pdf` | USDA/SBA/regulatory rules, adverse action, retention, policy versioning, regulatory monitoring |
+| Volume III | `Furlong_Volume_III_Technical_Infrastructure_Master_v25.2.pdf` | Technical architecture, ledger, replay, schema singularity, implementation sequence |
+| Volume III-B | `Furlong_Volume_III_B_Governance_Runtime_Master_v4.2.pdf` | Governance runtime, metrics, human-in-the-loop rules, observability, onboarding architecture |
+| Volume IV | `Furlong_Volume_IV_Operational_Runbooks_Master_v23.2.pdf` | Operational runbooks, deployment sequencing, workpackages, escalation and continuity procedures |
+| Volume V | `Furlong_Volume_V_Canonical_Doctrines_Master_v10.2.pdf` | Canonical doctrines: classification, explainability, overlays, versioning, observability, simulation, treasury, consent, source, sovereignty, economics |
+| Volume VI | `Furlong_Volume_VI_Source_Intelligence_Integration_Master_v1.4.pdf` | Canonical de-duplicated authority for source intelligence, scraper governance, revenue/source intelligence, runtime governance, platform integration, module integration, conformance, backend readiness, and portable vertical surface alignment |
 | Volume VII | `Furlong_Volume_VII_Unified_Governance_Conformance_Matrix.pdf` | Unified governance conformance proof matrix, doctrine-to-code verification, and build-control traceability |
-| Cross-Reference | `Furlong_Master_Cross_Reference_Index.pdf` | Traceability map across all volumes; use this before building or changing modules |
-| Unified TOC | `Furlong_Master_Volume_Series_Unified_TOC.pdf` | Current master-series front matter spanning Volumes 0-VII and the Index |
+| Cross-Reference | `Furlong_Master_Cross_Reference_Index_v24.1.pdf` | Traceability map across all volumes; use this before building or changing modules |
+| Unified TOC | `Furlong_Master_Volume_Series_Unified_TOC_v1.2.pdf` | Current master-series front matter spanning Volumes 0-VII and the Index |
 | Build Conformance Matrix | `Furlong_Build_Conformance_Cross_Reference_Matrix.pdf` | Doctrine-family to actual build artifact proof matrix with routes, schema, migrations, commands, and Built vs Built/BLOCKED status |
-| Series Hub | `Furlong_Master_Series_Hub.html` | Current index of the maintained Master Series documents |
+| Series Hub | `Furlong_Master_Series_Hub_v1.1.html` | Current index of the maintained Master Series documents |
 | Volume VI Changes Summary | `Volume_VI_Consolidation_and_Changes_Summary.md` | Governing change-control note for the Volume VI consolidation, de-duplication, index/TOC/hub updates, and conformance matrix expectations |
 
 These supplemental governing inputs are also active for this build:
@@ -40,19 +40,25 @@ These supplemental governing inputs are also active for this build:
 | Canonical External Source Discovery Architecture | `SOURCE_STACK_001_Canonical_External_Source_Discovery_Architecture.docx` | External source stack, source tiers, connector certification, scraper runtime, ingestion gates, provenance, canonicalization, conflict handling, failover, and public translation boundaries |
 | Revenue Intelligence Runtime Workpackages | `IMPLEMENTATION_WORKPACKAGES_Revenue_Intelligence_Runtime_Build.docx` | Implementation workpackages for governed source stack APIs, canonical entities, program graph aliases, revenue opportunity aliases, market/geospatial aliases, queue health, freshness, and conformance checks |
 
-Current governing snapshot:
+Current governing snapshot (machine pointer: `docs/current-master-volume-registry.json`):
 
-- Volume 0 v14.0
-- Volume I v29.0 active supplied volume; the Volume VI summary records the earlier v28.0 consolidation pass
-- Volume II v23.0 compatibility state
-- Volume III v25.0 active supplied volume; the Volume VI summary records the earlier v24.0 consolidation pass
-- Volume III-B v4.0
-- Volume IV v22.0 active supplied volume; the Volume VI summary records the earlier v21.0 consolidation pass
-- Volume V v10.0 active supplied volume; the Volume VI summary records the earlier v7.0 consolidation pass
-- Volume VI v1.1
+- Unified TOC v1.2
+- Volume 0 v14.2 current annotated
+- Volume I v31.2 current annotated
+- Volume II v25.2 current annotated
+- Volume III v25.2 current annotated
+- Volume III-B v4.2 current annotated
+- Volume IV v23.2 current annotated
+- Volume V v10.2 current annotated
+- Volume VI v1.4 current annotated
 - Volume VII v1.0 active conformance matrix
-- Build Conformance Matrix v1.0
-- Cross-Reference Index v22.0 summary intent, with the supplied local copy still showing v21.0 in some extracted header fields
+- Build Conformance & Cross-Reference Matrix v1.2
+- Master Cross-Reference Index v24.1 current annotated
+- Doctrine Mirror Reconciliation amendment v3 — 2026-09-02
+- Current Build Parity amendment — 2026-09-04 (`MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md`)
+- Canonical schema target for the current source build: 0057
+- Active nonresidential rank/diagnostic runtimes: `ranking-runtime-v0.2.0` / `property-project-diagnostic-v0.2.0`
+- Farm/land use-integrity runtime: `farm-use-integrity-v1.0.0`; agricultural enterprise screening is separate from property-wide highest/best-supported use, and `verify:farm-use-integrity` is a standing parity gate.
 
 The detailed source snapshot and file hashes are recorded in:
 
@@ -97,7 +103,7 @@ Going forward:
 
 ## 2. Authority Order
 
-When rules appear to conflict, use this order:
+When rules appear to conflict, first check `docs/current-master-volume-registry.json` for a later **scoped amendment**. A registered later amendment controls conflicting older wording only within the scope it expressly amends; historical source files remain preserved. For matters not changed by a later scoped amendment, use this order:
 
 1. Volume I constitutional rules.
 2. Volume V canonical doctrines.
@@ -107,7 +113,7 @@ When rules appear to conflict, use this order:
 6. Volume 0 orientation and positioning.
 7. Local implementation details in the codebase.
 
-The Cross-Reference Index is not optional. It is the map that tells us which rules apply to the module we are building.
+The Cross-Reference Index is not optional. It is the map that tells us which rules apply to the module we are building. The executable parity gate `npm run verify:master-volume-build-parity` is also mandatory: a build that no longer matches the registered current Series is a failed build, even if older doctrine-count checks still pass.
 
 ## 3. Backend-First Gate
 
@@ -655,24 +661,24 @@ A final decision packet must bind the exact immutable production image, the 4V r
 ### Step 4X — Cross-Functional Internal Change Verification
 Every code, configuration, security, finance, underwriting, or public-communications change must originate from a frozen plain-language request and produce one immutable Internal Change Verification and Plain-Language Assurance Report. The report combines a common machine-evidence backbone with a domain-specific checklist overlay. It records the exact request version, owner, commit, immutable image, build, tests, affected routes, permissions, database and configuration changes, known limitations, unverified claims, rollback image, release invariants, and post-release regression checks.
 
-The change owner may implement and attest but may not independently approve the change. Caitlin-owned technical and governance changes require Stuart and Francis; Stuart-owned finance and underwriting changes require Caitlin and Francis; Francis-owned public and communications changes require Caitlin and Stuart. Any change to the request, evidence, code, configuration, test results, image, or report hash invalidates all prior signatures. A rejection, failed checklist item, failed regression, missing rollback, or external-review requirement keeps activation blocked.
+The change owner may implement and attest but may not independently approve a constitutionally significant change. Owner-controlled technical, governance, finance, underwriting, and public-communications changes require the independent role-bound review specified by the applicable doctrine, risk tier, and release packet. No named external broker, communications participant, or former partner is a standing approval dependency. Any change to the request, evidence, code, configuration, test results, image, or report hash invalidates all prior signatures. A rejection, failed checklist item, failed regression, missing rollback, or external-review requirement keeps activation blocked.
 
 **Hard rule:** No governed change may be activated, promoted, or relied upon without a valid frozen report, owner attestation, both required outside-group approvals, and passing post-release invariants. The report must explain in plain English what changed, what tests proved, what tests did not prove, principal risks, and how to reverse the change. Standing proof: `npm run verify:internal-change-verification`.
 
 
-### Step 4Y — Three-Founder Cross-Functional Release Authority Addendum
-The initial production opening requires all three founders to participate across technical/governance, finance/release-risk, and public/independent-review roles. Routine group-owned changes require the two founders outside the owning group. The change owner may attest to implementation but may not independently approve their own change. Each founder retains unilateral stop and rollback authority within an observed risk event. Domain objections block release until resolved or escalated.
+### Step 4Y — Owner-Controlled Cross-Functional Release Authority Addendum
+Furlong is owner-controlled, but constitutionally significant release decisions remain separation-of-powers events. The implementation owner may attest to implementation but may not independently approve their own material change. Required independent reviewers are assigned by role and competence for the applicable risk domain; external professional-spoke access never creates a governance vote. The owner and designated safety authorities retain stop and rollback authority within an observed risk event. Domain objections block release until resolved or escalated.
 
-**Hard rule:** The three-founder model replaces artificial four-person distinct-principal requirements, but it never weakens owner exclusion, packet binding, signature integrity, domain review, or separate activation. Initial launch requires unanimous three-founder participation; routine changes require both outside-group approvals. Standing proof: `npm run verify:three-founder-release-authority`.
+**Hard rule:** Owner control removes personal-partner dependency; it does not remove independent review, packet binding, signature integrity, domain review, or separate activation. Release packets must fail closed whenever a required independent role is vacant or unverified. Standing proof remains the release-authority verification suite.
 
 
-### Step 4Z — Founder Change Review Workspace
-The platform must provide a restricted operational workspace that freezes the plain-language internal change report, binds actions to configured founder identities, stores owner attestations and outside-group reviews as immutable signed events, reconstructs the current report deterministically, and records the three-founder initial-launch authority separately. The workspace may display readiness but never activate a release. Standing proof: `npm run verify:founder-change-review-workspace`.
+### Step 4Z — Governed Change Review Workspace
+The platform must provide a restricted operational workspace that freezes the plain-language internal change report, binds actions to configured authorized reviewer identities, stores owner attestations and outside-group reviews as immutable signed events, reconstructs the current report deterministically, and records initial-launch authority separately. The workspace may display readiness but never activate a release. Standing proof: `npm run verify:founder-change-review-workspace`.
 
 **Hard rule:** No unauthenticated or unassigned identity may freeze, attest, review, or record launch authority. A material change after freeze requires a new request version; existing signatures cannot be edited or silently reused.
 
 
-### Step 5A — Two-Founder Controlled Internal Pilot Gate
-Caitlin and Stuart may conduct a testing-only internal pilot before Francis or broader testers are bound. Caitlin remains the implementation owner and attestor; Stuart is the sole initial pilot tester and may record a green light, rejection, or retest requirement against the exact frozen report hash. Francis may remain intentionally unbound during this phase.
+### Step 5A — Owner-Controlled Internal Pilot Gate
+The owner may conduct a testing-only internal pilot with designated test operators, including the temporarily retained external-broker workspace, without granting those testers ownership or governance authority. Caitlin remains the implementation owner and attestor. A tester may record a green light, rejection, or retest requirement against the exact frozen report hash, but a test result is not a release approval.
 
-**Hard rule:** Pilot readiness authorizes only controlled internal testing. It does not authorize public launch, external actions, payments, notices, official reports, lender or agency reliance, or final production promotion. Francis or another final reviewer remains required before launch. Standing proof: `npm run verify:founder-pilot-test-gate`.
+**Hard rule:** Pilot readiness authorizes only controlled internal testing. It does not authorize public launch, external actions, payments, notices, official reports, lender or agency reliance, or final production promotion. Any independent review required for launch remains mandatory and must be role-bound rather than person-bound. Standing proof: `npm run verify:founder-pilot-test-gate`.

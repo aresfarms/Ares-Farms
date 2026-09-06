@@ -10,9 +10,8 @@ import { accentForLane } from "@/lib/property/laneThemes";
 
 /**
  * FinancingFeeChart — the Financial module's fee chart. Leads plainly with
- * "applications are free," then lists the only paid services: one-on-one time
- * with the licensed lender ($250/hr or Guild-included) and other financial
- * analysis a licensed mortgage broker can provide. Server component; purple.
+ * free Capital Desk coordination first, then shows the explicit regulatory
+ * boundary around any future paid packaging/brokerage work. Server component.
  *
  * Master Volume Governance: FACILITATION-001 (loan is the lender's; free to
  * apply); CANON-TREASURY-001 §9.1 (fees disclosed up front); bright line — no
@@ -79,11 +78,11 @@ export function FinancingFeeChart() {
     <section aria-label="Financing fees" style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 4 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
-          The only paid services — one-on-one with the licensed lender
+          What is free now — and what is not activated
         </span>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6, maxWidth: 720 }}>
-          Optional advisory time, billed by the hour or included with a Guild membership. Everything to
-          do with applying for and getting a loan stays free.
+          Furlong can organize the initial financing path without charging you. Paid packaging, brokerage,
+          referral, or consulting is a separate regulated activity and remains off until its state/program gate is cleared.
         </p>
       </div>
 
@@ -128,7 +127,7 @@ export function FinancingFeeChart() {
 
       <div style={{ display: "grid", gap: 10 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
-          What your licensed broker does for you
+          What the Furlong Capital Desk can coordinate
         </span>
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {FINANCING_OFFERINGS.map((o) => (

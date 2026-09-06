@@ -22,8 +22,8 @@
  * user-facing capital-navigation brand and a Furlong-OWNED asset — NOT
  * automatically Five Borough Capital. It MAY route to Five Borough and future
  * capital providers, and MUST preserve the financing-neutrality doctrine.
- * Five Borough Capital is Stuart Fraass's professional financing module,
- * absorbed only as a CONNECTED module, never collapsed into Furlong Core.
+ * An external professional financing workspace may be connected as a
+ * separate spoke, never collapsed into Furlong Core or granted governance authority.
  * "Furlong informs. Compass/Five Borough performs professional financing work
  * when separately activated."
  *

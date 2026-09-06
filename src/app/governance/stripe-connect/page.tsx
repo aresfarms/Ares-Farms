@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type Recipient = "CAITLIN" | "STUART";
+type Recipient = "CAITLIN";
 type Status = { exists: boolean; recipient: Recipient; accountId?: string; testMode?: boolean;
   detailsSubmitted?: boolean; payoutsEnabled?: boolean; chargesEnabled?: boolean;
   currentlyDue?: string[]; eventuallyDue?: string[]; disabledReason?: string | null;
@@ -19,7 +19,7 @@ export default function StripeConnectGovernancePage() {
     if (res.ok) setStatuses((current) => ({ ...current, [recipient]: data.status }));
   }
 
-  useEffect(() => { void refresh("CAITLIN"); void refresh("STUART"); }, []);
+  useEffect(() => { void refresh("CAITLIN"); }, []);
   async function onboard(recipient: Recipient) {
     setBusy(recipient); setError(null);
     const res = await fetch("/api/stripe/connect/onboarding", {
@@ -39,10 +39,10 @@ export default function StripeConnectGovernancePage() {
       </p>
     </header>
     {error ? <div role="alert" style={{ padding: 12, border: "1px solid #b91c1c", borderRadius: 8 }}>{error}</div> : null}
-    {(["CAITLIN", "STUART"] as Recipient[]).map((recipient) => {
+    {(["CAITLIN"] as Recipient[]).map((recipient) => {
       const status = statuses[recipient];
       return <section key={recipient} style={{ border: "1px solid #d7deea", borderRadius: 12, padding: 18, display: "grid", gap: 10 }}>
-        <h2 style={{ margin: 0 }}>{recipient === "CAITLIN" ? "Caitlin Hudson" : "Stuart Fraass"}</h2>
+        <h2 style={{ margin: 0 }}>Caitlin Hudson</h2>
         <div>Connected account: <strong>{status?.accountId ?? "Not created"}</strong></div>
         <div>Identity/KYC submitted: <strong>{status?.detailsSubmitted ? "Yes" : "No"}</strong></div>
         <div>Payouts enabled: <strong>{status?.payoutsEnabled ? "Yes" : "No"}</strong></div>
@@ -58,7 +58,7 @@ export default function StripeConnectGovernancePage() {
           </button>
           <button onClick={() => void refresh(recipient)}>Refresh status</button>
         </div>
-        {recipient === "STUART" ? <small>Generating Stuart's link is allowed for platform administration, but Stuart should complete his own Stripe-hosted identity and bank verification.</small> : null}
+
       </section>;
     })}
     <p style={{ margin: 0, fontSize: 13 }}>

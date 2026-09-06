@@ -43,7 +43,7 @@ function main() {
   const branch = safeExec("git rev-parse --abbrev-ref HEAD", "main");
 
   // Load the Vol VII Operational Annex if present. The Annex records
-  // the 7 Active-Fill Vol VI-A authorities (Caitlin / Stuart / Frances)
+  // the current role-based Vol VII operational authorities
   // + their mappings to Module 45 roles + the External + Unfilled-by-
   // Design assignments. If the Annex is missing the gate falls back to
   // the no-fills baseline.

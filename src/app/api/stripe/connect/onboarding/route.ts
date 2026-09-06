@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import { createFounderOnboardingLink, type FounderConnectRecipient } from "@/lib/stripe-connect/onboarding";
 
-const RECIPIENTS = new Set(["CAITLIN", "STUART"]);
+const RECIPIENTS = new Set(["CAITLIN"]);
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);

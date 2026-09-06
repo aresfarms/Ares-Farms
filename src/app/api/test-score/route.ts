@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import {
-  calculatePropertyScore,
-  type ApplicantInput,
+  calculatePropertyProjectScore,
+  type PropertyProjectScoreInput,
 } from "@/services/scoring/calculatePropertyScore";
 import { persistRouteGovernanceEvidence } from "@/lib/governance/routeEvidence";
 import { classifyRecord } from "@/lib/runtime/classificationRuntime";
@@ -37,19 +37,40 @@ import {
  *   version lineage, and evidence preservation.
  */
 
-type TestScoreRequestBody = Partial<ApplicantInput> & {
+type TestScoreRequestBody = Partial<PropertyProjectScoreInput> & {
   borrowerId?: string | null;
   userId?: string | null;
   metadata?: Record<string, unknown>;
+  [key: string]: unknown;
 };
 
-const DEFAULT_SCORE_INPUT: ApplicantInput = {
-  creditScore: 690,
-  liquidity: 150000,
-  experienceLevel: 6,
-  collateralEquity: 250000,
-  acreage: 80,
+const DEFAULT_SCORE_INPUT: PropertyProjectScoreInput = {
+  propertyReadiness: 75,
+  programFit: 80,
+  evidenceCompleteness: 70,
+  executionReadiness: 65,
+  environmentalReadiness: 75,
+  propertyRisk: 20,
 };
+
+const FORBIDDEN_PERSONAL_FINANCIAL_INPUT_KEYS = new Set([
+  "creditscore",
+  "credit_score",
+  "liquidity",
+  "personalincome",
+  "householdincome",
+  "debttoincome",
+  "dti",
+  "personalnetworth",
+  "personalassets",
+  "householdassets",
+]);
+
+function hasForbiddenPersonalFinancialInput(body: TestScoreRequestBody): boolean {
+  return Object.keys(body).some((key) =>
+    FORBIDDEN_PERSONAL_FINANCIAL_INPUT_KEYS.has(key.replace(/[^a-z0-9_]/gi, "").toLowerCase()),
+  );
+}
 
 function createTestScoreTraceId(): string {
   return `test-score-${Date.now()}-${Math.random()
@@ -63,22 +84,14 @@ function toNumberOrDefault(value: unknown, fallback: number): number {
   return Number.isFinite(numeric) ? numeric : fallback;
 }
 
-function normalizeScoreInput(body: TestScoreRequestBody = {}): ApplicantInput {
+function normalizeScoreInput(body: TestScoreRequestBody = {}): PropertyProjectScoreInput {
   return {
-    creditScore: toNumberOrDefault(
-      body.creditScore,
-      DEFAULT_SCORE_INPUT.creditScore
-    ),
-    liquidity: toNumberOrDefault(body.liquidity, DEFAULT_SCORE_INPUT.liquidity),
-    experienceLevel: toNumberOrDefault(
-      body.experienceLevel,
-      DEFAULT_SCORE_INPUT.experienceLevel
-    ),
-    collateralEquity: toNumberOrDefault(
-      body.collateralEquity,
-      DEFAULT_SCORE_INPUT.collateralEquity
-    ),
-    acreage: toNumberOrDefault(body.acreage, DEFAULT_SCORE_INPUT.acreage),
+    propertyReadiness: toNumberOrDefault(body.propertyReadiness, DEFAULT_SCORE_INPUT.propertyReadiness),
+    programFit: toNumberOrDefault(body.programFit, DEFAULT_SCORE_INPUT.programFit),
+    evidenceCompleteness: toNumberOrDefault(body.evidenceCompleteness, DEFAULT_SCORE_INPUT.evidenceCompleteness),
+    executionReadiness: toNumberOrDefault(body.executionReadiness, DEFAULT_SCORE_INPUT.executionReadiness),
+    environmentalReadiness: toNumberOrDefault(body.environmentalReadiness, DEFAULT_SCORE_INPUT.environmentalReadiness),
+    propertyRisk: toNumberOrDefault(body.propertyRisk, DEFAULT_SCORE_INPUT.propertyRisk),
   };
 }
 
@@ -87,14 +100,24 @@ async function executeScoreRequest(
   method: "GET" | "POST"
 ) {
   const traceId = createTestScoreTraceId();
-  const input = normalizeScoreInput(body);
   const actorId = body.userId ?? body.borrowerId ?? null;
+  if (hasForbiddenPersonalFinancialInput(body)) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Nonresidential property/project diagnostics do not accept personal-financial scoring inputs.",
+        governance: { traceId, propertyProjectOnly: true, selectedProviderOwnsBorrowerUnderwriting: true },
+      },
+      { status: 400 },
+    );
+  }
+  const input = normalizeScoreInput(body);
 
   const runtimeGuard = runRuntimeGuard({
     operation: "score.test",
     module: "api.testScore",
     traceId,
-    schemaVersion: "test-score-request-v0.1.0",
+    schemaVersion: "test-score-request-v0.2.0",
     governanceVersion: "master-volumes-runtime-v0.1.0",
     classificationLevel: "INTERNAL",
     replayRef: traceId,
@@ -128,7 +151,7 @@ async function executeScoreRequest(
       operation: "score.test",
       module: "api.testScore",
       observability,
-      sourceVersion: "test-score-api-v0.1.0",
+      sourceVersion: "test-score-api-v0.2.0",
       metadata: {
         runtimeBlocked: true,
       },
@@ -156,7 +179,7 @@ async function executeScoreRequest(
     versions: [
       createRuntimeVersionRef(
         "schema",
-        "test-score-request-v0.1.0",
+        "test-score-request-v0.2.0",
         "src/app/api/test-score/route.ts",
         traceId
       ),
@@ -180,7 +203,7 @@ async function executeScoreRequest(
       ),
       createRuntimeVersionRef(
         "rules",
-        "test-score-engine-v0.1.0",
+        "property-project-diagnostic-v0.2.0",
         "src/services/scoring/calculatePropertyScore.ts",
         traceId
       ),
@@ -200,9 +223,9 @@ async function executeScoreRequest(
       replayRef: traceId,
       disclosureAudience: ["authorized-operator", "governance"],
       sharingPermissions: ["backend-diagnostic-review"],
-      aiUsagePermissions: ["score", "summarize", "explain"],
+      aiUsagePermissions: ["summarize", "explain"],
       exportRestrictions: [
-        "not-a-final-credit-decision",
+        "not-underwriting-or-credit-decision",
         "requires-diagnostic-context",
       ],
       redactionRequirements: [
@@ -212,13 +235,13 @@ async function executeScoreRequest(
     }
   );
 
-  const score = calculatePropertyScore(input);
+  const score = calculatePropertyProjectScore(input);
 
   const classifiedOutput = classifyRecord(
     {
       score,
       advisory:
-        "AI-GENERATED INFORMATION ONLY - NOT AN OFFICIAL REPORT - NOT VALID FOR PERMITTING, FINANCING, LEGAL, OR REGULATORY USE.",
+        "PROPERTY/PROJECT DIAGNOSTIC ONLY - NOT UNDERWRITING, A CREDIT DECISION, OR A PROGRAM ELIGIBILITY DETERMINATION.",
     },
     {
       classificationLevel: "INTERNAL",
@@ -230,7 +253,7 @@ async function executeScoreRequest(
       sharingPermissions: ["backend-diagnostic-review"],
       aiUsagePermissions: ["summarize", "explain"],
       exportRestrictions: [
-        "not-a-final-credit-decision",
+        "not-underwriting-or-credit-decision",
         "requires-human-review-before-regulatory-reliance",
       ],
       redactionRequirements: [
@@ -242,12 +265,12 @@ async function executeScoreRequest(
 
   const explanation = createExplanationLineage({
     outputIdentifier: traceId,
-    outputType: "test_score_result",
+    outputType: "property_project_diagnostic_score",
     audience: "internal",
     claimType: "recommendation",
     summary:
-      "Test score generated through governed backend diagnostics and preserved with durable evidence.",
-    ruleVersion: "test-score-runtime-v0.1.0",
+      "Property/project diagnostic score generated from property-side readiness inputs only and preserved with durable evidence.",
+    ruleVersion: "property-project-diagnostic-v0.2.0",
     overlayRefs: [],
     confidenceScore: 0.7,
     humanReviewRequired: true,
@@ -256,7 +279,8 @@ async function executeScoreRequest(
     metadata: {
       method,
       advisoryOnly: true,
-      sba: score.sba,
+      propertyProject: score.propertyProject,
+      personalFinancialScoring: false,
     },
   });
 
@@ -264,7 +288,7 @@ async function executeScoreRequest(
     eventType: "TEST_SCORE_EXECUTED",
     domain: "operations",
     severity: "INFO",
-    message: "Test score executed through governed backend runtime controls.",
+    message: "Property/project diagnostic score executed through governed backend runtime controls.",
     traceId,
     replayRef: traceId,
     actorId,
@@ -309,12 +333,13 @@ async function executeScoreRequest(
       },
     ],
     observability,
-    sourceVersion: "test-score-api-v0.1.0",
+    sourceVersion: "test-score-api-v0.2.0",
     result: {
       method,
       versionRuntimeOk: versionRuntime.ok,
       advisoryOnly: true,
-      sba: score.sba,
+      propertyProject: score.propertyProject,
+      personalFinancialScoring: false,
     },
   });
 

@@ -29,7 +29,7 @@
 export const INTERNAL_CHROME_PREFIXES = [
   "/internal", "/governance", "/operator-queue", "/operator-demo",
   "/applications", "/documents", "/reviews", "/rules", "/decisions",
-  "/notices", "/audit-replay", "/connectors", "/partners", "/billing",
+  "/notices", "/audit-replay", "/connectors", "/partners", "/capital-network", "/billing",
   "/reports", "/promotion", "/case-command", "/evidence-packets",
   "/exception-remediation", "/module-readiness", "/lender",
   "/sponsor",
@@ -51,6 +51,9 @@ export const INTERNAL_CHROME_PREFIXES = [
  */
 export const NO_INTERNAL_CHROME_PREFIXES = [
   "/security", "/sign-in", "/portal", "/lender-desk",
+  "/capital-network/onboarding", "/capital-network/provider",
+  // Authenticated test-launch surface, not the 78-console engine room.
+  "/internal/synthetic-fixtures",
 ] as const;
 
 export const PROTECTED_PAGE_PREFIXES = [
@@ -58,8 +61,8 @@ export const PROTECTED_PAGE_PREFIXES = [
   "/security/mfa",
   "/security/password-setup",
   "/portal",
-  // The Lender Deal Desk is auth-gated but does NOT wear the internal
-  // operator chrome — the licensed lender gets a clean working surface,
+  // The Broker Deal Desk is auth-gated but does NOT wear the internal
+  // operator chrome — the broker gets a clean working surface,
   // not the 76-console engine room (founder test 2026-08-05).
   "/lender-desk",
 ] as const;

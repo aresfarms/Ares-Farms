@@ -1,17 +1,16 @@
 import { createHash } from "node:crypto";
 import type { StripeConnectRecipientRegistry } from "./runtime";
 
-export const FOUNDER_ECONOMICS_VERSION = "founder-economics-v1";
+export const FOUNDER_ECONOMICS_VERSION = "owner-controlled-economics-v2";
 export const PLATFORM_STEWARDSHIP_BASE_CENTS = 400_000;
 export const PLATFORM_STEWARDSHIP_INCLUDED_HOURS = 20;
 export const PLATFORM_STEWARDSHIP_EXCESS_RATE_CENTS = 17_500;
 export const BUILD_RECOVERY_PRIORITY_BASIS_POINTS = 1_500;
 
 export type RevenueClass =
-  | "CAITLIN_ENVIRONMENTAL_MODULE"
-  | "STUART_FINANCING_MODULE"
-  | "GENERAL_PLATFORM"
-  | "FRANCES_FUTURE_MODULE";
+  | "OWNER_ENVIRONMENTAL_MODULE"
+  | "PLATFORM_FINANCING_MODULE"
+  | "GENERAL_PLATFORM";
 
 export type GeneralFundWaterfallInput = {
   paymentRef: string;
@@ -33,7 +32,7 @@ export type GeneralFundWaterfallInput = {
 };
 
 export type GeneralFundTransfer = {
-  recipient: "CAITLIN" | "STUART";
+  recipient: "CAITLIN";
   purpose: "STEWARDSHIP" | "EXPENSE_REIMBURSEMENT" | "BUILD_RECOVERY" | "GENERAL_DISTRIBUTION";
   amount: number;
   connectedAccountRef: string | null;
@@ -52,10 +51,8 @@ export type GeneralFundWaterfallEvidence = {
   founderExpenseReimbursementPaid: number;
   buildRecoveryPaid: number;
   caitlinGeneralDistribution: number;
-  stuartGeneralDistribution: number;
   platformReserveRetained: number;
   totalCaitlinTransfer: number;
-  totalStuartTransfer: number;
   transfers: GeneralFundTransfer[];
   generatedAt: string;
   governanceVersion: string;
@@ -94,7 +91,7 @@ export function stewardshipCashCap(monthlyGeneralFundRevenue: number): number {
 }
 
 function transfer(
-  recipient: "CAITLIN" | "STUART",
+  recipient: "CAITLIN",
   purpose: GeneralFundTransfer["purpose"],
   amount: number,
   recipients: StripeConnectRecipientRegistry
@@ -131,9 +128,8 @@ export function buildGeneralFundWaterfall(input: GeneralFundWaterfallInput): Gen
   const buildRecoveryPaid = Math.min(available, input.outstandingBuildRecovery, buildRecoveryTarget);
   available -= buildRecoveryPaid;
 
-  const caitlinGeneralDistribution = Math.floor(available / 3);
-  const stuartGeneralDistribution = Math.floor(available / 3);
-  const platformReserveRetained = available - caitlinGeneralDistribution - stuartGeneralDistribution;
+  const caitlinGeneralDistribution = 0;
+  const platformReserveRetained = available;
   const stewardshipAccruedAfterThisPayment = Math.max(0, stewardshipOutstanding - stewardshipCashPaidOnThisPayment);
 
   const transfers = [
@@ -141,11 +137,9 @@ export function buildGeneralFundWaterfall(input: GeneralFundWaterfallInput): Gen
     transfer("CAITLIN", "EXPENSE_REIMBURSEMENT", founderExpenseReimbursementPaid, input.recipients),
     transfer("CAITLIN", "BUILD_RECOVERY", buildRecoveryPaid, input.recipients),
     transfer("CAITLIN", "GENERAL_DISTRIBUTION", caitlinGeneralDistribution, input.recipients),
-    transfer("STUART", "GENERAL_DISTRIBUTION", stuartGeneralDistribution, input.recipients),
   ].filter((item) => item.amount > 0);
 
   const totalCaitlinTransfer = transfers.filter((item) => item.recipient === "CAITLIN").reduce((sum, item) => sum + item.amount, 0);
-  const totalStuartTransfer = transfers.filter((item) => item.recipient === "STUART").reduce((sum, item) => sum + item.amount, 0);
 
   const base = {
     paymentRef: input.paymentRef,
@@ -159,10 +153,8 @@ export function buildGeneralFundWaterfall(input: GeneralFundWaterfallInput): Gen
     founderExpenseReimbursementPaid,
     buildRecoveryPaid,
     caitlinGeneralDistribution,
-    stuartGeneralDistribution,
     platformReserveRetained,
     totalCaitlinTransfer,
-    totalStuartTransfer,
     transfers,
     generatedAt: input.generatedAt,
     governanceVersion: FOUNDER_ECONOMICS_VERSION,
@@ -172,15 +164,9 @@ export function buildGeneralFundWaterfall(input: GeneralFundWaterfallInput): Gen
   return { evidenceId, ...base, evidenceSha256 };
 }
 
-export function directModuleRule(revenueClass: RevenueClass) {
-  if (revenueClass === "CAITLIN_ENVIRONMENTAL_MODULE") {
-    return { caitlinBasisPoints: 10_000, stuartBasisPoints: 0 };
-  }
-  if (revenueClass === "STUART_FINANCING_MODULE") {
-    return { caitlinBasisPoints: 0, stuartBasisPoints: 10_000 };
-  }
-  if (revenueClass === "FRANCES_FUTURE_MODULE") {
-    return { caitlinBasisPoints: 0, stuartBasisPoints: 10_000, economicOwner: "FRANCES" as const };
-  }
-  return { caitlinBasisPoints: 0, stuartBasisPoints: 0 };
+export function directModuleRule(_revenueClass: RevenueClass) {
+  // Owner-controlled transition: automatic personal/module splits are disabled.
+  // Revenue remains in Furlong until a separately approved compensation or
+  // affiliate economics policy is adopted.
+  return { caitlinBasisPoints: 0 };
 }

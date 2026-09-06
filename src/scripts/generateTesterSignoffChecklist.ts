@@ -1,7 +1,6 @@
 /**
  * generateTesterSignoffChecklist — the printable platform sign-off checklist
- * for Stuart's pre-launch review (founder request 2026-07-29; launch gate:
- * "Stuart's pre-launch compliance review (financing surfaces)").
+ * for the independent pre-launch compliance review of financing surfaces.
  *
  * Run:  npx tsx src/scripts/generateTesterSignoffChecklist.ts [outPath]
  * Emits a fillable print PDF: checkbox per item, notes lines per section,
@@ -127,7 +126,7 @@ function generate(outPath: string): void {
   );
   doc.moveDown(0.5);
   doc.font("Helvetica").fontSize(9.5).fillColor(MUTED);
-  doc.text(`Reviewer: Stuart Fraas (sfraas@aresfarmsinc.com) · Prepared ${dateStamp}`);
+  doc.text(`Reviewer: Independent Governance / Finance Reviewer · Prepared ${dateStamp}`);
   doc.text(`Staging: ${STAGING_URL} · Access: Google sign-in via IAP (allowlisted)`);
   doc.moveDown(0.3);
   doc.moveTo(54, doc.y).lineTo(54 + W, doc.y).lineWidth(1.5).strokeColor(NAVY).stroke();
@@ -197,7 +196,7 @@ function generate(outPath: string): void {
   doc.moveTo(54, sigY).lineTo(54 + half, sigY).lineWidth(0.8).strokeColor(INK).stroke();
   doc.moveTo(54 + half + 28, sigY).lineTo(54 + W, sigY).lineWidth(0.8).strokeColor(INK).stroke();
   doc.font("Helvetica").fontSize(8.5).fillColor(MUTED);
-  doc.text("Signature — Stuart Fraas, Reviewer", 54, sigY + 4, { width: half });
+  doc.text("Signature — Independent Reviewer", 54, sigY + 4, { width: half });
   doc.text("Date", 54 + half + 28, sigY + 4, { width: half });
   doc.moveDown(2);
   doc.font("Helvetica").fontSize(7.5).fillColor(MUTED).text(

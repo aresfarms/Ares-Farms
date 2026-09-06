@@ -8,13 +8,13 @@ const packet = composePublicAlphaSignoffCeremonyPacket({
   generatedAt: "2026-07-26T12:00:00.000Z",
 });
 assert.equal(packet.predecessor, "4D_CONTROLLED_PROMOTION_READINESS_RECONCILIATION");
-assert.equal(packet.ceremonyStatus, "READY_FOR_FOUNDER_REVIEW");
-assert.equal(packet.quorumRule, "2_OF_3_FOUNDERS");
+assert.equal(packet.ceremonyStatus, "READY_FOR_OWNER_AND_INDEPENDENT_REVIEW");
+assert.equal(packet.quorumRule, "OWNER_PLUS_INDEPENDENT_REVIEW");
 assert.equal(packet.minimumAffirmativeVotes, 2);
-assert.equal(packet.founderVoteCount, 0);
+assert.equal(packet.reviewDecisionCount, 0);
 assert.equal(packet.voteRecordingPermitted, false);
 assert.equal(packet.decisions.length, 5);
-assert.equal(packet.decisions.every((x) => x.status === "PENDING_FOUNDER_DECISION"), true);
+assert.equal(packet.decisions.every((x) => x.status === "PENDING_OWNER_DECISION"), true);
 assert.equal(packet.entryConditions.filter((x) => x.status === "PASS").length, 6);
 assert.equal(packet.entryConditions.filter((x) => x.status === "EXTERNAL_EVIDENCE_REQUIRED").length, 2);
 assert.equal(packet.engineeringStatus, "PASS");
@@ -28,7 +28,7 @@ console.log(JSON.stringify({
   rule: PUBLIC_ALPHA_SIGNOFF_CEREMONY_RULE,
   predecessor: packet.predecessor,
   ceremonyStatus: packet.ceremonyStatus,
-  pendingFounderDecisions: packet.decisions.length,
+  pendingOwnerDecisions: packet.decisions.length,
   externalEvidenceConditions: 2,
   voteRecorded: false,
   productionStatus: packet.productionStatus,

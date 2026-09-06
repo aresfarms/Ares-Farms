@@ -17,7 +17,7 @@
  * WHAT THIS IS NOT (governance boundary — CANON / advisory-not-decide)
  *   - NOT advice. It computes a ratio and shows the published benchmark band.
  *     It never says "you should" anything. "What do I do about it" routes to the
- *     Guild / Stuart's licensed advisory (the licensing seam).
+ *     an appropriately credentialed external financing advisor (the licensing seam).
  *   - NOT Pinion's proprietary peer dataset. The critical values below are the
  *     PUBLISHED FFSC/UMN thresholds, not a private client pool. We fabricate no
  *     peer comparison and no benchmark we cannot cite to a public source.

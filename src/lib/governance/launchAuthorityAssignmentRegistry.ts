@@ -23,7 +23,6 @@ export type LaunchAuthorityAssignment = Readonly<{
 
 const identityByHolderId: Readonly<Record<string, readonly string[]>> = {
   "caitlin-hudson": ["chudson@aresfarmsinc.com"],
-  "stuart-fraass": ["sfraas@aresfarmsinc.com"],
 };
 
 const activeByRole = new Map(
@@ -34,7 +33,7 @@ const activeByRole = new Map(
 
 const assigned = (
   authorityRole: string,
-  holderId: "caitlin-hudson" | "stuart-fraass",
+  holderId: "caitlin-hudson",
   sourceRef: string,
   reason: string
 ): LaunchAuthorityAssignment => {
@@ -59,12 +58,6 @@ const explicitAssignments: readonly LaunchAuthorityAssignment[] = [
     "caitlin-hudson",
     "named-tester-acceptance",
     "Named tester identity is explicitly recorded for Caitlin Hudson."
-  ),
-  assigned(
-    "STUART_NAMED_TESTER",
-    "stuart-fraass",
-    "named-tester-acceptance",
-    "Named tester identity is explicitly recorded for Stuart Fraass."
   ),
   assigned(
     "DATA_RIGHTS_OFFICER",

@@ -20,7 +20,7 @@ import {
   type SyntheticFixtureContext,
 } from "@/lib/testing/syntheticFixtureLineage";
 
-const ROLES = new Set(["lender", "attorney", "auditor", "sponsor"]);
+const ROLES = new Set(["broker", "lender", "attorney", "auditor", "sponsor"]);
 
 async function professionalSyntheticContext(
   req: NextRequest,

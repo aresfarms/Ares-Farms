@@ -1,5 +1,7 @@
 "use client";
 
+import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
+
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
@@ -138,6 +140,7 @@ type PropertyFactsResponse = {
     recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
     parcelSourceName?: string | null;
     parcelSourceAsOf?: string | null;
+    assessmentAsOf?: string | null;
     parcelSourceUrl?: string | null;
     landUse?: string | null;
     zoning?: string | null;
@@ -146,6 +149,7 @@ type PropertyFactsResponse = {
     assessedLandValue?: number | null;
     assessedImprovementValue?: number | null;
     assessedTotalValue?: number | null;
+    propertyValueScreen?: MarketValueIndication | null;
     publicWater?: boolean | null;
     publicSewer?: boolean | null;
     waterfront?: boolean | null;
@@ -1730,14 +1734,20 @@ function buildReportModel(args: {
   const farmAnswerText = farmAnswers.map(
     (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`
   );
-  // Highest-and-best-use ranking for a farm/land parcel.
+  // Agricultural-enterprise screen for farm/land parcels. This is deliberately
+  // separate from the property-wide highest/best-use conclusion.
   const bestUse = args.placeIntelligence?.farmBestUse ?? null;
   const bestUseLines = bestUse
     ? [
-        ...bestUse.options.map((o) => `[${o.tier.toUpperCase()}] ${o.name} — ${o.grossPerAcre} — ${o.why}`),
-        // One-crop-vs-diversify verdict travels with the ranking in BOTH
-        // export paths (founder request 2026-07-28).
-        `[${bestUse.portfolioAdvice.verdict === "diversify" ? "DIVERSIFY" : "ONE ANCHOR SYSTEM"}] ${bestUse.portfolioAdvice.title}`,
+        `[SCOPE] Agricultural enterprise screen only - not a property-wide highest-and-best-use conclusion.`,
+        ...(bestUse.propertyWideContext.currentUse ? [`[CURRENT USE] ${bestUse.propertyWideContext.currentUse}`] : []),
+        ...(bestUse.propertyWideContext.zoning
+          ? [`[ZONING] ${bestUse.propertyWideContext.zoning}${bestUse.propertyWideContext.zoningSummary ? ` - ${bestUse.propertyWideContext.zoningSummary}` : ""}`]
+          : []),
+        `[PROPERTY-WIDE ALTERNATIVES] ${bestUse.propertyWideContext.candidates.join("; ")}`,
+        `[PROPERTY-WIDE RULE] ${bestUse.propertyWideContext.note}`,
+        ...bestUse.options.map((o) => `[${o.tier.toUpperCase()}] ${o.name} — economics context (${o.economicsBasis}): ${o.grossPerAcre} — ${o.why}`),
+        `[${bestUse.portfolioAdvice.verdict === "diversify" ? "COMPARE / DIVERSIFY" : bestUse.portfolioAdvice.verdict === "single-anchor" ? "ONE AGRICULTURAL ANCHOR" : "NOT YET RANKED"}] ${bestUse.portfolioAdvice.title}`,
         ...bestUse.portfolioAdvice.reasons.map((reason) => `• ${reason}`),
       ]
     : [];
@@ -1813,7 +1823,7 @@ function buildReportModel(args: {
       ? [`## How people typically pay for a property like this`, `- ${financingProse}`, ``]
       : []),
     ...(bestUse
-      ? [`## Best use for this parcel — ranked by the numbers`, `- ${bestUse.headline}`, ...bestUseLines.map((l) => `- ${l}`), ``]
+      ? [`## Agricultural enterprise screen — separate from property-wide highest/best use`, `- ${bestUse.headline}`, ...bestUseLines.map((l) => `- ${l}`), ``]
       : []),
     ...(farmAnswerText.length > 0
       ? [`## Your farm questions — answered for this property`, ...farmAnswerText.map((l) => `- ${l}`), ``]
@@ -1873,7 +1883,7 @@ function buildReportModel(args: {
       ? section("How people typically pay for a property like this", `<p>${escapeHtml(financingProse)}</p>`)
       : "",
     bestUse
-      ? section("Best use for this parcel — ranked by the numbers", `<p>${escapeHtml(bestUse.headline)}</p><ul>${htmlList(bestUseLines)}</ul>`)
+      ? section("Agricultural enterprise screen — separate from property-wide highest/best use", `<p>${escapeHtml(bestUse.headline)}</p><ul>${htmlList(bestUseLines)}</ul>`)
       : "",
     farmAnswerText.length > 0
       ? section("Your farm questions — answered for this property", `<ul>${htmlList(farmAnswerText)}</ul>`)
@@ -2062,17 +2072,22 @@ export function PropertyEvaluationWorkspace({
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
   const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
-  // Residential screening basis (founder 2026-07-29: the pro forma must
-  // carry real numbers "period" — same stated-basis chain the farm and
-  // commercial lanes already use): entered/listed price, else the county-
-  // assessed total value, with the basis printed on every figure.
-  const residentialAssessedTotal = facts?.propertyRecord?.assessedTotalValue ?? null;
-  const residentialBasisPrice = effectiveListedPrice ?? residentialAssessedTotal;
+  // Residential ownership-cost/pro-forma basis: a real asking/entered price
+  // wins. Without one, use Furlong's residential-only assessment/HPI screen
+  // ONLY when that screen is actually supportable. Never substitute a raw tax
+  // assessment for market/acquisition value merely because no listing exists.
+  const residentialValueScreen = facts?.propertyRecord?.propertyValueScreen ?? null;
+  const residentialScreenMid =
+    residentialValueScreen?.status === "indicated" &&
+    residentialValueScreen.profileId === "residential"
+      ? residentialValueScreen.midUsd
+      : null;
+  const residentialBasisPrice = effectiveListedPrice ?? residentialScreenMid;
   const residentialBasisNote =
     effectiveListedPrice != null
       ? null
-      : residentialAssessedTotal != null
-        ? `No asking price is published for this parcel, so every figure runs on the county-assessed total value of $${residentialAssessedTotal.toLocaleString("en-US")} as a stated screening basis — the county's taxation value, not a market appraisal. Enter your intended offer on the report page to run your own number; the negotiated price and an appraisal govern.`
+      : residentialScreenMid != null
+        ? `No asking price is published for this parcel, so the residential ownership-cost screen uses the Furlong Property Estimate midpoint of $${residentialScreenMid.toLocaleString("en-US")} as a stated planning basis. ${residentialValueScreen?.method ?? ""} This is not an appraisal; enter an intended offer when you have one.`
         : null;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
@@ -3010,6 +3025,7 @@ export function PropertyEvaluationWorkspace({
             verdict: report.verdict,
             executiveSummary: report.executiveSummary,
             propertySummary: report.propertySummary,
+            propertyValueScreen: facts?.propertyRecord?.propertyValueScreen ?? undefined,
             conceptSummary: report.conceptSummary,
             strengths: report.strengths,
             risks: report.risks,
@@ -3081,14 +3097,14 @@ export function PropertyEvaluationWorkspace({
               ];
               const farmOnly = [
                 { name: "FSA Direct Farm Ownership", body: "USDA lends directly — lowest rate, ~$600K limit (indexed), targeted at beginning and underserved farmers; government processing timelines." },
-                { name: "FSA Guaranteed Farm Ownership", body: "The commercial farm path most established farmers use: a local ag bank or Farm Credit association makes the loan at bank speed and USDA guarantees up to 95% — limits near $2.25M (indexed)." },
+                { name: "FSA Guaranteed Farm Ownership", body: "A commercial agricultural lender makes and services the loan and FSA provides the guarantee. The current FY2026 guaranteed-loan ceiling is $2.343M and is indexed; the selected lender/FSA office confirms the current limit and borrower underwriting." },
                 { name: "Farm Credit System", body: "The nationwide cooperative ag lender network — farm real estate and operating credit as their core business, with patronage refunds to member-borrowers." },
               ];
               return {
                 heading: "The Federal Programs That Fund Properties Like This",
                 items: isFarm ? [...farmOnly, ...shared] : shared,
                 fsaNote: isFarm
-                  ? "Furlong's in-network commercial debt broker sources commercial and business debt and does NOT originate FSA farm loans. FSA-guaranteed lenders (local ag banks and Farm Credit associations) and FSA direct loans make these — find your closest FSA office and active guaranteed lenders through the USDA Service Center Locator (offices.usda.gov) and your state FSA office at fsa.usda.gov. Take this report and its pro forma with you; they are built for exactly that conversation."
+                  ? "Furlong does not force an agricultural case through one broker. Use the Capital Network, nominate your own FSA-guaranteed lender/Farm Credit contact, or invite a verified one-case guest provider. FSA direct loans are handled by FSA itself. Your property/project report and pro forma can travel with the borrower-selected provider after explicit consent; that provider performs any borrower underwriting required for approval."
                   : undefined,
               };
             })(),
@@ -3344,6 +3360,8 @@ export function PropertyEvaluationWorkspace({
           landUse: facts?.propertyRecord?.landUse ?? null,
           squareFeet: facts?.propertyRecord?.squareFeet ?? null,
           town: analysisContext.location ?? null,
+          county: analysisContext.county ?? null,
+          stateCode: analysisContext.stateCode ?? facts?.verification?.parsedAddress?.state ?? null,
           screeningPrice,
           benchRatePct: ownershipContext?.rates.rate30 ?? null,
         })
@@ -3777,6 +3795,8 @@ export function PropertyEvaluationWorkspace({
             landUse: facts?.propertyRecord?.landUse ?? null,
             squareFeet: facts?.propertyRecord?.squareFeet ?? null,
             town: context.town ?? null,
+            county: context.county ?? null,
+            stateCode: context.stateCode ?? null,
           },
           acreage,
           fsaRatePct,
@@ -4069,10 +4089,10 @@ export function PropertyEvaluationWorkspace({
       })()}
       {!deepView && importedProperty && (!propertyClassificationAvailable || !rankingPrice) && (
         <section aria-label="Complete property basics" style={{ display: "grid", gap: 7, border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px" }}>
-          <strong style={{ color: "#162033", fontSize: 15 }}>Complete the property basics before Furlong recommends a course</strong>
+          <strong style={{ color: "#162033", fontSize: 15 }}>Complete the property basics before Furlong calculates financing or transaction recommendations</strong>
           <span style={{ color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>
             {propertyClassificationAvailable
-              ? "Furlong classified the property from the available parcel and listing evidence. Enter the asking price or your intended offer before any financial recommendation is generated. The type control above is only for correcting a source record that does not reflect the property’s actual use."
+              ? "Furlong classified the property from the available parcel and listing evidence. Property facts and use possibilities can be screened now; enter the asking price or your intended offer before price-dependent financing, return, cash-to-close, or transaction recommendations are calculated. The type control above is only for correcting a source record that does not reflect the property's actual use."
               : "Furlong is still resolving the parcel acreage, land-use, and structure record for this address. It will not default the property to residential or generate type-specific analysis until that evidence is available."}
           </span>
         </section>
@@ -4147,6 +4167,7 @@ export function PropertyEvaluationWorkspace({
           <FinanceAnalysisPanel
             useScreen={financingProgramFit.useScreen}
             scorecard={financingProgramFit.scorecard}
+            location={analysisContext.location}
           />
         }
         agricultureSlot={
@@ -4752,15 +4773,17 @@ export function PropertyEvaluationWorkspace({
             gate. That is a guarantee about how <em>we</em> conduct ourselves — the part we fully control:
           </p>
           <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 5, fontSize: 13, lineHeight: 1.55, color: "#dce8f2" }}>
-            <li><strong style={{ color: "#f4f7fa" }}>No capture.</strong> No account, no login, no personal data required to read this.</li>
-            <li><strong style={{ color: "#f4f7fa" }}>No sale.</strong> We never sell, broker, or hand your information to a third party.</li>
-            <li><strong style={{ color: "#f4f7fa" }}>No cut of your deal.</strong> Furlong facilitates introductions; it never decides your deal and takes no piece of your transaction.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>No capture.</strong> No account, no login, no personal data required to read the open property analysis.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>No lead sale or file auction.</strong> Furlong never sells borrower leads or auctions borrower files.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>You control sharing.</strong> A provider receives only the exact package you authorize for that exact recipient; selecting a provider does not silently share your file.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>No pay-to-rank.</strong> Provider compensation and affiliation have zero influence on matching or ranking.</li>
+            <li><strong style={{ color: "#f4f7fa" }}>Disclosed fees only.</strong> Furlong may charge for reports, workflow, packaging, or other clearly described services, but those fees never buy a provider better placement.</li>
             <li><strong style={{ color: "#f4f7fa" }}>Sources, always.</strong> Every figure carries its origin and date — you can check our work.</li>
           </ul>
           <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#b9cbd9" }}>
-            The one exception, stated plainly: if <em>you</em> choose to join a waitlist or the Guild, we
-            ask for your name and email — only to reach you, and we tell you exactly why right where you
-            enter it. Reading and analyzing stay anonymous, always.
+            Reading the open property analysis can remain anonymous. If you choose a paid report, save a case,
+            nominate a provider, open a deal room, request a professional service, or authorize delivery, Furlong
+            collects only the information required for that chosen workflow and states the purpose at the point of collection.
           </p>
         </section>
       )}
@@ -4792,7 +4815,7 @@ export function PropertyEvaluationWorkspace({
               ))}
             </div>
             <span style={{ fontSize: 11.5, color: "#7c6f57", lineHeight: 1.55, fontFamily: "Georgia, serif", fontStyle: "italic" }}>
-              These route to Furlong&apos;s own disclosed people — the licensed lending desk and the Guild&apos;s licensed PE. Furlong facilitates the introduction; it never decides your deal, and takes no cut of your transaction.
+              These are optional next-step workflows. For financing, Furlong can compare suitable Capital Network providers, let you nominate your own provider, or invite a verified one-case guest provider. Nothing is sent until you choose the exact recipient and authorize the exact package; compensation never improves provider ranking.
             </span>
           </section>
         );

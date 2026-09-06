@@ -76,23 +76,44 @@ type Lane = {
 
 const LANES: Lane[] = [
   {
-    role: "lender",
-    title: "Lender / Debt Broker",
-    who: "The commercial debt broker or a funding lender working a live financing file.",
+    role: "broker",
+    title: "Commercial Debt Broker",
+    who: "The broker coordinating the borrower's financing request before and during lender placement.",
     sees: [
-      "Deals routed to you, with the customer's contact details and property",
+      "Borrower financing requests assigned to your broker workspace",
       "The borrower's uploaded documents — one file at a time, every open recorded",
-      "Status, customer-visible notes, and the closing timeline you maintain",
-      "Documents you send back to the customer, and signature requests",
+      "Status, customer-visible notes, pro forma coordination, and the working timeline",
+      "Governed lender-routing controls, customer documents, and signature requests",
     ],
     neverSees: [
-      "Any deal not routed to you",
+      "Unassigned borrower matters",
+      "A lender's internal underwriting or credit-decision workspace",
       "Environmental case files or the PE's work product",
       "Platform governance, audit ledgers, or other professionals' queues",
     ],
     destination: "/lender-desk",
     accent: "#534AB7",
     status: "live",
+  },
+  {
+    role: "lender",
+    title: "Funding Lender",
+    who: "A lender or financial institution receiving a package deliberately routed to that institution.",
+    sees: [
+      "Only financing packages routed to your institution",
+      "The borrower documents and broker package authorized for that lender handoff",
+      "Your institution's requests, terms, response, and status history",
+    ],
+    neverSees: [
+      "The broker's full pipeline or unrelated borrower requests",
+      "Packages routed to competing lenders",
+      "Platform governance, environmental work product, or other professionals' queues",
+    ],
+    destination: "/lender",
+    accent: "#185FA5",
+    status: "building",
+    buildingNote:
+      "The lender-specific review surface is intentionally separate from the broker workspace. It stays closed until institution-scoped package routing, lender response, and least-privilege document access are wired end to end.",
   },
   {
     role: "attorney",

@@ -349,9 +349,9 @@ export default async function ExplorePage({
     );
   }
 
-  // Financial & Capital — a licensed module: learn how financing works, see live
-  // public rates, then submit a deal routed to the licensed lender (founder
-  // direction 2026-07-18). Purple accent. Facilitation only — never a lender.
+  // Financial & Capital — learn how financing works, see public rate context,
+  // then submit a deal into the Furlong Capital Desk. External handoff remains
+  // separately consented/certified. Purple accent. Facilitation only — never a credit decision.
   if (selected && selected.slug === "financing-capital") {
     return (
       <main>
@@ -364,7 +364,7 @@ export default async function ExplorePage({
               {selected.label}
             </h1>
             <p style={{ margin: 0, fontSize: 16, color: "#4d596d", lineHeight: 1.6, maxWidth: 640 }}>
-              The capital side of every property decision — learn the programs and see today&apos;s rates free, then bring your deal to our commercial debt broker when you&apos;re ready.
+              The capital side of every property decision — learn the programs and see current rate context free, then bring your deal to the Furlong Capital Desk when you&apos;re ready.
             </p>
           </header>
           <FinancingLaneSections />

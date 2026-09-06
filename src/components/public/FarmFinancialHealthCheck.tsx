@@ -7,7 +7,7 @@
  * Furlong way — a farmer enters their OWN numbers and sees the standard public
  * Farm Financial Scorecard measures with their published "strong / watch /
  * vulnerable" bands. Facts + calculator only. Never advice: "what do I do about
- * it" routes to the Guild / Stuart's licensed advisory (the licensing seam).
+ * it" routes to the an appropriately credentialed external financing advisor (the licensing seam).
  *
  * Stateless + client-side: the operator's numbers live only in this component's
  * React state — nothing is sent anywhere, nothing is persisted (no PII store).
@@ -207,7 +207,8 @@ export function FarmFinancialHealthCheck() {
           <strong>Farm Financial Scorecard</strong>{" "}measures — the same liquidity, solvency, profitability,
           efficiency, and repayment ratios a lender or advisor runs — each next to its published
           &ldquo;strong / watch / vulnerable&rdquo; band. Nothing you type leaves this page or is saved. This is a
-          calculator, not advice.
+          calculator, not advice. These numbers do not enter Furlong&apos;s nonresidential property score,
+          financing-pathway rank, or provider match.
         </p>
       </div>
 
@@ -353,7 +354,7 @@ export function FarmFinancialHealthCheck() {
         <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "#312a6b" }}>
           A ratio shows you <em>where</em>{" "}the operation stands — not <em>what to do</em>{" "}about it. Reading a watch or
           vulnerable band, and building the plan that moves it, is licensed financial and lending work. That&apos;s the
-          Guild &mdash; and, for lending, Stuart&apos;s licensed desk. Bring these numbers to a real advisor before you
+          the appropriate program or lending desk. Bring these numbers to a real advisor before you
           act on them.
         </p>
       </div>

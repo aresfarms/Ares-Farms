@@ -27,8 +27,8 @@ profile routes as public (no internal chrome); npm scripts + CI steps added.
 
 ## Domains (persist independently of individuals)
 
-Financing & Capital → Stuart Fraass · Environmental & Compliance → Caitlin Hudson
-· Communications & Public Trust → Frances Fraass. `profileRoute` derives from
+Financing & Capital → Furlong Capital Desk · Environmental & Compliance → Caitlin Hudson
+· Communications & Public Trust → Furlong Trust Desk. `profileRoute` derives from
 `domainId`, so a steward change never moves a page. Environmental technical
 review remains **held for Alpha** (CCR-2026-002).
 

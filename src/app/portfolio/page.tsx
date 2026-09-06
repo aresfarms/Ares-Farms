@@ -4,10 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 
 type RankedApplication = {
   id: string;
-  score?: number;
-  risk?: number;
-  acreage?: number;
-  liquidity?: number;
+  propertyReadinessScore?: number;
+  programFitScore?: number;
+  evidenceCompletenessScore?: number;
+  executionReadinessScore?: number;
+  environmentalReadinessScore?: number;
+  propertyRiskScore?: number;
   computedRankScore?: number;
   rank?: number;
   metadata?: {
@@ -22,7 +24,8 @@ type RankedApplication = {
 type RankResponse = {
   ok: boolean;
   error?: string;
-  ranked?: {
+  ranked?: RankedApplication[];
+  output?: {
     ranked?: RankedApplication[];
     classification?: {
       classificationLevel?: string;
@@ -70,10 +73,12 @@ const demoRankRequest = {
   applications: [
     {
       id: "FARM_001",
-      score: 0.75,
-      risk: 0.3,
-      acreage: 0.6,
-      liquidity: 0.6,
+      propertyReadinessScore: 78,
+      programFitScore: 84,
+      evidenceCompletenessScore: 72,
+      executionReadinessScore: 68,
+      environmentalReadinessScore: 80,
+      propertyRiskScore: 25,
       metadata: {
         farmName: "Demo Farm North",
         state: "MD",
@@ -83,10 +88,12 @@ const demoRankRequest = {
     },
     {
       id: "FARM_002",
-      score: 0.55,
-      risk: 0.6,
-      acreage: 0.4,
-      liquidity: 0.4,
+      propertyReadinessScore: 64,
+      programFitScore: 70,
+      evidenceCompletenessScore: 58,
+      executionReadinessScore: 62,
+      environmentalReadinessScore: 66,
+      propertyRiskScore: 40,
       metadata: {
         farmName: "Demo Farm South",
         state: "MD",
@@ -105,12 +112,9 @@ function formatNumber(value: number | undefined): string {
   return value.toFixed(2);
 }
 
-function formatPercent(value: number | undefined): string {
-  if (typeof value !== "number" || !Number.isFinite(value)) {
-    return "Pending";
-  }
-
-  return `${(value * 100).toFixed(1)}%`;
+function formatScore(value: number | undefined): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "Pending";
+  return `${value.toFixed(1)}/100`;
 }
 
 function formatBoolean(value: boolean | undefined): string {
@@ -156,13 +160,13 @@ export default function PortfolioPage() {
   }, []);
 
   const rankedApplications = useMemo(() => {
-    const ranked = response?.ranked?.ranked;
+    const ranked = response?.ranked;
     return Array.isArray(ranked) ? ranked : [];
-  }, [response?.ranked?.ranked]);
+  }, [response?.ranked]);
 
   const governance = response?.governance;
   const classification =
-    response?.ranked?.classification ?? governance?.outputClassification;
+    response?.output?.classification ?? governance?.outputClassification;
 
   if (loading) {
     return (
@@ -247,7 +251,7 @@ export default function PortfolioPage() {
       </section>
 
       <section>
-        <h2>Ranked Applications</h2>
+        <h2>Ranked Property / Project Cases</h2>
         <div style={{ display: "grid", gap: 12 }}>
           {rankedApplications.length > 0 ? (
             rankedApplications.map((application) => (
@@ -272,23 +276,29 @@ export default function PortfolioPage() {
                     margin: 0,
                   }}
                 >
-                  <dt>Application ID</dt>
+                  <dt>Property / Case ID</dt>
                   <dd>{application.id}</dd>
 
                   <dt>Computed Rank Score</dt>
                   <dd>{formatNumber(application.computedRankScore)}</dd>
 
-                  <dt>Base Score</dt>
-                  <dd>{formatPercent(application.score)}</dd>
+                  <dt>Property Readiness</dt>
+                  <dd>{formatScore(application.propertyReadinessScore)}</dd>
 
-                  <dt>Liquidity</dt>
-                  <dd>{formatPercent(application.liquidity)}</dd>
+                  <dt>Program / Property Fit</dt>
+                  <dd>{formatScore(application.programFitScore)}</dd>
 
-                  <dt>Acreage Readiness</dt>
-                  <dd>{formatPercent(application.acreage)}</dd>
+                  <dt>Evidence Completeness</dt>
+                  <dd>{formatScore(application.evidenceCompletenessScore)}</dd>
 
-                  <dt>Risk Penalty</dt>
-                  <dd>{formatPercent(application.risk)}</dd>
+                  <dt>Execution Readiness</dt>
+                  <dd>{formatScore(application.executionReadinessScore)}</dd>
+
+                  <dt>Environmental Readiness</dt>
+                  <dd>{formatScore(application.environmentalReadinessScore)}</dd>
+
+                  <dt>Property Risk Penalty</dt>
+                  <dd>{formatScore(application.propertyRiskScore)}</dd>
 
                   <dt>Location</dt>
                   <dd>
@@ -299,7 +309,7 @@ export default function PortfolioPage() {
               </article>
             ))
           ) : (
-            <p>No ranked applications returned by the governed runtime.</p>
+            <p>No ranked property/project cases returned by the governed runtime.</p>
           )}
         </div>
       </section>
@@ -307,7 +317,7 @@ export default function PortfolioPage() {
       <section>
         <h2>Governance Notice</h2>
         <p>
-          Portfolio ranking is a governed operational recommendation surface.
+          Portfolio ranking is a governed property/project recommendation surface. Personal financial-profile data does not affect this nonresidential ranking.
           It is not a final credit decision and requires authorized human
           review before regulated reliance.
         </p>

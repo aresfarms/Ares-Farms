@@ -5,11 +5,10 @@ import { serviceRequests } from "@/db/schema";
 import { db } from "@/lib/db";
 import { persistServiceRequest } from "@/lib/serviceRequests/serviceRequestStore";
 
-export type FounderConnectRecipient = "CAITLIN" | "STUART";
+export type FounderConnectRecipient = "CAITLIN";
 
 const RECIPIENTS = {
   CAITLIN: { email: "chudson@aresfarmsinc.com", label: "Caitlin Hudson" },
-  STUART: { email: "sfraas@aresfarmsinc.com", label: "Stuart Fraass" },
 } as const;
 
 function sdk(): Stripe {

@@ -27,7 +27,7 @@ import type { ApprovalRecord } from "@/security/securityGovernanceVerification";
 
 const fail: string[] = [];
 const ok = (c: boolean, m: string) => { if (!c) fail.push(m); };
-const ap = (f: "caitlin" | "stuart", r = "domain review"): ApprovalRecord => ({ founderId: f, channel: "in-person", ts: new Date().toISOString(), rationale: r });
+const ap = (f: "owner" | "independent-reviewer", r = "domain review"): ApprovalRecord => ({ founderId: f, channel: "in-person", ts: new Date().toISOString(), rationale: r });
 
 // DOMAIN-ASSET-001 governs ONLY Furlong's two domains. aresfarmsinc.com and
 // redacre.enterprises are SEPARATE companies (not Furlong); Google system
@@ -57,17 +57,17 @@ ok(openDomainBlockers().includes("PRODUCTION_DNS_CUTOVER_REQUIRES_HUMAN_REVIEW")
 ok(openDomainBlockers().includes("DOMAIN_SECURITY_REVIEW_REQUIRED_BEFORE_PUBLIC_LAUNCH"), "pre-launch security-review blocker must be OPEN");
 
 // ── 3. Domain transfer requires multi-party founder approval ───────────────────
-ok(requireDomainTransferApproval([ap("caitlin")]).ok === false, "single founder CANNOT transfer a domain");
-ok(requireDomainTransferApproval([ap("caitlin"), ap("caitlin")]).ok === false, "duplicate founder cannot transfer a domain");
-ok(requireDomainTransferApproval([ap("caitlin"), ap("stuart")]).ok === true, "all founders CAN transfer a domain (quorum met)");
-ok(requireDomainOwnershipChangeApproval([ap("caitlin")]).ok === false, "single founder CANNOT change ownership");
+ok(requireDomainTransferApproval([ap("owner")]).ok === false, "single founder CANNOT transfer a domain");
+ok(requireDomainTransferApproval([ap("owner"), ap("owner")]).ok === false, "duplicate founder cannot transfer a domain");
+ok(requireDomainTransferApproval([ap("owner"), ap("independent-reviewer")]).ok === true, "owner + independent reviewer can transfer a domain (quorum met)");
+ok(requireDomainOwnershipChangeApproval([ap("owner")]).ok === false, "single founder CANNOT change ownership");
 
 // ── 4. DNS authority change requires multi-party founder approval ──────────────
-ok(requireDnsAuthorityChangeApproval([ap("stuart")]).ok === false, "single founder CANNOT change DNS authority");
-ok(requireDnsAuthorityChangeApproval([ap("caitlin"), ap("stuart")]).ok === true, "all founders CAN change DNS authority");
+ok(requireDnsAuthorityChangeApproval([ap("independent-reviewer")]).ok === false, "one governance principal cannot change DNS authority");
+ok(requireDnsAuthorityChangeApproval([ap("owner"), ap("independent-reviewer")]).ok === true, "owner + independent reviewer can change DNS authority");
 // primary public change needs multi-party too
-ok(requirePrimaryPublicChangeApproval([ap("caitlin")]).ok === false, "single founder cannot change the primary public domain");
-ok(requirePrimaryPublicChangeApproval([ap("caitlin"), ap("stuart")]).ok === true, "two founders can change the primary public domain (with review)");
+ok(requirePrimaryPublicChangeApproval([ap("owner")]).ok === false, "single founder cannot change the primary public domain");
+ok(requirePrimaryPublicChangeApproval([ap("owner"), ap("independent-reviewer")]).ok === true, "owner + independent reviewer can change the primary public domain");
 
 // ── 5. Missing auto-renew / transfer-lock attestations block production ────────
 const blockers = domainProductionBlockers();

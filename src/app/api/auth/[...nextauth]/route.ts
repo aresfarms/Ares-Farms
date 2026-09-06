@@ -155,7 +155,7 @@ async function authorizeCredentials(credentials: CredentialsInput | undefined) {
   const internalOperator = operatorByEmail(email);
   const professional = internalOperator ? null : professionalByEmail(email);
   let professionalRoleForSession:
-    "lender" | "attorney" | "auditor" | "sponsor" | null = null;
+    "broker" | "lender" | "attorney" | "auditor" | "sponsor" | null = null;
   if (professional) {
     const professionalAccess = await evaluateProfessionalAccess({
       principalId: email,

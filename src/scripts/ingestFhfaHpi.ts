@@ -53,6 +53,7 @@ async function main(): Promise<void> {
     baseSum: number; baseCount: number;
     latestYr: number; latestPeriod: number; latestIndex: number;
     oldYr: number; oldPeriod: number; oldIndex: number;
+    recentQuarterly: Record<string, number>;
   }>();
   for (let i = 1; i < lines.length; i += 1) {
     const cells = lines[i].split(",");
@@ -69,10 +70,14 @@ async function main(): Promise<void> {
       baseSum: 0, baseCount: 0,
       latestYr: 0, latestPeriod: 0, latestIndex: 0,
       oldYr: 0, oldPeriod: 0, oldIndex: 0,
+      recentQuarterly: {},
     };
     if (yr === BASE_YEAR) {
       entry.baseSum += index;
       entry.baseCount += 1;
+    }
+    if (yr >= 2020) {
+      entry.recentQuarterly[`${yr}Q${period}`] = index;
     }
     if (yr > entry.latestYr || (yr === entry.latestYr && period > entry.latestPeriod)) {
       entry.latestYr = yr;
@@ -117,9 +122,14 @@ async function main(): Promise<void> {
       const longRunAnnualPct = Number(
         ((Math.pow(e.latestIndex / e.oldIndex, 1 / spanYears) - 1) * 100).toFixed(2)
       );
+      const recentQuarterly = Object.fromEntries(
+        Object.entries(e.recentQuarterly).sort(([a], [b]) => a.localeCompare(b))
+      );
       return `  ${JSON.stringify(state)}: ${JSON.stringify({
         factorSinceBase: factor,
         latestQuarter: `${e.latestYr}Q${e.latestPeriod}`,
+        latestIndex: Number(e.latestIndex.toFixed(4)),
+        recentQuarterly,
         longRunAnnualPct,
         longRunSpanYears: Math.round(spanYears),
       })},`;
@@ -150,8 +160,13 @@ export const STATE_HPI_PROVENANCE = {
 export interface StateHpi {
   /** Multiply a ${BASE_YEAR} dollar value by this to walk it to the latest quarter. */
   factorSinceBase: number;
-  /** Latest quarter in the series, e.g. "2026Q1". */
+  /** Latest quarter in the series, e.g. "2026Q2". */
   latestQuarter: string;
+  /** Raw latest state index value, used for date-aligned residential walk-forward. */
+  latestIndex: number;
+  /** Recent quarterly state index values. Residential valuation uses an exact
+      quarter from this map rather than a long-run CAGR bridge. */
+  recentQuarterly: Record<string, number>;
   /** The state's PUBLISHED long-run annualized price change, percent —
       basis for equity-outlook scenarios (history, never a prediction). */
   longRunAnnualPct: number;

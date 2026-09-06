@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth/operatorRegistry";
 import { isSoleMaintenanceSuperuser } from "@/lib/auth/maintenanceSuperuser";
 import { evaluateProfessionalAccess } from "@/lib/auth/professionalAccessAuthority";
+import { professionalByEmail } from "@/lib/auth/professionalRegistry";
 import { apiAuthEnforcementRequired } from "@/lib/security/apiSecurityPolicy";
 import { db } from "@/lib/db";
 import {
@@ -18,6 +19,7 @@ import {
 import {
   listDealDocuments,
   listLenderDeals,
+  listLenderDealsForProvider,
   runDueReminders,
   sendDocumentReminder,
   updateDealDesk,
@@ -45,9 +47,13 @@ import {
 } from "@/lib/notifications/lenderSignature";
 import { serviceRequests } from "@/db/schema";
 import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixtureLineageStore";
+import {
+  providerMayAccessServiceRequest,
+  retainedExternalBrokerProviderId,
+} from "@/lib/financing/capitalNetworkStore";
 
 /**
- * Lender Deal Desk API — the licensed lender's governed working surface
+ * Broker Deal Desk API — the commercial debt broker's governed working surface
  * (founder direction 2026-08-05).
  *
  * GET  ?view=deals                          → all financing deals + desk state
@@ -61,7 +67,7 @@ import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixture
  *        DOCUMENTS_REQUESTED (3-day spacing, cap 3, honest per-deal reasons)
  *
  * Master Volume Governance:
- * - Vol I: accountable authority — role-gated via evaluateAccess (lender/
+ * - Vol I: accountable authority — role-gated via evaluateAccess (broker/
  *   operator/admin/governance), behind IAP at the platform boundary.
  * - Vol II: regulated borrower-document handling; single-file audited reads;
  *   customer communication is minimum-disclosure (reminder emails carry a
@@ -74,7 +80,7 @@ import { syntheticFixtureLineageForRecord } from "@/lib/testing/syntheticFixture
  */
 
 const MODULE = "api.lender.deal-desk";
-const ALLOWED_ROLES: AccessRole[] = ["lender", "governance"];
+const ALLOWED_ROLES: AccessRole[] = ["broker", "governance"];
 const VALID_STATUSES = new Set(FINANCING_DEAL_STATUSES.map((s) => s.status));
 
 function traceIdFor(op: string): string {
@@ -101,7 +107,7 @@ function portalBaseUrl(req: NextRequest): string {
  */
 async function resolveIdentity(
   req: NextRequest,
-): Promise<{ role: string; actorId: string | null }> {
+): Promise<{ role: string; actorId: string | null; providerId: string | null }> {
   const email = req.headers.get("x-ares-authenticated-email")?.trim() || null;
   const sessionActor =
     req.headers.get("x-ares-authenticated-user-id")?.trim() || email;
@@ -111,48 +117,62 @@ async function resolveIdentity(
     return {
       role: "governance",
       actorId: email ?? operator?.id ?? sessionActor,
+      providerId: null,
     };
   }
 
-  // Lender-file authority is credential-first. A registry entry or a finance
-  // label is only an invitation/basis; it is never sufficient professional
-  // authority by itself. The current verified credential must be bound to the
-  // exact authenticated principal + email.
-  const lenderAccess = await evaluateProfessionalAccess({
+  const brokerAccess = await evaluateProfessionalAccess({
     principalId: sessionActor,
     principalEmail: email,
-    requestedRole: "lender",
+    requestedRole: "broker",
   });
-  if (lenderAccess.allowed) {
-    return { role: "lender", actorId: lenderAccess.principalId };
+  if (brokerAccess.allowed) {
+    return {
+      role: "broker",
+      actorId: brokerAccess.principalId,
+      providerId: brokerAccess.providerId,
+    };
   }
 
-  // Stuart is the named internal steward of the licensed lending spoke. In
-  // non-production environments he must be able to enter and exercise the
-  // broker workflow before live professional reliance is enabled. Production
-  // still requires the verified professional credential above.
+  // Retain the staging transition bridge for the existing external broker.
+  // It remains provider-scoped and cannot see new Capital Desk cases unless an
+  // exact Capital Network deal room is activated for that provider.
   const internalLenderRole = internalLenderDeskRole(email);
   if (internalLenderRole) {
     return {
       role: internalLenderRole,
       actorId: email ?? operator?.id ?? sessionActor,
+      providerId: professionalByEmail(email)?.providerId ?? null,
     };
   }
 
   if (operator) {
-    return { role: "operator", actorId: email ?? operator.id };
+    return {
+      role: "operator",
+      actorId: email ?? operator.id,
+      providerId: null,
+    };
   }
 
   const sessionRole = req.headers.get("x-ares-authenticated-role")?.trim();
-  if (sessionRole === "lender") {
-    return { role: "lender", actorId: sessionActor };
+  if (sessionRole === "broker") {
+    return {
+      role: "broker",
+      actorId: sessionActor,
+      providerId: professionalByEmail(email)?.providerId ?? null,
+    };
   }
 
   if (!apiAuthEnforcementRequired()) {
-    return { role: "lender", actorId: sessionActor ?? "dev-lender-console" };
+    return {
+      role: "broker",
+      actorId: sessionActor ?? "dev-broker-console",
+      providerId:
+        professionalByEmail(email)?.providerId ?? retainedExternalBrokerProviderId,
+    };
   }
 
-  return { role: "user", actorId: sessionActor };
+  return { role: "user", actorId: sessionActor, providerId: null };
 }
 
 function authorize(args: {
@@ -188,12 +208,41 @@ function authorize(args: {
   };
 }
 
+async function externalBrokerMayAccessApplication(
+  providerId: string | null,
+  applicationId: string,
+): Promise<boolean> {
+  if (!providerId || !applicationId.startsWith("finintake-")) return false;
+  const serviceRequestId = applicationId.slice("finintake-".length);
+  return providerMayAccessServiceRequest(providerId, serviceRequestId, true);
+}
+
+async function externalBrokerMayAccessServiceRequest(
+  providerId: string | null,
+  serviceRequestId: string,
+): Promise<boolean> {
+  if (!providerId) return false;
+  return providerMayAccessServiceRequest(providerId, serviceRequestId, true);
+}
+
+function brokerScopeDenied(traceId: string) {
+  return NextResponse.json(
+    {
+      ok: false,
+      error:
+        "This financing case belongs to the Furlong Capital Desk and has not been assigned to the external broker workspace.",
+      governance: { traceId },
+    },
+    { status: 403 },
+  );
+}
+
 function denied(traceId: string, actorId: string | null, operation: string) {
   const observability = createObservabilityEvent({
     eventType: "LENDER_DEAL_DESK_ACCESS_DENIED",
     domain: "security",
     severity: "WARN",
-    message: "Lender deal desk access was denied by runtime or role controls.",
+    message: "Broker deal desk access was denied by runtime or role controls.",
     traceId,
     replayRef: traceId,
     actorId,
@@ -203,7 +252,7 @@ function denied(traceId: string, actorId: string | null, operation: string) {
   return NextResponse.json(
     {
       ok: false,
-      error: "Role is not authorized for the lender deal desk.",
+      error: "Role is not authorized for the broker deal desk.",
       governance: { traceId, observability },
     },
     { status: 403 },
@@ -213,7 +262,7 @@ function denied(traceId: string, actorId: string | null, operation: string) {
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
   const view = params.get("view") ?? "deals";
-  const { role, actorId } = await resolveIdentity(req);
+  const { role, actorId, providerId } = await resolveIdentity(req);
   const traceId = traceIdFor(`read-${view}`);
   const operation = `lender-desk.read-${view}`;
 
@@ -222,7 +271,14 @@ export async function GET(req: NextRequest) {
     if (!auth.allowed) return denied(traceId, actorId, operation);
 
     if (view === "deals") {
-      const deals = await listLenderDeals();
+      // External brokers see only legacy/explicit broker-spoke cases. New
+      // owner-controlled Capital Desk intakes are not exposed merely because
+      // the broker workspace remains open.
+      if (role === "broker" && !providerId) return brokerScopeDenied(traceId);
+      const deals =
+        role === "broker"
+          ? await listLenderDealsForProvider(providerId!, 50)
+          : await listLenderDeals(50);
       createObservabilityEvent({
         eventType: "LENDER_DEAL_DESK_READ",
         domain: "operations",
@@ -232,7 +288,7 @@ export async function GET(req: NextRequest) {
         replayRef: traceId,
         actorId,
         module: MODULE,
-        metadata: { view, count: deals.length },
+        metadata: { view, count: deals.length, providerId: role === "broker" ? providerId : null },
       });
       return NextResponse.json({
         ok: true,
@@ -243,7 +299,7 @@ export async function GET(req: NextRequest) {
         emailConfigured: Boolean(
           process.env.EMAIL_FROM && process.env.SENDGRID_API_KEY,
         ),
-        governance: { traceId },
+        governance: { traceId, providerId: role === "broker" ? providerId : null },
       });
     }
 
@@ -258,6 +314,12 @@ export async function GET(req: NextRequest) {
           },
           { status: 400 },
         );
+      }
+      if (
+        role === "broker" &&
+        !(await externalBrokerMayAccessApplication(providerId, applicationId))
+      ) {
+        return brokerScopeDenied(traceId);
       }
       void sweepPendingScans(applicationId); // opportunistic re-scan of pendings
       const documents = await listDealDocuments(applicationId);
@@ -302,6 +364,12 @@ export async function GET(req: NextRequest) {
           { ok: false, error: "Document not found.", governance: { traceId } },
           { status: 404 },
         );
+      }
+      if (
+        role === "broker" &&
+        !(await externalBrokerMayAccessApplication(providerId, doc.applicationId))
+      ) {
+        return brokerScopeDenied(traceId);
       }
       const scanGate = scanAllowsStreaming(doc.metadata);
       if (!scanGate.allowed) {
@@ -486,13 +554,25 @@ export async function POST(req: NextRequest) {
     );
   }
   const action = typeof body.action === "string" ? body.action : "";
-  const { role, actorId } = await resolveIdentity(req);
+  const { role, actorId, providerId } = await resolveIdentity(req);
   const traceId = traceIdFor(action || "post");
   const operation = `lender-desk.${action || "unknown"}`;
 
   try {
     const auth = authorize({ role, actorId, operation, traceId });
     if (!auth.allowed) return denied(traceId, actorId, operation);
+
+    const requestedServiceRequestId =
+      typeof body.serviceRequestId === "string"
+        ? body.serviceRequestId.trim()
+        : "";
+    if (
+      role === "broker" &&
+      requestedServiceRequestId &&
+      !(await externalBrokerMayAccessServiceRequest(providerId, requestedServiceRequestId))
+    ) {
+      return brokerScopeDenied(traceId);
+    }
 
     if (action === "update") {
       const serviceRequestId =
@@ -973,7 +1053,11 @@ export async function POST(req: NextRequest) {
     }
 
     if (action === "remind-all") {
-      const result = await runDueReminders(portalBaseUrl(req));
+      const result = await runDueReminders(
+        portalBaseUrl(req),
+        null,
+        role === "broker" ? providerId : null,
+      );
       createObservabilityEvent({
         eventType: "LENDER_DOCUMENT_REMINDER_SWEEP",
         domain: "operations",

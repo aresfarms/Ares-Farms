@@ -97,7 +97,10 @@ async function main(): Promise<void> {
     ssl: createPostgresSslConfig(connectionString),
     max: 1,
     idleTimeoutMillis: 10000,
-    connectionTimeoutMillis: 10000,
+    // Direct-VPC Cloud Run cold starts can exceed ten seconds before the
+    // private database path is ready. Match the governed migrator's bounded
+    // first-connection window so this proof measures privileges, not VPC warmup.
+    connectionTimeoutMillis: 30_000,
   });
 
   const client = await pool.connect();

@@ -25,6 +25,8 @@ import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
 
 const RECIPIENT_ENV_BY_SPOKE: Record<string, string> = {
   "environmental-engineering-spoke": "NOTIFY_PE_EMAIL",
+  "furlong-capital-desk": "NOTIFY_CAPITAL_DESK_EMAIL",
+  // Retained only for legacy/external-broker assignments.
   "licensed-lending-spoke": "NOTIFY_LENDER_EMAIL",
 };
 

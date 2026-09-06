@@ -10,7 +10,7 @@ analysis, and licensed professional services, but it does **not** itself lend,
 qualify, approve, price, or make credit/environmental determinations. At launch it
 is **IAP-private, test-mode** (no live payments, no live lending decisions, no
 external sends). Two **licensed** modules exist — environmental (Caitlin, PE) and
-financing (Stuart, licensed lender). The platform's backend governance is
+financing (independent licensed financing professional / lender counsel review). The platform's backend governance is
 substantially complete (`verify:master-volumes` PASSES: 57/60 requirements
 implemented; the 3 remaining are **intentionally blocked** pending controlled
 promotion + qualified human/legal approval — that approval is largely what this
@@ -44,7 +44,7 @@ go live (the code will not promote without recorded approval).
 | B4 | **Consent / e-sign disclosures** for intake (contact + property) | CANON-CONSENT-001; recorded at intake | YES |
 | B5 | **Guild membership agreement** — draft to the strawman in `GUILD_TIER_PROPOSAL_DRAFT.md` §7–18: availability-retainer (earned-on-receipt), use-it-or-lose-it annual hours, velocity caps, pass-through disclosure, advisory-vs-transactional scope, lifetime=entity-lifespan, assignment/successor, fair reserve-funded buyout floor | membership economics (founders + counsel) | NO — post-launch (gated) |
 | B6 | **IOLTA / trust-accounting determination** for prepaid professional time | whether unearned prepaid hours must sit in trust | NO — with B5 |
-| B7 | **Lender-paid-compensation / RESPA memo** for Stuart's licensed-lending seam | borrower never charged by Furlong/Stuart; lender pays Stuart | YES (with #34) |
+| B7 | **Lender-paid-compensation / RESPA memo** for the licensed-financing-provider seam | borrower compensation and lender-paid compensation must follow the approved provider agreement and applicable law | YES (with #34) |
 | B8 | **Source / listing data LICENSING agreements** | live-source reliance gate (A3); partner feeds not scraped | before live data (A3) |
 | B9 | **Vendor DPAs + subprocessor list** (hosting, email/SendGrid, Stripe, AI) | data-processing governance; examiner-ready | YES (SendGrid/Stripe already in use) |
 | B10 | **Breach-notification procedure** (legal steps + timelines) | incident governance built; the legal workflow is counsel's | YES |
@@ -57,7 +57,7 @@ go live (the code will not promote without recorded approval).
 
 - **Financing copy** — Reg Z / trigger-terms, no rate/APR promises, "facilitate not
   decide," no pre-approval/qualification language (financing intake + lane copy).
-  *(Overlaps task #34 — Stuart's compliance review.)*
+  *(Overlaps task #34 — independent financing compliance review.)*
 - **Environmental copy** — PE scope/liability, no environmental determination
   implied, order-not-clearance framing.
 - **Public claims + disclaimers** — the advisory-only posture, HUBZone/place-fact

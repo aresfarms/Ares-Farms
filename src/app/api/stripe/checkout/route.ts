@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "../../auth/[...nextauth]/route";
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
+import { evaluateRecordedPaymentAuthorization } from "@/lib/treasury/borrowerFinancialControlStore";
 import { PLANS } from "@/lib/billing/plans";
 import { persistGovernanceEvidence } from "@/lib/governance/evidenceStore";
 import {
@@ -50,6 +51,10 @@ type CheckoutBody = {
   plan?: string | null;
   customerSubjectRef?: string | null;
   dealRef?: string | null;
+  scopeAcceptanceId?: string | null;
+  feeControlId?: string | null;
+  actualWorkEvidenceId?: string | null;
+  moduleAttribution?: string | null;
 };
 
 type SessionUserWithTenant = {
@@ -421,6 +426,23 @@ export async function POST(req: NextRequest) {
     const baseUrl = getBaseUrl();
     const tenantId = sessionUser.tenantId ?? "dev";
     const revenueClass = inferRevenueClass(body.plan);
+    const financialPreflight =
+      selected.price > 0 && !syntheticFixtureContext
+        ? await evaluateRecordedPaymentAuthorization({
+            tenantId,
+            scopeAcceptanceId: body.scopeAcceptanceId,
+            feeControlId: body.feeControlId,
+            actualWorkEvidenceId: body.actualWorkEvidenceId,
+            moduleAttribution: body.moduleAttribution,
+            expectedAmountCents: Math.round(selected.price * 100),
+          })
+        : null;
+    if (financialPreflight && !financialPreflight.allowed) {
+      const observability = createObservabilityEvent({ eventType: "STRIPE_CHECKOUT_FINANCIAL_CONTROL_BLOCKED", domain: "operations", severity: "WARN", message: "Paid checkout was blocked because the financial-control chain was incomplete.", traceId, replayRef: traceId, actorId, module: "api.stripe.checkout", metadata: { blockers: financialPreflight.blockers } });
+      const evidence = await persistGovernanceEvidence({ traceId, replayRef: traceId, observability, metadata: { route: "/api/stripe/checkout", financialPreflight } });
+      return NextResponse.json({ ok: false, error: "Paid checkout requires accepted scope, BorrowerProtectionFeeControl, module attribution, and verified actual-work evidence.", financialPreflight, governance: { traceId, observability, evidence } }, { status: 409 });
+    }
+
     const checkoutMetadata = furlongCheckoutMetadata({
       tenantId,
       plan: body.plan,
@@ -428,6 +450,10 @@ export async function POST(req: NextRequest) {
       customerSubjectRef: body.customerSubjectRef,
       dealRef: body.dealRef,
       revenueClass,
+      scopeAcceptanceId: body.scopeAcceptanceId,
+      feeControlId: body.feeControlId,
+      actualWorkEvidenceId: body.actualWorkEvidenceId,
+      moduleAttribution: body.moduleAttribution,
       syntheticFixtureContext,
     });
     assertStripeCheckoutAvailable();
@@ -536,6 +562,7 @@ export async function POST(req: NextRequest) {
         authenticated: true,
         durableBillingEvent: true,
         syntheticFixtureActive: Boolean(syntheticFixtureContext),
+        financialPreflight,
       },
       syntheticFixtureContext,
     });

@@ -1,7 +1,7 @@
 # CURATED OPPORTUNITY PIPELINE — COP-001
 
 - **Owner:** Caitlin
-- **Reviewers:** Stuart Fraass, Frances Fraass
+- **Reviewers:** role-based Capital Review and Public Trust Review queues
 - **Target platform:** Furlong Hub
 - **Status:** Build-Later / Governance Approved Concept
 - **Registry:** `src/lib/platform/curatedOpportunityPipeline.ts`
@@ -54,9 +54,9 @@ No candidate becomes a Furlong Featured Opportunity without human review.
 
 - **Caitlin** — environmental, compliance, agricultural, unusual opportunities,
   adaptive reuse, stewardship potential.
-- **Stuart** — financing pathways, capital stack, business viability, lender
+- **Capital Review** — financing pathways, capital stack, business viability, lender
   attractiveness, transaction feasibility.
-- **Frances** — public appeal, community value, story potential, communications
+- **Public Trust Review** — public appeal, community value, story potential, communications
   impact, audience interest.
 
 Volume targets: each reviewer may nominate **5–10/week**; reviewed pipeline

@@ -17,7 +17,7 @@ import type { PropertyCategoryId } from "@/lib/property/propertyCategories";
  *
  * HARD LINES (Caitlin doctrine 2026-06-10):
  *  - NO PII, NO qualification questions — qualifying a person is a licensed act
- *    that happens in the licensed modules (Stuart/Five Borough for financing;
+ *    that happens in licensed external professional modules (financing;
  *    Caitlin for environmental), never on a Furlong surface.
  *  - Verified-only: zone interest filters count VERIFIED designations from the
  *    frozen snapshots; counts come from the same is_current machinery as the

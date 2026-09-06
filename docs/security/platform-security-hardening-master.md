@@ -14,7 +14,7 @@ consent core · future PII modules (counsel-gated) · AI-assisted ingestion · s
 Deny-by-default perimeter + rate limiting · CSRF on server actions · security headers (next.config) ·
 hash-chained audit ledger (tamper detection) · consent tokens hashed at rest + PII-write DLP · ingest
 sanitization before store+render · AI prompt-injection screen · multi-party founder governance (quorum,
-all-founder control-disable, Stuart-as-steward) · two-channel high-risk verification · incident switches
+owner-controlled separation-of-powers controls, role-bound independent review) · two-channel high-risk verification · incident switches
 (freeze/lockdown/revoke/intake-disable) · honeytokens · security dashboard · secret/SCA/SBOM CI.
 
 ## What is PARTIAL / DOCTRINE / MISSING (with blocking production gates)

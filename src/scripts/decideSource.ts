@@ -8,7 +8,7 @@
  *
  *   npm run source:decide -- --source=usda --decision=APPROVE --by="Caitlin" --reason="CC0 public domain; vintage labeled."
  *   npm run source:decide -- --source=hud  --decision=APPROVE --by=chudson@aresfarmsinc.com --reason="..."
- *   npm run source:decide -- --source=usda --decision=HOLD    --by=Stuart --reason="need second look"
+ *   npm run source:decide -- --source=usda --decision=HOLD    --by=Reviewer --reason="need second look"
  *
  * The --by operator MUST hold Module 45 'approve:source-legal' authority
  * (operatorRegistry); otherwise the decision is refused. Every decision is

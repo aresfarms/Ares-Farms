@@ -118,9 +118,10 @@ function append(input: Omit<FounderChangeReviewRecord, "eventId" | "recordedAtUt
 export function founderPrincipalForEmail(email: string): FounderPrincipal | null {
   const normalized = email.trim().toLowerCase();
   const bindings: Array<[FounderPrincipal, string | undefined]> = [
-    ["CAITLIN", process.env.FOUNDER_CAITLIN_EMAIL],
-    ["STUART", process.env.FOUNDER_STUART_EMAIL],
-    ["FRANCIS", process.env.FOUNDER_FRANCIS_EMAIL],
+    ["OWNER", process.env.FURLONG_OWNER_EMAIL ?? process.env.FOUNDER_CAITLIN_EMAIL],
+    ["INDEPENDENT_REVIEWER", process.env.FURLONG_INDEPENDENT_REVIEWER_EMAIL],
+    ["FINANCE_RISK_REVIEWER", process.env.FURLONG_FINANCE_RISK_REVIEWER_EMAIL],
+    ["INDEPENDENT_FINAL_REVIEWER", process.env.FURLONG_INDEPENDENT_FINAL_REVIEWER_EMAIL],
   ];
   return bindings.find(([, value]) => value?.trim().toLowerCase() === normalized)?.[0] ?? null;
 }
@@ -229,8 +230,8 @@ export function recordFounderLaunchAuthority(actorPrincipal: FounderPrincipal, r
 }
 
 export function recordFounderPilotTestAcceptance(actorPrincipal: FounderPrincipal, requestId: string, acceptance: PilotTesterAcceptance) {
-  if (actorPrincipal !== "STUART" || acceptance.tester !== "STUART")
-    throw new Error("Only Stuart may record the initial pilot testing decision.");
+  if (actorPrincipal !== "OWNER" || acceptance.tester !== "OWNER")
+    throw new Error("Only the platform owner may record the internal pilot testing decision.");
   const snapshot = founderChangeReviewSnapshot(requestId);
   if (!snapshot.report) throw new Error("A frozen report is required before pilot testing approval.");
   if (!snapshot.report.ownerAttestation) throw new Error("The implementation owner must attest before pilot testing approval.");

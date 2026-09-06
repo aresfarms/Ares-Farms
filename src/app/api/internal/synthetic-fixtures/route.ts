@@ -20,6 +20,40 @@ function safeReturnTo(value: string | null): string {
   return value;
 }
 
+function canonicalRedirectOrigin(req: NextRequest): string {
+  const configured = process.env.NEXTAUTH_URL?.trim();
+  if (configured) {
+    const url = new URL(configured);
+    if (url.protocol === "https:" || process.env.NODE_ENV !== "production") {
+      return url.origin;
+    }
+  }
+
+  const forwardedHost = req.headers
+    .get("x-forwarded-host")
+    ?.split(",")[0]
+    ?.trim();
+  const forwardedProto = req.headers
+    .get("x-forwarded-proto")
+    ?.split(",")[0]
+    ?.trim();
+  if (forwardedHost) {
+    const url = new URL(`${forwardedProto || "https"}://${forwardedHost}`);
+    if (url.hostname !== "0.0.0.0") return url.origin;
+  }
+
+  const requestOrigin = req.nextUrl.origin;
+  const requestUrl = new URL(requestOrigin);
+  if (
+    process.env.NODE_ENV !== "production" ||
+    !["0.0.0.0", "127.0.0.1", "localhost"].includes(requestUrl.hostname)
+  ) {
+    return requestUrl.origin;
+  }
+
+  throw new Error("Canonical public redirect origin is unavailable.");
+}
+
 export async function GET(req: NextRequest) {
   if (!syntheticFixtureRuntimeEnabled()) {
     return new NextResponse("Not Found", { status: 404 });
@@ -42,12 +76,13 @@ export async function GET(req: NextRequest) {
   }
 
   const returnTo = safeReturnTo(req.nextUrl.searchParams.get("returnTo"));
-  const response = NextResponse.redirect(new URL(returnTo, req.url));
+  const redirectUrl = new URL(returnTo, canonicalRedirectOrigin(req));
+  const response = NextResponse.redirect(redirectUrl);
 
   if (req.nextUrl.searchParams.get("clear") === "1") {
     response.cookies.set(SYNTHETIC_FIXTURE_COOKIE, "", {
       httpOnly: true,
-      secure: req.nextUrl.protocol === "https:",
+      secure: redirectUrl.protocol === "https:",
       sameSite: "strict",
       path: "/",
       maxAge: 0,
@@ -81,7 +116,7 @@ export async function GET(req: NextRequest) {
   const signed = issueSyntheticFixtureSessionToken(context, secret);
   response.cookies.set(SYNTHETIC_FIXTURE_COOKIE, signed, {
     httpOnly: true,
-    secure: req.nextUrl.protocol === "https:",
+    secure: redirectUrl.protocol === "https:",
     sameSite: "strict",
     path: "/",
     maxAge: SYNTHETIC_FIXTURE_SESSION_MAX_AGE_SECONDS,

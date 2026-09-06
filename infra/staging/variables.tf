@@ -218,13 +218,33 @@ variable "core_image" {
 }
 
 variable "migrator_image" {
-  description = "Digest-pinned image ref for the furlong-db-migrate Job (the Dockerfile `migrator` target). Empty = job not created."
+  description = "Digest-pinned image ref for the furlong-db-migrate Job. Empty = job not created."
   type        = string
   default     = ""
 
   validation {
     condition     = var.migrator_image == "" || can(regex("@sha256:[a-f0-9]{64}$", var.migrator_image))
     error_message = "migrator_image must be pinned by digest (…@sha256:<64 hex chars>), not a tag."
+  }
+}
+
+variable "runtime_verify_image" {
+  description = "Optional independently pinned migrator-runtime image for the privilege-verification Job. Empty inherits migrator_image."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.runtime_verify_image == "" || can(regex("@sha256:[a-f0-9]{64}$", var.runtime_verify_image))
+    error_message = "runtime_verify_image must be pinned by digest."
+  }
+}
+
+variable "source_refresh_image" {
+  description = "Optional independently pinned migrator-runtime image for the source-refresh Job. Empty inherits migrator_image."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.source_refresh_image == "" || can(regex("@sha256:[a-f0-9]{64}$", var.source_refresh_image))
+    error_message = "source_refresh_image must be pinned by digest."
   }
 }
 
@@ -443,8 +463,20 @@ variable "amenity_live_lookup_enabled" {
   default     = false
 }
 
+variable "default_traffic_revision" {
+  description = "Optional explicit revision receiving 100% ordinary staging traffic. Empty routes ordinary traffic to latest."
+  type        = string
+  default     = ""
+}
+
+variable "testing_revision" {
+  description = "Optional testing candidate pinned at 0% ordinary traffic. Use an explicit revision name, or the sentinel LATEST to tag the revision minted by the same Terraform apply."
+  type        = string
+  default     = ""
+}
+
 variable "stable_revision" {
-  description = "Revision pinned to the 'stable' traffic tag (0% traffic, own URL) so testers keep a blessed build while latest churns. Empty = no tag."
+  description = "Optional legacy blessed revision exposed only through the stable tag at 0% ordinary traffic."
   type        = string
   default     = ""
 }

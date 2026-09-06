@@ -35,6 +35,10 @@ resource "google_cloud_run_v2_service" "scanner" {
   # anonymous probe cannot reach it).
   ingress = "INGRESS_TRAFFIC_ALL"
 
+  lifecycle {
+    ignore_changes = [client, client_version]
+  }
+
   dynamic "binary_authorization" {
     for_each = var.enable_binary_authorization ? [1] : []
     content {

@@ -35,6 +35,7 @@ export async function geocodeToCensusTract(
   city: string,
   state: string,
   zip?: string,
+  options?: { timeoutMs?: number },
 ): Promise<CensusGeocodeResult | null> {
   const params = new URLSearchParams({
     street,
@@ -49,7 +50,7 @@ export async function geocodeToCensusTract(
 
   const res = await governedFetch(`${CENSUS_GEOCODER_URL}?${params.toString()}`, {
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(10_000),
+    signal: AbortSignal.timeout(options?.timeoutMs ?? 10_000),
   });
 
   if (!res.ok) throw new Error(`Census geocoder HTTP ${res.status}`);

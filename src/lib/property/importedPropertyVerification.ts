@@ -233,7 +233,7 @@ async function geocodeFreeformAddress(
     `${CENSUS_GEOCODER_URL.replace("/address", "/onelineaddress")}?${params.toString()}`,
     {
       headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(3_500),
     }
   );
 
@@ -395,7 +395,7 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   // objects are safe: JS is single-threaded and each block owns its keys.
   const geocodePromise: Promise<CensusGeocodeResult | null> = freeformGeocode
     ? Promise.resolve(freeformGeocode)
-    : geocodeToCensusTract(parsed.street, parsed.city, parsed.state, parsed.zip).catch(() => null);
+    : geocodeToCensusTract(parsed.street, parsed.city, parsed.state, parsed.zip, { timeoutMs: 3_500 }).catch(() => null);
 
   const ozTask = (async () => {
   if (ozActivated) {
@@ -490,7 +490,10 @@ export async function verifyImportedPropertyAddress(input: ImportedVerificationR
   const floodTask = (async () => {
   if (floodActivated) {
     if (geocode?.lat && geocode?.lon) {
-      const flood = await queryFloodZone(Number(geocode.lon), Number(geocode.lat)).catch(() => undefined);
+      // Customer-facing cold path: one quick retry is enough. The durable
+      // ingestion jobs retain the adapter's longer six-attempt default. A
+      // timeout remains an unknown, never a fabricated low-risk finding.
+      const flood = await queryFloodZone(Number(geocode.lon), Number(geocode.lat), { timeoutMs: 2_500, attempts: 2 }).catch(() => undefined);
       if (flood?.floodZone) {
         // Symmetric honesty: a non-SFHA zone (e.g. X) is a FACT the buyer
         // needs ("outside hazard area"), not a no-match — record it either

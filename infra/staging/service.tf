@@ -39,7 +39,7 @@ resource "google_cloud_run_v2_service" "core" {
   # so Terraform does not manufacture a perpetual service update/IAP replay;
   # every material service field remains governed by this resource.
   lifecycle {
-    ignore_changes = [client, client_version]
+    ignore_changes = [client, client_version, template[0].revision]
 
     precondition {
       condition = var.deployment_environment != "production" || (
@@ -561,12 +561,44 @@ resource "google_cloud_run_v2_service" "core" {
     }
   }
 
-  # Traffic: latest serves 100%; an optional "stable" tag pins a blessed
-  # revision on its own URL (0% of default traffic) so testers keep a known
-  # build while the owner iterates on latest (P3, founder 2026-07-17).
-  traffic {
-    type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
-    percent = 100
+  # Ordinary staging traffic may be pinned to an explicit accepted revision
+  # while a candidate remains isolated behind the testing tag at 0% traffic.
+  # This prevents a Terraform apply from silently promoting "latest".
+  dynamic "traffic" {
+    for_each = var.default_traffic_revision == "" ? [1] : []
+    content {
+      type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+      percent = 100
+    }
+  }
+  dynamic "traffic" {
+    for_each = var.default_traffic_revision == "" ? [] : [var.default_traffic_revision]
+    content {
+      type     = "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION"
+      revision = traffic.value
+      percent  = 100
+    }
+  }
+  # A testing candidate can either target an explicit revision name or the
+  # revision minted by this apply. Using the sentinel LATEST keeps ordinary
+  # traffic pinned to default_traffic_revision while attaching the testing tag
+  # at 0% to the newly-created candidate in the same governed apply.
+  dynamic "traffic" {
+    for_each = var.testing_revision != "" && var.testing_revision != "LATEST" ? [var.testing_revision] : []
+    content {
+      type     = "TRAFFIC_TARGET_ALLOCATION_TYPE_REVISION"
+      revision = traffic.value
+      tag      = "testing"
+      percent  = 0
+    }
+  }
+  dynamic "traffic" {
+    for_each = var.testing_revision == "LATEST" ? [1] : []
+    content {
+      type    = "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST"
+      tag     = "testing"
+      percent = 0
+    }
   }
   dynamic "traffic" {
     for_each = var.stable_revision == "" ? [] : [var.stable_revision]

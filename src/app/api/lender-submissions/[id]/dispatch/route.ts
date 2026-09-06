@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { lenderSubmissionDenied, lenderSubmissionError, lenderSubmissionRequestContext } from "@/lib/lender-submission/api";
 import { dispatchSandbox, retrySandboxDelivery } from "@/lib/lender-submission/store";
+import { assertSubmissionCaseAccess } from "@/lib/lender-submission/caseAccess";
 
 export async function POST(req: NextRequest, contextParams: { params: Promise<{ id: string }> }) {
   const { id } = await contextParams.params;
-  const context = lenderSubmissionRequestContext(req, "lender-submission.sandbox.dispatch", ["lender", "operator", "admin", "governance"]);
+  const context = lenderSubmissionRequestContext(req, "lender-submission.sandbox.dispatch", ["operator", "admin", "governance"]);
   if (!context.allowed) return lenderSubmissionDenied(context);
   try {
+    await assertSubmissionCaseAccess({ caseId: id, actorId: context.actorId, role: context.role });
     const body = await req.json();
     const action = body.retry === true ? retrySandboxDelivery : dispatchSandbox;
     const result = await action({ caseId: id, authorizationId: body.authorizationId, idempotencyKey: body.idempotencyKey, simulate: body.simulate, actorId: context.actorId, traceId: context.traceId });

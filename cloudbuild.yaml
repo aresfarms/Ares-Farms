@@ -28,6 +28,7 @@ substitutions:
   # retain explicit sentinel values so provenance is never silently invented.
   _GIT_COMMIT: unknown-local-submission
   _GIT_REF: unknown-local-submission
+  _IMAGE_TAG: p2
 
 steps:
   # Deployment-blocking canonical authority gates. These run in Cloud Build
@@ -135,6 +136,9 @@ steps:
         npm run verify:founder-pilot-test-gate
         npm run verify:property-profile-classification
         npm run verify:customer-property-experience
+        npm run verify:property-facts-latency
+        npm run verify:lender-submission-bola
+        npm run verify:lender-delivery-conformance
         npm run verify:three-lane-consumer-command-center
         npm run verify:compass-lane-entry-routing
         npm run verify:property-data-resolution
@@ -161,7 +165,7 @@ steps:
       - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
       - --label=org.opencontainers.image.ref.name=${_GIT_REF}
       - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
-      - -t=${_REPO}/furlong-core:p2
+      - -t=${_REPO}/furlong-core:${_IMAGE_TAG}
       - .
 
   # Migrator Job image (pre-bundled programs + canonical SQL; no toolchain)
@@ -173,7 +177,7 @@ steps:
       - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
       - --label=org.opencontainers.image.ref.name=${_GIT_REF}
       - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
-      - -t=${_REPO}/furlong-db-migrate:p2
+      - -t=${_REPO}/furlong-db-migrate:${_IMAGE_TAG}
       - .
 
   # Vault malware scanner (ClamAV, IAM-private; definitions baked at build —
@@ -185,7 +189,7 @@ steps:
       - --label=org.opencontainers.image.revision=${_GIT_COMMIT}
       - --label=org.opencontainers.image.ref.name=${_GIT_REF}
       - --label=org.opencontainers.image.source=https://github.com/aresfarms/Ares-Farms
-      - -t=${_REPO}/furlong-scanner:p2
+      - -t=${_REPO}/furlong-scanner:${_IMAGE_TAG}
       - scanner
 
   # Prove the cross-distribution native closure is complete: clamd must start,
@@ -196,10 +200,10 @@ steps:
     args:
       - -ceu
       - |
-        cid="$$(docker run --detach ${_REPO}/furlong-scanner:p2)"
+        cid="$$(docker run --detach ${_REPO}/furlong-scanner:${_IMAGE_TAG})"
         trap 'docker rm --force "$${cid}" >/dev/null 2>&1 || true' EXIT
         for attempt in $$(seq 1 120); do
-          if docker exec "$${cid}" /usr/bin/python3 -c 'import urllib.request; assert urllib.request.urlopen("http://127.0.0.1:8080/healthz", timeout=2).status == 200' 2>/dev/null; then
+          if docker exec "$${cid}" /usr/bin/python -c 'import urllib.request; assert urllib.request.urlopen("http://127.0.0.1:8080/healthz", timeout=2).status == 200' 2>/dev/null; then
             exit 0
           fi
           if ! docker inspect --format '{{.State.Running}}' "$${cid}" | grep -qx true; then
@@ -212,9 +216,9 @@ steps:
         exit 1
 
 images:
-  - ${_REPO}/furlong-core:p2
-  - ${_REPO}/furlong-db-migrate:p2
-  - ${_REPO}/furlong-scanner:p2
+  - ${_REPO}/furlong-core:${_IMAGE_TAG}
+  - ${_REPO}/furlong-db-migrate:${_IMAGE_TAG}
+  - ${_REPO}/furlong-scanner:${_IMAGE_TAG}
 
 # The default compute service account is intentionally DISABLED (security
 # hardening — it is over-privileged), and Cloud Build defaults to it. The

@@ -462,37 +462,37 @@ function buildAnswerCard(args: {
 
   const headline =
     sourceId === "hud" && isHome
-      ? "An ordinary home purchase with one unusual advantage: as a live-in buyer, you get to bid before any investor is allowed to."
+      ? "This is a HUD home sale. An owner-occupant may receive a protected bidding window before investor bids are considered, so timing matters as much as price and condition."
       : sourceId === "usda"
-        ? "A government resale bought through USDA's own process — sold as-is, with the current price on USDA's listing page."
+        ? "This is a USDA resale. Treat the agency listing, sale terms, property condition, and current price as the starting point before comparing financing paths."
         : sourceId === "gsa"
-          ? "Federal surplus sold by auction — the auction page carries the price, the deposit rules, and the timeline."
+          ? "This is federal surplus sold through an auction process. The controlling auction page sets the bid, deposit, deadline, and sale terms."
           : imported
-            ? "A property you brought in yourself — here is what could be verified about it so far, and what couldn't."
-            : "A first look built from what can be verified about this property and its place — nothing more implied.";
+            ? "Furlong is building a sourced record from the property you entered. The summary below shows what can be supported now; unsupported facts stay unknown until a source resolves them."
+            : "Furlong has assembled the strongest sourced property record currently available. Use this first read to orient quickly, then open each section for the evidence and remaining unknowns.";
 
   const readiness: string[] = [];
-  readiness.push(args.restrictionsPresent ? "Needs review before anything else" : "Looks reviewable");
-  if (priceOnRequest) readiness.push("Price not captured here");
-  if (isGovSale) readiness.push("Needs inspection detail");
-  if (sourceId === "hud" && isHome) readiness.push("HUD owner-occupant timing matters");
+  readiness.push(args.restrictionsPresent ? "Source restriction needs review" : "Core property record is reviewable");
+  if (priceOnRequest) readiness.push("Price still needed for financing math");
+  if (isGovSale) readiness.push("Condition and inspection still need confirmation");
+  if (sourceId === "hud" && isHome) readiness.push("HUD owner-occupant timing applies");
 
   const fitBits = [
-    sourceId === "hud" && isHome ? "the HUD owner-occupant bid window" : null,
-    args.context.location ? `the ${args.context.location} setting` : null,
-    "place facts that come with sources",
+    sourceId === "hud" && isHome ? "HUD owner-occupant sale mechanics" : null,
+    args.context.location ? `verified place evidence for ${args.context.location}` : null,
+    "source-backed property and location facts",
   ].filter((bit): bit is string => Boolean(bit));
   const pauseBits = [
-    priceOnRequest ? "a confirmed price" : null,
-    isGovSale ? "inspection results and a repair estimate" : "inspection results",
-    "a lender-ready package today",
+    priceOnRequest ? "confirm the actual price" : null,
+    isGovSale ? "confirm condition, inspection findings, and repair scope" : "confirm condition or inspection findings that could change the economics",
+    "complete the borrower-specific file before treating any financing path as lender-ready",
   ].filter((bit): bit is string => Boolean(bit));
 
   return {
     headline,
     readiness,
-    fitLine: fitBits.length > 0 ? fitBits.join(", ") : null,
-    pauseLine: pauseBits.join(", "),
+    fitLine: fitBits.length > 0 ? fitBits.join(" · ") : null,
+    pauseLine: pauseBits.join(" · "),
   };
 }
 

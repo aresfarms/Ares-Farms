@@ -1,3 +1,8 @@
+locals {
+  runtime_verify_image_effective = var.runtime_verify_image != "" ? var.runtime_verify_image : var.migrator_image
+  source_refresh_image_effective = var.source_refresh_image != "" ? var.source_refresh_image : var.migrator_image
+}
+
 # =============================================================================
 # infra/staging — furlong-db-migrate Cloud Run Job (STAGING-DEPLOY P2.2)
 #
@@ -23,6 +28,10 @@ resource "google_cloud_run_v2_job" "db_migrate" {
   labels   = var.labels
 
   deletion_protection = false
+
+  lifecycle {
+    ignore_changes = [client, client_version]
+  }
 
   dynamic "binary_authorization" {
     for_each = var.enable_binary_authorization ? [1] : []
@@ -107,6 +116,10 @@ resource "google_cloud_run_v2_job" "runtime_verify" {
 
   deletion_protection = false
 
+  lifecycle {
+    ignore_changes = [client, client_version]
+  }
+
   dynamic "binary_authorization" {
     for_each = var.enable_binary_authorization ? [1] : []
     content {
@@ -135,7 +148,7 @@ resource "google_cloud_run_v2_job" "runtime_verify" {
       }
 
       containers {
-        image = var.migrator_image
+        image = local.runtime_verify_image_effective
         # Distroless Node keeps its immutable entrypoint; args replace the image
         # CMD and select the pre-bundled privilege verifier.
         args = ["verifyRuntimePrivileges.cjs"]
@@ -184,6 +197,10 @@ resource "google_cloud_run_v2_job" "source_refresh" {
 
   deletion_protection = false
 
+  lifecycle {
+    ignore_changes = [client, client_version]
+  }
+
   dynamic "binary_authorization" {
     for_each = var.enable_binary_authorization ? [1] : []
     content {
@@ -220,7 +237,7 @@ resource "google_cloud_run_v2_job" "source_refresh" {
       }
 
       containers {
-        image = var.migrator_image
+        image = local.source_refresh_image_effective
         # Select the pre-bundled approved-source refresh program; no npm or
         # TypeScript toolchain exists in the runtime image.
         args = ["runSourceRefresh.cjs"]

@@ -9,8 +9,8 @@
 #
 # Design contract (each line maps to a P0.3 requirement):
 #   * Node build toolchain pinned EXACTLY (24.15.0); runtime pinned by
-#     content-addressed distroless Node 24 digest.
-#   * Multi-stage; the runtime layer installs NOTHING and carries NO toolchain.
+#     content-addressed Wolfi base digest with exact Node 24 LTS package.
+#   * Multi-stage; the runtime installs only exact signed Node/CA packages and carries no npm/build toolchain.
 #   * Consumes Next.js `output: "standalone"` (see next.config.mjs). standalone
 #     does NOT bundle `public` or `.next/static`, so we copy them in explicitly.
 #   * Runs as the FIXED distroless non-root UID/GID (65532:65532).
@@ -45,7 +45,6 @@ FROM node:24.15.0-bookworm-slim AS builder
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS=--max-old-space-size=4096
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Defense in depth: even though .dockerignore keeps .env* out of the context,
@@ -81,8 +80,12 @@ RUN mkdir -p /migrator \
 # the migrator principal via MIGRATOR_DATABASE_URL (Secret Manager -> env).
 # Build with: docker build --target migrator -t furlong-db-migrate .
 # -----------------------------------------------------------------------------
-FROM gcr.io/distroless/nodejs24-debian13@sha256:7cca079bad19303c78cd874a5da79832441985a216b767196507d69b8784a698 AS migrator
+FROM cgr.dev/chainguard/wolfi-base@sha256:918a593b8268c222afd4e2c4f06860ac984e60719b4697e4c71d796bc8fcd042 AS migrator
 WORKDIR /app
+
+# Exact Wolfi Node 24 LTS package: patched zlib closure, package metadata retained
+# for Google On-Demand Scanning, and no untracked library overlay.
+RUN apk add --no-cache nodejs-24=24.20.0-r1 ca-certificates=20260611-r1
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -96,15 +99,20 @@ COPY --from=builder --chown=65532:65532 /app/src/lib/db/migrations ./src/lib/db/
 
 USER 65532:65532
 
-# Distroless Node supplies the node entrypoint. The wrapper runs structure then
-# grants sequentially and propagates the first non-zero exit code.
+# The runtime is intentionally explicit rather than relying on an inherited
+# entrypoint: the wrapper runs structure then grants sequentially.
+ENTRYPOINT ["/usr/bin/node"]
 CMD ["migratorEntrypoint.mjs"]
 
 # -----------------------------------------------------------------------------
 # Stage 4 — runner: minimal production runtime. No npm, no source, no toolchain.
 # -----------------------------------------------------------------------------
-FROM gcr.io/distroless/nodejs24-debian13@sha256:7cca079bad19303c78cd874a5da79832441985a216b767196507d69b8784a698 AS runner
+FROM cgr.dev/chainguard/wolfi-base@sha256:918a593b8268c222afd4e2c4f06860ac984e60719b4697e4c71d796bc8fcd042 AS runner
 WORKDIR /app
+
+# Match the migrator runtime exactly so application and migration execution share
+# the same patched Node 24 LTS + CA trust closure.
+RUN apk add --no-cache nodejs-24=24.20.0-r1 ca-certificates=20260611-r1
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -112,8 +120,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8080
 ENV HOSTNAME=0.0.0.0
 
-# Distroless supplies the pinned Node runtime and CA certificates only: no
-# shell, package manager, OS administration tools, or mutable install layer.
+# Wolfi retains signed package metadata so vulnerability scanners can account
+# for every runtime package; Cloud Run still executes as fixed non-root UID 65532.
 
 # Copy ONLY the standalone runtime, owned by the non-root user.
 #   * .next/standalone -> /app  (includes the traced server.js + node_modules)
@@ -130,5 +138,6 @@ COPY --from=builder --chown=65532:65532 /app/node_modules/pdfkit/js/data /ROOT/n
 USER 65532:65532
 EXPOSE 8080
 
-# Distroless Node supplies the node entrypoint; server.js reads all config from env.
+# Explicit Node entrypoint; server.js reads all config from runtime env only.
+ENTRYPOINT ["/usr/bin/node"]
 CMD ["server.js"]

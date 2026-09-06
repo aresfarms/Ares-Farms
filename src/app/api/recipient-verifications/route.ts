@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   const context = lenderSubmissionRequestContext(
     req,
     "lender-submission.recipient.verify",
-    ["lender", "operator", "admin", "governance"],
+    ["operator", "admin", "governance"],
   );
   if (!context.allowed) return lenderSubmissionDenied(context);
   try {

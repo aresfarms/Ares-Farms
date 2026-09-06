@@ -24,8 +24,8 @@ terraform {
     }
   }
 
-  # backend "gcs" {
-  #   bucket = "furlong-staging-tfstate"   # pre-create; versioning ON; UBLA ON
-  #   prefix = "staging/bootstrap"
-  # }
+  backend "gcs" {
+    bucket = "furlong-staging-499102-tfstate"
+    prefix = "staging/core"
+  }
 }

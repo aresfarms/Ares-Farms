@@ -2114,18 +2114,49 @@ function floodFactFromLive(floodZone: string, asOf: string): BriefFactLine {
  * env bundle only ever needed the coordinate). Every lookup is fail-safe —
  * the bundle never rejects.
  */
+const PUBLIC_ENV_LOOKUP_BUDGET_MS = 4_500;
+
+/**
+ * Customer-facing property facts must not wait for the slowest external source.
+ * A lookup that misses this soft budget becomes `null` for the current response
+ * while its underlying request is allowed to finish and warm the source/cache for
+ * a later request. No timeout is converted into a negative property finding.
+ */
+function settleEnvironmentalLookupWithin<T>(promise: Promise<T>, budgetMs = PUBLIC_ENV_LOOKUP_BUDGET_MS): Promise<T | null> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) return;
+      settled = true;
+      resolve(null);
+    }, budgetMs);
+    timeout.unref?.();
+    promise.then((value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(value);
+    }).catch(() => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      resolve(null);
+    });
+  });
+}
+
 export function startEnvironmentalLookups(lat: number, lon: number, amenityEnv?: NodeJS.ProcessEnv) {
   const amenitiesGateOpen = amenityLiveLookupEnabled(amenityEnv ?? process.env);
   return Promise.all([
-    amenitiesGateOpen ? queryAmenitiesLive(lat, lon) : Promise.resolve(null),
-    fetchSoilProfile(lat, lon),
-    fetchClimateNormals(lat, lon),
-    fetchSolarPotential(lat, lon),
-    fetchWetlands(lat, lon),
-    fetchEpaFacilityScreen(lat, lon),
+    settleEnvironmentalLookupWithin(amenitiesGateOpen ? queryAmenitiesLive(lat, lon) : Promise.resolve(null)),
+    settleEnvironmentalLookupWithin(fetchSoilProfile(lat, lon)),
+    settleEnvironmentalLookupWithin(fetchClimateNormals(lat, lon)),
+    settleEnvironmentalLookupWithin(fetchSolarPotential(lat, lon)),
+    settleEnvironmentalLookupWithin(fetchWetlands(lat, lon)),
+    settleEnvironmentalLookupWithin(fetchEpaFacilityScreen(lat, lon)),
     // USDA RD area eligibility — the B&I/RD geographic gate (founder wedge
     // decision 2026-08-05); rides the same coordinate-only bundle.
-    fetchUsdaRuralEligibility(lat, lon),
+    settleEnvironmentalLookupWithin(fetchUsdaRuralEligibility(lat, lon)),
   ]);
 }
 

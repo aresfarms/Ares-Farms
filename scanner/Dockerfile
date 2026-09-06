@@ -4,7 +4,7 @@
 #
 # Build ClamAV and refresh signatures in a mutable stage, then copy only clamd,
 # its runtime libraries, configuration, definitions, and the HTTP shim into a
-# digest-pinned distroless Python runtime.
+# digest-pinned Chainguard Python runtime with continuously remediated packages.
 
 FROM clamav/clamav-debian:1.4.5 AS clamav-builder
 
@@ -39,7 +39,7 @@ RUN lddtree -l /usr/sbin/clamd | sort -u \
       cp -L "$file" "/scanner-rootfs$destination"; \
     done
 
-FROM gcr.io/distroless/python3-debian13@sha256:f2b206661cee3edb44f132d7f054a9ced96f671d8a973de0db750895c9acb2fb
+FROM cgr.dev/chainguard/python@sha256:1f37785e5cdb70151f36aaa15e1e3cef4571424dbefbf4b0d8a9222535cb13ff
 
 WORKDIR /srv
 ENV PORT=8080
@@ -52,6 +52,6 @@ COPY --chown=65532:65532 server.py /srv/server.py
 USER 65532:65532
 EXPOSE 8080
 
-# Distroless Python supplies the interpreter entrypoint. The shim starts clamd
+# Chainguard Python supplies the interpreter entrypoint. The shim starts clamd
 # directly and refuses readiness until its baked signature database is loaded.
 CMD ["/srv/server.py"]

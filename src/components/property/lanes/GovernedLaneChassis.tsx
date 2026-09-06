@@ -290,7 +290,14 @@ export function GovernedLaneChassis(props: ChassisProps) {
         }
         const totalFacts = facts.length;
         return <>
-        <article style={{ ...card, background: "linear-gradient(155deg,#20304E,#16233C)", color: "#fff", border: 0, display: "grid", gap: 9 }}><span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase" }}>Property summary</span><h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: 24 }}>{props.title}</h2><span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane.consumerLaneLabel}</span><p style={{ margin: 0, lineHeight: 1.6, color: "#E6E9EF" }}>{props.headline}</p></article>
+        <article style={{ ...card, background: "linear-gradient(155deg,#20304E,#16233C)", color: "#fff", border: 0, display: "grid", gap: 9 }}><span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase" }}>Property summary</span><h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: 24 }}>{props.title}</h2><span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane.consumerLaneLabel}</span></article>
+        <section aria-label="Furlong answer" style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 10 }}>
+          <span style={{ color: "#8F6E1F", fontSize: 10.5, fontWeight: 850, letterSpacing: ".14em", textTransform: "uppercase" }}>Furlong answer</span>
+          <p style={{ margin: 0, color: "#1C2B45", fontSize: 15, lineHeight: 1.6, fontWeight: 650 }}>{props.headline}</p>
+          {props.readiness.length > 0 && <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>{props.readiness.map((item) => <span key={item} style={{ border: "1px solid #D7DEEA", borderRadius: 999, padding: "5px 9px", background: "#fff", color: "#3D4655", fontSize: 11.5, fontWeight: 700 }}>{item}</span>)}</div>}
+          {props.fitLine && <p style={{ margin: 0, color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}><strong style={{ color: "#1C2B45" }}>What supports this read:</strong> {props.fitLine}.</p>}
+          {props.pauseLine && <p style={{ margin: 0, color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}><strong style={{ color: "#1C2B45" }}>Before relying on it:</strong> {props.pauseLine}.</p>}
+        </section>
         {summaryFacts.length > 0 ? (
           <section style={{ ...card, display: "grid", gap: 10 }}>
             <strong style={{ color: "#1C2B45" }}>The property, in brief</strong>

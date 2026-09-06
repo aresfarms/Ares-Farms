@@ -8,27 +8,34 @@
 # =============================================================================
 
 locals {
-  expected_secret_reader_principals = concat(
-    [
-      google_service_account.core_runtime.email,
-      google_service_account.db_migrator.email,
-    ],
-    var.expected_secret_reader_emails
-  )
+  # Secret access is authorized per principal+secret pair, not merely by principal.
+  # A compromised runtime identity therefore cannot read an unrelated secret
+  # without triggering the alert. Human operators remain explicitly enumerated.
+  expected_secret_reader_pairs = [
+    for pair in [
+      [google_service_account.core_runtime.email, "DATABASE_URL"],
+      [google_service_account.core_runtime.email, "SENDGRID_API_KEY"],
+      [google_service_account.core_runtime.email, "AUTH_CREDENTIAL_SHARED_SECRET"],
+      [google_service_account.core_runtime.email, "NEXTAUTH_SECRET"],
+      [google_service_account.core_runtime.email, "EVIDENCE_REPLAY_SIGNING_SECRET"],
+      [google_service_account.core_runtime.email, "EVIDENCE_REPLAY_SIGNING_SECRET_V1"],
+      [google_service_account.core_runtime.email, "REPORT_SIGNING_SECRET"],
+      [google_service_account.core_runtime.email, "STAGING_SEED_SHARED_SECRET"],
+      [google_service_account.core_runtime.email, "ANTHROPIC_API_KEY"],
+      [google_service_account.core_runtime.email, "DATA_GOV_API_KEY"],
+      [google_service_account.core_runtime.email, "NOAA_CDO_TOKEN"],
+      [google_service_account.db_migrator.email, "MIGRATOR_DATABASE_URL"],
+      [google_service_account.source_refresh_scheduler.email, "NASS_API_KEY"],
+      ["furlong-stripe-webhook-runtime@${var.project_id}.iam.gserviceaccount.com", "DATABASE_URL"],
+      ["furlong-stripe-webhook-runtime@${var.project_id}.iam.gserviceaccount.com", "STRIPE_WEBHOOK_SECRET"],
+    ] : format("(protoPayload.authenticationInfo.principalEmail=\"%s\" AND protoPayload.resourceName:\"/secrets/%s/\")", pair[0], pair[1])
+  ]
 
-  unexpected_secret_access_filter = join(
-    " AND ",
-    concat(
-      [
-        "protoPayload.serviceName=\"secretmanager.googleapis.com\"",
-        "protoPayload.methodName=\"google.cloud.secretmanager.v1.SecretManagerService.AccessSecretVersion\"",
-      ],
-      [
-        for email in local.expected_secret_reader_principals :
-        format("protoPayload.authenticationInfo.principalEmail!=\"%s\"", email)
-      ]
-    )
-  )
+  unexpected_secret_access_filter = join(" AND ", concat([
+    "protoPayload.serviceName=\"secretmanager.googleapis.com\"",
+    "protoPayload.methodName=\"google.cloud.secretmanager.v1.SecretManagerService.AccessSecretVersion\"",
+    format("NOT (%s)", join(" OR ", local.expected_secret_reader_pairs)),
+  ], [for email in var.expected_secret_reader_emails : format("protoPayload.authenticationInfo.principalEmail!=\"%s\"", email)]))
 
   edge_403_filter = join(
     " AND ",

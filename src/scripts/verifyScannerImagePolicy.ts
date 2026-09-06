@@ -25,15 +25,15 @@ assert.doesNotMatch(
 );
 assert.match(
   dockerfile,
-  /^FROM gcr\.io\/distroless\/python3-debian13@sha256:[a-f0-9]{64}$/m,
-  "Scanner runtime must use a digest-pinned distroless Python base.",
+  /^FROM cgr\.dev\/chainguard\/python@sha256:[a-f0-9]{64}$/m,
+  "Scanner runtime must use a digest-pinned Chainguard Python base with accounted package provenance.",
 );
 assert.match(
   dockerfile,
   /^USER 65532:65532$/m,
-  "Scanner runtime must use the fixed distroless non-root identity.",
+  "Scanner runtime must use the fixed non-root identity.",
 );
 
 console.log(
-  "verify:scanner-image-policy PASS — patched ClamAV build stage, fresh signatures, digest-pinned distroless runtime, and fixed non-root identity are enforced.",
+  "verify:scanner-image-policy PASS — patched ClamAV build stage, fresh signatures, digest-pinned Chainguard runtime, and fixed non-root identity are enforced.",
 );

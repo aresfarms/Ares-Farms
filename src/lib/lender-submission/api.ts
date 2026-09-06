@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { evaluateAccess, type AccessRole } from "@/lib/auth/accessControl";
-import { effectiveRole } from "@/lib/auth/sessionAuthority";
+import { sessionAuthority } from "@/lib/auth/sessionAuthority";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
 
 const ROLES: AccessRole[] = ["borrower", "lender", "operator", "admin", "governance"];
 
 export function lenderSubmissionRequestContext(req: NextRequest, operation: string, allowedRoles: AccessRole[] = ROLES) {
   const traceId = `lender-submission-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  const actorId = req.headers.get("x-ares-authenticated-user-id") ?? req.headers.get("x-ares-authenticated-email");
-  const runtime = runRuntimeGuard({ operation, module: "lender-submission", traceId, schemaVersion: "lender-submission-v1", governanceVersion: "CANON-LENDER-SUBMISSION-001", classificationLevel: "RESTRICTED", replayRef: traceId, actorId, metadata: { route: req.nextUrl.pathname } });
-  const access = evaluateAccess({ role: effectiveRole(req), allowedRoles, operation, module: "lender-submission", traceId, actorId });
-  return { traceId, actorId: actorId ?? "authenticated-actor", allowed: runtime.allowed && access.allowed, runtime, access };
+  const authority = sessionAuthority(req);
+  const actorId = authority.actorId;
+  const runtime = runRuntimeGuard({ operation, module: "lender-submission", traceId, schemaVersion: "lender-submission-v1", governanceVersion: "CANON-LENDER-SUBMISSION-001", classificationLevel: "RESTRICTED", replayRef: traceId, actorId, metadata: { route: req.nextUrl.pathname, authorityBasis: authority.basis } });
+  const access = evaluateAccess({ role: authority.role, allowedRoles, operation, module: "lender-submission", traceId, actorId });
+  return { traceId, actorId: actorId ?? "authenticated-actor", role: access.role, allowed: runtime.allowed && access.allowed, runtime, access, authority };
 }
 
 export function lenderSubmissionDenied(context: ReturnType<typeof lenderSubmissionRequestContext>) {

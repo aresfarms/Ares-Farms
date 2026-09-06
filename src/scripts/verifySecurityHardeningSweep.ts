@@ -23,7 +23,18 @@ const proxy = read("src/proxy.ts");
 const session = read("src/lib/auth/session.ts");
 const ledgerHashChain = read("src/lib/security/ledgerHashChain.ts");
 const nextConfig = read("next.config.mjs");
-const stagingService = read("infra/staging/service.tf");
+const infraAuthorityPath = process.env.FURLONG_INFRA_AUTHORITY_MANIFEST_PATH
+  ?? path.join(repoRoot, ".controlled", "infra-authority-manifest.json");
+assert(fs.existsSync(infraAuthorityPath), `Authoritative GCP infrastructure manifest is required: ${infraAuthorityPath}`);
+const infraAuthority = JSON.parse(fs.readFileSync(infraAuthorityPath, "utf8")) as {
+  schemaVersion?: string;
+  projectId?: string;
+  authority?: string;
+  controlledSource?: { uri?: string; generation?: string; sha256?: string };
+  terraform?: { backend?: string; stateBucket?: string; statePrefix?: string; serial?: number; lineage?: string };
+  controls?: Record<string, boolean | string>;
+  live?: Record<string, unknown>;
+};
 const applicationSources = sourceFiles(path.join(repoRoot, "src"));
 const apiRoutes = applicationSources.filter((file) => /\/app\/api\/.+\/route\.ts$/.test(file));
 
@@ -33,7 +44,20 @@ assert(!proxy.includes("clientIp: clientIdentity"), "Perimeter logs must not per
 assert(!proxy.includes("detail: {\n        session,\n        claimed,"), "Authority-conflict logs must not persist raw session/claim identifiers.");
 assert(!proxy.includes("'strict-dynamic' https: http:"), "Production CSP must not retain broad legacy script-host fallbacks.");
 assert(proxy.includes("process.env.STAGING_SEED_ENABLED !== \"true\""), "Staging seed authority must require an explicit environment switch.");
-assert(stagingService.includes('name  = "STAGING_SEED_ENABLED"'), "Staging Terraform must scope the seed authority explicitly.");
+assert(infraAuthority.schemaVersion === "furlong-infra-authority-manifest-v1", "Infrastructure authority manifest schema must be v1.");
+assert(infraAuthority.projectId === "furlong-staging-499102", "Infrastructure authority manifest must describe the canonical staging project.");
+assert(infraAuthority.authority === "GCP_LIVE_STATE", "Security verification must consume GCP live-state authority, not excluded local Terraform files.");
+assert(Boolean(infraAuthority.controlledSource?.uri?.startsWith("gs://furlong-staging-499102-iac-source/")), "Infrastructure authority must identify the controlled GCS IaC source.");
+assert(/^\d+$/.test(infraAuthority.controlledSource?.generation ?? ""), "Controlled IaC source must be pinned to an immutable GCS generation.");
+assert(/^[a-f0-9]{64}$/.test(infraAuthority.controlledSource?.sha256 ?? ""), "Controlled IaC source must carry a SHA-256 digest.");
+assert(infraAuthority.terraform?.backend === "gcs", "Terraform authority must use the GCS backend.");
+assert(infraAuthority.terraform?.stateBucket === "furlong-staging-499102-tfstate", "Terraform state must live in the governed state bucket.");
+assert((infraAuthority.terraform?.serial ?? 0) > 0 && Boolean(infraAuthority.terraform?.lineage), "Terraform state must carry live serial and lineage evidence.");
+assert(infraAuthority.controls?.stagingSeedExplicitSwitchDeclared === true, "Controlled IaC source must explicitly scope STAGING_SEED_ENABLED.");
+assert(infraAuthority.controls?.binaryAuthorizationEnforced === true, "GCP live state must enforce Binary Authorization.");
+assert(infraAuthority.controls?.iapEnabled === true, "GCP live state must keep IAP enabled.");
+assert(infraAuthority.controls?.cloudSqlPrivateOnly === true, "Cloud SQL must remain private-IP only.");
+assert(infraAuthority.controls?.stateVersioningEnabled === true && infraAuthority.controls?.statePublicAccessPrevention === true && infraAuthority.controls?.stateCmekEnabled === true, "Terraform state bucket must retain versioning, PAP, and CMEK.");
 assert(proxy.includes("same-origin-mutation"), "Protected mutation requests must enforce same-origin browser context.");
 assert(proxy.includes("API_MAX_JSON_BODY_BYTES"), "Perimeter JSON claim inspection must be size-bounded.");
 assert(proxy.includes("MAX_RATE_LIMIT_BUCKETS"), "In-memory rate-limit state must have a hard cardinality bound.");

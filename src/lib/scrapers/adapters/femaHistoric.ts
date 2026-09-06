@@ -148,7 +148,11 @@ async function fetchJsonViaHttpsWithRetry(
     : new Error("HTTPS request failed after multiple attempts.");
 }
 
-export async function queryFloodZone(lon: number, lat: number): Promise<FloodZoneFact | null> {
+export async function queryFloodZone(
+  lon: number,
+  lat: number,
+  options?: { timeoutMs?: number; attempts?: number },
+): Promise<FloodZoneFact | null> {
   const cached = readFloodCache(lon, lat);
   if (cached) {
     return cached.value;
@@ -166,7 +170,8 @@ export async function queryFloodZone(lon: number, lat: number): Promise<FloodZon
   try {
     const body = (await fetchJsonViaHttpsWithRetry(
       `${FEMA_NFHL_URL}?${params}`,
-      15_000
+      options?.timeoutMs ?? 15_000,
+      options?.attempts ?? 6,
     )) as { features?: Array<{ attributes?: Record<string, string> }> };
     const a = (body?.features ?? [])[0]?.attributes as Record<string, string> | undefined;
     if (!a?.FLD_ZONE) {

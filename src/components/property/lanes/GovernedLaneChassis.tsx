@@ -413,9 +413,9 @@ export function GovernedLaneChassis(props: ChassisProps) {
             </div>
           </section>
           <details style={{ ...card, background: "#FFFDF7" }}>
-            <summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Correct or add a property fact</summary>
+            <summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Something Furlong missed? Correct or add a property fact</summary>
             <form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "Customer-supplied property feature pending source verification.", provenance: "Owner assertion added in the property workspace", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800 }}>Add feature</button></form>
-            {ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7, marginTop: 10 }}>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}
+            {ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7, marginTop: 10 }}><strong style={{ color: "#1C2B45", fontSize: 12 }}>Owner-reported property features</strong>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}
           </details>
         </>;
       })()}

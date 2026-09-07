@@ -4402,6 +4402,44 @@ export function PropertyEvaluationWorkspace({
       noiAnnual = useScreen.bestUse.noiMid;
       noiBasis = `best modeled use — ${useScreen.bestUse.use} (screening bands, not an appraisal)`;
     }
+    const farmAcreage =
+      facts?.propertyRecord?.offeredAcreage ??
+      (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
+    const farmRate =
+      ownershipContext?.fsa?.ownershipDirectPct ??
+      ownershipContext?.rates.rate30 ??
+      6.5;
+    const farmDebtService =
+      screeningPrice != null
+        ? (screeningPrice * 0.8 * (farmRate / 100)) /
+          (1 - Math.pow(1 + farmRate / 100, -40))
+        : 0;
+    // The answer-first page must use the agricultural optimizer that already
+    // powers the report. Missing diligence inputs reduce this to a clearly
+    // labeled screening result; they do not erase a usable acreage-grounded
+    // ranking or replace every modeled NOI with null.
+    const farmUseScreen =
+      laneId === "farm" && farmAcreage != null
+        ? optimizeAgriculturalOpportunities({
+            acres: farmAcreage,
+            purchasePrice: screeningPrice ?? 0,
+            debtService: farmDebtService,
+            waterScore: facts?.propertyRecord?.publicWater === true ? 75 : 60,
+            laborCapacity: 55,
+            capitalCapacity: 55,
+            marketAccess: 60,
+            gridEvidence: false,
+            solarZoningEvidence: false,
+            soilSuitability:
+              effectivePlaceIntelligence?.soilProfile?.capabilityClass != null
+                ? Math.max(
+                    30,
+                    90 -
+                      effectivePlaceIntelligence.soilProfile.capabilityClass * 10,
+                  )
+                : 50,
+          })
+        : null;
     const farmPortfolio =
       effectivePlaceIntelligence?.farmBestUse?.parcelPortfolio ?? null;
     const farmCoverageReady =
@@ -4419,6 +4457,14 @@ export function PropertyEvaluationWorkspace({
       noiAnnual = farmPortfolio.modeledNoiAnnual;
       noiBasis =
         farmPortfolio.basis ?? "segment-aware parcel operating scenario";
+    } else if (
+      laneId === "farm" &&
+      farmUseScreen &&
+      farmUseScreen.portfolioNoi > 0
+    ) {
+      noiAnnual = farmUseScreen.portfolioNoi;
+      noiBasis =
+        "preliminary diversified agricultural portfolio using disclosed acreage and screening assumptions";
     }
     const ctx: ProgramFitContext = {
       laneId,
@@ -4446,24 +4492,38 @@ export function PropertyEvaluationWorkspace({
             : null,
         }))
       : laneId === "farm"
-        ? [
-            {
-              id: "farm-parcel-portfolio",
-              label: "Whole-parcel enterprise portfolio",
-              noiAnnual: farmCoverageReady ? farmPortfolio?.modeledNoiAnnual ?? null : null,
-              basis: farmPortfolio?.basis ?? "segment-aware parcel operating scenario",
-              evidenceStatus: farmCoverageReady ? "supported" : "needs-evidence",
-              timeToIncome: null,
-            },
-            ...(effectivePlaceIntelligence?.farmBestUse?.options ?? []).slice(0, 4).map((option, index) => ({
-              id: "farm-option-" + index,
-              label: option.name,
-              noiAnnual: null,
-              basis: option.economicsBasis + " economics — " + option.grossPerAcre,
-              evidenceStatus: "needs-evidence" as const,
-              timeToIncome: null,
-            })),
-          ]
+        ? farmUseScreen
+          ? [
+              {
+                id: "farm-parcel-portfolio",
+                label: "Diversified whole-parcel agricultural portfolio",
+                noiAnnual: farmUseScreen.portfolioNoi,
+                basis:
+                  farmPortfolio?.basis ??
+                  "weighted combination of the three strongest feasible agricultural enterprises under disclosed screening assumptions",
+                evidenceStatus: farmCoverageReady ? "supported" as const : "screening" as const,
+                timeToIncome: null,
+              },
+              ...farmUseScreen.ranked.slice(0, 8).map((option, index) => ({
+                id: "farm-option-" + index,
+                label: option.label,
+                noiAnnual: option.eligible ? option.noi : null,
+                basis:
+                  `${option.note} Fit ${option.fit.toFixed(0)}/100; ${option.usedAcres.toFixed(1)} acres modeled; ${option.yearsToCash}-year estimated path to cash.`,
+                evidenceStatus: option.eligible ? "screening" as const : "needs-evidence" as const,
+                timeToIncome: `${option.yearsToCash} year${option.yearsToCash === 1 ? "" : "s"}`,
+              })),
+            ]
+          : [
+              {
+                id: "farm-acreage-required",
+                label: "Agricultural enterprise comparison",
+                noiAnnual: null,
+                basis: "Verified acreage is required before enterprise economics can be modeled.",
+                evidenceStatus: "needs-evidence" as const,
+                timeToIncome: null,
+              },
+            ]
         : [];
     const scenarioMatrix = buildScenarioFinancingMatrix({ baseContext: ctx, programs: topProgramPreview, scenarios });
     const map: Record<

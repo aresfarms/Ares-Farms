@@ -323,7 +323,9 @@ export function GovernedLaneChassis(props: ChassisProps) {
         const answer = lane.id === "farm"
           ? farmScreen?.evidenceStatus === "supported-screen"
             ? `The record supports ${currentUse || "an agricultural property"}. ${farmScreen.options[0]?.name ?? "No enterprise"} leads the supported agricultural fit screen, but the property's overall highest-and-best use still requires comparison with every legally and physically feasible alternative.`
-            : `The record supports ${currentUse || "a farm or land property"}. Furlong cannot yet name either the best agricultural enterprise or the property's overall highest-and-best use because productive acreage, soil/topography/climate fit, water, demand, competition, and economics are not all verified.`
+            : farmScreen?.evidenceStatus === "screening" && farmScreen.options[0]
+              ? `The record supports ${currentUse || "an agricultural property"}. ${farmScreen.options[0].name} leads Furlong's preliminary agricultural enterprise screen from the acreage, soils, location, and public operating benchmarks currently available. Treat that as the first option to test—not a guarantee—while Furlong compares the other profitable and property-wide alternatives below.`
+              : `The record supports ${currentUse || "a farm or land property"}, but verified acreage is still missing. Furlong cannot responsibly rank enterprises until parcel size is known; soil quality alone is not enough.`
           : lane.id === "residential"
             ? `The strongest supported starting use is residential. Furlong has not found enough verified evidence to claim a conversion or income use is better than using the property as a home.`
             : `The property should be evaluated first as ${currentUse || "commercial real estate"}. The strongest business use remains provisional until permitted use, demand, building condition, operating income, and acquisition price are verified.`;
@@ -331,7 +333,9 @@ export function GovernedLaneChassis(props: ChassisProps) {
           ? "Still gathering evidence"
           : lane.id === "farm" && farmScreen?.evidenceStatus === "supported-screen"
             ? "Agricultural screen supported"
-            : "Preliminary — key evidence remains";
+            : lane.id === "farm" && farmScreen?.evidenceStatus === "screening"
+              ? "Preliminary agricultural ranking"
+              : "Preliminary — key evidence remains";
         const materialRisk = factsByTab.environmental.find((fact) => fact.tone === "caution") ?? null;
         const environmentalIndication = materialRisk
           ? `${materialRisk.label}: ${materialRisk.value}`
@@ -358,7 +362,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
               <div style={{ border: "1px solid rgba(255,255,255,.16)", borderRadius: 12, padding: 14, background: "rgba(255,255,255,.045)" }}>
                 <span style={{ display: "block", color: "#AFC7CD", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>What it is</span>
                 <strong style={{ display: "block", marginTop: 6, color: "#fff", fontSize: 18, lineHeight: 1.4 }}>{currentUse || lane.consumerLaneLabel}</strong>
-                {lane.id === "farm" && farmScreen && <span style={{ display: "block", marginTop: 7, color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.5 }}>{farmScreen.evidenceStatus === "supported-screen" ? `Supported agricultural leader: ${farmScreen.options[0]?.name ?? "not yet established"}.` : "Agricultural enterprise ranking: not yet supportable."} Overall highest-and-best use: not yet determined.</span>}
+                {lane.id === "farm" && farmScreen && <span style={{ display: "block", marginTop: 7, color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.5 }}>{farmScreen.evidenceStatus === "supported-screen" ? `Supported agricultural leader: ${farmScreen.options[0]?.name ?? "not yet established"}.` : farmScreen.evidenceStatus === "screening" && farmScreen.options[0] ? `Preliminary agricultural leader: ${farmScreen.options[0].name}. Other ranked and diversified options remain visible for comparison.` : "Agricultural enterprise ranking requires verified acreage."} Property-wide use remains a preliminary comparison until legal and physical feasibility is confirmed.</span>}
               </div>
               <div style={{ border: "1px solid rgba(255,255,255,.16)", borderRadius: 12, padding: 14, background: "rgba(255,255,255,.045)" }}>
                 <span style={{ display: "block", color: "#AFC7CD", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>Environmental indication</span>

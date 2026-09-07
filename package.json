@@ -606,6 +606,7 @@
     "verify:property-value-indication": "tsx src/scripts/propertyValueIndicationConformance.ts",
     "verify:master-volume-build-parity": "tsx src/scripts/verifyMasterVolumeBuildParity.ts",
     "verify:farm-use-integrity": "tsx src/scripts/farmUseIntegrityConformance.ts",
+    "verify:financing-program-fit": "tsx src/scripts/financingProgramFitConformance.ts",
     "verify:lender-submission-bola": "tsx src/scripts/lenderSubmissionBolaConformance.ts",
     "verify:property-facts-latency": "tsx src/scripts/verifyPropertyFactsLatencyBudget.ts",
     "verify:furlong-vision": "tsx src/scripts/furlongVisionConformance.ts",

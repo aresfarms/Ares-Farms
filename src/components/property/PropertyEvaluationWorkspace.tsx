@@ -18,7 +18,11 @@ import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace
 import { FarmAgricultureTab } from "@/components/property/lanes/FarmAgricultureTab";
 import { ResidentialGardenTab } from "@/components/property/lanes/ResidentialGardenTab";
 import { ReportRecordToken } from "@/components/property/ReportRecordToken";
-import { getSaved, SAVED_EVENT, type SavedProperty } from "@/lib/property/savedProperty";
+import {
+  getSaved,
+  SAVED_EVENT,
+  type SavedProperty,
+} from "@/lib/property/savedProperty";
 import { CommercialLaneWorkspace } from "@/components/property/lanes/CommercialLaneWorkspace";
 import { ResidentialLaneWorkspace } from "@/components/property/lanes/ResidentialLaneWorkspace";
 import { OwnershipCostPanel } from "@/components/property/OwnershipCostPanel";
@@ -34,19 +38,48 @@ import { buildRecommendationEvidenceLedger } from "@/lib/intelligence/recommenda
 import { buildHumanDecisionAssignmentPlan } from "@/lib/intelligence/humanDecisionAssignmentPlan";
 import { buildDecisionResolutionPlan } from "@/lib/intelligence/decisionResolutionPlan";
 import { buildRecommendationFinalityPlan } from "@/lib/intelligence/recommendationFinalityPlan";
-import { buildRecommendationReleaseRecord, type RecommendationReleaseRecord } from "@/lib/intelligence/recommendationReleaseRecord";
+import {
+  buildRecommendationReleaseRecord,
+  type RecommendationReleaseRecord,
+} from "@/lib/intelligence/recommendationReleaseRecord";
 import { buildRecommendationReleaseChangeControl } from "@/lib/intelligence/recommendationReleaseChangeControl";
-import { buildRecommendationReleaseHistory, type RecommendationReleaseAuditEntry, type RecommendationReleaseHistory } from "@/lib/intelligence/recommendationReleaseHistory";
+import {
+  buildRecommendationReleaseHistory,
+  type RecommendationReleaseAuditEntry,
+  type RecommendationReleaseHistory,
+} from "@/lib/intelligence/recommendationReleaseHistory";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
 import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
 import { CHART_THEMES, type ChartVariant } from "@/lib/property/chartThemes";
-import { buildEquityOutlook, buildOwnershipCostModel, buildPostSaleTaxScenario, buildPriceContext, type OwnershipCostContext } from "@/lib/property/ownershipCostModel";
-import { buildResidentialLenderProforma, type LenderProformaSection } from "@/lib/property/residentialLenderProforma";
-import { buildLenderTestScorecard, evaluateProgramFit, type ProgramFitContext } from "@/lib/property/financingProgramFit";
+import {
+  buildEquityOutlook,
+  buildOwnershipCostModel,
+  buildPostSaleTaxScenario,
+  buildPriceContext,
+  type OwnershipCostContext,
+} from "@/lib/property/ownershipCostModel";
+import {
+  buildResidentialLenderProforma,
+  type LenderProformaSection,
+} from "@/lib/property/residentialLenderProforma";
+import {
+  buildLenderTestScorecard,
+  evaluateProgramFit,
+  type ProgramFitContext,
+} from "@/lib/property/financingProgramFit";
 import { modelCommercialUses } from "@/lib/property/commercialUseModel";
 import { FinanceAnalysisPanel } from "@/components/property/lanes/FinanceAnalysisPanel";
-import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
-import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
+import {
+  buildRealEstateCompensationTransparency,
+  emptyRealEstateCompensationInput,
+} from "@/lib/property/realEstateCompensationTransparency";
+import {
+  buildInfrastructureRiskFromEvidence,
+  ingestPropertyEvidence,
+  ingestStructuredPropertyEvidence,
+  mergeWithDefaultPropertyEvidence,
+  structuredTaxRecord,
+} from "@/lib/property/propertyEvidenceIngestion";
 import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
 import type { ExtendedPropertyRiskEvidence } from "@/lib/property/propertyRiskEvidence";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
@@ -59,7 +92,10 @@ import {
 } from "@/lib/property/propertyProfile";
 import type { DiscoveryFlow } from "@/lib/discovery/discoveryFlow";
 import type { PropertyBriefIntelligence } from "@/lib/property/propertyBriefIntelligence";
-import { reportTierIdentity, type ReportTierIdentity } from "@/lib/reports/reportTierIdentity";
+import {
+  reportTierIdentity,
+  type ReportTierIdentity,
+} from "@/lib/reports/reportTierIdentity";
 import { evaluateFinancingPathways } from "@/lib/financing/pathwayEngine";
 import {
   programsForAsset,
@@ -94,13 +130,20 @@ type PropertyContext = {
   categoryLabel: string | null;
   pathwayList: string[];
   importScreeningStatus: "normal" | "reroute" | null;
-  importScreeningCategory: "standard-property" | "special-asset" | "restricted-asset" | null;
+  importScreeningCategory:
+    "standard-property" | "special-asset" | "restricted-asset" | null;
   importScreeningSummary: string | null;
   importScreeningReasons: string[];
-  salePosture: "listing-source-present" | "official-disposition-source" | "unverified-public-claim" | "not-for-sale-likely" | null;
+  salePosture:
+    | "listing-source-present"
+    | "official-disposition-source"
+    | "unverified-public-claim"
+    | "not-for-sale-likely"
+    | null;
   manualReviewRequired: boolean;
   manualReviewSummary: string | null;
-  sourceVerificationStatus: "matched-approved-source-record" | "verified-address-only" | null;
+  sourceVerificationStatus:
+    "matched-approved-source-record" | "verified-address-only" | null;
   matchedSourceRecordId: string | null;
   listingSourceCandidate: string | null;
   listingSourceCandidateStatus:
@@ -109,9 +152,7 @@ type PropertyContext = {
     | "generic-quarantined"
     | null;
   listingSourceGovernanceStatus:
-    | "live-fetch-blocked-by-governance"
-    | "not-in-governed-source-stack"
-    | null;
+    "live-fetch-blocked-by-governance" | "not-in-governed-source-stack" | null;
   listingSourceMatchStatus:
     | "approved-source-match-established"
     | "approved-source-match-not-yet-established"
@@ -134,7 +175,11 @@ type PropertyFactsResponse = {
     town?: string | null;
     state?: string | null;
     parcelRefs?: string[];
-    recordBasis?: "matched-approved-source-record" | "matched-jurisdiction-parcel-record" | "matched-governed-listing-and-parcel-record" | "verified-address-only";
+    recordBasis?:
+      | "matched-approved-source-record"
+      | "matched-jurisdiction-parcel-record"
+      | "matched-governed-listing-and-parcel-record"
+      | "verified-address-only";
     parcelSourceName?: string | null;
     parcelSourceAsOf?: string | null;
     assessmentAsOf?: string | null;
@@ -285,7 +330,10 @@ const DOCUMENT_OPTIONS = [
 ];
 
 function tierMeta(tier: ReportTier) {
-  return REPORT_TIER_OPTIONS.find((option) => option.id === tier) ?? REPORT_TIER_OPTIONS[0];
+  return (
+    REPORT_TIER_OPTIONS.find((option) => option.id === tier) ??
+    REPORT_TIER_OPTIONS[0]
+  );
 }
 
 function buildTierAccessMap(previewMode: boolean): TierAccessMap {
@@ -299,23 +347,27 @@ function buildTierAccessMap(previewMode: boolean): TierAccessMap {
       ? {
           unlocked: true,
           badge: "Testing unlock",
-          detail: "Institutional coordination content is visible during testing and can be re-locked later by flipping one flag.",
+          detail:
+            "Institutional coordination content is visible during testing and can be re-locked later by flipping one flag.",
         }
       : {
           unlocked: false,
           badge: "Locked",
-          detail: "Institutional coordination content is framework-ready but hidden until the premium access switch is turned on.",
+          detail:
+            "Institutional coordination content is framework-ready but hidden until the premium access switch is turned on.",
         },
     environmental: previewMode
       ? {
           unlocked: true,
           badge: "Testing unlock",
-          detail: "Environmental readiness content is visible during testing and can be re-locked later by flipping one flag.",
+          detail:
+            "Environmental readiness content is visible during testing and can be re-locked later by flipping one flag.",
         }
       : {
           unlocked: false,
           badge: "Locked",
-          detail: "Environmental documentation readiness is framework-ready but hidden until the premium access switch is turned on.",
+          detail:
+            "Environmental documentation readiness is framework-ready but hidden until the premium access switch is turned on.",
         },
   };
 }
@@ -324,26 +376,42 @@ function lowerList(values: string[]): string[] {
   return values.map((value) => value.toLowerCase());
 }
 
-function inferredFarmTypes(propertyType: string, categoryLabel: string | null, possibility: string): string[] {
-  const joined = `${propertyType} ${categoryLabel ?? ""} ${possibility}`.toLowerCase();
+function inferredFarmTypes(
+  propertyType: string,
+  categoryLabel: string | null,
+  possibility: string,
+): string[] {
+  const joined =
+    `${propertyType} ${categoryLabel ?? ""} ${possibility}`.toLowerCase();
   if (/(farm|land|ranch|acre)/.test(joined)) return ["farm operation"];
   if (/(hospitality|inn|tourism|retreat)/.test(joined)) return ["agritourism"];
   if (/(business|commercial|retail)/.test(joined)) return ["rural business"];
   return ["mixed-use property"];
 }
 
-function inferredGoals(pathways: string[], possibility: string, usePlan: string): string[] {
+function inferredGoals(
+  pathways: string[],
+  possibility: string,
+  usePlan: string,
+): string[] {
   const joined = `${possibility} ${usePlan}`.toLowerCase();
   const goals = new Set<string>();
-  if (pathways.some((pathway) => /usda/i.test(pathway)) || /(farm|ag|crop|livestock|rural)/.test(joined)) {
+  if (
+    pathways.some((pathway) => /usda/i.test(pathway)) ||
+    /(farm|ag|crop|livestock|rural)/.test(joined)
+  ) {
     goals.add("land acquisition");
     goals.add("production support");
   }
-  if (pathways.some((pathway) => /sba/i.test(pathway)) || /(business|commercial|hospitality|operations)/.test(joined)) {
+  if (
+    pathways.some((pathway) => /sba/i.test(pathway)) ||
+    /(business|commercial|hospitality|operations)/.test(joined)
+  ) {
     goals.add("business expansion");
     goals.add("site improvement");
   }
-  if (/(tourism|retreat|event|lodging)/.test(joined)) goals.add("marketing support");
+  if (/(tourism|retreat|event|lodging)/.test(joined))
+    goals.add("marketing support");
   if (goals.size === 0) goals.add("site improvement");
   return Array.from(goals);
 }
@@ -370,7 +438,10 @@ function firstUserAnswer(turns: NavigatorSnapshot["turns"]): string | null {
 }
 
 function userTurns(turns: NavigatorSnapshot["turns"]): string[] {
-  return turns.filter((turn) => turn.role === "you").map((turn) => turn.text.trim()).filter(Boolean);
+  return turns
+    .filter((turn) => turn.role === "you")
+    .map((turn) => turn.text.trim())
+    .filter(Boolean);
 }
 
 function unique(values: string[]): string[] {
@@ -404,11 +475,16 @@ function compactLocation(context: PropertyContext): string {
   return `${context.location}${context.exactAddress ? ` · ${context.exactAddress}` : ""}`;
 }
 
-function propertySpecificSummary(context: PropertyContext, facts: PropertyFactsResponse | null): string[] {
+function propertySpecificSummary(
+  context: PropertyContext,
+  facts: PropertyFactsResponse | null,
+): string[] {
   const record = facts?.propertyRecord;
   const lines: string[] = [];
   if (record?.exactAddress) {
-    lines.push(`Known address: ${record.exactAddress}${record.zip ? ` ${record.zip}` : ""}.`);
+    lines.push(
+      `Known address: ${record.exactAddress}${record.zip ? ` ${record.zip}` : ""}.`,
+    );
   }
   if (record?.rawPropertyStyle) {
     lines.push(`Recorded property style: ${record.rawPropertyStyle}.`);
@@ -419,22 +495,28 @@ function propertySpecificSummary(context: PropertyContext, facts: PropertyFactsR
   // when it doesn't.
   const sizeBits = [
     record?.acreageText ? record.acreageText : null,
-    record?.squareFeet ? `${record.squareFeet.toLocaleString("en-US")} sq ft building` : null,
+    record?.squareFeet
+      ? `${record.squareFeet.toLocaleString("en-US")} sq ft building`
+      : null,
   ].filter(Boolean);
   lines.push(
     sizeBits.length > 0
       ? `Size: ${sizeBits.join(" · ")}.`
-      : "Size: not stated by the source — the county parcel/GIS viewer shows the exact lot dimensions and acreage free (see the size entry under Honest Unknowns)."
+      : "Size: not stated by the source — the county parcel/GIS viewer shows the exact lot dimensions and acreage free (see the size entry under Honest Unknowns).",
   );
   const detailBits = [
-    record?.bedrooms ? `${record.bedrooms} bedroom${record.bedrooms === 1 ? "" : "s"}` : null,
+    record?.bedrooms
+      ? `${record.bedrooms} bedroom${record.bedrooms === 1 ? "" : "s"}`
+      : null,
     record?.yearBuilt ? `built ${record.yearBuilt}` : null,
   ].filter(Boolean);
   if (detailBits.length > 0) {
     lines.push(`Recorded physical details: ${detailBits.join(" · ")}.`);
   }
   if (record?.listingId) {
-    lines.push(`Listing reference: ${record.listingId} — use this number to find the listing on the source site.`);
+    lines.push(
+      `Listing reference: ${record.listingId} — use this number to find the listing on the source site.`,
+    );
   }
   return lines;
 }
@@ -450,11 +532,21 @@ function propertySpecificSummary(context: PropertyContext, facts: PropertyFactsR
 function buildAnswerCard(args: {
   context: PropertyContext;
   restrictionsPresent: boolean;
-}): { headline: string; readiness: string[]; fitLine: string | null; pauseLine: string } {
-  const isHome = /home|residential|house/i.test(args.context.propertyType ?? "");
+}): {
+  headline: string;
+  readiness: string[];
+  fitLine: string | null;
+  pauseLine: string;
+} {
+  const isHome = /home|residential|house/i.test(
+    args.context.propertyType ?? "",
+  );
   const sourceId = (args.context.sourceId ?? "").toLowerCase();
-  const priceOnRequest = /price on request/i.test(args.context.priceLabel ?? "");
-  const isGovSale = sourceId === "hud" || sourceId === "usda" || sourceId === "gsa";
+  const priceOnRequest = /price on request/i.test(
+    args.context.priceLabel ?? "",
+  );
+  const isGovSale =
+    sourceId === "hud" || sourceId === "usda" || sourceId === "gsa";
   const imported = Boolean(args.context.propertyId?.startsWith("imported:"));
 
   const headline =
@@ -469,19 +561,29 @@ function buildAnswerCard(args: {
             : "Furlong has assembled the strongest sourced property record currently available. Use this first read to orient quickly, then open each section for the evidence and remaining unknowns.";
 
   const readiness: string[] = [];
-  readiness.push(args.restrictionsPresent ? "Source restriction needs review" : "Core property record is reviewable");
+  readiness.push(
+    args.restrictionsPresent
+      ? "Source restriction needs review"
+      : "Core property record is reviewable",
+  );
   if (priceOnRequest) readiness.push("Price still needed for financing math");
-  if (isGovSale) readiness.push("Condition and inspection still need confirmation");
-  if (sourceId === "hud" && isHome) readiness.push("HUD owner-occupant timing applies");
+  if (isGovSale)
+    readiness.push("Condition and inspection still need confirmation");
+  if (sourceId === "hud" && isHome)
+    readiness.push("HUD owner-occupant timing applies");
 
   const fitBits = [
     sourceId === "hud" && isHome ? "HUD owner-occupant sale mechanics" : null,
-    args.context.location ? `verified place evidence for ${args.context.location}` : null,
+    args.context.location
+      ? `verified place evidence for ${args.context.location}`
+      : null,
     "source-backed property and location facts",
   ].filter((bit): bit is string => Boolean(bit));
   const pauseBits = [
     priceOnRequest ? "confirm the actual price" : null,
-    isGovSale ? "confirm condition, inspection findings, and repair scope" : "confirm condition or inspection findings that could change the economics",
+    isGovSale
+      ? "confirm condition, inspection findings, and repair scope"
+      : "confirm condition or inspection findings that could change the economics",
     "complete the borrower-specific file before treating any financing path as lender-ready",
   ].filter((bit): bit is string => Boolean(bit));
 
@@ -493,7 +595,10 @@ function buildAnswerCard(args: {
   };
 }
 
-function verificationTone(status: NonNullable<PropertyFactsResponse["verification"]>["status"] | undefined) {
+function verificationTone(
+  status:
+    NonNullable<PropertyFactsResponse["verification"]>["status"] | undefined,
+) {
   switch (status) {
     case "verified":
       return {
@@ -526,7 +631,10 @@ function verificationTone(status: NonNullable<PropertyFactsResponse["verificatio
   }
 }
 
-function verificationStatusCopy(status: NonNullable<PropertyFactsResponse["verification"]>["status"] | undefined): string {
+function verificationStatusCopy(
+  status:
+    NonNullable<PropertyFactsResponse["verification"]>["status"] | undefined,
+): string {
   switch (status) {
     case "verified":
       return "Imported address verified against live public place-fact sources.";
@@ -554,7 +662,8 @@ function sourceVerificationCopy(context: PropertyContext): {
   }
 
   return {
-    title: "No approved source match yet — continuing with verified address only",
+    title:
+      "No approved source match yet — continuing with verified address only",
     detail:
       "Furlong verified the address posture through live public place-fact checks, but did not match this property to an approved source-backed record in the platform. Imported listing details should still be treated as intake material, not independently confirmed listing facts.",
   };
@@ -570,27 +679,31 @@ function sourceCandidateCopy(context: PropertyContext): string | null {
     "allowlisted-marketplace-source-detected"
   ) {
     lines.push(
-      `${context.listingSourceCandidate} was recognized as an allowlisted marketplace source candidate.`
+      `${context.listingSourceCandidate} was recognized as an allowlisted marketplace source candidate.`,
     );
-  } else if (context.listingSourceCandidateStatus === "allowlisted-address-only") {
+  } else if (
+    context.listingSourceCandidateStatus === "allowlisted-address-only"
+  ) {
     lines.push(
-      `${context.listingSourceCandidate} was recognized as an allowlisted source candidate for address extraction only.`
+      `${context.listingSourceCandidate} was recognized as an allowlisted source candidate for address extraction only.`,
     );
   } else {
     lines.push(
-      `${context.listingSourceCandidate} was treated as a quarantined outside source candidate.`
+      `${context.listingSourceCandidate} was treated as a quarantined outside source candidate.`,
     );
   }
 
-  if (context.listingSourceGovernanceStatus === "live-fetch-blocked-by-governance") {
+  if (
+    context.listingSourceGovernanceStatus === "live-fetch-blocked-by-governance"
+  ) {
     lines.push(
-      "Live third-party listing fetch remains blocked until connector certification, legal review, and promotion approval."
+      "Live third-party listing fetch remains blocked until connector certification, legal review, and promotion approval.",
     );
   } else if (
     context.listingSourceGovernanceStatus === "not-in-governed-source-stack"
   ) {
     lines.push(
-      "This source is not yet in Furlong's governed source stack, so the portal stayed in address-only posture."
+      "This source is not yet in Furlong's governed source stack, so the portal stayed in address-only posture.",
     );
   }
 
@@ -598,9 +711,7 @@ function sourceCandidateCopy(context: PropertyContext): string | null {
     context.listingSourceMatchStatus ===
     "approved-source-match-not-yet-established"
   ) {
-    lines.push(
-      "Approved source match not yet established."
-    );
+    lines.push("Approved source match not yet established.");
   }
 
   if (
@@ -623,7 +734,10 @@ function sourceCandidateCopy(context: PropertyContext): string | null {
   return lines.join(" ");
 }
 
-function propertyIntentText(context: PropertyContext, answers: DraftAnswers): string {
+function propertyIntentText(
+  context: PropertyContext,
+  answers: DraftAnswers,
+): string {
   return [
     context.propertyType,
     context.categoryLabel ?? "",
@@ -636,15 +750,24 @@ function propertyIntentText(context: PropertyContext, answers: DraftAnswers): st
     .toLowerCase();
 }
 
-function propertyUseClass(context: PropertyContext, answers: DraftAnswers): "farm" | "hospitality" | "business" | "mixed" {
+function propertyUseClass(
+  context: PropertyContext,
+  answers: DraftAnswers,
+): "farm" | "hospitality" | "business" | "mixed" {
   const joined = propertyIntentText(context, answers);
-  if (/(inn|lodging|guesthouse|retreat|tourism|hospitality|event|wedding|stay)/.test(joined)) {
+  if (
+    /(inn|lodging|guesthouse|retreat|tourism|hospitality|event|wedding|stay)/.test(
+      joined,
+    )
+  ) {
     return "hospitality";
   }
   if (/(business|retail|commercial|office|industrial)/.test(joined)) {
     return "business";
   }
-  if (/(farm|agri|crop|livestock|pasture|ranch|orchard|greenhouse)/.test(joined)) {
+  if (
+    /(farm|agri|crop|livestock|pasture|ranch|orchard|greenhouse)/.test(joined)
+  ) {
     return "farm";
   }
   return "mixed";
@@ -656,14 +779,28 @@ function immediateDealLabel(context: PropertyContext): string {
     context.categoryLabel ?? "",
     context.description ?? "",
     context.title,
-  ].join(" ").toLowerCase();
-  if (/(inn|hotel|motel|lodging|retreat|guesthouse|hospitality|event venue|wedding)/.test(joined)) {
+  ]
+    .join(" ")
+    .toLowerCase();
+  if (
+    /(inn|hotel|motel|lodging|retreat|guesthouse|hospitality|event venue|wedding)/.test(
+      joined,
+    )
+  ) {
     return "Hospitality acquisition";
   }
-  if (/(farm|ranch|orchard|acre|pasture|agri|homestead|crop|livestock)/.test(joined)) {
+  if (
+    /(farm|ranch|orchard|acre|pasture|agri|homestead|crop|livestock)/.test(
+      joined,
+    )
+  ) {
     return "Working farm";
   }
-  if (/(historic|vacant|warehouse|adaptive reuse|redevelop|conversion|main street|mixed-use)/.test(joined)) {
+  if (
+    /(historic|vacant|warehouse|adaptive reuse|redevelop|conversion|main street|mixed-use)/.test(
+      joined,
+    )
+  ) {
     return "Redevelopment opportunity";
   }
   if (/(commercial|retail|office|industrial|warehouse|business)/.test(joined)) {
@@ -699,18 +836,42 @@ function deriveAssetClassFromContext(context: PropertyContext): AssetClass {
     context.description ?? "",
     context.title,
     context.sourceLabel,
-  ].join(" ").toLowerCase();
-  if (/(farm|ranch|orchard|agri|acre|pasture|livestock|crop|homestead)/.test(joined)) return "agricultural";
-  if (/(inn|hotel|motel|retreat|hospitality|event venue|lodge)/.test(joined)) return "specialty";
-  if (/(commercial|retail|office|industrial|warehouse|business|mixed-use)/.test(joined)) return "commercial";
+  ]
+    .join(" ")
+    .toLowerCase();
+  if (
+    /(farm|ranch|orchard|agri|acre|pasture|livestock|crop|homestead)/.test(
+      joined,
+    )
+  )
+    return "agricultural";
+  if (/(inn|hotel|motel|retreat|hospitality|event venue|lodge)/.test(joined))
+    return "specialty";
+  if (
+    /(commercial|retail|office|industrial|warehouse|business|mixed-use)/.test(
+      joined,
+    )
+  )
+    return "commercial";
   if (/(clinic|medical|hospital|nursing)/.test(joined)) return "institutional";
-  if (/(home|house|residential|condo|duplex|single family)/.test(joined)) return "residential";
+  if (/(home|house|residential|condo|duplex|single family)/.test(joined))
+    return "residential";
   return "unknown";
 }
 
 function isResidentialHomeContext(context: PropertyContext): boolean {
-  const text = [context.propertyType, context.categoryLabel ?? "", context.description ?? "", context.title].join(" ");
-  if (/(farm|ranch|agric|crop|pasture|livestock|orchard|vineyard|poultry|dairy|tillable|irrigat|acre)/i.test(text)) return false;
+  const text = [
+    context.propertyType,
+    context.categoryLabel ?? "",
+    context.description ?? "",
+    context.title,
+  ].join(" ");
+  if (
+    /(farm|ranch|agric|crop|pasture|livestock|orchard|vineyard|poultry|dairy|tillable|irrigat|acre)/i.test(
+      text,
+    )
+  )
+    return false;
   return /(home|house|residential|single family|condo|duplex)/i.test(text);
 }
 
@@ -718,9 +879,12 @@ function buildBudgetExpectations(context: PropertyContext): BudgetExpectations {
   const price = parsePriceSignal(context.priceLabel);
   if (price === null) {
     return {
-      acquisition: "The price lives on the source listing and can change as bid periods reset — check it there before you run numbers.",
-      softCosts: "Plan on real out-of-pocket costs before closing: inspection, appraisal, title work, and insurance quotes. Typical ranges are itemized in the cost guide below.",
-      buildout: "Repair and improvement costs can't be estimated until someone walks the property — budget a contingency and get contractor numbers after the inspection.",
+      acquisition:
+        "The price lives on the source listing and can change as bid periods reset — check it there before you run numbers.",
+      softCosts:
+        "Plan on real out-of-pocket costs before closing: inspection, appraisal, title work, and insurance quotes. Typical ranges are itemized in the cost guide below.",
+      buildout:
+        "Repair and improvement costs can't be estimated until someone walks the property — budget a contingency and get contractor numbers after the inspection.",
     };
   }
 
@@ -753,8 +917,10 @@ function buildPropertyFirstProgramRanking(args: {
           citation: "HUD Home Store / FHA disposition context",
         },
         score: 74,
-        rationale: "This is a HUD home listing, and if you plan to live in it, an FHA-style owner-occupant loan is the most common way homes like this are bought. A lender confirms what fits your situation.",
-        caution: "This is not an eligibility or approval signal, and the file is still thin because the source record does not publish an asking price or condition here.",
+        rationale:
+          "This is a HUD home listing, and if you plan to live in it, an FHA-style owner-occupant loan is the most common way homes like this are bought. A lender confirms what fits your situation.",
+        caution:
+          "This is not an eligibility or approval signal, and the file is still thin because the source record does not publish an asking price or condition here.",
       },
       {
         program: {
@@ -765,8 +931,10 @@ function buildPropertyFirstProgramRanking(args: {
           citation: "General residential mortgage market context",
         },
         score: 66,
-        rationale: "If the appraisal, condition, and borrower-side profile cooperate, a standard residential acquisition path is more plausible than business or redevelopment financing.",
-        caution: "This weakens quickly if hidden condition issues, occupancy restrictions, or borrower-side weakness appear later in diligence.",
+        rationale:
+          "If the appraisal, condition, and borrower-side profile cooperate, a standard residential acquisition path is more plausible than business or redevelopment financing.",
+        caution:
+          "This weakens quickly if hidden condition issues, occupancy restrictions, or borrower-side weakness appear later in diligence.",
       },
     ];
   }
@@ -778,46 +946,85 @@ function buildPropertyFirstProgramRanking(args: {
     args.context.description ?? "",
     args.context.title,
     args.context.pathwayList.join(" "),
-  ].join(" ").toLowerCase();
+  ]
+    .join(" ")
+    .toLowerCase();
   const oz = Boolean(args.facts?.placeFacts?.opportunityZone);
   const hubzone = Boolean(args.facts?.placeFacts?.hubzone?.isCurrent);
   const ruralHint =
     /(rural|farm|acre|pasture|usda|agri)/.test(joined) ||
-    args.verifiedPrograms.some((program) => /USDA/i.test(program.administering_body));
-  const hospitalityHint = /(inn|hotel|motel|retreat|lodge|hospitality|event)/.test(joined);
-  const redevelopmentHint = /(redevelop|conversion|adaptive reuse|historic|mixed-use|warehouse|vacant)/.test(joined);
+    args.verifiedPrograms.some((program) =>
+      /USDA/i.test(program.administering_body),
+    );
+  const hospitalityHint =
+    /(inn|hotel|motel|retreat|lodge|hospitality|event)/.test(joined);
+  const redevelopmentHint =
+    /(redevelop|conversion|adaptive reuse|historic|mixed-use|warehouse|vacant)/.test(
+      joined,
+    );
 
   return programs
     .map((program) => {
       let score = 55;
       const name = program.name.toLowerCase();
 
-      if (args.assetClass === "agricultural" && /fsa|farm credit|reap|b&i/.test(name)) score += 18;
-      if (args.assetClass === "commercial" && /sba 504|sba 7\(a\)|sba express/.test(name)) score += 18;
-      if (args.assetClass === "specialty" && hospitalityHint && /sba 504|sba 7\(a\)|b&i|reap/.test(name)) score += 16;
+      if (
+        args.assetClass === "agricultural" &&
+        /fsa|farm credit|reap|b&i/.test(name)
+      )
+        score += 18;
+      if (
+        args.assetClass === "commercial" &&
+        /sba 504|sba 7\(a\)|sba express/.test(name)
+      )
+        score += 18;
+      if (
+        args.assetClass === "specialty" &&
+        hospitalityHint &&
+        /sba 504|sba 7\(a\)|b&i|reap/.test(name)
+      )
+        score += 16;
       if (ruralHint && /usda|farm credit/.test(name)) score += 12;
       if (redevelopmentHint && /sba 504|b&i/.test(name)) score += 10;
       if (oz && /sba 504|sba 7\(a\)|b&i/.test(name)) score += 6;
       if (hubzone && /sba/.test(name)) score += 8;
-      if (args.context.pathwayList.some((pathway) => name.includes(pathway.toLowerCase()))) score += 6;
+      if (
+        args.context.pathwayList.some((pathway) =>
+          name.includes(pathway.toLowerCase()),
+        )
+      )
+        score += 6;
 
-      const rationale =
-        /sba 504/.test(name) ? "Most plausible when the property will be occupied by a real operating business and improvements are part of the story."
-        : /sba 7\(a\)/.test(name) ? "Usually strongest when acquisition and operating business needs have to be financed together."
-        : /sba express/.test(name) ? "More plausible as a smaller, faster business-purpose lane than as a heavy real-estate solution."
-        : /b&i/.test(name) ? "Becomes more credible when the property is rural and tied to a business or operating-use thesis."
-        : /fsa/.test(name) ? "Most plausible if the property is genuinely agricultural rather than simply rural."
-        : /farm credit/.test(name) ? "Often strongest where the land or operation is clearly agricultural and operator-led."
-        : /reap/.test(name) ? "More of an improvement / energy-adjacent lane than a primary acquisition solution."
-        : "Program fit depends on the final operating and ownership structure.";
+      const rationale = /sba 504/.test(name)
+        ? "Most plausible when the property will be occupied by a real operating business and improvements are part of the story."
+        : /sba 7\(a\)/.test(name)
+          ? "Usually strongest when acquisition and operating business needs have to be financed together."
+          : /sba express/.test(name)
+            ? "More plausible as a smaller, faster business-purpose lane than as a heavy real-estate solution."
+            : /b&i/.test(name)
+              ? "Becomes more credible when the property is rural and tied to a business or operating-use thesis."
+              : /fsa/.test(name)
+                ? "Most plausible if the property is genuinely agricultural rather than simply rural."
+                : /farm credit/.test(name)
+                  ? "Often strongest where the land or operation is clearly agricultural and operator-led."
+                  : /reap/.test(name)
+                    ? "More of an improvement / energy-adjacent lane than a primary acquisition solution."
+                    : "Program fit depends on the final operating and ownership structure.";
 
-      const caution =
-        /sba/.test(name) ? "Weakens quickly if the property cannot support a credible owner-user or operating-business story."
-        : /fsa|farm credit/.test(name) ? "Weakens quickly if the use is mostly hospitality or non-farm commercial."
-        : /reap/.test(name) ? "Should not be mistaken for a full capital-stack answer."
-        : "Needs rule and document review before reliance.";
+      const caution = /sba/.test(name)
+        ? "Weakens quickly if the property cannot support a credible owner-user or operating-business story."
+        : /fsa|farm credit/.test(name)
+          ? "Weakens quickly if the use is mostly hospitality or non-farm commercial."
+          : /reap/.test(name)
+            ? "Should not be mistaken for a full capital-stack answer."
+            : "Needs rule and document review before reliance.";
 
-      return { program, score: Math.max(0, Math.min(100, score)), rationale, caution };
+      return {
+        program,
+        score: Math.max(0, Math.min(100, score)),
+        rationale,
+        caution,
+      };
     })
     .sort((a, b) => b.score - a.score);
 }
@@ -833,36 +1040,74 @@ function buildQuestionsYouWouldNormallyAsk(args: {
   const out: string[] = [];
 
   if (useClass === "hospitality" || /hospitality/i.test(dealLabel)) {
-    out.push("Is this really a hospitality asset, or is it just a beautiful property with a weak lodging or event business case?");
-    out.push("What occupancy, ADR, event volume, or seasonal demand would have to be true for this property to carry its acquisition and improvement costs?");
-    out.push("What is most likely to break the hospitality thesis first: access, staffing, local demand, liquor/event restrictions, or renovation scope?");
+    out.push(
+      "Is this really a hospitality asset, or is it just a beautiful property with a weak lodging or event business case?",
+    );
+    out.push(
+      "What occupancy, ADR, event volume, or seasonal demand would have to be true for this property to carry its acquisition and improvement costs?",
+    );
+    out.push(
+      "What is most likely to break the hospitality thesis first: access, staffing, local demand, liquor/event restrictions, or renovation scope?",
+    );
   } else if (useClass === "farm") {
-    out.push("Is this truly a working farm opportunity, or mostly rural land with a weaker operating case?");
-    out.push("What exact agricultural use fits this site best: crop, livestock, orchard, greenhouse, agritourism, or a mixed operation?");
-    out.push("What breaks the farm thesis first: acreage, soils, water, utilities, access, improvements, or operator capability?");
+    out.push(
+      "Is this truly a working farm opportunity, or mostly rural land with a weaker operating case?",
+    );
+    out.push(
+      "What exact agricultural use fits this site best: crop, livestock, orchard, greenhouse, agritourism, or a mixed operation?",
+    );
+    out.push(
+      "What breaks the farm thesis first: acreage, soils, water, utilities, access, improvements, or operator capability?",
+    );
   } else if (/redevelopment/i.test(dealLabel)) {
-    out.push("Is this actually a redevelopment opportunity with enough margin, or a romantic project that gets too expensive too quickly?");
-    out.push("What would have to be true on zoning, code, utilities, and condition for the reuse concept to survive first-pass diligence?");
-    out.push("Does the historic or conversion story create real value, or mostly extra approvals, cost, and delay?");
+    out.push(
+      "Is this actually a redevelopment opportunity with enough margin, or a romantic project that gets too expensive too quickly?",
+    );
+    out.push(
+      "What would have to be true on zoning, code, utilities, and condition for the reuse concept to survive first-pass diligence?",
+    );
+    out.push(
+      "Does the historic or conversion story create real value, or mostly extra approvals, cost, and delay?",
+    );
   } else if (useClass === "business") {
-    out.push("Is there a credible owner-user or operating-business case here, or is the property stronger as ordinary real estate than as a business-backed acquisition?");
-    out.push("What business model fits this site best given traffic, layout, town size, access, and likely operating demand?");
-    out.push("What kills the business case first: demand, buildout, staffing, working capital, or mismatch between property and use?");
+    out.push(
+      "Is there a credible owner-user or operating-business case here, or is the property stronger as ordinary real estate than as a business-backed acquisition?",
+    );
+    out.push(
+      "What business model fits this site best given traffic, layout, town size, access, and likely operating demand?",
+    );
+    out.push(
+      "What kills the business case first: demand, buildout, staffing, working capital, or mismatch between property and use?",
+    );
   } else {
-    out.push("What is the highest-probability use case this property can actually support before branding or optimism gets involved?");
-    out.push("What is most likely to break the deal first: zoning, condition, utilities, staffing, capital structure, or local demand?");
+    out.push(
+      "What is the highest-probability use case this property can actually support before branding or optimism gets involved?",
+    );
+    out.push(
+      "What is most likely to break the deal first: zoning, condition, utilities, staffing, capital structure, or local demand?",
+    );
   }
 
-  out.push("Is the likely financing story owner-user business occupancy, farm operation, redevelopment, or something weaker than that?");
-  out.push("How much diligence reserve should be assumed before the asking price is treated like the real cost of the deal?");
+  out.push(
+    "Is the likely financing story owner-user business occupancy, farm operation, redevelopment, or something weaker than that?",
+  );
+  out.push(
+    "How much diligence reserve should be assumed before the asking price is treated like the real cost of the deal?",
+  );
   if (args.facts?.placeFacts?.flood) {
-    out.push("How much does the visible flood posture change insurance, financing, or usable-site assumptions?");
+    out.push(
+      "How much does the visible flood posture change insurance, financing, or usable-site assumptions?",
+    );
   }
   if (args.facts?.placeFacts?.historic) {
-    out.push("Does the historic posture create upside through identity, or cost through approvals and construction constraints?");
+    out.push(
+      "Does the historic posture create upside through identity, or cost through approvals and construction constraints?",
+    );
   }
   if (args.topProgramRanks[0]) {
-    out.push(`If ${args.topProgramRanks[0].program.name} is the lead lane, what exact facts would strengthen it or knock it out?`);
+    out.push(
+      `If ${args.topProgramRanks[0].program.name} is the lead lane, what exact facts would strengthen it or knock it out?`,
+    );
   }
   return out.slice(0, 6);
 }
@@ -879,12 +1124,12 @@ function buildPropertyEconomicsLines(args: {
   ];
   if (args.topProgramRanks[0]) {
     out.push(
-      `${args.topProgramRanks[0].program.name} currently looks like the lead financing lane because ${cleanPhrase(args.topProgramRanks[0].rationale).toLowerCase()}.`
+      `${args.topProgramRanks[0].program.name} currently looks like the lead financing lane because ${cleanPhrase(args.topProgramRanks[0].rationale).toLowerCase()}.`,
     );
   }
   if (args.topProgramRanks[1]) {
     out.push(
-      `${args.topProgramRanks[1].program.name} is the usual backup if the first option doesn't fit.`
+      `${args.topProgramRanks[1].program.name} is the usual backup if the first option doesn't fit.`,
     );
   }
   return out.slice(0, 5);
@@ -892,7 +1137,12 @@ function buildPropertyEconomicsLines(args: {
 
 function buildImmediateSuitability(args: {
   context: PropertyContext;
-  topPathways: Array<{ label: string; fitScore: number; fitReasons: string[]; missingItems: string[] }>;
+  topPathways: Array<{
+    label: string;
+    fitScore: number;
+    fitReasons: string[];
+    missingItems: string[];
+  }>;
   verifiedPrograms: NonNullable<PropertyFactsResponse["verifiedPrograms"]>;
   facts: PropertyFactsResponse | null;
 }) {
@@ -914,10 +1164,16 @@ function buildImmediateSuitability(args: {
         "The source does not publish a firm asking price here, so acquisition basis is still unconfirmed.",
         record?.bedrooms || record?.squareFeet || record?.yearBuilt
           ? `Recorded physical detail is partial: ${[
-              record?.bedrooms ? `${record.bedrooms} bedroom${record.bedrooms === 1 ? "" : "s"}` : null,
-              record?.squareFeet ? `${record.squareFeet.toLocaleString("en-US")} sq ft` : null,
+              record?.bedrooms
+                ? `${record.bedrooms} bedroom${record.bedrooms === 1 ? "" : "s"}`
+                : null,
+              record?.squareFeet
+                ? `${record.squareFeet.toLocaleString("en-US")} sq ft`
+                : null,
               record?.yearBuilt ? `built ${record.yearBuilt}` : null,
-            ].filter(Boolean).join(" · ")}.`
+            ]
+              .filter(Boolean)
+              .join(" · ")}.`
           : "The record is still thin on bedrooms, square footage, year built, and condition, so this remains an initial screen rather than a decision-grade valuation.",
         args.facts?.placeFacts?.historic
           ? "Historic context is positively confirmed and could affect scope, approvals, or rehab framing."
@@ -932,29 +1188,45 @@ function buildImmediateSuitability(args: {
   const constraints: string[] = [];
 
   if (best) {
-    signals.push(`${best.label} is the strongest immediate lane at fit score ${best.fitScore}.`);
+    signals.push(
+      `${best.label} is the strongest immediate lane at fit score ${best.fitScore}.`,
+    );
     if (best.fitReasons[0]) signals.push(best.fitReasons[0]);
     if (best.missingItems.length > 0) {
-      constraints.push(`This lane still depends on ${best.missingItems.slice(0, 3).join(", ")}.`);
+      constraints.push(
+        `This lane still depends on ${best.missingItems.slice(0, 3).join(", ")}.`,
+      );
     }
   }
   for (const pathway of secondary) {
-    signals.push(`${pathway.label} also remains plausible if the use case and file support it.`);
+    signals.push(
+      `${pathway.label} also remains plausible if the use case and file support it.`,
+    );
   }
   if (args.verifiedPrograms.length > 0) {
-    constraints.unshift(`${args.verifiedPrograms.length} verified property-side criteria signal(s) already attach to the property, which strengthens suitability.`);
+    constraints.unshift(
+      `${args.verifiedPrograms.length} verified property-side criteria signal(s) already attach to the property, which strengthens suitability.`,
+    );
   }
   if (args.facts?.placeFacts?.flood) {
-    constraints.push(`Flood posture is already visible and may affect insurance, financing, or site-use assumptions.`);
+    constraints.push(
+      `Flood posture is already visible and may affect insurance, financing, or site-use assumptions.`,
+    );
   }
   if (args.facts?.placeFacts?.historic) {
-    constraints.push(`Historic context could help the story or complicate redevelopment, depending on the actual scope.`);
+    constraints.push(
+      `Historic context could help the story or complicate redevelopment, depending on the actual scope.`,
+    );
   }
   if (!best) {
-    signals.push("The property still needs more structured facts before a strong lead lane can be stated.");
+    signals.push(
+      "The property still needs more structured facts before a strong lead lane can be stated.",
+    );
   }
   if (constraints.length === 0) {
-    constraints.push("The property can be screened immediately, but execution still depends on zoning, capital structure, and human review.");
+    constraints.push(
+      "The property can be screened immediately, but execution still depends on zoning, capital structure, and human review.",
+    );
   }
 
   return {
@@ -964,7 +1236,11 @@ function buildImmediateSuitability(args: {
   };
 }
 
-function contextualMissingItem(item: string, context: PropertyContext, answers: DraftAnswers): string {
+function contextualMissingItem(
+  item: string,
+  context: PropertyContext,
+  answers: DraftAnswers,
+): string {
   const useClass = propertyUseClass(context, answers);
   switch (item) {
     case "borrower onboarding intake":
@@ -972,7 +1248,9 @@ function contextualMissingItem(item: string, context: PropertyContext, answers: 
     case "farm stage":
       return "project stage";
     case "farm location":
-      return context.exactAddress ? "site-specific property details" : "site-specific location details";
+      return context.exactAddress
+        ? "site-specific property details"
+        : "site-specific location details";
     case "farm type":
       return useClass === "hospitality"
         ? "property use classification"
@@ -990,8 +1268,14 @@ function contextualMissingItem(item: string, context: PropertyContext, answers: 
   }
 }
 
-function contextualMissingItems(items: string[], context: PropertyContext, answers: DraftAnswers): string[] {
-  return unique(items.map((item) => contextualMissingItem(item, context, answers)));
+function contextualMissingItems(
+  items: string[],
+  context: PropertyContext,
+  answers: DraftAnswers,
+): string[] {
+  return unique(
+    items.map((item) => contextualMissingItem(item, context, answers)),
+  );
 }
 
 function rankPropertyPathways(args: {
@@ -1008,9 +1292,16 @@ function rankPropertyPathways(args: {
 }) {
   const joined = propertyIntentText(args.context, args.answers);
   const requestedPrograms = args.context.pathwayList.join(" ").toLowerCase();
-  const hospitalityLike = /(hospitality|inn|hotel|motel|lodge|retreat|event venue|wedding|tourism)/.test(joined);
-  const farmLike = /(farm|crop|orchard|livestock|agri|greenhouse|pasture|ranch)/.test(joined);
-  const businessLike = /(commercial|business|retail|office|mixed-use|redevelopment|investment)/.test(joined);
+  const hospitalityLike =
+    /(hospitality|inn|hotel|motel|lodge|retreat|event venue|wedding|tourism)/.test(
+      joined,
+    );
+  const farmLike =
+    /(farm|crop|orchard|livestock|agri|greenhouse|pasture|ranch)/.test(joined);
+  const businessLike =
+    /(commercial|business|retail|office|mixed-use|redevelopment|investment)/.test(
+      joined,
+    );
 
   return [...args.pathways]
     .map((pathway) => {
@@ -1021,7 +1312,12 @@ function rankPropertyPathways(args: {
         if (/rural tourism/.test(label)) adjustment += 18;
         if (/sba|business|b&i/.test(label)) adjustment += 16;
         if (/energy efficiency/.test(label)) adjustment += 10;
-        if (/specialty crop|fsa|farm credit|farm ownership|farm operating/.test(label)) adjustment -= 40;
+        if (
+          /specialty crop|fsa|farm credit|farm ownership|farm operating/.test(
+            label,
+          )
+        )
+          adjustment -= 40;
       }
 
       if (farmLike) {
@@ -1066,8 +1362,14 @@ function buildResidentialLenderSections(args: {
   valuationNote?: string | null;
 }): LenderProformaSection[] | null {
   const model = buildOwnershipCostModel(
-    { price: args.listedPrice, priceIsAssumption: false, isHome: args.isHome, farmShaped: false, farmMode: false },
-    args.ownershipContext
+    {
+      price: args.listedPrice,
+      priceIsAssumption: false,
+      isHome: args.isHome,
+      farmShaped: false,
+      farmMode: false,
+    },
+    args.ownershipContext,
   );
   if (!model) return null;
   const outlook = buildEquityOutlook(args.listedPrice, args.ownershipContext);
@@ -1084,8 +1386,17 @@ function buildResidentialLenderSections(args: {
     })),
     closingLow: model.purchase.closingLow,
     closingHigh: model.purchase.closingHigh,
-    monthly: model.monthly.map((line) => ({ label: line.label, low: line.low, high: line.high, note: line.note })),
-    monthlyTotals: model.monthlyTotals.map((t) => ({ program: t.program, low: t.low, high: t.high })),
+    monthly: model.monthly.map((line) => ({
+      label: line.label,
+      low: line.low,
+      high: line.high,
+      note: line.note,
+    })),
+    monthlyTotals: model.monthlyTotals.map((t) => ({
+      program: t.program,
+      low: t.low,
+      high: t.high,
+    })),
     equityRows: (outlook?.rows ?? []).map((row) => ({
       year: row.year,
       loanBalance: row.loanBalance,
@@ -1113,7 +1424,11 @@ function formatOwnershipCostsForPdf(args: {
 }):
   | {
       priceLine: string;
-      scenarios: Array<{ program: string; downPayment: string; monthly: string }>;
+      scenarios: Array<{
+        program: string;
+        downPayment: string;
+        monthly: string;
+      }>;
       closingLine: string;
       monthlyLines: Array<{ label: string; range: string; note: string }>;
       totalsLines: string[];
@@ -1132,21 +1447,29 @@ function formatOwnershipCostsForPdf(args: {
       farmShaped: args.farmShaped,
       farmMode: args.farmMode,
     },
-    args.ownershipContext
+    args.ownershipContext,
   );
   if (!model) return undefined;
   const dollars = (n: number) => `$${n.toLocaleString("en-US")}`;
-  const priceContext = buildPriceContext(args.listedPrice, args.ownershipContext);
+  const priceContext = buildPriceContext(
+    args.listedPrice,
+    args.ownershipContext,
+  );
   return {
     priceLine:
       `Figured at the listed price of ${dollars(args.listedPrice)}. These are the numbers that decide whether ownership stays comfortable — worth knowing before the offer, not after.` +
       (priceContext ? ` ${priceContext.text}` : ""),
     scenarios: model.purchase.scenarios.map((s) => ({
       program: s.program,
-      downPayment: s.downPayment === 0 ? "$0 (0%)" : `${dollars(s.downPayment)} (${s.downPaymentPct}%)`,
+      downPayment:
+        s.downPayment === 0
+          ? "$0 (0%)"
+          : `${dollars(s.downPayment)} (${s.downPaymentPct}%)`,
       monthly:
         `${dollars(s.monthlyPrincipalInterest)} P&I` +
-        (s.monthlyMortgageInsurance > 0 ? ` + ${dollars(s.monthlyMortgageInsurance)} mortgage ins.` : ", no mortgage ins.") +
+        (s.monthlyMortgageInsurance > 0
+          ? ` + ${dollars(s.monthlyMortgageInsurance)} mortgage ins.`
+          : ", no mortgage ins.") +
         `  ·  Income that works: ≈${dollars(s.incomeGuidance.comfortableAnnual)}/yr (sometimes from ${dollars(s.incomeGuidance.stretchAnnual)})` +
         (s.program.startsWith("USDA") ? "; county income caps apply" : ""),
     })),
@@ -1159,7 +1482,8 @@ function formatOwnershipCostsForPdf(args: {
       note: `${line.note} [${line.provenance}]`,
     })),
     totalsLines: model.monthlyTotals.map(
-      (total) => `All-in monthly on ${total.program}: ${dollars(total.low)}–${dollars(total.high)}`
+      (total) =>
+        `All-in monthly on ${total.program}: ${dollars(total.low)}–${dollars(total.high)}`,
     ),
     horizonLines: (
       [
@@ -1177,7 +1501,10 @@ function formatOwnershipCostsForPdf(args: {
       equityRows?: Array<{ label: string; value: string }>;
       equityDisclaimers?: string[];
     } => {
-      const outlook = buildEquityOutlook(args.listedPrice, args.ownershipContext);
+      const outlook = buildEquityOutlook(
+        args.listedPrice,
+        args.ownershipContext,
+      );
       if (!outlook) return {};
       return {
         equityIntro: outlook.intro,
@@ -1206,25 +1533,37 @@ function reportVerdict(args: {
   if (isResidentialHomeContext(args.context) && !args.answers.usePlan.trim()) {
     return {
       label: "A regular house for sale — one real possibility",
-      explanation:
-        `This is a house listed for sale through ${args.context.sourceLabel}. Buying it works the same way as buying any house: make an offer, get an inspection, line up a loan, close. This profile pulls together what we could verify about the place — flood risk, schools, what it costs to buy and own — so you can decide whether it deserves an offer.`,
+      explanation: `This is a house listed for sale through ${args.context.sourceLabel}. Buying it works the same way as buying any house: make an offer, get an inspection, line up a loan, close. This profile pulls together what we could verify about the place — flood risk, schools, what it costs to buy and own — so you can decide whether it deserves an offer.`,
     };
   }
 
-  const hasConcept = args.answers.possibility.trim().length > 0 && args.answers.usePlan.trim().length > 0;
-  const detailScore = [
-    args.answers.capitalPlan,
-    args.answers.requestedAmount,
-    args.answers.operatorExperience,
-    args.answers.revenueModel,
-    args.answers.renovationScope,
-    args.answers.ownershipPosture,
-  ].filter((value) => value.trim().length > 0).length + args.answers.documents.length;
-  const avgFit = args.topPathways.length > 0
-    ? Math.round(args.topPathways.reduce((sum, pathway) => sum + pathway.fitScore, 0) / args.topPathways.length)
-    : 0;
+  const hasConcept =
+    args.answers.possibility.trim().length > 0 &&
+    args.answers.usePlan.trim().length > 0;
+  const detailScore =
+    [
+      args.answers.capitalPlan,
+      args.answers.requestedAmount,
+      args.answers.operatorExperience,
+      args.answers.revenueModel,
+      args.answers.renovationScope,
+      args.answers.ownershipPosture,
+    ].filter((value) => value.trim().length > 0).length +
+    args.answers.documents.length;
+  const avgFit =
+    args.topPathways.length > 0
+      ? Math.round(
+          args.topPathways.reduce((sum, pathway) => sum + pathway.fitScore, 0) /
+            args.topPathways.length,
+        )
+      : 0;
 
-  if (hasConcept && detailScore >= 7 && args.readinessPercent >= 40 && avgFit >= 65) {
+  if (
+    hasConcept &&
+    detailScore >= 7 &&
+    args.readinessPercent >= 40 &&
+    avgFit >= 65
+  ) {
     return {
       label: "Taking shape — review comes next",
       explanation:
@@ -1284,11 +1623,20 @@ function buildStrengths(args: {
   const out: string[] = [];
 
   // 1. Verified positive place facts — the strongest signals, with cites.
-  for (const fact of (args.placeIntelligence?.verifiedFacts ?? []).filter((f) => f.tone === "positive").slice(0, 3)) {
-    out.push(`${fact.label}: ${fact.value} (${fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim()}).`);
+  for (const fact of (args.placeIntelligence?.verifiedFacts ?? [])
+    .filter((f) => f.tone === "positive")
+    .slice(0, 3)) {
+    out.push(
+      `${fact.label}: ${fact.value} (${fact.provenance
+        .replace(/^Source:\s*/i, "")
+        .split("·")[0]
+        .trim()}).`,
+    );
   }
   if (args.verifiedPrograms.length > 0) {
-    out.push(`${args.verifiedPrograms.length} property-side program signal(s) verified against government sources — support, never an approval basis.`);
+    out.push(
+      `${args.verifiedPrograms.length} property-side program signal(s) verified against government sources — support, never an approval basis.`,
+    );
   }
 
   // 2. The customer's own inputs — labeled as theirs.
@@ -1296,12 +1644,16 @@ function buildStrengths(args: {
     out.push(`Your stated plan: ${sentence(args.answers.usePlan)}`);
   }
   if (args.answers.operatorExperience.trim()) {
-    out.push(`Your stated experience: ${sentence(args.answers.operatorExperience)}`);
+    out.push(
+      `Your stated experience: ${sentence(args.answers.operatorExperience)}`,
+    );
   }
 
   // 3. Engine-derived lane, in plain language.
   if (args.topPathways[0]) {
-    out.push(`${args.topPathways[0].label} currently reads as the strongest financing lane to test first.`);
+    out.push(
+      `${args.topPathways[0].label} currently reads as the strongest financing lane to test first.`,
+    );
   }
   return out.slice(0, 5);
 }
@@ -1317,25 +1669,43 @@ function buildRisks(args: {
   const out = (args.placeIntelligence?.verifiedFacts ?? [])
     .filter((f) => f.tone === "caution")
     .slice(0, 2)
-    .map((f) => `${f.label}: ${f.value} (${f.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim()}).`);
+    .map(
+      (f) =>
+        `${f.label}: ${f.value} (${f.provenance
+          .replace(/^Source:\s*/i, "")
+          .split("·")[0]
+          .trim()}).`,
+    );
   // One honest flag, not a litany (founder feedback 2026-07-17).
   if (args.readinessMissing.length > 0) {
-    out.push(`To complete your file, Furlong still needs: ${args.readinessMissing.join("; ")}.`);
+    out.push(
+      `To complete your file, Furlong still needs: ${args.readinessMissing.join("; ")}.`,
+    );
   }
   if (!args.answers.capitalPlan.trim()) {
-    out.push("The capital plan is still vague, so renovation, equipment, working capital, and timing risk are not decision-grade yet.");
+    out.push(
+      "The capital plan is still vague, so renovation, equipment, working capital, and timing risk are not decision-grade yet.",
+    );
   }
   if (!args.answers.revenueModel.trim()) {
-    out.push("The revenue model is still too thin, so the report cannot yet test whether the concept actually supports the capital need.");
+    out.push(
+      "The revenue model is still too thin, so the report cannot yet test whether the concept actually supports the capital need.",
+    );
   }
   if (!args.answers.ownershipPosture.trim()) {
-    out.push("The ownership or entity posture is still undefined, which creates avoidable ambiguity around borrowing structure and execution readiness.");
+    out.push(
+      "The ownership or entity posture is still undefined, which creates avoidable ambiguity around borrowing structure and execution readiness.",
+    );
   }
   if (!args.answers.usePlan.trim()) {
-    out.push("The use case is not operationally defined enough yet to test staffing, occupancy, production, or revenue assumptions.");
+    out.push(
+      "The use case is not operationally defined enough yet to test staffing, occupancy, production, or revenue assumptions.",
+    );
   }
   if (args.verifiedPrograms.length === 0) {
-    out.push("No verified property-side program criteria have surfaced yet, so the report should avoid leaning on incentives as a lead story.");
+    out.push(
+      "No verified property-side program criteria have surfaced yet, so the report should avoid leaning on incentives as a lead story.",
+    );
   }
   return unique(out).slice(0, 5);
 }
@@ -1352,48 +1722,86 @@ function buildKeyQuestions(args: {
 
   if (!args.answers.usePlan.trim()) {
     if (useClass === "hospitality" || /hospitality/i.test(dealLabel)) {
-      out.push("Is the real play here lodging, events, retreat programming, food and beverage, or some narrower hospitality use?");
+      out.push(
+        "Is the real play here lodging, events, retreat programming, food and beverage, or some narrower hospitality use?",
+      );
     } else if (useClass === "farm") {
-      out.push("What exact farm or land-based operation would this property support on day one?");
+      out.push(
+        "What exact farm or land-based operation would this property support on day one?",
+      );
     } else if (/redevelopment/i.test(dealLabel)) {
-      out.push("What is the first realistic reuse concept that survives code, utilities, and renovation reality?");
+      out.push(
+        "What is the first realistic reuse concept that survives code, utilities, and renovation reality?",
+      );
     } else if (useClass === "business") {
-      out.push("What operating business would actually occupy and justify this property?");
+      out.push(
+        "What operating business would actually occupy and justify this property?",
+      );
     } else {
-      out.push("What is the actual operating model for this property once acquired?");
+      out.push(
+        "What is the actual operating model for this property once acquired?",
+      );
     }
   }
   if (!args.answers.capitalPlan.trim()) {
     if (/redevelopment/i.test(dealLabel)) {
-      out.push("How much of the capital stack is really acquisition versus hard rehab, code work, utilities, and contingency?");
+      out.push(
+        "How much of the capital stack is really acquisition versus hard rehab, code work, utilities, and contingency?",
+      );
     } else {
-      out.push("What specifically needs to be financed: acquisition, renovation, equipment, working capital, or all of the above?");
+      out.push(
+        "What specifically needs to be financed: acquisition, renovation, equipment, working capital, or all of the above?",
+      );
     }
   }
-  if (!args.answers.requestedAmount.trim()) out.push("What is the realistic capital requirement range?");
-  if (!args.answers.operatorExperience.trim()) out.push("Who will actually operate this property, and what relevant experience do they already have?");
+  if (!args.answers.requestedAmount.trim())
+    out.push("What is the realistic capital requirement range?");
+  if (!args.answers.operatorExperience.trim())
+    out.push(
+      "Who will actually operate this property, and what relevant experience do they already have?",
+    );
   if (!args.answers.revenueModel.trim()) {
     if (useClass === "hospitality") {
-      out.push("What occupancy, nightly rate, event frequency, or ancillary revenue streams would make this hospitality concept real?");
+      out.push(
+        "What occupancy, nightly rate, event frequency, or ancillary revenue streams would make this hospitality concept real?",
+      );
     } else if (useClass === "farm") {
-      out.push("What production, contracts, crop mix, herd logic, or agritourism revenue would actually support this farm concept?");
+      out.push(
+        "What production, contracts, crop mix, herd logic, or agritourism revenue would actually support this farm concept?",
+      );
     } else if (useClass === "business") {
-      out.push("What customer demand and operating margin would actually support this business use?");
+      out.push(
+        "What customer demand and operating margin would actually support this business use?",
+      );
     } else {
-      out.push("How will this property make money or sustain itself operationally?");
+      out.push(
+        "How will this property make money or sustain itself operationally?",
+      );
     }
   }
   if (!args.answers.renovationScope.trim()) {
     if (/redevelopment/i.test(dealLabel)) {
-      out.push("How much hidden condition risk is likely sitting behind the romantic redevelopment story?");
+      out.push(
+        "How much hidden condition risk is likely sitting behind the romantic redevelopment story?",
+      );
     } else {
-      out.push("What level of renovation, code work, or site improvement is really required?");
+      out.push(
+        "What level of renovation, code work, or site improvement is really required?",
+      );
     }
   }
-  if (!args.answers.ownershipPosture.trim()) out.push("Who is intended to own or borrow for this property: an individual, a new entity, or an existing operating company?");
-  if (args.answers.documents.length < 2) out.push("Which support documents already exist and which must still be assembled?");
+  if (!args.answers.ownershipPosture.trim())
+    out.push(
+      "Who is intended to own or borrow for this property: an individual, a new entity, or an existing operating company?",
+    );
+  if (args.answers.documents.length < 2)
+    out.push(
+      "Which support documents already exist and which must still be assembled?",
+    );
   if (args.topProgramRanks[0]) {
-    out.push(`What fact would most strengthen ${args.topProgramRanks[0].program.name}, and what fact would knock it out immediately?`);
+    out.push(
+      `What fact would most strengthen ${args.topProgramRanks[0].program.name}, and what fact would knock it out immediately?`,
+    );
   }
   const guideQuestion = latestGuideQuestion(args.navigator?.turns ?? []);
   if (guideQuestion) out.push(guideQuestion);
@@ -1408,29 +1816,47 @@ function buildNextMoves(args: {
 }): string[] {
   const out: string[] = [];
   if (args.answers.usePlan.trim()) {
-    out.push("Turn the use concept into a one-page operating brief with intended users, revenue logic, and who will run it.");
+    out.push(
+      "Turn the use concept into a one-page operating brief with intended users, revenue logic, and who will run it.",
+    );
   } else {
-    out.push("Define the specific use case before doing anything else; the report is weak until the property has a clear operating thesis.");
+    out.push(
+      "Define the specific use case before doing anything else; the report is weak until the property has a clear operating thesis.",
+    );
   }
   if (args.answers.capitalPlan.trim()) {
-    out.push("Break the capital plan into acquisition, improvements, equipment, and working capital so financing lanes can be tested more realistically.");
+    out.push(
+      "Break the capital plan into acquisition, improvements, equipment, and working capital so financing lanes can be tested more realistically.",
+    );
   } else {
-    out.push("Build a first-pass capital stack estimate instead of a generic funding ask.");
+    out.push(
+      "Build a first-pass capital stack estimate instead of a generic funding ask.",
+    );
   }
   if (!args.answers.revenueModel.trim()) {
-    out.push("Translate the concept into an actual revenue model with pricing, volume, occupancy, production, or contract assumptions.");
+    out.push(
+      "Translate the concept into an actual revenue model with pricing, volume, occupancy, production, or contract assumptions.",
+    );
   }
   if (!args.answers.ownershipPosture.trim()) {
-    out.push("Decide whether this should sit with an existing entity, a new acquisition entity, or a different ownership structure before the report goes any further.");
+    out.push(
+      "Decide whether this should sit with an existing entity, a new acquisition entity, or a different ownership structure before the report goes any further.",
+    );
   }
   if (args.readinessMissing.length > 0) {
-    out.push(`Close the highest-friction gaps first: ${args.readinessMissing.slice(0, 3).join(", ")}.`);
+    out.push(
+      `Close the highest-friction gaps first: ${args.readinessMissing.slice(0, 3).join(", ")}.`,
+    );
   }
   if (args.topPathways[0]) {
-    out.push(`Pressure-test ${args.topPathways[0].label} first, then compare it against the next-best lane rather than assuming one route is automatically best.`);
+    out.push(
+      `Pressure-test ${args.topPathways[0].label} first, then compare it against the next-best lane rather than assuming one route is automatically best.`,
+    );
   }
   if (args.verifiedPrograms.length > 0) {
-    out.push("Use the verified place-side criteria as support, but do not let incentives drive the whole strategy unless the business case works without them.");
+    out.push(
+      "Use the verified place-side criteria as support, but do not let incentives drive the whole strategy unless the business case works without them.",
+    );
   }
   return unique(out).slice(0, 5);
 }
@@ -1444,7 +1870,11 @@ function buildExplainabilityNotes(args: {
   context: PropertyContext;
   answers: DraftAnswers;
   verifiedPrograms: NonNullable<PropertyFactsResponse["verifiedPrograms"]>;
-  topPathways: Array<{ label: string; fitReasons: string[]; missingItems: string[] }>;
+  topPathways: Array<{
+    label: string;
+    fitReasons: string[];
+    missingItems: string[];
+  }>;
 }): string[] {
   const primaryPathway = args.topPathways[0];
   const lines = [
@@ -1452,8 +1882,8 @@ function buildExplainabilityNotes(args: {
     isResidentialHomeContext(args.context) && !args.answers.usePlan.trim()
       ? "Because no specialty use concept has been entered yet, the report defaults to ordinary residential acquisition context instead of stretching for a business, farm, or tourism thesis."
       : primaryPathway
-      ? `${primaryPathway.label} is currently the lead lane because ${primaryPathway.fitReasons[0] ?? "it currently ranks strongest against this property's facts"}.`
-      : "No pathway lead can be stated yet because the current draft is still too thin.",
+        ? `${primaryPathway.label} is currently the lead lane because ${primaryPathway.fitReasons[0] ?? "it currently ranks strongest against this property's facts"}.`
+        : "No pathway lead can be stated yet because the current draft is still too thin.",
     args.verifiedPrograms.length > 0
       ? `${args.verifiedPrograms.length} property-side criteria signal(s) were verified from snapshot-backed place facts and used only as support, not as an approval basis.`
       : "No verified property-side criteria were available, so the report relies more heavily on intake answers and clearly marks that limit.",
@@ -1494,7 +1924,9 @@ function buildHumanReviewBoundary(args: {
   ];
 
   if (args.readinessMissing.length > 0) {
-    lines.push(`The file still has unresolved readiness gaps: ${args.readinessMissing.slice(0, 3).join(", ")}.`);
+    lines.push(
+      `The file still has unresolved readiness gaps: ${args.readinessMissing.slice(0, 3).join(", ")}.`,
+    );
   }
 
   return lines;
@@ -1502,7 +1934,12 @@ function buildHumanReviewBoundary(args: {
 
 type ReportModel = {
   branding: ReturnType<typeof buildReportBranding>;
-  tier: { id: ReportTier; label: string; shortLabel: string; description: string };
+  tier: {
+    id: ReportTier;
+    label: string;
+    shortLabel: string;
+    description: string;
+  };
   verdict: { label: string; explanation: string };
   executiveSummary: string;
   propertySummary: string[];
@@ -1577,7 +2014,11 @@ function buildReportModel(args: {
   });
   const risks = buildRisks({
     answers: args.answers,
-    readinessMissing: contextualMissingItems(args.readinessResult.missingItems, args.context, args.answers),
+    readinessMissing: contextualMissingItems(
+      args.readinessResult.missingItems,
+      args.context,
+      args.answers,
+    ),
     verifiedPrograms: args.verifiedPrograms,
     placeIntelligence: args.placeIntelligence,
   });
@@ -1587,10 +2028,17 @@ function buildReportModel(args: {
     topProgramRanks: args.topProgramRanks,
     navigator: args.navigator,
   });
-  const platformQuestions = unique([...args.defaultQuestions, ...keyQuestions]).slice(0, 6);
+  const platformQuestions = unique([
+    ...args.defaultQuestions,
+    ...keyQuestions,
+  ]).slice(0, 6);
   const nextMoves = buildNextMoves({
     answers: args.answers,
-    readinessMissing: contextualMissingItems(args.readinessResult.missingItems, args.context, args.answers),
+    readinessMissing: contextualMissingItems(
+      args.readinessResult.missingItems,
+      args.context,
+      args.answers,
+    ),
     topPathways: args.topPathways,
     verifiedPrograms: args.verifiedPrograms,
   });
@@ -1601,7 +2049,10 @@ function buildReportModel(args: {
     topPathways: args.topPathways,
   });
 
-  const propertySpecificLines = propertySpecificSummary(args.context, args.facts);
+  const propertySpecificLines = propertySpecificSummary(
+    args.context,
+    args.facts,
+  );
   const propertySummary = [
     `Asset: ${args.context.title}`,
     `Location: ${compactLocation(args.context)}`,
@@ -1618,8 +2069,9 @@ function buildReportModel(args: {
     topProgramRanks: args.topProgramRanks,
   });
 
-  const pathwayAnalysis = args.topProgramRanks.map((entry, index) =>
-    `${index + 1}. ${entry.program.name}. ${entry.rationale} ${entry.caution}`
+  const pathwayAnalysis = args.topProgramRanks.map(
+    (entry, index) =>
+      `${index + 1}. ${entry.program.name}. ${entry.rationale} ${entry.caution}`,
   );
 
   const propertyVerificationSummary = (() => {
@@ -1628,41 +2080,63 @@ function buildReportModel(args: {
     const lines: string[] = [];
 
     if (args.facts?.placeFacts?.opportunityZone) {
-      lines.push(`Opportunity Zone confirmed: tract ${args.facts.placeFacts.opportunityZone.tractId}.`);
+      lines.push(
+        `Opportunity Zone confirmed: tract ${args.facts.placeFacts.opportunityZone.tractId}.`,
+      );
     } else if (checks?.opportunityZoneActivated) {
-      lines.push("Opportunity Zone was checked live and no positive tract designation was confirmed.");
+      lines.push(
+        "Opportunity Zone was checked live and no positive tract designation was confirmed.",
+      );
     }
 
     if (args.facts?.placeFacts?.nmtc) {
-      lines.push(`NMTC low-income community confirmed: tract ${args.facts.placeFacts.nmtc.tractId} is qualified in the current snapshot.`);
+      lines.push(
+        `NMTC low-income community confirmed: tract ${args.facts.placeFacts.nmtc.tractId} is qualified in the current snapshot.`,
+      );
     } else if (checks?.nmtcActivated) {
-      lines.push("NMTC low-income community status was checked live and no positive tract qualification was confirmed.");
+      lines.push(
+        "NMTC low-income community status was checked live and no positive tract qualification was confirmed.",
+      );
     }
 
     if (args.facts?.placeFacts?.hubzone) {
-      lines.push(`HUBZone confirmed: ${args.facts.placeFacts.hubzone.hubzoneType} designation for GEOID ${args.facts.placeFacts.hubzone.geoid}.`);
+      lines.push(
+        `HUBZone confirmed: ${args.facts.placeFacts.hubzone.hubzoneType} designation for GEOID ${args.facts.placeFacts.hubzone.geoid}.`,
+      );
     } else if (checks?.hubzoneActivated) {
-      lines.push("HUBZone was checked live and no current positive designation was confirmed.");
+      lines.push(
+        "HUBZone was checked live and no current positive designation was confirmed.",
+      );
     }
 
     if (args.facts?.placeFacts?.flood) {
-      lines.push(`FEMA flood posture confirmed: Special Flood Hazard Area, Zone ${args.facts.placeFacts.flood.floodZone}.`);
+      lines.push(
+        `FEMA flood posture confirmed: Special Flood Hazard Area, Zone ${args.facts.placeFacts.flood.floodZone}.`,
+      );
     } else if (checks?.floodActivated) {
-      lines.push("FEMA flood posture was checked live and no Special Flood Hazard Area match was confirmed.");
+      lines.push(
+        "FEMA flood posture was checked live and no Special Flood Hazard Area match was confirmed.",
+      );
     }
 
     if (args.facts?.placeFacts?.historic) {
       lines.push(
         args.facts.placeFacts.historic.historicName
           ? `Historic context confirmed: National Register area — ${args.facts.placeFacts.historic.historicName}.`
-          : "Historic context confirmed: National Register listed area."
+          : "Historic context confirmed: National Register listed area.",
       );
     } else if (checks?.historicActivated) {
-      lines.push("Historic context was checked live and no National Register area match was confirmed.");
+      lines.push(
+        "Historic context was checked live and no National Register area match was confirmed.",
+      );
     }
 
     if (verification?.warnings?.length) {
-      lines.push(...verification.warnings.map((warning) => `Verification caution: ${warning}`));
+      lines.push(
+        ...verification.warnings.map(
+          (warning) => `Verification caution: ${warning}`,
+        ),
+      );
     }
 
     // Snapshot-backed place intelligence (spec 2026-07-15 unification): the
@@ -1687,23 +2161,30 @@ function buildReportModel(args: {
     }
 
     if (lines.length === 0) {
-      lines.push("No live place-fact verification details were available when this report was assembled.");
+      lines.push(
+        "No live place-fact verification details were available when this report was assembled.",
+      );
     }
 
     return lines;
   })();
 
-  const verifiedCriteria = args.verifiedPrograms.length > 0
-    ? args.verifiedPrograms.map((program) =>
-        `${program.name}: ${program.verifiedStatement} Basis: ${program.basis}` +
-        (program.whyItMatters ? ` ${program.whyItMatters}` : "")
-      )
-    : ["No verified property-side program criteria surfaced from the current snapshot set yet."];
+  const verifiedCriteria =
+    args.verifiedPrograms.length > 0
+      ? args.verifiedPrograms.map(
+          (program) =>
+            `${program.name}: ${program.verifiedStatement} Basis: ${program.basis}` +
+            (program.whyItMatters ? ` ${program.whyItMatters}` : ""),
+        )
+      : [
+          "No verified property-side program criteria surfaced from the current snapshot set yet.",
+        ];
 
   const readinessSectionNotes = args.readinessResult.sections.map((section) => {
-    const missing = section.missingItems.length > 0
-      ? ` Missing: ${contextualMissingItems(section.missingItems, args.context, args.answers).join(", ")}.`
-      : "";
+    const missing =
+      section.missingItems.length > 0
+        ? ` Missing: ${contextualMissingItems(section.missingItems, args.context, args.answers).join(", ")}.`
+        : "";
     return `${section.label} — ${section.readinessPercent}% (${section.status}). ${section.reviewSignals[0] ?? "Review-bound."}${missing}`;
   });
 
@@ -1715,21 +2196,25 @@ function buildReportModel(args: {
     args.topProgramRanks[0]
       ? `${args.topProgramRanks[0].program.name.replace(/ context$/i, "")} is usually the first financing lane checked for a property like this — it is not the only one. The financing section lists every lane that could fit, most likely first. Which lane you qualify for comes down to credit, income, and whether you will live here; already owning a home does not by itself rule these out — most programs simply ask that this one become your primary residence. A lender confirms the fit in one conversation.`
       : "",
-    args.immediateSuitability.constraints[0] ? `First thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.` : "",
-  ].filter(Boolean).join(" ");
+    args.immediateSuitability.constraints[0]
+      ? `First thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   // Free Place Brief content folded into the report (spec 2026-07-15): the
   // exported report IS the full free brief — mechanics, honest unknowns, and
   // the prose pathways line travel with it.
   const buyingProcess = args.placeIntelligence?.mechanics?.paragraphs ?? [];
   const honestUnknowns = (args.placeIntelligence?.unknowns ?? []).map(
-    (unknown) => `${unknown.label}: ${unknown.howToFind}`
+    (unknown) => `${unknown.label}: ${unknown.howToFind}`,
   );
   const financingProse = args.placeIntelligence?.pathwaysProse ?? null;
   // Farm-lane questions answered FOR THIS PROPERTY (null on non-farm profiles).
   const farmAnswers = args.placeIntelligence?.farmEnterpriseAnswers ?? [];
   const farmAnswerText = farmAnswers.map(
-    (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`
+    (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`,
   );
   // Agricultural-enterprise screen for farm/land parcels. This is deliberately
   // separate from the property-wide highest/best-use conclusion.
@@ -1737,28 +2222,49 @@ function buildReportModel(args: {
   const bestUseLines = bestUse
     ? [
         `[SCOPE] Agricultural enterprise screen only - not a property-wide highest-and-best-use conclusion.`,
-        ...(bestUse.propertyWideContext.currentUse ? [`[CURRENT USE] ${bestUse.propertyWideContext.currentUse}`] : []),
+        ...(bestUse.propertyWideContext.currentUse
+          ? [`[CURRENT USE] ${bestUse.propertyWideContext.currentUse}`]
+          : []),
         ...(bestUse.propertyWideContext.zoning
-          ? [`[ZONING] ${bestUse.propertyWideContext.zoning}${bestUse.propertyWideContext.zoningSummary ? ` - ${bestUse.propertyWideContext.zoningSummary}` : ""}`]
+          ? [
+              `[ZONING] ${bestUse.propertyWideContext.zoning}${bestUse.propertyWideContext.zoningSummary ? ` - ${bestUse.propertyWideContext.zoningSummary}` : ""}`,
+            ]
           : []),
         `[PROPERTY-WIDE ALTERNATIVES] ${bestUse.propertyWideContext.candidates.join("; ")}`,
         `[PROPERTY-WIDE RULE] ${bestUse.propertyWideContext.note}`,
-        ...bestUse.options.map((o) => `[${o.tier.toUpperCase()}] ${o.name} — economics context (${o.economicsBasis}): ${o.grossPerAcre} — ${o.why}`),
+        ...bestUse.options.map(
+          (o) =>
+            `[${o.tier.toUpperCase()}] ${o.name} — economics context (${o.economicsBasis}): ${o.grossPerAcre} — ${o.why}`,
+        ),
         `[${bestUse.portfolioAdvice.verdict === "diversify" ? "COMPARE / DIVERSIFY" : bestUse.portfolioAdvice.verdict === "single-anchor" ? "ONE AGRICULTURAL ANCHOR" : "NOT YET RANKED"}] ${bestUse.portfolioAdvice.title}`,
         ...bestUse.portfolioAdvice.reasons.map((reason) => `• ${reason}`),
       ]
     : [];
   // Residential / commercial burning-questions answered FOR THIS PROPERTY
   // (null on the other profiles). Each renders as "Question — answer (Confirm: …)".
-  const laneAnswerText = (answers: { question: string; answer: string; confirm: string | null }[]) =>
-    answers.map((a) => `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`);
-  const residentialAnswerText = laneAnswerText(args.placeIntelligence?.residentialAnswers ?? []);
-  const commercialAnswerText = laneAnswerText(args.placeIntelligence?.commercialAnswers ?? []);
+  const laneAnswerText = (
+    answers: { question: string; answer: string; confirm: string | null }[],
+  ) =>
+    answers.map(
+      (a) =>
+        `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`,
+    );
+  const residentialAnswerText = laneAnswerText(
+    args.placeIntelligence?.residentialAnswers ?? [],
+  );
+  const commercialAnswerText = laneAnswerText(
+    args.placeIntelligence?.commercialAnswers ?? [],
+  );
   // Utilities, public-safety (link-out only), and planned-construction diligence.
   const localServices = args.placeIntelligence?.localServices ?? null;
   const localServicesLines = localServices
-    ? [...localServices.utilities, ...localServices.publicSafety, ...localServices.plannedConstruction].map(
-        (s) => `${s.category}: ${s.detail}${s.url ? ` (${s.urlLabel ?? "source"}: ${s.url})` : ""}`
+    ? [
+        ...localServices.utilities,
+        ...localServices.publicSafety,
+        ...localServices.plannedConstruction,
+      ].map(
+        (s) =>
+          `${s.category}: ${s.detail}${s.url ? ` (${s.urlLabel ?? "source"}: ${s.url})` : ""}`,
       )
     : [];
 
@@ -1767,7 +2273,9 @@ function buildReportModel(args: {
         ``,
         `## ${tierIdentity.nextTierTeaser.heading}`,
         `- ${tierIdentity.nextTierTeaser.intro}`,
-        ...tierIdentity.nextTierTeaser.items.map((item) => `- ${item.name} — ${item.adds}`),
+        ...tierIdentity.nextTierTeaser.items.map(
+          (item) => `- ${item.name} — ${item.adds}`,
+        ),
         `- ${tierIdentity.nextTierTeaser.closing}`,
       ]
     : [];
@@ -1798,7 +2306,9 @@ function buildReportModel(args: {
     `## What supports the deal thesis`,
     ...(strengths.length > 0
       ? strengths
-      : ["No meaningful supporting signals can be stated yet because the file is still too thin."]
+      : [
+          "No meaningful supporting signals can be stated yet because the file is still too thin.",
+        ]
     ).map((line) => `- ${line}`),
     ``,
     `## What could break the deal`,
@@ -1814,28 +2324,61 @@ function buildReportModel(args: {
     ...verifiedCriteria.map((line) => `- ${line}`),
     ``,
     ...(buyingProcess.length > 0
-      ? [`## How this purchase actually works`, ...buyingProcess.map((line) => `- ${line}`), ``]
+      ? [
+          `## How this purchase actually works`,
+          ...buyingProcess.map((line) => `- ${line}`),
+          ``,
+        ]
       : []),
     ...(financingProse
-      ? [`## How people typically pay for a property like this`, `- ${financingProse}`, ``]
+      ? [
+          `## How people typically pay for a property like this`,
+          `- ${financingProse}`,
+          ``,
+        ]
       : []),
     ...(bestUse
-      ? [`## Agricultural enterprise screen — separate from property-wide highest/best use`, `- ${bestUse.headline}`, ...bestUseLines.map((l) => `- ${l}`), ``]
+      ? [
+          `## Agricultural enterprise screen — separate from property-wide highest/best use`,
+          `- ${bestUse.headline}`,
+          ...bestUseLines.map((l) => `- ${l}`),
+          ``,
+        ]
       : []),
     ...(farmAnswerText.length > 0
-      ? [`## Your farm questions — answered for this property`, ...farmAnswerText.map((l) => `- ${l}`), ``]
+      ? [
+          `## Your farm questions — answered for this property`,
+          ...farmAnswerText.map((l) => `- ${l}`),
+          ``,
+        ]
       : []),
     ...(residentialAnswerText.length > 0
-      ? [`## Your questions — answered for this home`, ...residentialAnswerText.map((l) => `- ${l}`), ``]
+      ? [
+          `## Your questions — answered for this home`,
+          ...residentialAnswerText.map((l) => `- ${l}`),
+          ``,
+        ]
       : []),
     ...(commercialAnswerText.length > 0
-      ? [`## Your questions — answered for this property`, ...commercialAnswerText.map((l) => `- ${l}`), ``]
+      ? [
+          `## Your questions — answered for this property`,
+          ...commercialAnswerText.map((l) => `- ${l}`),
+          ``,
+        ]
       : []),
     ...(localServicesLines.length > 0
-      ? [`## Utilities, services & diligence links`, ...localServicesLines.map((l) => `- ${l}`), ``]
+      ? [
+          `## Utilities, services & diligence links`,
+          ...localServicesLines.map((l) => `- ${l}`),
+          ``,
+        ]
       : []),
     ...(honestUnknowns.length > 0
-      ? [`## Honest unknowns — and how you'd find out`, ...honestUnknowns.map((line) => `- ${line}`), ``]
+      ? [
+          `## Honest unknowns — and how you'd find out`,
+          ...honestUnknowns.map((line) => `- ${line}`),
+          ``,
+        ]
       : []),
     `## Basis and limits of this analysis`,
     ...explainabilityNotes.map((line) => `- ${line}`),
@@ -1850,7 +2393,9 @@ function buildReportModel(args: {
     ...nextMoves.map((line) => `- ${line}`),
     ``,
     `## Guided interview signals`,
-    ...(interviewSignals.length > 0 ? interviewSignals.map((line) => `- ${line}`) : ["- No meaningful guided interview content captured yet."]),
+    ...(interviewSignals.length > 0
+      ? interviewSignals.map((line) => `- ${line}`)
+      : ["- No meaningful guided interview content captured yet."]),
     ...teaserLines,
     ``,
     `## Disclosure`,
@@ -1860,42 +2405,76 @@ function buildReportModel(args: {
     `- Borrowers pay nothing for baseline readiness support and export rights remain available.`,
   ];
 
-  const htmlList = (lines: string[]) => lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("");
+  const htmlList = (lines: string[]) =>
+    lines.map((line) => `<li>${escapeHtml(line)}</li>`).join("");
   const section = (title: string, body: string) =>
     `<section class="report-section"><h2>${escapeHtml(title)}</h2>${body}</section>`;
-  const decisionOnly = tier.id === "paid" || tier.id === "environmental"
-    ? section("Optional deeper intake posture", `<ul>${htmlList(readinessSectionNotes)}</ul>`)
-    : "";
-  const strategyAndUp = tier.id !== "free"
-    ? [
-        section("Ranked financing lanes", `<ul>${htmlList(pathwayAnalysis)}</ul>`),
-        section("Questions the platform should already be asking", `<ul>${htmlList(platformQuestions)}</ul>`),
-      ].join("")
-    : "";
+  const decisionOnly =
+    tier.id === "paid" || tier.id === "environmental"
+      ? section(
+          "Optional deeper intake posture",
+          `<ul>${htmlList(readinessSectionNotes)}</ul>`,
+        )
+      : "";
+  const strategyAndUp =
+    tier.id !== "free"
+      ? [
+          section(
+            "Ranked financing lanes",
+            `<ul>${htmlList(pathwayAnalysis)}</ul>`,
+          ),
+          section(
+            "Questions the platform should already be asking",
+            `<ul>${htmlList(platformQuestions)}</ul>`,
+          ),
+        ].join("")
+      : "";
   const placeBriefSections = [
     buyingProcess.length > 0
-      ? section("How this purchase actually works", `<ul>${htmlList(buyingProcess)}</ul>`)
+      ? section(
+          "How this purchase actually works",
+          `<ul>${htmlList(buyingProcess)}</ul>`,
+        )
       : "",
     financingProse
-      ? section("How people typically pay for a property like this", `<p>${escapeHtml(financingProse)}</p>`)
+      ? section(
+          "How people typically pay for a property like this",
+          `<p>${escapeHtml(financingProse)}</p>`,
+        )
       : "",
     bestUse
-      ? section("Agricultural enterprise screen — separate from property-wide highest/best use", `<p>${escapeHtml(bestUse.headline)}</p><ul>${htmlList(bestUseLines)}</ul>`)
+      ? section(
+          "Agricultural enterprise screen — separate from property-wide highest/best use",
+          `<p>${escapeHtml(bestUse.headline)}</p><ul>${htmlList(bestUseLines)}</ul>`,
+        )
       : "",
     farmAnswerText.length > 0
-      ? section("Your farm questions — answered for this property", `<ul>${htmlList(farmAnswerText)}</ul>`)
+      ? section(
+          "Your farm questions — answered for this property",
+          `<ul>${htmlList(farmAnswerText)}</ul>`,
+        )
       : "",
     residentialAnswerText.length > 0
-      ? section("Your questions — answered for this home", `<ul>${htmlList(residentialAnswerText)}</ul>`)
+      ? section(
+          "Your questions — answered for this home",
+          `<ul>${htmlList(residentialAnswerText)}</ul>`,
+        )
       : "",
     commercialAnswerText.length > 0
-      ? section("Your questions — answered for this property", `<ul>${htmlList(commercialAnswerText)}</ul>`)
+      ? section(
+          "Your questions — answered for this property",
+          `<ul>${htmlList(commercialAnswerText)}</ul>`,
+        )
       : "",
     localServicesLines.length > 0
       ? section(
           "Utilities, services & diligence links",
           `<ul>${(localServices
-            ? [...localServices.utilities, ...localServices.publicSafety, ...localServices.plannedConstruction]
+            ? [
+                ...localServices.utilities,
+                ...localServices.publicSafety,
+                ...localServices.plannedConstruction,
+              ]
             : []
           )
             .map(
@@ -1903,24 +2482,29 @@ function buildReportModel(args: {
                 `<li><strong>${escapeHtml(s.category)}:</strong> ${escapeHtml(s.detail)}${
                   s.url
                     ? ` <a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(
-                        s.urlLabel ?? "source"
+                        s.urlLabel ?? "source",
                       )} ↗</a>`
                     : ""
-                }</li>`
+                }</li>`,
             )
-            .join("")}</ul>`
+            .join("")}</ul>`,
         )
       : "",
     honestUnknowns.length > 0
-      ? section("Honest unknowns — and how you'd find out", `<ul>${htmlList(honestUnknowns)}</ul>`)
+      ? section(
+          "Honest unknowns — and how you'd find out",
+          `<ul>${htmlList(honestUnknowns)}</ul>`,
+        )
       : "",
   ].join("");
   const teaserSectionHtml = tierIdentity.nextTierTeaser
     ? section(
         tierIdentity.nextTierTeaser.heading,
         `<p>${escapeHtml(tierIdentity.nextTierTeaser.intro)}</p><ul>${htmlList(
-          tierIdentity.nextTierTeaser.items.map((item) => `${item.name} — ${item.adds}`)
-        )}</ul><p>${escapeHtml(tierIdentity.nextTierTeaser.closing)}</p>`
+          tierIdentity.nextTierTeaser.items.map(
+            (item) => `${item.name} — ${item.adds}`,
+          ),
+        )}</ul><p>${escapeHtml(tierIdentity.nextTierTeaser.closing)}</p>`,
       )
     : "";
   const exportHtml = `<!doctype html>
@@ -1978,8 +2562,10 @@ function buildReportModel(args: {
         ${strategyAndUp}
         ${section("Property verification summary", `<ul>${htmlList(propertyVerificationSummary)}</ul>`)}
         ${section(
-          tier.id === "environmental" ? "Environmental and site-side criteria" : "Property-side criteria and external flags",
-          `<ul>${htmlList(verifiedCriteria)}</ul>`
+          tier.id === "environmental"
+            ? "Environmental and site-side criteria"
+            : "Property-side criteria and external flags",
+          `<ul>${htmlList(verifiedCriteria)}</ul>`,
         )}
         ${placeBriefSections}
         ${section("Basis and limits of this analysis", `<ul>${htmlList(explainabilityNotes)}</ul>`)}
@@ -2065,7 +2651,8 @@ export function PropertyEvaluationWorkspace({
   // Visitor's answer to "what is this property?" — an imported address carries
   // no type, and the wrong default (a working farm read as a home) sends every
   // lane wrong (founder-caught on her own farm, 2026-07-18). Session-only.
-  const [profileOverride, setProfileOverride] = useState<PropertyProfileId | null>(null);
+  const [profileOverride, setProfileOverride] =
+    useState<PropertyProfileId | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
   const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
@@ -2073,7 +2660,8 @@ export function PropertyEvaluationWorkspace({
   // wins. Without one, use Furlong's residential-only assessment/HPI screen
   // ONLY when that screen is actually supportable. Never substitute a raw tax
   // assessment for market/acquisition value merely because no listing exists.
-  const residentialValueScreen = facts?.propertyRecord?.propertyValueScreen ?? null;
+  const residentialValueScreen =
+    facts?.propertyRecord?.propertyValueScreen ?? null;
   const residentialScreenMid =
     residentialValueScreen?.status === "indicated" &&
     residentialValueScreen.profileId === "residential"
@@ -2092,50 +2680,71 @@ export function PropertyEvaluationWorkspace({
   // Two documents on every lane (founder 2026-07-29): the Pro Forma Report
   // (numbers-only, experienced buyers) and the First-Time Buyer Report (the
   // full-guidance Land Ledger). The toggle picks which one View/Download build.
-  const [reportDocKind, setReportDocKind] = useState<"proforma" | "first-time">("proforma");
+  const [reportDocKind, setReportDocKind] = useState<"proforma" | "first-time">(
+    "proforma",
+  );
   // Other saved properties this session — offered as optional additions to
   // the DRAFT pro forma (founder 2026-07-29: multi-property when they have
   // them, single-property document otherwise). Loaded post-mount so server
   // and first client render agree.
-  const [otherSavedProperties, setOtherSavedProperties] = useState<SavedProperty[]>([]);
+  const [otherSavedProperties, setOtherSavedProperties] = useState<
+    SavedProperty[]
+  >([]);
   const [proformaIncludedIds, setProformaIncludedIds] = useState<string[]>([]);
   useEffect(() => {
-    const sync = () => setOtherSavedProperties(getSaved().filter((p) => p.id !== context.propertyId));
+    const sync = () =>
+      setOtherSavedProperties(
+        getSaved().filter((p) => p.id !== context.propertyId),
+      );
     sync();
     window.addEventListener(SAVED_EVENT, sync);
     return () => window.removeEventListener(SAVED_EVENT, sync);
   }, [context.propertyId]);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [manualReviewBusy, setManualReviewBusy] = useState(false);
-  const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(null);
-  const [manualReviewError, setManualReviewError] = useState<string | null>(null);
+  const [manualReviewMessage, setManualReviewMessage] = useState<string | null>(
+    null,
+  );
+  const [manualReviewError, setManualReviewError] = useState<string | null>(
+    null,
+  );
   const [manualPriceLabel, setManualPriceLabel] = useState("");
-  const [persistedReleaseRows, setPersistedReleaseRows] = useState<Array<{
-    releaseId: string;
-    releasePayload: RecommendationReleaseRecord;
-    historyPayload: RecommendationReleaseHistory;
-    createdAt?: string | null;
-  }>>([]);
+  const [persistedReleaseRows, setPersistedReleaseRows] = useState<
+    Array<{
+      releaseId: string;
+      releasePayload: RecommendationReleaseRecord;
+      historyPayload: RecommendationReleaseHistory;
+      createdAt?: string | null;
+    }>
+  >([]);
   const [releaseHistoryLoading, setReleaseHistoryLoading] = useState(false);
-  const [releaseHistoryError, setReleaseHistoryError] = useState<string | null>(null);
+  const [releaseHistoryError, setReleaseHistoryError] = useState<string | null>(
+    null,
+  );
   const [releaseRecordBusy, setReleaseRecordBusy] = useState(false);
-  const [releaseRecordMessage, setReleaseRecordMessage] = useState<string | null>(null);
-  const [escalationAcknowledgeBusy, setEscalationAcknowledgeBusy] = useState(false);
-  const [escalationAcknowledgeMessage, setEscalationAcknowledgeMessage] = useState<string | null>(null);
-  const [pendingReleaseReviews, setPendingReleaseReviews] = useState<Array<{
-    releaseId: string;
-    attestationCycleId: string;
-    currentActorAlreadyAttested: boolean;
-    canCountersign: boolean;
-    firstAttestedAt: string;
-    expiresAt: string;
-    freshnessState: "active" | "expired";
-    urgencyState: "normal" | "due-soon" | "critical" | "expired";
-    remainingSeconds: number;
-    escalationRequired: boolean;
-    escalationAcknowledged: boolean;
-    acknowledgedByCurrentActor: boolean;
-  }>>([]);
+  const [releaseRecordMessage, setReleaseRecordMessage] = useState<
+    string | null
+  >(null);
+  const [escalationAcknowledgeBusy, setEscalationAcknowledgeBusy] =
+    useState(false);
+  const [escalationAcknowledgeMessage, setEscalationAcknowledgeMessage] =
+    useState<string | null>(null);
+  const [pendingReleaseReviews, setPendingReleaseReviews] = useState<
+    Array<{
+      releaseId: string;
+      attestationCycleId: string;
+      currentActorAlreadyAttested: boolean;
+      canCountersign: boolean;
+      firstAttestedAt: string;
+      expiresAt: string;
+      freshnessState: "active" | "expired";
+      urgencyState: "normal" | "due-soon" | "critical" | "expired";
+      remainingSeconds: number;
+      escalationRequired: boolean;
+      escalationAcknowledged: boolean;
+      acknowledgedByCurrentActor: boolean;
+    }>
+  >([]);
   // The report opens with its FULL chart already expanded (founder direction
   // 2026-07-20, superseding the earlier "one click behind": a report that doesn't
   // visibly open reads as broken). The summary card still leads; the complete
@@ -2160,9 +2769,10 @@ export function PropertyEvaluationWorkspace({
     priceLabel: effectivePriceLabel,
   };
   const releaseSubjectType = "property-evaluation";
-  const releaseSubjectKey = context.propertyId?.trim()
-    || context.exactAddress?.trim()
-    || [context.title, context.location].filter(Boolean).join(" · ").trim();
+  const releaseSubjectKey =
+    context.propertyId?.trim() ||
+    context.exactAddress?.trim() ||
+    [context.title, context.location].filter(Boolean).join(" · ").trim();
 
   useEffect(() => {
     if (!releaseSubjectKey) {
@@ -2179,11 +2789,14 @@ export function PropertyEvaluationWorkspace({
           subjectType: releaseSubjectType,
           subjectKey: releaseSubjectKey,
         });
-        const response = await fetch(`/api/recommendation-releases?${query.toString()}`, {
-          signal: controller.signal,
-          cache: "no-store",
-        });
-        const payload = await response.json() as {
+        const response = await fetch(
+          `/api/recommendation-releases?${query.toString()}`,
+          {
+            signal: controller.signal,
+            cache: "no-store",
+          },
+        );
+        const payload = (await response.json()) as {
           ok?: boolean;
           rows?: Array<{
             releaseId: string;
@@ -2193,10 +2806,15 @@ export function PropertyEvaluationWorkspace({
           }>;
           error?: string;
         };
-        if (!response.ok || !payload.ok) throw new Error(payload.error || "Release history lookup failed.");
+        if (!response.ok || !payload.ok)
+          throw new Error(payload.error || "Release history lookup failed.");
         if (!canceled) setPersistedReleaseRows(payload.rows ?? []);
       } catch (error) {
-        if (!canceled && error instanceof Error && error.name !== "AbortError") {
+        if (
+          !canceled &&
+          error instanceof Error &&
+          error.name !== "AbortError"
+        ) {
           setReleaseHistoryError(error.message);
           setPersistedReleaseRows([]);
         }
@@ -2218,17 +2836,38 @@ export function PropertyEvaluationWorkspace({
     let canceled = false;
     let pollingAuthorized = true;
     let refreshTimer: number | null = null;
-    const query = new URLSearchParams({ subjectType: releaseSubjectType, subjectKey: releaseSubjectKey });
+    const query = new URLSearchParams({
+      subjectType: releaseSubjectType,
+      subjectKey: releaseSubjectKey,
+    });
     const refreshPendingReviews = () => {
       if (!pollingAuthorized) return;
-      void fetch(`/api/recommendation-releases/pending?${query.toString()}`, { cache: "no-store" })
+      void fetch(`/api/recommendation-releases/pending?${query.toString()}`, {
+        cache: "no-store",
+      })
         .then(async (response) => {
           if (response.status === 401 || response.status === 403) {
             pollingAuthorized = false;
             if (refreshTimer !== null) window.clearInterval(refreshTimer);
             return { ok: false, rows: [] };
           }
-          return response.json() as Promise<{ ok?: boolean; rows?: Array<{ releaseId: string; attestationCycleId: string; currentActorAlreadyAttested: boolean; canCountersign: boolean; firstAttestedAt: string; expiresAt: string; freshnessState: "active" | "expired"; urgencyState: "normal" | "due-soon" | "critical" | "expired"; remainingSeconds: number; escalationRequired: boolean; escalationAcknowledged: boolean; acknowledgedByCurrentActor: boolean }> }>;
+          return response.json() as Promise<{
+            ok?: boolean;
+            rows?: Array<{
+              releaseId: string;
+              attestationCycleId: string;
+              currentActorAlreadyAttested: boolean;
+              canCountersign: boolean;
+              firstAttestedAt: string;
+              expiresAt: string;
+              freshnessState: "active" | "expired";
+              urgencyState: "normal" | "due-soon" | "critical" | "expired";
+              remainingSeconds: number;
+              escalationRequired: boolean;
+              escalationAcknowledged: boolean;
+              acknowledgedByCurrentActor: boolean;
+            }>;
+          }>;
         })
         .then((payload) => {
           if (!canceled) setPendingReleaseReviews(payload.rows ?? []);
@@ -2238,7 +2877,8 @@ export function PropertyEvaluationWorkspace({
         });
     };
     refreshPendingReviews();
-    if (pollingAuthorized) refreshTimer = window.setInterval(refreshPendingReviews, 60_000);
+    if (pollingAuthorized)
+      refreshTimer = window.setInterval(refreshPendingReviews, 60_000);
     return () => {
       canceled = true;
       if (refreshTimer !== null) window.clearInterval(refreshTimer);
@@ -2283,9 +2923,14 @@ export function PropertyEvaluationWorkspace({
       // test" left the Agriculture tab on its placeholder).
       declaredPropertyType:
         profileOverride ??
-        (["residential", "farm", "commercial", "hospitality", "mobile-home-park", "land"].includes(
-          (context.propertyType ?? "").trim().toLowerCase()
-        )
+        ([
+          "residential",
+          "farm",
+          "commercial",
+          "hospitality",
+          "mobile-home-park",
+          "land",
+        ].includes((context.propertyType ?? "").trim().toLowerCase())
           ? (context.propertyType ?? "").trim().toLowerCase()
           : null),
     };
@@ -2297,12 +2942,14 @@ export function PropertyEvaluationWorkspace({
         const prefetched = consumePropertyFactsPrefetch(requestBody);
         const data = prefetched
           ? ((await prefetched) as PropertyFactsResponse)
-          : ((await (await fetch("/api/public/property-facts", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              signal: controller.signal,
-              body: JSON.stringify(requestBody),
-            })).json()) as PropertyFactsResponse);
+          : ((await (
+              await fetch("/api/public/property-facts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                signal: controller.signal,
+                body: JSON.stringify(requestBody),
+              })
+            ).json()) as PropertyFactsResponse);
         if (!canceled) setFacts(data);
       } catch {
         // Aborted or failed — leave facts null; the workspace renders from the
@@ -2318,7 +2965,16 @@ export function PropertyEvaluationWorkspace({
       clearTimeout(timeout);
       controller.abort();
     };
-  }, [context.propertyId, context.exactAddress, context.location, context.stateCode, context.town, context.county, profileOverride, startingLens]);
+  }, [
+    context.propertyId,
+    context.exactAddress,
+    context.location,
+    context.stateCode,
+    context.town,
+    context.county,
+    profileOverride,
+    startingLens,
+  ]);
 
   async function submitSpecialBuildingReview() {
     setManualReviewBusy(true);
@@ -2348,11 +3004,20 @@ export function PropertyEvaluationWorkspace({
       });
       const data = (await res.json()) as SpecialBuildingReviewResponse;
       if (!res.ok || !data.ok) {
-        throw new Error(data.error || "The special building review could not be queued.");
+        throw new Error(
+          data.error || "The special building review could not be queued.",
+        );
       }
-      setManualReviewMessage(data.message || "Special building review was submitted for manual handling.");
+      setManualReviewMessage(
+        data.message ||
+          "Special building review was submitted for manual handling.",
+      );
     } catch (error) {
-      setManualReviewError(error instanceof Error ? error.message : "The special building review could not be queued.");
+      setManualReviewError(
+        error instanceof Error
+          ? error.message
+          : "The special building review could not be queued.",
+      );
     } finally {
       setManualReviewBusy(false);
     }
@@ -2368,21 +3033,44 @@ export function PropertyEvaluationWorkspace({
             gap: 0,
             border: "1px solid #d7deea",
             borderRadius: 22,
-            background: "linear-gradient(135deg, #f8fafc, #ffffff 58%, #f7fbff)",
+            background:
+              "linear-gradient(135deg, #f8fafc, #ffffff 58%, #f7fbff)",
             overflow: "hidden",
           }}
         >
           <div style={{ display: "grid", gap: 18, padding: "22px 24px 24px" }}>
             <div style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: 0.08, textTransform: "uppercase", color: "#0f766e" }}>
+              <span
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 800,
+                  letterSpacing: 0.08,
+                  textTransform: "uppercase",
+                  color: "#0f766e",
+                }}
+              >
                 Property-first analysis
               </span>
-              <h1 style={{ margin: 0, fontSize: 26, color: "#101a2b", lineHeight: 1.08 }}>
-                Start with the property. Furlong will build the first-pass analysis from there.
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: 26,
+                  color: "#101a2b",
+                  lineHeight: 1.08,
+                }}
+              >
+                Start with the property. Furlong will build the first-pass
+                analysis from there.
               </h1>
               {startingLens && (
-                <span style={{ fontSize: 13.5, color: "#4d596d", lineHeight: 1.6 }}>
-                  You entered through <strong>{startingLens.replace(/-/g, " ")}</strong>. We will use that as the starting lens, then test the property across every plausible use, market, cost, environmental, and financing pathway.
+                <span
+                  style={{ fontSize: 13.5, color: "#4d596d", lineHeight: 1.6 }}
+                >
+                  You entered through{" "}
+                  <strong>{startingLens.replace(/-/g, " ")}</strong>. We will
+                  use that as the starting lens, then test the property across
+                  every plausible use, market, cost, environmental, and
+                  financing pathway.
                 </span>
               )}
             </div>
@@ -2394,7 +3082,13 @@ export function PropertyEvaluationWorkspace({
             {/* ONE front door (founder feedback 2026-07-16): the address form
                 above is how a property comes in; paste/upload is the same task,
                 so it lives here folded, not as a second open form. */}
-            <details style={{ ...detailsStyle, background: "#ffffff", padding: "12px 16px" }}>
+            <details
+              style={{
+                ...detailsStyle,
+                background: "#ffffff",
+                padding: "12px 16px",
+              }}
+            >
               <summary style={{ ...summaryStyle, fontSize: 13.5 }}>
                 Have a listing link or a screenshot instead? Paste or upload it
               </summary>
@@ -2418,14 +3112,25 @@ export function PropertyEvaluationWorkspace({
             gap: 0,
             border: "1px solid #d7deea",
             borderRadius: 22,
-            background: "linear-gradient(135deg, #f8fafc, #ffffff 58%, #f7fbff)",
+            background:
+              "linear-gradient(135deg, #f8fafc, #ffffff 58%, #f7fbff)",
             overflow: "hidden",
           }}
         >
-          <div style={{ padding: "14px 24px", borderBottom: "1px solid #e5ebf3" }}>
-            <details style={{ ...detailsStyle, background: "transparent", border: "none", padding: 0 }}>
+          <div
+            style={{ padding: "14px 24px", borderBottom: "1px solid #e5ebf3" }}
+          >
+            <details
+              style={{
+                ...detailsStyle,
+                background: "transparent",
+                border: "none",
+                padding: 0,
+              }}
+            >
               <summary style={{ ...summaryStyle, fontSize: 13.5 }}>
-                Evaluating a different property? Paste a link or upload a listing
+                Evaluating a different property? Paste a link or upload a
+                listing
               </summary>
               <div style={{ paddingTop: 12 }}>
                 <PropertyImportLaunchpadEmbedded />
@@ -2434,64 +3139,148 @@ export function PropertyEvaluationWorkspace({
           </div>
           <div style={{ display: "grid", gap: 18, padding: "22px 24px 24px" }}>
             <div style={{ display: "grid", gap: 8 }}>
-              <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: 0.08, textTransform: "uppercase", color: "#854F0B" }}>
-                {context.importScreeningCategory === "restricted-asset" ? "Restricted asset routing" : "Special asset routing"}
+              <span
+                style={{
+                  fontSize: 11.5,
+                  fontWeight: 800,
+                  letterSpacing: 0.08,
+                  textTransform: "uppercase",
+                  color: "#854F0B",
+                }}
+              >
+                {context.importScreeningCategory === "restricted-asset"
+                  ? "Restricted asset routing"
+                  : "Special asset routing"}
               </span>
-              <h1 style={{ margin: 0, fontSize: 30, color: "#101a2b", lineHeight: 1.04 }}>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: 30,
+                  color: "#101a2b",
+                  lineHeight: 1.04,
+                }}
+              >
                 {context.title}
               </h1>
-              <span style={{ fontSize: 14.5, color: "#4d596d", lineHeight: 1.6 }}>
+              <span
+                style={{ fontSize: 14.5, color: "#4d596d", lineHeight: 1.6 }}
+              >
                 {context.location}
                 {context.exactAddress ? ` · ${context.exactAddress}` : ""}
               </span>
             </div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               <span style={pillGold}>{context.propertyType}</span>
-              <span style={pillGray}>{context.salePosture ?? "sale posture unknown"}</span>
-              {context.currentLabel && <span style={pillBlue}>{context.currentLabel}</span>}
-              {context.manualReviewRequired && <span style={pillGold}>Manual review required</span>}
+              <span style={pillGray}>
+                {context.salePosture ?? "sale posture unknown"}
+              </span>
+              {context.currentLabel && (
+                <span style={pillBlue}>{context.currentLabel}</span>
+              )}
+              {context.manualReviewRequired && (
+                <span style={pillGold}>Manual review required</span>
+              )}
             </div>
-            <section style={{ ...panelStyle, background: "#fffaf0", borderColor: "#ead8aa" }}>
+            <section
+              style={{
+                ...panelStyle,
+                background: "#fffaf0",
+                borderColor: "#ead8aa",
+              }}
+            >
               <div style={{ display: "grid", gap: 5 }}>
                 <strong style={{ fontSize: 20, color: "#162033" }}>
-                  {context.importScreeningSummary ?? "This import was routed out of the ordinary property-analysis flow."}
+                  {context.importScreeningSummary ??
+                    "This import was routed out of the ordinary property-analysis flow."}
                 </strong>
-                <span style={{ fontSize: 13.5, color: "#5d687a", lineHeight: 1.65 }}>
-                  This page is intentionally not treating this asset like a normal for-sale listing. Furlong should stay in a high-level public-disposition and governance posture here until a verified ordinary listing or official disposition source says otherwise.
+                <span
+                  style={{ fontSize: 13.5, color: "#5d687a", lineHeight: 1.65 }}
+                >
+                  This page is intentionally not treating this asset like a
+                  normal for-sale listing. Furlong should stay in a high-level
+                  public-disposition and governance posture here until a
+                  verified ordinary listing or official disposition source says
+                  otherwise.
                 </span>
                 {context.manualReviewSummary && (
-                  <span style={{ fontSize: 13.5, color: "#854F0B", lineHeight: 1.65 }}>
+                  <span
+                    style={{
+                      fontSize: 13.5,
+                      color: "#854F0B",
+                      lineHeight: 1.65,
+                    }}
+                  >
                     {context.manualReviewSummary}
                   </span>
                 )}
               </div>
-              <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gap: 12,
+                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                }}
+              >
                 <div style={factCard}>
-                  <strong style={{ fontSize: 13.5, color: "#162033" }}>Why it was rerouted</strong>
+                  <strong style={{ fontSize: 13.5, color: "#162033" }}>
+                    Why it was rerouted
+                  </strong>
                   <div style={{ display: "grid", gap: 6 }}>
-                    {context.importScreeningReasons.length > 0 ? context.importScreeningReasons.map((line) => (
-                      <span key={line} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{line}</span>
-                    )) : (
-                      <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>
-                        The import triggered special-asset posture and needs high-level feasibility review rather than ordinary listing analysis.
+                    {context.importScreeningReasons.length > 0 ? (
+                      context.importScreeningReasons.map((line) => (
+                        <span
+                          key={line}
+                          style={{
+                            fontSize: 12.5,
+                            color: "#3b475a",
+                            lineHeight: 1.55,
+                          }}
+                        >
+                          {line}
+                        </span>
+                      ))
+                    ) : (
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          color: "#3b475a",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        The import triggered special-asset posture and needs
+                        high-level feasibility review rather than ordinary
+                        listing analysis.
                       </span>
                     )}
                   </div>
                 </div>
                 <div style={factCard}>
-                  <strong style={{ fontSize: 13.5, color: "#162033" }}>What Furlong can do here</strong>
+                  <strong style={{ fontSize: 13.5, color: "#162033" }}>
+                    What Furlong can do here
+                  </strong>
                   <div style={{ display: "grid", gap: 6 }}>
                     {[
                       "Assess whether there is a real public-disposition or redevelopment path at all.",
                       "Frame lawful reuse, governance boundaries, environmental diligence, and site constraints.",
                       "Keep out ownership, operator, active-status, access, and vulnerability analysis.",
                     ].map((line) => (
-                      <span key={line} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{line}</span>
+                      <span
+                        key={line}
+                        style={{
+                          fontSize: 12.5,
+                          color: "#3b475a",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        {line}
+                      </span>
                     ))}
                   </div>
                 </div>
                 <div style={factCard}>
-                  <strong style={{ fontSize: 13.5, color: "#162033" }}>What needs to happen next</strong>
+                  <strong style={{ fontSize: 13.5, color: "#162033" }}>
+                    What needs to happen next
+                  </strong>
                   <div style={{ display: "grid", gap: 6 }}>
                     {[
                       context.listingUrl
@@ -2501,32 +3290,74 @@ export function PropertyEvaluationWorkspace({
                         ? "After sale posture is verified, route this through manual Furlong review rather than automated analysis."
                         : "Only after that should the platform decide whether ordinary property analysis is appropriate.",
                     ].map((line) => (
-                      <span key={line} style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{line}</span>
+                      <span
+                        key={line}
+                        style={{
+                          fontSize: 12.5,
+                          color: "#3b475a",
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        {line}
+                      </span>
                     ))}
                   </div>
                 </div>
               </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 12,
+                  alignItems: "center",
+                }}
+              >
                 {context.listingUrl && (
-                  <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
+                  <Link
+                    href={context.listingUrl}
+                    style={{
+                      color: "#185FA5",
+                      textDecoration: "underline",
+                      fontWeight: 700,
+                    }}
+                  >
                     See the current price on the official listing ↗
                   </Link>
                 )}
                 {context.manualReviewRequired && (
-                  <button type="button" onClick={() => void submitSpecialBuildingReview()} disabled={manualReviewBusy} style={actionButtonPrimary}>
-                    {manualReviewBusy ? "Submitting manual review..." : "Submit Special Building Manual Review"}
+                  <button
+                    type="button"
+                    onClick={() => void submitSpecialBuildingReview()}
+                    disabled={manualReviewBusy}
+                    style={actionButtonPrimary}
+                  >
+                    {manualReviewBusy
+                      ? "Submitting manual review..."
+                      : "Submit Special Building Manual Review"}
                   </button>
                 )}
               </div>
               {(manualReviewMessage || manualReviewError) && (
                 <div style={{ display: "grid", gap: 6 }}>
                   {manualReviewMessage && (
-                    <span style={{ fontSize: 12.5, color: "#0f6e56", lineHeight: 1.55 }}>
+                    <span
+                      style={{
+                        fontSize: 12.5,
+                        color: "#0f6e56",
+                        lineHeight: 1.55,
+                      }}
+                    >
                       {manualReviewMessage}
                     </span>
                   )}
                   {manualReviewError && (
-                    <span style={{ fontSize: 12.5, color: "#a12626", lineHeight: 1.55 }}>
+                    <span
+                      style={{
+                        fontSize: 12.5,
+                        color: "#a12626",
+                        lineHeight: 1.55,
+                      }}
+                    >
                       {manualReviewError}
                     </span>
                   )}
@@ -2535,12 +3366,21 @@ export function PropertyEvaluationWorkspace({
             </section>
             <section style={panelStyle}>
               <div style={{ display: "grid", gap: 5 }}>
-                <strong style={{ fontSize: 18, color: "#162033" }}>Restricted special-asset interview</strong>
-                <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-                  This stays in high-level feasibility and public-disposition posture only.
+                <strong style={{ fontSize: 18, color: "#162033" }}>
+                  Restricted special-asset interview
+                </strong>
+                <span
+                  style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}
+                >
+                  This stays in high-level feasibility and public-disposition
+                  posture only.
                 </span>
               </div>
-              <FurlongNavigator initialMessage={context.initialMessage} existingCase={navigatorCaseContext} onStateChange={setNavigator} />
+              <FurlongNavigator
+                initialMessage={context.initialMessage}
+                existingCase={navigatorCaseContext}
+                onStateChange={setNavigator}
+              />
             </section>
           </div>
         </section>
@@ -2554,13 +3394,24 @@ export function PropertyEvaluationWorkspace({
       state: analysisContext.stateCode,
       county: analysisContext.county,
     },
-    farmTypes: inferredFarmTypes(analysisContext.propertyType, analysisContext.categoryLabel, answers.possibility),
-    goals: inferredGoals(context.pathwayList, answers.possibility, answers.usePlan),
+    farmTypes: inferredFarmTypes(
+      analysisContext.propertyType,
+      analysisContext.categoryLabel,
+      answers.possibility,
+    ),
+    goals: inferredGoals(
+      context.pathwayList,
+      answers.possibility,
+      answers.usePlan,
+    ),
     requestedAmount: requestedAmountFrom(answers.requestedAmount),
     requestedPrograms: analysisContext.pathwayList,
     documents: lowerList(answers.documents),
     metadata: {
-      purpose: [answers.capitalPlan, answers.usePlan, answers.revenueModel].filter(Boolean).join(" · ") || null,
+      purpose:
+        [answers.capitalPlan, answers.usePlan, answers.revenueModel]
+          .filter(Boolean)
+          .join(" · ") || null,
       timing: answers.timing || null,
       propertyType: analysisContext.propertyType,
       propertyId: analysisContext.propertyId,
@@ -2574,13 +3425,24 @@ export function PropertyEvaluationWorkspace({
         state: analysisContext.stateCode,
         county: analysisContext.county,
       },
-      farmTypes: inferredFarmTypes(analysisContext.propertyType, analysisContext.categoryLabel, answers.possibility),
-      goals: inferredGoals(analysisContext.pathwayList, answers.possibility, answers.usePlan),
+      farmTypes: inferredFarmTypes(
+        analysisContext.propertyType,
+        analysisContext.categoryLabel,
+        answers.possibility,
+      ),
+      goals: inferredGoals(
+        analysisContext.pathwayList,
+        answers.possibility,
+        answers.usePlan,
+      ),
       requestedAmount: requestedAmountFrom(answers.requestedAmount),
       requestedPrograms: analysisContext.pathwayList,
       documents: lowerList(answers.documents),
       metadata: {
-        purpose: [answers.capitalPlan, answers.usePlan, answers.revenueModel].filter(Boolean).join(" · ") || null,
+        purpose:
+          [answers.capitalPlan, answers.usePlan, answers.revenueModel]
+            .filter(Boolean)
+            .join(" · ") || null,
         timing: answers.timing || null,
         propertyType: analysisContext.propertyType,
         propertyId: analysisContext.propertyId,
@@ -2727,15 +3589,18 @@ export function PropertyEvaluationWorkspace({
   // For imported ids the API brief is authoritative — a property-keyed server
   // brief can only be empty/negative for an address with no canonical record.
   const basePlaceIntelligence = context.propertyId?.startsWith("imported:")
-    ? facts?.placeIntelligence ?? placeIntelligence ?? null
-    : placeIntelligence ?? facts?.placeIntelligence ?? null;
+    ? (facts?.placeIntelligence ?? placeIntelligence ?? null)
+    : (placeIntelligence ?? facts?.placeIntelligence ?? null);
   // Acreage is a foundational property fact for every lane, not merely a farm
   // classifier input. The property-facts API already carries acreageText; promote
   // it into the customer-visible evidence whenever the source brief omitted it.
   const effectivePlaceIntelligence = (() => {
-    if (!basePlaceIntelligence || !facts?.propertyRecord?.acreageText) return basePlaceIntelligence;
+    if (!basePlaceIntelligence || !facts?.propertyRecord?.acreageText)
+      return basePlaceIntelligence;
     const alreadyVisible = basePlaceIntelligence.verifiedFacts.some((fact) =>
-      /size|acreage|land area|land, lots|tax-parcel profile|parcel and conveyance profile/i.test(fact.label)
+      /size|acreage|land area|land, lots|tax-parcel profile|parcel and conveyance profile/i.test(
+        fact.label,
+      ),
     );
     if (alreadyVisible) return basePlaceIntelligence;
     return {
@@ -2745,7 +3610,8 @@ export function PropertyEvaluationWorkspace({
           label: "Land area",
           value: facts.propertyRecord.acreageText,
           text: `The matched property record reports ${facts.propertyRecord.acreageText} of land. Acreage affects value, usable layout, setbacks, operating capacity, and the financial model regardless of whether the property is residential, agricultural, or commercial.`,
-          provenance: "Source: matched canonical property record; county parcel geometry and recorded plat remain controlling",
+          provenance:
+            "Source: matched canonical property record; county parcel geometry and recorded plat remain controlling",
           tone: "neutral" as const,
         },
         ...basePlaceIntelligence.verifiedFacts,
@@ -2757,43 +3623,59 @@ export function PropertyEvaluationWorkspace({
   // The VISITOR'S declaration wins over any machine classification — the
   // owner knows it's a working farm; the classifier can only read type text.
   const importedProperty = context.propertyId?.startsWith("imported:") === true;
-  const genericImportedType = /^(?:place|property|imported|unknown|not specified|place-led property)$/i.test((analysisContext.propertyType ?? "").trim());
-  const automaticTypeEvidenceAvailable = !importedProperty || Boolean(
-    facts?.propertyRecord?.rawPropertyStyle ||
-    facts?.propertyRecord?.acreageText ||
-    (analysisContext.propertyType && !genericImportedType)
-  );
-  const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null;
+  const genericImportedType =
+    /^(?:place|property|imported|unknown|not specified|place-led property)$/i.test(
+      (analysisContext.propertyType ?? "").trim(),
+    );
+  const automaticTypeEvidenceAvailable =
+    !importedProperty ||
+    Boolean(
+      facts?.propertyRecord?.rawPropertyStyle ||
+      facts?.propertyRecord?.acreageText ||
+      (analysisContext.propertyType && !genericImportedType),
+    );
+  const propertyClassificationAvailable =
+    automaticTypeEvidenceAvailable || profileOverride !== null;
   // The county assessment record's land-use / building style IS a property-type
   // signal — it was fetched but never classified (founder-caught 2026-08-06:
   // "why can't we automatically tell what type of property this is?"). Use it
   // for typed addresses; ignore the generic placeholders the facts route emits
   // when no real record matched.
   const countyStyleRaw = (facts?.propertyRecord?.rawPropertyStyle ?? "").trim();
-  const countyStyleIsGeneric = /^(?:verified property address|place|property|imported|unknown|not specified|place-led property)$/i.test(countyStyleRaw);
-  const countyDerivedStyle = countyStyleRaw && !countyStyleIsGeneric ? countyStyleRaw : null;
-  const explicitImportedProfile = importedProperty && (
-    (analysisContext.propertyType && !genericImportedType) || countyDerivedStyle
-  )
-    ? classifyPropertyProfile({
-        propertyType:
-          (analysisContext.propertyType && !genericImportedType ? analysisContext.propertyType : null) ??
-          countyDerivedStyle,
-        description: analysisContext.description ?? null,
-        acreageText: facts?.propertyRecord?.acreageText ?? null,
-      })
-    : null;
+  const countyStyleIsGeneric =
+    /^(?:verified property address|place|property|imported|unknown|not specified|place-led property)$/i.test(
+      countyStyleRaw,
+    );
+  const countyDerivedStyle =
+    countyStyleRaw && !countyStyleIsGeneric ? countyStyleRaw : null;
+  const explicitImportedProfile =
+    importedProperty &&
+    ((analysisContext.propertyType && !genericImportedType) ||
+      countyDerivedStyle)
+      ? classifyPropertyProfile({
+          propertyType:
+            (analysisContext.propertyType && !genericImportedType
+              ? analysisContext.propertyType
+              : null) ?? countyDerivedStyle,
+          description: analysisContext.description ?? null,
+          acreageText: facts?.propertyRecord?.acreageText ?? null,
+        })
+      : null;
   // True only when NOTHING in the record implies a type — the one case where
   // the customer genuinely has to pick.
-  const typeIsGuessworkOnly = importedProperty && !explicitImportedProfile && !facts?.propertyRecord?.acreageText;
+  const typeIsGuessworkOnly =
+    importedProperty &&
+    !explicitImportedProfile &&
+    !facts?.propertyRecord?.acreageText;
   const workspaceProfile = profileOverride
     ? profileById(profileOverride)
-    : explicitImportedProfile ?? effectivePlaceIntelligence?.profile ??
+    : (explicitImportedProfile ??
+      effectivePlaceIntelligence?.profile ??
       classifyPropertyProfile({
         propertyType: analysisContext.propertyType,
         description: analysisContext.description ?? null,
         acreageText: facts?.propertyRecord?.acreageText ?? null,
-      });
+      }));
   const answerCard = buildAnswerCard({
     context: analysisContext,
     restrictionsPresent: (facts?.verification?.restrictions?.length ?? 0) > 0,
@@ -2855,7 +3737,10 @@ export function PropertyEvaluationWorkspace({
     },
     {
       title: "Ranked financing lanes",
-      lines: answers.reportTier === "free" ? report.pathwayAnalysis.slice(0, 1) : report.pathwayAnalysis,
+      lines:
+        answers.reportTier === "free"
+          ? report.pathwayAnalysis.slice(0, 1)
+          : report.pathwayAnalysis,
     },
     {
       title: "Property verification summary",
@@ -2869,7 +3754,7 @@ export function PropertyEvaluationWorkspace({
             lines: report.keyQuestions,
           },
         ]),
-    ...((answers.reportTier === "paid" || answers.reportTier === "environmental")
+    ...(answers.reportTier === "paid" || answers.reportTier === "environmental"
       ? [
           {
             title: "Optional deeper intake posture",
@@ -2878,9 +3763,10 @@ export function PropertyEvaluationWorkspace({
         ]
       : []),
     {
-      title: answers.reportTier === "environmental"
-        ? "Environmental and site-side criteria"
-        : "Property-side criteria and external flags",
+      title:
+        answers.reportTier === "environmental"
+          ? "Environmental and site-side criteria"
+          : "Property-side criteria and external flags",
       lines: report.verifiedCriteria,
     },
     ...(report.buyingProcess.length > 0
@@ -2924,7 +3810,7 @@ export function PropertyEvaluationWorkspace({
             lines: [
               report.tierIdentity.nextTierTeaser.intro,
               ...report.tierIdentity.nextTierTeaser.items.map(
-                (item) => `${item.name} — ${item.adds}`
+                (item) => `${item.name} — ${item.adds}`,
               ),
               report.tierIdentity.nextTierTeaser.closing,
             ],
@@ -2946,7 +3832,10 @@ export function PropertyEvaluationWorkspace({
       ];
   const headlinePreviewSections = visiblePreviewSections.slice(0, 3);
 
-  function updateAnswer<K extends keyof DraftAnswers>(key: K, value: DraftAnswers[K]) {
+  function updateAnswer<K extends keyof DraftAnswers>(
+    key: K,
+    value: DraftAnswers[K],
+  ) {
     setAnswers((current) => ({ ...current, [key]: value }));
   }
 
@@ -2967,7 +3856,11 @@ export function PropertyEvaluationWorkspace({
       updatedAt,
       // Enough to list + resume this draft weeks later — the analysis URL
       // carries only property context, never the visitor's answers.
-      resume: { title: context.title, location: context.location, href: baseHref },
+      resume: {
+        title: context.title,
+        location: context.location,
+        href: baseHref,
+      },
       answers,
     });
     setSavedAt(updatedAt);
@@ -2981,7 +3874,6 @@ export function PropertyEvaluationWorkspace({
     if (!context.propertyId) return;
     const timer = window.setTimeout(saveDraft, 1_200);
     return () => window.clearTimeout(timer);
-
   }, [answers, context.propertyId]);
 
   async function requestReportPdf() {
@@ -2997,179 +3889,310 @@ export function PropertyEvaluationWorkspace({
       return requestProformaPdf();
     }
     setPdfError(null);
-    const fileStem = `${context.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "property-evaluation"}-${report.tier.id}`;
+    const fileStem = `${
+      context.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") || "property-evaluation"
+    }-${report.tier.id}`;
     try {
       // The PDF route requires a short-lived attestation minted from the
       // IDENTICAL report payload (digest + context key must match), so build
       // the payload once, mint, then export.
       const reportPayload = {
-            branding: report.branding,
-            tier: report.tier,
-            context: {
-              propertyId: context.propertyId ?? null,
-              title: analysisContext.title,
-              location: analysisContext.location,
-              exactAddress: analysisContext.exactAddress,
-              priceLabel: analysisContext.priceLabel,
-              propertyType: analysisContext.propertyType,
-              sourceLabel: analysisContext.sourceLabel,
-              currentLabel: analysisContext.currentLabel,
-              importScreeningStatus: analysisContext.importScreeningStatus,
-              importScreeningCategory: analysisContext.importScreeningCategory,
-              salePosture: analysisContext.salePosture,
-              manualReviewRequired: analysisContext.manualReviewRequired,
+        branding: report.branding,
+        tier: report.tier,
+        context: {
+          propertyId: context.propertyId ?? null,
+          title: analysisContext.title,
+          location: analysisContext.location,
+          exactAddress: analysisContext.exactAddress,
+          priceLabel: analysisContext.priceLabel,
+          propertyType: analysisContext.propertyType,
+          sourceLabel: analysisContext.sourceLabel,
+          currentLabel: analysisContext.currentLabel,
+          importScreeningStatus: analysisContext.importScreeningStatus,
+          importScreeningCategory: analysisContext.importScreeningCategory,
+          salePosture: analysisContext.salePosture,
+          manualReviewRequired: analysisContext.manualReviewRequired,
+        },
+        verdict: report.verdict,
+        executiveSummary: report.executiveSummary,
+        propertySummary: report.propertySummary,
+        propertyValueScreen:
+          facts?.propertyRecord?.propertyValueScreen ?? undefined,
+        conceptSummary: report.conceptSummary,
+        strengths: report.strengths,
+        risks: report.risks,
+        pathwayAnalysis: report.pathwayAnalysis,
+        propertyVerificationSummary: report.propertyVerificationSummary,
+        verifiedCriteria: report.verifiedCriteria,
+        readinessSectionNotes: report.readinessSectionNotes,
+        keyQuestions: report.keyQuestions,
+        nextMoves: report.nextMoves,
+        includedSections: buildIncludedSections(answers.reportTier),
+        explainabilityNotes: report.explainabilityNotes,
+        buyingProcess: report.buyingProcess,
+        honestUnknowns: report.honestUnknowns,
+        financingProse: report.financingProse,
+        // Lane burning-questions answered for THIS property — the signed
+        // PDF carries the same answers the web report shows (Tier 3).
+        laneAnswers: (() => {
+          const fmt = (
+            answers: {
+              question: string;
+              answer: string;
+              confirm: string | null;
+            }[],
+          ) =>
+            answers.map(
+              (a) =>
+                `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`,
+            );
+          const farm = (
+            effectivePlaceIntelligence?.farmEnterpriseAnswers ?? []
+          ).map(
+            (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`,
+          );
+          if (farm.length > 0)
+            return {
+              title: "Your Farm Questions — Answered for This Property",
+              lines: farm,
+            };
+          const residential = fmt(
+            effectivePlaceIntelligence?.residentialAnswers ?? [],
+          );
+          if (residential.length > 0)
+            return {
+              title: "Your Questions — Answered for This Home",
+              lines: residential,
+            };
+          const commercial = fmt(
+            effectivePlaceIntelligence?.commercialAnswers ?? [],
+          );
+          if (commercial.length > 0)
+            return {
+              title: "Your Questions — Answered for This Property",
+              lines: commercial,
+            };
+          return null;
+        })(),
+        placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? [])
+          // Education facts stay in the farm report too (founder 2026-07-29:
+          // the Education tab promises them on every lane); the farm PDF
+          // still drops the residential-flavored context lines below.
+          .filter(
+            (fact) =>
+              workspaceProfile.id !== "farm" ||
+              !/broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(
+                fact.label,
+              ),
+          )
+          .map((fact) => ({
+            label: fact.label,
+            value: fact.value,
+            source: fact.provenance
+              .replace(/^Source:\s*/i, "")
+              .split("·")[0]
+              .trim(),
+          })),
+        diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
+        ownershipCosts:
+          effectiveListedPrice != null &&
+          ownershipContext &&
+          chartVariant !== "finance" &&
+          // Residential-only path (farm/commercial return the pro forma above).
+          profileUsesResidentialLanes(workspaceProfile.id)
+            ? formatOwnershipCostsForPdf({
+                listedPrice: effectiveListedPrice,
+                ownershipContext,
+                isHome: isResidentialHomeContext(analysisContext),
+                farmShaped: false,
+                farmMode: false,
+              })
+            : undefined,
+        // The SAME real pro forma rides in the First-Time Buyer Report as
+        // a lender-ready appendix (founder 2026-07-29: first-time buyers
+        // need the numbers "for a lender if they don't choose ours").
+        // Lane-aware federal program guide (founder 2026-08-05): the
+        // First-Time report teaches USDA RD / B&I / SBA / FSA for this
+        // lane and skips residential-mortgage content entirely.
+        programGuide: (() => {
+          const isFarm =
+            workspaceProfile.id === "farm" || workspaceProfile.id === "land";
+          const isCommercial = !isFarm && workspaceProfile.id !== "residential";
+          if (!isFarm && !isCommercial) return undefined;
+          const shared = [
+            {
+              name: "USDA B&I (OneRD guarantee)",
+              body: "Rural BUSINESS financing: a private lender makes the loan and USDA guarantees it. Requires a USDA-eligible rural area (checked live on this report) and an eligible business purpose; agricultural production alone does not qualify, but value-added, processing, and agritourism operations can.",
             },
-            verdict: report.verdict,
-            executiveSummary: report.executiveSummary,
-            propertySummary: report.propertySummary,
-            propertyValueScreen: facts?.propertyRecord?.propertyValueScreen ?? undefined,
-            conceptSummary: report.conceptSummary,
-            strengths: report.strengths,
-            risks: report.risks,
-            pathwayAnalysis: report.pathwayAnalysis,
-            propertyVerificationSummary: report.propertyVerificationSummary,
-            verifiedCriteria: report.verifiedCriteria,
-            readinessSectionNotes: report.readinessSectionNotes,
-            keyQuestions: report.keyQuestions,
-            nextMoves: report.nextMoves,
-            includedSections: buildIncludedSections(answers.reportTier),
-            explainabilityNotes: report.explainabilityNotes,
-            buyingProcess: report.buyingProcess,
-            honestUnknowns: report.honestUnknowns,
-            financingProse: report.financingProse,
-            // Lane burning-questions answered for THIS property — the signed
-            // PDF carries the same answers the web report shows (Tier 3).
-            laneAnswers: (() => {
-              const fmt = (answers: { question: string; answer: string; confirm: string | null }[]) =>
-                answers.map((a) => `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`);
-              const farm = (effectivePlaceIntelligence?.farmEnterpriseAnswers ?? []).map(
-                (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`
-              );
-              if (farm.length > 0) return { title: "Your Farm Questions — Answered for This Property", lines: farm };
-              const residential = fmt(effectivePlaceIntelligence?.residentialAnswers ?? []);
-              if (residential.length > 0) return { title: "Your Questions — Answered for This Home", lines: residential };
-              const commercial = fmt(effectivePlaceIntelligence?.commercialAnswers ?? []);
-              if (commercial.length > 0) return { title: "Your Questions — Answered for This Property", lines: commercial };
-              return null;
-            })(),
-            placeFacts: (effectivePlaceIntelligence?.verifiedFacts ?? [])
-              // Education facts stay in the farm report too (founder 2026-07-29:
-              // the Education tab promises them on every lane); the farm PDF
-              // still drops the residential-flavored context lines below.
-              .filter((fact) => workspaceProfile.id !== "farm" || !/broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
-              .map((fact) => ({
-                label: fact.label,
-                value: fact.value,
-                source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
-              })),
-            diligenceCosts: effectivePlaceIntelligence?.diligenceCosts ?? [],
-            ownershipCosts:
-              effectiveListedPrice != null &&
-              ownershipContext &&
-              chartVariant !== "finance" &&
-              // Residential-only path (farm/commercial return the pro forma above).
-              profileUsesResidentialLanes(workspaceProfile.id)
-                ? formatOwnershipCostsForPdf({
-                    listedPrice: effectiveListedPrice,
-                    ownershipContext,
-                    isHome: isResidentialHomeContext(analysisContext),
-                    farmShaped: false,
-                    farmMode: false,
-                  })
-                : undefined,
-            // The SAME real pro forma rides in the First-Time Buyer Report as
-            // a lender-ready appendix (founder 2026-07-29: first-time buyers
-            // need the numbers "for a lender if they don't choose ours").
-            // Lane-aware federal program guide (founder 2026-08-05): the
-            // First-Time report teaches USDA RD / B&I / SBA / FSA for this
-            // lane and skips residential-mortgage content entirely.
-            programGuide: (() => {
-              const isFarm = workspaceProfile.id === "farm" || workspaceProfile.id === "land";
-              const isCommercial = !isFarm && workspaceProfile.id !== "residential";
-              if (!isFarm && !isCommercial) return undefined;
-              const shared = [
-                { name: "USDA B&I (OneRD guarantee)", body: "Rural BUSINESS financing: a private lender makes the loan and USDA guarantees it. Requires a USDA-eligible rural area (checked live on this report) and an eligible business purpose; agricultural production alone does not qualify, but value-added, processing, and agritourism operations can." },
-                { name: "SBA 7(a)", body: "The general-purpose small-business loan through participating lenders: real estate, acquisition, working capital, equipment. Requires an eligible operating business — owner-occupancy for real estate." },
-                { name: "SBA 504", body: "Fixed-asset financing (real estate, heavy equipment) through a bank + a Certified Development Company at below-market blended rates. Owner-occupied businesses only." },
-              ];
-              const farmOnly = [
-                { name: "FSA Direct Farm Ownership", body: "USDA lends directly — lowest rate, ~$600K limit (indexed), targeted at beginning and underserved farmers; government processing timelines." },
-                { name: "FSA Guaranteed Farm Ownership", body: "A commercial agricultural lender makes and services the loan and FSA provides the guarantee. The current FY2026 guaranteed-loan ceiling is $2.343M and is indexed; the selected lender/FSA office confirms the current limit and borrower underwriting." },
-                { name: "Farm Credit System", body: "The nationwide cooperative ag lender network — farm real estate and operating credit as their core business, with patronage refunds to member-borrowers." },
-              ];
-              return {
-                heading: "The Federal Programs That Fund Properties Like This",
-                items: isFarm ? [...farmOnly, ...shared] : shared,
-                fsaNote: isFarm
-                  ? "Furlong does not force an agricultural case through one broker. Use the Capital Network, nominate your own FSA-guaranteed lender/Farm Credit contact, or invite a verified one-case guest provider. FSA direct loans are handled by FSA itself. Your property/project report and pro forma can travel with the borrower-selected provider after explicit consent; that provider performs any borrower underwriting required for approval."
-                  : undefined,
-              };
-            })(),
-            lenderProforma:
-              workspaceProfile.id === "residential" &&
-              residentialBasisPrice != null &&
-              ownershipContext
-                ? buildResidentialLenderSections({
-                    listedPrice: residentialBasisPrice,
-                    ownershipContext,
-                    isHome: isResidentialHomeContext(analysisContext),
-                    financingLanes: topProgramPreview,
-                    valuationNote: residentialBasisNote,
-                  }) ?? undefined
-                : undefined,
-            agriculturalProForma: (() => {
-              // Residential-only path — the farm pro forma section never applies here.
-              if ((workspaceProfile.id as string) !== "farm" || effectiveListedPrice == null || !ownershipContext) return undefined;
-              const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
-              if (!acreage) return undefined;
-              const rate = ownershipContext.fsa?.ownershipDirectPct ?? ownershipContext.rates.rate30;
-              const annualDebtService = effectiveListedPrice * 0.8 * (rate / 100) / (1 - Math.pow(1 + rate / 100, -40));
-              const model = optimizeAgriculturalOpportunities({ acres: acreage, purchasePrice: effectiveListedPrice, debtService: annualDebtService, waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
-              const dollars = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
-              return {
-                scopeLine: `${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres screened at ${dollars(effectiveListedPrice)} across agricultural, livestock, specialty-crop, controlled-environment, renewable-energy, storage, leasing, and diversified-use candidates. Rankings are assumptions until site and operator evidence is attached.`,
-                acreageRows: model.ranked.slice(0, 8).map((item, index) => ({ label: `${index + 1}. ${item.label}`, value: `${item.fit.toFixed(0)}/100 fit · ${item.usedAcres.toFixed(1)} acres modeled · ${item.eligible ? dollars(item.noi) + " annual NOI" : "blocked pending feasibility evidence"}` })),
-                operatingRows: model.diversified.length ? model.diversified.map((item) => ({ label: `${Math.round(item.portfolioShare * 100)}% ${item.label}`, value: `${dollars(item.noi * item.portfolioShare)} weighted annual NOI` })) : [{ label: "Diversified portfolio", value: "No feasible portfolio until constraints are resolved" }],
-                debtRows: [
-                  { label: "Illustrative annual debt service", value: dollars(annualDebtService) },
-                  { label: "Highest-ranked diversified NOI", value: dollars(model.portfolioNoi) },
-                  { label: "Diversified DSCR", value: `${model.portfolioDscr?.toFixed(2) ?? "—"}x against a 1.25x screening threshold` },
-                  { label: "Energy-use treatment", value: "Solar, agrivoltaics, and battery storage receive no credited revenue until zoning and grid/interconnection evidence is present." },
-                ],
-                assumptions: [model.warning, "Opportunity economics are editable screening assumptions, not appraisals, bids, contracts, or eligibility findings.", "The selected best use can be singular or diversified; the optimizer does not privilege commodity crops."],
-                readiness: [
-                  "NRCS soils, capability classes, drainage, wetlands, and productive-acre delineation",
-                  "FSA acreage/base history, APH, conservation obligations, and crop-insurance records",
-                  "Water supply, irrigation capacity, nutrient-management and waste-handling constraints",
-                  "Labor, operator skill, equipment, buildings, working capital, and market/offtake capacity",
-                  "Zoning and permits for livestock, poultry, greenhouse, agritourism, solar, agrivoltaics, or battery storage",
-                  "Utility territory, substation distance, hosting capacity, interconnection queue, and offtake terms",
-                  "Enterprise-specific budgets, contracts, price scenarios, and downside sensitivities",
-                ],
-              };
-            })(),
-            compensationTransparency: buildRealEstateCompensationTransparency({
-              ...emptyRealEstateCompensationInput(),
-              jurisdiction: analysisContext.location || null,
-            }),
-            similarHomes: similarHomes.length
-              ? similarHomes.map((home) => ({
-                  title: home.title,
-                  detail:
-                    `${home.priceLabel}` +
-                    (home.comparison === "lower" ? " (less than this one)" : home.comparison === "higher" ? " (more than this one)" : home.comparison === "similar" ? " (about the same)" : "") +
-                    ` · ${home.location}` +
-                    (home.distanceMiles != null ? ` · ~${home.distanceMiles} mi away` : "") +
-                    ` · ${home.sourceLabel}${home.isCurrent ? "" : ` · ${home.vintage}`}` +
-                    ((home.signals?.length ?? 0) > 0 ? ` · ${home.signals?.join(" · ")}` : ""),
-                }))
+            {
+              name: "SBA 7(a)",
+              body: "The general-purpose small-business loan through participating lenders: real estate, acquisition, working capital, equipment. Requires an eligible operating business — owner-occupancy for real estate.",
+            },
+            {
+              name: "SBA 504",
+              body: "Fixed-asset financing (real estate, heavy equipment) through a bank + a Certified Development Company at below-market blended rates. Owner-occupied businesses only.",
+            },
+          ];
+          const farmOnly = [
+            {
+              name: "FSA Direct Farm Ownership",
+              body: "USDA lends directly — lowest rate, ~$600K limit (indexed), targeted at beginning and underserved farmers; government processing timelines.",
+            },
+            {
+              name: "FSA Guaranteed Farm Ownership",
+              body: "A commercial agricultural lender makes and services the loan and FSA provides the guarantee. The current FY2026 guaranteed-loan ceiling is $2.343M and is indexed; the selected lender/FSA office confirms the current limit and borrower underwriting.",
+            },
+            {
+              name: "Farm Credit System",
+              body: "The nationwide cooperative ag lender network — farm real estate and operating credit as their core business, with patronage refunds to member-borrowers.",
+            },
+          ];
+          return {
+            heading: "The Federal Programs That Fund Properties Like This",
+            items: isFarm ? [...farmOnly, ...shared] : shared,
+            fsaNote: isFarm
+              ? "Furlong does not force an agricultural case through one broker. Use the Capital Network, nominate your own FSA-guaranteed lender/Farm Credit contact, or invite a verified one-case guest provider. FSA direct loans are handled by FSA itself. Your property/project report and pro forma can travel with the borrower-selected provider after explicit consent; that provider performs any borrower underwriting required for approval."
               : undefined,
-            customerRights: buildCustomerRightsSummary(),
-            humanReviewBoundary: buildHumanReviewBoundary({
-              tier: { id: answers.reportTier, label: report.tier.label },
-              answers,
-              readinessMissing: contextualMissingItems(readinessResult.missingItems, analysisContext, answers),
-            }),
+          };
+        })(),
+        lenderProforma:
+          workspaceProfile.id === "residential" &&
+          residentialBasisPrice != null &&
+          ownershipContext
+            ? (buildResidentialLenderSections({
+                listedPrice: residentialBasisPrice,
+                ownershipContext,
+                isHome: isResidentialHomeContext(analysisContext),
+                financingLanes: topProgramPreview,
+                valuationNote: residentialBasisNote,
+              }) ?? undefined)
+            : undefined,
+        agriculturalProForma: (() => {
+          // Residential-only path — the farm pro forma section never applies here.
+          if (
+            (workspaceProfile.id as string) !== "farm" ||
+            effectiveListedPrice == null ||
+            !ownershipContext
+          )
+            return undefined;
+          const acreage =
+            facts?.propertyRecord?.offeredAcreage ??
+            (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") ||
+              null);
+          if (!acreage) return undefined;
+          const rate =
+            ownershipContext.fsa?.ownershipDirectPct ??
+            ownershipContext.rates.rate30;
+          const annualDebtService =
+            (effectiveListedPrice * 0.8 * (rate / 100)) /
+            (1 - Math.pow(1 + rate / 100, -40));
+          const model = optimizeAgriculturalOpportunities({
+            acres: acreage,
+            purchasePrice: effectiveListedPrice,
+            debtService: annualDebtService,
+            waterScore: 70,
+            laborCapacity: 55,
+            capitalCapacity: 55,
+            marketAccess: 60,
+            gridEvidence: false,
+            solarZoningEvidence: false,
+          });
+          const dollars = (value: number) =>
+            `$${Math.round(value).toLocaleString("en-US")}`;
+          return {
+            scopeLine: `${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres screened at ${dollars(effectiveListedPrice)} across agricultural, livestock, specialty-crop, controlled-environment, renewable-energy, storage, leasing, and diversified-use candidates. Rankings are assumptions until site and operator evidence is attached.`,
+            acreageRows: model.ranked
+              .slice(0, 8)
+              .map((item, index) => ({
+                label: `${index + 1}. ${item.label}`,
+                value: `${item.fit.toFixed(0)}/100 fit · ${item.usedAcres.toFixed(1)} acres modeled · ${item.eligible ? dollars(item.noi) + " annual NOI" : "blocked pending feasibility evidence"}`,
+              })),
+            operatingRows: model.diversified.length
+              ? model.diversified.map((item) => ({
+                  label: `${Math.round(item.portfolioShare * 100)}% ${item.label}`,
+                  value: `${dollars(item.noi * item.portfolioShare)} weighted annual NOI`,
+                }))
+              : [
+                  {
+                    label: "Diversified portfolio",
+                    value:
+                      "No feasible portfolio until constraints are resolved",
+                  },
+                ],
+            debtRows: [
+              {
+                label: "Illustrative annual debt service",
+                value: dollars(annualDebtService),
+              },
+              {
+                label: "Highest-ranked diversified NOI",
+                value: dollars(model.portfolioNoi),
+              },
+              {
+                label: "Diversified DSCR",
+                value: `${model.portfolioDscr?.toFixed(2) ?? "—"}x against a 1.25x screening threshold`,
+              },
+              {
+                label: "Energy-use treatment",
+                value:
+                  "Solar, agrivoltaics, and battery storage receive no credited revenue until zoning and grid/interconnection evidence is present.",
+              },
+            ],
+            assumptions: [
+              model.warning,
+              "Opportunity economics are editable screening assumptions, not appraisals, bids, contracts, or eligibility findings.",
+              "The selected best use can be singular or diversified; the optimizer does not privilege commodity crops.",
+            ],
+            readiness: [
+              "NRCS soils, capability classes, drainage, wetlands, and productive-acre delineation",
+              "FSA acreage/base history, APH, conservation obligations, and crop-insurance records",
+              "Water supply, irrigation capacity, nutrient-management and waste-handling constraints",
+              "Labor, operator skill, equipment, buildings, working capital, and market/offtake capacity",
+              "Zoning and permits for livestock, poultry, greenhouse, agritourism, solar, agrivoltaics, or battery storage",
+              "Utility territory, substation distance, hosting capacity, interconnection queue, and offtake terms",
+              "Enterprise-specific budgets, contracts, price scenarios, and downside sensitivities",
+            ],
+          };
+        })(),
+        compensationTransparency: buildRealEstateCompensationTransparency({
+          ...emptyRealEstateCompensationInput(),
+          jurisdiction: analysisContext.location || null,
+        }),
+        similarHomes: similarHomes.length
+          ? similarHomes.map((home) => ({
+              title: home.title,
+              detail:
+                `${home.priceLabel}` +
+                (home.comparison === "lower"
+                  ? " (less than this one)"
+                  : home.comparison === "higher"
+                    ? " (more than this one)"
+                    : home.comparison === "similar"
+                      ? " (about the same)"
+                      : "") +
+                ` · ${home.location}` +
+                (home.distanceMiles != null
+                  ? ` · ~${home.distanceMiles} mi away`
+                  : "") +
+                ` · ${home.sourceLabel}${home.isCurrent ? "" : ` · ${home.vintage}`}` +
+                ((home.signals?.length ?? 0) > 0
+                  ? ` · ${home.signals?.join(" · ")}`
+                  : ""),
+            }))
+          : undefined,
+        customerRights: buildCustomerRightsSummary(),
+        humanReviewBoundary: buildHumanReviewBoundary({
+          tier: { id: answers.reportTier, label: report.tier.label },
+          answers,
+          readinessMissing: contextualMissingItems(
+            readinessResult.missingItems,
+            analysisContext,
+            answers,
+          ),
+        }),
       };
 
       const tokenRes = await fetch("/api/public/property-report-token", {
@@ -3177,13 +4200,15 @@ export function PropertyEvaluationWorkspace({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ report: reportPayload }),
       });
-      const tokenBody = (await tokenRes.json().catch(() => null)) as
-        | { ok?: boolean; token?: string; error?: string }
-        | null;
+      const tokenBody = (await tokenRes.json().catch(() => null)) as {
+        ok?: boolean;
+        token?: string;
+        error?: string;
+      } | null;
       if (!tokenRes.ok || !tokenBody?.ok || !tokenBody.token) {
         throw new Error(
           tokenBody?.error ||
-            `The report attestation service returned HTTP ${tokenRes.status}${tokenRes.statusText ? ` (${tokenRes.statusText})` : ""} — try again in a moment; if it persists, this exact message is what to report.`
+            `The report attestation service returned HTTP ${tokenRes.status}${tokenRes.statusText ? ` (${tokenRes.statusText})` : ""} — try again in a moment; if it persists, this exact message is what to report.`,
         );
       }
 
@@ -3198,14 +4223,17 @@ export function PropertyEvaluationWorkspace({
       });
       if (!res.ok) {
         const failureText = await res.text();
-        throw new Error(failureText || "The report service returned an unexpected error.");
+        throw new Error(
+          failureText || "The report service returned an unexpected error.",
+        );
       }
       const blob = await res.blob();
       return { blob, fileStem };
     } catch (error) {
-      const message = error instanceof Error
-        ? error.message
-        : "The report could not be prepared right now.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "The report could not be prepared right now.";
       setPdfError(message);
       return null;
     }
@@ -3265,7 +4293,6 @@ export function PropertyEvaluationWorkspace({
     })();
   }
 
-
   const propertyRecord = facts?.propertyRecord ?? null;
   // Label/value rows, not sentences — the panel scans (redesign round 2).
   const topKnownFacts: { label: string; value: string }[] = [
@@ -3273,7 +4300,7 @@ export function PropertyEvaluationWorkspace({
       label: "Address",
       value: propertyRecord?.exactAddress
         ? `${propertyRecord.exactAddress}${propertyRecord.zip ? ` ${propertyRecord.zip}` : ""}`
-        : analysisContext.exactAddress ?? analysisContext.location,
+        : (analysisContext.exactAddress ?? analysisContext.location),
     },
     {
       label: "Style",
@@ -3286,49 +4313,53 @@ export function PropertyEvaluationWorkspace({
     {
       label: "Price",
       value:
-        analysisContext.priceLabel && !/price on request/i.test(analysisContext.priceLabel)
+        analysisContext.priceLabel &&
+        !/price on request/i.test(analysisContext.priceLabel)
           ? analysisContext.priceLabel
           : "On the source listing — changes as bid periods reset",
     },
   ];
-  const verifiedProgramPreview = topProgramRanks.slice(0, 4).map(
-    (entry, index) => `${index + 1}. ${entry.program.name}`
-  );
-  const preliminaryPropertyPathways = workspaceProfile.id === "residential"
-    ? [
-        "FHA purchase financing",
-        "FHA 203(k) renovation financing",
-        "VA purchase or renovation financing — borrower eligibility required",
-        "USDA Rural Development purchase financing — 0% down in eligible rural areas",
-        "Conventional purchase or renovation financing",
-        "Construction-to-permanent financing — if rehabilitation is impractical",
-        "Seller financing — seller carries a negotiated note",
-        "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
-      ]
-    : workspaceProfile.id === "farm"
+  const verifiedProgramPreview = topProgramRanks
+    .slice(0, 4)
+    .map((entry, index) => `${index + 1}. ${entry.program.name}`);
+  const preliminaryPropertyPathways =
+    workspaceProfile.id === "residential"
       ? [
-          // FSA split (founder 2026-08-05): direct and guaranteed are
-          // different programs with different limits, rates, and lenders —
-          // presenting one undifferentiated "FSA" entry was steering by
-          // omission toward the direct program.
-          "FSA direct farm ownership financing — USDA lends directly",
-          "FSA guaranteed farm ownership financing — bank loan with a USDA guarantee",
-          "USDA Rural Development housing financing — if owner-occupied residential use fits",
-          "Farm Credit or agricultural real-estate financing",
-          "Conventional farm or mixed-use financing",
-          "Seller financing — seller carries a negotiated note on land, improvements, or included assets",
-          "Private agricultural or asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
-        ]
-      : [
-          "Conventional bank or credit-union commercial real-estate financing",
-          "SBA 504 financing — owner-occupied fixed assets and eligible improvements",
-          "SBA 7(a) financing — real estate, business acquisition, working capital, and equipment when eligible",
-          "USDA Business & Industry financing — rural eligible business-purpose projects",
-          "Commercial bridge or value-add financing — acquisition plus renovation or lease-up",
-          "Seller financing — seller carries a negotiated note on real estate, business value, or included assets",
+          "FHA purchase financing",
+          "FHA 203(k) renovation financing",
+          "VA purchase or renovation financing — borrower eligibility required",
+          "USDA Rural Development purchase financing — 0% down in eligible rural areas",
+          "Conventional purchase or renovation financing",
+          "Construction-to-permanent financing — if rehabilitation is impractical",
+          "Seller financing — seller carries a negotiated note",
           "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
-          "Equipment financing — when machinery, fixtures, or other eligible fixed assets convey",
-        ];
+        ]
+      : workspaceProfile.id === "farm"
+        ? [
+            // FSA split (founder 2026-08-05): direct and guaranteed are
+            // different programs with different limits, rates, and lenders —
+            // presenting one undifferentiated "FSA" entry was steering by
+            // omission toward the direct program.
+            "USDA Business & Industry financing — rural business-purpose projects, including eligible value-added and integrated agricultural operations",
+            "SBA 504 financing — eligible owner-occupied processing, storage, agritourism, service, and other non-primary-production fixed assets",
+            "SBA 7(a) financing — eligible value-added or commercial operations, working capital, acquisition, and equipment",
+            "FSA direct farm ownership financing — USDA lends directly when the primary-production transaction requires the farm-credit lane",
+            "FSA guaranteed farm ownership financing — bank loan with a USDA guarantee when the primary-production transaction requires the farm-credit lane",
+            "USDA Rural Development housing financing — only when confirmed owner-occupied residential use is part of the transaction",
+            "Conventional farm or mixed-use financing",
+            "Seller financing — seller carries a negotiated note on land, improvements, or included assets",
+            "Private agricultural or asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
+          ]
+        : [
+            "Conventional bank or credit-union commercial real-estate financing",
+            "SBA 504 financing — owner-occupied fixed assets and eligible improvements",
+            "SBA 7(a) financing — real estate, business acquisition, working capital, and equipment when eligible",
+            "USDA Business & Industry financing — rural eligible business-purpose projects",
+            "Commercial bridge or value-add financing — acquisition plus renovation or lease-up",
+            "Seller financing — seller carries a negotiated note on real estate, business value, or included assets",
+            "Private asset-based bridge financing (hard money) — short-term, higher-cost, exit-dependent",
+            "Equipment financing — when machinery, fixtures, or other eligible fixed assets convey",
+          ];
   // Property-type compatibility controls this public list. Borrower-ranked
   // results may refine order later, but must never replace the correct lane.
   const topProgramPreview = preliminaryPropertyPathways;
@@ -3350,26 +4381,33 @@ export function PropertyEvaluationWorkspace({
     // Commercial: model income per candidate use (founder 2026-08-05 — the
     // commercial twin of the farm optimizer); best use's NOI feeds the
     // per-program DSCR lines.
-    const useScreen = laneId === "commercial"
-      ? modelCommercialUses({
-          zoning: facts?.propertyRecord?.zoning ?? null,
-          landUse: facts?.propertyRecord?.landUse ?? null,
-          squareFeet: facts?.propertyRecord?.squareFeet ?? null,
-          town: analysisContext.location ?? null,
-          county: analysisContext.county ?? null,
-          stateCode: analysisContext.stateCode ?? facts?.verification?.parsedAddress?.state ?? null,
-          screeningPrice,
-          benchRatePct: ownershipContext?.rates.rate30 ?? null,
-        })
-      : null;
+    const useScreen =
+      laneId === "commercial"
+        ? modelCommercialUses({
+            zoning: facts?.propertyRecord?.zoning ?? null,
+            landUse: facts?.propertyRecord?.landUse ?? null,
+            squareFeet: facts?.propertyRecord?.squareFeet ?? null,
+            town: analysisContext.location ?? null,
+            county: analysisContext.county ?? null,
+            stateCode:
+              analysisContext.stateCode ??
+              facts?.verification?.parsedAddress?.state ??
+              null,
+            screeningPrice,
+            benchRatePct: ownershipContext?.rates.rate30 ?? null,
+          })
+        : null;
     if (useScreen?.bestUse?.noiMid != null) {
       noiAnnual = useScreen.bestUse.noiMid;
       noiBasis = `best modeled use — ${useScreen.bestUse.use} (screening bands, not an appraisal)`;
     }
-    const farmPortfolio = effectivePlaceIntelligence?.farmBestUse?.parcelPortfolio ?? null;
+    const farmPortfolio =
+      effectivePlaceIntelligence?.farmBestUse?.parcelPortfolio ?? null;
     const farmCoverageReady =
-      effectivePlaceIntelligence?.farmBestUse?.evidenceStatus === "supported-screen" &&
-      effectivePlaceIntelligence.farmBestUse.missingCriticalInputs.length === 0 &&
+      effectivePlaceIntelligence?.farmBestUse?.evidenceStatus ===
+        "supported-screen" &&
+      effectivePlaceIntelligence.farmBestUse.missingCriticalInputs.length ===
+        0 &&
       farmPortfolio?.modeledNoiAnnual != null;
     if (laneId === "farm" && screeningPrice != null && farmCoverageReady) {
       // A farm is a parcel portfolio, not synonymous with tillable acreage.
@@ -3378,7 +4416,8 @@ export function PropertyEvaluationWorkspace({
       // Unsuitable uses are excluded from a segment; the segment itself is
       // never assigned zero economic value merely because it is not tillable.
       noiAnnual = farmPortfolio.modeledNoiAnnual;
-      noiBasis = farmPortfolio.basis ?? "segment-aware parcel operating scenario";
+      noiBasis =
+        farmPortfolio.basis ?? "segment-aware parcel operating scenario";
     }
     const ctx: ProgramFitContext = {
       laneId,
@@ -3387,46 +4426,63 @@ export function PropertyEvaluationWorkspace({
       noiBasis,
       rates: {
         mortgage30Pct: ownershipContext?.rates.rate30 ?? null,
-        fsaOwnershipDirectPct: ownershipContext?.fsa?.ownershipDirectPct ?? null,
+        fsaOwnershipDirectPct:
+          ownershipContext?.fsa?.ownershipDirectPct ?? null,
       },
       usdaRural: effectivePlaceIntelligence?.usdaRural ?? null,
     };
-    const map: Record<string, { score: number; line: string; excluded?: string }> = {};
+    const map: Record<
+      string,
+      { score: number; line: string; excluded?: string }
+    > = {};
     for (const name of topProgramPreview) {
       const fit = evaluateProgramFit(name, ctx);
       if (fit) map[name] = fit;
     }
     // Best DSCR across everything modeled, for the lender-test scorecard.
-    const bestDscr = laneId === "commercial"
-      ? useScreen?.bestUse?.dscr ?? null
-      : Object.values(map).reduce<number | null>((best, f) => {
-          const m = f.line.match(/DSCR (\d+\.\d+)/);
-          const v = m ? Number(m[1]) : null;
-          return v != null && (best == null || v > best) ? v : best;
-        }, null);
-    const bestDscrLabel = laneId === "commercial" ? useScreen?.bestUse?.use ?? null : noiBasis;
+    const bestDscr =
+      laneId === "commercial"
+        ? (useScreen?.bestUse?.dscr ?? null)
+        : Object.values(map).reduce<number | null>((best, f) => {
+            const m = f.line.match(/DSCR (\d+\.\d+)/);
+            const v = m ? Number(m[1]) : null;
+            return v != null && (best == null || v > best) ? v : best;
+          }, null);
+    const bestDscrLabel =
+      laneId === "commercial" ? (useScreen?.bestUse?.use ?? null) : noiBasis;
     const scorecard = buildLenderTestScorecard({
       ctx,
       bestDscr,
       bestDscrLabel,
       superfundWithin3mi: (() => {
-        const epa = (effectivePlaceIntelligence?.verifiedFacts ?? []).find((f) => /contamination screen/i.test(f.label));
+        const epa = (effectivePlaceIntelligence?.verifiedFacts ?? []).find(
+          (f) => /contamination screen/i.test(f.label),
+        );
         if (!epa) return null;
         const m = epa.value.match(/(\d+|No) Superfund/i);
         return m ? (m[1].toLowerCase() === "no" ? 0 : Number(m[1])) : null;
       })(),
       floodZone: (() => {
-        const flood = (effectivePlaceIntelligence?.verifiedFacts ?? []).find((f) => /flood zone/i.test(f.label));
+        const flood = (effectivePlaceIntelligence?.verifiedFacts ?? []).find(
+          (f) => /flood zone/i.test(f.label),
+        );
         const m = flood?.value.match(/Zone ([A-Z0-9]+)/i);
         return m ? m[1] : null;
       })(),
     });
     return { map, useScreen, scorecard };
-
-  }, [workspaceProfile.id, effectiveListedPrice, facts, effectivePlaceIntelligence, ownershipContext, topProgramPreview.join("|")]);
+  }, [
+    workspaceProfile.id,
+    effectiveListedPrice,
+    facts,
+    effectivePlaceIntelligence,
+    ownershipContext,
+    topProgramPreview.join("|"),
+  ]);
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
-    listedPrice: effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel),
+    listedPrice:
+      effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel),
     requestedAmount: parsePriceSignal(answers.requestedAmount),
     pathwayNames: topProgramRanks.map((entry) => entry.program.name),
   });
@@ -3437,45 +4493,67 @@ export function PropertyEvaluationWorkspace({
     profileId: workspaceProfile.id,
     comparables: similarHomes,
   });
-  const rankingPrice = effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel);
-  const officialTaxRecord = structuredTaxRecord(facts?.propertyEvidenceRecords ?? []);
-  const rankingTax = ownershipContext && rankingPrice
-    ? buildPostSaleTaxScenario({
-        price: rankingPrice,
-        sellerCurrentAnnualTax: officialTaxRecord?.currentAnnualTax ?? undefined,
-        currentTaxTransfersUnchanged: officialTaxRecord?.transferContinuityVerified === true,
-      }, ownershipContext)
-    : null;
-  const structuredRiskEvidence = ingestStructuredPropertyEvidence(facts?.propertyEvidenceRecords ?? []);
+  const rankingPrice =
+    effectiveListedPrice ?? parsePriceSignal(analysisContext.priceLabel);
+  const officialTaxRecord = structuredTaxRecord(
+    facts?.propertyEvidenceRecords ?? [],
+  );
+  const rankingTax =
+    ownershipContext && rankingPrice
+      ? buildPostSaleTaxScenario(
+          {
+            price: rankingPrice,
+            sellerCurrentAnnualTax:
+              officialTaxRecord?.currentAnnualTax ?? undefined,
+            currentTaxTransfersUnchanged:
+              officialTaxRecord?.transferContinuityVerified === true,
+          },
+          ownershipContext,
+        )
+      : null;
+  const structuredRiskEvidence = ingestStructuredPropertyEvidence(
+    facts?.propertyEvidenceRecords ?? [],
+  );
   const textRiskEvidence = ingestPropertyEvidence({
     facts: effectivePlaceIntelligence?.verifiedFacts ?? [],
     unknowns: effectivePlaceIntelligence?.unknowns ?? [],
     profileId: workspaceProfile.id,
     location: analysisContext.location,
   });
-  const structuredKinds = new Set(structuredRiskEvidence.map((item) => item.kind));
-  const ingestedRiskEvidence = [...structuredRiskEvidence, ...textRiskEvidence.filter((item) => !structuredKinds.has(item.kind))];
-  const reportRiskEvidence: ExtendedPropertyRiskEvidence[] = mergeWithDefaultPropertyEvidence({
-    ingested: ingestedRiskEvidence,
-    location: analysisContext.location,
-  });
+  const structuredKinds = new Set(
+    structuredRiskEvidence.map((item) => item.kind),
+  );
+  const ingestedRiskEvidence = [
+    ...structuredRiskEvidence,
+    ...textRiskEvidence.filter((item) => !structuredKinds.has(item.kind)),
+  ];
+  const reportRiskEvidence: ExtendedPropertyRiskEvidence[] =
+    mergeWithDefaultPropertyEvidence({
+      ingested: ingestedRiskEvidence,
+      location: analysisContext.location,
+    });
   const propertyEvidenceManifest = rankingTax
-    ? buildPropertyEvidenceManifest({ tax: rankingTax, evidence: reportRiskEvidence })
+    ? buildPropertyEvidenceManifest({
+        tax: rankingTax,
+        evidence: reportRiskEvidence,
+      })
     : null;
   void propertyEvidenceManifest;
-  const propertyInfrastructureRisk = buildInfrastructureRiskFromEvidence(reportRiskEvidence);
+  const propertyInfrastructureRisk =
+    buildInfrastructureRiskFromEvidence(reportRiskEvidence);
   const scenarioRankingPlan = buildScenarioRankingPlan({
     profileId: workspaceProfile.id,
     marketPlan: marketComparablePlan,
     capitalPlan: preliminaryCapitalPlan,
     pathwayCount: topProgramRanks.length,
-    taxImpact: rankingTax && rankingPrice
-      ? {
-          stabilizedAnnual: rankingTax.stabilizedAnnual,
-          adverseAnnual: rankingTax.adverseAnnual,
-          acquisitionPrice: rankingPrice,
-        }
-      : null,
+    taxImpact:
+      rankingTax && rankingPrice
+        ? {
+            stabilizedAnnual: rankingTax.stabilizedAnnual,
+            adverseAnnual: rankingTax.adverseAnnual,
+            acquisitionPrice: rankingPrice,
+          }
+        : null,
     infrastructureRisk: propertyInfrastructureRisk,
   });
   const transactionTimelinePlan = buildTransactionTimelinePlan({
@@ -3493,10 +4571,45 @@ export function PropertyEvaluationWorkspace({
   useEffect(() => {
     const propertyId = analysisContext.propertyId;
     if (!propertyId || propertyId.startsWith("imported:")) return;
-    const topThreeInput = { profileId: workspaceProfile.id, marketPlan: marketComparablePlan, capitalPlan: preliminaryCapitalPlan, pathwayCount: topProgramRanks.length, taxImpact: rankingTax && rankingPrice ? { stabilizedAnnual: rankingTax.stabilizedAnnual, adverseAnnual: rankingTax.adverseAnnual, acquisitionPrice: rankingPrice } : null, infrastructureRisk: propertyInfrastructureRisk };
+    const topThreeInput = {
+      profileId: workspaceProfile.id,
+      marketPlan: marketComparablePlan,
+      capitalPlan: preliminaryCapitalPlan,
+      pathwayCount: topProgramRanks.length,
+      taxImpact:
+        rankingTax && rankingPrice
+          ? {
+              stabilizedAnnual: rankingTax.stabilizedAnnual,
+              adverseAnnual: rankingTax.adverseAnnual,
+              acquisitionPrice: rankingPrice,
+            }
+          : null,
+      infrastructureRisk: propertyInfrastructureRisk,
+    };
     const captures = [
-      { kind: "top-three" as const, artifactId: `top-three:${propertyId}`, replayInput: topThreeInput, replayOutput: scenarioRankingPlan },
-      ...(rankingTax ? [{ kind: "tax-scenario" as const, artifactId: `tax-scenario:${propertyId}`, replayInput: { price: rankingPrice, sellerCurrentAnnualTax: officialTaxRecord?.currentAnnualTax ?? null, currentTaxTransfersUnchanged: officialTaxRecord?.transferContinuityVerified === true, ownershipContext }, replayOutput: rankingTax }] : []),
+      {
+        kind: "top-three" as const,
+        artifactId: `top-three:${propertyId}`,
+        replayInput: topThreeInput,
+        replayOutput: scenarioRankingPlan,
+      },
+      ...(rankingTax
+        ? [
+            {
+              kind: "tax-scenario" as const,
+              artifactId: `tax-scenario:${propertyId}`,
+              replayInput: {
+                price: rankingPrice,
+                sellerCurrentAnnualTax:
+                  officialTaxRecord?.currentAnnualTax ?? null,
+                currentTaxTransfersUnchanged:
+                  officialTaxRecord?.transferContinuityVerified === true,
+                ownershipContext,
+              },
+              replayOutput: rankingTax,
+            },
+          ]
+        : []),
     ];
     for (const capture of captures) {
       void fetch("/api/property/evidence-lineage/capture", {
@@ -3505,7 +4618,12 @@ export function PropertyEvaluationWorkspace({
         body: JSON.stringify({ ...capture, propertyId }),
       });
     }
-  }, [analysisContext.propertyId, rankingTax?.stabilizedAnnual, rankingTax?.adverseAnnual, scenarioRankingPlan.status]);
+  }, [
+    analysisContext.propertyId,
+    rankingTax?.stabilizedAnnual,
+    rankingTax?.adverseAnnual,
+    scenarioRankingPlan.status,
+  ]);
   const decisionSynthesisPlan = buildDecisionSynthesisPlan({
     propertyRanking: scenarioRankingPlan,
     executableRanking: executableScenarioRankingPlan,
@@ -3544,24 +4662,36 @@ export function PropertyEvaluationWorkspace({
     resolutions: decisionResolutionPlan,
     finality: recommendationFinalityPlan,
   });
-  const pendingReleaseReview = pendingReleaseReviews.find((row) => row.releaseId === recommendationReleaseRecord.releaseId) ?? null;
-  const latestPersistedRecommendationRelease = persistedReleaseRows[0]?.releasePayload ?? null;
+  const pendingReleaseReview =
+    pendingReleaseReviews.find(
+      (row) => row.releaseId === recommendationReleaseRecord.releaseId,
+    ) ?? null;
+  const latestPersistedRecommendationRelease =
+    persistedReleaseRows[0]?.releasePayload ?? null;
   const persistedAuditEntries = persistedReleaseRows
     .slice()
     .reverse()
     .map((row) => row.historyPayload?.entries?.at(-1))
-    .filter((entry): entry is RecommendationReleaseAuditEntry => Boolean(entry));
-  const recommendationReleaseChangeControl = buildRecommendationReleaseChangeControl({
-    current: recommendationReleaseRecord,
-    previous: latestPersistedRecommendationRelease,
-  });
+    .filter((entry): entry is RecommendationReleaseAuditEntry =>
+      Boolean(entry),
+    );
+  const recommendationReleaseChangeControl =
+    buildRecommendationReleaseChangeControl({
+      current: recommendationReleaseRecord,
+      previous: latestPersistedRecommendationRelease,
+    });
   const recommendationReleaseHistory = buildRecommendationReleaseHistory({
     current: recommendationReleaseRecord,
     changeControl: recommendationReleaseChangeControl,
     priorEntries: persistedAuditEntries,
   });
   const acknowledgeCriticalEscalation = async () => {
-    if (!pendingReleaseReview?.escalationRequired || !pendingReleaseReview.attestationCycleId || pendingReleaseReview.attestationCycleId === "pending-refresh") return;
+    if (
+      !pendingReleaseReview?.escalationRequired ||
+      !pendingReleaseReview.attestationCycleId ||
+      pendingReleaseReview.attestationCycleId === "pending-refresh"
+    )
+      return;
     setEscalationAcknowledgeBusy(true);
     setEscalationAcknowledgeMessage(null);
     try {
@@ -3574,14 +4704,32 @@ export function PropertyEvaluationWorkspace({
           traceId: `release-escalation-ack:${pendingReleaseReview.releaseId}:${Date.now()}`,
         }),
       });
-      const payload = await response.json() as { ok?: boolean; error?: string };
-      if (!response.ok || !payload.ok) throw new Error(payload.error || "Escalation acknowledgement failed.");
-      setPendingReleaseReviews((current) => current.map((row) => row.releaseId === pendingReleaseReview.releaseId
-        ? { ...row, escalationAcknowledged: true, acknowledgedByCurrentActor: true }
-        : row));
-      setEscalationAcknowledgeMessage("Your immutable escalation acknowledgement is recorded. This does not count as countersignature or release approval.");
+      const payload = (await response.json()) as {
+        ok?: boolean;
+        error?: string;
+      };
+      if (!response.ok || !payload.ok)
+        throw new Error(payload.error || "Escalation acknowledgement failed.");
+      setPendingReleaseReviews((current) =>
+        current.map((row) =>
+          row.releaseId === pendingReleaseReview.releaseId
+            ? {
+                ...row,
+                escalationAcknowledged: true,
+                acknowledgedByCurrentActor: true,
+              }
+            : row,
+        ),
+      );
+      setEscalationAcknowledgeMessage(
+        "Your immutable escalation acknowledgement is recorded. This does not count as countersignature or release approval.",
+      );
     } catch (error) {
-      setEscalationAcknowledgeMessage(error instanceof Error ? error.message : "Escalation acknowledgement failed.");
+      setEscalationAcknowledgeMessage(
+        error instanceof Error
+          ? error.message
+          : "Escalation acknowledgement failed.",
+      );
     } finally {
       setEscalationAcknowledgeBusy(false);
     }
@@ -3608,11 +4756,12 @@ export function PropertyEvaluationWorkspace({
             profileId: workspaceProfile.id,
             releaseState: recommendationReleaseRecord.releaseState,
             finality: recommendationReleaseRecord.finality,
-            priorReleaseId: latestPersistedRecommendationRelease?.releaseId ?? null,
+            priorReleaseId:
+              latestPersistedRecommendationRelease?.releaseId ?? null,
           },
         }),
       });
-      const payload = await response.json() as {
+      const payload = (await response.json()) as {
         ok?: boolean;
         row?: {
           releaseId: string;
@@ -3626,7 +4775,8 @@ export function PropertyEvaluationWorkspace({
         staleCycleRestarted?: boolean;
         error?: string;
       };
-      if (!response.ok || !payload.ok) throw new Error(payload.error || "Release persistence failed.");
+      if (!response.ok || !payload.ok)
+        throw new Error(payload.error || "Release persistence failed.");
       if (payload.pendingCountersignature) {
         setPendingReleaseReviews((current) => [
           {
@@ -3635,7 +4785,9 @@ export function PropertyEvaluationWorkspace({
             currentActorAlreadyAttested: true,
             canCountersign: false,
             firstAttestedAt: new Date().toISOString(),
-            expiresAt: payload.attestationExpiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            expiresAt:
+              payload.attestationExpiresAt ??
+              new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
             freshnessState: "active",
             urgencyState: "normal",
             remainingSeconds: 24 * 60 * 60,
@@ -3643,15 +4795,26 @@ export function PropertyEvaluationWorkspace({
             escalationAcknowledged: false,
             acknowledgedByCurrentActor: false,
           },
-          ...current.filter((row) => row.releaseId !== recommendationReleaseRecord.releaseId),
+          ...current.filter(
+            (row) => row.releaseId !== recommendationReleaseRecord.releaseId,
+          ),
         ]);
-        setReleaseRecordMessage(payload.staleCycleRestarted
-          ? "The prior countersignature cycle had expired. Your attestation started a fresh 24-hour independent review cycle."
-          : "Your authorized attestation is recorded. A different authorized reviewer must countersign before this recommendation becomes an immutable release.");
+        setReleaseRecordMessage(
+          payload.staleCycleRestarted
+            ? "The prior countersignature cycle had expired. Your attestation started a fresh 24-hour independent review cycle."
+            : "Your authorized attestation is recorded. A different authorized reviewer must countersign before this recommendation becomes an immutable release.",
+        );
         return;
       }
-      if (!payload.row) throw new Error("Release persistence completed without a release record.");
-      setPendingReleaseReviews((current) => current.filter((row) => row.releaseId !== recommendationReleaseRecord.releaseId));
+      if (!payload.row)
+        throw new Error(
+          "Release persistence completed without a release record.",
+        );
+      setPendingReleaseReviews((current) =>
+        current.filter(
+          (row) => row.releaseId !== recommendationReleaseRecord.releaseId,
+        ),
+      );
       setPersistedReleaseRows((current) => [
         payload.row!,
         ...current.filter((row) => row.releaseId !== payload.row!.releaseId),
@@ -3659,15 +4822,16 @@ export function PropertyEvaluationWorkspace({
       setReleaseRecordMessage(
         recommendationReleaseRecord.releaseState === "withheld"
           ? "The governed withheld-release event was recorded without implying approval."
-          : "The governed recommendation release was recorded as an immutable lineage entry."
+          : "The governed recommendation release was recorded as an immutable lineage entry.",
       );
     } catch (error) {
-      setReleaseHistoryError(error instanceof Error ? error.message : "Release persistence failed.");
+      setReleaseHistoryError(
+        error instanceof Error ? error.message : "Release persistence failed.",
+      );
     } finally {
       setReleaseRecordBusy(false);
     }
   };
-
 
   // DRAFT SBA/USDA pro forma (founder direction 2026-07-29): the real lender
   // package structure with the property's Land Ledger evidence attached as
@@ -3675,47 +4839,109 @@ export function PropertyEvaluationWorkspace({
   // residential keeps the Land Ledger report. Borrower-side gate items
   // intentionally stay open so the document is watermarked DRAFT with the
   // underwriting checklist. Zero PII leaves the page.
-  async function requestProformaPdf(): Promise<{ blob: Blob; fileStem: string } | null> {
+  async function requestProformaPdf(): Promise<{
+    blob: Blob;
+    fileStem: string;
+  } | null> {
     setPdfError(null);
     setProformaError(null);
     try {
-      const acreage = facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
-      const fsaRatePct = ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? null;
-      const isFarmLaneDoc = workspaceProfile.id === "farm" || workspaceProfile.id === "land";
-      let revenueUnits: Array<{ unitName: string; unitDescription: string; conservativeAnnualNoi: number; stabilizedAnnualNoi: number; methodology: string }> = [];
-      if (isFarmLaneDoc && effectiveListedPrice != null && acreage && fsaRatePct != null) {
-        const annualDebtService = effectiveListedPrice * 0.8 * (fsaRatePct / 100) / (1 - Math.pow(1 + fsaRatePct / 100, -40));
-        const model = optimizeAgriculturalOpportunities({ acres: acreage, purchasePrice: effectiveListedPrice, debtService: annualDebtService, waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false });
+      const acreage =
+        facts?.propertyRecord?.offeredAcreage ??
+        (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
+      const fsaRatePct =
+        ownershipContext?.fsa?.ownershipDirectPct ??
+        ownershipContext?.rates.rate30 ??
+        null;
+      const isFarmLaneDoc =
+        workspaceProfile.id === "farm" || workspaceProfile.id === "land";
+      let revenueUnits: Array<{
+        unitName: string;
+        unitDescription: string;
+        conservativeAnnualNoi: number;
+        stabilizedAnnualNoi: number;
+        methodology: string;
+      }> = [];
+      if (
+        isFarmLaneDoc &&
+        effectiveListedPrice != null &&
+        acreage &&
+        fsaRatePct != null
+      ) {
+        const annualDebtService =
+          (effectiveListedPrice * 0.8 * (fsaRatePct / 100)) /
+          (1 - Math.pow(1 + fsaRatePct / 100, -40));
+        const model = optimizeAgriculturalOpportunities({
+          acres: acreage,
+          purchasePrice: effectiveListedPrice,
+          debtService: annualDebtService,
+          waterScore: 70,
+          laborCapacity: 55,
+          capitalCapacity: 55,
+          marketAccess: 60,
+          gridEvidence: false,
+          solarZoningEvidence: false,
+        });
         revenueUnits = model.diversified.slice(0, 6).map((item) => ({
           unitName: item.label,
           unitDescription: `${Math.round(item.portfolioShare * 100)}% of the diversified screening portfolio on ~${acreage.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
-          conservativeAnnualNoi: Math.round(item.noi * item.portfolioShare * 0.75),
+          conservativeAnnualNoi: Math.round(
+            item.noi * item.portfolioShare * 0.75,
+          ),
           stabilizedAnnualNoi: Math.round(item.noi * item.portfolioShare),
-          methodology: "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
+          methodology:
+            "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
         }));
       }
       const additionalProperties = otherSavedProperties
         .filter((p) => proformaIncludedIds.includes(p.id))
         .map((p) => {
-          const parsedPrice = Number((p.priceLabel.match(/\$([0-9][0-9,]*)/) ?? [])[1]?.replace(/,/g, ""));
+          const parsedPrice = Number(
+            (p.priceLabel.match(/\$([0-9][0-9,]*)/) ?? [])[1]?.replace(
+              /,/g,
+              "",
+            ),
+          );
           return {
-            title: p.exactAddress ?? [p.town, p.state].filter(Boolean).join(", ") ?? p.id,
+            title:
+              p.exactAddress ??
+              [p.town, p.state].filter(Boolean).join(", ") ??
+              p.id,
             location: [p.county, p.state].filter(Boolean).join(", ") || null,
-            price: Number.isFinite(parsedPrice) && parsedPrice > 0 ? parsedPrice : null,
+            price:
+              Number.isFinite(parsedPrice) && parsedPrice > 0
+                ? parsedPrice
+                : null,
           };
         });
       // Land Ledger evidence rides as Exhibit A; lane answers as Exhibit B.
       const propertyEvidence = (effectivePlaceIntelligence?.verifiedFacts ?? [])
-        .filter((fact) => workspaceProfile.id !== "farm" || !/broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(fact.label))
+        .filter(
+          (fact) =>
+            workspaceProfile.id !== "farm" ||
+            !/broadband|airport|flight path|rental context|hud|daily-life|crime/i.test(
+              fact.label,
+            ),
+        )
         .map((fact) => ({
           label: fact.label,
           value: fact.value,
-          source: fact.provenance.replace(/^Source:\s*/i, "").split("·")[0].trim(),
+          source: fact.provenance
+            .replace(/^Source:\s*/i, "")
+            .split("·")[0]
+            .trim(),
         }));
-      const answerFmt = (answers: { question: string; answer: string; confirm: string | null }[]) =>
-        answers.map((a) => `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`);
+      const answerFmt = (
+        answers: { question: string; answer: string; confirm: string | null }[],
+      ) =>
+        answers.map(
+          (a) =>
+            `${a.question} — ${a.answer}${a.confirm ? ` (Confirm: ${a.confirm})` : ""}`,
+        );
       const laneAnswerLines = isFarmLaneDoc
-        ? (effectivePlaceIntelligence?.farmEnterpriseAnswers ?? []).map((a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`)
+        ? (effectivePlaceIntelligence?.farmEnterpriseAnswers ?? []).map(
+            (a) => `${a.propertyAnswer}${a.confirm ? ` (${a.confirm})` : ""}`,
+          )
         : answerFmt(effectivePlaceIntelligence?.commercialAnswers ?? []);
       // Residential gets the ownership-cost buyer pro forma (lane "R");
       // farm → USDA/FSA (B); commercial → SBA (A).
@@ -3726,13 +4952,13 @@ export function PropertyEvaluationWorkspace({
               priceLabel: analysisContext.priceLabel,
               ownershipCosts:
                 effectiveListedPrice != null && ownershipContext
-                  ? formatOwnershipCostsForPdf({
+                  ? (formatOwnershipCostsForPdf({
                       listedPrice: effectiveListedPrice,
                       ownershipContext,
                       isHome: isResidentialHomeContext(analysisContext),
                       farmShaped: false,
                       farmMode: false,
-                    }) ?? null
+                    }) ?? null)
                   : null,
               financingLanes: topProgramPreview,
               // The REAL pro forma body — Sources & Uses through Cash to
@@ -3750,7 +4976,10 @@ export function PropertyEvaluationWorkspace({
                     })
                   : null,
               rates: ownershipContext
-                ? { mortgage30Pct: ownershipContext.rates.rate30 ?? null, mortgageWeekOf: ownershipContext.rates.weekOf ?? null }
+                ? {
+                    mortgage30Pct: ownershipContext.rates.rate30 ?? null,
+                    mortgageWeekOf: ownershipContext.rates.weekOf ?? null,
+                  }
                 : null,
             }
           : undefined;
@@ -3762,7 +4991,12 @@ export function PropertyEvaluationWorkspace({
           exactAddress: context.exactAddress,
           county: context.county,
           state: context.stateCode,
-          lane: workspaceProfile.id === "residential" ? "R" : isFarmLaneDoc ? "B" : "A",
+          lane:
+            workspaceProfile.id === "residential"
+              ? "R"
+              : isFarmLaneDoc
+                ? "B"
+                : "A",
           residential: residentialPayload,
           acquisitionPrice: effectiveListedPrice,
           benchRatePct: ownershipContext?.rates.rate30 ?? null,
@@ -3793,11 +5027,17 @@ export function PropertyEvaluationWorkspace({
       });
       if (!res.ok) {
         const failureText = await res.text();
-        throw new Error(failureText.slice(0, 200) || `The pro forma service returned HTTP ${res.status}.`);
+        throw new Error(
+          failureText.slice(0, 200) ||
+            `The pro forma service returned HTTP ${res.status}.`,
+        );
       }
       return { blob: await res.blob(), fileStem: "furlong-draft-proforma" };
     } catch (error) {
-      const message = error instanceof Error ? error.message : "The pro forma service is unavailable right now.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "The pro forma service is unavailable right now.";
       setPdfError(message);
       setProformaError(message);
       return null;
@@ -3814,11 +5054,28 @@ export function PropertyEvaluationWorkspace({
       {/* Document picker (founder 2026-07-29): the Pro Forma Report is the
           numbers-only edition for experienced buyers; the First-Time Buyer
           Report carries the full guidance. Every lane offers both. */}
-      <div role="radiogroup" aria-label="Choose your document" style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-        {([
-          { kind: "proforma" as const, label: "Pro Forma Report", note: "numbers-only, for experienced buyers" },
-          { kind: "first-time" as const, label: "First-Time Buyer Report", note: "full guidance, every concept explained" },
-        ]).map((doc) => (
+      <div
+        role="radiogroup"
+        aria-label="Choose your document"
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 8,
+          alignItems: "center",
+        }}
+      >
+        {[
+          {
+            kind: "proforma" as const,
+            label: "Pro Forma Report",
+            note: "numbers-only, for experienced buyers",
+          },
+          {
+            kind: "first-time" as const,
+            label: "First-Time Buyer Report",
+            note: "full guidance, every concept explained",
+          },
+        ].map((doc) => (
           <button
             key={doc.kind}
             type="button"
@@ -3831,25 +5088,53 @@ export function PropertyEvaluationWorkspace({
               fontSize: 12.5,
               fontWeight: 750,
               cursor: "pointer",
-              border: reportDocKind === doc.kind ? "1px solid #1C2B45" : "1px solid #cdd9ec",
+              border:
+                reportDocKind === doc.kind
+                  ? "1px solid #1C2B45"
+                  : "1px solid #cdd9ec",
               background: reportDocKind === doc.kind ? "#1C2B45" : "#ffffff",
               color: reportDocKind === doc.kind ? "#ffffff" : "#3b475a",
             }}
           >
-            {doc.label} <span style={{ fontWeight: 500, opacity: 0.85 }}>· {doc.note}</span>
+            {doc.label}{" "}
+            <span style={{ fontWeight: 500, opacity: 0.85 }}>· {doc.note}</span>
           </button>
         ))}
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 12,
+          alignItems: "center",
+        }}
+      >
         {context.listingUrl && (
-          <Link href={context.listingUrl} style={{ color: "#185FA5", textDecoration: "underline", fontWeight: 700 }}>
+          <Link
+            href={context.listingUrl}
+            style={{
+              color: "#185FA5",
+              textDecoration: "underline",
+              fontWeight: 700,
+            }}
+          >
             See the current price on the official listing ↗
           </Link>
         )}
-        <button type="button" onClick={viewPdfTab} style={actionButtonPrimary} disabled={pdfBusy !== null}>
+        <button
+          type="button"
+          onClick={viewPdfTab}
+          style={actionButtonPrimary}
+          disabled={pdfBusy !== null}
+        >
           {pdfBusy === "view" ? "Preparing PDF..." : "View & print PDF"}
         </button>
-        <button type="button" onClick={exportDraft} style={actionButtonSecondary} disabled={pdfBusy !== null}>
+        <button
+          type="button"
+          onClick={exportDraft}
+          style={actionButtonSecondary}
+          disabled={pdfBusy !== null}
+        >
           {pdfBusy === "export" ? "Preparing PDF..." : "Download PDF"}
         </button>
         {/* ANONYMIZED permanent record (founder direction 2026-07-29): the
@@ -3878,12 +5163,21 @@ export function PropertyEvaluationWorkspace({
         />
         {savedAt && (
           <span style={{ fontSize: 12, color: "#7a8aa0" }}>
-            Draft saved automatically on this device · {new Date(savedAt).toLocaleString()}
+            Draft saved automatically on this device ·{" "}
+            {new Date(savedAt).toLocaleString()}
           </span>
         )}
       </div>
       {pdfError && (
-        <p style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 860 }}>
+        <p
+          style={{
+            margin: 0,
+            fontSize: 12.5,
+            color: "#a12626",
+            lineHeight: 1.6,
+            maxWidth: 860,
+          }}
+        >
           PDF generation hit an issue: {pdfError}
         </p>
       )}
@@ -3891,7 +5185,11 @@ export function PropertyEvaluationWorkspace({
   );
 
   return (
-    <section className="furlong-report-print" data-print="report" style={{ display: "grid", gap: 22 }}>
+    <section
+      className="furlong-report-print"
+      data-print="report"
+      style={{ display: "grid", gap: 22 }}
+    >
       {/* Immaculate print / "Download as a document" styling (founder direction
           2026-07-20): a browser Print (Ctrl+P) of the live ledger must NOT come
           out a navy web-page screenshot with buttons. This strips the whole page
@@ -3945,23 +5243,130 @@ export function PropertyEvaluationWorkspace({
           nameplate, the parcel, and a "DATA VERIFIED" stamp. Furlong = 220 yards
           of ground: a parcel measured, sourced, and logged. */}
       {!deepView && (
-        <div className="nl-doc" style={{ position: "relative", overflow: "hidden", borderRadius: 16, border: "1px solid #d7deea", boxShadow: "0 6px 22px rgba(16,26,43,0.08)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", padding: "20px 24px", background: "linear-gradient(180deg,#10233b,#14293f)", borderBottom: "3px solid #b8862f" }}>
-            { }
-            <img src={report.branding.emblemPath} alt="Furlong seal" width={58} height={58} style={{ width: 58, height: 58, borderRadius: "50%", flexShrink: 0, boxShadow: "0 0 0 2px rgba(201,168,76,0.45)" }} />
-            <div style={{ display: "grid", gap: 3, flex: "1 1 240px", fontFamily: "Georgia, 'Times New Roman', serif" }}>
-              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#d4b06a" }}>Furlong · The Land Ledger</span>
-              <strong style={{ fontSize: "clamp(20px,3.4vw,27px)", lineHeight: 1.12, color: "#f4f7fa", fontWeight: 700 }}>{context.title}</strong>
-              {context.location && <span style={{ fontSize: 13.5, color: "#b9cbd9" }}>{context.location}</span>}
+        <div
+          className="nl-doc"
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            borderRadius: 16,
+            border: "1px solid #d7deea",
+            boxShadow: "0 6px 22px rgba(16,26,43,0.08)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              flexWrap: "wrap",
+              padding: "20px 24px",
+              background: "linear-gradient(180deg,#10233b,#14293f)",
+              borderBottom: "3px solid #b8862f",
+            }}
+          >
+            {}
+            <img
+              src={report.branding.emblemPath}
+              alt="Furlong seal"
+              width={58}
+              height={58}
+              style={{
+                width: 58,
+                height: 58,
+                borderRadius: "50%",
+                flexShrink: 0,
+                boxShadow: "0 0 0 2px rgba(201,168,76,0.45)",
+              }}
+            />
+            <div
+              style={{
+                display: "grid",
+                gap: 3,
+                flex: "1 1 240px",
+                fontFamily: "Georgia, 'Times New Roman', serif",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 800,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "#d4b06a",
+                }}
+              >
+                Furlong · The Land Ledger
+              </span>
+              <strong
+                style={{
+                  fontSize: "clamp(20px,3.4vw,27px)",
+                  lineHeight: 1.12,
+                  color: "#f4f7fa",
+                  fontWeight: 700,
+                }}
+              >
+                {context.title}
+              </strong>
+              {context.location && (
+                <span style={{ fontSize: 13.5, color: "#b9cbd9" }}>
+                  {context.location}
+                </span>
+              )}
             </div>
-            <div aria-label={`Data verified ${report.branding.generatedDate}`} style={{ transform: "rotate(-4deg)", border: "2px solid #c9a84c", borderRadius: 8, padding: "7px 12px", textAlign: "center", flexShrink: 0, background: "rgba(201,168,76,0.06)" }}>
-              <span style={{ display: "block", fontSize: 9.5, fontWeight: 800, letterSpacing: "0.14em", color: "#d4b06a" }}>DATA VERIFIED</span>
-              <span style={{ display: "block", fontSize: 14, fontWeight: 800, fontFamily: "Georgia, serif", letterSpacing: "0.03em", color: "#eec07a" }}>{report.branding.generatedDate}</span>
+            <div
+              aria-label={`Data verified ${report.branding.generatedDate}`}
+              style={{
+                transform: "rotate(-4deg)",
+                border: "2px solid #c9a84c",
+                borderRadius: 8,
+                padding: "7px 12px",
+                textAlign: "center",
+                flexShrink: 0,
+                background: "rgba(201,168,76,0.06)",
+              }}
+            >
+              <span
+                style={{
+                  display: "block",
+                  fontSize: 9.5,
+                  fontWeight: 800,
+                  letterSpacing: "0.14em",
+                  color: "#d4b06a",
+                }}
+              >
+                DATA VERIFIED
+              </span>
+              <span
+                style={{
+                  display: "block",
+                  fontSize: 14,
+                  fontWeight: 800,
+                  fontFamily: "Georgia, serif",
+                  letterSpacing: "0.03em",
+                  color: "#eec07a",
+                }}
+              >
+                {report.branding.generatedDate}
+              </span>
             </div>
           </div>
-          <div style={{ padding: "7px 24px", background: "#faf6ec", borderTop: "1px solid #e9ddc4" }}>
-            <span style={{ fontSize: 11, color: "#7a5c1f", fontStyle: "italic", fontFamily: "Georgia, serif" }}>
-              A furlong — 220 yards of ground — measured, sourced, and logged. Every figure below carries its origin and date.
+          <div
+            style={{
+              padding: "7px 24px",
+              background: "#faf6ec",
+              borderTop: "1px solid #e9ddc4",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                color: "#7a5c1f",
+                fontStyle: "italic",
+                fontFamily: "Georgia, serif",
+              }}
+            >
+              A furlong — 220 yards of ground — measured, sourced, and logged.
+              Every figure below carries its origin and date.
             </span>
           </div>
         </div>
@@ -3990,15 +5395,20 @@ export function PropertyEvaluationWorkspace({
             padding: "12px 16px",
           }}
         >
-          <span aria-hidden style={{ fontSize: 15 }}>⏳</span>
+          <span aria-hidden style={{ fontSize: 15 }}>
+            ⏳
+          </span>
           <span style={{ fontSize: 13, color: "#4d596d", lineHeight: 1.55 }}>
-            <strong style={{ color: "#101a2b" }}>Still gathering this tract&apos;s public records.</strong>{" "}
-            Flood, tax, program, county and utility facts are still coming in — the ledger below is not
-            complete yet. Give it a moment before you print, save, or judge it.
+            <strong style={{ color: "#101a2b" }}>
+              Still gathering this tract&apos;s public records.
+            </strong>{" "}
+            Flood, tax, program, county and utility facts are still coming in —
+            the ledger below is not complete yet. Give it a moment before you
+            print, save, or judge it.
           </span>
           <span className="furlong-print-only" style={{ display: "none" }}>
-            INCOMPLETE COPY — the record was still loading when this was printed. Reprint once the ledger
-            has finished gathering.
+            INCOMPLETE COPY — the record was still loading when this was
+            printed. Reprint once the ledger has finished gathering.
           </span>
         </div>
       )}
@@ -4010,78 +5420,154 @@ export function PropertyEvaluationWorkspace({
           her own farm, 2026-07-18). Imported addresses carry no type, so this is
           an active picker; a typed listing shows it as a confirming stamp you can
           still correct. */}
-      {!deepView && (() => {
-        const imported = importedProperty;
-        return (
-          <section
-            aria-label="Property type on file"
-            style={{
-              display: "grid",
-              gap: 9,
-              border: "1px solid #e2d7bd",
-              borderLeft: "4px solid #b8862f",
-              background: "#faf6ec",
-              borderRadius: 12,
-              padding: "12px 16px",
-            }}
-          >
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: "4px 10px" }}>
-              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "#7a5c1f", fontFamily: "Georgia, serif" }}>
-                Property type
-              </span>
-              <span style={{ fontSize: 12.5, color: "#4d596d" }}>
-                {imported && typeIsGuessworkOnly ? (
-                  <>No public record for this address names its type yet — pick it. The financing lanes, costs, and questions all follow your answer.</>
-                ) : imported && countyDerivedStyle ? (
-                  <>Read as a <strong style={{ color: "#101a2b" }}>{workspaceProfile.label}</strong> from the county record (&ldquo;{countyDerivedStyle}&rdquo;). The lanes, costs, and questions follow this — not right? Set the true type.</>
-                ) : (
-                  <>Read as a <strong style={{ color: "#101a2b" }}>{workspaceProfile.label}</strong>. The lanes, costs, and questions below all follow this — not right? Set the true type.</>
-                )}
-              </span>
-            </div>
-            <details open={typeIsGuessworkOnly} style={{ borderTop: "1px solid #e2d7bd", paddingTop: 8 }}>
-              <summary style={{ cursor: "pointer", color: "#1C2B45", fontSize: 12.5, fontWeight: 800 }}>
-                {typeIsGuessworkOnly ? "Choose the property type to continue" : "Wrong classification? Change the property type"}
-              </summary>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, paddingTop: 10 }}>
-                {allProfiles().map((profile) => {
-                  const active = propertyClassificationAvailable && workspaceProfile.id === profile.id;
-                  return (
-                    <button
-                      key={profile.id}
-                      type="button"
-                      onClick={() => setProfileOverride(profile.id)}
-                      aria-pressed={active}
-                      style={{
-                        padding: "7px 13px",
-                        borderRadius: 999,
-                        border: active ? "1px solid #0f766e" : "1px solid #d7deea",
-                        background: active ? "#0f766e" : "#ffffff",
-                        color: active ? "#ffffff" : "#3b475a",
-                        fontSize: 12.5,
-                        fontWeight: active ? 700 : 500,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {active ? "✓ " : ""}{profile.label}
-                    </button>
-                  );
-                })}
+      {!deepView &&
+        (() => {
+          const imported = importedProperty;
+          return (
+            <section
+              aria-label="Property type on file"
+              style={{
+                display: "grid",
+                gap: 9,
+                border: "1px solid #e2d7bd",
+                borderLeft: "4px solid #b8862f",
+                background: "#faf6ec",
+                borderRadius: 12,
+                padding: "12px 16px",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "baseline",
+                  gap: "4px 10px",
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 800,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: "#7a5c1f",
+                    fontFamily: "Georgia, serif",
+                  }}
+                >
+                  Property type
+                </span>
+                <span style={{ fontSize: 12.5, color: "#4d596d" }}>
+                  {imported && typeIsGuessworkOnly ? (
+                    <>
+                      No public record for this address names its type yet —
+                      pick it. The financing lanes, costs, and questions all
+                      follow your answer.
+                    </>
+                  ) : imported && countyDerivedStyle ? (
+                    <>
+                      Read as a{" "}
+                      <strong style={{ color: "#101a2b" }}>
+                        {workspaceProfile.label}
+                      </strong>{" "}
+                      from the county record (&ldquo;{countyDerivedStyle}
+                      &rdquo;). The lanes, costs, and questions follow this —
+                      not right? Set the true type.
+                    </>
+                  ) : (
+                    <>
+                      Read as a{" "}
+                      <strong style={{ color: "#101a2b" }}>
+                        {workspaceProfile.label}
+                      </strong>
+                      . The lanes, costs, and questions below all follow this —
+                      not right? Set the true type.
+                    </>
+                  )}
+                </span>
               </div>
-            </details>
-            {profileOverride && (
-              <span style={{ fontSize: 12, color: "#0f766e" }}>
-                Read as: {workspaceProfile.label}. Everything below follows this shape.
-              </span>
-            )}
-          </section>
-        );
-      })()}
+              <details
+                open={typeIsGuessworkOnly}
+                style={{ borderTop: "1px solid #e2d7bd", paddingTop: 8 }}
+              >
+                <summary
+                  style={{
+                    cursor: "pointer",
+                    color: "#1C2B45",
+                    fontSize: 12.5,
+                    fontWeight: 800,
+                  }}
+                >
+                  {typeIsGuessworkOnly
+                    ? "Choose the property type to continue"
+                    : "Wrong classification? Change the property type"}
+                </summary>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                    paddingTop: 10,
+                  }}
+                >
+                  {allProfiles().map((profile) => {
+                    const active =
+                      propertyClassificationAvailable &&
+                      workspaceProfile.id === profile.id;
+                    return (
+                      <button
+                        key={profile.id}
+                        type="button"
+                        onClick={() => setProfileOverride(profile.id)}
+                        aria-pressed={active}
+                        style={{
+                          padding: "7px 13px",
+                          borderRadius: 999,
+                          border: active
+                            ? "1px solid #0f766e"
+                            : "1px solid #d7deea",
+                          background: active ? "#0f766e" : "#ffffff",
+                          color: active ? "#ffffff" : "#3b475a",
+                          fontSize: 12.5,
+                          fontWeight: active ? 700 : 500,
+                          cursor: "pointer",
+                        }}
+                      >
+                        {active ? "✓ " : ""}
+                        {profile.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </details>
+              {profileOverride && (
+                <span style={{ fontSize: 12, color: "#0f766e" }}>
+                  Read as: {workspaceProfile.label}. Everything below follows
+                  this shape.
+                </span>
+              )}
+            </section>
+          );
+        })()}
       {!deepView && importedProperty && !propertyClassificationAvailable && (
-        <section aria-label="Complete property basics" style={{ display: "grid", gap: 7, border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px" }}>
-          <strong style={{ color: "#162033", fontSize: 15 }}>Choose the property type to continue</strong>
+        <section
+          aria-label="Complete property basics"
+          style={{
+            display: "grid",
+            gap: 7,
+            border: "1px solid #d7deea",
+            borderRadius: 12,
+            background: "#fbfcfe",
+            padding: "14px 16px",
+          }}
+        >
+          <strong style={{ color: "#162033", fontSize: 15 }}>
+            Choose the property type to continue
+          </strong>
           <span style={{ color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>
-            Furlong is still resolving the parcel acreage, land-use, and structure record for this address. It will not default the property to residential or generate type-specific analysis until that evidence is available.
+            Furlong is still resolving the parcel acreage, land-use, and
+            structure record for this address. It will not default the property
+            to residential or generate type-specific analysis until that
+            evidence is available.
           </span>
         </section>
       )}
@@ -4094,144 +5580,246 @@ export function PropertyEvaluationWorkspace({
           Each lane owns its tabs/questions/panels; GovernedLaneChassis keeps the
           compliance substrate single-source. The type-correction picker above
           remounts the lane while all entered state stays in this parent. */}
-      {!deepView && propertyClassificationAvailable && (() => {
-        const LaneWorkspace =
-          workspaceProfile.id === "farm" || workspaceProfile.id === "land"
-            ? FarmLaneWorkspace
-            : workspaceProfile.id === "residential"
-              ? ResidentialLaneWorkspace
-              : CommercialLaneWorkspace;
-        return (
-      <LaneWorkspace
-        variant={chartVariant}
-        propertyId={context.propertyId ?? context.title}
-        title={context.title}
-        location={`${context.location}${context.exactAddress ? ` · ${context.exactAddress}` : ""}`}
-        sourceLabel={analysisContext.sourceLabel}
-        propertyType={analysisContext.propertyType}
-        priceLabel={analysisContext.priceLabel}
-        fileNo={facts?.propertyRecord?.listingId ?? null}
-        tierLabel={report.tier.label}
-        headline={answerCard.headline}
-        readiness={answerCard.readiness}
-        fitLine={answerCard.fitLine}
-        pauseLine={answerCard.pauseLine}
-        intelligence={effectivePlaceIntelligence}
-        propertyRecord={facts?.propertyRecord ?? null}
-        financingRateContext={ownershipContext ? {
-          fsaOwnershipDirectPct: ownershipContext.fsa?.ownershipDirectPct ?? null,
-          fsaDownPaymentPct: ownershipContext.fsa?.downPaymentPct ?? null,
-          fsaEffective: ownershipContext.fsa?.effective ?? null,
-          mortgage30Pct: ownershipContext.rates.rate30 ?? null,
-          mortgageWeekOf: ownershipContext.rates.weekOf ?? null,
-        } : null}
-        deedEvidence={facts?.propertyEvidenceRecords ?? []}
-        financingLanes={topProgramPreview}
-        costsSlot={
-          // The finance lens carries no products/terms/rates (counsel gate);
-          // the home-mortgage lane table only fits residential/farm profiles
-          // (canonical classifier — commercial/hospitality/MHP/land get their
-          // own profile questions instead).
-          ownershipContext &&
-          chartVariant !== "finance" &&
-          profileUsesResidentialLanes(workspaceProfile.id) ? (
-            <OwnershipCostPanel
-              theme={CHART_THEMES[chartVariant]}
-              context={ownershipContext}
-              listedPrice={effectiveListedPrice}
-              isHome={isResidentialHomeContext(analysisContext)}
-              farmShaped={workspaceProfile.id === "farm"}
-              farmMode={workspaceProfile.id === "farm"}
-              farmAcreage={facts?.propertyRecord?.offeredAcreage ?? (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null)}
-              profileId={workspaceProfile.id}
-            />
-          ) : null
-        }
-        similarHomes={similarHomes}
-        actionsSlot={chartActionsSlot}
-        factsPending={factsLoading}
-        financingFit={financingProgramFit.map}
-        financeAnalysisSlot={
-          <FinanceAnalysisPanel
-            useScreen={financingProgramFit.useScreen}
-            scorecard={financingProgramFit.scorecard}
-            location={analysisContext.location}
-          />
-        }
-        agricultureSlot={
-          workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
-            <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />
-          ) : workspaceProfile.id === "residential" ? (
-            // Residential repurposes the slot as Yard & Garden (founder
-            // 2026-07-29): soil-matched garden picks + region natives.
-            // Commercial keeps no agriculture tab at all.
-            <ResidentialGardenTab
-              state={analysisContext.stateCode ?? facts?.verification?.parsedAddress?.state ?? null}
-              soil={effectivePlaceIntelligence?.soilProfile ?? null}
-            />
-          ) : undefined
-        }
-        proformaSlot={
-          (
-            <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Two documents, your choice</h3>
-              <p style={{ margin: 0, color: "#5A6172", fontSize: 12.5, lineHeight: 1.6 }}>
-                The <strong>Pro Forma Report</strong> is the numbers-only edition for experienced buyers
-                {workspaceProfile.id === "residential"
-                  ? " — purchase and cash-to-close scenarios, the monthly carrying model, the ten-year cost and equity outlook, and the financing lanes to test."
-                  : " — the lender-package structure (Sources & Uses through the ten-year model and the generation-gate checklist) with the verified Land Ledger evidence attached as exhibits."}{" "}
-                The <strong>First-Time Buyer Report</strong> is the full-guidance edition: every concept,
-                cost, and question explained. Pick above; View &amp; print and Download build whichever is
-                selected. {rankingPrice == null ? (workspaceProfile.id === "residential" ? "Enter the asking price or your intended offer above to populate the finance math." : "No price entered yet — the finance math runs on a stated screening value (the parcel's assessed value, else the USDA state farmland average), with that basis printed on every figure. Enter your intended offer above to run your own number instead.") : ""}
-              </p>
-              {workspaceProfile.id !== "residential" && otherSavedProperties.length > 0 && (
-                <div style={{ display: "grid", gap: 5, border: "1px solid #E5D9BC", borderRadius: 10, background: "#FFFDF7", padding: "10px 12px" }}>
-                  <strong style={{ color: "#1C2B45", fontSize: 12.5 }}>
-                    Acquiring more than one? Include other saved properties in the pro forma (optional):
-                  </strong>
-                  {otherSavedProperties.map((p) => (
-                    <label key={p.id} style={{ display: "flex", gap: 7, alignItems: "baseline", fontSize: 12.5, color: "#3d4655", cursor: "pointer" }}>
-                      <input
-                        type="checkbox"
-                        checked={proformaIncludedIds.includes(p.id)}
-                        onChange={(event) =>
-                          setProformaIncludedIds((current) =>
-                            event.target.checked ? [...current, p.id] : current.filter((id) => id !== p.id)
-                          )
-                        }
-                      />
-                      <span>
-                        {p.exactAddress ?? [p.town, p.state].filter(Boolean).join(", ") ?? p.id} · {p.propertyType} · {p.priceLabel}
-                      </span>
-                    </label>
-                  ))}
-                  <span style={{ fontSize: 11, color: "#6B7280", lineHeight: 1.5 }}>
-                    Each included property becomes its own acquisition and collateral line with combined loan
-                    sizing. Income stays modeled for this property only until each is run through its own report.
-                  </span>
+      {!deepView &&
+        propertyClassificationAvailable &&
+        (() => {
+          const LaneWorkspace =
+            workspaceProfile.id === "farm" || workspaceProfile.id === "land"
+              ? FarmLaneWorkspace
+              : workspaceProfile.id === "residential"
+                ? ResidentialLaneWorkspace
+                : CommercialLaneWorkspace;
+          return (
+            <LaneWorkspace
+              variant={chartVariant}
+              propertyId={context.propertyId ?? context.title}
+              title={context.title}
+              location={`${context.location}${context.exactAddress ? ` · ${context.exactAddress}` : ""}`}
+              sourceLabel={analysisContext.sourceLabel}
+              propertyType={analysisContext.propertyType}
+              priceLabel={analysisContext.priceLabel}
+              fileNo={facts?.propertyRecord?.listingId ?? null}
+              tierLabel={report.tier.label}
+              headline={answerCard.headline}
+              readiness={answerCard.readiness}
+              fitLine={answerCard.fitLine}
+              pauseLine={answerCard.pauseLine}
+              intelligence={effectivePlaceIntelligence}
+              propertyRecord={facts?.propertyRecord ?? null}
+              financingRateContext={
+                ownershipContext
+                  ? {
+                      fsaOwnershipDirectPct:
+                        ownershipContext.fsa?.ownershipDirectPct ?? null,
+                      fsaDownPaymentPct:
+                        ownershipContext.fsa?.downPaymentPct ?? null,
+                      fsaEffective: ownershipContext.fsa?.effective ?? null,
+                      mortgage30Pct: ownershipContext.rates.rate30 ?? null,
+                      mortgageWeekOf: ownershipContext.rates.weekOf ?? null,
+                    }
+                  : null
+              }
+              deedEvidence={facts?.propertyEvidenceRecords ?? []}
+              financingLanes={topProgramPreview}
+              costsSlot={
+                // The finance lens carries no products/terms/rates (counsel gate);
+                // the home-mortgage lane table only fits residential/farm profiles
+                // (canonical classifier — commercial/hospitality/MHP/land get their
+                // own profile questions instead).
+                ownershipContext &&
+                chartVariant !== "finance" &&
+                profileUsesResidentialLanes(workspaceProfile.id) ? (
+                  <OwnershipCostPanel
+                    theme={CHART_THEMES[chartVariant]}
+                    context={ownershipContext}
+                    listedPrice={effectiveListedPrice}
+                    isHome={isResidentialHomeContext(analysisContext)}
+                    farmShaped={workspaceProfile.id === "farm"}
+                    farmMode={workspaceProfile.id === "farm"}
+                    farmAcreage={
+                      facts?.propertyRecord?.offeredAcreage ??
+                      (Number.parseFloat(
+                        facts?.propertyRecord?.acreageText ?? "",
+                      ) ||
+                        null)
+                    }
+                    profileId={workspaceProfile.id}
+                  />
+                ) : null
+              }
+              similarHomes={similarHomes}
+              actionsSlot={chartActionsSlot}
+              factsPending={factsLoading}
+              financingFit={financingProgramFit.map}
+              financeAnalysisSlot={
+                <FinanceAnalysisPanel
+                  useScreen={financingProgramFit.useScreen}
+                  scorecard={financingProgramFit.scorecard}
+                  location={analysisContext.location}
+                />
+              }
+              agricultureSlot={
+                workspaceProfile.id === "farm" ||
+                workspaceProfile.id === "land" ? (
+                  <FarmAgricultureTab
+                    bestUse={effectivePlaceIntelligence?.farmBestUse ?? null}
+                  />
+                ) : workspaceProfile.id === "residential" ? (
+                  // Residential repurposes the slot as Yard & Garden (founder
+                  // 2026-07-29): soil-matched garden picks + region natives.
+                  // Commercial keeps no agriculture tab at all.
+                  <ResidentialGardenTab
+                    state={
+                      analysisContext.stateCode ??
+                      facts?.verification?.parsedAddress?.state ??
+                      null
+                    }
+                    soil={effectivePlaceIntelligence?.soilProfile ?? null}
+                  />
+                ) : undefined
+              }
+              proformaSlot={
+                <div style={{ display: "grid", gap: 8 }}>
+                  <h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>
+                    Two documents, your choice
+                  </h3>
+                  <p
+                    style={{
+                      margin: 0,
+                      color: "#5A6172",
+                      fontSize: 12.5,
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    The <strong>Pro Forma Report</strong> is the numbers-only
+                    edition for experienced buyers
+                    {workspaceProfile.id === "residential"
+                      ? " — purchase and cash-to-close scenarios, the monthly carrying model, the ten-year cost and equity outlook, and the financing lanes to test."
+                      : " — the lender-package structure (Sources & Uses through the ten-year model and the generation-gate checklist) with the verified Land Ledger evidence attached as exhibits."}{" "}
+                    The <strong>First-Time Buyer Report</strong> is the
+                    full-guidance edition: every concept, cost, and question
+                    explained. Pick above; View &amp; print and Download build
+                    whichever is selected.{" "}
+                    {rankingPrice == null
+                      ? workspaceProfile.id === "residential"
+                        ? "Enter the asking price or your intended offer above to populate the finance math."
+                        : "No price entered yet — the finance math runs on a stated screening value (the parcel's assessed value, else the USDA state farmland average), with that basis printed on every figure. Enter your intended offer above to run your own number instead."
+                      : ""}
+                  </p>
+                  {workspaceProfile.id !== "residential" &&
+                    otherSavedProperties.length > 0 && (
+                      <div
+                        style={{
+                          display: "grid",
+                          gap: 5,
+                          border: "1px solid #E5D9BC",
+                          borderRadius: 10,
+                          background: "#FFFDF7",
+                          padding: "10px 12px",
+                        }}
+                      >
+                        <strong style={{ color: "#1C2B45", fontSize: 12.5 }}>
+                          Acquiring more than one? Include other saved
+                          properties in the pro forma (optional):
+                        </strong>
+                        {otherSavedProperties.map((p) => (
+                          <label
+                            key={p.id}
+                            style={{
+                              display: "flex",
+                              gap: 7,
+                              alignItems: "baseline",
+                              fontSize: 12.5,
+                              color: "#3d4655",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={proformaIncludedIds.includes(p.id)}
+                              onChange={(event) =>
+                                setProformaIncludedIds((current) =>
+                                  event.target.checked
+                                    ? [...current, p.id]
+                                    : current.filter((id) => id !== p.id),
+                                )
+                              }
+                            />
+                            <span>
+                              {p.exactAddress ??
+                                [p.town, p.state].filter(Boolean).join(", ") ??
+                                p.id}{" "}
+                              · {p.propertyType} · {p.priceLabel}
+                            </span>
+                          </label>
+                        ))}
+                        <span
+                          style={{
+                            fontSize: 11,
+                            color: "#6B7280",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          Each included property becomes its own acquisition and
+                          collateral line with combined loan sizing. Income
+                          stays modeled for this property only until each is run
+                          through its own report.
+                        </span>
+                      </div>
+                    )}
+                  {proformaError && (
+                    <span style={{ fontSize: 12, color: "#a12626" }}>
+                      {proformaError}
+                    </span>
+                  )}
                 </div>
-              )}
-              {proformaError && <span style={{ fontSize: 12, color: "#a12626" }}>{proformaError}</span>}
-            </div>
-          )
-        }
-      />
-        );
-      })()}
+              }
+            />
+          );
+        })()}
       {/* Imported-address verification status stays visible below the chart. */}
       <div style={{ display: "grid", gap: 16 }}>
-	        {context.propertyId?.startsWith("imported:") && (
-	          <div style={{ display: "grid", gap: 6 }}>
-            <p style={{ margin: 0, fontSize: 12.5, color: "#854F0B", lineHeight: 1.6, maxWidth: 840 }}>
-              This property was brought in by the visitor rather than from a verified internal inventory record, so the report should treat the imported listing details as intake material until the property facts are independently confirmed.
+        {context.propertyId?.startsWith("imported:") && (
+          <div style={{ display: "grid", gap: 6 }}>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 12.5,
+                color: "#854F0B",
+                lineHeight: 1.6,
+                maxWidth: 840,
+              }}
+            >
+              This property was brought in by the visitor rather than from a
+              verified internal inventory record, so the report should treat the
+              imported listing details as intake material until the property
+              facts are independently confirmed.
             </p>
             {facts?.verification?.restrictions?.map((line) => (
-              <p key={line} style={{ margin: 0, fontSize: 12.5, color: "#a12626", lineHeight: 1.6, maxWidth: 840 }}>
+              <p
+                key={line}
+                style={{
+                  margin: 0,
+                  fontSize: 12.5,
+                  color: "#a12626",
+                  lineHeight: 1.6,
+                  maxWidth: 840,
+                }}
+              >
                 {line}
               </p>
             ))}
             {facts?.verification?.warnings?.slice(0, 2).map((line) => (
-              <p key={line} style={{ margin: 0, fontSize: 12.5, color: "#7a5a10", lineHeight: 1.6, maxWidth: 840 }}>
+              <p
+                key={line}
+                style={{
+                  margin: 0,
+                  fontSize: 12.5,
+                  color: "#7a5a10",
+                  lineHeight: 1.6,
+                  maxWidth: 840,
+                }}
+              >
                 {line}
               </p>
             ))}
@@ -4247,445 +5835,947 @@ export function PropertyEvaluationWorkspace({
         <section style={{ display: "grid", gap: 16 }}>
           <a
             href={chartHref}
-            style={{ fontSize: 13.5, fontWeight: 700, color: "#0f766e", textDecoration: "underline", textUnderlineOffset: 2, justifySelf: "start" }}
+            style={{
+              fontSize: 13.5,
+              fontWeight: 700,
+              color: "#0f766e",
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+              justifySelf: "start",
+            }}
           >
             ← Back to the property brief
           </a>
-        <div style={{ paddingTop: 16 }}>
-      <div style={{ display: "grid", gap: 20, gridTemplateColumns: "minmax(0, 1.18fr) minmax(340px, 0.92fr)", alignItems: "start" }}>
-        <div style={{ display: "grid", gap: 22 }}>
-          <section style={panelStyle}>
-            <div style={{ display: "grid", gap: 5 }}>
-              <strong style={{ fontSize: 18, color: "#162033" }}>Immediate property memo</strong>
-              <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-                This should read like a first-pass deal memo before any interview starts: where the property fits, what it may cost, what could break it, and which financing lanes look strongest.
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-                <div style={miniCard}>
-                  <span style={miniLabel}>Lead lane</span>
-                  <strong style={{ fontSize: 18, color: "#162033" }}>
-                    {topProgramRanks[0]?.program.name ?? "Still classifying"}
-                  </strong>
-                  <span style={miniText}>
-                    {topProgramRanks[0]
-                      ? topProgramRanks[0].rationale
-                      : "The asset class still needs to be sharpened before a strong lead lane can be stated."}
-                  </span>
-                </div>
-                <div style={miniCard}>
-                  <span style={miniLabel}>Watch this first</span>
-                  <strong style={{ fontSize: 18, color: "#162033" }}>
-                    {immediateSuitability.constraints[0] ? "One open question" : "No single blocker yet"}
-                  </strong>
-                  <span style={miniText}>{immediateSuitability.constraints[0] ?? "Execution still depends on rule checks, condition, and capital structure."}</span>
-                </div>
-                <div style={miniCard}>
-                  <span style={miniLabel}>Cost posture</span>
-                  <strong style={{ fontSize: 18, color: "#162033" }}>
-                    First-pass basis
-                  </strong>
-                  <span style={miniText}>{budgetExpectations.acquisition}</span>
-                </div>
-              </div>
-              <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-                <label style={fieldBlock}>
-                  <span style={fieldLabel}>Property price / asking basis</span>
-                  <input
-                    value={manualPriceLabel}
-                    onChange={(event) => setManualPriceLabel(event.target.value)}
-                    placeholder={context.priceLabel}
-                    style={inputStyle}
-                  />
-                  <span style={{ fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>
-                    Change this here if the listing price is wrong, missing, or you want to test a different acquisition basis.
-                  </span>
-                </label>
-                <label style={fieldBlock}>
-                  <span style={fieldLabel}>Likely use for this property</span>
-                  <input
-                    value={answers.possibility}
-                    onChange={(event) => updateAnswer("possibility", event.target.value)}
-                    placeholder="Ex: boutique inn, farm stay, mixed-use rural business"
-                    style={inputStyle}
-                  />
-                  <span style={{ fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>
-                    One short use hypothesis is enough to materially improve the first-pass analysis.
-                  </span>
-                </label>
-                <label style={fieldBlock}>
-                  <span style={fieldLabel}>Likely capital need</span>
-                  <input
-                    value={answers.requestedAmount}
-                    onChange={(event) => updateAnswer("requestedAmount", event.target.value)}
-                    placeholder="$750,000"
-                    style={inputStyle}
-                  />
-                  <span style={{ fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>
-                    Use this only if you already have a rough target; otherwise the page should still work without it.
-                  </span>
-                </label>
-              </div>
-              <div style={{ display: "grid", gap: 8 }}>
-                <strong style={{ fontSize: 14, color: "#162033" }}>Current guided questions</strong>
-                <div style={{ display: "grid", gap: 8 }}>
-                  {report.keyQuestions.slice(0, 4).map((line) => (
-                    <div key={line} style={factCard}>
-                      <span style={{ fontSize: 12.8, color: "#3b475a", lineHeight: 1.55 }}>{line}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <details style={detailsStyle}>
-                <summary style={summaryStyle}>Optional deeper intake and report tier controls</summary>
-                <div style={{ display: "grid", gap: 14, paddingTop: 14 }}>
-                  <div style={{ display: "grid", gap: 8 }}>
-                    <span style={fieldLabel}>Report structure / tier</span>
-                    <div style={{ display: "grid", gap: 10 }}>
-                      {REPORT_TIER_OPTIONS.map((option) => {
-                        const active = answers.reportTier === option.id;
-                        const access = tierAccess[option.id];
-                        return (
-                          <button
-                            key={option.id}
-                            type="button"
-                            onClick={() => updateAnswer("reportTier", option.id)}
-                            style={{
-                              borderRadius: 14,
-                              border: active ? "1.5px solid #0f766e" : "1px solid #d7deea",
-                              background: active ? "#edf9f5" : "#fff",
-                              padding: "14px 16px",
-                              textAlign: "left",
-                              cursor: "pointer",
-                              display: "grid",
-                              gap: 4,
-                            }}
-                          >
-                            <strong style={{ fontSize: 14, color: "#162033" }}>{option.shortLabel} · {option.label}</strong>
-                            <span style={{ fontSize: 11.5, fontWeight: 800, color: access.unlocked ? "#0f766e" : "#854F0B", textTransform: "uppercase", letterSpacing: 0.04 }}>
-                              {access.badge}
-                            </span>
-                            <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.55 }}>{option.description}</span>
-                            <span style={{ fontSize: 12, color: "#7a8aa0", lineHeight: 1.5 }}>{access.detail}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>1. What are your possibilities for this property?</span>
-                    <textarea value={answers.possibility} onChange={(event) => updateAnswer("possibility", event.target.value)} placeholder="Ex: boutique inn, event venue, mixed-use rural business, working farm, workforce housing..." style={textareaStyle} rows={3} />
-                  </label>
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>2. How would this actually be used or operated?</span>
-                    <textarea value={answers.usePlan} onChange={(event) => updateAnswer("usePlan", event.target.value)} placeholder="Describe occupancy, operations, customer use, production, staffing, or who would run it." style={textareaStyle} rows={3} />
-                  </label>
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>3. What capital would likely be needed?</span>
-                    <textarea value={answers.capitalPlan} onChange={(event) => updateAnswer("capitalPlan", event.target.value)} placeholder="Purchase, renovation, equipment, working capital, site improvements, contingencies..." style={textareaStyle} rows={3} />
-                  </label>
-                  <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-                    <label style={fieldBlock}>
-                      <span style={fieldLabel}>Target capital need</span>
-                      <input value={answers.requestedAmount} onChange={(event) => updateAnswer("requestedAmount", event.target.value)} placeholder="$750,000" style={inputStyle} />
-                    </label>
-                    <label style={fieldBlock}>
-                      <span style={fieldLabel}>Timing / urgency</span>
-                      <input value={answers.timing} onChange={(event) => updateAnswer("timing", event.target.value)} placeholder="Ex: under contract, 90-day close, exploratory only" style={inputStyle} />
-                    </label>
-                  </div>
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>4. What relevant operator experience already exists?</span>
-                    <textarea value={answers.operatorExperience} onChange={(event) => updateAnswer("operatorExperience", event.target.value)} placeholder="Describe who would run this, what they have done before, and where execution strength or gaps exist." style={textareaStyle} rows={3} />
-                  </label>
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>5. How would this property make money or sustain itself?</span>
-                    <textarea value={answers.revenueModel} onChange={(event) => updateAnswer("revenueModel", event.target.value)} placeholder="Explain the revenue model, occupancy logic, production output, contracts, memberships, rents, ticketing, or any other operating economics." style={textareaStyle} rows={3} />
-                  </label>
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>6. What renovation or site work is really required?</span>
-                    <textarea value={answers.renovationScope} onChange={(event) => updateAnswer("renovationScope", event.target.value)} placeholder="Describe cosmetic refresh, major rehab, code work, ADA, utilities, environmental cleanup, kitchens, barns, roads, drainage, or vertical construction." style={textareaStyle} rows={3} />
-                  </label>
-                  <label style={fieldBlock}>
-                    <span style={fieldLabel}>7. What is the intended ownership or entity posture?</span>
-                    <textarea value={answers.ownershipPosture} onChange={(event) => updateAnswer("ownershipPosture", event.target.value)} placeholder="Ex: personal acquisition, existing operating company, new LLC, nonprofit sponsor, family office holdco, JV, or still undecided." style={textareaStyle} rows={3} />
-                  </label>
-                  <div style={{ display: "grid", gap: 8 }}>
-                    <span style={fieldLabel}>8. Which documents do you already have?</span>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                      {DOCUMENT_OPTIONS.map((option) => {
-                        const active = answers.documents.includes(option);
-                        return (
-                          <button
-                            key={option}
-                            type="button"
-                            onClick={() => toggleDocument(option)}
-                            style={{
-                              borderRadius: 999,
-                              padding: "8px 12px",
-                              border: active ? "1px solid #0f766e" : "1px solid #d7deea",
-                              background: active ? "#e8f6f2" : "#fff",
-                              color: active ? "#0f766e" : "#4d596d",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                            }}
-                          >
-                            {option}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </details>
-            </div>
-          </section>
-
-          <section style={panelStyle}>
-            <div style={{ display: "grid", gap: 5 }}>
-              <strong style={{ fontSize: 18, color: "#162033" }}>Ranked USDA / SBA financing read</strong>
-              <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-                This is still governed planning support, not an approval. The difference is that the page should tell you the most likely financing order first instead of making “missing answers” the headline.
-              </span>
-            </div>
-            {selectedTierUnlocked ? (
-              <>
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-                  <div style={miniCard}>
-                    <span style={miniLabel}>Lead program</span>
-                    <strong style={{ fontSize: 28, color: "#162033" }}>
-                      {topProgramRanks[0]?.program.name ?? "TBD"}
-                    </strong>
-                    <span style={miniText}>{topProgramRanks[0] ? "Ranked first from the current property facts." : "Still classifying from the current record."}</span>
-                  </div>
-                  <div style={miniCard}>
-                    <span style={miniLabel}>Verified property-side signals</span>
+          <div style={{ paddingTop: 16 }}>
+            <div
+              style={{
+                display: "grid",
+                gap: 20,
+                gridTemplateColumns: "minmax(0, 1.18fr) minmax(340px, 0.92fr)",
+                alignItems: "start",
+              }}
+            >
+              <div style={{ display: "grid", gap: 22 }}>
+                <section style={panelStyle}>
+                  <div style={{ display: "grid", gap: 5 }}>
                     <strong style={{ fontSize: 18, color: "#162033" }}>
-                      {verifiedPrograms.length}
+                      Immediate property memo
                     </strong>
-                    <span style={miniText}>Snapshot-backed criteria already attached to the property itself.</span>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "#5d687a",
+                        lineHeight: 1.55,
+                      }}
+                    >
+                      This should read like a first-pass deal memo before any
+                      interview starts: where the property fits, what it may
+                      cost, what could break it, and which financing lanes look
+                      strongest.
+                    </span>
                   </div>
-                  <div style={miniCard}>
-                    <span style={miniLabel}>Optional deeper intake readiness</span>
-                    <strong style={{ fontSize: 18, color: "#162033" }}>
-                      {readinessResult.overallReadinessPercent}%
-                    </strong>
-                    <span style={miniText}>Useful for later tightening, but no longer the first thing the customer should see.</span>
-                  </div>
-                </div>
-
-                <div style={{ display: "grid", gap: 10 }}>
-                  {topProgramRanks.map((entry, index) => (
-                    <div key={entry.program.id} style={{ border: "1px solid #e6ebf2", borderRadius: 12, padding: "14px 16px", display: "grid", gap: 5 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                        <strong style={{ fontSize: 14.5, color: "#162033" }}>{index + 1}. {entry.program.name}</strong>
-                        <span style={{ fontSize: 12, fontWeight: 800, color: "#0f766e" }}>
-                          {index === 0 ? "Strongest current lane" : `Lane ${index + 1}`}
+                  <div style={{ display: "grid", gap: 12 }}>
+                    <div
+                      style={{
+                        display: "grid",
+                        gap: 12,
+                        gridTemplateColumns:
+                          "repeat(auto-fit, minmax(220px, 1fr))",
+                      }}
+                    >
+                      <div style={miniCard}>
+                        <span style={miniLabel}>Lead lane</span>
+                        <strong style={{ fontSize: 18, color: "#162033" }}>
+                          {topProgramRanks[0]?.program.name ??
+                            "Still classifying"}
+                        </strong>
+                        <span style={miniText}>
+                          {topProgramRanks[0]
+                            ? topProgramRanks[0].rationale
+                            : "The asset class still needs to be sharpened before a strong lead lane can be stated."}
                         </span>
                       </div>
-                      <span style={{ fontSize: 12.5, color: "#5d687a", lineHeight: 1.55 }}>
-                        {entry.rationale}
-                      </span>
-                      <span style={{ fontSize: 11.5, color: "#7a8aa0", lineHeight: 1.5 }}>
-                        Watch-out: {entry.caution}
+                      <div style={miniCard}>
+                        <span style={miniLabel}>Watch this first</span>
+                        <strong style={{ fontSize: 18, color: "#162033" }}>
+                          {immediateSuitability.constraints[0]
+                            ? "One open question"
+                            : "No single blocker yet"}
+                        </strong>
+                        <span style={miniText}>
+                          {immediateSuitability.constraints[0] ??
+                            "Execution still depends on rule checks, condition, and capital structure."}
+                        </span>
+                      </div>
+                      <div style={miniCard}>
+                        <span style={miniLabel}>Cost posture</span>
+                        <strong style={{ fontSize: 18, color: "#162033" }}>
+                          First-pass basis
+                        </strong>
+                        <span style={miniText}>
+                          {budgetExpectations.acquisition}
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        display: "grid",
+                        gap: 12,
+                        gridTemplateColumns:
+                          "repeat(auto-fit, minmax(220px, 1fr))",
+                      }}
+                    >
+                      <label style={fieldBlock}>
+                        <span style={fieldLabel}>
+                          Property price / asking basis
+                        </span>
+                        <input
+                          value={manualPriceLabel}
+                          onChange={(event) =>
+                            setManualPriceLabel(event.target.value)
+                          }
+                          placeholder={context.priceLabel}
+                          style={inputStyle}
+                        />
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: "#7a8aa0",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          Change this here if the listing price is wrong,
+                          missing, or you want to test a different acquisition
+                          basis.
+                        </span>
+                      </label>
+                      <label style={fieldBlock}>
+                        <span style={fieldLabel}>
+                          Likely use for this property
+                        </span>
+                        <input
+                          value={answers.possibility}
+                          onChange={(event) =>
+                            updateAnswer("possibility", event.target.value)
+                          }
+                          placeholder="Ex: boutique inn, farm stay, mixed-use rural business"
+                          style={inputStyle}
+                        />
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: "#7a8aa0",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          One short use hypothesis is enough to materially
+                          improve the first-pass analysis.
+                        </span>
+                      </label>
+                      <label style={fieldBlock}>
+                        <span style={fieldLabel}>Likely capital need</span>
+                        <input
+                          value={answers.requestedAmount}
+                          onChange={(event) =>
+                            updateAnswer("requestedAmount", event.target.value)
+                          }
+                          placeholder="$750,000"
+                          style={inputStyle}
+                        />
+                        <span
+                          style={{
+                            fontSize: 12,
+                            color: "#7a8aa0",
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          Use this only if you already have a rough target;
+                          otherwise the page should still work without it.
+                        </span>
+                      </label>
+                    </div>
+                    <div style={{ display: "grid", gap: 8 }}>
+                      <strong style={{ fontSize: 14, color: "#162033" }}>
+                        Current guided questions
+                      </strong>
+                      <div style={{ display: "grid", gap: 8 }}>
+                        {report.keyQuestions.slice(0, 4).map((line) => (
+                          <div key={line} style={factCard}>
+                            <span
+                              style={{
+                                fontSize: 12.8,
+                                color: "#3b475a",
+                                lineHeight: 1.55,
+                              }}
+                            >
+                              {line}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <details style={detailsStyle}>
+                      <summary style={summaryStyle}>
+                        Optional deeper intake and report tier controls
+                      </summary>
+                      <div style={{ display: "grid", gap: 14, paddingTop: 14 }}>
+                        <div style={{ display: "grid", gap: 8 }}>
+                          <span style={fieldLabel}>
+                            Report structure / tier
+                          </span>
+                          <div style={{ display: "grid", gap: 10 }}>
+                            {REPORT_TIER_OPTIONS.map((option) => {
+                              const active = answers.reportTier === option.id;
+                              const access = tierAccess[option.id];
+                              return (
+                                <button
+                                  key={option.id}
+                                  type="button"
+                                  onClick={() =>
+                                    updateAnswer("reportTier", option.id)
+                                  }
+                                  style={{
+                                    borderRadius: 14,
+                                    border: active
+                                      ? "1.5px solid #0f766e"
+                                      : "1px solid #d7deea",
+                                    background: active ? "#edf9f5" : "#fff",
+                                    padding: "14px 16px",
+                                    textAlign: "left",
+                                    cursor: "pointer",
+                                    display: "grid",
+                                    gap: 4,
+                                  }}
+                                >
+                                  <strong
+                                    style={{ fontSize: 14, color: "#162033" }}
+                                  >
+                                    {option.shortLabel} · {option.label}
+                                  </strong>
+                                  <span
+                                    style={{
+                                      fontSize: 11.5,
+                                      fontWeight: 800,
+                                      color: access.unlocked
+                                        ? "#0f766e"
+                                        : "#854F0B",
+                                      textTransform: "uppercase",
+                                      letterSpacing: 0.04,
+                                    }}
+                                  >
+                                    {access.badge}
+                                  </span>
+                                  <span
+                                    style={{
+                                      fontSize: 12.5,
+                                      color: "#5d687a",
+                                      lineHeight: 1.55,
+                                    }}
+                                  >
+                                    {option.description}
+                                  </span>
+                                  <span
+                                    style={{
+                                      fontSize: 12,
+                                      color: "#7a8aa0",
+                                      lineHeight: 1.5,
+                                    }}
+                                  >
+                                    {access.detail}
+                                  </span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                        <label style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            1. What are your possibilities for this property?
+                          </span>
+                          <textarea
+                            value={answers.possibility}
+                            onChange={(event) =>
+                              updateAnswer("possibility", event.target.value)
+                            }
+                            placeholder="Ex: boutique inn, event venue, mixed-use rural business, working farm, workforce housing..."
+                            style={textareaStyle}
+                            rows={3}
+                          />
+                        </label>
+                        <label style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            2. How would this actually be used or operated?
+                          </span>
+                          <textarea
+                            value={answers.usePlan}
+                            onChange={(event) =>
+                              updateAnswer("usePlan", event.target.value)
+                            }
+                            placeholder="Describe occupancy, operations, customer use, production, staffing, or who would run it."
+                            style={textareaStyle}
+                            rows={3}
+                          />
+                        </label>
+                        <label style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            3. What capital would likely be needed?
+                          </span>
+                          <textarea
+                            value={answers.capitalPlan}
+                            onChange={(event) =>
+                              updateAnswer("capitalPlan", event.target.value)
+                            }
+                            placeholder="Purchase, renovation, equipment, working capital, site improvements, contingencies..."
+                            style={textareaStyle}
+                            rows={3}
+                          />
+                        </label>
+                        <div
+                          style={{
+                            display: "grid",
+                            gap: 12,
+                            gridTemplateColumns:
+                              "repeat(auto-fit, minmax(220px, 1fr))",
+                          }}
+                        >
+                          <label style={fieldBlock}>
+                            <span style={fieldLabel}>Target capital need</span>
+                            <input
+                              value={answers.requestedAmount}
+                              onChange={(event) =>
+                                updateAnswer(
+                                  "requestedAmount",
+                                  event.target.value,
+                                )
+                              }
+                              placeholder="$750,000"
+                              style={inputStyle}
+                            />
+                          </label>
+                          <label style={fieldBlock}>
+                            <span style={fieldLabel}>Timing / urgency</span>
+                            <input
+                              value={answers.timing}
+                              onChange={(event) =>
+                                updateAnswer("timing", event.target.value)
+                              }
+                              placeholder="Ex: under contract, 90-day close, exploratory only"
+                              style={inputStyle}
+                            />
+                          </label>
+                        </div>
+                        <label style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            4. What relevant operator experience already exists?
+                          </span>
+                          <textarea
+                            value={answers.operatorExperience}
+                            onChange={(event) =>
+                              updateAnswer(
+                                "operatorExperience",
+                                event.target.value,
+                              )
+                            }
+                            placeholder="Describe who would run this, what they have done before, and where execution strength or gaps exist."
+                            style={textareaStyle}
+                            rows={3}
+                          />
+                        </label>
+                        <label style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            5. How would this property make money or sustain
+                            itself?
+                          </span>
+                          <textarea
+                            value={answers.revenueModel}
+                            onChange={(event) =>
+                              updateAnswer("revenueModel", event.target.value)
+                            }
+                            placeholder="Explain the revenue model, occupancy logic, production output, contracts, memberships, rents, ticketing, or any other operating economics."
+                            style={textareaStyle}
+                            rows={3}
+                          />
+                        </label>
+                        <label style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            6. What renovation or site work is really required?
+                          </span>
+                          <textarea
+                            value={answers.renovationScope}
+                            onChange={(event) =>
+                              updateAnswer(
+                                "renovationScope",
+                                event.target.value,
+                              )
+                            }
+                            placeholder="Describe cosmetic refresh, major rehab, code work, ADA, utilities, environmental cleanup, kitchens, barns, roads, drainage, or vertical construction."
+                            style={textareaStyle}
+                            rows={3}
+                          />
+                        </label>
+                        <label style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            7. What is the intended ownership or entity posture?
+                          </span>
+                          <textarea
+                            value={answers.ownershipPosture}
+                            onChange={(event) =>
+                              updateAnswer(
+                                "ownershipPosture",
+                                event.target.value,
+                              )
+                            }
+                            placeholder="Ex: personal acquisition, existing operating company, new LLC, nonprofit sponsor, family office holdco, JV, or still undecided."
+                            style={textareaStyle}
+                            rows={3}
+                          />
+                        </label>
+                        <div style={{ display: "grid", gap: 8 }}>
+                          <span style={fieldLabel}>
+                            8. Which documents do you already have?
+                          </span>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 8,
+                            }}
+                          >
+                            {DOCUMENT_OPTIONS.map((option) => {
+                              const active = answers.documents.includes(option);
+                              return (
+                                <button
+                                  key={option}
+                                  type="button"
+                                  onClick={() => toggleDocument(option)}
+                                  style={{
+                                    borderRadius: 999,
+                                    padding: "8px 12px",
+                                    border: active
+                                      ? "1px solid #0f766e"
+                                      : "1px solid #d7deea",
+                                    background: active ? "#e8f6f2" : "#fff",
+                                    color: active ? "#0f766e" : "#4d596d",
+                                    fontWeight: 700,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  {option}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+                </section>
+
+                <section style={panelStyle}>
+                  <div style={{ display: "grid", gap: 5 }}>
+                    <strong style={{ fontSize: 18, color: "#162033" }}>
+                      Ranked USDA / SBA financing read
+                    </strong>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "#5d687a",
+                        lineHeight: 1.55,
+                      }}
+                    >
+                      This is still governed planning support, not an approval.
+                      The difference is that the page should tell you the most
+                      likely financing order first instead of making “missing
+                      answers” the headline.
+                    </span>
+                  </div>
+                  {selectedTierUnlocked ? (
+                    <>
+                      <div
+                        style={{
+                          display: "grid",
+                          gap: 12,
+                          gridTemplateColumns:
+                            "repeat(auto-fit, minmax(180px, 1fr))",
+                        }}
+                      >
+                        <div style={miniCard}>
+                          <span style={miniLabel}>Lead program</span>
+                          <strong style={{ fontSize: 28, color: "#162033" }}>
+                            {topProgramRanks[0]?.program.name ?? "TBD"}
+                          </strong>
+                          <span style={miniText}>
+                            {topProgramRanks[0]
+                              ? "Ranked first from the current property facts."
+                              : "Still classifying from the current record."}
+                          </span>
+                        </div>
+                        <div style={miniCard}>
+                          <span style={miniLabel}>
+                            Verified property-side signals
+                          </span>
+                          <strong style={{ fontSize: 18, color: "#162033" }}>
+                            {verifiedPrograms.length}
+                          </strong>
+                          <span style={miniText}>
+                            Snapshot-backed criteria already attached to the
+                            property itself.
+                          </span>
+                        </div>
+                        <div style={miniCard}>
+                          <span style={miniLabel}>
+                            Optional deeper intake readiness
+                          </span>
+                          <strong style={{ fontSize: 18, color: "#162033" }}>
+                            {readinessResult.overallReadinessPercent}%
+                          </strong>
+                          <span style={miniText}>
+                            Useful for later tightening, but no longer the first
+                            thing the customer should see.
+                          </span>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "grid", gap: 10 }}>
+                        {topProgramRanks.map((entry, index) => (
+                          <div
+                            key={entry.program.id}
+                            style={{
+                              border: "1px solid #e6ebf2",
+                              borderRadius: 12,
+                              padding: "14px 16px",
+                              display: "grid",
+                              gap: 5,
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                gap: 8,
+                                flexWrap: "wrap",
+                              }}
+                            >
+                              <strong
+                                style={{ fontSize: 14.5, color: "#162033" }}
+                              >
+                                {index + 1}. {entry.program.name}
+                              </strong>
+                              <span
+                                style={{
+                                  fontSize: 12,
+                                  fontWeight: 800,
+                                  color: "#0f766e",
+                                }}
+                              >
+                                {index === 0
+                                  ? "Strongest current lane"
+                                  : `Lane ${index + 1}`}
+                              </span>
+                            </div>
+                            <span
+                              style={{
+                                fontSize: 12.5,
+                                color: "#5d687a",
+                                lineHeight: 1.55,
+                              }}
+                            >
+                              {entry.rationale}
+                            </span>
+                            <span
+                              style={{
+                                fontSize: 11.5,
+                                color: "#7a8aa0",
+                                lineHeight: 1.5,
+                              }}
+                            >
+                              Watch-out: {entry.caution}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <details style={detailsStyle}>
+                        <summary style={summaryStyle}>
+                          Optional deeper intake gaps and human confirmation
+                          points
+                        </summary>
+                        <div
+                          style={{ display: "grid", gap: 8, paddingTop: 14 }}
+                        >
+                          <strong style={{ fontSize: 14, color: "#162033" }}>
+                            What still needs human confirmation
+                          </strong>
+                          <div
+                            style={{
+                              display: "flex",
+                              flexWrap: "wrap",
+                              gap: 8,
+                            }}
+                          >
+                            {contextualMissingItems(
+                              financingResult.readiness.missingItems,
+                              context,
+                              answers,
+                            ).map((item) => (
+                              <span key={item} style={pillGray}>
+                                {item}
+                              </span>
+                            ))}
+                            {financingResult.readiness.missingItems.length ===
+                              0 && (
+                              <span style={pillGray}>
+                                Core intake fields are currently filled.
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </details>
+                    </>
+                  ) : (
+                    <div style={{ ...miniCard, background: "#fbfcfe" }}>
+                      <span style={miniLabel}>Premium layer locked</span>
+                      <strong style={{ fontSize: 18, color: "#162033" }}>
+                        {report.tier.label}
+                      </strong>
+                      <span style={miniText}>{selectedTierAccess.detail}</span>
+                      <span style={miniText}>
+                        The underlying framework is already wired, so turning
+                        this live later is a switch instead of a rebuild.
                       </span>
                     </div>
-                  ))}
-                </div>
+                  )}
+                </section>
 
-                <details style={detailsStyle}>
-                  <summary style={summaryStyle}>Optional deeper intake gaps and human confirmation points</summary>
-                  <div style={{ display: "grid", gap: 8, paddingTop: 14 }}>
-                    <strong style={{ fontSize: 14, color: "#162033" }}>What still needs human confirmation</strong>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                      {contextualMissingItems(financingResult.readiness.missingItems, context, answers).map((item) => (
-                        <span key={item} style={pillGray}>{item}</span>
+                <section style={panelStyle}>
+                  <div style={{ display: "grid", gap: 5 }}>
+                    <strong style={{ fontSize: 18, color: "#162033" }}>
+                      Guided AI interview
+                    </strong>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "#5d687a",
+                        lineHeight: 1.55,
+                      }}
+                    >
+                      The interview should still be available when you want to
+                      pressure-test the property beyond the first-pass memo.
+                    </span>
+                  </div>
+                  {selectedTierUnlocked ? (
+                    <details style={detailsStyle}>
+                      <summary style={summaryStyle}>
+                        Open guided follow-up questions and live analysis
+                      </summary>
+                      <div style={{ paddingTop: 14 }}>
+                        <FurlongNavigator
+                          initialMessage={context.initialMessage}
+                          existingCase={navigatorCaseContext}
+                          onStateChange={setNavigator}
+                        />
+                      </div>
+                    </details>
+                  ) : (
+                    <div style={{ ...miniCard, background: "#fbfcfe" }}>
+                      <span style={miniLabel}>Interview access</span>
+                      <strong style={{ fontSize: 18, color: "#162033" }}>
+                        Hidden on this tier state
+                      </strong>
+                      <span style={miniText}>
+                        The deeper guided interview stays out of the main screen
+                        until this tier is unlocked.
+                      </span>
+                    </div>
+                  )}
+                </section>
+              </div>
+
+              <aside
+                style={{
+                  display: "grid",
+                  gap: 18,
+                  alignContent: "start",
+                  position: "sticky",
+                  top: 20,
+                }}
+              >
+                <section style={panelStyle}>
+                  <div style={{ display: "grid", gap: 5 }}>
+                    <strong style={{ fontSize: 18, color: "#162033" }}>
+                      Verified property-side criteria
+                    </strong>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "#5d687a",
+                        lineHeight: 1.55,
+                      }}
+                    >
+                      Snapshot-backed place facts and programs tied to the
+                      property itself, not to a borrower claim.
+                    </span>
+                  </div>
+                  {factsLoading ? (
+                    <span style={{ fontSize: 13, color: "#7a8aa0" }}>
+                      Checking property-side criteria…
+                    </span>
+                  ) : (
+                    <div style={{ display: "grid", gap: 10 }}>
+                      {verifiedPrograms.map((program) => (
+                        <div
+                          key={program.program_id}
+                          style={{
+                            border: "1px solid #b9e3d4",
+                            background: "#f4fbf8",
+                            borderRadius: 12,
+                            padding: "12px 14px",
+                            display: "grid",
+                            gap: 4,
+                          }}
+                        >
+                          <strong style={{ fontSize: 13.5, color: "#0f6e56" }}>
+                            {program.name}
+                          </strong>
+                          <span
+                            style={{
+                              fontSize: 12.5,
+                              color: "#3b475a",
+                              lineHeight: 1.55,
+                            }}
+                          >
+                            {program.verifiedStatement}
+                          </span>
+                          {program.whyItMatters && (
+                            <span
+                              style={{
+                                fontSize: 12.5,
+                                color: "#0f6e56",
+                                lineHeight: 1.55,
+                              }}
+                            >
+                              {program.whyItMatters}
+                            </span>
+                          )}
+                          <span style={{ fontSize: 11.5, color: "#5d687a" }}>
+                            {program.basis}
+                          </span>
+                        </div>
                       ))}
-                      {financingResult.readiness.missingItems.length === 0 && (
-                        <span style={pillGray}>Core intake fields are currently filled.</span>
+                      {verifiedPrograms.length === 0 && (
+                        <span
+                          style={{
+                            fontSize: 12.5,
+                            color: "#7a8aa0",
+                            lineHeight: 1.55,
+                          }}
+                        >
+                          {context.propertyId?.startsWith("imported:")
+                            ? "No internal snapshot-backed property facts are attached yet because this property was imported by the visitor and still needs independent confirmation."
+                            : "No verified federal property-side program criteria surfaced from the current snapshot set for this listing yet."}
+                        </span>
+                      )}
+                      {facts?.placeFacts?.flood && (
+                        <div style={factCard}>
+                          <strong style={{ fontSize: 13.5, color: "#162033" }}>
+                            FEMA flood posture
+                          </strong>
+                          <span style={{ fontSize: 12.5, color: "#3b475a" }}>
+                            Special Flood Hazard Area, Zone{" "}
+                            {facts.placeFacts.flood.floodZone}.
+                          </span>
+                        </div>
+                      )}
+                      {facts?.placeFacts?.historic && (
+                        <div style={factCard}>
+                          <strong style={{ fontSize: 13.5, color: "#162033" }}>
+                            Historic context
+                          </strong>
+                          <span style={{ fontSize: 12.5, color: "#3b475a" }}>
+                            National Register area
+                            {facts.placeFacts.historic.historicName
+                              ? ` — ${facts.placeFacts.historic.historicName}`
+                              : ""}
+                            .
+                          </span>
+                        </div>
+                      )}
+                      {facts?.placeFacts?.nmtc && (
+                        <div style={factCard}>
+                          <strong style={{ fontSize: 13.5, color: "#162033" }}>
+                            NMTC tract
+                          </strong>
+                          <span style={{ fontSize: 12.5, color: "#3b475a" }}>
+                            Tract {facts.placeFacts.nmtc.tractId} is
+                            NMTC-qualified in the current snapshot.
+                          </span>
+                        </div>
                       )}
                     </div>
-                  </div>
-                </details>
-              </>
-            ) : (
-              <div style={{ ...miniCard, background: "#fbfcfe" }}>
-                <span style={miniLabel}>Premium layer locked</span>
-                <strong style={{ fontSize: 18, color: "#162033" }}>{report.tier.label}</strong>
-                <span style={miniText}>{selectedTierAccess.detail}</span>
-                <span style={miniText}>
-                  The underlying framework is already wired, so turning this live later is a switch instead of a rebuild.
-                </span>
-              </div>
-            )}
-          </section>
+                  )}
+                </section>
 
-          <section style={panelStyle}>
-            <div style={{ display: "grid", gap: 5 }}>
-              <strong style={{ fontSize: 18, color: "#162033" }}>Guided AI interview</strong>
-              <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-                The interview should still be available when you want to pressure-test the property beyond the first-pass memo.
-              </span>
-            </div>
-            {selectedTierUnlocked ? (
-              <details style={detailsStyle}>
-                <summary style={summaryStyle}>Open guided follow-up questions and live analysis</summary>
-                <div style={{ paddingTop: 14 }}>
-                  <FurlongNavigator initialMessage={context.initialMessage} existingCase={navigatorCaseContext} onStateChange={setNavigator} />
-                </div>
-              </details>
-            ) : (
-              <div style={{ ...miniCard, background: "#fbfcfe" }}>
-                <span style={miniLabel}>Interview access</span>
-                <strong style={{ fontSize: 18, color: "#162033" }}>Hidden on this tier state</strong>
-                <span style={miniText}>
-                  The deeper guided interview stays out of the main screen until this tier is unlocked.
-                </span>
-              </div>
-            )}
-          </section>
-        </div>
-
-        <aside style={{ display: "grid", gap: 18, alignContent: "start", position: "sticky", top: 20 }}>
-          <section style={panelStyle}>
-            <div style={{ display: "grid", gap: 5 }}>
-              <strong style={{ fontSize: 18, color: "#162033" }}>Verified property-side criteria</strong>
-              <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-                Snapshot-backed place facts and programs tied to the property itself, not to a borrower claim.
-              </span>
-            </div>
-            {factsLoading ? (
-              <span style={{ fontSize: 13, color: "#7a8aa0" }}>Checking property-side criteria…</span>
-            ) : (
-              <div style={{ display: "grid", gap: 10 }}>
-                {verifiedPrograms.map((program) => (
-                  <div key={program.program_id} style={{ border: "1px solid #b9e3d4", background: "#f4fbf8", borderRadius: 12, padding: "12px 14px", display: "grid", gap: 4 }}>
-                    <strong style={{ fontSize: 13.5, color: "#0f6e56" }}>{program.name}</strong>
-                    <span style={{ fontSize: 12.5, color: "#3b475a", lineHeight: 1.55 }}>{program.verifiedStatement}</span>
-                    {program.whyItMatters && (
-                      <span style={{ fontSize: 12.5, color: "#0f6e56", lineHeight: 1.55 }}>{program.whyItMatters}</span>
-                    )}
-                    <span style={{ fontSize: 11.5, color: "#5d687a" }}>{program.basis}</span>
-                  </div>
-                ))}
-                {verifiedPrograms.length === 0 && (
-                  <span style={{ fontSize: 12.5, color: "#7a8aa0", lineHeight: 1.55 }}>
-                    {context.propertyId?.startsWith("imported:")
-                      ? "No internal snapshot-backed property facts are attached yet because this property was imported by the visitor and still needs independent confirmation."
-                      : "No verified federal property-side program criteria surfaced from the current snapshot set for this listing yet."}
-                  </span>
-                )}
-                {facts?.placeFacts?.flood && (
-                  <div style={factCard}>
-                    <strong style={{ fontSize: 13.5, color: "#162033" }}>FEMA flood posture</strong>
-                    <span style={{ fontSize: 12.5, color: "#3b475a" }}>
-                      Special Flood Hazard Area, Zone {facts.placeFacts.flood.floodZone}.
+                <section style={panelStyle}>
+                  <div style={{ display: "grid", gap: 5 }}>
+                    <strong style={{ fontSize: 18, color: "#162033" }}>
+                      Draft evaluation report
+                    </strong>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "#5d687a",
+                        lineHeight: 1.55,
+                      }}
+                    >
+                      Saveable, exportable, watermarked, and updated live from
+                      your property notes plus the guided conversation. This
+                      should read like a useful advisory brief, not a
+                      scratchpad.
                     </span>
                   </div>
-                )}
-                {facts?.placeFacts?.historic && (
-                  <div style={factCard}>
-                    <strong style={{ fontSize: 13.5, color: "#162033" }}>Historic context</strong>
-                    <span style={{ fontSize: 12.5, color: "#3b475a" }}>
-                      National Register area{facts.placeFacts.historic.historicName ? ` — ${facts.placeFacts.historic.historicName}` : ""}.
-                    </span>
-                  </div>
-                )}
-                {facts?.placeFacts?.nmtc && (
-                  <div style={factCard}>
-                    <strong style={{ fontSize: 13.5, color: "#162033" }}>NMTC tract</strong>
-                    <span style={{ fontSize: 12.5, color: "#3b475a" }}>
-                      Tract {facts.placeFacts.nmtc.tractId} is NMTC-qualified in the current snapshot.
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-
-          <section style={panelStyle}>
-            <div style={{ display: "grid", gap: 5 }}>
-              <strong style={{ fontSize: 18, color: "#162033" }}>Draft evaluation report</strong>
-              <span style={{ fontSize: 13, color: "#5d687a", lineHeight: 1.55 }}>
-                Saveable, exportable, watermarked, and updated live from your property notes plus the guided conversation. This should read like a useful advisory brief, not a scratchpad.
-              </span>
-            </div>
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ ...reportSection, position: "relative", overflow: "hidden", background: "linear-gradient(135deg, #fbfcfe, #ffffff)", borderRadius: 16, padding: "16px 18px" }}>
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    backgroundImage: `url(${report.branding.compassWatermarkPath})`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                    backgroundSize: "260px",
-                    opacity: 0.08,
-                    pointerEvents: "none",
-                  }}
-                />
-                <div
-                  aria-hidden="true"
-                  style={{
-                    position: "absolute",
-                    right: 12,
-                    top: 10,
-                    width: 64,
-                    height: 64,
-                    backgroundImage: `url(${report.branding.emblemPath})`,
-                    backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center",
-                    backgroundSize: "contain",
-                    opacity: 0.16,
-                    pointerEvents: "none",
-                  }}
-                />
-                <div style={{ position: "relative", zIndex: 1, display: "grid", gap: 6 }}>
-                  <span style={miniLabel}>Report tier</span>
-                  <strong style={{ fontSize: 18, color: "#162033" }}>
-                    {report.tier.shortLabel} · {report.tier.label}
-                  </strong>
-                  <span style={miniText}>{report.tier.description}</span>
-                </div>
-              </div>
-              <div style={{ ...reportSection, borderRadius: 16, padding: "16px 18px" }}>
-                <span style={miniLabel}>Verdict</span>
-                <strong style={{ fontSize: 18, color: "#162033", lineHeight: 1.35 }}>
-                  {report.verdict.label}
-                </strong>
-                <span style={miniText}>{report.verdict.explanation}</span>
-              </div>
-              <div style={{ ...reportSection, borderRadius: 16, padding: "16px 18px" }}>
-                <span style={miniLabel}>Executive summary</span>
-                <span style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.65 }}>
-                  {report.executiveSummary}
-                </span>
-              </div>
-              {visiblePreviewSections.map((section) => {
-                const sectionLines = section.lines.length > 0 ? section.lines : section.emptyFallback ? [section.emptyFallback] : [];
-                return (
-                  <div key={section.title} style={{ ...reportSection, borderRadius: 16, padding: "16px 18px" }}>
-                    <span style={miniLabel}>{section.title}</span>
-                    <div style={{ display: "grid", gap: 6 }}>
-                      {sectionLines.map((line) => (
-                        <span key={line} style={{ fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}>{line}</span>
-                      ))}
+                  <div style={{ display: "grid", gap: 12 }}>
+                    <div
+                      style={{
+                        ...reportSection,
+                        position: "relative",
+                        overflow: "hidden",
+                        background: "linear-gradient(135deg, #fbfcfe, #ffffff)",
+                        borderRadius: 16,
+                        padding: "16px 18px",
+                      }}
+                    >
+                      <div
+                        aria-hidden="true"
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          backgroundImage: `url(${report.branding.compassWatermarkPath})`,
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "center",
+                          backgroundSize: "260px",
+                          opacity: 0.08,
+                          pointerEvents: "none",
+                        }}
+                      />
+                      <div
+                        aria-hidden="true"
+                        style={{
+                          position: "absolute",
+                          right: 12,
+                          top: 10,
+                          width: 64,
+                          height: 64,
+                          backgroundImage: `url(${report.branding.emblemPath})`,
+                          backgroundRepeat: "no-repeat",
+                          backgroundPosition: "center",
+                          backgroundSize: "contain",
+                          opacity: 0.16,
+                          pointerEvents: "none",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "relative",
+                          zIndex: 1,
+                          display: "grid",
+                          gap: 6,
+                        }}
+                      >
+                        <span style={miniLabel}>Report tier</span>
+                        <strong style={{ fontSize: 18, color: "#162033" }}>
+                          {report.tier.shortLabel} · {report.tier.label}
+                        </strong>
+                        <span style={miniText}>{report.tier.description}</span>
+                      </div>
                     </div>
-                    {section.title === "Diligence priorities before commitment" && (
-                      <span style={{ fontSize: 12, color: "#7a8aa0", lineHeight: 1.55 }}>
-                        {report.branding.advisoryDisclosure}
+                    <div
+                      style={{
+                        ...reportSection,
+                        borderRadius: 16,
+                        padding: "16px 18px",
+                      }}
+                    >
+                      <span style={miniLabel}>Verdict</span>
+                      <strong
+                        style={{
+                          fontSize: 18,
+                          color: "#162033",
+                          lineHeight: 1.35,
+                        }}
+                      >
+                        {report.verdict.label}
+                      </strong>
+                      <span style={miniText}>{report.verdict.explanation}</span>
+                    </div>
+                    <div
+                      style={{
+                        ...reportSection,
+                        borderRadius: 16,
+                        padding: "16px 18px",
+                      }}
+                    >
+                      <span style={miniLabel}>Executive summary</span>
+                      <span
+                        style={{
+                          fontSize: 13,
+                          color: "#3b475a",
+                          lineHeight: 1.65,
+                        }}
+                      >
+                        {report.executiveSummary}
                       </span>
-                    )}
+                    </div>
+                    {visiblePreviewSections.map((section) => {
+                      const sectionLines =
+                        section.lines.length > 0
+                          ? section.lines
+                          : section.emptyFallback
+                            ? [section.emptyFallback]
+                            : [];
+                      return (
+                        <div
+                          key={section.title}
+                          style={{
+                            ...reportSection,
+                            borderRadius: 16,
+                            padding: "16px 18px",
+                          }}
+                        >
+                          <span style={miniLabel}>{section.title}</span>
+                          <div style={{ display: "grid", gap: 6 }}>
+                            {sectionLines.map((line) => (
+                              <span
+                                key={line}
+                                style={{
+                                  fontSize: 13,
+                                  color: "#3b475a",
+                                  lineHeight: 1.6,
+                                }}
+                              >
+                                {line}
+                              </span>
+                            ))}
+                          </div>
+                          {section.title ===
+                            "Diligence priorities before commitment" && (
+                            <span
+                              style={{
+                                fontSize: 12,
+                                color: "#7a8aa0",
+                                lineHeight: 1.55,
+                              }}
+                            >
+                              {report.branding.advisoryDisclosure}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </section>
+              </aside>
             </div>
-          </section>
-        </aside>
-      </div>
-        </div>
+          </div>
         </section>
       ) : null}
       {/* The separate "deeper analysis workspace" link was removed (founder
@@ -4712,30 +6802,114 @@ export function PropertyEvaluationWorkspace({
           <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 800 }}>
             Why you can trust this analysis
           </summary>
-          <div style={{ display: "grid", gap: 10, paddingTop: 14, fontFamily: "Georgia, 'Times New Roman', serif" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <span aria-hidden style={{ fontSize: 15, color: "#d4b06a" }}>❧</span>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#d4b06a" }}>
-              The Furlong Sovereignty Guarantee
-            </span>
-          </div>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "#3B475A" }}>
-            We lay out every figure with its source and date because this is your ground, not ours to
-            gate. That is a guarantee about how <em>we</em> conduct ourselves — the part we fully control:
-          </p>
-          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 5, fontSize: 13, lineHeight: 1.55, color: "#3B475A" }}>
-            <li><strong style={{ color: "#1C2B45" }}>No capture.</strong> No account, no login, no personal data required to read the open property analysis.</li>
-            <li><strong style={{ color: "#1C2B45" }}>No lead sale or file auction.</strong> Furlong never sells borrower leads or auctions borrower files.</li>
-            <li><strong style={{ color: "#1C2B45" }}>You control sharing.</strong> A provider receives only the exact package you authorize for that exact recipient; selecting a provider does not silently share your file.</li>
-            <li><strong style={{ color: "#1C2B45" }}>No pay-to-rank.</strong> Provider compensation and affiliation have zero influence on matching or ranking.</li>
-            <li><strong style={{ color: "#1C2B45" }}>Core financing workflow stays customer-free.</strong> Property analysis, financing readiness, provider comparison, and the authorized case-room handoff are not borrower paywalls. Optional professional or archival services are separately scoped and never buy a provider better placement.</li>
-            <li><strong style={{ color: "#1C2B45" }}>Sources, always.</strong> Every figure carries its origin and date — you can check our work.</li>
-          </ul>
-          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#5A6172" }}>
-            Reading the open property analysis can remain anonymous. If you choose to save a case, add borrower
-            readiness information, nominate a provider, open a deal room, request an optional professional service,
-            or authorize delivery, Furlong collects only what that chosen workflow requires and states the purpose at collection.
-          </p>
+          <div
+            style={{
+              display: "grid",
+              gap: 10,
+              paddingTop: 14,
+              fontFamily: "Georgia, 'Times New Roman', serif",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                flexWrap: "wrap",
+              }}
+            >
+              <span aria-hidden style={{ fontSize: 15, color: "#d4b06a" }}>
+                ❧
+              </span>
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "#d4b06a",
+                }}
+              >
+                The Furlong Sovereignty Guarantee
+              </span>
+            </div>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 14,
+                lineHeight: 1.6,
+                color: "#3B475A",
+              }}
+            >
+              We lay out every figure with its source and date because this is
+              your ground, not ours to gate. That is a guarantee about how{" "}
+              <em>we</em> conduct ourselves — the part we fully control:
+            </p>
+            <ul
+              style={{
+                margin: 0,
+                paddingLeft: 20,
+                display: "grid",
+                gap: 5,
+                fontSize: 13,
+                lineHeight: 1.55,
+                color: "#3B475A",
+              }}
+            >
+              <li>
+                <strong style={{ color: "#1C2B45" }}>No capture.</strong> No
+                account, no login, no personal data required to read the open
+                property analysis.
+              </li>
+              <li>
+                <strong style={{ color: "#1C2B45" }}>
+                  No lead sale or file auction.
+                </strong>{" "}
+                Furlong never sells borrower leads or auctions borrower files.
+              </li>
+              <li>
+                <strong style={{ color: "#1C2B45" }}>
+                  You control sharing.
+                </strong>{" "}
+                A provider receives only the exact package you authorize for
+                that exact recipient; selecting a provider does not silently
+                share your file.
+              </li>
+              <li>
+                <strong style={{ color: "#1C2B45" }}>No pay-to-rank.</strong>{" "}
+                Provider compensation and affiliation have zero influence on
+                matching or ranking.
+              </li>
+              <li>
+                <strong style={{ color: "#1C2B45" }}>
+                  Core financing workflow stays customer-free.
+                </strong>{" "}
+                Property analysis, financing readiness, provider comparison, and
+                the authorized case-room handoff are not borrower paywalls.
+                Optional professional or archival services are separately scoped
+                and never buy a provider better placement.
+              </li>
+              <li>
+                <strong style={{ color: "#1C2B45" }}>Sources, always.</strong>{" "}
+                Every figure carries its origin and date — you can check our
+                work.
+              </li>
+            </ul>
+            <p
+              style={{
+                margin: 0,
+                fontSize: 12,
+                lineHeight: 1.55,
+                color: "#5A6172",
+              }}
+            >
+              Reading the open property analysis can remain anonymous. If you
+              choose to save a case, add borrower readiness information,
+              nominate a provider, open a deal room, request an optional
+              professional service, or authorize delivery, Furlong collects only
+              what that chosen workflow requires and states the purpose at
+              collection.
+            </p>
           </div>
         </details>
       )}
@@ -4745,38 +6919,145 @@ export function PropertyEvaluationWorkspace({
           exact problem — routed to Furlong's OWN disclosed people (the licensed
           lending desk + the Guild's licensed PE), never generic third parties.
           The logical next step, not a generic "contact us". */}
-      {!deepView && (() => {
-        const pf = facts?.placeFacts;
-        const rows: { finding: string; step: string; href: string; accent: string }[] = [];
-        if (pf?.flood) rows.push({ finding: `This site maps to FEMA flood zone ${pf.flood.floodZone}`, step: "Review the boundary + a Phase I with the Guild's licensed PE", href: "/explore?lane=environmental-compliance", accent: "#0f6e56" });
-        if (pf?.opportunityZone?.rural) rows.push({ finding: "USDA-rural eligible ground", step: "Line up the USDA loan with the licensed lending desk", href: "/explore?lane=financing-capital", accent: "#534AB7" });
-        if (pf?.opportunityZone || pf?.nmtc) rows.push({ finding: pf?.opportunityZone && pf?.nmtc ? "Opportunity Zone + NMTC tract" : pf?.opportunityZone ? "Opportunity Zone tract" : "NMTC low-income community tract", step: "Map the capital-gains / community-lending structure with the licensed desk", href: "/explore?lane=financing-capital", accent: "#534AB7" });
-        if (rows.length === 0) rows.push({ finding: "Your verified results, above", step: "Bring the whole picture to the licensed lending desk", href: "/explore?lane=financing-capital", accent: "#534AB7" });
-        return (
-          <section aria-label="Your next step from these results" style={{ display: "grid", gap: 12, border: "1px solid #e9ddc4", borderLeft: "3px solid #c9a84c", background: "#faf6ec", borderRadius: 14, padding: "16px 20px" }}>
-            <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: "#7a5c1f", fontFamily: "Georgia, serif" }}>
-              From these results — your logical next step
-            </span>
-            <div style={{ display: "grid", gap: 10 }}>
-              {rows.map((r) => (
-                <div key={r.finding} style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px 12px", padding: "10px 12px", background: "#ffffff", border: "1px solid #e4e9f0", borderRadius: 10 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: "#162033", flex: "1 1 200px" }}>{r.finding}</span>
-                  <span aria-hidden style={{ color: "#7a5c1f", fontWeight: 800 }}>→</span>
-                  <a href={r.href} style={{ fontSize: 13, fontWeight: 800, color: r.accent, textDecoration: "none", flex: "1 1 240px" }}>{r.step} →</a>
-                </div>
-              ))}
-            </div>
-            <span style={{ fontSize: 11.5, color: "#7c6f57", lineHeight: 1.55, fontFamily: "Georgia, serif", fontStyle: "italic" }}>
-              These are optional next-step workflows. For financing, Furlong can compare suitable Capital Network providers, let you nominate your own provider, or invite a verified one-case guest provider. Nothing is sent until you choose the exact recipient and authorize the exact package; compensation never improves provider ranking.
-            </span>
-          </section>
-        );
-      })()}
+      {!deepView &&
+        (() => {
+          const pf = facts?.placeFacts;
+          const rows: {
+            finding: string;
+            step: string;
+            href: string;
+            accent: string;
+          }[] = [];
+          if (pf?.flood)
+            rows.push({
+              finding: `This site maps to FEMA flood zone ${pf.flood.floodZone}`,
+              step: "Review the boundary + a Phase I with the Guild's licensed PE",
+              href: "/explore?lane=environmental-compliance",
+              accent: "#0f6e56",
+            });
+          if (pf?.opportunityZone?.rural)
+            rows.push({
+              finding: "USDA-rural eligible ground",
+              step: "Line up the USDA loan with the licensed lending desk",
+              href: "/explore?lane=financing-capital",
+              accent: "#534AB7",
+            });
+          if (pf?.opportunityZone || pf?.nmtc)
+            rows.push({
+              finding:
+                pf?.opportunityZone && pf?.nmtc
+                  ? "Opportunity Zone + NMTC tract"
+                  : pf?.opportunityZone
+                    ? "Opportunity Zone tract"
+                    : "NMTC low-income community tract",
+              step: "Map the capital-gains / community-lending structure with the licensed desk",
+              href: "/explore?lane=financing-capital",
+              accent: "#534AB7",
+            });
+          if (rows.length === 0)
+            rows.push({
+              finding: "Your verified results, above",
+              step: "Bring the whole picture to the licensed lending desk",
+              href: "/explore?lane=financing-capital",
+              accent: "#534AB7",
+            });
+          return (
+            <section
+              aria-label="Your next step from these results"
+              style={{
+                display: "grid",
+                gap: 12,
+                border: "1px solid #e9ddc4",
+                borderLeft: "3px solid #c9a84c",
+                background: "#faf6ec",
+                borderRadius: 14,
+                padding: "16px 20px",
+              }}
+            >
+              <span
+                style={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: "#7a5c1f",
+                  fontFamily: "Georgia, serif",
+                }}
+              >
+                From these results — your logical next step
+              </span>
+              <div style={{ display: "grid", gap: 10 }}>
+                {rows.map((r) => (
+                  <div
+                    key={r.finding}
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      gap: "6px 12px",
+                      padding: "10px 12px",
+                      background: "#ffffff",
+                      border: "1px solid #e4e9f0",
+                      borderRadius: 10,
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: "#162033",
+                        flex: "1 1 200px",
+                      }}
+                    >
+                      {r.finding}
+                    </span>
+                    <span
+                      aria-hidden
+                      style={{ color: "#7a5c1f", fontWeight: 800 }}
+                    >
+                      →
+                    </span>
+                    <a
+                      href={r.href}
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 800,
+                        color: r.accent,
+                        textDecoration: "none",
+                        flex: "1 1 240px",
+                      }}
+                    >
+                      {r.step} →
+                    </a>
+                  </div>
+                ))}
+              </div>
+              <span
+                style={{
+                  fontSize: 11.5,
+                  color: "#7c6f57",
+                  lineHeight: 1.55,
+                  fontFamily: "Georgia, serif",
+                  fontStyle: "italic",
+                }}
+              >
+                These are optional next-step workflows. For financing, Furlong
+                can compare suitable Capital Network providers, let you nominate
+                your own provider, or invite a verified one-case guest provider.
+                Nothing is sent until you choose the exact recipient and
+                authorize the exact package; compensation never improves
+                provider ranking.
+              </span>
+            </section>
+          );
+        })()}
 
       {/* Switch-property moved from the page top to a quiet, collapsed rail at
           the end (redesign Phase 1): the visitor came to evaluate THIS
           property — leaving it is the last offer, not the first. */}
-      <details style={{ ...detailsStyle, background: "#ffffff", padding: "14px 18px" }}>
+      <details
+        style={{ ...detailsStyle, background: "#ffffff", padding: "14px 18px" }}
+      >
         <summary style={{ ...summaryStyle, fontSize: 14 }}>
           Evaluating a different property? Paste a link or upload a listing
         </summary>

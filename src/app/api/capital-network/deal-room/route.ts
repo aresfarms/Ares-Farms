@@ -13,8 +13,10 @@ import {
   listProviderDealRooms,
   publicProvider,
   recordCapitalNetworkExecutionOutcome,
+  updateClosingMilestone,
 } from "@/lib/financing/capitalNetworkStore";
 import type { CapitalExecutionOutcome } from "@/lib/financing/capitalNetworkExecutionReliability";
+import { CLOSING_MILESTONES, type ClosingMilestone } from "@/lib/financing/managedProviderHandoff";
 import { recordCapitalNetworkEvidence } from "@/lib/financing/capitalNetworkGovernance";
 import { createSubmissionCase } from "@/lib/lender-submission/store";
 
@@ -117,6 +119,9 @@ export async function POST(req: NextRequest) {
       providerDispositionAt?: string | null;
       closedFundedAt?: string | null;
       evidenceRefs?: string[];
+      milestone?: ClosingMilestone;
+      milestoneStatus?: "NOT_STARTED" | "IN_PROGRESS" | "BLOCKED" | "COMPLETE";
+      note?: string | null;
     };
     const serviceRequestId = (body.serviceRequestId ?? "").trim().toUpperCase();
     const providerId = (body.providerId ?? "").trim();
@@ -168,6 +173,30 @@ export async function POST(req: NextRequest) {
           personalFinancialScoring: false,
         },
       }, { status: 201 });
+    }
+    if (body.action === "update-closing-milestone") {
+      if (!body.milestone || !CLOSING_MILESTONES.includes(body.milestone)) throw new Error("A valid closing milestone is required.");
+      if (!body.milestoneStatus || !["NOT_STARTED", "IN_PROGRESS", "BLOCKED", "COMPLETE"].includes(body.milestoneStatus)) throw new Error("A valid milestone status is required.");
+      const room = await updateClosingMilestone({
+        serviceRequestId,
+        providerId,
+        milestone: body.milestone,
+        status: body.milestoneStatus,
+        note: body.note,
+        evidenceRefs: Array.isArray(body.evidenceRefs) ? body.evidenceRefs : [],
+        actorId: actorId ?? "capital-desk",
+        traceId: trace,
+      });
+      await recordCapitalNetworkEvidence({
+        traceId: trace,
+        operation: "capital-network.closing-milestone.update",
+        actorId,
+        eventType: "CAPITAL_NETWORK_CLOSING_MILESTONE_UPDATED",
+        message: `Closing milestone ${body.milestone} was updated to ${body.milestoneStatus}.`,
+        targetId: serviceRequestId,
+        metadata: { providerId, milestone: body.milestone, status: body.milestoneStatus },
+      });
+      return NextResponse.json({ ok: true, room, governance: { traceId: trace, logbookTerminalMilestone: "KEYS_AND_LOGBOOK" } });
     }
     if (body.action !== "create-submission-case") {
       throw new Error("Unsupported Capital Network deal-room action.");

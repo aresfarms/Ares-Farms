@@ -45,6 +45,13 @@ export interface CapitalProviderProfile {
   borrowerTypes: string[];
   minDealAmount: number | null;
   maxDealAmount: number | null;
+  publishedCreditBox: Record<string, unknown>;
+  collateralPolicy: Record<string, unknown>;
+  environmentalRequirements: Record<string, unknown>;
+  typicalFirstResponseDays: number | null;
+  typicalClosingDays: number | null;
+  creditBoxSourceRefs: string[];
+  creditBoxVerifiedAt: Date | null;
   matchingEnabled: boolean;
   explicitAssignmentAllowed: boolean;
   liveRoutingAllowed: boolean;
@@ -140,6 +147,12 @@ export function matchCapitalProvider(
   else blockers.push("Industry is outside declared appetite.");
   if (optionalFit(provider.borrowerTypes, deal.borrowerType)) score += deal.borrowerType ? 4 : 0;
   else blockers.push("Borrower type is outside declared appetite.");
+
+  if (provider.creditBoxVerifiedAt && provider.creditBoxSourceRefs.length > 0) {
+    reasons.push("Published provider box is source-verified by Furlong; personal credit criteria remain provider-reviewed, not Furlong-decided.");
+  } else {
+    reasons.push("Provider program appetite is verified, but the full published credit-box evidence is still being completed.");
+  }
 
   return {
     providerId: provider.providerId,

@@ -1,8 +1,8 @@
 {
   "registryId": "current-master-volume-registry",
-  "generatedAt": "2026-09-05T01:33:09Z",
+  "generatedAt": "2026-09-05T18:30:00Z",
   "repository": "ares-farms",
-  "activeBuildDate": "2026-09-04",
+  "activeBuildDate": "2026-09-05",
   "controllingRule": "This registry is the machine-readable current-version pointer for build verification. The doctrine truth mirror requires an authoritative source, explicit platform status, existing evidence files, registered verification commands, and a reconciliation basis for every canonical doctrine. Later scoped amendments registered here control over conflicting older wording within their stated scope, while historical files remain preserved as versioned evidence. Mirror certification means documentation and platform state agree; it does not imply every doctrine is deployed, live, externally validated, certified, or production-authorized.",
   "documents": [
     {
@@ -98,9 +98,16 @@
     {
       "key": "currentBuildParityAmendment",
       "label": "Master Volume Amendment - Current Build Parity",
-      "governingVersion": "2026-09-04 controlling current-build amendment",
+      "governingVersion": "2026-09-05 scope extension over 2026-09-04 controlling amendment",
       "file": "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
-      "note": "Controls current property/program/provider boundaries, Capital Network neutrality, execution reliability, valuation-method scope, owner-controlled governance, and schema target 0057 where older exported wording conflicts."
+      "note": "Controls current property/program/provider boundaries, customer-free financing core, living case, provider-box evidence, managed handoff, outcome learning, Capital Network neutrality, owner-controlled governance, and canonical schema target 0062 where older exported wording conflicts."
+    },
+    {
+      "key": "platformExperienceEconomicsAmendment",
+      "label": "Master Volume Amendment - Platform Experience, Customer Economics & Living Case",
+      "governingVersion": "2026-09-05 controlling scoped amendment",
+      "file": "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+      "note": "Controls customer journey, borrower-free financing core, institution-funded economics, living Furlong Case, provider published-box evidence, outcome learning, market specialization order, and production security-claim gate."
     }
   ],
   "supportingDocuments": [
@@ -116,7 +123,8 @@
     "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
     "COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
     "OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
-    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md"
+    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
   ],
   "repositoryEvidence": [
     "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
@@ -185,11 +193,26 @@
     "src/lib/property/zoningUseCurated.ts",
     "src/app/api/public/property-facts/route.ts",
     "src/components/property/lanes/FarmAgricultureTab.tsx",
-    "src/scripts/farmUseIntegrityConformance.ts"
+    "src/scripts/farmUseIntegrityConformance.ts",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+    "src/lib/platform/furlongVision.ts",
+    "src/scripts/furlongVisionConformance.ts",
+    "src/db/schema/furlongCases.ts",
+    "src/lib/intelligence/furlongCaseStore.ts",
+    "src/components/intelligence/LivingFurlongCasePanel.tsx",
+    "src/lib/financing/managedProviderHandoff.ts",
+    "src/scripts/managedProviderHandoffConformance.ts",
+    "src/scripts/furlongCaseConformance.ts",
+    "src/scripts/capitalNetworkCreditBoxConformance.ts",
+    "src/lib/db/migrations/0058_furlong_case_lifecycle.sql",
+    "src/lib/db/migrations/0059_managed_provider_handoff.sql",
+    "src/lib/db/migrations/0060_furlong_case_living_record_upgrade.sql",
+    "src/lib/db/migrations/0061_capital_network_published_credit_box.sql",
+    "src/lib/db/migrations/0062_identity_verifications.sql"
   ],
   "buildBinding": {
-    "branch": "feature/ai-operating-model-20260904",
-    "canonicalSchemaTarget": "0057",
+    "branch": "master",
+    "canonicalSchemaTarget": "0062",
     "capitalNetworkRuntimeVersion": "capital-network-runtime-v1.1.0",
     "capitalNetworkReliabilityVersion": "capital-network-execution-reliability-v1.0.0",
     "parityMirror": "docs/current-build-parity.json",
@@ -200,6 +223,9 @@
     "preParityBehaviorBaselineCommit": "8ead373",
     "parityImplementationCommit": "19e654b",
     "farmUseIntegrityRuntimeVersion": "farm-use-integrity-v1.0.0",
-    "farmLandUseBoundary": "agricultural enterprise screen is separate from property-wide highest/best-supported use"
+    "farmLandUseBoundary": "agricultural enterprise screen is separate from property-wide highest/best-supported use",
+    "furlongVisionVersion": "furlong-vision-v1.0.0",
+    "furlongCaseVersion": "furlong-case-v1.0.0",
+    "managedProviderHandoff": "source-implemented; database promotion pending migrations 0058-0062"
   }
 }

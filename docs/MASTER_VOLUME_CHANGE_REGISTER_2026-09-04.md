@@ -63,3 +63,23 @@ The Farm Financial Health self-check remains available as an optional browser-si
 - `npm run build`
 
 Any later material runtime/schema change must update the controlling Master Volume pointer and parity mirror in the same change set. A passing historical doctrine count is not sufficient if the executable hard rules have drifted.
+
+## 2026-09-05 scoped extension — customer experience, economics and living case
+
+**Change ID:** MVS-EXPERIENCE-ECONOMICS-2026-09-05  
+**Authority:** `MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md`
+
+The September 5 platform-wide review found that the underlying governance architecture was stronger than the customer-facing product coherence and economics. The approved correction makes Property → Feasibility → Capital the public decision journey; makes the borrower/customer financing core free through readiness, verified-provider comparison and exact-recipient case-room handoff; separates optional professional/archival services from financing access; and moves the primary revenue model to institutional infrastructure rather than borrower transaction economics.
+
+Source implementation now adds the durable customer-controlled Furlong Case, append-oriented case timeline and actual-outcome records; bounded multi-provider comparison; separate expiring provider case rooms; structured provider response and closing milestones through keys/logbook; and source-governed provider published-box, collateral, environmental and turnaround evidence. Provider-published expectations remain separate from Furlong-measured execution history, and person-side credit authority remains with the provider.
+
+The **canonical source schema target is now `0062`**. The controlled staging/testing database remains at the previously promoted `0057` state until migrations `0058`, `0059`, `0060`, `0061` and `0062` complete governed migration and deployed verification. This register therefore distinguishes source-build parity from environment promotion and does not represent the new persistence as deployed yet.
+
+Additional standing proof:
+- `npm run verify:furlong-vision`
+- `npm run verify:managed-provider-handoff`
+- `npm run verify:furlong-case`
+- `npm run verify:capital-network-credit-box`
+- `npm run verify:customer-property-experience`
+
+Production security claims remain evidence-gated: architecture alone is not unrestricted production assurance. Threat-model, scan, IAM/isolation, key/secret rotation, backup/restore/replay, penetration, incident/rollback, vendor and signed promotion evidence remain required for the affected live actions.

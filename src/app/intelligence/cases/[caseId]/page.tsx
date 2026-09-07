@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { LivingFurlongCasePanel } from "@/components/intelligence/LivingFurlongCasePanel";
+
 import { composeIntelligenceCaseWorkspace } from "@/lib/intelligence/intelligenceCaseWorkspaceRuntime";
 
 const panel = {
@@ -85,10 +87,11 @@ export default async function IntelligenceCasePage({
               color: "#0f766e",
             }}
           >
-            FURLONG INTELLIGENCE CASE
+            YOUR FURLONG CASE
           </div>
           <h1 style={{ margin: "8px 0" }}>{workspace.subject.displayName}</h1>
           <p style={muted}>{workspace.goal}</p>
+          <p style={{ ...muted, marginBottom: 12 }}>Property → Feasibility → Capital → Diligence → Closing → Operating logbook. One case carries the evidence and permissions forward; no provider receives it until you authorize that named recipient.</p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <strong>Recommendation: {workspace.recommendation.state}</strong>
             <span>·</span>
@@ -100,8 +103,17 @@ export default async function IntelligenceCasePage({
           </div>
         </header>
 
+        <LivingFurlongCasePanel
+          caseId={caseId}
+          displayName={workspace.subject.displayName}
+          goal={workspace.goal}
+          state={state}
+          customerTypes={customerTypes}
+          intendedUses={intendedUses}
+        />
+
         <section style={{ ...panel, borderLeft: "5px solid #c58b21" }}>
-          <h2 style={{ marginTop: 0 }}>Current recommendation posture</h2>
+          <h2 style={{ marginTop: 0 }}>What Furlong knows right now</h2>
           <p>{workspace.recommendation.recommendationText}</p>
           <p style={muted}>
             This workspace is advisory only. It does not approve financing,
@@ -111,7 +123,7 @@ export default async function IntelligenceCasePage({
         </section>
 
         <section>
-          <h2>Scenarios</h2>
+          <h2>What paths are worth testing?</h2>
           <div
             style={{
               display: "grid",
@@ -139,7 +151,7 @@ export default async function IntelligenceCasePage({
         </section>
 
         <section style={panel}>
-          <h2 style={{ marginTop: 0 }}>Evidence and conflicts</h2>
+          <h2 style={{ marginTop: 0 }}>Show me why — evidence and conflicts</h2>
           {workspace.evidence.length === 0 ? (
             <p style={muted}>
               No case-specific evidence has been supplied yet. Add the customer
@@ -159,7 +171,7 @@ export default async function IntelligenceCasePage({
         </section>
 
         <section style={panel}>
-          <h2 style={{ marginTop: 0 }}>Outcome learning</h2>
+          <h2 style={{ marginTop: 0 }}>What actually happened</h2>
           <p style={muted}>
             Status: {workspace.outcome.status}.{" "}
             {workspace.outcome.status === "NOT_STARTED"

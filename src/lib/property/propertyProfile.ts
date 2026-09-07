@@ -4,14 +4,14 @@
  *
  *   Axis 1 — what the asset IS (this module)
  *   Axis 2 — how it is being SOLD (mechanicsForSource)
- *   Axis 3 — who is READING (chart lenses; paid-tier personalization)
+ *   Axis 3 — who is READING (chart lenses; authorized case-context personalization)
  *
  *   "If it's a fact about the place, it's tier-free and property-typed;
- *    if it's about the person's file, it's paid and person-typed."
+ *    if it's about the person's file, it is consented case context and person-typed."
  *
- * The free tier is driven entirely by axes 1+2 — verified facts don't depend
- * on who's asking. Axis 3 reorders and reframes at the free tier (lenses) and
- * becomes real personalization only in paid tiers.
+ * Open property facts are driven entirely by axes 1+2 — verified facts do not
+ * depend on who is asking. Axis 3 may reorder/reframe the public view and becomes
+ * personal only after the customer affirmatively creates or enriches a case.
  *
  * Each profile carries the QUESTIONS that property type demands — a mobile
  * home park asks about lot rent rolls and master metering; a hotel asks about

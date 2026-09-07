@@ -126,7 +126,7 @@ function main() {
   );
   assert(
     review?.currentMasterVolumeVersions.some(
-      (entry) => entry.key === "volumeVI" && entry.governingVersion === "v1.1"
+      (entry) => entry.key === "volumeVI" && entry.governingVersion.startsWith("v1.4")
     ) &&
       review.currentMasterVolumeVersions.some(
         (entry) => entry.key === "volumeVII"

@@ -998,7 +998,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   doc.text("Why we lay it all out.", PAGE.marginX, y, { continued: true });
   setFont("regular", 11, COLORS.text);
   doc.text(
-    " We open every figure with its source and date because this is your ground, not ours to gate. The open property analysis can remain anonymous. If you choose a paid report, save a case, nominate a provider, open a deal room, request a professional service, or authorize delivery, Furlong collects only what that chosen workflow requires and states the purpose at collection. Furlong never sells borrower leads, auctions borrower files, or lets compensation improve provider ranking. Read it, check it, and carry it wherever you like.",
+    " We open every figure with its source and date because this is your ground, not ours to gate. The open property analysis can remain anonymous. If you save a case, add financing-readiness information, nominate a provider, open a deal room, request an optional professional service, or authorize delivery, Furlong collects only what that chosen workflow requires and states the purpose at collection. Furlong never sells borrower leads, auctions borrower files, charges a success percentage, or lets compensation improve provider ranking. Read it, check it, and carry it wherever you like.",
     { width: CONTENT_W, lineGap: 3 }
   );
   y = doc.y + 14;
@@ -1022,11 +1022,11 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
   // ── FINAL PASS: footer + page numbers on every buffered page ───────────────
   //
   // THE TIER ARTIFACT BOUNDARY (founder direction 2026-07-18, for the external broker
-  // tier verdict): the FREE export keeps the diagonal informational watermark
-  // — free forever, share it anywhere, it advertises Furlong. The PAID tiers
-  // export CLEAN: no diagonal line, a "prepared for institutional use" footer
-  // — the take-it-to-your-lender artifact IS the paid product. The brand seal
-  // and every advisory disclosure remain on all tiers.
+  // tier verdict): the open export keeps the informational watermark. The
+  // institution-formatted/professional artifact exports clean. This is an
+  // artifact-format boundary, not a financing-access paywall: a borrower does
+  // not pay to unlock provider matching, readiness, or authorized handoff. The
+  // brand seal and every advisory disclosure remain on all tiers.
   const cleanExport = identity.id !== "free";
 
   const range = doc.bufferedPageRange();

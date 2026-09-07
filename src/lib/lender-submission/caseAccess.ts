@@ -90,7 +90,7 @@ export async function assertSubmissionCaseAccess(input: {
   let providerIds = [input.actorId];
   if (input.role === "lender" && input.allowConsentedProvider) {
     const grant = professionalByEmail(input.actorId);
-    providerIds = [input.actorId, grant?.organization ?? "", ...(grant?.providerIds ?? [])];
+    providerIds = [input.actorId, grant?.organization ?? "", grant?.providerId ?? ""];
     consents = await db
       .select({
         lenderId: customerSubmissionConsents.lenderId,

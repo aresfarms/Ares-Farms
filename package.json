@@ -607,7 +607,11 @@
     "verify:master-volume-build-parity": "tsx src/scripts/verifyMasterVolumeBuildParity.ts",
     "verify:farm-use-integrity": "tsx src/scripts/farmUseIntegrityConformance.ts",
     "verify:lender-submission-bola": "tsx src/scripts/lenderSubmissionBolaConformance.ts",
-    "verify:property-facts-latency": "tsx src/scripts/verifyPropertyFactsLatencyBudget.ts"
+    "verify:property-facts-latency": "tsx src/scripts/verifyPropertyFactsLatencyBudget.ts",
+    "verify:furlong-vision": "tsx src/scripts/furlongVisionConformance.ts",
+    "verify:managed-provider-handoff": "tsx src/scripts/managedProviderHandoffConformance.ts",
+    "verify:furlong-case": "tsx src/scripts/furlongCaseConformance.ts",
+    "verify:capital-network-credit-box": "tsx src/scripts/capitalNetworkCreditBoxConformance.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",

@@ -30,7 +30,7 @@ const amendment = fs.readFileSync(
   "utf8",
 );
 
-assert.equal(parity.effectiveDate, "2026-09-04");
+assert.equal(parity.effectiveDate, "2026-09-05");
 assert.equal(parity.canonicalSchemaTarget, canonicalTargetSchemaVersion());
 assert.equal(parity.capitalNetwork.runtimeVersion, CAPITAL_NETWORK_RUNTIME_VERSION);
 assert.equal(
@@ -205,6 +205,22 @@ assert.ok(
 );
 assert.deepEqual(versions, registry, "docs/versions.json drifted from the current Master Volume registry.");
 
+assert.equal(parity.customerExperience.answerFirstProgressiveDisclosure, true);
+assert.equal(parity.customerEconomics.borrowerCoreDirectFree, true);
+assert.equal(parity.customerEconomics.successPercentage, false);
+assert.equal(parity.customerEconomics.transactionPercentage, false);
+assert.equal(parity.livingCase.customerControlled, true);
+assert.equal(parity.livingCase.saveSharesProviderData, false);
+assert.equal(parity.managedProviderHandoff.separateConsentPerProvider, true);
+assert.equal(parity.managedProviderHandoff.expiringProviderCaseRooms, true);
+assert.equal(parity.providerPublishedBox.publishedExpectationsSeparatedFromMeasuredExecution, true);
+assert.equal(parity.providerPublishedBox.personalCreditAuthorityRemainsProvider, true);
+assert.equal(parity.securityAssurance.productionEvidenceGateRequired, true);
+assert.deepEqual(parity.securityAssurance.unpromotedMigrations, ["0058", "0059", "0060", "0061", "0062"]);
+assert.deepEqual(parity.marketSpecializationSequence.slice(0, 3), ["USDA_BI", "SBA_504", "SBA_7A"]);
+assert.ok(amendment.includes("customer-free financing core"));
+assert.ok(amendment.includes("canonical source schema target for this build is **0062**"));
+
 const requiredEvidence = [
   "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
   "docs/current-build-parity.json",
@@ -214,6 +230,7 @@ const requiredEvidence = [
   "docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md",
   "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md",
   "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
+  "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
   "docs/governance/OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
   "src/lib/capital-graph/programRegistry.ts",
   "src/lib/financing/capitalNetworkRuntime.ts",
@@ -228,6 +245,19 @@ const requiredEvidence = [
   "src/scripts/farmUseIntegrityConformance.ts",
   "src/lib/db/migrations/0056_capital_network_multi_provider.sql",
   "src/lib/db/migrations/0057_capital_network_execution_reliability.sql",
+  "src/lib/db/migrations/0058_furlong_case_lifecycle.sql",
+  "src/lib/db/migrations/0059_managed_provider_handoff.sql",
+  "src/lib/db/migrations/0060_furlong_case_living_record_upgrade.sql",
+  "src/lib/db/migrations/0061_capital_network_published_credit_box.sql",
+  "src/lib/db/migrations/0062_identity_verifications.sql",
+  "src/lib/platform/furlongVision.ts",
+  "src/lib/intelligence/furlongCaseStore.ts",
+  "src/db/schema/furlongCases.ts",
+  "src/lib/financing/managedProviderHandoff.ts",
+  "src/scripts/furlongVisionConformance.ts",
+  "src/scripts/managedProviderHandoffConformance.ts",
+  "src/scripts/furlongCaseConformance.ts",
+  "src/scripts/capitalNetworkCreditBoxConformance.ts",
   "src/app/api/rank/route.ts",
   "src/app/api/test-score/route.ts",
   "src/services/scoring/calculatePropertyScore.ts",
@@ -336,6 +366,10 @@ for (const id of [
   "PROPERTY-AI-OPERATING-MODEL-001",
   "PROPERTY-VALUE-INDICATION-001",
   "PROPERTY-USE-INTEGRITY-001",
+  "PLATFORM-EXPERIENCE-ECONOMICS-2026-09-05",
+  "FURLONG-CASE-001",
+  "MANAGED-PROVIDER-HANDOFF-001",
+  "CAPITAL-NETWORK-PUBLISHED-BOX-001",
 ] as const) {
   assert.ok(requirements.requirements[id], `Current build requirement missing: ${id}`);
 }
@@ -347,7 +381,7 @@ for (const phrase of [
   "Residential mortgage workflows are the explicit exception",
   "Prime farmland or a favorable NRCS capability class establishes agricultural capability; it does not by itself make commodity row crops the best use",
   "Agricultural enterprise screen",
-  "canonical schema target for this build is **0057**",
+  "canonical source schema target for this build is **0062**",
 ] as const) {
   assert.ok(amendment.includes(phrase), `Parity amendment lost hard rule: ${phrase}`);
 }

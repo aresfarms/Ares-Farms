@@ -6,13 +6,13 @@
  *
  * Design intent:
  *   free          — clean, generous, trustworthy. Navy/teal. The document a
- *                   customer keeps AND shares. Ends with an honest, named
- *                   preview of what the paid tiers add (no prices — tier
- *                   economics remain founder-gated; the teaser sells substance,
- *                   not a checkout).
- *   paid          — the "Institutional Coordination Report": gold-on-navy,
- *                   double-ruled, denser sections — reads like a banker's
- *                   package, because that's what it feeds.
+ *                   customer keeps AND shares. Ends with an honest preview of
+ *                   optional institution-formatted, professional, and archival
+ *                   services. Core financing analysis is not withheld.
+ *   paid          — internal legacy tier id for the "Institutional Coordination
+ *                   Report": gold-on-navy, double-ruled, denser sections. The
+ *                   id does not authorize a borrower financing-access paywall;
+ *                   the artifact may be institution-funded or separately scoped.
  *   environmental — the "Environmental Documentation Readiness" review: field
  *                   green, checklist cadence, engineering-report tone.
  *
@@ -41,9 +41,9 @@ export interface ReportTierIdentity {
   /** Closing footer line — tier-specific voice. */
   footerLine: string;
   /**
-   * FREE TIER ONLY: the honest upgrade preview — named locked sections with
-   * one-line substance descriptions. No prices, no checkout language (tier
-   * economics are founder-gated). Sells the substance, invites the return.
+   * OPEN PROFILE ONLY: the honest next-layer preview. No financing information
+   * is intentionally withheld; items describe optional professional review,
+   * source-document curation, or archival/institutional formatting.
    */
   nextTierTeaser: {
     heading: string;
@@ -74,10 +74,10 @@ const IDENTITIES: Record<ReportTierId, ReportTierIdentity> = {
         {
           name: "Institutional Coordination Report",
           adds:
-            "The full ranked financing-lane analysis with fit reasons and missing-item lists, the " +
-            "complete question set a lender will ask (answered in advance), county-records pulls " +
-            "(taxes, liens, recorded covenants), and packaging formatted for handing directly to a " +
-            "lender or institution.",
+            "A frozen, source-indexed institutional artifact assembled from the same customer-free " +
+            "financing-readiness case: certified source copies when available, document normalization, " +
+            "case chronology, consent manifest, and institution-formatted packaging. The analysis and " +
+            "provider comparison are not withheld from the borrower.",
         },
         {
           name: "Environmental Documentation Readiness Review",
@@ -89,13 +89,11 @@ const IDENTITIES: Record<ReportTierId, ReportTierIdentity> = {
       ],
       closing:
         "Both reviews stay anchored to this property and this county — nothing generic, nothing " +
-        "resold. The free side is a founding commitment, not a promo: exploring, the facts, this " +
-        "brief, and having Furlong facilitate your financing — through any lending partner — never " +
-        "cost you anything, and Furlong never earns based on any loan's outcome. What can be " +
-        "purchased is people, not information: optional professional engagements — expert working " +
-        "time on your file, delivered as the clean, lender-ready package — and participating " +
-        "institutions carry packaging access under their own platform subscriptions. Your Place " +
-        "Brief carries forward unchanged.",
+        "resold. The customer-free core is a founding commitment, not a promotion: property facts, " +
+        "decision reasons, financing readiness, verified-provider comparison, and the authorized " +
+        "case-room handoff remain available without a borrower financing fee. Optional professional " +
+        "engagements and archival artifacts may be separately scoped; institutions may fund their " +
+        "own packaging/integration access. Furlong never earns based on the loan outcome.",
     },
   },
   paid: {

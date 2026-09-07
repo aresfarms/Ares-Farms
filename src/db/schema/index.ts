@@ -88,6 +88,7 @@ export * from "./externalConnectorExecutions";
 export * from "./externalDataConnectors";
 export * from "./externalSourceStackGovernance";
 export * from "./founderEconomicEvents";
+export * from "./furlongCases";
 export * from "./liveActionReadinessReviews";
 export * from "./lenderSubmissions";
 export * from "./missingDoctrineGovernance";

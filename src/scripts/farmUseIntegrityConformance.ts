@@ -93,12 +93,21 @@ const genuineCommodityScale = farmBestUse({
   primeFarmland: "All areas are prime farmland",
   capabilityClass: 2,
   drainageClass: "Well drained",
+  hardinessZone: "7b",
   cornYieldPerAcre: 190,
   soybeanYieldPerAcre: 62,
   wheatYieldPerAcre: 80,
   yieldYear: 2025,
   landUse: "Agricultural",
   zoningCode: "AG",
+  tillableAcres: 720,
+  forestedAcres: 80,
+  parcelPortfolioNoiAnnual: 120000,
+  parcelPortfolioBasis: "verified segment-aware operating scenario",
+  slopePct: 2,
+  buyerDemandVerified: true,
+  competitionVerified: true,
+  waterCapacityVerified: true,
 });
 assert.equal(genuineCommodityScale.options[0]?.name, "Commodity row crops (corn/soy/wheat)");
 assert.equal(genuineCommodityScale.options[0]?.tier, "leading-screen");

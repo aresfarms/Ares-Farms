@@ -58,6 +58,22 @@ export interface FarmPropertyFacts {
   energyNote?: string | null;
   publicWater?: boolean | null;
   publicSewer?: boolean | null;
+  /** Parcel allocation by land cover/use. No segment is presumed worthless. */
+  tillableAcres?: number | null;
+  pastureAcres?: number | null;
+  forestedAcres?: number | null;
+  wetlandAcres?: number | null;
+  developedAcres?: number | null;
+  otherAcres?: number | null;
+  /** NOI of a complete, segment-aware parcel operating scenario. */
+  parcelPortfolioNoiAnnual?: number | null;
+  parcelPortfolioBasis?: string | null;
+  /** Verified rather than inferred from distance to a metro. */
+  buyerDemandVerified?: boolean;
+  competitionVerified?: boolean;
+  waterCapacityVerified?: boolean;
+  /** Representative parcel slope when the soil/topography resolver supplies it. */
+  slopePct?: number | null;
 }
 
 export interface BestUseOption {
@@ -75,6 +91,19 @@ export interface FarmBestUse {
   scope: "agricultural-enterprise-screen";
   evidenceStatus: "insufficient" | "screening" | "supported-screen";
   missingCriticalInputs: string[];
+  parcelPortfolio: {
+    totalAcres: number | null;
+    segments: {
+      tillable: number | null;
+      pasture: number | null;
+      forested: number | null;
+      wetland: number | null;
+      developed: number | null;
+      other: number | null;
+    };
+    modeledNoiAnnual: number | null;
+    basis: string | null;
+  };
   headline: string;
   options: BestUseOption[];
   propertyWideContext: {
@@ -266,12 +295,28 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
   const weakYield = cornY != null ? cornY < 120 : soyY != null ? soyY < 38 : false;
   const countyEconomicsKnown = rent != null || cornY != null || soyY != null || f.wheatYieldPerAcre != null;
   const where = acreLabel(f.county, f.state).replace(/^ in /, "");
+  const allocatedAcres = [
+    f.tillableAcres,
+    f.pastureAcres,
+    f.forestedAcres,
+    f.wetlandAcres,
+    f.developedAcres,
+    f.otherAcres,
+  ].reduce<number>((sum, value) => sum + (typeof value === "number" && value >= 0 ? value : 0), 0);
+  const landAllocationKnown =
+    acresKnown && allocatedAcres >= a! * 0.95 && allocatedAcres <= a! * 1.05;
 
   const missingCriticalInputs = [
     !acresKnown ? "verified acreage" : null,
+    !landAllocationKnown ? "complete acreage allocation across tillable, pasture, forest, wetland, developed, and other ground" : null,
+    f.parcelPortfolioNoiAnnual == null ? "segment-aware parcel operating income" : null,
     !soilKnown ? "parcel soil/capability evidence" : null,
+    f.slopePct == null ? "parcel topography/slope evidence" : null,
+    !f.hardinessZone ? "climate and growing-season fit" : null,
     !countyEconomicsKnown ? "county production/rent benchmark" : null,
-    !marketKnown ? "verified market/offtake access" : null,
+    !f.buyerDemandVerified ? "verified buyer demand/offtake" : null,
+    !f.competitionVerified ? "local competition and attainable market share" : null,
+    !f.waterCapacityVerified ? "water/irrigation capacity" : null,
     !f.zoningCode ? "zoning code and current use-table interpretation" : null,
   ].filter((x): x is string => Boolean(x));
 
@@ -384,11 +429,11 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
             : `at ~${a!.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres, the soil may grow grain well but the parcel is well below stand-alone commodity scale; row crops can be a rotation or rental component, not an automatic best use`,
     },
     {
-      name: "Forestry / Christmas trees",
+      name: "Managed woodland / timber / recreation / forest products",
       score: 30 + (mid ? 8 : midsize ? 8 : 0) + (metroMid ? 8 : marketKnown ? 0 : -5),
-      grossPerAcre: "Long-cycle use - value depends on species, survival, harvest cycle and choose-and-cut/wholesale channel",
-      economicsBasis: "gross",
-      why: "a slower-cash land use that may fit portions of a tract, but it should not outrank faster or more productive uses without market and site evidence",
+      grossPerAcre: "Segment-specific and often multi-stream - timber inventory, hunting/recreation access, silvopasture, forest products, conservation programs and harvest timing require separate budgets",
+      economicsBasis: "unpriced",
+      why: "forested or steep acreage remains economically usable; its feasible income streams, stewardship costs, timing, access and owner goals must be modeled rather than assigning the ground zero value",
       marketSensitive: true,
     },
   ];
@@ -419,7 +464,7 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
   const sorted = [...adjusted].sort((x, y) => y.score - x.score);
   const evidenceStatus: FarmBestUse["evidenceStatus"] = !acresKnown
     ? "insufficient"
-    : soilKnown && countyEconomicsKnown && marketKnown && Boolean(f.zoningCode)
+    : missingCriticalInputs.length === 0
       ? "supported-screen"
       : "screening";
 
@@ -531,6 +576,19 @@ export function farmBestUse(f: FarmPropertyFacts): FarmBestUse {
     scope: "agricultural-enterprise-screen",
     evidenceStatus,
     missingCriticalInputs,
+    parcelPortfolio: {
+      totalAcres: acresKnown ? a! : null,
+      segments: {
+        tillable: f.tillableAcres ?? null,
+        pasture: f.pastureAcres ?? null,
+        forested: f.forestedAcres ?? null,
+        wetland: f.wetlandAcres ?? null,
+        developed: f.developedAcres ?? null,
+        other: f.otherAcres ?? null,
+      },
+      modeledNoiAnnual: f.parcelPortfolioNoiAnnual ?? null,
+      basis: f.parcelPortfolioBasis ?? null,
+    },
     headline,
     options,
     propertyWideContext,

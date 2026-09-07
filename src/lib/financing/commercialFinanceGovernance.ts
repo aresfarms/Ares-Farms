@@ -14,7 +14,7 @@
  */
 
 export const COMMERCIAL_FINANCE_GOVERNANCE_VERSION =
-  "commercial-finance-governance-v1.0.0";
+  "commercial-finance-governance-v1.2.0";
 
 export type CommercialFinanceActivity =
   | "program_navigation"
@@ -38,7 +38,8 @@ export type AuthorityPosture =
   | "PARTNER_CERTIFICATION_REQUIRED"
   | "LEGAL_REVIEW_REQUIRED"
   | "LENDER_AUTHORITY_REQUIRED"
-  | "RESIDENTIAL_LICENSE_REQUIRED";
+  | "RESIDENTIAL_LICENSE_REQUIRED"
+  | "CONTROLLED_REFERRAL_AUTHORITY_REQUIRED";
 
 export interface CommercialFinanceAuthorityInput {
   state?: string | null;
@@ -77,10 +78,7 @@ export function requiresSbaForm159(
   program?: CommercialFinanceProgram | null,
 ): boolean {
   if (program !== "sba_7a" && program !== "sba_504") return false;
-  return (
-    activity === "compensated_packaging" ||
-    activity === "compensated_brokerage_or_referral"
-  );
+  return activity === "compensated_packaging" || activity === "compensated_brokerage_or_referral";
 }
 
 export function assessCommercialFinanceAuthority(
@@ -130,6 +128,30 @@ export function assessCommercialFinanceAuthority(
       blockedReasons,
       disclosures: [
         "A network listing or candidate record is not a lender endorsement, approval, or commitment.",
+      ],
+    };
+  }
+
+  if (input.activity === "compensated_brokerage_or_referral") {
+    if (!input.partnerCertified) blockedReasons.push("The provider must be verified and certified before recommendation or routing.");
+    if (!input.stateLegalClearance) blockedReasons.push("State and program authority for the proposed referral or brokerage activity has not been cleared.");
+    if (!input.writtenEngagementAccepted) blockedReasons.push("The customer has not accepted the written role and compensation disclosure.");
+    return {
+      version: COMMERCIAL_FINANCE_GOVERNANCE_VERSION,
+      allowed: blockedReasons.length === 0,
+      posture: "CONTROLLED_REFERRAL_AUTHORITY_REQUIRED",
+      state,
+      activity: input.activity,
+      form159Required,
+      conditions: [
+        "Ranking must use documented credit-box fit and verified execution evidence only.",
+        "The customer selects every recipient and separately authorizes every package.",
+        "No lead sale, file auction, automatic broadcast, pay-to-rank placement, or undisclosed compensation.",
+        ...(form159Required ? ["Apply the required SBA Agent compensation disclosure and handling controls."] : []),
+      ],
+      blockedReasons,
+      disclosures: [
+        "Furlong may recommend and rank verified providers, but the provider controls underwriting, pricing, approval, and commitment.",
       ],
     };
   }
@@ -213,7 +235,7 @@ export function assessCommercialFinanceAuthority(
     ],
     blockedReasons,
     disclosures: [
-      "Paid packaging, brokerage, referral, or consulting activity is not activated merely because intake and readiness tools are available.",
+      "Borrower-financing referral fees, success percentages, transaction cuts, and pay-to-rank compensation are outside Furlong's customer-free core and are not activated. Any separately scoped professional service remains subject to applicable legal, program, engagement, consent, and conflict controls.",
     ],
   };
 }
@@ -227,6 +249,6 @@ export const COMMERCIAL_FINANCE_JURISDICTION_NOTES = {
   MD: {
     status: "LEGAL_REVIEW_REQUIRED",
     note:
-      "Maryland business-purpose lender exemptions do not automatically answer the separate paid-broker/referral question. Obtain Maryland licensing analysis before compensated brokerage activation.",
+      "Maryland business-purpose lender exemptions do not by themselves authorize Furlong referral or brokerage activity. Obtain written Maryland and program-specific clearance before activation."
   },
 } as const;

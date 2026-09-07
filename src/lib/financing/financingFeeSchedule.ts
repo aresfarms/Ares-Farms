@@ -1,11 +1,12 @@
 /**
  * Financing fee posture — owner-controlled Furlong Capital Desk.
  *
- * Intake, program navigation, and initial readiness coordination are free.
- * Compensated packaging, brokerage/referral, or consulting is NOT activated by
- * this schedule. Any paid activity requires state/program authority clearance,
- * an accepted written scope, advance fee disclosure, and SBA Form 159 handling
- * when applicable.
+ * The customer-facing financing core is free end-to-end: intake, readiness,
+ * verified-provider comparison, exact-recipient case-room handoff, and status
+ * coordination through closing. Optional professional/archival engagements are
+ * separate fixed-scope services and never buy financing access, placement, or a
+ * better rank. Lead sales, file auctions, automatic broadcasts, referral fees,
+ * success percentages, transaction cuts, and pay-to-rank placement are prohibited.
  *
  * Master Volume Governance:
  * - FACILITATION-001 / CONST-FAIR-001: no credit decision or paid placement.
@@ -14,9 +15,9 @@
  */
 
 export const FINANCING_FREE_STATEMENT = {
-  lead: "Capital Desk intake and initial readiness review are free.",
+  lead: "The Furlong financing core is free to the customer.",
   body:
-    "You can submit a deal, compare program pathways, organize the first readiness picture, and identify potential lender categories without paying Furlong. The funding institution sets its own loan pricing and closing costs. Any later paid Furlong professional service requires a separate written engagement and legal/program clearance before work begins.",
+    "You can submit a deal, build one readiness file, compare verified providers, authorize provider-specific case rooms, and follow the file through closing without a borrower financing fee. The funding institution sets its own loan pricing and closing costs. Optional professional or archival work is separately scoped and never changes financing access or provider rank.",
 };
 
 export interface FinFeeLine {
@@ -46,14 +47,22 @@ export const FINANCING_FEE_LINES: FinFeeLine[] = [
     guild: "Included",
   },
   {
-    service: "Compensated packaging / brokerage / referral",
+    service: "Managed provider comparison",
     detail:
-      "Not currently activated. Before any paid work begins, Furlong must clear the activity for the applicable state and program, issue a written scope and compensation disclosure, and satisfy any program-specific agent disclosure requirement.",
-    fee: "Not activated",
+      "Furlong ranks verified providers by published credit-box fit and evidence-backed execution. Customers may authorize several provider-specific case rooms; Furlong never sells or broadcasts the file.",
+    fee: "$0",
     feeConfirmed: true,
-    guild: "Not activated",
+    guild: "Included",
     emphasis:
-      "Submitting a deal does not enroll you in a paid service and does not create a commission or referral obligation.",
+      "No provider can pay to improve rank. Furlong takes no success percentage, referral fee, or transaction cut from the financing outcome.",
+  },
+  {
+    service: "Authorized case-room handoff & closing status",
+    detail:
+      "Freeze the exact package, authorize each named recipient separately, keep provider access expiring and revocable, and track conditions, environmental work, appraisal, title, closing, and keys/logbook status.",
+    fee: "$0",
+    feeConfirmed: true,
+    guild: "Included",
   },
 ];
 
@@ -69,9 +78,9 @@ export const FINANCING_OFFERINGS: { title: string; body: string }[] = [
       "Build a lender-ready evidence picture, surface missing items, and keep sensitive documents inside the governed vault.",
   },
   {
-    title: "Lender-network coordination",
+    title: "Customer-controlled provider search",
     body:
-      "Identify institutions whose published program, geography, and deal profile may fit. Candidate status is not a partnership or endorsement, and no case is sent until the recipient and consent gates pass.",
+      "See the best-supported verified providers and why each published credit box fits. Select more than one for a private comparison; each receives a separate expiring case room only after exact-recipient consent.",
   },
   {
     title: "Environmental-finance coordination",
@@ -100,7 +109,7 @@ export const FINANCING_TRUST: FinancingTrustLine[] = [
   },
   {
     text:
-      "Paid commercial packaging, brokerage, referral, or consulting remains off until jurisdiction and program requirements are cleared and the customer accepts the written scope and compensation disclosure.",
+      "Borrower financing access is never sold. Lead sales, file auctions, automatic broadcasts, referral fees, success percentages, transaction cuts, and pay-to-rank placement are prohibited. Optional professional or archival work uses a separate written scope and cannot affect financing routing.",
   },
   {
     text:
@@ -112,7 +121,7 @@ export const FINANCING_FEE_NOTES = {
   guild:
     "Membership does not create an exception to licensing, disclosure, conflict, or program-agent requirements.",
   broker:
-    "No paid commercial brokerage or packaging fee is authorized by this page today.",
+    "Managed provider matching may recommend verified providers, but Furlong charges the borrower no financing-access, referral, success, or transaction fee. Lead sales, file auctions, and pay-to-rank placement are never permitted.",
   disclosure:
-    "If Furlong later activates a paid professional service, the exact scope, payer, amount or calculation method, provider, legal basis, and required program disclosures must be accepted before work begins.",
+    "Any optional professional or archival engagement must use a separate written scope, fixed or otherwise non-outcome-contingent fee disclosure, applicable professional authority, and conflict review. It cannot affect provider ranking, routing, or credit treatment."
 };

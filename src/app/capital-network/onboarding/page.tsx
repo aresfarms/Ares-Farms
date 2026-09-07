@@ -13,6 +13,12 @@ export default function CapitalNetworkOnboardingPage() {
   const [programs, setPrograms] = useState<string[]>([]);
   const [minDealAmount, setMinDealAmount] = useState("");
   const [maxDealAmount, setMaxDealAmount] = useState("");
+  const [publishedBoxSummary, setPublishedBoxSummary] = useState("");
+  const [collateralPolicy, setCollateralPolicy] = useState("");
+  const [environmentalRequirements, setEnvironmentalRequirements] = useState("");
+  const [creditBoxSources, setCreditBoxSources] = useState("");
+  const [typicalFirstResponseDays, setTypicalFirstResponseDays] = useState("");
+  const [typicalClosingDays, setTypicalClosingDays] = useState("");
   const [acceptsBrokeredDeals, setAcceptsBrokeredDeals] = useState(true);
   const [acceptsDirectBorrower, setAcceptsDirectBorrower] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
@@ -47,6 +53,12 @@ export default function CapitalNetworkOnboardingPage() {
           programs,
           minDealAmount: minDealAmount ? Number(minDealAmount) : null,
           maxDealAmount: maxDealAmount ? Number(maxDealAmount) : null,
+          publishedCreditBox: publishedBoxSummary.trim() ? { publishedSummary: publishedBoxSummary.trim(), providerAttested: true } : {},
+          collateralPolicy: collateralPolicy.trim() ? { publishedSummary: collateralPolicy.trim(), providerAttested: true } : {},
+          environmentalRequirements: environmentalRequirements.trim() ? { publishedSummary: environmentalRequirements.trim(), providerAttested: true } : {},
+          creditBoxSourceRefs: creditBoxSources.split(/[\n,]+/).map((value) => value.trim()).filter(Boolean),
+          typicalFirstResponseDays: typicalFirstResponseDays ? Number(typicalFirstResponseDays) : null,
+          typicalClosingDays: typicalClosingDays ? Number(typicalClosingDays) : null,
           acceptsBrokeredDeals,
           acceptsDirectBorrower,
         }),
@@ -84,6 +96,18 @@ export default function CapitalNetworkOnboardingPage() {
             <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Minimum deal amount<input style={field} inputMode="numeric" value={minDealAmount} onChange={(e) => setMinDealAmount(e.target.value)} /></label>
             <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Maximum deal amount<input style={field} inputMode="numeric" value={maxDealAmount} onChange={(e) => setMaxDealAmount(e.target.value)} /></label>
           </div>
+          <fieldset style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 12, display: "grid", gap: 10 }}>
+            <legend style={{ fontSize: 12.5, fontWeight: 800 }}>Published provider box</legend>
+            <p style={{ margin: 0, color: "#64748b", fontSize: 12, lineHeight: 1.55 }}>Tell Furlong what your institution publicly says it will consider. We preserve the source and verify it before showing it as a verified box. These fields never let Furlong make the credit decision.</p>
+            <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Published credit-box summary<textarea style={{ ...field, minHeight: 78, resize: "vertical" }} value={publishedBoxSummary} onChange={(e) => setPublishedBoxSummary(e.target.value)} placeholder="Examples: minimum operating history, owner-occupancy, project-use limits, required equity/cash injection, program-specific constraints…" /></label>
+            <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Collateral policy summary<textarea style={{ ...field, minHeight: 64, resize: "vertical" }} value={collateralPolicy} onChange={(e) => setCollateralPolicy(e.target.value)} placeholder="Collateral coverage, appraisal posture, lien position, guarantees, property-type limits…" /></label>
+            <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Environmental requirements<textarea style={{ ...field, minHeight: 64, resize: "vertical" }} value={environmentalRequirements} onChange={(e) => setEnvironmentalRequirements(e.target.value)} placeholder="Phase I / questionnaire / NEPA / program-specific review expectations…" /></label>
+            <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Published sources or policy references<textarea style={{ ...field, minHeight: 58, resize: "vertical" }} value={creditBoxSources} onChange={(e) => setCreditBoxSources(e.target.value)} placeholder="One public URL or policy reference per line" /></label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+              <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Typical first response (days)<input style={field} inputMode="numeric" value={typicalFirstResponseDays} onChange={(e) => setTypicalFirstResponseDays(e.target.value)} /></label>
+              <label style={{ display: "grid", gap: 5, fontSize: 12.5, fontWeight: 700 }}>Typical closing window (days)<input style={field} inputMode="numeric" value={typicalClosingDays} onChange={(e) => setTypicalClosingDays(e.target.value)} /></label>
+            </div>
+          </fieldset>
           <label style={{ fontSize: 12.5, display: "flex", gap: 7 }}><input type="checkbox" checked={acceptsBrokeredDeals} onChange={(e) => setAcceptsBrokeredDeals(e.target.checked)} />Accept broker-submitted transactions</label>
           <label style={{ fontSize: 12.5, display: "flex", gap: 7 }}><input type="checkbox" checked={acceptsDirectBorrower} onChange={(e) => setAcceptsDirectBorrower(e.target.checked)} />Accept direct borrower transactions</label>
           <button disabled={busy || !organizationName.trim()} style={{ justifySelf: "start", border: 0, borderRadius: 10, padding: "10px 16px", background: "#534AB7", color: "#fff", fontWeight: 800 }}>{busy ? "Recording…" : "Submit provider application"}</button>

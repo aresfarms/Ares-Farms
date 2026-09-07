@@ -1,8 +1,8 @@
 {
-  "mirrorId": "master-volume-current-build-parity-v1.0.0",
-  "effectiveDate": "2026-09-04",
+  "mirrorId": "master-volume-current-build-parity-v1.1.0",
+  "effectiveDate": "2026-09-05",
   "controllingAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
-  "canonicalSchemaTarget": "0057",
+  "canonicalSchemaTarget": "0062",
   "capitalNetwork": {
     "runtimeVersion": "capital-network-runtime-v1.1.0",
     "sellsBorrowerLeads": false,
@@ -86,5 +86,78 @@
     "propertyWideUseMustTestLegalPhysicalEntitlementMarketEconomics": true,
     "unsupportedZoningInterpretationFailsClosed": true,
     "developmentMayNotBeDowngradedFromRuralLocationAlone": true
-  }
+  },
+  "customerExperience": {
+    "answerFirstProgressiveDisclosure": true,
+    "customerSequence": [
+      "what-found",
+      "why-it-matters",
+      "what-next",
+      "evidence-and-detail"
+    ],
+    "addressFirstEntry": true,
+    "unsupportedRecommendationsFailClosed": true
+  },
+  "customerEconomics": {
+    "borrowerCoreDirectFree": true,
+    "freeCore": [
+      "property-analysis",
+      "financing-readiness",
+      "verified-provider-comparison",
+      "customer-controlled-case",
+      "exact-recipient-case-room-handoff",
+      "closing-status-through-keys-logbook"
+    ],
+    "institutionFundedPrimaryModel": true,
+    "leadSale": false,
+    "fileAuction": false,
+    "payToRank": false,
+    "hiddenReferralEconomics": false,
+    "successPercentage": false,
+    "transactionPercentage": false,
+    "customerDataSale": false
+  },
+  "livingCase": {
+    "runtimeVersion": "furlong-case-v1.0.0",
+    "customerControlled": true,
+    "saveSharesProviderData": false,
+    "appendOrientedTimeline": true,
+    "actualOutcomeLearning": true,
+    "operatingLogbookContinuity": true
+  },
+  "managedProviderHandoff": {
+    "boundedPrivateComparison": true,
+    "separateConsentPerProvider": true,
+    "expiringProviderCaseRooms": true,
+    "structuredProviderResponse": true,
+    "closingMilestonesEndAtKeysAndLogbook": true
+  },
+  "providerPublishedBox": {
+    "sourceReferencesPreserved": true,
+    "verificationTimestampPreserved": true,
+    "publishedExpectationsSeparatedFromMeasuredExecution": true,
+    "personalCreditAuthorityRemainsProvider": true,
+    "administrativeVerificationStatusRankingAdvantage": false
+  },
+  "marketSpecializationSequence": [
+    "USDA_BI",
+    "SBA_504",
+    "SBA_7A",
+    "FSA_FARM_OWNERSHIP_AND_OPERATING",
+    "USDA_CF_AND_REAP",
+    "CONVENTIONAL_COMMERCIAL",
+    "RESIDENTIAL_CONVENTIONAL_WHEN_PROPERTY_JOURNEY_REQUIRES"
+  ],
+  "securityAssurance": {
+    "architectureAloneEqualsProductionAssurance": false,
+    "productionEvidenceGateRequired": true,
+    "unpromotedMigrations": [
+      "0058",
+      "0059",
+      "0060",
+      "0061",
+      "0062"
+    ]
+  },
+  "platformExperienceEconomicsAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
 }

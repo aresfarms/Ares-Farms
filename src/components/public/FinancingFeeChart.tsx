@@ -10,8 +10,8 @@ import { accentForLane } from "@/lib/property/laneThemes";
 
 /**
  * FinancingFeeChart — the Financial module's fee chart. Leads plainly with
- * free Capital Desk coordination first, then shows the explicit regulatory
- * boundary around any future paid packaging/brokerage work. Server component.
+ * the customer-free Capital Desk workflow first, then shows the bright line
+ * separating optional professional/archival engagements from financing access. Server component.
  *
  * Master Volume Governance: FACILITATION-001 (loan is the lender's; free to
  * apply); CANON-TREASURY-001 §9.1 (fees disclosed up front); bright line — no
@@ -78,11 +78,10 @@ export function FinancingFeeChart() {
     <section aria-label="Financing fees" style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 4 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
-          What is free now — and what is not activated
+          What stays free — and what is separate
         </span>
         <p style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6, maxWidth: 720 }}>
-          Furlong can organize the initial financing path without charging you. Paid packaging, brokerage,
-          referral, or consulting is a separate regulated activity and remains off until its state/program gate is cleared.
+          Furlong&apos;s core financing workflow stays free to the customer from readiness through provider comparison and the authorized case-room handoff. Optional professional or archival services use a separate scope; they never buy financing access, placement, or a better provider rank.
         </p>
       </div>
 

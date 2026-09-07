@@ -32,7 +32,8 @@
     "MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md",
     "COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
     "OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
-    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md"
+    "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
   ],
   "allowedStatuses": [
     "implemented",
@@ -9012,12 +9013,27 @@
         "src/lib/property/zoningUseCurated.ts",
         "src/app/api/public/property-facts/route.ts",
         "src/components/property/lanes/FarmAgricultureTab.tsx",
-        "src/scripts/farmUseIntegrityConformance.ts"
+        "src/scripts/farmUseIntegrityConformance.ts",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+        "src/lib/platform/furlongVision.ts",
+        "src/lib/intelligence/furlongCaseStore.ts",
+        "src/db/schema/furlongCases.ts",
+        "src/lib/financing/managedProviderHandoff.ts",
+        "src/lib/db/migrations/0058_furlong_case_lifecycle.sql",
+        "src/lib/db/migrations/0059_managed_provider_handoff.sql",
+        "src/lib/db/migrations/0060_furlong_case_living_record_upgrade.sql",
+        "src/lib/db/migrations/0061_capital_network_published_credit_box.sql",
+        "src/lib/db/migrations/0062_identity_verifications.sql",
+        "src/scripts/furlongVisionConformance.ts",
+        "src/scripts/managedProviderHandoffConformance.ts",
+        "src/scripts/furlongCaseConformance.ts",
+        "src/scripts/capitalNetworkCreditBoxConformance.ts"
       ],
-      "reconciliationBasis": "The current-build amendment, machine parity mirror and executable verification gate bind the current Master Volume Series to schema/runtime hard rules and fail when the two drift.",
+      "reconciliationBasis": "The current-build amendment, 2026-09-05 scoped platform-experience/economics amendment, machine parity mirror and executable verification gates bind the current Master Volume Series to source schema target 0062 and customer/provider hard rules. Source implementation is distinct from governed database/environment promotion.",
       "masterSources": [
         "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
-        "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md"
+        "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
@@ -9039,7 +9055,11 @@
         "src/db/schema/capitalNetwork.ts",
         "src/lib/financing/capitalNetworkRuntime.ts",
         "src/lib/financing/capitalNetworkStore.ts",
-        "src/lib/db/migrations/0056_capital_network_multi_provider.sql"
+        "src/lib/db/migrations/0056_capital_network_multi_provider.sql",
+        "src/lib/db/migrations/0059_managed_provider_handoff.sql",
+        "src/lib/db/migrations/0061_capital_network_published_credit_box.sql",
+        "src/scripts/capitalNetworkCreditBoxConformance.ts",
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
       ],
       "reconciliationBasis": "The multi-provider Capital Network is built in source with neutral matching, borrower selection and provider-scoped deal rooms; real provider certification and controlled deployment remain operational gates.",
       "masterSources": [
@@ -9048,9 +9068,9 @@
       ],
       "operationallyComplete": false,
       "outstandingObligations": [
-        "Apply canonical migrations through 0057 in the governed environment.",
-        "Onboard/certify real providers before representing them as selectable.",
-        "Promote provider delivery adapters only through controlled authorization."
+        "Apply canonical migrations through 0062 in the governed environment.",
+        "Onboard/certify real providers and verify their published box sources before representing those boxes as source-verified.",
+        "Promote provider delivery adapters and durable case-room persistence only through controlled authorization."
       ]
     },
     "CAPITAL-NETWORK-EXECUTION-001": {
@@ -9212,6 +9232,134 @@
       ],
       "operationallyComplete": true,
       "outstandingObligations": []
+    },
+    "PLATFORM-EXPERIENCE-ECONOMICS-2026-09-05": {
+      "title": "Property-to-capital customer experience and institution-funded economics",
+      "status": "implemented",
+      "requires": [
+        "answer_first_progressive_disclosure_customer_free_financing_core_institution_funded_neutral_economics"
+      ],
+      "tests": [
+        "verify:furlong-vision",
+        "verify:customer-property-experience",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+        "docs/current-build-parity.json",
+        "src/lib/platform/furlongVision.ts",
+        "src/components/public/HomePropertyFrontDoor.tsx",
+        "src/lib/financing/financingFeeSchedule.ts",
+        "src/components/public/FinancingFeeChart.tsx",
+        "src/app/(public)/guild/page.tsx",
+        "src/scripts/furlongVisionConformance.ts"
+      ],
+      "reconciliationBasis": "The customer journey, borrower-free financing core, institutional revenue posture, prohibited outcome-tied/referral economics, USDA/SBA market-depth sequence and production-security claim boundary are encoded in source and executable conformance. This row does not claim pending database migrations are deployed.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
+      ],
+      "operationallyComplete": true,
+      "outstandingObligations": []
+    },
+    "FURLONG-CASE-001": {
+      "title": "Durable customer-controlled Furlong Case and verified outcome learning",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "one_case_property_to_keys_operating_logbook_append_timeline_and_evidence_backed_outcomes"
+      ],
+      "tests": [
+        "verify:furlong-case",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+        "src/db/schema/furlongCases.ts",
+        "src/lib/intelligence/furlongCaseStore.ts",
+        "src/app/api/intelligence/cases/[caseId]/route.ts",
+        "src/components/intelligence/LivingFurlongCasePanel.tsx",
+        "src/lib/db/migrations/0058_furlong_case_lifecycle.sql",
+        "src/lib/db/migrations/0060_furlong_case_living_record_upgrade.sql",
+        "src/scripts/furlongCaseConformance.ts"
+      ],
+      "reconciliationBasis": "The living-case schema, store, API, customer panel and conformance are implemented in source. Migrations 0058 and 0060 must be applied through the governed migrator before durable persistence is represented as deployed.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
+      ],
+      "operationallyComplete": false,
+      "outstandingObligations": [
+        "Apply migrations 0058 and 0060 through the governed migrator.",
+        "Verify customer case save/load, event lineage, isolation and outcome evidence in the deployed testing environment.",
+        "Promote only after security and authorization evidence gates pass."
+      ]
+    },
+    "MANAGED-PROVIDER-HANDOFF-001": {
+      "title": "Bounded private provider comparison, expiring exact-recipient case rooms and closing path",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "bounded_provider_comparison_separate_consent_expiring_case_rooms_structured_response_closing_to_keys_logbook"
+      ],
+      "tests": [
+        "verify:managed-provider-handoff",
+        "verify:capital-network",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+        "src/lib/financing/managedProviderHandoff.ts",
+        "src/lib/financing/capitalNetworkStore.ts",
+        "src/db/schema/capitalNetwork.ts",
+        "src/app/api/capital-network/provider-response/route.ts",
+        "src/lib/db/migrations/0059_managed_provider_handoff.sql",
+        "src/scripts/managedProviderHandoffConformance.ts"
+      ],
+      "reconciliationBasis": "The managed handoff runtime, provider response and closing-milestone persistence are source-implemented and conformance-tested. Migration 0059 and deployed end-to-end authorization/revocation checks remain promotion gates.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+        "MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md"
+      ],
+      "operationallyComplete": false,
+      "outstandingObligations": [
+        "Apply migration 0059 through the governed migrator.",
+        "Verify separate recipient consent, expiry, revocation and provider access isolation in testing.",
+        "Verify structured provider response and closing progression end-to-end."
+      ]
+    },
+    "CAPITAL-NETWORK-PUBLISHED-BOX-001": {
+      "title": "Source-governed provider published-box, collateral, environmental and turnaround evidence",
+      "status": "awaiting_controlled_promotion",
+      "requires": [
+        "published_provider_box_source_refs_verification_and_separation_from_measured_execution_history"
+      ],
+      "tests": [
+        "verify:capital-network-credit-box",
+        "verify:capital-network",
+        "verify:master-volume-build-parity",
+        "verify:master-volumes"
+      ],
+      "evidence": [
+        "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+        "src/db/schema/capitalNetwork.ts",
+        "src/lib/financing/capitalNetworkRuntime.ts",
+        "src/lib/financing/capitalNetworkStore.ts",
+        "src/app/capital-network/onboarding/page.tsx",
+        "src/components/public/CapitalNetworkMatches.tsx",
+        "src/lib/db/migrations/0061_capital_network_published_credit_box.sql",
+        "src/scripts/capitalNetworkCreditBoxConformance.ts"
+      ],
+      "reconciliationBasis": "Provider-published box fields, source references, governance verification, customer explanation and conformance are implemented in source. Administrative verification does not itself improve ranking; person-side credit authority remains with the provider.",
+      "masterSources": [
+        "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
+      ],
+      "operationallyComplete": false,
+      "outstandingObligations": [
+        "Apply migration 0061 through the governed migrator.",
+        "Populate and governance-verify real provider source references before showing SOURCE VERIFIED to customers.",
+        "Verify provider-box UI and provenance in testing."
+      ]
     }
   }
 }

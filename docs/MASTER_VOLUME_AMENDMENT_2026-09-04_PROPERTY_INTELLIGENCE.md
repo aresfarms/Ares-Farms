@@ -6,9 +6,33 @@
 
 ## Canonical product rule
 
+**FURLONG-VISION-001:** “Give Furlong an address and it will show what the entire property could realistically produce and how to finance it completely through receiving the keys—not merely its listing facts, agricultural classification or estimated sale value.”
+
+This is a platform invariant, not optional marketing copy. Every public entrypoint, property analysis, opportunity model, financing workflow, and customer report must preserve the address-first, whole-property, production-through-capital journey. A listing-facts, classification-only, valuation-only, crop-only, or financing-only result does not satisfy the Furlong product promise.
+
 Furlong is not a generic listing-data product. Its property-intelligence layer combines **property facts + best-use screening + zoning/conversion execution risk + environmental posture + DSCR + USDA + FSA + SBA + conventional financing pathways** in one governed analysis.
 
 The breadth is an advantage only when the interface reduces decision burden. The customer should see a short recommended/primary path first, then progressively reveal alternatives, evidence and specialist detail. The platform therefore uses **progressive disclosure** rather than presenting every possible program, use and permit path at the same visual weight.
+
+## Objective plan, practical plan, and soil-restoration rule
+
+Furlong must keep the **objectively strongest property plan** separate from the **most practical starting plan**. The objective plan is derived from the property’s land segments, law, physical constraints, market demand, competition, costs, risk, and time. Customer budget, labor, and goals may refine execution, but must not rewrite the underlying property conclusion.
+
+Poor current soil is not an automatic reason to discard an otherwise viable use. When verified soil evidence indicates amendment is required, Furlong must compare: (1) current-soil production, (2) purchased or mechanical amendment, and (3) livestock-assisted regeneration. Because some customers will not manage animals, the platform must always provide a non-livestock amendment alternative. Each pathway must separately disclose capital cost, operating cost, time to productive soil, labor and management burden, and the effect on three-, five-, and ten-year net results. Unsupported amendment economics must remain unpriced rather than being guessed.
+
+## Living property record, portfolio, and Guild rule
+
+The analysis is not a disposable report. Each property may become a durable, customer-controlled logbook that records the property baseline, evaluated plans, selected plan, financing path, evidence, improvements, operating results, and material changes over time. Customers may maintain multiple properties in one portfolio register, generate a printable edition, and grant specific people revocable, auditable access rather than circulating uncontrolled copies. The Guild is the continuity layer for this living record and may later extend into operating records, accounting, and tax-preparation workflows without changing the underlying property record.
+
+## Controlled provider recommendation and managed handoff
+
+Furlong may recommend and rank verified providers using documented property, program, published credit-box, geography, transaction, and evidence-backed execution fit. Compensation, affiliation, advertising, and commercial relationships may never increase rank. No recommendation is underwriting, approval, a commitment, or a rate lock.
+
+A customer may select several providers for one private comparison round. Selection is never an automatic broadcast: every provider receives a separate expiring case room only after consent bound to that named recipient, exact package, purpose, data categories, and delivery channel. Access and revocation remain provider-specific. Furlong never sells borrower leads, auctions borrower files, permits pay-to-rank placement, or allows downstream redistribution of the package.
+
+Each provider may continue underwriting in its existing loan-origination system and must return one structured response to Furlong: Accept for review, Missing information, Outside credit box, Conditional path, or Decline. Furlong then tracks underwriting conditions, appraisal, environmental review, title, clear-to-close, closing, keys, and the final logbook record.
+
+The customer-facing financing core—readiness, verified-provider comparison, exact-recipient case-room handoff, and status coordination through closing—remains free to the customer under the 2026-09-05 Platform Experience & Economics amendment. Furlong does not take a referral fee, success percentage, or transaction percentage from the financing outcome. Optional professional or archival engagements remain separately scoped and subject to applicable authority, written engagement, compensation disclosure, conflict, consent, and professional/program controls. Residential mortgage activity remains separately gated to properly licensed authority.
 
 ## Customer-visible property intelligence hierarchy
 

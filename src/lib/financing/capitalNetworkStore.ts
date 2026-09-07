@@ -18,6 +18,13 @@ import {
   type CapitalProviderProfile,
 } from "@/lib/financing/capitalNetworkRuntime";
 import {
+  MAX_COMPARISON_PROVIDERS,
+  caseRoomExpiry,
+  validateProviderResponse,
+  type ClosingMilestone,
+  type ProviderResponseStatus,
+} from "@/lib/financing/managedProviderHandoff";
+import {
   executionReliabilityTieBreak,
   summarizeProviderExecutionReliability,
   type CapitalExecutionOutcome,
@@ -41,6 +48,12 @@ export type ProviderApplicationInput = {
   borrowerTypes?: string[];
   minDealAmount?: number | null;
   maxDealAmount?: number | null;
+  publishedCreditBox?: Record<string, unknown>;
+  collateralPolicy?: Record<string, unknown>;
+  environmentalRequirements?: Record<string, unknown>;
+  typicalFirstResponseDays?: number | null;
+  typicalClosingDays?: number | null;
+  creditBoxSourceRefs?: string[];
   acceptsBrokeredDeals?: boolean;
   acceptsDirectBorrower?: boolean;
   affiliation?: "INDEPENDENT" | "FURLONG_AFFILIATE";
@@ -60,6 +73,13 @@ export type ProviderGatePatch = Partial<{
   borrowerTypes: string[];
   minDealAmount: number | null;
   maxDealAmount: number | null;
+  publishedCreditBox: Record<string, unknown>;
+  collateralPolicy: Record<string, unknown>;
+  environmentalRequirements: Record<string, unknown>;
+  typicalFirstResponseDays: number | null;
+  typicalClosingDays: number | null;
+  creditBoxSourceRefs: string[];
+  creditBoxVerifiedAt: Date | string | null;
   acceptsBrokeredDeals: boolean;
   acceptsDirectBorrower: boolean;
   website: string | null;
@@ -95,6 +115,18 @@ function money(value: number | null | undefined): number | null {
   if (value == null || !Number.isFinite(value)) return null;
   const rounded = Math.round(value);
   return rounded >= 0 ? rounded : null;
+}
+
+function object(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function positiveDays(value: number | null | undefined): number | null {
+  if (value == null || !Number.isFinite(value)) return null;
+  const rounded = Math.round(value);
+  return rounded > 0 && rounded <= 3650 ? rounded : null;
 }
 
 
@@ -232,6 +264,13 @@ export function providerProfileFromRow(row: CapitalNetworkProviderRow): CapitalP
     borrowerTypes: list(row.borrowerTypes),
     minDealAmount: row.minDealAmount,
     maxDealAmount: row.maxDealAmount,
+    publishedCreditBox: object(row.publishedCreditBox),
+    collateralPolicy: object(row.collateralPolicy),
+    environmentalRequirements: object(row.environmentalRequirements),
+    typicalFirstResponseDays: row.typicalFirstResponseDays,
+    typicalClosingDays: row.typicalClosingDays,
+    creditBoxSourceRefs: list(row.creditBoxSourceRefs),
+    creditBoxVerifiedAt: row.creditBoxVerifiedAt,
     matchingEnabled: row.matchingEnabled,
     explicitAssignmentAllowed: row.explicitAssignmentAllowed,
     liveRoutingAllowed: row.liveRoutingAllowed,
@@ -255,6 +294,16 @@ export function publicProvider(row: CapitalNetworkProviderRow) {
     borrowerTypes: list(row.borrowerTypes),
     minDealAmount: row.minDealAmount,
     maxDealAmount: row.maxDealAmount,
+    publishedCreditBox: object(row.publishedCreditBox),
+    collateralPolicy: object(row.collateralPolicy),
+    environmentalRequirements: object(row.environmentalRequirements),
+    typicalFirstResponseDays: row.typicalFirstResponseDays,
+    typicalClosingDays: row.typicalClosingDays,
+    creditBoxSourceRefs: list(row.creditBoxSourceRefs),
+    creditBoxVerifiedAt: row.creditBoxVerifiedAt?.toISOString() ?? null,
+    creditBoxEvidenceStatus: row.creditBoxVerifiedAt && list(row.creditBoxSourceRefs).length > 0
+      ? "SOURCE_VERIFIED"
+      : "PROGRAM_APPETITE_ONLY",
     acceptsBrokeredDeals: row.acceptsBrokeredDeals,
     acceptsDirectBorrower: row.acceptsDirectBorrower,
     profileVersion: row.profileVersion,
@@ -294,6 +343,13 @@ export async function createProviderApplication(input: ProviderApplicationInput,
     borrowerTypes: list(input.borrowerTypes),
     minDealAmount: money(input.minDealAmount),
     maxDealAmount: money(input.maxDealAmount),
+    publishedCreditBox: object(input.publishedCreditBox),
+    collateralPolicy: object(input.collateralPolicy),
+    environmentalRequirements: object(input.environmentalRequirements),
+    typicalFirstResponseDays: positiveDays(input.typicalFirstResponseDays),
+    typicalClosingDays: positiveDays(input.typicalClosingDays),
+    creditBoxSourceRefs: list(input.creditBoxSourceRefs),
+    creditBoxVerifiedAt: null,
     acceptsBrokeredDeals: input.acceptsBrokeredDeals === true,
     acceptsDirectBorrower: input.acceptsDirectBorrower === true,
     matchingEnabled: false,
@@ -358,6 +414,23 @@ export async function reviewCapitalProvider(
   const arrayKeys = ["states", "programs", "purposes", "propertyTypes", "industries", "borrowerTypes"] as const;
   for (const key of arrayKeys) {
     if (patch[key] !== undefined) next[key] = list(patch[key], key === "states");
+  }
+  if (patch.creditBoxSourceRefs !== undefined) next.creditBoxSourceRefs = list(patch.creditBoxSourceRefs);
+  for (const key of ["publishedCreditBox", "collateralPolicy", "environmentalRequirements"] as const) {
+    if (patch[key] !== undefined) next[key] = object(patch[key]);
+  }
+  if (patch.typicalFirstResponseDays !== undefined) next.typicalFirstResponseDays = positiveDays(patch.typicalFirstResponseDays);
+  if (patch.typicalClosingDays !== undefined) next.typicalClosingDays = positiveDays(patch.typicalClosingDays);
+  if (patch.creditBoxVerifiedAt !== undefined) {
+    if (patch.creditBoxVerifiedAt == null) {
+      next.creditBoxVerifiedAt = null;
+    } else {
+      const verifiedAt = patch.creditBoxVerifiedAt instanceof Date
+        ? patch.creditBoxVerifiedAt
+        : new Date(patch.creditBoxVerifiedAt);
+      if (Number.isNaN(verifiedAt.getTime())) throw new Error("Credit-box verification timestamp is invalid.");
+      next.creditBoxVerifiedAt = verifiedAt;
+    }
   }
   for (const key of ["credentialStatus", "connectorStatus", "participationTermsStatus", "dataAgreementStatus", "compensationStatus", "website"] as const) {
     if (patch[key] !== undefined) next[key] = patch[key];
@@ -522,6 +595,16 @@ export async function selectProviderForRequest(serviceRequestId: string, email: 
   if (!provider || provider.status !== "CERTIFIED_ACTIVE" || !provider.explicitAssignmentAllowed) {
     throw new Error("That provider is not active for case assignment.");
   }
+  const alreadySelected = await db
+    .select({ providerId: capitalNetworkMatches.providerId })
+    .from(capitalNetworkMatches)
+    .where(and(
+      eq(capitalNetworkMatches.serviceRequestId, request.serviceRequestId),
+      eq(capitalNetworkMatches.matchStatus, "BORROWER_SELECTED"),
+    ));
+  if (!alreadySelected.some((row) => row.providerId === providerId) && alreadySelected.length >= MAX_COMPARISON_PROVIDERS) {
+    throw new Error(`A comparison round may include no more than ${MAX_COMPARISON_PROVIDERS} providers.`);
+  }
   const [existingRoom] = await db
     .select()
     .from(capitalNetworkDealRooms)
@@ -622,6 +705,7 @@ export async function activateDealRoomAfterConsent(serviceRequestId: string | nu
     // consented deal room. Full package dispatch remains a separate gate.
     dataShared: true,
     consentedAt: new Date(),
+    caseRoomExpiresAt: caseRoomExpiry(new Date()),
     traceId,
     replayRef: traceId,
     updatedAt: new Date(),
@@ -629,6 +713,93 @@ export async function activateDealRoomAfterConsent(serviceRequestId: string | nu
     eq(capitalNetworkDealRooms.serviceRequestId, serviceRequestId),
     eq(capitalNetworkDealRooms.providerId, providerId),
   ));
+}
+
+export async function recordManagedProviderResponse(input: {
+  serviceRequestId: string;
+  providerId: string;
+  status: ProviderResponseStatus;
+  summary?: string | null;
+  missingItems?: string[];
+  conditions?: string[];
+  offerTerms?: Record<string, unknown> | null;
+  actorId: string;
+  traceId: string;
+}) {
+  const errors = validateProviderResponse({
+    status: input.status,
+    missingItems: input.missingItems,
+    conditions: input.conditions,
+    explanation: input.summary,
+  });
+  if (errors.length) throw new Error(errors.join(" "));
+  const [room] = await db.select().from(capitalNetworkDealRooms).where(and(
+    eq(capitalNetworkDealRooms.serviceRequestId, input.serviceRequestId),
+    eq(capitalNetworkDealRooms.providerId, input.providerId),
+    eq(capitalNetworkDealRooms.providerAccessAllowed, true),
+  )).limit(1);
+  if (!room) throw new Error("An active, consented case room is required.");
+  if (room.caseRoomExpiresAt && room.caseRoomExpiresAt.getTime() <= Date.now()) {
+    throw new Error("This case room has expired.");
+  }
+  const now = new Date();
+  const [updated] = await db.update(capitalNetworkDealRooms).set({
+    providerResponseStatus: input.status,
+    providerResponseSummary: input.summary?.trim() || null,
+    providerResponseDetails: {
+      missingItems: input.missingItems ?? [],
+      conditions: input.conditions ?? [],
+      offerTerms: input.offerTerms ?? null,
+      recordedBy: input.actorId,
+    },
+    providerRespondedAt: now,
+    roomStatus: input.status,
+    traceId: input.traceId,
+    replayRef: input.traceId,
+    updatedAt: now,
+  }).where(eq(capitalNetworkDealRooms.id, room.id)).returning();
+  return updated;
+}
+
+export async function updateClosingMilestone(input: {
+  serviceRequestId: string;
+  providerId: string;
+  milestone: ClosingMilestone;
+  status: "NOT_STARTED" | "IN_PROGRESS" | "BLOCKED" | "COMPLETE";
+  note?: string | null;
+  evidenceRefs?: string[];
+  actorId: string;
+  traceId: string;
+}) {
+  const [room] = await db.select().from(capitalNetworkDealRooms).where(and(
+    eq(capitalNetworkDealRooms.serviceRequestId, input.serviceRequestId),
+    eq(capitalNetworkDealRooms.providerId, input.providerId),
+  )).limit(1);
+  if (!room) throw new Error("Provider case room was not found.");
+  const current = Array.isArray(room.closingMilestones)
+    ? room.closingMilestones.filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === "object")
+    : [];
+  const without = current.filter((item) => item.milestone !== input.milestone);
+  const now = new Date();
+  const closingMilestones = [...without, {
+    milestone: input.milestone,
+    status: input.status,
+    note: input.note?.trim() || null,
+    evidenceRefs: input.evidenceRefs ?? [],
+    recordedBy: input.actorId,
+    recordedAt: now.toISOString(),
+  }];
+  const [updated] = await db.update(capitalNetworkDealRooms).set({
+    closingMilestones,
+    roomStatus: input.milestone === "KEYS_AND_LOGBOOK" && input.status === "COMPLETE"
+      ? "CLOSED_LOGBOOK_RECORDED"
+      : "CLOSING_IN_PROGRESS",
+    closedAt: input.milestone === "KEYS_AND_LOGBOOK" && input.status === "COMPLETE" ? now : room.closedAt,
+    traceId: input.traceId,
+    replayRef: input.traceId,
+    updatedAt: now,
+  }).where(eq(capitalNetworkDealRooms.id, room.id)).returning();
+  return updated;
 }
 
 export async function providerMayAccessServiceRequest(providerId: string | null, serviceRequestId: string, allowLegacy = false): Promise<boolean> {
@@ -689,6 +860,12 @@ export async function listCapitalDealRoomsForCapitalDesk(limit = 200) {
       submissionCaseId: room.submissionCaseId,
       providerAccessAllowed: room.providerAccessAllowed,
       dataShared: room.dataShared,
+      caseRoomExpiresAt: room.caseRoomExpiresAt?.toISOString() ?? null,
+      providerResponseStatus: room.providerResponseStatus,
+      providerResponseSummary: room.providerResponseSummary,
+      providerResponseDetails: room.providerResponseDetails,
+      providerRespondedAt: room.providerRespondedAt?.toISOString() ?? null,
+      closingMilestones: room.closingMilestones,
       selectedAt: room.selectedAt?.toISOString() ?? null,
       consentedAt: room.consentedAt?.toISOString() ?? null,
       status: request?.status ?? null,
@@ -732,6 +909,12 @@ export async function listProviderDealRooms(providerId: string) {
       scopeSummary: request?.scopeSummary ?? null,
       providerAccessAllowed: room.providerAccessAllowed,
       dataShared: room.dataShared,
+      caseRoomExpiresAt: room.caseRoomExpiresAt?.toISOString() ?? null,
+      providerResponseStatus: room.providerResponseStatus,
+      providerResponseSummary: room.providerResponseSummary,
+      providerResponseDetails: room.providerResponseDetails,
+      providerRespondedAt: room.providerRespondedAt?.toISOString() ?? null,
+      closingMilestones: room.closingMilestones,
       selectedAt: room.selectedAt?.toISOString() ?? null,
       consentedAt: room.consentedAt?.toISOString() ?? null,
     };

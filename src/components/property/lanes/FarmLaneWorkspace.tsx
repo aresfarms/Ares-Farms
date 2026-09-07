@@ -44,7 +44,7 @@ function programNote(name: string) {
 const FARM_LANE: LaneDefinition = {
   id: "farm",
   consumerLaneLabel: "Farm & agricultural",
-  initialTab: "property",
+  initialTab: "summary",
   tabs: [
     { id: "summary", label: "Summary", intro: "The whole tract at a glance." },
     { id: "property", label: "Property", intro: "Acreage, parcel identity, land use, price, taxes, deed, structures, and the core physical identity of the tract live here." },

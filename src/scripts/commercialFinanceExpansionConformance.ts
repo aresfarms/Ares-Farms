@@ -53,8 +53,9 @@ assert(
   "New financing intake must route to the owner-controlled Furlong Capital Desk.",
 );
 assert(
-  intake.networkNote?.includes("no candidate receives your information") === true,
-  "FSA/network intake must disclose that candidates receive no data before a governed handoff.",
+  intake.networkNote?.includes("no recipient receives your information") === true &&
+    intake.networkNote?.includes("ranks verified providers") === true,
+  "FSA intake must disclose verified-fit ranking, customer-controlled routing, and no data before consent.",
 );
 
 const navigation = assessCommercialFinanceAuthority({
@@ -69,8 +70,9 @@ const paidSba = assessCommercialFinanceAuthority({
   activity: "compensated_brokerage_or_referral",
   program: "sba_7a",
 });
-assert(!paidSba.allowed, "Paid SBA brokerage/referral must fail closed before legal clearance and written engagement.");
-assert(paidSba.form159Required, "Paid SBA 7(a) broker/referral activity must carry the Form 159 control.");
+assert(!paidSba.allowed, "Paid provider referral must fail closed before legal, engagement, and provider gates pass.");
+assert(paidSba.posture === "CONTROLLED_REFERRAL_AUTHORITY_REQUIRED", "Provider referral must use the controlled-authority posture.");
+assert(paidSba.form159Required, "Potentially compensated SBA Agent activity must carry the Form 159 control.");
 assert(
   requiresSbaForm159("compensated_packaging", "sba_504"),
   "Paid SBA 504 packaging must carry the Form 159 control.",
@@ -129,8 +131,10 @@ assert(
 
 const feeSchedule = read("src/lib/financing/financingFeeSchedule.ts");
 assert(
-  feeSchedule.includes("Not activated") && feeSchedule.includes("SBA Form 159"),
-  "Fee posture must keep paid agent activity off and preserve SBA Form 159 control.",
+  feeSchedule.includes("Managed provider comparison") &&
+    feeSchedule.includes("No provider can pay to improve rank") &&
+    feeSchedule.includes("SBA Form 159"),
+  "Fee posture must permit controlled provider comparison, prohibit pay-to-rank placement, and preserve Form 159 controls.",
 );
 assert(
   !/NMLS|FHA|jumbo|non-QM|fiduciary duty/i.test(feeSchedule),

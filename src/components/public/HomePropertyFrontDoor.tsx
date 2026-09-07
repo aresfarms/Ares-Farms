@@ -124,12 +124,9 @@ export function HomePropertyFrontDoor() {
   return (
     <section className="fl-front-door" aria-label="Analyze a property">
       <div className="fl-front-door-copy">
-        <span className="fl-front-door-eyebrow">One address. The whole property picture.</span>
-        <h2>What could this property become—and how could it be financed?</h2>
-        <p>
-          Furlong verifies the place, identifies the property type, tests realistic uses,
-          compares financing paths, and opens the relevant environmental and decision modules automatically.
-        </p>
+        <span className="fl-front-door-eyebrow">Start with the place—not a loan product.</span>
+        <h2>What are you looking at?</h2>
+        <p>Enter one U.S. property address. Furlong starts with the answer, then shows the evidence, risks, and capital paths behind it.</p>
       </div>
       <div
         className="fl-front-door-form"
@@ -157,11 +154,11 @@ export function HomePropertyFrontDoor() {
             onClick={() => void analyze()}
             disabled={busy}
           >
-            {busy ? "Verifying…" : "Analyze this property"}
+            {busy ? "Checking…" : "Check this property"}
           </button>
         </div>
         <span id="front-door-support" className="fl-front-door-support">
-          No account required. Your address is used to build this analysis—not to decide your eligibility.
+          No account · No sales call · Free core analysis · Sources included
         </span>
         <span id="front-door-error" role="alert" className="fl-front-door-error">
           {error}

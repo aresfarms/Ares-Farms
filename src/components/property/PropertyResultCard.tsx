@@ -6,10 +6,10 @@ import type { ChartTheme } from "@/lib/property/chartThemes";
  * PropertyResultCard — the free tier's DEFAULT view (founder direction
  * 2026-07-17): no more than ten bullets that answer the questions, grouped as
  * green flags / watch flags, with a short overall read and the full property brief one
- * click behind it. The tease is DEPTH, not withholding — every bullet keeps
- * its number; what's paid is the why, the documents, the county pulls, the
- * personalized file. The full property brief stays complete and free: its completeness
- * is the trust argument the platform stands on.
+ * click behind it. Decision-relevant information is never withheld behind a
+ * financing paywall. Optional professional, archival, or institution-formatted
+ * artifacts may add service work, but the facts, reasons, financing-readiness
+ * pathway, and provider comparison remain part of the customer-free core.
  */
 
 export interface ResultCardFlag {
@@ -38,7 +38,7 @@ export interface PropertyResultCardProps {
   caseFor: string | null;
   caseAgainst: string;
   decisionLine: string;
-  /** What the paid tiers add — one line, depth not withholding. */
+  /** Optional deeper artifact/service line — never a financing-access paywall. */
   tierLine: string;
   chartOpen: boolean;
   onToggleChart: () => void;

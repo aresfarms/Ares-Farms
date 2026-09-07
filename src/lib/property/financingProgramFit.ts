@@ -81,7 +81,7 @@ function coverage(
 }
 
 const NEEDS_INPUTS =
-  "Property-standalone test needs a price and a modeled income figure — enter the asking price or your intended offer to run it.";
+  "Property-standalone coverage is not yet supportable. Furlong needs a verified acquisition basis and a whole-parcel operating scenario—including tillable, forested, sloped, wet, pasture, and developed segments; site fit; attainable demand; competition; and enterprise costs—before displaying DSCR.";
 
 export interface LenderTest {
   test: string;

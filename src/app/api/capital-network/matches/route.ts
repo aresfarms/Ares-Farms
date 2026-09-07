@@ -22,6 +22,7 @@ function publicSafeError(error: unknown): string {
     "Financing request was not found for that reference and email.",
     "That provider is not currently eligible for borrower selection on this case.",
     "That provider is not active for case assignment.",
+    "A comparison round may include no more than 4 providers.",
   ];
   return safe.includes(message)
     ? message

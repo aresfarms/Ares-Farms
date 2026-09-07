@@ -14,6 +14,13 @@ type ProviderRow = {
   affiliation: string;
   states: string[];
   programs: string[];
+  publishedCreditBox: Record<string, unknown>;
+  collateralPolicy: Record<string, unknown>;
+  environmentalRequirements: Record<string, unknown>;
+  typicalFirstResponseDays: number | null;
+  typicalClosingDays: number | null;
+  creditBoxSourceRefs: string[];
+  creditBoxVerifiedAt: string | null;
   credentialStatus: string;
   connectorStatus: string;
   participationTermsStatus: string;
@@ -41,6 +48,10 @@ type DealRoomRow = {
   executionOutcome: string | null;
   executionVerificationStatus: string | null;
   executionVerifiedAt: string | null;
+  caseRoomExpiresAt: string | null;
+  providerResponseStatus: string | null;
+  providerResponseSummary: string | null;
+  closingMilestones: Array<{ milestone?: string; status?: string }> | null;
 };
 
 function blockers(provider: ProviderRow): string[] {
@@ -63,6 +74,7 @@ export default function CapitalNetworkConsolePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [executionInputs, setExecutionInputs] = useState<Record<string, { outcome: string; evidenceRef: string }>>({});
+  const [milestoneInputs, setMilestoneInputs] = useState<Record<string, { milestone: string; status: string }>>({});
 
   async function loadProviders() {
     const res = await fetch("/api/capital-network/providers");
@@ -99,6 +111,33 @@ export default function CapitalNetworkConsolePage() {
       await loadProviders();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Provider review failed.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function verifyPublishedBox(provider: ProviderRow) {
+    if (!Array.isArray(provider.creditBoxSourceRefs) || provider.creditBoxSourceRefs.length === 0) {
+      setMessage("Add at least one published source or provider policy reference before marking a box verified.");
+      return;
+    }
+    setBusy(`${provider.providerId}:credit-box`);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/capital-network/providers/${encodeURIComponent(provider.providerId)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "UPDATE_GATES",
+          patch: { creditBoxVerifiedAt: new Date().toISOString() },
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.ok !== true) throw new Error(data.error ?? "Credit-box verification failed.");
+      setMessage(`${provider.organizationName}: published credit-box sources marked verified by governance. This does not approve any borrower.`);
+      await loadProviders();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Credit-box verification failed.");
     } finally {
       setBusy(null);
     }
@@ -161,6 +200,37 @@ export default function CapitalNetworkConsolePage() {
     }
   }
 
+  function milestoneInput(roomId: string) {
+    return milestoneInputs[roomId] ?? { milestone: "UNDERWRITING", status: "IN_PROGRESS" };
+  }
+
+  async function updateMilestone(room: DealRoomRow) {
+    const input = milestoneInput(room.roomId);
+    setBusy(`milestone:${room.roomId}`);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/capital-network/deal-room", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update-closing-milestone",
+          serviceRequestId: room.serviceRequestId,
+          providerId: room.providerId,
+          milestone: input.milestone,
+          milestoneStatus: input.status,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.ok !== true) throw new Error(data.error ?? "Closing milestone update failed.");
+      setMessage(`${room.serviceRequestId} → ${room.providerName}: ${input.milestone} updated to ${input.status}.`);
+      await loadRooms();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Closing milestone update failed.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function recompute() {
     setBusy("match");
     setMessage(null);
@@ -187,11 +257,13 @@ export default function CapitalNetworkConsolePage() {
 
     <section style={{ ...card, background: "#111827", color: "#e5e7eb", borderColor: "#334155" }}><strong style={{ color: "#fff" }}>Current fail-closed posture</strong><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 8, fontSize: 12.5 }}><span>Provider application ≠ activation</span><span>Match ≠ approval</span><span>Selection ≠ data sharing</span><span>Consent ≠ credit commitment</span><span>Affiliated lender gets no scoring preference</span><span>Production delivery remains separately gated</span></div></section>
 
-    <section style={{ display: "grid", gap: 10 }}><div><h2 style={{ margin: 0, color: "#101a2b", fontSize: 21 }}>Provider registry</h2><p style={{ margin: "3px 0 0", color: "#64748b", fontSize: 13 }}>These are actual Capital Network provider profiles, not the outreach candidate list.</p></div>{providers.length === 0 ? <div style={card}>No provider profiles yet.</div> : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 10 }}>{providers.map((provider) => { const blocked = blockers(provider); return <article key={provider.providerId} style={card}><div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><strong style={{ color: "#101a2b" }}>{provider.organizationName}</strong><span style={{ color: provider.status === "CERTIFIED_ACTIVE" ? "#166534" : "#92400e", fontSize: 11.5, fontWeight: 800 }}>{provider.status}</span></div><span style={{ color: "#64748b", fontSize: 12 }}>{provider.providerRole} · {provider.providerType} · {provider.affiliation} · profile v{provider.profileVersion}</span><span style={{ color: "#475569", fontSize: 12.5 }}>{provider.states?.join(", ") || "No geography yet"} · {provider.programs?.join(", ") || "No programs yet"}</span><div style={{ fontSize: 11.5, color: "#64748b", lineHeight: 1.5 }}>Credential {provider.credentialStatus} · Connector {provider.connectorStatus} · Terms {provider.participationTermsStatus} · DPA {provider.dataAgreementStatus} · Comp/conflict {provider.compensationStatus}</div><div style={{ fontSize: 12, color: blocked.length ? "#92400e" : "#166534" }}>{blocked.length ? `Activation blockers: ${blocked.join(", ")}` : "All profile activation gates present."}</div><div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "START_DUE_DILIGENCE")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750 }}>Start diligence</button><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "CERTIFY")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#dcfce7", color: "#166534" }}>Certify if gates pass</button><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "SUSPEND")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#fee2e2", color: "#991b1b" }}>Suspend</button></div><span style={{ fontSize: 11.5, color: "#64748b" }}>Matching {provider.matchingEnabled ? "ON" : "OFF"} · live routing entitlement {provider.liveRoutingAllowed ? "ON" : "OFF"}</span></article>; })}</div>}</section>
+    <section style={{ display: "grid", gap: 10 }}><div><h2 style={{ margin: 0, color: "#101a2b", fontSize: 21 }}>Provider registry</h2><p style={{ margin: "3px 0 0", color: "#64748b", fontSize: 13 }}>These are actual Capital Network provider profiles, not the outreach candidate list.</p></div>{providers.length === 0 ? <div style={card}>No provider profiles yet.</div> : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 10 }}>{providers.map((provider) => { const blocked = blockers(provider); return <article key={provider.providerId} style={card}><div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><strong style={{ color: "#101a2b" }}>{provider.organizationName}</strong><span style={{ color: provider.status === "CERTIFIED_ACTIVE" ? "#166534" : "#92400e", fontSize: 11.5, fontWeight: 800 }}>{provider.status}</span></div><span style={{ color: "#64748b", fontSize: 12 }}>{provider.providerRole} · {provider.providerType} · {provider.affiliation} · profile v{provider.profileVersion}</span><span style={{ color: "#475569", fontSize: 12.5 }}>{provider.states?.join(", ") || "No geography yet"} · {provider.programs?.join(", ") || "No programs yet"}</span><div style={{ fontSize: 11.5, color: "#64748b", lineHeight: 1.5 }}>Credential {provider.credentialStatus} · Connector {provider.connectorStatus} · Terms {provider.participationTermsStatus} · DPA {provider.dataAgreementStatus} · Comp/conflict {provider.compensationStatus}</div><div style={{ fontSize: 11.5, color: provider.creditBoxVerifiedAt ? "#166534" : "#92400e", lineHeight: 1.5 }}>Published box: {provider.creditBoxVerifiedAt ? "SOURCE VERIFIED" : Array.isArray(provider.creditBoxSourceRefs) && provider.creditBoxSourceRefs.length ? `${provider.creditBoxSourceRefs.length} source ref(s) awaiting governance verification` : "source references missing"}{provider.typicalFirstResponseDays != null ? ` · stated response ~${provider.typicalFirstResponseDays}d` : ""}{provider.typicalClosingDays != null ? ` · stated close ~${provider.typicalClosingDays}d` : ""}</div><div style={{ fontSize: 12, color: blocked.length ? "#92400e" : "#166534" }}>{blocked.length ? `Activation blockers: ${blocked.join(", ")}` : "All profile activation gates present."}</div><div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "START_DUE_DILIGENCE")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750 }}>Start diligence</button><button disabled={busy !== null || provider.creditBoxVerifiedAt != null || !Array.isArray(provider.creditBoxSourceRefs) || provider.creditBoxSourceRefs.length === 0} onClick={() => void verifyPublishedBox(provider)} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#fff7ed", color: "#9a3412" }}>Mark box sources verified</button><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "CERTIFY")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#dcfce7", color: "#166534" }}>Certify if gates pass</button><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "SUSPEND")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#fee2e2", color: "#991b1b" }}>Suspend</button></div><span style={{ fontSize: 11.5, color: "#64748b" }}>Matching {provider.matchingEnabled ? "ON" : "OFF"} · live routing entitlement {provider.liveRoutingAllowed ? "ON" : "OFF"}</span></article>; })}</div>}</section>
 
     <section style={{ display: "grid", gap: 10 }}>
       <div><h2 style={{ margin: 0, color: "#101a2b", fontSize: 21 }}>Borrower-selected deal rooms</h2><p style={{ margin: "3px 0 0", color: "#64748b", fontSize: 13 }}>Selection is visible to the Capital Desk immediately, but the provider remains locked out until exact package consent.</p></div>
       {rooms.length === 0 ? <div style={card}>No borrower-selected Capital Network deal rooms yet.</div> : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 10 }}>{rooms.map((room) => <article key={room.roomId} style={card}><div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><strong style={{ color: "#101a2b" }}>{room.serviceRequestId}</strong><span style={{ color: room.providerAccessAllowed ? "#166534" : "#92400e", fontSize: 11.5, fontWeight: 800 }}>{room.roomStatus}</span></div><span style={{ color: "#475569", fontSize: 13 }}>{room.providerName} · {room.providerRole ?? "provider"}</span><span style={{ color: "#64748b", fontSize: 12 }}>{room.program ?? "program open"} · {[room.locationCounty, room.locationState].filter(Boolean).join(", ") || "location in case"}{room.estimatedAmount != null ? ` · $${room.estimatedAmount.toLocaleString()}` : ""}</span><span style={{ color: "#64748b", fontSize: 11.5 }}>Provider access {room.providerAccessAllowed ? "ACTIVE after consent" : "LOCKED"} · scoped data {room.dataShared ? "authorized" : "not shared"}</span>{room.submissionCaseId ? <span style={{ color: "#166534", fontSize: 12.5, fontWeight: 750 }}>Submission case: {room.submissionCaseId}</span> : <button disabled={busy !== null} onClick={() => void createSubmissionCase(room)} style={{ justifySelf: "start", border: 0, borderRadius: 8, padding: "7px 10px", background: "#ede9fe", color: "#4c1d95", fontWeight: 800 }}>{busy === `submission:${room.roomId}` ? "Creating…" : "Create governed submission case"}</button>}
+        {room.providerResponseStatus && <div style={{ borderTop: "1px solid #e2e8f0", paddingTop: 8, display: "grid", gap: 3 }}><strong style={{ fontSize: 12, color: "#334155" }}>Provider response: {room.providerResponseStatus.replaceAll("_", " ")}</strong>{room.providerResponseSummary && <span style={{ fontSize: 11.5, color: "#64748b" }}>{room.providerResponseSummary}</span>}</div>}
+        {room.providerAccessAllowed && <div style={{ display: "grid", gap: 6, borderTop: "1px solid #e2e8f0", paddingTop: 8 }}><strong style={{ fontSize: 11.5, color: "#334155" }}>Closing path</strong><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}><select value={milestoneInput(room.roomId).milestone} onChange={(event) => setMilestoneInputs((current) => ({ ...current, [room.roomId]: { ...milestoneInput(room.roomId), milestone: event.target.value } }))} style={{ border: "1px solid #cbd5e1", borderRadius: 7, padding: "6px 8px", fontSize: 11.5 }}><option>UNDERWRITING</option><option>CONDITIONS</option><option>APPRAISAL</option><option>ENVIRONMENTAL_REVIEW</option><option>TITLE</option><option>CLEAR_TO_CLOSE</option><option>CLOSING</option><option>KEYS_AND_LOGBOOK</option></select><select value={milestoneInput(room.roomId).status} onChange={(event) => setMilestoneInputs((current) => ({ ...current, [room.roomId]: { ...milestoneInput(room.roomId), status: event.target.value } }))} style={{ border: "1px solid #cbd5e1", borderRadius: 7, padding: "6px 8px", fontSize: 11.5 }}><option>NOT_STARTED</option><option>IN_PROGRESS</option><option>BLOCKED</option><option>COMPLETE</option></select><button disabled={busy !== null} onClick={() => void updateMilestone(room)} style={{ border: 0, borderRadius: 7, padding: "6px 9px", background: "#dbeafe", color: "#1d4ed8", fontWeight: 800, fontSize: 11.5 }}>{busy === `milestone:${room.roomId}` ? "Updating…" : "Update"}</button></div><span style={{ fontSize: 10.5, color: "#64748b" }}>{Array.isArray(room.closingMilestones) ? room.closingMilestones.filter((item) => item.status === "COMPLETE").length : 0} of 8 milestones complete · finish line: keys and property logbook</span></div>}
         {room.executionVerificationStatus === "VERIFIED" ? <span style={{ color: "#166534", fontSize: 12, fontWeight: 750 }}>Verified execution outcome: {room.executionOutcome}</span> : <div style={{ display: "grid", gap: 6, borderTop: "1px solid #e2e8f0", paddingTop: 8 }}><strong style={{ fontSize: 11.5, color: "#334155" }}>Record evidence-backed execution outcome</strong><div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}><select value={executionInput(room.roomId).outcome} onChange={(event) => setExecutionInputs((current) => ({ ...current, [room.roomId]: { ...executionInput(room.roomId), outcome: event.target.value } }))} style={{ border: "1px solid #cbd5e1", borderRadius: 7, padding: "6px 8px", fontSize: 11.5 }}><option value="CLOSED_FUNDED">Closed / funded</option><option value="PROVIDER_DECLINED">Provider declined</option><option value="PROVIDER_WITHDREW">Provider withdrew</option><option value="PROVIDER_NO_RESPONSE">Provider no response</option><option value="BORROWER_WITHDREW">Borrower withdrew</option><option value="PROPERTY_OR_PROGRAM_BLOCKED">Property/program blocked</option><option value="THIRD_PARTY_OR_EXTERNAL_BLOCKED">Third-party/external blocked</option><option value="CANCELED">Canceled</option></select><input value={executionInput(room.roomId).evidenceRef} onChange={(event) => setExecutionInputs((current) => ({ ...current, [room.roomId]: { ...executionInput(room.roomId), evidenceRef: event.target.value } }))} placeholder="Evidence ref(s), comma-separated" style={{ flex: "1 1 190px", border: "1px solid #cbd5e1", borderRadius: 7, padding: "6px 8px", fontSize: 11.5 }} /><button disabled={busy !== null || !executionInput(room.roomId).evidenceRef.trim()} onClick={() => void recordExecutionOutcome(room)} style={{ border: 0, borderRadius: 7, padding: "6px 9px", background: "#e7f6ee", color: "#166534", fontWeight: 800, fontSize: 11.5 }}>{busy === `outcome:${room.roomId}` ? "Recording…" : "Record verified outcome"}</button></div><span style={{ fontSize: 10.5, color: "#64748b" }}>Outcome history affects no provider until sample thresholds are met; borrower/external exits are separated from provider performance.</span></div>}
       </article>)}</div>}
     </section>

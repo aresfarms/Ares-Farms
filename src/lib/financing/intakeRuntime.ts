@@ -180,8 +180,8 @@ export function evaluateFinancingIntake(
 
   const networkNote =
     input.programInterest === "fsa"
-      ? "FSA farm financing is now a Capital Desk network-search pathway. Furlong can prepare the file and identify appropriate FSA/Farm Credit candidates, but no candidate receives your information until that institution is certified for live routing and you consent to that exact handoff."
-      : "Your request enters the Furlong Capital Desk first. A live lender handoff occurs only after a qualified network recipient is certified for the program/jurisdiction and the governed consent/delivery gates are satisfied.";
+      ? "Furlong compares the published FSA and Farm Credit pathways, prepares one readiness file, and ranks verified providers by documented fit. You may authorize several providers separately; no recipient receives your information before its own consent and delivery gates pass."
+      : "Your request enters the Furlong Capital Desk first. Furlong ranks verified providers by published credit-box fit and evidence-backed execution. You choose each recipient, and every live handoff requires separate exact-recipient consent and an expiring case room.";
   return {
     runtimeVersion: FINANCING_INTAKE_RUNTIME_VERSION,
     generatedAt: new Date().toISOString(),
@@ -196,21 +196,21 @@ export function evaluateFinancingIntake(
     },
     feeDisclosure: {
       payerPosture:
-        "There is no fee to submit your deal or receive the Capital Desk's initial readiness review.",
-      amountLabel: "No submission fee",
-      note: "Any later paid packaging, brokerage, referral, or consulting service requires a separate written scope, state/program authority review, and advance compensation disclosure before work begins. Loan costs are set by the funding institution.",
+        "There is no borrower financing fee for intake, readiness, provider comparison, or the authorized case-room handoff.",
+      amountLabel: "$0 Furlong financing-access fee",
+      note: "Furlong takes no referral fee, success percentage, or transaction cut from the financing outcome. Optional professional or archival work requires a separate written scope and cannot affect provider ranking or routing. Loan costs are set by the funding institution.",
     },
     nextSteps: [
       "Your deal is recorded in the Furlong Capital Desk.",
-      "The Capital Desk organizes readiness evidence and identifies lender/program candidates without making a credit decision.",
-      "Before any live lender receives your case, Furlong verifies the recipient and obtains consent binding the exact provider, purpose, package, and delivery channel.",
-      "The funding institution performs underwriting and decides whether to offer credit; you decide whether to proceed.",
+      "The Capital Desk organizes one readiness file and identifies the strongest verified provider fits without making a credit decision.",
+      "You may choose several providers; each receives a separate expiring case room only after consent binding that provider, purpose, package, and delivery channel.",
+      "Providers return a structured response; Furlong tracks conditions, appraisal, environmental review, title, closing, and the final property logbook record.",
     ],
     disclosures: [
       "Furlong records, prepares, and coordinates your request; Furlong Core does not lend, qualify, approve, price, or determine eligibility.",
       "A program fitting your project is not the same as you qualifying — the funding institution makes that call.",
       "This is not a loan application decision, a pre-approval, a commitment, or a rate lock.",
-      "No paid commercial brokerage, packaging, or referral service is activated merely by submitting this intake. Any such service requires separate legal/program clearance and written disclosure.",
+      "Submitting this intake never sells or broadcasts your information. Provider ranking cannot be purchased. Furlong charges no borrower referral, success, or transaction fee; optional professional or archival work is separately scoped and cannot affect routing.",
       "Your information is classified RESTRICTED, human-reviewed, and handled under the platform's data-protection controls.",
     ],
     blockedClaims: [

@@ -1,6 +1,6 @@
 # MASTER VOLUME AMENDMENT — CURRENT BUILD PARITY
 
-**Effective:** 2026-09-04  
+**Effective:** 2026-09-04; scoped extension effective 2026-09-05  
 **Status:** CONTROLLING CURRENT-BUILD AMENDMENT  
 **Amendment ID:** MASTER-BUILD-PARITY-2026-09-04  
 **Machine mirror:** `docs/current-build-parity.json`
@@ -45,7 +45,7 @@ Generic model-governance, explainability, replay, bias-control and feature-gover
 
 ## 5. Capital Network hard rules
 
-The current multi-provider Capital Network is governed by these non-negotiable rules:
+The current multi-provider Capital Network is governed by these non-negotiable rules. The 2026-09-05 Platform Experience, Customer Economics & Living Case amendment adds the customer-free financing core, institution-funded economics, living-case continuity, provider published-box evidence, outcome learning, and security-claim gate:
 
 - Furlong does not sell borrower leads.
 - Furlong does not auction borrower files.
@@ -56,6 +56,10 @@ The current multi-provider Capital Network is governed by these non-negotiable r
 - Provider selection alone shares no file.
 - Exact provider/package/purpose/channel consent and recipient authority are required before governed disclosure/delivery.
 - A future Furlong-affiliated lender is one provider among others and receives no algorithmic priority.
+- The customer pays no Furlong financing-access fee for readiness, verified-provider comparison, exact-recipient case-room handoff, or closing-status coordination through keys/logbook.
+- Furlong takes no referral fee, success percentage, or transaction percentage from the financing outcome.
+- Provider payment may fund infrastructure or services but never public inclusion, placement, rank, a lead, or access to a customer file.
+- Provider-published box evidence and stated turnaround expectations remain distinct from Furlong-measured execution history.
 
 These rules are the current executable interpretation of `CONST-FAIR-001`, `ECON-CONFLICT-001`, `ECON-CONFLICT-REG-001`, `FACILITATION-001`, `CANON-FACILITATE-001` and the lender/provider operational doctrines.
 
@@ -64,6 +68,22 @@ These rules are the current executable interpretation of `CONST-FAIR-001`, `ECON
 Furlong may maintain an evidence-backed record of how providers execute Furlong cases. The record may use verified milestones and outcomes such as first response, provider disposition and closed/funded status. It may not use borrower personal-financial profile, provider compensation, affiliation or quoted interest rate as a provider-ranking input.
 
 Customer-facing performance metrics require at least **5 verified Furlong outcomes**. Execution history may affect ordering only as a tie-break between otherwise-equal property/program/provider suitability scores and only when **both providers have at least 10 verified provider-decision outcomes**. Borrower withdrawals and property/program/third-party/external blocks are separately counted and excluded from the provider close-rate denominator.
+
+## 6.1 Living Furlong Case, managed handoff and actual outcomes
+
+The canonical Furlong Case carries one customer-controlled matter from property analysis through feasibility, readiness, provider comparison, case-room consent, diligence, closing, keys and later operating-logbook continuity. Saving the case shares nothing with a provider. Material case events are append-oriented and replay/evidence referenced.
+
+A private provider comparison is bounded. Each provider receives a separate expiring case room only after exact-recipient package consent and recipient verification. Providers return structured responses, and Furlong tracks the closing path through `KEYS_AND_LOGBOOK`.
+
+Furlong may preserve verified actual outcomes—including response/disposition, reason category, conditions, financing structure, actual rate/project cost when authorized, environmental outcome, and closing dates—as evidence-backed learning. This data does not create autonomous Furlong credit authority and remains subject to the execution-reliability sample and neutrality rules above.
+
+## 6.2 Customer experience, economics and security claims
+
+The customer-facing decision hierarchy is **what Furlong found → why it matters → what to do next → show the evidence**. The first screen may be simple without weakening auditability because supporting evidence, assumptions and governance remain progressively available.
+
+Institutional subscriptions, licensing, workflow infrastructure, APIs/integrations, analytics, governance tooling, support and enterprise environments are the primary revenue model. Optional professional or archival services are separate. Borrower lead sale, file auction, paid ranking, hidden referral economics, success percentages, transaction cuts and customer-data sale are prohibited.
+
+Security architecture alone may not be described as unrestricted production assurance. Production claims require current threat-model, scan, IAM/isolation, key/secret rotation, backup/restore/replay, penetration, incident/rollback, vendor and signed promotion evidence. Missing evidence keeps the affected live action blocked.
 
 ## 7. Property intelligence and valuation
 
@@ -93,7 +113,7 @@ Furlong is owner-controlled under the current governance transition. The retaine
 
 ## 9. Current schema and proof surface
 
-The canonical schema target for this build is **0057**. Migration `0056_capital_network_multi_provider.sql` establishes the multi-provider network and provider-bound deal rooms. Migration `0057_capital_network_execution_reliability.sql` establishes evidence-backed provider execution records.
+The canonical source schema target for this build is **0062**. Migration `0056_capital_network_multi_provider.sql` establishes the multi-provider network and provider-bound deal rooms. Migration `0057_capital_network_execution_reliability.sql` establishes evidence-backed provider execution records. Migration `0058_furlong_case_lifecycle.sql` establishes the customer-controlled Furlong Case lifecycle. Migration `0059_managed_provider_handoff.sql` adds expiring case rooms, provider responses and closing milestones. Migration `0060_furlong_case_living_record_upgrade.sql` adds the append-oriented case timeline and actual-outcome records. Migration `0061_capital_network_published_credit_box.sql` adds source-governed provider published-box, collateral, environmental and turnaround evidence. Migration `0062_identity_verifications.sql` preserves the previously implemented identity-verification schema after collision-free renumbering. Migrations 0058–0062 remain subject to controlled environment promotion and must not be described as deployed before migration evidence exists.
 
 Standing implementation/proof anchors include:
 
@@ -112,6 +132,16 @@ Standing implementation/proof anchors include:
 - `src/lib/db/canonicalGovernanceMigrations.ts`
 - `src/lib/db/migrations/0056_capital_network_multi_provider.sql`
 - `src/lib/db/migrations/0057_capital_network_execution_reliability.sql`
+- `src/lib/db/migrations/0058_furlong_case_lifecycle.sql`
+- `src/lib/db/migrations/0059_managed_provider_handoff.sql`
+- `src/lib/db/migrations/0060_furlong_case_living_record_upgrade.sql`
+- `src/lib/db/migrations/0061_capital_network_published_credit_box.sql`
+- `src/lib/db/migrations/0062_identity_verifications.sql`
+- `src/lib/platform/furlongVision.ts`
+- `src/lib/intelligence/furlongCaseStore.ts`
+- `src/db/schema/furlongCases.ts`
+- `src/lib/financing/managedProviderHandoff.ts`
+- `docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md`
 - `docs/MASTER_VOLUME_AMENDMENT_2026-09-04_PROPERTY_INTELLIGENCE.md`
 - `docs/MASTER_VOLUME_AMENDMENT_2026-09-04_AI_OPERATING_MODEL.md`
 - `docs/CAPITAL_NETWORK_MULTI_PROVIDER_2026-09-04.md`
@@ -128,6 +158,11 @@ Standing gates:
 - `npm run verify:property-operating-model`
 - `npm run verify:property-value-indication`
 - `npm run verify:farm-use-integrity`
+- `npm run verify:furlong-vision`
+- `npm run verify:managed-provider-handoff`
+- `npm run verify:furlong-case`
+- `npm run verify:capital-network-credit-box`
+- `npm run verify:customer-property-experience`
 - `npm run build`
 
 ## 10. Final parity rule

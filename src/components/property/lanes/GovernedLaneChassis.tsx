@@ -262,6 +262,11 @@ export function GovernedLaneChassis(props: ChassisProps) {
   }, [facts, lane]);
 
   const introFor = (id: TabId): string => lane.tabs.find((item) => item.id === id)?.intro ?? "";
+  const primaryTabIds: TabId[] = lane.id === "farm"
+    ? ["summary", "property", "agriculture", "finance", "environmental", "report"]
+    : ["summary", "property", "finance", "environmental", "report"];
+  const primaryTabs = lane.tabs.filter((item) => primaryTabIds.includes(item.id));
+  const secondaryTabs = lane.tabs.filter((item) => !primaryTabIds.includes(item.id));
 
   const shell = { background: "#FAF8F3", border: "1px solid #E5E0D5", borderRadius: 18, overflow: "hidden" } as const;
   const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
@@ -274,58 +279,145 @@ export function GovernedLaneChassis(props: ChassisProps) {
     </h1>
     <nav aria-label="Property workspace sections" style={{ position: "sticky", top: 0, zIndex: 4, background: "rgba(250,248,243,.97)", borderBottom: "1px solid #E5E0D5", padding: "10px 12px", display: "flex", gap: 7, overflowX: "auto", alignItems: "center" }}>
       <img src="/brand/furlong-emblem.png" alt="Furlong emblem" width={38} height={38} style={{ width: 38, height: 38, objectFit: "contain", flex: "none", marginRight: 4 }} />
-      {lane.tabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 12px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>{item.label}</button>)}
+      {primaryTabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 12px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>{item.id === "summary" ? "Answer" : item.label}</button>)}
+      {secondaryTabs.length > 0 && (
+        <select
+          aria-label="More property facts"
+          value={secondaryTabs.some((item) => item.id === tab) ? tab : ""}
+          onChange={(event) => {
+            if (event.target.value) setTab(event.target.value as TabId);
+          }}
+          style={{ flex: "none", border: "1px solid #D7DEE8", borderRadius: 9, padding: "8px 10px", background: "#fff", color: "#1C2B45", fontWeight: 750 }}
+        >
+          <option value="">More facts</option>
+          {secondaryTabs.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+        </select>
+      )}
     </nav>
     <div style={{ padding: 20, display: "grid", gap: 16 }}>
       {tab === "summary" && (() => {
-        // A REAL summary (founder direction 2026-07-29: "why don't we have an
-        // actual summary of the property here?") — the most decision-relevant
-        // verified facts, in priority order, not a count line.
-        const SUMMARY_PRIORITY = [/^size$/i, /^land area$/i, /asking price/i, /appraised total/i, /^property type$/i, /^county$/i, /flood zone/i, /soil survey/i, /^zoning$/i, /^land use$/i, /^sale status$/i, /wetlands/i, /^schools$/i, /broadband/i, /climate normals/i];
+        const SUMMARY_PRIORITY = [/^land area$/i, /^size$/i, /asking price/i, /property estimate/i, /^property type$/i, /^zoning$/i, /^land use$/i, /flood zone/i];
         const summaryFacts: typeof facts = [];
         for (const pattern of SUMMARY_PRIORITY) {
           const hit = facts.find((fact) => pattern.test(fact.label) && !summaryFacts.includes(fact));
           if (hit) summaryFacts.push(hit);
-          if (summaryFacts.length >= 8) break;
+          if (summaryFacts.length >= 4) break;
         }
+        const rankedPrograms = [...props.financingLanes].sort((a, b) => {
+          const fit = props.financingFit ?? {};
+          const aFit = fit[a];
+          const bFit = fit[b];
+          if (Boolean(aFit?.excluded) !== Boolean(bFit?.excluded)) return aFit?.excluded ? 1 : -1;
+          if ((bFit?.score ?? -0.5) !== (aFit?.score ?? -0.5)) return (bFit?.score ?? -0.5) - (aFit?.score ?? -0.5);
+          return lane.financingPriority(a) - lane.financingPriority(b);
+        });
+        const leadProgram = rankedPrograms.find((name) => !props.financingFit?.[name]?.excluded) ?? null;
+        const leadProgramLine = leadProgram ? props.financingFit?.[leadProgram]?.line ?? null : null;
+        const modeledIncome = leadProgramLine?.match(/modeled income (\$[\d,]+)\/yr/i)?.[1] ?? null;
+        const annualDebtService = leadProgramLine?.match(/vs (\$[\d,]+)\/yr debt service/i)?.[1] ?? null;
+        const debtTerms = leadProgramLine?.match(/at ([\d.]+)% \(([^)]+)\)/i);
+        const dscr = leadProgramLine?.match(/DSCR ([\d.]+)/i)?.[1] ?? null;
+        const incomeBasis = leadProgramLine?.match(/Income basis: (.+)$/i)?.[1]?.replace(/\.$/, "") ?? null;
+        const farmScreen = props.intelligence?.farmBestUse ?? null;
+        const currentUse = props.propertyRecord?.landUse ?? props.propertyRecord?.rawPropertyStyle ?? props.propertyType;
+        const answer = lane.id === "farm"
+          ? farmScreen?.evidenceStatus === "supported-screen"
+            ? `The record supports ${currentUse || "an agricultural property"}. ${farmScreen.options[0]?.name ?? "No enterprise"} leads the supported agricultural fit screen, but the property's overall highest-and-best use still requires comparison with every legally and physically feasible alternative.`
+            : `The record supports ${currentUse || "a farm or land property"}. Furlong cannot yet name either the best agricultural enterprise or the property's overall highest-and-best use because productive acreage, soil/topography/climate fit, water, demand, competition, and economics are not all verified.`
+          : lane.id === "residential"
+            ? `The strongest supported starting use is residential. Furlong has not found enough verified evidence to claim a conversion or income use is better than using the property as a home.`
+            : `The property should be evaluated first as ${currentUse || "commercial real estate"}. The strongest business use remains provisional until permitted use, demand, building condition, operating income, and acquisition price are verified.`;
+        const status = props.factsPending
+          ? "Still gathering evidence"
+          : lane.id === "farm" && farmScreen?.evidenceStatus === "supported-screen"
+            ? "Agricultural screen supported"
+            : "Preliminary — key evidence remains";
+        const materialRisk = factsByTab.environmental.find((fact) => fact.tone === "caution") ?? null;
+        const environmentalIndication = materialRisk
+          ? `${materialRisk.label}: ${materialRisk.value}`
+          : factsByTab.environmental.length > 0
+            ? "No material issue identified in the basic screen; professional review may still be required"
+            : "Environmental screen not yet resolved";
+        const nextNeeded = !hasPrice
+          ? "Enter the asking price or intended offer. Without it, Furlong cannot compare returns, debt service, cash to close, or transaction economics."
+          : lane.id === "farm" && farmScreen?.missingCriticalInputs.length
+            ? `The agricultural ranking still needs ${farmScreen.missingCriticalInputs.slice(0, 2).join(" and ")} before it is dependable.`
+            : props.pauseLine || "Confirm condition, legal use, market demand, and the operating assumptions before relying on the result.";
         const totalFacts = facts.length;
         return <>
-        <article style={{ ...card, background: "linear-gradient(155deg,#20304E,#16233C)", color: "#fff", border: 0, display: "grid", gap: 9 }}><span style={{ color: "#CBA24A", fontSize: 10.5, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase" }}>Property summary</span><h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: 24 }}>{props.title}</h2><span style={{ color: "#AEB6C6", fontSize: 13 }}>{props.location} · {lane.consumerLaneLabel}</span></article>
-        <section aria-label="Furlong answer" style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 10 }}>
-          <span style={{ color: "#8F6E1F", fontSize: 10.5, fontWeight: 850, letterSpacing: ".14em", textTransform: "uppercase" }}>Furlong answer</span>
-          <p style={{ margin: 0, color: "#1C2B45", fontSize: 15, lineHeight: 1.6, fontWeight: 650 }}>{props.headline}</p>
-          {props.readiness.length > 0 && <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>{props.readiness.map((item) => <span key={item} style={{ border: "1px solid #D7DEEA", borderRadius: 999, padding: "5px 9px", background: "#fff", color: "#3D4655", fontSize: 11.5, fontWeight: 700 }}>{item}</span>)}</div>}
-          {props.fitLine && <p style={{ margin: 0, color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}><strong style={{ color: "#1C2B45" }}>What supports this read:</strong> {props.fitLine}.</p>}
-          {props.pauseLine && <p style={{ margin: 0, color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}><strong style={{ color: "#1C2B45" }}>Before relying on it:</strong> {props.pauseLine}.</p>}
-        </section>
-        {summaryFacts.length > 0 ? (
-          <section style={{ ...card, display: "grid", gap: 10 }}>
-            <strong style={{ color: "#1C2B45" }}>The property, in brief</strong>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "8px 18px" }}>
-              {summaryFacts.map((fact) => (
-                <div key={fact.label} style={{ display: "grid", gap: 2, borderLeft: "3px solid #E5E0D5", paddingLeft: 10 }}>
-                  <span style={{ fontSize: 10, color: "#8A8F9C", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{fact.label}</span>
-                  <span style={{ color: "#1C2B45", fontSize: 13.5, fontWeight: 650, lineHeight: 1.45 }}>{fact.value}</span>
-                </div>
-              ))}
+          <article data-testid="customer-decision-summary" style={{ background: "linear-gradient(145deg,#10243B,#173A43)", color: "#fff", borderRadius: 16, padding: "clamp(20px,4vw,30px)", display: "grid", gap: 18, boxShadow: "0 12px 30px rgba(16,36,59,.16)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap" }}>
+              <div style={{ display: "grid", gap: 6, maxWidth: 760 }}>
+                <span style={{ color: "#D7B85A", fontSize: 11, fontWeight: 850, letterSpacing: ".16em", textTransform: "uppercase" }}>Furlong&apos;s answer first</span>
+                <h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: "clamp(23px,4vw,34px)", lineHeight: 1.12 }}>What does this property appear best suited for?</h2>
+              </div>
+              <span style={{ border: "1px solid rgba(215,184,90,.55)", borderRadius: 999, padding: "7px 11px", color: "#F3D98D", background: "rgba(215,184,90,.08)", fontSize: 12, fontWeight: 750 }}>{status}</span>
             </div>
-            <p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 12.5 }}>
-              {hasPrice ? `Price basis: ${props.priceLabel}. ` : "Price is not yet confirmed. "}
-              {totalFacts} verified fact{totalFacts === 1 ? "" : "s"} in all — {factsByTab.property.length} property, {factsByTab.utilities.length} utility, {factsByTab.environmental.length} environmental, {factsByTab.education.length} education, {factsByTab.misc.length} other — each with its source and date in the tabs above.
-            </p>
+            <p style={{ margin: 0, color: "#F3F6F8", fontSize: 17, lineHeight: 1.65, maxWidth: 900 }}>{answer}</p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12 }}>
+              <div style={{ border: "1px solid rgba(255,255,255,.16)", borderRadius: 12, padding: 14, background: "rgba(255,255,255,.045)" }}>
+                <span style={{ display: "block", color: "#AFC7CD", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>What it is</span>
+                <strong style={{ display: "block", marginTop: 6, color: "#fff", fontSize: 18, lineHeight: 1.4 }}>{currentUse || lane.consumerLaneLabel}</strong>
+                {lane.id === "farm" && farmScreen && <span style={{ display: "block", marginTop: 7, color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.5 }}>{farmScreen.evidenceStatus === "supported-screen" ? `Supported agricultural leader: ${farmScreen.options[0]?.name ?? "not yet established"}.` : "Agricultural enterprise ranking: not yet supportable."} Overall highest-and-best use: not yet determined.</span>}
+              </div>
+              <div style={{ border: "1px solid rgba(255,255,255,.16)", borderRadius: 12, padding: 14, background: "rgba(255,255,255,.045)" }}>
+                <span style={{ display: "block", color: "#AFC7CD", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>Environmental indication</span>
+                <strong style={{ display: "block", marginTop: 6, color: "#fff", lineHeight: 1.45 }}>{environmentalIndication}</strong>
+              </div>
+              <div style={{ gridColumn: "1 / -1", border: "1px solid rgba(215,184,90,.55)", borderRadius: 12, padding: "16px 18px", background: "rgba(215,184,90,.08)", display: "grid", gap: 11 }}>
+                <span style={{ color: "#F3D98D", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>Financing to test first</span>
+                <strong style={{ color: "#fff", fontSize: 18, lineHeight: 1.4 }}>{leadProgram ?? "Needs price and use confirmation"}</strong>
+                {dscr && modeledIncome && annualDebtService ? <>
+                  <div style={{ display: "flex", gap: "12px 22px", alignItems: "baseline", flexWrap: "wrap" }}>
+                    <strong style={{ color: "#fff", fontSize: 27, lineHeight: 1 }}>{dscr}x DSCR</strong>
+                    <span style={{ color: "#F3D98D", fontSize: 13, fontWeight: 800 }}>Clears the 1.25x screening floor</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(175px,1fr))", gap: 10 }}>
+                    <div><strong style={{ display: "block", color: "#fff", fontSize: 17 }}>{modeledIncome}/yr</strong><span style={{ color: "#AFC7CD", fontSize: 11.5 }}>Modeled annual income</span></div>
+                    <div><strong style={{ display: "block", color: "#fff", fontSize: 17 }}>{annualDebtService}/yr</strong><span style={{ color: "#AFC7CD", fontSize: 11.5 }}>Annual debt service</span></div>
+                    {debtTerms && <div><strong style={{ display: "block", color: "#fff", fontSize: 17 }}>{debtTerms[1]}% · {debtTerms[2]}</strong><span style={{ color: "#AFC7CD", fontSize: 11.5 }}>Published-rate test basis</span></div>}
+                  </div>
+                  {incomeBasis && <span style={{ color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.55 }}>Income basis: {incomeBasis}. Screening only—not a projection, approval, or credit decision.</span>}
+                </> : leadProgramLine ? <span style={{ color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.55 }}>{leadProgramLine}</span> : null}
+              </div>
+            </div>
+          </article>
+          <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 8 }}>
+            <span style={{ color: "#8F6E1F", fontSize: 10.5, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase" }}>What Furlong needs next</span>
+            <strong style={{ color: "#1C2B45", fontSize: 16, lineHeight: 1.5 }}>{nextNeeded}</strong>
           </section>
-        ) : (
-          <section style={{ ...card, display: "grid", gap: 9 }}>
-            <strong style={{ color: "#1C2B45" }}>The property, in brief</strong>
-            <p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 13 }}>
-              {props.factsPending
-                ? "Public records for this property are still arriving — flood, parcel, soil, and program facts land here as each source answers. The summary fills in momentarily."
-                : "No verified public records resolved for this entry yet. Facts appear here the moment a source answers; each carries its origin and date."}
-            </p>
+          {summaryFacts.length > 0 ? (
+            <section style={{ ...card, display: "grid", gap: 11 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "baseline", flexWrap: "wrap" }}>
+                <strong style={{ color: "#1C2B45" }}>The four facts that matter first</strong>
+                <span style={{ color: "#6B7280", fontSize: 11.5 }}>{totalFacts} sourced facts available in the detailed sections</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: "9px 16px" }}>
+                {summaryFacts.map((fact) => (
+                  <div key={fact.label} style={{ display: "grid", gap: 3, borderLeft: "3px solid #D7B85A", paddingLeft: 10 }}>
+                    <span style={{ fontSize: 10, color: "#7B8190", fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>{fact.label}</span>
+                    <span style={{ color: "#1C2B45", fontSize: 13.5, fontWeight: 700, lineHeight: 1.45 }}>{fact.value}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : (
+            <section style={{ ...card, display: "grid", gap: 8 }}><strong style={{ color: "#1C2B45" }}>Verified facts are still arriving</strong><p style={{ margin: 0, color: "#5A6172", lineHeight: 1.6, fontSize: 13 }}>{props.factsPending ? "Furlong is checking parcel, flood, soil, program, and utility sources now." : "No governed public record resolved for this entry yet, so the answer remains intentionally limited."}</p></section>
+          )}
+          <section style={{ ...card, display: "grid", gap: 10 }}>
+            <strong style={{ color: "#1C2B45" }}>Why use Furlong for this decision?</strong>
+            <p style={{ margin: 0, color: "#5A6172", lineHeight: 1.65, fontSize: 13.5 }}>Most property sites show a listing, a valuation, or a loan product in isolation. Furlong tests the property, plausible uses, financing fit, and material environmental constraints together—and shows the source and date behind each conclusion.</p>
+            <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
+              <button type="button" onClick={() => setTab("property")} style={{ border: "1px solid #C9D4E1", borderRadius: 9, padding: "9px 12px", background: "#fff", color: "#1C2B45", fontWeight: 750, cursor: "pointer" }}>Review property evidence</button>
+              <button type="button" onClick={() => setTab("finance")} style={{ border: 0, borderRadius: 9, padding: "9px 12px", background: "#1C2B45", color: "#fff", fontWeight: 800, cursor: "pointer" }}>See financing analysis</button>
+            </div>
           </section>
-        )}
-        <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 9 }}><strong style={{ color: "#1C2B45" }}>Something Furlong missed?</strong><form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "Customer-supplied property feature pending source verification.", provenance: "Owner assertion added in the property workspace", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800 }}>Add feature</button></form>{ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7 }}><strong style={{ color: "#1C2B45", fontSize: 12 }}>Owner-reported property features</strong>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}</section>
-      </>;
+          <details style={{ ...card, background: "#FFFDF7" }}>
+            <summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Correct or add a property fact</summary>
+            <form onSubmit={(event) => { event.preventDefault(); const value = ownerFeatureInput.trim(); if (!value) return; setLocalOwnerAssertions((current) => [...current, { label: value, value: "Owner reported — pending verification", text: "Customer-supplied property feature pending source verification.", provenance: "Owner assertion added in the property workspace", tone: "neutral" }]); setOwnerFeatureInput(""); }} style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}><input value={ownerFeatureInput} onChange={(event) => setOwnerFeatureInput(event.target.value)} placeholder="e.g. deeded pier, two parcels" aria-label="Property feature Furlong missed" style={{ flex: "1 1 260px", border: "1px solid #B08A2E", borderRadius: 9, padding: "10px 12px" }} /><button type="submit" style={{ border: 0, borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800 }}>Add feature</button></form>
+            {ownerAssertions.length > 0 && <div style={{ display: "grid", gap: 7, marginTop: 10 }}>{ownerAssertions.map((fact) => <span key={`${fact.label}-${fact.value}`} style={{ color: "#5A6172", fontSize: 12 }}><strong>{fact.label}:</strong> {fact.value}</span>)}</div>}
+          </details>
+        </>;
       })()}
       {tab === "property" && renderCategory("property", "Property")}
       {tab === "agriculture" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>{lane.tabs.find((item) => item.id === "agriculture")?.label ?? "Agriculture"}</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("agriculture")}</p></header>{props.agricultureSlot ?? <div style={card}>The growing analysis for this ground is still assembling — soil, county yields, and market signals arrive with the property facts.</div>}</>}

@@ -255,7 +255,7 @@ try {
     ),
     "Synthetic lineage migration must be present in the canonical executable registry.",
   );
-  assert.equal(canonicalTargetSchemaVersion(), "0057");
+  assert.equal(canonicalTargetSchemaVersion(), "0062");
   assert(migration.includes("BEFORE UPDATE OR DELETE"));
   assert(migration.includes("synthetic_fixture_lineage_records"));
   assert(

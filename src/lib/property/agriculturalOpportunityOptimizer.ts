@@ -55,7 +55,13 @@ export function optimizeAgriculturalOpportunities(a:OpportunityAssumptions){
   const riskAdjustedNoi=noi*(fit/100);
   const returnOnStartup=startup>0?noi/startup:null;
   return {...c,eligible,usedAcres,gross,opex,noi,startup,fit,soilFit,weatherFit,marketFit,riskAdjustedNoi,irrigationCapex,irrigationAnnual,returnOnStartup,dscr:a.debtService>0?noi/a.debtService:null,modelDetails:c.key==="alfalfa-small-square"?{hayYield,baleWeight,balesPerTon,sellableBales,averageBalePrice,winterShare,shrink}:null};
- }).sort((x,y)=>(y.riskAdjustedNoi+y.fit*1000)-(x.riskAdjustedNoi+x.fit*1000));
+ }).sort((x,y)=>
+   (y.riskAdjustedNoi-x.riskAdjustedNoi) ||
+   (y.fit-x.fit)
+ );
+ // Feasibility is a gate; once through it, rank by risk-adjusted NOI. The
+ // previous fit*1000 weighting made generic ease-of-operation overwhelm
+ // profitability and falsely elevated hay, cash rent, and row crops.
  const feasible=ranked.filter(r=>r.eligible&&r.fit>=45&&r.soilFit>=35&&r.weatherFit>=35&&r.marketFit>=35);
  const diversified=feasible.slice(0,3).map((r,i)=>({...r,portfolioShare:[.5,.3,.2][i]||0}));
  const portfolioNoi=diversified.reduce((s,r)=>s+r.noi*r.portfolioShare,0);

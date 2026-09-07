@@ -12,7 +12,6 @@ import {
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { ReportTokenReturn } from "@/components/property/ReportTokenReturn";
-import { BoundEditionReserve } from "@/components/property/BoundEditionReserve";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
@@ -46,8 +45,6 @@ import { buildResidentialLenderProforma, type LenderProformaSection } from "@/li
 import { buildLenderTestScorecard, evaluateProgramFit, type ProgramFitContext } from "@/lib/property/financingProgramFit";
 import { modelCommercialUses } from "@/lib/property/commercialUseModel";
 import { FinanceAnalysisPanel } from "@/components/property/lanes/FinanceAnalysisPanel";
-import { solveDscrCoverage } from "@/lib/property/dscrCoverageSolver";
-import { indicateMarketValue } from "@/lib/property/marketValueIndication";
 import { buildRealEstateCompensationTransparency, emptyRealEstateCompensationInput } from "@/lib/property/realEstateCompensationTransparency";
 import { buildInfrastructureRiskFromEvidence, ingestPropertyEvidence, ingestStructuredPropertyEvidence, mergeWithDefaultPropertyEvidence, structuredTaxRecord } from "@/lib/property/propertyEvidenceIngestion";
 import { buildPropertyEvidenceManifest } from "@/lib/property/propertyEvidenceManifest";
@@ -3348,7 +3345,6 @@ export function PropertyEvaluationWorkspace({
           : "commercial";
     const screeningPrice =
       effectiveListedPrice ?? facts?.propertyRecord?.assessedTotalValue ?? null;
-    const soil = effectivePlaceIntelligence?.soilProfile ?? null;
     let noiAnnual: number | null = null;
     let noiBasis: string | null = null;
     // Commercial: model income per candidate use (founder 2026-08-05 — the
@@ -3370,30 +3366,19 @@ export function PropertyEvaluationWorkspace({
       noiAnnual = useScreen.bestUse.noiMid;
       noiBasis = `best modeled use — ${useScreen.bestUse.use} (screening bands, not an appraisal)`;
     }
-    if (laneId === "farm" && screeningPrice != null) {
-      // Parcel-resolver acreage reads "≈41 acres by mapped parcel geometry" —
-      // extract the number, never parseFloat a prefixed string.
-      const acresMatch = (facts?.propertyRecord?.acreageText ?? "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
-      const acres =
-        facts?.propertyRecord?.offeredAcreage ??
-        (acresMatch ? Number(acresMatch[1]) : null);
-      const ratePct =
-        ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? null;
-      if (acres != null && acres > 0 && ratePct != null) {
-        const r = ratePct / 100;
-        const ads = (screeningPrice * r) / (1 - Math.pow(1 + r, -40));
-        const solution = solveDscrCoverage({
-          acres,
-          screeningPrice,
-          annualDebtService: ads,
-          ratePct,
-          amortYears: 40,
-          ltv: 1.0,
-          soil,
-        });
-        noiAnnual = solution.bestMix?.annualNoi ?? solution.bestSingle?.annualNoi ?? null;
-        noiBasis = "best modeled enterprise mix for this parcel's soil and county (screening, not a projection)";
-      }
+    const farmPortfolio = effectivePlaceIntelligence?.farmBestUse?.parcelPortfolio ?? null;
+    const farmCoverageReady =
+      effectivePlaceIntelligence?.farmBestUse?.evidenceStatus === "supported-screen" &&
+      effectivePlaceIntelligence.farmBestUse.missingCriticalInputs.length === 0 &&
+      farmPortfolio?.modeledNoiAnnual != null;
+    if (laneId === "farm" && screeningPrice != null && farmCoverageReady) {
+      // A farm is a parcel portfolio, not synonymous with tillable acreage.
+      // Coverage uses the combined NOI of verified segment-specific plans:
+      // cropland, pasture, forest, wetland, structures and other feasible uses.
+      // Unsuitable uses are excluded from a segment; the segment itself is
+      // never assigned zero economic value merely because it is not tillable.
+      noiAnnual = farmPortfolio.modeledNoiAnnual;
+      noiBasis = farmPortfolio.basis ?? "segment-aware parcel operating scenario";
     }
     const ctx: ProgramFitContext = {
       laneId,
@@ -4054,31 +4039,36 @@ export function PropertyEvaluationWorkspace({
                 )}
               </span>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {allProfiles().map((profile) => {
-                const active = propertyClassificationAvailable && workspaceProfile.id === profile.id;
-                return (
-                  <button
-                    key={profile.id}
-                    type="button"
-                    onClick={() => setProfileOverride(profile.id)}
-                    aria-pressed={active}
-                    style={{
-                      padding: "6px 13px",
-                      borderRadius: 999,
-                      border: active ? "1px solid #0f766e" : "1px solid #d7deea",
-                      background: active ? "#0f766e" : "#ffffff",
-                      color: active ? "#ffffff" : "#3b475a",
-                      fontSize: 12.5,
-                      fontWeight: active ? 700 : 500,
-                      cursor: "pointer",
-                    }}
-                  >
-                    {active ? "✓ " : ""}{profile.label}
-                  </button>
-                );
-              })}
-            </div>
+            <details open={typeIsGuessworkOnly} style={{ borderTop: "1px solid #e2d7bd", paddingTop: 8 }}>
+              <summary style={{ cursor: "pointer", color: "#1C2B45", fontSize: 12.5, fontWeight: 800 }}>
+                {typeIsGuessworkOnly ? "Choose the property type to continue" : "Wrong classification? Change the property type"}
+              </summary>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, paddingTop: 10 }}>
+                {allProfiles().map((profile) => {
+                  const active = propertyClassificationAvailable && workspaceProfile.id === profile.id;
+                  return (
+                    <button
+                      key={profile.id}
+                      type="button"
+                      onClick={() => setProfileOverride(profile.id)}
+                      aria-pressed={active}
+                      style={{
+                        padding: "7px 13px",
+                        borderRadius: 999,
+                        border: active ? "1px solid #0f766e" : "1px solid #d7deea",
+                        background: active ? "#0f766e" : "#ffffff",
+                        color: active ? "#ffffff" : "#3b475a",
+                        fontSize: 12.5,
+                        fontWeight: active ? 700 : 500,
+                        cursor: "pointer",
+                      }}
+                    >
+                      {active ? "✓ " : ""}{profile.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </details>
             {profileOverride && (
               <span style={{ fontSize: 12, color: "#0f766e" }}>
                 Read as: {workspaceProfile.label}. Everything below follows this shape.
@@ -4087,13 +4077,11 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
-      {!deepView && importedProperty && (!propertyClassificationAvailable || !rankingPrice) && (
+      {!deepView && importedProperty && !propertyClassificationAvailable && (
         <section aria-label="Complete property basics" style={{ display: "grid", gap: 7, border: "1px solid #d7deea", borderRadius: 12, background: "#fbfcfe", padding: "14px 16px" }}>
-          <strong style={{ color: "#162033", fontSize: 15 }}>Complete the property basics before Furlong calculates financing or transaction recommendations</strong>
+          <strong style={{ color: "#162033", fontSize: 15 }}>Choose the property type to continue</strong>
           <span style={{ color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>
-            {propertyClassificationAvailable
-              ? "Furlong classified the property from the available parcel and listing evidence. Property facts and use possibilities can be screened now; enter the asking price or your intended offer before price-dependent financing, return, cash-to-close, or transaction recommendations are calculated. The type control above is only for correcting a source record that does not reflect the property's actual use."
-              : "Furlong is still resolving the parcel acreage, land-use, and structure record for this address. It will not default the property to residential or generate type-specific analysis until that evidence is available."}
+            Furlong is still resolving the parcel acreage, land-use, and structure record for this address. It will not default the property to residential or generate type-specific analysis until that evidence is available.
           </span>
         </section>
       )}
@@ -4172,43 +4160,7 @@ export function PropertyEvaluationWorkspace({
         }
         agricultureSlot={
           workspaceProfile.id === "farm" || workspaceProfile.id === "land" ? (
-            <FarmAgricultureTab
-              bestUse={effectivePlaceIntelligence?.farmBestUse ?? null}
-              proForma={(() => {
-                if (workspaceProfile.id !== "farm" && workspaceProfile.id !== "land") return null;
-                const acresMatch = (facts?.propertyRecord?.acreageText ?? "").replace(/,/g, "").match(/([0-9]+(?:\.[0-9]+)?)/);
-                const acres = facts?.propertyRecord?.offeredAcreage ?? (acresMatch ? Number(acresMatch[1]) : null);
-                const ratePct = ownershipContext?.fsa?.ownershipDirectPct ?? ownershipContext?.rates.rate30 ?? undefined;
-                // No asking price → seed Furlong's assessment-based value
-                // indication (cited), which the visitor can override; a real
-                // price always wins. This is an assessment-reconciliation screen,
-                // NOT a closed-comps BPO. The pro-forma is ALWAYS the surface for
-                // farm/land — never the old cards. Full-price 40-yr screen matches the PDF.
-                const indication = effectiveListedPrice == null
-                  ? indicateMarketValue({
-                      assessedTotalValue: facts?.propertyRecord?.assessedTotalValue ?? null,
-                      stateCode: analysisContext.stateCode ?? null,
-                      county: analysisContext.county ?? null,
-                    })
-                  : null;
-                const estimateMid = indication?.status === "indicated" ? indication.midUsd : null;
-                const band = indication?.status === "indicated" && indication.lowUsd != null && indication.highUsd != null
-                  ? { low: indication.lowUsd, high: indication.highUsd }
-                  : null;
-                return {
-                  acres: acres ?? null,
-                  listPrice: effectiveListedPrice ?? null,
-                  bpo: estimateMid,
-                  priceIsEstimate: estimateMid != null,
-                  estimateBand: band,
-                  estimateSources: indication?.sources ?? [],
-                  estimateNote: indication?.method ?? null,
-                  ratePct, amortYears: 40, ltv: 1.0,
-                  soil: effectivePlaceIntelligence?.soilProfile ?? null,
-                  valuationInputs: effectivePlaceIntelligence?.farmValuationInputs ?? null,
-                };
-              })()}
-            />
+            <FarmAgricultureTab bestUse={effectivePlaceIntelligence?.farmBestUse ?? null} />
           ) : workspaceProfile.id === "residential" ? (
             // Residential repurposes the slot as Yard & Garden (founder
             // 2026-07-29): soil-matched garden picks + region natives.
@@ -4747,45 +4699,45 @@ export function PropertyEvaluationWorkspace({
           It is a guarantee of OUR OWN CONDUCT — things we fully control — not a
           promise about any outcome, which keeps "Guarantee" honest. */}
       {!deepView && (
-        <section
-          aria-label="The Furlong Sovereignty Guarantee"
+        <details
+          aria-label="Why you can trust this analysis"
           style={{
-            position: "relative",
-            overflow: "hidden",
-            display: "grid",
-            gap: 10,
-            border: "1px solid #b8862f",
-            borderRadius: 14,
-            background: "linear-gradient(180deg,#10233b,#14293f)",
-            color: "#eef3f8",
-            padding: "18px 20px",
-            fontFamily: "Georgia, 'Times New Roman', serif",
+            border: "1px solid #c9d4e1",
+            borderRadius: 12,
+            background: "#f7fafc",
+            padding: "14px 18px",
+            color: "#1C2B45",
           }}
         >
+          <summary style={{ cursor: "pointer", fontSize: 14, fontWeight: 800 }}>
+            Why you can trust this analysis
+          </summary>
+          <div style={{ display: "grid", gap: 10, paddingTop: 14, fontFamily: "Georgia, 'Times New Roman', serif" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <span aria-hidden style={{ fontSize: 15, color: "#d4b06a" }}>❧</span>
             <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#d4b06a" }}>
               The Furlong Sovereignty Guarantee
             </span>
           </div>
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "#eef3f8" }}>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.6, color: "#3B475A" }}>
             We lay out every figure with its source and date because this is your ground, not ours to
             gate. That is a guarantee about how <em>we</em> conduct ourselves — the part we fully control:
           </p>
-          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 5, fontSize: 13, lineHeight: 1.55, color: "#dce8f2" }}>
-            <li><strong style={{ color: "#f4f7fa" }}>No capture.</strong> No account, no login, no personal data required to read the open property analysis.</li>
-            <li><strong style={{ color: "#f4f7fa" }}>No lead sale or file auction.</strong> Furlong never sells borrower leads or auctions borrower files.</li>
-            <li><strong style={{ color: "#f4f7fa" }}>You control sharing.</strong> A provider receives only the exact package you authorize for that exact recipient; selecting a provider does not silently share your file.</li>
-            <li><strong style={{ color: "#f4f7fa" }}>No pay-to-rank.</strong> Provider compensation and affiliation have zero influence on matching or ranking.</li>
-            <li><strong style={{ color: "#f4f7fa" }}>Disclosed fees only.</strong> Furlong may charge for reports, workflow, packaging, or other clearly described services, but those fees never buy a provider better placement.</li>
-            <li><strong style={{ color: "#f4f7fa" }}>Sources, always.</strong> Every figure carries its origin and date — you can check our work.</li>
+          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 5, fontSize: 13, lineHeight: 1.55, color: "#3B475A" }}>
+            <li><strong style={{ color: "#1C2B45" }}>No capture.</strong> No account, no login, no personal data required to read the open property analysis.</li>
+            <li><strong style={{ color: "#1C2B45" }}>No lead sale or file auction.</strong> Furlong never sells borrower leads or auctions borrower files.</li>
+            <li><strong style={{ color: "#1C2B45" }}>You control sharing.</strong> A provider receives only the exact package you authorize for that exact recipient; selecting a provider does not silently share your file.</li>
+            <li><strong style={{ color: "#1C2B45" }}>No pay-to-rank.</strong> Provider compensation and affiliation have zero influence on matching or ranking.</li>
+            <li><strong style={{ color: "#1C2B45" }}>Core financing workflow stays customer-free.</strong> Property analysis, financing readiness, provider comparison, and the authorized case-room handoff are not borrower paywalls. Optional professional or archival services are separately scoped and never buy a provider better placement.</li>
+            <li><strong style={{ color: "#1C2B45" }}>Sources, always.</strong> Every figure carries its origin and date — you can check our work.</li>
           </ul>
-          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#b9cbd9" }}>
-            Reading the open property analysis can remain anonymous. If you choose a paid report, save a case,
-            nominate a provider, open a deal room, request a professional service, or authorize delivery, Furlong
-            collects only the information required for that chosen workflow and states the purpose at the point of collection.
+          <p style={{ margin: 0, fontSize: 12, lineHeight: 1.55, color: "#5A6172" }}>
+            Reading the open property analysis can remain anonymous. If you choose to save a case, add borrower
+            readiness information, nominate a provider, open a deal room, request an optional professional service,
+            or authorize delivery, Furlong collects only what that chosen workflow requires and states the purpose at collection.
           </p>
-        </section>
+          </div>
+        </details>
       )}
 
       {/* Tailored community bridge (founder direction 2026-07-20): the report's
@@ -4820,20 +4772,6 @@ export function PropertyEvaluationWorkspace({
           </section>
         );
       })()}
-
-      {/* Bound-edition reservation (ALPHA "mock the desire", founder direction
-          2026-07-20): a physical bound edition of this ledger is a future Guild
-          benefit; this only measures who wants one. Waitlist signal — no
-          payment, no shipping, no PII on the anonymous surface. */}
-      {!deepView && (
-        <BoundEditionReserve
-          propertyId={context.propertyId ?? context.title}
-          title={context.title}
-          location={context.location}
-          propertyType={workspaceProfile.label}
-          lane={chartVariant}
-        />
-      )}
 
       {/* Switch-property moved from the page top to a quiet, collapsed rail at
           the end (redesign Phase 1): the visitor came to evaluate THIS

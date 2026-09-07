@@ -91,8 +91,7 @@ export default function CommunityPage() {
           Owners, operators, and the people who fund them — one guild.
         </h1>
         <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.65, color: "#c8d6ea", maxWidth: 640 }}>
-          Furlong is free to explore, and always will be. The Guild is the next step for people who want to go
-          deeper — together, and looking out for each other. It is being built right now.
+          Furlong&apos;s core property analysis, financing readiness, provider comparison, and authorized case-room handoff are free to the customer. The Guild is separate: an optional community, archival, and professional-services layer for people who want to go deeper together. It is being built right now.
         </p>
       </section>
 
@@ -137,8 +136,9 @@ export default function CommunityPage() {
         </span>
         <p style={{ margin: 0, fontSize: 14, lineHeight: 1.65, color: "#4a3d1e" }}>
           There is no sign-up yet, and we are not quoting prices. The Guild takes shape once our founders and
-          counsel finalize it — and when it opens, everything you already use on Furlong carries forward
-          unchanged. Nothing you explore today ever costs you anything.
+          counsel finalize it. Membership can never improve provider ranking, unlock financing eligibility, buy
+          faster credit treatment, or gate the core Furlong case-room handoff. Furlong takes no success fee,
+          transaction percentage, referral fee, or pay-to-rank payment from the financing outcome.
         </p>
       </section>
     </main>

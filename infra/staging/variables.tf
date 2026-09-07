@@ -217,6 +217,17 @@ variable "core_image" {
   }
 }
 
+variable "core_revision_name" {
+  description = "Explicit unique Cloud Run revision name for a governed candidate deployment."
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.core_revision_name == null || can(regex("^furlong-core-[a-z0-9-]{1,49}$", var.core_revision_name))
+    error_message = "core_revision_name must be null or a valid unique furlong-core-* revision name."
+  }
+}
+
 variable "migrator_image" {
   description = "Digest-pinned image ref for the furlong-db-migrate Job. Empty = job not created."
   type        = string

@@ -30,13 +30,8 @@ RUN printf 'DatabaseDirectory /var/lib/clamav\nTCPSocket 3310\nTCPAddr 127.0.0.1
 # utilities, freshclam, a shell, and the package manager do not cross this line.
 RUN lddtree -l /usr/sbin/clamd | sort -u \
   | while IFS= read -r file; do \
-      case "$file" in \
-        */libc.so.6|*/libm.so.6|*/libpthread.so.0|*/libdl.so.2|*/librt.so.1|*/libresolv.so.2|*/ld-linux-x86-64.so.2|*/libssl.so.3|*/libcrypto.so.3|*/libexpat.so.1) continue ;; \
-        /lib/*) destination="/usr$file" ;; \
-        *) destination="$file" ;; \
-      esac; \
-      mkdir -p "/scanner-rootfs$(dirname "$destination")"; \
-      cp -L "$file" "/scanner-rootfs$destination"; \
+      mkdir -p "/scanner-rootfs$(dirname "$file")"; \
+      cp -L "$file" "/scanner-rootfs$file"; \
     done
 
 FROM cgr.dev/chainguard/python@sha256:1f37785e5cdb70151f36aaa15e1e3cef4571424dbefbf4b0d8a9222535cb13ff

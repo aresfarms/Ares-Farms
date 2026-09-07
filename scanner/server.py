@@ -92,7 +92,14 @@ if __name__ == "__main__":
     # Distroless has no shell or process supervisor; start clamd directly and
     # refuse to serve until the baked signature database is loaded.
     clamd = subprocess.Popen(
-        ["/usr/sbin/clamd"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        [
+            "/opt/clamav-root/lib64/ld-linux-x86-64.so.2",
+            "--library-path",
+            "/opt/clamav-root/lib/x86_64-linux-gnu:/opt/clamav-root/usr/lib/x86_64-linux-gnu:/opt/clamav-root/lib64:/opt/clamav-root/usr/lib64",
+            "/opt/clamav-root/usr/sbin/clamd",
+        ],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     ready = False
     for _ in range(120):

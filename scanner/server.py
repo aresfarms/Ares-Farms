@@ -89,17 +89,18 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    # Distroless has no shell or process supervisor; start clamd directly and
-    # refuse to serve until the baked signature database is loaded.
+    # The minimal image has no shell or process supervisor; start clamd through
+    # its isolated loader and refuse service until the baked database is ready.
     clamd = subprocess.Popen(
         [
             "/opt/clamav-root/lib64/ld-linux-x86-64.so.2",
             "--library-path",
-            "/opt/clamav-root/lib/x86_64-linux-gnu:/opt/clamav-root/usr/lib/x86_64-linux-gnu:/opt/clamav-root/lib64:/opt/clamav-root/usr/lib64",
+            "/opt/clamav-root/usr/local/lib:/opt/clamav-root/usr/local/lib/x86_64-linux-gnu:/opt/clamav-root/lib:/opt/clamav-root/lib/x86_64-linux-gnu:/opt/clamav-root/usr/lib:/opt/clamav-root/usr/lib/x86_64-linux-gnu:/opt/clamav-root/lib64:/opt/clamav-root/usr/lib64",
             "/opt/clamav-root/usr/sbin/clamd",
         ],
         stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+        text=True,
     )
     ready = False
     for _ in range(120):
@@ -107,7 +108,10 @@ if __name__ == "__main__":
             ready = True
             break
         if clamd.poll() is not None:
-            raise RuntimeError(f"clamd exited before readiness: {clamd.returncode}")
+            diagnostic = (clamd.stderr.read() if clamd.stderr else "").strip()[:1000]
+            raise RuntimeError(
+                f"clamd exited before readiness: {clamd.returncode}: {diagnostic}"
+            )
         time.sleep(1)
     if not ready:
         clamd.terminate()

@@ -64,8 +64,10 @@ import {
 } from "@/lib/property/residentialLenderProforma";
 import {
   buildLenderTestScorecard,
+  buildScenarioFinancingMatrix,
   evaluateProgramFit,
   type ProgramFitContext,
+  type PropertyUseScenario,
 } from "@/lib/property/financingProgramFit";
 import { modelCommercialUses } from "@/lib/property/commercialUseModel";
 import { FinanceAnalysisPanel } from "@/components/property/lanes/FinanceAnalysisPanel";
@@ -3634,8 +3636,7 @@ export function PropertyEvaluationWorkspace({
       facts?.propertyRecord?.acreageText ||
       (analysisContext.propertyType && !genericImportedType),
     );
-  const propertyClassificationAvailable =
-    automaticTypeEvidenceAvailable || profileOverride !== null;
+  const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null;
   // The county assessment record's land-use / building style IS a property-type
   // signal — it was fetched but never classified (founder-caught 2026-08-06:
   // "why can't we automatically tell what type of property this is?"). Use it
@@ -4431,6 +4432,40 @@ export function PropertyEvaluationWorkspace({
       },
       usdaRural: effectivePlaceIntelligence?.usdaRural ?? null,
     };
+    const scenarios: PropertyUseScenario[] = laneId === "commercial"
+      ? (useScreen?.uses ?? []).map((use, index) => ({
+          id: "commercial-" + index,
+          label: use.use,
+          noiAnnual: use.noiMid,
+          noiLow: use.noiLow,
+          noiHigh: use.noiHigh,
+          basis: use.use + " at the disclosed square-foot screening assumptions",
+          evidenceStatus: use.financialModelAvailable && use.noiMid != null ? "screening" : "needs-evidence",
+          timeToIncome: use.conversion?.endToEndMonths
+            ? use.conversion.endToEndMonths.low + "–" + use.conversion.endToEndMonths.high + " months"
+            : null,
+        }))
+      : laneId === "farm"
+        ? [
+            {
+              id: "farm-parcel-portfolio",
+              label: "Whole-parcel enterprise portfolio",
+              noiAnnual: farmCoverageReady ? farmPortfolio?.modeledNoiAnnual ?? null : null,
+              basis: farmPortfolio?.basis ?? "segment-aware parcel operating scenario",
+              evidenceStatus: farmCoverageReady ? "supported" : "needs-evidence",
+              timeToIncome: null,
+            },
+            ...(effectivePlaceIntelligence?.farmBestUse?.options ?? []).slice(0, 4).map((option, index) => ({
+              id: "farm-option-" + index,
+              label: option.name,
+              noiAnnual: null,
+              basis: option.economicsBasis + " economics — " + option.grossPerAcre,
+              evidenceStatus: "needs-evidence" as const,
+              timeToIncome: null,
+            })),
+          ]
+        : [];
+    const scenarioMatrix = buildScenarioFinancingMatrix({ baseContext: ctx, programs: topProgramPreview, scenarios });
     const map: Record<
       string,
       { score: number; line: string; excluded?: string }
@@ -4470,7 +4505,7 @@ export function PropertyEvaluationWorkspace({
         return m ? m[1] : null;
       })(),
     });
-    return { map, useScreen, scorecard };
+    return { map, useScreen, scorecard, scenarioMatrix };
   }, [
     workspaceProfile.id,
     effectiveListedPrice,
@@ -5580,9 +5615,7 @@ export function PropertyEvaluationWorkspace({
           Each lane owns its tabs/questions/panels; GovernedLaneChassis keeps the
           compliance substrate single-source. The type-correction picker above
           remounts the lane while all entered state stays in this parent. */}
-      {!deepView &&
-        propertyClassificationAvailable &&
-        (() => {
+      {!deepView && propertyClassificationAvailable && (() => {
           const LaneWorkspace =
             workspaceProfile.id === "farm" || workspaceProfile.id === "land"
               ? FarmLaneWorkspace
@@ -5655,6 +5688,7 @@ export function PropertyEvaluationWorkspace({
                 <FinanceAnalysisPanel
                   useScreen={financingProgramFit.useScreen}
                   scorecard={financingProgramFit.scorecard}
+                  scenarioMatrix={financingProgramFit.scenarioMatrix}
                   location={analysisContext.location}
                 />
               }

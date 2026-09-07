@@ -470,3 +470,61 @@ export function evaluateProgramFit(
   }
   return null;
 }
+
+
+export interface PropertyUseScenario {
+  id: string;
+  label: string;
+  noiAnnual: number | null;
+  noiLow?: number | null;
+  noiHigh?: number | null;
+  basis: string;
+  evidenceStatus: "supported" | "screening" | "needs-evidence";
+  timeToIncome?: string | null;
+}
+
+export interface ScenarioFinancingMatch {
+  scenario: PropertyUseScenario;
+  program: string;
+  fit: ProgramFit;
+}
+
+export interface ScenarioFinancingMatrix {
+  matches: ScenarioFinancingMatch[];
+  best: ScenarioFinancingMatch | null;
+  alternatives: ScenarioFinancingMatch[];
+  note: string;
+}
+
+export function buildScenarioFinancingMatrix(args: {
+  baseContext: ProgramFitContext;
+  programs: string[];
+  scenarios: PropertyUseScenario[];
+}): ScenarioFinancingMatrix {
+  const matches: ScenarioFinancingMatch[] = [];
+  for (const scenario of args.scenarios) {
+    for (const program of args.programs) {
+      const fit = evaluateProgramFit(program, {
+        ...args.baseContext,
+        noiAnnual: scenario.noiAnnual,
+        noiBasis: scenario.basis,
+      });
+      if (fit) matches.push({ scenario, program, fit });
+    }
+  }
+  matches.sort((a, b) => {
+    const evidenceA = a.scenario.evidenceStatus === "supported" ? 2 : a.scenario.evidenceStatus === "screening" ? 1 : 0;
+    const evidenceB = b.scenario.evidenceStatus === "supported" ? 2 : b.scenario.evidenceStatus === "screening" ? 1 : 0;
+    const executableA = a.fit.excluded ? -1 : a.fit.score;
+    const executableB = b.fit.excluded ? -1 : b.fit.score;
+    return evidenceB - evidenceA || executableB - executableA;
+  });
+  const viable = matches.filter((match) => !match.fit.excluded && match.scenario.noiAnnual != null);
+  return {
+    matches,
+    best: viable[0] ?? null,
+    alternatives: viable.slice(1, 4),
+    note:
+      "Furlong ranks the supported property-use and financing combination that appears most executable on the property's own evidence. This is an advisory screen, not a financing approval, closing assurance, or promise of keys.",
+  };
+}

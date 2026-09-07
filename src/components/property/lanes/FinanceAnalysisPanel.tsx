@@ -13,7 +13,7 @@
  */
 
 import type { CommercialUseScreen } from "@/lib/property/commercialUseModel";
-import type { LenderTest } from "@/lib/property/financingProgramFit";
+import type { LenderTest, ScenarioFinancingMatrix } from "@/lib/property/financingProgramFit";
 import { OperatingModelWorkbench } from "@/components/property/OperatingModelWorkbench";
 
 const card = { background: "#fff", border: "1px solid #E5E0D5", borderRadius: 14, padding: "16px 18px" } as const;
@@ -30,15 +30,55 @@ const monthRange = (r: { low: number; high: number }) => r.low === r.high ? `${r
 export function FinanceAnalysisPanel({
   useScreen,
   scorecard,
+  scenarioMatrix,
   location,
 }: {
   useScreen: CommercialUseScreen | null;
   scorecard: LenderTest[] | null;
+  scenarioMatrix: ScenarioFinancingMatrix;
   location?: string | null;
 }) {
-  if (!useScreen && !scorecard) return null;
+  if (!useScreen && !scorecard && scenarioMatrix.matches.length === 0) return null;
   return (
     <>
+      {scenarioMatrix.matches.length > 0 && (
+        <section style={{ ...card, display: "grid", gap: 10 }} aria-label="Property use and financing comparison">
+          <span style={{ fontSize: 10.5, fontWeight: 850, letterSpacing: ".14em", textTransform: "uppercase", color: "#1C4532" }}>
+            Best property plan × financing path
+          </span>
+          {scenarioMatrix.best ? (
+            <p style={{ margin: 0, color: "#1C2B45", fontSize: 13.5, lineHeight: 1.6 }}>
+              <strong>Strongest supported combination: {scenarioMatrix.best.scenario.label} with {scenarioMatrix.best.program}.</strong>{" "}
+              {scenarioMatrix.best.fit.line}
+            </p>
+          ) : (
+            <p style={{ margin: 0, color: "#5A6172", fontSize: 13, lineHeight: 1.6 }}>
+              Furlong found possible property uses and financing programs, but cannot rank a closing path until the missing acreage, operating-income, cost, market, or use evidence is supplied.
+            </p>
+          )}
+          {scenarioMatrix.alternatives.length > 0 && (
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ borderCollapse: "collapse", width: "100%", fontSize: 12 }}>
+                <thead><tr style={{ textAlign: "left", color: "#6B7280" }}>
+                  <th style={{ padding: "6px 8px", borderBottom: "1px solid #E5E0D5" }}>Property-use option</th>
+                  <th style={{ padding: "6px 8px", borderBottom: "1px solid #E5E0D5" }}>Financing path</th>
+                  <th style={{ padding: "6px 8px", borderBottom: "1px solid #E5E0D5" }}>Evidence</th>
+                  <th style={{ padding: "6px 8px", borderBottom: "1px solid #E5E0D5" }}>Time to income</th>
+                </tr></thead>
+                <tbody>{[scenarioMatrix.best, ...scenarioMatrix.alternatives].filter(Boolean).map((match) => match && (
+                  <tr key={match.scenario.id + match.program}>
+                    <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4", fontWeight: 700 }}>{match.scenario.label}</td>
+                    <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4" }}>{match.program}</td>
+                    <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4" }}>{match.scenario.evidenceStatus}</td>
+                    <td style={{ padding: "6px 8px", borderBottom: "1px solid #F0EDE4" }}>{match.scenario.timeToIncome ?? "Not yet supported"}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          )}
+          <p style={{ margin: 0, color: "#6B7280", fontSize: 11, lineHeight: 1.55 }}>{scenarioMatrix.note}</p>
+        </section>
+      )}
       {useScreen && (
         <section style={{ ...card, display: "grid", gap: 10 }} aria-label="Best-use income screen">
           <span style={{ fontSize: 10.5, fontWeight: 850, letterSpacing: ".14em", textTransform: "uppercase", color: "#8F6E1F" }}>

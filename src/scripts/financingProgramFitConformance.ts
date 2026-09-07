@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
 import {
+  buildScenarioFinancingMatrix,
   evaluateProgramFit,
   type ProgramFitContext,
 } from "@/lib/property/financingProgramFit";
@@ -74,6 +75,18 @@ assert.match(
   /exceeds the FSA direct loan limit/i,
 );
 
+const matrix = buildScenarioFinancingMatrix({
+  baseContext: base,
+  programs: ["USDA Business & Industry financing", "SBA 504 financing", "FSA direct farm ownership financing"],
+  scenarios: [
+    { id: "supported", label: "Verified whole-parcel plan", noiAnnual: 80_000, basis: "verified operating evidence", evidenceStatus: "supported" },
+    { id: "speculative", label: "Unverified specialty crop", noiAnnual: 200_000, basis: "unverified customer idea", evidenceStatus: "needs-evidence" },
+  ],
+});
+assert.equal(matrix.best?.scenario.id, "supported", "Supported economics must outrank a larger but unverified profitability claim");
+assert.equal(matrix.best?.program, "FSA direct farm ownership financing", "The strongest executable program must lead without agency preference");
+assert.match(matrix.note, /not a financing approval, closing assurance, or promise of keys/i);
+
 console.log(
   JSON.stringify(
     {
@@ -83,6 +96,9 @@ console.log(
       fsaMayLeadWhenStrongest: true,
       usdaAndSbaFarmProjectPathsEvaluated: true,
       ruralHousingRequiresConfirmedResidentialUse: true,
+      profitabilityFinancingMatrix: true,
+      supportedEvidenceOutranksSpeculativeRevenue: true,
+      noClosingOrKeysGuarantee: true,
     },
     null,
     2,

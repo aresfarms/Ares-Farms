@@ -45,6 +45,9 @@ FROM node:24.15.0-bookworm-slim AS builder
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# The 247-route production typecheck exceeds Node's default ~2 GiB heap in
+# Cloud Build. This applies only to the builder stage; runtime memory is unchanged.
+ENV NODE_OPTIONS=--max-old-space-size=4096
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Defense in depth: even though .dockerignore keeps .env* out of the context,

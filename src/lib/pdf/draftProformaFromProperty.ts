@@ -268,15 +268,15 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
           ? `USDA/FSA farm-ownership is the property/program screening lane for an agricultural acquisition${where ? ` in ${where}` : ""}: purpose-built for farm real estate, ${AMORT_YEARS}-year terms, and the published direct rate used in the debt-service model. Furlong's ranking remains property/project-only; the selected provider performs any borrower underwriting required for approval.`
           : `SBA 7(a) is a property/program screening lane for an owner-operated business acquisition${where ? ` in ${where}` : ""}. Furlong's ranking remains property/project-only; the selected provider performs any borrower/business underwriting required for approval.`,
       eligibilityNarrative:
-        `Property/project screening only: the figures in Parts I and IV come from the ${propertyCount > 1 ? `${propertyCount} included properties'` : "property's"} verified record${propertyCount > 1 ? "s" : ""}, county economics, and modeled enterprise income.${unmodeledIncomeNote} Personal credit, income, DTI, assets and liquidity do not alter Furlong's nonresidential property/program ranking. The selected provider separately determines borrower/business underwriting, program eligibility and approval — this DRAFT makes no eligibility finding.`,
+        `Property/project screening only: the figures in Parts I and IV come from the ${propertyCount > 1 ? `${propertyCount} included properties'` : "property's"} entered record${propertyCount > 1 ? "s" : ""} and explicitly supplied net-income scenarios; they are not automatically verified market or operating evidence.${unmodeledIncomeNote} Personal credit, income, DTI, assets and liquidity do not alter Furlong's nonresidential property/program ranking. The selected provider separately determines borrower/business underwriting, program eligibility and approval — this DRAFT makes no eligibility finding.`,
     },
     ...(args.lane === "B"
       ? { moduleB: { countyOffice: args.county ? `${args.county}${/county/i.test(args.county) ? "" : " County"} USDA Service Center` : "County USDA Service Center (identified from the parcel county)" } }
       : {}),
     partIV: {
       twoCase: {
-        revenue: { conservative: dollars(consNoi), stabilized: dollars(stabNoi) },
-        opex: { conservative: "Netted in modeled NOI", stabilized: "Netted in modeled NOI" },
+        revenue: { conservative: "Gross revenue evidence pending — supplied figures are net income", stabilized: "Gross revenue evidence pending — supplied figures are net income" },
+        opex: { conservative: "Itemized operating expenses pending", stabilized: "Itemized operating expenses pending" },
         noi: { conservative: dollars(consNoi), stabilized: dollars(stabNoi) },
         margins: { conservative: "NOI-modeled", stabilized: "NOI-modeled" },
         debtService: annualDebtService != null ? dollars(annualDebtService) : "Requires acquisition price + rate",

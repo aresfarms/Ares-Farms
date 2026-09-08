@@ -76,6 +76,8 @@ assert(commercial.uses.every(use=>use.noiMid==null&&use.dscr==null));
 assert.equal(commercial.bestSupportedUse,null);
 const draftArgs={propertyTitle:"Fixture",exactAddress:null,county:null,state:"MD",lane:"B" as const,generationDate:"2026-09-08",acquisitionPrice:400000,acreage:59.34,fsaRatePct:6,valuationNote:"Fixture asking price",revenueUnits:[]};
 const blankDraft=buildDraftProformaInput(draftArgs);
+assert.match(blankDraft.partIV.twoCase.revenue.conservative,/Gross revenue evidence pending/);
+assert.match(blankDraft.partIV.twoCase.opex.conservative,/Itemized operating expenses pending/);
 assert.equal(blankDraft.partIV.twoCase.dscrStandalone.conservative,"Operating evidence pending");
 const missingPrice=buildDraftProformaInput({...draftArgs,acquisitionPrice:null,additionalProperties:[{title:"Other",location:null,price:200000}]});
 assert.match(missingPrice.partIV.twoCase.debtService,/Requires acquisition price/);

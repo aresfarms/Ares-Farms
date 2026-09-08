@@ -6,8 +6,8 @@
   "sourceBaseline": "cc46a1ceeaad1b0ec8e51441c4a490ae44472962",
   "answerVersion": "furlong-answer-v1.0.0",
   "exportVersion": "furlong-answer-export-v1.0.0",
-  "status": "source-implemented-local-verification",
-  "cloudDeployment": false,
+  "status": "controlled-testing-deployed",
+  "cloudDeployment": true,
   "ordinaryTrafficPromoted": false,
   "schemaChanges": false,
   "coreCustomerFees": false,
@@ -21,5 +21,12 @@
   "securityCertified": false,
   "stuartAccessChanged": false,
   "paidOrganizationalAdoptionVerified": false,
-  "proof": "npm run verify:customer-experience"
+  "proof": "npm run verify:customer-experience",
+  "cloudBuild": "11d2eadf-3096-4dd6-8b5b-6a5cc3a05d54",
+  "implementationCommit": "bc39e72f57c41365ea72a797db6d75382054afe9",
+  "testingRevision": "furlong-core-r7-answer-0908",
+  "testingUrl": "https://testing---furlong-core-mwei3cj3jq-uc.a.run.app",
+  "image": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:a871d3f6dcfd7f4d614043bcb4c8e18d9586f44ab58d417822a016ba0591ba28",
+  "coreScanReportedVulnerabilities": 0,
+  "liveEndToEndCertification": false
 }

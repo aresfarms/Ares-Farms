@@ -101,7 +101,7 @@
     "releaseMirror": "docs/customer-experience-release.json",
     "answerVersion": "furlong-answer-v1.0.0",
     "exportVersion": "furlong-answer-export-v1.0.0",
-    "status": "source-implemented-local-verification",
+    "status": "controlled-testing-deployed",
     "providerSharingOnSave": false,
     "assessmentFallback": false,
     "cloudCertification": false

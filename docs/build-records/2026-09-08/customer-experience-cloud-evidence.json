@@ -1,0 +1,112 @@
+{
+  "build": {
+    "finishTime": "2026-09-08T05:07:03.068033Z",
+    "id": "11d2eadf-3096-4dd6-8b5b-6a5cc3a05d54",
+    "results": {
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/furlong-staging-499102/locations/us-central1/repositories/furlong/packages/furlong-core/versions/sha256:a871d3f6dcfd7f4d614043bcb4c8e18d9586f44ab58d417822a016ba0591ba28",
+          "digest": "sha256:a871d3f6dcfd7f4d614043bcb4c8e18d9586f44ab58d417822a016ba0591ba28",
+          "name": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core:r7-answer-0908",
+          "pushTiming": {
+            "endTime": "2026-09-08T05:06:49.751074410Z",
+            "startTime": "2026-09-08T05:06:39.058742546Z"
+          }
+        },
+        {
+          "artifactRegistryPackage": "projects/furlong-staging-499102/locations/us-central1/repositories/furlong/packages/furlong-db-migrate/versions/sha256:d64d993199be3e800b24323993b5414e339096b506c38df54de67f935ff60f2e",
+          "digest": "sha256:d64d993199be3e800b24323993b5414e339096b506c38df54de67f935ff60f2e",
+          "name": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-db-migrate:r7-answer-0908",
+          "pushTiming": {
+            "endTime": "2026-09-08T05:06:51.381332401Z",
+            "startTime": "2026-09-08T05:06:49.751161999Z"
+          }
+        },
+        {
+          "artifactRegistryPackage": "projects/furlong-staging-499102/locations/us-central1/repositories/furlong/packages/furlong-scanner/versions/sha256:e9f1274981d9bc62008dd1b742549bd8bf9425ea8d56118be8ba300c3d682f75",
+          "digest": "sha256:e9f1274981d9bc62008dd1b742549bd8bf9425ea8d56118be8ba300c3d682f75",
+          "name": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-scanner:r7-answer-0908",
+          "pushTiming": {
+            "endTime": "2026-09-08T05:07:02.662233821Z",
+            "startTime": "2026-09-08T05:06:51.381454649Z"
+          }
+        }
+      ]
+    },
+    "status": "SUCCESS"
+  },
+  "scan": {
+    "done": true,
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.ondemandscanning.v1.AnalyzePackagesMetadata",
+      "createTime": "2026-09-08T05:09:16.652425Z",
+      "resourceUri": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:a871d3f6dcfd7f4d614043bcb4c8e18d9586f44ab58d417822a016ba0591ba28"
+    },
+    "name": "projects/furlong-staging-499102/locations/us/operations/4786cdac-ad70-4333-9105-e9017faa67d1",
+    "response": {
+      "@type": "type.googleapis.com/google.cloud.ondemandscanning.v1.AnalyzePackagesResponse",
+      "scan": "projects/furlong-staging-499102/locations/us/scans/539b4d68-a0f9-4ca4-9e1d-cacb0445537d"
+    }
+  },
+  "vulnerabilities": [],
+  "attestationValidated": true,
+  "before": {
+    "status": {
+      "latestReadyRevisionName": "furlong-core-r7-finance-0908",
+      "traffic": [
+        {
+          "revisionName": "furlong-core-r7-finance-0908",
+          "tag": "testing",
+          "url": "https://testing---furlong-core-mwei3cj3jq-uc.a.run.app"
+        },
+        {
+          "percent": 100,
+          "revisionName": "furlong-core-test-38a9b36"
+        }
+      ]
+    }
+  },
+  "after": {
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/binary-authorization": "default",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "572.0.0",
+        "run.googleapis.com/iap-enabled": "true",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/ingress-status": "all",
+        "run.googleapis.com/maxScale": "20",
+        "run.googleapis.com/operation-id": "d578b0ff-aa9a-46a8-9480-b2b58cd74ccb",
+        "run.googleapis.com/urls": "[\"https://furlong-core-859763772114.us-central1.run.app\",\"https://furlong-core-mwei3cj3jq-uc.a.run.app\"]",
+        "serving.knative.dev/creator": "chudson@aresfarmsinc.com",
+        "serving.knative.dev/lastModifier": "chudson@aresfarmsinc.com"
+      }
+    },
+    "spec": {
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "image": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:a871d3f6dcfd7f4d614043bcb4c8e18d9586f44ab58d417822a016ba0591ba28"
+            }
+          ]
+        }
+      }
+    },
+    "status": {
+      "latestReadyRevisionName": "furlong-core-r7-answer-0908",
+      "traffic": [
+        {
+          "revisionName": "furlong-core-r7-answer-0908",
+          "tag": "testing",
+          "url": "https://testing---furlong-core-mwei3cj3jq-uc.a.run.app"
+        },
+        {
+          "percent": 100,
+          "revisionName": "furlong-core-test-38a9b36"
+        }
+      ]
+    }
+  },
+  "liveEndToEndCertification": false
+}

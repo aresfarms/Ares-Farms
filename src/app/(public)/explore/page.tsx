@@ -350,7 +350,7 @@ export default async function ExplorePage({
   }
 
   // Financial & Capital — learn how financing works, see public rate context,
-  // then submit a deal into the Furlong Capital Desk. External handoff remains
+  // then create a private Furlong financing case. External handoff remains
   // separately consented/certified. Purple accent. Facilitation only — never a credit decision.
   if (selected && selected.slug === "financing-capital") {
     return (
@@ -364,9 +364,14 @@ export default async function ExplorePage({
               {selected.label}
             </h1>
             <p style={{ margin: 0, fontSize: 16, color: "#4d596d", lineHeight: 1.6, maxWidth: 640 }}>
-              The capital side of every property decision — learn the programs and see current rate context free, then bring your deal to the Furlong Capital Desk when you&apos;re ready.
+              The capital side of every property decision — learn the programs and see current rate context free, then build one readiness file and compare source-verified provider credit boxes when you&apos;re ready.
             </p>
           </header>
+          <section style={{ border: "1px solid #d8d5f2", background: "#f7f6ff", borderRadius: 14, padding: "16px 18px", display: "grid", gap: 8 }}>
+            <strong style={{ color: "#403a8f", fontSize: 16 }}>Provider fit without paid ranking or silent submission</strong>
+            <p style={{ margin: 0, color: "#4d596d", lineHeight: 1.6, fontSize: 14 }}>Furlong only presents a provider as a transaction fit after the provider is active for matching and its published credit box is source-verified. Compensation and affiliation do not increase score or rank. Comparing a provider sends nothing.</p>
+            <Link href="/provider-compare" style={{ justifySelf: "start", color: "#534AB7", fontSize: 13.5, fontWeight: 800, textDecoration: "none" }}>How verified provider comparison works →</Link>
+          </section>
           <FinancingLaneSections />
           <CommunityCta />
           <Disclosures variant="full" />
@@ -476,8 +481,7 @@ export default async function ExplorePage({
             <section aria-label="Providers in this lane" style={{ display: "grid", gap: 12 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 800, color: theme.ink }}>Providers in this lane</h2>
               <p style={{ margin: 0, fontSize: 13, ...muted }}>
-                Independent, licensed companies — each a separate business that pays a flat license fee to be
-                listed. Furlong takes no referral fee and submits none of your information.
+                Independent companies shown under their own licenses and disclosures. Institutional payments never buy public inclusion, a better rank, a lead, or access to your file. Furlong takes no referral fee and submits none of your information.
               </p>
               <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 10 }}>
                 {canonicalProviderAuthority.forLane(selected.slug).map((p) => (

@@ -107,6 +107,14 @@ const volumeViConsolidationRequirementIds = [
   "NO-CAPABILITY-DRIFT-001",
 ] as const;
 
+const septemberProductCoherenceRequirementIds = [
+  "FURLONG-CUSTOMER-RELATIONSHIP-001",
+  "CAPITAL-NETWORK-NEUTRALITY-001",
+  "BORROWER-CORE-FREE-001",
+  "CASE-ROOM-HANDOFF-001",
+  "PROPERTY-BEST-USE-EVIDENCE-001",
+] as const;
+
 const updatedMasterVolumeSources = [
   "Furlong_Master_Volume_Series_Unified_TOC.pdf",
   "Furlong_Volume_VI_Source_Intelligence_Integration_Master.pdf",
@@ -200,6 +208,16 @@ function main() {
       Boolean(matrix.requirements[requirementId]),
     ),
     "Requirement matrix must include Volume VI consolidation and build-conformance doctrine IDs.",
+  );
+  assert(
+    septemberProductCoherenceRequirementIds.every((requirementId) =>
+      Boolean(matrix.requirements[requirementId])
+    ),
+    "Requirement matrix must include the September 2026 customer-platform/economics amendment controls."
+  );
+  assert(
+    matrix.sourceDocuments.includes("MASTER_VOLUME_AMENDMENT_CUSTOMER_PLATFORM_ECONOMICS_2026-09-08.md"),
+    "Requirement matrix must reference the active September 2026 customer-platform/economics amendment."
   );
 
   for (const [requirementId, requirement] of requirements) {

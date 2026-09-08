@@ -54,8 +54,10 @@ const verified = matchCapitalProvider(deal, base);
 const unverified = matchCapitalProvider(deal, { ...base, creditBoxSourceRefs: [], creditBoxVerifiedAt: null });
 assert(verified.eligible, "A matching verified provider should be eligible on non-personal fit dimensions.");
 assert(verified.score === unverified.score, "Published-box verification status must not create a paid/administrative ranking advantage.");
+assert(!unverified.eligible, "An unverified published credit box must fail closed instead of appearing as a transaction fit.");
+assert(unverified.blockers.some((reason) => reason.includes("not source-verified")), "Unverified credit-box exclusion must be explained.");
 assert(verified.reasons.some((reason) => reason.includes("source-verified")), "Verified published-box evidence must be explained.");
-assert(unverified.reasons.some((reason) => reason.includes("still being completed")), "Incomplete published-box evidence must be disclosed.");
+assert(unverified.reasons.some((reason) => reason.includes("will not present this provider as a transaction fit")), "Incomplete published-box evidence must be disclosed.");
 for (const token of ["published_credit_box", "collateral_policy", "environmental_requirements", "credit_box_source_refs", "credit_box_verified_at"]) {
   assert(migration.includes(token), `Published-box migration missing ${token}.`);
 }
@@ -76,4 +78,5 @@ console.log(JSON.stringify({
   personalCreditAuthorityRemainsProvider: true,
   publishedExpectationsSeparatedFromMeasuredHistory: true,
   rankingIndependentOfVerificationAdministration: true,
+  verifiedPublishedBoxRequiredForFit: true,
 }, null, 2));

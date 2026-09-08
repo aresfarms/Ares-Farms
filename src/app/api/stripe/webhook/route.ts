@@ -780,8 +780,6 @@ export async function POST(req: Request) {
     });
 
     let governedPaymentRecord: Awaited<ReturnType<typeof recordGovernedPayment>> | null = null;
-    let moduleAttributionRecord: Awaited<ReturnType<typeof recordModuleRevenueAttribution>> | null = null;
-    let governedRefundRecord: Awaited<ReturnType<typeof recordObservedProviderRefund>> | null = null;
     if (!syntheticFixtureContext && event.type === "checkout.session.completed") {
       const checkoutSession = stripeEvent.data.object as Stripe.Checkout.Session;
       const scopeAcceptanceId = checkoutSession.metadata?.scopeAcceptanceId;
@@ -814,7 +812,7 @@ export async function POST(req: Request) {
           liveCapture: livePaymentConnector,
           traceId,
         });
-        moduleAttributionRecord = await recordModuleRevenueAttribution({
+        await recordModuleRevenueAttribution({
           paymentRecordId: governedPaymentRecord.paymentRecordId,
           moduleId: moduleAttribution,
           serviceCode: requestedPlan ?? "professional-service",
@@ -836,7 +834,7 @@ export async function POST(req: Request) {
       const providerPaymentRef =
         typeof charge.payment_intent === "string" ? charge.payment_intent : null;
       if (providerPaymentRef) {
-        governedRefundRecord = await recordObservedProviderRefund({
+        await recordObservedProviderRefund({
           providerPaymentRef,
           providerRefundRef: event.id ?? traceId,
           amount: ((charge.amount_refunded ?? 0) / 100).toFixed(2),

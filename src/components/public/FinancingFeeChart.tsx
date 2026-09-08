@@ -10,7 +10,7 @@ import { accentForLane } from "@/lib/property/laneThemes";
 
 /**
  * FinancingFeeChart — the Financial module's fee chart. Leads plainly with
- * the customer-free Capital Desk workflow first, then shows the bright line
+ * the customer-free financing workflow first, then shows the bright line
  * separating optional professional/archival engagements from financing access. Server component.
  *
  * Master Volume Governance: FACILITATION-001 (loan is the lender's; free to
@@ -126,7 +126,7 @@ export function FinancingFeeChart() {
 
       <div style={{ display: "grid", gap: 10 }}>
         <span style={{ fontSize: 11.5, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: PURPLE }}>
-          What the Furlong Capital Desk can coordinate
+          What Furlong can coordinate
         </span>
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {FINANCING_OFFERINGS.map((o) => (

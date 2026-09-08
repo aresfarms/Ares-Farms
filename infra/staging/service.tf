@@ -39,7 +39,7 @@ resource "google_cloud_run_v2_service" "core" {
   # so Terraform does not manufacture a perpetual service update/IAP replay;
   # every material service field remains governed by this resource.
   lifecycle {
-    ignore_changes = [client, client_version]
+    ignore_changes = [client, client_version, template[0].revision]
 
     precondition {
       condition = var.deployment_environment != "production" || (

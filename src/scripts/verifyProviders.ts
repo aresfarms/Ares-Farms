@@ -1,10 +1,10 @@
 /**
  * verify:providers — neutral-directory / license-to-operate guardrails.
  *
- *   MODEL      Each Provider Page states the license-to-operate model verbatim
- *              (pays a license fee · no referral fee · no commission · no data
- *              sale/submission · providers pay to belong) — and NEVER publishes
- *              the fee amount.
+ *   MODEL      Each Provider Page states the current neutral institutional-economics
+ *              model: institutions may pay for infrastructure/integrations/support,
+ *              but payment never buys listing, rank, leads, or customer-file access;
+ *              Furlong takes no referral fee or deal commission and passes no data.
  *   SEPARATION Provider is marked a separate company; the provider's claims are
  *              clearly attributed to the provider ("not Furlong's"), and Furlong's
  *              own <Disclosures> still render.
@@ -28,11 +28,10 @@ const note = (m: string) => fail.push(m);
 const read = (rel: string) => { try { return readFileSync(join(ROOT, rel), "utf8"); } catch { return ""; } };
 
 const MODEL_PHRASES = [
-  "pays Furlong a license fee",
-  "does not take referral fees",
-  "does not earn a commission on your deal",
+  "may pay Furlong for institutional platform infrastructure, integrations, or support",
+  "never buys this listing, a better rank, a lead, or access to your file",
+  "does not take referral fees or a commission on your deal",
   "does not sell or submit your information",
-  "Providers pay to belong",
 ];
 
 // ── Static: registry + page source ───────────────────────────────────────────
@@ -88,7 +87,7 @@ async function main(): Promise<void> {
     for (const f of fail) console.error(`    ✗ ${f}`);
     process.exit(1);
   }
-  console.log("\n✓  verify:providers PASS — license model stated (no fee amount), providers separate + self-attributed, link-out only (no data submission).");
+  console.log("\n✓  verify:providers PASS — institutional economics stated (no paid rank/lead/file access), providers separate + self-attributed, link-out only (no data submission).");
   process.exit(0);
 }
 

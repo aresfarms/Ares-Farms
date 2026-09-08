@@ -111,6 +111,9 @@ export function matchCapitalProvider(
   if (provider.status !== "CERTIFIED_ACTIVE" || !provider.matchingEnabled) {
     blockers.push("Provider is not active for automatic matching.");
   }
+  if (!provider.creditBoxVerifiedAt || provider.creditBoxSourceRefs.length === 0) {
+    blockers.push("Published provider credit box is not source-verified yet.");
+  }
   if (!deal.state || !has(provider.states, deal.state)) {
     blockers.push("Declared geography does not cover this deal.");
   } else {
@@ -151,7 +154,7 @@ export function matchCapitalProvider(
   if (provider.creditBoxVerifiedAt && provider.creditBoxSourceRefs.length > 0) {
     reasons.push("Published provider box is source-verified by Furlong; personal credit criteria remain provider-reviewed, not Furlong-decided.");
   } else {
-    reasons.push("Provider program appetite is verified, but the full published credit-box evidence is still being completed.");
+    reasons.push("Provider program appetite may be recorded, but Furlong will not present this provider as a transaction fit until the published credit box is source-verified.");
   }
 
   return {

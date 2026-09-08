@@ -5,7 +5,6 @@ import { buildDraftProformaInput, type DraftProformaPropertyArgs } from "@/lib/p
 import { buildUltimateProformaDocument, evaluateGenerationGate } from "@/lib/pdf/ultimateProformaTemplate";
 import { generateLoanProformaPdf } from "@/lib/pdf/generateLoanProformaPdf";
 import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
-import { STATE_FARMLAND, STATE_FARMLAND_PROVENANCE } from "@/lib/property/stateFarmlandGenerated";
 import { solveDscrCoverage, DSCR_FLOOR } from "@/lib/property/dscrCoverageSolver";
 import { commercialAlternativeUses } from "@/lib/property/commercialAlternativeUses";
 import { modelCommercialUses } from "@/lib/property/commercialUseModel";
@@ -161,9 +160,8 @@ export async function POST(req: NextRequest) {
   const fsaRatePct = num(body.fsaRatePct);
   const enteredPrice = (num(body.acquisitionPrice) ?? 0) > 0 ? num(body.acquisitionPrice) : null;
   const assessedTotal = num(body.assessedTotalValue);
-  const stateFarmland = stateCode ? STATE_FARMLAND[stateCode.toUpperCase()] : undefined;
-  let screeningPrice: number | null = enteredPrice;
-  let valuationNote: string | null = enteredPrice != null ? "Asking price / intended offer as entered; appraisal governs" : null;
+  const screeningPrice: number | null = enteredPrice;
+  const valuationNote: string | null = enteredPrice != null ? "Asking price / intended offer as entered; appraisal governs" : null;
   // Transaction price is never derived from assessment or state averages.
   // Keep the assessment available only as a tax/assessment fact. It must not
   // become the acquisition price simply because the listing price is missing.

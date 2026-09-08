@@ -143,7 +143,7 @@ export function CapitalNetworkMatches({
         <div style={{ ...panel, background: "#f8fafc" }}>
           <strong style={{ color: "#334155", fontSize: 13.5 }}>No certified provider is ready for selection yet.</strong>
           <span style={{ color: "#64748b", fontSize: 12.5, lineHeight: 1.5 }}>
-            Your case remains with the Furlong Capital Desk while the network is expanded. A candidate institution never receives your information merely because it appears in the network.
+            Your case remains private in Furlong while the verified network is expanded. A candidate institution never receives your information merely because it appears in the network.
           </span>
         </div>
       ) : (

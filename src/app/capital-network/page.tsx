@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { LENDER_NETWORK_CANDIDATES } from "@/lib/financing/lenderNetworkRegistry";
@@ -75,6 +75,33 @@ export default function CapitalNetworkConsolePage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [executionInputs, setExecutionInputs] = useState<Record<string, { outcome: string; evidenceRef: string }>>({});
   const [milestoneInputs, setMilestoneInputs] = useState<Record<string, { milestone: string; status: string }>>({});
+  const [nowMs, setNowMs] = useState(0);
+
+  useEffect(() => {
+    const refresh = () => setNowMs(Date.now());
+    refresh();
+    const timer = window.setInterval(refresh, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const operationsPulse = useMemo(() => {
+    const now = nowMs;
+    const soon = now + 72 * 60 * 60 * 1000;
+    return {
+      certifiedProviders: providers.filter((provider) => provider.status === "CERTIFIED_ACTIVE").length,
+      verifiedBoxes: providers.filter((provider) => Boolean(provider.creditBoxVerifiedAt) && Array.isArray(provider.creditBoxSourceRefs) && provider.creditBoxSourceRefs.length > 0).length,
+      dealRooms: rooms.length,
+      awaitingSubmissionPackage: rooms.filter((room) => !room.submissionCaseId).length,
+      providerAccessActive: rooms.filter((room) => room.providerAccessAllowed).length,
+      providerResponses: rooms.filter((room) => Boolean(room.providerResponseStatus)).length,
+      verifiedOutcomes: rooms.filter((room) => room.executionVerificationStatus === "VERIFIED").length,
+      expiringWithin72Hours: rooms.filter((room) => {
+        if (!room.caseRoomExpiresAt) return false;
+        const expires = Date.parse(room.caseRoomExpiresAt);
+        return Number.isFinite(expires) && expires > now && expires <= soon;
+      }).length,
+    };
+  }, [providers, rooms, nowMs]);
 
   async function loadProviders() {
     const res = await fetch("/api/capital-network/providers");
@@ -256,6 +283,23 @@ export default function CapitalNetworkConsolePage() {
     <header style={{ display: "grid", gap: 6 }}><span style={{ color: "#534AB7", fontSize: 12, fontWeight: 850, letterSpacing: "0.08em", textTransform: "uppercase" }}>Owner-controlled financing infrastructure</span><h1 style={{ margin: 0, color: "#101a2b", fontSize: 34 }}>Furlong Capital Network</h1><p style={{ margin: 0, maxWidth: 900, color: "#475569", lineHeight: 1.65 }}>One borrower case can work with many independently governed brokers and funding institutions. Providers declare their appetite; Furlong verifies them; matching remains lender-neutral; the borrower chooses; no provider sees the file until exact package consent and recipient verification.</p><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}><Link href="/capital-network/onboarding" style={{ color: "#fff", background: "#534AB7", borderRadius: 9, padding: "8px 12px", fontWeight: 800, textDecoration: "none" }}>Provider onboarding</Link><Link href="/lender-submissions" style={{ color: "#334155", border: "1px solid #cbd5e1", borderRadius: 9, padding: "8px 12px", fontWeight: 800, textDecoration: "none" }}>Submission governance</Link></div></header>
 
     <section style={{ ...card, background: "#111827", color: "#e5e7eb", borderColor: "#334155" }}><strong style={{ color: "#fff" }}>Current fail-closed posture</strong><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 8, fontSize: 12.5 }}><span>Provider application ≠ activation</span><span>Match ≠ approval</span><span>Selection ≠ data sharing</span><span>Consent ≠ credit commitment</span><span>Affiliated lender gets no scoring preference</span><span>Production delivery remains separately gated</span></div></section>
+
+    <section style={{ ...card, gap: 12 }} aria-label="Capital Network operations pulse">
+      <div><h2 style={{ margin: 0, color: "#101a2b", fontSize: 20 }}>Network operations pulse</h2><p style={{ margin: "3px 0 0", color: "#64748b", fontSize: 12.5 }}>Operational counts only — not approval, conversion, or employee-performance targets.</p></div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 8 }}>
+        {[
+          ["Certified providers", operationsPulse.certifiedProviders],
+          ["Source-verified boxes", operationsPulse.verifiedBoxes],
+          ["Deal rooms", operationsPulse.dealRooms],
+          ["Need submission package", operationsPulse.awaitingSubmissionPackage],
+          ["Provider access active", operationsPulse.providerAccessActive],
+          ["Provider responses", operationsPulse.providerResponses],
+          ["Verified outcomes", operationsPulse.verifiedOutcomes],
+          ["Expire ≤72h", operationsPulse.expiringWithin72Hours],
+        ].map(([label, value]) => <div key={String(label)} style={{ border: "1px solid #e2e8f0", borderRadius: 10, background: "#fbfcfe", padding: "11px 12px", display: "grid", gap: 3 }}><strong style={{ color: "#101a2b", fontSize: 20 }}>{String(value)}</strong><span style={{ color: "#64748b", fontSize: 11.5 }}>{String(label)}</span></div>)}
+      </div>
+      <span style={{ color: "#64748b", fontSize: 11.5, lineHeight: 1.5 }}>Use these counts to find incomplete handoffs, expiring rooms, missing provider responses, and unverified outcomes. They must not be used to pressure underwriting decisions or change provider rank.</span>
+    </section>
 
     <section style={{ display: "grid", gap: 10 }}><div><h2 style={{ margin: 0, color: "#101a2b", fontSize: 21 }}>Provider registry</h2><p style={{ margin: "3px 0 0", color: "#64748b", fontSize: 13 }}>These are actual Capital Network provider profiles, not the outreach candidate list.</p></div>{providers.length === 0 ? <div style={card}>No provider profiles yet.</div> : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))", gap: 10 }}>{providers.map((provider) => { const blocked = blockers(provider); return <article key={provider.providerId} style={card}><div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><strong style={{ color: "#101a2b" }}>{provider.organizationName}</strong><span style={{ color: provider.status === "CERTIFIED_ACTIVE" ? "#166534" : "#92400e", fontSize: 11.5, fontWeight: 800 }}>{provider.status}</span></div><span style={{ color: "#64748b", fontSize: 12 }}>{provider.providerRole} · {provider.providerType} · {provider.affiliation} · profile v{provider.profileVersion}</span><span style={{ color: "#475569", fontSize: 12.5 }}>{provider.states?.join(", ") || "No geography yet"} · {provider.programs?.join(", ") || "No programs yet"}</span><div style={{ fontSize: 11.5, color: "#64748b", lineHeight: 1.5 }}>Credential {provider.credentialStatus} · Connector {provider.connectorStatus} · Terms {provider.participationTermsStatus} · DPA {provider.dataAgreementStatus} · Comp/conflict {provider.compensationStatus}</div><div style={{ fontSize: 11.5, color: provider.creditBoxVerifiedAt ? "#166534" : "#92400e", lineHeight: 1.5 }}>Published box: {provider.creditBoxVerifiedAt ? "SOURCE VERIFIED" : Array.isArray(provider.creditBoxSourceRefs) && provider.creditBoxSourceRefs.length ? `${provider.creditBoxSourceRefs.length} source ref(s) awaiting governance verification` : "source references missing"}{provider.typicalFirstResponseDays != null ? ` · stated response ~${provider.typicalFirstResponseDays}d` : ""}{provider.typicalClosingDays != null ? ` · stated close ~${provider.typicalClosingDays}d` : ""}</div><div style={{ fontSize: 12, color: blocked.length ? "#92400e" : "#166534" }}>{blocked.length ? `Activation blockers: ${blocked.join(", ")}` : "All profile activation gates present."}</div><div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "START_DUE_DILIGENCE")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750 }}>Start diligence</button><button disabled={busy !== null || provider.creditBoxVerifiedAt != null || !Array.isArray(provider.creditBoxSourceRefs) || provider.creditBoxSourceRefs.length === 0} onClick={() => void verifyPublishedBox(provider)} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#fff7ed", color: "#9a3412" }}>Mark box sources verified</button><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "CERTIFY")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#dcfce7", color: "#166534" }}>Certify if gates pass</button><button disabled={busy !== null} onClick={() => void providerAction(provider.providerId, "SUSPEND")} style={{ border: 0, borderRadius: 8, padding: "7px 9px", fontWeight: 750, background: "#fee2e2", color: "#991b1b" }}>Suspend</button></div><span style={{ fontSize: 11.5, color: "#64748b" }}>Matching {provider.matchingEnabled ? "ON" : "OFF"} · live routing entitlement {provider.liveRoutingAllowed ? "ON" : "OFF"}</span></article>; })}</div>}</section>
 

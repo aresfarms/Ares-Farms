@@ -5,8 +5,8 @@
  * direction 2026-08-05: best use, DSCR clearance, and the lender-test
  * scorecard, on-screen). Two sections, each rendered only when its data
  * exists:
- *   - Commercial best-use income screen: modeled NOI + DSCR per candidate
- *     use at lender-shaped reference terms, best use highlighted.
+ *   - Commercial scenario income screen: modeled NOI + DSCR per candidate
+ *     use at lender-shaped reference terms, top modeled scenario highlighted.
  *   - Lender-test scorecard: which of a lender's property-side tests this
  *     property passes on paper — never an approval probability (approval is
  *     a licensed credit decision about a person; this is about the parcel).
@@ -80,9 +80,9 @@ export function FinanceAnalysisPanel({
         </section>
       )}
       {useScreen && (
-        <section style={{ ...card, display: "grid", gap: 10 }} aria-label="Best-use income screen">
+        <section style={{ ...card, display: "grid", gap: 10 }} aria-label="Modeled use income screen">
           <span style={{ fontSize: 10.5, fontWeight: 850, letterSpacing: ".14em", textTransform: "uppercase", color: "#8F6E1F" }}>
-            What this building earns best — modeled income and coverage by use
+            Modeled income and coverage by possible use
           </span>
           <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
             <div style={{ border: "1px solid #E5E0D5", borderRadius: 10, padding: "10px 12px", background: "#FAFAF8" }}>
@@ -104,9 +104,9 @@ export function FinanceAnalysisPanel({
           </div>
           {useScreen.bestUse ? (
             <p style={{ margin: 0, color: "#1C2B45", fontSize: 13.5, lineHeight: 1.6 }}>
-              <strong>Best modeled use: {useScreen.bestUse.use}</strong> — ≈{dollars(useScreen.bestUse.noiMid ?? 0)}/yr modeled NOI,
+              <strong>Top modeled scenario: {useScreen.bestUse.use}</strong> — ≈{dollars(useScreen.bestUse.noiMid ?? 0)}/yr modeled NOI,
               DSCR {useScreen.bestUse.dscr?.toFixed(2)} against the 1.25x floor at {useScreen.referenceTerms}
-              {useScreen.bestUse.clearsFloor ? " — clears on the property's own paper." : " — under the floor at the stated screening value."}
+              {useScreen.bestUse.clearsFloor ? " — clears the modeled screening floor." : " — under the floor at the stated screening value."}
             </p>
           ) : (
             <p style={{ margin: 0, color: "#5A6172", fontSize: 13, lineHeight: 1.6 }}>{useScreen.note}</p>
@@ -165,7 +165,7 @@ export function FinanceAnalysisPanel({
               </table>
             </div>
           )}
-          <p style={{ margin: 0, color: "#6B7280", fontSize: 11, lineHeight: 1.55 }}>{useScreen.note}</p>
+          <p style={{ margin: 0, color: "#6B7280", fontSize: 11, lineHeight: 1.55 }}>{useScreen.note} A top modeled scenario is not a highest-and-best-use conclusion; zoning, market demand, conversion scope, operating history, and professional review can change the ordering.</p>
         </section>
       )}
 

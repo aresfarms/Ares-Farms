@@ -12,6 +12,7 @@ import {
   type NavigatorSnapshot,
 } from "@/components/navigator/FurlongNavigator";
 import { PlaceFirstDiscovery } from "@/components/discovery/PlaceFirstDiscovery";
+import { CustomerJourneyBar } from "@/components/borrower/CustomerJourneyBar";
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { ReportTokenReturn } from "@/components/property/ReportTokenReturn";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
@@ -4927,7 +4928,7 @@ export function PropertyEvaluationWorkspace({
       const fsaRatePct = isFarmLaneDoc
         ? ownershipContext?.fsa?.ownershipDirectPct ?? null
         : ownershipContext?.rates.rate30 ?? null;
-      let revenueUnits: Array<{
+      const revenueUnits: Array<{
         unitName: string;
         unitDescription: string;
         conservativeAnnualNoi: number;
@@ -5278,6 +5279,11 @@ export function PropertyEvaluationWorkspace({
           @page { margin: 0.6in; }
         }
       `}</style>
+      {!deepView && (
+        <div className="no-print">
+          <CustomerJourneyBar current="understand" financeHref="/provider-compare" />
+        </div>
+      )}
       {/* Ship's Ledger masthead (founder direction 2026-07-20): the report opens
           like an official, stamped land ledger — emblem seal, THE LAND LEDGER
           nameplate, the parcel, and a "DATA VERIFIED" stamp. Furlong = 220 yards
@@ -6977,8 +6983,8 @@ export function PropertyEvaluationWorkspace({
           if (pf?.opportunityZone?.rural)
             rows.push({
               finding: "USDA-rural eligible ground",
-              step: "Line up the USDA loan with the licensed lending desk",
-              href: "/explore?lane=financing-capital",
+              step: "Compare verified USDA-capable providers and why they fit",
+              href: "/provider-compare",
               accent: "#534AB7",
             });
           if (pf?.opportunityZone || pf?.nmtc)
@@ -6989,15 +6995,15 @@ export function PropertyEvaluationWorkspace({
                   : pf?.opportunityZone
                     ? "Opportunity Zone tract"
                     : "NMTC low-income community tract",
-              step: "Map the capital-gains / community-lending structure with the licensed desk",
-              href: "/explore?lane=financing-capital",
+              step: "Compare verified providers for the financing structure",
+              href: "/provider-compare",
               accent: "#534AB7",
             });
           if (rows.length === 0)
             rows.push({
               finding: "Your verified results, above",
-              step: "Bring the whole picture to the licensed lending desk",
-              href: "/explore?lane=financing-capital",
+              step: "Compare verified providers whose published criteria fit",
+              href: "/provider-compare",
               accent: "#534AB7",
             });
           return (

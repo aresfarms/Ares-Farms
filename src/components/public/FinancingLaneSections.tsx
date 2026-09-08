@@ -18,7 +18,7 @@ import {
 /**
  * FinancingLaneSections — the Financial & Capital module's sections. The
  * customer learns how financing works, sees live public capital rates, then
- * submits a deal into the owner-controlled Capital Desk. A later external
+ * creates an owner-controlled financing case. A later external
  * financing handoff requires a certified recipient plus exact borrower consent.
  * Wears the financing PURPLE accent. Server component; the intake panel
  * is the one client island.
@@ -60,7 +60,7 @@ interface FinBrief {
 const FINANCING_BRIEFS: FinBrief[] = [
   {
     title: "How this works",
-    body: "You bring the deal; the Furlong Capital Desk organizes readiness, compares pathways, and identifies possible lender categories. No outside lender or broker receives the case from this intake alone, and Furlong Core does not lend, qualify, price, or approve.",
+    body: "You bring the deal; Furlong organizes readiness, compares pathways, and identifies possible provider categories. No outside lender or broker receives the case from this intake alone, and Furlong Core does not lend, qualify, price, or approve.",
   },
   {
     title: "SBA, USDA, or conventional — the quick map",
@@ -122,7 +122,7 @@ export async function FinancingLaneSections() {
             color: PURPLE,
           }}
         >
-          Furlong Capital Desk
+          Furlong financing workspace
         </span>
         <p
           style={{
@@ -135,7 +135,7 @@ export async function FinancingLaneSections() {
         >
           The capital side of every property decision. Learn how the programs
           map to your project, see current public rate context, then place the
-          deal in the Capital Desk so readiness and lender-network options can be organized before any external handoff.
+          deal in a private Furlong financing case so readiness and provider options can be organized before any external handoff.
         </p>
         <div style={cardGrid}>
           {FINANCING_BRIEFS.map((b) => (
@@ -177,10 +177,10 @@ export async function FinancingLaneSections() {
         </span>
         <div style={card}>
           <strong style={{ fontSize: 14, color: "#101a2b" }}>
-            Capital Desk first; funding institution second
+            Furlong preparation first; customer-selected provider second
           </strong>
           <span style={{ fontSize: 12.5, color: "#4d596d", lineHeight: 1.5 }}>
-            Furlong organizes the case and identifies possible institutions. Candidate lenders are not represented as partners until certification is complete. The selected funding institution performs underwriting and makes the credit decision.
+            Furlong organizes the case and can compare verified provider criteria without making a credit decision. The customer selects the recipient; the selected funding institution performs underwriting and makes the credit decision.
           </span>
         </div>
       </section>

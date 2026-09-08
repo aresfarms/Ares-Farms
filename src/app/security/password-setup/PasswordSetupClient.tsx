@@ -1,8 +1,10 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function PasswordSetupClient() {
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [message, setMessage] = useState<string | null>(null);
@@ -21,7 +23,7 @@ export default function PasswordSetupClient() {
       setMessage(body.error === "PASSWORD_ALREADY_CONFIGURED" ? "Password is already configured." : "Password setup failed.");
       setBusy(false); return;
     }
-    window.location.assign("/sign-in?callbackUrl=%2Fsecurity%2Fmfa");
+    router.push("/sign-in?callbackUrl=%2Fsecurity%2Fmfa");
   }
 
   return <form onSubmit={submit} style={{display:"grid",gap:16}}>

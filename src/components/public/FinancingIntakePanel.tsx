@@ -241,7 +241,7 @@ export function FinancingIntakePanel({
         <p
           style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}
         >
-          Your deal is recorded in the Furlong Capital Desk. Here&apos;s what happens next:
+          Your private Furlong financing case is recorded. Here&apos;s what happens next:
         </p>
         {submit.secureUploadPath && (
           <a
@@ -271,8 +271,7 @@ export function FinancingIntakePanel({
           >
             Financial statements and identification never travel by email here:
             the button opens your deal&apos;s encrypted upload channel —
-            single-purpose, expiring, and held inside Furlong&apos;s governed custody until an authorized
-            Capital Desk or later consented lender handoff. Bookmark it or return to this page;
+            single-purpose, expiring, and held inside Furlong&apos;s governed custody until authorized Furlong custody or a later consented provider handoff. Bookmark it or return to this page;
             the link stays valid for 72 hours.
           </p>
         )}
@@ -292,7 +291,7 @@ export function FinancingIntakePanel({
               fontSize: 13.5,
             }}
           >
-            📅 Schedule a Capital Desk call →
+            📅 Schedule a financing review call →
           </a>
         )}
         {submit.bookingUrl && (
@@ -353,13 +352,12 @@ export function FinancingIntakePanel({
             color: PURPLE,
           }}
         >
-          Bring your deal — the Furlong Capital Desk organizes the path
+          Bring your deal — Furlong organizes the path
         </span>
         <p
           style={{ margin: 0, fontSize: 13, color: "#3b475a", lineHeight: 1.6 }}
         >
-          Tell us what you&apos;re trying to finance. We record it in the Furlong Capital Desk,
-          organize readiness evidence, and identify appropriate lender/program candidates. Furlong Core
+          Tell us what you&apos;re trying to finance. We record it as a private Furlong financing case, organize readiness evidence, and compare appropriate program/provider candidates. Furlong Core
           does not lend, qualify, price, or approve. No lender receives your case from this intake alone;
           a live handoff requires a certified recipient and your exact consent.
         </p>
@@ -661,8 +659,7 @@ export function FinancingIntakePanel({
           style={{ marginTop: 2 }}
         />
         <span>
-          I consent to placing my request in the Furlong Capital Desk for readiness review and
-          lender-network coordination. I understand this is not a qualification, pre-approval, rate lock,
+          I consent to creating a private Furlong financing case for readiness review and provider comparison. I understand this is not a qualification, pre-approval, rate lock,
           lender commitment, or permission to send my information to an outside lender without a later governed handoff.
         </span>
       </label>

@@ -163,7 +163,7 @@ function quarterFromDate(raw?: string | null): string | null {
 
   let year: number | null = null;
   let month: number | null = null;
-  let compact = text.match(/^(\d{4})(\d{2})$/);
+  const compact = text.match(/^(\d{4})(\d{2})$/);
   if (compact) {
     year = Number(compact[1]);
     month = Number(compact[2]);

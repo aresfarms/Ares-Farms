@@ -54,7 +54,7 @@ function friendlyStatus(s: StatusView): { headline: string; detail: string } {
     s.requestType === "environmental_report_order"
       ? "the licensed PE"
       : s.routedTo === "furlong-capital-desk"
-        ? "the Furlong Capital Desk"
+        ? "your Furlong financing review"
         : "your assigned finance professional";
   const status = (s.status ?? "").toUpperCase();
   if (status.includes("PENDING") || status.includes("SUBMITTED")) {

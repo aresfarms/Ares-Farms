@@ -7,7 +7,6 @@ import {
   appendFurlongCaseEvent,
   loadFurlongCase,
   loadFurlongCaseBundle,
-  normalizeFurlongCaseStage,
   recordFurlongCaseOutcome,
   type FurlongCaseStage,
   saveFurlongCase,

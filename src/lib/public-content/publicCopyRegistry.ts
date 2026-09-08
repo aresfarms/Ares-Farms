@@ -64,11 +64,11 @@
  */
 export const HOMEPAGE_HERO = {
   brandName: "Furlong",
-  headline:  "Type in an address. See if it's worth buying — and exactly how to pay for it.",
+  headline:  "Type in an address. See what works before you buy or apply.",
   tagline:
-    "Explore a property, business or project. Understand what the evidence supports, what remains unresolved and which next steps are worth investigating.",
+    "Explore a property, business or project. See what the evidence supports, what could stop it, what remains unresolved, and which capital paths are worth testing.",
   subhead:
-    "Start with an address or a question. Core exploration is free; optional professional work is quoted separately. Saving is not sharing.",
+    "Start with an address or a question. Core exploration is free. Saving is not sharing, and comparing a financing path never sends your file to a provider.",
   trustTag:  "Explore anonymously. No account required. No hidden handoff.",
 } as const;
 
@@ -158,9 +158,9 @@ export const HOMEPAGE_MODULES = {
       title: "Financing & Capital",
       href: "/explore?lane=financing-capital",
       accent: "#534AB7",
-      lead: "Bring the deal to a licensed lender.",
+      lead: "See which capital paths actually fit.",
       body:
-        "SBA, USDA, and conventional — see how the programs map to your project, then send your deal to a licensed lender.",
+        "USDA, SBA, FSA, and conventional — compare the paths worth testing, then review source-verified providers whose published credit boxes fit the transaction. You choose who receives anything.",
       cta: "Explore financing",
     },
   ],

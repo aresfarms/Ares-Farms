@@ -13,6 +13,10 @@ locals {
   # without triggering the alert. Human operators remain explicitly enumerated.
   expected_secret_reader_pairs = [
     for pair in [
+      [google_service_account.core_runtime.email, "PLAID_CLIENT_ID"],
+      [google_service_account.core_runtime.email, "PlaidSecret"],
+      [google_service_account.core_runtime.email, "PLAID_DATA_ENCRYPTION_KEY"],
+      [google_service_account.core_runtime.email, "STRIPE_SECRET_KEY"],
       [google_service_account.core_runtime.email, "DATABASE_URL"],
       [google_service_account.core_runtime.email, "SENDGRID_API_KEY"],
       [google_service_account.core_runtime.email, "AUTH_CREDENTIAL_SHARED_SECRET"],
@@ -137,6 +141,25 @@ resource "google_project_iam_audit_config" "run" {
   }
 }
 
+resource "google_project_iam_audit_config" "iap" {
+  count = var.enable_security_observability ? 1 : 0
+
+  project = var.project_id
+  service = "iap.googleapis.com"
+
+  audit_log_config {
+    log_type = "ADMIN_READ"
+  }
+
+  audit_log_config {
+    log_type = "DATA_READ"
+  }
+
+  audit_log_config {
+    log_type = "DATA_WRITE"
+  }
+}
+
 resource "google_logging_project_bucket_config" "forensics_runtime" {
   count = var.enable_security_observability ? 1 : 0
 
@@ -191,7 +214,7 @@ resource "google_logging_project_sink" "forensics_runtime_logs" {
   project                = var.project_id
   name                   = "furlong-forensics-runtime-logs"
   destination            = "logging.googleapis.com/projects/${var.project_id}/locations/global/buckets/${google_logging_project_bucket_config.forensics_runtime[0].bucket_id}"
-  filter                 = "resource.type=\"cloud_run_revision\" AND severity>=DEFAULT"
+  filter                 = "(resource.type=\"cloud_run_revision\" AND severity>=DEFAULT) OR protoPayload.serviceName=\"iap.googleapis.com\""
   unique_writer_identity = true
 }
 
@@ -394,7 +417,7 @@ resource "google_monitoring_alert_policy" "unexpected_secret_access" {
 
   documentation {
     mime_type = "text/markdown"
-    content   = "A Secret Manager read occurred from a principal outside the expected staging runtime, migrator, or operator set. Review immediately."
+    content   = "A Secret Manager access attempt matched an unapproved principal/secret pair. Check status to distinguish successful access from denial. Approved runtime bindings are explicitly paired with individual secrets; an internal caller IP alone is not authorization. Review principal, secret resource, delegation, caller metadata and Cloud Run startup evidence. Run scripts/verifySecretAlertCoverage.mjs before releasing changed secret bindings. Do not exempt an entire runtime principal to silence this alert."
   }
 
   alert_strategy {

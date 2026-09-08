@@ -20,11 +20,11 @@ function rateLabel(name: string, rates: FinancingRateContext): string {
   const value = name.toLowerCase();
   if (/fsa direct/.test(value))
     return rates?.fsaOwnershipDirectPct != null
-      ? `${rates.fsaOwnershipDirectPct.toFixed(3).replace(/\.?0+$/, "")}% published FSA direct rate`
+      ? `${rates.fsaOwnershipDirectPct.toFixed(3).replace(/\.?0+$/, "")}% FSA published snapshot — effective ${rates.fsaEffective ?? "date not supplied"}; confirm the current rate with FSA`
       : "Current FSA direct rate unavailable";
   if (/fsa guaranteed/.test(value))
     return rates?.mortgage30Pct != null
-      ? `Participating-lender rate — illustratively ≈${(rates.mortgage30Pct + 0.75).toFixed(2)}% (benchmark +0.75); USDA guarantees up to 95%`
+      ? `Illustrative rate ≈${(rates.mortgage30Pct + 0.75).toFixed(2)}% (benchmark +0.75; benchmark week ${rates.mortgageWeekOf ?? "not supplied"}), not a lender quote; USDA guarantee is not borrower approval`
       : "Participating-lender quote — USDA guarantees up to 95%";
   if (/rural development housing/.test(value))
     return rates?.mortgage30Pct != null

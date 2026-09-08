@@ -1,0 +1,207 @@
+{
+  "version": "calculation-financing-release-v1",
+  "asOf": "2026-09-08T03:09:49.625Z",
+  "project": "furlong-staging-499102",
+  "service": "furlong-core",
+  "region": "us-central1",
+  "sourceCommit": "d930fac4a3a30da13ee91370869cf6938ab8a725",
+  "build": {
+    "finishTime": "2026-09-08T03:05:28.534126Z",
+    "id": "5583dea8-91f7-4d70-ae28-335fac9b036f",
+    "results": {
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/furlong-staging-499102/locations/us-central1/repositories/furlong/packages/furlong-core/versions/sha256:f515a11b2caa341cfbcd02d2b5875467b1d622c176fc073f2f248011cbd25070",
+          "digest": "sha256:f515a11b2caa341cfbcd02d2b5875467b1d622c176fc073f2f248011cbd25070",
+          "name": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core:r7-finance3-0908",
+          "pushTiming": {
+            "endTime": "2026-09-08T03:05:13.907256861Z",
+            "startTime": "2026-09-08T03:05:02.417048689Z"
+          }
+        },
+        {
+          "artifactRegistryPackage": "projects/furlong-staging-499102/locations/us-central1/repositories/furlong/packages/furlong-db-migrate/versions/sha256:53532f0b1613108613cfbb32fe1eed16b5be56eb7adbaec4e700791f712c725d",
+          "digest": "sha256:53532f0b1613108613cfbb32fe1eed16b5be56eb7adbaec4e700791f712c725d",
+          "name": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-db-migrate:r7-finance3-0908",
+          "pushTiming": {
+            "endTime": "2026-09-08T03:05:15.592696076Z",
+            "startTime": "2026-09-08T03:05:13.907322111Z"
+          }
+        },
+        {
+          "artifactRegistryPackage": "projects/furlong-staging-499102/locations/us-central1/repositories/furlong/packages/furlong-scanner/versions/sha256:7870ab09af046d60e62d995d28839831ee9965385c60eb9cf81c16289e6ac87c",
+          "digest": "sha256:7870ab09af046d60e62d995d28839831ee9965385c60eb9cf81c16289e6ac87c",
+          "name": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-scanner:r7-finance3-0908",
+          "pushTiming": {
+            "endTime": "2026-09-08T03:05:28.154551612Z",
+            "startTime": "2026-09-08T03:05:15.592837907Z"
+          }
+        }
+      ]
+    },
+    "startTime": "2026-09-08T02:58:19.388483062Z",
+    "status": "SUCCESS"
+  },
+  "revision": {
+    "metadata": {
+      "name": "furlong-core-r7-finance-0908"
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-09-08T03:09:05.700313Z",
+          "message": "Deploying revision succeeded in 39.72s.",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-09-08T03:09:05.752324Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-09-08T03:09:05.647784Z",
+          "message": "Containers became healthy in 13.67s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-09-08T03:08:35.104805Z",
+          "message": "Container image import completed in 8.34s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-09-08T03:08:50.780059Z",
+          "message": "Provisioning imported containers completed in 15.67s. Checking container health. This will wait for up to 4m5s for the configured startup probe, including an initial delay of 5s.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        }
+      ],
+      "imageDigest": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:f515a11b2caa341cfbcd02d2b5875467b1d622c176fc073f2f248011cbd25070"
+    }
+  },
+  "testingUrl": "https://testing---furlong-core-mwei3cj3jq-uc.a.run.app",
+  "traffic": [
+    {
+      "revisionName": "furlong-core-r7-finance-0908",
+      "tag": "testing",
+      "url": "https://testing---furlong-core-mwei3cj3jq-uc.a.run.app"
+    },
+    {
+      "percent": 100,
+      "revisionName": "furlong-core-test-38a9b36"
+    }
+  ],
+  "protections": {
+    "iapEnabled": "true",
+    "binaryAuthorization": "default",
+    "anonymousTestingHttpStatus": 302
+  },
+  "securityScan": {
+    "done": true,
+    "metadata": {
+      "@type": "type.googleapis.com/google.cloud.ondemandscanning.v1.AnalyzePackagesMetadata",
+      "createTime": "2026-09-08T03:06:57.565633Z",
+      "resourceUri": "us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core@sha256:f515a11b2caa341cfbcd02d2b5875467b1d622c176fc073f2f248011cbd25070"
+    },
+    "name": "projects/furlong-staging-499102/locations/us/operations/08b473c7-8d41-44bf-9ddf-6e4bb987e183",
+    "response": {
+      "@type": "type.googleapis.com/google.cloud.ondemandscanning.v1.AnalyzePackagesResponse",
+      "scan": "projects/furlong-staging-499102/locations/us/scans/5ab60f37-3382-4418-98a3-a94882b166d4"
+    }
+  },
+  "reportedImageVulnerabilities": [],
+  "releaseAttestation": "projects/furlong-staging-499102/occurrences/99e34bd7-721c-496b-aff6-ab60e719810c",
+  "checks": {
+    "registeredCloudChecksPassed": 119,
+    "typecheck": "passed",
+    "productionBuild": "passed: 247 static pages",
+    "renderedFinancialScenarios": "pending and supported states passed",
+    "localDraftPdf": "generated, text checked and page 5 visually inspected",
+    "previousTestingRevision": "live Seippes summary confirmed no automatic alfalfa/range/2.14; export revealed and triggered follow-up fixes",
+    "finalLiveBrowserAndPdf": "pending: Mac locked, user asked to unlock"
+  },
+  "reproducedDefect": {
+    "property": "3835 Seippes Road, Federalsburg, MD 21632",
+    "reproducedSourceCommit": "e6216e37f13a5aaaed83794f97a0dac76dd6feac",
+    "classification": "defective-historical-calculation-replay-not-property-income",
+    "taxAssessmentUsd": 69800,
+    "incorrectLoanBasis": "tax assessment substituted for transaction price",
+    "annualInterestRate": 0.06,
+    "amortizationYears": 40,
+    "paymentsPerYear": 1,
+    "legacyAnnualDebtService": 4639.01520726315,
+    "components": [
+      {
+        "enterprise": "Hay/pasture",
+        "parcelAcres": 59.34,
+        "acreage_share": 0.7,
+        "gross_per_acre": 520,
+        "expense_pct": 0.55,
+        "portfolio_weight": 0.5,
+        "presetNoi": 9719.891999999998,
+        "weightedIncome": 4859.945999999999
+      },
+      {
+        "enterprise": "Cash lease",
+        "parcelAcres": 59.34,
+        "acreage_share": 0.8,
+        "gross_per_acre": 200,
+        "expense_pct": 0.08,
+        "portfolio_weight": 0.3,
+        "presetNoi": 8734.848000000002,
+        "weightedIncome": 2620.4544000000005
+      },
+      {
+        "enterprise": "Livestock",
+        "parcelAcres": 59.34,
+        "acreage_share": 0.55,
+        "gross_per_acre": 1100,
+        "expense_pct": 0.66,
+        "portfolio_weight": 0.2,
+        "presetNoi": 12206.238000000003,
+        "weightedIncome": 2441.2476000000006
+      }
+    ],
+    "legacyAnnualNoi": 9921.648,
+    "legacyCoverage": 2.1387401327044606,
+    "correctCurrentPrice": null,
+    "correctCurrentNoi": null,
+    "correctCurrentDscr": null,
+    "fixes": "No assessment fallback, no generic agricultural NOI fallback, no named financing leader when inputs missing. Structured scenario inputs and source dates exposed; default draft financing claims removed."
+  },
+  "fsaCurrentRateReadOnlyCheck": {
+    "sourceUrl": "https://www.fsa.usda.gov/tools/informational/rates/current-fsa-loan-interest-rates",
+    "effective": "2026-09-01",
+    "checkedAt": "2026-09-08",
+    "farmOwnershipDirectPct": 6,
+    "farmOperatingDirectPct": 5.25,
+    "committedSnapshotEffective": "2026-07-01",
+    "note": "Direct ownership rate unchanged at 6%; committed operating rate 5.125% is stale. This release exposes the snapshot date rather than claiming currentness. Scheduled snapshot refresh remains unfinished."
+  },
+  "noDatabaseMigration": true,
+  "scannerOrMigratorDeployed": false,
+  "mainTrafficChanged": false,
+  "allPlatformCalculationsCertified": false,
+  "interruptedBuilds": [
+    {
+      "id": "721e8964-ba88-42e7-af5e-db184c5e0e10",
+      "reason": "Cancelled before release to include source dates beside rate snapshots"
+    },
+    {
+      "id": "63f438bf-ccee-4925-9ae8-aa012c5658c2",
+      "reason": "Cancelled before release to include live-discovered PDF narrative and draft completeness defects"
+    }
+  ],
+  "outstanding": [
+    "Final live browser/PDF confirmation after Mac unlock",
+    "Authenticated reviewed-comparable intake and adjusted BPO workflow",
+    "NY/DE current official batches and general retail asking-price source",
+    "Parcel clipped soil acreages, field tests and actual operating evidence",
+    "Scheduled rate/source snapshot refresh; operating FSA rate changed",
+    "Broader tax, fee, treasury, risk and verification calculation review",
+    "Findings HTML responsive layout QA blocked by portable-reader horizontal overflow"
+  ]
+}

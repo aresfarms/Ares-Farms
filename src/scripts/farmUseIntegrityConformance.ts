@@ -1,149 +1,68 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
-import path from "node:path";
-
-import { farmBestUse } from "@/lib/property/farmAnswerEngine";
+import { readFileSync } from "node:fs";
+import { farmBestUse, type FarmPropertyFacts } from "@/lib/property/farmAnswerEngine";
+import { assessAlfalfaSuitability, type AgronomicSoilEvidence } from "@/lib/property/cropSuitability";
+import { parseSoilRows, soilPointQuery } from "@/lib/property/soilsLive";
+import { polygonToWkt } from "@/lib/property/parcelSoils";
 import { zoningUseInterpretation } from "@/lib/property/zoningUseCurated";
 
-const carolineR = zoningUseInterpretation({ state: "MD", county: "Caroline County", zoningCode: "R" });
-assert(carolineR, "Caroline County R zoning interpretation must resolve.");
-assert.equal(carolineR.zoningLabel, "R - Rural District");
-assert(carolineR.propertyWideCandidates.some((v) => /minor subdivision/i.test(v)));
-assert(carolineR.propertyWideCandidates.some((v) => /agricultural tourism/i.test(v)));
-assert.match(carolineR.developmentNote, /Do not label development marginal/i);
-
-const unknownAcres = farmBestUse({
-  acres: null,
-  county: "Caroline County",
-  state: "MD",
-  croplandRentPerAcre: 137,
-  pastureRentPerAcre: null,
-  stateFarmlandPerAcre: null,
-  nearestMetroMiles: null,
-  primeFarmland: "All areas are prime farmland",
-  capabilityClass: 2,
-  drainageClass: "Well drained",
-  cornYieldPerAcre: null,
-  soybeanYieldPerAcre: null,
-  wheatYieldPerAcre: null,
-  yieldYear: null,
-  landUse: "Agricultural",
-  zoningCode: "R",
-  zoningLabel: carolineR.zoningLabel,
-  zoningSummary: carolineR.summary,
-  zoningSource: carolineR.sourceName,
-  zoningSourceUrl: carolineR.sourceUrl,
-  propertyWideCandidates: carolineR.propertyWideCandidates,
-  developmentNote: carolineR.developmentNote,
-  energyNote: carolineR.energyNote,
-});
-assert.equal(unknownAcres.evidenceStatus, "insufficient");
-assert(unknownAcres.options.every((o) => o.tier === "needs-evidence"));
-assert.match(unknownAcres.headline, /not naming a best agricultural enterprise/i);
-assert.match(unknownAcres.headline, /Prime-soil status by itself cannot make commodity row crops the answer/i);
-
-const seippesScreen = farmBestUse({
-  acres: 59.34,
-  county: "Caroline County",
-  state: "MD",
-  croplandRentPerAcre: 137,
-  pastureRentPerAcre: null,
-  stateFarmlandPerAcre: null,
-  nearestMetroMiles: null,
-  primeFarmland: "All areas are prime farmland",
-  capabilityClass: 2,
-  drainageClass: "Well drained",
-  cornYieldPerAcre: null,
-  soybeanYieldPerAcre: null,
-  wheatYieldPerAcre: null,
-  yieldYear: null,
-  landUse: "Agricultural",
-  zoningCode: "R",
-  zoningLabel: carolineR.zoningLabel,
-  zoningSummary: carolineR.summary,
-  zoningSource: carolineR.sourceName,
-  zoningSourceUrl: carolineR.sourceUrl,
-  propertyWideCandidates: carolineR.propertyWideCandidates,
-  developmentNote: carolineR.developmentNote,
-  energyNote: carolineR.energyNote,
-  publicWater: false,
-  publicSewer: false,
-});
-assert.equal(seippesScreen.scope, "agricultural-enterprise-screen");
-assert.equal(seippesScreen.evidenceStatus, "screening");
-assert.notEqual(seippesScreen.options[0]?.name, "Commodity row crops (corn/soy/wheat)");
-assert(seippesScreen.options.every((o) => o.tier !== "leading-screen"));
-assert.match(seippesScreen.headline, /not labeling any agricultural enterprise the leading use yet/i);
-const commodity = seippesScreen.options.find((o) => o.name.startsWith("Commodity row crops"));
-assert(commodity, "Commodity option should remain visible as an agricultural possibility.");
-assert.notEqual(commodity.tier, "leading-screen");
-assert.match(commodity.why, /below stand-alone commodity scale/i);
-assert.equal(seippesScreen.propertyWideContext.zoning, "R - Rural District");
-assert(seippesScreen.propertyWideContext.candidates.some((v) => /rural residential/i.test(v)));
-assert.match(seippesScreen.propertyWideContext.note, /TDR receiving-versus-sending status/i);
-
-const genuineCommodityScale = farmBestUse({
-  acres: 800,
-  county: "Example County",
-  state: "MD",
-  croplandRentPerAcre: 220,
-  pastureRentPerAcre: 80,
-  stateFarmlandPerAcre: null,
-  nearestMetroMiles: 120,
-  primeFarmland: "All areas are prime farmland",
-  capabilityClass: 2,
-  drainageClass: "Well drained",
-  hardinessZone: "7b",
-  cornYieldPerAcre: 190,
-  soybeanYieldPerAcre: 62,
-  wheatYieldPerAcre: 80,
-  yieldYear: 2025,
-  landUse: "Agricultural",
-  zoningCode: "AG",
-  tillableAcres: 720,
-  forestedAcres: 80,
-  parcelPortfolioNoiAnnual: 120000,
-  parcelPortfolioBasis: "verified segment-aware operating scenario",
-  slopePct: 2,
-  buyerDemandVerified: true,
-  competitionVerified: true,
-  waterCapacityVerified: true,
-});
-assert.equal(genuineCommodityScale.options[0]?.name, "Commodity row crops (corn/soy/wheat)");
-assert.equal(genuineCommodityScale.options[0]?.tier, "leading-screen");
-
-const root = process.cwd();
-const route = fs.readFileSync(path.join(root, "src/app/api/public/property-facts/route.ts"), "utf8");
-const tab = fs.readFileSync(path.join(root, "src/components/property/lanes/FarmAgricultureTab.tsx"), "utf8");
-const chassis = fs.readFileSync(path.join(root, "src/components/property/lanes/GovernedLaneChassis.tsx"), "utf8");
-const workspace = fs.readFileSync(path.join(root, "src/components/property/PropertyEvaluationWorkspace.tsx"), "utf8");
-assert(route.includes("applyResolvedFarmParcelContext"));
-assert(route.includes("resolvedAcreageText"));
-assert(tab.includes("LEADING AG SCREEN"));
-assert(!tab.includes('label: "BEST FIT"'));
-assert(tab.includes("Property-wide use context"));
-assert(chassis.includes("Preliminary agricultural leader:"));
-assert(chassis.includes("leads Furlong's preliminary agricultural enterprise screen"));
-assert(workspace.includes("farmUseScreen.portfolioNoi"));
-assert(workspace.includes("Diversified whole-parcel agricultural portfolio"));
-assert(workspace.includes("No lead sale or file auction"));
-assert(workspace.includes("No pay-to-rank"));
-assert(!workspace.includes("Complete the property basics before Furlong recommends a course"));
-assert(!workspace.includes("takes no cut of your transaction"));
-
-console.log(JSON.stringify({
-  ok: true,
-  unknownAcreageFailsClosed: true,
-  seippesFixture: {
-    acres: 59.34,
-    zoning: seippesScreen.propertyWideContext.zoning,
-    firstAgriculturalCandidate: seippesScreen.options[0]?.name ?? null,
-    anyLeadingUseClaim: seippesScreen.options.some((o) => o.tier === "leading-screen"),
-    commodityPosition: seippesScreen.options.findIndex((o) => o.name.startsWith("Commodity row crops")) + 1,
-    commodityIsBest: false,
-    propertyWideHighestBestUseClaimed: false,
-  },
-  genuineCommodityScaleStillPossible: genuineCommodityScale.options[0]?.name,
-  mixedEconomicsLabeled: seippesScreen.options.every((o) => Boolean(o.economicsBasis)),
-  borrowerControlledRoutingCopy: true,
-}, null, 2));
+const asOf = "2026-09-08";
+const soil: AgronomicSoilEvidence = {
+ mapUnitName: "Ingleside loamy sand, 2 to 5 percent slopes", dominantComponent: "Ingleside",
+ farmlandClass: "All areas are prime farmland", drainageClass: "Well drained", slopePct: 3,
+ capabilityClass: 2, spatialScope: "point-map-unit", parcelCoveragePct: null,
+};
+const base: FarmPropertyFacts = { acres: 59.34, county: "Caroline County", state: "MD",
+ croplandRentPerAcre: 137, pastureRentPerAcre: null, stateFarmlandPerAcre: 9750,
+ soil, evidenceAsOf: asOf, zoningCode: "R", primeFarmland: soil.farmlandClass,
+ capabilityClass: 2, drainageClass: "Well drained" };
+const seippes = farmBestUse(base);
+assert.equal(seippes.evidenceStatus, "screening");
+assert(seippes.options.every(o => o.tier === "needs-evidence" && o.economicsBasis === "unpriced"));
+assert.equal(seippes.parcelPortfolio.modeledNoiAnnual, null);
+assert.match(seippes.headline, /not naming or ranking/);
+assert.match(seippes.options.find(o => /Alfalfa/.test(o.name))!.why, /naturally extremely to strongly acid unless limed/);
+assert(seippes.options.some(o => /Grass hay/.test(o.name)));
+assert.equal(farmBestUse({ ...base, acres: null }).evidenceStatus, "insufficient");
+assert(farmBestUse({ ...base, acres: 800, cornYieldPerAcre: 190 }).options.every(o => o.tier === "needs-evidence"), "Large acreage plus county yield is not a verified business plan.");
+assert.equal(assessAlfalfaSuitability(soil, asOf).status, "needs-evidence");
+assert.equal(assessAlfalfaSuitability({ ...soil, fieldPh: { value: 5.2, sourceRef: "fixture-soil-lab", sampledAt: "2026-07-01", coversProposedAcres: true } }, asOf).status, "constraint");
+const completeSoil: AgronomicSoilEvidence = { ...soil, spatialScope: "parcel-intersection", parcelCoveragePct: 100,
+ fieldPh: { value: 6.8, sourceRef: "fixture-soil-lab", sampledAt: "2026-07-01", coversProposedAcres: true },
+ cropReview: { crop: "alfalfa", sourceRef: "fixture-agronomist", reviewedAt: "2026-08-01", coversProposedAcres: true,
+ waterVerified: true, climateVerified: true, nutrientsVerified: true, establishmentVerified: true, marketVerified: true } };
+assert.equal(assessAlfalfaSuitability(completeSoil, asOf).status, "supported-screen", "Adequate evidence must unlock a testable alternative; alfalfa is not geographically banned.");
+assert.equal(assessAlfalfaSuitability({ ...completeSoil, drainageClass: "Poorly drained" }, asOf).status, "constraint");
+assert.equal(assessAlfalfaSuitability({ ...completeSoil, fieldPh: { ...completeSoil.fieldPh!, sampledAt: "2027-01-01" } }, asOf).status, "needs-evidence");
+assert.equal(assessAlfalfaSuitability({ ...completeSoil, fieldPh: { ...completeSoil.fieldPh!, sampledAt: "2020-01-01" } }, asOf).status, "needs-evidence");
+const reviewed: FarmPropertyFacts = { ...base, soil: completeSoil, tillableAcres: 50, pastureAcres: 0,
+ forestedAcres: 9.34, wetlandAcres: 0, developedAcres: 0, otherAcres: 0, hardinessZone: "7b",
+ waterCapacityVerified: true, buyerDemandVerified: true, competitionVerified: true, zoningSourceUrl: "https://example.gov/zoning",
+ parcelPortfolioNoiAnnual: 99999999, parcelPortfolioBasis: "Deliberately unrelated amount must be ignored",
+ enterpriseBudgets: [
+  { name: "Alfalfa with woodland", annualRevenue: 120000, annualOperatingCosts: 75000, annualReplacementReserve: 5000, startupCapital: 60000, sourceRef: "fixture-reviewed-budget-a", asOf: "2026-08-01", coversWholeParcel: true, agronomyVerified: true, marketVerified: true, legalUseVerified: true },
+  { name: "Grain rotation with woodland", annualRevenue: 100000, annualOperatingCosts: 70000, annualReplacementReserve: 5000, startupCapital: 40000, sourceRef: "fixture-reviewed-budget-b", asOf: "2026-08-01", coversWholeParcel: true, agronomyVerified: true, marketVerified: true, legalUseVerified: true },
+ ] };
+assert.equal(farmBestUse(reviewed).evidenceStatus, "supported-screen");
+assert.equal(farmBestUse(reviewed).parcelPortfolio.modeledNoiAnnual, 40000);
+assert(farmBestUse({ ...reviewed, pastureAcres: 20 }).options.every(o => o.tier === "needs-evidence"), "Overlapping acreage cannot support a plan.");
+assert.equal(farmBestUse({ ...reviewed, enterpriseBudgets: reviewed.enterpriseBudgets!.slice(0,1) }).evidenceStatus, "screening");
+const headers = ["mukey","muname","farmlndcl","cokey","compname","comppct_r","drainagecl","slope_r","niccdcd","chkey","hzdept_r","hzdepb_r","ph1to1h2o_l","ph1to1h2o_r","ph1to1h2o_h"];
+const rows = [headers, ["1","Ingleside","Prime","c1","Ingleside","75","Well drained","3","2","h1","0","20","4","5.2","5.5"], ["1","Ingleside","Prime","c2","Minor component","25","Poorly drained","0","2","h2","0","10",null,"",null]];
+const parsed = parseSoilRows(rows, asOf)!;
+assert.equal(parsed.components!.length, 2);
+assert.equal(parsed.components![1].horizons[0].phRepresentative, null);
+assert.equal(parsed.parcelCoveragePct, null, "75% of a map unit must never become 75% of a parcel.");
+assert.equal(soilPointQuery(NaN, -75), null);
+assert.match(soilPointQuery(38,-75)!, /LEFT JOIN chorizon/);
+assert.equal(polygonToWkt({ type: "Polygon", coordinates: [[[0,0],[1,0],[1,1],[0,0]]] }), "POLYGON((0 0,1 0,1 1,0 0))");
+assert.equal(polygonToWkt({ type: "Polygon", coordinates: [[[0,0],[1,0],[1,1],[0,1]]] }), null);
+assert.equal(polygonToWkt({ type: "Polygon", coordinates: [[["malicious SQL",0],[1,0],[1,1],[0,0]]] }), null);
+const zoning = zoningUseInterpretation({state: "MD", county: "Caroline County", zoningCode: "R"});
+assert.equal(zoning?.zoningLabel, "R - Rural District");
+const chassis = readFileSync("src/components/property/lanes/GovernedLaneChassis.tsx", "utf8");
+assert(!chassis.includes("leads Furlong's preliminary agricultural enterprise screen"));
+assert(chassis.includes("farmScreen?.headline"));
+const route = readFileSync("src/app/api/public/property-facts/route.ts", "utf8");
+assert(route.includes("fetchMarylandParcelSoils") && route.includes("basePlaceIntelligence.soilProfile = parcelSoils"));
+console.log(JSON.stringify({ok:true,rule:"FARM-EVIDENCE-INTEGRITY-002",seippesDoesNotRankAlfalfa:true,adequateEvidenceUnlocksScreen:true,wholeParcelBudgetArithmetic:40000,fieldPhNotMappedPh:true,pointNotParcel:true}));

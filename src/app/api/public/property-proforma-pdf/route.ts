@@ -1,3 +1,4 @@
+import { annualLevelDebtService } from "@/lib/property/calculationMath";
 import { NextRequest, NextResponse } from "next/server";
 
 import { buildDraftProformaInput, type DraftProformaPropertyArgs } from "@/lib/pdf/draftProformaFromProperty";
@@ -60,14 +61,21 @@ export async function POST(req: NextRequest) {
   const lane = body.lane === "A" || body.lane === "B" || body.lane === "C" ? body.lane : "B";
   const num = (value: unknown): number | null =>
     typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
+  if (Array.isArray(body.revenueUnits) && (body.revenueUnits.length > 8 || body.revenueUnits.some(unit =>
+    !unit || typeof unit.unitName !== "string" || !unit.unitName.trim() ||
+    typeof unit.conservativeAnnualNoi !== "number" || !Number.isFinite(unit.conservativeAnnualNoi) ||
+    typeof unit.stabilizedAnnualNoi !== "number" || !Number.isFinite(unit.stabilizedAnnualNoi)))) {
+    return NextResponse.json({ ok: false, error: "Supply up to eight complete operating units with explicit net-income figures. Losses may be negative; missing income is not zero." }, { status: 400 });
+  }
+  if (Array.isArray(body.additionalProperties) && body.additionalProperties.length > 6) return NextResponse.json({ok:false,error:"At most six additional properties; totals must not silently omit properties."},{status:400});
   const revenueUnits = Array.isArray(body.revenueUnits)
     ? body.revenueUnits
         .slice(0, 8)
         .map((unit) => ({
           unitName: String(unit?.unitName ?? "").slice(0, 120),
           unitDescription: String(unit?.unitDescription ?? "").slice(0, 400),
-          conservativeAnnualNoi: num(unit?.conservativeAnnualNoi) ?? 0,
-          stabilizedAnnualNoi: num(unit?.stabilizedAnnualNoi) ?? 0,
+          conservativeAnnualNoi: unit.conservativeAnnualNoi,
+          stabilizedAnnualNoi: unit.stabilizedAnnualNoi,
           methodology: String(unit?.methodology ?? "").slice(0, 400),
         }))
         .filter((unit) => unit.unitName)
@@ -151,15 +159,12 @@ export async function POST(req: NextRequest) {
   const stateCode = typeof body.state === "string" ? body.state.slice(0, 40) : null;
   const acreage = num(body.acreage);
   const fsaRatePct = num(body.fsaRatePct);
-  const enteredPrice = num(body.acquisitionPrice);
+  const enteredPrice = (num(body.acquisitionPrice) ?? 0) > 0 ? num(body.acquisitionPrice) : null;
   const assessedTotal = num(body.assessedTotalValue);
   const stateFarmland = stateCode ? STATE_FARMLAND[stateCode.toUpperCase()] : undefined;
   let screeningPrice: number | null = enteredPrice;
   let valuationNote: string | null = enteredPrice != null ? "Asking price / intended offer as entered; appraisal governs" : null;
-  if (screeningPrice == null && lane === "B" && acreage != null && acreage > 0 && stateFarmland) {
-    screeningPrice = Math.round(acreage * stateFarmland.dollarsPerAcre);
-    valuationNote = `BROAD FARM SCREEN — ${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres × USDA ${stateFarmland.year ?? STATE_FARMLAND_PROVENANCE.asOf} state farm real-estate average ($${stateFarmland.dollarsPerAcre.toLocaleString("en-US")}/acre). This state average is not a parcel appraisal; local closed sales, soils, improvements and appraisal govern.`;
-  }
+  // Transaction price is never derived from assessment or state averages.
   // Keep the assessment available only as a tax/assessment fact. It must not
   // become the acquisition price simply because the listing price is missing.
   void assessedTotal;
@@ -181,7 +186,7 @@ export async function POST(req: NextRequest) {
   // revenue units, so Part I and IV.3 tell the same soil-aware story.
   let coverageSolution: ReturnType<typeof solveDscrCoverage> | null = null;
   if (lane === "B" && acreage != null && acreage > 0 && screeningPrice != null && fsaRatePct != null) {
-    const debtService = (screeningPrice * 0.8 * (fsaRatePct / 100)) / (1 - Math.pow(1 + fsaRatePct / 100, -40));
+    const debtService = annualLevelDebtService(screeningPrice * 0.8, fsaRatePct, 40, 12) ?? 0;
     coverageSolution = solveDscrCoverage({
       acres: acreage,
       screeningPrice,
@@ -225,7 +230,7 @@ export async function POST(req: NextRequest) {
   // ── IV.3 — Coverage solution (founder direction 2026-07-29): solve for the
   // soil-sustainable enterprise mix that clears the 1.25x floor, or say
   // plainly that none can.
-  if (coverageSolution) {
+  if (coverageSolution && coverageSolution.verdict !== "needs-evidence") {
     const dollars = (v: number) => `$${Math.round(v).toLocaleString("en-US")}`;
     const solution = coverageSolution;
     const mixClears = (solution.bestMix?.dscr ?? 0) >= DSCR_FLOOR;

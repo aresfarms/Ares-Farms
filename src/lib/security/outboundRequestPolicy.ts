@@ -9,6 +9,7 @@ const STATIC_ALLOWED_HOSTS = new Set([
   "services6.arcgis.com",
   "opendata.arcgis.com",
   "mdgeodata.md.gov",
+  "gis.nccde.org", // New Castle official sales metadata; candidate discovery only.
   "map.sussexcountyde.gov",
   "www.treasury.gov",
   "realestatesales.gov",
@@ -58,5 +59,8 @@ export async function governedFetch(
   init?: RequestInit
 ): Promise<Response> {
   const parsed = assertAllowedOutboundUrl(url);
-  return fetch(parsed, init);
+  // Never follow an approved endpoint redirect into an unapproved host.
+  const response = await fetch(parsed, { ...init, redirect: "manual" });
+  if (response.status >= 300 && response.status < 400) throw new Error("Outbound redirect requires a separately reviewed endpoint.");
+  return response;
 }

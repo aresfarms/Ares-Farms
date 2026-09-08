@@ -42,7 +42,7 @@ type PropertyEvaluationPdfInput = {
   executiveSummary: string;
   propertySummary: string[];
   propertyValueScreen?: {
-    status: "indicated" | "needs-property-evidence" | "no-registered-basis" | "no-assessed-value";
+    status: "indicated" | "context-only" | "needs-property-evidence" | "no-registered-basis" | "no-assessed-value";
     profileId: string;
     methodCode: string;
     confidence: string;
@@ -699,7 +699,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
 
   if (input.propertyValueScreen) {
     const value = input.propertyValueScreen;
-    heading("Furlong Property Estimate — Screening");
+    heading("Furlong Value Screen");
     if (value.status === "indicated" && value.lowUsd != null && value.midUsd != null && value.highUsd != null) {
       factsTable([
         { label: "Screening range", value: `$${value.lowUsd.toLocaleString("en-US")} – $${value.highUsd.toLocaleString("en-US")}` },
@@ -709,7 +709,7 @@ export function generatePropertyEvaluationPdf(input: PropertyEvaluationPdfInput)
       paragraph(value.method, { size: 9.5 });
     } else {
       panel({
-        title: "Needs property-specific valuation evidence",
+        title: "Comparable evidence pending",
         lines: [value.method, ...(value.requiredInputs.length ? [`Needed next: ${value.requiredInputs.join("; ")}`] : [])],
         fill: ACCENT_SOFT,
       });

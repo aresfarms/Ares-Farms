@@ -108,6 +108,20 @@
       "governingVersion": "2026-09-05 controlling scoped amendment",
       "file": "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
       "note": "Controls customer journey, borrower-free financing core, institution-funded economics, living Furlong Case, provider published-box evidence, outcome learning, market specialization order, and production security-claim gate."
+    },
+    {
+      "key": "calculationIntegrityAmendment",
+      "label": "Calculation and evidence integrity",
+      "governingVersion": "2026-09-07 scoped correction",
+      "file": "MASTER_VOLUME_AMENDMENT_2026-09-07_CALCULATION_INTEGRITY.md",
+      "note": "Implemented safeguards and explicit remaining gaps; not all-platform certification."
+    },
+    {
+      "key": "productCoherenceAmendment",
+      "label": "Product coherence and valuation integrity",
+      "governingVersion": "2026-09-05",
+      "file": "MASTER_VOLUME_AMENDMENT_2026-09-05_PRODUCT_COHERENCE.md",
+      "note": "Restored scoped governing document pointer; no rollback of newer identity/module schema."
     }
   ],
   "supportingDocuments": [
@@ -208,7 +222,15 @@
     "src/lib/db/migrations/0059_managed_provider_handoff.sql",
     "src/lib/db/migrations/0060_furlong_case_living_record_upgrade.sql",
     "src/lib/db/migrations/0061_capital_network_published_credit_box.sql",
-    "src/lib/db/migrations/0062_identity_verifications.sql"
+    "src/lib/db/migrations/0062_identity_verifications.sql",
+    "src/lib/property/calculationMath.ts",
+    "src/lib/property/cropSuitability.ts",
+    "src/lib/property/parcelSoils.ts",
+    "src/lib/property/governmentComparableNetwork.ts",
+    "src/lib/property/listingPriceEvidence.ts",
+    "src/scripts/calculationIntegrityConformance.ts",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-07_CALCULATION_INTEGRITY.md",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PRODUCT_COHERENCE.md"
   ],
   "buildBinding": {
     "branch": "master",
@@ -222,7 +244,7 @@
     "activeNonResidentialScoring": "property-project-only; personal-financial scoring inputs rejected",
     "preParityBehaviorBaselineCommit": "8ead373",
     "parityImplementationCommit": "19e654b",
-    "farmUseIntegrityRuntimeVersion": "farm-use-integrity-v1.0.0",
+    "farmUseIntegrityRuntimeVersion": "farm-use-integrity-v2.0.0",
     "farmLandUseBoundary": "agricultural enterprise screen is separate from property-wide highest/best-supported use",
     "furlongVisionVersion": "furlong-vision-v1.0.0",
     "furlongCaseVersion": "furlong-case-v1.0.0",

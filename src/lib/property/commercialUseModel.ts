@@ -1,20 +1,7 @@
-/**
- * commercialUseModel — the commercial twin of the farm enterprise optimizer
- * (founder direction 2026-08-05: "the pro forma doesn't tell us the best use
- * for this commercial property, nor if it clears the DSCR requirements —
- * we need those numbers, on-screen and in the pro forma").
- *
- * Deterministic income screening per candidate use: conservative small-market
- * net-to-owner rent bands ($/sq ft/yr, NNN-posture) × the building's square
- * footage × a stabilized-occupancy factor → modeled NOI per use → DSCR at
- * lender-shaped terms against the 1.25x floor. The candidate list reuses the
- * alternative-use screen's zoning logic, so a use zoning rules out never
- * appears with a number on it.
- *
- * Honesty rules: every figure is a stated screening assumption, not an
- * appraisal, rent comp, or value opinion; an actual rent roll or appraisal
- * OUTRANKS this model the moment one exists, and the note says so.
- */
+import { annualLevelDebtService, transactionPrice } from "./calculationMath";
+/** Source-backed operating alternatives, not automatic rent-per-foot valuations.
+ * TECH-PROV-001 / CANON-EXPL-001. Generic rent and occupancy assumptions never
+ * become parcel NOI. Financing terms are explicitly modeled, not lender quotes. */
 
 import { commercialAlternativeUses } from "@/lib/property/commercialAlternativeUses";
 import { buildCommercialConversionIntelligence, type ConversionIntelligence } from "@/lib/property/commercialConversionIntelligence";
@@ -22,8 +9,8 @@ import { buildCommercialConversionIntelligence, type ConversionIntelligence } fr
 export interface ModeledUse {
   use: string;
   /** Conservative net-to-owner band, $/sq ft/yr. */
-  netPerSqftLow: number;
-  netPerSqftHigh: number;
+  netPerSqftLow: number | null;
+  netPerSqftHigh: number | null;
   /** Modeled stabilized NOI at the midpoint band × occupancy. */
   noiMid: number | null;
   noiLow: number | null;
@@ -59,20 +46,9 @@ const DSCR_FLOOR = 1.25;
 const OCCUPANCY = 0.88;
 
 /** Conservative small-market net bands by use family ($/sq ft/yr to owner). */
-const NET_BANDS: Array<{ pattern: RegExp; low: number; high: number }> = [
-  { pattern: /office|medical/i, low: 8, high: 14 },
-  { pattern: /retail|service storefront/i, low: 7, high: 14 },
-  { pattern: /flex|light industrial/i, low: 5, high: 9 },
-  { pattern: /warehouse|self-storage|storage/i, low: 4, high: 7 },
-  { pattern: /mixed-use|residential/i, low: 8, high: 15 },
-  { pattern: /food service|restaurant/i, low: 10, high: 16 },
-];
 
-function levelAnnualDebtService(principal: number, ratePct: number, years: number): number {
-  const r = ratePct / 100;
-  if (r <= 0) return principal / years;
-  return (principal * r) / (1 - Math.pow(1 + r, -years));
-}
+
+const levelAnnualDebtService = (principal: number, ratePct: number, years: number) => annualLevelDebtService(principal, ratePct, years, 12);
 
 export function modelCommercialUses(args: {
   zoning: string | null;
@@ -84,6 +60,7 @@ export function modelCommercialUses(args: {
   screeningPrice: number | null;
   /** Published 30-yr benchmark; lender terms modeled at benchmark +0.75, 25-yr, 80% LTV. */
   benchRatePct: number | null;
+  operatingEvidence?: Array<{use:string; noiLow:number; noiHigh:number; sourceRef:string; legalUseVerified:boolean; marketVerified:boolean}>;
 }): CommercialUseScreen {
   const candidates = commercialAlternativeUses({
     zoning: args.zoning,
@@ -93,22 +70,23 @@ export function modelCommercialUses(args: {
   });
   const ratePct = args.benchRatePct != null ? args.benchRatePct + 0.75 : null;
   const ads =
-    args.screeningPrice != null && ratePct != null
-      ? levelAnnualDebtService(args.screeningPrice * 0.8, ratePct, 25)
+    transactionPrice(args.screeningPrice) != null && ratePct != null
+      ? levelAnnualDebtService(args.screeningPrice! * 0.8, ratePct, 25)
       : null;
 
   const uses: ModeledUse[] = candidates.uses.map((candidate) => {
-    const band = NET_BANDS.find((b) => b.pattern.test(candidate.use)) ?? { low: 6, high: 11 };
+
     const sqft = args.squareFeet;
     const operatingModelRequired = /senior housing|extended-stay hospitality/i.test(candidate.use);
-    const noiLow = !operatingModelRequired && sqft != null ? Math.round(sqft * band.low * OCCUPANCY) : null;
-    const noiHigh = !operatingModelRequired && sqft != null ? Math.round(sqft * band.high * OCCUPANCY) : null;
+    const budget = args.operatingEvidence?.find(b => b.use === candidate.use && b.sourceRef.trim() && b.legalUseVerified && b.marketVerified && Number.isFinite(b.noiLow) && Number.isFinite(b.noiHigh) && b.noiLow <= b.noiHigh);
+    const noiLow = budget?.noiLow ?? null;
+    const noiHigh = budget?.noiHigh ?? null;
     const noiMid = noiLow != null && noiHigh != null ? Math.round((noiLow + noiHigh) / 2) : null;
     const dscr = noiMid != null && ads != null && ads > 0 ? noiMid / ads : null;
     return {
       use: candidate.use,
-      netPerSqftLow: band.low,
-      netPerSqftHigh: band.high,
+      netPerSqftLow: budget && sqft != null && sqft > 0 ? budget.noiLow / sqft : null,
+      netPerSqftHigh: budget && sqft != null && sqft > 0 ? budget.noiHigh / sqft : null,
       noiLow,
       noiHigh,
       noiMid,
@@ -116,10 +94,10 @@ export function modelCommercialUses(args: {
       clearsFloor: dscr != null ? dscr >= DSCR_FLOOR : null,
       why: candidate.why,
       watch: candidate.watch,
-      financialModelAvailable: !operatingModelRequired,
+      financialModelAvailable: Boolean(budget),
       financialModelNote: operatingModelRequired
         ? "Requires a unit/room-level operating model, staffing/service assumptions where applicable, and code-capex before NOI or DSCR is credible."
-        : "Square-foot screening model available; replace it with verified rent roll, lease comps or operating statements when available.",
+        : "Property-specific rent roll, lease comparables, expenses, reserves and operating statements are required. Generic rent bands do not establish property NOI.",
       conversion: buildCommercialConversionIntelligence({
         currentLandUse: args.landUse,
         zoning: args.zoning,
@@ -146,7 +124,7 @@ export function modelCommercialUses(args: {
           ? "Commercial—office/medical"
           : "Commercial—general";
   const extendedStay = uses.find((u) => /extended-stay hospitality/i.test(u.use)) ?? null;
-  const bestSupportedUse = hospitalityShell && extendedStay ? extendedStay : bestUse;
+  const bestSupportedUse = bestUse;
   const seniorOpportunity = uses.find((u) => /senior housing|independent-living/i.test(u.use)) ?? null;
   const secondaryOpportunity =
     seniorOpportunity && seniorOpportunity.use !== bestSupportedUse?.use
@@ -168,9 +146,6 @@ export function modelCommercialUses(args: {
     bestUse,
     bestSupportedUse,
     secondaryOpportunity,
-    note:
-      args.squareFeet == null
-        ? "The income model needs the building's square footage — add it (or confirm the parcel record) and every use gets a modeled NOI and DSCR."
-        : `Screening assumptions: conservative small-market net-to-owner rent bands per use × ${Math.round(OCCUPANCY * 100)}% stabilized occupancy; not an appraisal, rent comp, or value opinion. Senior-housing and extended-stay opportunities deliberately do not receive invented NOI/DSCR without a unit/room operating model. An actual rent roll, operating statement, appraisal, zoning determination or permit record outranks this model the moment one exists. ${candidates.note}`,
+    note: "Property-specific operating evidence is required before alternatives can receive NOI, DSCR or a highest-income ranking. Building area alone does not establish rent, occupancy or profitability. " + candidates.note,
   };
 }

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 
+import { fullListingAddress } from "@/lib/property/listingPriceEvidence";
+import { isSourceLiveRuntime } from "@/lib/property/sourceActivationStore";
 import { buildPropertyAnalysisHref } from "@/lib/property/propertyAnalysisHref";
-import { findCanonicalPropertyByExactAddress, findCanonicalPropertyById, recordsForReview, PROPERTY_SOURCE_IDS } from "@/lib/property/propertyData";
+import { matchCanonicalExactAddress, findCanonicalPropertyByExactAddress, findCanonicalPropertyById, recordsForReview, PROPERTY_SOURCE_IDS } from "@/lib/property/propertyData";
 
 function governingFingerprint(href: string): string {
   const url = new URL(href, "https://furlong.test");
@@ -19,7 +21,12 @@ const property = PROPERTY_SOURCE_IDS
 
 assert(property, "A canonical property with an exact address is required for the parity proof.");
 const source = property.source_records[0];
-const manualMatch = findCanonicalPropertyByExactAddress(source.exactAddress!);
+const fullAddress = fullListingAddress(source);
+const manualMatch = matchCanonicalExactAddress(fullAddress, [property]);
+assert.equal(matchCanonicalExactAddress(source.exactAddress!, [property]), null, "A street-only address must not cross-match towns.");
+const liveMatch = findCanonicalPropertyByExactAddress(fullAddress);
+assert.equal(Boolean(liveMatch), isSourceLiveRuntime(source.sourceId), "Unapproved sources cannot bypass the public source gate.");
+assert.equal(matchCanonicalExactAddress(fullAddress, [property, {...property, canonical_property_id:"conflicting-identity"}]), null);
 assert(manualMatch, "Manual exact-address intake must resolve to a canonical property.");
 assert.equal(manualMatch.canonical_property_id, property.canonical_property_id);
 assert.equal(findCanonicalPropertyById(property.canonical_property_id)?.canonical_property_id, property.canonical_property_id);

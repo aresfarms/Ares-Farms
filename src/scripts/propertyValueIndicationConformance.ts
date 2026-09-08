@@ -1,132 +1,46 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { indicateMarketValue } from "@/lib/property/marketValueIndication";
-
-const residential = indicateMarketValue({
-  assessedTotalValue: 500_000,
-  assessmentAsOf: "202301",
-  stateCode: "MD",
-  county: "Queen Anne's",
-  propertyType: "single family residential home",
-  knownPriceUsd: 575_000,
-  knownPriceLabel: "Asking price",
-});
-assert.equal(residential.status, "indicated");
-assert.equal(residential.profileId, "residential");
-assert.equal(residential.methodCode, "residential-assessment-hpi");
-assert(residential.midUsd && residential.midUsd > 500_000);
-assert(residential.method.includes("exact MD FHFA single-family HPI movement"));
-
-const undatedResidential = indicateMarketValue({
-  assessedTotalValue: 629_000,
-  assessmentAsOf: null,
-  stateCode: "DE",
-  county: "Sussex",
-  propertyType: "residential home",
-  knownPriceUsd: 2_500_000,
-  knownPriceLabel: "Under contract at",
-});
-assert.equal(undatedResidential.status, "needs-property-evidence");
-assert.equal(undatedResidential.methodCode, "none");
-assert(undatedResidential.method.includes("did not publish the assessment vintage"));
-assert.equal(undatedResidential.midUsd, null);
-
-const commercialWithoutIncome = indicateMarketValue({
-  assessedTotalValue: 1_000_000,
-  assessmentAsOf: "2025-01-01",
-  stateCode: "MD",
-  propertyType: "30 room hotel hospitality",
-});
-assert.equal(commercialWithoutIncome.status, "needs-property-evidence");
-assert.equal(commercialWithoutIncome.profileId, "hospitality");
-assert.equal(commercialWithoutIncome.methodCode, "none");
-assert(commercialWithoutIncome.method.includes("does not apply a residential house-price index"));
-
-const commercialIncome = indicateMarketValue({
-  propertyType: "hotel hospitality property",
-  noiAnnual: 500_000,
-  capRateLowPct: 8,
-  capRateHighPct: 10,
-  knownPriceUsd: 8_000_000,
-  knownPriceLabel: "Asking price",
-});
-assert.equal(commercialIncome.status, "indicated");
-assert.equal(commercialIncome.methodCode, "commercial-income-capitalization");
-assert.equal(commercialIncome.lowUsd, 5_000_000);
-assert.equal(commercialIncome.highUsd, 6_250_000);
-assert.equal(commercialIncome.midUsd, 5_556_000);
-assert(commercialIncome.divergence?.verdict.includes("Asking price is a seller signal"));
-
-const farm = indicateMarketValue({
-  stateCode: "MD",
-  propertyType: "working farm",
-  acreage: 60,
-});
-assert.equal(farm.status, "indicated");
-assert.equal(farm.methodCode, "farm-state-acreage");
-assert.equal(farm.midUsd, 585_000);
-assert.equal(farm.lowUsd, 351_000);
-assert.equal(farm.highUsd, 819_000);
-assert(farm.method.includes("USDA NASS 2025 MD average farm real-estate value"));
-
-const land = indicateMarketValue({
-  stateCode: "MD",
-  propertyType: "vacant unimproved land",
-  acreage: 10,
-});
-assert.equal(land.status, "needs-property-evidence");
-assert.equal(land.methodCode, "none");
-assert(land.method.includes("will not apply a residential HPI to bare land"));
-
-const source = readFileSync("src/lib/property/marketValueIndication.ts", "utf8");
-assert(!source.includes("long-run rate. Treat this indication"));
-assert(source.includes("exactResidentialIndexFactor"));
-assert(source.includes("STATE_FARMLAND"));
-assert(source.includes("commercial-income-capitalization"));
-assert(source.includes("Asking price is a seller signal, not proof of market value"));
-
-const chassis = readFileSync("src/components/property/lanes/GovernedLaneChassis.tsx", "utf8");
-assert(chassis.includes("Furlong Property Estimate — screening"));
-assert(chassis.includes("Needs property-specific valuation evidence"));
-assert(chassis.includes("record.propertyValueScreen"));
-assert(chassis.includes("import type { MarketValueIndication }"));
+import { indicateMarketValue, type ClosedSaleComparable } from "@/lib/property/marketValueIndication";
+import { resolveListingPrice } from "@/lib/property/listingPriceEvidence";
+import { findGovernedListingSnapshot } from "@/lib/property/governedListingSnapshot";
+const asOf = "2026-09-08", subjectId = "fixture-subject";
+const tax = indicateMarketValue({assessedTotalValue:500000,assessmentAsOf:"202301",stateCode:"MD",propertyType:"single family residential home", knownPriceUsd:575000,knownPriceLabel:"Asking price"});
+assert.equal(tax.status,"context-only");
+assert.equal(tax.midUsd,null); assert.equal(tax.lowUsd,null); assert.equal(tax.highUsd,null); assert.equal(tax.divergence,null);
+const farm = indicateMarketValue({stateCode:"MD",propertyType:"working farm",acreage:60});
+assert.equal(farm.status,"context-only"); assert.equal(farm.midUsd,null);
+for (const propertyType of ["vacant land","hotel","residential"]) {
+ const result=indicateMarketValue({propertyType,assessedTotalValue:629000,knownPriceUsd:2500000});
+ assert.equal(result.midUsd,null,"Neither asking price nor assessment alone creates a market opinion.");
+}
+const comps: ClosedSaleComparable[] = [550000,600000,650000].map((amount,i)=>({
+ id:"fixture-comp-"+i, transactionId:"fixture-deed-"+i, subjectId, salePriceUsd:amount-10000, adjustedIndicationUsd:amount,
+ saleDate:"2026-06-01", adjustmentBasis:"Fixture documented condition adjustment +10000",
+ sourceName:"Fixture recorded sale",sourceUrl:"https://example.gov/record/"+i,verified:true,armLengthVerified:true,
+}));
+const screen=(c:ClosedSaleComparable[])=>indicateMarketValue({propertyType:"residential",asOf,subjectId,closedSaleComparables:c});
+const valid=screen(comps);
+assert.equal(valid.methodCode,"sales-comparison-screen"); assert.equal(valid.midUsd,600000); assert.equal(valid.lowUsd,550000); assert.equal(valid.highUsd,650000);
+assert.equal(screen(comps.slice(0,2)).midUsd,null);
+assert.equal(screen([comps[0],comps[0],comps[1]]).midUsd,null,"One deed is one sale.");
+assert.equal(screen([...comps,{...comps[0],adjustedIndicationUsd:990000}]).midUsd,null,"Conflicting duplicate is quarantined.");
+for (const change of [{saleDate:"2027-01-01"},{saleDate:"2020-01-01"},{saleDate:"2026-02-30"},{saleDate:"invalid"},{subjectId:"other"},{armLengthVerified:false},{adjustmentBasis:""},{sourceUrl:""},{adjustedIndicationUsd:Infinity}]) {
+ assert.equal(screen([{...comps[0],...change},...comps.slice(1)]).midUsd,null,JSON.stringify(change));
+}
+const incomeArgs={propertyType:"hotel",noiAnnual:500000,capRateLowPct:8,capRateHighPct:10};
+assert.equal(indicateMarketValue(incomeArgs).midUsd,null,"Typed cap rates do not establish market evidence.");
+const income=indicateMarketValue({...incomeArgs,incomeEvidenceRef:"fixture-property-noi",capRateEvidenceRef:"fixture-market-cap-review"});
+assert.equal(income.lowUsd,5000000); assert.equal(income.highUsd,6250000); assert.equal(income.midUsd,5556000);
+const listing={subjectAddress:"3835 Seippes Road Federalsburg MD 21632",sourceAddress:"3835 Seippes Rd Federalsburg MD 21632",sourceName:"Fixture approved broker feed",sourceUrl:"https://example.gov/listing",observedAt:"2026-09-07",asOf,price:750000,status:"Active",approved:true,priceKind:"asking" as const};
+assert.equal(resolveListingPrice(listing).amountUsd,750000);
+for (const change of [{observedAt:"2026-04-01"},{observedAt:"2027-01-01"},{approved:false},{sourceAddress:"3835 Seippes Rd"},{sourceAddress:"3835 Seippes Rd Unit 2 Federalsburg MD 21632"},{status:"Sold"},{status:"Pending"},{priceKind:"assessment" as const},{priceKind:"auction-bid" as const},{price:Infinity}]) assert.equal(resolveListingPrice({...listing,...change}).amountUsd,null,JSON.stringify(change));
+assert.equal(findGovernedListingSnapshot("18885"),null);
+assert.equal(findGovernedListingSnapshot("18885 Sand Hill Road Georgetown DE 19947",asOf)?.askingPrice,null);
+const chassis=readFileSync("src/components/property/lanes/GovernedLaneChassis.tsx","utf8");
+assert(chassis.includes("Comparable evidence pending") && chassis.includes("record.propertyValueScreen"));
 assert(!chassis.includes("const valuation = indicateMarketValue"));
-
-const resolver = readFileSync("src/lib/property/jurisdictionParcelResolver.ts", "utf8");
-assert(resolver.includes("assessmentAsOf: clean(primary.LASTASSD)"));
-assert(resolver.includes("sourceAsOf: clean(primary.SDATDATE)"));
-assert(!resolver.includes("assessmentAsOf: clean(primary.SDATDATE)"));
-
-const propertyFacts = readFileSync("src/app/api/public/property-facts/route.ts", "utf8");
-assert(propertyFacts.includes("propertyValueScreen: indicateMarketValue"));
-assert(propertyFacts.includes("assessmentAsOf: jurisdictionParcel?.assessmentAsOf"));
-
-const proformaRoute = readFileSync("src/app/api/public/property-proforma-pdf/route.ts", "utf8");
-assert(proformaRoute.includes("A county tax assessment is NEVER substituted for acquisition/market value"));
-assert(!proformaRoute.includes("screeningPrice = assessedTotal"));
-
-const pdf = readFileSync("src/lib/pdf/generatePropertyEvaluationPdf.ts", "utf8");
-assert(pdf.includes("Furlong Property Estimate — Screening"));
-assert(pdf.includes("Needs property-specific valuation evidence"));
-
-const workbench = readFileSync("src/components/property/OperatingModelWorkbench.tsx", "utf8");
-assert(workbench.includes("Market cap rate — low %"));
-assert(workbench.includes("It will not apply a residential house-price index or invent a generic cap rate"));
-assert(workbench.includes("Furlong Property Estimate — income-capitalization screen"));
-
-console.log(JSON.stringify({
-  ok: true,
-  residential: { method: residential.methodCode, midpoint: residential.midUsd },
-  undatedResidential: { status: undatedResidential.status, publishesNumber: false },
-  commercial: { method: commercialIncome.methodCode, low: commercialIncome.lowUsd, mid: commercialIncome.midUsd, high: commercialIncome.highUsd },
-  farm: { method: farm.methodCode, low: farm.lowUsd, mid: farm.midUsd, high: farm.highUsd },
-  bareLand: { status: land.status, publishesNumber: false },
-  hardRules: {
-    fhfaResidentialOnly: true,
-    undatedAssessmentCannotBeIndexed: true,
-    mdDataLinkageDateIsNotValuationDate: true,
-    commercialRequiresNoiAndMarketCapRate: true,
-    farmUsesUsdaAgriculturalAnchor: true,
-    askingPriceIsNotMarketTruth: true,
-  },
-}, null, 2));
+const pdf=readFileSync("src/lib/pdf/generatePropertyEvaluationPdf.ts","utf8");
+assert(pdf.includes("Comparable evidence pending") && pdf.includes("input.propertyValueScreen"));
+const workspace=readFileSync("src/components/property/PropertyEvaluationWorkspace.tsx","utf8");
+assert(workspace.includes("residentialBasisPrice = effectiveListedPrice"));
+console.log(JSON.stringify({ok:true,rule:"VALUATION-INTEGRITY-002",assessmentAndStateAverageContextOnly:true,threeDistinctRecentReviewedCompsRequired:true,median:valid.midUsd,askingPriceFreshExactAndApproved:true,webAndExportUseCanonicalOutput:true}));

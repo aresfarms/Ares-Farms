@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { CommercialUseScreen } from "@/lib/property/commercialUseModel";
 import type { PropertyOperatingModelResult, OperatingUseType, OperatingRevenueCadence } from "@/lib/property/propertyOperatingModel";
 import type { OperatingModelAiAdvice } from "@/lib/property/propertyOperatingModelAdvisor";
-import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
+import { parseScenarioNumber, type IncomeCapScenario } from "@/lib/property/calculationMath";
 
 type ExpenseKey = "payrollMonthly" | "utilitiesMonthly" | "insuranceMonthly" | "propertyTaxMonthly" | "maintenanceHousekeepingMonthly" | "foodServicesMonthly" | "managementMarketingMonthly" | "licensingOtherMonthly";
 
@@ -30,7 +30,7 @@ type FormState = {
 };
 
 const money = (n: number | null | undefined) => n == null ? "—" : `$${Math.round(n).toLocaleString("en-US")}`;
-const num = (v: string) => v.trim() === "" ? 0 : Number(v.replace(/,/g, "")) || 0;
+const num = parseScenarioNumber;
 const fieldStyle = { width: "100%", border: "1px solid #CBD5E1", borderRadius: 8, padding: "8px 9px", fontSize: 12.5, boxSizing: "border-box" as const, background: "#fff" };
 const labelStyle = { display: "grid", gap: 4, color: "#475569", fontSize: 11.5, fontWeight: 700 } as const;
 
@@ -83,7 +83,7 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
   const [projectConcern, setProjectConcern] = useState("unknown");
   const [result, setResult] = useState<PropertyOperatingModelResult | null>(null);
   const [advice, setAdvice] = useState<OperatingModelAiAdvice | null>(null);
-  const [valuation, setValuation] = useState<MarketValueIndication | null>(null);
+  const [capScenario, setCapScenario] = useState<IncomeCapScenario | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -129,10 +129,10 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
         requestAdvice: true,
       };
       const response = await fetch("/api/public/property-operating-model", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
-      const data = await response.json() as { ok?: boolean; error?: string; result?: PropertyOperatingModelResult; valuation?: MarketValueIndication | null; advice?: OperatingModelAiAdvice };
+      const data = await response.json() as { ok?: boolean; error?: string; result?: PropertyOperatingModelResult; capScenario?: IncomeCapScenario | null; advice?: OperatingModelAiAdvice };
       if (!response.ok || !data.ok || !data.result) throw new Error(data.error || "The operating-model service could not complete the analysis.");
       setResult(data.result);
-      setValuation(data.valuation ?? null);
+      setCapScenario(data.capScenario ?? null);
       setAdvice(data.advice ?? null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "The model could not be calculated.");
@@ -187,9 +187,9 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
           <label style={labelStyle}>Interest rate %<input inputMode="decimal" value={form.interestRatePct} onChange={(e) => update("interestRatePct", e.target.value)} style={fieldStyle} /></label>
           <label style={labelStyle}>Amortization years<input inputMode="decimal" value={form.amortizationYears} onChange={(e) => update("amortizationYears", e.target.value)} style={fieldStyle} /></label>
           <label style={labelStyle}>DSCR target<input inputMode="decimal" value={form.targetDscr} onChange={(e) => update("targetDscr", e.target.value)} style={fieldStyle} /></label>
-          <label style={labelStyle}>Market cap rate — low % (optional)<input inputMode="decimal" value={form.capRateLowPct} onChange={(e) => update("capRateLowPct", e.target.value)} style={fieldStyle} placeholder="Use local market evidence" /></label>
-          <label style={labelStyle}>Market cap rate — high % (optional)<input inputMode="decimal" value={form.capRateHighPct} onChange={(e) => update("capRateHighPct", e.target.value)} style={fieldStyle} placeholder="Use local market evidence" /></label>
-        </div><p style={{ margin: "7px 0 0", color: "#64748B", fontSize: 11, lineHeight: 1.5 }}>For commercial/hospitality value, Furlong uses NOI ÷ a market-supported cap-rate range. It will not apply a residential house-price index or invent a generic cap rate. Leave these blank until you have local broker/appraiser/closed-sale evidence.</p></details>
+          <label style={labelStyle}>What-if cap rate — low % (optional)<input inputMode="decimal" value={form.capRateLowPct} onChange={(e) => update("capRateLowPct", e.target.value)} style={fieldStyle} placeholder="Use local market evidence" /></label>
+          <label style={labelStyle}>What-if cap rate — high % (optional)<input inputMode="decimal" value={form.capRateHighPct} onChange={(e) => update("capRateHighPct", e.target.value)} style={fieldStyle} placeholder="Use local market evidence" /></label>
+        </div><p style={{ margin: "7px 0 0", color: "#64748B", fontSize: 11, lineHeight: 1.5 }}>This optional scenario uses entered NOI ÷ entered cap rates. It is not a verified market value; a Value Screen requires reviewed operating and local market evidence.</p></details>
 
         <div style={{ display: "grid", gridTemplateColumns: "minmax(0,2fr) minmax(200px,1fr)", gap: 8 }}>
           <label style={labelStyle}>What are you trying to accomplish? (optional)<input value={goal} onChange={(e) => setGoal(e.target.value.slice(0, 1000))} style={fieldStyle} placeholder="Example: convert the hotel to independent senior living and determine what must be true for the property to close." /></label>
@@ -201,10 +201,11 @@ export function OperatingModelWorkbench({ screen, location }: { screen: Commerci
 
         {result && <div style={{ display: "grid", gap: 9 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 7 }}>{[
-            ["Annual revenue", money(result.annualRevenue)], ["NOI", money(result.noi)], ["NOI margin", result.noiMarginPct == null ? "—" : `${result.noiMarginPct.toFixed(1)}%`], ["Annual debt service", money(result.annualDebtService)], ["DSCR", result.dscr == null ? "—" : `${result.dscr.toFixed(2)}x`], ["Break-even occupancy", result.breakEvenOccupancyPct == null ? "—" : `${result.breakEvenOccupancyPct.toFixed(1)}%`], ["Project cost", money(result.totalProjectCost)], ["Equity required", result.equityRequired == null ? "—" : `${money(result.equityRequired)}${result.equityRequiredPct == null ? "" : ` (${result.equityRequiredPct.toFixed(1)}%)`}`], ["Loan supported at target", money(result.maxLoanSupportedAtTarget)]
+            ["Annual revenue", money(result.annualRevenue)], ["NOI", result.coveragePosture === "NEEDS_EVIDENCE" ? "Evidence pending" : money(result.noi)], ["NOI margin", result.coveragePosture === "NEEDS_EVIDENCE" || result.noiMarginPct == null ? "—" : `${result.noiMarginPct.toFixed(1)}%`], ["Annual debt service", money(result.annualDebtService)], ["DSCR", result.dscr == null ? "—" : `${result.dscr.toFixed(2)}x`], ["Break-even occupancy", result.breakEvenOccupancyPct == null ? "—" : `${result.breakEvenOccupancyPct.toFixed(1)}%`], ["Project cost", money(result.totalProjectCost)], ["Equity required", result.equityRequired == null ? "—" : `${money(result.equityRequired)}${result.equityRequiredPct == null ? "" : ` (${result.equityRequiredPct.toFixed(1)}%)`}`], ["Loan supported at target", money(result.maxLoanSupportedAtTarget)]
           ].map(([label, value]) => <div key={label} style={{ border: "1px solid #E2E8F0", borderRadius: 9, padding: "8px 10px", background: "#F8FAFC" }}><div style={{ fontSize: 9.5, color: "#64748B", fontWeight: 800, textTransform: "uppercase" }}>{label}</div><div style={{ marginTop: 3, color: "#0F172A", fontSize: 13, fontWeight: 850 }}>{value}</div></div>)}</div>
-          {valuation?.status === "indicated" && <div style={{ border: "1px solid #C7D7CD", borderRadius: 10, padding: "10px 12px", background: "#F7FBF8", fontSize: 12, color: "#334155", lineHeight: 1.55 }}><strong style={{ color: "#1C4532" }}>Furlong Property Estimate — income-capitalization screen:</strong> {money(valuation.lowUsd)}–{money(valuation.highUsd)} <span style={{ color: "#64748B" }}>(midpoint {money(valuation.midUsd)})</span>. {valuation.method} {valuation.cautions.join(" ")}</div>}
-          {result && !valuation && <div style={{ border: "1px solid #E2E8F0", borderRadius: 9, padding: "8px 10px", background: "#F8FAFC", fontSize: 11.5, color: "#64748B", lineHeight: 1.5 }}><strong>Commercial value screen not run yet.</strong> Enter a market-supported cap-rate range above and recalculate. Furlong will use the modeled NOI; it will not manufacture a commercial value from a residential index.</div>}
+          {result.coveragePosture === "NEEDS_EVIDENCE" && <p role="status" style={{ color: "#92400E" }}>Operating evidence pending: {result.missingInputs.join("; ")}. Any partial revenue or expense arithmetic above is not a supported NOI or financing finding. Enter an amount or explicit zero in each expense field.</p>}
+          {capScenario && <div style={{ border: "1px solid #CBD5E1", padding: 12, fontSize: 12 }}><strong>What-if income capitalization — not market value:</strong> {money(capScenario.lowUsd)}–{money(capScenario.highUsd)} (at the middle cap rate: {money(capScenario.midUsd)}). {capScenario.method}</div>}
+          {!capScenario && <p style={{ fontSize: 12, color: "#64748B" }}>Income-capitalization scenario pending. Complete the operating budget and enter a positive cap-rate range to test the arithmetic. A Furlong Value Screen separately requires reviewed property and market evidence.</p>}
           {result.annualCoverageGap != null && result.annualCoverageGap > 0 && <div style={{ fontSize: 12, color: "#92400E", background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 9, padding: "8px 10px" }}>At the entered debt terms, this property-side case needs about <strong>{money(result.annualCoverageGap)}/yr more NOI</strong> to reach the {result.targetDscr.toFixed(2)}x target. That property-side gap can be attacked through price, debt structure, revenue, occupancy, expense control or a better-supported operating plan. Any borrower-side support is evaluated separately by the selected provider and does not change Furlong's property score.</div>}
           <details><summary style={{ cursor: "pointer", color: "#334155", fontSize: 12, fontWeight: 800 }}>Sensitivity — what happens if occupancy or unit revenue moves?</summary><div style={{ overflowX: "auto", marginTop: 7 }}><table style={{ width: "100%", borderCollapse: "collapse", fontSize: 11.5 }}><thead><tr><th style={{ textAlign: "left", padding: 5 }}>Case</th><th style={{ textAlign: "right", padding: 5 }}>Revenue</th><th style={{ textAlign: "right", padding: 5 }}>NOI</th><th style={{ textAlign: "right", padding: 5 }}>DSCR</th></tr></thead><tbody>{result.sensitivity.map((s) => <tr key={s.label}><td style={{ padding: 5, borderTop: "1px solid #E2E8F0" }}>{s.label}</td><td style={{ padding: 5, borderTop: "1px solid #E2E8F0", textAlign: "right" }}>{money(s.annualRevenue)}</td><td style={{ padding: 5, borderTop: "1px solid #E2E8F0", textAlign: "right" }}>{money(s.noi)}</td><td style={{ padding: 5, borderTop: "1px solid #E2E8F0", textAlign: "right" }}>{s.dscr == null ? "—" : `${s.dscr.toFixed(2)}x`}</td></tr>)}</tbody></table></div></details>
         </div>}

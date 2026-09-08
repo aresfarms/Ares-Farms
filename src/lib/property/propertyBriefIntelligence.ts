@@ -1,3 +1,4 @@
+import type { AgronomicSoilEvidence } from "@/lib/property/cropSuitability";
 /**
  * Property Brief Intelligence — the free "Place Brief" data assembly
  * (PROPERTY_BRIEF_INTELLIGENCE_SPEC_2026-07-15, build-order step 1).
@@ -234,13 +235,7 @@ export interface PropertyBriefIntelligence {
   /** Structured SSURGO soil facts for the parcel (live point query) — the
       agronomic constraints (drainage, slope, capability) that gate what this
       ground can sustainably grow (founder direction 2026-07-29). */
-  soilProfile: {
-    mapUnitName: string | null;
-    farmlandClass: string | null;
-    drainageClass: string | null;
-    slopePct: number | null;
-    capabilityClass: number | null;
-  } | null;
+  soilProfile: AgronomicSoilEvidence | null;
   /** LIVE USDA RD area eligibility (B&I business gate + RD housing gate) —
       the geographic hinge for the rural financing programs (2026-08-05). */
   usdaRural: UsdaRuralEligibility | null;
@@ -1168,6 +1163,9 @@ export function applyResolvedFarmParcelContext(
     primeFarmland: intelligence.soilProfile?.farmlandClass ?? null,
     capabilityClass: intelligence.soilProfile?.capabilityClass ?? null,
     drainageClass: intelligence.soilProfile?.drainageClass ?? null,
+    slopePct: intelligence.soilProfile?.slopePct ?? null,
+    soil: intelligence.soilProfile,
+    evidenceAsOf: intelligence.soilProfile?.retrievedAt,
     cornYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.corn ?? null : null,
     soybeanYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.soybeans ?? null : null,
     wheatYieldPerAcre: countyFips ? COUNTY_YIELDS[countyFips]?.wheat ?? null : null,
@@ -2359,7 +2357,7 @@ export async function buildLocationBriefIntelligence(args: {
         value: bits.join(" · "),
         text:
           `USDA Rural Development's own eligibility layers place this point ` +
-          `${usdaRuralResult.businessEligible ? "inside" : "outside"} the eligible rural area for business programs (B&I / OneRD)` +
+          `${usdaRuralResult.businessEligible == null ? "in an unresolved business eligibility area" : usdaRuralResult.businessEligible ? "inside the eligible rural area for business programs (B&I / OneRD)" : "outside the eligible rural area for business programs (B&I / OneRD)"}` +
           `${usdaRuralResult.housingEligible != null ? ` and ${usdaRuralResult.housingEligible ? "inside" : "outside"} the eligible area for RD housing programs` : ""}. ` +
           `This is the area designation only — program eligibility for a person or project is a separate, licensed determination.`,
         provenance: `Source: USDA Rural Development eligibility service (live point query), retrieved ${usdaRuralResult.retrievedAt} · eligibility.sc.egov.usda.gov`,
@@ -2376,7 +2374,7 @@ export async function buildLocationBriefIntelligence(args: {
     if (soil) {
       const detailBits = [
         soil.dominantComponent && soil.componentPct != null
-          ? `dominant component ${soil.dominantComponent} (~${soil.componentPct}%)`
+          ? `dominant component ${soil.dominantComponent} (~${soil.componentPct}% of the map unit, NOT of the parcel)`
           : soil.dominantComponent,
         soil.drainageClass ? soil.drainageClass.toLowerCase() : null,
         soil.slopePct != null ? `~${soil.slopePct}% representative slope` : null,
@@ -2388,7 +2386,7 @@ export async function buildLocationBriefIntelligence(args: {
           `The USDA soil survey maps this point as ${soil.mapUnitName}` +
           `${detailBits.length ? ` — ${detailBits.join(", ")}` : ""}. ` +
           `${soil.farmlandClass ? `NRCS classifies it as "${soil.farmlandClass}". ` : ""}` +
-          `Soil behavior varies within a map unit — an on-site soil evaluation still governs septic, ` +
+          `This is point-map context, not a parcel-boundary soil analysis. Current field pH and liming history are unverified. Soil behavior varies within a map unit — an on-site soil evaluation still governs septic, ` +
           `drainage, and cropping decisions.`,
         provenance: `Source: USDA NRCS Soil Data Access (SSURGO), retrieved ${soil.retrievedAt} · websoilsurvey.nrcs.usda.gov`,
         tone: "neutral",
@@ -2601,6 +2599,9 @@ export async function buildLocationBriefIntelligence(args: {
           nearestMetroMiles: null,
           // LIVE SSURGO point query (2026-07-28): the ranking reads the actual
           // dominant soil under this address, not a snapshot.
+          soil: soilResult,
+          slopePct: soilResult?.slopePct ?? null,
+          evidenceAsOf: soilResult?.retrievedAt,
           primeFarmland: soilResult?.farmlandClass ?? null,
           capabilityClass: soilResult?.capabilityClass ?? null,
           drainageClass: soilResult?.drainageClass ?? null,
@@ -2675,15 +2676,7 @@ export async function buildLocationBriefIntelligence(args: {
       broadbandPctWired: countyFips ? COUNTY_BROADBAND[countyFips]?.pctWired ?? null : null,
     }),
     // Live SSURGO point query — the agronomic gate for the coverage solver.
-    soilProfile: soilResult
-      ? {
-          mapUnitName: soilResult.mapUnitName,
-          farmlandClass: soilResult.farmlandClass,
-          drainageClass: soilResult.drainageClass,
-          slopePct: soilResult.slopePct,
-          capabilityClass: soilResult.capabilityClass,
-        }
-      : null,
+    soilProfile: soilResult ?? null,
     usdaRural: usdaRuralResult ?? null,
     resolvedCounty,
     chips: buildChips({

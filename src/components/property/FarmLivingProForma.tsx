@@ -152,7 +152,7 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
       }),
     [acres, vi, bestModelNoi, props.soil, asOfYear],
   );
-  const estimatedValue = valuation.combinedUsd ?? valuation.midUsd ?? null;
+  const estimatedValue = null; // A market screen is not an asking price or intended offer.
 
   // Hazard-adjusted rebuild (FEMA NRI + flood zone), inflation-escalated.
   const rebuild = useMemo(
@@ -296,6 +296,15 @@ export function FarmLivingProForma(props: FarmLivingProFormaProps) {
         />
       </span>
     </label>
+  );
+
+  if (!model.ranked.some(row => row.eligible)) return (
+    <section data-testid="farm-living-proforma" style={{ padding: 18, background: paper, color: ink, border: `1px solid ${line}`, borderRadius: 12 }}>
+      <h3>Can this land pay for itself? Operating evidence pending.</h3>
+      <p>Acreage, tax assessments and county averages do not establish this farm's income. No crop winner, borrowing capacity, purchase-price ceiling or failure verdict is calculated from missing evidence.</p>
+      <p>Next: reconcile the usable fields and soil tests, then supply the proposed enterprise's revenue, operating expenses, replacement reserves, startup costs and buyer or lease evidence. Use the operating what-if calculator for explicitly labeled assumptions.</p>
+      <p>{props.priceIsEstimate ? "The supplied estimate is not used as a purchase price." : props.listPrice ? "A price is available; the property operating budget is still required." : "Current asking price, verified contract or intended offer is also needed."}</p>
+    </section>
   );
 
   return (

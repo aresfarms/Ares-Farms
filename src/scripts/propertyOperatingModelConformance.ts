@@ -30,9 +30,9 @@ const model = calculatePropertyOperatingModel({
   targetDscr: 1.25,
 });
 
-assert.equal(model.version, "property-operating-model-v1.0.0");
+assert.equal(model.version, "property-operating-model-v1.1.0");
 assert(model.annualRevenue > 0);
-assert(model.noi < model.annualRevenue);
+assert(model.noi != null && model.noi < model.annualRevenue);
 assert(model.annualDebtService && model.annualDebtService > 0);
 assert(model.dscr != null);
 assert(model.sensitivity.length >= 5);

@@ -68,7 +68,7 @@ export function buildDeterministicOperatingModelAdvice(
   result: PropertyOperatingModelResult,
   projectConcern: ProjectConcern = "unknown",
 ): OperatingModelAiAdvice {
-  const coverage = result.dscr == null
+  const coverage = result.noi == null ? "Operating evidence is incomplete. Supply the missing revenue, occupancy, reserve or expense inputs before Furlong can state NOI or debt coverage." : result.dscr == null
     ? "Debt-service coverage cannot be tested until loan amount, rate and amortization are supplied."
     : `Based on the entered property/project operating assumptions, modeled NOI is $${result.noi.toLocaleString("en-US")} and property-side DSCR is ${result.dscr.toFixed(2)}x against the entered ${result.targetDscr.toFixed(2)}x target.`;
   return {

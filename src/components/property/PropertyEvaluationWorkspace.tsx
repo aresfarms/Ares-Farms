@@ -1,5 +1,7 @@
 "use client";
 
+import { annualLevelDebtService, transactionPrice } from "@/lib/property/calculationMath";
+
 import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
 
 import { useEffect, useMemo, useState } from "react";
@@ -2657,25 +2659,10 @@ export function PropertyEvaluationWorkspace({
     useState<PropertyProfileId | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
-  const effectiveListedPrice = facts?.propertyRecord?.price ?? listedPrice;
-  // Residential ownership-cost/pro-forma basis: a real asking/entered price
-  // wins. Without one, use Furlong's residential-only assessment/HPI screen
-  // ONLY when that screen is actually supportable. Never substitute a raw tax
-  // assessment for market/acquisition value merely because no listing exists.
-  const residentialValueScreen =
-    facts?.propertyRecord?.propertyValueScreen ?? null;
-  const residentialScreenMid =
-    residentialValueScreen?.status === "indicated" &&
-    residentialValueScreen.profileId === "residential"
-      ? residentialValueScreen.midUsd
-      : null;
-  const residentialBasisPrice = effectiveListedPrice ?? residentialScreenMid;
-  const residentialBasisNote =
-    effectiveListedPrice != null
-      ? null
-      : residentialScreenMid != null
-        ? `No asking price is published for this parcel, so the residential ownership-cost screen uses the Furlong Property Estimate midpoint of $${residentialScreenMid.toLocaleString("en-US")} as a stated planning basis. ${residentialValueScreen?.method ?? ""} This is not an appraisal; enter an intended offer when you have one.`
-        : null;
+  const effectiveListedPrice = transactionPrice(facts?.propertyRecord?.price) ?? transactionPrice(listedPrice);
+  // A value screen is not a transaction price. No assessment, AVM, midpoint or state-average substitution.
+  const residentialBasisPrice = effectiveListedPrice;
+  const residentialBasisNote = null;
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState<"export" | "view" | null>(null);
   const [proformaError, setProformaError] = useState<string | null>(null);
@@ -4087,9 +4074,7 @@ export function PropertyEvaluationWorkspace({
           const rate =
             ownershipContext.fsa?.ownershipDirectPct ??
             ownershipContext.rates.rate30;
-          const annualDebtService =
-            (effectiveListedPrice * 0.8 * (rate / 100)) /
-            (1 - Math.pow(1 + rate / 100, -40));
+          const annualDebtService = annualLevelDebtService(effectiveListedPrice * 0.8, rate, 40, 12) ?? 0;
           const model = optimizeAgriculturalOpportunities({
             acres: acreage,
             purchasePrice: effectiveListedPrice,
@@ -4109,7 +4094,7 @@ export function PropertyEvaluationWorkspace({
               .slice(0, 8)
               .map((item, index) => ({
                 label: `${index + 1}. ${item.label}`,
-                value: `${item.fit.toFixed(0)}/100 fit · ${item.usedAcres.toFixed(1)} acres modeled · ${item.eligible ? dollars(item.noi) + " annual NOI" : "blocked pending feasibility evidence"}`,
+                value: item.eligible ? dollars(item.noi) + " illustrative annual NOI" : "Site-specific field allocation and operating evidence pending",
               })),
             operatingRows: model.diversified.length
               ? model.diversified.map((item) => ({
@@ -4120,7 +4105,7 @@ export function PropertyEvaluationWorkspace({
                   {
                     label: "Diversified portfolio",
                     value:
-                      "No feasible portfolio until constraints are resolved",
+                      "Portfolio comparison pending operating evidence; no infeasibility conclusion",
                   },
                 ],
             debtRows: [
@@ -4129,8 +4114,8 @@ export function PropertyEvaluationWorkspace({
                 value: dollars(annualDebtService),
               },
               {
-                label: "Highest-ranked diversified NOI",
-                value: dollars(model.portfolioNoi),
+                label: "Whole-parcel operating NOI",
+                value: model.diversified.length ? dollars(model.portfolioNoi) : "Operating evidence pending",
               },
               {
                 label: "Diversified DSCR",
@@ -4376,7 +4361,7 @@ export function PropertyEvaluationWorkspace({
           ? "residential"
           : "commercial";
     const screeningPrice =
-      effectiveListedPrice ?? facts?.propertyRecord?.assessedTotalValue ?? null;
+      effectiveListedPrice;
     let noiAnnual: number | null = null;
     let noiBasis: string | null = null;
     // Commercial: model income per candidate use (founder 2026-08-05 — the
@@ -4409,15 +4394,10 @@ export function PropertyEvaluationWorkspace({
       ownershipContext?.fsa?.ownershipDirectPct ??
       ownershipContext?.rates.rate30 ??
       6.5;
-    const farmDebtService =
-      screeningPrice != null
-        ? (screeningPrice * 0.8 * (farmRate / 100)) /
-          (1 - Math.pow(1 + farmRate / 100, -40))
-        : 0;
-    // The answer-first page must use the agricultural optimizer that already
-    // powers the report. Missing diligence inputs reduce this to a clearly
-    // labeled screening result; they do not erase a usable acreage-grounded
-    // ranking or replace every modeled NOI with null.
+    const farmDebtService = screeningPrice != null
+      ? annualLevelDebtService(screeningPrice * 0.8, farmRate, 40, 12) ?? 0 : 0;
+    // Automatic findings require reviewed property evidence. Generic enterprise
+    // budgets are available only in the explicitly labeled what-if tool.
     const farmUseScreen =
       laneId === "farm" && farmAcreage != null
         ? optimizeAgriculturalOpportunities({
@@ -4457,14 +4437,6 @@ export function PropertyEvaluationWorkspace({
       noiAnnual = farmPortfolio.modeledNoiAnnual;
       noiBasis =
         farmPortfolio.basis ?? "segment-aware parcel operating scenario";
-    } else if (
-      laneId === "farm" &&
-      farmUseScreen &&
-      farmUseScreen.portfolioNoi > 0
-    ) {
-      noiAnnual = farmUseScreen.portfolioNoi;
-      noiBasis =
-        "preliminary diversified agricultural portfolio using disclosed acreage and screening assumptions";
     }
     const ctx: ProgramFitContext = {
       laneId,
@@ -4497,11 +4469,11 @@ export function PropertyEvaluationWorkspace({
               {
                 id: "farm-parcel-portfolio",
                 label: "Diversified whole-parcel agricultural portfolio",
-                noiAnnual: farmUseScreen.portfolioNoi,
+                noiAnnual: farmCoverageReady ? farmPortfolio?.modeledNoiAnnual ?? null : null,
                 basis:
                   farmPortfolio?.basis ??
-                  "weighted combination of the three strongest feasible agricultural enterprises under disclosed screening assumptions",
-                evidenceStatus: farmCoverageReady ? "supported" as const : "screening" as const,
+                  "Whole-parcel source-backed operating budget pending",
+                evidenceStatus: farmCoverageReady ? "supported" as const : "needs-evidence" as const,
                 timeToIncome: null,
               },
               ...farmUseScreen.ranked.slice(0, 8).map((option, index) => ({
@@ -4509,9 +4481,9 @@ export function PropertyEvaluationWorkspace({
                 label: option.label,
                 noiAnnual: option.eligible ? option.noi : null,
                 basis:
-                  `${option.note} Fit ${option.fit.toFixed(0)}/100; ${option.usedAcres.toFixed(1)} acres modeled; ${option.yearsToCash}-year estimated path to cash.`,
+                  `${option.note} Field allocation, timing and operating economics remain evidence-pending.`,
                 evidenceStatus: option.eligible ? "screening" as const : "needs-evidence" as const,
-                timeToIncome: `${option.yearsToCash} year${option.yearsToCash === 1 ? "" : "s"}`,
+                timeToIncome: null,
               })),
             ]
           : [
@@ -4957,37 +4929,7 @@ export function PropertyEvaluationWorkspace({
         stabilizedAnnualNoi: number;
         methodology: string;
       }> = [];
-      if (
-        isFarmLaneDoc &&
-        effectiveListedPrice != null &&
-        acreage &&
-        fsaRatePct != null
-      ) {
-        const annualDebtService =
-          (effectiveListedPrice * 0.8 * (fsaRatePct / 100)) /
-          (1 - Math.pow(1 + fsaRatePct / 100, -40));
-        const model = optimizeAgriculturalOpportunities({
-          acres: acreage,
-          purchasePrice: effectiveListedPrice,
-          debtService: annualDebtService,
-          waterScore: 70,
-          laborCapacity: 55,
-          capitalCapacity: 55,
-          marketAccess: 60,
-          gridEvidence: false,
-          solarZoningEvidence: false,
-        });
-        revenueUnits = model.diversified.slice(0, 6).map((item) => ({
-          unitName: item.label,
-          unitDescription: `${Math.round(item.portfolioShare * 100)}% of the diversified screening portfolio on ~${acreage.toLocaleString("en-US", { maximumFractionDigits: 1 })} acres`,
-          conservativeAnnualNoi: Math.round(
-            item.noi * item.portfolioShare * 0.75,
-          ),
-          stabilizedAnnualNoi: Math.round(item.noi * item.portfolioShare),
-          methodology:
-            "Screening optimizer over county economics and stated capacity assumptions — editable assumptions, not appraisals, bids, or contracts.",
-        }));
-      }
+      // Revenue units require source-backed whole-parcel budgets; automatic placeholder earnings are not exported.
       const additionalProperties = otherSavedProperties
         .filter((p) => proformaIncludedIds.includes(p.id))
         .map((p) => {
@@ -5797,7 +5739,7 @@ export function PropertyEvaluationWorkspace({
                     {rankingPrice == null
                       ? workspaceProfile.id === "residential"
                         ? "Enter the asking price or your intended offer above to populate the finance math."
-                        : "No price entered yet — the finance math runs on a stated screening value (the parcel's assessed value, else the USDA state farmland average), with that basis printed on every figure. Enter your intended offer above to run your own number instead."
+                        : "No verified asking price or intended offer is available yet. Furlong checks approved listing evidence; an unresolved price remains pending and tax assessments or state averages are never substituted."
                       : ""}
                   </p>
                   {workspaceProfile.id !== "residential" &&

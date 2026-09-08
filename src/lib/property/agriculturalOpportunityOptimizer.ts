@@ -1,5 +1,6 @@
+import { assessAlfalfaSuitability, type AgronomicSoilEvidence } from "@/lib/property/cropSuitability";
 export type OpportunityKey = "row-crops"|"cash-rent"|"hay-pasture"|"alfalfa-small-square"|"livestock"|"poultry"|"specialty-crops"|"greenhouse"|"solar-lease"|"agrivoltaics"|"battery-storage"|"mixed-portfolio";
-export type OpportunityAssumptions = { acres:number; purchasePrice:number; debtService:number; waterScore:number; laborCapacity:number; capitalCapacity:number; marketAccess:number; gridEvidence:boolean; solarZoningEvidence:boolean; hayYieldTonsPerAcre?:number; hayBaleWeightLb?:number; haySummerPrice?:number; hayWinterPrice?:number; hayWinterShare?:number; hayVariableCostPerAcre?:number; hayHandlingCostPerBale?:number; hayShrinkPct?:number; irrigationInstallCost?:number; irrigationAnnualPowerCost?:number; irrigationAnnualMaintenanceCost?:number; soilSuitability?:number; weatherSuitability?:number; localMarketDepth?:number; competitionPressure?:number;
+export type OpportunityAssumptions = { scenarioMode?:boolean; soil?:AgronomicSoilEvidence|null; acres:number; purchasePrice:number; debtService:number; waterScore:number; laborCapacity:number; capitalCapacity:number; marketAccess:number; gridEvidence:boolean; solarZoningEvidence:boolean; hayYieldTonsPerAcre?:number; hayBaleWeightLb?:number; haySummerPrice?:number; hayWinterPrice?:number; hayWinterShare?:number; hayVariableCostPerAcre?:number; hayHandlingCostPerBale?:number; hayShrinkPct?:number; irrigationInstallCost?:number; irrigationAnnualPowerCost?:number; irrigationAnnualMaintenanceCost?:number; soilSuitability?:number; weatherSuitability?:number; localMarketDepth?:number; competitionPressure?:number;
  /** Market-linked row-crop revenue $/ac = CURRENT USDA grain price × county yield.
   * When supplied, row-crop revenue tracks the grain market instead of the static
   * benchmark, so the pro-forma reflects what the crop is worth right now. */
@@ -26,8 +27,9 @@ const CANDIDATES: Candidate[] = [
 ];
 const clamp=(n:number,a=0,b=100)=>Math.max(a,Math.min(b,n));
 export function optimizeAgriculturalOpportunities(a:OpportunityAssumptions){
+ const validInputs = [a.acres,a.purchasePrice,a.debtService,a.waterScore,a.laborCapacity,a.capitalCapacity,a.marketAccess].every(Number.isFinite) && a.acres>0 && a.purchasePrice>=0 && a.debtService>=0;
  const ranked=CANDIDATES.map(c=>{
-  const eligible= c.gate==="grid"?a.gridEvidence:c.gate==="solar"?(a.gridEvidence&&a.solarZoningEvidence):true;
+  const eligible=validInputs && a.scenarioMode === true && (c.key !== "alfalfa-small-square" || assessAlfalfaSuitability(a.soil, a.soil?.retrievedAt).status === "supported-screen") && (c.gate==="grid"?a.gridEvidence:c.gate==="solar"?(a.gridEvidence&&a.solarZoningEvidence):true);
   const usedAcres=a.acres*c.acresShare;
   const hayYield=a.hayYieldTonsPerAcre ?? 5;
   const baleWeight=Math.max(35,a.hayBaleWeightLb ?? 55);
@@ -39,13 +41,13 @@ export function optimizeAgriculturalOpportunities(a:OpportunityAssumptions){
   const rowCropGross=c.key==="row-crops"&&a.rowCropMarketGrossPerAcre!=null&&a.rowCropMarketGrossPerAcre>0?a.rowCropMarketGrossPerAcre:c.grossPerAcre;
   const gross=eligible?(c.key==="alfalfa-small-square"?sellableBales*averageBalePrice:usedAcres*rowCropGross):0;
   const irrigationDependent=c.irrigates===true;
-  const irrigationAnnual=irrigationDependent?usedAcres*IRRIGATION_ANNUAL_PER_ACRE:0;
+  const irrigationAnnual=irrigationDependent?(a.irrigationAnnualPowerCost != null || a.irrigationAnnualMaintenanceCost != null ? (a.irrigationAnnualPowerCost ?? 0) + (a.irrigationAnnualMaintenanceCost ?? 0) : usedAcres*IRRIGATION_ANNUAL_PER_ACRE):0;
   const baseOpex=c.key==="alfalfa-small-square"
     ? usedAcres*(a.hayVariableCostPerAcre ?? 1400)+sellableBales*(a.hayHandlingCostPerBale ?? 2)
     : gross*c.costPct;
   const opex=baseOpex+irrigationAnnual;
   const noi=gross-opex;
-  const irrigationCapex=irrigationDependent?usedAcres*IRRIGATION_INSTALL_PER_ACRE:0;
+  const irrigationCapex=irrigationDependent?(a.irrigationInstallCost ?? usedAcres*IRRIGATION_INSTALL_PER_ACRE):0;
   const startup=usedAcres*c.startupPerAcre+irrigationCapex;
   const soilFit=clamp((a.soilSuitability ?? 50)-c.soil+50);
   const weatherFit=clamp((a.weatherSuitability ?? 50)-c.weather+50);
@@ -65,5 +67,5 @@ export function optimizeAgriculturalOpportunities(a:OpportunityAssumptions){
  const feasible=ranked.filter(r=>r.eligible&&r.fit>=45&&r.soilFit>=35&&r.weatherFit>=35&&r.marketFit>=35);
  const diversified=feasible.slice(0,3).map((r,i)=>({...r,portfolioShare:[.5,.3,.2][i]||0}));
  const portfolioNoi=diversified.reduce((s,r)=>s+r.noi*r.portfolioShare,0);
- const mostProfitable=[...ranked].filter(r=>r.eligible).sort((x,y)=>y.noi-x.noi)[0]??null; const mostFeasible=[...ranked].filter(r=>r.eligible).sort((x,y)=>y.fit-x.fit)[0]??null; const bestRiskAdjusted=[...ranked].filter(r=>r.eligible).sort((x,y)=>y.riskAdjustedNoi-x.riskAdjustedNoi)[0]??null; return {ranked,diversified,portfolioNoi,portfolioDscr:a.debtService>0?portfolioNoi/a.debtService:null,mostProfitable,mostFeasible,bestRiskAdjusted,warning:"Screening model only. Rankings change when soils, water, labor, contracts, market access, zoning, interconnection, operating history and project economics are verified. Borrower-side underwriting remains with the selected provider and is not part of this property ranking."};
+ const mostProfitable=[...ranked].filter(r=>r.eligible).sort((x,y)=>y.noi-x.noi)[0]??null; const mostFeasible=[...ranked].filter(r=>r.eligible).sort((x,y)=>y.fit-x.fit)[0]??null; const bestRiskAdjusted=[...ranked].filter(r=>r.eligible).sort((x,y)=>y.riskAdjustedNoi-x.riskAdjustedNoi)[0]??null; return {ranked,diversified,portfolioNoi,portfolioDscr:diversified.length>0&&a.debtService>0?portfolioNoi/a.debtService:null,mostProfitable,mostFeasible,bestRiskAdjusted,evidenceStatus:"scenario-only" as const, warning:"Illustrative what-if assumptions only, not verified property economics, crop suitability or a profitability recommendation. No default scenario can supply transaction underwriting or an export revenue projection. Rankings change when soils, water, labor, contracts, market access, zoning, interconnection, operating history and project economics are verified. Borrower-side underwriting remains with the selected provider and is not part of this property ranking."};
 }

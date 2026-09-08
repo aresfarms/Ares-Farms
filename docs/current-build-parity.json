@@ -76,7 +76,7 @@
   },
   "parityImplementationCommit": "19e654b",
   "propertyUseIntegrity": {
-    "runtimeVersion": "farm-use-integrity-v1.0.0",
+    "runtimeVersion": "farm-use-integrity-v2.0.0",
     "currentUseClassificationIsNotHighestBestUse": true,
     "agriculturalEnterpriseScreenIsNotPropertyWideHighestBestUse": true,
     "verifiedAcreageRequiredBeforeAgriculturalLeaderClaim": true,
@@ -159,5 +159,16 @@
       "0062"
     ]
   },
-  "platformExperienceEconomicsAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
+  "platformExperienceEconomicsAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+  "calculationIntegrity": {
+    "amendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-07_CALCULATION_INTEGRITY.md",
+    "version": "calculation-math-v1.0.0",
+    "updatedAt": "2026-09-08",
+    "allPlatformCalculationsCertified": false,
+    "assessmentAsMarketValue": false,
+    "unverifiedCropRanking": false,
+    "missingEvidenceAsZero": false,
+    "governmentCandidatesAreVerifiedComparables": false,
+    "nyDeCurrentBatchImported": false
+  }
 }

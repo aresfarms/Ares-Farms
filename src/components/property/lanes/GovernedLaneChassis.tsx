@@ -87,6 +87,7 @@ export type LaneWorkspaceProps = ChartTableBriefProps & {
     assessedImprovementValue?: number | null;
     assessedTotalValue?: number | null;
     propertyValueScreen?: MarketValueIndication | null;
+    priceEvidence?: { status: string; reason: string; observedAt: string | null } | null;
     publicWater?: boolean | null;
     publicSewer?: boolean | null;
     waterfront?: boolean | null;
@@ -187,6 +188,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
       record.exactAddress ? { label: "Verified address", value: record.exactAddress, text: "The entered property address resolved successfully through the public address-verification path.", provenance: source, tone: "neutral" as const } : null,
       place ? { label: "Property location", value: place, text: "Town, county, and state carried into the property record from the verified intake context.", provenance: source, tone: "neutral" as const } : null,
       record.price != null ? { label: "Asking price", value: `$${record.price.toLocaleString("en-US")}`, text: "Current seller asking price carried by the matched governed listing snapshot.", provenance: record.listingSourceName ? `Source: ${record.listingSourceName}${record.listingSourceAsOf ? ` · ${record.listingSourceAsOf}` : ""}` : source, tone: "neutral" as const } : null,
+      record.priceEvidence?.status === "price-pending" ? { label: "Current asking price", value: "Price evidence pending", text: record.priceEvidence.reason + " Supply a current listing link, asking-price confirmation, verified contract or intended offer. No assessment is substituted.", provenance: record.priceEvidence.observedAt ? "Last source observation: " + record.priceEvidence.observedAt : "Current price not established", tone: "caution" as const } : null,
       // Market status is ALWAYS shown — because its absence is itself the
       // most decision-relevant fact a visitor can have. A brief that simply
       // omits it lets someone read a full report on a property that sold
@@ -203,7 +205,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
       record.deedReference ? { label: "Recorded deed reference", value: record.deedReference, text: record.legalDescription || "Deed book and page reference published with the parcel record.", provenance: source, tone: "neutral" as const } : null,
       record.assessedLandValue != null ? { label: "County-assessed land value", value: `$${record.assessedLandValue.toLocaleString("en-US")}`, text: "The land component of the county's estimated value for taxation. It is not a market appraisal and not a seller asking price — a lender's appraiser or the market may conclude differently.", provenance: source, tone: "neutral" as const } : null,
       record.assessedImprovementValue != null ? { label: "County-assessed improvement value", value: `$${record.assessedImprovementValue.toLocaleString("en-US")}`, text: "The building/improvement component of the county's estimated value for taxation — not a market appraisal.", provenance: source, tone: "neutral" as const } : null,
-      record.assessedTotalValue != null ? { label: "County-assessed total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: `The county's total estimated value FOR TAXATION${record.parcelSourceAsOf ? ` as published by the source on ${record.parcelSourceAsOf}` : ", of a vintage this source does not publish"}. Read it as a tax figure and nothing else. Assessed values routinely sit far below — occasionally far above — what a property actually trades for, because many jurisdictions assess against a frozen base year and none of them re-assess when a property goes under contract. It is not an appraisal, not a market-price opinion, and not Furlong's view of what this property is worth.`, provenance: source, tone: "caution" as const } : null,
+      record.assessedTotalValue != null ? { label: "County-assessed total value", value: `$${record.assessedTotalValue.toLocaleString("en-US")}`, text: `The county's total estimated value FOR TAXATION${record.parcelSourceAsOf ? ` as published by the source on ${record.parcelSourceAsOf}` : ", of a vintage this source does not publish"}. Read it as a tax figure and nothing else. Assessed values routinely sit far below — occasionally far above — what a property actually trades for, because many jurisdictions assess against a frozen base year and assessment timing differs from a negotiated transaction. It is not an appraisal, not a market-price opinion, and not Furlong's view of what this property is worth.`, provenance: source, tone: "caution" as const } : null,
       // FURLONG'S OWN INDICATED VALUE (founder direction 2026-08-06: "it must
       // publish that data, that is the entire point of that part of the
       // platform"). The assessed value must never stand as the only dollar
@@ -211,8 +213,8 @@ export function GovernedLaneChassis(props: ChassisProps) {
       // reader takes away as what the property is worth.
       valuation
         ? valuation.status === "indicated"
-          ? { label: "Furlong Property Estimate — screening", value: `$${valuation.lowUsd!.toLocaleString("en-US")} – $${valuation.highUsd!.toLocaleString("en-US")}`, text: `Midpoint $${valuation.midUsd!.toLocaleString("en-US")} · ${valuation.profileId} · ${valuation.confidence}. ${valuation.method} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.map((sourceLine) => `Source: ${sourceLine}`).join(" · "), tone: "neutral" as const }
-          : { label: "Furlong Property Estimate — screening", value: "Needs property-specific valuation evidence", text: `${valuation.method}${valuation.requiredInputs.length ? ` Needed next: ${valuation.requiredInputs.join("; ")}.` : ""} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.length ? valuation.sources.map((sourceLine) => `Source: ${sourceLine}`).join(" · ") : "Stated limitation — Furlong does not publish a value when the valuation method lacks the evidence it requires", tone: "caution" as const }
+          ? { label: "Furlong Value Screen", value: `$${valuation.lowUsd!.toLocaleString("en-US")} – $${valuation.highUsd!.toLocaleString("en-US")}`, text: `Midpoint $${valuation.midUsd!.toLocaleString("en-US")} · ${valuation.profileId} · ${valuation.confidence}. ${valuation.method} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.map((sourceLine) => `Source: ${sourceLine}`).join(" · "), tone: "neutral" as const }
+          : { label: "Furlong Value Screen", value: "Comparable evidence pending", text: `${valuation.method}${valuation.requiredInputs.length ? ` Needed next: ${valuation.requiredInputs.join("; ")}.` : ""} ${valuation.cautions.join(" ")}`, provenance: valuation.sources.length ? valuation.sources.map((sourceLine) => `Source: ${sourceLine}`).join(" · ") : "Stated limitation — Furlong does not publish a value when the valuation method lacks the evidence it requires", tone: "caution" as const }
         : null,
       // Divergence is evidence to reconcile. A closed/contract transaction is
       // stronger than an asking price; an asking price remains a seller signal.
@@ -247,7 +249,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
   // authorized diligence workflow, but are not rendered as customer property facts.
   const unknowns = useMemo(() => suppressResolvedUnknowns(facts, rawUnknowns), [facts, rawUnknowns]);
   void unknowns;
-  const hasPrice = !/not captured|unknown|enter|not provided|—/i.test(props.priceLabel);
+  const hasPrice = (props.propertyRecord?.price ?? 0) > 0 || /\$\s*[1-9][\d,]*(?:\.\d+)?/.test(props.priceLabel) && !/assess|estimate|starting bid|minimum bid|benchmark/i.test(props.priceLabel);
   const ownerAssertions = [...(props.intelligence?.ownerAssertions ?? []), ...localOwnerAssertions];
   const deedEvidence = (props.deedEvidence ?? []).filter((record) => record.domain === "title");
 
@@ -321,11 +323,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
         const farmScreen = props.intelligence?.farmBestUse ?? null;
         const currentUse = props.propertyRecord?.landUse ?? props.propertyRecord?.rawPropertyStyle ?? props.propertyType;
         const answer = lane.id === "farm"
-          ? farmScreen?.evidenceStatus === "supported-screen"
-            ? `The record supports ${currentUse || "an agricultural property"}. ${farmScreen.options[0]?.name ?? "No enterprise"} leads the supported agricultural fit screen, but the property's overall highest-and-best use still requires comparison with every legally and physically feasible alternative.`
-            : farmScreen?.evidenceStatus === "screening" && farmScreen.options[0]
-              ? `The record supports ${currentUse || "an agricultural property"}. ${farmScreen.options[0].name} leads Furlong's preliminary agricultural enterprise screen from the acreage, soils, location, and public operating benchmarks currently available. Treat that as the first option to test—not a guarantee—while Furlong compares the other profitable and property-wide alternatives below.`
-              : `The record supports ${currentUse || "a farm or land property"}, but verified acreage is still missing. Furlong cannot responsibly rank enterprises until parcel size is known; soil quality alone is not enough.`
+          ? `The record identifies ${currentUse || "a farm or land property"}. ${farmScreen?.headline ?? "Agricultural suitability and profitability remain evidence-pending."}`
           : lane.id === "residential"
             ? `The strongest supported starting use is residential. Furlong has not found enough verified evidence to claim a conversion or income use is better than using the property as a home.`
             : `The property should be evaluated first as ${currentUse || "commercial real estate"}. The strongest business use remains provisional until permitted use, demand, building condition, operating income, and acquisition price are verified.`;
@@ -334,18 +332,18 @@ export function GovernedLaneChassis(props: ChassisProps) {
           : lane.id === "farm" && farmScreen?.evidenceStatus === "supported-screen"
             ? "Agricultural screen supported"
             : lane.id === "farm" && farmScreen?.evidenceStatus === "screening"
-              ? "Preliminary agricultural ranking"
+              ? "Agricultural evidence pending"
               : "Preliminary — key evidence remains";
         const materialRisk = factsByTab.environmental.find((fact) => fact.tone === "caution") ?? null;
         const environmentalIndication = materialRisk
           ? `${materialRisk.label}: ${materialRisk.value}`
           : factsByTab.environmental.length > 0
-            ? "No material issue identified in the basic screen; professional review may still be required"
+            ? "Only the listed source checks have been completed; missing checks and parcel-wide environmental conditions remain unresolved"
             : "Environmental screen not yet resolved";
         const nextNeeded = !hasPrice
           ? "Enter the asking price or intended offer. Without it, Furlong cannot compare returns, debt service, cash to close, or transaction economics."
           : lane.id === "farm" && farmScreen?.missingCriticalInputs.length
-            ? `The agricultural ranking still needs ${farmScreen.missingCriticalInputs.slice(0, 2).join(" and ")} before it is dependable.`
+            ? `The agricultural comparison needs ${farmScreen.missingCriticalInputs.join(" and ")} before it is dependable.`
             : props.pauseLine || "Confirm condition, legal use, market demand, and the operating assumptions before relying on the result.";
         const totalFacts = facts.length;
         return <>
@@ -362,7 +360,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
               <div style={{ border: "1px solid rgba(255,255,255,.16)", borderRadius: 12, padding: 14, background: "rgba(255,255,255,.045)" }}>
                 <span style={{ display: "block", color: "#AFC7CD", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>What it is</span>
                 <strong style={{ display: "block", marginTop: 6, color: "#fff", fontSize: 18, lineHeight: 1.4 }}>{currentUse || lane.consumerLaneLabel}</strong>
-                {lane.id === "farm" && farmScreen && <span style={{ display: "block", marginTop: 7, color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.5 }}>{farmScreen.evidenceStatus === "supported-screen" ? `Supported agricultural leader: ${farmScreen.options[0]?.name ?? "not yet established"}.` : farmScreen.evidenceStatus === "screening" && farmScreen.options[0] ? `Preliminary agricultural leader: ${farmScreen.options[0].name}. Other ranked and diversified options remain visible for comparison.` : "Agricultural enterprise ranking requires verified acreage."} Property-wide use remains a preliminary comparison until legal and physical feasibility is confirmed.</span>}
+                {lane.id === "farm" && farmScreen && <span style={{ display: "block", marginTop: 7, color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.5 }}>{farmScreen.evidenceStatus === "supported-screen" ? `Supported agricultural leader: ${farmScreen.options[0]?.name ?? "not yet established"}.` : "Agricultural enterprise ranking and profitability remain evidence-pending; no leading use is established."} Property-wide use remains a preliminary comparison until legal and physical feasibility is confirmed.</span>}
               </div>
               <div style={{ border: "1px solid rgba(255,255,255,.16)", borderRadius: 12, padding: 14, background: "rgba(255,255,255,.045)" }}>
                 <span style={{ display: "block", color: "#AFC7CD", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>Environmental indication</span>
@@ -374,7 +372,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
                 {dscr && modeledIncome && annualDebtService ? <>
                   <div style={{ display: "flex", gap: "12px 22px", alignItems: "baseline", flexWrap: "wrap" }}>
                     <strong style={{ color: "#fff", fontSize: 27, lineHeight: 1 }}>{dscr}x DSCR</strong>
-                    <span style={{ color: "#F3D98D", fontSize: 13, fontWeight: 800 }}>Clears the 1.25x screening floor</span>
+                    <span style={{ color: "#F3D98D", fontSize: 13, fontWeight: 800 }}>{Number(dscr) >= 1.25 ? "Scenario meets the 1.25x screening target" : "Scenario does not meet the 1.25x screening target"}</span>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(175px,1fr))", gap: 10 }}>
                     <div><strong style={{ display: "block", color: "#fff", fontSize: 17 }}>{modeledIncome}/yr</strong><span style={{ color: "#AFC7CD", fontSize: 11.5 }}>Modeled annual income</span></div>

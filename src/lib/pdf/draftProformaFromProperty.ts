@@ -1,3 +1,4 @@
+import { annualLevelDebtService, transactionPrice } from "@/lib/property/calculationMath";
 /**
  * draftProformaFromProperty — property-side DRAFT of the Ultimate Pro Forma
  * (founder direction 2026-07-29: the downloadable pro forma must be the REAL
@@ -41,7 +42,7 @@ export interface DraftProformaPropertyArgs {
   /** Published FSA direct farm-ownership rate, percent (screening basis). */
   fsaRatePct: number | null;
   /** Where acquisitionPrice came from — printed with every figure it drives
-      (entered offer > listing price > assessed value > state-average screen). */
+      (explicit intended offer, verified contract or current asking price only). */
   valuationNote: string | null;
   revenueUnits: DraftProformaRevenueUnit[];
   /** OPTIONAL multi-property acquisition (founder direction 2026-07-29):
@@ -57,7 +58,7 @@ const TO_SUPPLY = "TO BE SUPPLIED AT UNDERWRITING";
 // nonresidential property score, program ranking, or Capital Network ranking.
 const VIA_FINANCIAL_MODULE = "PROVIDER-REQUIRED BORROWER EVIDENCE — RECIPIENT-BOUND; NOT A FURLONG PROPERTY-SCORING INPUT";
 
-const dollars = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
+const dollars = (value: number | null) => value == null ? "Operating evidence pending" : `${Math.round(value).toLocaleString("en-US")}`;
 
 /** Level annual payment on principal at ratePct over years (screening math). */
 function levelDebtService(principal: number, ratePct: number, years: number): number {
@@ -88,7 +89,7 @@ const LANE_AUTHORITY: Record<LoanLane, { refs: string[]; formVersion: string }> 
 };
 
 export function buildDraftProformaInput(args: DraftProformaPropertyArgs): UltimateProformaInput {
-  const price = args.acquisitionPrice;
+  const price = transactionPrice(args.acquisitionPrice);
   const where = [args.county, args.state].filter(Boolean).join(", ");
   const authority = LANE_AUTHORITY[args.lane];
 
@@ -97,15 +98,15 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
   // properties, each priced one contributes to the combined acquisition;
   // unpriced ones appear as rows whose figures await appraisal/offer.
   const additional = args.additionalProperties ?? [];
-  const pricedAdditional = additional.filter((p): p is DraftProformaAdditionalProperty & { price: number } => p.price != null && p.price > 0);
+  const pricedAdditional = additional.filter((p): p is DraftProformaAdditionalProperty & { price: number } => transactionPrice(p.price) != null);
   const combinedPrice =
-    price != null || pricedAdditional.length > 0
+    price != null && pricedAdditional.length === additional.length
       ? (price ?? 0) + pricedAdditional.reduce((sum, p) => sum + p.price, 0)
       : null;
   const propertyCount = 1 + additional.length;
   const unmodeledIncomeNote =
     additional.length > 0
-      ? ` Income is modeled for the primary property only — run each included property through its own Furlong report to model its income; until then combined coverage is understated.`
+      ? ` Income is modeled for the primary property only — run each included property through its own Furlong report to model its income; until all included prices and operating budgets are supplied, combined coverage is unresolved.`
       : "";
 
   // ── Screening finance math (every assumption stated in the document) ──────
@@ -117,18 +118,19 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
   const totalProject = combinedPrice != null ? combinedPrice + (closingEstimate ?? 0) + (workingCapitalReserve ?? 0) : null;
   const injection = combinedPrice != null && totalProject != null && loanAmount != null ? totalProject - loanAmount : null;
   const rate = args.fsaRatePct;
-  const annualDebtService = loanAmount != null && rate != null ? levelDebtService(loanAmount, rate, AMORT_YEARS) : null;
+  const annualDebtService = loanAmount != null && rate != null ? annualLevelDebtService(loanAmount, rate, AMORT_YEARS, 12) : null;
 
-  const consNoi = args.revenueUnits.reduce((sum, u) => sum + u.conservativeAnnualNoi, 0);
-  const stabNoi = args.revenueUnits.reduce((sum, u) => sum + u.stabilizedAnnualNoi, 0);
-  const dscr = (noi: number) => (annualDebtService && annualDebtService > 0 ? (noi / annualDebtService).toFixed(2) + "x" : "Requires price + rate");
-  const stressNoi = consNoi * 0.75;
+  const incomeComplete = additional.length === 0 && args.revenueUnits.length > 0 && args.revenueUnits.every(u => Number.isFinite(u.conservativeAnnualNoi) && Number.isFinite(u.stabilizedAnnualNoi));
+  const consNoi = incomeComplete ? args.revenueUnits.reduce((sum, u) => sum + u.conservativeAnnualNoi, 0) : null;
+  const stabNoi = incomeComplete ? args.revenueUnits.reduce((sum, u) => sum + u.stabilizedAnnualNoi, 0) : null;
+  const dscr = (noi: number | null) => (noi == null ? "Operating evidence pending" : annualDebtService && annualDebtService > 0 ? (noi / annualDebtService).toFixed(2) + "x" : "Requires price + rate");
+  const stressNoi = consNoi == null ? null : consNoi - Math.abs(consNoi) * 0.25;
 
   const yearLabels = Array.from({ length: 10 }, (_, i) => `Year ${i + 1}P`);
   const noiSeries = yearLabels.map((_, i) => dollars(i === 0 ? consNoi : stabNoi));
   const dsSeries = yearLabels.map(() => (annualDebtService != null ? dollars(annualDebtService) : "TBD"));
   const cushionSeries = yearLabels.map((_, i) =>
-    annualDebtService != null ? dollars((i === 0 ? consNoi : stabNoi) - annualDebtService) : "TBD"
+    annualDebtService != null && consNoi != null && stabNoi != null ? dollars((i === 0 ? consNoi : stabNoi) - annualDebtService) : "Operating evidence pending"
   );
 
   return {
@@ -281,7 +283,7 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         dscrStandalone: { conservative: dscr(consNoi), stabilized: dscr(stabNoi) },
         dscrGlobal: { conservative: "Not used in Furlong nonresidential property scoring — selected provider handles borrower-side underwriting separately", stabilized: "Not used in Furlong nonresidential property scoring — selected provider handles borrower-side underwriting separately" },
         dscrFloor: "1.25x screening threshold",
-        stressDescription: `Conservative-case net operating income stressed a further -25%.${unmodeledIncomeNote}`,
+        stressDescription: `Illustrative downside stress: subtract 25% of the absolute conservative NOI (losses worsen, not shrink).${unmodeledIncomeNote}`,
         dscrStress: dscr(stressNoi),
       },
       debtServiceAssumptions: {

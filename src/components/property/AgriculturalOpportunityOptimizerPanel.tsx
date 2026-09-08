@@ -1,5 +1,6 @@
 "use client";
 
+import { annualLevelDebtService } from "@/lib/property/calculationMath";
 import { useMemo, useState } from "react";
 import type { ChartTheme } from "@/lib/property/chartThemes";
 import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOpportunityOptimizer";
@@ -7,9 +8,10 @@ import { optimizeAgriculturalOpportunities } from "@/lib/property/agriculturalOp
 const money = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 
 export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; price: number; rate: number; theme: ChartTheme }) {
-  const debt = p.price * 0.8 * (p.rate / 100) / (1 - Math.pow(1 + p.rate / 100, -40));
+  const debt = annualLevelDebtService(p.price * 0.8, p.rate, 40, 12) ?? 0;
+  const [scenarioMode, setScenarioMode] = useState(false);
   const [x, setX] = useState({ waterScore: 70, laborCapacity: 55, capitalCapacity: 55, marketAccess: 60, gridEvidence: false, solarZoningEvidence: false, hayYieldTonsPerAcre: 5, hayBaleWeightLb: 55, haySummerPrice: 20, hayWinterPrice: 35, hayWinterShare: 35, hayVariableCostPerAcre: 1400, hayHandlingCostPerBale: 2, hayShrinkPct: 8, irrigationInstallCost: 450000, irrigationAnnualPowerCost: 30000, irrigationAnnualMaintenanceCost: 10000, soilSuitability: 50, weatherSuitability: 50, localMarketDepth: 60, competitionPressure: 40 });
-  const m = useMemo(() => optimizeAgriculturalOpportunities({ acres: p.acreage, purchasePrice: p.price, debtService: debt, ...x }), [p.acreage, p.price, debt, x]);
+  const m = useMemo(() => optimizeAgriculturalOpportunities({ acres: p.acreage, purchasePrice: p.price, debtService: debt, scenarioMode, ...x }), [p.acreage, p.price, debt, x, scenarioMode]);
 
   // Explicit theme ink on every control label — these cells sit on cellBg and
   // must never inherit the stage's text color (founder-caught unreadable
@@ -24,10 +26,11 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
   return (
     <section data-testid="agricultural-opportunity-optimizer" style={{ display: "grid", gap: 18, padding: "clamp(14px,2vw,22px)", border: `2px solid ${p.theme.accent}`, borderRadius: 14, background: p.theme.plate }}>
       <header style={{ display: "grid", gap: 5 }}>
-        <strong style={{ fontSize: "clamp(18px,2.2vw,24px)", color: p.theme.ink }}>Best-use agricultural opportunity optimizer</strong>
-        <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: p.theme.inkSoft }}>Compare singular enterprises and diversified portfolios. Commodity crops are one option—not the assumed answer.</p>
+        <strong style={{ fontSize: "clamp(18px,2.2vw,24px)", color: p.theme.ink }}>Agricultural what-if explorer</strong>
+        <p style={{ margin: 0, fontSize: 13.5, lineHeight: 1.55, color: p.theme.inkSoft }}>Illustrative assumptions only. This does not determine the property’s best use, verify crop suitability, or supply income for financing.</p>
       </header>
 
+      <label><input type="checkbox" checked={scenarioMode} onChange={e => setScenarioMode(e.target.checked)} /> Show illustrative what-if assumptions (not a property recommendation)</label>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))", gap: 10 }}>
         {slider("waterScore", "Water / irrigation")}
         {slider("laborCapacity", "Labor / management")}
@@ -86,7 +89,7 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
 
       <div style={{ display: "grid", gap: 10 }}>
         {m.ranked.map((r, i) => {
-          const status = r.eligible ? "Screenable" : "Blocked pending evidence";
+          const status = r.eligible ? "Illustrative only" : "Blocked pending evidence";
           return (
             <article key={r.key} style={{ display: "grid", gap: 10, padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 12, background: p.theme.cellBg }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
@@ -102,11 +105,11 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(105px,1fr))", gap: 8 }}>
                 {[
-                  ["Fit", `${r.fit.toFixed(0)}/100`],
-                  ["Acres", r.usedAcres.toFixed(1)],
-                  ["Annual NOI", r.eligible ? money(r.noi) : "$0"],
-                  ["Risk-adjusted NOI", r.eligible ? money(r.riskAdjustedNoi) : "$0"],
-                  ["DSCR", `${r.dscr?.toFixed(2) ?? "—"}x`],
+                  ["Assumption index", r.eligible ? `${r.fit.toFixed(0)}/100 (uncalibrated)` : "Pending"],
+                  ["Scenario acres", r.eligible ? r.usedAcres.toFixed(1) : "Pending"],
+                  ["Annual NOI", r.eligible ? money(r.noi) : "Pending"],
+                  ["Index-weighted scenario NOI", r.eligible ? money(r.riskAdjustedNoi) : "Pending"],
+                  ["Scenario DSCR", r.eligible ? `${r.dscr?.toFixed(2) ?? "—"}x` : "Pending"],
                 ].map(([label, value]) => (
                   <div key={label} style={{ padding: "8px 10px", borderRadius: 8, background: p.theme.plate }}>
                     <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.06em", color: p.theme.inkSoft }}>{label}</div>
@@ -123,20 +126,20 @@ export function AgriculturalOpportunityOptimizerPanel(p: { acreage: number; pric
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(210px,1fr))", gap: 10 }}>
         {[
           { label: "Most profitable on paper", item: m.mostProfitable },
-          { label: "Most feasible to operate", item: m.mostFeasible },
-          { label: "Best risk-adjusted use", item: m.bestRiskAdjusted },
+          { label: "Highest illustrative index", item: m.mostFeasible },
+          { label: "Highest index-weighted scenario NOI", item: m.bestRiskAdjusted },
         ].map(({ label, item }) => (
           <div key={label} style={{ padding: 12, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 10, background: p.theme.cellBg }}>
             <div style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.06em", color: p.theme.inkSoft }}>{label}</div>
-            <strong style={{ display: "block", marginTop: 4, fontSize: 14, color: p.theme.ink }}>{item?.label ?? "No feasible result"}</strong>
+            <strong style={{ display: "block", marginTop: 4, fontSize: 14, color: p.theme.ink }}>{item?.label ?? "Evidence pending"}</strong>
           </div>
         ))}
       </div>
 
       <div style={{ padding: 14, border: `1px solid ${p.theme.cellBorder}`, borderRadius: 11, background: p.theme.cellBg, color: p.theme.ink }}>
         <strong style={{ fontSize: 15, color: p.theme.ink }}>Highest-ranked diversified screen</strong>
-        <p style={{ margin: "6px 0 10px", fontSize: 13, lineHeight: 1.5, color: p.theme.inkSoft }}>{m.diversified.map(r => `${Math.round(r.portfolioShare * 100)}% ${r.label}`).join(" + ") || "No feasible portfolio yet"}</p>
-        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, color: p.theme.ink }}><span><strong>Modeled NOI:</strong> {money(m.portfolioNoi)}</span><span><strong>DSCR:</strong> {m.portfolioDscr?.toFixed(2) ?? "—"}x</span></div>
+        <p style={{ margin: "6px 0 10px", fontSize: 13, lineHeight: 1.5, color: p.theme.inkSoft }}>{m.diversified.map(r => `${Math.round(r.portfolioShare * 100)}% ${r.label}`).join(" + ") || "Portfolio evidence pending"}</p>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, color: p.theme.ink }}><span><strong>Modeled NOI:</strong> {m.diversified.length ? money(m.portfolioNoi) : "Pending"}</span><span><strong>DSCR:</strong> {m.portfolioDscr?.toFixed(2) ?? "—"}x</span></div>
       </div>
 
       <p style={{ margin: 0, fontSize: 11.5, lineHeight: 1.5, color: p.theme.inkSoft }}>{m.warning}</p>

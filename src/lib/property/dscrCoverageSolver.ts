@@ -1,3 +1,4 @@
+import { assessAlfalfaSuitability, type AgronomicSoilEvidence } from "@/lib/property/cropSuitability";
 /**
  * dscrCoverageSolver — answers the founder's question (2026-07-29): "what
  * combination of crops, livestock, hay, flowers, or orchard would clear the
@@ -23,13 +24,7 @@ import { optimizeAgriculturalOpportunities, type OpportunityAssumptions } from "
 
 export const DSCR_FLOOR = 1.25;
 
-export interface SoilConstraintInput {
-  mapUnitName: string | null;
-  farmlandClass: string | null;
-  drainageClass: string | null;
-  slopePct: number | null;
-  capabilityClass: number | null;
-}
+export type SoilConstraintInput = AgronomicSoilEvidence;
 
 /**
  * Agronomic constraints (founder direction 2026-07-29: "not everything grows
@@ -46,6 +41,8 @@ function soilAdjustments(soil: SoilConstraintInput | null): {
   notes: string[];
 } {
   const excluded = new Map<string, string>();
+  const alfalfa = assessAlfalfaSuitability(soil, soil?.retrievedAt);
+  if (alfalfa.status !== "supported-screen") excluded.set("alfalfa-small-square", [...alfalfa.reasons, ...alfalfa.requiredEvidence].join("; "));
   const penalties = new Map<string, { factor: number; reason: string }>();
   const notes: string[] = [];
   if (!soil) {
@@ -132,7 +129,7 @@ export interface CoverageSolution {
   requiredNoi: number;
   bestSingle: { label: string; annualNoi: number; dscr: number } | null;
   bestMix: { parts: CoverageMixPart[]; annualNoi: number; dscr: number } | null;
-  verdict: "clears" | "close" | "cannot";
+  verdict: "clears" | "close" | "cannot" | "needs-evidence";
   /** Dollars/yr the best option falls short of the 1.25x floor (null when clear). */
   gapAnnual: number | null;
   /** Off-farm income counted in GLOBAL DSCR that closes the gap (== gapAnnual). */
@@ -173,6 +170,14 @@ export function solveDscrCoverage(args: {
   assumptions?: Partial<OpportunityAssumptions>;
 }): CoverageSolution {
   const soilAdj = soilAdjustments(args.soil ?? null);
+  // Generic capacity knobs are not an executable property income plan.
+  if (args.assumptions?.scenarioMode !== true) return {
+    floor: DSCR_FLOOR, annualDebtService: Number.isFinite(args.annualDebtService) ? args.annualDebtService : 0,
+    requiredNoi: Number.isFinite(args.annualDebtService) ? args.annualDebtService * DSCR_FLOOR : 0,
+    bestSingle: null, bestMix: null, verdict: "needs-evidence", gapAnnual: null,
+    outsideIncomeNeeded: null, maxSupportablePrice: null, planRequirements: [],
+    notes: [...soilAdj.notes, "Field-specific enterprise budgets and an actual transaction price are required. No generic income or assessment fallback was used."],
+  };
   const model = optimizeAgriculturalOpportunities({
     acres: args.acres,
     purchasePrice: args.screeningPrice,

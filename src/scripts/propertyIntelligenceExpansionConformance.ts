@@ -16,8 +16,8 @@ const screen = modelCommercialUses({
 
 assert.equal(screen.currentUse, "30-room independent hotel");
 assert.equal(screen.propertyClassification, "Commercial—hospitality");
-assert.equal(screen.bestSupportedUse?.use, "Extended-stay hospitality");
-assert(screen.bestSupportedUse, "Commercial screen must retain a best-supported modeled use when inputs support one.");
+assert.equal(screen.bestSupportedUse, null, "A hotel shell alone does not establish a best-supported use or income model.");
+assert(screen.uses.every(use => use.noiMid == null && use.dscr == null), "Every unsupported use must withhold income and coverage.");
 assert(screen.secondaryOpportunity, "Commercial screen must surface a secondary opportunity.");
 assert.match(screen.secondaryOpportunity!.use, /senior housing|independent-living/i);
 assert.equal(screen.secondaryOpportunity!.financialModelAvailable, false, "Senior housing cannot receive invented NOI/DSCR from a generic square-foot model.");

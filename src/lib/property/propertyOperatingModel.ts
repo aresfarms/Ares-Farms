@@ -1,3 +1,4 @@
+import { annualLevelDebtService, principalFromAnnualDebtService } from "@/lib/property/calculationMath";
 /**
  * Property operating-model calculator.
  *
@@ -43,26 +44,26 @@ export interface PropertyOperatingModelInput {
   targetDscr?: number | null;
 }
 
-export type CoveragePosture = "STRONG" | "CLEARS_TARGET" | "THIN" | "SHORT" | "NO_DEBT_MODEL";
+export type CoveragePosture = "STRONG" | "CLEARS_TARGET" | "THIN" | "SHORT" | "NO_DEBT_MODEL" | "NEEDS_EVIDENCE";
 
 export interface OperatingSensitivityCase {
   label: string;
   occupancyPct: number;
   averageUnitRevenue: number;
   annualRevenue: number;
-  noi: number;
+  noi: number | null;
   dscr: number | null;
 }
 
 export interface PropertyOperatingModelResult {
-  version: "property-operating-model-v1.0.0";
+  version: "property-operating-model-v1.1.0";
   annualUnitRevenue: number;
   annualAncillaryRevenue: number;
   annualRevenue: number;
   annualFixedOperatingExpenses: number;
   annualReplacementReserve: number;
-  annualOperatingExpenses: number;
-  noi: number;
+  annualOperatingExpenses: number | null;
+  noi: number | null;
   noiMarginPct: number | null;
   annualDebtService: number | null;
   dscr: number | null;
@@ -85,24 +86,8 @@ const finite = (value: unknown, fallback = 0): number =>
 const nonNegative = (value: unknown): number => Math.max(0, finite(value));
 const pct = (value: unknown, fallback: number): number => Math.min(100, Math.max(0, finite(value, fallback)));
 
-function annualDebtService(principal: number, ratePct: number, years: number): number | null {
-  if (!(principal > 0) || !(years > 0)) return null;
-  const monthlyRate = Math.max(0, ratePct) / 100 / 12;
-  const periods = years * 12;
-  const payment = monthlyRate === 0
-    ? principal / periods
-    : (principal * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -periods));
-  return payment * 12;
-}
-
-function loanPrincipalFromAnnualDebtService(ads: number, ratePct: number, years: number): number | null {
-  if (!(ads > 0) || !(years > 0)) return null;
-  const monthlyPayment = ads / 12;
-  const monthlyRate = Math.max(0, ratePct) / 100 / 12;
-  const periods = years * 12;
-  if (monthlyRate === 0) return monthlyPayment * periods;
-  return monthlyPayment * (1 - Math.pow(1 + monthlyRate, -periods)) / monthlyRate;
-}
+const expenseKeys = ["payrollMonthly", "utilitiesMonthly", "insuranceMonthly", "propertyTaxMonthly", "maintenanceHousekeepingMonthly", "foodServicesMonthly", "managementMarketingMonthly", "licensingOtherMonthly"] as const;
+const suppliedNonNegative = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v) && v >= 0;
 
 function fixedExpensesAnnual(expenses: OperatingExpenseInput): number {
   return 12 * [
@@ -160,11 +145,17 @@ export function calculatePropertyOperatingModel(input: PropertyOperatingModelInp
   const loanAmount = nonNegative(input.loanAmount);
   const rate = finite(input.interestRatePct, 0);
   const amortYears = finite(input.amortizationYears, 0);
-  const ads = annualDebtService(loanAmount, rate, amortYears);
-  const dscr = ads && ads > 0 ? noi / ads : null;
-  const annualNoiRequiredForTarget = ads ? ads * targetDscr : null;
+  const debtTermsPresent = suppliedNonNegative(input.interestRatePct) && suppliedNonNegative(input.amortizationYears) && amortYears > 0;
+  const missingExpenses = expenseKeys.filter(key => !suppliedNonNegative(input.expenses[key]));
+  const operatingInputsComplete = missingExpenses.length === 0 && suppliedNonNegative(input.unitCount) &&
+    input.unitCount > 0 && suppliedNonNegative(input.occupancyPct) && input.occupancyPct <= 100 &&
+    suppliedNonNegative(input.averageUnitRevenue) && suppliedNonNegative(input.ancillaryRevenueMonthly) &&
+    suppliedNonNegative(input.replacementReservePct) && input.replacementReservePct <= 100;
+  const ads = debtTermsPresent && loanAmount > 0 ? annualLevelDebtService(loanAmount, rate, amortYears, 12) : null;
+  const dscr = operatingInputsComplete && ads && ads > 0 ? noi / ads : null;
+  const annualNoiRequiredForTarget = operatingInputsComplete && ads ? ads * targetDscr : null;
   const annualCoverageGap = annualNoiRequiredForTarget == null ? null : Math.max(0, annualNoiRequiredForTarget - noi);
-  const coveragePosture: CoveragePosture = dscr == null
+  const coveragePosture: CoveragePosture = !operatingInputsComplete ? "NEEDS_EVIDENCE" : dscr == null
     ? "NO_DEBT_MODEL"
     : dscr >= Math.max(1.35, targetDscr + 0.1)
       ? "STRONG"
@@ -178,13 +169,13 @@ export function calculatePropertyOperatingModel(input: PropertyOperatingModelInp
     ? nonNegative(input.unitCount) * 365 * averageUnitRevenue
     : nonNegative(input.unitCount) * 12 * averageUnitRevenue;
   const netRevenueFactor = 1 - reserveRate;
-  const breakEvenOccupancy = ads && unitPotentialAt100 > 0 && netRevenueFactor > 0
+  const breakEvenOccupancy = operatingInputsComplete && ads && unitPotentialAt100 > 0 && netRevenueFactor > 0
     ? ((ads + annualFixedOperatingExpenses - annualAncillaryRevenue * netRevenueFactor) / (unitPotentialAt100 * netRevenueFactor)) * 100
     : null;
 
   const maxAdsAtTarget = noi > 0 ? noi / targetDscr : null;
-  const maxLoanSupportedAtTarget = maxAdsAtTarget && rate >= 0 && amortYears > 0
-    ? loanPrincipalFromAnnualDebtService(maxAdsAtTarget, rate, amortYears)
+  const maxLoanSupportedAtTarget = operatingInputsComplete && maxAdsAtTarget && debtTermsPresent
+    ? principalFromAnnualDebtService(maxAdsAtTarget, rate, amortYears, 12)
     : null;
 
   const acquisitionPrice = nonNegative(input.acquisitionPrice);
@@ -193,19 +184,24 @@ export function calculatePropertyOperatingModel(input: PropertyOperatingModelInp
   const contingencyRate = pct(input.contingencyPct, 10) / 100;
   const projectBase = acquisitionPrice + conversionCapex + professionalSoftCost;
   const contingency = conversionCapex * contingencyRate;
-  const totalProjectCost = projectBase > 0 ? projectBase + contingency : null;
-  const equityRequired = totalProjectCost == null ? null : Math.max(0, totalProjectCost - loanAmount);
+  const projectInputsComplete = suppliedNonNegative(input.acquisitionPrice) && suppliedNonNegative(input.conversionCapex) && suppliedNonNegative(input.professionalSoftCost) && suppliedNonNegative(input.contingencyPct);
+  const totalProjectCost = projectInputsComplete && projectBase > 0 ? projectBase + contingency : null;
+  const equityRequired = totalProjectCost == null || !suppliedNonNegative(input.loanAmount) ? null : Math.max(0, totalProjectCost - loanAmount);
   const equityRequiredPct = totalProjectCost && equityRequired != null ? (equityRequired / totalProjectCost) * 100 : null;
 
-  const missingInputs: string[] = [];
+  const missingInputs: string[] = missingExpenses.map(key => key + " (enter an amount or explicit zero)");
+  if (!suppliedNonNegative(input.ancillaryRevenueMonthly)) missingInputs.push("ancillary revenue or explicit zero");
+  if (!suppliedNonNegative(input.replacementReservePct)) missingInputs.push("replacement reserve percentage or explicit zero");
+  if (!projectInputsComplete) missingInputs.push("complete acquisition, conversion, soft-cost and contingency budget");
   if (!(input.unitCount > 0)) missingInputs.push("room/unit count");
-  if (!(input.occupancyPct > 0)) missingInputs.push("stabilized occupancy assumption");
+  if (!suppliedNonNegative(input.occupancyPct) || input.occupancyPct > 100) missingInputs.push("stabilized occupancy assumption");
   if (!(input.averageUnitRevenue > 0)) missingInputs.push(input.revenueCadence === "nightly" ? "average daily rate" : "monthly revenue per occupied unit");
   if (!(loanAmount > 0)) missingInputs.push("proposed loan amount");
-  if (!(rate > 0)) missingInputs.push("interest-rate assumption");
+  if (!suppliedNonNegative(input.interestRatePct)) missingInputs.push("interest-rate assumption");
   if (!(amortYears > 0)) missingInputs.push("amortization term");
 
   const warnings: string[] = [
+    ...(!operatingInputsComplete ? ["Incomplete operating inputs: revenue, expense and NOI subtotals are partial scenario arithmetic only; coverage, capacity and break-even conclusions are withheld."] : []),
     "Screening model only: replace assumptions with verified property/project operating statements, rent/room data, staffing plan, taxes, insurance, utility quotes, licensing requirements and contractor pricing as they become available.",
     "DSCR here is property/project-side math, not a credit decision or financing approval. Furlong does not use personal credit, personal income, household assets, DTI or other personal financial-profile data to score this nonresidential property. A selected lender/program may separately require borrower underwriting before approval.",
   ];
@@ -219,20 +215,20 @@ export function calculatePropertyOperatingModel(input: PropertyOperatingModelInp
   const occCases = [Math.max(0, occupancy - 10), Math.max(0, occupancy - 5), occupancy, Math.min(100, occupancy + 5)];
   const rateCases = [0.9, 1, 1.1];
   const sensitivity = [
-    ...occCases.map((o) => sensitivityCase(input, o, averageUnitRevenue, ads)),
-    ...rateCases.filter((m) => m !== 1).map((m) => sensitivityCase(input, occupancy, averageUnitRevenue * m, ads)),
+    ...occCases.map((o) => sensitivityCase(input, o, averageUnitRevenue, operatingInputsComplete ? ads : null)),
+    ...rateCases.filter((m) => m !== 1).map((m) => sensitivityCase(input, occupancy, averageUnitRevenue * m, operatingInputsComplete ? ads : null)),
   ];
 
   return {
-    version: "property-operating-model-v1.0.0",
+    version: "property-operating-model-v1.1.0",
     annualUnitRevenue: Math.round(annualUnitRevenue),
     annualAncillaryRevenue: Math.round(annualAncillaryRevenue),
     annualRevenue: Math.round(annualRevenue),
     annualFixedOperatingExpenses: Math.round(annualFixedOperatingExpenses),
     annualReplacementReserve: Math.round(annualReplacementReserve),
-    annualOperatingExpenses: Math.round(annualOperatingExpenses),
-    noi: Math.round(noi),
-    noiMarginPct,
+    annualOperatingExpenses: operatingInputsComplete ? Math.round(annualOperatingExpenses) : null,
+    noi: operatingInputsComplete ? Math.round(noi) : null,
+    noiMarginPct: operatingInputsComplete ? noiMarginPct : null,
     annualDebtService: ads == null ? null : Math.round(ads),
     dscr,
     targetDscr,
@@ -244,7 +240,7 @@ export function calculatePropertyOperatingModel(input: PropertyOperatingModelInp
     totalProjectCost: totalProjectCost == null ? null : Math.round(totalProjectCost),
     equityRequired: equityRequired == null ? null : Math.round(equityRequired),
     equityRequiredPct,
-    sensitivity,
+    sensitivity: operatingInputsComplete ? sensitivity : sensitivity.map(row => ({...row, noi: null, dscr: null})),
     missingInputs,
     warnings,
   };

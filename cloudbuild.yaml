@@ -136,6 +136,10 @@ steps:
         npm run verify:founder-pilot-test-gate
         npm run verify:property-profile-classification
         npm run verify:customer-property-experience
+        npm run verify:calculation-integrity
+        npm run verify:farm-use-integrity
+        npm run verify:property-value-indication
+        npm run verify:property-operating-model
         npm run verify:financing-program-fit
         npm run verify:property-facts-latency
         npm run verify:lender-submission-bola

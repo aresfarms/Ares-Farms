@@ -1,3 +1,4 @@
+import { annualLevelDebtService } from "@/lib/property/calculationMath";
 import { COMMODITY_PRICES, COMMODITY_PRICES_PROVENANCE } from "@/lib/property/commodityPricesGenerated";
 
 export type AgriculturalProFormaInputs = {
@@ -17,16 +18,10 @@ export type AgriculturalProFormaInputs = {
   amortizationYears: number;
   cashRentLowPerAcre: number;
   cashRentHighPerAcre: number;
+  cashRentOwnerCostsAnnual?: number | null;
 };
 
 export type AgriculturalProForma = ReturnType<typeof buildAgriculturalProForma>;
-
-const payment = (principal: number, ratePct: number, years: number): number => {
-  const months = years * 12;
-  const r = ratePct / 100 / 12;
-  if (!r) return principal / months;
-  return principal * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1);
-};
 
 export function defaultAgriculturalProFormaInputs(args: {
   tractAcres: number;
@@ -54,6 +49,14 @@ export function defaultAgriculturalProFormaInputs(args: {
 }
 
 export function buildAgriculturalProForma(input: AgriculturalProFormaInputs) {
+  for (const [key, value] of Object.entries(input)) {
+    if (key === "cashRentOwnerCostsAnnual" && value == null) continue;
+    if (typeof value !== "number" || !Number.isFinite(value) || value < 0) throw new RangeError("Invalid agricultural scenario input: " + key);
+  }
+  for (const key of ["tillablePct", "cornSharePct", "downPaymentPct"] as const) {
+    if (input[key] > 100) throw new RangeError(key + " must be between 0 and 100");
+  }
+  if (!(input.tractAcres > 0) || !(input.amortizationYears > 0) || input.amortizationYears > 100 || input.cashRentLowPerAcre > input.cashRentHighPerAcre) throw new RangeError("Invalid acreage, loan term or cash-rent range");
   const tillableAcres = input.tractAcres * input.tillablePct / 100;
   const nonTillableAcres = Math.max(0, input.tractAcres - tillableAcres);
   const cornAcres = tillableAcres * input.cornSharePct / 100;
@@ -67,13 +70,15 @@ export function buildAgriculturalProForma(input: AgriculturalProFormaInputs) {
   const totalOperatingExpense = cornVariableCosts + soybeanVariableCosts + fixedOverhead;
   const netOperatingIncome = grossCropRevenue - totalOperatingExpense;
   const loanAmount = input.purchasePrice * (1 - input.downPaymentPct / 100);
-  const annualDebtService = payment(loanAmount, input.annualRatePct, input.amortizationYears) * 12;
+  const annualDebtService = annualLevelDebtService(loanAmount, input.annualRatePct, input.amortizationYears, 12)!;
   const dscr = annualDebtService > 0 ? netOperatingIncome / annualDebtService : null;
   const cashRentLow = tillableAcres * input.cashRentLowPerAcre;
   const cashRentHigh = tillableAcres * input.cashRentHighPerAcre;
-  const cashRentDscrLow = annualDebtService > 0 ? cashRentLow / annualDebtService : null;
-  const cashRentDscrHigh = annualDebtService > 0 ? cashRentHigh / annualDebtService : null;
+  const cashRentDscrLow = input.cashRentOwnerCostsAnnual != null && annualDebtService > 0 ? (cashRentLow - input.cashRentOwnerCostsAnnual) / annualDebtService : null;
+  const cashRentDscrHigh = input.cashRentOwnerCostsAnnual != null && annualDebtService > 0 ? (cashRentHigh - input.cashRentOwnerCostsAnnual) / annualDebtService : null;
   return {
+    version: "agricultural-proforma-v2.0.0",
+    evidenceStatus: "scenario-only" as const,
     inputs: input,
     acreage: { tillableAcres, nonTillableAcres, cornAcres, soybeanAcres },
     revenue: { cornRevenue, soybeanRevenue, grossCropRevenue, cashRentLow, cashRentHigh },
@@ -83,7 +88,7 @@ export function buildAgriculturalProForma(input: AgriculturalProFormaInputs) {
       commodityPrices: `${COMMODITY_PRICES_PROVENANCE.source}, snapshot ${COMMODITY_PRICES_PROVENANCE.asOf ?? "date unavailable"}`,
       yields: "Editable operator assumptions pending USDA NASS Caroline County yield snapshot",
       costs: "Editable planning assumptions pending operator crop budgets, supplier quotes, MPCI election, and machinery records",
-      cashRent: "Editable Eastern Shore planning range pending USDA NASS county cash-rent and local lease evidence",
+      cashRent: "Editable Eastern Shore planning range pending USDA NASS county cash-rent and local lease evidence. Gross cash rent is not NOI; owner costs are required before lease DSCR is calculated.",
     },
     readiness: [
       "NRCS Web Soil Survey map-unit acreage and capability classification",

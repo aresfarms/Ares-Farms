@@ -1,3 +1,4 @@
+import { normalizedListingAddress, fullListingAddress } from "./listingPriceEvidence";
 /**
  * Unified property data access — SERVER-ONLY (imports exact addresses + coords).
  *
@@ -114,26 +115,19 @@ export function findCanonicalPropertyById(propertyId: string): CanonicalProperty
   return null;
 }
 
-function normalizePropertyAddress(value: string | null | undefined): string {
-  return (value ?? "")
-    .trim()
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+const normalizePropertyAddress = (value: string | null | undefined) => normalizedListingAddress(value ?? "");
 
-/** Resolve manual address intake to the same canonical property used by map cards. */
-export function findCanonicalPropertyByExactAddress(exactAddress: string): CanonicalProperty | null {
+/** Pure full-address identity resolver. Callers must supply only approved records. */
+export function matchCanonicalExactAddress(exactAddress: string, approvedRecords: CanonicalProperty[]): CanonicalProperty | null {
   const target = normalizePropertyAddress(exactAddress);
   if (!target) return null;
-  for (const source of SOURCES) {
-    const match = recordsOf(source).find((record) =>
-      record.source_records.some((row) => normalizePropertyAddress(row.exactAddress) === target)
-    );
-    if (match) return match;
-  }
-  return null;
+  const matches = approvedRecords.filter(record => record.source_records.some(row => normalizePropertyAddress(fullListingAddress(row)) === target));
+  const unique = [...new Map(matches.map(record => [record.canonical_property_id, record])).values()];
+  return unique.length === 1 ? unique[0] : null; // conflicting identities need review
+}
+/** Manual address intake and map entry use the same approved canonical identity. */
+export function findCanonicalPropertyByExactAddress(exactAddress: string): CanonicalProperty | null {
+  return matchCanonicalExactAddress(exactAddress, SOURCES.filter(source => isSourceLive(source.id)).flatMap(recordsOf));
 }
 
 export function buildPublicSafeInventoryByState(): Record<string, PublicSafeProperty[]> {

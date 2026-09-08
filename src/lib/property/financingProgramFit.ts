@@ -1,3 +1,4 @@
+import { annualLevelDebtService, transactionPrice } from "@/lib/property/calculationMath";
 /**
  * financingProgramFit — property-first program ranking (founder premise,
  * stated 2026-08-05: "weigh the actual property values and determine which
@@ -9,7 +10,7 @@
  * Replaces the lanes' static hard-coded orderings (FSA-always-first on farm,
  * SBA-always-first on commercial) with fit computed from THIS property:
  *   - eligibility gates: verified USDA rural-area designation (live layer),
- *     purchase price vs. each program's statutory loan limit;
+ *     proposed loan amount vs. the dated program loan limit;
  *   - coverage math: the property's modeled income (farm enterprise NOI)
  *     against each program's debt service at its own rate and term, tested
  *     against the 1.25x DSCR floor — the standalone-lendability test.
@@ -22,8 +23,11 @@ import type { UsdaRuralEligibility } from "@/lib/property/usdaRuralLive";
 
 export interface ProgramFitContext {
   laneId: "farm" | "commercial" | "residential";
-  /** Entered/listed price, else county-assessed total (the screening basis). */
+  /** Actual asking/contract price or explicit intended offer only; never assessment. */
   screeningPrice: number | null;
+  /** Proposed amount of this loan, not property value. Other debt still needs reconciliation. */
+  proposedLoanAmount?: number | null;
+  asOf?: string;
   /** Modeled property-standalone income (farm: best enterprise-mix NOI). */
   noiAnnual: number | null;
   /** Where the NOI figure came from, printed with every coverage line. */
@@ -48,7 +52,10 @@ export interface ProgramFit {
 }
 
 const DSCR_FLOOR = 1.25;
-// Statutory / program screening parameters (indexed figures noted as ≈).
+// Official FSA ownership/guaranteed pages checked 2026-09-07. FY2026
+// expires 2026-09-30; after that the indexed ceiling needs a refreshed source.
+// https://www.fsa.usda.gov/resources/loans/farm-ownership-loans
+// https://www.fsa.usda.gov/resources/loans/guaranteed-farm-loans
 const FSA_DIRECT_LIMIT = 600_000;
 const FSA_GUARANTEED_LIMIT = 2_343_000;
 
@@ -59,9 +66,7 @@ function levelAnnualDebtService(
   ratePct: number,
   years: number,
 ): number {
-  const r = ratePct / 100;
-  if (r <= 0) return principal / years;
-  return (principal * r) / (1 - Math.pow(1 + r, -years));
+  return annualLevelDebtService(principal, ratePct, years, 12) ?? NaN;
 }
 
 /** DSCR line for a program's own rate/term at the stated screening price. */
@@ -72,14 +77,14 @@ function coverage(
   amortYears: number,
   ltv: number,
 ): { score: number; line: string } | null {
-  if (ctx.screeningPrice == null || ctx.noiAnnual == null || ratePct == null)
+  if (transactionPrice(ctx.screeningPrice) == null || ctx.noiAnnual == null || !Number.isFinite(ctx.noiAnnual) || ratePct == null || !Number.isFinite(ratePct) || ratePct < 0)
     return null;
   const ads = levelAnnualDebtService(
-    ctx.screeningPrice * ltv,
+    ctx.proposedLoanAmount ?? ctx.screeningPrice! * ltv,
     ratePct,
     amortYears,
   );
-  if (ads <= 0) return null;
+  if (!Number.isFinite(ads) || ads <= 0) return null;
   const dscr = ctx.noiAnnual / ads;
   const verdict =
     dscr >= DSCR_FLOOR
@@ -92,7 +97,7 @@ function coverage(
     line:
       `Property-standalone test: modeled income ${dollars(ctx.noiAnnual)}/yr vs ` +
       `${dollars(ads)}/yr debt service at ${ratePct.toFixed(2)}% (${rateBasis}, ${amortYears}-yr, ` +
-      `${Math.round(ltv * 100)}% LTV) → DSCR ${dscr.toFixed(2)} — ${verdict}.` +
+      `${ctx.proposedLoanAmount != null ? dollars(ctx.proposedLoanAmount) + " proposed loan; other debt not included" : Math.round(ltv * 100) + "% illustrative LTV"}) → DSCR ${dscr.toFixed(2)} — ${verdict}.` +
       (ctx.noiBasis ? ` Income basis: ${ctx.noiBasis}.` : ""),
   };
 }
@@ -124,21 +129,21 @@ export function buildLenderTestScorecard(args: {
   const { ctx } = args;
 
   tests.push(
-    ctx.screeningPrice != null
+    transactionPrice(ctx.screeningPrice) != null
       ? {
           test: "Stated value basis",
           status: "pass",
-          detail: `Screening value ${dollars(ctx.screeningPrice)} on record — the loan math has a basis (appraisal governs).`,
+          detail: `Transaction price ${dollars(ctx.screeningPrice!)} supplied — this is a price basis, not a market-value finding.`,
         }
       : {
           test: "Stated value basis",
           status: "unknown",
           detail:
-            "No price or assessed value on record — enter an intended offer to run the loan math.",
+            "No verified asking price or intended offer is available — acquisition math is pending.",
         },
   );
 
-  if (args.bestDscr != null) {
+  if (args.bestDscr != null && Number.isFinite(args.bestDscr)) {
     tests.push(
       args.bestDscr >= 1.25
         ? {
@@ -299,35 +304,27 @@ export function evaluateProgramFit(
         ? { score: c.score, line: `${eligibility} ${c.line}` }
         : { score: 0, line: `${eligibility} ${NEEDS_INPUTS}` };
     }
-    if (/fsa direct/.test(name)) {
-      if (ctx.screeningPrice != null && ctx.screeningPrice > FSA_DIRECT_LIMIT) {
-        return {
-          score: -1,
-          line: "",
-          excluded: `Screening price ${dollars(ctx.screeningPrice)} exceeds the FSA direct loan limit (≈${dollars(FSA_DIRECT_LIMIT)}, indexed) — the direct program cannot carry this purchase alone.`,
-        };
+    if (/fsa direct|fsa guaranteed/.test(name)) {
+      const direct = /fsa direct/.test(name);
+      const asOf = Date.parse(ctx.asOf ?? new Date().toISOString());
+      if (!Number.isFinite(asOf) || asOf >= Date.parse("2026-10-01T00:00:00Z")) {
+        return { score: 0, line: "FSA limit evidence requires refresh for this calculation date; no program exclusion or coverage ranking is issued." };
       }
-      const c = coverage(ctx, fsaDirect, "published FSA direct rate", 40, 1.0);
-      return c ?? { score: 0, line: NEEDS_INPUTS };
-    }
-    if (/fsa guaranteed/.test(name)) {
-      if (
-        ctx.screeningPrice != null &&
-        ctx.screeningPrice > FSA_GUARANTEED_LIMIT
-      ) {
-        return {
-          score: -1,
-          line: "",
-          excluded: `Screening price ${dollars(ctx.screeningPrice)} exceeds the FSA guaranteed loan limit (≈${dollars(FSA_GUARANTEED_LIMIT)}, indexed annually).`,
-        };
+      const limit = direct ? FSA_DIRECT_LIMIT : FSA_GUARANTEED_LIMIT;
+      const proposed = ctx.proposedLoanAmount;
+      if (proposed != null && (!Number.isFinite(proposed) || proposed <= 0)) {
+        return { score: 0, line: "Enter a positive proposed loan amount; the purchase price is not the loan amount." };
       }
-      const c = coverage(
-        ctx,
-        bench != null ? bench + 0.75 : null,
-        "illustrative bank rate ≈ benchmark +0.75",
-        30,
-        0.9,
-      );
+      if (proposed != null && proposed > limit) {
+        return { score: -1, line: "", excluded: `Proposed FSA loan ${dollars(proposed)} exceeds the dated ${direct ? "direct" : "FY2026 guaranteed"} loan ceiling of ${dollars(limit)}. This excludes that loan structure, not the property or a revised blended structure. FSA/lender review is required.` };
+      }
+      const modeledPrincipal = proposed ?? (transactionPrice(ctx.screeningPrice) == null ? null : ctx.screeningPrice! * (direct ? 1 : 0.9));
+      if (proposed == null && modeledPrincipal != null && modeledPrincipal > limit) {
+        return { score: 0, line: `Loan structure pending: the illustrative principal exceeds the dated ${dollars(limit)} FSA ceiling. Purchase price alone does not disqualify this property. Supply the requested FSA loan, equity, any joint financing and total debt service for review.` };
+      }
+      const c = direct
+        ? coverage(ctx, fsaDirect, "published FSA direct rate; payment schedule assumed monthly", 40, 1.0)
+        : coverage(ctx, bench != null ? bench + 0.75 : null, "illustrative bank rate ≈ benchmark +0.75", 30, 0.9);
       return c ?? { score: 0, line: NEEDS_INPUTS };
     }
     if (/farm credit/.test(name)) {
@@ -506,7 +503,7 @@ export function buildScenarioFinancingMatrix(args: {
     for (const program of args.programs) {
       const fit = evaluateProgramFit(program, {
         ...args.baseContext,
-        noiAnnual: scenario.noiAnnual,
+        noiAnnual: scenario.evidenceStatus === "supported" ? scenario.noiAnnual : null,
         noiBasis: scenario.basis,
       });
       if (fit) matches.push({ scenario, program, fit });
@@ -519,7 +516,7 @@ export function buildScenarioFinancingMatrix(args: {
     const executableB = b.fit.excluded ? -1 : b.fit.score;
     return evidenceB - evidenceA || executableB - executableA;
   });
-  const viable = matches.filter((match) => !match.fit.excluded && match.scenario.noiAnnual != null);
+  const viable = matches.filter((match) => !match.fit.excluded && match.scenario.evidenceStatus === "supported" && Number.isFinite(match.scenario.noiAnnual) && transactionPrice(args.baseContext.screeningPrice) != null);
   return {
     matches,
     best: viable[0] ?? null,

@@ -1,3 +1,7 @@
+import { discoverGovernmentComparables } from "@/lib/property/governmentComparableNetwork";
+import { fetchMarylandParcelSoils } from "@/lib/property/parcelSoils";
+import { isSourceLiveRuntime } from "@/lib/property/sourceActivationStore";
+import { fullListingAddress, resolveListingPrice } from "@/lib/property/listingPriceEvidence";
 import { NextRequest, NextResponse } from "next/server";
 
 import { verifyPropertyPrograms } from "@/lib/capital-graph/programVerification";
@@ -100,6 +104,14 @@ export async function POST(req: NextRequest) {
   }
 
   const body = parsed.body;
+  const selected = body.propertyId && !body.propertyId.startsWith("imported:")
+    ? findCanonicalPropertyById(body.propertyId) : null;
+  const selectedRecord = selected?.source_records[0];
+  if (selectedRecord && !isSourceLiveRuntime(selectedRecord.sourceId)) return NextResponse.json({ok:false,error:"This property source is awaiting governed activation."},{status:403});
+  if (selectedRecord) {
+    body.exactAddress = fullListingAddress(selectedRecord);
+    body.stateCode = selectedRecord.state;
+  }
   const propertyId = body.propertyId ? String(body.propertyId) : null;
   // Allowlisted profile ids only — never free text into the classifier.
   const DECLARABLE = new Set(["residential", "farm", "commercial", "hospitality", "mobile-home-park", "land"]);
@@ -111,7 +123,7 @@ export async function POST(req: NextRequest) {
     (/farm|agric/i.test(String(body.startingLens ?? "")) ? "farm" :
       /commercial|business/i.test(String(body.startingLens ?? "")) ? "commercial" : null);
 
-  if (propertyId?.startsWith("imported:") || (!propertyId && (body.exactAddress || body.location))) {
+  if (selectedRecord || propertyId?.startsWith("imported:") || (!propertyId && (body.exactAddress || body.location))) {
     const factsCacheKey = JSON.stringify([
       propertyId, body.exactAddress ?? null, body.location ?? null, body.stateCode ?? null,
       body.town ?? null, body.county ?? null, body.rawInput ?? null, body.notes ?? null,
@@ -143,7 +155,18 @@ export async function POST(req: NextRequest) {
       ? findCanonicalPropertyByExactAddress(imported.normalizedAddress)
       : null;
     const matchedSourceRecord = canonicalMatch?.source_records[0] ?? null;
-    const listingSnapshot = findGovernedListingSnapshot(imported.normalizedAddress);
+    const evidenceAsOf = new Date().toISOString();
+    const listingSnapshot = findGovernedListingSnapshot(imported.normalizedAddress, evidenceAsOf);
+    const listingPriceEvidence = matchedSourceRecord && canonicalMatch
+      ? resolveListingPrice({
+          subjectAddress: imported.normalizedAddress ?? "",
+          sourceAddress: fullListingAddress(matchedSourceRecord),
+          sourceName: canonicalMatch.source_name, sourceUrl: matchedSourceRecord.listingUrl || canonicalMatch.source_url,
+          observedAt: canonicalMatch.fetched_at, asOf: evidenceAsOf, price: matchedSourceRecord.price,
+          status: canonicalMatch.listing_status, approved: true,
+          priceKind: ["treasury", "gsa-realestate"].includes(matchedSourceRecord.sourceId) ? "auction-bid" : "asking",
+        })
+      : listingSnapshot?.priceEvidence ?? null;
     // The county parcel resolver and the Place Brief are independent — run
     // them CONCURRENTLY (founder-reported slowness 2026-07-29: the parcel
     // service was serially blocking the whole intelligence build).
@@ -162,7 +185,14 @@ export async function POST(req: NextRequest) {
     // the geocode and the strongest available asset evidence. An exact address
     // match carries its canonical property style into classification; a visitor
     // correction remains secondary and never replaces available parcel facts.
-    const [jurisdictionParcel, basePlaceIntelligence] = await Promise.all([
+    const parcelSoilsPromise = jurisdictionParcelPromise.then(parcel => imported.parsedAddress?.state === "MD" && parcel?.accountId ? fetchMarylandParcelSoils(parcel.accountId) : null);
+    const comparableDiscoveryPromise = jurisdictionParcelPromise.then(parcel => discoverGovernmentComparables({
+      subjectId: canonicalMatch?.canonical_property_id ?? imported.normalizedAddress ?? propertyId ?? "unresolved",
+      state: imported.parsedAddress?.state ?? null, county: matchedSourceRecord?.county ?? body.county ?? null,
+      parcelId: parcel?.accountId ?? null, propertyType: parcel?.landUse ?? lanePropertyType, lat: imported.geocode?.lat == null ? null : Number(imported.geocode.lat),
+      lon: imported.geocode?.lon == null ? null : Number(imported.geocode.lon), asOf: evidenceAsOf,
+    }));
+    const [jurisdictionParcel, basePlaceIntelligence, parcelSoils, comparableDiscovery] = await Promise.all([
       jurisdictionParcelPromise,
       buildLocationBriefIntelligence({
         geocode: imported.geocode,
@@ -172,10 +202,24 @@ export async function POST(req: NextRequest) {
         ownerNotes: body.notes ?? null,
         envPrefetch,
       }),
+      parcelSoilsPromise,
+      comparableDiscoveryPromise,
     ]);
     const resolvedAcreageText = listingSnapshot?.offeredAcreage
       ? `${listingSnapshot.offeredAcreage.toLocaleString("en-US")} acres offered across ${listingSnapshot.offeredParcelCount ?? "multiple"} parcels`
       : derivedAcreageText(matchedSourceRecord) ?? jurisdictionParcel?.acreageText ?? null;
+    if (parcelSoils) {
+      basePlaceIntelligence.soilProfile = parcelSoils;
+      basePlaceIntelligence.verifiedFacts = basePlaceIntelligence.verifiedFacts.filter(fact => fact.label !== "Soil survey (soils)");
+      basePlaceIntelligence.verifiedFacts.push({
+        label: "Soil survey (soils)",
+        value: (parcelSoils.mapUnits ?? []).length + " soil map units intersect the official parcel outline",
+        text: (parcelSoils.mapUnits ?? []).map(unit => unit.name + (unit.capabilityClass ? " (capability class " + unit.capabilityClass + ")" : "")).join("; ") +
+          ". These are parcel-outline intersections, not acreage weights or a claim that every map-unit component occurs in every field. Field pH, usable-acre allocation and management history remain unverified. An address point cannot stand in for the whole parcel.",
+        provenance: "USDA NRCS SSURGO retrieved " + parcelSoils.retrievedAt + "; Maryland parcel " + parcelSoils.boundaryEvidence?.parcelId + "; mapped boundary date " + parcelSoils.boundaryEvidence?.sourceDate,
+        tone: "caution",
+      });
+    }
     const placeIntelligence = applyResolvedFarmParcelContext(basePlaceIntelligence, {
       propertyType:
         lanePropertyType ??
@@ -219,6 +263,20 @@ export async function POST(req: NextRequest) {
         tone: "neutral",
       });
     }
+    placeIntelligence.verifiedFacts.push({
+      label: "Government-record sale candidates", value: comparableDiscovery.candidates.length ? comparableDiscovery.candidates.length + " candidate transfer records — comparable review pending" : "Comparable evidence pending",
+      text: comparableDiscovery.notes.join(" "),
+      provenance: "Source: " + (comparableDiscovery.sourceUrl ?? "No supported county sale source") + "; discovery " + comparableDiscovery.retrievedAt + "; replay " + comparableDiscovery.replayRef,
+      tone: "caution",
+    });
+    for (const sale of comparableDiscovery.candidates.slice(0,8)) placeIntelligence.verifiedFacts.push({
+      label: "Recorded transfer candidate — not an adjusted comp",
+      value: sale.address + " · $" + sale.recordedConsiderationUsd.toLocaleString("en-US"),
+      text: "Recorded transfer " + sale.saleDate + "; " + (sale.acres == null ? "acreage unavailable" : sale.acres + " acres") + "; " +
+        (sale.propertyUse ?? "asset use unavailable") + ". Recorded consideration is NOT an adjusted value for this subject. " + sale.reviewRequired.join(" "),
+      provenance: sale.sourceUrl + "; source data date " + (sale.sourceDate ?? "unpublished") + "; deed " + (sale.transactionId ?? "identity pending"),
+      tone: "caution",
+    });
     const evidenceRecords = canonicalMatch ? officialPropertyEvidenceRecords(canonicalMatch) : [];
     for (const record of evidenceRecords.filter((item) => item.domain === "title")) {
       placeIntelligence.verifiedFacts.push({
@@ -293,7 +351,9 @@ export async function POST(req: NextRequest) {
             zip: matchedSourceRecord?.zip ?? imported.parsedAddress?.zip ?? null,
             rawPropertyStyle: matchedSourceRecord?.rawPropertyStyle ?? listingSnapshot?.propertyType ?? jurisdictionParcel?.landUse ?? (lanePropertyType === "farm" ? "Farm / agricultural property" : lanePropertyType),
             propertyType: matchedSourceRecord?.propertyType ?? listingSnapshot?.propertyType ?? assessorPropertyType ?? lanePropertyType,
-            price: matchedSourceRecord?.price ?? listingSnapshot?.askingPrice ?? null,
+            price: listingPriceEvidence?.amountUsd ?? null,
+            priceEvidence: listingPriceEvidence,
+            comparableDiscovery,
             county: matchedSourceRecord?.county ?? body.county ?? null,
             town: matchedSourceRecord?.town ?? body.town ?? imported.parsedAddress?.city ?? null,
             state: matchedSourceRecord?.state ?? imported.parsedAddress?.state ?? body.stateCode ?? null,
@@ -312,7 +372,7 @@ export async function POST(req: NextRequest) {
             // (founder-caught 2026-08-06 on a property already under contract
             // at $2.5M). Null here means "no listing feed covers this address",
             // and the brief must say exactly that.
-            listingStatus: canonicalMatch?.listing_status ?? listingSnapshot?.status ?? null,
+            listingStatus: listingPriceEvidence?.listingStatus ?? null,
             recordBasis: matchedSourceRecord ? "matched-approved-source-record" : listingSnapshot ? "matched-governed-listing-and-parcel-record" : "matched-jurisdiction-parcel-record",
             parcelSourceName: jurisdictionParcel?.sourceName ?? null,
             parcelSourceAsOf: jurisdictionParcel?.sourceAsOf ?? null,
@@ -330,8 +390,10 @@ export async function POST(req: NextRequest) {
               assessmentAsOf: jurisdictionParcel?.assessmentAsOf ?? null,
               stateCode: matchedSourceRecord?.state ?? imported.parsedAddress?.state ?? body.stateCode ?? null,
               county: matchedSourceRecord?.county ?? body.county ?? null,
-              knownPriceUsd: matchedSourceRecord?.price ?? listingSnapshot?.askingPrice ?? null,
-              knownPriceLabel: canonicalMatch?.listing_status ?? listingSnapshot?.status ?? "Asking price",
+              knownPriceUsd: listingPriceEvidence?.amountUsd ?? null,
+              knownPriceLabel: "Asking price",
+              asOf: evidenceAsOf,
+              subjectId: canonicalMatch?.canonical_property_id ?? imported.normalizedAddress ?? undefined,
               propertyType: matchedSourceRecord?.rawPropertyStyle ?? matchedSourceRecord?.propertyType ?? listingSnapshot?.propertyType ?? lanePropertyType,
               landUse: jurisdictionParcel?.landUse ?? null,
               acreage: listingSnapshot?.offeredAcreage ?? null,
@@ -343,9 +405,9 @@ export async function POST(req: NextRequest) {
             resolvedParcelCount: jurisdictionParcel?.resolvedParcelCount ?? 0,
             offeredParcelCount: listingSnapshot?.offeredParcelCount ?? null,
             offeredAcreage: listingSnapshot?.offeredAcreage ?? null,
-            listingSourceName: listingSnapshot?.sourceName ?? null,
-            listingSourceAsOf: listingSnapshot?.sourceAsOf ?? null,
-            listingSourceUrl: listingSnapshot?.sourceUrl ?? null,
+            listingSourceName: listingPriceEvidence?.sourceName ?? null,
+            listingSourceAsOf: listingPriceEvidence?.observedAt ?? null,
+            listingSourceUrl: listingPriceEvidence?.sourceUrl ?? null,
             listingAgent: listingSnapshot?.listingAgent ?? null,
             listingBrokerage: listingSnapshot?.listingBrokerage ?? null,
             listingPhone: listingSnapshot?.listingPhone ?? null,

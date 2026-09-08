@@ -1,3 +1,4 @@
+import { annualLevelDebtService, positiveNumber } from "@/lib/property/calculationMath";
 /**
  * laneRateEstimates — illustrative pricing for residential financing lanes
  * (founder direction 2026-07-29: "We can't give them an estimated cost here
@@ -26,10 +27,9 @@ export interface LanePricingEstimate {
   estimated: boolean;
 }
 
-function monthlyPandI(principal: number, annualRatePct: number, years: number): number {
-  const r = annualRatePct / 100 / 12;
-  const n = years * 12;
-  return principal * (r / (1 - Math.pow(1 + r, -n)));
+function monthlyPandI(principal: number, annualRatePct: number, years: number): number | null {
+  const annual = annualLevelDebtService(principal, annualRatePct, years, 12);
+  return annual == null ? null : annual / 12;
 }
 
 function dollars(value: number): string {
@@ -38,8 +38,9 @@ function dollars(value: number): string {
 
 /** Est. monthly P&I clause for a down-payment share, or "" without a price. */
 function monthlyClause(price: number | null, ratePct: number, downShare: number, label: string): string {
-  if (price == null || price <= 0) return "";
+  if (!positiveNumber(price)) return "";
   const monthly = monthlyPandI(price * (1 - downShare), ratePct, 30);
+  if (monthly == null) return "";
   return ` · est. ${dollars(monthly)}/mo P&I at ${label}`;
 }
 
@@ -54,7 +55,7 @@ export function estimateLanePricing(
   price: number | null
 ): LanePricingEstimate {
   const name = laneName.toLowerCase();
-  const bench = rates?.mortgage30Pct ?? null;
+  const bench = rates?.mortgage30Pct != null && Number.isFinite(rates.mortgage30Pct) && rates.mortgage30Pct >= 0 ? rates.mortgage30Pct : null;
   const week = rates?.mortgageWeekOf ? ` · week of ${rates.mortgageWeekOf}` : "";
 
   if (/hard money|asset-based bridge|private bridge/.test(name)) {

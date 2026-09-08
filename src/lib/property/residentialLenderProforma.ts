@@ -62,8 +62,7 @@ export interface ResidentialLenderProformaArgs {
   financingLanes: string[];
   rates: LaneRateContext | null;
   disclaimers: string[];
-  /** Printed basis when the price is a stated screening value (e.g. the
-      county-assessed total) rather than an asking price or entered offer. */
+  /** Actual asking/contract price or explicit intended offer provenance; never assessment. */
   valuationNote?: string | null;
 }
 
@@ -80,6 +79,7 @@ const dollars = (n: number) => `$${Math.round(n).toLocaleString("en-US")}`;
 export function buildResidentialLenderProforma(
   args: ResidentialLenderProformaArgs
 ): LenderProformaSection[] {
+  if (!Number.isFinite(args.price) || args.price <= 0) return [{ title: "Acquisition evidence pending", paragraphs: ["Supply a current verified asking price, contract, or intended offer before financing calculations. Tax assessment is not a transaction price."] }];
   const sections: LenderProformaSection[] = [];
   const anchor = args.scenarios[0] ?? null;
   const closingMid = Math.round((args.closingLow + args.closingHigh) / 2);

@@ -8,6 +8,7 @@ import {
 
 const base: ProgramFitContext = {
   laneId: "farm",
+  asOf: "2026-09-07",
   screeningPrice: 400_000,
   noiAnnual: 80_000,
   noiBasis: "verified whole-parcel operating scenario",
@@ -69,11 +70,15 @@ const aboveDirectLimit = evaluateProgramFit(
     screeningPrice: 1_000_000,
   },
 );
-assert.equal(aboveDirectLimit?.score, -1);
-assert.match(
-  aboveDirectLimit?.excluded ?? "",
-  /exceeds the FSA direct loan limit/i,
-);
+assert.equal(aboveDirectLimit?.excluded, undefined, "Purchase price is not a loan-limit exclusion");
+assert.match(aboveDirectLimit?.line ?? "", /Loan structure pending/);
+const aboveLoanLimit = evaluateProgramFit("FSA direct farm ownership financing", { ...base, screeningPrice: 1_000_000, proposedLoanAmount: 700_000 });
+assert.match(aboveLoanLimit?.excluded ?? "", /Proposed FSA loan/);
+const belowLoanLimit = evaluateProgramFit("FSA direct farm ownership financing", { ...base, screeningPrice: 1_000_000, proposedLoanAmount: 500_000 });
+assert.equal(belowLoanLimit?.excluded, undefined);
+assert.match(belowLoanLimit?.line ?? "", /500,000 proposed loan/);
+const expired = evaluateProgramFit("FSA guaranteed farm ownership financing", { ...base, asOf: "2026-10-01" });
+assert.match(expired?.line ?? "", /requires refresh/);
 
 const matrix = buildScenarioFinancingMatrix({
   baseContext: base,

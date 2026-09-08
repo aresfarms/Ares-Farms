@@ -6,7 +6,7 @@ import { guardPublicInput } from "@/security/realityPlatform/publicInputGuard";
 import { calculatePropertyOperatingModel, type PropertyOperatingModelInput, type OperatingUseType, type OperatingRevenueCadence } from "@/lib/property/propertyOperatingModel";
 import { adviseOnPropertyOperatingModel, buildDeterministicOperatingModelAdvice, type ProjectConcern } from "@/lib/property/propertyOperatingModelAdvisor";
 import { decideRate } from "@/security/realityPlatform/navigatorRateLimit";
-import { indicateMarketValue } from "@/lib/property/marketValueIndication";
+import { incomeCapScenario } from "@/lib/property/calculationMath";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +46,7 @@ const bounded = (value: unknown, max: number, fallback = 0) => {
   const n = typeof value === "number" && Number.isFinite(value) ? value : fallback;
   return Math.min(max, Math.max(0, n));
 };
+const optionalBounded = (value: unknown, max: number) => typeof value === "number" && Number.isFinite(value) && value >= 0 && value <= max ? value : null;
 const text = (value: unknown, max = 240) => typeof value === "string" ? value.trim().slice(0, max) : null;
 
 function cleanModel(raw: OperatingModelRequest["model"]): PropertyOperatingModelInput | null {
@@ -57,27 +58,27 @@ function cleanModel(raw: OperatingModelRequest["model"]): PropertyOperatingModel
     useType,
     revenueCadence,
     unitCount: bounded(raw.unitCount, 10_000),
-    occupancyPct: bounded(raw.occupancyPct, 100),
+    occupancyPct: optionalBounded(raw.occupancyPct, 100) ?? NaN,
     averageUnitRevenue: bounded(raw.averageUnitRevenue, 1_000_000),
-    ancillaryRevenueMonthly: bounded(raw.ancillaryRevenueMonthly, 50_000_000),
-    replacementReservePct: bounded(raw.replacementReservePct, 25, 3),
+    ancillaryRevenueMonthly: optionalBounded(raw.ancillaryRevenueMonthly, 50_000_000),
+    replacementReservePct: optionalBounded(raw.replacementReservePct, 100),
     expenses: {
-      payrollMonthly: bounded(e.payrollMonthly, 50_000_000),
-      utilitiesMonthly: bounded(e.utilitiesMonthly, 50_000_000),
-      insuranceMonthly: bounded(e.insuranceMonthly, 50_000_000),
-      propertyTaxMonthly: bounded(e.propertyTaxMonthly, 50_000_000),
-      maintenanceHousekeepingMonthly: bounded(e.maintenanceHousekeepingMonthly, 50_000_000),
-      foodServicesMonthly: bounded(e.foodServicesMonthly, 50_000_000),
-      managementMarketingMonthly: bounded(e.managementMarketingMonthly, 50_000_000),
-      licensingOtherMonthly: bounded(e.licensingOtherMonthly, 50_000_000),
+      payrollMonthly: optionalBounded(e.payrollMonthly, 50_000_000),
+      utilitiesMonthly: optionalBounded(e.utilitiesMonthly, 50_000_000),
+      insuranceMonthly: optionalBounded(e.insuranceMonthly, 50_000_000),
+      propertyTaxMonthly: optionalBounded(e.propertyTaxMonthly, 50_000_000),
+      maintenanceHousekeepingMonthly: optionalBounded(e.maintenanceHousekeepingMonthly, 50_000_000),
+      foodServicesMonthly: optionalBounded(e.foodServicesMonthly, 50_000_000),
+      managementMarketingMonthly: optionalBounded(e.managementMarketingMonthly, 50_000_000),
+      licensingOtherMonthly: optionalBounded(e.licensingOtherMonthly, 50_000_000),
     },
-    acquisitionPrice: bounded(raw.acquisitionPrice, 10_000_000_000),
-    conversionCapex: bounded(raw.conversionCapex, 10_000_000_000),
-    professionalSoftCost: bounded(raw.professionalSoftCost, 1_000_000_000),
-    contingencyPct: bounded(raw.contingencyPct, 100, 10),
-    loanAmount: bounded(raw.loanAmount, 10_000_000_000),
-    interestRatePct: bounded(raw.interestRatePct, 50),
-    amortizationYears: bounded(raw.amortizationYears, 50),
+    acquisitionPrice: optionalBounded(raw.acquisitionPrice, 10_000_000_000),
+    conversionCapex: optionalBounded(raw.conversionCapex, 10_000_000_000),
+    professionalSoftCost: optionalBounded(raw.professionalSoftCost, 1_000_000_000),
+    contingencyPct: optionalBounded(raw.contingencyPct, 100),
+    loanAmount: optionalBounded(raw.loanAmount, 10_000_000_000),
+    interestRatePct: optionalBounded(raw.interestRatePct, 50),
+    amortizationYears: optionalBounded(raw.amortizationYears, 50),
     targetDscr: Math.min(3, Math.max(1, typeof raw.targetDscr === "number" && Number.isFinite(raw.targetDscr) ? raw.targetDscr : 1.25)),
   };
 }
@@ -112,15 +113,9 @@ export async function POST(request: Request) {
   const result = calculatePropertyOperatingModel(model);
   const capRateLowPct = bounded(parsed.body.valuation?.capRateLowPct, 30);
   const capRateHighPct = bounded(parsed.body.valuation?.capRateHighPct, 30);
-  const valuation = capRateLowPct > 0 && capRateHighPct > 0
-    ? indicateMarketValue({
-        propertyType: propertyContext.classification || propertyContext.currentUse || "commercial",
-        landUse: propertyContext.currentUse,
-        noiAnnual: result.noi,
-        capRateLowPct,
-        capRateHighPct,
-      })
-    : null;
+  const valuation = null; // Only a reviewed evidence path may publish a Value Screen.
+  const capScenario = result.coveragePosture !== "NEEDS_EVIDENCE"
+    ? incomeCapScenario(result.noi, capRateLowPct, capRateHighPct) : null;
   const budget = parsed.body.requestAdvice === false ? null : aiBudget(request);
   const advice = parsed.body.requestAdvice === false
     ? null
@@ -140,6 +135,7 @@ export async function POST(request: Request) {
       model,
       result,
       valuation,
+      capScenario,
       advice,
       posture: {
         mathAuthority: "deterministic",

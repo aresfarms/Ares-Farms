@@ -1,6 +1,8 @@
+import { normalizedListingAddress, resolveListingPrice, type ListingPriceEvidence } from "./listingPriceEvidence";
 export type GovernedListingSnapshot = {
   normalizedAddress: string;
-  status: "Active" | "Pending" | "Sold" | "Off market";
+  status: "Active" | "Pending" | "Sold" | "Off market" | null;
+  priceEvidence?: ListingPriceEvidence;
   askingPrice: number | null;
   listingId: string | null;
   sourceName: string;
@@ -21,9 +23,7 @@ export type GovernedListingSnapshot = {
   description: string | null;
 };
 
-function key(value: string): string {
-  return value.toLowerCase().replace(/\broad\b/g, "rd").replace(/[^a-z0-9]+/g, " ").trim();
-}
+const key = normalizedListingAddress;
 
 const SNAPSHOTS: GovernedListingSnapshot[] = [
   {
@@ -69,8 +69,17 @@ const SNAPSHOTS: GovernedListingSnapshot[] = [
   },
 ];
 
-export function findGovernedListingSnapshot(address: string | null | undefined): GovernedListingSnapshot | null {
+export function findGovernedListingSnapshot(address: string | null | undefined, asOf = new Date().toISOString()): GovernedListingSnapshot | null {
   const target = key(address ?? "");
   if (!target) return null;
-  return SNAPSHOTS.find((item) => target.includes(key(item.normalizedAddress)) || key(item.normalizedAddress).includes(target)) ?? null;
+  const snapshot = SNAPSHOTS.find(item => target === key(item.normalizedAddress));
+  if (!snapshot) return null;
+  const priceEvidence = resolveListingPrice({ subjectAddress: address!, sourceAddress: snapshot.normalizedAddress,
+    sourceName: snapshot.sourceName, sourceUrl: snapshot.sourceUrl, observedAt: snapshot.sourceAsOf,
+    price: snapshot.askingPrice, status: snapshot.status, approved: true, priceKind: "asking", asOf });
+  return { ...snapshot, askingPrice: priceEvidence.amountUsd,
+    status: priceEvidence.listingStatus as GovernedListingSnapshot["status"], priceEvidence,
+    offeredAcreage: priceEvidence.status === "price-pending" ? null : snapshot.offeredAcreage,
+    offeredParcelCount: priceEvidence.status === "price-pending" ? null : snapshot.offeredParcelCount,
+    description: priceEvidence.status === "price-pending" ? "Historical listing description; current listing status, price and offered parcel assembly require re-verification. " + snapshot.description : snapshot.description };
 }

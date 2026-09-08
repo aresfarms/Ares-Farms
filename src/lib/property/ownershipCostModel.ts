@@ -1,3 +1,4 @@
+import { annualLevelDebtService, remainingLoanBalance } from "@/lib/property/calculationMath";
 /**
  * ownershipCostModel — what buying and OWNING this property is likely to
  * cost, in plain dollars (founder direction 2026-07-17: estimated
@@ -232,13 +233,7 @@ const EQUITY_YEARS = [3, 5, 10, 15, 20, 30, 50];
 
 /** Remaining balance on a fixed-rate loan after `months` payments. */
 function remainingBalance(loanAmount: number, annualRatePct: number, years: number, months: number): number {
-  const r = annualRatePct / 100 / 12;
-  const n = years * 12;
-  if (months >= n) return 0;
-  if (r <= 0) return loanAmount * (1 - months / n);
-  const growth = Math.pow(1 + r, n);
-  const paid = Math.pow(1 + r, months);
-  return loanAmount * ((growth - paid) / (growth - 1));
+  return remainingLoanBalance(loanAmount, annualRatePct, years, months, 12) ?? NaN;
 }
 
 export function buildEquityOutlook(
@@ -246,7 +241,7 @@ export function buildEquityOutlook(
   context: OwnershipCostContext,
   farmMode = false
 ): EquityOutlook | null {
-  if (!context.hpi) return null;
+  if (farmMode || !context.hpi) return null; // Residential HPI and FHA financing cannot describe farm equity.
   if (!Number.isFinite(price) || price < 10_000 || price > 50_000_000) return null;
   const steadyRate = context.hpi.longRunAnnualPct / 100;
   const slowerRate = steadyRate / 2;
@@ -259,7 +254,7 @@ export function buildEquityOutlook(
     const valueAt = (annualRate: number) => Math.round(price * Math.pow(1 + annualRate, year));
     const rowFor = (annualRate: number) => {
       const value = valueAt(annualRate);
-      return { value, equity: Math.max(0, value - loanBalance) };
+      return { value, equity: value - loanBalance };
     };
     return {
       year,
@@ -289,10 +284,8 @@ export function buildEquityOutlook(
 
 /** Standard amortization: monthly payment on a fixed-rate loan. */
 function monthlyPayment(loanAmount: number, annualRatePct: number, years: number): number {
-  const r = annualRatePct / 100 / 12;
-  const n = years * 12;
-  if (r <= 0) return loanAmount / n;
-  return (loanAmount * r) / (1 - Math.pow(1 + r, -n));
+  const annual = annualLevelDebtService(loanAmount, annualRatePct, years, 12);
+  return annual == null ? NaN : annual / 12;
 }
 
 const round10 = (n: number): number => Math.round(n / 10) * 10;

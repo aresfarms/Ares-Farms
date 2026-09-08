@@ -4920,12 +4920,13 @@ export function PropertyEvaluationWorkspace({
       const acreage =
         facts?.propertyRecord?.offeredAcreage ??
         (Number.parseFloat(facts?.propertyRecord?.acreageText ?? "") || null);
-      const fsaRatePct =
-        ownershipContext?.fsa?.ownershipDirectPct ??
-        ownershipContext?.rates.rate30 ??
-        null;
       const isFarmLaneDoc =
         workspaceProfile.id === "farm" || workspaceProfile.id === "land";
+      // Legacy payload key; the rate source must match the actual scenario.
+      // Do not substitute a residential benchmark when an FSA rate is missing.
+      const fsaRatePct = isFarmLaneDoc
+        ? ownershipContext?.fsa?.ownershipDirectPct ?? null
+        : ownershipContext?.rates.rate30 ?? null;
       let revenueUnits: Array<{
         unitName: string;
         unitDescription: string;
@@ -5042,10 +5043,7 @@ export function PropertyEvaluationWorkspace({
           acquisitionPrice: effectiveListedPrice,
           benchRatePct: ownershipContext?.rates.rate30 ?? null,
           usdaRural: effectivePlaceIntelligence?.usdaRural ?? null,
-          // No published/entered price → the server derives a stated screening
-          // value (assessed value, else USDA state average × acreage) so the
-          // document carries real numbers with their basis printed.
-          assessedTotalValue: facts?.propertyRecord?.assessedTotalValue ?? null,
+          // Missing transaction price stays pending. Tax facts travel only in the evidence exhibit.
           // Parcel soil facts gate what the coverage solver may recommend
           // (founder 2026-07-29: soil type and topography must be respected).
           soil: effectivePlaceIntelligence?.soilProfile ?? null,
@@ -5060,6 +5058,7 @@ export function PropertyEvaluationWorkspace({
           },
           acreage,
           fsaRatePct,
+          fsaRateAsOf: isFarmLaneDoc ? ownershipContext?.fsa?.effective ?? null : ownershipContext?.rates.weekOf ?? null,
           revenueUnits,
           additionalProperties,
           propertyEvidence,

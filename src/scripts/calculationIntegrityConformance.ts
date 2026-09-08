@@ -1,3 +1,4 @@
+import { evaluateGenerationGate } from "@/lib/pdf/ultimateProformaTemplate";
 import { buildDraftProformaInput } from "@/lib/pdf/draftProformaFromProperty";
 import { normalizeMarylandSales } from "@/lib/property/governmentComparableNetwork";
 import assert from "node:assert/strict";
@@ -79,6 +80,10 @@ const blankDraft=buildDraftProformaInput(draftArgs);
 assert.match(blankDraft.partIV.twoCase.revenue.conservative,/Gross revenue evidence pending/);
 assert.match(blankDraft.partIV.twoCase.opex.conservative,/Itemized operating expenses pending/);
 assert.equal(blankDraft.partIV.twoCase.dscrStandalone.conservative,"Operating evidence pending");
+for (const id of ["U8","U9","U10","U13"]) assert(evaluateGenerationGate(blankDraft).some(f=>f.id===id), `Draft missing evidence must keep ${id} open`);
+assert(evaluateGenerationGate({...blankDraft,draftEvidenceStatus:undefined}).some(f=>f.id==="U10"), "Placeholder year rows must not pass even without draft flags");
+assert.match(blankDraft.partII.laneRationale,/No financing program has been selected/);
+assert.match(blankDraft.partIV.debtServiceAssumptions.amortization,/12 monthly payments/);
 const missingPrice=buildDraftProformaInput({...draftArgs,acquisitionPrice:null,additionalProperties:[{title:"Other",location:null,price:200000}]});
 assert.match(missingPrice.partIV.twoCase.debtService,/Requires acquisition price/);
 const rows=[{JURSCODE:"CARO",ACCTID:"a",TRADATE:"20260601",CONSIDR1:500000,DR1LIBER:"1",DR1FOLIO:"2",ADDRESS:"1 Test",PREMCITY:"Test",PREMZIP:"21632"}, {JURSCODE:"CARO",ACCTID:"b",TRADATE:"20260601",CONSIDR1:500000,DR1LIBER:"1",DR1FOLIO:"2",ADDRESS:"2 Test",PREMCITY:"Test",PREMZIP:"21632"}];

@@ -38,6 +38,13 @@ export const LANE_LABELS: Record<LoanLane, string> = {
 /* ── Input model (Parts I–IV; Part V is computed) ─────────────────────────── */
 
 export interface UltimateProformaInput {
+  /** Draft export cannot imply lender-ready evidence from placeholder text. CANON-EXPL-001. */
+  draftEvidenceStatus?: {
+    revenueReconciled: boolean;
+    debtScheduleConfirmed: boolean;
+    yearModelReconciled: boolean;
+    financingSelectionConfirmed: boolean;
+  };
   authority: {
     reviewedAt: string;
     formVersion: string;
@@ -232,18 +239,18 @@ export function evaluateGenerationGate(input: UltimateProformaInput): GateFailur
     f.push({ id: "U7", item: "Crop inventory & growing-crops register — ag operation" });
   if (p.assetRegisters.isLivestockOperation && !has(p.assetRegisters.livestockRegister))
     f.push({ id: "U7", item: "Livestock & products register — livestock operation" });
-  if (p.revenueUnits.length === 0 || p.revenueUnits.some((u) => u.lines.length === 0))
+  if (input.draftEvidenceStatus?.revenueReconciled === false || p.revenueUnits.length === 0 || p.revenueUnits.some((u) => u.lines.length === 0))
     f.push({ id: "U8", item: "Revenue segments itemized per unit; subtotals tie to Part IV" });
   const a = input.partIV.debtServiceAssumptions;
-  if (![a.rate, a.term, a.amortization, a.ioPeriod].every(has))
+  if (input.draftEvidenceStatus?.debtScheduleConfirmed === false || ![a.rate, a.term, a.amortization, a.ioPeriod].every(has))
     f.push({ id: "U9", item: "Debt-service assumptions stated (rate, term, amortization, IO)" });
-  if (input.partIV.yearModel.yearLabels.length === 0 || input.partIV.yearModel.rows.length === 0)
+  if (input.draftEvidenceStatus?.yearModelReconciled === false || input.partIV.yearModel.yearLabels.length === 0 || input.partIV.yearModel.rows.length === 0 || input.partIV.yearModel.rows.some(row => row.values.length !== input.partIV.yearModel.yearLabels.length || row.values.some(value => /\b(?:TBD|pending|requires|unknown)\b/i.test(value))))
     f.push({ id: "U10", item: "Year-by-year model complete; two-case summary ties out" });
   if (p.workingCapital.rows.length === 0)
     f.push({ id: "U11", item: "Working capital detailed with justifications" });
   if (has(p.identity.creditContext) && !p.identity.creditEventsDocumented)
     f.push({ id: "U12", item: "Credit events documented with Letters of Explanation" });
-  if (!has(input.partII.laneRationale) || !has(input.partII.eligibilityNarrative))
+  if (input.draftEvidenceStatus?.financingSelectionConfirmed === false || !has(input.partII.laneRationale) || !has(input.partII.eligibilityNarrative))
     f.push({ id: "U13", item: "Lane match recorded with rationale and eligibility narrative (Part II)" });
 
   // Lane-specific blocking items.

@@ -67,7 +67,7 @@
         "verify:calculation-integrity",
         "verify:property-value-indication"
       ],
-      "evidence": "No assessment acquisition fallback; no generic crop NOI; no partial bundle purchase total; unknown income remains pending. Local draft PDF rendered and inspected; absent gross revenue is not relabeled from supplied NOI. Live export check remains pending.",
+      "evidence": "No assessment acquisition fallback; no generic crop NOI; no partial bundle purchase total; unknown income remains pending. Local draft PDF rendered and inspected; absent gross revenue is not relabeled from supplied NOI. Live export check remains pending. Follow-up draft template removes default FSA match; missing revenue/debt/year-model/selection checks remain open; source-date and monthly frequency printed. Re-rendered local PDF verified. Cloud end-to-end confirmation still pending.",
       "limitations": "Every export path and complete live customer journey not certified."
     },
     {

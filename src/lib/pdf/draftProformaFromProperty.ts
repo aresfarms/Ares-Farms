@@ -41,6 +41,7 @@ export interface DraftProformaPropertyArgs {
   acreage: number | null;
   /** Published FSA direct farm-ownership rate, percent (screening basis). */
   fsaRatePct: number | null;
+  fsaRateAsOf?: string | null;
   /** Where acquisitionPrice came from — printed with every figure it drives
       (explicit intended offer, verified contract or current asking price only). */
   valuationNote: string | null;
@@ -134,13 +135,14 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
   );
 
   return {
+    draftEvidenceStatus: { revenueReconciled: false, debtScheduleConfirmed: false, yearModelReconciled: false, financingSelectionConfirmed: false },
     authority: {
       reviewedAt: args.generationDate,
       formVersion: authority.formVersion,
       officialSourceRefs: authority.refs,
       reviewedContentHashes: {},
       programTermsNote:
-        "Program terms referenced are current-source snapshots, not lender approval or an eligibility determination. " +
+        "Program references and rate snapshots require current confirmation; this draft does not establish loan eligibility or approval. " +
         "Official form versions and content hashes are recorded at the underwriting review that finalizes this document.",
       coverageThresholdBasis: "Illustrative lender underwriting assumption; lender-specific confirmation required.",
     },
@@ -149,7 +151,7 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
       clientLegalName: `DRAFT — borrower entity ${TO_SUPPLY.toLowerCase()}`,
       guarantorNames: TO_SUPPLY,
       lane: args.lane,
-      programVariant: args.lane === "B" ? "USDA FSA Farm Ownership (screening)" : undefined,
+      programVariant: "Financing comparison draft — no loan program selected",
       lenderContactAndInstitution: "Lender/recipient designated at underwriting",
       documentId: `FURLONG-DRAFT-${args.lane}-${args.generationDate.slice(0, 4)}-00`,
       generationDate: args.generationDate,
@@ -265,8 +267,8 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
     partII: {
       laneRationale:
         args.lane === "B"
-          ? `USDA/FSA farm-ownership is the property/program screening lane for an agricultural acquisition${where ? ` in ${where}` : ""}: purpose-built for farm real estate, ${AMORT_YEARS}-year terms, and the published direct rate used in the debt-service model. Furlong's ranking remains property/project-only; the selected provider performs any borrower underwriting required for approval.`
-          : `SBA 7(a) is a property/program screening lane for an owner-operated business acquisition${where ? ` in ${where}` : ""}. Furlong's ranking remains property/project-only; the selected provider performs any borrower/business underwriting required for approval.`,
+          ? `No financing program has been selected for this agricultural property${where ? ` in ${where}` : ""}. An FSA direct loan means borrowing from USDA; an FSA guaranteed loan means borrowing from a participating lender with USDA backing. Farm classification alone does not establish program eligibility or require either loan. Any calculations in this draft are explicitly stated comparison assumptions, not recommended terms.`
+          : `No financing program has been selected for this property${where ? ` in ${where}` : ""}. SBA, USDA and conventional options require confirmation of the actual business use, loan purpose, eligibility and lender terms. This draft records a comparison scenario, not a program match or approval.`,
       eligibilityNarrative:
         `Property/project screening only: the figures in Parts I and IV come from the ${propertyCount > 1 ? `${propertyCount} included properties'` : "property's"} entered record${propertyCount > 1 ? "s" : ""} and explicitly supplied net-income scenarios; they are not automatically verified market or operating evidence.${unmodeledIncomeNote} Personal credit, income, DTI, assets and liquidity do not alter Furlong's nonresidential property/program ranking. The selected provider separately determines borrower/business underwriting, program eligibility and approval — this DRAFT makes no eligibility finding.`,
     },
@@ -278,18 +280,18 @@ export function buildDraftProformaInput(args: DraftProformaPropertyArgs): Ultima
         revenue: { conservative: "Gross revenue evidence pending — supplied figures are net income", stabilized: "Gross revenue evidence pending — supplied figures are net income" },
         opex: { conservative: "Itemized operating expenses pending", stabilized: "Itemized operating expenses pending" },
         noi: { conservative: dollars(consNoi), stabilized: dollars(stabNoi) },
-        margins: { conservative: "NOI-modeled", stabilized: "NOI-modeled" },
+        margins: { conservative: "Revenue basis pending; margin not calculable", stabilized: "Revenue basis pending; margin not calculable" },
         debtService: annualDebtService != null ? dollars(annualDebtService) : "Requires acquisition price + rate",
         dscrStandalone: { conservative: dscr(consNoi), stabilized: dscr(stabNoi) },
         dscrGlobal: { conservative: "Not used in Furlong nonresidential property scoring — selected provider handles borrower-side underwriting separately", stabilized: "Not used in Furlong nonresidential property scoring — selected provider handles borrower-side underwriting separately" },
-        dscrFloor: "1.25x screening threshold",
+        dscrFloor: "1.25x illustrative comparison target — not a program requirement",
         stressDescription: `Illustrative downside stress: subtract 25% of the absolute conservative NOI (losses worsen, not shrink).${unmodeledIncomeNote}`,
         dscrStress: dscr(stressNoi),
       },
       debtServiceAssumptions: {
-        rate: rate != null ? `${rate}% (published FSA direct farm-ownership rate — screening basis)` : "",
+        rate: rate != null ? `${rate}% (supplied rate snapshot; effective ${args.fsaRateAsOf ?? "date not supplied"}; confirm current terms)` : "Rate evidence pending",
         term: `${AMORT_YEARS} years`,
-        amortization: `${AMORT_YEARS}-year level amortization`,
+        amortization: `${AMORT_YEARS}-year level amortization, 12 monthly payments per year; illustrative schedule, not a confirmed lender term`,
         ioPeriod: "None assumed",
       },
       yearModel: {

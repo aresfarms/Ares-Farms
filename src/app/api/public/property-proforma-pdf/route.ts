@@ -218,6 +218,7 @@ export async function POST(req: NextRequest) {
     acquisitionPrice: screeningPrice,
     acreage,
     fsaRatePct,
+    fsaRateAsOf: typeof body.fsaRateAsOf === "string" ? body.fsaRateAsOf.slice(0, 100) : null,
     valuationNote,
     revenueUnits: effectiveRevenueUnits,
     additionalProperties,

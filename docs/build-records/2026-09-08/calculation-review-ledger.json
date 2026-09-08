@@ -57,17 +57,17 @@
       "tests": [
         "verify:financing-program-fit"
       ],
-      "evidence": "Loan ceilings apply to proposed loan not purchase price; blended funding remains pending; expired FY2026 limit requires refresh; farm does not use residential HPI/FHA equity.",
+      "evidence": "Loan ceilings apply to proposed loan not purchase price; blended funding remains pending; expired FY2026 limit requires refresh; farm does not use residential HPI/FHA equity. Structured price/loan/NOI/rate-date/payment inputs replace prose parsing. Missing financial evidence cannot produce a named financing leader; 1.25x is an illustrative comparison target. Old Seippes outputs independently replayed exactly.",
       "limitations": "Program rule library, rates, total debts and specific eligibility still need dated authoritative review."
     },
     {
       "domain": "Exports and document calculations",
-      "status": "targeted-behavior-tested-render-verification-pending",
+      "status": "targeted-behavior-tested-local-pdf-render-checked",
       "tests": [
         "verify:calculation-integrity",
         "verify:property-value-indication"
       ],
-      "evidence": "No assessment acquisition fallback; no generic crop NOI; no partial bundle purchase total; unknown income remains pending.",
+      "evidence": "No assessment acquisition fallback; no generic crop NOI; no partial bundle purchase total; unknown income remains pending. Local draft PDF rendered and inspected; absent gross revenue is not relabeled from supplied NOI. Live export check remains pending.",
       "limitations": "Every export path and complete live customer journey not certified."
     },
     {

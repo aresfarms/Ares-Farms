@@ -24,6 +24,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief";
 import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
+import type { ProgramFit, FinancingCalculation } from "@/lib/property/financingProgramFit";
 import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
 
 export type TabId = "summary" | "property" | "agriculture" | "utilities" | "finance" | "environmental" | "education" | "misc" | "report";
@@ -124,13 +125,33 @@ export type LaneWorkspaceProps = ChartTableBriefProps & {
       When present, the Finance tab ranks by fit score (excluded programs
       last) instead of the lane's static fallback order, and renders each
       program's property-standalone line. Keys match financingLanes names. */
-  financingFit?: Record<string, { score: number; line: string; excluded?: string }>;
+  financingFit?: Record<string, ProgramFit>;
   /** Finance-tab analysis panel (commercial best-use income screen, lender-
       test scorecard) rendered between the best-first box and the cost model. */
   financeAnalysisSlot?: ReactNode;
 };
 
 type ChassisProps = LaneWorkspaceProps & { lane: LaneDefinition };
+
+function FinancingCalculationDetails({ calculation: c }: { calculation: FinancingCalculation }) {
+  const money = (n: number) => n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+  return <div data-testid="financing-calculation-inputs" style={{ display: "grid", gap: 9, fontSize: 13, lineHeight: 1.6 }}>
+    <strong>{c.dscr.toFixed(2)}× loan-payment coverage (DSCR)</strong>
+    <span>{money(c.annualNoi)} annual net operating income ÷ {money(c.annualDebtService)} annual loan payments = {c.dscr.toFixed(2)}×.</span>
+    <span>Net operating income means revenue minus operating expenses, before loan payments. The {c.comparisonTarget.toFixed(2)}× comparison target is illustrative—not an FSA requirement or loan approval.</span>
+    <details>
+      <summary style={{ cursor: "pointer", fontWeight: 800 }}>Show exactly where these numbers come from</summary>
+      <dl style={{ display: "grid", gap: 9, marginBottom: 0 }}>
+        <div><dt>Transaction price: {money(c.purchasePrice)}</dt><dd style={{ margin: 0 }}>{c.priceBasis}</dd></div>
+        <div><dt>Loan amount: {money(c.loanAmount)}</dt><dd style={{ margin: 0 }}>{c.loanBasis}</dd></div>
+        <div><dt>Annual net operating income: {money(c.annualNoi)}</dt><dd style={{ margin: 0 }}>{c.incomeBasis}</dd></div>
+        <div><dt>Rate and payment assumptions: {c.ratePct.toFixed(2)}%, {c.termYears} years, monthly payments</dt><dd style={{ margin: 0 }}>{c.rateBasis}. Source effective date: {c.rateAsOf ?? "not supplied — currentness unverified"}. Term and payment frequency are assumptions until confirmed by the lender.</dd></div>
+        <div><dt>Loan payments: {money(c.monthlyPayment)} per month × 12 = {money(c.annualDebtService)} per year</dt><dd style={{ margin: 0 }}>Fully amortizing principal and interest only. Monthly payment = loan × monthly rate ÷ [1 − (1 + monthly rate) raised to minus the number of payments]. At 0% interest, divide the loan by the number of payments. Calculations use unrounded amounts.</dd></div>
+      </dl>
+    </details>
+    <span>Other loans, fees, taxes, insurance, household costs and cash needed at closing still require reconciliation. This is a comparison scenario, not a financing commitment.</span>
+  </div>;
+}
 
 function suppressResolvedUnknowns(
   facts: NonNullable<ChartTableBriefProps["intelligence"]>["verifiedFacts"],
@@ -313,13 +334,8 @@ export function GovernedLaneChassis(props: ChassisProps) {
           if ((bFit?.score ?? -0.5) !== (aFit?.score ?? -0.5)) return (bFit?.score ?? -0.5) - (aFit?.score ?? -0.5);
           return lane.financingPriority(a) - lane.financingPriority(b);
         });
-        const leadProgram = rankedPrograms.find((name) => !props.financingFit?.[name]?.excluded) ?? null;
-        const leadProgramLine = leadProgram ? props.financingFit?.[leadProgram]?.line ?? null : null;
-        const modeledIncome = leadProgramLine?.match(/modeled income (\$[\d,]+)\/yr/i)?.[1] ?? null;
-        const annualDebtService = leadProgramLine?.match(/vs (\$[\d,]+)\/yr debt service/i)?.[1] ?? null;
-        const debtTerms = leadProgramLine?.match(/at ([\d.]+)% \(([^)]+)\)/i);
-        const dscr = leadProgramLine?.match(/DSCR ([\d.]+)/i)?.[1] ?? null;
-        const incomeBasis = leadProgramLine?.match(/Income basis: (.+)$/i)?.[1]?.replace(/\.$/, "") ?? null;
+        const leadProgram = rankedPrograms.find((name) => !props.financingFit?.[name]?.excluded && props.financingFit?.[name]?.calculation) ?? null;
+        const leadCalculation = leadProgram ? props.financingFit?.[leadProgram]?.calculation : undefined;
         const farmScreen = props.intelligence?.farmBestUse ?? null;
         const currentUse = props.propertyRecord?.landUse ?? props.propertyRecord?.rawPropertyStyle ?? props.propertyType;
         const answer = lane.id === "farm"
@@ -367,20 +383,21 @@ export function GovernedLaneChassis(props: ChassisProps) {
                 <strong style={{ display: "block", marginTop: 6, color: "#fff", lineHeight: 1.45 }}>{environmentalIndication}</strong>
               </div>
               <div style={{ gridColumn: "1 / -1", border: "1px solid rgba(215,184,90,.55)", borderRadius: 12, padding: "16px 18px", background: "rgba(215,184,90,.08)", display: "grid", gap: 11 }}>
-                <span style={{ color: "#F3D98D", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>Financing to test first</span>
-                <strong style={{ color: "#fff", fontSize: 18, lineHeight: 1.4 }}>{leadProgram ?? "Needs price and use confirmation"}</strong>
-                {dscr && modeledIncome && annualDebtService ? <>
-                  <div style={{ display: "flex", gap: "12px 22px", alignItems: "baseline", flexWrap: "wrap" }}>
-                    <strong style={{ color: "#fff", fontSize: 27, lineHeight: 1 }}>{dscr}x DSCR</strong>
-                    <span style={{ color: "#F3D98D", fontSize: 13, fontWeight: 800 }}>{Number(dscr) >= 1.25 ? "Scenario meets the 1.25x screening target" : "Scenario does not meet the 1.25x screening target"}</span>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(175px,1fr))", gap: 10 }}>
-                    <div><strong style={{ display: "block", color: "#fff", fontSize: 17 }}>{modeledIncome}/yr</strong><span style={{ color: "#AFC7CD", fontSize: 11.5 }}>Modeled annual income</span></div>
-                    <div><strong style={{ display: "block", color: "#fff", fontSize: 17 }}>{annualDebtService}/yr</strong><span style={{ color: "#AFC7CD", fontSize: 11.5 }}>Annual debt service</span></div>
-                    {debtTerms && <div><strong style={{ display: "block", color: "#fff", fontSize: 17 }}>{debtTerms[1]}% · {debtTerms[2]}</strong><span style={{ color: "#AFC7CD", fontSize: 11.5 }}>Published-rate test basis</span></div>}
-                  </div>
-                  {incomeBasis && <span style={{ color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.55 }}>Income basis: {incomeBasis}. Screening only—not a projection, approval, or credit decision.</span>}
-                </> : leadProgramLine ? <span style={{ color: "#C9D9DD", fontSize: 12.5, lineHeight: 1.55 }}>{leadProgramLine}</span> : null}
+                <span style={{ color: "#F3D98D", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".1em" }}>Can this property cover loan payments?</span>
+                <strong style={{ color: "#fff", fontSize: 18, lineHeight: 1.4 }}>{leadCalculation ? "Illustrative payment comparison" : "We cannot calculate loan coverage yet"}</strong>
+                {leadCalculation ? <>
+                  <span>{leadProgram}</span>
+                  <FinancingCalculationDetails calculation={leadCalculation} />
+                </> : <div data-testid="financing-evidence-pending" style={{ color: "#C9D9DD", fontSize: 13, lineHeight: 1.65 }}>
+                  <p style={{ margin: "0 0 8px" }}>No loan program is being recommended. We need:</p>
+                  <ul style={{ margin: 0, paddingLeft: 20 }}>
+                    <li>A purchase price or intended offer{hasPrice ? " — supplied; its source and terms still need review" : " — not available"}.</li>
+                    <li>Annual revenue and itemized operating costs supported by records or a documented property-specific budget.</li>
+                    <li>The loan amount, interest rate, repayment term, payment schedule and any other debt.</li>
+                  </ul>
+                  <p style={{ margin: "8px 0 0" }}>The tax assessment is not the purchase price. Acreage and generic crop budgets do not establish this farm’s income. See Finance for loan options and their requirements.</p>
+                </div>}
+
               </div>
             </div>
           </article>
@@ -443,9 +460,9 @@ export function GovernedLaneChassis(props: ChassisProps) {
           }
           return lane.financingPriority(a) - lane.financingPriority(b);
         });
-        const first = ranked[0] ?? null;
+        const first = ranked.find((name) => !fit[name]?.excluded && fit[name]?.calculation) ?? null;
         const firstFit = first ? fit[first] : undefined;
-        return <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Finance</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("finance")}</p></header>{first && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFF9E8", display: "grid", gap: 7 }}><span style={{ fontSize: 10, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase", color: "#8F6E1F" }}>Best first path to test — ranked by this property&apos;s own numbers</span><strong style={{ color: "#1C2B45", fontSize: 17 }}>{first}</strong><span style={{ color: "#8F6E1F", fontWeight: 800 }}>{lane.financingRateLabel(first, props.financingRateContext ?? null)}</span>{firstFit?.line && <span style={{ color: "#3d4655", fontSize: 12.5, lineHeight: 1.55 }}>{firstFit.line}</span>}<span style={{ color: "#5A6172", fontSize: 12 }}>{lane.bestFirstPathNote(first)} This is a screening priority—not an eligibility or approval decision.</span>{props.financingRateContext?.fsaEffective && lane.id === "farm" && <span style={{ color: "#6B7280", fontSize: 10.8 }}>FSA rate effective {props.financingRateContext.fsaEffective}.</span>}</section>}{props.financeAnalysisSlot}{props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the payment and cash-to-close model.</div>}<section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Property financing programs</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{ranked.length ? ranked.map((item, index) => { const note = lane.financingProgramNote(item); const itemFit = fit[item]; const excluded = Boolean(itemFit?.excluded); return <article key={item} style={{ border: `1px solid ${excluded ? "#D9DEE7" : index === 0 ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: excluded ? "#F7F8FA" : index === 0 ? "#FBF5E6" : "#fff", display: "grid", gap: 6, opacity: excluded ? 0.75 : 1 }}><strong style={{ color: "#1C2B45" }}>{index + 1}. {item}</strong>{excluded ? <span style={{ color: "#8A93A3", fontSize: 11.5, fontWeight: 800 }}>NOT A FIT FOR THIS PROPERTY — {itemFit?.excluded}</span> : <><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{lane.financingRateLabel(item, props.financingRateContext ?? null)}</span>{itemFit?.line && <span style={{ color: "#3d4655", fontSize: 11.5, lineHeight: 1.55 }}>{itemFit.line}</span>}<span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5 }}>{note.why}</span></>}<span style={{ color: "#6B7280", fontSize: 10.8 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span>No property-relevant program has been produced yet.</span>}</div></section></>;
+        return <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Finance</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("finance")}</p></header>{first && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFF9E8", display: "grid", gap: 7 }}><span style={{ fontSize: 10, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase", color: "#8F6E1F" }}>Illustrative loan-payment comparison — not a program recommendation</span><strong style={{ color: "#1C2B45", fontSize: 17 }}>{first}</strong><span style={{ color: "#8F6E1F", fontWeight: 800 }}>{lane.financingRateLabel(first, props.financingRateContext ?? null)}</span>{firstFit?.calculation && <FinancingCalculationDetails calculation={firstFit.calculation} />}<span style={{ color: "#5A6172", fontSize: 12 }}>This compares the supplied financial scenario only. Program eligibility and borrower underwriting have not been established.</span>{props.financingRateContext?.fsaEffective && lane.id === "farm" && <span style={{ color: "#6B7280", fontSize: 10.8 }}>FSA rate effective {props.financingRateContext.fsaEffective}.</span>}</section>}{!first && <section data-testid="finance-no-recommendation" style={card}><strong>No financing recommendation or loan-coverage result yet.</strong><p>We need a transaction price, supported revenue and operating costs, and the proposed loan terms. The options below are a reference list, not a ranking or approval.</p></section>}{props.financeAnalysisSlot}{props.costsSlot ?? <div style={card}>Enter or confirm the property price to begin the payment and cash-to-close model.</div>}<section style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Loan options to investigate—not approvals</h3><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))", gap: 9, marginTop: 10 }}>{ranked.length ? ranked.map((item) => { const note = lane.financingProgramNote(item); const itemFit = fit[item]; const excluded = Boolean(itemFit?.excluded); return <article key={item} style={{ border: `1px solid ${excluded ? "#D9DEE7" : item === first ? "#B08A2E" : "#E5E0D5"}`, borderRadius: 10, padding: "12px 13px", background: excluded ? "#F7F8FA" : item === first ? "#FBF5E6" : "#fff", display: "grid", gap: 6, opacity: excluded ? 0.75 : 1 }}><strong style={{ color: "#1C2B45" }}>{item}</strong>{excluded ? <span style={{ color: "#8A93A3", fontSize: 11.5, fontWeight: 800 }}>REQUIREMENT NOT MET OR NOT CONFIRMED — {itemFit?.excluded}</span> : <><span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{lane.financingRateLabel(item, props.financingRateContext ?? null)}</span>{itemFit?.line && <span style={{ color: "#3d4655", fontSize: 11.5, lineHeight: 1.55 }}>{itemFit.line}</span>}<span style={{ color: "#8F6E1F", fontSize: 11.5, fontWeight: 800 }}>{note.fit}</span><span style={{ color: "#5A6172", fontSize: 11.5 }}>{note.why}</span></>}<span style={{ color: "#6B7280", fontSize: 10.8 }}><b>What still controls:</b> {note.watch}</span></article>; }) : <span>No property-relevant program has been produced yet.</span>}</div></section></>;
       })()}
       {tab === "report" && <><header style={card}><h3 style={{ margin: 0, color: "#1C2B45", fontFamily: "Georgia,serif" }}>Report and pro forma</h3><p style={{ margin: "5px 0 0", color: "#5A6172", fontSize: 13 }}>{introFor("report")}</p></header>{props.actionsSlot && <section style={{ ...card, display: "grid", gap: 9, borderColor: "#C8D8EA", background: "#F7FAFD" }}>{props.actionsSlot}</section>}{props.proformaSlot && <section style={{ ...card, borderColor: "#B08A2E", background: "#FFFDF5", display: "grid", gap: 9 }}>{props.proformaSlot}</section>}<section style={{ ...card, borderColor: "#C8D8EA", background: "#F7FAFD", display: "grid", gap: 9 }}><h3 style={{ margin: 0, color: "#1C2B45", fontSize: 16 }}>Personalized pro forma</h3><p style={{ margin: 0, color: "#5A6172", fontSize: 12.5 }}>Continue when you want borrower-specific qualification, document review, and a finalized pro forma from the licensed Financial module.</p><a href="/explore?lane=financing-capital#lender-intake" style={{ justifySelf: "start", borderRadius: 9, padding: "10px 14px", background: "#1C2B45", color: "#fff", fontWeight: 800, textDecoration: "none" }}>Continue to personalized Financial module</a></section>{deedEvidence.length > 0 && <details style={card}><summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Restricted deed evidence</summary><p style={{ color: "#5A6172", fontSize: 12 }}>Recorded deed evidence is available inside an authorized financial or lender workspace.</p></details>}</>}
     </div>

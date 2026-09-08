@@ -69,6 +69,7 @@ import {
   buildScenarioFinancingMatrix,
   evaluateProgramFit,
   type ProgramFitContext,
+  type ProgramFit,
   type PropertyUseScenario,
 } from "@/lib/property/financingProgramFit";
 import { modelCommercialUses } from "@/lib/property/commercialUseModel";
@@ -4329,8 +4330,8 @@ export function PropertyEvaluationWorkspace({
             "USDA Business & Industry financing — rural business-purpose projects, including eligible value-added and integrated agricultural operations",
             "SBA 504 financing — eligible owner-occupied processing, storage, agritourism, service, and other non-primary-production fixed assets",
             "SBA 7(a) financing — eligible value-added or commercial operations, working capital, acquisition, and equipment",
-            "FSA direct farm ownership financing — USDA lends directly when the primary-production transaction requires the farm-credit lane",
-            "FSA guaranteed farm ownership financing — bank loan with a USDA guarantee when the primary-production transaction requires the farm-credit lane",
+            "FSA direct farm-purchase loan — borrow directly from USDA",
+            "FSA guaranteed farm-purchase loan — borrow from a participating lender with USDA backing",
             "USDA Rural Development housing financing — only when confirmed owner-occupied residential use is part of the transaction",
             "Conventional farm or mixed-use financing",
             "Seller financing — seller carries a negotiated note on land, improvements, or included assets",
@@ -4441,6 +4442,10 @@ export function PropertyEvaluationWorkspace({
     const ctx: ProgramFitContext = {
       laneId,
       screeningPrice,
+      priceBasis: facts?.propertyRecord?.price != null && facts.propertyRecord.price === screeningPrice
+        ? `Current asking price: ${facts.propertyRecord.listingSourceName ?? "matched property record"}; observed ${facts.propertyRecord.listingSourceAsOf ?? "date unavailable"}`
+        : "Entered transaction price or intended offer; not an appraisal or tax assessment",
+      rateAsOf: { mortgage: ownershipContext?.rates.weekOf ?? null, fsaDirect: ownershipContext?.fsa?.effective ?? null },
       noiAnnual,
       noiBasis,
       rates: {
@@ -4500,7 +4505,7 @@ export function PropertyEvaluationWorkspace({
     const scenarioMatrix = buildScenarioFinancingMatrix({ baseContext: ctx, programs: topProgramPreview, scenarios });
     const map: Record<
       string,
-      { score: number; line: string; excluded?: string }
+      ProgramFit
     > = {};
     for (const name of topProgramPreview) {
       const fit = evaluateProgramFit(name, ctx);
@@ -4511,8 +4516,7 @@ export function PropertyEvaluationWorkspace({
       laneId === "commercial"
         ? (useScreen?.bestUse?.dscr ?? null)
         : Object.values(map).reduce<number | null>((best, f) => {
-            const m = f.line.match(/DSCR (\d+\.\d+)/);
-            const v = m ? Number(m[1]) : null;
+            const v = f.calculation?.dscr ?? null;
             return v != null && (best == null || v > best) ? v : best;
           }, null);
     const bestDscrLabel =

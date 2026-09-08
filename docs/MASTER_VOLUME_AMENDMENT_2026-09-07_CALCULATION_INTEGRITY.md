@@ -37,3 +37,11 @@ No production promotion, new source approval, user onboarding certification or l
 ## Repeatable checks
 
 Run `npm run verify:calculation-integrity`, `npm run verify:farm-use-integrity`, `npm run verify:property-value-indication`, `npm run verify:property-operating-model`, `npm run verify:financing-program-fit`, `npm run verify:master-volume-build-parity`, `npx tsc --noEmit` and `npm run build`. Any failure blocks release of these changes; investigate the failing evidence rather than removing the gate.
+
+## September 8 UTC follow-up — Seippes financing display
+
+Replayed the prior e6216e3 source: $69,800 tax assessment was substituted for acquisition price; annual amortization at 6% over 40 years generated $4,639.015207/year. The unverified optimizer combined 50% of $9,719.892 hay NOI, 30% of $8,734.848 lease NOI and 20% of $12,206.238 livestock NOI, producing $9,921.648/year and a displayed 2.14x ratio. Those are reproduced defective outputs, not property financial findings.
+
+The assessment fallback and automatic generic farm-income fallback are removed. No named financing leader may be presented without an actual calculable financial scenario; incomplete inputs produce a plain-language missing-evidence panel, not a zero or implied approval. A scenario must expose transaction-price basis, loan principal, borrowing assumption, net operating income and its basis, interest-rate source/date, term, payment frequency, monthly and annual payments, and the coverage equation. Structured calculation fields—not numbers extracted from prose—drive these displays. The 1.25x target is explicitly an illustrative comparison threshold, not an FSA requirement or approval standard.
+
+FSA direct and guaranteed options remain separate and use plain-language descriptions: borrowing directly from USDA, or borrowing from a participating lender with USDA backing. No assertion of lowest rate, guaranteed processing speed, required farm-credit lane or automatic program eligibility is made. Current FSA source pages were reviewed September 8 UTC. This display correction does not complete missing property-income evidence, a current listing-price feed, reviewed BPO intake, or the all-platform calculation audit.

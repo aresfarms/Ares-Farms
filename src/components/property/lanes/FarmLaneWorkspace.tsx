@@ -75,17 +75,17 @@ function programNote(name: string) {
     };
   if (value.includes("fsa direct"))
     return {
-      fit: "USDA lends directly — no bank in the transaction",
-      why: "The lowest-rate farm-ownership path, targeted at beginning and underserved farmers, with statutory loan limits and government processing timelines.",
+      fit: "Borrow directly from USDA’s Farm Service Agency (FSA)",
+      why: "A loan to buy or improve an operating farm. FSA makes and services its portion of the loan; another lender may participate in a joint-financing arrangement. This is an option to investigate, not a requirement or approval.",
       watch:
-        "Loan limits (≈$600K, indexed), eligibility targeting, farm experience requirements, appraisal, and FSA processing timelines still control.",
+        "FSA must confirm current limits, eligibility, farm-management experience, repayment ability, appraisal, available funding and the actual loan terms.",
     };
   if (value.includes("fsa guaranteed"))
     return {
       fit: "Bank-made farm loan with a USDA guarantee behind it",
-      why: "The commercial farm-ownership path most non-beginning farmers actually use: a private lender underwrites and closes at bank speed, with USDA guaranteeing up to 95% — higher limits than the direct program.",
+      why: "A participating lender makes and services the farm loan. USDA’s guarantee protects the lender against a qualifying loss; it does not approve the borrower or guarantee that the farm is profitable.",
       watch:
-        "Participating-lender availability, the guaranteed loan limit (≈$2.25M, indexed annually), farm repayment ability, appraisal, and collateral still control.",
+        "The lender and FSA must confirm current limits, eligibility, repayment ability, appraisal, collateral and loan terms. No closing timeline is promised.",
     };
   if (value.includes("usda") || value.includes("fsa"))
     return {

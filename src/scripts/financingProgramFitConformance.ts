@@ -1,4 +1,9 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
+import type { LaneWorkspaceProps } from "@/components/property/lanes/GovernedLaneChassis";
 
 import {
   buildScenarioFinancingMatrix,
@@ -80,6 +85,25 @@ assert.match(belowLoanLimit?.line ?? "", /500,000 proposed loan/);
 const expired = evaluateProgramFit("FSA guaranteed farm ownership financing", { ...base, asOf: "2026-10-01" });
 assert.match(expired?.line ?? "", /requires refresh/);
 
+assert.equal(fsaDirect?.calculation?.loanAmount, 400_000);
+assert.equal(fsaDirect?.calculation?.paymentsPerYear, 12);
+assert.equal(fsaDirect?.calculation?.annualNoi, 80_000);
+assert.equal(fsaDirect?.calculation?.annualDebtService, (fsaDirect?.calculation?.monthlyPayment ?? 0) * 12);
+assert.equal(belowLoanLimit?.calculation?.loanAmount, 500_000);
+assert.equal(usdaBi?.calculation?.loanAmount, 320_000, "Eligibility copy must not discard structured calculation inputs");
+assert.equal(evaluateProgramFit("FSA direct farm-purchase loan — borrow directly from USDA", { ...base, screeningPrice: null, noiAnnual: null })?.calculation, undefined);
+assert.equal(evaluateProgramFit("FSA direct farm ownership financing", { ...base, noiAnnual: null })?.calculation, undefined);
+assert.equal(evaluateProgramFit("FSA direct farm ownership financing", { ...base, noiAnnual: -1000 })?.calculation?.annualNoi, -1000);
+assert.match(fsaDirect?.line ?? "", /illustrative 1.25x comparison target/);
+const chassis = readFileSync("src/components/property/lanes/GovernedLaneChassis.tsx", "utf8");
+assert.match(chassis, /financing-calculation-inputs/);
+assert.match(chassis, /We cannot calculate loan coverage yet/);
+assert.match(chassis, /No loan program is being recommended/);
+assert.doesNotMatch(chassis, /leadProgramLine\?\.match|ranked\[0\].*null|Clears the 1.25x|Best first path to test/);
+const workspace = readFileSync("src/components/property/PropertyEvaluationWorkspace.tsx", "utf8");
+assert.doesNotMatch(workspace, /primary-production transaction requires the farm-credit lane/);
+assert.doesNotMatch(workspace, /effectiveListedPrice \?\? facts\?\.propertyRecord\?\.assessedTotalValue/);
+
 const matrix = buildScenarioFinancingMatrix({
   baseContext: base,
   programs: ["USDA Business & Industry financing", "SBA 504 financing", "FSA direct farm ownership financing"],
@@ -91,6 +115,26 @@ const matrix = buildScenarioFinancingMatrix({
 assert.equal(matrix.best?.scenario.id, "supported", "Supported economics must outrank a larger but unverified profitability claim");
 assert.equal(matrix.best?.program, "FSA direct farm ownership financing", "The strongest executable program must lead without agency preference");
 assert.match(matrix.note, /not a financing approval, closing assurance, or promise of keys/i);
+
+Object.assign(globalThis, { React });
+const renderProgram = "FSA direct farm-purchase loan — borrow directly from USDA";
+const renderProps: LaneWorkspaceProps = {
+  propertyId: "regression-not-a-deal", title: "Seippes display regression", location: "Federalsburg, MD",
+  sourceLabel: "Test fixture", propertyType: "farm", priceLabel: "Price pending", fileNo: null, tierLabel: "Test",
+  headline: "Test", readiness: [], fitLine: null, pauseLine: "Evidence pending", intelligence: null,
+  financingLanes: [renderProgram],
+};
+const pendingMarkup = renderToStaticMarkup(React.createElement(FarmLaneWorkspace, renderProps));
+assert.match(pendingMarkup, /We cannot calculate loan coverage yet/);
+assert.doesNotMatch(pendingMarkup, /2\.14|9,922|4,639|Financing to test first/);
+const knownMarkup = renderToStaticMarkup(React.createElement(FarmLaneWorkspace, {
+  ...renderProps, priceLabel: "$400,000",
+  financingFit: { [renderProgram]: evaluateProgramFit(renderProgram, base)! },
+}));
+assert.match(knownMarkup, /Show exactly where these numbers come from/);
+assert.match(knownMarkup, /Transaction price: \$400,000/);
+assert.match(knownMarkup, /Loan amount: \$400,000/);
+assert.match(knownMarkup, /Annual net operating income: \$80,000/);
 
 console.log(
   JSON.stringify(

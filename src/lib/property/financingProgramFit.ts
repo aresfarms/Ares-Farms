@@ -28,6 +28,8 @@ export interface ProgramFitContext {
   /** Proposed amount of this loan, not property value. Other debt still needs reconciliation. */
   proposedLoanAmount?: number | null;
   asOf?: string;
+  priceBasis?: string;
+  rateAsOf?: { mortgage: string | null; fsaDirect: string | null };
   /** Modeled property-standalone income (farm: best enterprise-mix NOI). */
   noiAnnual: number | null;
   /** Where the NOI figure came from, printed with every coverage line. */
@@ -42,7 +44,27 @@ export interface ProgramFitContext {
   > | null;
 }
 
+/** CANON-EXPL / TECH-PROV: structured, replayable inputs; never parse prose for money. */
+export interface FinancingCalculation {
+  version: "financing-calculation-v1";
+  purchasePrice: number;
+  priceBasis: string;
+  loanAmount: number;
+  loanBasis: string;
+  annualNoi: number;
+  incomeBasis: string;
+  ratePct: number;
+  rateBasis: string;
+  rateAsOf: string | null;
+  termYears: number;
+  paymentsPerYear: 12;
+  monthlyPayment: number;
+  annualDebtService: number;
+  dscr: number;
+  comparisonTarget: number;
+}
 export interface ProgramFit {
+  calculation?: FinancingCalculation;
   /** Higher = better property-side fit. Excluded programs sort last. */
   score: number;
   /** One-line property-standalone finding, rendered under the program. */
@@ -76,11 +98,12 @@ function coverage(
   rateBasis: string,
   amortYears: number,
   ltv: number,
-): { score: number; line: string } | null {
+): ProgramFit | null {
   if (transactionPrice(ctx.screeningPrice) == null || ctx.noiAnnual == null || !Number.isFinite(ctx.noiAnnual) || ratePct == null || !Number.isFinite(ratePct) || ratePct < 0)
     return null;
+  const loanAmount = ctx.proposedLoanAmount ?? ctx.screeningPrice! * ltv;
   const ads = levelAnnualDebtService(
-    ctx.proposedLoanAmount ?? ctx.screeningPrice! * ltv,
+    loanAmount,
     ratePct,
     amortYears,
   );
@@ -88,11 +111,25 @@ function coverage(
   const dscr = ctx.noiAnnual / ads;
   const verdict =
     dscr >= DSCR_FLOOR
-      ? "clears the 1.25x floor on its own paper"
+      ? "meets the illustrative 1.25x comparison target; lender requirements may differ"
       : dscr >= 1.0
-        ? "covers the payment but sits under the 1.25x floor"
-        : "does not cover the payment on its own paper";
+        ? "covers this modeled payment but is below the illustrative 1.25x comparison target"
+        : "does not cover this modeled payment";
   return {
+    calculation: {
+      version: "financing-calculation-v1",
+      purchasePrice: ctx.screeningPrice!,
+      priceBasis: ctx.priceBasis ?? "Entered transaction scenario; independent price verification not supplied",
+      loanAmount,
+      loanBasis: ctx.proposedLoanAmount != null ? "Entered proposed loan; other debt is not included" : `Illustrative borrowing assumption: ${Math.round(ltv * 100)}% of the transaction price; not an approved loan-to-value ratio`,
+      annualNoi: ctx.noiAnnual,
+      incomeBasis: ctx.noiBasis ?? "Income source not supplied; do not rely on this scenario",
+      ratePct, rateBasis,
+      rateAsOf: /published FSA direct/.test(rateBasis) ? ctx.rateAsOf?.fsaDirect ?? null : ctx.rateAsOf?.mortgage ?? null,
+      termYears: amortYears, paymentsPerYear: 12,
+      monthlyPayment: ads / 12, annualDebtService: ads, dscr,
+      comparisonTarget: DSCR_FLOOR,
+    },
     score: dscr,
     line:
       `Property-standalone test: modeled income ${dollars(ctx.noiAnnual)}/yr vs ` +
@@ -103,7 +140,7 @@ function coverage(
 }
 
 const NEEDS_INPUTS =
-  "Property-standalone coverage is not yet supportable. Furlong needs a verified acquisition basis and a whole-parcel operating scenario—including tillable, forested, sloped, wet, pasture, and developed segments; site fit; attainable demand; competition; and enterprise costs—before displaying DSCR.";
+  "We cannot calculate whether this property can cover loan payments yet. We need a purchase price or intended offer, a supported annual income-and-expense budget, and the proposed loan amount, interest rate, term and payment schedule. Tax assessment and generic crop budgets are not substitutes.";
 
 export interface LenderTest {
   test: string;
@@ -147,22 +184,22 @@ export function buildLenderTestScorecard(args: {
     tests.push(
       args.bestDscr >= 1.25
         ? {
-            test: "Debt-service coverage (1.25x floor)",
+            test: "Debt-service coverage (illustrative 1.25x target)",
             status: "pass",
-            detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — the property covers the loan on its own paper.`,
+            detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — this scenario meets the comparison target, not a lender approval or verified repayment finding.`,
           }
         : {
-            test: "Debt-service coverage (1.25x floor)",
+            test: "Debt-service coverage (illustrative 1.25x target)",
             status: "fail",
-            detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — under the floor; price, project NOI or debt structure must improve for the property-side case to clear.`,
+            detail: `Best modeled use${args.bestDscrLabel ? ` (${args.bestDscrLabel})` : ""} reaches DSCR ${args.bestDscr.toFixed(2)} — this scenario is below the comparison target; review price, income, costs and debt terms.`,
           },
     );
   } else {
     tests.push({
-      test: "Debt-service coverage (1.25x floor)",
+      test: "Debt-service coverage (illustrative 1.25x target)",
       status: "unknown",
       detail:
-        "Coverage needs a price and an income model (square footage for commercial, acreage for farm).",
+        "Coverage needs a transaction price, a supported income-and-expense budget and debt terms. Acreage or square footage alone cannot establish income.",
     });
   }
 
@@ -273,7 +310,7 @@ export function evaluateProgramFit(
       const eligibility =
         "USDA Rural Development B&I/OneRD must confirm an eligible rural business purpose; primary agricultural production and integrated/value-added components require program-specific review.";
       return c
-        ? { score: c.score, line: `${eligibility} ${c.line}` }
+        ? { ...c, line: `${eligibility} ${c.line}` }
         : { score: 0, line: `${eligibility} ${NEEDS_INPUTS}` };
     }
     if (/sba 504/.test(name)) {
@@ -287,7 +324,7 @@ export function evaluateProgramFit(
       const eligibility =
         "SBA 504 must confirm an eligible owner-occupied business fixed-asset use; Furlong does not treat ordinary primary-production acreage as automatically SBA-eligible.";
       return c
-        ? { score: c.score, line: `${eligibility} ${c.line}` }
+        ? { ...c, line: `${eligibility} ${c.line}` }
         : { score: 0, line: `${eligibility} ${NEEDS_INPUTS}` };
     }
     if (/sba 7\(a\)|sba 7a/.test(name)) {
@@ -301,7 +338,7 @@ export function evaluateProgramFit(
       const eligibility =
         "SBA 7(a) must confirm an eligible value-added or commercial operating purpose; primary farm production is not assumed eligible.";
       return c
-        ? { score: c.score, line: `${eligibility} ${c.line}` }
+        ? { ...c, line: `${eligibility} ${c.line}` }
         : { score: 0, line: `${eligibility} ${NEEDS_INPUTS}` };
     }
     if (/fsa direct|fsa guaranteed/.test(name)) {
@@ -374,7 +411,7 @@ export function evaluateProgramFit(
         const ruralLine =
           "Address verified inside the USDA-eligible rural area for business programs (live USDA layer) — the B&I geographic gate passes; eligible business purpose and lender participation still control. Borrower underwriting is performed separately by the selected provider and is not part of Furlong's property score.";
         return c
-          ? { score: c.score + 1, line: `${ruralLine} ${c.line}` }
+          ? { ...c, score: c.score + 1, line: `${ruralLine} ${c.line}` }
           : { score: 3, line: ruralLine };
       }
       if (ctx.usdaRural?.businessEligible === false) {
@@ -516,7 +553,7 @@ export function buildScenarioFinancingMatrix(args: {
     const executableB = b.fit.excluded ? -1 : b.fit.score;
     return evidenceB - evidenceA || executableB - executableA;
   });
-  const viable = matches.filter((match) => !match.fit.excluded && match.scenario.evidenceStatus === "supported" && Number.isFinite(match.scenario.noiAnnual) && transactionPrice(args.baseContext.screeningPrice) != null);
+  const viable = matches.filter((match) => !match.fit.excluded && match.fit.calculation != null && match.scenario.evidenceStatus === "supported" && Number.isFinite(match.scenario.noiAnnual) && transactionPrice(args.baseContext.screeningPrice) != null);
   return {
     matches,
     best: viable[0] ?? null,

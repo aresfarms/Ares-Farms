@@ -49,6 +49,14 @@ steps:
         assert m['sourceControls']['stagingSeedExplicitSwitchDeclared'] is True
         PY
   - name: hashicorp/terraform:1.15.8
+    id: init-approved-source
+    dir: /workspace/source/infra/staging
+    entrypoint: terraform
+    args:
+      - init
+      - -input=false
+
+  - name: hashicorp/terraform:1.15.8
     id: apply-approved-plan
     dir: /workspace/source/infra/staging
     entrypoint: terraform

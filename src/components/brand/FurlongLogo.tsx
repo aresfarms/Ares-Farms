@@ -1,28 +1,29 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /**
- * FurlongLogo (Build 44-B) — the journey's North Star / trust anchor.
+ * FurlongLogo — shared interactive web identity.
  *
- * PNG-first logo component using the official Furlong mark at
- * /brand/furlong-logo.png. The SVG can remain as a secondary/vector follow-up,
- * but the canonical in-product asset is now the PNG provided for Build 44-B.
+ * The founder-supplied lighthouse / safeguarding-coasts emblem is the visible
+ * home button across the public header, exploration journeys, and portal
+ * surfaces. Formal report exports keep their separate print-branding asset.
  *
- * The logo supports the journey; it never becomes the journey. It is not a
- * sales banner and never replaces trust language or disclosures.
+ * Master Volume traceability:
+ * - Vol I CONST-BRAND-001: one recognizable platform identity.
+ * - Vol III TECH-UX-001: stable dimensions and keyboard-visible navigation.
+ * - Vol V CANON-CLAIMS-001: the emblem is identity, not a capability claim.
  */
 
 export type FurlongLogoSize = "hero" | "header" | "report" | "compact";
 
-const LOGO_SRC = "/brand/furlong-logo.png";
+export const FURLONG_WEB_EMBLEM_SRC = "/brand/furlong-portal-emblem.jpg";
 
-const DIMS: Record<FurlongLogoSize, { width: number }> = {
-  hero: { width: 220 },
-  header: { width: 138 },
-  report: { width: 188 },
-  compact: { width: 96 },
+const DIMS: Record<FurlongLogoSize, number> = {
+  hero: 160,
+  header: 64,
+  report: 112,
+  compact: 52,
 };
-
-const LOGO_ASPECT_RATIO = 2346 / 1792;
 
 export function FurlongLogo({
   size = "header",
@@ -35,40 +36,81 @@ export function FurlongLogo({
   href?: string;
   className?: string;
 }) {
-  const dims = DIMS[size];
-  const height = Math.round(dims.width / LOGO_ASPECT_RATIO);
+  const dimension = DIMS[size];
   const accessibleLabel = href
-    ? undefined
+    ? href === "/"
+      ? "Furlong home"
+      : "Furlong"
     : withWordmark
       ? "Furlong"
-      : "Furlong logo";
+      : "Furlong emblem";
 
-  const content = (
+  const emblem = (
     <span
-      className={className}
-      style={{ display: "inline-flex", alignItems: "center", lineHeight: 1 }}
+      className={["furlong-web-emblem", className].filter(Boolean).join(" ")}
+      style={{ width: dimension, height: dimension }}
     >
-      <img
-        src={LOGO_SRC}
-        alt={accessibleLabel ?? ""}
-        width={dims.width}
-        height={height}
-        style={{ display: "block", width: dims.width, height: "auto" }}
+      <Image
+        src={FURLONG_WEB_EMBLEM_SRC}
+        alt={href ? "" : accessibleLabel}
+        width={dimension}
+        height={dimension}
+        preload={size === "header"}
+        sizes={`${dimension}px`}
+        style={{
+          display: "block",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
       />
     </span>
   );
 
-  if (href) {
-    return (
-      <Link
-        href={href}
-        aria-label={href === "/" ? "Furlong home" : "Furlong"}
-        style={{ textDecoration: "none", display: "inline-flex" }}
-      >
-        {content}
-      </Link>
-    );
-  }
-
-  return content;
+  return (
+    <>
+      <style>{`
+        .furlong-web-emblem {
+          display: inline-flex;
+          flex: none;
+          overflow: hidden;
+          border: 1px solid #8a5a12;
+          border-radius: 16%;
+          background: #25313a;
+          box-shadow: 0 3px 10px rgba(15, 23, 42, 0.22);
+          line-height: 1;
+        }
+        a.furlong-home-button {
+          display: inline-flex;
+          border-radius: 14px;
+          text-decoration: none;
+          transition: transform 140ms ease, filter 140ms ease;
+        }
+        a.furlong-home-button:hover {
+          filter: brightness(1.06);
+          transform: translateY(-1px);
+        }
+        a.furlong-home-button:focus-visible {
+          outline: 3px solid #0f766e;
+          outline-offset: 4px;
+        }
+        a.furlong-home-button:active { transform: translateY(0); }
+        @media (prefers-reduced-motion: reduce) {
+          a.furlong-home-button { transition: none; }
+        }
+      `}</style>
+      {href ? (
+        <Link
+          href={href}
+          aria-label={accessibleLabel}
+          title="Furlong home"
+          className="furlong-home-button"
+        >
+          {emblem}
+        </Link>
+      ) : (
+        emblem
+      )}
+    </>
+  );
 }

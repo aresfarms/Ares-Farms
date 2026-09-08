@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { FurlongLogo } from "@/components/brand/FurlongLogo";
+
 import {
   ADVISORY_ONLY_DISCLOSURE,
   BORROWER_PORTABILITY_DISCLOSURE,
@@ -138,6 +140,7 @@ export function PortableVerticalSurfacePage(props: { surfaceId: string }) {
     <main style={shellStyle}>
       <div style={containerStyle}>
         <header style={{ display: "grid", gap: 12, padding: "16px 0 4px" }}>
+          <FurlongLogo size="compact" href="/" />
           <p
             style={{
               margin: 0,
@@ -347,6 +350,7 @@ export function PortableSurfaceIndexPage(props: {
     <main style={shellStyle}>
       <div style={containerStyle}>
         <header style={{ display: "grid", gap: 8, padding: "16px 0 4px" }}>
+          <FurlongLogo size="compact" href="/" />
           <p
             style={{
               margin: 0,

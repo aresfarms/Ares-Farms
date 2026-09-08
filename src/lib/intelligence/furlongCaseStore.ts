@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 import {
   furlongCaseEvents,
@@ -74,7 +74,7 @@ export async function saveFurlongCase(
     // Ownership is established on first save and is never silently transferred by
     // a later operator/admin update. Any ownership transfer requires a separate,
     // explicit governed ceremony rather than an upsert side effect.
-    ownerActorId: existing?.ownerActorId ?? actorId,
+    ownerActorId: existing ? existing.ownerActorId : actorId,
     customerId: input.customerId?.trim() || existing?.customerId || null,
     propertyId: input.propertyId?.trim() || existing?.propertyId || null,
     propertyAddress: input.propertyAddress?.trim() || existing?.propertyAddress || null,
@@ -105,8 +105,11 @@ export async function saveFurlongCase(
 
   const [saved] = await db.insert(furlongCases).values(values).onConflictDoUpdate({
     target: furlongCases.caseId,
-    set: values,
+    set: { ...values, ownerActorId: sql`${furlongCases.ownerActorId}` },
+    setWhere: existing?.ownerActorId === null ? sql`${furlongCases.ownerActorId} IS NULL` : eq(furlongCases.ownerActorId, existing?.ownerActorId ?? actorId),
   }).returning();
+
+  if (!saved) throw new Error("Case ownership changed; reload before saving.");
 
   await appendFurlongCaseEvent({
     caseId,
@@ -238,7 +241,8 @@ export async function recordFurlongCaseOutcome(input: {
     },
   }).returning();
 
-  await db.update(furlongCases).set({
+  // A self-reported outcome is retained, but cannot certify closing or complete stages.
+  if (input.verified) await db.update(furlongCases).set({
     outcomeStatus: input.closedAt ? "COMPLETED" : "IN_PROGRESS",
     currentStage: input.closedAt ? "OPERATING_LOGBOOK" : "CLOSING",
     caseStatus: input.closedAt ? "CLOSED_ACTIVE_LOGBOOK" : "OPEN",
@@ -273,4 +277,14 @@ export async function loadFurlongCaseBundle(caseId: string) {
     listFurlongCaseOutcomes(caseId),
   ]);
   return { record, events, outcomes };
+}
+
+/** Owner-only index; raw evidence and permissions are not exposed in the list. */
+export async function listOwnedFurlongCases(actorId: string) {
+  if (!actorId.trim()) throw new Error("Authenticated actor required.");
+  return db.select({
+    caseId: furlongCases.caseId, propertyAddress: furlongCases.propertyAddress,
+    customerGoal: furlongCases.customerGoal, currentStage: furlongCases.currentStage,
+    updatedAt: furlongCases.updatedAt,
+  }).from(furlongCases).where(eq(furlongCases.ownerActorId, actorId)).orderBy(desc(furlongCases.updatedAt)).limit(100);
 }

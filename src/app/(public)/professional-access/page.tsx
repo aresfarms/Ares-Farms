@@ -221,6 +221,17 @@ export default function ProfessionalAccessPage() {
           </p>
         </header>
 
+        <section style={card} aria-labelledby="professional-workflows">
+          <h2 id="professional-workflows" style={{ margin: 0, fontSize: 23, color: NAVY }}>A clearer starting point for the cases you handle</h2>
+          <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.65 }}>Use the Furlong Answer to inspect a customer's property context, source dates, missing evidence and next questions. A portable summary does not replace your independent review or your own systems.</p>
+          <ul style={{ fontSize: 16, lineHeight: 1.65 }}>
+            <li>Inspect what is supported and what still needs evidence.</li>
+            <li>Keep each named recipient and authorized document package separate.</li>
+            <li>Discuss workflow capacity, integrations and defined support—not purchases of leads or ranking preference.</li>
+          </ul>
+          <p style={{ fontSize: 14 }}>Organizational pricing, service levels and scope require a separate agreement. No institutional acceptance, turnaround improvement or production certification is claimed here. Availability of each access path is shown below.</p>
+          <Link href="/guides/preparing-a-financing-discussion">See the case-preparation guide</Link>
+        </section>
         <div
           style={{
             border: "1px solid #e2d7bd",

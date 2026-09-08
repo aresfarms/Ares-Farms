@@ -66,10 +66,9 @@ export const HOMEPAGE_HERO = {
   brandName: "Furlong",
   headline:  "Type in an address. See if it's worth buying — and exactly how to pay for it.",
   tagline:
-    "A farm, a commercial building, a rural business property, bare land — Furlong shows you what's really there, what it actually costs to own, the deal-killers hiding in the details, and the financing built for exactly that kind of property. Free, before you commit to anything.",
+    "Explore a property, business or project. Understand what the evidence supports, what remains unresolved and which next steps are worth investigating.",
   subhead:
-    "Not sure the property is even right for what you want? That's the exact question this answers. " +
-    "Start with an address — or just a question — and see the whole picture and your next move before you talk to anyone or share a thing.",
+    "Start with an address or a question. Core exploration is free; optional professional work is quoted separately. Saving is not sharing.",
   trustTag:  "Explore anonymously. No account required. No hidden handoff.",
 } as const;
 

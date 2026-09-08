@@ -31,8 +31,8 @@ export const LEGACY_KEY = "furlong-navigator-journey-v1";
 
 export const OPT_IN_PROMPT = "Continue this anonymous journey on this device?";
 export const SAVE_JOURNEY_CONSENT_COPY =
-  "Saving is optional. If you save this journey, Furlong will store your conversation, search criteria, " +
-  "saved properties, and results so you can return later. Public Navigator remains anonymous when you do not save.";
+  "Saving is optional. Temporary continuity retains a redacted conversation in this browser tab only after you enable it. " +
+  "Private account case saving is a separate action; neither action authorizes a provider to receive your information.";
 
 export type Turn = { role: "guide" | "you"; text: string; intent?: string };
 

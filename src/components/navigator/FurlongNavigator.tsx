@@ -146,7 +146,7 @@ export function FurlongNavigator({
           const seededReply = await post({ message: initialMessage, journey: open.journey });
           handle(seededReply, userTurns);
         }
-      } finally { setLoading(false); }
+      } catch { setTurns([{ role: "guide", text: "The guide could not start. Please try again; no answer has been produced." }]); } finally { setLoading(false); }
     })();
 
   }, []);
@@ -158,7 +158,7 @@ export function FurlongNavigator({
     setTurns([]); setJourney(null); setPathways(null); setGraphChain([]);
     setProgramsSeam(null); setDecision(null); setSearchGuidance(null); setIntelligenceCaseHref(null); setInput("");
     setLoading(true);
-    try { handle(await post({}), []); } finally { setLoading(false); }
+    try { handle(await post({}), []); } catch { setTurns([{ role: "guide", text: "The guide could not restart. Please try again." }]); } finally { setLoading(false); }
   }
 
   function resumeSaved() {
@@ -202,8 +202,8 @@ export function FurlongNavigator({
       <div style={{ display: "grid", gap: 4 }}>
         <strong style={{ fontSize: 19, color: "#101a2b" }}>Furlong Navigator</strong>
         <span style={{ fontSize: 12.5, color: "#7a8aa0" }}>
-          A guide through uncertain waters — anonymous, no account, and we don't sell you anything.
-          Your conversation clears when you leave or start over.
+          Explore without an account. Core exploration is free; professional work is optional and separately scoped.
+          Conversation stays in this page unless you enable temporary continuity below.
         </span>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", marginTop: 4 }}>
           <button type="button" data-testid="start-over" onClick={() => void startOver()}
@@ -216,14 +216,12 @@ export function FurlongNavigator({
           </label>
           <button type="button" data-testid="save-journey" onClick={() => setShowSaveInfo((v) => !v)}
             style={{ fontSize: 12, fontWeight: 700, color: "#185FA5", background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>
-            Save this journey
+            About saving
           </button>
         </div>
         {showSaveInfo && (
           <p data-testid="save-journey-info" style={{ margin: 0, fontSize: 12, color: "#5d687a", lineHeight: 1.5, border: "1px solid #e6ebf2", borderRadius: 10, padding: "10px 12px" }}>
-            {SAVE_JOURNEY_CONSENT_COPY} Saved-journey accounts aren't open yet — until they are, nothing is
-            stored and your session stays anonymous. <em>Continue without saving:</em> your session stays
-            anonymous and clears when you leave or start over.
+            {SAVE_JOURNEY_CONSENT_COPY} When your project preview is available, you can sign in and explicitly save its structured summary to My Cases. That action does not save this transcript or share with a provider. <em>Continue without saving:</em> exploration stays available.
           </p>
         )}
         {pendingResume && (

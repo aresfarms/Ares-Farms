@@ -54,6 +54,19 @@ for (const [key, value] of Object.entries(CAPITAL_NETWORK_NON_NEGOTIABLES)) {
   );
 }
 
+const experience = readJson<any>(parity.customerExperience.releaseMirror);
+assert.equal(experience.answerVersion, "furlong-answer-v1.0.0");
+assert.equal(experience.exportVersion, "furlong-answer-export-v1.0.0");
+assert.equal(experience.amendment, parity.customerExperience.amendment);
+assert.ok(exists(experience.amendment));
+assert.equal(experience.providerSharingOnSave, false);
+assert.equal(experience.exportRequiresOwner, true);
+assert.equal(experience.exportRequiresDurableAudit, true);
+assert.equal(experience.comparisonIsSalesComparableEngine, false);
+assert.equal(experience.allCalculationsCertified, false);
+assert.equal(experience.securityCertified, false);
+assert.equal(registry.buildBinding.customerExperienceSupplement, parity.customerExperience.releaseMirror);
+
 const personSideCriteria = PROGRAM_REGISTRY.flatMap((program) =>
   program.person_side_criteria.map((criterion) => ({ program: program.program_id, criterion })),
 );

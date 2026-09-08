@@ -494,3 +494,7 @@ Proof commands:
 ## Update Rule
 
 When Caitlin provides the next Master Volume update, re-run the source review before building more backend. If any PDF hash changes, update this snapshot first, then map the changed rules into schema, routes, runtime guards, smoke tests, and the backend readiness checklist.
+
+## September 8 customer-experience supplement
+
+The historical baseline above is retained; it is not a claim about today's cloud deployment. Owner-approved customer-experience changes are scoped by [the September 8 amendment](MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md). Their exact source/verification/promotion state is tracked separately in `docs/customer-experience-release.json`. Branch: `release/r7-logo-20260907`; source baseline: `cc46a1ceeaad1b0ec8e51441c4a490ae44472962`. No additional schema migration or certification is implied.

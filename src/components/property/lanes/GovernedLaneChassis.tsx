@@ -21,6 +21,9 @@
  */
 
 import { useMemo, useState, type ReactNode } from "react";
+import { FurlongAnswerCard } from "@/components/property/FurlongAnswerCard";
+import { PropertyComparison } from "@/components/property/PropertyComparison";
+import { propertyFurlongAnswer } from "@/lib/property/furlongAnswer";
 import type { ChartTableBriefProps } from "@/components/property/ChartTableBrief";
 import { CHART_THEMES } from "@/lib/property/chartThemes";
 import type { OfficialPropertyEvidenceRecord } from "@/lib/property/propertyEvidenceIngestion";
@@ -184,6 +187,7 @@ function defaultCategoryForFact(label: string): CategoryTabId {
 
 export function GovernedLaneChassis(props: ChassisProps) {
   const lane = props.lane;
+  const furlongAnswer = useMemo(() => propertyFurlongAnswer(props), [props]);
   const theme = CHART_THEMES[props.variant ?? "buyer"];
   void theme;
   const [tab, setTab] = useState<TabId>(lane.initialTab);
@@ -301,7 +305,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
       {props.title}
     </h1>
     <nav aria-label="Property workspace sections" style={{ position: "sticky", top: 0, zIndex: 4, background: "rgba(250,248,243,.97)", borderBottom: "1px solid #E5E0D5", padding: "10px 12px", display: "flex", gap: 7, overflowX: "auto", alignItems: "center" }}>
-      <img src="/brand/furlong-emblem.png" alt="Furlong emblem" width={38} height={38} style={{ width: 38, height: 38, objectFit: "contain", flex: "none", marginRight: 4 }} />
+      <img src="/brand/furlong-portal-emblem.jpg" alt="Furlong emblem" width={38} height={38} style={{ width: 38, height: 38, objectFit: "contain", flex: "none", marginRight: 4 }} />
       {primaryTabs.map((item) => <button key={item.id} type="button" onClick={() => setTab(item.id)} aria-current={tab === item.id ? "page" : undefined} style={{ border: 0, borderRadius: 9, padding: "9px 12px", whiteSpace: "nowrap", fontWeight: 750, cursor: "pointer", background: tab === item.id ? "#fff" : "transparent", color: tab === item.id ? "#1C2B45" : "#5A6172", boxShadow: tab === item.id ? "0 1px 4px rgba(28,43,69,.12)" : "none" }}>{item.id === "summary" ? "Answer" : item.label}</button>)}
       {secondaryTabs.length > 0 && (
         <select
@@ -341,7 +345,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
         const answer = lane.id === "farm"
           ? `The record identifies ${currentUse || "a farm or land property"}. ${farmScreen?.headline ?? "Agricultural suitability and profitability remain evidence-pending."}`
           : lane.id === "residential"
-            ? `The strongest supported starting use is residential. Furlong has not found enough verified evidence to claim a conversion or income use is better than using the property as a home.`
+            ? `The available classification is residential. That classification does not establish the best use or rule out other uses; legal, physical, market and economic evidence must be evaluated.`
             : `The property should be evaluated first as ${currentUse || "commercial real estate"}. The strongest business use remains provisional until permitted use, demand, building condition, operating income, and acquisition price are verified.`;
         const status = props.factsPending
           ? "Still gathering evidence"
@@ -363,11 +367,14 @@ export function GovernedLaneChassis(props: ChassisProps) {
             : props.pauseLine || "Confirm condition, legal use, market demand, and the operating assumptions before relying on the result.";
         const totalFacts = facts.length;
         return <>
+          <FurlongAnswerCard answer={furlongAnswer} allowSave />
+          <PropertyComparison answer={furlongAnswer} />
+          <details><summary style={{ cursor: "pointer", padding: 12 }}>Detailed property and financing screen</summary>
           <article data-testid="customer-decision-summary" style={{ background: "linear-gradient(145deg,#10243B,#173A43)", color: "#fff", borderRadius: 16, padding: "clamp(20px,4vw,30px)", display: "grid", gap: 18, boxShadow: "0 12px 30px rgba(16,36,59,.16)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap" }}>
               <div style={{ display: "grid", gap: 6, maxWidth: 760 }}>
-                <span style={{ color: "#D7B85A", fontSize: 11, fontWeight: 850, letterSpacing: ".16em", textTransform: "uppercase" }}>Furlong&apos;s answer first</span>
-                <h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: "clamp(23px,4vw,34px)", lineHeight: 1.12 }}>What does this property appear best suited for?</h2>
+                <span style={{ color: "#D7B85A", fontSize: 11, fontWeight: 850, letterSpacing: ".16em", textTransform: "uppercase" }}>Detailed supporting screen</span>
+                <h2 style={{ margin: 0, color: "#fff", fontFamily: "Georgia,serif", fontSize: "clamp(23px,4vw,34px)", lineHeight: 1.12 }}>What does the current record support?</h2>
               </div>
               <span style={{ border: "1px solid rgba(215,184,90,.55)", borderRadius: 999, padding: "7px 11px", color: "#F3D98D", background: "rgba(215,184,90,.08)", fontSize: 12, fontWeight: 750 }}>{status}</span>
             </div>
@@ -401,6 +408,7 @@ export function GovernedLaneChassis(props: ChassisProps) {
               </div>
             </div>
           </article>
+          </details>
           <section style={{ ...card, borderColor: "#D7B85A", background: "#FFF9E8", display: "grid", gap: 8 }}>
             <span style={{ color: "#8F6E1F", fontSize: 10.5, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase" }}>What Furlong needs next</span>
             <strong style={{ color: "#1C2B45", fontSize: 16, lineHeight: 1.5 }}>{nextNeeded}</strong>

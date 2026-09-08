@@ -7,6 +7,7 @@ const source = fs.readFileSync(compassPath, "utf8");
 const discoverySource = fs.readFileSync(path.join(root, "src/components/discovery/PlaceFirstDiscovery.tsx"), "utf8");
 const homepageSource = fs.readFileSync(path.join(root, "src/app/(public)/page.tsx"), "utf8");
 const frontDoorSource = fs.readFileSync(path.join(root, "src/components/public/HomePropertyFrontDoor.tsx"), "utf8");
+const startSource = fs.readFileSync(path.join(root, "src/components/public/FurlongStart.tsx"), "utf8");
 const failures: string[] = [];
 
 for (const lane of ["property-land", "farms-agriculture", "small-business-growth"]) {
@@ -22,7 +23,7 @@ if (source.includes("/brand/furlong-emblem.png")) failures.push("The lighthouse/
 if (!discoverySource.includes("if (result && analysisHref)")) failures.push("Successful property lookup does not route directly to results.");
 if (discoverySource.includes("(compact || embedded) && result && analysisHref")) failures.push("Direct results routing is still limited to selected page variants.");
 
-if (!homepageSource.includes("<HomePropertyFrontDoor />")) failures.push("Homepage is missing the single property front door.");
+if (!homepageSource.includes("<FurlongStart />") || !startSource.includes("<HomePropertyFrontDoor />")) failures.push("Homepage is missing its governed optional property front door.");
 if (homepageSource.includes("<CompassRose")) failures.push("Homepage still renders the choice-heavy Compass.");
 if (homepageSource.includes("HOMEPAGE_MODULES.cards.map")) failures.push("Homepage still exposes competing module cards.");
 if (!frontDoorSource.includes('data-testid="homepage-property-address"')) failures.push("Front door is missing its single address input.");

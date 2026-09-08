@@ -50,7 +50,7 @@ export const INTERNAL_CHROME_PREFIXES = [
  * access to any internal/portal surface".
  */
 export const NO_INTERNAL_CHROME_PREFIXES = [
-  "/security", "/sign-in", "/portal", "/lender-desk",
+  "/security", "/sign-in", "/portal", "/lender-desk", "/intelligence/cases",
   "/capital-network/onboarding", "/capital-network/provider",
   // Authenticated test-launch surface, not the 78-console engine room.
   "/internal/synthetic-fixtures",
@@ -58,6 +58,7 @@ export const NO_INTERNAL_CHROME_PREFIXES = [
 
 export const PROTECTED_PAGE_PREFIXES = [
   ...INTERNAL_CHROME_PREFIXES,
+  "/intelligence/cases",
   "/security/mfa",
   "/security/password-setup",
   "/portal",

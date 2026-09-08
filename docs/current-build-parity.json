@@ -96,7 +96,15 @@
       "evidence-and-detail"
     ],
     "addressFirstEntry": true,
-    "unsupportedRecommendationsFailClosed": true
+    "unsupportedRecommendationsFailClosed": true,
+    "amendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md",
+    "releaseMirror": "docs/customer-experience-release.json",
+    "answerVersion": "furlong-answer-v1.0.0",
+    "exportVersion": "furlong-answer-export-v1.0.0",
+    "status": "source-implemented-local-verification",
+    "providerSharingOnSave": false,
+    "assessmentFallback": false,
+    "cloudCertification": false
   },
   "customerEconomics": {
     "borrowerCoreDirectFree": true,

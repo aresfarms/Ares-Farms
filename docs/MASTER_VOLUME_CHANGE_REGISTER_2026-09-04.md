@@ -83,3 +83,7 @@ Additional standing proof:
 - `npm run verify:customer-property-experience`
 
 Production security claims remain evidence-gated: architecture alone is not unrestricted production assurance. Threat-model, scan, IAM/isolation, key/secret rotation, backup/restore/replay, penetration, incident/rollback, vendor and signed promotion evidence remain required for the affected live actions.
+
+## 2026-09-08: recognizable answer and private customer journey
+
+Owner approval: “Agreed make it happen,” referring to the eight customer-experience recommendations. See `MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md`, `customer-experience-release.json` and `runbooks/FURLONG_ORGANIZATIONAL_PILOT_2026-09-08.md`. This extends, rather than certifies, the earlier source-build work. The new shared answer, private case UI, owner checks, versioned/audited personal export, explicit comparison, practical guides and bounded commercial positioning are tracked independently from production promotion and paid adoption. Historical PDFs remain unchanged.

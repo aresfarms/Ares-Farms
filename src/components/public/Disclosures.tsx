@@ -26,7 +26,7 @@ const FULL_TEXT =
   "This is not a public verification or official record. " +
   "AI does not decide, does not approve, and does not determine. Human review is required for every material step. " +
   "Furlong is not a lender and not a regulator. Furlong does not lend, does not commit funds, and does not decide credit, eligibility, or approval, and does not issue permits, clearances, or certifications. " +
-  "Free for borrowers. Borrowers pay nothing. " +
+  "Core property intelligence, financing navigation and baseline readiness are free for borrowers. Optional separately commissioned professional services require an agreed scope and fee. " +
   "Your information belongs to you. Furlong does not secretly submit, sell, or distribute your information. " +
   "No silent submission. No information sale.";
 
@@ -34,7 +34,7 @@ const COMPACT_TEXT =
   "Advisory only — not an approval, guarantee, or official determination, and no legal reliance, " +
   "no regulatory reliance, or official reliance may be placed on it. Furlong is not a lender and not a " +
   "regulator: it does not lend, commit funds, or decide credit, eligibility, or approval. " +
-  "Free for borrowers. Borrowers pay nothing. Your information belongs to you. " +
+  "Core property intelligence, financing navigation and baseline readiness are free for borrowers. Optional separately commissioned professional services require an agreed scope and fee. Your information belongs to you. " +
   "Furlong does not secretly submit, sell, or distribute your information. No silent submission. No information sale.";
 
 export function Disclosures({
@@ -77,16 +77,16 @@ export function Disclosures({
         <p
           style={{
             margin: "0 0 2px",
-            fontSize: 12.5,
+            fontSize: 14,
             fontWeight: 700,
             color: dark ? "#eef3f6" : "#3b3730",
             lineHeight: 1.55,
           }}
         >
           <span style={{ color: dark ? "#d4b06a" : "#7a5c1f" }}>Why we lay it all out.</span>{" "}
-          Most sites bury the fine print and quietly route what you type to whoever pays for the lead. We
-          don&apos;t do either — no account, no data capture, no handoff. The parameters below are exactly how a
-          federal regulator or an underwriter reads a deal: unfiltered, unbiased, and entirely in your hands.
+          Furlong separates evidence from assumptions and shows what remains unresolved.
+          Saving a case and sharing it are different actions. You choose whether to save and
+          separately authorize each provider handoff. See Trust &amp; Your Data for the applicable controls.
         </p>
       )}
       <span
@@ -104,7 +104,7 @@ export function Disclosures({
         style={{
           margin: 0,
           fontFamily: "Georgia, 'Times New Roman', serif",
-          fontSize: 12.5,
+          fontSize: 14,
           fontStyle: "italic",
           color: dark ? CHART_TONES.dark.bodyInk : "#6b6152",
           lineHeight: 1.65,

@@ -12,6 +12,7 @@ const verification = fs.readFileSync(verificationPath, "utf8");
 const discovery = fs.readFileSync(discoveryPath, "utf8");
 const chassis = fs.readFileSync(chassisPath, "utf8");
 const farmLane = fs.readFileSync(farmLanePath, "utf8");
+const answerContract = fs.readFileSync(path.join(root, "src/lib/property/furlongAnswer.ts"), "utf8");
 
 const supportedProfiles = ["home", "farm", "commercial", "land", "hospitality", "mobile-home-park"];
 const failures: string[] = [];
@@ -30,7 +31,7 @@ if (discovery.includes("Not run — governed gate")) failures.push("Discovery st
 if (verification.includes("is not activated yet")) failures.push("Customer warnings still expose internal activation state.");
 if (!verification.includes("Some property-specific jurisdiction and hazard checks are still pending verification")) failures.push("Consolidated customer-safe verification note is missing.");
 if (!chassis.includes('data-testid="customer-decision-summary"')) failures.push("Property lanes do not lead with the shared customer answer.");
-if (!chassis.includes("What does this property appear best suited for?")) failures.push("Customer answer does not state the core property-use question.");
+if (!chassis.includes("<FurlongAnswerCard") || !answerContract.includes("What appears possible?")) failures.push("Customer answer does not use the canonical evidence-scoped property-use question.");
 if (!chassis.includes('item.id === "summary" ? "Answer"')) failures.push("Primary navigation does not label the decision-first surface as Answer.");
 if (!chassis.includes('<option value="">More facts</option>')) failures.push("Secondary property facts are not progressively disclosed.");
 if (!farmLane.includes('initialTab: "summary"')) failures.push("Farm and land properties do not open on the answer.");

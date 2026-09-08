@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 
 import { evaluateAccess, type AccessRole } from "@/lib/auth/accessControl";
 import { sessionAuthority } from "@/lib/auth/sessionAuthority";
@@ -13,6 +14,8 @@ import {
 } from "@/lib/intelligence/furlongCaseStore";
 import { composeIntelligenceCaseWorkspace } from "@/lib/intelligence/intelligenceCaseWorkspaceRuntime";
 import { runRuntimeGuard } from "@/lib/runtime/runtimeGuard";
+import { readJsonBodyWithLimit } from "@/lib/security/requestGuards";
+import { containsProtectedClassDisclosure, REDACTED_PLACEHOLDER } from "@/lib/navigator/navigatorSessionPrivacy";
 
 const READ_ROLES: AccessRole[] = ["user", "borrower", "lender", "sponsor", "operator", "governance", "admin", "auditor"];
 const WRITE_ROLES: AccessRole[] = ["user", "borrower", "operator", "governance", "admin"];
@@ -93,7 +96,8 @@ async function durableBundleOrUnavailable(caseId: string) {
 }
 
 export async function GET(req: NextRequest, context: { params: Promise<{ caseId: string }> }) {
-  const { caseId } = await context.params;
+  const caseId = (await context.params).caseId.trim();
+  if (!/^[A-Za-z0-9:_-]{1,160}$/.test(caseId)) return NextResponse.json({ ok: false, error: "A valid Furlong case identifier is required." }, { status: 400 });
   const authority = sessionAuthority(req);
   const trace = traceId("read", caseId);
   const runtimeGuard = runRuntimeGuard({
@@ -115,7 +119,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ caseId:
     traceId: trace,
     actorId: authority.actorId,
   });
-  if (!runtimeGuard.allowed || !access.allowed) {
+  if (!runtimeGuard.allowed || !access.allowed || !authority.actorId) {
     return NextResponse.json({ ok: false, error: "Authorized case access is required.", governance: { traceId: trace, runtimeGuard, access } }, { status: 403 });
   }
 
@@ -129,6 +133,9 @@ export async function GET(req: NextRequest, context: { params: Promise<{ caseId:
     intendedUses: split(req.nextUrl.searchParams.get("intendedUses")),
   });
   const durable = await durableBundleOrUnavailable(caseId);
+  if (durable.durableCase && !mayReadDurableCase(authority.role, authority.actorId, durable.durableCase.record.ownerActorId)) {
+    return NextResponse.json({ ok: false, error: "Case not found or access not authorized." }, { status: 404, headers: { "Cache-Control": "private, no-store" } });
+  }
   return NextResponse.json({
     ok: true,
     workspace,
@@ -142,17 +149,16 @@ export async function GET(req: NextRequest, context: { params: Promise<{ caseId:
       noEnvironmentalClearance: true,
       actorAuthorityDerivedFromSession: true,
     },
-  });
+  }, { headers: { "Cache-Control": "private, no-store", "Vary": "Cookie" } });
 }
 
 export async function POST(req: NextRequest, context: { params: Promise<{ caseId: string }> }) {
-  const { caseId } = await context.params;
-  let body: Record<string, unknown>;
-  try {
-    body = await req.json() as Record<string, unknown>;
-  } catch {
-    return NextResponse.json({ ok: false, error: "Invalid JSON body." }, { status: 400 });
-  }
+  const caseId = (await context.params).caseId.trim();
+  if (!/^[A-Za-z0-9:_-]{1,160}$/.test(caseId)) return NextResponse.json({ ok: false, error: "A valid Furlong case identifier is required." }, { status: 400 });
+  const parsed = await readJsonBodyWithLimit<Record<string, unknown>>(req, { maxBytes: 128 * 1024 });
+  if (!parsed.ok) return NextResponse.json({ ok: false, error: parsed.error }, { status: parsed.status });
+  if (!parsed.body || Array.isArray(parsed.body) || typeof parsed.body !== "object") return NextResponse.json({ ok: false, error: "A case request object is required." }, { status: 400 });
+  const body = parsed.body;
 
   const authority = sessionAuthority(req);
   const action = nullableString(body.action)?.toLowerCase() ?? "save";
@@ -181,14 +187,36 @@ export async function POST(req: NextRequest, context: { params: Promise<{ caseId
   }
 
   try {
+    const existing = await loadFurlongCase(caseId);
+    if (existing && !mayWriteDurableCase(authority.role, authority.actorId, existing.ownerActorId)) {
+      return NextResponse.json({ ok: false, error: "Case not found or access not authorized." }, { status: 404 });
+    }
+    if (!existing && action !== "save") {
+      return NextResponse.json({ ok: false, error: "Save the Furlong Case before adding events or outcomes." }, { status: 404 });
+    }
+    const effectiveCaseId = existing?.caseId ?? randomUUID();
     if (action === "save") {
-      const payload = record(body.case);
+      const supplied = record(body.case);
+      // A partial snapshot must not erase previously saved evidence or permissions.
+      const payload = { ...(existing ?? {}), ...supplied };
+      const isOperator = PRIVILEGED_CASE_WRITE_ROLES.has(authority.role);
+      if (!isOperator) {
+        payload.currentStage = existing?.currentStage ?? "PROPERTY_ANALYSIS";
+        payload.caseStatus = existing?.caseStatus ?? "OPEN";
+        payload.outcomeStatus = existing?.outcomeStatus ?? "NOT_STARTED";
+        payload.permissionState = existing?.permissionState ?? { providerSharingAuthorized: false };
+        payload.providerSelections = existing?.providerSelections ?? [];
+        payload.borrowerReadiness = existing?.borrowerReadiness ?? {};
+        payload.environmentalContext = existing?.environmentalContext ?? {};
+        payload.capitalContext = existing?.capitalContext ?? {};
+        payload.documentRefs = existing?.documentRefs ?? [];
+      }
       await saveFurlongCase({
-        caseId,
+        caseId: effectiveCaseId,
         customerId: nullableString(payload.customerId),
         propertyId: nullableString(payload.propertyId),
         propertyAddress: nullableString(payload.propertyAddress),
-        customerGoal: nullableString(payload.customerGoal),
+        customerGoal: containsProtectedClassDisclosure(nullableString(payload.customerGoal) ?? "") ? REDACTED_PLACEHOLDER : nullableString(payload.customerGoal),
         currentStage: (nullableString(payload.currentStage) as FurlongCaseStage | null) ?? "PROPERTY_ANALYSIS",
         caseStatus: nullableString(payload.caseStatus) ?? undefined,
         outcomeStatus: nullableString(payload.outcomeStatus) ?? undefined,
@@ -245,7 +273,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ caseId
       return NextResponse.json({ ok: false, error: "Unknown Furlong Case action.", governance: { traceId: trace } }, { status: 400 });
     }
 
-    const durableCase = await loadFurlongCaseBundle(caseId);
+    const durableCase = await loadFurlongCaseBundle(effectiveCaseId);
     return NextResponse.json({
       ok: true,
       action,

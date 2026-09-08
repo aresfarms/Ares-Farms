@@ -122,6 +122,13 @@
       "governingVersion": "2026-09-05",
       "file": "MASTER_VOLUME_AMENDMENT_2026-09-05_PRODUCT_COHERENCE.md",
       "note": "Restored scoped governing document pointer; no rollback of newer identity/module schema."
+    },
+    {
+      "key": "customerExperience20260908",
+      "label": "Furlong Answer and Customer Experience",
+      "governingVersion": "v1.0 - 2026-09-08 owner-approved scoped implementation",
+      "file": "MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md",
+      "note": "Source implementation; promotion and certification remain separately gated."
     }
   ],
   "supportingDocuments": [
@@ -230,7 +237,13 @@
     "src/lib/property/listingPriceEvidence.ts",
     "src/scripts/calculationIntegrityConformance.ts",
     "docs/MASTER_VOLUME_AMENDMENT_2026-09-07_CALCULATION_INTEGRITY.md",
-    "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PRODUCT_COHERENCE.md"
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PRODUCT_COHERENCE.md",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md",
+    "docs/customer-experience-release.json",
+    "docs/runbooks/FURLONG_ORGANIZATIONAL_PILOT_2026-09-08.md",
+    "src/lib/property/furlongAnswer.ts",
+    "src/lib/intelligence/furlongAnswerExport.ts",
+    "src/scripts/customerExperienceConformance.ts"
   ],
   "buildBinding": {
     "branch": "master",
@@ -248,6 +261,7 @@
     "farmLandUseBoundary": "agricultural enterprise screen is separate from property-wide highest/best-supported use",
     "furlongVisionVersion": "furlong-vision-v1.0.0",
     "furlongCaseVersion": "furlong-case-v1.0.0",
-    "managedProviderHandoff": "source-implemented; database promotion pending migrations 0058-0062"
+    "managedProviderHandoff": "source-implemented; database promotion pending migrations 0058-0062",
+    "customerExperienceSupplement": "docs/customer-experience-release.json"
   }
 }

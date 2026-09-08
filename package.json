@@ -613,6 +613,7 @@
     "verify:furlong-vision": "tsx src/scripts/furlongVisionConformance.ts",
     "verify:managed-provider-handoff": "tsx src/scripts/managedProviderHandoffConformance.ts",
     "verify:furlong-case": "tsx src/scripts/furlongCaseConformance.ts",
+    "verify:customer-experience": "tsx src/scripts/customerExperienceConformance.ts",
     "verify:capital-network-credit-box": "tsx src/scripts/capitalNetworkCreditBoxConformance.ts"
   },
   "dependencies": {

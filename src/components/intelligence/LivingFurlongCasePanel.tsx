@@ -1,251 +1,110 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { FurlongAnswerCard } from "@/components/property/FurlongAnswerCard";
+import { object, textValue, savedCaseAnswer, type CustomerCaseRecord, type CustomerCaseEvent } from "@/lib/intelligence/furlongCaseAnswer";
 
 const STAGES = [
-  ["PROPERTY_ANALYSIS", "Property"],
-  ["FEASIBILITY", "Feasibility"],
-  ["FINANCING_READINESS", "Readiness"],
-  ["PROVIDER_COMPARISON", "Providers"],
-  ["CASE_ROOM", "Case room"],
-  ["DILIGENCE", "Diligence"],
-  ["CLOSING", "Closing"],
-  ["OPERATING_LOGBOOK", "Logbook"],
+  ["PROPERTY_ANALYSIS", "Property"], ["FEASIBILITY", "Feasibility"],
+  ["FINANCING_READINESS", "Readiness"], ["PROVIDER_COMPARISON", "Providers"],
+  ["CASE_ROOM", "Case room"], ["DILIGENCE", "Diligence"],
+  ["CLOSING", "Closing"], ["OPERATING_LOGBOOK", "Logbook"],
 ] as const;
+type Bundle = { record: CustomerCaseRecord; events: CustomerCaseEvent[]; outcomes: Array<{ id: string; outcomeType: string; verificationStatus: string }> };
+const box = { border: "1px solid #ccd6df", borderRadius: 12, padding: 18, background: "#fff" } as const;
 
-type CaseRecord = {
-  caseId: string;
-  propertyId?: string | null;
-  propertyAddress?: string | null;
-  customerGoal?: string | null;
-  currentStage: string;
-  caseStatus: string;
-  outcomeStatus: string;
-  providerSelections?: unknown;
-  updatedAt?: string | null;
-};
-
-type CaseEvent = {
-  id: string;
-  eventType: string;
-  summary: string;
-  eventStatus: string;
-  occurredAt: string;
-};
-
-type CaseOutcome = {
-  id: string;
-  outcomeType: string;
-  outcomeReasonCategory?: string | null;
-  providerId?: string | null;
-  verificationStatus: string;
-  environmentalOutcome?: string | null;
-  closedAt?: string | null;
-  createdAt: string;
-};
-
-type DurableBundle = {
-  record: CaseRecord;
-  events: CaseEvent[];
-  outcomes: CaseOutcome[];
-};
-
-type ApiResult = {
-  ok?: boolean;
-  persistenceAvailable?: boolean;
-  persistenceNote?: string;
-  durableCase?: DurableBundle | null;
-  error?: string;
-};
-
-function formatDate(value?: string | null): string {
-  if (!value) return "";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "" : date.toLocaleString();
-}
-
-export function LivingFurlongCasePanel({
-  caseId,
-  displayName,
-  goal,
-  state,
-  customerTypes,
-  intendedUses,
-}: {
-  caseId: string;
-  displayName: string;
-  goal: string;
-  state: string | null;
-  customerTypes: string[];
-  intendedUses: string[];
+export function LivingFurlongCasePanel({ caseId, displayName, goal, state, customerTypes, intendedUses }: {
+  caseId: string; displayName: string; goal: string; state: string | null; customerTypes: string[]; intendedUses: string[];
 }) {
-  const [bundle, setBundle] = useState<DurableBundle | null>(null);
-  const [persistenceAvailable, setPersistenceAvailable] = useState<boolean | null>(null);
-  const [note, setNote] = useState<string | null>(null);
+  const router = useRouter();
+  const [bundle, setBundle] = useState<Bundle | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
-
-  const query = useMemo(() => {
-    const params = new URLSearchParams();
-    if (displayName) params.set("name", displayName);
-    if (goal) params.set("goal", goal);
-    if (state) params.set("state", state);
-    if (customerTypes.length) params.set("customerTypes", customerTypes.join(","));
-    if (intendedUses.length) params.set("intendedUses", intendedUses.join(","));
-    return params.toString();
-  }, [customerTypes, displayName, goal, intendedUses, state]);
-
-  const load = useCallback(async () => {
+  const [reload, setReload] = useState(0);
+  const [lastVisit, setLastVisit] = useState<string | null>(null);
+  const [rememberVisits, setRememberVisits] = useState(false);
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true); setBundle(null); setError("");
+    void fetch("/api/intelligence/cases/" + encodeURIComponent(caseId), { cache: "no-store", signal: controller.signal })
+      .then(async response => {
+        const data = await response.json();
+        if (!response.ok || !data.ok || data.persistenceAvailable === false) throw new Error(data.error || "Saved-case information is temporarily unavailable. Please try again.");
+        setBundle(data.durableCase ?? null);
+      }).catch(error => { if (error.name !== "AbortError") setError(error.message); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [caseId, reload]);
+  useEffect(() => {
     try {
-      const response = await fetch(`/api/intelligence/cases/${encodeURIComponent(caseId)}?${query}`, { cache: "no-store" });
-      const data = await response.json() as ApiResult;
-      if (!response.ok || data.ok !== true) throw new Error(data.error ?? "Case status is unavailable.");
-      setPersistenceAvailable(data.persistenceAvailable === true);
-      setBundle(data.durableCase ?? null);
-      setNote(data.persistenceNote ?? null);
-    } catch (error) {
-      setPersistenceAvailable(false);
-      setNote(error instanceof Error ? error.message : "Case status is unavailable.");
-    }
-  }, [caseId, query]);
-
-  useEffect(() => { void load(); }, [load]);
-
+      const remembered = localStorage.getItem("furlong-remember-case-visits") === "yes";
+      setRememberVisits(remembered);
+      setLastVisit(remembered ? localStorage.getItem("furlong-case-visit:" + caseId) : null);
+      if (remembered) localStorage.setItem("furlong-case-visit:" + caseId, new Date().toISOString());
+    } catch { setLastVisit(null); }
+  }, [caseId]);
+  const answer = useMemo(() => bundle ? savedCaseAnswer(bundle.record) : null, [bundle]);
+  const readiness = object(bundle?.record.borrowerReadiness);
+  const changes = (bundle?.events ?? []).filter(event => !lastVisit || new Date(event.occurredAt).getTime() > new Date(lastVisit).getTime());
   async function save() {
-    setBusy(true);
-    setNote(null);
+    setBusy(true); setNote("");
     try {
-      const response = await fetch(`/api/intelligence/cases/${encodeURIComponent(caseId)}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "save",
-          case: {
-            customerGoal: goal,
-            currentStage: bundle?.record.currentStage ?? "PROPERTY_ANALYSIS",
-            propertySnapshot: {
-              displayName,
-              state,
-              intendedUses,
-              source: "intelligence-case-workspace",
-            },
-            businessContext: { customerTypes },
-            permissionState: {
-              customerControlled: true,
-              providerSharingAuthorized: false,
-            },
-            metadata: {
-              savedFrom: "/intelligence/cases/[caseId]",
-              noProviderDataSharedBySave: true,
-            },
-          },
-        }),
+      const response = await fetch("/api/intelligence/cases/" + encodeURIComponent(caseId), {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save", case: { customerGoal: goal,
+          ...(!bundle ? { propertySnapshot: { displayName, state, intendedUses, source: "intelligence-case-workspace" }, businessContext: { customerTypes } } : {}) } }),
       });
-      const data = await response.json() as ApiResult;
-      if (!response.ok || data.ok !== true) throw new Error(data.error ?? "Case could not be saved.");
-      setPersistenceAvailable(data.persistenceAvailable === true);
-      setBundle(data.durableCase ?? null);
-      setNote("Saved. This creates your living case; it does not send anything to a provider.");
-    } catch (error) {
-      setNote(error instanceof Error ? error.message : "Case could not be saved.");
-    } finally {
-      setBusy(false);
-    }
+      const result = await response.json();
+      if (!response.ok || !result.durableCase?.record?.caseId) throw new Error(result.error || "The case could not be saved.");
+      setNote("Saved. Saving or updating this case shares nothing with a lender.");
+      if (result.durableCase.record.caseId !== caseId) router.replace("/intelligence/cases/" + encodeURIComponent(result.durableCase.record.caseId));
+      else { setBundle(result.durableCase); }
+    } catch (error) { setNote(error instanceof Error ? error.message : "The case could not be saved."); }
+    finally { setBusy(false); }
   }
-
-  const currentStage = bundle?.record.currentStage ?? "PROPERTY_ANALYSIS";
-  const stageIndex = Math.max(0, STAGES.findIndex(([id]) => id === currentStage));
-
-  return (
-    <section data-testid="living-furlong-case" style={{ border: "1px solid #c9d4e1", borderRadius: 14, background: "#fff", padding: 18, display: "grid", gap: 14 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
-        <div style={{ display: "grid", gap: 5 }}>
-          <span style={{ color: "#8a6914", fontSize: 11, fontWeight: 850, letterSpacing: ".12em", textTransform: "uppercase" }}>Living Furlong Case</span>
-          <h2 style={{ margin: 0, color: "#162033", fontSize: 21 }}>One record from property idea to keys—and beyond</h2>
-          <p style={{ margin: 0, color: "#5d687a", lineHeight: 1.6, maxWidth: 820, fontSize: 13.5 }}>
-            Property facts, feasibility, financing readiness, environmental work, provider permissions, closing progress, and verified outcomes stay attached to the same customer-controlled case instead of being rebuilt at every handoff.
-          </p>
-        </div>
-        {!bundle && persistenceAvailable !== false && (
-          <button type="button" disabled={busy} onClick={() => void save()} style={{ border: 0, borderRadius: 9, padding: "9px 13px", background: "#0f766e", color: "#fff", fontWeight: 800, cursor: "pointer" }}>
-            {busy ? "Saving…" : "Save this case"}
-          </button>
-        )}
-        {bundle && (
-          <button type="button" disabled={busy} onClick={() => void save()} style={{ border: "1px solid #0f766e", borderRadius: 9, padding: "8px 12px", background: "#fff", color: "#0f766e", fontWeight: 800, cursor: "pointer" }}>
-            {busy ? "Updating…" : "Update case snapshot"}
-          </button>
-        )}
+  return <section data-testid="living-furlong-case" style={{ display: "grid", gap: 18, fontSize: 16, lineHeight: 1.65 }}>
+    {loading && <p role="status">Loading your case…</p>}
+    {error && <div role="alert" style={box}><p>{error}</p><button type="button" onClick={() => setReload(value => value + 1)}>Try again</button></div>}
+    {!loading && !error && !bundle && <div style={box}>
+      <h2>Save this project when you are ready</h2><p>{displayName}</p><p>{goal || "Your project goal has not been recorded."}</p>
+      <p>This preview has not been saved. Creating a case does not share it or appoint a provider.</p>
+      <button type="button" onClick={() => void save()} disabled={busy} style={{ padding: 12 }}>{busy ? "Saving…" : "Save this case"}</button>
+    </div>}
+    {bundle && <>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,240px),1fr))", gap: 14 }}>
+        <section style={box}><h2 style={{ fontSize: 18 }}>{lastVisit ? "Changes since your last recorded visit" : "Recent recorded changes"}</h2>
+          {changes.length ? <ul>{changes.slice(0,5).map(event => <li key={event.id}>{event.summary}<br /><small>{new Date(event.occurredAt).toLocaleString()}</small></li>)}</ul> : <p>No newer events in the returned timeline. This is not confirmation that external work is complete.</p>}
+          <label><input type="checkbox" checked={rememberVisits} onChange={event => {
+            const checked = event.target.checked;
+            try {
+              if (checked) { localStorage.setItem("furlong-remember-case-visits", "yes"); localStorage.setItem("furlong-case-visit:" + caseId, new Date().toISOString()); }
+              else { localStorage.removeItem("furlong-remember-case-visits"); Object.keys(localStorage).filter(key => key.startsWith("furlong-case-visit:")).forEach(key => localStorage.removeItem(key)); setLastVisit(null); }
+              setRememberVisits(checked);
+            } catch { setNote("This browser could not remember the visit."); }
+          }} /> Remember visit times on this device</label>
+        </section>
+        <section style={box}><h2 style={{ fontSize: 18 }}>What needs your attention</h2><p>{answer?.sections.find(section => section.key === "next")?.text}</p></section>
+        <section style={box}><h2 style={{ fontSize: 18 }}>Who is responsible next?</h2><p>{textValue(readiness.nextActionOwner, "No responsible person is recorded. Confirm who will handle the next action; do not assume it has been assigned.")}</p></section>
+        <section style={box}><h2 style={{ fontSize: 18 }}>What is waiting?</h2><p>{textValue(readiness.waitingOn, "No external waiting status is recorded. Review the missing evidence and confirm any provider handoff separately.")}</p></section>
       </div>
-
-      <div aria-label="Furlong case progression" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(105px,1fr))", gap: 7 }}>
-        {STAGES.map(([id, label], index) => {
-          const complete = index < stageIndex;
-          const active = id === currentStage;
-          return (
-            <div key={id} style={{ borderRadius: 9, border: active ? "1px solid #8a6914" : "1px solid #d7deea", background: active ? "#fff8e7" : complete ? "#eef8f5" : "#f8fafc", padding: "8px 9px", display: "grid", gap: 2 }}>
-              <span style={{ color: active ? "#8a6914" : complete ? "#0f766e" : "#8090a0", fontSize: 10.5, fontWeight: 850 }}>{complete ? "✓" : active ? "NOW" : `${index + 1}`}</span>
-              <strong style={{ color: "#263548", fontSize: 11.5 }}>{label}</strong>
-            </div>
-          );
-        })}
-      </div>
-
-      {bundle ? (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 12, display: "grid", gap: 5 }}>
-            <strong style={{ color: "#162033", fontSize: 13.5 }}>Current case state</strong>
-            <span style={{ color: "#526074", fontSize: 12.5 }}>Stage: {bundle.record.currentStage.replaceAll("_", " ")}</span>
-            <span style={{ color: "#526074", fontSize: 12.5 }}>Case: {bundle.record.caseStatus.replaceAll("_", " ")}</span>
-            <span style={{ color: "#526074", fontSize: 12.5 }}>Outcome: {bundle.record.outcomeStatus.replaceAll("_", " ")}</span>
-            {bundle.record.updatedAt && <span style={{ color: "#8090a0", fontSize: 11.5 }}>Updated {formatDate(bundle.record.updatedAt)}</span>}
-          </div>
-          <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 12, display: "grid", gap: 5 }}>
-            <strong style={{ color: "#162033", fontSize: 13.5 }}>Sharing boundary</strong>
-            <span style={{ color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>Saving or updating this case shares nothing with a lender. Each provider receives only a frozen package you separately authorize for that named recipient.</span>
-          </div>
-        </div>
-      ) : (
-        <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 12, background: "#f8fafc", color: "#526074", fontSize: 12.5, lineHeight: 1.55 }}>
-          This analysis can remain unsaved. Create a living case only when you want Furlong to carry the same property and decision context forward.
-        </div>
-      )}
-
-      {bundle && bundle.events.length > 0 && (
-        <details>
-          <summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Case timeline ({bundle.events.length})</summary>
-          <div style={{ display: "grid", gap: 7, paddingTop: 10 }}>
-            {bundle.events.slice(0, 12).map((event) => (
-              <div key={event.id} style={{ borderLeft: "3px solid #c9d4e1", paddingLeft: 10, display: "grid", gap: 2 }}>
-                <strong style={{ color: "#263548", fontSize: 12.5 }}>{event.summary}</strong>
-                <span style={{ color: "#8090a0", fontSize: 11 }}>{event.eventType.replaceAll("_", " ")} · {formatDate(event.occurredAt)}</span>
-              </div>
-            ))}
-          </div>
-        </details>
-      )}
-
-      {bundle && bundle.outcomes.length > 0 && (
-        <details>
-          <summary style={{ cursor: "pointer", fontWeight: 800, color: "#1C2B45" }}>Verified outcome learning ({bundle.outcomes.length})</summary>
-          <div style={{ display: "grid", gap: 7, paddingTop: 10 }}>
-            {bundle.outcomes.slice(0, 10).map((outcome) => (
-              <div key={outcome.id} style={{ border: "1px solid #e2e8f0", borderRadius: 9, padding: 10, display: "grid", gap: 2 }}>
-                <strong style={{ color: "#263548", fontSize: 12.5 }}>{outcome.outcomeType.replaceAll("_", " ")}</strong>
-                <span style={{ color: "#526074", fontSize: 11.5 }}>
-                  {outcome.providerId ? `${outcome.providerId} · ` : ""}{outcome.verificationStatus.replaceAll("_", " ")}{outcome.outcomeReasonCategory ? ` · ${outcome.outcomeReasonCategory}` : ""}
-                </span>
-              </div>
-            ))}
-          </div>
-        </details>
-      )}
-
-      {persistenceAvailable === false && (
-        <div role="status" style={{ border: "1px solid #e3c777", borderRadius: 9, background: "#fff9e8", padding: "9px 11px", color: "#6f571c", fontSize: 12.5 }}>
-          {note ?? "The living-case database migration has not been promoted in this environment yet. The advisory analysis remains available."}
-        </div>
-      )}
-      {note && persistenceAvailable !== false && <span role="status" style={{ color: "#526074", fontSize: 12.5 }}>{note}</span>}
-    </section>
-  );
+      <section style={box}><h2 style={{ fontSize: 18 }}>Recorded stage</h2>
+        <p>{STAGES.find(([id]) => id === bundle.record.currentStage)?.[1] || "Not established"} · {bundle.record.caseStatus.replaceAll("_"," ").toLowerCase()}</p>
+        <p>A recorded stage does not certify earlier steps as complete. No percentage or completion checkmarks are inferred.</p>
+        <p>Last saved: {bundle.record.updatedAt ? new Date(bundle.record.updatedAt).toLocaleString() : "Not recorded"}</p>
+        <p>Saving or updating this case shares nothing with a lender. Recipient authorization remains separate.</p>
+      </section>
+      {answer && <FurlongAnswerCard answer={answer} savedCase={{ caseId, recordVersion: bundle.record.replayRef || bundle.record.updatedAt || "" }} />}
+      <details style={box}><summary>Recorded outcomes ({bundle.outcomes.length})</summary>
+        {bundle.outcomes.length ? bundle.outcomes.map(outcome => <p key={outcome.id}>{outcome.outcomeType} — {outcome.verificationStatus}</p>) : <p>No actual outcomes recorded.</p>}
+        <p>Customer reports remain separate from verified outcomes.</p>
+      </details>
+      <button type="button" onClick={() => setReload(value => value + 1)} style={{ justifySelf: "start", padding: 12 }}>Refresh recorded case information</button>
+    </>}
+    {note && <p role="status">{note}</p>}
+    <Link href="/intelligence/cases">Back to My Cases</Link>
+  </section>;
 }

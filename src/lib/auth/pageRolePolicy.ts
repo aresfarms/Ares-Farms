@@ -79,6 +79,9 @@ export function evaluateProtectedPageRole(
     };
   }
 
+  if (pathname === "/intelligence/cases" || pathname.startsWith("/intelligence/cases/")) {
+    return { protected: true, allowed: ["user", "borrower", "lender", "sponsor", "operator", "admin", "governance", "auditor"].includes(role), reason: "authenticated-owner-scoped-cases" };
+  }
   if (pathname === "/portal" || pathname.startsWith("/portal/")) {
     const allowed =
       role === "user" || role === "borrower" || role === "governance";

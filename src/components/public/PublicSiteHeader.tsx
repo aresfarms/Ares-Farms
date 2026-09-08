@@ -57,6 +57,7 @@ export function PublicSiteHeader() {
           <Link href="/#explore" className="ps-nav-link">
             Explore
           </Link>
+          <Link href="/guides" className="ps-nav-link">Guides</Link>
           <Link href="/compass" className="ps-nav-link">
             What We Do
           </Link>
@@ -78,6 +79,7 @@ export function PublicSiteHeader() {
               the confirmation email — had no route back to their own request at
               all. A customer with money in motion needs this reachable from
               every page, not from one screen they saw once. */}
+          <Link href="/intelligence/cases" className="ps-nav-link">My Cases</Link>
           <Link href="/status" className="ps-nav-link">
             Check Status
           </Link>

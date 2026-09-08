@@ -121,7 +121,7 @@
     "renderedFinancialScenarios": "pending and supported states passed",
     "localDraftPdf": "generated, text checked and page 5 visually inspected",
     "previousTestingRevision": "live Seippes summary confirmed no automatic alfalfa/range/2.14; export revealed and triggered follow-up fixes",
-    "finalLiveBrowserAndPdf": "pending: Mac locked, user asked to unlock"
+    "finalLiveBrowserAndPdf": "passed for the focused Seippes regressions on the reloaded testing revision; fresh PDF generated 2026-09-08T03:12:11Z. Remaining template/UI issues recorded separately."
   },
   "reproducedDefect": {
     "property": "3835 Seippes Road, Federalsburg, MD 21632",
@@ -196,12 +196,76 @@
     }
   ],
   "outstanding": [
-    "Final live browser/PDF confirmation after Mac unlock",
     "Authenticated reviewed-comparable intake and adjusted BPO workflow",
     "NY/DE current official batches and general retail asking-price source",
     "Parcel clipped soil acreages, field tests and actual operating evidence",
     "Scheduled rate/source snapshot refresh; operating FSA rate changed",
     "Broader tax, fee, treasury, risk and verification calculation review",
-    "Findings HTML responsive layout QA blocked by portable-reader horizontal overflow"
-  ]
+    "Findings HTML responsive layout QA blocked by portable-reader horizontal overflow",
+    "Remaining live UI/export findings: legacy headings, malformed U2 threshold glyph, truncated prose, environmental overclaim and visible comparable status coverage"
+  ],
+  "liveVerification": {
+    "verifiedAt": "2026-09-08T03:16:01Z",
+    "property": "3835 Seippes Road, Federalsburg, MD 21632",
+    "scope": "Focused regression verification of the reloaded testing website and a fresh application-generated PDF; not full-platform certification.",
+    "browser": {
+      "testingUrl": "https://testing---furlong-core-mwei3cj3jq-uc.a.run.app",
+      "revision": "furlong-core-r7-finance-0908",
+      "reloaded": true,
+      "sectionsChecked": [
+        "Answer",
+        "Finance",
+        "Property",
+        "Report"
+      ],
+      "answerObserved": [
+        "Agricultural evidence pending",
+        "7 soil map units intersect the official parcel outline",
+        "We cannot calculate loan coverage yet",
+        "No loan program is being recommended",
+        "The tax assessment is not the purchase price"
+      ],
+      "financeObserved": [
+        "No financing recommendation or loan-coverage result yet",
+        "FSA direct farm-purchase loan — borrow directly from USDA",
+        "Published snapshot effective July 1, 2026; confirm current rate"
+      ],
+      "unsupportedFiguresAbsent": [
+        "$9,922",
+        "$4,639",
+        "2.14x",
+        "automatic alfalfa winner"
+      ],
+      "visualCheck": "Answer page inspected at the actual desktop viewport; retained open for the user"
+    },
+    "pdf": {
+      "path": "/Users/caitlinhudson/Downloads/furlong-draft-proforma (1).pdf",
+      "sha256": "33ef02b0b450581f384ee10155a92753efba3f58881d1d313cc3b7ecfab6842a",
+      "generatedAt": "2026-09-08T03:12:11Z",
+      "bytes": 87998,
+      "pages": 13,
+      "textCheck": "Complete text extracted; no legacy 9,922, 4,639 or 2.14 figures. Revenue, expenses, NOI, debt service and coverage remain pending. No financing program selected. Rate snapshot and monthly frequency explicit.",
+      "relevantPagesVisuallyInspected": [
+        5,
+        7,
+        9,
+        10
+      ],
+      "openChecks": [
+        "U8",
+        "U9",
+        "U10",
+        "U13"
+      ],
+      "originalPreserved": true,
+      "allPagesOrTemplateCertified": false
+    },
+    "remainingObservedIssues": [
+      "Legacy PDF headings still say Loan Lane Matching and Matched lane despite corrected no-program-selected narrative.",
+      "Generation-gate U2 threshold glyph renders incorrectly; some question-answer prose is truncated.",
+      "Environmental PASS/starts clean language overstates the scope of the narrow Superfund proximity check; not certified.",
+      "A visible comparable-evidence-pending/value card was not observed on the Property or Finance tabs during this check; source gates do not establish complete UI coverage.",
+      "Header-wide DATA VERIFIED date must not be interpreted as currentness of every individual source."
+    ]
+  }
 }

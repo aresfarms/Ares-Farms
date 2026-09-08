@@ -62,13 +62,13 @@
     },
     {
       "domain": "Exports and document calculations",
-      "status": "targeted-behavior-tested-local-pdf-render-checked",
+      "status": "targeted-behavior-tested-live-testing-pdf-checked",
       "tests": [
         "verify:calculation-integrity",
         "verify:property-value-indication"
       ],
-      "evidence": "No assessment acquisition fallback; no generic crop NOI; no partial bundle purchase total; unknown income remains pending. Local draft PDF rendered and inspected; absent gross revenue is not relabeled from supplied NOI. Live export check remains pending. Follow-up draft template removes default FSA match; missing revenue/debt/year-model/selection checks remain open; source-date and monthly frequency printed. Re-rendered local PDF verified. Cloud end-to-end confirmation still pending.",
-      "limitations": "Every export path and complete live customer journey not certified."
+      "evidence": "No assessment acquisition fallback; no generic crop NOI; no partial bundle purchase total; unknown income remains pending. Local and live testing PDF checks completed. Fresh 13-page cloud PDF generated 2026-09-08T03:12:11Z: no default selected FSA program, no old 9,922/4,639/2.14 figures, pending gross revenue/expenses/NOI/debt service/DSCR, dated rate basis and monthly payment frequency. U8/U9/U10/U13 remain OPEN. Complete text checked; pages 5, 7, 9 and 10 visually inspected. Evidence and hash in calculation-financing-release.json.",
+      "limitations": "Every export path and complete live customer journey not certified. Legacy loan-lane headings, malformed U2 threshold glyph, truncated answers and narrow environmental-screen overclaims remain review items."
     },
     {
       "domain": "Other platform calculations, treasury, verification and workflows",

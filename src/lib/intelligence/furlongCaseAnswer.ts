@@ -2,7 +2,7 @@ import { ANSWER_QUESTIONS, composeFurlongAnswer, type FurlongAnswer } from "@/li
 export type CustomerCaseRecord = {
   caseId: string; propertyAddress?: string | null; customerGoal?: string | null;
   currentStage: string; caseStatus: string; outcomeStatus: string;
-  propertySnapshot?: unknown; borrowerReadiness?: unknown; documentRefs?: unknown;
+  propertySnapshot?: unknown; businessContext?: unknown; borrowerReadiness?: unknown; documentRefs?: unknown;
   updatedAt?: string | null; replayRef?: string | null;
 };
 export type CustomerCaseEvent = { id: string; eventType: string; summary: string; eventStatus: string; occurredAt: string };

@@ -31,11 +31,11 @@ assert.match(farmA.href, /^\/intelligence\/cases\/onboarding-/);
 assert.match(farmA.href, /origin=onboarding/);
 
 const onboardingPage = fs.readFileSync("src/app/(public)/onboarding/page.tsx", "utf8");
-const casePage = fs.readFileSync("src/app/intelligence/cases/[caseId]/page.tsx", "utf8");
+const livingCasePanel = fs.readFileSync("src/components/intelligence/LivingFurlongCasePanel.tsx", "utf8");
 assert.match(onboardingPage, /Return to your enriched intelligence case/);
 assert.match(onboardingPage, /ONBOARDING_CASE_ENRICHMENT|onboardingIntelligenceCaseHandoff/);
 assert.match(onboardingPage, /No identity, address, transcript, listing URL, or hidden account is transferred/);
-assert.match(casePage, /Enrich this case through onboarding/);
-assert.match(casePage, /onboardingParams/);
+assert.match(livingCasePanel, /Enrich this case through onboarding/);
+assert.match(livingCasePanel, /onboardingParams/);
 
 console.log("✓ onboarding intelligence case creation and enrichment smoke test passed");

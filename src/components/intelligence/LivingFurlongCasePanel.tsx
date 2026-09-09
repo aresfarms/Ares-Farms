@@ -49,6 +49,24 @@ export function LivingFurlongCasePanel({ caseId, displayName, goal, state, custo
   }, [caseId]);
   const answer = useMemo(() => bundle ? savedCaseAnswer(bundle.record) : null, [bundle]);
   const readiness = object(bundle?.record.borrowerReadiness);
+  const propertySnapshot = object(bundle?.record.propertySnapshot);
+  const businessContext = object(bundle?.record.businessContext);
+  const durableCustomerTypes = Array.isArray(businessContext.customerTypes)
+    ? businessContext.customerTypes.filter((value): value is string => typeof value === "string" && Boolean(value.trim()))
+    : customerTypes;
+  const durableIntendedUses = Array.isArray(propertySnapshot.intendedUses)
+    ? propertySnapshot.intendedUses.filter((value): value is string => typeof value === "string" && Boolean(value.trim()))
+    : intendedUses;
+  const onboardingParams = new URLSearchParams({ caseId });
+  const effectiveName = bundle?.record.propertyAddress || textValue(propertySnapshot.displayName, displayName);
+  const effectiveGoal = bundle?.record.customerGoal || goal;
+  const effectiveState = textValue(propertySnapshot.state, state || "");
+  if (effectiveName) onboardingParams.set("name", effectiveName);
+  if (effectiveGoal) onboardingParams.set("goal", effectiveGoal);
+  if (effectiveState) onboardingParams.set("state", effectiveState);
+  if (durableCustomerTypes.length) onboardingParams.set("customerTypes", durableCustomerTypes.join(","));
+  if (durableIntendedUses.length) onboardingParams.set("intendedUses", durableIntendedUses.join(","));
+  const navigatorParams = new URLSearchParams(onboardingParams);
   const changes = (bundle?.events ?? []).filter(event => !lastVisit || new Date(event.occurredAt).getTime() > new Date(lastVisit).getTime());
   async function save() {
     setBusy(true); setNote("");
@@ -105,6 +123,14 @@ export function LivingFurlongCasePanel({ caseId, displayName, goal, state, custo
       <button type="button" onClick={() => setReload(value => value + 1)} style={{ justifySelf: "start", padding: 12 }}>Refresh recorded case information</button>
     </>}
     {note && <p role="status">{note}</p>}
+    <section style={{ ...box, display: "grid", gap: 8 }}>
+      <h2 style={{ margin: 0, fontSize: 18 }}>Continue building this case</h2>
+      <p style={{ margin: 0, color: "#526074" }}>Add project context or return to the Navigator without creating a second matter. These links do not share the case with a provider.</p>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <Link href={`/onboarding?${onboardingParams.toString()}`}>Enrich this case through onboarding</Link>
+        <Link href={`/navigator?${navigatorParams.toString()}`}>Continue this case in Navigator</Link>
+      </div>
+    </section>
     <Link href="/intelligence/cases">Back to My Cases</Link>
   </section>;
 }

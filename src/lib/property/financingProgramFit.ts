@@ -267,7 +267,7 @@ export function buildLenderTestScorecard(args: {
         : {
             test: "Flood posture",
             status: "pass",
-            detail: `FEMA zone ${args.floodZone} — outside the mapped hazard area.`,
+            detail: `FEMA zone ${args.floodZone} — outside the mapped Special Flood Hazard Area.`,
           },
     );
   } else {

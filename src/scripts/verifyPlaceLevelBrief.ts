@@ -37,7 +37,7 @@ const facts: BriefFactLine[] = [
   // Parcel/tract-level — MUST NOT be asserted for a whole city:
   fact("Opportunity Zone", "Designated QOZ tract", "positive"),
   fact("NMTC", "Qualified low-income community tract", "positive"),
-  fact("Flood zone", "Zone X — outside hazard area", "positive"),
+  fact("Flood zone", "Zone X — outside mapped Special Flood Hazard Area", "positive"),
   fact("Historic status", "National Register district"),
 ];
 

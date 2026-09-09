@@ -881,6 +881,11 @@ function isResidentialHomeContext(context: PropertyContext): boolean {
   return /(home|house|residential|single family|condo|duplex)/i.test(text);
 }
 
+function isSpecialFloodHazardZone(zone: string | null | undefined): boolean {
+  const normalized = (zone ?? "").trim().toUpperCase();
+  return normalized.startsWith("A") || normalized.startsWith("V");
+}
+
 function buildBudgetExpectations(context: PropertyContext): BudgetExpectations {
   const price = parsePriceSignal(context.priceLabel);
   if (price === null) {
@@ -974,11 +979,12 @@ function buildPropertyFirstProgramRanking(args: {
       let score = 55;
       const name = program.name.toLowerCase();
 
-      if (
-        args.assetClass === "agricultural" &&
-        /fsa|farm credit|reap|b&i/.test(name)
-      )
-        score += 18;
+      if (args.assetClass === "agricultural") {
+        if (/fsa/.test(name)) score += 28;
+        else if (/farm credit/.test(name)) score += 24;
+        else if (/b&i/.test(name)) score += 12;
+        else if (/reap/.test(name)) score += 8;
+      }
       if (
         args.assetClass === "commercial" &&
         /sba 504|sba 7\(a\)|sba express/.test(name)
@@ -1008,9 +1014,9 @@ function buildPropertyFirstProgramRanking(args: {
           : /sba express/.test(name)
             ? "More plausible as a smaller, faster business-purpose lane than as a heavy real-estate solution."
             : /b&i/.test(name)
-              ? "Becomes more credible when the property is rural and tied to a business or operating-use thesis."
+              ? "Relevant only when the rural property supports a qualifying business purpose; ordinary primary agricultural production is not assumed eligible."
               : /fsa/.test(name)
-                ? "Most plausible if the property is genuinely agricultural rather than simply rural."
+                ? "First farm-specific federal lane to screen when the property is genuinely agricultural and the proposed use is farm ownership or operation."
                 : /farm credit/.test(name)
                   ? "Often strongest where the land or operation is clearly agricultural and operator-led."
                   : /reap/.test(name)
@@ -1019,8 +1025,10 @@ function buildPropertyFirstProgramRanking(args: {
 
       const caution = /sba/.test(name)
         ? "Weakens quickly if the property cannot support a credible owner-user or operating-business story."
-        : /fsa|farm credit/.test(name)
-          ? "Weakens quickly if the use is mostly hospitality or non-farm commercial."
+        : /b&i/.test(name)
+          ? "Primary agricultural production can be restricted; confirm a qualifying rural business purpose before treating B&I as a viable lane."
+          : /fsa|farm credit/.test(name)
+            ? "Weakens quickly if the use is mostly hospitality or non-farm commercial; borrower and operator eligibility still require separate review."
           : /reap/.test(name)
             ? "Should not be mistaken for a full capital-stack answer."
             : "Needs rule and document review before reliance.";
@@ -1658,7 +1666,7 @@ function buildStrengths(args: {
   // 3. Engine-derived lane, in plain language.
   if (args.topPathways[0]) {
     out.push(
-      `${args.topPathways[0].label} currently reads as the strongest financing lane to test first.`,
+      `${args.topPathways[0].label} is the strongest current property-side program signal to review first; it is not a ranked closing path.`,
     );
   }
   return out.slice(0, 5);
@@ -2116,8 +2124,11 @@ function buildReportModel(args: {
     }
 
     if (args.facts?.placeFacts?.flood) {
+      const zone = args.facts.placeFacts.flood.floodZone;
       lines.push(
-        `FEMA flood posture confirmed: Special Flood Hazard Area, Zone ${args.facts.placeFacts.flood.floodZone}.`,
+        isSpecialFloodHazardZone(zone)
+          ? `FEMA flood posture confirmed: Zone ${zone}, inside the mapped Special Flood Hazard Area.`
+          : `FEMA flood posture confirmed: Zone ${zone}, outside the mapped Special Flood Hazard Area. Low mapped risk is not no flood risk.`,
       );
     } else if (checks?.floodActivated) {
       lines.push(
@@ -2200,7 +2211,9 @@ function buildReportModel(args: {
   // once). Scores are internal ranking signals, never customer copy.
   const executiveSummary = [
     args.topProgramRanks[0]
-      ? `${args.topProgramRanks[0].program.name.replace(/ context$/i, "")} is usually the first financing lane checked for a property like this — it is not the only one. The financing section lists every lane that could fit, most likely first. Which lane you qualify for comes down to credit, income, and whether you will live here; already owning a home does not by itself rule these out — most programs simply ask that this one become your primary residence. A lender confirms the fit in one conversation.`
+      ? isResidentialHomeContext(args.context)
+        ? `${args.topProgramRanks[0].program.name.replace(/ context$/i, "")} is a property-side residential lane to investigate first, not an approval. Final fit depends on owner occupancy, borrower eligibility, credit, income, appraisal, condition, and the lender's current program rules.`
+        : `${args.topProgramRanks[0].program.name.replace(/ context$/i, "")} is the first property-side program to screen from the current record, not a ranked closing recommendation. Final fit depends on the actual project use, borrower or entity eligibility, repayment capacity, collateral, use of proceeds, and the provider's current program rules. The Finance tab remains unranked until transaction price, supported operating economics, and proposed loan terms are available.`
       : "",
     args.immediateSuitability.constraints[0]
       ? `First thing to pin down: ${cleanPhrase(args.immediateSuitability.constraints[0]).toLowerCase()}.`
@@ -3726,7 +3739,7 @@ export function PropertyEvaluationWorkspace({
       lines: report.risks,
     },
     {
-      title: "Ranked financing lanes",
+      title: "Programs to investigate from property-side fit",
       lines:
         answers.reportTier === "free"
           ? report.pathwayAnalysis.slice(0, 1)
@@ -6319,7 +6332,7 @@ export function PropertyEvaluationWorkspace({
                 <section style={panelStyle}>
                   <div style={{ display: "grid", gap: 5 }}>
                     <strong style={{ fontSize: 18, color: "#162033" }}>
-                      Ranked USDA / SBA financing read
+                      Property-side program screen
                     </strong>
                     <span
                       style={{
@@ -6328,10 +6341,10 @@ export function PropertyEvaluationWorkspace({
                         lineHeight: 1.55,
                       }}
                     >
-                      This is still governed planning support, not an approval.
-                      The difference is that the page should tell you the most
-                      likely financing order first instead of making “missing
-                      answers” the headline.
+                      This orders plausible programs from current property facts only.
+                      It is not a closing-path ranking or approval. The Finance tab
+                      stays unranked until transaction price, supported operating
+                      economics, use, and proposed loan terms support a comparison.
                     </span>
                   </div>
                   {selectedTierUnlocked ? (
@@ -6345,13 +6358,13 @@ export function PropertyEvaluationWorkspace({
                         }}
                       >
                         <div style={miniCard}>
-                          <span style={miniLabel}>Lead program</span>
+                          <span style={miniLabel}>First program to screen</span>
                           <strong style={{ fontSize: 28, color: "#162033" }}>
                             {topProgramRanks[0]?.program.name ?? "TBD"}
                           </strong>
                           <span style={miniText}>
                             {topProgramRanks[0]
-                              ? "Ranked first from the current property facts."
+                              ? "Property-side order only — not a closing-path ranking."
                               : "Still classifying from the current record."}
                           </span>
                         </div>
@@ -6414,8 +6427,8 @@ export function PropertyEvaluationWorkspace({
                                 }}
                               >
                                 {index === 0
-                                  ? "Strongest current lane"
-                                  : `Lane ${index + 1}`}
+                                  ? "First property-side screen"
+                                  : `Screen ${index + 1}`}
                               </span>
                             </div>
                             <span
@@ -6626,8 +6639,9 @@ export function PropertyEvaluationWorkspace({
                             FEMA flood posture
                           </strong>
                           <span style={{ fontSize: 12.5, color: "#3b475a" }}>
-                            Special Flood Hazard Area, Zone{" "}
-                            {facts.placeFacts.flood.floodZone}.
+                            {isSpecialFloodHazardZone(facts.placeFacts.flood.floodZone)
+                              ? `Zone ${facts.placeFacts.flood.floodZone} — inside the mapped Special Flood Hazard Area.`
+                              : `Zone ${facts.placeFacts.flood.floodZone} — outside the mapped Special Flood Hazard Area; low mapped risk is not no flood risk.`}
                           </span>
                         </div>
                       )}
@@ -6973,10 +6987,10 @@ export function PropertyEvaluationWorkspace({
             href: string;
             accent: string;
           }[] = [];
-          if (pf?.flood)
+          if (pf?.flood && isSpecialFloodHazardZone(pf.flood.floodZone))
             rows.push({
               finding: `This site maps to FEMA flood zone ${pf.flood.floodZone}`,
-              step: "Review the boundary + a Phase I with the Guild's licensed PE",
+              step: "Review the current FEMA boundary, elevation, drainage, and flood-insurance implications with the appropriate professional",
               href: "/explore?lane=environmental-compliance",
               accent: "#0f6e56",
             });

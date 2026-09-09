@@ -114,7 +114,7 @@ export interface BriefFactLine {
   /** Short label, e.g. "Flood zone". */
   label: string;
   /**
-   * The scannable headline value ("Zone X — outside hazard area"). Redesign
+   * The scannable headline value ("Zone X — outside mapped Special Flood Hazard Area"). Redesign
    * round 2 (2026-07-17): the page must SCAN, not read — the value carries
    * the answer; the sentence and provenance sit behind an expand.
    */
@@ -316,7 +316,7 @@ function floodFactLine(propertyId: string): BriefFactLine | null {
   }
   return {
     label: "Flood zone",
-    value: `Zone ${f.floodZone} — outside hazard area`,
+    value: `Zone ${f.floodZone} — outside mapped Special Flood Hazard Area`,
     text:
       `This location maps to FEMA flood zone ${f.floodZone}, outside the Special Flood Hazard Area. ` +
       `Flood insurance is typically optional here, though flooding can occur outside mapped zones.`,
@@ -571,7 +571,7 @@ function buildChips(args: {
         ? "flood insurance likely required"
         : args.floodZone.toUpperCase() === "D"
           ? "hazard undetermined"
-          : "outside hazard area";
+          : "outside mapped Special Flood Hazard Area";
     chips.push(chipFrom(args.verifiedFacts, "Flood zone", `Flood zone ${args.floodZone} — ${posture}`));
   }
   const groceryMiles = args.amenities?.grocery?.nearestMiles ?? null;
@@ -2094,7 +2094,7 @@ function floodFactFromLive(floodZone: string, asOf: string): BriefFactLine {
   }
   return {
     label: "Flood zone",
-    value: `Zone ${zone} — outside hazard area`,
+    value: `Zone ${zone} — outside mapped Special Flood Hazard Area`,
     text:
       `This address maps to FEMA flood zone ${zone}, outside the Special Flood Hazard Area. ` +
       `Flood insurance is typically optional here, though flooding can occur outside mapped zones.`,

@@ -659,9 +659,6 @@ resource "terraform_data" "enable_iap" {
     replace_triggered_by = [google_cloud_run_v2_service.core]
   }
 
-  provisioner "local-exec" {
-    command = "gcloud run services update ${self.triggers_replace.service} --project ${self.triggers_replace.project} --region ${self.triggers_replace.region} --iap --quiet"
-  }
 
   depends_on = [
     google_cloud_run_v2_service.core,

@@ -240,7 +240,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
     );
   }
 
-  if (isPlaceFirstFlow(flow)) {
+  if (isPlaceFirstFlow(flow) && !propertyContext) {
     return (
       <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
         <PropertyEvaluationWorkspace

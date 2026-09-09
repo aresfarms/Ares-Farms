@@ -220,3 +220,12 @@ resource "google_kms_crypto_key_iam_member" "plan_release_attestor_public_key" {
   role          = "roles/cloudkms.publicKeyViewer"
   member        = "serviceAccount:${google_service_account.plan.email}"
 }
+
+# The apply identity performs a post-apply drift plan in the governed pipeline.
+# That verification refreshes the same Binary Authorization public-key data
+# source, so it needs the same key-scoped read permission (never signer rights).
+resource "google_kms_crypto_key_iam_member" "apply_release_attestor_public_key" {
+  crypto_key_id = "projects/${var.project_id}/locations/${var.region}/keyRings/furlong-security/cryptoKeys/furlong-release-attestor"
+  role          = "roles/cloudkms.publicKeyViewer"
+  member        = "serviceAccount:${google_service_account.apply.email}"
+}

@@ -244,6 +244,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
     return (
       <main style={{ display: "grid", gap: 28, padding: "40px 20px", maxWidth: 980, margin: "0 auto" }}>
         <PropertyEvaluationWorkspace
+          key={`address-first:${flow}`}
           context={addressFirstContext!}
           tierPreviewMode={tierPreviewMode}
           addressFirstFlow={flow}
@@ -331,6 +332,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
           {/* The Chart Table renders the full Place Brief (chart concept,
               founder-selected 2026-07-16) — no separate intelligence section. */}
           <PropertyEvaluationWorkspace
+            key={`property:${propertyContext.propertyId ?? propertyContext.exactAddress ?? propertyContext.title}`}
             context={propertyContext}
             tierPreviewMode={tierPreviewMode}
             placeIntelligence={briefIntelligence}
@@ -349,6 +351,7 @@ export function DiscoverSurface({ route, query }: { route: string; query: SP }) 
         </>
       ) : (
         <PropertyEvaluationWorkspace
+          key="address-first:property-discovery"
           context={defaultPropertyContext!}
           tierPreviewMode={tierPreviewMode}
           addressFirstFlow="property-discovery"

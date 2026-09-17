@@ -2,7 +2,7 @@ name: gcp-inventory-main-20260917
 
 on:
   push:
-    branches: [main]
+    branches: [ops/main-gcp-inventory-20260917]
 
 permissions:
   contents: read

@@ -1,0 +1,41 @@
+name: gcp-inventory-main-20260917
+
+on:
+  push:
+    branches: [ops/main-gcp-inventory-20260917]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
+        with:
+          workload_identity_provider: projects/859763772114/locations/global/workloadIdentityPools/github-actions/providers/ares-farms
+          service_account: furlong-github-build@furlong-staging-499102.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
+      - name: Sanitized Furlong GCP inventory
+        shell: bash
+        run: |
+          set +e
+          PROJECT=furlong-staging-499102
+          REGION=us-central1
+          echo '=== CLOUD RUN SERVICES ==='
+          gcloud run services list --platform=managed --region="$REGION" --project="$PROJECT" --format='table(metadata.name,status.url,status.latestReadyRevisionName,status.latestCreatedRevisionName)'
+          echo '=== SANITIZED SERVICE DETAILS ==='
+          for SVC in $(gcloud run services list --platform=managed --region="$REGION" --project="$PROJECT" --format='value(metadata.name)' 2>/dev/null); do
+            echo "--- $SVC ---"
+            gcloud run services describe "$SVC" --platform=managed --region="$REGION" --project="$PROJECT" --format=json 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); spec=((d.get("spec") or {}).get("template") or {}).get("spec") or {}; c=(spec.get("containers") or [{}])[0]; st=d.get("status") or {}; print("url="+str(st.get("url",""))); print("latestReadyRevision="+str(st.get("latestReadyRevisionName",""))); print("latestCreatedRevision="+str(st.get("latestCreatedRevisionName",""))); print("image="+str(c.get("image",""))); print("env_names="+",".join(sorted(e.get("name","") for e in c.get("env",[]) if e.get("name")))); print("traffic="+json.dumps(st.get("traffic",[]),separators=(",",":")))' || true
+          done
+          echo '=== RECENT REVISIONS ==='
+          gcloud run revisions list --platform=managed --region="$REGION" --project="$PROJECT" --limit=30 --sort-by='~metadata.creationTimestamp' --format='table(metadata.name,metadata.labels.serving_knative_dev/service,metadata.creationTimestamp,status.conditions[0].status)'
+          echo '=== RECENT BUILDS ==='
+          gcloud builds list --project="$PROJECT" --limit=30 --sort-by='~createTime' --format='table(id,status,createTime,source.storageSource.bucket,source.storageSource.object,source.repoSource.repoName,source.repoSource.branchName,results.images)'
+          echo '=== BUILD TRIGGERS ==='
+          gcloud builds triggers list --project="$PROJECT" --format='table(id,name,disabled,github.owner,github.name,github.push.branch,repositoryEventConfig.repository,repositoryEventConfig.push.branch)'
+          echo '=== ARTIFACT IMAGES ==='
+          gcloud artifacts docker images list "$REGION-docker.pkg.dev/$PROJECT/furlong-app/furlong-core" --project="$PROJECT" --include-tags --limit=30 --sort-by='~UPDATE_TIME' --format='table(IMAGE,DIGEST,TAGS,UPDATE_TIME)'

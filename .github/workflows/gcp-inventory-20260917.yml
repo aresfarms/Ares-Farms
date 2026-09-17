@@ -17,17 +17,17 @@ jobs:
       PROJECT_ID: furlong-staging-499102
       REGION: us-central1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
           ref: ops/gcp-inventory-20260917
 
       - id: auth
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093
         with:
-          workload_identity_provider: projects/412184800531/locations/global/workloadIdentityPools/furlong-github-pool/providers/github
-          service_account: gha-cloud-build@furlong-staging-499102.iam.gserviceaccount.com
+          workload_identity_provider: projects/859763772114/locations/global/workloadIdentityPools/github-actions/providers/ares-farms
+          service_account: furlong-github-build@furlong-staging-499102.iam.gserviceaccount.com
 
-      - uses: google-github-actions/setup-gcloud@v2
+      - uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db
 
       - name: Inventory GCP without secret values
         shell: bash

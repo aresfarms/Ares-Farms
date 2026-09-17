@@ -1,0 +1,77 @@
+name: gcp-inventory-20260917
+
+on:
+  push:
+    branches:
+      - ops/gcp-inventory-20260917
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: furlong-staging-499102
+      REGION: us-central1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ops/gcp-inventory-20260917
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/412184800531/locations/global/workloadIdentityPools/furlong-github-pool/providers/github
+          service_account: gha-cloud-build@furlong-staging-499102.iam.gserviceaccount.com
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Inventory GCP without secret values
+        shell: bash
+        run: |
+          set +e
+          OUT=gcp-inventory.txt
+          : > "$OUT"
+          {
+            echo "Furlong GCP inventory $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            echo "project=$PROJECT_ID region=$REGION"
+            echo
+            echo "=== CLOUD RUN SERVICES ==="
+            gcloud run services list --platform=managed --region="$REGION" --project="$PROJECT_ID" --format='table(metadata.name,status.url,status.latestReadyRevisionName,status.latestCreatedRevisionName)'
+            echo
+            echo "=== CLOUD RUN SERVICE DETAILS (sanitized) ==="
+            for SVC in $(gcloud run services list --platform=managed --region="$REGION" --project="$PROJECT_ID" --format='value(metadata.name)' 2>/dev/null); do
+              echo "--- $SVC ---"
+              gcloud run services describe "$SVC" --platform=managed --region="$REGION" --project="$PROJECT_ID" --format=json 2>/dev/null | python3 -c 'import json,sys; d=json.load(sys.stdin); t=((d.get("spec") or {}).get("template") or {}).get("spec") or {}; c=(t.get("containers") or [{}])[0]; st=d.get("status") or {}; print("url="+str(st.get("url",""))); print("latestReadyRevision="+str(st.get("latestReadyRevisionName",""))); print("latestCreatedRevision="+str(st.get("latestCreatedRevisionName",""))); print("image="+str(c.get("image",""))); print("env_names="+",".join(sorted(e.get("name","") for e in c.get("env",[]) if e.get("name")))); print("traffic="+json.dumps(st.get("traffic",[]),separators=(",",":")))' || true
+            done
+            echo
+            echo "=== RECENT CLOUD RUN REVISIONS ==="
+            gcloud run revisions list --platform=managed --region="$REGION" --project="$PROJECT_ID" --limit=30 --sort-by='~metadata.creationTimestamp' --format='table(metadata.name,metadata.labels.serving_knative_dev/service,metadata.creationTimestamp,status.conditions[0].status)'
+            echo
+            echo "=== RECENT CLOUD BUILDS ==="
+            gcloud builds list --project="$PROJECT_ID" --limit=30 --sort-by='~createTime' --format='table(id,status,createTime,source.storageSource.bucket,source.storageSource.object,source.repoSource.repoName,source.repoSource.branchName,results.images)'
+            echo
+            echo "=== CLOUD BUILD TRIGGERS ==="
+            gcloud builds triggers list --project="$PROJECT_ID" --format='table(id,name,disabled,github.owner,github.name,github.push.branch,repositoryEventConfig.repository,repositoryEventConfig.push.branch)'
+            echo
+            echo "=== ARTIFACT REGISTRY REPOSITORIES ==="
+            gcloud artifacts repositories list --project="$PROJECT_ID" --location="$REGION" --format='table(name,format,createTime,updateTime)'
+            echo
+            echo "=== RECENT FURLONG IMAGES ==="
+            gcloud artifacts docker images list "$REGION-docker.pkg.dev/$PROJECT_ID/furlong-app/furlong-core" --project="$PROJECT_ID" --include-tags --limit=30 --sort-by='~UPDATE_TIME' --format='table(IMAGE,DIGEST,TAGS,UPDATE_TIME)'
+            echo
+            echo "=== CLOUD SOURCE REPOSITORIES ==="
+            gcloud source repos list --project="$PROJECT_ID" --format='table(name,url)' || true
+          } >> "$OUT" 2>&1
+
+      - name: Commit sanitized inventory
+        shell: bash
+        run: |
+          git config user.name "furlong-ops-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add gcp-inventory.txt
+          git commit -m "ops: record sanitized GCP inventory" || exit 0
+          git push origin HEAD:ops/gcp-inventory-20260917

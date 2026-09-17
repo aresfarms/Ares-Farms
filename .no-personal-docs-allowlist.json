@@ -1,0 +1,42 @@
+[
+  {
+    "path": "src/lib/property/propertyFloodHistoricGenerated.ts",
+    "reason": "Generated public government/property identifiers trigger the credit-card numeric heuristic; reviewed as public source IDs, not personal financial data.",
+    "approvingAuthority": "Caitlin Hudson, repository owner; release authorization 2026-09-17",
+    "expirationDate": "2026-10-17",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/propertyHubzonesGenerated.ts",
+    "reason": "Generated public government/property identifiers trigger the credit-card numeric heuristic; reviewed as public source IDs, not personal financial data.",
+    "approvingAuthority": "Caitlin Hudson, repository owner; release authorization 2026-09-17",
+    "expirationDate": "2026-10-17",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/propertyNmtcGenerated.ts",
+    "reason": "Generated public government/property identifiers trigger the credit-card numeric heuristic; reviewed as public source IDs, not personal financial data.",
+    "approvingAuthority": "Caitlin Hudson, repository owner; release authorization 2026-09-17",
+    "expirationDate": "2026-10-17",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/propertyOpportunityZonesGenerated.ts",
+    "reason": "Generated public government/property identifiers trigger the credit-card numeric heuristic; reviewed as public source IDs, not personal financial data.",
+    "approvingAuthority": "Caitlin Hudson, repository owner; release authorization 2026-09-17",
+    "expirationDate": "2026-10-17",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  },
+  {
+    "path": "src/lib/property/usdaResaleGenerated.ts",
+    "reason": "Generated public government/property identifiers trigger the credit-card numeric heuristic; reviewed as public source IDs, not personal financial data.",
+    "approvingAuthority": "Caitlin Hudson, repository owner; release authorization 2026-09-17",
+    "expirationDate": "2026-10-17",
+    "classificationLevel": "PUBLIC",
+    "redactionConfirmation": true
+  }
+]

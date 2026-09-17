@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 import Stripe from "stripe";
 
 /**
@@ -15,6 +17,7 @@ export type StripeCheckoutLineItem = {
     currency?: string;
     product_data?: {
       name?: string;
+      description?: string;
     };
     unit_amount?: number;
   };
@@ -36,6 +39,7 @@ export type StripeCheckoutSessionCreateParams = {
   success_url?: string;
   cancel_url?: string;
   customer_email?: string | null;
+  idempotencyKey?: string;
 };
 
 export type StripeCheckoutSession = {
@@ -49,6 +53,24 @@ export type StripeCheckoutSession = {
   metadata: Record<string, string>;
   success_url: string;
   cancel_url: string;
+};
+
+export type StripeRefundCreateParams = {
+  payment_intent: string;
+  amount: number;
+  currency: string;
+  reason: "requested_by_customer";
+  metadata?: Record<string, string | number | boolean | null | undefined>;
+  idempotencyKey: string;
+};
+
+export type StripeRefund = {
+  id: string;
+  status: string;
+  amount: number;
+  currency: string;
+  payment_intent: string | null;
+  metadata: Record<string, string>;
 };
 
 export type StripeRuntimeMode = "stub" | "live";
@@ -123,6 +145,7 @@ async function createLiveCheckoutSession(
             currency: item.price_data.currency ?? "usd",
             product_data: {
               name: item.price_data.product_data?.name ?? "Furlong purchase",
+              description: item.price_data.product_data?.description,
             },
             unit_amount: item.price_data.unit_amount ?? 0,
           }
@@ -140,7 +163,7 @@ async function createLiveCheckoutSession(
     success_url: params.success_url ?? "http://localhost:3000/success",
     cancel_url: params.cancel_url ?? "http://localhost:3000/dashboard",
     customer_email: params.customer_email ?? undefined,
-  });
+  }, params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : undefined);
 
   return {
     id: session.id,
@@ -164,8 +187,12 @@ async function createStubCheckoutSession(
   const successUrl = params.success_url ?? "http://localhost:3000/success";
   const cancelUrl = params.cancel_url ?? "http://localhost:3000/dashboard";
 
+  const stubId = params.idempotencyKey
+    ? createHash("sha256").update(params.idempotencyKey).digest("hex").slice(0, 24)
+    : String(Date.now());
+
   return {
-    id: `stub_checkout_session_${Date.now()}`,
+    id: `stub_checkout_session_${stubId}`,
     url: successUrl,
     mode: params.mode ?? "payment",
     payment_method_types: params.payment_method_types ?? ["card"],
@@ -175,6 +202,52 @@ async function createStubCheckoutSession(
     metadata: normalizeMetadata(params.metadata),
     success_url: successUrl,
     cancel_url: cancelUrl,
+  };
+}
+
+async function createLiveRefund(
+  params: StripeRefundCreateParams
+): Promise<StripeRefund> {
+  const sdk = stripeSdk();
+  const refund = await sdk.refunds.create({
+    payment_intent: params.payment_intent,
+    amount: params.amount,
+    reason: params.reason,
+    metadata: normalizeMetadata(params.metadata),
+  }, { idempotencyKey: params.idempotencyKey });
+
+  return {
+    id: refund.id,
+    status: refund.status ?? "unknown",
+    amount: refund.amount,
+    currency: refund.currency,
+    payment_intent:
+      typeof refund.payment_intent === "string"
+        ? refund.payment_intent
+        : refund.payment_intent?.id ?? null,
+    metadata: Object.fromEntries(
+      Object.entries(refund.metadata ?? {}).map(([key, value]) => [
+        key,
+        value ?? "",
+      ])
+    ),
+  };
+}
+
+async function createStubRefund(
+  params: StripeRefundCreateParams
+): Promise<StripeRefund> {
+  const stubId = createHash("sha256")
+    .update(params.idempotencyKey)
+    .digest("hex")
+    .slice(0, 24);
+  return {
+    id: `stub_refund_${stubId}`,
+    status: "succeeded",
+    amount: params.amount,
+    currency: params.currency,
+    payment_intent: params.payment_intent,
+    metadata: normalizeMetadata(params.metadata),
   };
 }
 
@@ -270,6 +343,18 @@ export const stripe = {
         assertStripeCheckoutAvailable();
         return createStubCheckoutSession(params);
       },
+    },
+  },
+  refunds: {
+    create: async (
+      params: StripeRefundCreateParams
+    ): Promise<StripeRefund> => {
+      if (stripeConfiguredForLivePayments()) {
+        return createLiveRefund(params);
+      }
+
+      assertStripeCheckoutAvailable();
+      return createStubRefund(params);
     },
   },
   identity: {

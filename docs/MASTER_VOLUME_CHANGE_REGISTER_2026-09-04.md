@@ -76,6 +76,7 @@ Source implementation now adds the durable customer-controlled Furlong Case, app
 The **canonical source schema target is now `0062`**. The controlled staging/testing database remains at the previously promoted `0057` state until migrations `0058`, `0059`, `0060`, `0061` and `0062` complete governed migration and deployed verification. This register therefore distinguishes source-build parity from environment promotion and does not represent the new persistence as deployed yet.
 
 Additional standing proof:
+
 - `npm run verify:furlong-vision`
 - `npm run verify:managed-provider-handoff`
 - `npm run verify:furlong-case`
@@ -87,3 +88,37 @@ Production security claims remain evidence-gated: architecture alone is not unre
 ## 2026-09-08: recognizable answer and private customer journey
 
 Owner approval: “Agreed make it happen,” referring to the eight customer-experience recommendations. See `MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md`, `customer-experience-release.json` and `runbooks/FURLONG_ORGANIZATIONAL_PILOT_2026-09-08.md`. This extends, rather than certifies, the earlier source-build work. The new shared answer, private case UI, owner checks, versioned/audited personal export, explicit comparison, practical guides and bounded commercial positioning are tracked independently from production promotion and paid adoption. Historical PDFs remain unchanged.
+
+## 2026-09-16: public property-report commerce
+
+**Change ID:** MASTER-PUBLIC-REPORT-COMMERCE-2026-09-16
+**Authority:** `MASTER_VOLUME_AMENDMENT_2026-09-16_PUBLIC_REPORT_COMMERCE.md`
+
+The owner approved one useful free Property Snapshot, one proposed $49
+automated Property Report, and one proposed $249 base-scope human-reviewed
+Property Decision Report. This scoped amendment supersedes older wording that
+made every depth of public property analysis free. Financing access, provider
+comparison, exact-recipient sharing, neutrality, and lender decision authority
+remain free from pay-to-access, pay-to-rank, or outcome-based influence.
+
+The public catalog, neutral smallest-sufficient recommendation, exact scope
+agreement, Stripe/refund/dispute order controls, single-use same-property
+30-day upgrade credit, and separately scoped professional-services intake now
+exist in source. Both paid products remain closed. The automated product also
+fails before payment unless a server-verified immutable artifact reference,
+SHA-256 digest, and generation time exist.
+
+The canonical source schema target is now `0065`: migration `0063` adds
+property comparisons, `0064` adds public orders and immutable order events,
+and `0065` adds the single-use upgrade-credit relationship. No environment
+promotion is implied. The current blockers and acceptance matrix are recorded
+in `docs/runbooks/PUBLIC_ORDER_PAYMENT_REFUND_READINESS.md`.
+
+The supervised Decision Report source now adds direct-to-private-storage PDF
+upload, exact size and SHA-256 reconciliation, malware and PDF structural
+verification, verified-artifact completion, order-token customer download, and
+download/refund/dispute access evidence. Live state inspected on 2026-09-16
+remains 100 percent on `furlong-core-access-main-0908`, with
+`furlong-core-coherence-8b1a348` behind the `testing` tag; neither revision
+contains this source. The delivery path is therefore source-implemented but not
+deployed or customer-certified. Both sales paths remain closed.

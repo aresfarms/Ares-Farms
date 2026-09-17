@@ -48,6 +48,42 @@ Every business-purpose property report should strive to show, in this order:
 8. Financing-path comparison across the program families actually relevant to the property.
 9. Execution risks and next evidence needed to turn a screen into a decision-ready package.
 
+## Canonical three-candidate decision and controlled vision rule
+
+Every property evaluation must independently preserve three decision candidates:
+
+1. the strongest supported single-enterprise configuration;
+2. the strongest supported mixed-use or whole-parcel configuration; and
+3. the customer's selected vision.
+
+Candidate type and customer preference must never predetermine final rank. Furlong ranks the three from the same property, market, cost, lifecycle, environmental, zoning, engineering, and property/project financing evidence. When the customer selects no vision, the third position becomes the strongest materially distinct alternative. When a vision duplicates the best single or mixed result, the duplicate is consolidated and replaced with the strongest materially distinct supported alternative. Furlong must not invent a third option when fewer than three survive the evidence and feasibility gates.
+
+The standard customer workflow must not accept unrestricted free-form concepts into automated ranking. After property resolution and preliminary supportability screening, it offers only property-generated candidate uses plus a no-preference choice. An unlisted idea routes to a separately scoped Custom Concept Review and enters the ranking only after independent feasibility classification.
+
+Every candidate keeps two conclusions separate: property/project economic rank and property/project financing-program fit. Borrower eligibility, personal creditworthiness, lender overlays, and final approval are not evaluated by the property ranking and remain with the authorized lender or program authority.
+
+## Multi-property comparison intake rule
+
+The public entrance must offer two explicit property-led paths: investigate one property or compare a list. A comparison accepts 1–1,000 submitted addresses, an optional exclusion list, and a customer-selected result count of 1–5. Intake parsing must normalize line prefixes, remove duplicates, and apply exclusions before any work is scheduled.
+
+A submitted list is not a ranked portfolio. Every retained property must independently pass address/parcel verification and the same evidence, feasibility, lifecycle-cost, enterprise-ranking, and financing-fit workflow used for a single property. Only comparable completed results may enter cross-property ranking. The system must preserve failed, excluded, incomplete, and unverifiable properties with explicit statuses and must never manufacture a top result from unprocessed addresses.
+
+The durable model is one customer-controlled parent comparison case with child property analyses, not a second unrelated case system and not 1,000 synchronous calls through the single-property public endpoint.
+
+Cross-property ranking is a net-profit comparison, not a reuse of the preliminary property-fit score. A property may enter ranking only when its best single enterprise, best mixed-use configuration, and customer vision or distinct alternative have been independently tested; property-specific or source-supported revenue and operating costs are present; payroll, benefits, health insurance, retirement, utilities, insurance, tax, maintenance, replacement reserve, marketing, materials, professional fees, inflation, debt service, and periodic capital costs are explicit; environmental, zoning, engineering, and market feasibility are resolved; total project cost and property/project DSCR are calculable; and the evidence confidence floor is met. Scenario-only figures are never eligible.
+
+The comparison output reports first-year monthly, quarterly, and annual net after debt and scheduled capital costs, cumulative 5-, 10-, and 30-year net, and annual outside-income shortfall when the enterprise cannot support itself. Revenue growth and every expense-inflation rate must be explicit inputs. If any retained property is still processing, no ranking is released. If completed properties lack material evidence, Furlong identifies the gaps and returns fewer than the requested 1–5 rather than filling the list with unsupported choices.
+
+## Paid economic evidence package rule
+
+No enterprise candidate may enter a paid property or cross-property profitability ranking from a generic template, an unreviewed source capture, a stale record, or a customer estimate presented as fact. Every candidate requires a versioned, CONFIDENTIAL economic evidence package with trace and replay references. Every relied-upon source must preserve its authority tier, jurisdiction, reference, as-of and capture timestamps, freshness window, review state, permitted-use state, content hash, and replay reference.
+
+The package must resolve property identity, current and advertised use, acquisition price, physical and legal suitability, environmental and engineering feasibility, market demand, competition, revenue, labor, benefits, operating costs, insurance, property tax, capital costs, financing, grants/incentives, and inflation. Not-applicable findings still require a sourced determination; absence is not evidence of non-applicability.
+
+Revenue, every operating-cost category, every inflation rate, purchase and conversion costs, equipment, working capital, periodic replacement capital, owner labor, employee count, loan amount, rate, amortization, term, and project-side cash assumption must be explicit. Benefits must exclude health-insurance and retirement amounts; maintenance must exclude replacement reserve; and periodic capital must not duplicate annual reserves. Mixed-use packages must identify at least two distinct components and pass a no-double-counting review.
+
+Customer assumptions remain visible for sensitivity and vision testing, but they make the candidate scenario-only and ineligible for paid ranking until replaced or corroborated by permitted, current evidence. Identified or conditional grants are pathways, not base-case capital; only verified other capital may balance the financed project stack. A fully supported blocked constraint is a completed negative finding, not an evidence failure, and must remain eligible to produce a clear no-go explanation.
+
 ## Furlong Property Estimate — type-aware valuation rule
 
 Furlong must **not** use one universal estimate formula across residential, farm, commercial, hospitality and land. The valuation method must follow the asset class and the evidence actually available.
@@ -106,6 +142,10 @@ Research basis reviewed 2026-09-04:
 - `src/lib/property/commercialConversionIntelligence.ts`
 - `src/lib/property/commercialUseModel.ts`
 - `src/lib/property/marketValueIndication.ts`
+- `src/lib/intelligence/enterpriseProjection.ts`
+- `src/lib/intelligence/economicEvidencePackage.ts`
+- `src/lib/intelligence/propertyComparisonRanking.ts`
+- `src/scripts/verifyEconomicEvidencePackage.ts`
 - `src/lib/property/stateHpiGenerated.ts`
 - `src/lib/property/stateFarmlandGenerated.ts`
 - `src/components/property/lanes/FinanceAnalysisPanel.tsx`

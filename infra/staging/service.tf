@@ -47,6 +47,26 @@ resource "google_cloud_run_v2_service" "core" {
       )
       error_message = "Production must not carry the staging founder testing lane or any direct invoker principals."
     }
+
+    precondition {
+      condition = !var.public_property_report_sales_enabled || (
+        var.stripe_payments_enabled &&
+        var.stripe_webhook_enabled &&
+        var.public_property_report_artifact_delivery_enabled &&
+        var.public_property_report_max_open_orders >= 1
+      )
+      error_message = "Public Property Report sales require Stripe payments, signed webhook ingress, verified immutable-artifact delivery, and positive automated-order capacity."
+    }
+
+    precondition {
+      condition = !var.public_decision_report_sales_enabled || (
+        var.stripe_payments_enabled &&
+        var.stripe_webhook_enabled &&
+        var.public_decision_report_delivery_business_days >= 1 &&
+        var.public_decision_report_max_open_orders >= 1
+      )
+      error_message = "Public Property Decision Report sales require Stripe payments, signed webhook ingress, a definite delivery window, and positive supervised-order capacity."
+    }
   }
 
   # Caitlin's authenticated direct testing lane remains open in staging until
@@ -310,6 +330,36 @@ resource "google_cloud_run_v2_service" "core" {
             }
           }
         }
+      }
+
+      env {
+        name  = "FURLONG_PUBLIC_PROPERTY_REPORT_SALES_ENABLED"
+        value = tostring(var.public_property_report_sales_enabled)
+      }
+
+      env {
+        name  = "FURLONG_PROPERTY_REPORT_ARTIFACT_DELIVERY_ENABLED"
+        value = tostring(var.public_property_report_artifact_delivery_enabled)
+      }
+
+      env {
+        name  = "FURLONG_PROPERTY_REPORT_MAX_OPEN_ORDERS"
+        value = tostring(var.public_property_report_max_open_orders)
+      }
+
+      env {
+        name  = "FURLONG_PUBLIC_DECISION_REPORT_SALES_ENABLED"
+        value = tostring(var.public_decision_report_sales_enabled)
+      }
+
+      env {
+        name  = "FURLONG_DECISION_REPORT_DELIVERY_BUSINESS_DAYS"
+        value = tostring(var.public_decision_report_delivery_business_days)
+      }
+
+      env {
+        name  = "FURLONG_DECISION_REPORT_MAX_OPEN_ORDERS"
+        value = tostring(var.public_decision_report_max_open_orders)
       }
 
       dynamic "env" {

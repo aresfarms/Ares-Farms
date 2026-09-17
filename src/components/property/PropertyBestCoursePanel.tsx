@@ -397,7 +397,7 @@ export function PropertyBestCoursePanel({
         {scenarioRankingPlan.scenarios.map((scenario, index) => (
           <article key={scenario.id} style={{ display: "grid", gap: 7, border: "1px solid #e1e7ef", borderRadius: 12, padding: "14px 15px", background: index === 0 ? "#f2fbf8" : "#fafbfd" }}>
             <span style={{ fontSize: 11, fontWeight: 800, color: index === 0 ? "#0f766e" : "#607086", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-              {index === 0 ? "Rank 1 · leading course" : `Rank ${index + 1}`}
+              {index === 0 ? "Rank 1 · leading course" : `Rank ${index + 1}`} · {scenario.candidateRole.replace(/-/g, " ")}
             </span>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "baseline" }}>
               <strong style={{ fontSize: 16, color: "#162033", lineHeight: 1.3 }}>{scenario.title}</strong>

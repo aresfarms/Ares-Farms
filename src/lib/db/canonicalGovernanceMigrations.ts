@@ -87,6 +87,9 @@ export const CANONICAL_GOVERNANCE_MIGRATION_FILES = [
   "0060_furlong_case_living_record_upgrade.sql",
   "0061_capital_network_published_credit_box.sql",
   "0062_identity_verifications.sql",
+  "0063_furlong_property_comparisons.sql",
+  "0064_furlong_public_orders.sql",
+  "0065_public_order_upgrade_credit.sql",
 ] as const;
 
 /** Directory holding the canonical governance migration SQL files. */

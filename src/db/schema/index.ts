@@ -98,6 +98,8 @@ export * from "./partnerWorkflows";
 export * from "./paymentConnectorAdapters";
 export * from "./paymentConnectorExecutions";
 export * from "./plaidSecureData";
+export * from "./propertyComparisons";
+export * from "./publicOrders";
 export * from "./identityVerifications";
 export * from "./pipeline";
 export * from "./regulatedDecisionNotices";

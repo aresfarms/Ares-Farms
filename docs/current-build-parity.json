@@ -1,8 +1,8 @@
 {
-  "mirrorId": "master-volume-current-build-parity-v1.1.0",
-  "effectiveDate": "2026-09-05",
+  "mirrorId": "master-volume-current-build-parity-v1.3.0",
+  "effectiveDate": "2026-09-16",
   "controllingAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-04_CURRENT_BUILD_PARITY.md",
-  "canonicalSchemaTarget": "0062",
+  "canonicalSchemaTarget": "0065",
   "capitalNetwork": {
     "runtimeVersion": "capital-network-runtime-v1.1.0",
     "sellsBorrowerLeads": false,
@@ -108,14 +108,16 @@
   },
   "customerEconomics": {
     "borrowerCoreDirectFree": true,
+    "freeCoreMeansSnapshotAndFinancingAccessNotEveryAnalysisDepth": true,
     "freeCore": [
-      "property-analysis",
+      "property-snapshot",
       "financing-readiness",
       "verified-provider-comparison",
       "customer-controlled-case",
       "exact-recipient-case-room-handoff",
       "closing-status-through-keys-logbook"
     ],
+    "propertyAnalysisDepthMayBePaid": true,
     "institutionFundedPrimaryModel": true,
     "leadSale": false,
     "fileAuction": false,
@@ -124,6 +126,26 @@
     "successPercentage": false,
     "transactionPercentage": false,
     "customerDataSale": false
+  },
+  "publicReportCommerce": {
+    "amendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-16_PUBLIC_REPORT_COMMERCE.md",
+    "catalogVersion": "furlong-public-product-catalog-v2.0.0",
+    "freeSnapshot": true,
+    "propertyReportProposedCents": 4900,
+    "decisionReportBaseProposedCents": 24900,
+    "monthlySubscriptionAuthorized": false,
+    "neutralSmallestSufficientRecommendation": true,
+    "samePropertyUpgradeCreditCents": 4900,
+    "upgradeCreditValidDays": 30,
+    "professionalServicesSeparatelyScoped": true,
+    "automatedArtifactRequiredBeforePayment": true,
+    "decisionReportSecureArtifactDeliverySourceImplemented": true,
+    "decisionReportDeployedEndToEndVerified": false,
+    "observedProductionRevision": "furlong-core-access-main-0908",
+    "observedTestingRevision": "furlong-core-coherence-8b1a348",
+    "deployedStateObservedAt": "2026-09-16",
+    "salesActivated": false,
+    "cloudDeploymentVerified": false
   },
   "livingCase": {
     "runtimeVersion": "furlong-case-v1.0.0",
@@ -164,7 +186,10 @@
       "0059",
       "0060",
       "0061",
-      "0062"
+      "0062",
+      "0063",
+      "0064",
+      "0065"
     ]
   },
   "platformExperienceEconomicsAmendment": "docs/MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",

@@ -41,6 +41,7 @@ export type ServiceRequestType =
   | "environmental_report_order"
   | "financing_deal_intake"
   | "professional_credential_verification_request"
+  | "professional_services_scope_request"
   | "stripe_connect_account_onboarding";
 
 /**
@@ -58,7 +59,11 @@ export const FINANCING_DEAL_STATUSES: ReadonlyArray<{
     status: "SUBMITTED_PENDING_REVIEW",
     customerLabel: "Received — awaiting Capital Desk review",
   },
-  { status: "IN_LENDER_REVIEW", customerLabel: "In review with the Capital Desk / assigned finance provider" },
+  {
+    status: "IN_LENDER_REVIEW",
+    customerLabel:
+      "In review with the Capital Desk / assigned finance provider",
+  },
   {
     status: "DOCUMENTS_REQUESTED",
     customerLabel: "Documents requested — use your secure upload link",

@@ -1,8 +1,8 @@
 {
   "registryId": "current-master-volume-registry",
-  "generatedAt": "2026-09-05T18:30:00Z",
+  "generatedAt": "2026-09-16T00:00:00Z",
   "repository": "ares-farms",
-  "activeBuildDate": "2026-09-05",
+  "activeBuildDate": "2026-09-16",
   "controllingRule": "This registry is the machine-readable current-version pointer for build verification. The doctrine truth mirror requires an authoritative source, explicit platform status, existing evidence files, registered verification commands, and a reconciliation basis for every canonical doctrine. Later scoped amendments registered here control over conflicting older wording within their stated scope, while historical files remain preserved as versioned evidence. Mirror certification means documentation and platform state agree; it does not imply every doctrine is deployed, live, externally validated, certified, or production-authorized.",
   "documents": [
     {
@@ -129,6 +129,13 @@
       "governingVersion": "v1.0 - 2026-09-08 owner-approved scoped implementation",
       "file": "MASTER_VOLUME_AMENDMENT_2026-09-08_CUSTOMER_EXPERIENCE.md",
       "note": "Source implementation; promotion and certification remain separately gated."
+    },
+    {
+      "key": "publicReportCommerce20260916",
+      "label": "Public Property Report Commerce",
+      "governingVersion": "v1.1 - 2026-09-16 controlling scoped amendment",
+      "file": "MASTER_VOLUME_AMENDMENT_2026-09-16_PUBLIC_REPORT_COMMERCE.md",
+      "note": "Controls the free Snapshot, proposed $49 automated Property Report, proposed $249 base-scope human-reviewed Decision Report, neutral recommendation, upgrade credit, secure supervised artifact delivery, professional-services separation, and fail-closed activation."
     }
   ],
   "supportingDocuments": [
@@ -145,7 +152,8 @@
     "COMMERCIAL_FINANCE_EXPANSION_STEPS_2_5_2026-09-04.md",
     "OWNER_CONTROLLED_PLATFORM_TRANSITION_2026-09-03.md",
     "MASTER_VOLUME_CHANGE_REGISTER_2026-09-04.md",
-    "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md"
+    "MASTER_VOLUME_AMENDMENT_2026-09-05_PLATFORM_EXPERIENCE_ECONOMICS.md",
+    "MASTER_VOLUME_AMENDMENT_2026-09-16_PUBLIC_REPORT_COMMERCE.md"
   ],
   "repositoryEvidence": [
     "docs/MASTER_VOLUME_SOURCE_SNAPSHOT.md",
@@ -243,11 +251,24 @@
     "docs/runbooks/FURLONG_ORGANIZATIONAL_PILOT_2026-09-08.md",
     "src/lib/property/furlongAnswer.ts",
     "src/lib/intelligence/furlongAnswerExport.ts",
-    "src/scripts/customerExperienceConformance.ts"
+    "src/scripts/customerExperienceConformance.ts",
+    "docs/MASTER_VOLUME_AMENDMENT_2026-09-16_PUBLIC_REPORT_COMMERCE.md",
+    "docs/runbooks/PUBLIC_ORDER_PAYMENT_REFUND_READINESS.md",
+    "src/lib/billing/publicProductCatalog.ts",
+    "src/lib/billing/propertyDecisionReportRecommendation.ts",
+    "src/lib/billing/publicOrderStore.ts",
+    "src/lib/billing/publicOrderReportArtifact.ts",
+    "src/app/api/internal/public-orders/report-artifact/route.ts",
+    "src/app/api/public/purchases/[orderId]/report/route.ts",
+    "src/lib/db/migrations/0063_furlong_property_comparisons.sql",
+    "src/lib/db/migrations/0064_furlong_public_orders.sql",
+    "src/lib/db/migrations/0065_public_order_upgrade_credit.sql",
+    "src/scripts/verifyPublicReportCommerce.ts",
+    "src/scripts/verifyPublicOrderBilling.ts"
   ],
   "buildBinding": {
     "branch": "master",
-    "canonicalSchemaTarget": "0062",
+    "canonicalSchemaTarget": "0065",
     "capitalNetworkRuntimeVersion": "capital-network-runtime-v1.1.0",
     "capitalNetworkReliabilityVersion": "capital-network-execution-reliability-v1.0.0",
     "parityMirror": "docs/current-build-parity.json",
@@ -262,6 +283,8 @@
     "furlongVisionVersion": "furlong-vision-v1.0.0",
     "furlongCaseVersion": "furlong-case-v1.0.0",
     "managedProviderHandoff": "source-implemented; database promotion pending migrations 0058-0062",
-    "customerExperienceSupplement": "docs/customer-experience-release.json"
+    "customerExperienceSupplement": "docs/customer-experience-release.json",
+    "publicReportCommerceSupplement": "docs/MASTER_VOLUME_AMENDMENT_2026-09-16_PUBLIC_REPORT_COMMERCE.md",
+    "publicPaidReportActivation": "source-implemented; sales flags false; supervised artifact delivery source added; automated artifact, price, payment, deployment, browser, legal, and security proof pending"
   }
 }

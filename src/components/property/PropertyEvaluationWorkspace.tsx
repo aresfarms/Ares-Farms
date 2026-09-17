@@ -1,6 +1,9 @@
 "use client";
 
-import { annualLevelDebtService, transactionPrice } from "@/lib/property/calculationMath";
+import {
+  annualLevelDebtService,
+  transactionPrice,
+} from "@/lib/property/calculationMath";
 
 import type { MarketValueIndication } from "@/lib/property/marketValueIndication";
 
@@ -16,6 +19,8 @@ import { CustomerJourneyBar } from "@/components/borrower/CustomerJourneyBar";
 import { SavedDraftsRail } from "@/components/property/SavedDraftsRail";
 import { ReportTokenReturn } from "@/components/property/ReportTokenReturn";
 import { PropertyImportLaunchpadEmbedded } from "@/components/property/PropertyImportLaunchpad";
+import { PropertyDecisionRankingPanel } from "@/components/property/PropertyDecisionRankingPanel";
+import { PropertyReportOfferPanel } from "@/components/property/PropertyReportOfferPanel";
 import type { SimilarHomeLine } from "@/components/property/ChartTableBrief";
 import { FarmLaneWorkspace } from "@/components/property/lanes/FarmLaneWorkspace";
 import { FarmAgricultureTab } from "@/components/property/lanes/FarmAgricultureTab";
@@ -309,19 +314,19 @@ const REPORT_TIER_OPTIONS: Array<{
   {
     id: "free",
     label: reportPolicy.free.name,
-    shortLabel: "Free tier",
+    shortLabel: "Free snapshot",
     description: reportPolicy.free.description,
   },
   {
     id: "paid",
     label: reportPolicy.paid.name,
-    shortLabel: "Institution tier",
+    shortLabel: "$49 one-time",
     description: reportPolicy.paid.description,
   },
   {
     id: "environmental",
     label: reportPolicy.environmental.name,
-    shortLabel: "Environmental tier",
+    shortLabel: "$249 reviewed",
     description: reportPolicy.environmental.description,
   },
 ];
@@ -347,33 +352,34 @@ function buildTierAccessMap(previewMode: boolean): TierAccessMap {
     free: {
       unlocked: true,
       badge: "Included",
-      detail: "Baseline readiness stays visible and exportable.",
+      detail:
+        "Known facts, warnings, uncertainty, and the next action stay visible.",
     },
     paid: previewMode
       ? {
           unlocked: true,
           badge: "Testing unlock",
           detail:
-            "Institutional coordination content is visible during testing and can be re-locked later by flipping one flag.",
+            "The automated Property Report is visible in controlled testing only.",
         }
       : {
           unlocked: false,
           badge: "Locked",
           detail:
-            "Institutional coordination content is framework-ready but hidden until the premium access switch is turned on.",
+            "The automated Property Report stays locked until payment, artifact delivery, and price gates are verified.",
         },
     environmental: previewMode
       ? {
           unlocked: true,
           badge: "Testing unlock",
           detail:
-            "Environmental readiness content is visible during testing and can be re-locked later by flipping one flag.",
+            "The human-reviewed Property Decision Report is visible in controlled testing only.",
         }
       : {
           unlocked: false,
           badge: "Locked",
           detail:
-            "Environmental documentation readiness is framework-ready but hidden until the premium access switch is turned on.",
+            "The Property Decision Report stays locked until payment and supervised-fulfillment gates are verified.",
         },
   };
 }
@@ -1029,9 +1035,9 @@ function buildPropertyFirstProgramRanking(args: {
           ? "Primary agricultural production can be restricted; confirm a qualifying rural business purpose before treating B&I as a viable lane."
           : /fsa|farm credit/.test(name)
             ? "Weakens quickly if the use is mostly hospitality or non-farm commercial; borrower and operator eligibility still require separate review."
-          : /reap/.test(name)
-            ? "Should not be mistaken for a full capital-stack answer."
-            : "Needs rule and document review before reliance.";
+            : /reap/.test(name)
+              ? "Should not be mistaken for a full capital-stack answer."
+              : "Needs rule and document review before reliance.";
 
       return {
         program,
@@ -1930,10 +1936,12 @@ function buildHumanReviewBoundary(args: {
   const lines = [
     "This export is advisory only and cannot be used as an approval, eligibility decision, underwriting determination, financing commitment, permit filing, legal opinion, or regulatory record.",
     args.tier.id === "free"
-      ? "The baseline report is meant for exploration and self-organization, not decision-grade reliance."
-      : `${args.tier.label} still requires named human review before anyone treats it as decision-grade.`,
+      ? "The snapshot is meant for orientation, not decision-grade reliance."
+      : args.tier.id === "paid"
+        ? "The Property Report is automated and not human-reviewed; treat its calculations as preliminary until the evidence is independently confirmed."
+        : "The Property Decision Report includes named human review, but remains advisory and evidence-scoped.",
     args.answers.reportTier === "environmental"
-      ? "Environmental observations remain planning support only until an independent licensed professional reviews the file."
+      ? "The Decision Report is human-reviewed, but field investigations, laboratory work, official environmental reports, and stamped plans remain separate professional engagements."
       : "Program and pathway signals remain planning support only until human review confirms missing facts and constraints.",
   ];
 
@@ -2674,7 +2682,9 @@ export function PropertyEvaluationWorkspace({
     useState<PropertyProfileId | null>(null);
   const [facts, setFacts] = useState<PropertyFactsResponse | null>(null);
   const [factsLoading, setFactsLoading] = useState(false);
-  const effectiveListedPrice = transactionPrice(facts?.propertyRecord?.price) ?? transactionPrice(listedPrice);
+  const effectiveListedPrice =
+    transactionPrice(facts?.propertyRecord?.price) ??
+    transactionPrice(listedPrice);
   // A value screen is not a transaction price. No assessment, AVM, midpoint or state-average substitution.
   const residentialBasisPrice = effectiveListedPrice;
   const residentialBasisNote = null;
@@ -3638,7 +3648,8 @@ export function PropertyEvaluationWorkspace({
       facts?.propertyRecord?.acreageText ||
       (analysisContext.propertyType && !genericImportedType),
     );
-  const propertyClassificationAvailable = automaticTypeEvidenceAvailable || profileOverride !== null;
+  const propertyClassificationAvailable =
+    automaticTypeEvidenceAvailable || profileOverride !== null;
   // The county assessment record's land-use / building style IS a property-type
   // signal — it was fetched but never classified (founder-caught 2026-08-06:
   // "why can't we automatically tell what type of property this is?"). Use it
@@ -3768,7 +3779,7 @@ export function PropertyEvaluationWorkspace({
     {
       title:
         answers.reportTier === "environmental"
-          ? "Environmental and site-side criteria"
+          ? "Decision conditions, environmental posture, and site-side criteria"
           : "Property-side criteria and external flags",
       lines: report.verifiedCriteria,
     },
@@ -4089,7 +4100,9 @@ export function PropertyEvaluationWorkspace({
           const rate =
             ownershipContext.fsa?.ownershipDirectPct ??
             ownershipContext.rates.rate30;
-          const annualDebtService = annualLevelDebtService(effectiveListedPrice * 0.8, rate, 40, 12) ?? 0;
+          const annualDebtService =
+            annualLevelDebtService(effectiveListedPrice * 0.8, rate, 40, 12) ??
+            0;
           const model = optimizeAgriculturalOpportunities({
             acres: acreage,
             purchasePrice: effectiveListedPrice,
@@ -4105,12 +4118,12 @@ export function PropertyEvaluationWorkspace({
             `$${Math.round(value).toLocaleString("en-US")}`;
           return {
             scopeLine: `${acreage.toLocaleString("en-US", { maximumFractionDigits: 2 })} acres screened at ${dollars(effectiveListedPrice)} across agricultural, livestock, specialty-crop, controlled-environment, renewable-energy, storage, leasing, and diversified-use candidates. Rankings are assumptions until site and operator evidence is attached.`,
-            acreageRows: model.ranked
-              .slice(0, 8)
-              .map((item, index) => ({
-                label: `${index + 1}. ${item.label}`,
-                value: item.eligible ? dollars(item.noi) + " illustrative annual NOI" : "Site-specific field allocation and operating evidence pending",
-              })),
+            acreageRows: model.ranked.slice(0, 8).map((item, index) => ({
+              label: `${index + 1}. ${item.label}`,
+              value: item.eligible
+                ? dollars(item.noi) + " illustrative annual NOI"
+                : "Site-specific field allocation and operating evidence pending",
+            })),
             operatingRows: model.diversified.length
               ? model.diversified.map((item) => ({
                   label: `${Math.round(item.portfolioShare * 100)}% ${item.label}`,
@@ -4130,7 +4143,9 @@ export function PropertyEvaluationWorkspace({
               },
               {
                 label: "Whole-parcel operating NOI",
-                value: model.diversified.length ? dollars(model.portfolioNoi) : "Operating evidence pending",
+                value: model.diversified.length
+                  ? dollars(model.portfolioNoi)
+                  : "Operating evidence pending",
               },
               {
                 label: "Diversified DSCR",
@@ -4375,8 +4390,7 @@ export function PropertyEvaluationWorkspace({
         : workspaceProfile.id === "residential"
           ? "residential"
           : "commercial";
-    const screeningPrice =
-      effectiveListedPrice;
+    const screeningPrice = effectiveListedPrice;
     let noiAnnual: number | null = null;
     let noiBasis: string | null = null;
     // Commercial: model income per candidate use (founder 2026-08-05 — the
@@ -4409,8 +4423,10 @@ export function PropertyEvaluationWorkspace({
       ownershipContext?.fsa?.ownershipDirectPct ??
       ownershipContext?.rates.rate30 ??
       6.5;
-    const farmDebtService = screeningPrice != null
-      ? annualLevelDebtService(screeningPrice * 0.8, farmRate, 40, 12) ?? 0 : 0;
+    const farmDebtService =
+      screeningPrice != null
+        ? (annualLevelDebtService(screeningPrice * 0.8, farmRate, 40, 12) ?? 0)
+        : 0;
     // Automatic findings require reviewed property evidence. Generic enterprise
     // budgets are available only in the explicitly labeled what-if tool.
     const farmUseScreen =
@@ -4430,7 +4446,8 @@ export function PropertyEvaluationWorkspace({
                 ? Math.max(
                     30,
                     90 -
-                      effectivePlaceIntelligence.soilProfile.capabilityClass * 10,
+                      effectivePlaceIntelligence.soilProfile.capabilityClass *
+                        10,
                   )
                 : 50,
           })
@@ -4456,10 +4473,15 @@ export function PropertyEvaluationWorkspace({
     const ctx: ProgramFitContext = {
       laneId,
       screeningPrice,
-      priceBasis: facts?.propertyRecord?.price != null && facts.propertyRecord.price === screeningPrice
-        ? `Current asking price: ${facts.propertyRecord.listingSourceName ?? "matched property record"}; observed ${facts.propertyRecord.listingSourceAsOf ?? "date unavailable"}`
-        : "Entered transaction price or intended offer; not an appraisal or tax assessment",
-      rateAsOf: { mortgage: ownershipContext?.rates.weekOf ?? null, fsaDirect: ownershipContext?.fsa?.effective ?? null },
+      priceBasis:
+        facts?.propertyRecord?.price != null &&
+        facts.propertyRecord.price === screeningPrice
+          ? `Current asking price: ${facts.propertyRecord.listingSourceName ?? "matched property record"}; observed ${facts.propertyRecord.listingSourceAsOf ?? "date unavailable"}`
+          : "Entered transaction price or intended offer; not an appraisal or tax assessment",
+      rateAsOf: {
+        mortgage: ownershipContext?.rates.weekOf ?? null,
+        fsaDirect: ownershipContext?.fsa?.effective ?? null,
+      },
       noiAnnual,
       noiBasis,
       rates: {
@@ -4469,58 +4491,73 @@ export function PropertyEvaluationWorkspace({
       },
       usdaRural: effectivePlaceIntelligence?.usdaRural ?? null,
     };
-    const scenarios: PropertyUseScenario[] = laneId === "commercial"
-      ? (useScreen?.uses ?? []).map((use, index) => ({
-          id: "commercial-" + index,
-          label: use.use,
-          noiAnnual: use.noiMid,
-          noiLow: use.noiLow,
-          noiHigh: use.noiHigh,
-          basis: use.use + " at the disclosed square-foot screening assumptions",
-          evidenceStatus: use.financialModelAvailable && use.noiMid != null ? "screening" : "needs-evidence",
-          timeToIncome: use.conversion?.endToEndMonths
-            ? use.conversion.endToEndMonths.low + "–" + use.conversion.endToEndMonths.high + " months"
-            : null,
-        }))
-      : laneId === "farm"
-        ? farmUseScreen
-          ? [
-              {
-                id: "farm-parcel-portfolio",
-                label: "Diversified whole-parcel agricultural portfolio",
-                noiAnnual: farmCoverageReady ? farmPortfolio?.modeledNoiAnnual ?? null : null,
-                basis:
-                  farmPortfolio?.basis ??
-                  "Whole-parcel source-backed operating budget pending",
-                evidenceStatus: farmCoverageReady ? "supported" as const : "needs-evidence" as const,
-                timeToIncome: null,
-              },
-              ...farmUseScreen.ranked.slice(0, 8).map((option, index) => ({
-                id: "farm-option-" + index,
-                label: option.label,
-                noiAnnual: option.eligible ? option.noi : null,
-                basis:
-                  `${option.note} Field allocation, timing and operating economics remain evidence-pending.`,
-                evidenceStatus: option.eligible ? "screening" as const : "needs-evidence" as const,
-                timeToIncome: null,
-              })),
-            ]
-          : [
-              {
-                id: "farm-acreage-required",
-                label: "Agricultural enterprise comparison",
-                noiAnnual: null,
-                basis: "Verified acreage is required before enterprise economics can be modeled.",
-                evidenceStatus: "needs-evidence" as const,
-                timeToIncome: null,
-              },
-            ]
-        : [];
-    const scenarioMatrix = buildScenarioFinancingMatrix({ baseContext: ctx, programs: topProgramPreview, scenarios });
-    const map: Record<
-      string,
-      ProgramFit
-    > = {};
+    const scenarios: PropertyUseScenario[] =
+      laneId === "commercial"
+        ? (useScreen?.uses ?? []).map((use, index) => ({
+            id: "commercial-" + index,
+            label: use.use,
+            noiAnnual: use.noiMid,
+            noiLow: use.noiLow,
+            noiHigh: use.noiHigh,
+            basis:
+              use.use + " at the disclosed square-foot screening assumptions",
+            evidenceStatus:
+              use.financialModelAvailable && use.noiMid != null
+                ? "screening"
+                : "needs-evidence",
+            timeToIncome: use.conversion?.endToEndMonths
+              ? use.conversion.endToEndMonths.low +
+                "–" +
+                use.conversion.endToEndMonths.high +
+                " months"
+              : null,
+          }))
+        : laneId === "farm"
+          ? farmUseScreen
+            ? [
+                {
+                  id: "farm-parcel-portfolio",
+                  label: "Diversified whole-parcel agricultural portfolio",
+                  noiAnnual: farmCoverageReady
+                    ? (farmPortfolio?.modeledNoiAnnual ?? null)
+                    : null,
+                  basis:
+                    farmPortfolio?.basis ??
+                    "Whole-parcel source-backed operating budget pending",
+                  evidenceStatus: farmCoverageReady
+                    ? ("supported" as const)
+                    : ("needs-evidence" as const),
+                  timeToIncome: null,
+                },
+                ...farmUseScreen.ranked.slice(0, 8).map((option, index) => ({
+                  id: "farm-option-" + index,
+                  label: option.label,
+                  noiAnnual: option.eligible ? option.noi : null,
+                  basis: `${option.note} Field allocation, timing and operating economics remain evidence-pending.`,
+                  evidenceStatus: option.eligible
+                    ? ("screening" as const)
+                    : ("needs-evidence" as const),
+                  timeToIncome: null,
+                })),
+              ]
+            : [
+                {
+                  id: "farm-acreage-required",
+                  label: "Agricultural enterprise comparison",
+                  noiAnnual: null,
+                  basis:
+                    "Verified acreage is required before enterprise economics can be modeled.",
+                  evidenceStatus: "needs-evidence" as const,
+                  timeToIncome: null,
+                },
+              ]
+          : [];
+    const scenarioMatrix = buildScenarioFinancingMatrix({
+      baseContext: ctx,
+      programs: topProgramPreview,
+      scenarios,
+    });
+    const map: Record<string, ProgramFit> = {};
     for (const name of topProgramPreview) {
       const fit = evaluateProgramFit(name, ctx);
       if (fit) map[name] = fit;
@@ -4564,6 +4601,25 @@ export function PropertyEvaluationWorkspace({
     ownershipContext,
     topProgramPreview.join("|"),
   ]);
+  const supportedVisionOptions = Array.from(
+    new Set(
+      workspaceProfile.id === "commercial" ||
+        workspaceProfile.id === "hospitality" ||
+        workspaceProfile.id === "mobile-home-park"
+        ? (financingProgramFit.useScreen?.uses ?? [])
+            .filter((use) => use.financialModelAvailable)
+            .map((use) => use.use)
+        : workspaceProfile.id === "farm" || workspaceProfile.id === "land"
+          ? (effectivePlaceIntelligence?.farmBestUse?.options ?? [])
+              .filter(
+                (option) =>
+                  option.tier !== "needs-evidence" &&
+                  option.tier !== "marginal",
+              )
+              .map((option) => option.name)
+          : ["Use the property as currently classified"],
+    ),
+  );
   const preliminaryCapitalPlan = buildPreliminaryCapitalPlan({
     profileId: workspaceProfile.id,
     listedPrice:
@@ -4631,6 +4687,7 @@ export function PropertyEvaluationWorkspace({
     marketPlan: marketComparablePlan,
     capitalPlan: preliminaryCapitalPlan,
     pathwayCount: topProgramRanks.length,
+    customerVision: answers.usePlan.trim() || null,
     taxImpact:
       rankingTax && rankingPrice
         ? {
@@ -4661,6 +4718,7 @@ export function PropertyEvaluationWorkspace({
       marketPlan: marketComparablePlan,
       capitalPlan: preliminaryCapitalPlan,
       pathwayCount: topProgramRanks.length,
+      customerVision: answers.usePlan.trim() || null,
       taxImpact:
         rankingTax && rankingPrice
           ? {
@@ -4705,6 +4763,7 @@ export function PropertyEvaluationWorkspace({
     }
   }, [
     analysisContext.propertyId,
+    answers.usePlan,
     rankingTax?.stabilizedAnnual,
     rankingTax?.adverseAnnual,
     scenarioRankingPlan.status,
@@ -4939,8 +4998,8 @@ export function PropertyEvaluationWorkspace({
       // Legacy payload key; the rate source must match the actual scenario.
       // Do not substitute a residential benchmark when an FSA rate is missing.
       const fsaRatePct = isFarmLaneDoc
-        ? ownershipContext?.fsa?.ownershipDirectPct ?? null
-        : ownershipContext?.rates.rate30 ?? null;
+        ? (ownershipContext?.fsa?.ownershipDirectPct ?? null)
+        : (ownershipContext?.rates.rate30 ?? null);
       const revenueUnits: Array<{
         unitName: string;
         unitDescription: string;
@@ -5072,7 +5131,9 @@ export function PropertyEvaluationWorkspace({
           },
           acreage,
           fsaRatePct,
-          fsaRateAsOf: isFarmLaneDoc ? ownershipContext?.fsa?.effective ?? null : ownershipContext?.rates.weekOf ?? null,
+          fsaRateAsOf: isFarmLaneDoc
+            ? (ownershipContext?.fsa?.effective ?? null)
+            : (ownershipContext?.rates.weekOf ?? null),
           revenueUnits,
           additionalProperties,
           propertyEvidence,
@@ -5294,7 +5355,10 @@ export function PropertyEvaluationWorkspace({
       `}</style>
       {!deepView && (
         <div className="no-print">
-          <CustomerJourneyBar current="understand" financeHref="/provider-compare" />
+          <CustomerJourneyBar
+            current="understand"
+            financeHref="/provider-compare"
+          />
         </div>
       )}
       {/* Ship's Ledger masthead (founder direction 2026-07-20): the report opens
@@ -5437,6 +5501,28 @@ export function PropertyEvaluationWorkspace({
           items were simply not back yet). A report must never look done while
           it is empty. This band says so on screen, and prints as an explicit
           INCOMPLETE stamp so a premature copy can never pass as the real one. */}
+      {!deepView && !factsLoading && (
+        <>
+          <PropertyDecisionRankingPanel plan={scenarioRankingPlan} />
+          <PropertyReportOfferPanel
+            plan={scenarioRankingPlan}
+            exactAddress={
+              facts?.propertyRecord?.exactAddress ??
+              analysisContext.exactAddress
+            }
+            propertyId={analysisContext.propertyId}
+            priceKnown={preliminaryCapitalPlan.priceKnown}
+            customerVisionSelected={Boolean(answers.usePlan.trim())}
+            activeTransaction={Boolean(
+              answers.timing.trim() || answers.requestedAmount.trim(),
+            )}
+            materialEvidenceGapCount={
+              effectivePlaceIntelligence?.unknowns.length ?? 0
+            }
+            professionalEvidenceRequired={false}
+          />
+        </>
+      )}
       {!deepView && factsLoading && (
         <div
           data-facts-loading="true"
@@ -5639,7 +5725,9 @@ export function PropertyEvaluationWorkspace({
           Each lane owns its tabs/questions/panels; GovernedLaneChassis keeps the
           compliance substrate single-source. The type-correction picker above
           remounts the lane while all entered state stays in this parent. */}
-      {!deepView && propertyClassificationAvailable && (() => {
+      {!deepView &&
+        propertyClassificationAvailable &&
+        (() => {
           const LaneWorkspace =
             workspaceProfile.id === "farm" || workspaceProfile.id === "land"
               ? FarmLaneWorkspace
@@ -6009,16 +6097,25 @@ export function PropertyEvaluationWorkspace({
                       </label>
                       <label style={fieldBlock}>
                         <span style={fieldLabel}>
-                          Likely use for this property
+                          What do you see as your vision for this property?
                         </span>
-                        <input
-                          value={answers.possibility}
-                          onChange={(event) =>
-                            updateAnswer("possibility", event.target.value)
-                          }
-                          placeholder="Ex: boutique inn, farm stay, mixed-use rural business"
+                        <select
+                          value={answers.usePlan}
+                          onChange={(event) => {
+                            updateAnswer("usePlan", event.target.value);
+                            updateAnswer("possibility", event.target.value);
+                          }}
                           style={inputStyle}
-                        />
+                        >
+                          <option value="">
+                            No preference — show me what performs best
+                          </option>
+                          {supportedVisionOptions.map((option) => (
+                            <option key={option} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
                         <span
                           style={{
                             fontSize: 12,
@@ -6026,9 +6123,22 @@ export function PropertyEvaluationWorkspace({
                             lineHeight: 1.5,
                           }}
                         >
-                          One short use hypothesis is enough to materially
-                          improve the first-pass analysis.
+                          These choices come from this property&apos;s
+                          preliminary supportability screen. Furlong still
+                          calculates the best single enterprise and mixed-use
+                          configuration independently.
                         </span>
+                        <Link
+                          href="/explore"
+                          style={{
+                            fontSize: 12,
+                            fontWeight: 750,
+                            color: "#0f766e",
+                          }}
+                        >
+                          Have a different idea? Request a Custom Concept
+                          Review.
+                        </Link>
                       </label>
                       <label style={fieldBlock}>
                         <span style={fieldLabel}>Likely capital need</span>
@@ -6146,33 +6256,57 @@ export function PropertyEvaluationWorkspace({
                             })}
                           </div>
                         </div>
+                        <div style={fieldBlock}>
+                          <span style={fieldLabel}>
+                            1. Property-supported possibilities
+                          </span>
+                          <span
+                            style={{
+                              fontSize: 12.5,
+                              color: "#5d687a",
+                              lineHeight: 1.55,
+                            }}
+                          >
+                            Furlong generates the candidate set from the
+                            building, parcel, physical constraints,
+                            permitted-use evidence, market support, and
+                            operating economics. Unsupported free-form concepts
+                            do not enter the standard ranking.
+                          </span>
+                        </div>
                         <label style={fieldBlock}>
                           <span style={fieldLabel}>
-                            1. What are your possibilities for this property?
+                            2. Which supported property vision should Furlong
+                            test?
                           </span>
-                          <textarea
-                            value={answers.possibility}
-                            onChange={(event) =>
-                              updateAnswer("possibility", event.target.value)
-                            }
-                            placeholder="Ex: boutique inn, event venue, mixed-use rural business, working farm, workforce housing..."
-                            style={textareaStyle}
-                            rows={3}
-                          />
-                        </label>
-                        <label style={fieldBlock}>
-                          <span style={fieldLabel}>
-                            2. How would this actually be used or operated?
-                          </span>
-                          <textarea
+                          <select
                             value={answers.usePlan}
-                            onChange={(event) =>
-                              updateAnswer("usePlan", event.target.value)
-                            }
-                            placeholder="Describe occupancy, operations, customer use, production, staffing, or who would run it."
-                            style={textareaStyle}
-                            rows={3}
-                          />
+                            onChange={(event) => {
+                              updateAnswer("usePlan", event.target.value);
+                              updateAnswer("possibility", event.target.value);
+                            }}
+                            style={inputStyle}
+                          >
+                            <option value="">
+                              No preference — show me what performs best
+                            </option>
+                            {supportedVisionOptions.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </select>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              color: "#7a8aa0",
+                              lineHeight: 1.5,
+                            }}
+                          >
+                            Unlisted ideas are evaluated through a separately
+                            scoped Custom Concept Review before entering the
+                            property ranking.
+                          </span>
                         </label>
                         <label style={fieldBlock}>
                           <span style={fieldLabel}>
@@ -6341,10 +6475,11 @@ export function PropertyEvaluationWorkspace({
                         lineHeight: 1.55,
                       }}
                     >
-                      This orders plausible programs from current property facts only.
-                      It is not a closing-path ranking or approval. The Finance tab
-                      stays unranked until transaction price, supported operating
-                      economics, use, and proposed loan terms support a comparison.
+                      This orders plausible programs from current property facts
+                      only. It is not a closing-path ranking or approval. The
+                      Finance tab stays unranked until transaction price,
+                      supported operating economics, use, and proposed loan
+                      terms support a comparison.
                     </span>
                   </div>
                   {selectedTierUnlocked ? (
@@ -6639,7 +6774,9 @@ export function PropertyEvaluationWorkspace({
                             FEMA flood posture
                           </strong>
                           <span style={{ fontSize: 12.5, color: "#3b475a" }}>
-                            {isSpecialFloodHazardZone(facts.placeFacts.flood.floodZone)
+                            {isSpecialFloodHazardZone(
+                              facts.placeFacts.flood.floodZone,
+                            )
                               ? `Zone ${facts.placeFacts.flood.floodZone} — inside the mapped Special Flood Hazard Area.`
                               : `Zone ${facts.placeFacts.flood.floodZone} — outside the mapped Special Flood Hazard Area; low mapped risk is not no flood risk.`}
                           </span>

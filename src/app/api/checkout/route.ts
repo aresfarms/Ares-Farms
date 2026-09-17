@@ -114,6 +114,25 @@ function billingEventResponse(
 export async function POST(req: Request) {
   const traceId = createCheckoutTraceId();
 
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "This legacy client-priced checkout is disabled. Use the server-priced public or institutional checkout route.",
+        governance: {
+          traceId,
+          route: "/api/checkout",
+          disabledReason: "client-supplied-price",
+        },
+      },
+      {
+        status: 410,
+        headers: { "Cache-Control": "private, no-store" },
+      },
+    );
+  }
+
   try {
     const body = (await req.json()) as CheckoutRequest;
     const productName = normalizeText(body.productName);

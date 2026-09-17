@@ -159,6 +159,10 @@ steps:
         npm run verify:water-insurance-evidence
         npm run verify:unified-property-risk
         npm run verify:tax-aware-top-three
+        npm run verify:property-comparison-ranking
+        npm run verify:economic-evidence-package
+        npm run verify:public-order-billing
+        npm run verify:public-report-commerce
         npm run verify:post-sale-tax
         npm run verify:property-entry-parity
 

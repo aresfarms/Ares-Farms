@@ -681,6 +681,75 @@ variable "stripe_webhook_enabled" {
   default     = false
 }
 
+variable "public_property_report_sales_enabled" {
+  description = "Explicit kill switch for the automated public Property Report. Keep false until price evidence and every payment, artifact, refund, dispute, and delivery acceptance test passes."
+  type        = bool
+  default     = false
+}
+
+variable "public_property_report_artifact_delivery_enabled" {
+  description = "Attests that immutable, version-frozen automated Property Report generation and delivery have passed acceptance. False keeps automated checkout closed."
+  type        = bool
+  default     = false
+}
+
+variable "public_property_report_max_open_orders" {
+  description = "Maximum automated Property Report orders reserved or pending at once. Zero keeps automated checkout closed."
+  type        = number
+  default     = 0
+  validation {
+    condition = (
+      var.public_property_report_max_open_orders == 0 ||
+      (
+        floor(var.public_property_report_max_open_orders) == var.public_property_report_max_open_orders &&
+        var.public_property_report_max_open_orders >= 1 &&
+        var.public_property_report_max_open_orders <= 100
+      )
+    )
+    error_message = "public_property_report_max_open_orders must be 0 (closed) or an integer from 1 through 100."
+  }
+}
+
+variable "public_decision_report_sales_enabled" {
+  description = "Explicit kill switch for the supervised public Property Decision Report. Keep false until price evidence and every payment, refund, dispute, fulfillment, and delivery acceptance test passes."
+  type        = bool
+  default     = false
+}
+
+variable "public_decision_report_delivery_business_days" {
+  description = "Publicly displayed Property Decision Report delivery target measured from signed payment confirmation. Zero keeps supervised checkout closed."
+  type        = number
+  default     = 0
+  validation {
+    condition = (
+      var.public_decision_report_delivery_business_days == 0 ||
+      (
+        floor(var.public_decision_report_delivery_business_days) == var.public_decision_report_delivery_business_days &&
+        var.public_decision_report_delivery_business_days >= 1 &&
+        var.public_decision_report_delivery_business_days <= 30
+      )
+    )
+    error_message = "public_decision_report_delivery_business_days must be 0 (closed) or an integer from 1 through 30."
+  }
+}
+
+variable "public_decision_report_max_open_orders" {
+  description = "Maximum supervised Property Decision Report orders reserved or in progress at once. Zero keeps supervised checkout closed."
+  type        = number
+  default     = 0
+  validation {
+    condition = (
+      var.public_decision_report_max_open_orders == 0 ||
+      (
+        floor(var.public_decision_report_max_open_orders) == var.public_decision_report_max_open_orders &&
+        var.public_decision_report_max_open_orders >= 1 &&
+        var.public_decision_report_max_open_orders <= 100
+      )
+    )
+    error_message = "public_decision_report_max_open_orders must be 0 (closed) or an integer from 1 through 100."
+  }
+}
+
 variable "tier_preview_mode" {
   description = "FURLONG_TIER_PREVIEW_MODE for the core service. Empty (default) leaves the env unset — the app previews paid tiers, correct for staging/testing. Set to \"off\" at LAUNCH FREEZE so paid tiers stop previewing (see docs/LAUNCH_HYGIENE_CHECKLIST.md)."
   type        = string

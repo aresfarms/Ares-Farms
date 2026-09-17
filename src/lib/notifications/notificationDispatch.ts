@@ -25,6 +25,7 @@ import { emailConfigured, sendEmail } from "@/lib/notifications/emailProvider";
 
 const RECIPIENT_ENV_BY_SPOKE: Record<string, string> = {
   "environmental-engineering-spoke": "NOTIFY_PE_EMAIL",
+  "professional-services-scope-desk": "NOTIFY_PE_EMAIL",
   "furlong-capital-desk": "NOTIFY_CAPITAL_DESK_EMAIL",
   // Retained only for legacy/external-broker assignments.
   "licensed-lending-spoke": "NOTIFY_LENDER_EMAIL",
@@ -37,13 +38,15 @@ function recipientFor(routedTo: string): string | null {
 }
 
 function portalUrl(): string {
-  const base =
-    process.env.APP_BASE_URL ?? process.env.NEXTAUTH_URL ?? "";
-  return base ? `${base.replace(/\/$/, "")}/portal/fulfillment` : "/portal/fulfillment";
+  const base = process.env.APP_BASE_URL ?? process.env.NEXTAUTH_URL ?? "";
+  return base
+    ? `${base.replace(/\/$/, "")}/portal/fulfillment`
+    : "/portal/fulfillment";
 }
 
 const LABEL_BY_TYPE: Record<string, string> = {
   environmental_report_order: "environmental service order",
+  professional_services_scope_request: "professional-services scope request",
   financing_deal_intake: "financing deal",
 };
 
@@ -65,7 +68,7 @@ export type NotifyResult = {
  * to call from any governed intake route — it returns a result and never throws.
  */
 export async function notifyOnServiceRequest(
-  input: NotifyOnServiceRequestInput
+  input: NotifyOnServiceRequestInput,
 ): Promise<NotifyResult> {
   const label = LABEL_BY_TYPE[input.requestType] ?? "request";
   const recipient = recipientFor(input.routedTo);

@@ -5,16 +5,11 @@
  * make a customer want to come back for the paid ones).
  *
  * Design intent:
- *   free          — clean, generous, trustworthy. Navy/teal. The document a
- *                   customer keeps AND shares. Ends with an honest preview of
- *                   optional institution-formatted, professional, and archival
- *                   services. Core financing analysis is not withheld.
- *   paid          — internal legacy tier id for the "Institutional Coordination
- *                   Report": gold-on-navy, double-ruled, denser sections. The
- *                   id does not authorize a borrower financing-access paywall;
- *                   the artifact may be institution-funded or separately scoped.
- *   environmental — the "Environmental Documentation Readiness" review: field
- *                   green, checklist cadence, engineering-report tone.
+ *   free          — the useful Furlong Property Snapshot.
+ *   paid          — legacy internal id for the automated Furlong Property Report.
+ *   environmental — legacy internal id for the human-reviewed Furlong Property
+ *                   Decision Report. Environmental review remains one section,
+ *                   not a separate public report tier.
  *
  * This module is the SINGLE source of tier look/feel for the PDF generator,
  * the HTML export, and the on-screen preview — the three must never drift.
@@ -40,11 +35,7 @@ export interface ReportTierIdentity {
   ruleStyle: "single" | "double" | "thick";
   /** Closing footer line — tier-specific voice. */
   footerLine: string;
-  /**
-   * OPEN PROFILE ONLY: the honest next-layer preview. No financing information
-   * is intentionally withheld; items describe optional professional review,
-   * source-document curation, or archival/institutional formatting.
-   */
+  /** OPEN SNAPSHOT ONLY: the exact next-layer preview. */
   nextTierTeaser: {
     heading: string;
     intro: string;
@@ -56,76 +47,66 @@ export interface ReportTierIdentity {
 const IDENTITIES: Record<ReportTierId, ReportTierIdentity> = {
   free: {
     id: "free",
-    displayName: "Furlong Property Profile",
-    tagline: "The facts of this place — sourced, dated, and honest about what isn't known yet.",
-    coverBadge: "FURLONG COMPLIMENTARY PROPERTY PROFILE",
+    displayName: "Furlong Property Snapshot",
+    tagline:
+      "The useful first screen — sourced, dated, and honest about what is not known yet.",
+    coverBadge: "FURLONG FREE PROPERTY SNAPSHOT",
     accent: "#0f766e",
     accentSoft: "#e8f4f2",
     ink: "#162033",
     ruleStyle: "single",
     footerLine:
-      "This Place Brief is free, and always will be. It is the beginning of the file — not the end of it.",
+      "This snapshot is free. Known hazards, uncertainty, and material missing evidence are never hidden behind payment.",
     nextTierTeaser: {
-      heading: "Where the file goes next",
+      heading: "Choose only the next answer you need",
       intro:
-        "This brief established the place facts. Two deeper reviews build on it when you are ready — " +
-        "each picks up exactly where this document stops:",
+        "The snapshot established the first property facts. Furlong offers two paid report levels — no overlapping middle tier:",
       items: [
         {
-          name: "Institutional Coordination Report",
-          adds:
-            "A frozen, source-indexed institutional artifact assembled from the same customer-free " +
-            "financing-readiness case: certified source copies when available, document normalization, " +
-            "case chronology, consent manifest, and institution-formatted packaging. The analysis and " +
-            "provider comparison are not withheld from the borrower.",
+          name: "Furlong Property Report — proposed $49 one-time price",
+          adds: "An immediate, version-frozen automated report with preliminary use, economics, financing, sources, assumptions, confidence, and missing evidence.",
         },
         {
-          name: "Environmental Documentation Readiness Review",
-          adds:
-            "The site-side review this property has not had yet: water/well/septic screening " +
-            "framework, environmental red-flag desk review, documentation checklist mapped to what " +
-            "agencies and lenders actually request, and a pathway to professional-engineer review.",
+          name: "Furlong Property Decision Report — proposed $249 base-scope price",
+          adds: "Human review, ranked scenarios, acquisition and offer boundaries, sensitivities, long-range projections, and an explicit proceed, renegotiate, investigate, or walk-away verdict.",
         },
       ],
       closing:
-        "Both reviews stay anchored to this property and this county — nothing generic, nothing " +
-        "resold. The customer-free core is a founding commitment, not a promotion: property facts, " +
-        "decision reasons, financing readiness, verified-provider comparison, and the authorized " +
-        "case-room handoff remain available without a borrower financing fee. Optional professional " +
-        "engagements and archival artifacts may be separately scoped; institutions may fund their " +
-        "own packaging/integration access. Furlong never earns based on the loan outcome.",
+        "The portal recommends the smallest sufficient level and may say not to buy. Known hazards and uncertainty stay visible for free. Professional field, laboratory, environmental, and engineering work is separately scoped. Furlong never earns based on a loan outcome.",
     },
   },
   paid: {
     id: "paid",
-    displayName: "Institutional Coordination Report",
-    tagline: "The property file, packaged the way an institution expects to receive it.",
-    coverBadge: "INSTITUTIONAL COORDINATION",
+    displayName: "Furlong Property Report",
+    tagline:
+      "The automated property and enterprise screen — complete, sourced, and frozen at delivery.",
+    coverBadge: "FURLONG PROPERTY REPORT",
     accent: "#9c6b1b",
     accentSoft: "#faf3e6",
     ink: "#12233d",
     ruleStyle: "double",
     footerLine:
-      "Prepared for institutional coordination — advisory analysis; human review remains required " +
-      "before any decision-grade use.",
+      "Automated advisory analysis — not an appraisal, professional report, borrower underwriting, or guaranteed outcome.",
     nextTierTeaser: null,
   },
   environmental: {
     id: "environmental",
-    displayName: "Environmental Documentation Readiness Review",
-    tagline: "Site-side reality, documented before it becomes a surprise.",
-    coverBadge: "ENVIRONMENTAL READINESS",
+    displayName: "Furlong Property Decision Report",
+    tagline:
+      "The reviewed acquisition decision — what works, at what boundary, and what must happen next.",
+    coverBadge: "HUMAN-REVIEWED DECISION REPORT",
     accent: "#2f6b3a",
     accentSoft: "#ecf4ed",
     ink: "#1a2b1e",
     ruleStyle: "thick",
     footerLine:
-      "Prepared under Furlong's environmental documentation framework — advisory desk review; " +
-      "professional-engineer review is a separate, explicit engagement.",
+      "Human-reviewed advisory analysis — professional field services, official determinations, lender approval, and stamped plans remain separate engagements.",
     nextTierTeaser: null,
   },
 };
 
 export function reportTierIdentity(tierId: string): ReportTierIdentity {
-  return IDENTITIES[(tierId as ReportTierId) in IDENTITIES ? (tierId as ReportTierId) : "free"];
+  return IDENTITIES[
+    (tierId as ReportTierId) in IDENTITIES ? (tierId as ReportTierId) : "free"
+  ];
 }

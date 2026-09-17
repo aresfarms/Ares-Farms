@@ -7,6 +7,7 @@ import { headers } from "next/headers";
 import Stripe from "stripe";
 
 import { persistBillingEvent } from "@/lib/billing/billingEventStore";
+import { processPublicOrderStripeWebhook } from "@/lib/billing/publicOrderStripeWebhook";
 import {
   recordGovernedPayment,
   recordModuleRevenueAttribution,
@@ -123,7 +124,9 @@ function getMetadataValue(
   return null;
 }
 
-function mapPlanToEntitlementPlan(plan: string | null): EntitlementPlan {
+function mapPlanToEntitlementPlan(
+  plan: string | null,
+): EntitlementPlan | null {
   if (plan === "free") {
     return "free";
   }
@@ -136,10 +139,12 @@ function mapPlanToEntitlementPlan(plan: string | null): EntitlementPlan {
     return "pro";
   }
 
-  return "pro";
+  return null;
 }
 
-function mapPlanToPermissions(plan: string | null): EntitlementType[] {
+function mapPlanToPermissions(
+  plan: string | null,
+): EntitlementType[] | null {
   if (plan === "environmental") {
     return ["paid", "environmental"];
   }
@@ -152,7 +157,7 @@ function mapPlanToPermissions(plan: string | null): EntitlementType[] {
     return ["free"];
   }
 
-  return ["paid", "environmental"];
+  return null;
 }
 
 function billingEventResponse(
@@ -525,11 +530,84 @@ export async function POST(req: Request) {
       });
     }
 
+    const publicOrderWebhook = await processPublicOrderStripeWebhook({
+      stripeEvent,
+      rawBody: bodyText,
+      traceId,
+    });
+    if (publicOrderWebhook.handled) {
+      const orderId = publicOrderWebhook.order?.id ?? null;
+      const orphaned =
+        "orphaned" in publicOrderWebhook &&
+        publicOrderWebhook.orphaned === true;
+      const observability = createObservabilityEvent({
+        eventType: orphaned
+          ? "PUBLIC_ORDER_WEBHOOK_ORPHANED"
+          : "PUBLIC_ORDER_WEBHOOK_APPLIED",
+        domain: "connector",
+        severity:
+          orphaned ||
+          publicOrderWebhook.decision.action === "REJECT_HOLD"
+            ? "WARN"
+            : "INFO",
+        message: orphaned
+          ? "A declared public-order Stripe event did not match an order."
+          : "A signed Stripe event was applied to a public order.",
+        traceId,
+        replayRef: traceId,
+        actorId: null,
+        module: "api.stripe.webhook",
+        metadata: {
+          stripeEventId: stripeEvent.id,
+          stripeEventType: stripeEvent.type,
+          orderId,
+          duplicate: publicOrderWebhook.duplicate,
+          action: publicOrderWebhook.decision.action,
+          reasons: publicOrderWebhook.decision.reasons,
+        },
+      });
+      const evidence = await persistGovernanceEvidence({
+        traceId,
+        replayRef: traceId,
+        versionRuntime,
+        observability,
+        metadata: {
+          route: "/api/stripe/webhook",
+          domain: "public-order",
+          stripeEventId: stripeEvent.id,
+          orderId,
+          duplicate: publicOrderWebhook.duplicate,
+          action: publicOrderWebhook.decision.action,
+        },
+      });
+      return NextResponse.json({
+        ok: !orphaned,
+        handled: "public-order",
+        order: publicOrderWebhook.order
+          ? {
+              id: publicOrderWebhook.order.id,
+              status: publicOrderWebhook.order.status,
+              productCode: publicOrderWebhook.order.productCode,
+              targetType: publicOrderWebhook.order.targetType,
+            }
+          : null,
+        duplicate: publicOrderWebhook.duplicate,
+        transition: {
+          action: publicOrderWebhook.decision.action,
+          eventStatus: publicOrderWebhook.decision.eventStatus,
+          reasons: publicOrderWebhook.decision.reasons,
+          accessGranted: publicOrderWebhook.decision.grantAccess,
+          accessRevoked: publicOrderWebhook.decision.revokeAccess,
+        },
+        governance: { traceId, versionRuntime, observability, evidence },
+      }, { status: orphaned ? 409 : 200 });
+    }
+
     const metadata = event.data?.object?.metadata;
     const syntheticFixtureContext = syntheticFixtureContextFromProviderMetadata(
       isRecord(metadata) ? metadata : null,
     );
-    const tenantId = getMetadataValue(metadata, "tenantId") ?? "dev";
+    const tenantId = getMetadataValue(metadata, "tenantId");
     const requestedPlan = getMetadataValue(metadata, "plan");
     const sessionId =
       getMetadataValue(metadata, "sessionId") ??
@@ -656,11 +734,22 @@ export async function POST(req: Request) {
       consentRequirements: ["borrower-payment-consent"],
     });
 
-    if (event.type === "checkout.session.completed") {
+    const entitlementPlan = mapPlanToEntitlementPlan(requestedPlan);
+    const entitlementPermissions = mapPlanToPermissions(requestedPlan);
+    const entitlementGrantEligible =
+      event.type === "charge.succeeded" &&
+      fraudDecision?.releaseAllowed === true &&
+      Boolean(tenantId && entitlementPlan && entitlementPermissions);
+    if (
+      entitlementGrantEligible &&
+      tenantId &&
+      entitlementPlan &&
+      entitlementPermissions
+    ) {
       entitlement = await grantEntitlement(
         tenantId,
-        mapPlanToEntitlementPlan(requestedPlan),
-        mapPlanToPermissions(requestedPlan),
+        entitlementPlan,
+        entitlementPermissions,
         {
           traceId,
           replayRef: traceId,
@@ -670,11 +759,14 @@ export async function POST(req: Request) {
           metadata: {
             requestedPlan,
             eventType: event.type,
+            paymentRiskReleased: true,
             stubSignatureVerification: false,
           },
         },
       );
+    }
 
+    if (event.type === "checkout.session.completed") {
       const checkoutSession = stripeEvent.data
         .object as Stripe.Checkout.Session;
       const revenueClass = normalizeRevenueClass(
@@ -917,7 +1009,7 @@ export async function POST(req: Request) {
         },
         {
           resourceType: "stripe_webhook_output",
-          resourceId: entitlement?.id ?? tenantId,
+          resourceId: entitlement?.id ?? tenantId ?? "unattributed-stripe-event",
           classification: classifiedResult.classification,
           traceId,
           replayRef: traceId,
@@ -932,7 +1024,7 @@ export async function POST(req: Request) {
         traceId,
         replayRef: traceId,
         targetType: "stripe_webhook",
-        targetId: entitlement?.id ?? tenantId,
+        targetId: entitlement?.id ?? tenantId ?? "unattributed-stripe-event",
         verificationStatus: versionRuntime.ok
           ? "cryptographically_verified"
           : "warning",

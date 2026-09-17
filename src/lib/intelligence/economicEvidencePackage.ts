@@ -11,7 +11,7 @@ import {
   type EconomicEvidenceStatus,
 } from "@/lib/intelligence/propertyComparisonRanking";
 import type { ScenarioCandidateRole } from "@/lib/intelligence/scenarioRankingPlan";
-import type { SourceAuthorityTier } from "@/lib/source-stack/sourceStackRuntime";
+import type { SourceAuthorityTier } from "@/lib/platform/authorities/source";
 
 /**
  * Governed economic-evidence package for a property-specific enterprise.

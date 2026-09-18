@@ -6,7 +6,7 @@
 # its runtime libraries, configuration, definitions, and the HTTP shim into a
 # digest-pinned Chainguard Python runtime with continuously remediated packages.
 
-FROM clamav/clamav-debian:1.4.5 AS clamav-builder
+FROM clamav/clamav-debian:1.5.4 AS clamav-builder
 
 USER root
 

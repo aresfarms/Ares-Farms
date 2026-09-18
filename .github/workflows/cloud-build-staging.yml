@@ -1,29 +1,56 @@
-name: Keyless staging image build
+name: Pinned-source keyless staging image build
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: "Exact 40-character source commit SHA to build"
+        required: true
+        type: string
 
-# Vol III / III-B / TECH-SEC-001:
-# GitHub OIDC is exchanged for a short-lived Google credential. No stored
-# Google service-account key or GitHub cloud credential is used.
 permissions:
   contents: read
   id-token: write
 
 concurrency:
-  group: keyless-staging-build
+  group: pinned-source-keyless-staging-build
   cancel-in-progress: false
 
 jobs:
   submit:
-    name: Submit governed Cloud Build
+    name: Submit pinned governed Cloud Build
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 60
 
     steps:
-      - name: Checkout exact protected-main commit
+      - name: Validate requested source SHA
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "source_sha must be an exact lowercase 40-character Git commit SHA" >&2
+            exit 1
+          }
+
+      - name: Checkout exact pinned source commit
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 1
+
+      - name: Verify checkout provenance
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          test -f cloudbuild.yaml
+          git diff --exit-code
+          git diff --cached --exit-code
 
       - name: Exchange GitHub OIDC for short-lived Google identity
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
@@ -34,20 +61,19 @@ jobs:
       - name: Set up Google Cloud CLI
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
 
-      - name: Submit source with commit provenance
+      - name: Submit source with immutable provenance
         id: build
         shell: bash
+        env:
+          SOURCE_SHA: ${{ inputs.source_sha }}
         run: |
           set -euo pipefail
-          build_id="$(gcloud builds submit . \
-            --project=furlong-staging-499102 \
-            --config=cloudbuild.yaml \
-            --async \
-            --substitutions=_GIT_COMMIT="${GITHUB_SHA}",_GIT_REF="${GITHUB_REF_NAME}" \
-            --format='value(id)')"
-          test -n "${build_id}"
-          echo "build_id=${build_id}" >> "${GITHUB_OUTPUT}"
-          echo "Cloud Build ${build_id} submitted for ${GITHUB_SHA}." >> "${GITHUB_STEP_SUMMARY}"
+          image_tag="report-${SOURCE_SHA:0:12}"
+          build_id="$(gcloud builds submit .             --project=furlong-staging-499102             --config=cloudbuild.yaml             --async             --substitutions=_GIT_COMMIT="$SOURCE_SHA",_GIT_REF="pinned-$SOURCE_SHA",_IMAGE_TAG="$image_tag"             --format='value(id)')"
+          test -n "$build_id"
+          echo "build_id=$build_id" >> "$GITHUB_OUTPUT"
+          echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+          echo "Cloud Build $build_id submitted for $SOURCE_SHA." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Wait for governed build result
         shell: bash
@@ -56,20 +82,22 @@ jobs:
         run: |
           set -euo pipefail
           for attempt in $(seq 1 180); do
-            status="$(gcloud builds describe "${BUILD_ID}" \
-              --project=furlong-staging-499102 \
-              --format='value(status)')"
-            case "${status}" in
-              SUCCESS)
-                echo "Cloud Build ${BUILD_ID} succeeded." >> "${GITHUB_STEP_SUMMARY}"
-                exit 0
-                ;;
-              FAILURE|INTERNAL_ERROR|TIMEOUT|CANCELLED|EXPIRED)
-                echo "Cloud Build ${BUILD_ID} ended with ${status}." >> "${GITHUB_STEP_SUMMARY}"
-                exit 1
-                ;;
+            status="$(gcloud builds describe "$BUILD_ID"               --project=furlong-staging-499102               --format='value(status)')"
+            case "$status" in
+              SUCCESS) exit 0 ;;
+              FAILURE|INTERNAL_ERROR|TIMEOUT|CANCELLED|EXPIRED) exit 1 ;;
             esac
             sleep 15
           done
-          echo "Cloud Build ${BUILD_ID} did not finish within the workflow window." >> "${GITHUB_STEP_SUMMARY}"
           exit 1
+
+      - name: Record immutable core digest
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ steps.build.outputs.image_tag }}
+        run: |
+          set -euo pipefail
+          image="us-central1-docker.pkg.dev/furlong-staging-499102/furlong/furlong-core:$IMAGE_TAG"
+          digest="$(gcloud artifacts docker images describe "$image"             --project=furlong-staging-499102             --format='value(image_summary.digest)')"
+          test -n "$digest"
+          echo "Core image digest: $digest" >> "$GITHUB_STEP_SUMMARY"
